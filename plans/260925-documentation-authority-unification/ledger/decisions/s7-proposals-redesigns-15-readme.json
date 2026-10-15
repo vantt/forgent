@@ -24,7 +24,7 @@
       "targetAnchor": "architect-level-proposals",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
       "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep the map collection-index as a candidate snapshot. Its active list is historical source wording and will not describe the final live/history split; navigation owner owes reviewed update, no silent rewrite now. Evidence: Source Active Proposals and Handoff Prompts lists six entries, with five active proposal links; the snapshot lists 6 of the directory’s 14 entries, all six carried in full. The map explicitly assigns collection-index; no semantic required-root consumer was found (README.md basename matches are unrelated). Complete source heading docs/architect/proposals/README.md#architect-level-proposals (lines 1–1) is carried at docs/platform/proposals/README.md#architect-level-proposals (lines 1–1); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by native retained identity. Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
       "priorReview": {
@@ -46,9 +46,14 @@
         "targetAncestry": [],
         "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
       },
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: full section diff read both ways; candidate metadata block, Added in candidate label and Source relationship line inserted after the H1 (Provenance blob and commit verified against git, source link resolves); nothing in source dropped, nothing unlabelled added; anchors pass; rationale difference sentence is true",
       "targetUnitDigest": "03330e9b08cb144dc36c76550e849444c3e07f5a13ec984602cf4268698e6fc6",
-      "targetAncestry": []
+      "targetAncestry": [],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c02-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_25b51a36a5abf6a4190291ac4da1f037",
@@ -184,8 +189,8 @@
       "claimKind": "architecture",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep the map collection-index as a candidate snapshot. Its active list is historical source wording and will not describe the final live/history split; navigation owner owes reviewed update, no silent rewrite now. Evidence: Source Active Proposals and Handoff Prompts lists six entries, with five active proposal links; the snapshot lists 6 of the directory’s 14 entries, all six carried in full. The map explicitly assigns collection-index; no semantic required-root consumer was found (README.md basename matches are unrelated). Complete source heading docs/architect/proposals/README.md#active-proposals (lines 16–16) is carried at docs/platform/proposals/README.md#active-proposals (lines 40–40); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "rationale": "Weak-exact: current source and target unit digests are equal; placement ancestry is disclosed.; mandatory A36 deep read. place verbatim: Keep the map collection-index as a candidate snapshot. Its active list is historical source wording and will not describe the final live/history split; navigation owner owes reviewed update, no silent rewrite now. Evidence: Source Active Proposals and Handoff Prompts lists six entries, with five active proposal links; the snapshot lists 6 of the directory’s 14 entries, all six carried in full. The map explicitly assigns collection-index; no semantic required-root consumer was found (README.md basename matches are unrelated). Complete source heading docs/architect/proposals/README.md#active-proposals (lines 16–16) is carried at docs/platform/proposals/README.md#active-proposals (lines 40–40); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
       "priorReview": {
         "claimId": "claim_69cd8997c627f22f069222676cc25e4d",
         "sourceUnitDigest": "35d38e36aa9ae5117a3aba40a90d734ccb07badb2f8c4c7e19984e6f6c0b1b93",
@@ -207,7 +212,7 @@
         ],
         "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
       },
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
       "targetUnitDigest": "35d38e36aa9ae5117a3aba40a90d734ccb07badb2f8c4c7e19984e6f6c0b1b93",
       "targetAncestry": [
         "Architect-Level Proposals"
@@ -221,8 +226,8 @@
       "claimKind": "architecture",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep the map collection-index as a candidate snapshot. Its active list is historical source wording and will not describe the final live/history split; navigation owner owes reviewed update, no silent rewrite now. Evidence: Source Active Proposals and Handoff Prompts lists six entries, with five active proposal links; the snapshot lists 6 of the directory’s 14 entries, all six carried in full. The map explicitly assigns collection-index; no semantic required-root consumer was found (README.md basename matches are unrelated). Complete source unheaded-block docs/architect/proposals/README.md#unheaded-block-4 (lines 18–28) is carried at docs/platform/proposals/README.md#unheaded-block-7 (lines 42–52); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "rationale": "Weak-exact: current source and target unit digests are equal; placement ancestry is disclosed.; mandatory A36 deep read. place verbatim: Keep the map collection-index as a candidate snapshot. Its active list is historical source wording and will not describe the final live/history split; navigation owner owes reviewed update, no silent rewrite now. Evidence: Source Active Proposals and Handoff Prompts lists six entries, with five active proposal links; the snapshot lists 6 of the directory’s 14 entries, all six carried in full. The map explicitly assigns collection-index; no semantic required-root consumer was found (README.md basename matches are unrelated). Complete source unheaded-block docs/architect/proposals/README.md#unheaded-block-4 (lines 18–28) is carried at docs/platform/proposals/README.md#unheaded-block-7 (lines 42–52); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
       "priorReview": {
         "claimId": "claim_76cd5a79f79a23ddf7bf30b53312aadf",
         "sourceUnitDigest": "949cee59831d5ac67c174f297bcdcc5837dca9532809923571987f7cb12a42b0",
@@ -245,7 +250,7 @@
         ],
         "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
       },
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
       "targetUnitDigest": "949cee59831d5ac67c174f297bcdcc5837dca9532809923571987f7cb12a42b0",
       "targetAncestry": [
         "Architect-Level Proposals",
@@ -259,7 +264,7 @@
       "targetAnchor": "handoff-prompts",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
       "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep the map collection-index as a candidate snapshot. Its active list is historical source wording and will not describe the final live/history split; navigation owner owes reviewed update, no silent rewrite now. Evidence: Source Active Proposals and Handoff Prompts lists six entries, with five active proposal links; the snapshot lists 6 of the directory’s 14 entries, all six carried in full. The map explicitly assigns collection-index; no semantic required-root consumer was found (README.md basename matches are unrelated). Complete source heading docs/architect/proposals/README.md#handoff-prompts (lines 30–30) is carried at docs/platform/proposals/README.md#handoff-prompts (lines 54–54); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
       "priorReview": {
@@ -283,11 +288,16 @@
         ],
         "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
       },
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: full section diff read both ways; 1 link destination(s) repointed (e.g. step-09-step-10-replan-handoff-prompt.md -> agent-coordination/history/proposals-redesigns/step-09-step-10-replan-), all resolve at HEAD and appear in the Step 10 link records; nothing in source dropped, nothing unlabelled added; anchors pass; rationale difference sentence is true",
       "targetUnitDigest": "d71e6387389dabff7f8a44f44a7b6b9e95cdb9f7439319a474da301f581e60ec",
       "targetAncestry": [
         "Architect-Level Proposals"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c02-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_f8e206eea9c8d807bb63e249dbc858f4",
@@ -296,7 +306,7 @@
       "targetAnchor": "unheaded-block-8",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
       "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep the map collection-index as a candidate snapshot. Its active list is historical source wording and will not describe the final live/history split; navigation owner owes reviewed update, no silent rewrite now. Evidence: Source Active Proposals and Handoff Prompts lists six entries, with five active proposal links; the snapshot lists 6 of the directory’s 14 entries, all six carried in full. The map explicitly assigns collection-index; no semantic required-root consumer was found (README.md basename matches are unrelated). Complete source unheaded-block docs/architect/proposals/README.md#unheaded-block-5 (lines 32–32) is carried at docs/platform/proposals/README.md#unheaded-block-8 (lines 56–56); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
       "priorReview": {
@@ -321,12 +331,17 @@
         ],
         "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
       },
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: full section diff read both ways; 1 link destination(s) repointed (e.g. step-09-step-10-replan-handoff-prompt.md -> agent-coordination/history/proposals-redesigns/step-09-step-10-replan-), all resolve at HEAD and appear in the Step 10 link records; nothing in source dropped, nothing unlabelled added; anchors pass; rationale difference sentence is true",
       "targetUnitDigest": "6de050d8ed6f923deda5e05f1e426df33f5300f75c0d9c034866f974d18459cd",
       "targetAncestry": [
         "Architect-Level Proposals",
         "Handoff Prompts"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c02-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     }
   ],
   "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1205-proposals-redesigns-bounded-rereview-d39fe9033.md"

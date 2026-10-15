@@ -107,21 +107,17 @@
       "targetOwner": "docs/platform/observe/spec.md",
       "targetAnchor": "owns",
       "claimKind": "specification",
-      "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
-      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
-      "reviewNote": "deep: owns section diff is the ping and migrate additions to the friction list (correction 01); digests recomputed",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1451-specs-ui-bounded-rereview-6b8d84f9e.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "104495512d35295fbc91fbc2d7a68a6b3c78bdb661eedfc6fbbb42a0b52acb0a",
+      "disposition": "partial-carry",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "rationale": "A31 / SYNC 59b9b7087: upstream changed the historical unit docs/specs/observe.md#owns. Current changed spans carried into mapped candidate; this predecessor keeps its historical digest. A34 partial-carry retains the exact historical residual in the named evidence file; representation and acceptance pending. Native sync must resolve heading identity versus predecessor gap, with no identity loss. Current-source draft separately pending. No approval carried.",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetUnitDigest": "a03c9cf9107371c2ec305cd2efea93cc9ca0f549ec485158bdb5e9ecc05c63aa",
       "targetAncestry": [
         "Observe Component Specification",
         "1. Overview & Boundaries"
       ],
-      "reviewReportCommit": "af0057e1347f180e699d6580e7fe5d50c9319899"
+      "remainder": "A34 pending: exact historical upstream lines replaced at SYNC 59b9b7087 remain in step10-review-predecessor-residuals.json, claim claim_b2a51d5d39832d330879947bdbbcb227, residual SHA256 ca9a59c18839e81d0f58c6602e5c373a161cbeb6a20721e23fbff39be36107af. Native classification of retained identity versus gap and independent representation review owed; cutover blocked."
     },
     {
       "claimId": "claim_a7278e1567e5432cfb079506cf2f5050",
@@ -129,22 +125,18 @@
       "targetOwner": "docs/platform/observe/spec.md",
       "targetAnchor": "unheaded-block-5",
       "claimKind": "specification",
-      "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
-      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
-      "reviewNote": "deep: unheaded block diff is the same bullet only; digests recomputed",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1451-specs-ui-bounded-rereview-6b8d84f9e.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "fb157c8023d0df3a8f9673a7659d80b88bde4b76d28c32811d5b0552f530bb4d",
+      "disposition": "partial-carry",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "rationale": "A31 / SYNC 59b9b7087: upstream changed the historical unit docs/specs/observe.md#unheaded-block-3. Current changed spans carried into mapped candidate; this predecessor keeps its historical digest. A34 partial-carry retains the exact historical residual in the named evidence file; representation and acceptance pending. Native sync must resolve heading identity versus predecessor gap, with no identity loss. Current-source draft separately pending. No approval carried.",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetUnitDigest": "11717c094b7543079c51f31172bdc5cc8e3d66f9da00bdb02056323819401b2c",
       "targetAncestry": [
         "Observe Component Specification",
         "1. Overview & Boundaries",
         "Owns"
       ],
-      "reviewReportCommit": "af0057e1347f180e699d6580e7fe5d50c9319899"
+      "remainder": "A34 pending: exact historical upstream lines replaced at SYNC 59b9b7087 remain in step10-review-predecessor-residuals.json, claim claim_a7278e1567e5432cfb079506cf2f5050, residual SHA256 ca9a59c18839e81d0f58c6602e5c373a161cbeb6a20721e23fbff39be36107af. Native classification of retained identity versus gap and independent representation review owed; cutover blocked."
     },
     {
       "claimId": "claim_fde5bf697a74032ae96b87746d5f5f25",

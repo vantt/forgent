@@ -82,20 +82,15 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/work-state/spec.md",
       "targetAnchor": "unheaded-block-93",
-      "authoredBy": "codex-session:22@2026-10-14",
-      "reviewStatus": "reviewed",
-      "rationale": "Authorized U8/RUL60 second-fragment correction under A19 creates a native predecessor gap. Exact old/current same-file units are shown; A22 requires this real successor pending, no truth approval or identity graft.",
-      "reviewNote": "deep: new native predecessor for the c3895c140 RUL unit 5c61302d (fingerprint 787b3dda equal to the registry gap), successor f20c0ca6 at unheaded-block-93, ancestry two levels equal; shard equals pack; nothing grafted.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-rework2.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "f20c0ca6ad7490fa85635d8100333e97787282b0936df18a2f7f7599d5cd3b63",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewStatus": "pending",
+      "rationale": "Authorized U8/RUL60 second-fragment correction under A19 creates a native predecessor gap. Exact old/current same-file units are shown; A22 requires this real successor pending, no truth approval or identity graft. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetUnitDigest": "9098a0e9ed02a324a16abe3c1016fad73ad261bfc4459aed889be5baeb1515b3",
       "targetAncestry": [
         "Work State Specification",
         "11. Business Rules"
-      ],
-      "reviewReportCommit": "9f087f37d134366bd2057af2fac831ed18a9b3c3"
+      ]
     }
   ]
 }

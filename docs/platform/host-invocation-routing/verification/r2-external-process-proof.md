@@ -102,4 +102,4 @@ Marketplace, publisher trust, signature system, production WASM, and core-provid
 | provider manifest | [../contracts/external-provider-manifest.md](../contracts/external-provider-manifest.md) |
 | implementation alignment | [implementation-alignment.md](implementation-alignment.md) |
 | R1 proof | [r1-rust-host-proof.md](r1-rust-host-proof.md) |
-| source plan | [../roadmap.md](../roadmap.md) |
+| source plan | [../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md) |

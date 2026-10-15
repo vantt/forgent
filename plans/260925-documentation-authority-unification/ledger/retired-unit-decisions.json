@@ -81649,6 +81649,114 @@
         "Other Architecture Drafts"
       ],
       "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4"
+    },
+    {
+      "claimId": "claim_b12ca1fdc3534fa31f9d7459c1be9ef7",
+      "sourcePath": "AGENTS.md",
+      "sourceAnchor": "dispatch-routing-work-to-a-executor",
+      "sourceUnitDigest": "6f82f0a34b9d52aeb929fa62c63a49e558f0cf94e6552b59bca278097f14ea6d",
+      "claimKind": "procedure",
+      "disposition": "reclassify-out-of-platform-scope",
+      "rationale": "L10-16 / L10-3: claim_b12ca1fdc3534fa31f9d7459c1be9ef7 records the historical native instruction identity AGENTS.md#dispatch-routing-work-to-a-executor (digest 6f82f0a34b9d52aeb929fa62c63a49e558f0cf94e6552b59bca278097f14ea6d). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Pending bounded independent re-review after Step 10 author corrections; no approval carried."
+    },
+    {
+      "claimId": "claim_c3ef3a4ddc116883db10a70d55ba7bd5",
+      "sourcePath": "AGENTS.md",
+      "sourceAnchor": "rul11-tùm-lum-không-phải-nặng-d-adr0036-docsspecsplatform-foundationsmd",
+      "sourceUnitDigest": "4485eb54512289665baad03b45714d0d19bdb4b46f1ce565850aea8aa969b940",
+      "claimKind": "procedure",
+      "disposition": "reclassify-out-of-platform-scope",
+      "rationale": "L10-16 / L10-3: claim_c3ef3a4ddc116883db10a70d55ba7bd5 records the historical native instruction identity AGENTS.md#rul11-tùm-lum-không-phải-nặng-d-adr0036-docsspecsplatform-foundationsmd (digest 4485eb54512289665baad03b45714d0d19bdb4b46f1ce565850aea8aa969b940). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Pending bounded independent re-review after Step 10 author corrections; no approval carried."
+    },
+    {
+      "claimId": "claim_21f66ad1c973daaf6c31abf50b6c8cc3",
+      "sourcePath": "AGENTS.md",
+      "sourceAnchor": "starting-the-herdr-gateway-one-door-never-a-raw-process",
+      "sourceUnitDigest": "43d98a2d84170eee45f9c337cd6700c7af2e32965c415e3fb26cf3c3ebe14bd7",
+      "claimKind": "procedure",
+      "disposition": "reclassify-out-of-platform-scope",
+      "rationale": "L10-16 / L10-3: claim_21f66ad1c973daaf6c31abf50b6c8cc3 records the historical native instruction identity AGENTS.md#starting-the-herdr-gateway-one-door-never-a-raw-process (digest 43d98a2d84170eee45f9c337cd6700c7af2e32965c415e3fb26cf3c3ebe14bd7). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Pending bounded independent re-review after Step 10 author corrections; no approval carried."
+    },
+    {
+      "claimId": "claim_806342ec2a1c5fd1d0b6d82ebd54d4e0",
+      "sourcePath": "AGENTS.md",
+      "sourceAnchor": "unheaded-block-18",
+      "sourceUnitDigest": "818ed72de3118b43bbb9682e5b2231a74894d6001771d6375d08fcb626cd99b1",
+      "claimKind": "procedure",
+      "disposition": "reclassify-out-of-platform-scope",
+      "rationale": "L10-16 / L10-3: claim_806342ec2a1c5fd1d0b6d82ebd54d4e0 records the historical native instruction identity AGENTS.md#unheaded-block-18 (digest 818ed72de3118b43bbb9682e5b2231a74894d6001771d6375d08fcb626cd99b1). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Pending bounded independent re-review after Step 10 author corrections; no approval carried."
+    },
+    {
+      "claimId": "claim_7a4fef4aa802940385df7cd8fc1bf6f0",
+      "sourcePath": "AGENTS.md",
+      "sourceAnchor": "unheaded-block-23",
+      "sourceUnitDigest": "367c95ab6574855f85ab31608ca9438bddb2bef0839cfc45ff4bf2640c6ea2f4",
+      "claimKind": "procedure",
+      "disposition": "reclassify-out-of-platform-scope",
+      "rationale": "L10-16 / L10-3: claim_7a4fef4aa802940385df7cd8fc1bf6f0 records the historical native instruction identity AGENTS.md#unheaded-block-23 (digest 367c95ab6574855f85ab31608ca9438bddb2bef0839cfc45ff4bf2640c6ea2f4). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Pending bounded independent re-review after Step 10 author corrections; no approval carried."
+    },
+    {
+      "claimId": "claim_7b209ce1498d7ab5ddafe25d203e5852",
+      "sourcePath": "AGENTS.md",
+      "sourceAnchor": "unheaded-block-24",
+      "sourceUnitDigest": "bd95c2c1daeda69523d203dcefc33f2d50d81a401087e921c058a7d004f5a02a",
+      "claimKind": "procedure",
+      "disposition": "reclassify-out-of-platform-scope",
+      "rationale": "L10-16 / L10-3: claim_7b209ce1498d7ab5ddafe25d203e5852 records the historical native instruction identity AGENTS.md#unheaded-block-24 (digest bd95c2c1daeda69523d203dcefc33f2d50d81a401087e921c058a7d004f5a02a). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Pending bounded independent re-review after Step 10 author corrections; no approval carried."
+    },
+    {
+      "claimId": "claim_30f4d7e2306cb4ecdad78086848d139f",
+      "sourcePath": "AGENTS.md",
+      "sourceAnchor": "unheaded-block-26",
+      "sourceUnitDigest": "52b2e04e2be1548ef98b8c68b27ee09c3cef2b516ce1cdd6925362d81dd2a306",
+      "claimKind": "procedure",
+      "disposition": "reclassify-out-of-platform-scope",
+      "rationale": "L10-16 / L10-3: claim_30f4d7e2306cb4ecdad78086848d139f records the historical native instruction identity AGENTS.md#unheaded-block-26 (digest 52b2e04e2be1548ef98b8c68b27ee09c3cef2b516ce1cdd6925362d81dd2a306). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Pending bounded independent re-review after Step 10 author corrections; no approval carried."
+    },
+    {
+      "claimId": "claim_500d588a939fd6109cf102b8343484bb",
+      "sourcePath": "AGENTS.md",
+      "sourceAnchor": "unheaded-block-28",
+      "sourceUnitDigest": "45945b0c37c8cca3414b5e11c8b0dba3c210d8dcf30d34fc26a1d794e848801e",
+      "claimKind": "procedure",
+      "disposition": "reclassify-out-of-platform-scope",
+      "rationale": "L10-16 / L10-3: claim_500d588a939fd6109cf102b8343484bb records the historical native instruction identity AGENTS.md#unheaded-block-28 (digest 45945b0c37c8cca3414b5e11c8b0dba3c210d8dcf30d34fc26a1d794e848801e). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Pending bounded independent re-review after Step 10 author corrections; no approval carried."
+    },
+    {
+      "claimId": "claim_dea64a2d50bdbadf3b2ebeceec84fa5d",
+      "sourcePath": "AGENTS.md",
+      "sourceAnchor": "unheaded-block-34",
+      "sourceUnitDigest": "ba8b02c21fe45af0ba20b280ef182065e87c3410dae024d6ede3983845990c9c",
+      "claimKind": "procedure",
+      "disposition": "reclassify-out-of-platform-scope",
+      "rationale": "L10-16 / L10-3: claim_dea64a2d50bdbadf3b2ebeceec84fa5d records the historical native instruction identity AGENTS.md#unheaded-block-34 (digest ba8b02c21fe45af0ba20b280ef182065e87c3410dae024d6ede3983845990c9c). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried. This is consistent with gap claim_91884eb1 (same ba8b02c2 text digest): both historical identities classify the instruction outside platform authority. The old registry delete-as-obsolete disposition is historical bookkeeping, not authority to delete root instruction text; no registry mutation this turn.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Pending bounded independent re-review after Step 10 author corrections; no approval carried."
     }
   ]
 }

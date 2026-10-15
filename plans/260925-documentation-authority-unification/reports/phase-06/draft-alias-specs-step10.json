@@ -688,61 +688,61 @@
       "aliasId": "step10-specs-0069",
       "fromPath": "docs/specs/confinement-authority.md#unheaded-block-114",
       "toOwner": "docs/platform/agent-confinement/spec.md",
-      "toAnchor": "unheaded-block-47",
+      "toAnchor": "unheaded-block-48",
       "kind": "redirected",
-      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/step10-review-confinement-aliases.json",
       "immutableRefs": [],
-      "recordedAt": "2026-10-15"
+      "recordedAt": "2026-10-16"
     },
     {
       "aliasId": "step10-specs-0070",
       "fromPath": "docs/specs/confinement-authority.md#unheaded-block-115",
       "toOwner": "docs/platform/agent-confinement/spec.md",
-      "toAnchor": "unheaded-block-48",
+      "toAnchor": "unheaded-block-49",
       "kind": "redirected",
-      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/step10-review-confinement-aliases.json",
       "immutableRefs": [],
-      "recordedAt": "2026-10-15"
+      "recordedAt": "2026-10-16"
     },
     {
       "aliasId": "step10-specs-0071",
       "fromPath": "docs/specs/confinement-authority.md#unheaded-block-116",
       "toOwner": "docs/platform/agent-confinement/spec.md",
-      "toAnchor": "unheaded-block-49",
+      "toAnchor": "unheaded-block-50",
       "kind": "redirected",
-      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/step10-review-confinement-aliases.json",
       "immutableRefs": [],
-      "recordedAt": "2026-10-15"
+      "recordedAt": "2026-10-16"
     },
     {
       "aliasId": "step10-specs-0072",
       "fromPath": "docs/specs/confinement-authority.md#unheaded-block-117",
       "toOwner": "docs/platform/agent-confinement/spec.md",
-      "toAnchor": "unheaded-block-50",
+      "toAnchor": "unheaded-block-51",
       "kind": "redirected",
-      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/step10-review-confinement-aliases.json",
       "immutableRefs": [],
-      "recordedAt": "2026-10-15"
+      "recordedAt": "2026-10-16"
     },
     {
       "aliasId": "step10-specs-0073",
       "fromPath": "docs/specs/confinement-authority.md#unheaded-block-118",
       "toOwner": "docs/platform/agent-confinement/spec.md",
-      "toAnchor": "unheaded-block-51",
+      "toAnchor": "unheaded-block-52",
       "kind": "redirected",
-      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/step10-review-confinement-aliases.json",
       "immutableRefs": [],
-      "recordedAt": "2026-10-15"
+      "recordedAt": "2026-10-16"
     },
     {
       "aliasId": "step10-specs-0074",
       "fromPath": "docs/specs/confinement-authority.md#unheaded-block-119",
       "toOwner": "docs/platform/agent-confinement/spec.md",
-      "toAnchor": "unheaded-block-52",
+      "toAnchor": "unheaded-block-53",
       "kind": "redirected",
-      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/step10-review-confinement-aliases.json",
       "immutableRefs": [],
-      "recordedAt": "2026-10-15"
+      "recordedAt": "2026-10-16"
     },
     {
       "aliasId": "step10-specs-0075",
@@ -758,81 +758,81 @@
       "aliasId": "step10-specs-0076",
       "fromPath": "docs/specs/confinement-authority.md#unheaded-block-120",
       "toOwner": "docs/platform/agent-confinement/spec.md",
-      "toAnchor": "unheaded-block-53",
+      "toAnchor": "unheaded-block-54",
       "kind": "redirected",
-      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/step10-review-confinement-aliases.json",
       "immutableRefs": [],
-      "recordedAt": "2026-10-15"
+      "recordedAt": "2026-10-16"
     },
     {
       "aliasId": "step10-specs-0077",
       "fromPath": "docs/specs/confinement-authority.md#unheaded-block-121",
       "toOwner": "docs/platform/agent-confinement/spec.md",
-      "toAnchor": "unheaded-block-54",
+      "toAnchor": "unheaded-block-55",
       "kind": "redirected",
-      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/step10-review-confinement-aliases.json",
       "immutableRefs": [],
-      "recordedAt": "2026-10-15"
+      "recordedAt": "2026-10-16"
     },
     {
       "aliasId": "step10-specs-0078",
       "fromPath": "docs/specs/confinement-authority.md#unheaded-block-122",
       "toOwner": "docs/platform/agent-confinement/spec.md",
-      "toAnchor": "unheaded-block-55",
+      "toAnchor": "unheaded-block-56",
       "kind": "redirected",
-      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/step10-review-confinement-aliases.json",
       "immutableRefs": [],
-      "recordedAt": "2026-10-15"
+      "recordedAt": "2026-10-16"
     },
     {
       "aliasId": "step10-specs-0079",
       "fromPath": "docs/specs/confinement-authority.md#unheaded-block-123",
       "toOwner": "docs/platform/agent-confinement/spec.md",
-      "toAnchor": "unheaded-block-56",
+      "toAnchor": "unheaded-block-57",
       "kind": "redirected",
-      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/step10-review-confinement-aliases.json",
       "immutableRefs": [],
-      "recordedAt": "2026-10-15"
+      "recordedAt": "2026-10-16"
     },
     {
       "aliasId": "step10-specs-0080",
       "fromPath": "docs/specs/confinement-authority.md#unheaded-block-124",
       "toOwner": "docs/platform/agent-confinement/spec.md",
-      "toAnchor": "unheaded-block-57",
+      "toAnchor": "unheaded-block-58",
       "kind": "redirected",
-      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/step10-review-confinement-aliases.json",
       "immutableRefs": [],
-      "recordedAt": "2026-10-15"
+      "recordedAt": "2026-10-16"
     },
     {
       "aliasId": "step10-specs-0081",
       "fromPath": "docs/specs/confinement-authority.md#unheaded-block-125",
       "toOwner": "docs/platform/agent-confinement/spec.md",
-      "toAnchor": "unheaded-block-58",
+      "toAnchor": "unheaded-block-59",
       "kind": "redirected",
-      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/step10-review-confinement-aliases.json",
       "immutableRefs": [],
-      "recordedAt": "2026-10-15"
+      "recordedAt": "2026-10-16"
     },
     {
       "aliasId": "step10-specs-0082",
       "fromPath": "docs/specs/confinement-authority.md#unheaded-block-126",
       "toOwner": "docs/platform/agent-confinement/spec.md",
-      "toAnchor": "unheaded-block-59",
+      "toAnchor": "unheaded-block-60",
       "kind": "redirected",
-      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/step10-review-confinement-aliases.json",
       "immutableRefs": [],
-      "recordedAt": "2026-10-15"
+      "recordedAt": "2026-10-16"
     },
     {
       "aliasId": "step10-specs-0083",
       "fromPath": "docs/specs/confinement-authority.md#unheaded-block-127",
-      "toOwner": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
-      "toAnchor": "unheaded-block-3",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-61",
       "kind": "redirected",
-      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/step10-review-confinement-aliases.json",
       "immutableRefs": [],
-      "recordedAt": "2026-10-15"
+      "recordedAt": "2026-10-16"
     },
     {
       "aliasId": "step10-specs-0084",
@@ -868,71 +868,71 @@
       "aliasId": "step10-specs-0087",
       "fromPath": "docs/specs/confinement-authority.md#unheaded-block-130",
       "toOwner": "docs/platform/agent-confinement/spec.md",
-      "toAnchor": "unheaded-block-61",
+      "toAnchor": "unheaded-block-62",
       "kind": "redirected",
-      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/step10-review-confinement-aliases.json",
       "immutableRefs": [],
-      "recordedAt": "2026-10-15"
+      "recordedAt": "2026-10-16"
     },
     {
       "aliasId": "step10-specs-0088",
       "fromPath": "docs/specs/confinement-authority.md#unheaded-block-131",
       "toOwner": "docs/platform/agent-confinement/spec.md",
-      "toAnchor": "unheaded-block-62",
+      "toAnchor": "unheaded-block-63",
       "kind": "redirected",
-      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/step10-review-confinement-aliases.json",
       "immutableRefs": [],
-      "recordedAt": "2026-10-15"
+      "recordedAt": "2026-10-16"
     },
     {
       "aliasId": "step10-specs-0089",
       "fromPath": "docs/specs/confinement-authority.md#unheaded-block-132",
       "toOwner": "docs/platform/agent-confinement/spec.md",
-      "toAnchor": "unheaded-block-63",
+      "toAnchor": "unheaded-block-64",
       "kind": "redirected",
-      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/step10-review-confinement-aliases.json",
       "immutableRefs": [],
-      "recordedAt": "2026-10-15"
+      "recordedAt": "2026-10-16"
     },
     {
       "aliasId": "step10-specs-0090",
       "fromPath": "docs/specs/confinement-authority.md#unheaded-block-133",
       "toOwner": "docs/platform/agent-confinement/spec.md",
-      "toAnchor": "unheaded-block-64",
+      "toAnchor": "unheaded-block-65",
       "kind": "redirected",
-      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/step10-review-confinement-aliases.json",
       "immutableRefs": [],
-      "recordedAt": "2026-10-15"
+      "recordedAt": "2026-10-16"
     },
     {
       "aliasId": "step10-specs-0091",
       "fromPath": "docs/specs/confinement-authority.md#unheaded-block-134",
       "toOwner": "docs/platform/agent-confinement/spec.md",
-      "toAnchor": "unheaded-block-65",
+      "toAnchor": "unheaded-block-66",
       "kind": "redirected",
-      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/step10-review-confinement-aliases.json",
       "immutableRefs": [],
-      "recordedAt": "2026-10-15"
+      "recordedAt": "2026-10-16"
     },
     {
       "aliasId": "step10-specs-0092",
       "fromPath": "docs/specs/confinement-authority.md#unheaded-block-135",
       "toOwner": "docs/platform/agent-confinement/spec.md",
-      "toAnchor": "unheaded-block-66",
+      "toAnchor": "unheaded-block-67",
       "kind": "redirected",
-      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/step10-review-confinement-aliases.json",
       "immutableRefs": [],
-      "recordedAt": "2026-10-15"
+      "recordedAt": "2026-10-16"
     },
     {
       "aliasId": "step10-specs-0093",
       "fromPath": "docs/specs/confinement-authority.md#unheaded-block-136",
-      "toOwner": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
-      "toAnchor": "unheaded-block-3",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-68",
       "kind": "redirected",
-      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/step10-review-confinement-aliases.json",
       "immutableRefs": [],
-      "recordedAt": "2026-10-15"
+      "recordedAt": "2026-10-16"
     },
     {
       "aliasId": "step10-specs-0094",
@@ -1018,21 +1018,21 @@
       "aliasId": "step10-specs-0102",
       "fromPath": "docs/specs/confinement-authority.md#unheaded-block-144",
       "toOwner": "docs/platform/agent-confinement/spec.md",
-      "toAnchor": "unheaded-block-68",
+      "toAnchor": "unheaded-block-69",
       "kind": "redirected",
-      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/step10-review-confinement-aliases.json",
       "immutableRefs": [],
-      "recordedAt": "2026-10-15"
+      "recordedAt": "2026-10-16"
     },
     {
       "aliasId": "step10-specs-0103",
       "fromPath": "docs/specs/confinement-authority.md#unheaded-block-145",
-      "toOwner": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
-      "toAnchor": "unheaded-block-4",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-70",
       "kind": "redirected",
-      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/step10-review-confinement-aliases.json",
       "immutableRefs": [],
-      "recordedAt": "2026-10-15"
+      "recordedAt": "2026-10-16"
     },
     {
       "aliasId": "step10-specs-0104",
@@ -1088,11 +1088,11 @@
       "aliasId": "step10-specs-0109",
       "fromPath": "docs/specs/confinement-authority.md#unheaded-block-150",
       "toOwner": "docs/platform/agent-confinement/spec.md",
-      "toAnchor": "unheaded-block-70",
+      "toAnchor": "unheaded-block-71",
       "kind": "redirected",
-      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/step10-review-confinement-aliases.json",
       "immutableRefs": [],
-      "recordedAt": "2026-10-15"
+      "recordedAt": "2026-10-16"
     },
     {
       "aliasId": "step10-specs-0110",
@@ -4493,6 +4493,16 @@
       "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-system-overview.json",
       "immutableRefs": [],
       "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-review-c491a724bb730522215633d79a66e5b3",
+      "fromPath": "docs/specs/confinement-authority.md#unheaded-block-151",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-72",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/step10-review-confinement-aliases.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-16"
     }
   ]
 }

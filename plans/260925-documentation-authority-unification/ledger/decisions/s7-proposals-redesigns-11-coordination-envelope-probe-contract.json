@@ -24,12 +24,17 @@
       "targetAnchor": "coordination-envelope-minimal-probe-contract",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
       "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. supersede: Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim. Evidence: Source scenario uses Assignment/Run, read-only executors and independent-first reveal; it contains neither CoordinationSession nor FlowDefinition. Live coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 cite this probe contract. Its retired-facility gap observations are dated, not proof the alternative experiment is retired. Complete source heading docs/architect/proposals/coordination-envelope-probe-contract.md#coordination-envelope-minimal-probe-contract (lines 1–1) is carried at docs/platform/proposals/coordination-envelope-probe-contract.md#coordination-envelope-minimal-probe-contract (lines 1–1); mapped proposal placement retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by native retained identity. Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: full section diff read both ways; candidate metadata block, Added in candidate label and Source relationship line inserted after the H1 (Provenance blob and commit verified against git, source link resolves); inherited Related block wrapped in a literal four-backtick fence, text inside byte-equal to source; nothing in source dropped, nothing unlabelled added; anchors pass; rationale difference sentence is true",
       "targetUnitDigest": "f92a789a540939691e20447ee95c7ed09c52c3653a7b6f3d54255d2035c524bf",
-      "targetAncestry": []
+      "targetAncestry": [],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c02-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_35d959dc7317485a1687b0490bdf5dee",
@@ -80,14 +85,19 @@
       "targetAnchor": "authorization-and-purpose",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
       "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. supersede: Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim. Evidence: Source scenario uses Assignment/Run, read-only executors and independent-first reveal; it contains neither CoordinationSession nor FlowDefinition. Live coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 cite this probe contract. Its retired-facility gap observations are dated, not proof the alternative experiment is retired. Complete source heading docs/architect/proposals/coordination-envelope-probe-contract.md#authorization-and-purpose (lines 15–15) is carried at docs/platform/proposals/coordination-envelope-probe-contract.md#authorization-and-purpose (lines 42–42); mapped proposal placement retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: full section diff read both ways; 1 link destination(s) repointed (e.g. coordination-envelope-progress.md -> agent-coordination/history/proposals-redesigns/coordination-envelope-p), all resolve at HEAD and appear in the Step 10 link records; nothing in source dropped, nothing unlabelled added; anchors pass; rationale difference sentence is true",
       "targetUnitDigest": "8899a7f90f43a9c0b98ca517d72a7bfc948df061503cbf0f8cc9818f8f4bb896",
       "targetAncestry": [
         "Coordination Envelope — Minimal Probe Contract"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c02-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_13c25d9b019d45c29e0889c7c9ef1398",
@@ -96,15 +106,20 @@
       "targetAnchor": "unheaded-block-6",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
       "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. supersede: Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim. Evidence: Source scenario uses Assignment/Run, read-only executors and independent-first reveal; it contains neither CoordinationSession nor FlowDefinition. Live coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 cite this probe contract. Its retired-facility gap observations are dated, not proof the alternative experiment is retired. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-3 (lines 17–18) is carried at docs/platform/proposals/coordination-envelope-probe-contract.md#unheaded-block-6 (lines 44–45); mapped proposal placement retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: full section diff read both ways; 1 link destination(s) repointed (e.g. coordination-envelope-progress.md -> agent-coordination/history/proposals-redesigns/coordination-envelope-p), all resolve at HEAD and appear in the Step 10 link records; nothing in source dropped, nothing unlabelled added; anchors pass; rationale difference sentence is true",
       "targetUnitDigest": "92271e2f97822db7853d7df1ae74e63110c1a6c0ee85b5da498e1b443781d2e2",
       "targetAncestry": [
         "Coordination Envelope — Minimal Probe Contract",
         "Authorization and purpose"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c02-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_c3113e9fa0c495d358c1bfd89e33474e",
@@ -462,9 +477,9 @@
       "claimKind": "contract",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. supersede: Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim. Evidence: Source scenario uses Assignment/Run, read-only executors and independent-first reveal; it contains neither CoordinationSession nor FlowDefinition. Live coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 cite this probe contract. Its retired-facility gap observations are dated, not proof the alternative experiment is retired. Complete source heading docs/architect/proposals/coordination-envelope-probe-contract.md#current-substrate-fit-and-gaps (lines 117–117) is carried at docs/platform/proposals/coordination-envelope-probe-contract.md#current-substrate-fit-and-gaps (lines 144–144); mapped proposal placement retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "rationale": "Weak-exact: current source and target unit digests are equal; placement ancestry is disclosed.; mandatory A36 deep read. supersede: Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim. Evidence: Source scenario uses Assignment/Run, read-only executors and independent-first reveal; it contains neither CoordinationSession nor FlowDefinition. Live coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 cite this probe contract. Its retired-facility gap observations are dated, not proof the alternative experiment is retired. Complete source heading docs/architect/proposals/coordination-envelope-probe-contract.md#current-substrate-fit-and-gaps (lines 117–117) is carried at docs/platform/proposals/coordination-envelope-probe-contract.md#current-substrate-fit-and-gaps (lines 144–144); mapped proposal placement retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
       "targetUnitDigest": "51371604be3b8c08e83a306d3cd53e9df9b39691bf09284fdf3b3aa93ec9c606",
       "targetAncestry": [
         "Coordination Envelope — Minimal Probe Contract"
@@ -478,9 +493,9 @@
       "claimKind": "contract",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. supersede: Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim. Evidence: Source scenario uses Assignment/Run, read-only executors and independent-first reveal; it contains neither CoordinationSession nor FlowDefinition. Live coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 cite this probe contract. Its retired-facility gap observations are dated, not proof the alternative experiment is retired. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-16 (lines 119–121) is carried at docs/platform/proposals/coordination-envelope-probe-contract.md#unheaded-block-19 (lines 146–148); mapped proposal placement retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "rationale": "Weak-exact: current source and target unit digests are equal; placement ancestry is disclosed.; mandatory A36 deep read. supersede: Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim. Evidence: Source scenario uses Assignment/Run, read-only executors and independent-first reveal; it contains neither CoordinationSession nor FlowDefinition. Live coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 cite this probe contract. Its retired-facility gap observations are dated, not proof the alternative experiment is retired. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-16 (lines 119–121) is carried at docs/platform/proposals/coordination-envelope-probe-contract.md#unheaded-block-19 (lines 146–148); mapped proposal placement retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
       "targetUnitDigest": "7a88cd1367a1f061fc69550b02958ba2b792609b6d814a30debb96fcc4d92b16",
       "targetAncestry": [
         "Coordination Envelope — Minimal Probe Contract",

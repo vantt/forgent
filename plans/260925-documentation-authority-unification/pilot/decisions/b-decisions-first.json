@@ -9,1301 +9,1744 @@
       "claimId": "claim_ae1f21106b52006a2ff377f9104a1fce",
       "sourceUnitDigest": "0e00c9cccba1af1e",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "1-provenance-of-retired-decisions",
       "claimKind": "historical-context",
       "disposition": "promote",
-      "rationale": "Source H2 stating where the retired records came from is represented by the frozen H2 \"1. Provenance Of Retired Decisions\"; only the heading title differs (numbered, English, no tsk id in the title).",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "260da5fd6eab8c113ea7e756985b782b"
+      "rationale": "Source H2 stating where the retired records came from is represented by the frozen H2 \"1. Provenance Of Retired Decisions\"; only the heading title differs (numbered, English, no tsk id in the title). L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "260da5fd6eab8c113ea7e756985b782b5e45721aae8f34aab1e50389af0dff24",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State"
+      ]
     },
     {
       "claimId": "claim_192ebab9dbc6cec8b8957683e3ff8c82",
       "sourceUnitDigest": "ac2b043c0d4f9fde",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-2",
       "claimKind": "historical-context",
       "disposition": "promote",
-      "rationale": "Relocation statement (ADRs moved verbatim from docs/decisions/, corpus retired) carried unchanged as the body of section 1; text identical to the source line.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "ac2b043c0d4f9fde1e7ecee60609cbe7"
+      "rationale": "Relocation statement (ADRs moved verbatim from docs/decisions/, corpus retired) carried unchanged as the body of section 1; text identical to the source line. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "ac2b043c0d4f9fde1e7ecee60609cbe700480b9dd33105f98d30f6c6057ffb5c",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "1. Provenance Of Retired Decisions"
+      ]
     },
     {
       "claimId": "claim_5412ac73c702e4ec33e4b59dd9ad1940",
       "sourceUnitDigest": "cb78249b3b34c872",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "2-adr-0002-flat-work-model",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Source ADR 0002 title heading is represented by the frozen H2 \"2. ADR 0002 ...\" (2-adr-0002-flat-work-model); title is renumbered and re-worded in English, text of the record is unchanged.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "dfbfbdbf1e8717cabbe38306651ad15e"
+      "rationale": "Source ADR 0002 title heading is represented by the frozen H2 \"2. ADR 0002 ...\" (2-adr-0002-flat-work-model); title is renumbered and re-worded in English, text of the record is unchanged. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "dfbfbdbf1e8717cabbe38306651ad15e816065313a7244b973a62ba4703a843d",
+      "targetAncestry": [
+        "Retired Decision History: Work State"
+      ],
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
     },
     {
       "claimId": "claim_0201a1d648765d578fb8fd96673da674",
       "sourceUnitDigest": "75563525a8cefd7b",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-3",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Supersession blockquote of ADR 0002 (partly superseded by 0012) carried in the ADR 0002 section; the only change is the link, rewritten from the retired 0012 file path to the in-document anchor #8-adr-0012-unified-typed-edge-graph-model.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "0a885e8073f37063ef015b0288f7517c"
+      "rationale": "Supersession blockquote of ADR 0002 (partly superseded by 0012) carried in the ADR 0002 section; the only change is the link, rewritten from the retired 0012 file path to the in-document anchor #8-adr-0012-unified-typed-edge-graph-model. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "0a885e8073f37063ef015b0288f7517cdd829863ae4f866864cf1969ad3260dd",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "2. ADR 0002 Flat Work Model"
+      ]
     },
     {
       "claimId": "claim_f8e2b48d6234ca8a73e15cdaad7d9c07",
       "sourceUnitDigest": "a05e96aa58d47c2d",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "2-adr-0002-flat-work-model",
       "claimKind": "decision",
       "disposition": "merge",
-      "rationale": "Repeated duplicate title \"# 0002 - Mo hinh viec phang\" inside the ADR 0002 text: merged into the single ADR 0002 H2 (no second H1 in the candidate), so no claim is lost but the heading itself does not appear twice.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "dfbfbdbf1e8717cabbe38306651ad15e"
+      "rationale": "Repeated duplicate title \"# 0002 - Mo hinh viec phang\" inside the ADR 0002 text: merged into the single ADR 0002 H2 (no second H1 in the candidate), so no claim is lost but the heading itself does not appear twice. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "dfbfbdbf1e8717cabbe38306651ad15e816065313a7244b973a62ba4703a843d",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State"
+      ]
     },
     {
       "claimId": "claim_faeaa8e46158de47c45810fb0a595dcc",
       "sourceUnitDigest": "f014a166cf0c8f3d",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "0002-context",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Bối cảnh\" of ADR 0002 is represented by the frozen H3 \"0002 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "5cd2a9a136e3025d04ed41810213e2a9"
+      "rationale": "Section heading \"Bối cảnh\" of ADR 0002 is represented by the frozen H3 \"0002 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "5cd2a9a136e3025d04ed41810213e2a9c383290b3eb3e863644e4af952612d3e",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "2. ADR 0002 Flat Work Model"
+      ]
     },
     {
       "claimId": "claim_310b7c85756d5a5631a83fd5b6f51450",
       "sourceUnitDigest": "2d791158021d4df9",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-4",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0002 (source lines 1348-1351, starting \"forgent cần một mô hình dữ liệu cho công việc tự-quản, đồng thời mở đư\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "2d791158021d4df9eabbc0897dffa6df"
+      "rationale": "Body of ADR 0002 (source lines 1348-1351, starting \"forgent cần một mô hình dữ liệu cho công việc tự-quản, đồng thời mở đư\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "2d791158021d4df9eabbc0897dffa6df940c425a067c7e7edee5c200e9111594",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "2. ADR 0002 Flat Work Model",
+        "0002 Context"
+      ]
     },
     {
       "claimId": "claim_5b6cd72833b3ee7ea7a2862b4eadb328",
       "sourceUnitDigest": "d6043b1481fba899",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "0002-decision",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Quyết định\" of ADR 0002 is represented by the frozen H3 \"0002 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "6a7b90c72430f1cb8d04a666d3fa9751"
+      "rationale": "Section heading \"Quyết định\" of ADR 0002 is represented by the frozen H3 \"0002 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "6a7b90c72430f1cb8d04a666d3fa97514ec1f6ba3c24cf36641333a9745f4e19",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "2. ADR 0002 Flat Work Model"
+      ]
     },
     {
       "claimId": "claim_6f1392a7f197c9824233896cf218bda9",
       "sourceUnitDigest": "6d29bd7598817238",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-5",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0002 (source lines 1355-1361, starting \"- **Một loại work item duy nhất, một FSM duy nhất.** Item trỏ **deps**\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "6d29bd75988172380cec9e3e8c6d38c0"
+      "rationale": "Body of ADR 0002 (source lines 1355-1361, starting \"- **Một loại work item duy nhất, một FSM duy nhất.** Item trỏ **deps**\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "6d29bd75988172380cec9e3e8c6d38c00ca34fe475aec97c412f338cf6484ba4",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "2. ADR 0002 Flat Work Model",
+        "0002 Decision"
+      ],
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
     },
     {
       "claimId": "claim_e8b18c86c4297b05e04a14793817bf6a",
       "sourceUnitDigest": "e91bbb5ae8fcb8f8",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "0002-consequences",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Hệ quả\" of ADR 0002 is represented by the frozen H3 \"0002 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "fc62699538350fccc923e8874a342f8d"
+      "rationale": "Section heading \"Hệ quả\" of ADR 0002 is represented by the frozen H3 \"0002 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "fc62699538350fccc923e8874a342f8d5e5f5582ae09db366066bf776b60ef7a",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "2. ADR 0002 Flat Work Model"
+      ]
     },
     {
       "claimId": "claim_6bf5e5b90a15803e49010737491afdb9",
       "sourceUnitDigest": "a45346dbf45eca84",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-6",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0002 (source lines 1365-1370, starting \"- **Fan-out đa-agent xuyên câu chuyện tự nhiên:** frontier gom mọi việ\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "a45346dbf45eca841ecf385d6a2d1444"
+      "rationale": "Body of ADR 0002 (source lines 1365-1370, starting \"- **Fan-out đa-agent xuyên câu chuyện tự nhiên:** frontier gom mọi việ\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "a45346dbf45eca841ecf385d6a2d1444175f264ec2bdf3a261f038abc7a84e90",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "2. ADR 0002 Flat Work Model",
+        "0002 Consequences"
+      ]
     },
     {
       "claimId": "claim_c56e0ea4200729ae5cf5542803b2fe10",
       "sourceUnitDigest": "95a357e29712c3c0",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-7",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Supersession-rule line of ADR 0002 (change by superseding with a new record) carried verbatim at the end of its consequences section; the located suggestion pointed at the first identical copy, so the anchor was set to this ADR's own block.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e7"
+      "rationale": "Supersession-rule line of ADR 0002 (change by superseding with a new record) carried verbatim at the end of its consequences section; the located suggestion pointed at the first identical copy, so the anchor was set to this ADR's own block. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "2. ADR 0002 Flat Work Model",
+        "0002 Consequences"
+      ]
     },
     {
       "claimId": "claim_0e062808f47ce5c348b6b44a91650ecc",
       "sourceUnitDigest": "c0dc9acc17db4283",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "3-adr-0003-naming-and-data-layout",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Source ADR 0003 title heading is represented by the frozen H2 \"3. ADR 0003 ...\" (3-adr-0003-naming-and-data-layout); title is renumbered and re-worded in English, text of the record is unchanged.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "eed7c45e529a07ba42be1926c4715e28"
+      "rationale": "Source ADR 0003 title heading is represented by the frozen H2 \"3. ADR 0003 ...\" (3-adr-0003-naming-and-data-layout); title is renumbered and re-worded in English, text of the record is unchanged. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "eed7c45e529a07ba42be1926c4715e28e71d7ab481a6e270e4db28d1981b35d3",
+      "targetAncestry": [
+        "Retired Decision History: Work State"
+      ],
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
     },
     {
       "claimId": "claim_75f47ef3fd99abd07c138f106f1ca023",
       "sourceUnitDigest": "203f9cd3142f933c",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "0003-context",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Bối cảnh\" of ADR 0003 is represented by the frozen H3 \"0003 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "c6a2c64d4858021065b5e9f3a7dd0566"
+      "rationale": "Section heading \"Bối cảnh\" of ADR 0003 is represented by the frozen H3 \"0003 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "c6a2c64d4858021065b5e9f3a7dd05666d15ee2123b64859bc98ecf175325bd1",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "3. ADR 0003 Naming And Data Layout"
+      ]
     },
     {
       "claimId": "claim_70c83eabb546f46e040404b3b908a02e",
       "sourceUnitDigest": "152aead220875817",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-8",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0003 (source lines 1378-1380, starting \"Cần chốt danh xưng và bố cục dữ liệu trên đĩa cho lớp work-state trước\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "152aead220875817c189bb95c64a8e95"
+      "rationale": "Body of ADR 0003 (source lines 1378-1380, starting \"Cần chốt danh xưng và bố cục dữ liệu trên đĩa cho lớp work-state trước\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "152aead220875817c189bb95c64a8e95ae9be24d79d6190afd2c02dfc5992fab",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "3. ADR 0003 Naming And Data Layout",
+        "0003 Context"
+      ]
     },
     {
       "claimId": "claim_c6a1314c4583518f5100cc53e78b1979",
       "sourceUnitDigest": "798c507e268c8c14",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "0003-decision",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Quyết định\" of ADR 0003 is represented by the frozen H3 \"0003 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "d0f79f2a53f7edfc1d92c6e8c71d50e3"
+      "rationale": "Section heading \"Quyết định\" of ADR 0003 is represented by the frozen H3 \"0003 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "d0f79f2a53f7edfc1d92c6e8c71d50e3eecb588a7bccf96f3eb9c97f0a628a7d",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "3. ADR 0003 Naming And Data Layout"
+      ]
     },
     {
       "claimId": "claim_45c662066b6e70bac4ff5991ee40afca",
       "sourceUnitDigest": "6f7961ba49b014f5",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-9",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0003 (source lines 1384-1389, starting \"- **CLI = `fgos`** (cửa lệnh của sản phẩm).\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "6f7961ba49b014f58ba0ec626d207f11"
+      "rationale": "Body of ADR 0003 (source lines 1384-1389, starting \"- **CLI = `fgos`** (cửa lệnh của sản phẩm).\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "6f7961ba49b014f58ba0ec626d207f11d8fa5ca3852f090640e1521c781db391",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "3. ADR 0003 Naming And Data Layout",
+        "0003 Decision"
+      ],
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
     },
     {
       "claimId": "claim_f161fbd15476131b86b7c2fd2f1d8f59",
       "sourceUnitDigest": "055bb7583cd58580",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "0003-consequences",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Hệ quả\" of ADR 0003 is represented by the frozen H3 \"0003 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "e6a929b78a9cc9b4254c5e289f33c764"
+      "rationale": "Section heading \"Hệ quả\" of ADR 0003 is represented by the frozen H3 \"0003 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "e6a929b78a9cc9b4254c5e289f33c764837ff88c2f3ff9919376e5f8823b9ff0",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "3. ADR 0003 Naming And Data Layout"
+      ]
     },
     {
       "claimId": "claim_0f85275ad3f392256b805bf226c9562d",
       "sourceUnitDigest": "37d75ce7b883a61c",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-10",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0003 (source lines 1393-1397, starting \"- **Brand nhất quán** giữa CLI, tài liệu và data dir.\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "37d75ce7b883a61c5bee0ad0e4bcc382"
+      "rationale": "Body of ADR 0003 (source lines 1393-1397, starting \"- **Brand nhất quán** giữa CLI, tài liệu và data dir.\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "37d75ce7b883a61c5bee0ad0e4bcc382fec55e8223ceeb80d63056d62f71d9e2",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "3. ADR 0003 Naming And Data Layout",
+        "0003 Consequences"
+      ],
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
     },
     {
       "claimId": "claim_c57c39536b983d5f172833853e8b3344",
       "sourceUnitDigest": "95a357e29712c3c0",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-11",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Supersession-rule line of ADR 0003 (change by superseding with a new record) carried verbatim at the end of its consequences section; the located suggestion pointed at the first identical copy, so the anchor was set to this ADR's own block.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e7"
+      "rationale": "Supersession-rule line of ADR 0003 (change by superseding with a new record) carried verbatim at the end of its consequences section; the located suggestion pointed at the first identical copy, so the anchor was set to this ADR's own block. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "3. ADR 0003 Naming And Data Layout",
+        "0003 Consequences"
+      ]
     },
     {
       "claimId": "claim_5908b357cb98d52934398e26e43fcb39",
       "sourceUnitDigest": "a0ff252fe4a05fd8",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "4-adr-0004-scope-and-non-goals",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Source ADR 0004 title heading is represented by the frozen H2 \"4. ADR 0004 ...\" (4-adr-0004-scope-and-non-goals); title is renumbered and re-worded in English, text of the record is unchanged.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "2d2db2abca61349471af2e2a3d0f5581"
+      "rationale": "Source ADR 0004 title heading is represented by the frozen H2 \"4. ADR 0004 ...\" (4-adr-0004-scope-and-non-goals); title is renumbered and re-worded in English, text of the record is unchanged. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "2d2db2abca61349471af2e2a3d0f5581e7f87af45a979df1e541c1448a865f8a",
+      "targetAncestry": [
+        "Retired Decision History: Work State"
+      ],
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
     },
     {
       "claimId": "claim_67494c7de8ad006fcb01b825ea00e6b2",
       "sourceUnitDigest": "f27931862e682c2f",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "0004-context",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Bối cảnh\" of ADR 0004 is represented by the frozen H3 \"0004 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "2d45d4866f7526c232afdeaf650c17f9"
+      "rationale": "Section heading \"Bối cảnh\" of ADR 0004 is represented by the frozen H3 \"0004 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "2d45d4866f7526c232afdeaf650c17f9c3efee2a04afd9e6241922d522abffe9",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "4. ADR 0004 Scope And Non-Goals"
+      ]
     },
     {
       "claimId": "claim_c23f1c3ed45f72de28f6ed3c605bc43a",
       "sourceUnitDigest": "e64dd190deebcac5",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-12",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0004 (source lines 1405-1407, starting \"Trước khi xây lớp state, cần chốt hai biên: nó phục vụ *ai trước*, và \") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "e64dd190deebcac53e83492fe91319c1"
+      "rationale": "Body of ADR 0004 (source lines 1405-1407, starting \"Trước khi xây lớp state, cần chốt hai biên: nó phục vụ *ai trước*, và \") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "e64dd190deebcac53e83492fe91319c1fced7ca4a6054a2b4c4745821020e531",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "4. ADR 0004 Scope And Non-Goals",
+        "0004 Context"
+      ]
     },
     {
       "claimId": "claim_4a9e0c360118d90051bb7c03002ff4d9",
       "sourceUnitDigest": "7fa451435e5be174",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-13",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0004 (source lines 1409-1411, starting \"> Ghi chú viết lại: quyết định gốc phát biểu qua quan hệ với harness p\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "7fa451435e5be174a0cf5118a1eaccb4"
+      "rationale": "Body of ADR 0004 (source lines 1409-1411, starting \"> Ghi chú viết lại: quyết định gốc phát biểu qua quan hệ với harness p\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "7fa451435e5be174a0cf5118a1eaccb44b208aaaf561387fbd36a186bfe74f48",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "4. ADR 0004 Scope And Non-Goals",
+        "0004 Context"
+      ]
     },
     {
       "claimId": "claim_4063855a9287de7cf5b27cb77d96955f",
       "sourceUnitDigest": "b72bf8ee1aea6db6",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "0004-decision",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Quyết định\" of ADR 0004 is represented by the frozen H3 \"0004 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "59bda06684c6859316ad8f0b236bc7b6"
+      "rationale": "Section heading \"Quyết định\" of ADR 0004 is represented by the frozen H3 \"0004 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "59bda06684c6859316ad8f0b236bc7b6ebc9dc72139fca854456d9b38de05252",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "4. ADR 0004 Scope And Non-Goals"
+      ]
     },
     {
       "claimId": "claim_93d9f629f8c7258d208b1c2d3fc413ab",
       "sourceUnitDigest": "fc46702e212ac516",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-14",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0004 (source lines 1415-1421, starting \"1. **Domain đầu tiên của lớp state là work-state của chính forgent** —\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "fc46702e212ac516c32faa5292ce6399"
+      "rationale": "Body of ADR 0004 (source lines 1415-1421, starting \"1. **Domain đầu tiên của lớp state là work-state của chính forgent** —\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "fc46702e212ac516c32faa5292ce63999a0e60af3361b2dcb7ddbe1dd43d09c7",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "4. ADR 0004 Scope And Non-Goals",
+        "0004 Decision"
+      ]
     },
     {
       "claimId": "claim_0b4d53be3903ac1ce9299b5d7174feab",
       "sourceUnitDigest": "e44f9991b9931d7c",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "0004-consequences",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Hệ quả\" of ADR 0004 is represented by the frozen H3 \"0004 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "12d505aab6487945d39c7e3a3f15ad06"
+      "rationale": "Section heading \"Hệ quả\" of ADR 0004 is represented by the frozen H3 \"0004 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "12d505aab6487945d39c7e3a3f15ad06171917f8bf16b2b27387a9c6efd0d33b",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "4. ADR 0004 Scope And Non-Goals"
+      ]
     },
     {
       "claimId": "claim_664fd1639ad346a2d2d240596a2a6604",
       "sourceUnitDigest": "9d43cd58043503f8",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-15",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0004 (source lines 1425-1428, starting \"- **Scope bước đầu nhỏ:** không phải cover ngay các cơ chế điều phối n\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "9d43cd58043503f832f75d165615f47a"
+      "rationale": "Body of ADR 0004 (source lines 1425-1428, starting \"- **Scope bước đầu nhỏ:** không phải cover ngay các cơ chế điều phối n\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "9d43cd58043503f832f75d165615f47af07532b2dbf99d50a87a5a553a5ae62c",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "4. ADR 0004 Scope And Non-Goals",
+        "0004 Consequences"
+      ]
     },
     {
       "claimId": "claim_7bc17cd130d9b9600e3a8db9bd57ca88",
       "sourceUnitDigest": "95a357e29712c3c0",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-16",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Supersession-rule line of ADR 0004 (change by superseding with a new record) carried verbatim at the end of its consequences section; the located suggestion pointed at the first identical copy, so the anchor was set to this ADR's own block.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e7"
+      "rationale": "Supersession-rule line of ADR 0004 (change by superseding with a new record) carried verbatim at the end of its consequences section; the located suggestion pointed at the first identical copy, so the anchor was set to this ADR's own block. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "4. ADR 0004 Scope And Non-Goals",
+        "0004 Consequences"
+      ]
     },
     {
       "claimId": "claim_dbc0da98acd1c90327ebd67850cc8983",
       "sourceUnitDigest": "2ff34201c3aa91d6",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "5-adr-0006-proposed-status",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Source ADR 0006 title heading is represented by the frozen H2 \"5. ADR 0006 ...\" (5-adr-0006-proposed-status); title is renumbered and re-worded in English, text of the record is unchanged.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "67c97b2b884ac9505324dc3b688a7989"
+      "rationale": "Source ADR 0006 title heading is represented by the frozen H2 \"5. ADR 0006 ...\" (5-adr-0006-proposed-status); title is renumbered and re-worded in English, text of the record is unchanged. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "67c97b2b884ac9505324dc3b688a7989f36bfd27700bf7389751058845c479f0",
+      "targetAncestry": [
+        "Retired Decision History: Work State"
+      ],
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
     },
     {
       "claimId": "claim_a79114f19bb479ea6b69c50166af8972",
       "sourceUnitDigest": "9c8485790cf86a6a",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "0006-context",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Bối cảnh\" of ADR 0006 is represented by the frozen H3 \"0006 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "6163b36b62dbb7c76e3510b09ab0d83b"
+      "rationale": "Section heading \"Bối cảnh\" of ADR 0006 is represented by the frozen H3 \"0006 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "6163b36b62dbb7c76e3510b09ab0d83b08f3542562b99abc5c41cd0534b0c789",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "5. ADR 0006 Proposed Status"
+      ]
     },
     {
       "claimId": "claim_423abdded73e62ffd62a773173555583",
       "sourceUnitDigest": "b2285ceac14bdb72",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-17",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0006 (source lines 1436-1436, starting \"Runner (0005) cho worker sinh kết quả trên **nhánh chưa merge**. Điều \") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "b2285ceac14bdb7210baf54029fa70b8"
+      "rationale": "Body of ADR 0006 (source lines 1436-1436, starting \"Runner (0005) cho worker sinh kết quả trên **nhánh chưa merge**. Điều \") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "b2285ceac14bdb7210baf54029fa70b8e167563a09c6804e7cc59330ad886f45",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "5. ADR 0006 Proposed Status",
+        "0006 Context"
+      ]
     },
     {
       "claimId": "claim_0fe4212f0537cfd4b9232280e9e6781b",
       "sourceUnitDigest": "3077bff801c5d9f0",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-18",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0006 (source lines 1438-1441, starting \"1. Một việc B phụ thuộc A có thể chạy trên nền **thiếu code của A** (A\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "3077bff801c5d9f092db1c250ec56309"
+      "rationale": "Body of ADR 0006 (source lines 1438-1441, starting \"1. Một việc B phụ thuộc A có thể chạy trên nền **thiếu code của A** (A\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "3077bff801c5d9f092db1c250ec563092342fdee17a8941b01e1318f6c3ff827",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "5. ADR 0006 Proposed Status",
+        "0006 Context"
+      ]
     },
     {
       "claimId": "claim_99fa84eefd3c917530ef1a453f08be21",
       "sourceUnitDigest": "965caf0a03321009",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "0006-decision",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Quyết định\" of ADR 0006 is represented by the frozen H3 \"0006 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "ffd717cc616acfaa71c4fb8a61763bcf"
+      "rationale": "Section heading \"Quyết định\" of ADR 0006 is represented by the frozen H3 \"0006 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "ffd717cc616acfaa71c4fb8a61763bcfb0a5272b8345d44b839fc6e10e2afb43",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "5. ADR 0006 Proposed Status"
+      ]
     },
     {
       "claimId": "claim_9283d5a06984f8b7a0bb9b53cb947051",
       "sourceUnitDigest": "bc5ca7e6617538ad",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-19",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0006 (source lines 1445-1445, starting \"Thêm trạng thái **`proposed`** vào FSM, với các cạnh:\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "bc5ca7e6617538adf69f4c157336e967"
+      "rationale": "Body of ADR 0006 (source lines 1445-1445, starting \"Thêm trạng thái **`proposed`** vào FSM, với các cạnh:\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "bc5ca7e6617538adf69f4c157336e967194051ccd11b686cfb97a85358255643",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "5. ADR 0006 Proposed Status",
+        "0006 Decision"
+      ]
     },
     {
       "claimId": "claim_6175bd55a942311ba1056efd762f44be",
       "sourceUnitDigest": "23622b5a51f195a4",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-20",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0006 (source lines 1447-1452, the transition list) carried line for line into its own block; text identical to the source.",
-      "targetUnitDigest": "23622b5a51f195a41cc870aac9b70d45",
-      "reviewedBy": "independent reviewer (re-review after the label rule)",
-      "reviewedAt": "2026-10-07"
+      "rationale": "Body of ADR 0006 (source lines 1447-1452, the transition list) carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "23622b5a51f195a41cc870aac9b70d45f4e6bc7f6247da22248bdaa5fea969f3",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "5. ADR 0006 Proposed Status",
+        "0006 Decision"
+      ]
     },
     {
       "claimId": "claim_e482cc83d02ca103ac12e881c2a712ee",
       "sourceUnitDigest": "671d794492bb185f",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-21",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "The label \"Ngữ nghĩa:\" and the two bullets it introduces (source lines 1454-1459) carried line for line into one block; the extraction rule attaches a short label ending in a colon to the block it introduces, in the candidate as in the source; text identical to the source.",
-      "targetUnitDigest": "671d794492bb185fc86e5b1cdbca92dc",
-      "reviewedBy": "independent reviewer (re-review after the label rule)",
-      "reviewedAt": "2026-10-07"
+      "rationale": "The label \"Ngữ nghĩa:\" and the two bullets it introduces (source lines 1454-1459) carried line for line into one block; the extraction rule attaches a short label ending in a colon to the block it introduces, in the candidate as in the source; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "671d794492bb185fc86e5b1cdbca92dc3a96080e0bf8b4319c51715c7a88ca85",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "5. ADR 0006 Proposed Status",
+        "0006 Decision"
+      ]
     },
     {
       "claimId": "claim_e602fe2731b631f7be06ccebc5cf8e91",
       "sourceUnitDigest": "899175d57462b103",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "0006-consequences",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Hệ quả\" of ADR 0006 is represented by the frozen H3 \"0006 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "783e9b5f2b2e44c3010507770e87c978"
+      "rationale": "Section heading \"Hệ quả\" of ADR 0006 is represented by the frozen H3 \"0006 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "783e9b5f2b2e44c3010507770e87c9785bcf8ff5b1aae09aecd902440090f996",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "5. ADR 0006 Proposed Status"
+      ]
     },
     {
       "claimId": "claim_453534a2ccfccba30980d90ae47b6e63",
       "sourceUnitDigest": "b7287de2ff36f57c",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-22",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0006 (source lines 1463-1468, starting \"- **Ghép nối qua nhánh an toàn:** phụ thuộc chỉ mở khi dep đã vào cây \") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "b7287de2ff36f57cb44f105c8ee8d259"
+      "rationale": "Body of ADR 0006 (source lines 1463-1468, starting \"- **Ghép nối qua nhánh an toàn:** phụ thuộc chỉ mở khi dep đã vào cây \") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "b7287de2ff36f57cb44f105c8ee8d259283f0f6445670c63dbe90337489cf97d",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "5. ADR 0006 Proposed Status",
+        "0006 Consequences"
+      ]
     },
     {
       "claimId": "claim_ad95e550092bec4474133ac2a451649d",
       "sourceUnitDigest": "12602590029a0f3b",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-23",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0006 (source lines 1470-1471, starting \"- Record này supersede **Tập trạng thái FSM của Phase 1 (spec work-sta\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "12602590029a0f3b8fe58c0ef444d338"
+      "rationale": "Body of ADR 0006 (source lines 1470-1471, starting \"- Record này supersede **Tập trạng thái FSM của Phase 1 (spec work-sta\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "12602590029a0f3b8fe58c0ef444d33801cb9c512c751362f2532c0323235155",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "5. ADR 0006 Proposed Status",
+        "0006 Consequences"
+      ]
     },
     {
       "claimId": "claim_2f1ede55aaf8adff2f15c46ffc646e8d",
       "sourceUnitDigest": "0652eaa390a60c98",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "6-adr-0007-schema-and-event-evolution",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Source ADR 0007 title heading is represented by the frozen H2 \"6. ADR 0007 ...\" (6-adr-0007-schema-and-event-evolution); title is renumbered and re-worded in English, text of the record is unchanged.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "38c7e64350e2c0ead7dc9dab84c6ecc2"
+      "rationale": "Source ADR 0007 title heading is represented by the frozen H2 \"6. ADR 0007 ...\" (6-adr-0007-schema-and-event-evolution); title is renumbered and re-worded in English, text of the record is unchanged. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "38c7e64350e2c0ead7dc9dab84c6ecc28918e7bb019e31a35b07fc88b495842f",
+      "targetAncestry": [
+        "Retired Decision History: Work State"
+      ],
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
     },
     {
       "claimId": "claim_208f5cc84da2b23ab24abde2c91c4f06",
       "sourceUnitDigest": "5483e14a0ec0d67c",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "0007-context",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Bối cảnh\" of ADR 0007 is represented by the frozen H3 \"0007 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "ab86aba22bff4bd95dfd666582cad23d"
+      "rationale": "Section heading \"Bối cảnh\" of ADR 0007 is represented by the frozen H3 \"0007 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "ab86aba22bff4bd95dfd666582cad23d4a6f3c760c8cf86de79efdac597d4dd2",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "6. ADR 0007 Schema And Event Evolution"
+      ]
     },
     {
       "claimId": "claim_5f4f81607ad69719e2fed9631a8dcd2b",
       "sourceUnitDigest": "8dd703c9d39dc60b",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-24",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0007 (source lines 1477-1479, starting \"Trạng thái `proposed` (0006) và trường `tier` (0005) **đổi shape dữ li\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "8dd703c9d39dc60ba48ae30e587eb759"
+      "rationale": "Body of ADR 0007 (source lines 1477-1479, starting \"Trạng thái `proposed` (0006) và trường `tier` (0005) **đổi shape dữ li\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "8dd703c9d39dc60ba48ae30e587eb759cc74eacd6680d54fbc831410a91eb791",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "6. ADR 0007 Schema And Event Evolution",
+        "0007 Context"
+      ]
     },
     {
       "claimId": "claim_886f9acc902249e303bacc887ffb9882",
       "sourceUnitDigest": "eb9a345fe658f7c4",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "0007-decision",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Quyết định\" of ADR 0007 is represented by the frozen H3 \"0007 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "08f6311c148ae29221fd5d1a3613d38b"
+      "rationale": "Section heading \"Quyết định\" of ADR 0007 is represented by the frozen H3 \"0007 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "08f6311c148ae29221fd5d1a3613d38b0e740914a3dcde683f27d48ee398de27",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "6. ADR 0007 Schema And Event Evolution"
+      ]
     },
     {
       "claimId": "claim_37315ade5a8ca0c583456c157daaecba",
       "sourceUnitDigest": "cc510df779670e7b",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-25",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0007 (source lines 1483-1483, starting \"Ba luật cho mọi tiến hoá schema/event từ đây về sau:\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "cc510df779670e7b9c13293a5a14adce"
+      "rationale": "Body of ADR 0007 (source lines 1483-1483, starting \"Ba luật cho mọi tiến hoá schema/event từ đây về sau:\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "cc510df779670e7b9c13293a5a14adce6a4890e98d58ab3de5cfca9ba1512f68",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "6. ADR 0007 Schema And Event Evolution",
+        "0007 Decision"
+      ]
     },
     {
       "claimId": "claim_4c29ddf395edf0a905c5cf76729c2d26",
       "sourceUnitDigest": "3544a54900acf99f",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-26",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0007 (source lines 1485-1491, starting \"1. **Log đã commit là bất khả xâm phạm.** Không bao giờ chạy migration\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "3544a54900acf99fb0dc62fc6dad1f1d"
+      "rationale": "Body of ADR 0007 (source lines 1485-1491, starting \"1. **Log đã commit là bất khả xâm phạm.** Không bao giờ chạy migration\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "3544a54900acf99fb0dc62fc6dad1f1d86468e495e95968a5c470efad2df6c8c",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "6. ADR 0007 Schema And Event Evolution",
+        "0007 Decision"
+      ],
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
     },
     {
       "claimId": "claim_9faf2f6fcfad6a089f7077f61abb3b56",
       "sourceUnitDigest": "e5123dd05236e7c9",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "0007-consequences",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Hệ quả\" of ADR 0007 is represented by the frozen H3 \"0007 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "55d9c1f19dff0d40bd97abcc406422ba"
+      "rationale": "Section heading \"Hệ quả\" of ADR 0007 is represented by the frozen H3 \"0007 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "55d9c1f19dff0d40bd97abcc406422ba20f7091135f9eaa20462af0bb2388f82",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "6. ADR 0007 Schema And Event Evolution"
+      ]
     },
     {
       "claimId": "claim_d0aa35a58456de6d8e5f552bdad1b08c",
       "sourceUnitDigest": "a7f8e3a1618320c0",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-27",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0007 (source lines 1495-1500, starting \"- **Log là hợp đồng tiến-tới:** thêm trường an toàn; đổi ngữ nghĩa thì\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "a7f8e3a1618320c0c7ba6fa420ed0cb2"
+      "rationale": "Body of ADR 0007 (source lines 1495-1500, starting \"- **Log là hợp đồng tiến-tới:** thêm trường an toàn; đổi ngữ nghĩa thì\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "a7f8e3a1618320c0c7ba6fa420ed0cb2286a83cae90d38e2052382c0cb0ed649",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "6. ADR 0007 Schema And Event Evolution",
+        "0007 Consequences"
+      ]
     },
     {
       "claimId": "claim_576e295be7d60ab95a555f11ada15da5",
       "sourceUnitDigest": "95a357e29712c3c0",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-28",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Supersession-rule line of ADR 0007 (change by superseding with a new record) carried verbatim at the end of its consequences section; the located suggestion pointed at the first identical copy, so the anchor was set to this ADR's own block.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e7"
+      "rationale": "Supersession-rule line of ADR 0007 (change by superseding with a new record) carried verbatim at the end of its consequences section; the located suggestion pointed at the first identical copy, so the anchor was set to this ADR's own block. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "6. ADR 0007 Schema And Event Evolution",
+        "0007 Consequences"
+      ]
     },
     {
       "claimId": "claim_e375b70390617716823280eb03a82a87",
       "sourceUnitDigest": "520a09658b949755",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "7-adr-0011-explicit-version-for-every-contract",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Source ADR 0011 title heading is represented by the frozen H2 \"7. ADR 0011 ...\" (7-adr-0011-explicit-version-for-every-contract); title is renumbered and re-worded in English, text of the record is unchanged.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "7b520a895337dc7ea9a23e4bcc1debc3"
+      "rationale": "Source ADR 0011 title heading is represented by the frozen H2 \"7. ADR 0011 ...\" (7-adr-0011-explicit-version-for-every-contract); title is renumbered and re-worded in English, text of the record is unchanged. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "7b520a895337dc7ea9a23e4bcc1debc386a39fc1e8120673d0aa77ea4a309457",
+      "targetAncestry": [
+        "Retired Decision History: Work State"
+      ],
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
     },
     {
       "claimId": "claim_a93bf40197e2bf32890a9cf931226e15",
       "sourceUnitDigest": "f0e519e3d177081f",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "0011-context",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Bối cảnh\" of ADR 0011 is represented by the frozen H3 \"0011 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "e113b11d301e876e8e3b3d3f59eca420"
+      "rationale": "Section heading \"Bối cảnh\" of ADR 0011 is represented by the frozen H3 \"0011 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "e113b11d301e876e8e3b3d3f59eca420dab2ea0aa6f3adc8d3ac076de93317d4",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "7. ADR 0011 Explicit Version For Every Contract"
+      ]
     },
     {
       "claimId": "claim_bad3eb429a52fae0b9100c7468c2d4d6",
       "sourceUnitDigest": "3a9e4da78591f573",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-29",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0011 (source lines 1508-1514, starting \"0007 đã khoá \"mỗi **event** mang trường schema version\". Nhưng fgOS kh\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "3a9e4da78591f573c1cf6b4019c03802"
+      "rationale": "Body of ADR 0011 (source lines 1508-1514, starting \"0007 đã khoá \"mỗi **event** mang trường schema version\". Nhưng fgOS kh\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "3a9e4da78591f573c1cf6b4019c03802f81d41c30be8ea815acaf95df65824bc",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "7. ADR 0011 Explicit Version For Every Contract",
+        "0011 Context"
+      ]
     },
     {
       "claimId": "claim_33c9953761a4fe99a4072b008cefc634",
       "sourceUnitDigest": "f0eb277249c05d98",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-30",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0011 (source lines 1516-1523, starting \"Bằng chứng sống trong chính workshop: bee (harness phát triển cạnh fgO\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "f0eb277249c05d987db88e8f1d6b6889"
+      "rationale": "Body of ADR 0011 (source lines 1516-1523, starting \"Bằng chứng sống trong chính workshop: bee (harness phát triển cạnh fgO\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "f0eb277249c05d987db88e8f1d6b6889788206f611c9b07aa9dc74e49982edee",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "7. ADR 0011 Explicit Version For Every Contract",
+        "0011 Context"
+      ]
     },
     {
       "claimId": "claim_ff4510bb2afe125aedac972ed943ce2c",
       "sourceUnitDigest": "03f45ad00ec7a12c",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "0011-decision",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Quyết định\" of ADR 0011 is represented by the frozen H3 \"0011 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "28cc1686008a465c5f12c2c878349dc0"
+      "rationale": "Section heading \"Quyết định\" of ADR 0011 is represented by the frozen H3 \"0011 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "28cc1686008a465c5f12c2c878349dc018dd023ba3dbd514689390ca5ac61776",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "7. ADR 0011 Explicit Version For Every Contract"
+      ]
     },
     {
       "claimId": "claim_50eed5d7ed0c4f2107e50cca1ffcee82",
       "sourceUnitDigest": "4746d446f503df65",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-31",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0011 (source lines 1527-1530, starting \"Ba loại contract fgOS expose ra ngoài code của nó — **schema** (shape \") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "4746d446f503df656947b8c1b4b27210"
+      "rationale": "Body of ADR 0011 (source lines 1527-1530, starting \"Ba loại contract fgOS expose ra ngoài code của nó — **schema** (shape \") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "4746d446f503df656947b8c1b4b27210c2d5c43ef909cd2aacb0d99c93bbe6c3",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "7. ADR 0011 Explicit Version For Every Contract",
+        "0011 Decision"
+      ]
     },
     {
       "claimId": "claim_6346dec77f2dff715949806586e100d3",
       "sourceUnitDigest": "f665548de1acd2a9",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-32",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0011 (source lines 1532-1544, starting \"1. **Artifact có shape ổn định mang `contract: <name>/v<N>`** trong\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "f665548de1acd2a9a08cd71ec99df897"
+      "rationale": "Body of ADR 0011 (source lines 1532-1544, starting \"1. **Artifact có shape ổn định mang `contract: <name>/v<N>`** trong\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "f665548de1acd2a9a08cd71ec99df897a2876584b3b987c25faf5a40c4ebfaa0",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "7. ADR 0011 Explicit Version For Every Contract",
+        "0011 Decision"
+      ]
     },
     {
       "claimId": "claim_0dd6189a9d8ed1bcdd656127bf71774e",
       "sourceUnitDigest": "3bd6300879f149e8",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "0011-consequences",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Hệ quả\" of ADR 0011 is represented by the frozen H3 \"0011 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "54a5977501d4d13b842a24d99b66e459"
+      "rationale": "Section heading \"Hệ quả\" of ADR 0011 is represented by the frozen H3 \"0011 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "54a5977501d4d13b842a24d99b66e4591c4b04006f57477f35b248e444d7585c",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "7. ADR 0011 Explicit Version For Every Contract"
+      ]
     },
     {
       "claimId": "claim_9be26c9507109484cc9b1663ca4ca2d9",
       "sourceUnitDigest": "da125878208e7de6",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-33",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0011 (source lines 1548-1554, starting \"- **0007 không bị supersede** — 0011 mở rộng phạm vi (event → +schema,\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "da125878208e7de6ec45f980e4c8e5bb"
+      "rationale": "Body of ADR 0011 (source lines 1548-1554, starting \"- **0007 không bị supersede** — 0011 mở rộng phạm vi (event → +schema,\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "da125878208e7de6ec45f980e4c8e5bbef2d5e53eadc5474c893b29a4e85beb1",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "7. ADR 0011 Explicit Version For Every Contract",
+        "0011 Consequences"
+      ]
     },
     {
       "claimId": "claim_08dc68ef23395b8f3f5b095508348e00",
       "sourceUnitDigest": "95a357e29712c3c0",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-34",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Supersession-rule line of ADR 0011 (change by superseding with a new record) carried verbatim at the end of its consequences section; the located suggestion pointed at the first identical copy, so the anchor was set to this ADR's own block.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e7"
+      "rationale": "Supersession-rule line of ADR 0011 (change by superseding with a new record) carried verbatim at the end of its consequences section; the located suggestion pointed at the first identical copy, so the anchor was set to this ADR's own block. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "7. ADR 0011 Explicit Version For Every Contract",
+        "0011 Consequences"
+      ]
     },
     {
       "claimId": "claim_e3c928a8fca5c645487d1b574f0c5d36",
       "sourceUnitDigest": "9b3ff4bedb1e8747",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "8-adr-0012-unified-typed-edge-graph-model",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Source ADR 0012 title heading is represented by the frozen H2 \"8. ADR 0012 ...\" (8-adr-0012-unified-typed-edge-graph-model); title is renumbered and re-worded in English, text of the record is unchanged.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "e9c5857a60ea685d3aab78eae8e2b44b"
+      "rationale": "Source ADR 0012 title heading is represented by the frozen H2 \"8. ADR 0012 ...\" (8-adr-0012-unified-typed-edge-graph-model); title is renumbered and re-worded in English, text of the record is unchanged. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "e9c5857a60ea685d3aab78eae8e2b44b7d96e10698e4764d4a8b109e54f47f45",
+      "targetAncestry": [
+        "Retired Decision History: Work State"
+      ],
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
     },
     {
       "claimId": "claim_386a8c90d7f9d79a52190add7a82f33f",
       "sourceUnitDigest": "95bdd9de256a67e0",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "0012-context",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Bối cảnh\" of ADR 0012 is represented by the frozen H3 \"0012 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "0dc5cda4fa7fbd44208f88a810d9e6f7"
+      "rationale": "Section heading \"Bối cảnh\" of ADR 0012 is represented by the frozen H3 \"0012 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "0dc5cda4fa7fbd44208f88a810d9e6f77a67e9efa236041735d82bad31cd0158",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "8. ADR 0012 Unified Typed-Edge Graph Model"
+      ]
     },
     {
       "claimId": "claim_4806fa4d3041b4b051cddf6a2490730b",
       "sourceUnitDigest": "46ed30006ee6e00a",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-35",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0012 (source lines 1562-1567, starting \"0002 khoá \"deps và parent là hai quan hệ tách rời có chủ đích\": `deps`\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "46ed30006ee6e00a1f81320cb86f1e91"
+      "rationale": "Body of ADR 0012 (source lines 1562-1567, starting \"0002 khoá \"deps và parent là hai quan hệ tách rời có chủ đích\": `deps`\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "46ed30006ee6e00a1f81320cb86f1e91d79732f033b3345aa8f956c9c1c54961",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "8. ADR 0012 Unified Typed-Edge Graph Model",
+        "0012 Context"
+      ]
     },
     {
       "claimId": "claim_d1d70b955b085baafa10ffcec2702b8d",
       "sourceUnitDigest": "e4554b1ed9990b0f",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-36",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0012 (source lines 1569-1575, starting \"Việc dò tay lúc validating S2a phát hiện một lỗ hổng sống **khác**, be\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "e4554b1ed9990b0f5dbf12aa19075d6d"
+      "rationale": "Body of ADR 0012 (source lines 1569-1575, starting \"Việc dò tay lúc validating S2a phát hiện một lỗ hổng sống **khác**, be\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "e4554b1ed9990b0f5dbf12aa19075d6dfd2eb29d0ca40117916f5672e419e4ba",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "8. ADR 0012 Unified Typed-Edge Graph Model",
+        "0012 Context"
+      ]
     },
     {
       "claimId": "claim_dc663544c2f4766e60ca2ce841c6ffd6",
       "sourceUnitDigest": "1186cfa23b3d3a5f",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-37",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0012 (source lines 1577-1581, starting \"Beads (nguồn tham khảo đã mined — `beads.md:36`, `work-item-management\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "1186cfa23b3d3a5f227a6f05ceacf581"
+      "rationale": "Body of ADR 0012 (source lines 1577-1581, starting \"Beads (nguồn tham khảo đã mined — `beads.md:36`, `work-item-management\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "1186cfa23b3d3a5f227a6f05ceacf581ab841a0bf5100c82d4db735cc5479859",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "8. ADR 0012 Unified Typed-Edge Graph Model",
+        "0012 Context"
+      ],
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
     },
     {
       "claimId": "claim_3b4da5c5b12c6780b24e84b53ca73e49",
       "sourceUnitDigest": "24cacb854eb926ac",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "0012-decision",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Quyết định\" of ADR 0012 is represented by the frozen H3 \"0012 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "9dee590708c4181b56606cd803fd345e"
+      "rationale": "Section heading \"Quyết định\" of ADR 0012 is represented by the frozen H3 \"0012 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "9dee590708c4181b56606cd803fd345edfe4a9db456d03efe6a0d63e7b8ad917",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "8. ADR 0012 Unified Typed-Edge Graph Model"
+      ]
     },
     {
       "claimId": "claim_f44a3645601fbc48b21a8d73b3ac3426",
       "sourceUnitDigest": "0f8f279453f179f3",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-38",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0012 (source lines 1585-1620, starting \"- **fgOS mô hình hoá quan hệ giữa các work item bằng MỘT đồ thị cạnh-đ\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "0f8f279453f179f3b8c688e65b42d55f"
+      "rationale": "Body of ADR 0012 (source lines 1585-1620, starting \"- **fgOS mô hình hoá quan hệ giữa các work item bằng MỘT đồ thị cạnh-đ\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "0f8f279453f179f3b8c688e65b42d55ff830d8cae0c7462980c05a4f00c04106",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "8. ADR 0012 Unified Typed-Edge Graph Model",
+        "0012 Decision"
+      ]
     },
     {
       "claimId": "claim_c6a32a1e4ab8c7078b89199236f3d5e0",
       "sourceUnitDigest": "f35473b9295a35af",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "0012-consequences",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Hệ quả\" of ADR 0012 is represented by the frozen H3 \"0012 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "764a0029f0ee73f78c522c71e69830fa"
+      "rationale": "Section heading \"Hệ quả\" of ADR 0012 is represented by the frozen H3 \"0012 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "764a0029f0ee73f78c522c71e69830fac20871e226b636c7832f1461d0c0c79c",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "8. ADR 0012 Unified Typed-Edge Graph Model"
+      ]
     },
     {
       "claimId": "claim_4da244a64b6f33711d89feb47331b4f0",
       "sourceUnitDigest": "df6252739cffc35e",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-39",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0012 (source lines 1624-1631, starting \"- `docs/architecture-map.md` nâng v0.2 → v0.3: dòng version trỏ record\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "df6252739cffc35e81a7acce610d94cd"
+      "rationale": "Body of ADR 0012 (source lines 1624-1631, starting \"- `docs/architecture-map.md` nâng v0.2 → v0.3: dòng version trỏ record\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "df6252739cffc35e81a7acce610d94cdb17bf12c53d106820a4b567ffbb55038",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "8. ADR 0012 Unified Typed-Edge Graph Model",
+        "0012 Consequences"
+      ],
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
     },
     {
       "claimId": "claim_a7c2e1310de5bcd152e86f3833e90033",
       "sourceUnitDigest": "95a357e29712c3c0",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-40",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Supersession-rule line of ADR 0012 (change by superseding with a new record) carried verbatim at the end of its consequences section; the located suggestion pointed at the first identical copy, so the anchor was set to this ADR's own block.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e7"
+      "rationale": "Supersession-rule line of ADR 0012 (change by superseding with a new record) carried verbatim at the end of its consequences section; the located suggestion pointed at the first identical copy, so the anchor was set to this ADR's own block. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "8. ADR 0012 Unified Typed-Edge Graph Model",
+        "0012 Consequences"
+      ]
     },
     {
       "claimId": "claim_2d27908b73621a411fcf708b067b6ba2",
       "sourceUnitDigest": "f529cf675d973db5",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "9-adr-0013-report-not-write-channel-for-discovered-from",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Source ADR 0013 title heading is represented by the frozen H2 \"9. ADR 0013 ...\" (9-adr-0013-report-not-write-channel-for-discovered-from); title is renumbered and re-worded in English, text of the record is unchanged.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "bb9207e0916a5823e45378afb7d0247d"
+      "rationale": "Source ADR 0013 title heading is represented by the frozen H2 \"9. ADR 0013 ...\" (9-adr-0013-report-not-write-channel-for-discovered-from); title is renumbered and re-worded in English, text of the record is unchanged. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "bb9207e0916a5823e45378afb7d0247d511cb2bf870386fdefd982d8a17e51cb",
+      "targetAncestry": [
+        "Retired Decision History: Work State"
+      ],
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
     },
     {
       "claimId": "claim_e68c14be45a430e3676761d7bdc9e6db",
       "sourceUnitDigest": "31a7f48e9cc16169",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "0013-context",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Bối cảnh\" of ADR 0013 is represented by the frozen H3 \"0013 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "39a94a27f6e89fec290ba89590cff979"
+      "rationale": "Section heading \"Bối cảnh\" of ADR 0013 is represented by the frozen H3 \"0013 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "39a94a27f6e89fec290ba89590cff97929d9c7625c0ad041e4bb461c53fe5d61",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
+      ]
     },
     {
       "claimId": "claim_62c3b825e8cc887ad822b8d1b5316769",
       "sourceUnitDigest": "a00c0f5592ff571c",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-41",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0013 (source lines 1639-1643, starting \"work-graph-intelligence S2b thêm `discoveredFrom` — một trường lineage\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "a00c0f5592ff571cf91553ec9c8faad0"
+      "rationale": "Body of ADR 0013 (source lines 1639-1643, starting \"work-graph-intelligence S2b thêm `discoveredFrom` — một trường lineage\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "a00c0f5592ff571cf91553ec9c8faad0802584c313d21071375ff8d6f8405ece",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+        "0013 Context"
+      ]
     },
     {
       "claimId": "claim_2591914de0c8f3b95488576fb8643dfb",
       "sourceUnitDigest": "ad532d04b4ed0695",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-42",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0013 (source lines 1645-1650, starting \"Nhà sản xuất (B) va thẳng vào một bất biến đã khoá: **runner là nhà gh\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "ad532d04b4ed06951112d9fecaf14648"
+      "rationale": "Body of ADR 0013 (source lines 1645-1650, starting \"Nhà sản xuất (B) va thẳng vào một bất biến đã khoá: **runner là nhà gh\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "ad532d04b4ed06951112d9fecaf1464867e47d988b18f9cfadf0dc88d059f767",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+        "0013 Context"
+      ]
     },
     {
       "claimId": "claim_1f9265c6ad8bc4b9e8cf754fb1b8b164",
       "sourceUnitDigest": "9b836a5af7fa427d",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "0013-decision",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Quyết định\" of ADR 0013 is represented by the frozen H3 \"0013 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "dc61b855030de6ec8c01fd1fd4621552"
+      "rationale": "Section heading \"Quyết định\" of ADR 0013 is represented by the frozen H3 \"0013 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "dc61b855030de6ec8c01fd1fd46215522d2327be9adb6c025724d974f8843b8e",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
+      ]
     },
     {
       "claimId": "claim_e2589be21644922e0424a20d39bbd6e3",
       "sourceUnitDigest": "c56d7ec3b4f47f64",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-43",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0013 (source lines 1654-1655, starting \"Phát minh một **kênh báo-cáo-không-ghi** (report-not-write) giữa worke\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "c56d7ec3b4f47f64c9a1c99b5401e17c"
+      "rationale": "Body of ADR 0013 (source lines 1654-1655, starting \"Phát minh một **kênh báo-cáo-không-ghi** (report-not-write) giữa worke\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "c56d7ec3b4f47f64c9a1c99b5401e17c42ef591a0edaee116811a00ba808d373",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+        "0013 Decision"
+      ]
     },
     {
       "claimId": "claim_ebf8d11889aea2db10db3f7d03fb7d50",
       "sourceUnitDigest": "f17f548794a78bbc",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-44",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0013 (source lines 1657-1661, starting \"1. **Worker chỉ báo cáo, dữ liệu thuần.** Prompt dispatch mô tả một kê\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "f17f548794a78bbc05c2553918d93b56"
+      "rationale": "Body of ADR 0013 (source lines 1657-1661, starting \"1. **Worker chỉ báo cáo, dữ liệu thuần.** Prompt dispatch mô tả một kê\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "f17f548794a78bbc05c2553918d93b56d0f307ea02732dcd113f04c48e8bd0f9",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+        "0013 Decision"
+      ],
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
     },
     {
       "claimId": "claim_afaa4b9499e137528bcf889ef6ef93f0",
       "sourceUnitDigest": "fe25484d362341cc",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-45",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0013 (source lines 1663-1668, starting \"2. **Runner đọc và tự ghi.** `loop.mjs` `dispatchClaimedItem` parse cá\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "fe25484d362341cc389e461a59cba3bb"
+      "rationale": "Body of ADR 0013 (source lines 1663-1668, starting \"2. **Runner đọc và tự ghi.** `loop.mjs` `dispatchClaimedItem` parse cá\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "fe25484d362341cc389e461a59cba3bbc6a065c6998456273f1a1956c993931d",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+        "0013 Decision"
+      ],
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
     },
     {
       "claimId": "claim_185e1f6f4d1ef50fead4ce341980898d",
       "sourceUnitDigest": "a25b933f983753d9",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-46",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0013 (source lines 1670-1673, starting \"3. **Parse là an-toàn-hỏng (fail-safe).** Khối méo/thiếu `title`/không\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "a25b933f983753d92ab77173127f6af1"
+      "rationale": "Body of ADR 0013 (source lines 1670-1673, starting \"3. **Parse là an-toàn-hỏng (fail-safe).** Khối méo/thiếu `title`/không\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "a25b933f983753d92ab77173127f6af159da4cf1b259bcdf6bcb8a8ba0ada695",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+        "0013 Decision"
+      ],
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
     },
     {
       "claimId": "claim_fc4d5078de5528578407ea0e3715e723",
       "sourceUnitDigest": "2bc3f7c954aa9f74",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-47",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0013 (source lines 1675-1682, starting \"4. **Item tạo ra có hình dạng như một `submit` tươi.** `generateId(tit\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "2bc3f7c954aa9f7464b354246e208cbc"
+      "rationale": "Body of ADR 0013 (source lines 1675-1682, starting \"4. **Item tạo ra có hình dạng như một `submit` tươi.** `generateId(tit\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "2bc3f7c954aa9f7464b354246e208cbce1ebd91f0bc7679e22771a946b19d7c2",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+        "0013 Decision"
+      ],
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
     },
     {
       "claimId": "claim_df1ec9feeaeb131a98f44cebcd3c8f6c",
       "sourceUnitDigest": "261b711fa046562a",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "0013-consequences",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Hệ quả\" of ADR 0013 is represented by the frozen H3 \"0013 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "19ae019de9e9e6e87ca9d19d8bb92a18"
+      "rationale": "Section heading \"Hệ quả\" of ADR 0013 is represented by the frozen H3 \"0013 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "19ae019de9e9e6e87ca9d19d8bb92a18bbefab9ab1579d1010a315477e994782",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
+      ]
     },
     {
       "claimId": "claim_b8d85d30862c55869062b5418f430f69",
       "sourceUnitDigest": "dd8567cf8f523681",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-48",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0013 (source lines 1686-1693, starting \"- **Runner vẫn một-cửa-ghi.** Worker phát dữ liệu; RUNNER ghi. Không c\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "dd8567cf8f5236817bec1f249d0b2189"
+      "rationale": "Body of ADR 0013 (source lines 1686-1693, starting \"- **Runner vẫn một-cửa-ghi.** Worker phát dữ liệu; RUNNER ghi. Không c\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "dd8567cf8f5236817bec1f249d0b21893c5d99f1c4a3d39e95dfe7e68595079c",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+        "0013 Consequences"
+      ],
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
     },
     {
       "claimId": "claim_9f56719f95c81edecfe6dfda00ca0268",
       "sourceUnitDigest": "5c944fd5d5e941cc",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "0013-trust-boundary",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Ranh giới tin cậy (bổ chú 2026-07-18, review-fix S11)\" of ADR 0013 is represented by the frozen H3 \"0013 Trust Boundary\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "f4b2987afebaa4bfcb171bf9122acb39"
+      "rationale": "Section heading \"Ranh giới tin cậy (bổ chú 2026-07-18, review-fix S11)\" of ADR 0013 is represented by the frozen H3 \"0013 Trust Boundary\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "f4b2987afebaa4bfcb171bf9122acb39d864d4321de4cc1af5bc61afa7f3c58b",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
+      ]
     },
     {
       "claimId": "claim_a4c7eec1fc96a1ad212a5de75a8942c5",
       "sourceUnitDigest": "1e83f0bc05ec81d1",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-49",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0013 (source lines 1697-1709, starting \"`title`/`description` trong một khối `fgos-discovered` là VĂN BẢN KHÔN\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "1e83f0bc05ec81d1fe854887d220e203"
+      "rationale": "Body of ADR 0013 (source lines 1697-1709, starting \"`title`/`description` trong một khối `fgos-discovered` là VĂN BẢN KHÔN\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "1e83f0bc05ec81d1fe854887d220e203809ead02d46721a52758b39275350332",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+        "0013 Trust Boundary"
+      ]
     },
     {
       "claimId": "claim_4e04420f3322b42d6a313faa72216ae9",
       "sourceUnitDigest": "58646cbd3a8ef4bd",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "0013-delivery-guarantee",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Bảo đảm giao-nhận (bổ chú 2026-07-18, review-fix S11)\" of ADR 0013 is represented by the frozen H3 \"0013 Delivery Guarantee\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "42a5b4fd66d36c0accc5dd7dffd9f8d1"
+      "rationale": "Section heading \"Bảo đảm giao-nhận (bổ chú 2026-07-18, review-fix S11)\" of ADR 0013 is represented by the frozen H3 \"0013 Delivery Guarantee\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "42a5b4fd66d36c0accc5dd7dffd9f8d1fb12d5b002b70a26114cfe538f6c23f1",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
+      ]
     },
     {
       "claimId": "claim_bd1c7b0191b236990a4740f007de2397",
       "sourceUnitDigest": "9a5163f684996577",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-50",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0013 (source lines 1713-1717, starting \"Kênh này là **cố-gắng-tối-đa, tối-đa-một-lần** (best-effort, at-most-o\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "9a5163f6849965777501890f2c895955"
+      "rationale": "Body of ADR 0013 (source lines 1713-1717, starting \"Kênh này là **cố-gắng-tối-đa, tối-đa-một-lần** (best-effort, at-most-o\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "9a5163f6849965777501890f2c89595562a69b5f7de6fda209b27130d346a77b",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+        "0013 Delivery Guarantee"
+      ]
     },
     {
       "claimId": "claim_fe29583fb3eaae959e22d8ea42f76e6d",
       "sourceUnitDigest": "e702d74cca4d0100",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "0013-alternatives-considered",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Phương án đã cân nhắc và bỏ\" of ADR 0013 is represented by the frozen H3 \"0013 Alternatives Considered\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "dd8d4e0029a8249cf8149298e7a2d77c"
+      "rationale": "Section heading \"Phương án đã cân nhắc và bỏ\" of ADR 0013 is represented by the frozen H3 \"0013 Alternatives Considered\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "dd8d4e0029a8249cf8149298e7a2d77c1497f8922738eb1904e786085c1b7f65",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
+      ]
     },
     {
       "claimId": "claim_8beebc48272beb4cf5dd32b6ed94d5d0",
       "sourceUnitDigest": "61cda065233d2cdb",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-51",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0013 (source lines 1721-1726, starting \"- **Worker tự gọi `fgos add`.** Bỏ — phá vỡ runner-một-cửa-ghi và làm \") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "61cda065233d2cdb3c74df03865aa0ac"
+      "rationale": "Body of ADR 0013 (source lines 1721-1726, starting \"- **Worker tự gọi `fgos add`.** Bỏ — phá vỡ runner-một-cửa-ghi và làm \") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "61cda065233d2cdb3c74df03865aa0ac7863c547f41f83f6868e8cae003d7d24",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+        "0013 Alternatives Considered"
+      ],
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
     },
     {
       "claimId": "claim_e763e03b02e0c2d677ef4b49f30a9ad3",
       "sourceUnitDigest": "74fba64154edbbc6",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "10-adr-0019-pre-release-exemption-for-the-schema-evolution-rule",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Source ADR 0019 title heading is represented by the frozen H2 \"10. ADR 0019 ...\" (10-adr-0019-pre-release-exemption-for-the-schema-evolution-rule); title is renumbered and re-worded in English, text of the record is unchanged.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "76fc593cba1fa3b5ebaf7e373e9251e1"
+      "rationale": "Source ADR 0019 title heading is represented by the frozen H2 \"10. ADR 0019 ...\" (10-adr-0019-pre-release-exemption-for-the-schema-evolution-rule); title is renumbered and re-worded in English, text of the record is unchanged. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "76fc593cba1fa3b5ebaf7e373e9251e1774f5eb9c16d0e6ced80024d7d410c8f",
+      "targetAncestry": [
+        "Retired Decision History: Work State"
+      ],
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
     },
     {
       "claimId": "claim_a9ff1aae0ff13bbce2c3ba5e9f30b19e",
       "sourceUnitDigest": "15548911bb940170",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "0019-context",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Bối cảnh\" of ADR 0019 is represented by the frozen H3 \"0019 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "b589b460ed77e03ef37631a2f2e38752"
+      "rationale": "Section heading \"Bối cảnh\" of ADR 0019 is represented by the frozen H3 \"0019 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "b589b460ed77e03ef37631a2f2e387529c52965ea0cb49f198e4e67d4c368d04",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "10. ADR 0019 Pre-Release Exemption For The Schema Evolution Rule"
+      ]
     },
     {
       "claimId": "claim_b87e27dca1c9e551eb4d296c858d0f08",
       "sourceUnitDigest": "5a365fcd8c5b99f7",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-52",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0019 (source lines 1732-1735, starting \"`RUL11 (tiến hóa schema)` (`docs/specs/work-state.md:886`, D-ID `feed7\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "5a365fcd8c5b99f79d1a6f32be9ae436"
+      "rationale": "Body of ADR 0019 (source lines 1732-1735, starting \"`RUL11 (tiến hóa schema)` (`docs/specs/work-state.md:886`, D-ID `feed7\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "5a365fcd8c5b99f79d1a6f32be9ae4363651d14b79a300edbe4f57e8b0827fe3",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "10. ADR 0019 Pre-Release Exemption For The Schema Evolution Rule",
+        "0019 Context"
+      ],
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
     },
     {
       "claimId": "claim_5770fe5a53057464d4c4795b24abb38a",
       "sourceUnitDigest": "04c1c4fb64c70d91",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-53",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0019 (source lines 1737-1742, starting \"STR46 đổi tên trường `actor` (và các trường phái sinh: `claimActor`, k\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "04c1c4fb64c70d916b094a4a20866c35"
+      "rationale": "Body of ADR 0019 (source lines 1737-1742, starting \"STR46 đổi tên trường `actor` (và các trường phái sinh: `claimActor`, k\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "04c1c4fb64c70d916b094a4a20866c3519994021038cee2d7a78f7701119ebf2",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "10. ADR 0019 Pre-Release Exemption For The Schema Evolution Rule",
+        "0019 Context"
+      ]
     },
     {
       "claimId": "claim_86e1127b120054dafe55e52585c2a1d9",
       "sourceUnitDigest": "1eb8c8df3524d600",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "0019-decision",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Quyết định\" of ADR 0019 is represented by the frozen H3 \"0019 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "f4473462b5e03712e55bee9a240b00c7"
+      "rationale": "Section heading \"Quyết định\" of ADR 0019 is represented by the frozen H3 \"0019 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "f4473462b5e03712e55bee9a240b00c7699d73164ee8bc8bf071b6dfff526187",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "10. ADR 0019 Pre-Release Exemption For The Schema Evolution Rule"
+      ]
     },
     {
       "claimId": "claim_ef05e66d20bc35c8c80ac2a83dbe7d92",
       "sourceUnitDigest": "8dc8ecc4dc88503f",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-54",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0019 (source lines 1746-1749, starting \"Ghi nhận một **miễn trừ pre-release** cho `RUL11 (tiến hóa schema)`: t\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "8dc8ecc4dc88503fd629b00fef6a1841"
+      "rationale": "Body of ADR 0019 (source lines 1746-1749, starting \"Ghi nhận một **miễn trừ pre-release** cho `RUL11 (tiến hóa schema)`: t\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "8dc8ecc4dc88503fd629b00fef6a1841c76a30a42340b9255a3c1f53300fd2c3",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "10. ADR 0019 Pre-Release Exemption For The Schema Evolution Rule",
+        "0019 Decision"
+      ]
     },
     {
       "claimId": "claim_16901b7106220f70f44d600ba4dbb40f",
       "sourceUnitDigest": "98bb7f4e04652171",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-55",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0019 (source lines 1751-1773, starting \"- **Phạm vi (coverage).** Miễn trừ bao trùm cả BA kho `.fgos` liệt ở t\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "98bb7f4e04652171ceed757c50de5df4"
+      "rationale": "Body of ADR 0019 (source lines 1751-1773, starting \"- **Phạm vi (coverage).** Miễn trừ bao trùm cả BA kho `.fgos` liệt ở t\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "98bb7f4e04652171ceed757c50de5df4b645a5a6b96aa900b80b6ae114c6391f",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "10. ADR 0019 Pre-Release Exemption For The Schema Evolution Rule",
+        "0019 Decision"
+      ],
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
     },
     {
       "claimId": "claim_6ce44d19e0f7b99b1c363579bf6eb68e",
       "sourceUnitDigest": "2f6e935eb95f8af8",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-56",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0019 (source lines 1775-1779, starting \"Vì `RUL11 (tiến hóa schema)` là một luật trong spec chứ không phải một\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "2f6e935eb95f8af8bd54cd1a01fc3f7c"
+      "rationale": "Body of ADR 0019 (source lines 1775-1779, starting \"Vì `RUL11 (tiến hóa schema)` là một luật trong spec chứ không phải một\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "2f6e935eb95f8af8bd54cd1a01fc3f7cbba7eea9b5346b6b6f2458dc94555724",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "10. ADR 0019 Pre-Release Exemption For The Schema Evolution Rule",
+        "0019 Decision"
+      ]
     },
     {
       "claimId": "claim_9974f7370cd9be4ca66f08057a94d3d7",
       "sourceUnitDigest": "8ae8c5f37b83bcd7",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "0019-consequences",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Hệ quả\" of ADR 0019 is represented by the frozen H3 \"0019 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "de5943f8259424b72bc4cfb00883277e"
+      "rationale": "Section heading \"Hệ quả\" of ADR 0019 is represented by the frozen H3 \"0019 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "de5943f8259424b72bc4cfb00883277e6e232f8b46e0f0fb46efcd42f5dda549",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "10. ADR 0019 Pre-Release Exemption For The Schema Evolution Rule"
+      ]
     },
     {
       "claimId": "claim_38fc27aadc8aecf157c5db30cda1862b",
       "sourceUnitDigest": "03dc0e5f689c7e6c",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-57",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0019 (source lines 1783-1789, starting \"- **Replay không còn đọc hai tên cho một trường.** Sau khi viết lại và\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "03dc0e5f689c7e6c592f7134944ef404"
+      "rationale": "Body of ADR 0019 (source lines 1783-1789, starting \"- **Replay không còn đọc hai tên cho một trường.** Sau khi viết lại và\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "03dc0e5f689c7e6c592f7134944ef404913e3d53ba2d2f02d7812e330a6bd60d",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "10. ADR 0019 Pre-Release Exemption For The Schema Evolution Rule",
+        "0019 Consequences"
+      ],
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
     },
     {
       "claimId": "claim_ebfb0421fa0d9c6693aaf57a262dd471",
       "sourceUnitDigest": "c71c9558d2d278e6",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "11-adr-0024-rename-proposed-status-to-awaiting-approval",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Source ADR 0024 title heading is represented by the frozen H2 \"11. ADR 0024 ...\" (11-adr-0024-rename-proposed-status-to-awaiting-approval); title is renumbered and re-worded in English, text of the record is unchanged.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "9a20af2987019cf46f528ef85e14e942"
+      "rationale": "Source ADR 0024 title heading is represented by the frozen H2 \"11. ADR 0024 ...\" (11-adr-0024-rename-proposed-status-to-awaiting-approval); title is renumbered and re-worded in English, text of the record is unchanged. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "9a20af2987019cf46f528ef85e14e942102ce13d868c9cd7ae034e513c1da91a",
+      "targetAncestry": [
+        "Retired Decision History: Work State"
+      ],
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
     },
     {
       "claimId": "claim_aa501f53cee0b7ec6adc656971266a97",
       "sourceUnitDigest": "a70886dacf6f54f1",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "0024-context",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Section heading \"Bối cảnh\" of ADR 0024 is represented by the frozen H3 \"0024 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "e7d340683e7d23c9fc7e740c59e3218b"
+      "rationale": "Section heading \"Bối cảnh\" of ADR 0024 is represented by the frozen H3 \"0024 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "e7d340683e7d23c9fc7e740c59e3218b1ba61e5d3580913aaa17db28483b9bd9",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "11. ADR 0024 Rename Proposed Status To Awaiting-Approval"
+      ]
     },
     {
       "claimId": "claim_7d0cfc9e7e784ee0492be9c2d04fa93b",
       "sourceUnitDigest": "7ef891c3b1ad980c",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "targetAnchor": "unheaded-block-58",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0024 (source lines 1795-1800, starting \"`0006` đặt tên status `proposed` cho trạng thái \"goal-check đạt, đề xu\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "7ef891c3b1ad980c1d7b4816db14927c"
+      "rationale": "Body of ADR 0024 (source lines 1795-1800, starting \"`0006` đặt tên status `proposed` cho trạng thái \"goal-check đạt, đề xu\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "targetUnitDigest": "7ef891c3b1ad980c1d7b4816db14927cbe0113c300984e0fa772aab39f164989",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetAncestry": [
+        "Retired Decision History: Work State",
+        "11. ADR 0024 Rename Proposed Status To Awaiting-Approval",
+        "0024 Context"
+      ]
     }
   ]
 }

@@ -58,4 +58,4 @@ The selected provider receives only the least-privilege grant through `Invocatio
 | operation catalog | [../contracts/operation-catalog.md](../contracts/operation-catalog.md) |
 | provider contract | [../contracts/operation-provider.md](../contracts/operation-provider.md) |
 | manifest contract | [../contracts/external-provider-manifest.md](../contracts/external-provider-manifest.md) |
-| source architecture | [../spec.md](../spec.md) |
+| source architecture | [../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../../../architect/host-invocation-routing/host-invocation-provider-routing.md) |

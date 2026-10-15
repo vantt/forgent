@@ -473,7 +473,7 @@ because its plan exists.
 | operative transitional switchboard | [transitional-switchboard.md](documentation/switchboard.md) |
 | migration authoring rules | [platform/migration-authoring-rules.md](migration-authoring-rules.md) |
 | platform portal | [platform/README.md](README.md) |
-| source design discussion | [architect/documentation-system-design.md](documentation/architecture/documentation-system-design.md) |
+| source design discussion | [architect/documentation-system-design.md](../architect/documentation-system-design.md) |
 
 ## Source Metadata (Added in candidate)
 

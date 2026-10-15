@@ -24,12 +24,17 @@
       "targetAnchor": "coordination-dispatch-execution-contract",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
       "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep the map proposal conservatively: the shared dispatch boundary survives. No acceptance of its unbuilt coordinator-facing contract or historical observations as current truth. Evidence: Source Correction to the current discussion / Responsibility split makes Dispatch the execution substrate. src/runner/execution/bind.mjs and run.mjs, src/runner/dispatch/assignment.mjs and assignment-runner.mjs survive; retired engine-internal consult/close observations remain dated. Complete source heading docs/architect/proposals/coordination-dispatch-contract.md#coordination-dispatch-execution-contract (lines 1–1) is carried at docs/platform/proposals/coordination-dispatch-contract.md#coordination-dispatch-execution-contract (lines 1–1); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by native retained identity. Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: full section diff read both ways; candidate metadata block, Added in candidate label and Source relationship line inserted after the H1 (Provenance blob and commit verified against git, source link resolves); 1 link destination(s) repointed (e.g. coordination-envelope-progress.md -> agent-coordination/history/proposals-redesigns/coordination-envelope-p), all resolve at HEAD and appear in the Step 10 link records; nothing in source dropped, nothing unlabelled added; anchors pass; rationale difference sentence is true",
       "targetUnitDigest": "ed6ddc6630839b95994598119c30f918fd91a1298f0778b4e451db9ffa3461bd",
-      "targetAncestry": []
+      "targetAncestry": [],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c02-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_517b04975763b42dd775bc2d49f1f559",
@@ -59,14 +64,19 @@
       "targetAnchor": "unheaded-block-5",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
       "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep the map proposal conservatively: the shared dispatch boundary survives. No acceptance of its unbuilt coordinator-facing contract or historical observations as current truth. Evidence: Source Correction to the current discussion / Responsibility split makes Dispatch the execution substrate. src/runner/execution/bind.mjs and run.mjs, src/runner/dispatch/assignment.mjs and assignment-runner.mjs survive; retired engine-internal consult/close observations remain dated. Complete source unheaded-block docs/architect/proposals/coordination-dispatch-contract.md#unheaded-block-2 (lines 10–13) is carried at docs/platform/proposals/coordination-dispatch-contract.md#unheaded-block-5 (lines 34–37); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: full section diff read both ways; 1 link destination(s) repointed (e.g. coordination-envelope-progress.md -> agent-coordination/history/proposals-redesigns/coordination-envelope-p), all resolve at HEAD and appear in the Step 10 link records; nothing in source dropped, nothing unlabelled added; anchors pass; rationale difference sentence is true",
       "targetUnitDigest": "b2a03516a51bc71238172fde6f40445aeaeea73d77e6f13d175fac93f7f2ef8a",
       "targetAncestry": [
         "Coordination ↔ Dispatch & Execution Contract"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c02-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_6c299fe3f83c529c32ea5062d20d92a7",

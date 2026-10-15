@@ -1,10 +1,12 @@
 {
   "version": 1,
   "rule": "A34",
-  "status": "accepted-for-batch-closure",
+  "status": "superseded-by-reclassification",
   "residualFile": "plans/260925-documentation-authority-unification/reports/phase-06/root-instructions-partial-carry-residual.json",
   "residualSha256": "d4bd139d397c007d0f633998319284bfc37073b27ed39f377cd677946fe00a0d",
-  "rows": [
+  "strictE": "Historical A34 partial acceptance superseded by L10-2 reclassification; no active partial carry for claim_5c520fcb. Root instruction text retained in place.",
+  "currentDisposition": "reclassify-out-of-platform-scope",
+  "historicalRows": [
     {
       "claimId": "claim_5c520fcb1a68ba27e2093341834258c7",
       "sourceUnitDigest": "938342cd7dfcb965b91bb4ab13461c296dbda391d975bca9d1f5e296e9b75895",
@@ -13,7 +15,7 @@
       "cutoverObligation": true
     }
   ],
-  "representationReview": {
+  "historicalRepresentationReview": {
     "reviewStatus": "reviewed",
     "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
     "reviewedAt": "2026-10-15",
@@ -21,6 +23,5 @@
     "reviewReportCommit": "6dadbb3685126542e6a2cecd64bcbae035b4fb58",
     "reviewMode": "ordinary",
     "reviewNote": "deep: partial-carry back to pending, residual shows line 2 verbatim, SHA256 d4bd139d and all three unit digests recompute, A34 shape matches packaging residual, cutover obligation named"
-  },
-  "strictE": "red; A34 representation accepted for batch closure only; cutover obligation remains; any digest drift revokes acceptance"
+  }
 }

@@ -68,3 +68,34 @@ test('restored same-named document takes precedence over an archived heading ali
  {fromPath:'docs/architect/a/design.md#design',toOwner:'docs/platform/a/history/design.md'},
  ], ['docs/platform/a/architecture/design.md','docs/platform/a/history/design.md'], 'design'), 'docs/platform/a/architecture/design.md');
 });
+test('all source relationship row labels retain legacy destinations and verbatim labels', () => {
+ for (const label of ['Source architecture','Source plan','Source migration','Source transition','Source design discussion','Retained source','Legacy full law source','Original','Canonical','Source']) {
+  const text=`| ${label} | [docs/architect/a/design.md](../../architect/a/design.md) |`;
+  assert.equal(run(text).text,text,label);
+ }
+});
+test('Source and Legacy source columns protect only their own cells', () => {
+ for (const header of ['Source','Legacy source','Retained original canonical source']) {
+  const text=`| Item | ${header} | Destination |\n|---|---|---|\n| A | [design](../../architect/a/design.md) | [design](../../architect/a/design.md) |`;
+  const r=run(text);assert.equal(r.edits.length,1);assert.equal(r.classified.length,1);
+  assert.equal(r.text,`| Item | ${header} | Destination |\n|---|---|---|\n| A | [design](../../architect/a/design.md) | [design](architecture/design.md) |`);
+ }
+});
+test('canonical in narrative text is not a source relationship label', () => {
+ const text='| Design | A canonical choice is discussed in [design](../../architect/a/design.md) |';
+ assert.equal(run(text).edits.length,1);
+});
+test('a labelled source relationship inside any cell protects that cell alone', () => {
+ const text='| Item | Read | Other |\n|---|---|---|\n| A | Retained source: [design](../../architect/a/design.md) | [design](../../architect/a/design.md) |';
+ const r=run(text);assert.equal(r.classified.length,1);assert.equal(r.edits.length,1);
+ assert.match(r.text,/Retained source: \[design\]\(\.\.\/\.\.\/architect\/a\/design.md\)/);
+ assert.match(r.text,/\| \[design\]\(architecture\/design.md\) \|$/);
+});
+test('a source relationship link label inside any cell stays verbatim', () => {
+ const text='| Item | Read |\n|---|---|\n| A | [Original source](../../architect/a/design.md) |';
+ assert.equal(run(text).text,text);
+});
+test('a source-column link label does not turn preservation targets into source relationships', () => {
+ const text='| Legacy source | Preservation target |\n|---|---|\n| [Legacy source](../../architect/a/design.md) | [design](../../architect/a/design.md) |';
+ const r=run(text);assert.equal(r.classified.length,1);assert.equal(r.edits.length,1);
+});

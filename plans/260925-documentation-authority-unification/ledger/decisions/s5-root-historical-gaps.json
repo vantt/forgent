@@ -81,22 +81,17 @@
       "sourceAnchor": "unheaded-block-14",
       "sourceUnitDigest": "e24cc26161b017265526e8e287d7ddb0777cabce83f1effd56099a3ea79814e5",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-24",
-      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
-      "reviewNote": "deep: gap row; old digest e24cc261 found at 05d6fc7ca io-contract block 14 (four-stream sentence); successor block 24 cb6381a3 unchanged, shift 23 to 24; word diff read: Four to Five streams only; supersede unchanged",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1526-specs-ui-reworks-main-recarry.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "cb6381a3b69f2fdd99ff81b06cafbce1f45add19c7076005c59ad0e093d49be8",
+      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetUnitDigest": "131cc0704d753f35dcbec3ebba7be49a0d103732b6f4ee8c5ecc175d5c46167e",
       "targetAncestry": [
         "CLI I/O Contract",
-        "5. Reasoned Envelope Exceptions"
-      ],
-      "reviewReportCommit": "0e8ce7710ac67ad038927b242b2461876bf8c90d"
+        "4. Exit Codes"
+      ]
     },
     {
       "claimId": "claim_6a8087a3f502f37f9c7b729e871bee9c",
@@ -104,22 +99,17 @@
       "sourceAnchor": "unheaded-block-15",
       "sourceUnitDigest": "74809b036d96332c8fd99e73be67a5abacbef4b899eb741b946b39aed1ce1fa6",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-25",
-      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
-      "reviewNote": "deep: gap row; old digest 74809b03 found at 05d6fc7ca io-contract block 15 (exceptions list); successor block 25 f5825340 now the five-item list; word diff read: help-flag wording and the added fifth item (agent hook door); anchor shift 24 to 25 verified; supersede unchanged",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1526-specs-ui-reworks-main-recarry.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "f58253403717e416cd5aa169d971bc332b43ab40f16ab6845c90d959d4283221",
+      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetUnitDigest": "cb6381a3b69f2fdd99ff81b06cafbce1f45add19c7076005c59ad0e093d49be8",
       "targetAncestry": [
         "CLI I/O Contract",
         "5. Reasoned Envelope Exceptions"
-      ],
-      "reviewReportCommit": "0e8ce7710ac67ad038927b242b2461876bf8c90d"
+      ]
     }
   ]
 }

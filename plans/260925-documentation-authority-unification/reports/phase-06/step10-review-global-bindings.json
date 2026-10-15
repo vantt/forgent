@@ -1,0 +1,16 @@
+{
+  "SYNC": "59b9b7087",
+  "reviewStatus": "pending",
+  "note": "Current replacement bindings for historical h-021/h-022. Committed review requests remain immutable historical evidence; next bounded review uses these current bytes. 26 authored partial-carry identities at review pin; new A31 provisional transitions are separately pending native sync, not silently added to that reviewed population.",
+  "expectedFileSHA256": "4cb6ec7b947d3f44e73cd772b2ee749370b801d55a76a0576c61508cfb4c6032",
+  "otherGroupQueueSHA256": "6537b1c9e03bd7ecfca768d4263c2180275396d0ad95636d3f5792b6c1ef6cdf",
+  "comparisonGuideSHA256": "8203556289c3dbe31db686165018bf86723b5c7f4d916a0a5db46ef5994bef23",
+  "manifestBlob": "e6d9582ddf4cbb72acaaebf8940dc4018e19ed67",
+  "deferredGroups": {
+    "count": 32,
+    "duplicate": 4,
+    "semantic": 28,
+    "nextPhase": "7/8",
+    "reason": "Outside item 2b’s three kinds. Queued, not resolved."
+  }
+}

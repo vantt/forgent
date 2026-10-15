@@ -20,12 +20,13 @@
     },
     {
       "kind": "duplicate",
-      "blobSha": "ae8c66912fbf631381632347382108e7e6835a4d",
+      "blobSha": "e6d9582ddf4cbb72acaaebf8940dc4018e19ed67",
       "paths": [
         "docs/architecture-manifest.json",
         "docs/platform/contracts/architecture-manifest.json"
       ],
-      "action": "Re-evaluate with native retirement/mirror exclusions in Step 10 package/rehearsal; no authority, deletion or implicit approval."
+      "action": "Re-evaluate with native retirement/mirror exclusions in Step 10 package/rehearsal; no authority, deletion or implicit approval.",
+      "historicalBlobSha": "ae8c66912fbf631381632347382108e7e6835a4d"
     },
     {
       "kind": "duplicate",
@@ -318,5 +319,6 @@
       "action": "Re-evaluate with native retirement/mirror exclusions in Step 10 package/rehearsal; no authority, deletion or implicit approval."
     }
   ],
-  "note": "Outside the 15 L10-5 groups; presence here is not a new checker exemption or group resolution."
+  "note": "Outside the 15 L10-5 groups; presence here is not a new checker exemption or group resolution.",
+  "scopeDisposition": "L10-15: all 32 groups outside item 2b’s three kinds remain queued for Phase 7/8; not resolutions and no closure."
 }

@@ -1,0 +1,73 @@
+✔ never repoints a source relationship or a link to its own file (1.737758ms)
+✔ source column header protects subsequent table rows (0.187146ms)
+✔ chooses a restored same-named candidate before a portal (0.21935ms)
+✔ chooses the unique per-anchor target when no same-named candidate exists (0.116895ms)
+✔ restores and classifies a portal alias with no specific target (0.118754ms)
+✔ wrapped labels are repointed and labels preserved (0.097457ms)
+✔ fences and historical referents are retained (0.1004ms)
+✔ anchored destinations preserve the explicit alias anchor (0.096324ms)
+✔ ambiguous specific targets fail closed (0.093231ms)
+✔ uses the source heading alias for a split document without guessing among sections (0.132114ms)
+✔ a canonical data cell does not protect unrelated following table rows (0.240918ms)
+✔ restored same-named document takes precedence over an archived heading alias (0.120997ms)
+✔ all source relationship row labels retain legacy destinations and verbatim labels (0.173371ms)
+✔ Source and Legacy source columns protect only their own cells (0.695451ms)
+✔ canonical in narrative text is not a source relationship label (0.105609ms)
+✖ a labelled source relationship inside any cell protects that cell alone (0.614705ms)
+✖ a source relationship link label inside any cell stays verbatim (0.433565ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 15
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 49.053008
+
+✖ failing tests:
+
+test at test/scripts/doc-link-pass.test.mjs:88:1
+✖ a labelled source relationship inside any cell protects that cell alone (0.614705ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  0 !== 1
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-link-pass.test.mjs:90:27)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/scripts/doc-link-pass.test.mjs:94:1
+✖ a source relationship link label inside any cell stays verbatim (0.433565ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + '| Item | Read |\n|---|---|\n| A | [Original source](architecture/design.md) |'
+  - '| Item | Read |\n' +
+  -   '|---|---|\n' +
+  -   '| A | [Original source](../../architect/a/design.md) |'
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-link-pass.test.mjs:96:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '| Item | Read |\n|---|---|\n| A | [Original source](architecture/design.md) |',
+    expected: '| Item | Read |\n|---|---|\n| A | [Original source](../../architect/a/design.md) |',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

@@ -218,14 +218,19 @@
       "targetAnchor": "visibility-boundary",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
       "rationale": "The current successor at docs/platform/agent-coordination/architecture/evidence-and-results.md#visibility-boundary supersedes the stale current-state claim shown at docs/platform/agent-coordination/architecture/evidence-and-results.md#visibility-boundary before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by native retained identity. Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: supersede truth correction of visibility-boundary; the 2 source lines (herdr is diagnostics only) are present verbatim in the dated carrier retired-engine/files/architecture/evidence-and-results.md; the successor also carries the area-portal and runner-spec pointer paragraph inherited from the already reviewed target, whose runner link now reads ../../runner/spec.md and resolves; no approval carried",
       "targetUnitDigest": "1e36b97aa12e851cf97ade9c39141632466db8ee2983a3d54e7bd7c3585d9f07",
       "targetAncestry": [
         "Evidence And Result Architecture"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_8b943b334db8f6fefa9f10ad2d936d4f",
@@ -454,14 +459,19 @@
       "targetAnchor": "7-agent-facing-contract",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
       "rationale": "The current successor at docs/platform/agent-coordination/architecture/runtime-recovery-design.md#7-agent-facing-contract supersedes the stale current-state claim shown at docs/platform/agent-coordination/architecture/runtime-recovery-design.md#7-agent-facing-contract before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by native retained identity. Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: supersede truth correction of section 7; all 20 source body lines survive verbatim in the dated carrier retired-engine/files/architecture/runtime-recovery-design.md; successor text checked against code (recover verb flags --action --expected-snapshot --expected-control-epoch --expected-expires-at --action-key, DEFAULT_TTL_MS five minutes, session-owned refusal at recover.mjs:295); the portal pointer paragraph is inherited and its links resolve",
       "targetUnitDigest": "0304740f98bdab3df44c5b9b88de64409ad96c2bd94bc3ab41aaa4afbbc2fe68",
       "targetAncestry": [
         "Runtime Recovery And Work Continuity"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_3430135237f992f3c212eab86eb77067",
@@ -2824,12 +2834,17 @@
       "targetOwner": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
       "targetAnchor": "7-agent-facing-contract",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
-      "reviewStatus": "pending",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "deep: supersede of the stale paragraph unheaded-block-24 by the corrected section 7; source lines present verbatim in the dated carrier (0 of 12 body lines missing); the successor facts match recover.mjs and recovery-planner.mjs; same target section as the sibling rows so one owner, nothing lost",
       "targetUnitDigest": "0304740f98bdab3df44c5b9b88de64409ad96c2bd94bc3ab41aaa4afbbc2fe68",
       "targetAncestry": [
         "Runtime Recovery And Work Continuity"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_e79e40a9ee21a51be2d37ee413a5b903",
@@ -2840,12 +2855,17 @@
       "targetOwner": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
       "targetAnchor": "7-agent-facing-contract",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
-      "reviewStatus": "pending",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "deep: supersede of the stale result-shape paragraph unheaded-block-25 by the corrected section 7; 8 of 8 source lines present verbatim in the dated carrier; successor replaces the outcome vocabulary with the verified recommendation fields (snapshotHash, expectedControlEpoch, actionKey, evidenceIds, expiresAt); removal is a labelled truth correction, not a silent drop",
       "targetUnitDigest": "0304740f98bdab3df44c5b9b88de64409ad96c2bd94bc3ab41aaa4afbbc2fe68",
       "targetAncestry": [
         "Runtime Recovery And Work Continuity"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_bb98dd8d67f6de65de2b005722ade1fd",
@@ -8112,14 +8132,19 @@
       "targetAnchor": "related-architect-level-intentions",
       "claimKind": "navigation",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
       "rationale": "The current successor at docs/platform/agent-coordination/proposals/README.md#related-architect-level-intentions supersedes the stale current-state claim shown at docs/platform/agent-coordination/proposals/README.md#related-architect-level-intentions before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: supersede truth correction of the related-intentions list; all 16 source body lines remain in the dated carrier retired-engine/files/proposals/README.md modulo link destinations (compared after destination masking); successor links resolve (architecture-intent.md moved under system-architecture, domains/coding exists)",
       "targetUnitDigest": "94e2cece7266f34a0d7dcac63448f64baff18bda11a04a1eee700c8baf5e0b4c",
       "targetAncestry": [
         "Agent Coordination Proposals"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_44a720a7dfd21c66efe74d66ad24f9dc",
@@ -8128,14 +8153,19 @@
       "targetAnchor": "related-architect-level-intentions",
       "claimKind": "navigation",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
       "rationale": "The current successor at docs/platform/agent-coordination/proposals/README.md#related-architect-level-intentions supersedes the stale current-state claim shown at docs/platform/agent-coordination/proposals/README.md#unheaded-block-8 before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: supersede of unheaded-block-7 by the corrected related-intentions section; same carrier and successor as the sibling row, 16 of 16 source lines present in the carrier modulo link destinations; target adds only the heading line and a trailing blank",
       "targetUnitDigest": "94e2cece7266f34a0d7dcac63448f64baff18bda11a04a1eee700c8baf5e0b4c",
       "targetAncestry": [
         "Agent Coordination Proposals"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_b2fba175c2d810cc1abe394525ca39bc",
@@ -8474,14 +8504,19 @@
       "targetAnchor": "reading-down-from-the-vision",
       "claimKind": "navigation",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
       "rationale": "The current successor at docs/platform/agent-coordination/vision.md#reading-down-from-the-vision supersedes the stale current-state claim shown at docs/platform/agent-coordination/vision.md#reading-down-from-the-vision before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by native retained identity. Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: supersede truth correction of the reading-down list; the old 8 items survive in the dated carrier retired-engine/files/vision.md (compared after link masking); successor items link to files that exist (vocabulary, architecture, assignment-run-runresult contract, decisions, historical step 07 and 08 snapshots, runner/spec.md)",
       "targetUnitDigest": "852ed9b500d96e96ae6dfa27c123feb107277c4bd2657c708dee8bdd220d2b52",
       "targetAncestry": [
         "Agent Coordination Foundation Vision"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_60a5c12e7c7c78095b2c90db75324462",
@@ -8490,14 +8525,19 @@
       "targetAnchor": "reading-down-from-the-vision",
       "claimKind": "navigation",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
       "rationale": "The current successor at docs/platform/agent-coordination/vision.md#reading-down-from-the-vision supersedes the stale current-state claim shown at docs/platform/agent-coordination/vision.md#unheaded-block-53 before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by native retained identity. Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: supersede of unheaded-block-65 (the numbered list) by the corrected reading-down section; 17 of 17 source lines present in the dated carrier modulo link destinations; target heading is the same section as the sibling row",
       "targetUnitDigest": "852ed9b500d96e96ae6dfa27c123feb107277c4bd2657c708dee8bdd220d2b52",
       "targetAncestry": [
         "Agent Coordination Foundation Vision"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_1a086e1e0b5c4c84e324859dc9a435ae",

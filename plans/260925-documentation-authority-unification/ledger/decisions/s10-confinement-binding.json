@@ -20,9 +20,15 @@
       ],
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792079321432-41fe2051@2026-10-15",
-      "rationale": "L10-14 current-source re-decision completes the binding addition carried in the prior docs turn. Complete source paragraph equals target text byte for byte, with limitations retained; identity already native in the prior package registry. Independent review required; no current-truth, promotion or cutover approval."
+      "rationale": "L10-14 current-source re-decision completes the binding addition carried in the prior docs turn. Complete source paragraph equals target text byte for byte, with limitations retained; identity already native in the prior package registry. Independent review required; no current-truth, promotion or cutover approval.",
+      "reviewNote": "deep: e-042, source block-113 line 1104 and target block-47 line 370 byte-equal, digest a7af69f1 recomputed by hand, move is right for a verbatim paragraph carried into the mapped section, placement after the Reaper paragraph matches source order, rationale claims (byte for byte, limitations retained, identity already native in the prior package) all true, pending and no approval carried",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-e01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     }
   ]
 }

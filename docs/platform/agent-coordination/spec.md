@@ -72,7 +72,7 @@ Current sequencing and collaboration belong to the [Workflow runner](../../../sr
 
 ## Contracts Owned
 
-Unit/Workflow execution ownership is described by [docs/platform/runner/spec.md](../runner/spec.md). The surviving Assignment/Run dispatch contract is retained in this area's current contract and architecture documents; the runner spec does not supersede their complete recovery/control details.
+Unit/Workflow execution ownership is described by [docs/specs/runner.md](../../specs/runner.md). The surviving Assignment/Run dispatch contract is retained in this area's current contract and architecture documents; the runner spec does not supersede their complete recovery/control details.
 
 | Contract reading | Owner |
 |---|---|
@@ -97,7 +97,7 @@ The former claim-by-claim evidence table is [retained history](history/retired-e
 
 ## Known Gaps
 
-The former gap/status list is [retained verbatim](history/retired-engine/spec.md#literal-snapshot). It is not a current implementation backlog; use [the current owner](../runner/spec.md) when assessing present execution.
+The former gap/status list is [retained verbatim](history/retired-engine/spec.md#literal-snapshot). It is not a current implementation backlog; use [the current owner](../../specs/runner.md) when assessing present execution.
 
 ## Related Files
 

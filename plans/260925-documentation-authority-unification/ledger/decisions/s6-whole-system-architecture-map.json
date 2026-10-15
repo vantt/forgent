@@ -24,15 +24,20 @@
       "targetAnchor": "bản-đồ-kiến-trúc-fgos-một-khung-chính-hai-lớp-phủ-hai-sổ-đăng-ký",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
       "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architecture-map.md#bản-đồ-kiến-trúc-fgos-một-khung-chính-hai-lớp-phủ-hai-sổ-đăng-ký (lines 1–1) into docs/platform/architecture-map.md#bản-đồ-kiến-trúc-fgos-một-khung-chính-hai-lớp-phủ-hai-sổ-đăng-ký (lines 78–78), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: move of the architecture-map H1 section; source body is identical apart from H1 to H3 and 6 link destinations: ADR 0010, 0015 and 0017 now point to in-page decision anchors and 0012 and 0013 to retired-decision-history anchors, all anchors verified present; rationale mentions only rebasing and omits this ADR link restoration, harmless as the sibling row records it",
       "targetUnitDigest": "db18cf8149df65ab7b696ff2693fbd05fbba27711a284476155a686cf452b49e",
       "targetAncestry": [
         "Architecture Map",
         "Added in candidate: architecture-map source carriage"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_63d932ce2cf2e02651341337917f55be",
@@ -64,16 +69,21 @@
       "targetAnchor": "unheaded-block-16",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
       "rationale": "Judgment: no target digest match. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-2 (lines 15–23) into docs/platform/architecture-map.md#unheaded-block-16 (lines 92–100), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending. Link-only restoration of the cited retired ADR to its existing numbered narrative is explicitly recorded; no decision text or meaning changed. Link-only restoration of the cited retired ADR to its existing numbered narrative is explicitly recorded; no decision text or meaning changed. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: move of unheaded-block-2; same 5 ADR link repoints as the heading row (in-page anchors 0010, 0015, 0017 and retired-decision-history 0012, 0013) all anchors exist and no text changed; the rationale states the link-only ADR restoration",
       "targetUnitDigest": "4110e9ccf179fb2e087862473f9c32f083ca175f59b39f63c426dbe2c77fa1a1",
       "targetAncestry": [
         "Architecture Map",
         "Added in candidate: architecture-map source carriage",
         "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_43157708757b0edbeca22d2c04e2ceca",
@@ -151,16 +161,21 @@
       "targetAnchor": "unheaded-block-20",
       "claimKind": "decision",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
       "rationale": "Judgment: no target digest match. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-6 (lines 43–43) into docs/platform/architecture-map.md#unheaded-block-20 (lines 120–120), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending. Link-only restoration of the cited retired ADR to its existing numbered narrative is explicitly recorded; no decision text or meaning changed. Link-only restoration of the cited retired ADR to its existing numbered narrative is explicitly recorded; no decision text or meaning changed. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: move of the v0.2 to v0.3 changelog line; only the ADR 0012 link differs, now retired-decision-history.md#8-adr-0012-unified-typed-edge-graph-model, anchor present, no wording changed",
       "targetUnitDigest": "7ea47b34149df93b004b73dea8f6fa7f9bbebc0461eb88ae92f00bde77f0ae4d",
       "targetAncestry": [
         "Architecture Map",
         "Added in candidate: architecture-map source carriage",
         "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_f4451b0812cb6c4c4b3d5f3146ceb22b",
@@ -192,16 +207,21 @@
       "targetAnchor": "unheaded-block-22",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
       "rationale": "Judgment: no target digest match. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-8 (lines 57–57) into docs/platform/architecture-map.md#unheaded-block-22 (lines 134–134), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending. Link-only restoration of the cited retired ADR to its existing numbered narrative is explicitly recorded; no decision text or meaning changed. Link-only restoration of the cited retired ADR to its existing numbered narrative is explicitly recorded; no decision text or meaning changed. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: move of the v0.3 to v0.4 changelog line; only the ADR 0013 link differs, now retired-decision-history.md#9-adr-0013-report-not-write-channel-for-discovered-from, anchor present, no wording changed",
       "targetUnitDigest": "7769a164b97cad770fc2454afdee43bc2915a594dd2a3afb3d95a674380d79c9",
       "targetAncestry": [
         "Architecture Map",
         "Added in candidate: architecture-map source carriage",
         "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_6796c9a5d940df2affe9d2fb3fb373d7",

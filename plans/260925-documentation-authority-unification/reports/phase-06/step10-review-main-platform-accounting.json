@@ -1,0 +1,191 @@
+{
+  "SYNC": "59b9b7087",
+  "switchboardEdited": false,
+  "records": [
+    {
+      "path": "docs/platform/component-boundary.md",
+      "status": "candidate",
+      "routeFacts": "candidate",
+      "classificationFacts": {
+        "fileClass": "maintained-authority",
+        "area": "Whole-system architecture and component boundaries",
+        "proposedDisposition": "unknown-blocking"
+      },
+      "currentSHA256": "a6229b3b37eb2820ca9b3f1a9372f9865c32f74adf2bddf7df2aea2e9ad3f079",
+      "mainSHA256": "a682e9b5400125b15a5754ecb184e90195a90c2a2391b6005e8c311c07214dcb",
+      "newNativeBindingNeeded": [
+        {
+          "draftId": "claim_identity_gap_64c2a4a923b050e4a6085919",
+          "anchor": "2-current-source-during-migration",
+          "digest": "5341c959c3d2fdd7e6713f825e09d581449633c8f54de7a70ca0421f34cdfd85"
+        },
+        {
+          "draftId": "claim_identity_gap_46d48d2d23cd0395c72a6650",
+          "anchor": "unheaded-block-5",
+          "digest": "ef970220b2a0deaa9fe9d0aabe96a61d29451f0955f547b511aaa46b7f5df403"
+        },
+        {
+          "draftId": "claim_identity_gap_a2ad4e5ad45f6cfc2666b756",
+          "anchor": "4-current-high-level-components",
+          "digest": "fcb4b0a3c668b8d140c18241d29ebe57991a7197a1696903fe93d346bbed7fdd"
+        },
+        {
+          "draftId": "claim_identity_gap_3a51a03cb1bbef6d152b8e6b",
+          "anchor": "unheaded-block-11",
+          "digest": "973ee5615eeb755822f8032d8d11c080f21e340bd20a87952b300cde23661e95"
+        },
+        {
+          "draftId": "claim_identity_gap_65b0c8f96ea8b1504e9e98ab",
+          "anchor": "7-contract-authority-matrix",
+          "digest": "1788408993b6607a28c59c3925c30846ec8eaaf79c32672b36ca78c29969d35c"
+        },
+        {
+          "draftId": "claim_identity_gap_2c480ed349718e856e36c4f8",
+          "anchor": "unheaded-block-56",
+          "digest": "71392c90d7e585abc412086957cca9584606daa7415c2afff44c2593060de45e"
+        }
+      ],
+      "authorEdits": "Only L10-18 explicit source-link restores and f-692 sibling repoint; main Session Identity row preserved verbatim.",
+      "followup": "Existing component boundary portal routing retained; native unit binding must account for main Session Identity row and L10-18 link changes."
+    },
+    {
+      "path": "docs/platform/session-identity/spec.md",
+      "status": "unrouted",
+      "routeFacts": "candidate",
+      "classificationFacts": {
+        "fileClass": "maintained-authority",
+        "area": "Platform documentation (unmapped candidate)",
+        "proposedDisposition": "unknown-blocking"
+      },
+      "currentSHA256": "d007573a8d4f659fa9e017214b312ac61e3f7ab7fc78226688118c3d1fa4bad9",
+      "mainSHA256": "d007573a8d4f659fa9e017214b312ac61e3f7ab7fc78226688118c3d1fa4bad9",
+      "newNativeBindingNeeded": [
+        {
+          "draftId": "claim_identity_gap_6c2a0a818d00f6367b0ede20",
+          "anchor": "session-identity-component-specification",
+          "digest": "edb2b14e9b84180246823708126e1dbc05f8f2ca57c9a8cce045685960224ce1"
+        },
+        {
+          "draftId": "claim_identity_gap_246e4277ffa543b2f4ef89fc",
+          "anchor": "unheaded-block-1",
+          "digest": "54ffebc5e7a158a6d273670146c1002dd8c6c08fea92f13a9b66f1c6e3efbb54"
+        },
+        {
+          "draftId": "claim_identity_gap_fdc3a44c477d3807142a9de6",
+          "anchor": "1-purpose",
+          "digest": "78c76fbce7486c590ac7fd3500912f3437e599253b033f39fd4260ad1d2ee45e"
+        },
+        {
+          "draftId": "claim_identity_gap_2b4bee91cf418d168a6c1916",
+          "anchor": "unheaded-block-2",
+          "digest": "ea440158744291bef8265622c2b62b0135c6ad91bbe714b4d467cc3c37e55b91"
+        },
+        {
+          "draftId": "claim_identity_gap_1e166b9c6cb5ce1783a5f8bc",
+          "anchor": "unheaded-block-3",
+          "digest": "9b9e0ec87463f681aec3e37a0b1bc7b3176810ae1a6c7ef5c923afd035ec678c"
+        },
+        {
+          "draftId": "claim_identity_gap_619b170aa4e7104ea756ec20",
+          "anchor": "2-ownership-boundary",
+          "digest": "b20605aeb82d541965e63262fd40cb344329cd81ec339165350c04fbd3db263d"
+        },
+        {
+          "draftId": "claim_identity_gap_661c03017963e2d794a62b96",
+          "anchor": "unheaded-block-4",
+          "digest": "161039de7e025c392db2990856b15adb81bd619f58b39f2e9b7f120432bf93cc"
+        },
+        {
+          "draftId": "claim_identity_gap_0e30a097d599f8180985e248",
+          "anchor": "unheaded-block-5",
+          "digest": "d278e0507de0851584d7375ce3644e7c1f124db0b8a90ea66a7730584a3d0499"
+        },
+        {
+          "draftId": "claim_identity_gap_a0c220afe23f1ca493076cde",
+          "anchor": "3-the-rule",
+          "digest": "6360dcf974e6c5812ef728dc77ccd1ee1165ee85df3480bd94f5981f59741afe"
+        },
+        {
+          "draftId": "claim_identity_gap_5a559a11ce9b0af5c97e8bfe",
+          "anchor": "unheaded-block-6",
+          "digest": "d21dac39a5e2e263810f4df931950e7aaaa26b1b0ba8cae3c3832287e0e216dc"
+        },
+        {
+          "draftId": "claim_identity_gap_9ca0d2dce546deff416e5b36",
+          "anchor": "unheaded-block-7",
+          "digest": "02fa8f818b4ed6ce002a837ce49d04381e2fcabc7e412106cb8042fe02ee7085"
+        },
+        {
+          "draftId": "claim_identity_gap_6822358bdefb0b769f502658",
+          "anchor": "unheaded-block-8",
+          "digest": "e9023f0ac41a192295f56eb93bd6ea13c1c43e1388aaaf8d4267b79198c69486"
+        },
+        {
+          "draftId": "claim_identity_gap_be6f8f109ce17c5ef7d31793",
+          "anchor": "4-verb-and-contract",
+          "digest": "4dc9c7e26b59933a04890bdd54e444b70497d718ba1e74dd69c9567666bab0cd"
+        },
+        {
+          "draftId": "claim_identity_gap_438e658993514224d07d889b",
+          "anchor": "unheaded-block-9",
+          "digest": "330198ec5e7f748102ca49354eee91728811e138bf59817ecedc950cc7a233a6"
+        },
+        {
+          "draftId": "claim_identity_gap_5b97a551c6b1e30d702540bd",
+          "anchor": "5-node-facade",
+          "digest": "593eff532dfde642ddf814b84d325970c91e522135e998102b160adba138f875"
+        },
+        {
+          "draftId": "claim_identity_gap_20b392484121f7f7170f5af3",
+          "anchor": "unheaded-block-10",
+          "digest": "dcd501d41dfa6bd5b9f47a03b7bb77a1bb95e44624581fb83b932668d65a7c66"
+        },
+        {
+          "draftId": "claim_identity_gap_21cb481621f55ef2190a8f05",
+          "anchor": "unheaded-block-11",
+          "digest": "811e45c7a2989be17dae109ec0bb5e37f00e94d614c6b482e9387a71d390f203"
+        },
+        {
+          "draftId": "claim_identity_gap_39f8425acce7181985eff9b9",
+          "anchor": "unheaded-block-12",
+          "digest": "870a4c66fb8df77230166150471688204ff1b609ff1bf422fd644f345683619a"
+        },
+        {
+          "draftId": "claim_identity_gap_2e901218d56743520b6dbf6e",
+          "anchor": "6-known-limits",
+          "digest": "b9200687f543f2ae2f190c7314f7a4934207bcfc159d3b9e53e00fc015b48f86"
+        },
+        {
+          "draftId": "claim_identity_gap_f4d22115f82bf712aec79111",
+          "anchor": "unheaded-block-13",
+          "digest": "f7a03170751a52de20b08ec171f3d55fe64c9ad654ca6ef6092c73590745bf8d"
+        },
+        {
+          "draftId": "claim_identity_gap_92566b9d17158bcaae102465",
+          "anchor": "7-doctor",
+          "digest": "016db9d5e3f20e7c2e102df76d9a7474e014f6d56c040e5ce7050ecb911ecb63"
+        },
+        {
+          "draftId": "claim_identity_gap_e8294e10e0dd6ccdcaabfbdd",
+          "anchor": "unheaded-block-14",
+          "digest": "1c3c11ae41cf9e0753828de01a33dcab6db9e458105328e4e3be8fb951d43d5c"
+        },
+        {
+          "draftId": "claim_identity_gap_b4a3abc05377db68285b1c7d",
+          "anchor": "8-decision-history",
+          "digest": "dd70f0a556e7ae8cfa36f7f4b568fb67d2490379f5fab32c3b7df994908cb963"
+        },
+        {
+          "draftId": "claim_identity_gap_45c1dc43bf1a9740c8002a5b",
+          "anchor": "unheaded-block-15",
+          "digest": "9e6b16a95461ceabeb794ce12301a1fb99500bba01d318ae4241c6d7856c0a09"
+        }
+      ],
+      "unchangedMainBytes": true,
+      "authorEdits": "No author edit.",
+      "followup": "New main source has no explicit switchboard route. Phase 7/8 must decide routing/classification; next package accounts all native units and root-reader edges. Its descriptive metadata does not grant platform cutover authority."
+    }
+  ],
+  "ioContractRatchet": "docs/io-contract.md is outside ratchet roots; accounted in main-carry receipt, no unused exception added.",
+  "mergeResolution": "Lead kept plan branch migration table row and added main Session Identity row verbatim. This turn preserves the merged row."
+}

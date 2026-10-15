@@ -1,3 +1,23 @@
+# Step 10 review reworks complete — package next
+
+Assignment `unit-run-1792089181794-89ae42db/producer/1`; **SYNC `59b9b7087`**. All 17 reports’ Notes/Concerns read. **309 matching ok verdicts applied verbatim; 174 remain reviewed / 135 re-opened pending after author corrections**. Four ok source/target-drift bindings not applied; nine retired AGENTS identities now real pending historical decisions. No author-session refusal. [Application](step10-review-application.json), [audit](step10-review-final-audit.json).
+
+**L10-15–L10-18 plus b/c/e fixes complete**: 26 reviewed-pin partial identities, 32 other groups explicitly Phase 7/8 queued; Pointers/0064 fixes; 36 wrappers / seven labelled truth corrections; six governance rationales; 25 confinement anchor/range and alias bindings; move→supersede/link inequality/nits corrected. **98 link edits**, including all 51 Source-column restores, link-226 label and f-692 repoint; unrelated target cells preserved. Helper tests first, **18 tests / 65 total green**. [Report](step-10-report.md), [every edit](step10-review-edits.json).
+
+Main io-contract/distribution/observe carried; one map entry verbatim; manifest byte-equal with current sidecar; root re-pinned. **14 provisional current-source drafts**, six pending A34 residual transitions + manifest containment; **18 IO paragraph target shifts** preserve prior referents. Main Session Identity bytes unchanged, **unrouted / 24 native units owed**; component-boundary main row preserved, six native binding changes flagged. No native registry mutation.
+
+**A/B/H pass, strict candidate-status 0 findings/unresolved links; I records one upstream main route, current readers equal SYNC; baseline unchanged. Ratchet clean; aliases 9,236 valid. FAST scoped D = 13 identical native-sync-only unknown-claim findings**, both priors together/each, zero target drift; E remains open. No global-green or full npm-suite claim. Final approved-claim evidence, scope and legacy/registry-byte audits pass. **Zero native sync / zero native --rebind / zero review packs**.
+
+**NEXT = PACKAGE at this turn’s runner commit: one native sync, preserve all IDs, resolve drafts/main units, --rebind ALL drift, refresh exact sets, ONE bounded re-review of everything changed since `ab4d6274a`.** Existing holds/A34/consumers/groups/truth/T9/rehearsal/checkpoint/scorecard/effort obligations remain; Phase 6 open. No CLI/git writes, workspace .fgos touch, protected edits, source retirement, authority flip or landing; runner commits.
+
+---
+
+# Step 10 review application and rework docs turn in progress
+
+SYNC `59b9b7087`; assignment `unit-run-1792089181794-89ae42db/producer/1`. Apply matching ok verdicts with verbatim notes; execute Lead L10-15–L10-18 and b/c reworks, re-carry changed main units. No native sync or review packs; next turn packages this runner commit with one native sync, all drift rebinds and one bounded re-review of changes since `ab4d6274a`. Runner commits.
+
+---
+
 # Step 10 replacement package complete — independent review next
 
 Assignment `unit-run-1792080300559-b4112a2f/producer/1`; **SYNC `2300d6557`**. **One background native sync 640.480s (10m40.5s)**, compact persistence once, **4,485 files / 91,348 active units**, known IDs **99,300 → 99,462, zero loss**. Five predecessors = two retained heading IDs + three gaps (one supersede, two partial-carries with verbatim SHA256 residuals); seven drafts native-resolved. **88 target rows / 22 shards rebound pending**, no approval carry.

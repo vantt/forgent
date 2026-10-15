@@ -52,4 +52,4 @@ The native kernel has exactly one semantic input/output boundary: `OperationRequ
 | operation request/outcome contract | [../contracts/operation-request-outcome.md](../contracts/operation-request-outcome.md) |
 | provider contract | [../contracts/operation-provider.md](../contracts/operation-provider.md) |
 | alignment | [../verification/implementation-alignment.md](../verification/implementation-alignment.md) |
-| source architecture | [../spec.md](../spec.md) |
+| source architecture | [../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../../../architect/host-invocation-routing/host-invocation-provider-routing.md) |

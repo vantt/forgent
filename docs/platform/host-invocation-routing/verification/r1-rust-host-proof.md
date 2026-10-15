@@ -89,4 +89,4 @@ Post-release CI: 35498322149, success, including external consumer proof
 | release boundaries | [../architecture/release-boundaries.md](../architecture/release-boundaries.md) |
 | compatibility harness | [compatibility-harness.md](compatibility-harness.md) |
 | release manifest contract | [../../packaging-distribution/contracts/release-manifest.md](../../packaging-distribution/contracts/release-manifest.md) |
-| source plan | [../roadmap.md](../roadmap.md) |
+| source plan | [../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md) |

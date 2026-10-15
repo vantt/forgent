@@ -89,7 +89,7 @@ Humans should stay present for judgment, review, and direction. They should not 
 | Whole-system architecture | [architecture-map.md](architecture-map.md) |
 | Component authority map | [component-boundary.md](component-boundary.md) |
 | Documentation governance | [governance.md](governance.md) |
-| Legacy full law source | [platform-foundations.md](platform-foundations.md) |
+| Legacy full law source | [../platform-foundations.md](../platform-foundations.md) |
 
 
 ## Chu trình Work-Item của fgOS — tầm nhìn nền tảng

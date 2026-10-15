@@ -113,20 +113,15 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/work-state/spec.md",
       "targetAnchor": "unheaded-block-93",
-      "authoredBy": "codex-session:22@2026-10-14",
-      "reviewStatus": "reviewed",
-      "rationale": "A35 Findings sentence corrections create this native predecessor/successor consequence. Complete old/current same-file unit is shown; only authorized false clauses change, heading structure/ancestry is retained. A22 requires independent re-review and no approval carry. Historical identity is preserved, not grafted to the current non-stable block. The current U8/RUL60 fragment is corrected to the exact required fields/live wrapper ordering under A19; A22 real target digest and ancestry are rebound, no approval carries.",
-      "reviewNote": "deep: old gap keeps id and fingerprint e25e00fd, before-digest 5c61302d equals the c3895c140 unit, successor f20c0ca6 equals HEAD, anchor unheaded-block-93 exists, shard equals pack; no identity graft.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-rework2.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "f20c0ca6ad7490fa85635d8100333e97787282b0936df18a2f7f7599d5cd3b63",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewStatus": "pending",
+      "rationale": "A35 Findings sentence corrections create this native predecessor/successor consequence. Complete old/current same-file unit is shown; only authorized false clauses change, heading structure/ancestry is retained. A22 requires independent re-review and no approval carry. Historical identity is preserved, not grafted to the current non-stable block. The current U8/RUL60 fragment is corrected to the exact required fields/live wrapper ordering under A19; A22 real target digest and ancestry are rebound, no approval carries. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetUnitDigest": "9098a0e9ed02a324a16abe3c1016fad73ad261bfc4459aed889be5baeb1515b3",
       "targetAncestry": [
         "Work State Specification",
         "11. Business Rules"
-      ],
-      "reviewReportCommit": "9f087f37d134366bd2057af2fac831ed18a9b3c3"
+      ]
     },
     {
       "claimId": "claim_2d8114529b804f49494e6d42548e1372",

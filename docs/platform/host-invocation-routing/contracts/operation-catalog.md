@@ -42,4 +42,4 @@ Superseded by: None recorded
 | --- | --- |
 | provider routing | [../architecture/provider-routing.md](../architecture/provider-routing.md) |
 | operation provider | [operation-provider.md](operation-provider.md) |
-| source architecture | [../spec.md](../spec.md) |
+| source architecture | [../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../../../architect/host-invocation-routing/host-invocation-provider-routing.md) |

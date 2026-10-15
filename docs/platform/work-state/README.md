@@ -58,7 +58,7 @@ The documents listed here are candidate material. No reader reads them yet. The 
 
 Canonical until the cutover: [docs/specs/work-state.md](../../specs/work-state.md), [docs/io-contract.md](../../io-contract.md)
 
-A third retained source, [docs/platform/vision.md](../vision.md), is not covered by this candidate area. It belongs to the platform vision candidate [vision.md](../vision.md).
+A third retained source, [vision.md](../vision.md), is not covered by this candidate area. It belongs to the platform vision candidate [docs/work-item-lifecycle-vision.md](../../work-item-lifecycle-vision.md).
 
 ## 5. Related Files
 
@@ -71,5 +71,5 @@ A third retained source, [docs/platform/vision.md](../vision.md), is not covered
 | candidate harness distill record | [history/multi-role-harness-distill-record.md](history/multi-role-harness-distill-record.md) |
 | legacy owner | [../../specs/work-state.md](../../specs/work-state.md) |
 | legacy owner | [../../io-contract.md](../../io-contract.md) |
-| retained source for the platform vision candidate | [../vision.md](../vision.md) |
+| retained source for the platform vision candidate | [../../work-item-lifecycle-vision.md](../../work-item-lifecycle-vision.md) |
 | platform vision candidate | [../vision.md](../vision.md) |

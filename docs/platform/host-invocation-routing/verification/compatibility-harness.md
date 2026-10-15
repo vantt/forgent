@@ -49,7 +49,7 @@ use from intentional legacy fallback use until that window closes.
 | --- | --- |
 | descriptor contract | [../contracts/command-route-descriptor.md](../contracts/command-route-descriptor.md) |
 | legacy transition | [../architecture/legacy-cli-transition.md](../architecture/legacy-cli-transition.md) |
-| source plan | [../roadmap.md](../roadmap.md) |
+| source plan | [../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md) |
 
 ## Restored registry linker procedure and its input output formula
 

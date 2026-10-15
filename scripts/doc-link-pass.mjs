@@ -2,7 +2,7 @@
 // callers own writes and retain the returned classification/evidence records.
 import path from 'node:path';
 const posix = path.posix;
-const relation = /source relationship|original source|canonical|legacy (?:source|owner|documents)|current source|source protocol|source document|source of truth|nguồn (?:gốc|chuẩn)/i;
+const relation = /\b(?:source|legacy|retained|original|canonical)\b|nguồn (?:gốc|chuẩn)/i;
 export function specificTarget(legacy, aliases, candidates, primaryAnchor) {
   const name = posix.basename(legacy);
   const same = candidates.filter(p => posix.basename(p) === name && name !== 'README.md');
@@ -20,15 +20,26 @@ export function specificTarget(legacy, aliases, candidates, primaryAnchor) {
 }
 export function planLinkPass({file, text, aliases, candidates, sourceHeadings = {}}) {
   const edits = [], classified = [], ranges = [];
-  let offset = 0, fence = null, sourceTable = false, inTable = false;
-  for (const line of text.split('\n')) {
+  let offset = 0, fence = null, sourceColumns = [], inTable = false;
+  const lines = text.split('\n');
+  for (const [lineIndex, line] of lines.entries()) {
     const mark = /^\s*(`{3,}|~{3,})/.exec(line)?.[1];
     if (mark) fence = fence && mark[0] === fence[0] && mark.length >= fence.length ? null : fence || mark;
     const tableRow = line.trim().startsWith('|');
-    if (!tableRow) sourceTable = false;
-    if (tableRow && !inTable && /current source|canonical|original source/i.test(line)) sourceTable = true;
+    if (!tableRow) sourceColumns = [];
+    const cells = [...line.matchAll(/(?<!\\)\|([^|]*)/g)].map(m => ({text:m[1], start:m.index+1, end:m.index+m[0].length}));
+    if (tableRow && !inTable && /^\s*\|[ :|\-]+\|\s*$/.test(lines[lineIndex+1] || '')) sourceColumns = cells.map(c => relation.test(c.text));
+    const rowRelationship = tableRow && relation.test((cells[0]?.text || '').replace(/\[[^\]]+\]\([^)]*\)/g, ''));
+    const protectedCells = cells.filter((c,i) => {
+      const prefix = c.text.split('[')[0].trim();
+      const labelledRelationship = prefix.endsWith(':') && relation.test(prefix);
+      const sourceLinkLabel = [...c.text.matchAll(/\[([^\]]+)\]\(/g)].some(m => relation.test(m[1]));
+      return rowRelationship || sourceColumns[i] || labelledRelationship || sourceLinkLabel;
+    });
     inTable = tableRow;
-    ranges.push({start:offset, end:offset+line.length+1, protected:!!fence||!!mark, relation:relation.test(line)||sourceTable});
+    ranges.push({start:offset, end:offset+line.length+1, protected:!!fence||!!mark,
+      relation:tableRow ? false : relation.test(line),
+      protectedCells:protectedCells.map(c=>({start:offset+c.start,end:offset+c.end}))});
     offset += line.length + 1;
   }
   const result = text.replace(/\[([^\]]+)\]\(([^\s)]+)\)/g, (whole, label, destination, index) => {
@@ -40,8 +51,9 @@ export function planLinkPass({file, text, aliases, candidates, sourceHeadings = 
     if (!alias) return whole;
     let target = alias.toOwner, anchor = alias.toAnchor || null, reason = 'explicit-alias';
     const record = {file, line:text.slice(0,index).split('\n').length, label, legacy, before:destination};
-    if (range.relation || target === file) {
-      classified.push({...record, reason:range.relation?'provenance/legacy-owner':'self-link', disposition:'retain-legacy-until-cutover'}); return whole;
+    const sourceRelationship = range.relation || range.protectedCells.some(c=>c.start <= index && index < c.end);
+    if (sourceRelationship || target === file) {
+      classified.push({...record, reason:sourceRelationship?'provenance/legacy-owner':'self-link', disposition:'retain-legacy-until-cutover'}); return whole;
     }
     if (!fragment && target.endsWith('/README.md') && posix.basename(legacy) !== 'README.md') {
       const specific = specificTarget(legacy, aliases, candidates, sourceHeadings[legacy]);

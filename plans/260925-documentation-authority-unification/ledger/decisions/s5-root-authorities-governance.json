@@ -1539,14 +1539,19 @@
       "targetAnchor": "13-migration-rule",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
       "rationale": "Whole Migration Rule section is retained; only two relative link spellings change, to ../transitional-switchboard.md and migration-authoring-rules.md, preserving the original repository destinations. Every prose clause and obligation is retained. No governance rule or authority changes. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: supersede 13-migration-rule to 13-migration-rule; text identical to source modulo masking; 2 link destination(s) repointed (transitional-switchboard.md to documentation/switchboard.md, platform/migration-authoring-rules.md to migration-authoring-rules.md); every changed link resolves at HEAD (anchors included) and matches the Step 10 link record; no approval carried",
       "targetUnitDigest": "19fe9bf85f578c7681a72d982c0c65fb87a21d03f6394be522e1d88054921337",
       "targetAncestry": [
         "Documentation Governance"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_c40dc0b5fa924e4daedc4551ec10a67c",
@@ -1577,15 +1582,20 @@
       "targetAnchor": "unheaded-block-59",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
       "rationale": "Whole Migration Rule block is retained; only two relative link spellings change, to ../transitional-switchboard.md and migration-authoring-rules.md, preserving the original repository destinations. Every prose clause and obligation is retained. No governance rule or authority changes. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: supersede unheaded-block-59 to unheaded-block-59; text identical to source modulo masking; 2 link destination(s) repointed (transitional-switchboard.md to documentation/switchboard.md, platform/migration-authoring-rules.md to migration-authoring-rules.md); every changed link resolves at HEAD (anchors included) and matches the Step 10 link record; no approval carried",
       "targetUnitDigest": "b285c3c99d4ba9b0b55f76043cae7212eafcf0f67324ea18cc084f0d4465692d",
       "targetAncestry": [
         "Documentation Governance",
         "13. Migration Rule"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_66f7be3b79ca1fe458ce0416ba1adf89",
@@ -1595,10 +1605,10 @@
       "claimKind": "contract",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
-      "rationale": "Whole Related Files section is retained. Nine relative link spellings are adjusted across governance.md to preserve the original repository destinations, including the documentation portal README.md now written ../README.md (docs/README.md), distinct from the platform portal. This unit contains no component-boundary plain path. No governance rule or authority changes. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
-      "targetUnitDigest": "1b5703ab9905bb5b86c289e9b6474f95cb2313ac563451919595515af5f1000c",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "rationale": "Whole Related Files section is retained. Nine relative link spellings are adjusted across governance.md to preserve the original repository destinations, including the documentation portal README.md now written ../README.md (docs/README.md), distinct from the platform portal. This unit contains no component-boundary plain path. No governance rule or authority changes. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetUnitDigest": "12cc18517f23da3cdd1de3e0a0090371e92f19fce30063363466eb6fdea56cb6",
       "targetAncestry": [
         "Documentation Governance"
       ]
@@ -1611,10 +1621,10 @@
       "claimKind": "contract",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
-      "rationale": "Whole Related Files table is retained. Nine relative link spellings are adjusted across governance.md to preserve the original repository destinations, including the documentation portal README.md now written ../README.md (docs/README.md), distinct from the platform portal. This unit contains no component-boundary plain path. No governance rule or authority changes. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
-      "targetUnitDigest": "32b40e383cb5cb41ff5b61f312d99116278ddac6728391109adbd1f7f891c4ba",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "rationale": "Whole Related Files table is retained. Nine relative link spellings are adjusted across governance.md to preserve the original repository destinations, including the documentation portal README.md now written ../README.md (docs/README.md), distinct from the platform portal. This unit contains no component-boundary plain path. No governance rule or authority changes. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetUnitDigest": "f389738a959bded8d713ae3139c654c123eed5d9a93ae8b439562d84aca629ae",
       "targetAncestry": [
         "Documentation Governance",
         "14. Related Files"

@@ -24,7 +24,7 @@
       "targetAnchor": "step-10-a0---coding-domain-boundary-and-facade-plan",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
       "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal; partial foundation retirement and surviving harnesses do not settle an unaccepted plan. Retain Not started and prerequisite uncertainty. Evidence: docs/platform/system-architecture/architecture/roadmap.md:53 retains coding-domain adoption. docs/architect/proposals/step-10-coding-domain-adoption.md:18,167–172,206–217 identifies A0 and its facade work. domains/coding/harness/enrich-and-validate-contract.mjs survives; no accepted whole-plan implementation is inferred. Complete source heading docs/architect/proposals/step-10-a0-coding-domain-boundary-facade-plan.md#step-10-a0---coding-domain-boundary-and-facade-plan (lines 1–1) is carried at docs/platform/proposals/step-10-a0-coding-domain-boundary-facade-plan.md#step-10-a0---coding-domain-boundary-and-facade-plan (lines 1–1); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by native retained identity. Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
       "priorReview": {
@@ -46,9 +46,14 @@
         "targetAncestry": [],
         "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
       },
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: full section diff read both ways; candidate metadata block, Added in candidate label and Source relationship line inserted after the H1 (Provenance blob and commit verified against git, source link resolves); 4 link destination(s) repointed (e.g. roadmap.md -> system-architecture/architecture/roadmap.md), all resolve at HEAD and appear in the Step 10 link records; nothing in source dropped, nothing unlabelled added; anchors pass; rationale difference sentence is true",
       "targetUnitDigest": "aa837afe6a57d9a7999aaedbc6972f2326e16b754c09f84c9104f2eff6237ec1",
-      "targetAncestry": []
+      "targetAncestry": [],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c02-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_41eb23771841396455b8a640a561618b",
@@ -99,7 +104,7 @@
       "targetAnchor": "unheaded-block-5",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
       "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal; partial foundation retirement and surviving harnesses do not settle an unaccepted plan. Retain Not started and prerequisite uncertainty. Evidence: docs/platform/system-architecture/architecture/roadmap.md:53 retains coding-domain adoption. docs/architect/proposals/step-10-coding-domain-adoption.md:18,167–172,206–217 identifies A0 and its facade work. domains/coding/harness/enrich-and-validate-contract.mjs survives; no accepted whole-plan implementation is inferred. Complete source unheaded-block docs/architect/proposals/step-10-a0-coding-domain-boundary-facade-plan.md#unheaded-block-2 (lines 10–15) is carried at docs/platform/proposals/step-10-a0-coding-domain-boundary-facade-plan.md#unheaded-block-5 (lines 34–39); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
       "priorReview": {
@@ -123,11 +128,16 @@
         ],
         "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
       },
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: full section diff read both ways; 4 link destination(s) repointed (e.g. roadmap.md -> system-architecture/architecture/roadmap.md), all resolve at HEAD and appear in the Step 10 link records; nothing in source dropped, nothing unlabelled added; anchors pass; rationale difference sentence is true",
       "targetUnitDigest": "ae8249b8edf47c319ae13ee94acf20330568d2567ee9937b6909d1d76f9ad039",
       "targetAncestry": [
         "Step 10 A0 - Coding Domain Boundary And Facade Plan"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c02-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_553287519504cc4d0ffe7bb06641150d",

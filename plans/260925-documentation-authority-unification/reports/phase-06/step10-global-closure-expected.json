@@ -2710,6 +2710,20 @@
       "sourceAnchor": "unheaded-block-92",
       "sourceUnitDigest": "c331d40816f84d25425abfdfdb8c6bff2a1e92b781bfe82d6f910fc0b1777917",
       "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/step9-l9-9-redecisions.json"
+    },
+    {
+      "claimId": "claim_41571c8f42f542be1f44c9371fad823a",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-52",
+      "sourceUnitDigest": "1b272bfab383f72def5df026184449f797cb7723c812253713808d6aed302988",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync2300-predecessor-residuals.json"
+    },
+    {
+      "claimId": "claim_a64fabc06da00bb0eb8dfaba5ea0c1a6",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-102",
+      "sourceUnitDigest": "b323720a9d4e93b156af47db347755f342dd8ad9fb9720466bb161732ebef4e3",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync2300-predecessor-residuals.json"
     }
   ],
   "candidateLists": [
@@ -22923,7 +22937,7 @@
       {
         "claimId": "claim_2bebe6c55e6d3140c1fa481d8a9dee77",
         "path": "docs/platform/runner/architecture/h-7af1f0242611.md",
-        "anchor": "added-in-candidate-runner-t\u1eeb-v\u1ef1ng-dispatch-hi\u1ec7n-h\u00e0nh",
+        "anchor": "added-in-candidate-runner-từ-vựng-dispatch-hiện-hành",
         "unitDigest": "ccc8696ed438ee4a84d995cf26b810c12311b606f9fdaf4928b18ac5efe48247"
       },
       {
@@ -22977,7 +22991,7 @@
       {
         "claimId": "claim_c868bc8d5e9e5a6f4859364834528dd6",
         "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
-        "anchor": "added-in-candidate-runner-l\u1ecbch-s\u1eed-quy\u1ebft-\u0111\u1ecbnh-retired-t\u1eeb-docsdecisions-tsk-1lv-4",
+        "anchor": "added-in-candidate-runner-lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4",
         "unitDigest": "742978b083aa9746696bc18a99d5e6d67ebe568eed7ea0dfb77f9d0486ce9ab8"
       },
       {
@@ -22995,7 +23009,7 @@
       {
         "claimId": "claim_8cd28ca6800c45c489bed67870072181",
         "path": "docs/platform/runner/decisions/h-aabefc85f0c9.md",
-        "anchor": "added-in-candidate-runner-coordinationsession-l\u1ecbch-s\u1eed-\u0111\u00e3-thu-h\u1ed3i-per-p4-thay-b\u1eb1ng-collaborationpattern-workflow-runner",
+        "anchor": "added-in-candidate-runner-coordinationsession-lịch-sử-đã-thu-hồi-per-p4-thay-bằng-collaborationpattern-workflow-runner",
         "unitDigest": "f74b367ba72da0fae4ac7a34c339c75b4607fab83af330e735270c0963684444"
       },
       {
@@ -24399,8 +24413,8 @@
     ],
     "candidateRawRows": 3609,
     "candidateUniqueTuples": 2293,
-    "partialCount": 24,
-    "note": "L10-13 expected-set refresh: 24 currently authored partial-carry identities after the pending closing-instruction reclassification. This does not approve that row. Candidate list tuples/group sets remain the earlier native snapshot; refresh after next single native sync and rebind. No global closure proof.",
-    "correctionSYNC": "e7393ea3c"
+    "partialCount": 26,
+    "note": "L10-15: all 26 authored partial-carry identities, including both runner predecessor gaps; root claim_5c520fcb is reclassified, not a partial carry. No A34 acceptance or closure implied. Native candidate/group refresh remains next package work.",
+    "correctionSYNC": "59b9b7087"
   }
 }

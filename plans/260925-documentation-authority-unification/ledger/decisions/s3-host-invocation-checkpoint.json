@@ -3853,17 +3853,22 @@
       "disposition": "partial-carry",
       "targetOwner": "docs/platform/host-invocation-routing/spec.md",
       "targetAnchor": "9-physical-placement",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
       "rationale": "Partial carry of the direct source section docs/architect/host-invocation-routing/host-invocation-provider-routing.md#9-physical-placement at docs/platform/host-invocation-routing/spec.md#9-physical-placement; surrounding content stays here. Remainder: The relocated passage of docs/architect/host-invocation-routing/host-invocation-provider-routing.md#9-physical-placement is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-physical-placement-layout-tree and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-46 (claim_54536d1078dc6a2b6eacd17105389f2b; ```txt Cargo.toml # workspace root; herdr-plugin/ excluded in R1 apps/ fgos/ # crat). No source wording is discarded; this row does not claim the primary target alone contains the relocated passage. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by native retained identity. Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: partial-carry; the code-fenced placement tree and its closers (25 removed lines) are all found verbatim in release-boundaries.md#restored-physical-placement-layout-tree, the one remaining Distribution paragraph differs only by the runtime-identity link destination; the pointer line is labelled Added in candidate; heading level 2 to 4; remainder unit-46 is named",
       "remainder": "The relocated passage of docs/architect/host-invocation-routing/host-invocation-provider-routing.md#9-physical-placement is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-physical-placement-layout-tree and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-46 (claim_54536d1078dc6a2b6eacd17105389f2b; ```txt Cargo.toml # workspace root; herdr-plugin/ excluded in R1 apps/ fgos/ # crat).",
       "targetUnitDigest": "e95f14771b2c72fc9eb48e5c9813b74f897175763fa9b44441fb2cb6a896c1cd",
       "targetAncestry": [
         "Spec: Host Invocation",
         "Retained selected source material",
         "Host Invocation And Provider Routing Architecture"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_d261432b2a27b402bd3027b58e918774",
@@ -3936,10 +3941,10 @@
       "disposition": "move",
       "targetOwner": "docs/platform/host-invocation-routing/spec.md",
       "targetAnchor": "unheaded-block-62",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
       "rationale": "Move the complete direct unheaded-block unit \"Distribution selects and activates the trusted runtime (`fgctl`: acquire/stage/verify/activate/upgrade/rollback); host invocation routes inside the activated runtime. Pac\" from docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-48 to its frozen mapped owner docs/platform/host-invocation-routing/spec.md#unheaded-block-61. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: move unheaded-block-48 to unheaded-block-62; text identical to source modulo masking; 1 link destination(s) repointed (packaging-distribution/runtime-identity-and-activation.md to packaging-distribution/architecture/runtime-identity-and-activation.md); every changed link resolves at HEAD (anchors included) and matches the Step 10 link record; no approval carried",
       "reviewPackCommit": "76353c58eb885becc550d734fde5d7c2709cce33",
       "reviewPackId": "31d576a0a8e687a2268a6862cacb1b71d7ea0fb2a5426c12bfd7c7e6481d55a6",
       "seedScoreId": "8fda89ebb85e6581f813c08f29335131c8b2fd62237949ca97551bf10b5ae0ba",
@@ -3949,7 +3954,12 @@
         "Retained selected source material",
         "Host Invocation And Provider Routing Architecture",
         "9. Physical Placement"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_851ddbaa6bc2c6725489d33799bd26f5",
@@ -3959,10 +3969,10 @@
       "disposition": "move",
       "targetOwner": "docs/platform/host-invocation-routing/spec.md",
       "targetAnchor": "10-release-boundaries",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
       "rationale": "Move the complete direct heading unit \"## 10. Release Boundaries\" from docs/architect/host-invocation-routing/host-invocation-provider-routing.md#10-release-boundaries to its frozen mapped owner docs/platform/host-invocation-routing/spec.md#10-release-boundaries. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: move 10-release-boundaries to 10-release-boundaries; text identical to source modulo masking; heading depth H2 to H4; 1 link destination(s) repointed (packaging-distribution/future-constraints.md to packaging-distribution/architecture/future-constraints.md); every changed link resolves at HEAD (anchors included) and matches the Step 10 link record; no approval carried",
       "reviewPackCommit": "76353c58eb885becc550d734fde5d7c2709cce33",
       "reviewPackId": "31d576a0a8e687a2268a6862cacb1b71d7ea0fb2a5426c12bfd7c7e6481d55a6",
       "seedScoreId": "8fda89ebb85e6581f813c08f29335131c8b2fd62237949ca97551bf10b5ae0ba",
@@ -3971,7 +3981,12 @@
         "Spec: Host Invocation",
         "Retained selected source material",
         "Host Invocation And Provider Routing Architecture"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_559fca19404946ba9ede9006edab6e63",
@@ -3981,10 +3996,10 @@
       "disposition": "move",
       "targetOwner": "docs/platform/host-invocation-routing/spec.md",
       "targetAnchor": "unheaded-block-63",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
       "rationale": "Move the complete direct unheaded-block unit \"| Release | Required architecture slice | Explicitly not a gate | |---|---|---| | R1 — distributable Rust CLI host | Invocation kernel; `const` `OperationCatalog` / `Regi\" from docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-49 to its frozen mapped owner docs/platform/host-invocation-routing/spec.md#unheaded-block-62. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: move unheaded-block-49 to unheaded-block-63; text identical to source modulo masking; 1 link destination(s) repointed (packaging-distribution/future-constraints.md to packaging-distribution/architecture/future-constraints.md); every changed link resolves at HEAD (anchors included) and matches the Step 10 link record; no approval carried",
       "reviewPackCommit": "76353c58eb885becc550d734fde5d7c2709cce33",
       "reviewPackId": "31d576a0a8e687a2268a6862cacb1b71d7ea0fb2a5426c12bfd7c7e6481d55a6",
       "seedScoreId": "8fda89ebb85e6581f813c08f29335131c8b2fd62237949ca97551bf10b5ae0ba",
@@ -3994,7 +4009,12 @@
         "Retained selected source material",
         "Host Invocation And Provider Routing Architecture",
         "10. Release Boundaries"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_21a5d8159161b20d737a94c96eb0a55d",
@@ -4025,10 +4045,10 @@
       "disposition": "move",
       "targetOwner": "docs/platform/host-invocation-routing/spec.md",
       "targetAnchor": "11-open-questions",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
       "rationale": "Move the complete direct heading unit \"## 11. Open Questions\" from docs/architect/host-invocation-routing/host-invocation-provider-routing.md#11-open-questions to its frozen mapped owner docs/platform/host-invocation-routing/spec.md#11-open-questions. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by native retained identity. Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: move 11-open-questions to 11-open-questions; text identical to source modulo masking; heading depth H2 to H4; 1 link destination(s) repointed (packaging-distribution/runtime-identity-and-activation.md to packaging-distribution/architecture/runtime-identity-and-activation.md); every changed link resolves at HEAD (anchors included) and matches the Step 10 link record; no approval carried",
       "reviewPackCommit": "76353c58eb885becc550d734fde5d7c2709cce33",
       "reviewPackId": "31d576a0a8e687a2268a6862cacb1b71d7ea0fb2a5426c12bfd7c7e6481d55a6",
       "seedScoreId": "8fda89ebb85e6581f813c08f29335131c8b2fd62237949ca97551bf10b5ae0ba",
@@ -4037,7 +4057,12 @@
         "Spec: Host Invocation",
         "Retained selected source material",
         "Host Invocation And Provider Routing Architecture"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_a8f97838dcc5ffcbacc85b316d50e496",
@@ -4068,10 +4093,10 @@
       "disposition": "move",
       "targetOwner": "docs/platform/host-invocation-routing/spec.md",
       "targetAnchor": "unheaded-block-66",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
       "rationale": "Move the complete direct unheaded-block unit \"Target matrix, install/upgrade mechanism, and R1 definition are owned by packaging — see [Runtime Identity And Activation](../packaging-distribution/runtime-identity-and-\" from docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-52 to its frozen mapped owner docs/platform/host-invocation-routing/spec.md#unheaded-block-65. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: move unheaded-block-52 to unheaded-block-66; text identical to source modulo masking; 1 link destination(s) repointed (packaging-distribution/runtime-identity-and-activation.md to packaging-distribution/architecture/runtime-identity-and-activation.md); every changed link resolves at HEAD (anchors included) and matches the Step 10 link record; no approval carried",
       "reviewPackCommit": "76353c58eb885becc550d734fde5d7c2709cce33",
       "reviewPackId": "31d576a0a8e687a2268a6862cacb1b71d7ea0fb2a5426c12bfd7c7e6481d55a6",
       "seedScoreId": "8fda89ebb85e6581f813c08f29335131c8b2fd62237949ca97551bf10b5ae0ba",
@@ -4081,7 +4106,12 @@
         "Retained selected source material",
         "Host Invocation And Provider Routing Architecture",
         "11. Open Questions"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_8494129121a2674191af910332dc4502",
@@ -4091,10 +4121,10 @@
       "disposition": "move",
       "targetOwner": "docs/platform/host-invocation-routing/spec.md",
       "targetAnchor": "related-documents",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
       "rationale": "Move the complete direct heading unit \"## Related Documents\" from docs/architect/host-invocation-routing/host-invocation-provider-routing.md#related-documents to its frozen mapped owner docs/platform/host-invocation-routing/spec.md#related-documents. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by native retained identity. Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: move related-documents to related-documents; text identical to source modulo masking; heading depth H2 to H4; 6 link destination(s) repointed (external-provider-protocol.md to architecture/external-provider-protocol.md, legacy-cli-transition.md to architecture/legacy-cli-transition.md...); every changed link resolves at HEAD (anchors included) and matches the Step 10 link record; no approval carried",
       "reviewPackCommit": "76353c58eb885becc550d734fde5d7c2709cce33",
       "reviewPackId": "31d576a0a8e687a2268a6862cacb1b71d7ea0fb2a5426c12bfd7c7e6481d55a6",
       "seedScoreId": "8fda89ebb85e6581f813c08f29335131c8b2fd62237949ca97551bf10b5ae0ba",
@@ -4103,7 +4133,12 @@
         "Spec: Host Invocation",
         "Retained selected source material",
         "Host Invocation And Provider Routing Architecture"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_b2a8587f5b61f728d0136e54d808289f",
@@ -4113,10 +4148,10 @@
       "disposition": "move",
       "targetOwner": "docs/platform/host-invocation-routing/spec.md",
       "targetAnchor": "unheaded-block-67",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
       "rationale": "Move the complete direct unheaded-block unit \"- [External Provider Protocol](./external-provider-protocol.md) - [Legacy CLI Transition](./legacy-cli-transition.md) - [Node To Rust Component Migration](./node-to-rust-\" from docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-53 to its frozen mapped owner docs/platform/host-invocation-routing/spec.md#unheaded-block-66. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: move unheaded-block-53 to unheaded-block-67; text identical to source modulo masking; 6 link destination(s) repointed (external-provider-protocol.md to architecture/external-provider-protocol.md, legacy-cli-transition.md to architecture/legacy-cli-transition.md...); every changed link resolves at HEAD (anchors included) and matches the Step 10 link record; no approval carried; seeded sample, digests recomputed by hand",
       "reviewPackCommit": "76353c58eb885becc550d734fde5d7c2709cce33",
       "reviewPackId": "31d576a0a8e687a2268a6862cacb1b71d7ea0fb2a5426c12bfd7c7e6481d55a6",
       "seedScoreId": "8fda89ebb85e6581f813c08f29335131c8b2fd62237949ca97551bf10b5ae0ba",
@@ -4126,7 +4161,12 @@
         "Retained selected source material",
         "Host Invocation And Provider Routing Architecture",
         "Related Documents"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_06ed1e74e28e628d68ae28927e3f14cb",
@@ -4400,11 +4440,11 @@
       "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
       "targetAnchor": "2-legacy-payload-identity-ownership-and-repair-path",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
-      "rationale": "Partial carry of the direct source section docs/architect/host-invocation-routing/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path at docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path; surrounding content stays here. Remainder: The relocated passage of docs/architect/host-invocation-routing/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-14 (claim_6a37273a0a45d24c53e344928c3edf22; `package.json` `bin.fgos` is removed (or pointed at the workspace shim) when the Rust host becomes the installed default; `bin.fgos-runner` ). No source wording is discarded; this row does not claim the primary target alone contains the relocated passage. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by native retained identity. Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "rationale": "Partial carry of the direct source section docs/architect/host-invocation-routing/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path at docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path; surrounding content stays here. Remainder: The relocated passage of docs/architect/host-invocation-routing/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-14 (claim_6a37273a0a45d24c53e344928c3edf22; `package.json` `bin.fgos` is removed (or pointed at the workspace shim) when the Rust host becomes the installed default; `bin.fgos-runner` ). No source wording is discarded; this row does not claim the primary target alone contains the relocated passage. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by native retained identity. Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
       "remainder": "The relocated passage of docs/architect/host-invocation-routing/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-14 (claim_6a37273a0a45d24c53e344928c3edf22; `package.json` `bin.fgos` is removed (or pointed at the workspace shim) when the Rust host becomes the installed default; `bin.fgos-runner` ).",
-      "targetUnitDigest": "b4dbf7eed4fee9a7d5e4844b1543c598c3f92d38f313d881c55fb088498aee1b",
+      "targetUnitDigest": "bcaecc76a91e2cd04d8a432c31285c9d795a274e2ae8dcba92ccfd94780daddf",
       "targetAncestry": [
         "Architecture: Legacy CLI Transition",
         "Retained selected source material",
@@ -4462,13 +4502,10 @@
       "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
       "targetAnchor": "unheaded-block-18",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
-      "rationale": "Move the complete direct unheaded-block unit \"**The Node program is not relocated and not renamed in the source tree** (decided 2026-09-10). `bin/fgos.mjs` computes its package root from its own file location and imp\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-12 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-18. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
-      "reviewPackCommit": "76353c58eb885becc550d734fde5d7c2709cce33",
-      "reviewPackId": "31d576a0a8e687a2268a6862cacb1b71d7ea0fb2a5426c12bfd7c7e6481d55a6",
-      "seedScoreId": "8fda89ebb85e6581f813c08f29335131c8b2fd62237949ca97551bf10b5ae0ba",
-      "targetUnitDigest": "d91f9f6c059d67429bf1103a52a8d0ea676d9af650e1cf9ac324d967124b0902",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "rationale": "Move the complete direct unheaded-block unit \"**The Node program is not relocated and not renamed in the source tree** (decided 2026-09-10). `bin/fgos.mjs` computes its package root from its own file location and imp\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-12 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-18. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetUnitDigest": "118885816abfb7f4aab2be95229d48b5f9d505ee4d781ced7fff9c43ce7dd95e",
       "targetAncestry": [
         "Architecture: Legacy CLI Transition",
         "Retained selected source material",
@@ -4485,13 +4522,10 @@
       "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
       "targetAnchor": "unheaded-block-19",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
-      "rationale": "Move the complete direct unheaded-block unit \"The public `fgos` executable is the platform Rust host. It resolves the legacy payload as `join(activeReleasePath, components.legacyNode.root, components.legacyNode.entry\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-13 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-19. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
-      "reviewPackCommit": "76353c58eb885becc550d734fde5d7c2709cce33",
-      "reviewPackId": "31d576a0a8e687a2268a6862cacb1b71d7ea0fb2a5426c12bfd7c7e6481d55a6",
-      "seedScoreId": "8fda89ebb85e6581f813c08f29335131c8b2fd62237949ca97551bf10b5ae0ba",
-      "targetUnitDigest": "de0ae19bed33fc5dd3ea48d0be145d8c50690bdb1529055b40c1bd0ae22ca06f",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "rationale": "Move the complete direct unheaded-block unit \"The public `fgos` executable is the platform Rust host. It resolves the legacy payload as `join(activeReleasePath, components.legacyNode.root, components.legacyNode.entry\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-13 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-19. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetUnitDigest": "c3301ca9cc5d4bc1b53296a7edf3a3afb1726f1280db021c8c3131b554354f95",
       "targetAncestry": [
         "Architecture: Legacy CLI Transition",
         "Retained selected source material",
@@ -4915,13 +4949,10 @@
       "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
       "targetAnchor": "related-documents",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
-      "rationale": "Move the complete direct heading unit \"## Related Documents\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#related-documents to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#related-documents. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by native retained identity. Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
-      "reviewPackCommit": "76353c58eb885becc550d734fde5d7c2709cce33",
-      "reviewPackId": "31d576a0a8e687a2268a6862cacb1b71d7ea0fb2a5426c12bfd7c7e6481d55a6",
-      "seedScoreId": "8fda89ebb85e6581f813c08f29335131c8b2fd62237949ca97551bf10b5ae0ba",
-      "targetUnitDigest": "fe124dcd355f3f421cd60d47a374615faf787606fbd70f0107ca75e8aeafc6ba",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "rationale": "Move the complete direct heading unit \"## Related Documents\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#related-documents to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#related-documents. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by native retained identity. Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetUnitDigest": "954b3dcc8c61cac86072dbe20d9c6aa044d2ddc3387979c743c81bfd69ae9337",
       "targetAncestry": [
         "Architecture: Legacy CLI Transition",
         "Retained selected source material",
@@ -4937,13 +4968,10 @@
       "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
       "targetAnchor": "unheaded-block-37",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
-      "rationale": "Move the complete direct unheaded-block unit \"- [Host Invocation And Provider Routing](./host-invocation-provider-routing.md) — kernel contract this document depends on. - [External Provider Protocol](./external-prov\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-30 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-36. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
-      "reviewPackCommit": "76353c58eb885becc550d734fde5d7c2709cce33",
-      "reviewPackId": "31d576a0a8e687a2268a6862cacb1b71d7ea0fb2a5426c12bfd7c7e6481d55a6",
-      "seedScoreId": "8fda89ebb85e6581f813c08f29335131c8b2fd62237949ca97551bf10b5ae0ba",
-      "targetUnitDigest": "cf294a957ee6cdf9b75f573e8796e10c7c55af7e0410888ae82824005a3f6a3e",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "rationale": "Move the complete direct unheaded-block unit \"- [Host Invocation And Provider Routing](./host-invocation-provider-routing.md) — kernel contract this document depends on. - [External Provider Protocol](./external-prov\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-30 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-36. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetUnitDigest": "79a8711ca2d89312fa54c5f3518f6e8541db0883c16b6de74b945a0c78b886a0",
       "targetAncestry": [
         "Architecture: Legacy CLI Transition",
         "Retained selected source material",
@@ -5778,10 +5806,10 @@
       "disposition": "move",
       "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
       "targetAnchor": "5-release-r1-distributable-rust-cli-host",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
       "rationale": "Move the complete direct heading unit \"## 5. Release R1: Distributable Rust CLI Host\" from docs/architect/host-invocation-routing/node-to-rust-component-migration.md#5-release-r1-distributable-rust-cli-host to its frozen mapped owner docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#5-release-r1-distributable-rust-cli-host. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by native retained identity. Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: move 5-release-r1-distributable-rust-cli-host to 5-release-r1-distributable-rust-cli-host; text identical to source modulo masking; heading depth H2 to H4; 2 link destination(s) repointed (packaging-distribution/runtime-identity-and-activation.md to packaging-distribution/architecture/runtime-identity-and-activation.md, legacy-cli-transition.md to legacy-cli-transition.md); every changed link resolves at HEAD (anchors included) and matches the Step 10 link record; no approval carried",
       "reviewPackCommit": "76353c58eb885becc550d734fde5d7c2709cce33",
       "reviewPackId": "31d576a0a8e687a2268a6862cacb1b71d7ea0fb2a5426c12bfd7c7e6481d55a6",
       "seedScoreId": "8fda89ebb85e6581f813c08f29335131c8b2fd62237949ca97551bf10b5ae0ba",
@@ -5790,7 +5818,12 @@
         "Architecture: Node To Rust Migration",
         "Retained selected source material",
         "Node To Rust Component Migration"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_502a4f82b936983d2e826e42f613f60d",
@@ -5842,10 +5875,10 @@
       "disposition": "move",
       "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
       "targetAnchor": "unheaded-block-32",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
       "rationale": "Move the complete direct unheaded-block unit \"1. adopt the packaging stream's settled install/activation/rollback contract (`fgctl` + release store + workspace activation binding; see [Runtime Identity And Activation\" from docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-28 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#unheaded-block-32. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: move unheaded-block-28 to unheaded-block-32; text identical to source modulo masking; 2 link destination(s) repointed (packaging-distribution/runtime-identity-and-activation.md to packaging-distribution/architecture/runtime-identity-and-activation.md, legacy-cli-transition.md to legacy-cli-transition.md); every changed link resolves at HEAD (anchors included) and matches the Step 10 link record; no approval carried",
       "reviewPackCommit": "76353c58eb885becc550d734fde5d7c2709cce33",
       "reviewPackId": "31d576a0a8e687a2268a6862cacb1b71d7ea0fb2a5426c12bfd7c7e6481d55a6",
       "seedScoreId": "8fda89ebb85e6581f813c08f29335131c8b2fd62237949ca97551bf10b5ae0ba",
@@ -5855,7 +5888,12 @@
         "Retained selected source material",
         "Node To Rust Component Migration",
         "5. Release R1: Distributable Rust CLI Host"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_cd920a5c6b37f91738221ce29db5e4d7",
@@ -5991,10 +6029,10 @@
       "disposition": "move",
       "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
       "targetAnchor": "7-release-r3-production-remote-host",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
       "rationale": "Move the complete direct heading unit \"## 7. Release R3: Production Remote Host\" from docs/architect/host-invocation-routing/node-to-rust-component-migration.md#7-release-r3-production-remote-host to its frozen mapped owner docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#7-release-r3-production-remote-host. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: move 7-release-r3-production-remote-host to 7-release-r3-production-remote-host; text identical to source modulo masking; heading depth H2 to H4; 1 link destination(s) repointed (packaging-distribution/future-constraints.md to packaging-distribution/architecture/future-constraints.md); every changed link resolves at HEAD (anchors included) and matches the Step 10 link record; no approval carried",
       "reviewPackCommit": "76353c58eb885becc550d734fde5d7c2709cce33",
       "reviewPackId": "31d576a0a8e687a2268a6862cacb1b71d7ea0fb2a5426c12bfd7c7e6481d55a6",
       "seedScoreId": "8fda89ebb85e6581f813c08f29335131c8b2fd62237949ca97551bf10b5ae0ba",
@@ -6003,7 +6041,12 @@
         "Architecture: Node To Rust Migration",
         "Retained selected source material",
         "Node To Rust Component Migration"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_3c20acd43697420d9cf2954ba122554a",
@@ -6076,10 +6119,10 @@
       "disposition": "move",
       "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
       "targetAnchor": "unheaded-block-41",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
       "rationale": "Move the complete direct unheaded-block unit \"The production remote host in R3 is the project-local gateway (the current Herdr crate, released alongside the runtime) composing the host-runtime crate in-process. A fut\" from docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-37 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#unheaded-block-41. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: move unheaded-block-37 to unheaded-block-41; text identical to source modulo masking; 1 link destination(s) repointed (packaging-distribution/future-constraints.md to packaging-distribution/architecture/future-constraints.md); every changed link resolves at HEAD (anchors included) and matches the Step 10 link record; no approval carried",
       "reviewPackCommit": "76353c58eb885becc550d734fde5d7c2709cce33",
       "reviewPackId": "31d576a0a8e687a2268a6862cacb1b71d7ea0fb2a5426c12bfd7c7e6481d55a6",
       "seedScoreId": "8fda89ebb85e6581f813c08f29335131c8b2fd62237949ca97551bf10b5ae0ba",
@@ -6089,7 +6132,12 @@
         "Retained selected source material",
         "Node To Rust Component Migration",
         "7. Release R3: Production Remote Host"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_ac42bff1400920fcfd54f99e5c852012",
@@ -6674,17 +6722,22 @@
       "disposition": "partial-carry",
       "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
       "targetAnchor": "13-rollback-rules",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
       "rationale": "Partial carry of the direct source section docs/architect/host-invocation-routing/node-to-rust-component-migration.md#13-rollback-rules at docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#13-rollback-rules; surrounding content stays here. Remainder: The relocated passage of docs/architect/host-invocation-routing/node-to-rust-component-migration.md#13-rollback-rules is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-rollback-bullets and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-59 (claim_a1c1085c9d77a84ca5e5aefe1de6d059; - Keep legacy and native implementations side by side only for the observation window of their operation. - Never delete a Node writer bef). No source wording is discarded; this row does not claim the primary target alone contains the relocated passage. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by native retained identity. Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: partial-carry; the removed rollback bullets are found verbatim at component-protocol.md#restored-rollback-bullets (2 of 9 removed lines differ only by heading level or link destination); pointer line is labelled Added in candidate; remainder unit-59 is named",
       "remainder": "The relocated passage of docs/architect/host-invocation-routing/node-to-rust-component-migration.md#13-rollback-rules is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-rollback-bullets and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-59 (claim_a1c1085c9d77a84ca5e5aefe1de6d059; - Keep legacy and native implementations side by side only for the observation window of their operation. - Never delete a Node writer bef).",
       "targetUnitDigest": "8d879f9c47c2ff7d5802b8a53b77ac6b4367b511681b018b81644f370b5abae6",
       "targetAncestry": [
         "Architecture: Node To Rust Migration",
         "Retained selected source material",
         "Node To Rust Component Migration"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_485913c207130897d47aa1e1511faa50",
@@ -6694,10 +6747,10 @@
       "disposition": "move",
       "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
       "targetAnchor": "unheaded-block-60",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
       "rationale": "Move the complete direct unheaded-block unit \"Config can never replace a built-in provider (host doc open question 2 closed as \"prohibit\"). A provider binding is not a runtime-selectable switch, so rollback of a nati\" from docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-58 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#unheaded-block-60. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: move unheaded-block-58 to unheaded-block-60; text identical to source modulo masking; 1 link destination(s) repointed (packaging-distribution/runtime-identity-and-activation.md to packaging-distribution/architecture/runtime-identity-and-activation.md); every changed link resolves at HEAD (anchors included) and matches the Step 10 link record; no approval carried",
       "reviewPackCommit": "76353c58eb885becc550d734fde5d7c2709cce33",
       "reviewPackId": "31d576a0a8e687a2268a6862cacb1b71d7ea0fb2a5426c12bfd7c7e6481d55a6",
       "seedScoreId": "8fda89ebb85e6581f813c08f29335131c8b2fd62237949ca97551bf10b5ae0ba",
@@ -6707,7 +6760,12 @@
         "Retained selected source material",
         "Node To Rust Component Migration",
         "13. Rollback Rules"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_a1c1085c9d77a84ca5e5aefe1de6d059",
@@ -6822,10 +6880,10 @@
       "disposition": "move",
       "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
       "targetAnchor": "15-remaining-migration-decisions",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
       "rationale": "Move the complete direct heading unit \"## 15. Remaining Migration Decisions\" from docs/architect/host-invocation-routing/node-to-rust-component-migration.md#15-remaining-migration-decisions to its frozen mapped owner docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#15-remaining-migration-decisions. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by native retained identity. Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: move 15-remaining-migration-decisions to 15-remaining-migration-decisions; text identical to source modulo masking; heading depth H2 to H4; 1 link destination(s) repointed (packaging-distribution/runtime-identity-and-activation.md to packaging-distribution/architecture/runtime-identity-and-activation.md); every changed link resolves at HEAD (anchors included) and matches the Step 10 link record; no approval carried",
       "reviewPackCommit": "76353c58eb885becc550d734fde5d7c2709cce33",
       "reviewPackId": "31d576a0a8e687a2268a6862cacb1b71d7ea0fb2a5426c12bfd7c7e6481d55a6",
       "seedScoreId": "8fda89ebb85e6581f813c08f29335131c8b2fd62237949ca97551bf10b5ae0ba",
@@ -6834,7 +6892,12 @@
         "Architecture: Node To Rust Migration",
         "Retained selected source material",
         "Node To Rust Component Migration"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_f16be2f3b890cb70b0c1492df480469d",
@@ -6865,10 +6928,10 @@
       "disposition": "move",
       "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
       "targetAnchor": "unheaded-block-66",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
       "rationale": "Move the complete direct unheaded-block unit \"The former \"which post-npm release/install mechanism owns native artifacts\" decision is settled: the packaging stream owns it (`fgctl` + release store + workspace activat\" from docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-64 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#unheaded-block-66. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: move unheaded-block-64 to unheaded-block-66; text identical to source modulo masking; 1 link destination(s) repointed (packaging-distribution/runtime-identity-and-activation.md to packaging-distribution/architecture/runtime-identity-and-activation.md); every changed link resolves at HEAD (anchors included) and matches the Step 10 link record; no approval carried",
       "reviewPackCommit": "76353c58eb885becc550d734fde5d7c2709cce33",
       "reviewPackId": "31d576a0a8e687a2268a6862cacb1b71d7ea0fb2a5426c12bfd7c7e6481d55a6",
       "seedScoreId": "8fda89ebb85e6581f813c08f29335131c8b2fd62237949ca97551bf10b5ae0ba",
@@ -6878,7 +6941,12 @@
         "Retained selected source material",
         "Node To Rust Component Migration",
         "15. Remaining Migration Decisions"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_15bf45a3b2bdf1083bc63a6f10d14e82",
@@ -6888,10 +6956,10 @@
       "disposition": "move",
       "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
       "targetAnchor": "rust-host-and-proof-providers-implementation-plan",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
       "rationale": "Move the complete direct heading unit \"# Rust Host And Proof Providers Implementation Plan\" from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#rust-host-and-proof-providers-implementation-plan to its frozen mapped owner docs/platform/host-invocation-routing/roadmap.md#rust-host-and-proof-providers-implementation-plan. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by native retained identity. Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: move rust-host-and-proof-providers-implementation-plan to rust-host-and-proof-providers-implementation-plan; text identical to source modulo masking; heading depth H1 to H3; 4 link destination(s) repointed (host-invocation-provider-routing.md to spec.md, node-to-rust-component-migration.md to architecture/node-to-rust-migration.md...); every changed link resolves at HEAD (anchors included) and matches the Step 10 link record; no approval carried",
       "reviewPackCommit": "76353c58eb885becc550d734fde5d7c2709cce33",
       "reviewPackId": "31d576a0a8e687a2268a6862cacb1b71d7ea0fb2a5426c12bfd7c7e6481d55a6",
       "seedScoreId": "8fda89ebb85e6581f813c08f29335131c8b2fd62237949ca97551bf10b5ae0ba",
@@ -6899,7 +6967,12 @@
       "targetAncestry": [
         "Host Invocation Routing Roadmap",
         "Retained selected source material"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_182dc1f2f896d82f0cf35519579ebbbf",
@@ -6909,10 +6982,10 @@
       "disposition": "move",
       "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
       "targetAnchor": "unheaded-block-61",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
       "rationale": "Move the complete direct unheaded-block unit \"**Status:** Proposed execution plan; blocked only by the remaining §3 decisions (target matrix, preview-vs-stable, compatibility-window duration) and the packaging stream\" from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-1 to its frozen mapped owner docs/platform/host-invocation-routing/roadmap.md#unheaded-block-60. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: move unheaded-block-1 to unheaded-block-61; text identical to source modulo masking; 4 link destination(s) repointed (host-invocation-provider-routing.md to spec.md, node-to-rust-component-migration.md to architecture/node-to-rust-migration.md...); every changed link resolves at HEAD (anchors included) and matches the Step 10 link record; no approval carried; seeded sample, digests recomputed by hand",
       "reviewPackCommit": "76353c58eb885becc550d734fde5d7c2709cce33",
       "reviewPackId": "31d576a0a8e687a2268a6862cacb1b71d7ea0fb2a5426c12bfd7c7e6481d55a6",
       "seedScoreId": "8fda89ebb85e6581f813c08f29335131c8b2fd62237949ca97551bf10b5ae0ba",
@@ -6921,7 +6994,12 @@
         "Host Invocation Routing Roadmap",
         "Retained selected source material",
         "Rust Host And Proof Providers Implementation Plan"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_c710c879488536d7a2b949141952f010",

@@ -24,15 +24,20 @@
       "targetAnchor": "component-boundary-architecture",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
       "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architect/component-boundary/README.md#component-boundary-architecture (lines 1–1) into docs/platform/component-boundary.md#component-boundary-architecture (lines 1154–1154), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: move component-boundary-architecture to component-boundary-architecture; text identical to source modulo masking; heading depth H1 to H3; 1 link destination(s) repointed (domainization/README.md to domainization/architecture/domainization.md); every changed link resolves at HEAD (anchors included) and matches the Step 10 link record; no approval carried",
       "targetUnitDigest": "0523eed9027c8952fd309ab937037f43e8c8025252aebbcd409100d48a9a9231",
       "targetAncestry": [
         "Component Boundary",
         "Added in candidate: README source carriage"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_5cba6fa874b39710beebf2ab34824909",
@@ -110,16 +115,21 @@
       "targetAnchor": "unheaded-block-163",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
       "rationale": "Judgment: no target digest match. Carry the complete unheaded-block at docs/architect/component-boundary/README.md#unheaded-block-4 (lines 15–18) into docs/platform/component-boundary.md#unheaded-block-163 (lines 1168–1171), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: move unheaded-block-4 to unheaded-block-163; text identical to source modulo masking; 1 link destination(s) repointed (domainization/README.md to domainization/architecture/domainization.md); every changed link resolves at HEAD (anchors included) and matches the Step 10 link record; no approval carried; seeded sample, digests recomputed by hand",
       "targetUnitDigest": "c7c3214ef3921701e072d3fc49112a74dc3e2da752e2d19d533e84584cdfc885",
       "targetAncestry": [
         "Component Boundary",
         "Added in candidate: README source carriage",
         "Component Boundary Architecture"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_c8d98c0008701e264eca755e375bf49f",
@@ -128,16 +138,21 @@
       "targetAnchor": "1-how-to-read-this-folder",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
       "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architect/component-boundary/README.md#1-how-to-read-this-folder (lines 20–20) into docs/platform/component-boundary.md#1-how-to-read-this-folder (lines 1173–1173), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by native retained identity. Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: move 1-how-to-read-this-folder to 1-how-to-read-this-folder; text identical to source modulo masking; heading depth H2 to H4; 5 link destination(s) repointed (component-boundary-advisory.md to architect/component-boundary/component-boundary-advisory.md, repo-layout-vision.md to architect/component-boundary/repo-layout-vision.md...); every changed link resolves at HEAD (anchors included) and matches the Step 10 link record; no approval carried",
       "targetUnitDigest": "8f3acc2c9875a25d866b98dd0d4903bb68ff8cdb44ff2d653cef53aa2c4b10e8",
       "targetAncestry": [
         "Component Boundary",
         "Added in candidate: README source carriage",
         "Component Boundary Architecture"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_9dda3f43258c741830447e1f10a72fd8",
@@ -170,17 +185,22 @@
       "targetAnchor": "unheaded-block-165",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
       "rationale": "Judgment: no target digest match. Carry the complete unheaded-block at docs/architect/component-boundary/README.md#unheaded-block-6 (lines 24–28) into docs/platform/component-boundary.md#unheaded-block-165 (lines 1177–1181), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: move unheaded-block-6 to unheaded-block-165; text identical to source modulo masking; 5 link destination(s) repointed (component-boundary-advisory.md to architect/component-boundary/component-boundary-advisory.md, repo-layout-vision.md to architect/component-boundary/repo-layout-vision.md...); every changed link resolves at HEAD (anchors included) and matches the Step 10 link record; no approval carried; seeded sample, digests recomputed by hand",
       "targetUnitDigest": "6af8570adb8504650c6d36ccc3e5e347ac8aa45cca06ff7b9c465b1c0225b903",
       "targetAncestry": [
         "Component Boundary",
         "Added in candidate: README source carriage",
         "Component Boundary Architecture",
         "1. How To Read This Folder"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_c54e55e6e9ae2a4dd7d365ba03c5a421",
@@ -476,17 +496,22 @@
       "targetAnchor": "component-boundary-advisory",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
       "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architect/component-boundary/README.md#component-boundary-advisory (lines 83–83) into docs/platform/component-boundary.md#component-boundary-advisory (lines 1236–1236), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by native retained identity. Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: move component-boundary-advisory to component-boundary-advisory; text identical to source modulo masking; heading depth H3 to H5; 2 link destination(s) repointed (component-boundary-advisory.md to architect/component-boundary/component-boundary-advisory.md, domainization/README.md to domainization/architecture/domainization.md); every changed link resolves at HEAD (anchors included) and matches the Step 10 link record; no approval carried; seeded sample, digests recomputed by hand",
       "targetUnitDigest": "457c2097e525258924d9dcf3bef70ebf0bf716e268b245048d5ae364fca41f8e",
       "targetAncestry": [
         "Component Boundary",
         "Added in candidate: README source carriage",
         "Component Boundary Architecture",
         "2. Documents"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_2f2826e65d051c01194cd662b5a8be9e",
@@ -495,10 +520,10 @@
       "targetAnchor": "unheaded-block-177",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
       "rationale": "Judgment: no target digest match. Carry the complete unheaded-block at docs/architect/component-boundary/README.md#unheaded-block-18 (lines 85–87) into docs/platform/component-boundary.md#unheaded-block-177 (lines 1238–1240), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: move unheaded-block-18 to unheaded-block-177; text identical to source modulo masking; 1 link destination(s) repointed (component-boundary-advisory.md to architect/component-boundary/component-boundary-advisory.md); every changed link resolves at HEAD (anchors included) and matches the Step 10 link record; no approval carried",
       "targetUnitDigest": "a3a418d3011a365ff46381767ed5c15547ad1a33da57b7e83405010c7c659fdd",
       "targetAncestry": [
         "Component Boundary",
@@ -506,7 +531,12 @@
         "Component Boundary Architecture",
         "2. Documents",
         "Component Boundary Advisory"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_6a4ad0be2d1231536575859cc0b797b7",
@@ -590,10 +620,10 @@
       "targetAnchor": "unheaded-block-181",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
       "rationale": "Judgment: no target digest match. Carry the complete unheaded-block at docs/architect/component-boundary/README.md#unheaded-block-22 (lines 104–107) into docs/platform/component-boundary.md#unheaded-block-181 (lines 1257–1260), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: move unheaded-block-22 to unheaded-block-181; text identical to source modulo masking; 1 link destination(s) repointed (domainization/README.md to domainization/architecture/domainization.md); every changed link resolves at HEAD (anchors included) and matches the Step 10 link record; no approval carried",
       "targetUnitDigest": "2f80936783402627608e27fda4b89cb12506927ad508f710fc20e346b42742a6",
       "targetAncestry": [
         "Component Boundary",
@@ -601,7 +631,12 @@
         "Component Boundary Architecture",
         "2. Documents",
         "Component Boundary Advisory"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_ea14128a766600a9a0942fcc908ff4ce",
@@ -610,17 +645,22 @@
       "targetAnchor": "repo-layout-vision",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
       "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architect/component-boundary/README.md#repo-layout-vision (lines 109–109) into docs/platform/component-boundary.md#repo-layout-vision (lines 1262–1262), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by native retained identity. Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: move repo-layout-vision to repo-layout-vision; text identical to source modulo masking; heading depth H3 to H5; 1 link destination(s) repointed (repo-layout-vision.md to architect/component-boundary/repo-layout-vision.md); every changed link resolves at HEAD (anchors included) and matches the Step 10 link record; no approval carried",
       "targetUnitDigest": "76ec7851ade9bdd4fef5b40b167bc07ec745dcedfc0e50c3672b6bd25796ad02",
       "targetAncestry": [
         "Component Boundary",
         "Added in candidate: README source carriage",
         "Component Boundary Architecture",
         "2. Documents"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_841c0c452b31d698f08d8460a92f8925",
@@ -629,10 +669,10 @@
       "targetAnchor": "unheaded-block-182",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
       "rationale": "Judgment: no target digest match. Carry the complete unheaded-block at docs/architect/component-boundary/README.md#unheaded-block-23 (lines 111–112) into docs/platform/component-boundary.md#unheaded-block-182 (lines 1264–1265), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: move unheaded-block-23 to unheaded-block-182; text identical to source modulo masking; 1 link destination(s) repointed (repo-layout-vision.md to architect/component-boundary/repo-layout-vision.md); every changed link resolves at HEAD (anchors included) and matches the Step 10 link record; no approval carried",
       "targetUnitDigest": "cd07aba31d0b8612aa7585d57c57e30a9905fc2fb17d6dd0bb53d852aae0d71b",
       "targetAncestry": [
         "Component Boundary",
@@ -640,7 +680,12 @@
         "Component Boundary Architecture",
         "2. Documents",
         "Repo Layout Vision"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_8470d98a34a61ac21da3eed22e1f9bff",
@@ -724,17 +769,22 @@
       "targetAnchor": "host-invocation-and-provider-routing",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
       "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architect/component-boundary/README.md#host-invocation-and-provider-routing (lines 126–126) into docs/platform/component-boundary.md#host-invocation-and-provider-routing (lines 1279–1279), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by native retained identity. Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: move host-invocation-and-provider-routing to host-invocation-and-provider-routing; text identical to source modulo masking; heading depth H3 to H5; 1 link destination(s) repointed (host-invocation-routing/host-invocation-provider-routing.md to host-invocation-routing/spec.md); every changed link resolves at HEAD (anchors included) and matches the Step 10 link record; no approval carried; seeded sample, digests recomputed by hand",
       "targetUnitDigest": "31ff1014acc172147fc74a432fee687499200fb8b238a8eb6f396f2a9cee005b",
       "targetAncestry": [
         "Component Boundary",
         "Added in candidate: README source carriage",
         "Component Boundary Architecture",
         "2. Documents"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_9d1e7b76bcbf3b0fcf5e0edcdf130653",
@@ -743,10 +793,10 @@
       "targetAnchor": "unheaded-block-186",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
       "rationale": "Judgment: no target digest match. Carry the complete unheaded-block at docs/architect/component-boundary/README.md#unheaded-block-27 (lines 128–129) into docs/platform/component-boundary.md#unheaded-block-186 (lines 1281–1282), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: move unheaded-block-27 to unheaded-block-186; text identical to source modulo masking; 1 link destination(s) repointed (host-invocation-routing/host-invocation-provider-routing.md to host-invocation-routing/spec.md); every changed link resolves at HEAD (anchors included) and matches the Step 10 link record; no approval carried; seeded sample, digests recomputed by hand",
       "targetUnitDigest": "799cd5b1d42b59ffa6bf38415e7bebe742b345003b87be4a77e5b512b1185efb",
       "targetAncestry": [
         "Component Boundary",
@@ -754,7 +804,12 @@
         "Component Boundary Architecture",
         "2. Documents",
         "Host Invocation And Provider Routing"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_8f95e3804f09043c13b0c3799e353fce",
@@ -813,17 +868,22 @@
       "targetAnchor": "node-to-rust-component-migration",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
       "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architect/component-boundary/README.md#node-to-rust-component-migration (lines 139–139) into docs/platform/component-boundary.md#node-to-rust-component-migration (lines 1292–1292), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by native retained identity. Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: move node-to-rust-component-migration to node-to-rust-component-migration; text identical to source modulo masking; heading depth H3 to H5; 1 link destination(s) repointed (host-invocation-routing/node-to-rust-component-migration.md to host-invocation-routing/architecture/node-to-rust-migration.md); every changed link resolves at HEAD (anchors included) and matches the Step 10 link record; no approval carried",
       "targetUnitDigest": "498170b56dca7baacfcc063c115e7e7717e47be121d39342eb1c9b56e7eae861",
       "targetAncestry": [
         "Component Boundary",
         "Added in candidate: README source carriage",
         "Component Boundary Architecture",
         "2. Documents"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_57cd483e44658aa1583e968cc86e8ab9",
@@ -832,10 +892,10 @@
       "targetAnchor": "unheaded-block-189",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
       "rationale": "Judgment: no target digest match. Carry the complete unheaded-block at docs/architect/component-boundary/README.md#unheaded-block-30 (lines 141–144) into docs/platform/component-boundary.md#unheaded-block-189 (lines 1294–1297), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: move unheaded-block-30 to unheaded-block-189; text identical to source modulo masking; 1 link destination(s) repointed (host-invocation-routing/node-to-rust-component-migration.md to host-invocation-routing/architecture/node-to-rust-migration.md); every changed link resolves at HEAD (anchors included) and matches the Step 10 link record; no approval carried",
       "targetUnitDigest": "c7a72d8d1c40718a22b72f05a0cba1f869153d86ea9f6436082c3f56a0ef760a",
       "targetAncestry": [
         "Component Boundary",
@@ -843,7 +903,12 @@
         "Component Boundary Architecture",
         "2. Documents",
         "Node To Rust Component Migration"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_3401119060c68c56af0822a00323287c",
@@ -1115,17 +1180,22 @@
       "targetAnchor": "canonical-architecture-and-specs",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
       "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architect/component-boundary/README.md#canonical-architecture-and-specs (lines 199–199) into docs/platform/component-boundary.md#canonical-architecture-and-specs (lines 1352–1352), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by native retained identity. Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: move canonical-architecture-and-specs to canonical-architecture-and-specs; text identical to source modulo masking; heading depth H3 to H5; 6 link destination(s) repointed (architecture-map.md to architecture-map.md, specs/system-overview.md to system-overview/spec.md...); every changed link resolves at HEAD (anchors included) and matches the Step 10 link record; no approval carried",
       "targetUnitDigest": "d5984df97888ec0c8a79017b5053c0b6377b1109ccce2b56fa13331071ac41e3",
       "targetAncestry": [
         "Component Boundary",
         "Added in candidate: README source carriage",
         "Component Boundary Architecture",
         "5. External Review Links"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_00f11cd8215f5649d5ef7bcb34bdb737",
@@ -1134,10 +1204,10 @@
       "targetAnchor": "unheaded-block-198",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
       "rationale": "Judgment: no target digest match. Carry the complete unheaded-block at docs/architect/component-boundary/README.md#unheaded-block-39 (lines 201–213) into docs/platform/component-boundary.md#unheaded-block-198 (lines 1354–1366), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: move unheaded-block-39 to unheaded-block-198; text identical to source modulo masking; 6 link destination(s) repointed (architecture-map.md to architecture-map.md, specs/system-overview.md to system-overview/spec.md...); every changed link resolves at HEAD (anchors included) and matches the Step 10 link record; no approval carried",
       "targetUnitDigest": "9c2b09723d424834b43348d027b8a5ddf18d635bc3ce3ba67fe1cbad8dc8e1cb",
       "targetAncestry": [
         "Component Boundary",
@@ -1145,7 +1215,12 @@
         "Component Boundary Architecture",
         "5. External Review Links",
         "Canonical Architecture And Specs"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_d060f9dfcce5f534cfa957c4245ac9e1",
@@ -1154,17 +1229,22 @@
       "targetAnchor": "related-agent-coordination-contracts",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
       "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architect/component-boundary/README.md#related-agent-coordination-contracts (lines 215–215) into docs/platform/component-boundary.md#related-agent-coordination-contracts (lines 1368–1368), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by native retained identity. Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: move related-agent-coordination-contracts to related-agent-coordination-contracts; text identical to source modulo masking; heading depth H3 to H5; 7 link destination(s) repointed (agent-coordination/README.md to agent-coordination/README.md, agent-coordination/vision.md to agent-coordination/vision.md...); every changed link resolves at HEAD (anchors included) and matches the Step 10 link record; no approval carried",
       "targetUnitDigest": "e96eb39fc1cebb38824be7d340ccba3f4ead668994a377434a180aa976c12e33",
       "targetAncestry": [
         "Component Boundary",
         "Added in candidate: README source carriage",
         "Component Boundary Architecture",
         "5. External Review Links"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_919ee8461ba273f0a132459b308ab3ff",
@@ -1173,10 +1253,10 @@
       "targetAnchor": "unheaded-block-199",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
       "rationale": "Judgment: no target digest match. Carry the complete unheaded-block at docs/architect/component-boundary/README.md#unheaded-block-40 (lines 217–230) into docs/platform/component-boundary.md#unheaded-block-199 (lines 1370–1383), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: move unheaded-block-40 to unheaded-block-199; text identical to source modulo masking; 7 link destination(s) repointed (agent-coordination/README.md to agent-coordination/README.md, agent-coordination/vision.md to agent-coordination/vision.md...); every changed link resolves at HEAD (anchors included) and matches the Step 10 link record; no approval carried",
       "targetUnitDigest": "db2184d7643038ad40c88bfeb7586a308ab907915fcbb5dfced23cc702ee7cce",
       "targetAncestry": [
         "Component Boundary",
@@ -1184,7 +1264,12 @@
         "Component Boundary Architecture",
         "5. External Review Links",
         "Related Agent Coordination Contracts"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     }
   ]
 }

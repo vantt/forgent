@@ -1201,4 +1201,4 @@ coverage: partial
 - [decisions/retired-decision-history.md](decisions/retired-decision-history.md)
 - [history/multi-role-harness-distill-record.md](history/multi-role-harness-distill-record.md)
 - [docs/specs/work-state.md](../../specs/work-state.md)
-- [docs/platform/work-state/contracts/cli-io-contract.md](contracts/cli-io-contract.md)
+- [docs/io-contract.md](../../io-contract.md)

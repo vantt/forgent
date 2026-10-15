@@ -452,21 +452,16 @@
       "disposition": "supersede",
       "targetOwner": "docs/specs/confinement-authority.md",
       "targetAnchor": "unheaded-block-144",
-      "authoredBy": "codex-session:15@2026-10-14",
-      "reviewStatus": "reviewed",
-      "rationale": "A31 main-only text change has this native same-file successor from the upstream diff. Conservation proposal only; no code truth review or identity graft.",
-      "reviewNote": "Historical confinement#144 (f99e0d4d, 1f911229f) superseded by f0b5e6c1; the old cap and held-when-full sentences are replaced by the redundant-only drop rule in the same unit, including main's latest per-store wording; same file, no graft",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-boundary-gaps.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewStatus": "pending",
+      "rationale": "A31 main-only text change has this native same-file successor from the upstream diff. Conservation proposal only; no code truth review or identity graft. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetUnitDigest": "9c24e69b1b4a4ede9fce9ed6d771f342920397506c61c2a546df8163a810c5ae",
       "targetAncestry": [
         "Spec: Agent Confinement Authority",
         "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
         "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
-      ],
-      "reviewReportCommit": "4f99b9ec9eaf90f9db38e9073f92ca76c6808d1e"
+      ]
     },
     {
       "claimId": "claim_40aafcee52b22eda087c5f85eacb9392",

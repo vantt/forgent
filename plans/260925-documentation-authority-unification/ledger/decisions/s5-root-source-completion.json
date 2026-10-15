@@ -2180,21 +2180,16 @@
       "sourceUnitDigest": "c1c230462d8e6a3a59005658d279246afcdcee727e89f03ff08b0f9ce8b14e85",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "targetOwner": "docs/platform/contracts/architecture-manifest.json",
       "targetAnchor": "file-block",
-      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
       "sourcePath": "docs/architecture-manifest.json",
       "sourceAnchor": "file-block",
-      "reviewNote": "deep: gap row on docs/architecture-manifest.json; old digest c1c23046 found at 1b818c586; successor platform copy 70c00c20 byte-equal to the current legacy file; diff read: entries added, two removed, fanout-batch reclassified (older generation); supersede true; pending",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1526-specs-ui-reworks-main-recarry.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "70c00c205578fc34084e5bf8701a6bde0999cb6f05a1b58f8424ad95ed4c28d4",
-      "targetAncestry": [],
-      "reviewReportCommit": "0e8ce7710ac67ad038927b242b2461876bf8c90d"
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetUnitDigest": "2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a",
+      "targetAncestry": []
     }
   ]
 }

@@ -1,0 +1,232 @@
+{
+  "SYNC": "59b9b7087",
+  "native": false,
+  "claims": [
+    {
+      "claimId": "claim_identity_gap_2f164a0ceb6d2d0f20c75d76",
+      "sourcePath": "AGENTS.md",
+      "sourceAnchor": "legacy-node-cli-ownership-boundary",
+      "sourceUnitDigest": "fed79e2e75d57ab326d97e74e6b2cd4b8fd1474aa6df3abb284ae2bb6d46f817",
+      "claimKind": "navigation",
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried.",
+      "provisionalIdentity": true
+    },
+    {
+      "claimId": "claim_identity_gap_bbe7d3593cab8f41680dfe46",
+      "sourcePath": "AGENTS.md",
+      "sourceAnchor": "unheaded-block-14",
+      "sourceUnitDigest": "e3c0146e4d7a42d364c551fcb327b9ab9faef893cfe3b6075a4e658836d69972",
+      "claimKind": "navigation",
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried.",
+      "provisionalIdentity": true
+    },
+    {
+      "claimId": "claim_identity_gap_21ea0150af757c6d731496aa",
+      "sourcePath": "docs/io-contract.md",
+      "sourceAnchor": "chiều-vào-verb-danh-tính",
+      "sourceUnitDigest": "a8638afcbc30af3cfed8ddecb38f890e54215f551afcbd9a9d09d23c02d8bce3",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried.",
+      "provisionalIdentity": true,
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "2-input-direction-verb-and-identity",
+      "targetUnitDigest": "7c4e0214ec4c8c108c24c1b00a560516fbc5de0bc1a26d70a082eca5ccafb23c",
+      "targetAncestry": [
+        "CLI I/O Contract"
+      ]
+    },
+    {
+      "claimId": "claim_identity_gap_3a5e1020a3d00a118803b9a1",
+      "sourcePath": "docs/io-contract.md",
+      "sourceAnchor": "unheaded-block-5",
+      "sourceUnitDigest": "d38286962b4133b3c55926e513b03625483e4bd0b6b885a6fd3dde23c00686b8",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried.",
+      "provisionalIdentity": true,
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-10",
+      "targetUnitDigest": "8aa8491435b1bd76c915faca0aaf324c77472f53839ef536c00d9cd1a7b9a2be",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "2. Input Direction Verb And Identity",
+        "Writer Source Trust Levels"
+      ]
+    },
+    {
+      "claimId": "claim_identity_gap_4763095801037b34f9feb4ab",
+      "sourcePath": "docs/io-contract.md",
+      "sourceAnchor": "unheaded-block-7",
+      "sourceUnitDigest": "b5b6124764e7d3f101cac103f5a6e63bdf8f5732bc72e4a7049337f519d4ea79",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried.",
+      "provisionalIdentity": true,
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-13",
+      "targetUnitDigest": "b5b6124764e7d3f101cac103f5a6e63bdf8f5732bc72e4a7049337f519d4ea79",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "2. Input Direction Verb And Identity",
+        "Caller Role"
+      ]
+    },
+    {
+      "claimId": "claim_identity_gap_fd95ceaa13b5af4daa658aa1",
+      "sourcePath": "docs/specs/distribution.md",
+      "sourceAnchor": "data-dictionary",
+      "sourceUnitDigest": "04f89e98512b5fd7af474ab2abbf362b9a0d30a25b5a911d011037539b3a9d3f",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried.",
+      "provisionalIdentity": true,
+      "targetOwner": "docs/platform/packaging-distribution/spec.md",
+      "targetAnchor": "data-dictionary",
+      "targetUnitDigest": "3dd2d51fac193d78f712a83b2f0918c9f5f48a0e8eb65572afda4bb678b1de95",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution"
+      ]
+    },
+    {
+      "claimId": "claim_identity_gap_7985fd7850ae727630ce41a8",
+      "sourcePath": "docs/specs/distribution.md",
+      "sourceAnchor": "unheaded-block-5",
+      "sourceUnitDigest": "59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried.",
+      "provisionalIdentity": true,
+      "targetOwner": "docs/platform/packaging-distribution/spec.md",
+      "targetAnchor": "unheaded-block-85",
+      "targetUnitDigest": "59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution",
+        "Data Dictionary"
+      ]
+    },
+    {
+      "claimId": "claim_identity_gap_19f69ea4d4fc4aa96430300e",
+      "sourcePath": "docs/specs/observe.md",
+      "sourceAnchor": "owns",
+      "sourceUnitDigest": "ca2fd76b4ca2fe575e858e1f9ae76cf0ddf0f7300593c6a58b11ac2249b4d1b2",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried.",
+      "provisionalIdentity": true,
+      "targetOwner": "docs/platform/observe/spec.md",
+      "targetAnchor": "owns",
+      "targetUnitDigest": "a03c9cf9107371c2ec305cd2efea93cc9ca0f549ec485158bdb5e9ecc05c63aa",
+      "targetAncestry": [
+        "Observe Component Specification",
+        "1. Overview & Boundaries"
+      ]
+    },
+    {
+      "claimId": "claim_identity_gap_26d8b072f359536877ecb56d",
+      "sourcePath": "docs/specs/observe.md",
+      "sourceAnchor": "unheaded-block-3",
+      "sourceUnitDigest": "36f5428de433214eb4a9a17e3a2366471095b9bb658faa4f11d4bb108beea137",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried.",
+      "provisionalIdentity": true,
+      "targetOwner": "docs/platform/observe/spec.md",
+      "targetAnchor": "unheaded-block-5",
+      "targetUnitDigest": "11717c094b7543079c51f31172bdc5cc8e3d66f9da00bdb02056323819401b2c",
+      "targetAncestry": [
+        "Observe Component Specification",
+        "1. Overview & Boundaries",
+        "Owns"
+      ]
+    },
+    {
+      "claimId": "claim_identity_gap_7ad7071547a442efe7ebe282",
+      "sourcePath": "docs/architecture-manifest.json",
+      "sourceAnchor": "file-block",
+      "sourceUnitDigest": "2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried.",
+      "provisionalIdentity": true,
+      "targetOwner": "docs/platform/contracts/architecture-manifest.json",
+      "targetAnchor": "file-block",
+      "targetUnitDigest": "2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a",
+      "targetAncestry": []
+    },
+    {
+      "claimId": "claim_identity_gap_245f277e6d6604fddedd699e",
+      "sourcePath": "docs/specs/reading-map.md",
+      "sourceAnchor": "reading-map-sản-phẩm",
+      "sourceUnitDigest": "19c2ff247fb664d39a56d6194b1d47b6dce16ea18c8ee19369bd2884efbf918a",
+      "claimKind": "navigation",
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried.",
+      "provisionalIdentity": true
+    },
+    {
+      "claimId": "claim_identity_gap_aec741bb28edd6992f0d90b8",
+      "sourcePath": "docs/specs/reading-map.md",
+      "sourceAnchor": "unheaded-block-2",
+      "sourceUnitDigest": "1c7bbf9e95dcf48b5e1f6de612a5baf82e268ea009eda1ff201ffa5dacdd1fbd",
+      "claimKind": "navigation",
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried.",
+      "provisionalIdentity": true
+    },
+    {
+      "claimId": "claim_identity_gap_ebed2ba1a70dcb2d5878e5e2",
+      "sourcePath": "docs/reading-map.md",
+      "sourceAnchor": "5-detailed-product-and-source-map",
+      "sourceUnitDigest": "01204e281f177e257efc7b015d93651c874a149f0e4bb3a68054b943a66d2e91",
+      "claimKind": "navigation",
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried.",
+      "provisionalIdentity": true
+    },
+    {
+      "claimId": "claim_identity_gap_7999a5d3979b38e5906917d0",
+      "sourcePath": "docs/reading-map.md",
+      "sourceAnchor": "unheaded-block-16",
+      "sourceUnitDigest": "607cd88b7a9323d610811e9bee61bbcb328ad12ba92f9f1b62defc5ab6c6db24",
+      "claimKind": "navigation",
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried.",
+      "provisionalIdentity": true
+    }
+  ]
+}

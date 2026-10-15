@@ -1,0 +1,84 @@
+{
+  "HEAD": "59b9b70876324e07135db53d2351f7db6a7e1746",
+  "A": {
+    "historicalOffenders": [
+      "plans/260925-documentation-authority-unification/phase-06-transform-all-platform-areas-as-candidate-material.md",
+      "plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md",
+      "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md",
+      "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/consumer-survey.json",
+      "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/consumer-survey.md",
+      "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/open-questions.md",
+      "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/phase-07-draft.md",
+      "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/phase-08-draft.md"
+    ],
+    "historicalEqual": true,
+    "newWorkingViolations": [],
+    "ok": true
+  },
+  "B": {
+    "rows": [
+      {
+        "path": "scripts/generate-doc-inventory.mjs",
+        "expected": "a52981ff2862cc2c553dbb3181e4e822a26b146b",
+        "actual": "a52981ff2862cc2c553dbb3181e4e822a26b146b"
+      },
+      {
+        "path": "scripts/doc-inventory-artifact.mjs",
+        "expected": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64",
+        "actual": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64"
+      },
+      {
+        "path": "scripts/generate-shipped-path-inventory.mjs",
+        "expected": "0f1cd7e1cee308772c0b56c37f3190333039cfb3",
+        "actual": "0f1cd7e1cee308772c0b56c37f3190333039cfb3"
+      },
+      {
+        "path": "scripts/check-legacy-docs-ratchet.mjs",
+        "expected": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d",
+        "actual": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d"
+      },
+      {
+        "path": "scripts/lib/is-main-module.mjs",
+        "expected": "680570946fa1381474900c9192795514b5b88f48",
+        "actual": "680570946fa1381474900c9192795514b5b88f48"
+      }
+    ],
+    "ok": true
+  },
+  "H": {
+    "findings": [],
+    "counts": {
+      "files": 609,
+      "byStatus": {
+        "promoted": 3,
+        "candidate": 213,
+        "legacy-current": 0,
+        "non-authority": 1,
+        "unrouted": 392
+      },
+      "exemptUnrouted": 302,
+      "checked": 216,
+      "findings": 0,
+      "byType": {}
+    }
+  },
+  "I": {
+    "equal": false,
+    "links": [
+      "docs/platform/**",
+      "docs/platform/<area",
+      "docs/platform/README.md",
+      "docs/platform/packaging-distribution/README.md",
+      "docs/platform/packaging-distribution/vision.md",
+      "docs/platform/session-identity/spec.md"
+    ],
+    "baselineEqual": false,
+    "mainIntroducedDelta": [
+      "docs/platform/session-identity/spec.md"
+    ],
+    "equalToSYNCReaders": true,
+    "interpretation": "One upstream reader route to Session Identity, imported under A31. Frozen baseline unchanged; zero author-introduced reader routes. Raw baseline comparison remains false."
+  },
+  "method": "Working-tree A/B/H/I; unchanged native checker functions; include untracked docs explicitly. Historical A observations compared exactly, not waived or rebaselined.",
+  "ok": true
+}

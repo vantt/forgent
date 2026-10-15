@@ -109,4 +109,4 @@ Migrating any remaining routes is strictly out of R3 scope. Writes stay out of t
 | execution record | [../../../../plans/260918-host-invocation-r3-remote-peer/plan.md](../../../../archive/plans/260918-host-invocation-r3-remote-peer/plan.md) |
 | host use cases | [../architecture/host-use-cases.md](../architecture/host-use-cases.md) |
 | release boundaries | [../architecture/release-boundaries.md](../architecture/release-boundaries.md) |
-| source migration | [../architecture/node-to-rust-migration.md](../architecture/node-to-rust-migration.md) |
+| source migration | [../../../architect/host-invocation-routing/node-to-rust-component-migration.md](../../../architect/host-invocation-routing/node-to-rust-component-migration.md) |

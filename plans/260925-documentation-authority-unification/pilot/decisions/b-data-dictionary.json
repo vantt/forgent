@@ -1678,72 +1678,57 @@
     },
     {
       "claimId": "claim_6dfbaa59a2f49bc668d9729fed01878a",
-      "authoredBy": "codex-session:1@2026-10-09",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "sourceUnitDigest": "8b3e099723160029",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-14",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "reviewed",
-      "rationale": "Four-field envelope description is stated in both sources; candidate carries the work-state block (this one) plus the io-contract block (lines 49-60 of io) under Envelope Shape, nothing dropped.",
-      "reviewNote": "Unchanged under A14. merge/contract: work-state.md L624-634 (unheaded-block-63) -> contracts/cli-io-contract.md#unheaded-block-14 L115-125; targetOwner/targetAnchor contracts/cli-io-contract.md#unheaded-block-14. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
-      "reviewedAt": "2026-10-09",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "8b3e099723160029770c62469f14db6ce2e484a6f7b4a1354cb4bf34288af9d4",
+      "reviewStatus": "pending",
+      "rationale": "Four-field envelope description is stated in both sources; candidate carries the work-state block (this one) plus the io-contract block (lines 49-60 of io) under Envelope Shape, nothing dropped. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetUnitDigest": "25e4a007d2fc9a153cb3273376471f15e4bfca5c257f0c8bf06d1dd6af198770",
       "targetAncestry": [
         "CLI I/O Contract",
-        "3. Output Direction Unified Envelope",
-        "Envelope Shape"
-      ],
-      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
+        "2. Input Direction Verb And Identity",
+        "Caller Role"
+      ]
     },
     {
       "claimId": "claim_140216d27eb5609e8b5d51f718ecf493",
-      "authoredBy": "codex-session:1@2026-10-09",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "sourceUnitDigest": "5d70ebc5bbf14b46",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-18",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "Error path not enveloped (stderr, exit code) is carried verbatim as its own block under Error Path Is Not Enveloped; io-contract states the same claim inside its envelope unit, so it also exists elsewhere in that heading, but this block was not merged.",
-      "reviewNote": "Unchanged under A14. promote/contract: work-state.md L636-639 (unheaded-block-64) -> contracts/cli-io-contract.md#unheaded-block-18 L142-145; targetOwner/targetAnchor contracts/cli-io-contract.md#unheaded-block-18. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
-      "reviewedAt": "2026-10-09",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "5d70ebc5bbf14b4604424fe9dc4e05c75110a85c0c24b6b1cb6e7a998bfaddc4",
+      "reviewStatus": "pending",
+      "rationale": "Error path not enveloped (stderr, exit code) is carried verbatim as its own block under Error Path Is Not Enveloped; io-contract states the same claim inside its envelope unit, so it also exists elsewhere in that heading, but this block was not merged. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetUnitDigest": "84367855d92bb2e3914cb9bc385c2dce9b5625c8acaf9e577c9c791e40d07e71",
       "targetAncestry": [
         "CLI I/O Contract",
         "3. Output Direction Unified Envelope",
-        "Error Path Is Not Enveloped"
-      ],
-      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
+        "Envelope Shape"
+      ]
     },
     {
       "claimId": "claim_52b54d49826d7ff8fd38f29925505f2a",
-      "authoredBy": "codex-session:1@2026-10-09",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "sourceUnitDigest": "75bf5b6af00287e0",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-19",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "reviewed",
-      "rationale": "Runner single-line envelope rule is stated in both sources; candidate carries both texts under Runner Stdout Envelope.",
-      "reviewNote": "Unchanged under A14. merge/contract: work-state.md L641-645 (unheaded-block-65) -> contracts/cli-io-contract.md#unheaded-block-19 L149-153; targetOwner/targetAnchor contracts/cli-io-contract.md#unheaded-block-19. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
-      "reviewedAt": "2026-10-09",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "75bf5b6af00287e081d243556f44f8e1c495da7238737ccd1b15d2a8191f196b",
+      "reviewStatus": "pending",
+      "rationale": "Runner single-line envelope rule is stated in both sources; candidate carries both texts under Runner Stdout Envelope. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetUnitDigest": "5d70ebc5bbf14b4604424fe9dc4e05c75110a85c0c24b6b1cb6e7a998bfaddc4",
       "targetAncestry": [
         "CLI I/O Contract",
         "3. Output Direction Unified Envelope",
-        "Runner Stdout Envelope"
-      ],
-      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
+        "Error Path Is Not Enveloped"
+      ]
     },
     {
       "claimId": "claim_9c6c68acbcd413ec5d826804b07650c0",
@@ -1769,92 +1754,73 @@
     },
     {
       "claimId": "claim_ce947d10ed900598bde4df5b552e0265",
-      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "sourceUnitDigest": "c219ee825c3475e61bb642fd89e50efedc586df24b0252a6d99e58df63f419d8",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-33",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
-      "reviewNote": "deep: unequal digests c219ee82 vs 0b3d8cfa; diff read: legacy work-state block 68 keeps the older externalEffect sentence while the carrier has the COMMAND_REGISTRY corrected sentence; unchanged by this merge (target digest equal before and after, shift 32 to 33); supersede unchanged and covers the correction",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1526-specs-ui-reworks-main-recarry.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2",
+      "reviewStatus": "pending",
+      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetUnitDigest": "51dd3c8aa026a8f5a15e4c12c522b3bf2ad7c29238c49bf9ba51324806e10e23",
       "targetAncestry": [
         "CLI I/O Contract",
         "7. Machine-Readable Verb Registry",
-        "Entry Fields And Effect Axes"
-      ],
-      "reviewReportCommit": "0e8ce7710ac67ad038927b242b2461876bf8c90d"
+        "Manifest Shape"
+      ]
     },
     {
       "claimId": "claim_15a24dbb1f2d0470f04cdf8900da67a0",
-      "authoredBy": "codex-session:unit-run-1792056203419-9b5bd055@2026-10-15",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "sourceUnitDigest": "2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-27",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "reviewed",
-      "rationale": "Cursor pagination superset (adds permanent list --all --json exception and side-log narrowing) is carried verbatim; the io-contract short text follows it in the same section, so both sources are present.",
-      "reviewNote": "deep: disposition restored to merge with the previously reviewed rationale word for word; only anchor (26 to 27) and digests differ from the reviewed form; source block 69 byte-equal to target block 27 (2140755c)",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1625-specs-ui-nine-decision-reworks.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9",
+      "reviewStatus": "pending",
+      "rationale": "Cursor pagination superset (adds permanent list --all --json exception and side-log narrowing) is carried verbatim; the io-contract short text follows it in the same section, so both sources are present. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetUnitDigest": "549dded9fe85b1cfd57f1ec7079141e4feb9e6468a31e93485ab91a2305e79fe",
       "targetAncestry": [
         "CLI I/O Contract",
-        "6. Cursor Pagination"
-      ],
-      "reviewReportCommit": "63fa6f15266f45c881f610235e0be8d61ff07120"
+        "5. Reasoned Envelope Exceptions"
+      ]
     },
     {
       "claimId": "claim_5dcb56608e17caeb53c197186ae33827",
-      "authoredBy": "codex-session:unit-run-1792056203419-9b5bd055@2026-10-15",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "sourceUnitDigest": "3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-36",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "reviewed",
-      "rationale": "csv versus json-array multiValueFormat rule is stated in both sources; candidate carries both texts under the H2 8. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
-      "reviewNote": "deep: disposition restored to merge with the reviewed rationale unchanged (the reviewed text still ends with a stale pending re-carry boilerplate sentence, harmless); source block 70 byte-equal to target block 36 (3964ac13), anchor ok",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1625-specs-ui-nine-decision-reworks.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62",
+      "reviewStatus": "pending",
+      "rationale": "csv versus json-array multiValueFormat rule is stated in both sources; candidate carries both texts under the H2 8. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetUnitDigest": "78393c0183b6bda3ff166520f4601ab2793cbdf85e2669949001a73b9102f293",
       "targetAncestry": [
         "CLI I/O Contract",
-        "8. Multi-Value Flag Convention"
-      ],
-      "reviewReportCommit": "63fa6f15266f45c881f610235e0be8d61ff07120"
+        "7. Machine-Readable Verb Registry",
+        "Entry Fields And Effect Axes"
+      ]
     },
     {
       "claimId": "claim_6fe86521fead9cec7253443e3275a3cf",
-      "authoredBy": "codex-session:unit-run-1792056203419-9b5bd055@2026-10-15",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "sourceUnitDigest": "a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-40",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "Runs-when / Blocked-when bullets of per-verb help are carried verbatim; kept as contract since it is a CLI surface guarantee. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
-      "reviewNote": "deep: disposition restored to promote with the reviewed rationale unchanged; source block 73 byte-equal to target block 40 (a1c9e2eb), anchor ok; promote legal since the unit stays a contract in the platform tree",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1625-specs-ui-nine-decision-reworks.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798",
+      "reviewStatus": "pending",
+      "rationale": "Runs-when / Blocked-when bullets of per-verb help are carried verbatim; kept as contract since it is a CLI surface guarantee. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetUnitDigest": "9b711cb5a088ede56ad00207289f1fed2ccc05887597169bbc41eb2e55429db3",
       "targetAncestry": [
         "CLI I/O Contract",
         "9. Per-Verb Help"
-      ],
-      "reviewReportCommit": "63fa6f15266f45c881f610235e0be8d61ff07120"
+      ]
     },
     {
       "claimId": "claim_a374334e7c5dc565cac42c0fa641f78f",
@@ -1974,28 +1940,22 @@
   "registryGaps": [
     {
       "claimId": "claim_9959e82e2874baeb627a8441faa07e9a",
-      "authoredBy": "codex-session:unit-run-1792056203419-9b5bd055@2026-10-15",
+      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "sourceUnitDigest": "a2e6a5ffa58ec1f13d1321cf4b14d70b2a261fba6ce0f15c0bda50975cf8de04",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-30",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "reviewed",
-      "rationale": "Manifest fields are combined from work-state and io-contract in the single Manifest Shape section; the work-state contribution includes the positional-parameter rule. The source schema_version 2.0 sentence is represented by the corrected schema_version 3.0 successor, with the complete fields carried. The reviewed merge disposition is restored: vocabulary merge combines multiple sources and does not require byte equality. The anchor shift changes no target text in this turn.",
+      "reviewStatus": "pending",
+      "rationale": "Manifest fields are combined from work-state and io-contract in the single Manifest Shape section; the work-state contribution includes the positional-parameter rule. The source schema_version 2.0 sentence is represented by the corrected schema_version 3.0 successor, with the complete fields carried. The reviewed merge disposition is restored: vocabulary merge combines multiple sources and does not require byte equality. The anchor shift changes no target text in this turn. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
       "sourcePath": "docs/specs/work-state.md",
       "sourceAnchor": "unheaded-block-66",
-      "reviewNote": "deep: merge restored; rationale rewritten truthfully (not the earlier 2.0 verbatim claim): diff of 977509d5f block 66 against target block 30 is only the schema_version 2.0 to 3.0 history sentence, and the positional-parameter rule is in the target; 2.0 to 3.0 stated as correction, vocabulary merge needs no byte equality; target 878d708d and anchor ok",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1625-specs-ui-nine-decision-reworks.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "878d708db7a0afb3e23a0829f98be122c83ac562946b51ab1989e73e5e4a8bfe",
+      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "targetUnitDigest": "b82a558166f118f339210d9a475214042a603bd09f64a3a2a8795d96fbdf57ce",
       "targetAncestry": [
         "CLI I/O Contract",
-        "7. Machine-Readable Verb Registry",
-        "Manifest Shape"
-      ],
-      "reviewReportCommit": "63fa6f15266f45c881f610235e0be8d61ff07120"
+        "6. Cursor Pagination"
+      ]
     }
   ]
 }

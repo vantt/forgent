@@ -1,0 +1,90 @@
+✔ never repoints a source relationship or a link to its own file (1.608955ms)
+✔ source column header protects subsequent table rows (0.167702ms)
+✔ chooses a restored same-named candidate before a portal (0.218541ms)
+✔ chooses the unique per-anchor target when no same-named candidate exists (0.11115ms)
+✔ restores and classifies a portal alias with no specific target (0.115681ms)
+✔ wrapped labels are repointed and labels preserved (0.099357ms)
+✔ fences and historical referents are retained (0.084795ms)
+✔ anchored destinations preserve the explicit alias anchor (0.118175ms)
+✔ ambiguous specific targets fail closed (0.097498ms)
+✔ uses the source heading alias for a split document without guessing among sections (0.128552ms)
+✔ a canonical data cell does not protect unrelated following table rows (0.202341ms)
+✔ restored same-named document takes precedence over an archived heading alias (0.123425ms)
+✖ all source relationship row labels retain legacy destinations and verbatim labels (0.71836ms)
+✖ Source and Legacy source columns protect only their own cells (0.266554ms)
+✖ canonical in narrative text is not a source relationship label (0.18036ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 12
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 47.763192
+
+✖ failing tests:
+
+test at test/scripts/doc-link-pass.test.mjs:71:1
+✖ all source relationship row labels retain legacy destinations and verbatim labels (0.71836ms)
+  AssertionError [ERR_ASSERTION]: Source architecture
+  + actual - expected
+  
+  + '| Source architecture | [docs/architect/a/design.md](architecture/design.md) |'
+  - '| Source architecture | [docs/architect/a/design.md](../../architect/a/design.md) |'
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-link-pass.test.mjs:74:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: '| Source architecture | [docs/architect/a/design.md](architecture/design.md) |',
+    expected: '| Source architecture | [docs/architect/a/design.md](../../architect/a/design.md) |',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/scripts/doc-link-pass.test.mjs:77:1
+✖ Source and Legacy source columns protect only their own cells (0.266554ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  2 !== 1
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-link-pass.test.mjs:80:28)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 2,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/scripts/doc-link-pass.test.mjs:84:1
+✖ canonical in narrative text is not a source relationship label (0.18036ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  0 !== 1
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-link-pass.test.mjs:86:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

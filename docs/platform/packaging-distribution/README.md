@@ -267,10 +267,10 @@ owning workflow and regenerate/check the spec projections.
 
 | Topic | Active source to follow | Status |
 |---|---|---|
-| Runtime/workspace/work-state topology | [Workspace Topology Architecture](../system-architecture/architecture/workspace-topology.md) | Active architecture target. Supersedes any simpler "one project root / one runtime root" reading. Packaging must not own physical placement for config/event/coordination roots. |
+| Runtime/workspace/work-state topology | [Workspace Topology Architecture](../../architect/workspace-topology.md) | Active architecture target. Supersedes any simpler "one project root / one runtime root" reading. Packaging must not own physical placement for config/event/coordination roots. |
 | Release identity and activation | [Promoted Runtime Identity And Activation](architecture/runtime-identity-and-activation.md) | Active architecture target. Uses per-workspace activation binding, not one repository-wide `active.json`. |
 | Shared gateway/web | [Promoted Future Constraints](architecture/future-constraints.md) | Future constraint only; not active delivery scope. |
-| Old npm/global/setup install story | [Distribution Baseline And Scattered Spec Fragments](history/distribution-baseline.md) | Historical input. Do not implement as target without explicit supersession. |
+| Old npm/global/setup install story | [Distribution Baseline And Scattered Spec Fragments](../../architect/packaging-distribution/history/distribution-baseline.md) | Historical input. Do not implement as target without explicit supersession. |
 | `docs/specs/*` distribution wording | Generated specs | Read as current generated state plus historical constraints; not the target while this architecture stream is active. |
 
 #### 3. Boundary Rule

@@ -168,9 +168,10 @@
       "sourceAnchor": "dispatch-routing-work-to-a-executor",
       "sourceUnitDigest": "6f82f0a34b9d52aeb929fa62c63a49e558f0cf94e6552b59bca278097f14ea6d",
       "disposition": "reclassify-out-of-platform-scope",
-      "rationale": "L10-3: retain AGENTS.md#dispatch-routing-work-to-a-executor as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification.",
+      "rationale": "L10-16 / L10-3: claim_b12ca1fdc3534fa31f9d7459c1be9ef7 records the historical native instruction identity AGENTS.md#dispatch-routing-work-to-a-executor (digest 6f82f0a34b9d52aeb929fa62c63a49e558f0cf94e6552b59bca278097f14ea6d). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
       "reviewStatus": "pending",
-      "priorDecision": null
+      "priorDecision": null,
+      "decisionFile": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json"
     },
     {
       "claimId": "claim_c3ef3a4ddc116883db10a70d55ba7bd5",
@@ -178,9 +179,10 @@
       "sourceAnchor": "rul11-tùm-lum-không-phải-nặng-d-adr0036-docsspecsplatform-foundationsmd",
       "sourceUnitDigest": "4485eb54512289665baad03b45714d0d19bdb4b46f1ce565850aea8aa969b940",
       "disposition": "reclassify-out-of-platform-scope",
-      "rationale": "L10-3: retain AGENTS.md#rul11-tùm-lum-không-phải-nặng-d-adr0036-docsspecsplatform-foundationsmd as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification.",
+      "rationale": "L10-16 / L10-3: claim_c3ef3a4ddc116883db10a70d55ba7bd5 records the historical native instruction identity AGENTS.md#rul11-tùm-lum-không-phải-nặng-d-adr0036-docsspecsplatform-foundationsmd (digest 4485eb54512289665baad03b45714d0d19bdb4b46f1ce565850aea8aa969b940). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
       "reviewStatus": "pending",
-      "priorDecision": null
+      "priorDecision": null,
+      "decisionFile": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json"
     },
     {
       "claimId": "claim_21f66ad1c973daaf6c31abf50b6c8cc3",
@@ -188,9 +190,10 @@
       "sourceAnchor": "starting-the-herdr-gateway-one-door-never-a-raw-process",
       "sourceUnitDigest": "43d98a2d84170eee45f9c337cd6700c7af2e32965c415e3fb26cf3c3ebe14bd7",
       "disposition": "reclassify-out-of-platform-scope",
-      "rationale": "L10-3: retain AGENTS.md#starting-the-herdr-gateway-one-door-never-a-raw-process as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification.",
+      "rationale": "L10-16 / L10-3: claim_21f66ad1c973daaf6c31abf50b6c8cc3 records the historical native instruction identity AGENTS.md#starting-the-herdr-gateway-one-door-never-a-raw-process (digest 43d98a2d84170eee45f9c337cd6700c7af2e32965c415e3fb26cf3c3ebe14bd7). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
       "reviewStatus": "pending",
-      "priorDecision": null
+      "priorDecision": null,
+      "decisionFile": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json"
     },
     {
       "claimId": "claim_806342ec2a1c5fd1d0b6d82ebd54d4e0",
@@ -198,9 +201,10 @@
       "sourceAnchor": "unheaded-block-18",
       "sourceUnitDigest": "818ed72de3118b43bbb9682e5b2231a74894d6001771d6375d08fcb626cd99b1",
       "disposition": "reclassify-out-of-platform-scope",
-      "rationale": "L10-3: retain AGENTS.md#unheaded-block-18 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification.",
+      "rationale": "L10-16 / L10-3: claim_806342ec2a1c5fd1d0b6d82ebd54d4e0 records the historical native instruction identity AGENTS.md#unheaded-block-18 (digest 818ed72de3118b43bbb9682e5b2231a74894d6001771d6375d08fcb626cd99b1). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
       "reviewStatus": "pending",
-      "priorDecision": null
+      "priorDecision": null,
+      "decisionFile": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json"
     },
     {
       "claimId": "claim_7a4fef4aa802940385df7cd8fc1bf6f0",
@@ -208,9 +212,10 @@
       "sourceAnchor": "unheaded-block-23",
       "sourceUnitDigest": "367c95ab6574855f85ab31608ca9438bddb2bef0839cfc45ff4bf2640c6ea2f4",
       "disposition": "reclassify-out-of-platform-scope",
-      "rationale": "L10-3: retain AGENTS.md#unheaded-block-23 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification.",
+      "rationale": "L10-16 / L10-3: claim_7a4fef4aa802940385df7cd8fc1bf6f0 records the historical native instruction identity AGENTS.md#unheaded-block-23 (digest 367c95ab6574855f85ab31608ca9438bddb2bef0839cfc45ff4bf2640c6ea2f4). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
       "reviewStatus": "pending",
-      "priorDecision": null
+      "priorDecision": null,
+      "decisionFile": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json"
     },
     {
       "claimId": "claim_7b209ce1498d7ab5ddafe25d203e5852",
@@ -218,9 +223,10 @@
       "sourceAnchor": "unheaded-block-24",
       "sourceUnitDigest": "bd95c2c1daeda69523d203dcefc33f2d50d81a401087e921c058a7d004f5a02a",
       "disposition": "reclassify-out-of-platform-scope",
-      "rationale": "L10-3: retain AGENTS.md#unheaded-block-24 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification.",
+      "rationale": "L10-16 / L10-3: claim_7b209ce1498d7ab5ddafe25d203e5852 records the historical native instruction identity AGENTS.md#unheaded-block-24 (digest bd95c2c1daeda69523d203dcefc33f2d50d81a401087e921c058a7d004f5a02a). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
       "reviewStatus": "pending",
-      "priorDecision": null
+      "priorDecision": null,
+      "decisionFile": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json"
     },
     {
       "claimId": "claim_30f4d7e2306cb4ecdad78086848d139f",
@@ -228,9 +234,10 @@
       "sourceAnchor": "unheaded-block-26",
       "sourceUnitDigest": "52b2e04e2be1548ef98b8c68b27ee09c3cef2b516ce1cdd6925362d81dd2a306",
       "disposition": "reclassify-out-of-platform-scope",
-      "rationale": "L10-3: retain AGENTS.md#unheaded-block-26 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification.",
+      "rationale": "L10-16 / L10-3: claim_30f4d7e2306cb4ecdad78086848d139f records the historical native instruction identity AGENTS.md#unheaded-block-26 (digest 52b2e04e2be1548ef98b8c68b27ee09c3cef2b516ce1cdd6925362d81dd2a306). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
       "reviewStatus": "pending",
-      "priorDecision": null
+      "priorDecision": null,
+      "decisionFile": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json"
     },
     {
       "claimId": "claim_500d588a939fd6109cf102b8343484bb",
@@ -238,9 +245,10 @@
       "sourceAnchor": "unheaded-block-28",
       "sourceUnitDigest": "45945b0c37c8cca3414b5e11c8b0dba3c210d8dcf30d34fc26a1d794e848801e",
       "disposition": "reclassify-out-of-platform-scope",
-      "rationale": "L10-3: retain AGENTS.md#unheaded-block-28 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification.",
+      "rationale": "L10-16 / L10-3: claim_500d588a939fd6109cf102b8343484bb records the historical native instruction identity AGENTS.md#unheaded-block-28 (digest 45945b0c37c8cca3414b5e11c8b0dba3c210d8dcf30d34fc26a1d794e848801e). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
       "reviewStatus": "pending",
-      "priorDecision": null
+      "priorDecision": null,
+      "decisionFile": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json"
     },
     {
       "claimId": "claim_dea64a2d50bdbadf3b2ebeceec84fa5d",
@@ -248,12 +256,25 @@
       "sourceAnchor": "unheaded-block-34",
       "sourceUnitDigest": "ba8b02c21fe45af0ba20b280ef182065e87c3410dae024d6ede3983845990c9c",
       "disposition": "reclassify-out-of-platform-scope",
-      "rationale": "L10-3: retain AGENTS.md#unheaded-block-34 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification.",
+      "rationale": "L10-16 / L10-3: claim_dea64a2d50bdbadf3b2ebeceec84fa5d records the historical native instruction identity AGENTS.md#unheaded-block-34 (digest ba8b02c21fe45af0ba20b280ef182065e87c3410dae024d6ede3983845990c9c). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried. This is consistent with gap claim_91884eb1 (same ba8b02c2 text digest): both historical identities classify the instruction outside platform authority. The old registry delete-as-obsolete disposition is historical bookkeeping, not authority to delete root instruction text; no registry mutation this turn.",
       "reviewStatus": "pending",
-      "priorDecision": null
+      "priorDecision": null,
+      "decisionFile": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json"
     }
   ],
-  "retiredNote": "Nine already-retired identities retain native registry dispositions; no registry mutation or unsupported retired decision overlay. Historical anchors are retained evidence outside platform authority, not current live anchors.",
+  "retiredNote": "L10-16: nine explicit historical decision rows in ledger/retired-unit-decisions.json, all pending; no live-anchor claims, registry mutation or approval.",
   "reviewStatus": "pending",
-  "nativeSyncCount": 0
+  "nativeSyncCount": 0,
+  "currentRepin": {
+    "SYNC": "59b9b70876324e07135db53d2351f7db6a7e1746",
+    "sourceHashes": {
+      "AGENTS.md": "47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f",
+      "CLAUDE.md": "473df70d0879413dac335100339bb5157ee58aef78ef08800acacbb9a96db1b5"
+    },
+    "sourceBlobs": {
+      "AGENTS.md": "15aad3fa981b11e53d40b17647bc857fe2958656",
+      "CLAUDE.md": "0ed93b2b465635aaab24e55ff06f55cdbb5e1780"
+    },
+    "note": "L10-3: all AGENTS bindings re-decided pending against current file pin. Two changed units have explicit provisional drafts; native sync resolves retained heading/gap identity. CLAUDE bytes unchanged. Earlier fields are historical witnesses."
+  }
 }

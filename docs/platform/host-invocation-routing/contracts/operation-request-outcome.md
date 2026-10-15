@@ -54,4 +54,4 @@ Providers never block waiting for a person. If human input is required, the prov
 | --- | --- |
 | kernel architecture | [../architecture/invocation-kernel.md](../architecture/invocation-kernel.md) |
 | component protocol | [component-protocol.md](component-protocol.md) |
-| source architecture | [../spec.md](../spec.md) |
+| source architecture | [../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../../../architect/host-invocation-routing/host-invocation-provider-routing.md) |

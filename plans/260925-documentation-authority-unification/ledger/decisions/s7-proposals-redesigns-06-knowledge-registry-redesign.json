@@ -24,7 +24,7 @@
       "targetAnchor": "knowledge-registry-redesign",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
       "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Retain map proposal kind: implementation alone does not promote a design. Full truth remains owed at promotion. Evidence: src/state/knowledge-registry.mjs:20,88,211,537,646,733–748 and bin/fgos.mjs:1701,1767 explicitly cite the source. domains/coding/skills/fgos-coding-knowledge/SKILL.md:44 is an additional canonical skill-source consumer; setup registrations:3977,4001,4035 remain. Complete source heading docs/architect/knowledge-registry-redesign.md#knowledge-registry-redesign (lines 1–1) is carried at docs/platform/proposals/knowledge-registry-redesign.md#knowledge-registry-redesign (lines 1–1); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. A22 rebind: the labelled Added in candidate paragraph now names the two authorized A19 section-17 pointer corrections; source wording outside those two corrections is retained. H1 section binding changed; no approval carries. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by native retained identity. Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
       "priorReview": {
@@ -46,9 +46,14 @@
         "targetAncestry": [],
         "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
       },
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: move; header fence and labelled Added in candidate paragraph added; the paragraph discloses two section-17 pointer corrections, which are labelled and outside this heading unit; source heading section unchanged",
       "targetUnitDigest": "9a493f0bbb35471b283432ed1c06dc1b182ffba794de0820fa07088fba7678c0",
-      "targetAncestry": []
+      "targetAncestry": [],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_736a70797d7977a9b389a38ff283ee0a",

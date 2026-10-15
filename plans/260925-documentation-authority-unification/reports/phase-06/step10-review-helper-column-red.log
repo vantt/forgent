@@ -1,0 +1,49 @@
+✔ never repoints a source relationship or a link to its own file (1.820758ms)
+✔ source column header protects subsequent table rows (0.214514ms)
+✔ chooses a restored same-named candidate before a portal (0.225991ms)
+✔ chooses the unique per-anchor target when no same-named candidate exists (0.107563ms)
+✔ restores and classifies a portal alias with no specific target (0.118827ms)
+✔ wrapped labels are repointed and labels preserved (0.106647ms)
+✔ fences and historical referents are retained (0.099607ms)
+✔ anchored destinations preserve the explicit alias anchor (0.096433ms)
+✔ ambiguous specific targets fail closed (0.083205ms)
+✔ uses the source heading alias for a split document without guessing among sections (0.132929ms)
+✔ a canonical data cell does not protect unrelated following table rows (0.237833ms)
+✔ restored same-named document takes precedence over an archived heading alias (0.125496ms)
+✔ all source relationship row labels retain legacy destinations and verbatim labels (0.192642ms)
+✔ Source and Legacy source columns protect only their own cells (0.696291ms)
+✔ canonical in narrative text is not a source relationship label (0.105829ms)
+✔ a labelled source relationship inside any cell protects that cell alone (0.16357ms)
+✔ a source relationship link label inside any cell stays verbatim (0.071849ms)
+✖ a source-column link label does not turn preservation targets into source relationships (0.566745ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 17
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 44.526135
+
+✖ failing tests:
+
+test at test/scripts/doc-link-pass.test.mjs:98:1
+✖ a source-column link label does not turn preservation targets into source relationships (0.566745ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  2 !== 1
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-link-pass.test.mjs:100:27)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 2,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

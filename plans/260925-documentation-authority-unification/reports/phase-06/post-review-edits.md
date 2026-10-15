@@ -473,3 +473,212 @@ Lead L10-12/L10-13/L10-14 under A42 authorize this correction pass; no self-revi
 - New versioned pure link-pass helper replaces scratch-only per-line method; tests first, red logs then 12 helper tests green. Protected gates/checkers/vocabulary/extractor/baselines unchanged. Current full diffs and hashes for every doc, decision, snapshot and helper/test edit are in `step10-correction-edits.json`; reproducible commands/scripts and all check logs are in `step10-correction-reproduction.json` and `step10-correction-checks.json`.
 
 Next: package at this runner commit with ONE native sync, all drift rebounds and ONE replacement review set covering 41b plus this turn. Phase 6 open; global D/E, holds/rehearsal/consumers/checkpoint/truth/promotion obligations remain as listed in step-10-report.md.
+
+## Step 10 review rework author turn — SYNC 59b9b7087 (2026-10-16)
+
+
+## L10-15–L10-18 — Step 10 author rework decisions (2026-10-16)
+
+Relayed by Lead under A42 in assignment `unit-run-1792089181794-89ae42db/producer/1`; SYNC `59b9b7087`. These are authoring directions, not independent verdicts or authority changes.
+
+- **L10-15 (h01):** add the runner predecessor partial carries `claim_41571c8f42f542be1f44c9371fad823a` and `claim_a64fabc06da00bb0eb8dfaba5ea0c1a6` to the reviewed-pin expected population (26); correct comparison wording, pin current hashes and refresh the manifest queue blob. All 32 groups outside item 2b’s three kinds stay queued for Phase 7/8, not resolved.
+- **L10-16 (a02):** make nine real pending historical-identity decision rows for retired AGENTS records, without live-anchor claims. Keep claim_dea64a2d consistent with gap claim_91884eb1; supersede the stale root partial-carry acceptance status with the current reclassification. The established `ledger/retired-unit-decisions.json` collection holds these rows; they are not invented active claims or registry gaps, and the registry is unchanged.
+- **L10-17 (i01):** bind claim_4599d55c to runner Pointers `spec.md#unheaded-block-3`, digest `eb280e498fa6fc523bdcb534532de95023a5a82ec1ffaa2be5f5f36a4e618891`, two-level ancestry; explain the labelled 0064 blockquote in claim_5788dd19 rather than digest equality; add the 0064 map row and update the decisions header to 12 records / 0055–0064.
+- **L10-18 (f/e links):** any cell/row/column label naming source, legacy, retained, original or canonical relationships retains its legacy destination and verbatim label, including the 51 Source-column links. Preserve unrelated target cells. Tests first; restore every affected link, link-226’s verbatim label, and repoint f-692 like its siblings. Detailed final changes are in `step10-review-link-restorations.json` and `post-review-edits.md`.
+
+Lead also directs b01’s 36-wrapper correction/evidence and seven-truth-correction rationales; c01’s six governance-repoint rationales; c02/e01’s explicit move→supersede/link-inequality explanations, 25 current confinement anchor/line-range rationales and alias bindings, stale classification nits, duplicate R9-1 removal and RUL40 citation `runner.md:1008`. Main re-carry is authorized under A31; package only next turn at this runner commit: one native sync, `--rebind` every drift, ONE bounded re-review of everything changed since `ab4d6274a`.
+
+All final document, decision, retired-decision, ratchet, helper and test changes are recorded with full before/after SHA256 and exact unified diffs in [step10-review-edits.json](step10-review-edits.json); every application/revocation is in [application](step10-review-application.json) and [final audit](step10-review-final-audit.json). No approval carried to edited bindings.
+
+Changed files in that exact diff record:
+
+- `docs/platform/agent-coordination/spec.md`
+- `docs/platform/component-boundary.md`
+- `docs/platform/contracts/architecture-manifest.json`
+- `docs/platform/governance.md`
+- `docs/platform/host-invocation-routing/architecture/host-use-cases.md`
+- `docs/platform/host-invocation-routing/architecture/invocation-kernel.md`
+- `docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md`
+- `docs/platform/host-invocation-routing/architecture/provider-routing.md`
+- `docs/platform/host-invocation-routing/architecture/release-boundaries.md`
+- `docs/platform/host-invocation-routing/contracts/component-protocol.md`
+- `docs/platform/host-invocation-routing/contracts/legacy-payload.md`
+- `docs/platform/host-invocation-routing/contracts/operation-catalog.md`
+- `docs/platform/host-invocation-routing/contracts/operation-request-outcome.md`
+- `docs/platform/host-invocation-routing/intent-preservation-ledger.md`
+- `docs/platform/host-invocation-routing/verification/compatibility-harness.md`
+- `docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md`
+- `docs/platform/host-invocation-routing/verification/r2-external-process-proof.md`
+- `docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md`
+- `docs/platform/host-invocation-routing/verification/source-preservation-audit.md`
+- `docs/platform/host-invocation-routing/vision.md`
+- `docs/platform/observe/spec.md`
+- `docs/platform/packaging-distribution/README.md`
+- `docs/platform/packaging-distribution/contracts/release-manifest.md`
+- `docs/platform/packaging-distribution/spec.md`
+- `docs/platform/proposals/component-authority-boundary-map.md`
+- `docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md`
+- `docs/platform/runner/decisions/h-36d872fbb0e5.md`
+- `docs/platform/vision.md`
+- `docs/platform/work-state/README.md`
+- `docs/platform/work-state/contracts/cli-io-contract.md`
+- `docs/platform/work-state/spec.md`
+- `docs/reading-map.md`
+- `plans/260925-documentation-authority-unification/ledger/area-map-runner.md`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s10-confinement-binding.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-governance.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-sc1-gaps.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s5-root-historical-gaps.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s5-root-mapped-conservation.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s5-root-retained-navigation-proposal.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s5-root-source-completion.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s5-root-source-native-successors.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s5-root-truth-successors.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-architecture-intent.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-architecture-map.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-workspace-topology-audit.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-workspace-topology-roadmap.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-workspace-topology.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-01-dispatch-control-plane-redesign.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-02-documentation-system-design.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-04-doing-coordination-redesign.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-05-readme.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-06-knowledge-registry-redesign.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-07-architecture-advisory-panel.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-08-component-authority-boundary-map.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-09-coordination-capability-envelope.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-10-coordination-dispatch-contract.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-11-coordination-envelope-probe-contract.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-13-coordination-worker-provider-boundary.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-15-readme.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-16-step-09-group-thinking-substrate.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-18-step-10-a0-coding-domain-boundary-facade-plan.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-19-step-10-coding-domain-adoption.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-20-visibility-and-interactive-contact-herdr-spawn.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json`
+- `plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json`
+- `plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json`
+- `scripts/check-legacy-docs-ratchet.exceptions.json`
+- `scripts/doc-link-pass.mjs`
+- `test/scripts/doc-link-pass.test.mjs`
+
+Every final link edit (verbatim labels and destinations are in the linked JSON; preservation-target cells remain candidate links):
+
+| Entry | File | Before | After |
+|---|---|---|---|
+| f-009 | `docs/platform/agent-coordination/spec.md` | [docs/platform/runner/spec.md](../runner/spec.md) | [docs/specs/runner.md](../../specs/runner.md) |
+| f-012 | `docs/platform/agent-coordination/spec.md` | [the current owner](../runner/spec.md) | [the current owner](../../specs/runner.md) |
+| f-021 | `docs/platform/component-boundary.md` | [proposals/component-authority-boundary-map.md](proposals/component-authority-boundary-map.md) | [../architect/proposals/component-authority-boundary-map.md](../architect/proposals/component-authority-boundary-map.md) |
+| f-107 | `docs/platform/governance.md` | [architect/documentation-system-design.md](documentation/architecture/documentation-system-design.md) | [architect/documentation-system-design.md](../architect/documentation-system-design.md) |
+| f-112 | `docs/platform/host-invocation-routing/architecture/host-use-cases.md` | [../spec.md](../spec.md) | [../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../../../architect/host-invocation-routing/host-invocation-provider-routing.md) |
+| f-113 | `docs/platform/host-invocation-routing/architecture/invocation-kernel.md` | [../spec.md](../spec.md) | [../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../../../architect/host-invocation-routing/host-invocation-provider-routing.md) |
+| f-117 | `docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md` | [Repo Layout Vision](../../component-boundary.md) | [Repo Layout Vision](../../../architect/component-boundary/repo-layout-vision.md) |
+| f-118 | `docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md` | [Runtime Identity And Activation](../../packaging-distribution/architecture/runtime-identity-and-activation.md) | [Runtime Identity And Activation](../../../architect/packaging-distribution/runtime-identity-and-activation.md) |
+| f-119 | `docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md` | [Runtime Identity And Activation](../../packaging-distribution/architecture/runtime-identity-and-activation.md) | [Runtime Identity And Activation](../../../architect/packaging-distribution/runtime-identity-and-activation.md) |
+| f-132 | `docs/platform/host-invocation-routing/architecture/provider-routing.md` | [../spec.md](../spec.md) | [../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../../../architect/host-invocation-routing/host-invocation-provider-routing.md) |
+| f-135 | `docs/platform/host-invocation-routing/architecture/release-boundaries.md` | [../roadmap.md](../roadmap.md) | [../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md) |
+| f-136 | `docs/platform/host-invocation-routing/architecture/release-boundaries.md` | [the retained component-boundary advisory](../../component-boundary.md) | [the retained component-boundary advisory](../../../architect/component-boundary/component-boundary-advisory.md) |
+| f-138 | `docs/platform/host-invocation-routing/contracts/component-protocol.md` | [the retained component-boundary advisory](../../component-boundary.md) | [the retained component-boundary advisory](../../../architect/component-boundary/component-boundary-advisory.md) |
+| f-141 | `docs/platform/host-invocation-routing/contracts/legacy-payload.md` | [../architecture/legacy-cli-transition.md](../architecture/legacy-cli-transition.md) | [../../../architect/host-invocation-routing/legacy-cli-transition.md](../../../architect/host-invocation-routing/legacy-cli-transition.md) |
+| f-142 | `docs/platform/host-invocation-routing/contracts/operation-catalog.md` | [../spec.md](../spec.md) | [../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../../../architect/host-invocation-routing/host-invocation-provider-routing.md) |
+| f-143 | `docs/platform/host-invocation-routing/contracts/operation-request-outcome.md` | [../spec.md](../spec.md) | [../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../../../architect/host-invocation-routing/host-invocation-provider-routing.md) |
+| f-144 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [host-invocation-provider-routing.md](spec.md#1-architecture-name) | [host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md#1-architecture-name) |
+| f-145 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [host-invocation-provider-routing.md](spec.md#1-architecture-name) | [host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md#1-architecture-name) |
+| f-146 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [host-invocation-provider-routing.md](spec.md#4-peer-host-use-cases) | [host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md#4-peer-host-use-cases) |
+| f-147 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [host-invocation-provider-routing.md](spec.md#4-peer-host-use-cases) | [host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md#4-peer-host-use-cases) |
+| f-148 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [legacy-cli-transition.md](architecture/legacy-cli-transition.md#1-two-distinct-adapters) | [legacy-cli-transition.md](../../architect/host-invocation-routing/legacy-cli-transition.md#1-two-distinct-adapters) |
+| f-150 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [host-invocation-provider-routing.md](spec.md#5-core-contracts) | [host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts) |
+| f-151 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [host-invocation-provider-routing.md](spec.md#5-core-contracts) | [host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts) |
+| f-152 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [external-provider-protocol.md](architecture/external-provider-protocol.md#3-component-protocol) | [external-provider-protocol.md](../../architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol) |
+| f-153 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [host-invocation-provider-routing.md](spec.md#5-core-contracts) | [host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts) |
+| f-154 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [host-invocation-provider-routing.md](spec.md#6-router-pure-and-invocationservice-pipeline) | [host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md#6-router-pure-and-invocationservice-pipeline) |
+| f-155 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [host-invocation-provider-routing.md](spec.md#7-authority-two-stage) | [host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md#7-authority-two-stage) |
+| f-156 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [host-invocation-provider-routing.md](spec.md#7-authority-two-stage) | [host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md#7-authority-two-stage) |
+| f-157 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [node-to-rust-component-migration.md](architecture/node-to-rust-migration.md#13-rollback-rules) | [node-to-rust-component-migration.md](../../architect/host-invocation-routing/node-to-rust-component-migration.md#13-rollback-rules) |
+| f-158 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [host-invocation-provider-routing.md](spec.md#8-failure-cancellation-lifecycle-and-human-input) | [host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md#8-failure-cancellation-lifecycle-and-human-input) |
+| f-159 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [host-invocation-provider-routing.md](spec.md#8-failure-cancellation-lifecycle-and-human-input) | [host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md#8-failure-cancellation-lifecycle-and-human-input) |
+| f-160 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [host-invocation-provider-routing.md](spec.md#8-failure-cancellation-lifecycle-and-human-input) | [host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md#8-failure-cancellation-lifecycle-and-human-input) |
+| f-161 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [node-to-rust-component-migration.md](architecture/node-to-rust-migration.md#9-repeat-by-component-boundary) | [node-to-rust-component-migration.md](../../architect/host-invocation-routing/node-to-rust-component-migration.md#9-repeat-by-component-boundary) |
+| f-162 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [host-invocation-provider-routing.md](spec.md#9-physical-placement) | [host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md#9-physical-placement) |
+| f-163 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [host-invocation-provider-routing.md](spec.md#9-physical-placement) | [host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md#9-physical-placement) |
+| f-164 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [rust-cli-and-proof-components-plan.md](roadmap.md#7-p2-rust-workspace-and-generated-inputs) | [rust-cli-and-proof-components-plan.md](../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#7-p2-rust-workspace-and-generated-inputs) |
+| f-165 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [host-invocation-provider-routing.md](spec.md#10-release-boundaries) | [host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md#10-release-boundaries) |
+| f-166 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [rust-cli-and-proof-components-plan.md](roadmap.md#1-outcome) | [rust-cli-and-proof-components-plan.md](../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#1-outcome) |
+| f-167 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [host-invocation-provider-routing.md](spec.md#10-release-boundaries) | [host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md#10-release-boundaries) |
+| f-168 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [rust-cli-and-proof-components-plan.md](roadmap.md#12-p7-external-process-provider-preview) | [rust-cli-and-proof-components-plan.md](../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#12-p7-external-process-provider-preview) |
+| f-169 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [host-invocation-provider-routing.md](spec.md#10-release-boundaries) | [host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md#10-release-boundaries) |
+| f-170 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [node-to-rust-component-migration.md](architecture/node-to-rust-migration.md#7-release-r3-production-remote-host) | [node-to-rust-component-migration.md](../../architect/host-invocation-routing/node-to-rust-component-migration.md#7-release-r3-production-remote-host) |
+| f-171 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [external-provider-protocol.md](architecture/external-provider-protocol.md#1-component-classes) | [external-provider-protocol.md](../../architect/host-invocation-routing/external-provider-protocol.md#1-component-classes) |
+| f-172 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [external-provider-protocol.md](architecture/external-provider-protocol.md#3-component-protocol) | [external-provider-protocol.md](../../architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol) |
+| f-173 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [external-provider-protocol.md](architecture/external-provider-protocol.md#4-plugin-registry-linker) | [external-provider-protocol.md](../../architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker) |
+| f-174 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [external-provider-protocol.md](architecture/external-provider-protocol.md#4-plugin-registry-linker) | [external-provider-protocol.md](../../architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker) |
+| f-175 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [external-provider-protocol.md](architecture/external-provider-protocol.md#5-namespace-rules) | [external-provider-protocol.md](../../architect/host-invocation-routing/external-provider-protocol.md#5-namespace-rules) |
+| f-176 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [legacy-cli-transition.md](architecture/legacy-cli-transition.md#1-two-distinct-adapters) | [legacy-cli-transition.md](../../architect/host-invocation-routing/legacy-cli-transition.md#1-two-distinct-adapters) |
+| f-177 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [legacy-cli-transition.md](architecture/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path) | [legacy-cli-transition.md](../../architect/host-invocation-routing/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path) |
+| f-178 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [legacy-cli-transition.md](architecture/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path) | [legacy-cli-transition.md](../../architect/host-invocation-routing/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path) |
+| f-179 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [legacy-cli-transition.md](architecture/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path) | [legacy-cli-transition.md](../../architect/host-invocation-routing/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path) |
+| f-180 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [rust-cli-and-proof-components-plan.md](roadmap.md#5-p0-lock-release-inputs-and-baseline-inventory) | [rust-cli-and-proof-components-plan.md](../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#5-p0-lock-release-inputs-and-baseline-inventory) |
+| f-181 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [legacy-cli-transition.md](architecture/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path) | [legacy-cli-transition.md](../../architect/host-invocation-routing/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path) |
+| f-182 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [rust-cli-and-proof-components-plan.md](roadmap.md#6-p1-compatibility-harness) | [rust-cli-and-proof-components-plan.md](../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#6-p1-compatibility-harness) |
+| f-183 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [legacy-cli-transition.md](architecture/legacy-cli-transition.md#4-public-presentation-versus-semantic-outcome) | [legacy-cli-transition.md](../../architect/host-invocation-routing/legacy-cli-transition.md#4-public-presentation-versus-semantic-outcome) |
+| f-184 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [node-to-rust-component-migration.md](architecture/node-to-rust-migration.md#2-options-considered) | [node-to-rust-component-migration.md](../../architect/host-invocation-routing/node-to-rust-component-migration.md#2-options-considered) |
+| f-185 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [node-to-rust-component-migration.md](architecture/node-to-rust-migration.md#4-current-migration-readiness) | [node-to-rust-component-migration.md](../../architect/host-invocation-routing/node-to-rust-component-migration.md#4-current-migration-readiness) |
+| f-186 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [node-to-rust-component-migration.md](architecture/node-to-rust-migration.md#5-release-r1-distributable-rust-cli-host) | [node-to-rust-component-migration.md](../../architect/host-invocation-routing/node-to-rust-component-migration.md#5-release-r1-distributable-rust-cli-host) |
+| f-187 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [node-to-rust-component-migration.md](architecture/node-to-rust-migration.md#8-migrate-the-next-small-read-only-proof) | [node-to-rust-component-migration.md](../../architect/host-invocation-routing/node-to-rust-component-migration.md#8-migrate-the-next-small-read-only-proof) |
+| f-188 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [rust-cli-and-proof-components-plan.md](roadmap.md#14-p9-next-native-read) | [rust-cli-and-proof-components-plan.md](../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#14-p9-next-native-read) |
+| f-189 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [node-to-rust-component-migration.md](architecture/node-to-rust-migration.md#10-migrate-read-models-before-writers) | [node-to-rust-component-migration.md](../../architect/host-invocation-routing/node-to-rust-component-migration.md#10-migrate-read-models-before-writers) |
+| f-190 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [node-to-rust-component-migration.md](architecture/node-to-rust-migration.md#11-migrate-state-writing-components) | [node-to-rust-component-migration.md](../../architect/host-invocation-routing/node-to-rust-component-migration.md#11-migrate-state-writing-components) |
+| f-191 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [node-to-rust-component-migration.md](architecture/node-to-rust-migration.md#12-remove-node) | [node-to-rust-component-migration.md](../../architect/host-invocation-routing/node-to-rust-component-migration.md#12-remove-node) |
+| f-192 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [rust-cli-and-proof-components-plan.md](roadmap.md#4-delivery-graph) | [rust-cli-and-proof-components-plan.md](../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#4-delivery-graph) |
+| f-193 | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | [rust-cli-and-proof-components-plan.md](roadmap.md#3-decisions-required-before-r1-execution) | [rust-cli-and-proof-components-plan.md](../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#3-decisions-required-before-r1-execution) |
+| f-201 | `docs/platform/host-invocation-routing/verification/compatibility-harness.md` | [../roadmap.md](../roadmap.md) | [../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md) |
+| f-202 | `docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md` | [../roadmap.md](../roadmap.md) | [../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md) |
+| f-203 | `docs/platform/host-invocation-routing/verification/r2-external-process-proof.md` | [../roadmap.md](../roadmap.md) | [../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md) |
+| f-204 | `docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md` | [../architecture/node-to-rust-migration.md](../architecture/node-to-rust-migration.md) | [../../../architect/host-invocation-routing/node-to-rust-component-migration.md](../../../architect/host-invocation-routing/node-to-rust-component-migration.md) |
+| f-205 | `docs/platform/host-invocation-routing/verification/source-preservation-audit.md` | [documentation-standardization-plan.md](../history/documentation-migration/documentation-standardization-plan.md) | [documentation-standardization-plan.md](../../../architect/host-invocation-routing/documentation-standardization-plan.md) |
+| f-207 | `docs/platform/host-invocation-routing/verification/source-preservation-audit.md` | [external-provider-protocol.md](../architecture/external-provider-protocol.md) | [external-provider-protocol.md](../../../architect/host-invocation-routing/external-provider-protocol.md) |
+| f-208 | `docs/platform/host-invocation-routing/verification/source-preservation-audit.md` | [legacy-cli-transition.md](../architecture/legacy-cli-transition.md) | [legacy-cli-transition.md](../../../architect/host-invocation-routing/legacy-cli-transition.md) |
+| f-209 | `docs/platform/host-invocation-routing/verification/source-preservation-audit.md` | [node-to-rust-component-migration.md](../architecture/node-to-rust-migration.md) | [node-to-rust-component-migration.md](../../../architect/host-invocation-routing/node-to-rust-component-migration.md) |
+| f-210 | `docs/platform/host-invocation-routing/verification/source-preservation-audit.md` | [rust-cli-and-proof-components-plan.md](../roadmap.md) | [rust-cli-and-proof-components-plan.md](../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md) |
+| f-212 | `docs/platform/host-invocation-routing/vision.md` | [legacy-cli-transition.md](architecture/legacy-cli-transition.md) | [legacy-cli-transition.md](../../architect/host-invocation-routing/legacy-cli-transition.md) |
+| f-215 | `docs/platform/host-invocation-routing/vision.md` | [spec.md](spec.md) | [../../architect/host-invocation-routing/host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md) |
+| f-216 | `docs/platform/host-invocation-routing/vision.md` | [architecture/node-to-rust-migration.md](architecture/node-to-rust-migration.md) | [../../architect/host-invocation-routing/node-to-rust-component-migration.md](../../architect/host-invocation-routing/node-to-rust-component-migration.md) |
+| f-222 | `docs/platform/packaging-distribution/contracts/release-manifest.md` | [Legacy CLI Transition](../../host-invocation-routing/architecture/legacy-cli-transition.md) | [Legacy CLI Transition](../../../architect/host-invocation-routing/legacy-cli-transition.md) |
+| f-231 | `docs/platform/proposals/component-authority-boundary-map.md` | [Step 09 Group Thinking Substrate](step-09-group-thinking-substrate.md) | [Step 09 Group Thinking Substrate](../../architect/proposals/step-09-group-thinking-substrate.md) |
+| f-232 | `docs/platform/proposals/component-authority-boundary-map.md` | [Step 10 Coding Domain Adoption](step-10-coding-domain-adoption.md) | [Step 10 Coding Domain Adoption](../../architect/proposals/step-10-coding-domain-adoption.md) |
+| f-233 | `docs/platform/proposals/component-authority-boundary-map.md` | [Agent Coordination Vision](../agent-coordination/vision.md) | [Agent Coordination Vision](../../architect/agent-coordination/vision.md) |
+| f-235 | `docs/platform/proposals/component-authority-boundary-map.md` | [Architecture Intent](../system-architecture/architecture/architecture-intent.md) | [Architecture Intent](../../architect/architecture-intent.md) |
+| f-236 | `docs/platform/proposals/component-authority-boundary-map.md` | [Component Boundary Advisory](../component-boundary.md) | [Component Boundary Advisory](../../architect/component-boundary/component-boundary-advisory.md) |
+| f-237 | `docs/platform/proposals/component-authority-boundary-map.md` | [Repo Layout Vision](../component-boundary.md) | [Repo Layout Vision](../../architect/component-boundary/repo-layout-vision.md) |
+| f-238 | `docs/platform/proposals/component-authority-boundary-map.md` | [Host Invocation And Provider Routing](../host-invocation-routing/spec.md) | [Host Invocation And Provider Routing](../../architect/host-invocation-routing/host-invocation-provider-routing.md) |
+| f-239 | `docs/platform/proposals/component-authority-boundary-map.md` | [Node To Rust Component Migration](../host-invocation-routing/architecture/node-to-rust-migration.md) | [Node To Rust Component Migration](../../architect/host-invocation-routing/node-to-rust-component-migration.md) |
+| f-325 | `docs/platform/vision.md` | [platform-foundations.md](platform-foundations.md) | [../platform-foundations.md](../platform-foundations.md) |
+| f-350 | `docs/platform/packaging-distribution/README.md` | [Workspace Topology Architecture](../system-architecture/architecture/workspace-topology.md) | [Workspace Topology Architecture](../../architect/workspace-topology.md) |
+| f-351 | `docs/platform/packaging-distribution/README.md` | [Distribution Baseline And Scattered Spec Fragments](history/distribution-baseline.md) | [Distribution Baseline And Scattered Spec Fragments](../../architect/packaging-distribution/history/distribution-baseline.md) |
+| f-667 | `docs/platform/work-state/README.md` | [docs/platform/vision.md](../vision.md) | [docs/work-item-lifecycle-vision.md](../../work-item-lifecycle-vision.md) |
+| f-668 | `docs/platform/work-state/README.md` | [../vision.md](../vision.md) | [../../work-item-lifecycle-vision.md](../../work-item-lifecycle-vision.md) |
+| link-226 | `docs/platform/packaging-distribution/spec.md` | [docs/platform/system-architecture/architecture/workspace-topology.md](../system-architecture/architecture/workspace-topology.md) | [docs/architect/workspace-topology.md](../system-architecture/architecture/workspace-topology.md) |
+| f-692 | `docs/platform/component-boundary.md` | [Visibility And Herdr](../architect/agent-coordination/architecture/visibility-and-herdr.md) | [Visibility And Herdr](agent-coordination/architecture/visibility-and-herdr.md) |
+| f-669 | `docs/platform/work-state/spec.md` | [docs/platform/work-state/contracts/cli-io-contract.md](contracts/cli-io-contract.md) | [docs/io-contract.md](../../io-contract.md) |
+| f-111 | `docs/platform/host-invocation-routing/architecture/host-use-cases.md` | [old architecture §10](../spec.md#10-release-boundaries) | [old architecture §10](../../../architect/host-invocation-routing/host-invocation-provider-routing.md#10-release-boundaries) |
+| f-133 | `docs/platform/host-invocation-routing/architecture/release-boundaries.md` | [source plan §18](../roadmap.md#18-definition-of-done) | [source plan §18](../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#18-definition-of-done) |
+| f-134 | `docs/platform/host-invocation-routing/architecture/release-boundaries.md` | [source plan §1](../roadmap.md#1-outcome) | [source plan §1](../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#1-outcome) |
+| f-141 | `docs/platform/host-invocation-routing/contracts/legacy-payload.md` | [../architecture/legacy-cli-transition.md](../architecture/legacy-cli-transition.md) | [../../../architect/host-invocation-routing/legacy-cli-transition.md](../../../architect/host-invocation-routing/legacy-cli-transition.md) |
+
+Main hunks, current source drafts, historical residuals, 18 IO paragraph shifts, 25 confinement aliases, root re-pins, rationale/nit fixes and current global hashes are described in [step-10-report.md](step-10-report.md) and its per-change receipts. Tests first: three retained red logs; final 65/65 pass. A/B/H pass; I has one main-added route and zero author route delta; scoped D has 13 native-sync-only predecessor findings, no target drift. No native sync, review packs or global closure this turn. Next = package at runner commit with ONE bounded re-review of everything since ab4d6274a.
+
+Final b01 check: [navigation rationales](step10-review-final-navigation-rationales.json) explicitly repeat seven labelled truth corrections in claim_8e290abb, claim_587566a4 and claim_d956ba3f after the A31 historical-source redecision. All remain pending. [Source-column audit](step10-review-source-column-audit.json) confirms every current markdown Source cell across both ledgers and the component Source table points to retained legacy source; 53 current links, 50 additional destination restorations versus SYNC and three already legacy. The reviewer’s 51-link requested population is covered.

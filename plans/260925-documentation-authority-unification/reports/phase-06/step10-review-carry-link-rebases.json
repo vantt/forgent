@@ -1,0 +1,15 @@
+{
+  "note": "Verbatim upstream text with only relative destination spelling adjusted to preserve the original Session Identity referent.",
+  "edits": [
+    {
+      "file": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "before": "](platform/session-identity/spec.md)",
+      "after": "](../../session-identity/spec.md)"
+    },
+    {
+      "file": "docs/platform/observe/spec.md",
+      "before": "](../platform/session-identity/spec.md)",
+      "after": "](../session-identity/spec.md)"
+    }
+  ]
+}

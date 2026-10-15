@@ -24,12 +24,17 @@
       "targetAnchor": "workspace-topology-codebase-audit",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
       "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architect/workspace-topology-audit.md#workspace-topology-codebase-audit (lines 1–1) into docs/platform/system-architecture/architecture/workspace-topology-audit.md#workspace-topology-codebase-audit (lines 1–1), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "deep: move of the H1 section; the target section is the source 1 line plus a candidate header fence and a paragraph labelled Added in candidate; source text unchanged; both additions are metadata or labelled",
       "targetUnitDigest": "d4a61eaea94baeab0d30531225f43ac0a03270e0ceeb33ea6aa79a42bca377ae",
-      "targetAncestry": []
+      "targetAncestry": [],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_42e7c719607bfe7fd194900be5ff3f3e",
@@ -38,14 +43,19 @@
       "targetAnchor": "unheaded-block-3",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
       "rationale": "Judgment: no target digest match. Carry the complete unheaded-block at docs/architect/workspace-topology-audit.md#unheaded-block-1 (lines 3–6) into docs/platform/system-architecture/architecture/workspace-topology-audit.md#unheaded-block-3 (lines 26–29), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "reviewNote": "mechanical: source and target digests are equal, section text byte-identical by script, anchor resolves, no approval carried; move to unheaded-block-3",
       "targetUnitDigest": "a6f75b670446ea96971dc97cc64d95daf3e9eaf59d656368bf86e84064dfbd48",
       "targetAncestry": [
         "Workspace Topology Codebase Audit"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-c01-2300d6557.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
       "claimId": "claim_678b8f5e9ccb142f6972b7cd5c33e125",
