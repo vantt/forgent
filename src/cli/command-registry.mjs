@@ -2058,6 +2058,14 @@ export const COMMAND_REGISTRY = [
             plan: { type: 'string', description: 'Path to an AgentKit plan.md or plan directory.' },
             units: { type: 'string', description: 'A YAML or JSON units file, { id?, title?, units: [Unit...] } or a list of Units, run as a one-off Workflow with one step per Unit; a Unit\'s dependsOn orders the steps and hands it the earlier reports. A Unit may carry a soft "prefer" executor list and a "persona". A writing Unit that builds on exactly one writing Unit starts from that Unit\'s branch; building on two or more is refused (merge them into one unit, or make one depend on the other). Nothing is merged for you: the result lists every writing Unit\'s branch and worktree (writeBranches). Not combinable with --seats.' },
             effort: { type: 'string', description: 'Reasoning effort every unit of the run asks for (low, medium, high, max), checked against each chosen executor; kept for resume.' },
+            timeout: {
+              type: 'string',
+              description: 'Duration every unit of the run may take instead of runner.timeoutMs (e.g. 90m, 5400s, 2h); kept for resume. A unit that declares its own timeoutMs keeps its own.',
+            },
+            account: {
+              type: 'string',
+              description: 'Pin the provider account every unit runs on; kept for resume. Refused if any seat binds an executor whose provider has no matching account.',
+            },
             request: { type: 'string', description: 'The owner request this run serves; every unit receives it in its objective.' },
             'stance-options': { type: 'string', description: 'Pipe-separated option labels a measured panelist picks a stance from ("a|b|c"); refused on resume with different options.' },
             'context-ref': { type: 'array', items: { type: 'string' }, description: 'Repeatable: safe repo-relative path or handoff reference; first-step Units receive these alongside template.contextRefs.' },
@@ -2114,6 +2122,14 @@ export const COMMAND_REGISTRY = [
             'run-id': { type: 'string', description: 'Positional (or --id): the Workflow Run id.' },
             id: { type: 'string', description: 'Same as the positional run id.' },
             seats: { type: 'string', description: 'Must equal the seats the run started with.' },
+            timeout: {
+              type: 'string',
+              description: 'Cannot change a resumed workflow run: keeps the timeout it was started with.',
+            },
+            account: {
+              type: 'string',
+              description: 'Cannot change a resumed workflow run: keeps the account its seats were bound to.',
+            },
             foreground: { type: 'boolean', description: 'Advance the run in this process.' },
             worktree: { type: 'string', description: 'Target worktree directory.' },
           },

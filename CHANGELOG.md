@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- `fgos workflow start` supports `--timeout <dur>` and `--account <id>` flags, propagating overrides down to each Unit run while honoring Unit self-declared timeouts.
 
 - `fgos run --timeout <dur>` (for example `90m` or `5400s`, from 1m to 4h), a `"timeoutMs"` key in `--override`, or a Unit's own `timeoutMs` (also in a units file) gives one run more (or less) time than `runner.timeoutMs`. The value is kept for resume (`--timeout` is refused with `--resume`). A run longer than an hour no longer has its private home reclaimed mid-turn, and a dispatch with a shorter timeout no longer takes the worktree lock of a longer run. `runner.timeoutMs` above 4h is now refused.
 - `fgos run --sync <ref>` (Unit field `syncBase`) merges a branch into the worktree's branch before the worker runs: the runner runs the merge and commits it, so a confined worker never needs git. A clean merge is committed as `chore(sync): merge <ref>`; on conflicts the conflicted files join the write scope and the worker's brief, and the runner concludes the merge commit after a passing round, refusing while a conflict marker is left (`fgos run --resume` then commits once they are gone). `--sync <ref> --writes <paths>` without a prompt only syncs. A sync never takes the base's changes under `.fgos/` (the branch keeps its own), and a pre-commit hook that refuses the merge commit is reported as `hook-refused` with the hook's message.

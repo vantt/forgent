@@ -29,7 +29,7 @@ import { expandWorkflowSeats, normalizeSeats, personaNameOf, seatedPanelUnits } 
 import { digestContextRefs } from './ref-digests.mjs';
 import { seatProviders } from './seat-providers.mjs';
 import { resolveAgentDefinition } from '../runner/agent-definitions.mjs';
-import { RunnerConfigError, assertReasoningEffort } from '../runner/dispatch/config.mjs';
+import { RunnerConfigError, assertReasoningEffort, parseRunTimeout, assertRunTimeoutMs } from '../runner/dispatch/config.mjs';
 import { matchesWriteScope } from '../runner/dispatch/write-scope.mjs';
 import { nulPaths } from '../util/git-paths.mjs';
 import { normalizeStanceOptions } from '../runner/execution/unit.mjs';
@@ -192,17 +192,36 @@ function unitPatternOf(template) {
  * does: on every entry above, and as a trailing unscoped `human-cli` override that a role no entry
  * names falls through to.
  */
-function unitOverridesOf(unit, seatPersonas = [], effort = null) {
-  const seatScoped = unit.template.pattern === 'panel'
+function unitOverridesOf(unit, seatPersonas = [], options = {}) {
+  const { effort = null, timeoutMs = null, account = null } =
+    typeof options === 'string' ? { effort: options } : (options ?? {});
+
+  const unitTimeoutMs = unit.timeoutMs ?? unit.template?.timeoutMs;
+  const applyTimeout = unitTimeoutMs === undefined && timeoutMs !== null;
+
+  const seatScoped = unit.template?.pattern === 'panel'
     ? seatPersonas.map(({ seat, name, digest, text }) => ({
       scope: { unit: unit.id, role: seat },
       persona: name,
       personaPin: { name, digest, text },
       origin: 'workflow',
+      ...(effort !== null ? { reasoningEffort: effort } : {}),
+      ...(applyTimeout ? { timeoutMs } : {}),
+      ...(account !== null ? { account } : {}),
     }))
     : [];
-  if (!effort) return seatScoped;
-  return [...seatScoped.map((ov) => ({ ...ov, reasoningEffort: effort })), { origin: 'human-cli', reasoningEffort: effort }];
+
+  const hasFallback = effort !== null || applyTimeout || account !== null;
+  if (!hasFallback) return seatScoped;
+
+  const fallback = {
+    origin: 'human-cli',
+    ...(effort !== null ? { reasoningEffort: effort } : {}),
+    ...(applyTimeout ? { timeoutMs } : {}),
+    ...(account !== null ? { account } : {}),
+  };
+
+  return [...seatScoped, fallback];
 }
 
 /**
@@ -597,7 +616,11 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
               cwd: unitWorktree,
               worktree: unitWorktree,
               pattern: unitPatternOf(u.template),
-              overrides: unitOverridesOf(u, state.seats?.personas, state.effort),
+              overrides: unitOverridesOf(u, state.seats?.personas, {
+                effort: state.effort,
+                timeoutMs: state.timeoutMs,
+                account: state.account,
+              }),
               workflow: { runId: workflowRunId, stepId: step.id, unitId: u.id },
               ...(resumeUnitRunId ? { resumeUnitRunId } : {
                 onUnitRunCreated: (unitRunId) => {
@@ -929,6 +952,23 @@ function resolveStart(params) {
   }
   const effort = params.effort === undefined || params.effort === null ? null : assertReasoningEffort(params.effort);
 
+  let timeoutMs = null;
+  if (params.timeout !== undefined && params.timeout !== null) {
+    timeoutMs = typeof params.timeout === 'number'
+      ? assertRunTimeoutMs(params.timeout, '--timeout')
+      : parseRunTimeout(params.timeout);
+  } else if (params.timeoutMs !== undefined && params.timeoutMs !== null) {
+    timeoutMs = assertRunTimeoutMs(params.timeoutMs, '--timeout');
+  }
+
+  let account = null;
+  if (params.account !== undefined && params.account !== null) {
+    if (typeof params.account !== 'string' || !params.account.trim()) {
+      throw new RunnerConfigError('--account requires a non-empty account id');
+    }
+    account = params.account.trim();
+  }
+
   const contextRefs = normalizeContextRefs(params.contextRefs);
   let seats;
   if (params.seats !== undefined) {
@@ -947,7 +987,7 @@ function resolveStart(params) {
       && resolveGitRoots(mainRoot).mainCheckoutRoot !== resolveGitRoots(worktreePath).mainCheckoutRoot) {
     throw new RunnerConfigError('Workflow contextRefs cannot use plain paths across repositories; use unit-run:<id>/<role> or gate-answer:<workflowRunId>/<stepId>');
   }
-  return { mainRoot, worktreePath, workflow, workflowId, contextRefs, seats, effort };
+  return { mainRoot, worktreePath, workflow, workflowId, contextRefs, seats, effort, timeoutMs, account };
 }
 
 /**
@@ -985,7 +1025,7 @@ export async function preflightWorkflowSeats(params = {}) {
  * handed to a caller before any step executes.
  */
 function prepareWorkflowRun(params) {
-  const { mainRoot, worktreePath, workflow, workflowId, contextRefs, seats, effort } = resolveStart(params);
+  const { mainRoot, worktreePath, workflow, workflowId, contextRefs, seats, effort, timeoutMs, account } = resolveStart(params);
   const configSnapshot = snapshotRunnerConfig(mainRoot);
   const { workflowRunId, runDir } = createWorkflowRun({
     repoRoot: mainRoot,
@@ -997,6 +1037,8 @@ function prepareWorkflowRun(params) {
     contextRefs,
     seats,
     effort,
+    timeoutMs,
+    account,
   });
 
   return { workflowRunId, runDir, workflow, mainRoot, worktreePath };

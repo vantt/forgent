@@ -2269,6 +2269,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           unitsPath,
           // --effort <level>: every unit of the run asks for this reasoning effort (kept for resume).
           effort: flags.effort === undefined ? undefined : requireField(flags.effort, '--effort requires a level (low, medium, high, max)'),
+          timeout: flags.timeout === undefined ? undefined : requireField(flags.timeout, '--timeout requires a duration, e.g. 90m or 5400s'),
+          account: flags.account === undefined ? undefined : requireField(flags.account, '--account requires an account id (an entry of providers.<provider>.accounts in ~/.fgos/config.json)'),
           request: typeof flags.request === 'string' ? flags.request : undefined,
           stanceOptions: flags['stance-options'] === undefined ? undefined : requireField(flags['stance-options'], '--stance-options requires pipe-separated option labels').split('|'),
           contextRefs: flags['context-ref'],
@@ -2305,6 +2307,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       if (sub === 'resume') {
         const { resumeWorkflow, resumeWorkflowDetached } = await import('../src/workflow/index.mjs');
         const workflowRunId = requireField(positional[1] ?? flags.id ?? swallowedId, 'workflow resume requires a workflowRunId: fgos workflow resume <id>');
+        if (flags.timeout !== undefined) throw new StoreError('validation', '--timeout cannot change a resumed workflow run: it keeps the timeout it was started with');
+        if (flags.account !== undefined) throw new StoreError('validation', '--account cannot change a resumed workflow run: it keeps the account its seats were bound to');
         // --seats on resume is only a consistency check: the run keeps the seats it started with.
         const resumeOptions = {
           repoRoot: flags.dir,
