@@ -17,7 +17,8 @@ Thiết kế: [phase-00 §6–§8, §11](phase-00-design-and-review.md).
 | sửa | `src/util/host-bin.mjs` (`resolveHostBin` dùng `resolveActiveHostBin`) + test của nó |
 | sửa | `src/state/events.mjs`, `src/state/runtime-coordination.mjs`, `src/state/store.mjs`, `src/state/porting-store.mjs`, `src/state/events-compaction.mjs`, `src/runner/claim-port.mjs` |
 | sửa | `.githooks/pre-commit`, `bin/fgos.mjs` (5 chỗ nhả lock), `src/runner/lock-wait.mjs`, `src/cli/invocation-fault-log.mjs`, comment `src/runner/dispatch/execution-contract.mjs:244` |
-| sửa test | hook e2e, `store`, `runtime-coordination`, `fgos-post-merge`, `merge*`, `runner-loop`, `root-file-guard-hook`, harness CLI nếu env tự dựng |
+| sửa | `.github/workflows/release-assets-check.yml` job `focused-tests` (Linux + Windows): `cargo test -p fgos-session-identity`, test Node facade + `host-bin-path` với `FGOS_HOST_BIN` = binary release |
+| sửa test | hook e2e (hai cấu hình hook), `store`, `runtime-coordination`, `fgos-post-merge`, `merge*`, `runner-loop`, `root-file-guard-hook`, harness CLI nếu env tự dựng |
 
 ## Bước
 
