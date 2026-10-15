@@ -1,0 +1,975 @@
+{
+  "version": 1,
+  "contentCommit": "7854cff84d8bcb67075d4f9c09cd0b6d04808ff4",
+  "sync": {
+    "pin": "7854cff84d8bcb67075d4f9c09cd0b6d04808ff4",
+    "startedAt": "2026-10-15T08:43:29.723Z",
+    "completedAt": "2026-10-15T08:52:39.904Z",
+    "durationSeconds": 550.181,
+    "items": 4467,
+    "claims": 90774,
+    "registryBytes": 61576932,
+    "registrySHA256": "b9b4f20ce368ed76b314e84bce31dc7ee0ac32764e9fe9795bdc8f9424a259e7",
+    "knownBefore": 98462,
+    "knownAfter": 98470,
+    "zeroKnownIDLoss": true,
+    "activeTupleEquality": true,
+    "carryForward": {
+      "fromCommit": "af0057e1347f180e699d6580e7fe5d50c9319899",
+      "toCommit": "7854cff84d8bcb67075d4f9c09cd0b6d04808ff4",
+      "oldUnits": 90773,
+      "newUnits": 90774,
+      "kept": 90394,
+      "paired": 366,
+      "moved": 0,
+      "editedKept": 6,
+      "added": 8,
+      "gaps": 7,
+      "retired": 0,
+      "retiredDocuments": 0
+    }
+  },
+  "registry": {
+    "path": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+    "bytes": 61576932,
+    "SHA256": "b9b4f20ce368ed76b314e84bce31dc7ee0ac32764e9fe9795bdc8f9424a259e7",
+    "persistCount": 1,
+    "zeroKnownIDLoss": true
+  },
+  "scope": [
+    "docs/specs/confinement-authority.md",
+    "docs/specs/decision-citation-drift.md",
+    "docs/specs/distillery.md",
+    "docs/specs/fgos-plugin.md",
+    "docs/specs/herdr-web-dashboard.md",
+    "docs/specs/observe.md",
+    "docs/ui-spec/00-overview.md",
+    "docs/ui-spec/15-system-events.md",
+    "docs/ui-spec/20-domain-rules.md",
+    "docs/ui-spec/30-states-and-errors.md",
+    "docs/ui-spec/components/C01-item-card.md",
+    "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+    "docs/ui-spec/flows/F02-approve-a-merge.md",
+    "docs/ui-spec/generated/action-registry.csv",
+    "docs/ui-spec/generated/coverage-report.md",
+    "docs/ui-spec/generated/navigation-graph.yaml",
+    "docs/ui-spec/generated/surface-registry.yaml",
+    "docs/ui-spec/generated/wireframe-v2.html",
+    "docs/ui-spec/modals/M01-answer-question.md",
+    "docs/ui-spec/modals/M02-approve-merge.md",
+    "docs/ui-spec/modals/M03-add-edit-item.md",
+    "docs/ui-spec/schema/surface-contract.schema.json",
+    "docs/ui-spec/screens/S01-sign-in.md",
+    "docs/ui-spec/screens/S02-taskboard.md",
+    "docs/ui-spec/screens/S03-task-detail.md",
+    "docs/ui-spec/screens/S04-questions-needing-answer.md",
+    "docs/ui-spec/spec.config.yaml",
+    "docs/io-contract.md",
+    "docs/specs/distribution.md",
+    "docs/architecture-manifest.json",
+    "docs/specs/work-state.md"
+  ],
+  "changedSources": [
+    "docs/io-contract.md",
+    "docs/specs/distribution.md",
+    "docs/architecture-manifest.json",
+    "docs/specs/work-state.md"
+  ],
+  "runs": [
+    {
+      "name": "D-both",
+      "scope": null,
+      "priors": [
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json"
+      ],
+      "durationSeconds": 81.022,
+      "fatalCount": 0,
+      "structuralFatal": [],
+      "open": [
+        {
+          "type": "files-unknown-blocking",
+          "count": 1161
+        },
+        {
+          "type": "claims-unknown-blocking",
+          "count": 22613
+        },
+        {
+          "type": "claims-partial-carry",
+          "count": 14
+        },
+        {
+          "type": "claims-not-reviewed",
+          "count": 22877
+        },
+        {
+          "type": "claims-without-own-rationale",
+          "count": 22613
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "count": 361
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "count": 499
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 2365
+        }
+      ]
+    },
+    {
+      "name": "E-both",
+      "scope": [
+        "docs/specs/confinement-authority.md",
+        "docs/specs/decision-citation-drift.md",
+        "docs/specs/distillery.md",
+        "docs/specs/fgos-plugin.md",
+        "docs/specs/herdr-web-dashboard.md",
+        "docs/specs/observe.md",
+        "docs/ui-spec/00-overview.md",
+        "docs/ui-spec/15-system-events.md",
+        "docs/ui-spec/20-domain-rules.md",
+        "docs/ui-spec/30-states-and-errors.md",
+        "docs/ui-spec/components/C01-item-card.md",
+        "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+        "docs/ui-spec/flows/F02-approve-a-merge.md",
+        "docs/ui-spec/generated/action-registry.csv",
+        "docs/ui-spec/generated/coverage-report.md",
+        "docs/ui-spec/generated/navigation-graph.yaml",
+        "docs/ui-spec/generated/surface-registry.yaml",
+        "docs/ui-spec/generated/wireframe-v2.html",
+        "docs/ui-spec/modals/M01-answer-question.md",
+        "docs/ui-spec/modals/M02-approve-merge.md",
+        "docs/ui-spec/modals/M03-add-edit-item.md",
+        "docs/ui-spec/schema/surface-contract.schema.json",
+        "docs/ui-spec/screens/S01-sign-in.md",
+        "docs/ui-spec/screens/S02-taskboard.md",
+        "docs/ui-spec/screens/S03-task-detail.md",
+        "docs/ui-spec/screens/S04-questions-needing-answer.md",
+        "docs/ui-spec/spec.config.yaml",
+        "docs/io-contract.md",
+        "docs/specs/distribution.md",
+        "docs/architecture-manifest.json",
+        "docs/specs/work-state.md"
+      ],
+      "priors": [
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json"
+      ],
+      "durationSeconds": 82.684,
+      "fatalCount": 3,
+      "structuralFatal": [],
+      "open": [
+        {
+          "type": "claims-not-reviewed",
+          "count": 37
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "count": 1
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 867
+        }
+      ]
+    },
+    {
+      "name": "D-identity",
+      "scope": null,
+      "priors": [
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json"
+      ],
+      "durationSeconds": 83.566,
+      "fatalCount": 0,
+      "structuralFatal": [],
+      "open": [
+        {
+          "type": "files-unknown-blocking",
+          "count": 1161
+        },
+        {
+          "type": "claims-unknown-blocking",
+          "count": 22613
+        },
+        {
+          "type": "claims-partial-carry",
+          "count": 14
+        },
+        {
+          "type": "claims-not-reviewed",
+          "count": 22877
+        },
+        {
+          "type": "claims-without-own-rationale",
+          "count": 22613
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "count": 361
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "count": 499
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 2365
+        }
+      ]
+    },
+    {
+      "name": "E-identity",
+      "scope": [
+        "docs/specs/confinement-authority.md",
+        "docs/specs/decision-citation-drift.md",
+        "docs/specs/distillery.md",
+        "docs/specs/fgos-plugin.md",
+        "docs/specs/herdr-web-dashboard.md",
+        "docs/specs/observe.md",
+        "docs/ui-spec/00-overview.md",
+        "docs/ui-spec/15-system-events.md",
+        "docs/ui-spec/20-domain-rules.md",
+        "docs/ui-spec/30-states-and-errors.md",
+        "docs/ui-spec/components/C01-item-card.md",
+        "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+        "docs/ui-spec/flows/F02-approve-a-merge.md",
+        "docs/ui-spec/generated/action-registry.csv",
+        "docs/ui-spec/generated/coverage-report.md",
+        "docs/ui-spec/generated/navigation-graph.yaml",
+        "docs/ui-spec/generated/surface-registry.yaml",
+        "docs/ui-spec/generated/wireframe-v2.html",
+        "docs/ui-spec/modals/M01-answer-question.md",
+        "docs/ui-spec/modals/M02-approve-merge.md",
+        "docs/ui-spec/modals/M03-add-edit-item.md",
+        "docs/ui-spec/schema/surface-contract.schema.json",
+        "docs/ui-spec/screens/S01-sign-in.md",
+        "docs/ui-spec/screens/S02-taskboard.md",
+        "docs/ui-spec/screens/S03-task-detail.md",
+        "docs/ui-spec/screens/S04-questions-needing-answer.md",
+        "docs/ui-spec/spec.config.yaml",
+        "docs/io-contract.md",
+        "docs/specs/distribution.md",
+        "docs/architecture-manifest.json",
+        "docs/specs/work-state.md"
+      ],
+      "priors": [
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json"
+      ],
+      "durationSeconds": 82.777,
+      "fatalCount": 3,
+      "structuralFatal": [],
+      "open": [
+        {
+          "type": "claims-not-reviewed",
+          "count": 37
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "count": 1
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 867
+        }
+      ]
+    },
+    {
+      "name": "D-phase02",
+      "scope": null,
+      "priors": [
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json"
+      ],
+      "durationSeconds": 83.78,
+      "fatalCount": 0,
+      "structuralFatal": [],
+      "open": [
+        {
+          "type": "files-unknown-blocking",
+          "count": 1161
+        },
+        {
+          "type": "claims-unknown-blocking",
+          "count": 22613
+        },
+        {
+          "type": "claims-partial-carry",
+          "count": 14
+        },
+        {
+          "type": "claims-not-reviewed",
+          "count": 22877
+        },
+        {
+          "type": "claims-without-own-rationale",
+          "count": 22613
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "count": 361
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "count": 499
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 2365
+        }
+      ]
+    },
+    {
+      "name": "E-phase02",
+      "scope": [
+        "docs/specs/confinement-authority.md",
+        "docs/specs/decision-citation-drift.md",
+        "docs/specs/distillery.md",
+        "docs/specs/fgos-plugin.md",
+        "docs/specs/herdr-web-dashboard.md",
+        "docs/specs/observe.md",
+        "docs/ui-spec/00-overview.md",
+        "docs/ui-spec/15-system-events.md",
+        "docs/ui-spec/20-domain-rules.md",
+        "docs/ui-spec/30-states-and-errors.md",
+        "docs/ui-spec/components/C01-item-card.md",
+        "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+        "docs/ui-spec/flows/F02-approve-a-merge.md",
+        "docs/ui-spec/generated/action-registry.csv",
+        "docs/ui-spec/generated/coverage-report.md",
+        "docs/ui-spec/generated/navigation-graph.yaml",
+        "docs/ui-spec/generated/surface-registry.yaml",
+        "docs/ui-spec/generated/wireframe-v2.html",
+        "docs/ui-spec/modals/M01-answer-question.md",
+        "docs/ui-spec/modals/M02-approve-merge.md",
+        "docs/ui-spec/modals/M03-add-edit-item.md",
+        "docs/ui-spec/schema/surface-contract.schema.json",
+        "docs/ui-spec/screens/S01-sign-in.md",
+        "docs/ui-spec/screens/S02-taskboard.md",
+        "docs/ui-spec/screens/S03-task-detail.md",
+        "docs/ui-spec/screens/S04-questions-needing-answer.md",
+        "docs/ui-spec/spec.config.yaml",
+        "docs/io-contract.md",
+        "docs/specs/distribution.md",
+        "docs/architecture-manifest.json",
+        "docs/specs/work-state.md"
+      ],
+      "priors": [
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json"
+      ],
+      "durationSeconds": 84.033,
+      "fatalCount": 3,
+      "structuralFatal": [],
+      "open": [
+        {
+          "type": "claims-not-reviewed",
+          "count": 37
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "count": 1
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 867
+        }
+      ]
+    }
+  ],
+  "applicationFindings": [],
+  "activeAndAppliedTupleEquality": true,
+  "lists": [
+    {
+      "name": "specs-ui",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-specs-ui.json",
+      "scope": [
+        "docs/specs/confinement-authority.md",
+        "docs/specs/decision-citation-drift.md",
+        "docs/specs/distillery.md",
+        "docs/specs/fgos-plugin.md",
+        "docs/specs/herdr-web-dashboard.md",
+        "docs/specs/observe.md",
+        "docs/ui-spec/00-overview.md",
+        "docs/ui-spec/15-system-events.md",
+        "docs/ui-spec/20-domain-rules.md",
+        "docs/ui-spec/30-states-and-errors.md",
+        "docs/ui-spec/components/C01-item-card.md",
+        "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+        "docs/ui-spec/flows/F02-approve-a-merge.md",
+        "docs/ui-spec/generated/action-registry.csv",
+        "docs/ui-spec/generated/coverage-report.md",
+        "docs/ui-spec/generated/navigation-graph.yaml",
+        "docs/ui-spec/generated/surface-registry.yaml",
+        "docs/ui-spec/generated/wireframe-v2.html",
+        "docs/ui-spec/modals/M01-answer-question.md",
+        "docs/ui-spec/modals/M02-approve-merge.md",
+        "docs/ui-spec/modals/M03-add-edit-item.md",
+        "docs/ui-spec/schema/surface-contract.schema.json",
+        "docs/ui-spec/screens/S01-sign-in.md",
+        "docs/ui-spec/screens/S02-taskboard.md",
+        "docs/ui-spec/screens/S03-task-detail.md",
+        "docs/ui-spec/screens/S04-questions-needing-answer.md",
+        "docs/ui-spec/spec.config.yaml"
+      ],
+      "count": 117,
+      "changedTuples": [],
+      "fullFiveFieldEquality": true,
+      "tupleSHA256": "31a3f0a6da6a91ebd7eaed1e20b00a65509d9a6a238afc833265f3523f26e43f"
+    },
+    {
+      "name": "packaging-distribution",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-packaging-distribution.json",
+      "scope": [
+        "docs/architect/packaging-distribution/README.md",
+        "docs/architect/packaging-distribution/future-constraints.md",
+        "docs/architect/packaging-distribution/history/distribution-baseline.md",
+        "docs/architect/packaging-distribution/migration-map.md",
+        "docs/architect/packaging-distribution/rewrite-plan.md",
+        "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+        "docs/architect/packaging-distribution/scope-map.md",
+        "docs/architect/packaging-distribution/workspace-runtime-model.md",
+        "docs/specs/distribution.md"
+      ],
+      "count": 694,
+      "changedTuples": [],
+      "fullFiveFieldEquality": true,
+      "tupleSHA256": "42d7478d05842bba9dce173cc81af74aa9f55ae0f2907e06e0c8b133cdfde544"
+    },
+    {
+      "name": "root-authorities",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-root-authorities.json",
+      "scope": [
+        "docs/architecture-manifest.json",
+        "docs/coexistence.md",
+        "docs/contracts/fgos-gateway-api-v1.yaml",
+        "docs/doc-governance.md",
+        "docs/doc-registry.json",
+        "docs/io-contract.md",
+        "docs/operator-runbook-herdr-cockpit.md",
+        "docs/platform-foundations.md",
+        "docs/reading-map.md",
+        "docs/README.md",
+        "docs/routing-handoff-contract.md",
+        "docs/specs/reading-map.md",
+        "docs/specs/work-state.md",
+        "docs/templates/architecture.md",
+        "docs/templates/area-readme.md",
+        "docs/templates/contract.md",
+        "docs/templates/decision.md",
+        "docs/templates/discussion.md",
+        "docs/templates/generated.md",
+        "docs/templates/intent-preservation-ledger.md",
+        "docs/templates/spec.md",
+        "docs/templates/subcomponent-readme.md",
+        "docs/templates/verification.md",
+        "docs/templates/vision.md",
+        "docs/transitional-switchboard.md",
+        "docs/user/README.md",
+        "docs/distribution-vision.md",
+        "docs/id-systems-audit.md",
+        "docs/work-item-lifecycle-vision.md",
+        "docs/backlog.md",
+        "docs/platform/proposals/documentation-system-unification.md",
+        "docs/decisions/index.md"
+      ],
+      "count": 846,
+      "changedTuples": [
+        {
+          "claimId": "claim_f247e1b06cc41a2b22399670b0dbd098",
+          "path": "docs/platform/documentation/architecture/documentation-system-design.md",
+          "anchor": "unheaded-block-1",
+          "unitDigest": "744aa1a17b6ad2ad2fe131479995e8d04b3ec2c213687999f7f4fba6c4a6ea7b",
+          "fileStatus": {
+            "kind": "architecture",
+            "kindCanonical": true,
+            "designStatus": "Candidate",
+            "canonical": false,
+            "canonicalHeader": "No",
+            "authorityStatus": "candidate"
+          }
+        },
+        {
+          "claimId": "claim_d62f84b191ba6d99047150bde67f7b74",
+          "path": "docs/platform/documentation/architecture/documentation-system-design.md",
+          "anchor": "unheaded-block-2",
+          "unitDigest": "c0125540ed0103d82806939feec50f6d1614c97d392efefc193435506283163b",
+          "fileStatus": {
+            "kind": "architecture",
+            "kindCanonical": true,
+            "designStatus": "Candidate",
+            "canonical": false,
+            "canonicalHeader": "No",
+            "authorityStatus": "candidate"
+          }
+        },
+        {
+          "claimId": "claim_98d6c194ff79ac24db79cab501f69e06",
+          "path": "docs/platform/documentation/architecture/documentation-system-design.md",
+          "anchor": "unheaded-block-3",
+          "unitDigest": "17eb7516e2dfefa437f112df67c20294b3eb9f847b9e79e632e8d82df62ad5f9",
+          "fileStatus": {
+            "kind": "architecture",
+            "kindCanonical": true,
+            "designStatus": "Candidate",
+            "canonical": false,
+            "canonicalHeader": "No",
+            "authorityStatus": "candidate"
+          }
+        },
+        {
+          "claimId": "claim_1fb7ce9d677f31b32d757cd1aae928d2",
+          "path": "docs/platform/documentation/history/proposals-redesigns/documentation-system-discussion.md",
+          "anchor": "unheaded-block-1",
+          "unitDigest": "151eeec5bcde1c249c4f9645495a744509fc8b5e2769e73f0bffa93703bbe436",
+          "fileStatus": {
+            "kind": "history",
+            "kindCanonical": false,
+            "designStatus": "Candidate",
+            "canonical": false,
+            "canonicalHeader": "No",
+            "authorityStatus": "candidate"
+          }
+        },
+        {
+          "claimId": "claim_0b11608ffb229dd6a1bb7ccfd7a10a5e",
+          "path": "docs/platform/documentation/history/proposals-redesigns/documentation-system-discussion.md",
+          "anchor": "unheaded-block-2",
+          "unitDigest": "1643ef60849260f1b0d711101df5845e9d1472c906d2114068d80824f549abd7",
+          "fileStatus": {
+            "kind": "history",
+            "kindCanonical": false,
+            "designStatus": "Candidate",
+            "canonical": false,
+            "canonicalHeader": "No",
+            "authorityStatus": "candidate"
+          }
+        },
+        {
+          "claimId": "claim_9fec2d089bc9fedb8288e61b27ecb8ce",
+          "path": "docs/platform/documentation/history/proposals-redesigns/documentation-system-discussion.md",
+          "anchor": "unheaded-block-3",
+          "unitDigest": "91dc369bf8617a17882da6f2217f7d096c759a32e66f3a70b9a5d6b726df35dc",
+          "fileStatus": {
+            "kind": "history",
+            "kindCanonical": false,
+            "designStatus": "Candidate",
+            "canonical": false,
+            "canonicalHeader": "No",
+            "authorityStatus": "candidate"
+          }
+        },
+        {
+          "claimId": "claim_4cf335d4b2c28cdf80cc8ec92606b42e",
+          "path": "docs/platform/herdr-web-dashboard/README.md",
+          "anchor": "herdr-web-dashboard-candidate-area",
+          "unitDigest": "53172a935f21e0c958817eb859b72809a693ebc6965745a83c9789f2a13b0a41",
+          "fileStatus": {
+            "kind": "area-portal",
+            "kindCanonical": true,
+            "designStatus": "Candidate",
+            "canonical": false,
+            "canonicalHeader": "No",
+            "authorityStatus": "candidate"
+          }
+        },
+        {
+          "claimId": "claim_da2427c312fde10f74d9b0bbf9fe4a0d",
+          "path": "docs/platform/herdr-web-dashboard/README.md",
+          "anchor": "unheaded-block-1",
+          "unitDigest": "c05e17742a66f0983c0fa113a11b124c838abdb4c1fe3cda6229f7b27e7e0c46",
+          "fileStatus": {
+            "kind": "area-portal",
+            "kindCanonical": true,
+            "designStatus": "Candidate",
+            "canonical": false,
+            "canonicalHeader": "No",
+            "authorityStatus": "candidate"
+          }
+        },
+        {
+          "claimId": "claim_346675f6fb601f3db3b9d2b99ecf890d",
+          "path": "docs/platform/herdr-web-dashboard/README.md",
+          "anchor": "unheaded-block-2",
+          "unitDigest": "71fe6fd752cf765de2e06475eb425b9ca31b4bdf11fa49e640673a5d449a3f63",
+          "fileStatus": {
+            "kind": "area-portal",
+            "kindCanonical": true,
+            "designStatus": "Candidate",
+            "canonical": false,
+            "canonicalHeader": "No",
+            "authorityStatus": "candidate"
+          }
+        },
+        {
+          "claimId": "claim_aef7c217570ab0907d9405bf99ee9c65",
+          "path": "docs/platform/herdr-web-dashboard/README.md",
+          "anchor": "added-in-candidate-read-this-area",
+          "unitDigest": "5ff4313f48c3562a6782061ad5a19a37c277c4bb3c785ff25fe131d6f7e69747",
+          "fileStatus": {
+            "kind": "area-portal",
+            "kindCanonical": true,
+            "designStatus": "Candidate",
+            "canonical": false,
+            "canonicalHeader": "No",
+            "authorityStatus": "candidate"
+          }
+        },
+        {
+          "claimId": "claim_1189e754aa1926c126d38463291e00c0",
+          "path": "docs/platform/herdr-web-dashboard/README.md",
+          "anchor": "unheaded-block-3",
+          "unitDigest": "aa79c5c0a25c4ae18597a52e583e5abbf7800a64be258063de2ca2cf2e51cdc8",
+          "fileStatus": {
+            "kind": "area-portal",
+            "kindCanonical": true,
+            "designStatus": "Candidate",
+            "canonical": false,
+            "canonicalHeader": "No",
+            "authorityStatus": "candidate"
+          }
+        },
+        {
+          "claimId": "claim_846184742415cc388d1a758c9bc551a7",
+          "path": "docs/platform/herdr-web-dashboard/README.md",
+          "anchor": "unheaded-block-4",
+          "unitDigest": "e1aeff36c7bdb9aa9126378b2f42caef3e5be08e0994cebd9d756e39b54d3158",
+          "fileStatus": {
+            "kind": "area-portal",
+            "kindCanonical": true,
+            "designStatus": "Candidate",
+            "canonical": false,
+            "canonicalHeader": "No",
+            "authorityStatus": "candidate"
+          }
+        },
+        {
+          "claimId": "claim_e62b187dc2f6284c8c089cfa4ae7dd85",
+          "path": "docs/platform/herdr-web-dashboard/README.md",
+          "anchor": "added-in-candidate-verification-and-change-boundary",
+          "unitDigest": "6c3c047ddd7118f92f4b6f66178d3e7a27207c28cd5f04fdf5ed65c718286c54",
+          "fileStatus": {
+            "kind": "area-portal",
+            "kindCanonical": true,
+            "designStatus": "Candidate",
+            "canonical": false,
+            "canonicalHeader": "No",
+            "authorityStatus": "candidate"
+          }
+        },
+        {
+          "claimId": "claim_e199d20b5b91aadfcf2cb3f02e6f9d92",
+          "path": "docs/platform/herdr-web-dashboard/README.md",
+          "anchor": "unheaded-block-5",
+          "unitDigest": "50744c72ca12a2b0a1e8e48d687e6896a71683106ba6839335a1c24eed18a6ad",
+          "fileStatus": {
+            "kind": "area-portal",
+            "kindCanonical": true,
+            "designStatus": "Candidate",
+            "canonical": false,
+            "canonicalHeader": "No",
+            "authorityStatus": "candidate"
+          }
+        },
+        {
+          "claimId": "claim_909293b8ce5508fa8f33ee8fc12cedfb",
+          "path": "docs/platform/herdr-web-dashboard/spec.md",
+          "anchor": "unheaded-block-2",
+          "unitDigest": "cc4a3791b26dc7ee677d5c3882ea4646ebe3d761f4f97130c969c3fc313d46fc",
+          "fileStatus": {
+            "kind": "spec",
+            "kindCanonical": true,
+            "designStatus": "Candidate",
+            "canonical": false,
+            "canonicalHeader": "No",
+            "authorityStatus": "candidate"
+          }
+        },
+        {
+          "claimId": "claim_abed0cde7ac92ab895b1fd10fcb6fd2f",
+          "path": "docs/platform/herdr-web-dashboard/spec.md",
+          "anchor": "unheaded-block-3",
+          "unitDigest": "389766338cbb1db768db41ba97d799313c92ce04edec7301dc305b78fc73051f",
+          "fileStatus": {
+            "kind": "spec",
+            "kindCanonical": true,
+            "designStatus": "Candidate",
+            "canonical": false,
+            "canonicalHeader": "No",
+            "authorityStatus": "candidate"
+          }
+        },
+        {
+          "claimId": "claim_3eda80201a85fe5bdf13782a93cc6331",
+          "path": "docs/platform/work-state/contracts/cli-io-contract.md",
+          "anchor": "unheaded-block-24",
+          "unitDigest": "cb6381a3b69f2fdd99ff81b06cafbce1f45add19c7076005c59ad0e093d49be8",
+          "fileStatus": {
+            "kind": "contract",
+            "kindCanonical": true,
+            "designStatus": "Candidate",
+            "canonical": false,
+            "canonicalHeader": null,
+            "authorityStatus": "candidate"
+          }
+        },
+        {
+          "claimId": "claim_d2b08fd0534d5773ce827072239491bb",
+          "path": "docs/platform/work-state/contracts/cli-io-contract.md",
+          "anchor": "unheaded-block-25",
+          "unitDigest": "f58253403717e416cd5aa169d971bc332b43ab40f16ab6845c90d959d4283221",
+          "fileStatus": {
+            "kind": "contract",
+            "kindCanonical": true,
+            "designStatus": "Candidate",
+            "canonical": false,
+            "canonicalHeader": null,
+            "authorityStatus": "candidate"
+          }
+        },
+        {
+          "claimId": "claim_9053f1edd1765577dd1bef202eff3d98",
+          "path": "docs/platform/work-state/contracts/cli-io-contract.md",
+          "anchor": "unheaded-block-26",
+          "unitDigest": "549dded9fe85b1cfd57f1ec7079141e4feb9e6468a31e93485ab91a2305e79fe",
+          "fileStatus": {
+            "kind": "contract",
+            "kindCanonical": true,
+            "designStatus": "Candidate",
+            "canonical": false,
+            "canonicalHeader": null,
+            "authorityStatus": "candidate"
+          }
+        },
+        {
+          "claimId": "claim_c9081814b1f39c068fb76e62b7726390",
+          "path": "docs/platform/work-state/contracts/cli-io-contract.md",
+          "anchor": "unheaded-block-49",
+          "unitDigest": "6238a5e1752c22a8bb4a2801757a1e891ae0902e8cec197d7a44d5f7f9eb8ea0",
+          "fileStatus": {
+            "kind": "contract",
+            "kindCanonical": true,
+            "designStatus": "Candidate",
+            "canonical": false,
+            "canonicalHeader": null,
+            "authorityStatus": "candidate"
+          }
+        }
+      ],
+      "fullFiveFieldEquality": true,
+      "tupleSHA256": "dec5b4a2c3e5629ec0eb858785f741c2cb54ea5fa59121beff766c9786c3b6d8"
+    }
+  ],
+  "combinedCandidateCount": 867,
+  "threeStrictEFullFiveFieldEquality": true,
+  "pendingSourceRows": [
+    {
+      "claimId": "claim_f9c135d80cce2e8cf98c8b3b5b0db4ad",
+      "path": "docs/architecture-manifest.json",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_f50b3640275fce5d0a7e8d4f4077c0c9",
+      "path": "docs/io-contract.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_bc091727d4f9526a57978e0ccc1cd5f7",
+      "path": "docs/io-contract.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_812873a889bd4222ea0ab3dc9194e1ad",
+      "path": "docs/io-contract.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_da21278ab32966f6631c82420552ed2b",
+      "path": "docs/io-contract.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_b38e730cc466114aa1e1ebba6fa880ed",
+      "path": "docs/io-contract.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_cbc7ad17e0764ac8d1d4d386e3b62e74",
+      "path": "docs/io-contract.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_b8fa7fa2cd614433de754bbb92302140",
+      "path": "docs/io-contract.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_535f1aeb31d616e2138a5b3719cb4cd0",
+      "path": "docs/io-contract.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_d0e16d088cdecf2dd0b491f819009aa6",
+      "path": "docs/io-contract.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_e9ee744c6e1847ef25b3eb0bf180f577",
+      "path": "docs/io-contract.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_6f7c99f38f64abb5af7f07c1e2690730",
+      "path": "docs/io-contract.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_ea280fa29dca090fe3306f6161ac6ae7",
+      "path": "docs/io-contract.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_8999e61e46d6c02b407b84263d7a2d67",
+      "path": "docs/io-contract.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_f10fba22a20755dc700bb1720f98f451",
+      "path": "docs/io-contract.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_cf56f4a8b7679435c6bf59abd8c23093",
+      "path": "docs/io-contract.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_deb4b4da2abbc3d6190dfce1c75cabf2",
+      "path": "docs/io-contract.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_d802aabd387ae98595c102f0e857f9b1",
+      "path": "docs/io-contract.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_4eeb2f406288458e61bad21531966ab1",
+      "path": "docs/specs/distribution.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_26f62a1ae1abc17d0f02706788bfd399",
+      "path": "docs/specs/distribution.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_74a311a5ab882fe8ee4806125167e2d4",
+      "path": "docs/specs/fgos-plugin.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_b78f1258e64bd182d527105502e087be",
+      "path": "docs/specs/fgos-plugin.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_511605d386df9bae4aa29fb1baad15ac",
+      "path": "docs/specs/fgos-plugin.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_c4c6b55686b7e315f34ae005173b79db",
+      "path": "docs/specs/fgos-plugin.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_32b42cc343ea5bed231dbfd43ef4b433",
+      "path": "docs/specs/fgos-plugin.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_111f864d78a1bcae3e3c3c6b343a9ea5",
+      "path": "docs/specs/herdr-web-dashboard.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_5877600a52b4cf5568796da3c9044b65",
+      "path": "docs/specs/herdr-web-dashboard.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_2aae8d6820a6ad622e47c07d29c428bf",
+      "path": "docs/specs/herdr-web-dashboard.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_83dd4d99cd52076452282b5565b0ea22",
+      "path": "docs/specs/herdr-web-dashboard.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_9c7dc2d7af79db454e4d63ffffe3d6f6",
+      "path": "docs/specs/work-state.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_045b588f4d839f90c40b48fbc0fc3f4d",
+      "path": "docs/specs/work-state.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_ce947d10ed900598bde4df5b552e0265",
+      "path": "docs/specs/work-state.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_15a24dbb1f2d0470f04cdf8900da67a0",
+      "path": "docs/specs/work-state.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_5dcb56608e17caeb53c197186ae33827",
+      "path": "docs/specs/work-state.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_e8c37a28267ca355475a2286b90ba453",
+      "path": "docs/specs/work-state.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_b69096018a7da1d3dc629b5d37f6fdac",
+      "path": "docs/specs/work-state.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_6fe86521fead9cec7253443e3275a3cf",
+      "path": "docs/specs/work-state.md",
+      "reviewStatus": "pending"
+    }
+  ],
+  "pendingRowsOutsideRequest": [],
+  "request": {
+    "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1526-specs-ui-reworks-main-recarry.md",
+    "count": 105,
+    "contentCommit": "7854cff84d8bcb67075d4f9c09cd0b6d04808ff4",
+    "shownEntryEquality": true,
+    "counts": {
+      "b": 87,
+      "a": 18
+    }
+  },
+  "reproduction": {
+    "native": "import fs from 'node:fs';import v8 from 'node:v8';import assert from 'node:assert/strict';import {execFileSync} from 'node:child_process';import crypto from 'node:crypto';\nconst root=process.cwd(),R='plans/260925-documentation-authority-unification/reports/phase-06/',S='/tmp/fgos-work/step8-7854cff84/',pin=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),start=Date.now();\nconst gen=await import(root+'/scripts/generate-doc-inventory.mjs');\nfs.copyFileSync(R+'working-identity-registry.json',S+'prior-registry.json');\nconsole.log('START',new Date().toISOString(),pin);\nconst registry=gen.carryForwardIdentityRegistryRepoWide(root,{commit:pin,identityRegistryPath:S+'prior-registry.json'});\nconst bytes=Buffer.from(JSON.stringify(registry)+'\\n');assert(bytes.length<90000000,'STOP: registry >= 90 MB');fs.writeFileSync(S+'identity-registry.json',bytes);console.log('CARRY',new Date().toISOString(),bytes.length,JSON.stringify(registry.carryForward));\nconst inv=gen.generateInventory(root,{commit:pin,identityRegistryPath:S+'identity-registry.json'});fs.writeFileSync(S+'inventory.bin',v8.serialize(inv));\nconst tuple=u=>JSON.stringify([u.claimId,u.sourcePath,u.sourceAnchor,u.sourceUnitDigest]),known=j=>['units','retiredUnits','identityGaps'].flatMap(k=>j[k]||[]),old=JSON.parse(fs.readFileSync(S+'prior-registry.json')),ids=new Set(known(registry).map(x=>x.claimId));assert(known(old).every(x=>ids.has(x.claimId)));assert.deepEqual(inv.claimLedger.map(tuple).sort(),registry.units.map(tuple).sort());\nconst result={pin,startedAt:new Date(start).toISOString(),completedAt:new Date().toISOString(),durationSeconds:(Date.now()-start)/1000,items:inv.items.length,claims:inv.claimLedger.length,registryBytes:bytes.length,registrySHA256:crypto.createHash('sha256').update(bytes).digest('hex'),knownBefore:known(old).length,knownAfter:known(registry).length,zeroKnownIDLoss:true,activeTupleEquality:true,carryForward:registry.carryForward};fs.writeFileSync(S+'sync-result.json',JSON.stringify(result,null,2)+'\\n');console.log('DONE',JSON.stringify(result));\n",
+    "verification": "import fs from 'node:fs';import v8 from 'node:v8';import assert from 'node:assert/strict';import crypto from 'node:crypto';import {execFileSync as exec} from 'node:child_process';\nconst root=process.cwd(),P='plans/260925-documentation-authority-unification/',R=P+'reports/phase-06/',S='/tmp/fgos-work/step8-7854cff84/',read=p=>JSON.parse(fs.readFileSync(p)),write=(p,j)=>fs.writeFileSync(p,JSON.stringify(j,null,2)+'\\n'),sha=b=>crypto.createHash('sha256').update(b).digest('hex');\nconst sync=read(S+'sync-result.json'),pin=sync.pin,inv=v8.deserialize(fs.readFileSync(S+'inventory.bin')),reg=read(S+'identity-registry.json'),bytes=fs.readFileSync(S+'identity-registry.json'),g=await import(root+'/scripts/check-doc-inventory-gates.mjs'),{classifyPath}=await import(root+'/scripts/check-doc-constitution.mjs');\nassert.equal(read(S+'persisted.json').count,1);assert(fs.readFileSync(R+'working-identity-registry.json').equals(bytes));\nconst request=read(R+'review-request-261015-1526-specs-ui-reworks-main-recarry.md.json'),scope8=read(R+'step8-liveness.json').files.map(f=>f.source),changedSources=['docs/io-contract.md','docs/specs/distribution.md','docs/architecture-manifest.json','docs/specs/work-state.md'],scope=[...new Set([...scope8,...changedSources])],vocabulary=read(P+'claim-and-disposition-vocabulary.json'),droppedClaimsRegister=read(P+'dropped-claims-register.json'),decisions=[...g.loadDecisionShards(P+'pilot/decisions'),...g.loadDecisionShards(P+'ledger/decisions')],priors=[P+'reports/identity-registry.json',P+'reports/phase-02-identity-registry.json'].map(label=>({label,registry:read(label)})),ratchetResult=null,runs=read(S+'gate-summary.json');\nconst common={repoRoot:root,inventory:inv,vocabulary,identityRegistry:reg,droppedClaimsRegister,ratchetResult,headCommit:pin,registryBytes:bytes,missingInputs:[],decisions};\nconst applied=g.applyDecisions(inv,decisions,{vocabulary,targetAnchorsOf:g.buildTargetAnchorLookup(root,pin),targetUnitDigestOf:g.buildTargetUnitDigestLookup(root,pin),unitsOf:g.buildConservationUnitLookup(root,pin),registry:reg,repoRoot:root}),tuple=u=>JSON.stringify([u.claimId,u.sourcePath,u.sourceAnchor,u.sourceUnitDigest]);assert.deepEqual(applied.inventory.claimLedger.map(tuple).sort(),reg.units.map(tuple).sort());\nconst constitution=read(P+'minimum-constitution.json'),items=new Map(inv.items.map(i=>[i.path,i])),statuses=new Map();function fileStatus(path){if(!statuses.has(path)){const body=exec('git',['show',pin+':'+path],{encoding:'utf8',maxBuffer:20e6}),kind=classifyPath(path,constitution,{header:body.slice(0,800)}).kind,designStatus=body.match(/^Design status:\\s*(.+)$/m)?.[1]?.trim()??null,canonical=body.match(/^Canonical:\\s*(.+)$/m)?.[1]?.trim()??null,authorityStatus=items.get(path)?.authorityStatus;assert.equal(authorityStatus,'candidate');const canonicalBoolean=/^Canonical:\\s*(?:yes|true)\\s*$/im.test(body);assert(kind==='history'||(['Candidate','Draft'].includes(designStatus)&&!canonicalBoolean),path);statuses.set(path,{kind,kindCanonical:constitution.documentKinds.find(x=>x.id===kind)?.canonical,designStatus,canonical:canonicalBoolean,canonicalHeader:canonical,authorityStatus});}return statuses.get(path);}\nconst normalize=x=>({claimId:x.claimId,path:x.path,anchor:x.anchor,unitDigest:x.unitDigest,fileStatus:fileStatus(x.path)}),five=x=>JSON.stringify([x.claimId,x.path,x.anchor,x.unitDigest,x.fileStatus]),sorted=rows=>rows.map(five).sort(),native=sc=>g.unreferencedCandidateRows(applied.inventory,decisions,{scope:sc,repoRoot:root}).map(normalize),combined=native(scope),lists=[];\nfor(const label of ['both','identity','phase02'])assert.deepEqual(sorted(read(R+'step8-committed-native-E-'+label+'.json').explicitOpenFindings.unreferencedCandidateRows.map(normalize)),sorted(combined));\nconst packagingScope=[\"docs/architect/packaging-distribution/README.md\", \"docs/architect/packaging-distribution/future-constraints.md\", \"docs/architect/packaging-distribution/history/distribution-baseline.md\", \"docs/architect/packaging-distribution/migration-map.md\", \"docs/architect/packaging-distribution/rewrite-plan.md\", \"docs/architect/packaging-distribution/runtime-identity-and-activation.md\", \"docs/architect/packaging-distribution/scope-map.md\", \"docs/architect/packaging-distribution/workspace-runtime-model.md\", \"docs/specs/distribution.md\"];\nfor(const [name,sc]of [['specs-ui',scope8],['packaging-distribution',packagingScope],['root-authorities',read(R+'candidate-unverified-root-authorities.json').scope]]){assert(sc.length);const path=R+'candidate-unverified-'+name+'.json',old=read(path),rows=native(sc),oldById=new Map(old.rows.map(x=>[x.claimId,x])),oldTuples=new Set(old.rows.map(x=>JSON.stringify([x.claimId,x.path,x.anchor,x.unitDigest]))),changed=rows.filter(x=>!oldTuples.has(JSON.stringify([x.claimId,x.path,x.anchor,x.unitDigest])));old.previousNativeListAtContentPin={contentCommit:pin,count:old.rows.length,rowsSHA256:sha(JSON.stringify(old.rows)),priorNativeEquality:old.nativeEquality,rows:old.rows};old.rows=rows.map(x=>({...oldById.get(x.claimId),...x,status:'candidate-unverified',...(changed.some(c=>c.claimId===x.claimId)?{reviewStatus:'pending'}:{})}));old.count=rows.length;old.contentCommit=pin;if(old.docsContentCommit){old.previousDocsContentCommit=old.docsContentCommit;old.docsContentCommit=pin;}old.nativeEquality={contentCommit:pin,fullTupleEquality:true,nativeSync:true,tupleFields:['claimId','path','anchor','unitDigest','fileStatus'],tupleSHA256:sha(sorted(rows).join('\\n')),count:rows.length,meaning:'Exact current native reverse population. Eligibility only; no truth approval. Prior review metadata is historical.'};write(path,old);assert.deepEqual(sorted(read(path).rows),sorted(rows));lists.push({name,path,scope:sc,count:rows.length,changedTuples:changed,fullFiveFieldEquality:true,tupleSHA256:old.nativeEquality.tupleSHA256});}\nconst requested=new Set(request.entries.map(e=>e.entryId)),pending=applied.inventory.claimLedger.filter(x=>scope.includes(x.sourcePath)&&x.reviewStatus!=='reviewed'),unexpected=pending.filter(x=>!requested.has(x.claimId));\nwrite(R+'step8-committed-native-candidate-union.json',{contentCommit:pin,scope,count:combined.length,rows:combined,threeStrictEFullFiveFieldEquality:true});\nconst proof={version:1,contentCommit:pin,sync,registry:{path:R+'working-identity-registry.json',bytes:bytes.length,SHA256:sha(bytes),persistCount:1,zeroKnownIDLoss:sync.zeroKnownIDLoss},scope,changedSources,runs,applicationFindings:applied.findings,activeAndAppliedTupleEquality:true,lists,combinedCandidateCount:combined.length,threeStrictEFullFiveFieldEquality:true,pendingSourceRows:pending.map(x=>({claimId:x.claimId,path:x.sourcePath,reviewStatus:x.reviewStatus})),pendingRowsOutsideRequest:unexpected,request:{path:R+'review-request-261015-1526-specs-ui-reworks-main-recarry.md',count:request.count},reproduction:{native:fs.readFileSync(S+'native-sync.mjs','utf8'),verification:fs.readFileSync(S+'resume-lists.mjs','utf8'),gates:fs.readFileSync(S+'check.mjs','utf8')}};write(R+'step8-committed-native-verification.json',proof);console.log('FINISHED',JSON.stringify({runs:runs.map(x=>({name:x.name,fatal:x.fatalCount,structural:x.structuralFatal.length,open:x.open})),lists:lists.map(x=>({name:x.name,count:x.count,changed:x.changedTuples.length})),unexpected:unexpected.length}));\n",
+    "gates": "import fs from 'node:fs';import v8 from 'node:v8';import assert from 'node:assert/strict';import crypto from 'node:crypto';import {execFileSync as exec} from 'node:child_process';\nconst root=process.cwd(),P='plans/260925-documentation-authority-unification/',R=P+'reports/phase-06/',S='/tmp/fgos-work/step8-7854cff84/',read=p=>JSON.parse(fs.readFileSync(p)),write=(p,j)=>fs.writeFileSync(p,JSON.stringify(j,null,2)+'\\n'),sha=b=>crypto.createHash('sha256').update(b).digest('hex');\nconst sync=read(S+'sync-result.json'),pin=sync.pin,inv=v8.deserialize(fs.readFileSync(S+'inventory.bin')),reg=read(S+'identity-registry.json'),bytes=fs.readFileSync(S+'identity-registry.json'),g=await import(root+'/scripts/check-doc-inventory-gates.mjs'),{classifyPath}=await import(root+'/scripts/check-doc-constitution.mjs');\nassert.equal(pin,'7854cff84d8bcb67075d4f9c09cd0b6d04808ff4');assert(bytes.length<90000000);assert(!fs.existsSync(S+'persisted.json'));fs.writeFileSync(R+'working-identity-registry.json',bytes);write(S+'persisted.json',{count:1,bytes:bytes.length,SHA256:sha(bytes),contentCommit:pin});assert(fs.readFileSync(R+'working-identity-registry.json').equals(bytes));\nconst request=read(R+'review-request-261015-1526-specs-ui-reworks-main-recarry.md.json'),scope8=read(R+'step8-liveness.json').files.map(f=>f.source),changedSources=['docs/io-contract.md','docs/specs/distribution.md','docs/architecture-manifest.json','docs/specs/work-state.md'],scope=[...new Set([...scope8,...changedSources])],vocabulary=read(P+'claim-and-disposition-vocabulary.json'),droppedClaimsRegister=read(P+'dropped-claims-register.json'),decisions=[...g.loadDecisionShards(P+'pilot/decisions'),...g.loadDecisionShards(P+'ledger/decisions')],priors=[P+'reports/identity-registry.json',P+'reports/phase-02-identity-registry.json'].map(label=>({label,registry:read(label)})),ratchetResult=g.loadRatchetResult(root),runs=[];\nconst common={repoRoot:root,inventory:inv,vocabulary,identityRegistry:reg,droppedClaimsRegister,ratchetResult,headCommit:pin,registryBytes:bytes,missingInputs:[],decisions};\nfor(const [label,previousRegistries]of [['both',priors],['identity',[priors[0]]],['phase02',[priors[1]]]])for(const strict of [false,true]){const name=(strict?'E':'D')+'-'+label,t=Date.now();console.log('START',name,new Date().toISOString());const result=g.checkInventory({...common,previousRegistries,strict,scope:strict?scope:null});write(R+'step8-committed-native-'+name+'.json',result);runs.push({name,scope:strict?scope:null,priors:previousRegistries.map(x=>x.label),durationSeconds:(Date.now()-t)/1000,fatalCount:result.fatalFindings.length,structuralFatal:result.fatalFindings.filter(x=>!strict||!result.conservationOpen.some(o=>o.type===x.type)),open:result.conservationOpen.map(x=>({type:x.type,count:x.count}))});console.log('DONE',JSON.stringify(runs.at(-1)));write(S+'gate-summary.json',runs);}\nconst applied=g.applyDecisions(inv,decisions,{vocabulary,targetAnchorsOf:g.buildTargetAnchorLookup(root,pin),targetUnitDigestOf:g.buildTargetUnitDigestLookup(root,pin),unitsOf:g.buildConservationUnitLookup(root,pin),registry:reg,repoRoot:root}),tuple=u=>JSON.stringify([u.claimId,u.sourcePath,u.sourceAnchor,u.sourceUnitDigest]);assert.deepEqual(applied.inventory.claimLedger.map(tuple).sort(),reg.units.map(tuple).sort());\nconst constitution=read(P+'minimum-constitution.json'),items=new Map(inv.items.map(i=>[i.path,i])),statuses=new Map();function fileStatus(path){if(!statuses.has(path)){const body=exec('git',['show',pin+':'+path],{encoding:'utf8',maxBuffer:20e6}),kind=classifyPath(path,constitution,{header:body.slice(0,800)}).kind,designStatus=body.match(/^Design status:\\s*(.+)$/m)?.[1]?.trim()??null,canonical=body.match(/^Canonical:\\s*(.+)$/m)?.[1]?.trim()??null,authorityStatus=items.get(path)?.authorityStatus;assert.equal(authorityStatus,'candidate');assert(kind==='history'||(['Candidate','Draft'].includes(designStatus)&&canonical?.startsWith('No')),path);statuses.set(path,{kind,kindCanonical:constitution.documentKinds.find(x=>x.id===kind)?.canonical,designStatus,canonical,authorityStatus});}return statuses.get(path);}\nconst normalize=x=>({claimId:x.claimId,path:x.path,anchor:x.anchor,unitDigest:x.unitDigest,fileStatus:fileStatus(x.path)}),five=x=>JSON.stringify([x.claimId,x.path,x.anchor,x.unitDigest,x.fileStatus]),sorted=rows=>rows.map(five).sort(),native=sc=>g.unreferencedCandidateRows(applied.inventory,decisions,{scope:sc,repoRoot:root}).map(normalize),combined=native(scope),lists=[];\nfor(const label of ['both','identity','phase02'])assert.deepEqual(sorted(read(R+'step8-committed-native-E-'+label+'.json').explicitOpenFindings.unreferencedCandidateRows.map(normalize)),sorted(combined));\nconst packagingScope=[\"docs/architect/packaging-distribution/README.md\", \"docs/architect/packaging-distribution/future-constraints.md\", \"docs/architect/packaging-distribution/history/distribution-baseline.md\", \"docs/architect/packaging-distribution/migration-map.md\", \"docs/architect/packaging-distribution/rewrite-plan.md\", \"docs/architect/packaging-distribution/runtime-identity-and-activation.md\", \"docs/architect/packaging-distribution/scope-map.md\", \"docs/architect/packaging-distribution/workspace-runtime-model.md\", \"docs/specs/distribution.md\"];\nfor(const [name,sc]of [['specs-ui',scope8],['packaging-distribution',packagingScope],['root-authorities',read(R+'candidate-unverified-root-authorities.json').scope]]){assert(sc.length);const path=R+'candidate-unverified-'+name+'.json',old=read(path),rows=native(sc),oldById=new Map(old.rows.map(x=>[x.claimId,x])),oldTuples=new Set(old.rows.map(x=>JSON.stringify([x.claimId,x.path,x.anchor,x.unitDigest]))),changed=rows.filter(x=>!oldTuples.has(JSON.stringify([x.claimId,x.path,x.anchor,x.unitDigest])));old.previousNativeListAtContentPin={contentCommit:pin,count:old.rows.length,rowsSHA256:sha(JSON.stringify(old.rows)),priorNativeEquality:old.nativeEquality,rows:old.rows};old.rows=rows.map(x=>({...oldById.get(x.claimId),...x,status:'candidate-unverified',...(changed.some(c=>c.claimId===x.claimId)?{reviewStatus:'pending'}:{})}));old.count=rows.length;old.contentCommit=pin;old.nativeEquality={contentCommit:pin,fullTupleEquality:true,nativeSync:true,tupleFields:['claimId','path','anchor','unitDigest','fileStatus'],tupleSHA256:sha(sorted(rows).join('\\n')),count:rows.length,meaning:'Exact current native reverse population. Eligibility only; no truth approval. Prior review metadata is historical.'};write(path,old);assert.deepEqual(sorted(read(path).rows),sorted(rows));lists.push({name,path,scope:sc,count:rows.length,changedTuples:changed,fullFiveFieldEquality:true,tupleSHA256:old.nativeEquality.tupleSHA256});}\nconst requested=new Set(request.entries.map(e=>e.entryId)),pending=applied.inventory.claimLedger.filter(x=>scope.includes(x.sourcePath)&&x.reviewStatus!=='reviewed'),unexpected=pending.filter(x=>!requested.has(x.claimId));\nwrite(R+'step8-committed-native-candidate-union.json',{contentCommit:pin,scope,count:combined.length,rows:combined,threeStrictEFullFiveFieldEquality:true});\nconst proof={version:1,contentCommit:pin,sync,registry:{path:R+'working-identity-registry.json',bytes:bytes.length,SHA256:sha(bytes),persistCount:1,zeroKnownIDLoss:sync.zeroKnownIDLoss},scope,changedSources,runs,applicationFindings:applied.findings,activeAndAppliedTupleEquality:true,lists,combinedCandidateCount:combined.length,threeStrictEFullFiveFieldEquality:true,pendingSourceRows:pending.map(x=>({claimId:x.claimId,path:x.sourcePath,reviewStatus:x.reviewStatus})),pendingRowsOutsideRequest:unexpected,request:{path:R+'review-request-261015-1526-specs-ui-reworks-main-recarry.md',count:request.count},reproduction:{native:fs.readFileSync(S+'native-sync.mjs','utf8'),verification:fs.readFileSync(S+'check.mjs','utf8')}};write(R+'step8-committed-native-verification.json',proof);console.log('FINISHED',JSON.stringify({runs:runs.map(x=>({name:x.name,fatal:x.fatalCount,structural:x.structuralFatal.length,open:x.open})),lists:lists.map(x=>({name:x.name,count:x.count,changed:x.changedTuples.length})),unexpected:unexpected.length}));\n",
+    "finalization": "import pathlib,json,hashlib,subprocess\nR=pathlib.Path('plans/260925-documentation-authority-unification/reports/phase-06');S=pathlib.Path('/tmp/fgos-work/step8-7854cff84');pin='7854cff84d8bcb67075d4f9c09cd0b6d04808ff4'\nread=lambda p:json.loads(p.read_text())\nwrite=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\\n')\nv=read(R/'step8-committed-native-verification.json');sync=v['sync']; reqpath=R/'review-request-261015-1526-specs-ui-reworks-main-recarry.md';jpath=pathlib.Path(str(reqpath)+'.json');req=read(jpath)\nassert len(req['entries'])==req['count']==105\nassert not v['pendingRowsOutsideRequest'],v['pendingRowsOutsideRequest']\nassert not v['applicationFindings'],v['applicationFindings']\nassert all(not r['structuralFatal'] for r in v['runs'])\nassert all(r['fatalCount']==0 for r in v['runs'] if r['name'].startswith('D'))\nassert all({o['type'] for o in r['open']} <= {'claims-not-reviewed','identical-units-multiple-owners','candidate-blocks-unreferenced'} for r in v['runs'] if r['name'].startswith('E'))\nold=read(S/'prior-registry.json');new=read(S/'identity-registry.json');oldg={x['claimId'] for x in old.get('identityGaps',[])};gaps=[x for x in new.get('identityGaps',[]) if x['claimId'] not in oldg]\n# Exact native predecessor records remain intact; current tuples are distinct identities.\nrows=v['lists'];gapEvidence=[]\nfor gap in gaps:\n path=gap['sourcePath'];entries=[e for e in req['entries'] if e.get('channel')=='changed-target-unit' and e.get('path')==path and e.get('beforeDigest')==gap['sourceUnitDigest']]\n current=[u for u in new['units'] if u['sourcePath']==path and any(e['afterDigest']==u['sourceUnitDigest'] for e in entries)]\n gapEvidence.append({'predecessor':gap,'matchingChangedTextEntries':[e['entryId'] for e in entries],'currentNativeUnits':current,'meaning':'Native candidate identity gap retained; matching is text evidence only, never an identity graft or approval. Candidate truth remains unverified.'})\nwrite(R/'step8-committed-native-gap-accounting.json',{'contentCommit':pin,'newCandidateIdentityGaps':gapEvidence,'count':len(gaps),'knownIDLoss':0})\noldbinding=req['binding'];oldlim=req['limitations'];binding=f'All current source and candidate target bytes are pinned to content commit {pin}. All 105 shown entries and five complete-file SHA256 values were independently recomputed against that committed tree; no shown text, digest or decision changed. Historical before/main witnesses retain their original pins. Reviewer must record this content commit and the runner commit containing the re-pinned request.'\nreq['previousSourceCommit']=req['sourceCommit'];req['sourceCommit']=pin;req['contentCommit']=pin;req['binding']=binding;req['previousLimitations']=oldlim;req['limitations']={'nativeWorkingStateEquality':True,'contentCommit':pin,'nativeProof':'step8-committed-native-verification.json','bindingProof':'step8-committed-request-binding-proof.json','candidateUnion':'step8-committed-native-candidate-union.json','currentNativeListEquality':'PASS; all five fields, Step 8 and Step 4/5 lists; all three strict E outputs','reviewAndTruth':'Independent verdicts pending. Full truth, promotion and cutover remain unapproved.'}\nreq['instructions']=req['instructions'].replace('subject to a native sync of the runner commit','with native sync and list equality at content commit 7854cff84 now proved')\nwrite(jpath,req)\nopens=next(r['open'] for r in v['runs'] if r['name']=='E-both');openstr=', '.join(f\"{o['count']} {o['type']}\" for o in opens)\nliststr=', '.join(f\"{x['name']}: {x['count']} ({len(x['changedTuples'])} changed tuples)\" for x in v['lists'])\ntable='| Run | Native fatal | Structural fatal |\\n|---|---:|---:|\\n'+'\\n'.join(f\"| {r['name']} | {r['fatalCount']} | {len(r['structuralFatal'])} |\" for r in v['runs'])\nbody=f'''One background native sync at **{pin}**: **{sync['durationSeconds']:.3f}s**, {sync['items']} files / {sync['claims']} claims; known IDs **{sync['knownBefore']} → {sync['knownAfter']}**, zero loss. Compact registry persisted **once**, {v['registry']['bytes']} bytes, SHA256 `{v['registry']['SHA256']}`. Native inventory, active registry and applied identity/path/anchor/digest tuples equal. Seven new candidate identity gaps remain explicit in [gap accounting](step8-committed-native-gap-accounting.json), without identity graft or approval carry.\\n\\n{table}\\n\\nD is zero fatal with both priors and each separately. Strict E covers the 27 Step 8 sources plus docs/io-contract.md, docs/specs/distribution.md, docs/architecture-manifest.json and docs/specs/work-state.md; it remains open with **{openstr}**, identical across the three runs. All {len(v['pendingSourceRows'])} pending current source rows belong to the 105-entry request; no unexplained structural failure or pending current source outside it. Predecessor judgments remain the request's separate pending accounting channel. Contextual identical-group and candidate-unverified lists are explicit closure-allowed opens, never truth approvals.\\n\\nFull **claimId/path/anchor/unitDigest/fileStatus** equality passes against actual native applied inventory and all three E outputs ({v['combinedCandidateCount']} union tuples). Refreshed full batch lists: **{liststr}**. File status derives from pinned bytes and constitution; all rows pass existing candidate eligibility. Historical list/review metadata stays historical.\\n\\nAll **105 request entries** match committed text/digests/ancestry and unchanged decisions; five complete-file SHA256 values match. The existing request retains **(a) Step 8 reworks, 18 entries; (b) main re-carry, 87 entries**. Reviewer supplies every verdict, seed and draw. Independent review/application remains pending; full truth at promotion, Rings holds, A34 residuals, token checkpoint, fresh-reader/isolation limits and navigation/consumer/alias/cutover obligations remain. Runner RUL98/99/100 stay deferred to Step 9.\\n\\nTests: **44/44 pass**, zero fail/skip/cancel/todo, `env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/scripts/doc-decision-conservation.test.mjs test/scripts/doc-decision-review.test.mjs test/scripts/doc-review-format.test.mjs`. No docs or decision content, gate/checker/vocabulary/extractor/baseline, .fgos workspace, secrets, lifecycle or git write. Scratch only /tmp/fgos-work; runner owns commit. Native proof blocker is resolved; independent review is the remaining closure dependency. MDView MCP unavailable; preview omitted under the assignment's write boundary.\\n\\nProof: [native verification](step8-committed-native-verification.json), [binding proof](step8-committed-request-binding-proof.json), [sync log](step8-committed-native-sync.log), [tests](step8-committed-tests.log).\\n'''\ns=reqpath.read_text().replace(oldbinding,binding).replace('Native current-working-state sync/list equality remain **UNPROVEN** under the no-git-write boundary. The one sync covers HEAD af0057e13. Inspect [verification](step8-final-verification.json) and raw native/overlay outputs; a green overlay cannot substitute for native evidence. This is a concrete review packet, not closure.','Native committed-tree sync/list equality now **PASS** at `7854cff84`. Inspect [current native verification](step8-committed-native-verification.json); prior overlay evidence is historical. This remains a pending independent review packet.').replace('subject to a native sync of the runner commit','with native sync and list equality at content commit 7854cff84 now proved')\ns=s.split('## Verification and remaining work')[0]+'## Verification and remaining work\\n\\n'+body;reqpath.write_text(s)\ncheckpoint='# Committed native proof complete — bounded independent review pending\\n\\n'+body+f'\\n**Request:** [{reqpath.name}]({reqpath.name}), **105 entries (a: 18; b: 87)**, content pinned to `{pin}`. This checkpoint supersedes prior native-blocked/provisional checkpoints; their text and raw artifacts below remain historical. No new owner-direction blocker.\\n\\n---\\n\\n'\nfor name in ['progress.md','step-08-report.md']:\n p=R/name;p.write_text(checkpoint+p.read_text())\nfor source,target in [('native-sync.log','step8-committed-native-sync.log'),('tests.log','step8-committed-tests.log')]: (R/target).write_bytes((S/source).read_bytes())\nv['request']['contentCommit']=pin;v['request']['shownEntryEquality']=True;v['request']['counts']=req['counts'];v['nativeProofBlockerResolved']=True;v['closureDependency']='Independent ordinary review and application; full truth/promotion remain owed.';v['newCandidateIdentityGaps']=len(gaps);v['reproduction']['finalization']=(S/'finalize.py').read_text();write(R/'step8-committed-native-verification.json',v)\nprint(json.dumps({'duration':sync['durationSeconds'],'open':opens,'lists':liststr,'pending':len(v['pendingSourceRows']),'request':str(reqpath),'count':105}))\n"
+  },
+  "nativeProofBlockerResolved": true,
+  "closureDependency": "Independent ordinary review and application; full truth/promotion remain owed.",
+  "newCandidateIdentityGaps": 7,
+  "explainedObstacle": "The first scratch list helper reused the Step 8 Canonical: No condition for Step 4/5 and stopped on an unchanged Draft header Canonical: Yes, after review. Resumed list-only verification using the prior packaging helper exact standalone yes|true regex; actual header is retained as canonicalHeader. Gates, decisions, sync and persistence were not rerun or changed."
+}

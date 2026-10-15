@@ -1,7 +1,7 @@
 {
   "version": 1,
   "authorSession": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
-  "sourceCommit": "af0057e1347f180e699d6580e7fe5d50c9319899",
+  "sourceCommit": "7854cff84d8bcb67075d4f9c09cd0b6d04808ff4",
   "reviewMode": "ordinary",
   "reviewStatus": "pending",
   "count": 105,
@@ -9,7 +9,7 @@
     "b": 87,
     "a": 18
   },
-  "binding": "Legacy sources at af0057e13; target bytes are the file SHA256 set below. Runner commits these bytes after this turn. Reviewer must obtain and record that immutable runner commit and verify the hashes before issuing verdicts. Input HEAD is not a content pin for changed candidate files.",
+  "binding": "All current source and candidate target bytes are pinned to content commit 7854cff84d8bcb67075d4f9c09cd0b6d04808ff4. All 105 shown entries and five complete-file SHA256 values were independently recomputed against that committed tree; no shown text, digest or decision changed. Historical before/main witnesses retain their original pins. Reviewer must record this content commit and the runner commit containing the re-pinned request.",
   "docsSHA256": {
     "docs/platform/herdr-web-dashboard/spec.md": "7b5fe48ff585963bfbfc903ac1aa840fa7db58a80a51d72d8cbf73008d9cff80",
     "docs/platform/claude-plugin/spec.md": "428f4043212d8b0fc7e635957f956db9be01549b6ddc9c9228cf5a79da8007bb",
@@ -18,13 +18,15 @@
     "docs/platform/contracts/architecture-manifest.json": "70c00c205578fc34084e5bf8701a6bde0999cb6f05a1b58f8424ad95ed4c28d4"
   },
   "limitations": {
-    "nativeWorkingStateEquality": false,
-    "blocker": "Native generator requires committed treeish; no git writes authorized. One HEAD native sync plus separately labelled working-tree conservation overlay, not native certification of changed bytes.",
-    "nativeHEADProof": "step8-final-verification.json",
-    "overlayList": "step8-final-candidate-overlay.json",
-    "currentNativeListEquality": "UNPROVEN; no changed tuple is approved from an old list"
+    "nativeWorkingStateEquality": true,
+    "contentCommit": "7854cff84d8bcb67075d4f9c09cd0b6d04808ff4",
+    "nativeProof": "step8-committed-native-verification.json",
+    "bindingProof": "step8-committed-request-binding-proof.json",
+    "candidateUnion": "step8-committed-native-candidate-union.json",
+    "currentNativeListEquality": "PASS; all five fields, Step 8 and Step 4/5 lists; all three strict E outputs",
+    "reviewAndTruth": "Independent verdicts pending. Full truth, promotion and cutover remain unapproved."
   },
-  "instructions": "Choose no author-provided seed or verdict: none is supplied. Reviewer independently chooses all seeds, draws and verdicts. Deep-read every changed-text/digest row; match full shown decisions, source and target digests, ancestry and before/after units. Accounting and eligibility verdicts never certify current truth or promotion. Unchanged accepted verdicts are not reopened. Section (a) closes Step 8 when accepted and applied; section (b) separately closes main-merge accounting when accepted and applied, subject to a native sync of the runner commit. Runner RUL98/99/100 are deferred to Step 9, never carried in this packet.",
+  "instructions": "Choose no author-provided seed or verdict: none is supplied. Reviewer independently chooses all seeds, draws and verdicts. Deep-read every changed-text/digest row; match full shown decisions, source and target digests, ancestry and before/after units. Accounting and eligibility verdicts never certify current truth or promotion. Unchanged accepted verdicts are not reopened. Section (a) closes Step 8 when accepted and applied; section (b) separately closes main-merge accounting when accepted and applied, with native sync and list equality at content commit 7854cff84 now proved. Runner RUL98/99/100 are deferred to Step 9, never carried in this packet.",
   "correctedSentences": [
     {
       "path": "docs/platform/herdr-web-dashboard/spec.md",
@@ -8566,5 +8568,14 @@
         "action": "Current merged source re-pinned for this bounded re-carry; affected rows returned pending; no merge or baseline write in worker."
       }
     }
-  ]
+  ],
+  "previousSourceCommit": "af0057e1347f180e699d6580e7fe5d50c9319899",
+  "contentCommit": "7854cff84d8bcb67075d4f9c09cd0b6d04808ff4",
+  "previousLimitations": {
+    "nativeWorkingStateEquality": false,
+    "blocker": "Native generator requires committed treeish; no git writes authorized. One HEAD native sync plus separately labelled working-tree conservation overlay, not native certification of changed bytes.",
+    "nativeHEADProof": "step8-final-verification.json",
+    "overlayList": "step8-final-candidate-overlay.json",
+    "currentNativeListEquality": "UNPROVEN; no changed tuple is approved from an old list"
+  }
 }

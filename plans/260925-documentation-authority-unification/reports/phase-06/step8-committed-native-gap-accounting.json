@@ -1,0 +1,238 @@
+{
+  "contentCommit": "7854cff84d8bcb67075d4f9c09cd0b6d04808ff4",
+  "newCandidateIdentityGaps": [
+    {
+      "predecessor": {
+        "sourcePath": "docs/platform/claude-plugin/spec.md",
+        "unitDigest": "d74ab113bbf20e79e8171b106df06b97b9282873727a1fec653cd66f73241c7d",
+        "identityFingerprint": "d74ab113bbf20e79e8171b106df06b97b9282873727a1fec653cd66f73241c7d",
+        "claimId": "claim_0b366309bbccedcdfe2fee4ce9173155",
+        "sourceAnchor": "unheaded-block-19",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "e02f12896615760aad3f55c30a0d47c09cf0019eb7e05580b82722c372172891",
+        "claimKind": "specification",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-19 is not a stable heading anchor"
+      },
+      "matchingChangedTextEntries": [
+        "truth-rework-08"
+      ],
+      "currentNativeUnits": [
+        {
+          "sourcePath": "docs/platform/claude-plugin/spec.md",
+          "unitDigest": "627fe6499d7b6cc9af4e33810f144df35321d66103cc136f1de8229ea0b0f6b3",
+          "identityFingerprint": "627fe6499d7b6cc9af4e33810f144df35321d66103cc136f1de8229ea0b0f6b3",
+          "claimId": "claim_fcc3282ddcb85f8134e685646a1192e0",
+          "sourceAnchor": "unheaded-block-19",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "f88a5c11a70dda7a7cf1102658cb21c3ee1d7b7f469f764954a389a4ca599993",
+          "claimKind": "specification",
+          "status": "future",
+          "origin": "added-since-af0057e1347f180e699d6580e7fe5d50c9319899"
+        }
+      ],
+      "meaning": "Native candidate identity gap retained; matching is text evidence only, never an identity graft or approval. Candidate truth remains unverified."
+    },
+    {
+      "predecessor": {
+        "sourcePath": "docs/platform/claude-plugin/spec.md",
+        "unitDigest": "5b99172305d240f04807e2f4c458ee8c302217b3f25199308938fa772139509b",
+        "identityFingerprint": "5b99172305d240f04807e2f4c458ee8c302217b3f25199308938fa772139509b",
+        "claimId": "claim_cd5e20886f207cc693ad91638948e3d7",
+        "sourceAnchor": "unheaded-block-6",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "c4423a6e79bd0e75d2d4ddce1e935e386ad69ad08b3411958a40879bf0a320f9",
+        "claimKind": "specification",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-6 is not a stable heading anchor"
+      },
+      "matchingChangedTextEntries": [
+        "truth-rework-06"
+      ],
+      "currentNativeUnits": [
+        {
+          "sourcePath": "docs/platform/claude-plugin/spec.md",
+          "unitDigest": "097486fd462386ee56dd6bd16b3585e1c4b26f73976d7346a0253d1570be5462",
+          "identityFingerprint": "097486fd462386ee56dd6bd16b3585e1c4b26f73976d7346a0253d1570be5462",
+          "claimId": "claim_57f67e64c8f526b63616691bb95d43cb",
+          "sourceAnchor": "unheaded-block-6",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "8341c4c3c7e2671f39ab511ae332704e9a4b035737fd9539169c805b7093eeae",
+          "claimKind": "specification",
+          "status": "future",
+          "origin": "added-since-af0057e1347f180e699d6580e7fe5d50c9319899"
+        }
+      ],
+      "meaning": "Native candidate identity gap retained; matching is text evidence only, never an identity graft or approval. Candidate truth remains unverified."
+    },
+    {
+      "predecessor": {
+        "sourcePath": "docs/platform/contracts/architecture-manifest.json",
+        "unitDigest": "97a2225a9ea7d820324336504ccedeef9953dc0c15d3b819fbd54fd666dfee1c",
+        "identityFingerprint": "97a2225a9ea7d820324336504ccedeef9953dc0c15d3b819fbd54fd666dfee1c",
+        "claimId": "claim_2cae83233f2c9f4038e573bc0f50ae5d",
+        "sourceAnchor": "file-block",
+        "unitKind": "file-block",
+        "sourceUnitDigest": "5a7e59abe736f2b6d3af229d70366d3b7c83484c682540ec4bcf79c3ec0a1657",
+        "claimKind": "contract",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor file-block is not a stable heading anchor"
+      },
+      "matchingChangedTextEntries": [
+        "main-carrier-unit-40"
+      ],
+      "currentNativeUnits": [
+        {
+          "sourcePath": "docs/platform/contracts/architecture-manifest.json",
+          "unitDigest": "311b8cc5c25aff8b67b8bed3a0c34ec6f296e63b1b76d7e12bcf9953cdc372dc",
+          "identityFingerprint": "311b8cc5c25aff8b67b8bed3a0c34ec6f296e63b1b76d7e12bcf9953cdc372dc",
+          "claimId": "claim_e253b15677336476c2c9c372b0acec85",
+          "sourceAnchor": "file-block",
+          "unitKind": "file-block",
+          "sourceUnitDigest": "70c00c205578fc34084e5bf8701a6bde0999cb6f05a1b58f8424ad95ed4c28d4",
+          "claimKind": "contract",
+          "status": "future",
+          "origin": "added-since-af0057e1347f180e699d6580e7fe5d50c9319899"
+        }
+      ],
+      "meaning": "Native candidate identity gap retained; matching is text evidence only, never an identity graft or approval. Candidate truth remains unverified."
+    },
+    {
+      "predecessor": {
+        "sourcePath": "docs/platform/herdr-web-dashboard/spec.md",
+        "unitDigest": "4192e815925c7eaa3c982aaec2ef571ca4f3b0b525678218580eb887c02aba94",
+        "identityFingerprint": "4192e815925c7eaa3c982aaec2ef571ca4f3b0b525678218580eb887c02aba94",
+        "claimId": "claim_f2aa8dfe48566e972dd033ca83dd776e",
+        "sourceAnchor": "unheaded-block-25",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "c1636dcb33981d273c811c4a29d9f600b05a8b16d83d96b73cee5f7a6be11a4a",
+        "claimKind": "specification",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-25 is not a stable heading anchor"
+      },
+      "matchingChangedTextEntries": [
+        "truth-rework-04"
+      ],
+      "currentNativeUnits": [
+        {
+          "sourcePath": "docs/platform/herdr-web-dashboard/spec.md",
+          "unitDigest": "c5337ac51f836c8be4e5b476b394cb703d7d632392064e2a29b29857dbfcca84",
+          "identityFingerprint": "c5337ac51f836c8be4e5b476b394cb703d7d632392064e2a29b29857dbfcca84",
+          "claimId": "claim_039c9f7e1bb15518109308865551eca6",
+          "sourceAnchor": "unheaded-block-25",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "550e42d570ef825d96c3d1f339b8fc0d20b82e1b486ba6d4529191fb45cafda4",
+          "claimKind": "specification",
+          "status": "future",
+          "origin": "added-since-af0057e1347f180e699d6580e7fe5d50c9319899"
+        }
+      ],
+      "meaning": "Native candidate identity gap retained; matching is text evidence only, never an identity graft or approval. Candidate truth remains unverified."
+    },
+    {
+      "predecessor": {
+        "sourcePath": "docs/platform/herdr-web-dashboard/spec.md",
+        "unitDigest": "603d30c9017255b13743f1fd607e2f4f27e32fd9b7fba164823a1f2ed404bb8f",
+        "identityFingerprint": "603d30c9017255b13743f1fd607e2f4f27e32fd9b7fba164823a1f2ed404bb8f",
+        "claimId": "claim_cea31b357993992183d5c8b15a05b19e",
+        "sourceAnchor": "unheaded-block-9",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "8de029edb99b82340cfc8c7d129d09c9cb7d493ac7e17bc2008056f4eb0290ec",
+        "claimKind": "specification",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-9 is not a stable heading anchor"
+      },
+      "matchingChangedTextEntries": [
+        "truth-rework-02"
+      ],
+      "currentNativeUnits": [
+        {
+          "sourcePath": "docs/platform/herdr-web-dashboard/spec.md",
+          "unitDigest": "85846a44617cdf4de4b25243ded95437225781eb85f471de46926217dbf48477",
+          "identityFingerprint": "85846a44617cdf4de4b25243ded95437225781eb85f471de46926217dbf48477",
+          "claimId": "claim_5eab64eeb1005d53ecbe23442e282b69",
+          "sourceAnchor": "unheaded-block-9",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "d6b2d0ae401b9c164dcb2da55dd7163e754c2dacd1b7b3bd7071a71b3be46cb7",
+          "claimKind": "specification",
+          "status": "future",
+          "origin": "added-since-af0057e1347f180e699d6580e7fe5d50c9319899"
+        }
+      ],
+      "meaning": "Native candidate identity gap retained; matching is text evidence only, never an identity graft or approval. Candidate truth remains unverified."
+    },
+    {
+      "predecessor": {
+        "sourcePath": "docs/platform/packaging-distribution/spec.md",
+        "unitDigest": "1c45f4d6c7a0bdfd4ecd536e2c58a9e145d5ba12ad8ffe5dde024a1d025e7580",
+        "identityFingerprint": "1c45f4d6c7a0bdfd4ecd536e2c58a9e145d5ba12ad8ffe5dde024a1d025e7580",
+        "claimId": "claim_86009039e04de00c901a1bb4cdca5a0e",
+        "sourceAnchor": "unheaded-block-85",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "b2602ce11716f89d5f4d3371f398fee7eba9a6db5481383e8b8a52b81b829b9f",
+        "claimKind": "specification",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-85 is not a stable heading anchor"
+      },
+      "matchingChangedTextEntries": [
+        "main-carrier-unit-39"
+      ],
+      "currentNativeUnits": [
+        {
+          "sourcePath": "docs/platform/packaging-distribution/spec.md",
+          "unitDigest": "1a72acf07f83fb86940d7242f60ed89cc80b9fa5ff85e4f69a25976849d34e4d",
+          "identityFingerprint": "1a72acf07f83fb86940d7242f60ed89cc80b9fa5ff85e4f69a25976849d34e4d",
+          "claimId": "claim_5733ecd0feed1e82582af50b273934c9",
+          "sourceAnchor": "unheaded-block-85",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "034305c494ee289535b1b4121c8b90ed9d2eb5b850364e1c2a63e936221d40e3",
+          "claimKind": "specification",
+          "status": "future",
+          "origin": "added-since-af0057e1347f180e699d6580e7fe5d50c9319899"
+        }
+      ],
+      "meaning": "Native candidate identity gap retained; matching is text evidence only, never an identity graft or approval. Candidate truth remains unverified."
+    },
+    {
+      "predecessor": {
+        "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "unitDigest": "5aa9793717abeaa7e01416264ae6e44c05dfe04fb53b9130dc19c3cfff99cb0f",
+        "identityFingerprint": "5aa9793717abeaa7e01416264ae6e44c05dfe04fb53b9130dc19c3cfff99cb0f",
+        "claimId": "claim_cc410a6df58d2ce6c7f88d6b11085c6b",
+        "sourceAnchor": "unheaded-block-22",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "3727b3fa0ee79f8b0b38d0e9fc868e336e85f10e12f7dbd47a34d140f3681127",
+        "claimKind": "contract",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-22 is not a stable heading anchor"
+      },
+      "matchingChangedTextEntries": [
+        "main-carrier-unit-10"
+      ],
+      "currentNativeUnits": [
+        {
+          "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+          "unitDigest": "78a5ddb4f5e294cd0185681fedb1e548cace7fbb42d520feec13ae171ceafb00",
+          "identityFingerprint": "78a5ddb4f5e294cd0185681fedb1e548cace7fbb42d520feec13ae171ceafb00",
+          "claimId": "claim_e928d55417d521f1c34a39e046a072e0",
+          "sourceAnchor": "unheaded-block-22",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "d1af2d5a982f5d139fda776a23b4ad0b3776cc40c1fc0177636c44bdc91b968d",
+          "claimKind": "contract",
+          "status": "future",
+          "origin": "added-since-af0057e1347f180e699d6580e7fe5d50c9319899"
+        }
+      ],
+      "meaning": "Native candidate identity gap retained; matching is text evidence only, never an identity graft or approval. Candidate truth remains unverified."
+    }
+  ],
+  "count": 7,
+  "knownIDLoss": 0
+}

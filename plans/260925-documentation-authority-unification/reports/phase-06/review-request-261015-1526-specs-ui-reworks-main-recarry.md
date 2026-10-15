@@ -5,11 +5,11 @@ Review mode: ordinary; review status: pending.
 
 **105 entries: section (a) 18; section (b) 87.**
 
-Legacy sources at af0057e13; target bytes are the file SHA256 set below. Runner commits these bytes after this turn. Reviewer must obtain and record that immutable runner commit and verify the hashes before issuing verdicts. Input HEAD is not a content pin for changed candidate files.
+All current source and candidate target bytes are pinned to content commit 7854cff84d8bcb67075d4f9c09cd0b6d04808ff4. All 105 shown entries and five complete-file SHA256 values were independently recomputed against that committed tree; no shown text, digest or decision changed. Historical before/main witnesses retain their original pins. Reviewer must record this content commit and the runner commit containing the re-pinned request.
 
-Choose no author-provided seed or verdict: none is supplied. Reviewer independently chooses all seeds, draws and verdicts. Deep-read every changed-text/digest row; match full shown decisions, source and target digests, ancestry and before/after units. Accounting and eligibility verdicts never certify current truth or promotion. Unchanged accepted verdicts are not reopened. Section (a) closes Step 8 when accepted and applied; section (b) separately closes main-merge accounting when accepted and applied, subject to a native sync of the runner commit. Runner RUL98/99/100 are deferred to Step 9, never carried in this packet.
+Choose no author-provided seed or verdict: none is supplied. Reviewer independently chooses all seeds, draws and verdicts. Deep-read every changed-text/digest row; match full shown decisions, source and target digests, ancestry and before/after units. Accounting and eligibility verdicts never certify current truth or promotion. Unchanged accepted verdicts are not reopened. Section (a) closes Step 8 when accepted and applied; section (b) separately closes main-merge accounting when accepted and applied, with native sync and list equality at content commit 7854cff84 now proved. Runner RUL98/99/100 are deferred to Step 9, never carried in this packet.
 
-Native current-working-state sync/list equality remain **UNPROVEN** under the no-git-write boundary. The one sync covers HEAD af0057e13. Inspect [verification](step8-final-verification.json) and raw native/overlay outputs; a green overlay cannot substitute for native evidence. This is a concrete review packet, not closure.
+Native committed-tree sync/list equality now **PASS** at `7854cff84`. Inspect [current native verification](step8-committed-native-verification.json); prior overlay evidence is historical. This remains a pending independent review packet.
 
 Full machine packet: [review-request-261015-1526-specs-ui-reworks-main-recarry.md.json](review-request-261015-1526-specs-ui-reworks-main-recarry.md.json). [Before/after accounting](step8-final-rework-accounting.json). [Manifest hashes](step8-final-manifest-sidecar.json).
 
@@ -9449,17 +9449,23 @@ Channel: plan-b-repin. Status: pending.
 
 ## Verification and remaining work
 
-One HEAD native sync: 548.859s; 98457 → 98462 known IDs, no loss; compact registry persisted once (61570791 bytes).
+One background native sync at **7854cff84d8bcb67075d4f9c09cd0b6d04808ff4**: **550.181s**, 4467 files / 90774 claims; known IDs **98462 → 98470**, zero loss. Compact registry persisted **once**, 61576932 bytes, SHA256 `b9b4f20ce368ed76b314e84bce31dc7ee0ac32764e9fe9795bdc8f9424a259e7`. Native inventory, active registry and applied identity/path/anchor/digest tuples equal. Seven new candidate identity gaps remain explicit in [gap accounting](step8-committed-native-gap-accounting.json), without identity graft or approval carry.
 
-Native and overlay D/E with both priors and each separately:
-
-| Run | Native fatal | Overlay structural fatal |
+| Run | Native fatal | Structural fatal |
 |---|---:|---:|
-| D-both | 36 | 0 |
-| E-both | 39 | 0 |
-| D-identity | 36 | 0 |
-| E-identity | 39 | 0 |
-| D-phase02 | 36 | 0 |
-| E-phase02 | 39 | 0 |
+| D-both | 0 | 0 |
+| E-both | 3 | 0 |
+| D-identity | 0 | 0 |
+| E-identity | 3 | 0 |
+| D-phase02 | 0 | 0 |
+| E-phase02 | 3 | 0 |
 
-Native failures and open categories remain visible in raw outputs. Current native candidate tuple equality is not certified. Working overlay lists match across all three strict E overlays; IDs newly produced in an overlay are provisional. 44/44 review/conservation tests pass with `env -u CLAUDE_CODE_SESSION_ID`, zero skips. Ratchet clean. No legacy source, checker, gate, vocabulary, extractor, baseline or .fgos workspace write; no git write. No component-boundary change. No promotion, retirement or cutover.
+D is zero fatal with both priors and each separately. Strict E covers the 27 Step 8 sources plus docs/io-contract.md, docs/specs/distribution.md, docs/architecture-manifest.json and docs/specs/work-state.md; it remains open with **37 claims-not-reviewed, 1 identical-units-multiple-owners, 867 candidate-blocks-unreferenced**, identical across the three runs. All 37 pending current source rows belong to the 105-entry request; no unexplained structural failure or pending current source outside it. Predecessor judgments remain the request's separate pending accounting channel. Contextual identical-group and candidate-unverified lists are explicit closure-allowed opens, never truth approvals.
+
+Full **claimId/path/anchor/unitDigest/fileStatus** equality passes against actual native applied inventory and all three E outputs (867 union tuples). Refreshed full batch lists: **specs-ui: 117 (0 changed tuples), packaging-distribution: 694 (0 changed tuples), root-authorities: 846 (20 changed tuples)**. File status derives from pinned bytes and constitution; all rows pass existing candidate eligibility. Historical list/review metadata stays historical.
+
+All **105 request entries** match committed text/digests/ancestry and unchanged decisions; five complete-file SHA256 values match. The existing request retains **(a) Step 8 reworks, 18 entries; (b) main re-carry, 87 entries**. Reviewer supplies every verdict, seed and draw. Independent review/application remains pending; full truth at promotion, Rings holds, A34 residuals, token checkpoint, fresh-reader/isolation limits and navigation/consumer/alias/cutover obligations remain. Runner RUL98/99/100 stay deferred to Step 9.
+
+Tests: **44/44 pass**, zero fail/skip/cancel/todo, `env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/scripts/doc-decision-conservation.test.mjs test/scripts/doc-decision-review.test.mjs test/scripts/doc-review-format.test.mjs`. No docs or decision content, gate/checker/vocabulary/extractor/baseline, .fgos workspace, secrets, lifecycle or git write. Scratch only /tmp/fgos-work; runner owns commit. Native proof blocker is resolved; independent review is the remaining closure dependency. MDView MCP unavailable; preview omitted under the assignment's write boundary.
+
+Proof: [native verification](step8-committed-native-verification.json), [binding proof](step8-committed-request-binding-proof.json), [sync log](step8-committed-native-sync.log), [tests](step8-committed-tests.log).

@@ -1,3 +1,30 @@
+# Committed native proof complete — bounded independent review pending
+
+One background native sync at **7854cff84d8bcb67075d4f9c09cd0b6d04808ff4**: **550.181s**, 4467 files / 90774 claims; known IDs **98462 → 98470**, zero loss. Compact registry persisted **once**, 61576932 bytes, SHA256 `b9b4f20ce368ed76b314e84bce31dc7ee0ac32764e9fe9795bdc8f9424a259e7`. Native inventory, active registry and applied identity/path/anchor/digest tuples equal. Seven new candidate identity gaps remain explicit in [gap accounting](step8-committed-native-gap-accounting.json), without identity graft or approval carry.
+
+| Run | Native fatal | Structural fatal |
+|---|---:|---:|
+| D-both | 0 | 0 |
+| E-both | 3 | 0 |
+| D-identity | 0 | 0 |
+| E-identity | 3 | 0 |
+| D-phase02 | 0 | 0 |
+| E-phase02 | 3 | 0 |
+
+D is zero fatal with both priors and each separately. Strict E covers the 27 Step 8 sources plus docs/io-contract.md, docs/specs/distribution.md, docs/architecture-manifest.json and docs/specs/work-state.md; it remains open with **37 claims-not-reviewed, 1 identical-units-multiple-owners, 867 candidate-blocks-unreferenced**, identical across the three runs. All 37 pending current source rows belong to the 105-entry request; no unexplained structural failure or pending current source outside it. Predecessor judgments remain the request's separate pending accounting channel. Contextual identical-group and candidate-unverified lists are explicit closure-allowed opens, never truth approvals.
+
+Full **claimId/path/anchor/unitDigest/fileStatus** equality passes against actual native applied inventory and all three E outputs (867 union tuples). Refreshed full batch lists: **specs-ui: 117 (0 changed tuples), packaging-distribution: 694 (0 changed tuples), root-authorities: 846 (20 changed tuples)**. File status derives from pinned bytes and constitution; all rows pass existing candidate eligibility. Historical list/review metadata stays historical.
+
+All **105 request entries** match committed text/digests/ancestry and unchanged decisions; five complete-file SHA256 values match. The existing request retains **(a) Step 8 reworks, 18 entries; (b) main re-carry, 87 entries**. Reviewer supplies every verdict, seed and draw. Independent review/application remains pending; full truth at promotion, Rings holds, A34 residuals, token checkpoint, fresh-reader/isolation limits and navigation/consumer/alias/cutover obligations remain. Runner RUL98/99/100 stay deferred to Step 9.
+
+Tests: **44/44 pass**, zero fail/skip/cancel/todo, `env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/scripts/doc-decision-conservation.test.mjs test/scripts/doc-decision-review.test.mjs test/scripts/doc-review-format.test.mjs`. No docs or decision content, gate/checker/vocabulary/extractor/baseline, .fgos workspace, secrets, lifecycle or git write. Scratch only /tmp/fgos-work; runner owns commit. Native proof blocker is resolved; independent review is the remaining closure dependency. MDView MCP unavailable; preview omitted under the assignment's write boundary.
+
+Proof: [native verification](step8-committed-native-verification.json), [binding proof](step8-committed-request-binding-proof.json), [sync log](step8-committed-native-sync.log), [tests](step8-committed-tests.log).
+
+**Request:** [review-request-261015-1526-specs-ui-reworks-main-recarry.md](review-request-261015-1526-specs-ui-reworks-main-recarry.md), **105 entries (a: 18; b: 87)**, content pinned to `7854cff84d8bcb67075d4f9c09cd0b6d04808ff4`. This checkpoint supersedes prior native-blocked/provisional checkpoints; their text and raw artifacts below remain historical. No new owner-direction blocker.
+
+---
+
 # Candidate corrections and main re-carry prepared — committed-working-state native proof blocked
 
 Assignment unit-run-1792052396770-6f1c5957/producer/1. Input **af0057e1347f180e699d6580e7fe5d50c9319899** (Lead main merge af0057e13); prior independent bounded review **88a1f4720**, 96 ok / 5 rework. This checkpoint supersedes counts above/below at earlier pins; all earlier entries are historical.
