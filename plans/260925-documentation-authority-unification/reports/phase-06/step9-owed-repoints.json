@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "sourceCommit": "63fa6f15266f45c881f610235e0be8d61ff07120",
+  "candidateStatusFindings": [
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/runner/architecture/h-69197b459754.md",
+      "message": "link target does not exist: ../../src/runner/dispatch/assignment-layout.mjs",
+      "rule": "A19 carriage now; P6/Step 10 candidate link pass before promotion",
+      "status": "open",
+      "owner": "Runner documentation migration owner",
+      "done": "Repoint to extant intended target, list post-review edit and rebind changed rows; independent re-review when bytes change."
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/runner/architecture/h-69197b459754.md",
+      "message": "link target does not exist: ../../test/fixtures/run-layout/expected.json",
+      "rule": "A19 carriage now; P6/Step 10 candidate link pass before promotion",
+      "status": "open",
+      "owner": "Runner documentation migration owner",
+      "done": "Repoint to extant intended target, list post-review edit and rebind changed rows; independent re-review when bytes change."
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/runner/architecture/h-69197b459754.md",
+      "message": "link target does not exist: ../../plans/reports/observe-unit-summary-stance-prior-art-261005.md",
+      "rule": "A19 carriage now; P6/Step 10 candidate link pass before promotion",
+      "status": "open",
+      "owner": "Runner documentation migration owner",
+      "done": "Repoint to extant intended target, list post-review edit and rebind changed rows; independent re-review when bytes change."
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/runner/architecture/h-7af1f0242611.md",
+      "message": "link target does not exist: ../architect/agent-coordination/architecture/dispatch-control-plane.md",
+      "rule": "A19 carriage now; P6/Step 10 candidate link pass before promotion",
+      "status": "open",
+      "owner": "Runner documentation migration owner",
+      "done": "Repoint to extant intended target, list post-review edit and rebind changed rows; independent re-review when bytes change."
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "message": "link target does not exist: ./confinement-authority.md",
+      "rule": "A19 carriage now; P6/Step 10 candidate link pass before promotion",
+      "status": "open",
+      "owner": "Runner documentation migration owner",
+      "done": "Repoint to extant intended target, list post-review edit and rebind changed rows; independent re-review when bytes change."
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "message": "link target does not exist: ../../plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/acceptance-herdr.md",
+      "rule": "A19 carriage now; P6/Step 10 candidate link pass before promotion",
+      "status": "open",
+      "owner": "Runner documentation migration owner",
+      "done": "Repoint to extant intended target, list post-review edit and rebind changed rows; independent re-review when bytes change."
+    }
+  ],
+  "cutover": [
+    {
+      "path": "test/docs/decisions-corpus-retired.test.mjs",
+      "owner": "Cutover/test owner",
+      "rule": "Lead decision 6 / P6",
+      "action": "Repoint the narrative source to candidate decision carrier at cutover; preserve exact-heading assertions, do not rewrite them.",
+      "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "done": "Same 34 ADR heading and 0032 / retired-history heading assertions pass against retained target."
+    },
+    {
+      "path": "docs/specs/runner.md",
+      "owner": "Runner source/cutover owner",
+      "rule": "A19 / earlier owner queue",
+      "action": "At cutover repoint RUL40 to docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md; dispatch-redesign pointers to docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md; preserve group-thinking-plan-loop as historical with system-architecture history proposal and archive/plans provenance. Self-line citations need anchor resolution, not stale line arithmetic.",
+      "done": "All inbound/outbound consumer and alias routes classified and independently verified; no legacy edits during candidate carriage."
+    }
+  ],
+  "linksRewritten": false
+}

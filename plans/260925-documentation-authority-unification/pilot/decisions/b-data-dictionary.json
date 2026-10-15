@@ -1798,13 +1798,19 @@
       "targetAnchor": "unheaded-block-27",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Cursor pagination superset (adds permanent list --all --json exception and side-log narrowing) is carried verbatim; the io-contract short text follows it in the same section, so both sources are present.",
+      "reviewNote": "deep: disposition restored to merge with the previously reviewed rationale word for word; only anchor (26 to 27) and digests differ from the reviewed form; source block 69 byte-equal to target block 27 (2140755c)",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1625-specs-ui-nine-decision-reworks.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9",
       "targetAncestry": [
         "CLI I/O Contract",
         "6. Cursor Pagination"
-      ]
+      ],
+      "reviewReportCommit": "63fa6f15266f45c881f610235e0be8d61ff07120"
     },
     {
       "claimId": "claim_5dcb56608e17caeb53c197186ae33827",
@@ -1814,13 +1820,19 @@
       "targetAnchor": "unheaded-block-36",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "csv versus json-array multiValueFormat rule is stated in both sources; candidate carries both texts under the H2 8. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
+      "reviewNote": "deep: disposition restored to merge with the reviewed rationale unchanged (the reviewed text still ends with a stale pending re-carry boilerplate sentence, harmless); source block 70 byte-equal to target block 36 (3964ac13), anchor ok",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1625-specs-ui-nine-decision-reworks.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62",
       "targetAncestry": [
         "CLI I/O Contract",
         "8. Multi-Value Flag Convention"
-      ]
+      ],
+      "reviewReportCommit": "63fa6f15266f45c881f610235e0be8d61ff07120"
     },
     {
       "claimId": "claim_6fe86521fead9cec7253443e3275a3cf",
@@ -1830,13 +1842,19 @@
       "targetAnchor": "unheaded-block-40",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Runs-when / Blocked-when bullets of per-verb help are carried verbatim; kept as contract since it is a CLI surface guarantee. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
+      "reviewNote": "deep: disposition restored to promote with the reviewed rationale unchanged; source block 73 byte-equal to target block 40 (a1c9e2eb), anchor ok; promote legal since the unit stays a contract in the platform tree",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1625-specs-ui-nine-decision-reworks.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798",
       "targetAncestry": [
         "CLI I/O Contract",
         "9. Per-Verb Help"
-      ]
+      ],
+      "reviewReportCommit": "63fa6f15266f45c881f610235e0be8d61ff07120"
     },
     {
       "claimId": "claim_a374334e7c5dc565cac42c0fa641f78f",
@@ -1962,16 +1980,22 @@
       "targetAnchor": "unheaded-block-30",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Manifest fields are combined from work-state and io-contract in the single Manifest Shape section; the work-state contribution includes the positional-parameter rule. The source schema_version 2.0 sentence is represented by the corrected schema_version 3.0 successor, with the complete fields carried. The reviewed merge disposition is restored: vocabulary merge combines multiple sources and does not require byte equality. The anchor shift changes no target text in this turn.",
       "sourcePath": "docs/specs/work-state.md",
       "sourceAnchor": "unheaded-block-66",
+      "reviewNote": "deep: merge restored; rationale rewritten truthfully (not the earlier 2.0 verbatim claim): diff of 977509d5f block 66 against target block 30 is only the schema_version 2.0 to 3.0 history sentence, and the positional-parameter rule is in the target; 2.0 to 3.0 stated as correction, vocabulary merge needs no byte equality; target 878d708d and anchor ok",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1625-specs-ui-nine-decision-reworks.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "878d708db7a0afb3e23a0829f98be122c83ac562946b51ab1989e73e5e4a8bfe",
       "targetAncestry": [
         "CLI I/O Contract",
         "7. Machine-Readable Verb Registry",
         "Manifest Shape"
-      ]
+      ],
+      "reviewReportCommit": "63fa6f15266f45c881f610235e0be8d61ff07120"
     }
   ]
 }

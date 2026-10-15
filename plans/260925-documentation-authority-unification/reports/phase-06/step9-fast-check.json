@@ -1,0 +1,181 @@
+{
+  "version": 1,
+  "method": "Scoped FAST D/E only: unchanged applyDecisions, validateAgainstVocabulary and checkConservation on a working-tree overlay. Not native committed-tree coverage or registry identity proof. No native sync, registry persistence or review packs.",
+  "sourceCommit": "63fa6f15266f45c881f610235e0be8d61ff07120",
+  "sourceBlob": "ddfa78cc7183cf1f7db8ee64d2339653a0aa0023",
+  "scopeArguments": [
+    "--scope",
+    "docs/specs/runner.md"
+  ],
+  "registry": {
+    "path": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+    "bytes": 61576932,
+    "sha256": "b9b4f20ce368ed76b314e84bce31dc7ee0ac32764e9fe9795bdc8f9424a259e7",
+    "unchanged": true
+  },
+  "runs": [
+    {
+      "label": "both",
+      "D": {
+        "fatalFindings": [],
+        "count": 0
+      },
+      "E": {
+        "structuralFatal": [],
+        "conservationOpen": [
+          {
+            "type": "claims-not-reviewed",
+            "message": "claim rows whose reviewStatus is not reviewed",
+            "count": 495,
+            "examples": [
+              "docs/specs/runner.md#unheaded-block-1",
+              "docs/specs/runner.md#spec-runner-vòng-tự-hành",
+              "docs/specs/runner.md#dispatch-runtime-inspection",
+              "docs/specs/runner.md#guard-reconciliation",
+              "docs/specs/runner.md#unheaded-block-2"
+            ]
+          },
+          {
+            "type": "registry-gaps-without-disposition",
+            "message": "registry identity-gap rows with no vocabulary disposition",
+            "count": 32,
+            "examples": [
+              "docs/specs/runner.md#unheaded-block-100",
+              "docs/specs/runner.md#unheaded-block-102",
+              "docs/specs/runner.md#unheaded-block-118",
+              "docs/specs/runner.md#unheaded-block-124",
+              "docs/specs/runner.md#unheaded-block-127"
+            ]
+          },
+          {
+            "type": "candidate-blocks-unreferenced",
+            "message": "candidate conservation units not named by a source decision",
+            "count": 62,
+            "examples": [
+              "docs/platform/runner/spec.md#unheaded-block-2",
+              "docs/platform/runner/spec.md#unheaded-block-3",
+              "docs/platform/runner/architecture/h-e53a3a9829a8.md#added-in-candidate-runner-dispatch-runtime-inspection",
+              "docs/platform/runner/architecture/h-e53a3a9829a8.md#unheaded-block-1",
+              "docs/platform/runner/architecture/h-e53a3a9829a8.md#unheaded-block-2"
+            ]
+          }
+        ],
+        "strictGreen": false
+      }
+    },
+    {
+      "label": "identity",
+      "D": {
+        "fatalFindings": [],
+        "count": 0
+      },
+      "E": {
+        "structuralFatal": [],
+        "conservationOpen": [
+          {
+            "type": "claims-not-reviewed",
+            "message": "claim rows whose reviewStatus is not reviewed",
+            "count": 495,
+            "examples": [
+              "docs/specs/runner.md#unheaded-block-1",
+              "docs/specs/runner.md#spec-runner-vòng-tự-hành",
+              "docs/specs/runner.md#dispatch-runtime-inspection",
+              "docs/specs/runner.md#guard-reconciliation",
+              "docs/specs/runner.md#unheaded-block-2"
+            ]
+          },
+          {
+            "type": "registry-gaps-without-disposition",
+            "message": "registry identity-gap rows with no vocabulary disposition",
+            "count": 32,
+            "examples": [
+              "docs/specs/runner.md#unheaded-block-100",
+              "docs/specs/runner.md#unheaded-block-102",
+              "docs/specs/runner.md#unheaded-block-118",
+              "docs/specs/runner.md#unheaded-block-124",
+              "docs/specs/runner.md#unheaded-block-127"
+            ]
+          },
+          {
+            "type": "candidate-blocks-unreferenced",
+            "message": "candidate conservation units not named by a source decision",
+            "count": 62,
+            "examples": [
+              "docs/platform/runner/spec.md#unheaded-block-2",
+              "docs/platform/runner/spec.md#unheaded-block-3",
+              "docs/platform/runner/architecture/h-e53a3a9829a8.md#added-in-candidate-runner-dispatch-runtime-inspection",
+              "docs/platform/runner/architecture/h-e53a3a9829a8.md#unheaded-block-1",
+              "docs/platform/runner/architecture/h-e53a3a9829a8.md#unheaded-block-2"
+            ]
+          }
+        ],
+        "strictGreen": false
+      }
+    },
+    {
+      "label": "phase02",
+      "D": {
+        "fatalFindings": [],
+        "count": 0
+      },
+      "E": {
+        "structuralFatal": [],
+        "conservationOpen": [
+          {
+            "type": "claims-not-reviewed",
+            "message": "claim rows whose reviewStatus is not reviewed",
+            "count": 495,
+            "examples": [
+              "docs/specs/runner.md#unheaded-block-1",
+              "docs/specs/runner.md#spec-runner-vòng-tự-hành",
+              "docs/specs/runner.md#dispatch-runtime-inspection",
+              "docs/specs/runner.md#guard-reconciliation",
+              "docs/specs/runner.md#unheaded-block-2"
+            ]
+          },
+          {
+            "type": "registry-gaps-without-disposition",
+            "message": "registry identity-gap rows with no vocabulary disposition",
+            "count": 32,
+            "examples": [
+              "docs/specs/runner.md#unheaded-block-100",
+              "docs/specs/runner.md#unheaded-block-102",
+              "docs/specs/runner.md#unheaded-block-118",
+              "docs/specs/runner.md#unheaded-block-124",
+              "docs/specs/runner.md#unheaded-block-127"
+            ]
+          },
+          {
+            "type": "candidate-blocks-unreferenced",
+            "message": "candidate conservation units not named by a source decision",
+            "count": 62,
+            "examples": [
+              "docs/platform/runner/spec.md#unheaded-block-2",
+              "docs/platform/runner/spec.md#unheaded-block-3",
+              "docs/platform/runner/architecture/h-e53a3a9829a8.md#added-in-candidate-runner-dispatch-runtime-inspection",
+              "docs/platform/runner/architecture/h-e53a3a9829a8.md#unheaded-block-1",
+              "docs/platform/runner/architecture/h-e53a3a9829a8.md#unheaded-block-2"
+            ]
+          }
+        ],
+        "strictGreen": false
+      }
+    }
+  ],
+  "stats": {
+    "sourceRows": 495,
+    "checkedBindings": 495,
+    "pending": 495,
+    "mappedFiles": 16,
+    "candidateFiles": 17,
+    "oneH1PerCandidate": true,
+    "fullP3Headers": true,
+    "allHeadingTitlesAndLevelsVerbatim": true,
+    "sourceRuleIds": 94,
+    "allRuleIdsRetained": true,
+    "sourceSegmentsReconstruct": true,
+    "fullSourceTextCarried": true
+  },
+  "preliminaryReverseCount": 62,
+  "reverseEqualAcrossPriors": true
+}

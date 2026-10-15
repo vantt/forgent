@@ -1,0 +1,50 @@
+{
+  "counts": {
+    "files": 607,
+    "byStatus": {
+      "promoted": 3,
+      "candidate": 213,
+      "legacy-current": 0,
+      "non-authority": 1,
+      "unrouted": 390
+    },
+    "exemptUnrouted": 302,
+    "checked": 216,
+    "findings": 6,
+    "byType": {
+      "unresolved-link": 6
+    }
+  },
+  "findings": [
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/runner/architecture/h-69197b459754.md",
+      "message": "link target does not exist: ../../src/runner/dispatch/assignment-layout.mjs"
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/runner/architecture/h-69197b459754.md",
+      "message": "link target does not exist: ../../test/fixtures/run-layout/expected.json"
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/runner/architecture/h-69197b459754.md",
+      "message": "link target does not exist: ../../plans/reports/observe-unit-summary-stance-prior-art-261005.md"
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/runner/architecture/h-7af1f0242611.md",
+      "message": "link target does not exist: ../architect/agent-coordination/architecture/dispatch-control-plane.md"
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "message": "link target does not exist: ./confinement-authority.md"
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "message": "link target does not exist: ../../plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/acceptance-herdr.md"
+    }
+  ]
+}

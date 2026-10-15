@@ -1,3 +1,11 @@
+# Eight re-review verdicts applied — one rationale remains pending
+
+At main sync `63fa6f152`, applied all **8 ok** verdicts from `41f8a8feb` with verbatim notes through unchanged ordinary `applyReviewVerdicts`. Docs content remains pinned to `7854cff84`; reviewed request `0be68ebeb`. [Application record](step8-last-rationale-application.json) retains all eight exact decisions and the report Notes verbatim.
+
+`claim_e597b776163803dcf6e4194962ea4f6e` remains pending: its corrected rationale now names both the review/approve/run examples and the new three-line `subcommands` bullet, absent from the historical source. Digests and binding are unchanged; no approval carry. [One-row bounded re-review](review-request-261015-1653-specs-ui-last-rationale.md). **Step 8 closes when that row is independently accepted and applied.** Runner authoring proceeds under the explicit Lead assignment; this does not declare Step 8 closed. Earlier evidence/checkpoint text below is historical.
+
+---
+
 # Accepted verdicts applied — nine corrected decisions await independent review
 
 Assignment `unit-run-1792056203419-9b5bd055/producer/1`. Input/review report commit **0e8ce7710ac67ad038927b242b2461876bf8c90d**. Request reviewed at **0068ed498417177761c43319a0da1171e90d2613**; all source/target docs remain pinned to **7854cff84d8bcb67075d4f9c09cd0b6d04808ff4**. This checkpoint supersedes earlier current counts; all older checkpoints and their raw proof remain historical.

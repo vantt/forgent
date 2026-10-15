@@ -807,17 +807,23 @@
       "targetAnchor": "unheaded-block-32",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The fgos --help --json manifest contract is combined with the work-state manifest contribution under Manifest Shape. Its schema_version 2.0 source wording is represented by the corrected schema_version 3.0 successor, including commands and per-verb entries; work-state adds the positional-parameter rule. The reviewed merge disposition is restored: vocabulary merge combines multiple sources and does not require byte equality. The anchor shift changes no target text in this turn.",
       "authoredBy": "codex-session:unit-run-1792056203419-9b5bd055@2026-10-15",
       "sourcePath": "docs/io-contract.md",
       "sourceAnchor": "unheaded-block-18",
+      "reviewNote": "deep: merge restored with a truthful rationale; diff of 977509d5f io-contract block 18 against target block 32 is the 3.0 version sentence plus the added per-verb help --json and Rust host sentences, both covered by commands and per-verb entries wording; target 51dd3c8a and anchor ok",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1625-specs-ui-nine-decision-reworks.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "51dd3c8aa026a8f5a15e4c12c522b3bf2ad7c29238c49bf9ba51324806e10e23",
       "targetAncestry": [
         "CLI I/O Contract",
         "7. Machine-Readable Verb Registry",
         "Manifest Shape"
-      ]
+      ],
+      "reviewReportCommit": "63fa6f15266f45c881f610235e0be8d61ff07120"
     },
     {
       "claimId": "claim_e2377849e4ba8e3d3beaf70880e4ed23",

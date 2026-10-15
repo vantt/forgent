@@ -126,13 +126,19 @@
       "targetAnchor": "data-dictionary",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792056203419-9b5bd055@2026-10-15",
       "rationale": "The complete Data Dictionary section replaces the legacy section with the corrected Work item id sentence: id is optional for pick/graph, check is not a shipped skill, and behavior when id is unspecified follows the corrected row. The section therefore differs from its source and is supersede, consistent with the corrected sibling units; its whole current section is bound by digest and ancestry.",
+      "reviewNote": "deep: section differs from source only in the corrected Work item id row (check has no shipped skill, optional id for pick/graph); disposition now supersede matching corrected siblings claim_3459a397 and claim_511605d3 (both supersede in the same shard), rationale names the corrected row truthfully; target 80aad498 and anchor data-dictionary ok",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1625-specs-ui-nine-decision-reworks.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "80aad4984704cb2169f9b47f19b917eb49396d225f5ba07cd499b7ce6c68e015",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)"
-      ]
+      ],
+      "reviewReportCommit": "63fa6f15266f45c881f610235e0be8d61ff07120"
     },
     {
       "claimId": "claim_b78f1258e64bd182d527105502e087be",
@@ -724,13 +730,19 @@
       "targetAnchor": "actors-access",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792056203419-9b5bd055@2026-10-15",
       "rationale": "The complete Actors & Access section replaces the legacy section with the corrected capability row: check is not a shipped skill. The corrected sentence makes the whole section differ from its source, so supersede matches the corrected sibling units; the full section is retained and bound by digest and ancestry.",
+      "reviewNote": "deep: section differs only in the capability row (check removed, parenthetical added); supersede now matches siblings, rationale names the corrected row and is true; target b1405975 and anchor actors-access ok",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1625-specs-ui-nine-decision-reworks.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "b1405975f4c717c854a7bb988a6af790be278401ffa1d415b2a24ec69c442c50",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)"
-      ]
+      ],
+      "reviewReportCommit": "63fa6f15266f45c881f610235e0be8d61ff07120"
     },
     {
       "claimId": "claim_32b42cc343ea5bed231dbfd43ef4b433",

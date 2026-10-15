@@ -1,0 +1,55 @@
+✔ coverage honors explicit source paths and prefix maps but not target mentions or neighboring prefixes (1.326711ms)
+✔ rebind preserves review only for one digest match and otherwise returns rows to pending (0.310604ms)
+✔ snapshot uses merged decisions in the ledger schema shape and verifies both content and digest (1.916811ms)
+✔ identical text moved under another heading loses review while same-context anchor shifts retain it (0.131193ms)
+✔ coverage excludes canonical and non-authority items and a heading range covers only its rows (0.411772ms)
+✔ review pack contains full source and target units and reverse unmatched candidate blocks (2.043389ms)
+✔ seeded review uses six real text mutations and scores missed defects and false flags (8.294882ms)
+✔ review application binds current digest and keeps rework and hold pending without inventing approval (3.434717ms)
+✔ valid source digest prefixes survive pack and review application with full seen-text bindings (1.694679ms)
+✔ verdict table names the reviewer and requires an explicit verdict and own note for each row (0.499136ms)
+✔ unknown dispositions remain blocking after a hold verdict and pass decision validation (1.559542ms)
+✔ unknown dispositions remain blocking after a rework verdict and pass decision validation (0.763836ms)
+✔ the same reviewer session on another date is still the author session (0.17041ms)
+✔ pre-reviewed hand rows without committed evidence are rejected instead of skipped (0.206927ms)
+✔ a public seeded pack does not expose its replay inputs or retain original mutated digests (1.275662ms)
+✔ review application requires a passing sensitivity result for the exact shown pack (1.329669ms)
+✔ approval cannot attach to target text or heading ancestry changed after the pack (1.426098ms)
+✔ approved rows retain the seen unit binding and their own report across review rounds (1.163724ms)
+✔ sensitivity controls must belong to the bound batch even when the sensitivity score passes (1.15883ms)
+✔ reviewers receive full text and a unified diff in Markdown with safely nested fences (76.55338ms)
+✔ the public seeded Markdown can be scored without exposing the seed or private selection key (196.400414ms)
+✔ script-proven carries supply batch sensitivity controls without reopening accepted decisions (203.950099ms)
+✔ a new shard cannot claim legacy compatibility by deleting author fields (64.982222ms)
+✔ ordinary committed reviews approve seen text without a sensitivity pack and retain their report pin (178.912091ms)
+▶ ordinary reviews cannot approve a changed digest, an unauthored row or their own session
+  ✔ target-digest (73.232495ms)
+  ✔ source-digest (76.971821ms)
+  ✔ authoredBy (67.668121ms)
+  ✔ authorSession (75.036805ms)
+  ✔ same-session (69.793628ms)
+✔ ordinary reviews cannot approve a changed digest, an unauthored row or their own session (363.450014ms)
+▶ checkpoint reports cannot use the ordinary channel to omit sensitivity proof
+  ✔ checkpoint 3 (197.793339ms)
+  ✔ checkpoint 6 (187.746735ms)
+  ✔ checkpoint 10 (177.26468ms)
+✔ checkpoint reports cannot use the ordinary channel to omit sensitivity proof (563.406669ms)
+✔ the review lint accepts a well-formed ordinary report before application and writes nothing (74.753995ms)
+✔ the review lint uses the recorded target digest of an applied shard without an inventory (98.020779ms)
+▶ the review lint names the line and claim of each malformed verdict row
+  ✔ source-digest-not-64-hex (68.032783ms)
+  ✔ wrong-cell-count (73.249601ms)
+  ✔ non-bare-first-cell (68.626427ms)
+  ✔ target-digest-mismatch (86.934484ms)
+  ✔ source-digest-mismatch (83.832185ms)
+  ✔ bad-verdict (70.98691ms)
+✔ the review lint names the line and claim of each malformed verdict row (452.444355ms)
+✔ the review lint allows labelled non-claim rows but reports unknown claims and missing headers (217.148268ms)
+ℹ tests 44
+ℹ suites 0
+ℹ pass 44
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2545.543624

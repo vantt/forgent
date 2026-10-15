@@ -1,0 +1,126 @@
+{
+  "version": 1,
+  "sourceCommit": "63fa6f15266f45c881f610235e0be8d61ff07120",
+  "rules": [
+    "P2",
+    "explicit Lead decisions 1,3,4,7"
+  ],
+  "addedRows": [
+    {
+      "source": "docs/specs/runner.md#0047-p1-lõi-thực-thi-unit-một-bind-một-cửa-chạy-fgos-run-3-pattern-cộng-tác-đóng-4-mối-authority-l5-1-đã-bị-thay-một-phần-bởi-0061",
+      "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0047-p1-lõi-thực-thi-unit-một-bind-một-cửa-chạy-fgos-run-3-pattern-cộng-tác-đóng-4-mối-authority-l5-1-đã-bị-thay-một-phần-bởi-0061",
+      "kind": "decision",
+      "operation": "split",
+      "note": "Added in candidate — P2, explicit Lead map-growth decision at sync 63fa6f15266f45c881f610235e0be8d61ff07120. Direct units only; source heading verbatim, including partial-supersession suffixes. Placement under the source retired-history heading is not a retirement judgment. Source blob: `ddfa78cc7183cf1f7db8ee64d2339653a0aa0023`."
+    },
+    {
+      "source": "docs/specs/runner.md#0052-worker-không-bao-giờ-có-quyền-git-runner-commit-trên-mọi-đường-thay-mục-2-của-0051-đã-bị-thay-một-phần-bởi-0060",
+      "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0052-worker-không-bao-giờ-có-quyền-git-runner-commit-trên-mọi-đường-thay-mục-2-của-0051-đã-bị-thay-một-phần-bởi-0060",
+      "kind": "decision",
+      "operation": "split",
+      "note": "Added in candidate — P2, explicit Lead map-growth decision at sync 63fa6f15266f45c881f610235e0be8d61ff07120. Direct units only; source heading verbatim, including partial-supersession suffixes. Placement under the source retired-history heading is not a retirement judgment. Source blob: `ddfa78cc7183cf1f7db8ee64d2339653a0aa0023`."
+    },
+    {
+      "source": "docs/specs/runner.md#0055-panel-khác-họ-provider-giữa-các-ghế-là-ưu-tiên-mềm-bind-rải-ghế-theo-thứ-tự-prefer-reviewed-vẫn-cứng",
+      "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0055-panel-khác-họ-provider-giữa-các-ghế-là-ưu-tiên-mềm-bind-rải-ghế-theo-thứ-tự-prefer-reviewed-vẫn-cứng",
+      "kind": "decision",
+      "operation": "split",
+      "note": "Added in candidate — P2, explicit Lead map-growth decision at sync 63fa6f15266f45c881f610235e0be8d61ff07120. Direct units only; source heading verbatim, including partial-supersession suffixes. Placement under the source retired-history heading is not a retirement judgment. Source blob: `ddfa78cc7183cf1f7db8ee64d2339653a0aa0023`."
+    },
+    {
+      "source": "docs/specs/runner.md#0056---seats-chuyên-biệt-hoá-ghế-panel-bằng-lens-khi-khởi-động-không-thêm-workflow-yaml-hay-registry",
+      "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0056---seats-chuyên-biệt-hoá-ghế-panel-bằng-lens-khi-khởi-động-không-thêm-workflow-yaml-hay-registry",
+      "kind": "decision",
+      "operation": "split",
+      "note": "Added in candidate — P2, explicit Lead map-growth decision at sync 63fa6f15266f45c881f610235e0be8d61ff07120. Direct units only; source heading verbatim, including partial-supersession suffixes. Placement under the source retired-history heading is not a retirement judgment. Source blob: `ddfa78cc7183cf1f7db8ee64d2339653a0aa0023`."
+    },
+    {
+      "source": "docs/specs/runner.md#0057---seats-name-persona-có-tên-theo-ba-tầng-tra-cứu-ghim-nội-dung-lúc-start-gắn-đúng-một-ghế",
+      "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0057---seats-name-persona-có-tên-theo-ba-tầng-tra-cứu-ghim-nội-dung-lúc-start-gắn-đúng-một-ghế",
+      "kind": "decision",
+      "operation": "split",
+      "note": "Added in candidate — P2, explicit Lead map-growth decision at sync 63fa6f15266f45c881f610235e0be8d61ff07120. Direct units only; source heading verbatim, including partial-supersession suffixes. Placement under the source retired-history heading is not a retirement judgment. Source blob: `ddfa78cc7183cf1f7db8ee64d2339653a0aa0023`."
+    },
+    {
+      "source": "docs/specs/runner.md#0058-provider-failure-fails-over-inside-execution-core-another-account-of-the-same-provider-first-then-the-next-candidate",
+      "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0058-provider-failure-fails-over-inside-execution-core-another-account-of-the-same-provider-first-then-the-next-candidate",
+      "kind": "decision",
+      "operation": "split",
+      "note": "Added in candidate — P2, explicit Lead map-growth decision at sync 63fa6f15266f45c881f610235e0be8d61ff07120. Direct units only; source heading verbatim, including partial-supersession suffixes. Placement under the source retired-history heading is not a retirement judgment. Source blob: `ddfa78cc7183cf1f7db8ee64d2339653a0aa0023`."
+    },
+    {
+      "source": "docs/specs/runner.md#0059-a-domain-persona-pack-is-a-folder-what-a-seat-can-name-what-it-pinned-and-who-ran-it-are-each-stated-by-one-read",
+      "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0059-a-domain-persona-pack-is-a-folder-what-a-seat-can-name-what-it-pinned-and-who-ran-it-are-each-stated-by-one-read",
+      "kind": "decision",
+      "operation": "split",
+      "note": "Added in candidate — P2, explicit Lead map-growth decision at sync 63fa6f15266f45c881f610235e0be8d61ff07120. Direct units only; source heading verbatim, including partial-supersession suffixes. Placement under the source retired-history heading is not a retirement judgment. Source blob: `ddfa78cc7183cf1f7db8ee64d2339653a0aa0023`."
+    },
+    {
+      "source": "docs/specs/runner.md#0060-runner-commit-theo-writes-của-unit-một-matcher-preflight-index-resume-chỉ-commit-brief-ghi-file-nói-rõ-phạm-vi-thay-mục-1-2-của-0052",
+      "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0060-runner-commit-theo-writes-của-unit-một-matcher-preflight-index-resume-chỉ-commit-brief-ghi-file-nói-rõ-phạm-vi-thay-mục-1-2-của-0052",
+      "kind": "decision",
+      "operation": "split",
+      "note": "Added in candidate — P2, explicit Lead map-growth decision at sync 63fa6f15266f45c881f610235e0be8d61ff07120. Direct units only; source heading verbatim, including partial-supersession suffixes. Placement under the source retired-history heading is not a retirement judgment. Source blob: `ddfa78cc7183cf1f7db8ee64d2339653a0aa0023`."
+    },
+    {
+      "source": "docs/specs/runner.md#0061-unit-ad-hoc-được-preferpersona-mềm-one-liner-fgos-run-workflow-start---units--effort-unit-ghi-nối-nhánh-thay-một-phần-mục-1-của-0047",
+      "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0061-unit-ad-hoc-được-preferpersona-mềm-one-liner-fgos-run-workflow-start---units--effort-unit-ghi-nối-nhánh-thay-một-phần-mục-1-của-0047",
+      "kind": "decision",
+      "operation": "split",
+      "note": "Added in candidate — P2, explicit Lead map-growth decision at sync 63fa6f15266f45c881f610235e0be8d61ff07120. Direct units only; source heading verbatim, including partial-supersession suffixes. Placement under the source retired-history heading is not a retirement judgment. Source blob: `ddfa78cc7183cf1f7db8ee64d2339653a0aa0023`."
+    },
+    {
+      "source": "docs/specs/runner.md#0062-xoá-cửa-thô-dispatch-là-tầng-thấp-fanout-về-tầng-work-thay-phần-purpose-door-của-rul68-2-tầng-dispatch-và-phần-mỗi-cửa-một-lane-posture-của-rul77-posture-belongs-to-the-capability",
+      "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0062-xoá-cửa-thô-dispatch-là-tầng-thấp-fanout-về-tầng-work-thay-phần-purpose-door-của-rul68-2-tầng-dispatch-và-phần-mỗi-cửa-một-lane-posture-của-rul77-posture-belongs-to-the-capability",
+      "kind": "decision",
+      "operation": "split",
+      "note": "Added in candidate — P2, explicit Lead map-growth decision at sync 63fa6f15266f45c881f610235e0be8d61ff07120. Direct units only; source heading verbatim, including partial-supersession suffixes. Placement under the source retired-history heading is not a retirement judgment. Source blob: `ddfa78cc7183cf1f7db8ee64d2339653a0aa0023`."
+    },
+    {
+      "source": "docs/specs/runner.md#0063-work-chỉ-là-bên-dùng-dispatch-nhận-input-generic-thay-phần-đầu-vào-còn-lại-của-rul73-dispatch-does-not-know-work2",
+      "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0063-work-chỉ-là-bên-dùng-dispatch-nhận-input-generic-thay-phần-đầu-vào-còn-lại-của-rul73-dispatch-does-not-know-work2",
+      "kind": "decision",
+      "operation": "split",
+      "note": "Added in candidate — P2, explicit Lead map-growth decision at sync 63fa6f15266f45c881f610235e0be8d61ff07120. Direct units only; source heading verbatim, including partial-supersession suffixes. Placement under the source retired-history heading is not a retirement judgment. Source blob: `ddfa78cc7183cf1f7db8ee64d2339653a0aa0023`."
+    }
+  ],
+  "rebounds": [
+    {
+      "oldSource": "docs/specs/runner.md#0047-p1-lõi-thực-thi-unit-một-bind-một-cửa-chạy-fgos-run-3-pattern-cộng-tác-đóng-4-mối-authority-l5",
+      "oldTarget": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0047-p1-lõi-thực-thi-unit-một-bind-một-cửa-chạy-fgos-run-3-pattern-cộng-tác-đóng-4-mối-authority-l5",
+      "currentSource": "docs/specs/runner.md#0047-p1-lõi-thực-thi-unit-một-bind-một-cửa-chạy-fgos-run-3-pattern-cộng-tác-đóng-4-mối-authority-l5-1-đã-bị-thay-một-phần-bởi-0061",
+      "currentTarget": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0047-p1-lõi-thực-thi-unit-một-bind-một-cửa-chạy-fgos-run-3-pattern-cộng-tác-đóng-4-mối-authority-l5-1-đã-bị-thay-một-phần-bởi-0061",
+      "originalRow": "| `docs/specs/runner.md#0047-p1-lõi-thực-thi-unit-một-bind-một-cửa-chạy-fgos-run-3-pattern-cộng-tác-đóng-4-mối-authority-l5` | `docs/platform/runner/decisions/h-36d872fbb0e5.md#0047-p1-lõi-thực-thi-unit-một-bind-một-cửa-chạy-fgos-run-3-pattern-cộng-tác-đóng-4-mối-authority-l5` | decision | split | Direct units of this heading only; nested headings have their own explicit row. Original headings retained; any new subdivision is Added in candidate. Source blob: `473a009662f22fb5d745e6ae151136da324d0d5e`. |",
+      "rule": "P2 Lead decision: rebind stale source and target anchors; old row recorded as rebinding receipt, ownership now in additive current-heading row."
+    },
+    {
+      "oldSource": "docs/specs/runner.md#0052-worker-không-bao-giờ-có-quyền-git-runner-commit-trên-mọi-đường-thay-mục-2-của-0051",
+      "oldTarget": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0052-worker-không-bao-giờ-có-quyền-git-runner-commit-trên-mọi-đường-thay-mục-2-của-0051",
+      "currentSource": "docs/specs/runner.md#0052-worker-không-bao-giờ-có-quyền-git-runner-commit-trên-mọi-đường-thay-mục-2-của-0051-đã-bị-thay-một-phần-bởi-0060",
+      "currentTarget": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0052-worker-không-bao-giờ-có-quyền-git-runner-commit-trên-mọi-đường-thay-mục-2-của-0051-đã-bị-thay-một-phần-bởi-0060",
+      "originalRow": "| `docs/specs/runner.md#0052-worker-không-bao-giờ-có-quyền-git-runner-commit-trên-mọi-đường-thay-mục-2-của-0051` | `docs/platform/runner/decisions/h-36d872fbb0e5.md#0052-worker-không-bao-giờ-có-quyền-git-runner-commit-trên-mọi-đường-thay-mục-2-của-0051` | decision | split | Direct units of this heading only; nested headings have their own explicit row. Original headings retained; any new subdivision is Added in candidate. Source blob: `473a009662f22fb5d745e6ae151136da324d0d5e`. |",
+      "rule": "P2 Lead decision: rebind stale source and target anchors; old row recorded as rebinding receipt, ownership now in additive current-heading row."
+    }
+  ],
+  "activeMapRows": 166,
+  "sourceHeadings": 166,
+  "h1OwnedByDefault": true,
+  "mapTargets": [
+    "docs/platform/runner/spec.md",
+    "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+    "docs/platform/runner/subcomponents/h-ce5b9771a26a/spec.md",
+    "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+    "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md",
+    "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+    "docs/platform/runner/subcomponents/h-37aced3896a8/spec.md",
+    "docs/platform/runner/subcomponents/h-2e032393add1/spec.md",
+    "docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md",
+    "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+    "docs/platform/runner/architecture/h-7af1f0242611.md",
+    "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+    "docs/platform/runner/decisions/h-aabefc85f0c9.md",
+    "docs/platform/runner/architecture/h-69197b459754.md",
+    "docs/platform/runner/decisions/h-36d872fbb0e5.md"
+  ]
+}

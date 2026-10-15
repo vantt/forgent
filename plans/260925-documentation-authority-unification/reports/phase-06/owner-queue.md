@@ -408,3 +408,22 @@ Record-only from the committed 105-entry review Notes; outside the nine submitte
 | step10-host-invocation-stale-successor-digest | Host Invocation / Packaging-distribution | `claim_9c0e5bb670fb2957bb0998cbe5d8d51e`, `docs/platform/packaging-distribution/spec.md#unheaded-block-4`: recorded target digest `c14f83e85b43064dd321bf0926e6b98f781c23df08cf772ef8959a30837a2e18`, actual `fd8f41577cf07e6e6713f2a48792d88071e7fa072e87b32c08ec0be373173c6c` at `7854cff84d8bcb67075d4f9c09cd0b6d04808ff4`. Inspect and independently rebind; old approval cannot carry. | Step 10 link pass | Pre-existing stale binding; record only, no shard mutation and no new Step 8 request row. |
 
 [Complete old decision and current unit](step8-nine-rework-step10-open.json). Carried stale sentences named by the reviewer (io-contract manifest table schema 2.0, herdr R6/child-process rationale, decision-citation-drift R3 scope) remain owed at promotion.
+
+
+## Runner carriage obligations — 2026-10-15
+
+Source sync `63fa6f15266f45c881f610235e0be8d61ff07120`, blob `ddfa78cc7183cf1f7db8ee64d2339653a0aa0023`. This is an authoring checkpoint, not closure. Existing Lead decisions are recorded, not reopened.
+
+| Item | Rule / decision | Owner and trigger | Done proof / status |
+|---|---|---|---|
+| Map growth and stale anchors | P2; Lead 1 | Runner author at current sync | 11 Added in candidate rows, two old keys rebound with full prior-row receipt; current 165 non-H1 headings map, H1/default preserved. Done for carriage; pending review. |
+| Drift reading | Stop 6; Lead 2 | Runner owner every sync | 27/470 changed pin digests (5.7447%); new units are growth. Remeasure at each sync. |
+| Intro and large sections | P2/P3; Lead 3/4 | Runner author | Intro remains frozen-map architecture; 55,000-byte passes into same map files. No new split; exact headings/RUL ids retained. |
+| Stale sentences and self-lines | A19 + explicit Lead A35 note; Lead 5 | Truth reviewer after carriage, full truth at promotion | Carry verbatim; truth-ledger-runner.json and candidate-unverified-runner.json record current uncertainty. A28 reviewer-drawn 30-unit threshold remains. |
+| Retired corpus test | P6/cutover; Lead 6 | Cutover/test owner at atomic cutover | Repoint test/docs/decisions-corpus-retired.test.mjs to mapped narrative carrier; preserve assertions and all exact headings. Open. |
+| Shared coordination phrase has no mapped subcomponent | P2; Lead 7 | Phase-plan owner at report acceptance | Follow map now; record that phase text names a subcomponent absent from the map. No inferred ownership or component-boundary change. Open documentation gap, no carriage blocker. |
+| Native review package | P4/P6, A36 | Next turn at runner commit | One native sync, compact persistence only as authorized, D/E and five-field reverse-list equality, then bounded source (494 Weak-exact + 1 Judgment), liveness/triage and candidate-list requests. No Step 9 packs this turn. |
+| Existing source identity gaps | Conservation / A31 | Runner migration owner after native sync | 32 pre-existing gaps lacking dispositions in step9-existing-registry-gaps.json; find historical witnesses and account independently. Strict E remains open. |
+| Candidate relative links | A19 / P6 / Step 10 | Link-pass owner before promotion | Six findings in step9-owed-repoints.json; exact bytes carried now, repoint then rebind/re-review. Open. |
+
+No component-boundary change. Source consumers (41 code files citing RUL ids), aliases, exact-heading test repoint, earlier RUL40 / dispatch-redesign / group-thinking provenance repoints and final sync remain cutover obligations.

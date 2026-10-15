@@ -1,0 +1,3351 @@
+{
+  "version": 1,
+  "sourceCommit": "63fa6f15266f45c881f610235e0be8d61ff07120",
+  "sourceBlob": "ddfa78cc7183cf1f7db8ee64d2339653a0aa0023",
+  "reviewStatus": "pending",
+  "truthCertified": false,
+  "method": "Carriage pass only, A19. All current-by-default units are truth-review eligible; historical/decision placement does not rule out current assertions. Reviewer chooses the actual 30-unit sample, not the author. Full current truth at promotion.",
+  "currentByDefaultUnitCount": 181,
+  "currentByDefaultUnits": [
+    {
+      "claimId": "claim_a5f8435c8d549e5b41a34cf3e1f3e351",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-1",
+      "sourceLines": [
+        1,
+        7
+      ],
+      "sourceDigest": "6995106e543166fec7e46573ed70ab54a171c1d87f545ef19ade28df2cd97866",
+      "targetOwner": "docs/platform/runner/spec.md",
+      "targetAnchor": "unheaded-block-1",
+      "targetDigest": "6995106e543166fec7e46573ed70ab54a171c1d87f545ef19ade28df2cd97866",
+      "class": "Weak-exact",
+      "classReason": "document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_d8ac30166d62dd668cf76d7dfb0a8170",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "spec-runner-vòng-tự-hành",
+      "sourceLines": [
+        9,
+        9
+      ],
+      "sourceDigest": "a86d867279b4935bdfdfe419a3121f088ead4fe51ea0a62fbfec1da3949cb54c",
+      "targetOwner": "docs/platform/runner/spec.md",
+      "targetAnchor": "spec-runner-vòng-tự-hành",
+      "targetDigest": "8e268a88fd1470f40fe63c54b8f819ebdf8fcc3c539d6ad3165f39bd064ac705",
+      "class": "Judgment",
+      "classReason": "no target digest match",
+      "mandatoryDeep": true,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_db73c791da40554dda8dacd8405de722",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "dispatch-runtime-inspection",
+      "sourceLines": [
+        11,
+        11
+      ],
+      "sourceDigest": "5ed555b20633e3d02aab26557fd2c1a144c2cac1cc1da5e7048986c280cfa1e0",
+      "targetOwner": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+      "targetAnchor": "dispatch-runtime-inspection",
+      "targetDigest": "5ed555b20633e3d02aab26557fd2c1a144c2cac1cc1da5e7048986c280cfa1e0",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; source unit shorter than 40 characters; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_383a6485c1aaed79a640a59463183fe8",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "guard-reconciliation",
+      "sourceLines": [
+        13,
+        13
+      ],
+      "sourceDigest": "16c2b3dace9daab9a6d90e29bd7f00fbad2c313cbedb0e28ed031664fa81b255",
+      "targetOwner": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+      "targetAnchor": "guard-reconciliation",
+      "targetDigest": "16c2b3dace9daab9a6d90e29bd7f00fbad2c313cbedb0e28ed031664fa81b255",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; source unit shorter than 40 characters; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_9a0635bb67690683a0a7465eadae82af",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-2",
+      "sourceLines": [
+        15,
+        19
+      ],
+      "sourceDigest": "52b140cfe4f41a03526182348d228ca206a88dade16f7969fe3852284677c39a",
+      "targetOwner": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+      "targetAnchor": "unheaded-block-3",
+      "targetDigest": "52b140cfe4f41a03526182348d228ca206a88dade16f7969fe3852284677c39a",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_cdf8c5562fb083bbdccf7d8c03decb7a",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-3",
+      "sourceLines": [
+        21,
+        36
+      ],
+      "sourceDigest": "026046f0b0c9dff4fa16ad675837105849db185678d8263e091270e599c0ba72",
+      "targetOwner": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+      "targetAnchor": "unheaded-block-4",
+      "targetDigest": "026046f0b0c9dff4fa16ad675837105849db185678d8263e091270e599c0ba72",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_5d9ba2698cc42766513d2f6892f4456c",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-4",
+      "sourceLines": [
+        38,
+        42
+      ],
+      "sourceDigest": "8e07eb62e2a93097b82a4428a8f5bb3a2880bff4992130393b9b7783c4cccdc1",
+      "targetOwner": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+      "targetAnchor": "unheaded-block-5",
+      "targetDigest": "8e07eb62e2a93097b82a4428a8f5bb3a2880bff4992130393b9b7783c4cccdc1",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_a48d3e36ff3950e3637e7a0945d8a26a",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-5",
+      "sourceLines": [
+        44,
+        48
+      ],
+      "sourceDigest": "0eced0ecaa6ff9b75497aef41ccbf40df3e5435c41dd06de86afdc82047ce5c9",
+      "targetOwner": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+      "targetAnchor": "unheaded-block-6",
+      "targetDigest": "0eced0ecaa6ff9b75497aef41ccbf40df3e5435c41dd06de86afdc82047ce5c9",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_6dba9226798857c2c2eedd1837fc382b",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-6",
+      "sourceLines": [
+        50,
+        52
+      ],
+      "sourceDigest": "c46300ac8ef4f83a196a65ab08fc44def29be98df645c8321a7b0a310d05a8de",
+      "targetOwner": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+      "targetAnchor": "unheaded-block-7",
+      "targetDigest": "c46300ac8ef4f83a196a65ab08fc44def29be98df645c8321a7b0a310d05a8de",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_2073b7160c35c63c611d02087866ddec",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-7",
+      "sourceLines": [
+        54,
+        54
+      ],
+      "sourceDigest": "a0ac201ce63ad313f1e8cd2584ab6ffc111a74a4b25a96f24c3a1c939b4ddeb2",
+      "targetOwner": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+      "targetAnchor": "unheaded-block-8",
+      "targetDigest": "a0ac201ce63ad313f1e8cd2584ab6ffc111a74a4b25a96f24c3a1c939b4ddeb2",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_38036fa49508cc4b76e5e20fdb797a77",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "entry-points-triggers",
+      "sourceLines": [
+        56,
+        56
+      ],
+      "sourceDigest": "72526beea6ee0dab3fb182c1754440a8b37f4be2a7c4ffe734e7ef583c833b68",
+      "targetOwner": "docs/platform/runner/subcomponents/h-ce5b9771a26a/spec.md",
+      "targetAnchor": "entry-points-triggers",
+      "targetDigest": "72526beea6ee0dab3fb182c1754440a8b37f4be2a7c4ffe734e7ef583c833b68",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; source unit shorter than 40 characters; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_9e761df1b2c15fd9a0e722d1f0324a4a",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-8",
+      "sourceLines": [
+        58,
+        69
+      ],
+      "sourceDigest": "66c396e78df6e72f66e4870a5c211b0deff5387b6985d9362a528e94cbfcd8a6",
+      "targetOwner": "docs/platform/runner/subcomponents/h-ce5b9771a26a/spec.md",
+      "targetAnchor": "unheaded-block-3",
+      "targetDigest": "66c396e78df6e72f66e4870a5c211b0deff5387b6985d9362a528e94cbfcd8a6",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_552ef3d6e22bac10c24cc31e48463d50",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "data-dictionary",
+      "sourceLines": [
+        71,
+        71
+      ],
+      "sourceDigest": "b91663aeb373f3e9759bda7e8edf97edc512497d6d3adbf55ebdb6b8c7af5187",
+      "targetOwner": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+      "targetAnchor": "data-dictionary",
+      "targetDigest": "b91663aeb373f3e9759bda7e8edf97edc512497d6d3adbf55ebdb6b8c7af5187",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; source unit shorter than 40 characters; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_5a944093894be93c5792a1c5e14990c6",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-9",
+      "sourceLines": [
+        73,
+        87
+      ],
+      "sourceDigest": "43f03eb4dffdeff420f464531d60be7e37e13192429963b10ba302be1e9b777e",
+      "targetOwner": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+      "targetAnchor": "unheaded-block-3",
+      "targetDigest": "43f03eb4dffdeff420f464531d60be7e37e13192429963b10ba302be1e9b777e",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_2c3300909e21da9dd0feb02e991c5f0a",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "hợp-đồng-rigor-tier-phase-2-2026-10-01",
+      "sourceLines": [
+        89,
+        89
+      ],
+      "sourceDigest": "cfd79dea41e34baf7969fddba3e30ecc5666de6a7ee32a50dd97cf099bfd8448",
+      "targetOwner": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+      "targetAnchor": "hợp-đồng-rigor-tier-phase-2-2026-10-01",
+      "targetDigest": "cfd79dea41e34baf7969fddba3e30ecc5666de6a7ee32a50dd97cf099bfd8448",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_62d9996e5897714517de064047f1ff83",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-10",
+      "sourceLines": [
+        91,
+        91
+      ],
+      "sourceDigest": "2431683892c8c5b500b16f2b6cb61a09cdf6832f5955012397fd028aabaf5d73",
+      "targetOwner": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+      "targetAnchor": "unheaded-block-4",
+      "targetDigest": "2431683892c8c5b500b16f2b6cb61a09cdf6832f5955012397fd028aabaf5d73",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_0735a1a1ac2e5c08ab7dde6f393746f0",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-11",
+      "sourceLines": [
+        93,
+        93
+      ],
+      "sourceDigest": "940f6b04cc13b1d6f8fbd92cf30fab8804ad74f218ab9ca618ca424dba8583d6",
+      "targetOwner": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+      "targetAnchor": "unheaded-block-5",
+      "targetDigest": "940f6b04cc13b1d6f8fbd92cf30fab8804ad74f218ab9ca618ca424dba8583d6",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_092c6c62f6b2c014d24f74aca3dee571",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-12",
+      "sourceLines": [
+        95,
+        95
+      ],
+      "sourceDigest": "344985adb8cb7f6b7f62c1b4ef88be9a3d3f73e531130851c57fa9a9106d3c12",
+      "targetOwner": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+      "targetAnchor": "unheaded-block-6",
+      "targetDigest": "344985adb8cb7f6b7f62c1b4ef88be9a3d3f73e531130851c57fa9a9106d3c12",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_ec3f286e81c31817022a1caa3eebda54",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-13",
+      "sourceLines": [
+        97,
+        97
+      ],
+      "sourceDigest": "a52e7ad1d984e28c180b20e213675e16bd0225c3a2746cbe06a3f3f1168e63cb",
+      "targetOwner": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+      "targetAnchor": "unheaded-block-7",
+      "targetDigest": "a52e7ad1d984e28c180b20e213675e16bd0225c3a2746cbe06a3f3f1168e63cb",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_e9802a0cf16dad3c227c5159d457e3dd",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-14",
+      "sourceLines": [
+        99,
+        99
+      ],
+      "sourceDigest": "c9c5d3f64f4d2259f31180907787ac87bd85322dc67c1ae9a63bac140497ce41",
+      "targetOwner": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+      "targetAnchor": "unheaded-block-8",
+      "targetDigest": "c9c5d3f64f4d2259f31180907787ac87bd85322dc67c1ae9a63bac140497ce41",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_7a21644819481756f27864ae791d992f",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "behaviors-operations",
+      "sourceLines": [
+        101,
+        101
+      ],
+      "sourceDigest": "39a803b85af853156a7029460b132103eac8017b2b1b7eb0b82d181f699b86f3",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "behaviors-operations",
+      "targetDigest": "39a803b85af853156a7029460b132103eac8017b2b1b7eb0b82d181f699b86f3",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; source unit shorter than 40 characters; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_99328b57521ed5691733ccfb07a8a8ef",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "kiểm-tra-tiền-điều-kiện-lúc-khởi-động-repo-root-head-phải-resolve-được",
+      "sourceLines": [
+        103,
+        103
+      ],
+      "sourceDigest": "b48b297ef79c6722fdefed76b59feba2ce2501b155c61c42ae3d4075b650d669",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "kiểm-tra-tiền-điều-kiện-lúc-khởi-động-repo-root-head-phải-resolve-được",
+      "targetDigest": "b48b297ef79c6722fdefed76b59feba2ce2501b155c61c42ae3d4075b650d669",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_320d0101f32ca1c7ee7f6b5d307f4d07",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-15",
+      "sourceLines": [
+        105,
+        108
+      ],
+      "sourceDigest": "b7ef0d6ed40afb21591309ec13d89a5287c6787c63d3e33f6548e4c5051810f2",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-3",
+      "targetDigest": "b7ef0d6ed40afb21591309ec13d89a5287c6787c63d3e33f6548e4c5051810f2",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_f39e4d12f25ee15624fbe91c5f5494c5",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "một-vòng---once-hạnh-phúc",
+      "sourceLines": [
+        110,
+        110
+      ],
+      "sourceDigest": "a6819204e999f51369aec6f2e0af4da6c09741d645d97ce8aaa2ab874412be38",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "một-vòng---once-hạnh-phúc",
+      "targetDigest": "a6819204e999f51369aec6f2e0af4da6c09741d645d97ce8aaa2ab874412be38",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; source unit shorter than 40 characters; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_3f78ee0b030eedd2797c24ffe5c40984",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-16",
+      "sourceLines": [
+        112,
+        115
+      ],
+      "sourceDigest": "2bc3d1aca72c5050ce1aa4f7c9aacd12b459c7dffd004ce68795c79d1cea5739",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-4",
+      "targetDigest": "2bc3d1aca72c5050ce1aa4f7c9aacd12b459c7dffd004ce68795c79d1cea5739",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_b959eede39e94094af895e70dd5eb8bf",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "vòng-cầm-giao-bền---watch-str7-str8-priority-intent",
+      "sourceLines": [
+        117,
+        117
+      ],
+      "sourceDigest": "384d3e845064d0c9958ceb5757a96b7644512f7ff69ddefbabab6d4a8ed80a81",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "vòng-cầm-giao-bền---watch-str7-str8-priority-intent",
+      "targetDigest": "384d3e845064d0c9958ceb5757a96b7644512f7ff69ddefbabab6d4a8ed80a81",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_c08649cbbf926cfe051d6ff44a8a59a3",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-17",
+      "sourceLines": [
+        119,
+        123
+      ],
+      "sourceDigest": "88c7a6c10418d546d1ec862c4368ffc4b93142064d7d8b1a9d280c56e6c025ef",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-5",
+      "targetDigest": "88c7a6c10418d546d1ec862c4368ffc4b93142064d7d8b1a9d280c56e6c025ef",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_d06a95f38d682c48135481fd702e5c26",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "giao-việc-theo-mẻ-song-song-có-giới-hạn-giữ-quyền-sở-hữu-gốc",
+      "sourceLines": [
+        125,
+        125
+      ],
+      "sourceDigest": "1eb8d70495713021803680d977e3d8788012c662e03b0b01aaff56cdc3fb53ff",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "giao-việc-theo-mẻ-song-song-có-giới-hạn-giữ-quyền-sở-hữu-gốc",
+      "targetDigest": "1eb8d70495713021803680d977e3d8788012c662e03b0b01aaff56cdc3fb53ff",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_d54b53375cadadc43742330bb2152220",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-18",
+      "sourceLines": [
+        127,
+        130
+      ],
+      "sourceDigest": "eabad82f74d0335435cf2ade58ea75de2a3e0e79180bee618a16a5dbcdc5cac0",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-6",
+      "targetDigest": "eabad82f74d0335435cf2ade58ea75de2a3e0e79180bee618a16a5dbcdc5cac0",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_d5ce63220d7ec853681b441183511c8d",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "cây-nhánh-tích-hợp-con-nhập-vào-nhánh-của-gốc-chỉ-gốc-nhập-vào-cây-chính",
+      "sourceLines": [
+        132,
+        132
+      ],
+      "sourceDigest": "b07c69bd296947367e0db70b6e6d4533d2ae58f471b3f6080198fae6c35f0f4a",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "cây-nhánh-tích-hợp-con-nhập-vào-nhánh-của-gốc-chỉ-gốc-nhập-vào-cây-chính",
+      "targetDigest": "b07c69bd296947367e0db70b6e6d4533d2ae58f471b3f6080198fae6c35f0f4a",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_f8757d828c667b842aebe376738018d8",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-19",
+      "sourceLines": [
+        134,
+        136
+      ],
+      "sourceDigest": "1682c15966714eeded330aa91328a6d32c1085a505250c1f433be92ca10976d5",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-7",
+      "targetDigest": "1682c15966714eeded330aa91328a6d32c1085a505250c1f433be92ca10976d5",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_d0ce89d8c38063d33b92edd554e0dc23",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "trôi-tích-hợp-đồng-bộ-lại-tại-gốccây-chính-integration-drift",
+      "sourceLines": [
+        138,
+        138
+      ],
+      "sourceDigest": "f679182359db641d3c0bd27210abb9c79ad9d7c3fbe8cb90156d47f64a99c907",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "trôi-tích-hợp-đồng-bộ-lại-tại-gốccây-chính-integration-drift",
+      "targetDigest": "f679182359db641d3c0bd27210abb9c79ad9d7c3fbe8cb90156d47f64a99c907",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_ac7e9d06c339f6f69a94e21755c315d3",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-20",
+      "sourceLines": [
+        140,
+        142
+      ],
+      "sourceDigest": "2cd7a5a94bb548f10371fe249f73337cd825d5e0c304561622c2b8c4ea23c4ac",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-8",
+      "targetDigest": "2cd7a5a94bb548f10371fe249f73337cd825d5e0c304561622c2b8c4ea23c4ac",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_5ea4ea0c22d5aba5df29ff3a97b26a74",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "đồng-bộ-lại-một-việc-đỗ-catch-up",
+      "sourceLines": [
+        144,
+        144
+      ],
+      "sourceDigest": "4e3a82557e5d9e59e796afc95080c1f06626b9d2bd98f936593cfdc073ad57c7",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "đồng-bộ-lại-một-việc-đỗ-catch-up",
+      "targetDigest": "4e3a82557e5d9e59e796afc95080c1f06626b9d2bd98f936593cfdc073ad57c7",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; source unit shorter than 40 characters; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_04e7484d047dcd08a46c213814f64560",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-21",
+      "sourceLines": [
+        146,
+        150
+      ],
+      "sourceDigest": "2861964793588c88c92db37e4409648327219d8d6f88dd4ea05c092ed8142e90",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-9",
+      "targetDigest": "2861964793588c88c92db37e4409648327219d8d6f88dd4ea05c092ed8142e90",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_d7bebb83ab16f451d60767eb12068069",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "phát-hiện-trôi-sau-nhập-nhánh-postland-drift-notify-consumer",
+      "sourceLines": [
+        152,
+        152
+      ],
+      "sourceDigest": "63a5ca7c0ce10fbbc9b649d225f5bc08e2bb89e85b4078e0d37ffc9c95d1ca09",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "phát-hiện-trôi-sau-nhập-nhánh-postland-drift-notify-consumer",
+      "targetDigest": "63a5ca7c0ce10fbbc9b649d225f5bc08e2bb89e85b4078e0d37ffc9c95d1ca09",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_ad43ca34ce5992c0847f446f83b41e21",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-22",
+      "sourceLines": [
+        154,
+        156
+      ],
+      "sourceDigest": "44f9e45556082f7848e074cfc44fc105411280a075798049bc83b2d2a0dbaa79",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-10",
+      "targetDigest": "44f9e45556082f7848e074cfc44fc105411280a075798049bc83b2d2a0dbaa79",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_c5db31e18a238a67423fa2b9fdde117e",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "quét-nghiên-cứu-trước-dispatch-discovery-dispatch",
+      "sourceLines": [
+        158,
+        158
+      ],
+      "sourceDigest": "febf53ab7d2dd568234e3f01ee5d8b3fa2b43ca9f98d784d47e9d8aa63269df3",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "quét-nghiên-cứu-trước-dispatch-discovery-dispatch",
+      "targetDigest": "febf53ab7d2dd568234e3f01ee5d8b3fa2b43ca9f98d784d47e9d8aa63269df3",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_b3358f454dabbbf74164665b3c96ce4a",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-23",
+      "sourceLines": [
+        160,
+        198
+      ],
+      "sourceDigest": "bf40c39bb8ee0dfb38922fe337c5912ad1328ef2e11a7b03328aaa36d841517f",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-11",
+      "targetDigest": "bf40c39bb8ee0dfb38922fe337c5912ad1328ef2e11a7b03328aaa36d841517f",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_9a9f59cf063a04999367545b2e268087",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "quét-chia-việc-trước-dispatch-plan-sweep",
+      "sourceLines": [
+        200,
+        200
+      ],
+      "sourceDigest": "3215d408d23e34915a62a6e096bfb1e26becd4798f8c9191a56eba8db488f637",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "quét-chia-việc-trước-dispatch-plan-sweep",
+      "targetDigest": "3215d408d23e34915a62a6e096bfb1e26becd4798f8c9191a56eba8db488f637",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_64a7409db3612a00cbd85bfb4ddce653",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-24",
+      "sourceLines": [
+        202,
+        242
+      ],
+      "sourceDigest": "f71314541ac70b91a0be7639e6c789c54b70acf093ba12bdc0b3ef668b7577a8",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-12",
+      "targetDigest": "f71314541ac70b91a0be7639e6c789c54b70acf093ba12bdc0b3ef668b7577a8",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_fffc060f9b1bff2243fcec0aa64de17d",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "gặt-lại-lúc-khởi-động-reap-phục-hồi-sau-crash",
+      "sourceLines": [
+        244,
+        244
+      ],
+      "sourceDigest": "f8968e79fcc258ed272fbdd6f442233110f238edac79ca5b2c8261adf32785b2",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "gặt-lại-lúc-khởi-động-reap-phục-hồi-sau-crash",
+      "targetDigest": "f8968e79fcc258ed272fbdd6f442233110f238edac79ca5b2c8261adf32785b2",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_8f0931db9df3ad44820db32e72b1e829",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-25",
+      "sourceLines": [
+        246,
+        251
+      ],
+      "sourceDigest": "a5e3c3bc36ebdee3e7e63dee2f46c705c0b3587568306f491e045ed9d401ce1b",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-13",
+      "targetDigest": "a5e3c3bc36ebdee3e7e63dee2f46c705c0b3587568306f491e045ed9d401ce1b",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_16c6e5c390a57004df0eb20358a7ff8a",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "chấm-trượt-lỗi-giữa-vòng",
+      "sourceLines": [
+        253,
+        253
+      ],
+      "sourceDigest": "bb15a10898312c62d0812b80ea5a0afd1660bc44d3c3b690a48d0c121a031f47",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "chấm-trượt-lỗi-giữa-vòng",
+      "targetDigest": "bb15a10898312c62d0812b80ea5a0afd1660bc44d3c3b690a48d0c121a031f47",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; source unit shorter than 40 characters; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_e7eba8f122fc187006897f7a13f17e81",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-26",
+      "sourceLines": [
+        255,
+        259
+      ],
+      "sourceDigest": "98b77515ba652ac6051a457333f012b6dd5f521044eba33163935fc983cd8589",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-14",
+      "targetDigest": "98b77515ba652ac6051a457333f012b6dd5f521044eba33163935fc983cd8589",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_db233a6e20d625b138b0e335d97a983a",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "ghi-lại-output-của-trợ-lý-sau-mỗi-lượt-dispatch-persist-log",
+      "sourceLines": [
+        261,
+        261
+      ],
+      "sourceDigest": "833e1a2724e50109d3f7ab290cc9febae57b6ee66d9715aeda8a29d032804e13",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "ghi-lại-output-của-trợ-lý-sau-mỗi-lượt-dispatch-persist-log",
+      "targetDigest": "833e1a2724e50109d3f7ab290cc9febae57b6ee66d9715aeda8a29d032804e13",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_722ee98ca7ed78df8a927a843f6ce944",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-27",
+      "sourceLines": [
+        263,
+        280
+      ],
+      "sourceDigest": "006645de2529324c91a9ab890a9de5d81b744e1a65f474458c16ad90aa6e7b0c",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-15",
+      "targetDigest": "006645de2529324c91a9ab890a9de5d81b744e1a65f474458c16ad90aa6e7b0c",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_a95c6485707d0b8601dbdc5ba80efe0a",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "xem-live-output-worker-khi-đang-chạy-live-tee-str39",
+      "sourceLines": [
+        282,
+        282
+      ],
+      "sourceDigest": "37a0ff733a372a145bbdcf0d7a280d305b15db67302cf433de74984c0d77d865",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "xem-live-output-worker-khi-đang-chạy-live-tee-str39",
+      "targetDigest": "37a0ff733a372a145bbdcf0d7a280d305b15db67302cf433de74984c0d77d865",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_344b9a104297ed0fd462fe5ac4b73097",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-28",
+      "sourceLines": [
+        284,
+        299
+      ],
+      "sourceDigest": "19eda00da959a4f1f56f5ae3dc701fcb18d4527e27d5c40e1f93759cd9d3d716",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-16",
+      "targetDigest": "19eda00da959a4f1f56f5ae3dc701fcb18d4527e27d5c40e1f93759cd9d3d716",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_c989dc1877e144abd29d133c0a59efc9",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-29",
+      "sourceLines": [
+        301,
+        308
+      ],
+      "sourceDigest": "0a8a86fc6704a4bb9bd73ffe0841504d8517b26dc4cb74d8437009bd04be46ae",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-17",
+      "targetDigest": "0a8a86fc6704a4bb9bd73ffe0841504d8517b26dc4cb74d8437009bd04be46ae",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_85a972e5144ff1c803aac5141be7f204",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "ai-ngã-ngũ-role-trên-settlement-phase-3-s3-closeout",
+      "sourceLines": [
+        310,
+        310
+      ],
+      "sourceDigest": "8aaf79d96e8764fe3ddca86618ab2693738753c8e172dbe14fc86f3abe07df4e",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "ai-ngã-ngũ-role-trên-settlement-phase-3-s3-closeout",
+      "targetDigest": "8aaf79d96e8764fe3ddca86618ab2693738753c8e172dbe14fc86f3abe07df4e",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_620028f486242c7a473bc79645c71e41",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-30",
+      "sourceLines": [
+        312,
+        313
+      ],
+      "sourceDigest": "7a42c3eb3aa1bd08033ac943c4fec8ea15d8c5126735b4c690ab4cdf3175e300",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-18",
+      "targetDigest": "7a42c3eb3aa1bd08033ac943c4fec8ea15d8c5126735b4c690ab4cdf3175e300",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_eb99a9f76e08b78ca828f756a151f24e",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-31",
+      "sourceLines": [
+        315,
+        326
+      ],
+      "sourceDigest": "f7a850e3632a4929a3ea118aa3369afc9f8ba52397cc7c07085de1621cfe1e81",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-19",
+      "targetDigest": "f7a850e3632a4929a3ea118aa3369afc9f8ba52397cc7c07085de1621cfe1e81",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_755400b3a9eb9c30de416274e7640bad",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "cổng-duyệt-pr-nội-bộ-approval-gate-reviewapprovereject",
+      "sourceLines": [
+        328,
+        328
+      ],
+      "sourceDigest": "82ff33c387aac2673e8aa51b5dfae092bc17fcfe90019aa50de38cdb2546ed97",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "cổng-duyệt-pr-nội-bộ-approval-gate-reviewapprovereject",
+      "targetDigest": "82ff33c387aac2673e8aa51b5dfae092bc17fcfe90019aa50de38cdb2546ed97",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_a455569255ad8333458d730b7f81d6e1",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-32",
+      "sourceLines": [
+        330,
+        338
+      ],
+      "sourceDigest": "29df2322c782d0df2126efffc06edea0046e9d10ac26f5bbaf1aac3640aef75b",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-20",
+      "targetDigest": "29df2322c782d0df2126efffc06edea0046e9d10ac26f5bbaf1aac3640aef75b",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_85d580fba9495eef054058ecb7746057",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-33",
+      "sourceLines": [
+        340,
+        346
+      ],
+      "sourceDigest": "5d45d0eb1c94a18613179f9932bdd7a51358e3472817ffcfdc5df54960bd2665",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-21",
+      "targetDigest": "5d45d0eb1c94a18613179f9932bdd7a51358e3472817ffcfdc5df54960bd2665",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_aaca29487ce49fbc1cf3aed873d710a3",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-34",
+      "sourceLines": [
+        348,
+        450
+      ],
+      "sourceDigest": "770b4294b4c56424a5352b5650768771989705930fb4577ed9eabe33e15e8759",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-22",
+      "targetDigest": "770b4294b4c56424a5352b5650768771989705930fb4577ed9eabe33e15e8759",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_0e24592e02fa91f1606eceb21b3f8d06",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "cổng-duyệt-qua-github-github-transport-tuỳ-chọn-reviewapprove---github",
+      "sourceLines": [
+        452,
+        452
+      ],
+      "sourceDigest": "70f158b97d460c6cd790f466868963419ca1955f3543d63e9cc93154bcdb4c5f",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "cổng-duyệt-qua-github-github-transport-tuỳ-chọn-reviewapprove---github",
+      "targetDigest": "70f158b97d460c6cd790f466868963419ca1955f3543d63e9cc93154bcdb4c5f",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_761058f5d54dac4d6a1710befd94522f",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-35",
+      "sourceLines": [
+        454,
+        461
+      ],
+      "sourceDigest": "e82f96712a0c1cfc5158b93bc557a9443ec6df7a73d168271ab0633de02e4ebc",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-23",
+      "targetDigest": "e82f96712a0c1cfc5158b93bc557a9443ec6df7a73d168271ab0633de02e4ebc",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_7665dc86e90a49ac7d7e5e3a3a58217c",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-36",
+      "sourceLines": [
+        463,
+        465
+      ],
+      "sourceDigest": "01f1f9649291100a6e5d775f39594a80a8f5f3a5d9245ae6e41717ecbc044632",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-24",
+      "targetDigest": "01f1f9649291100a6e5d775f39594a80a8f5f3a5d9245ae6e41717ecbc044632",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_94b051a8a4f2f1c9d453e361d232401c",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-37",
+      "sourceLines": [
+        467,
+        546
+      ],
+      "sourceDigest": "ea7e200ba1067ec378102ed507012b69c84addece633d3bf00a384a4c7078d9b",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-25",
+      "targetDigest": "ea7e200ba1067ec378102ed507012b69c84addece633d3bf00a384a4c7078d9b",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_224b5f54d28b453f1e3feaced0468399",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "gate-a-xếp-hạng-candidate-bắc-cầu-sang-việc-thật-evolve",
+      "sourceLines": [
+        548,
+        548
+      ],
+      "sourceDigest": "52a283ef3e1356d53fc5ae6efb44c1c8c687858b70009ef970c11e151b896b6d",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "gate-a-xếp-hạng-candidate-bắc-cầu-sang-việc-thật-evolve",
+      "targetDigest": "52a283ef3e1356d53fc5ae6efb44c1c8c687858b70009ef970c11e151b896b6d",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_979ec4a61acca9e1b6a0a3967b1d0c88",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-38",
+      "sourceLines": [
+        550,
+        560
+      ],
+      "sourceDigest": "c7182f609c029616bc8c23ef95b7fb69ade8fc943ebf7aba8f339003c4437459",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-26",
+      "targetDigest": "c7182f609c029616bc8c23ef95b7fb69ade8fc943ebf7aba8f339003c4437459",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_d55d7b0f484d74f056db873f5466dca5",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-39",
+      "sourceLines": [
+        562,
+        634
+      ],
+      "sourceDigest": "ec1fcc6bb48b6e8af04b6effa67ac90f4f27db4a2e5508cd7ce6cf5644946af9",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-27",
+      "targetDigest": "ec1fcc6bb48b6e8af04b6effa67ac90f4f27db4a2e5508cd7ce6cf5644946af9",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_dae296f2a034494ca1e4b6115c184c73",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "iron-law-phân-loại-rủi-ro-của-một-candidate-fix-self-improve-loop-str13-slice-23",
+      "sourceLines": [
+        636,
+        636
+      ],
+      "sourceDigest": "b5bd1aff8cdb056c9d10c357f80729d5c1cefd632d344242fc46a5441a8f0e23",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "iron-law-phân-loại-rủi-ro-của-một-candidate-fix-self-improve-loop-str13-slice-23",
+      "targetDigest": "b5bd1aff8cdb056c9d10c357f80729d5c1cefd632d344242fc46a5441a8f0e23",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_edb973d34234a306e25a3d1bd81a239b",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-40",
+      "sourceLines": [
+        638,
+        644
+      ],
+      "sourceDigest": "2c9e543faa091cedca0350f00da07dba8d9fecefd433b7b1a1b6315b11fc6dfe",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-28",
+      "targetDigest": "2c9e543faa091cedca0350f00da07dba8d9fecefd433b7b1a1b6315b11fc6dfe",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_31cf7725544958ccb622241d9be87ed8",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-41",
+      "sourceLines": [
+        646,
+        709
+      ],
+      "sourceDigest": "cd3e73eeeda4ade8c1e68e2a1a8cc0a6826fba801df13f18b156960d0dc0eaa4",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-29",
+      "targetDigest": "cd3e73eeeda4ade8c1e68e2a1a8cc0a6826fba801df13f18b156960d0dc0eaa4",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_399d412ed32e994fe3c7ed6d060abc80",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "tín-hiệu-compounding-qua-check-entropy-trend-seal-digest",
+      "sourceLines": [
+        711,
+        711
+      ],
+      "sourceDigest": "fd8a00e0ca00d21cca141a80fd716ea9346a45ec75286ba643d3c021bb148ad3",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "tín-hiệu-compounding-qua-check-entropy-trend-seal-digest",
+      "targetDigest": "fd8a00e0ca00d21cca141a80fd716ea9346a45ec75286ba643d3c021bb148ad3",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_ead999cada6751462e6b82a85b1969b4",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-42",
+      "sourceLines": [
+        713,
+        715
+      ],
+      "sourceDigest": "e9546cb5d80a44dfe7a0fcfc93b275e9e5c07f9b61723cfb1ff0923693e4f65f",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-30",
+      "targetDigest": "e9546cb5d80a44dfe7a0fcfc93b275e9e5c07f9b61723cfb1ff0923693e4f65f",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_4e251606aee466e2081834d3e3b16817",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-43",
+      "sourceLines": [
+        717,
+        750
+      ],
+      "sourceDigest": "e14379fd99ddc7fe3b048d1b1e4d9686b14da91b621745f1ba32d6e4895bfbe2",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-31",
+      "targetDigest": "e14379fd99ddc7fe3b048d1b1e4d9686b14da91b621745f1ba32d6e4895bfbe2",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_15a8bfa5b052f8bee7fa5813db8da7b0",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "phiên-checkout-đa-phiên-session-start-end-list-gc",
+      "sourceLines": [
+        752,
+        752
+      ],
+      "sourceDigest": "ed41e49c52943a8b95a3b4187794bb8733786cf9acab800670a1be9dd6aa9304",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "phiên-checkout-đa-phiên-session-start-end-list-gc",
+      "targetDigest": "ed41e49c52943a8b95a3b4187794bb8733786cf9acab800670a1be9dd6aa9304",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_4cbab974bfe317b6f233a76d94ed8880",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-44",
+      "sourceLines": [
+        754,
+        765
+      ],
+      "sourceDigest": "5854038d63afb3ea6fb4433ad3979a071f5da535468ea1523c01cbff68f6942a",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-32",
+      "targetDigest": "5854038d63afb3ea6fb4433ad3979a071f5da535468ea1523c01cbff68f6942a",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_dc5adc3445b7c6d46b566976d00e0e6c",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-45",
+      "sourceLines": [
+        767,
+        824
+      ],
+      "sourceDigest": "503647e1fd1b5d664c1e509b767c869d0fd5befb7fdc74732e53bbeb95a70092",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-33",
+      "targetDigest": "503647e1fd1b5d664c1e509b767c869d0fd5befb7fdc74732e53bbeb95a70092",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_b81a5d5c840b3cf3b6d7d956cb545565",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "bảo-vệ-approve-khỏi-lồng-phiên-session-nesting-guard-epic-2",
+      "sourceLines": [
+        826,
+        826
+      ],
+      "sourceDigest": "c92d09f05317c34d30da8c4f5e7119acce83d4dfd5073ceb8c42c3483cfca7b7",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "bảo-vệ-approve-khỏi-lồng-phiên-session-nesting-guard-epic-2",
+      "targetDigest": "c92d09f05317c34d30da8c4f5e7119acce83d4dfd5073ceb8c42c3483cfca7b7",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_d9fb7b4f4bf6f5ff4043342a0bec0f1a",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-46",
+      "sourceLines": [
+        828,
+        831
+      ],
+      "sourceDigest": "90e9768eebf19c1db709170ecf5c04a6b8b09bd0cbfccfb4937dab110ff6a6f5",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-34",
+      "targetDigest": "90e9768eebf19c1db709170ecf5c04a6b8b09bd0cbfccfb4937dab110ff6a6f5",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_2f143c5fc411f2ff25e41c84083ef5b8",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-47",
+      "sourceLines": [
+        833,
+        841
+      ],
+      "sourceDigest": "b30a4ab181944d380a972616da0432ff192fe07acca53cde512d11a1474e4971",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-35",
+      "targetDigest": "b30a4ab181944d380a972616da0432ff192fe07acca53cde512d11a1474e4971",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_172413eab83a90281012ca621b893d8c",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-48",
+      "sourceLines": [
+        843,
+        854
+      ],
+      "sourceDigest": "0198cbcedf6151d09c22efa53d024f0dacbda132fb6d8b95fd0f1f0c0675274b",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-36",
+      "targetDigest": "0198cbcedf6151d09c22efa53d024f0dacbda132fb6d8b95fd0f1f0c0675274b",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_9a50fb3e9a7b6df8a765442284b567b6",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-49",
+      "sourceLines": [
+        856,
+        861
+      ],
+      "sourceDigest": "94e068428040c30457a119252ec4045a9e19abdd86fa6805cfc718792a5a14b0",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-37",
+      "targetDigest": "94e068428040c30457a119252ec4045a9e19abdd86fa6805cfc718792a5a14b0",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_c05e0a378ca0c1528a276a0528bf7a0c",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-50",
+      "sourceLines": [
+        863,
+        876
+      ],
+      "sourceDigest": "7d7435ae9ca08f8f005955ef494be9a75a5eda29f7956fbcfd219cba9299a755",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-38",
+      "targetDigest": "7d7435ae9ca08f8f005955ef494be9a75a5eda29f7956fbcfd219cba9299a755",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_66c5a56d447d241a438d212c7b6222d2",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "khóa-hoạt-động-cây-chính-chặn-commit-trần-khi-phiên-khác-đang-hoạt-động-str65",
+      "sourceLines": [
+        878,
+        878
+      ],
+      "sourceDigest": "df9402da4e0b1087fb0b38c82b93963f70524eff5988cad5d9e4715eade7953a",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "khóa-hoạt-động-cây-chính-chặn-commit-trần-khi-phiên-khác-đang-hoạt-động-str65",
+      "targetDigest": "df9402da4e0b1087fb0b38c82b93963f70524eff5988cad5d9e4715eade7953a",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_d883159fc9171a01070453df2af79a8f",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-51",
+      "sourceLines": [
+        880,
+        884
+      ],
+      "sourceDigest": "0a2e8a0bd017b6f8d8eaedfa35a8b20aeb8fdd77ac0fad161d80749f151b42df",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-39",
+      "targetDigest": "0a2e8a0bd017b6f8d8eaedfa35a8b20aeb8fdd77ac0fad161d80749f151b42df",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_41571c8f42f542be1f44c9371fad823a",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-52",
+      "sourceLines": [
+        886,
+        906
+      ],
+      "sourceDigest": "1b272bfab383f72def5df026184449f797cb7723c812253713808d6aed302988",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-40",
+      "targetDigest": "1b272bfab383f72def5df026184449f797cb7723c812253713808d6aed302988",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_60ee5b173a01a6a4032956ede901812f",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "vòng-làm-việc-có-hướng-dẫn-qua-tầng-skill-trích-xuất-entry-skill-phase-skills-p50",
+      "sourceLines": [
+        908,
+        908
+      ],
+      "sourceDigest": "bc39a14690eeaef19cc3c657d134b42e6a2a9bbd58479381e65e1b1f552c8d44",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "vòng-làm-việc-có-hướng-dẫn-qua-tầng-skill-trích-xuất-entry-skill-phase-skills-p50",
+      "targetDigest": "bc39a14690eeaef19cc3c657d134b42e6a2a9bbd58479381e65e1b1f552c8d44",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_dab55f62d062b24d930be5af90b2f60f",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-53",
+      "sourceLines": [
+        910,
+        910
+      ],
+      "sourceDigest": "68e54965cdd0365aab241af3df035ccd6b81acbd1439eac6e81e60ef92504091",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-41",
+      "targetDigest": "68e54965cdd0365aab241af3df035ccd6b81acbd1439eac6e81e60ef92504091",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_1bceeeebe69033b803ed37f2a1e6213e",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-54",
+      "sourceLines": [
+        912,
+        925
+      ],
+      "sourceDigest": "7081262730c5a022bfa4b1c815bc90bffe5649538cc01fee4880433cb1144a4b",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-42",
+      "targetDigest": "7081262730c5a022bfa4b1c815bc90bffe5649538cc01fee4880433cb1144a4b",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_0cc820888c045e6521247c5e7291c177",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-55",
+      "sourceLines": [
+        927,
+        927
+      ],
+      "sourceDigest": "cb6a2b60e8c62091a37dbe5e29ad3546d82a62a7190729d8dc62bdd372c43fb5",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-43",
+      "targetDigest": "cb6a2b60e8c62091a37dbe5e29ad3546d82a62a7190729d8dc62bdd372c43fb5",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_eb7624af9ce523f5f4e81b159e5b3f09",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "báo-việc-phát-hiện-từ-trợ-lý-workerrunner-discovery-report",
+      "sourceLines": [
+        929,
+        929
+      ],
+      "sourceDigest": "59aa6f5d6d68c416a22eeea6fa6c4247fb7d7de59f69325d790f3bd7d7015581",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "báo-việc-phát-hiện-từ-trợ-lý-workerrunner-discovery-report",
+      "targetDigest": "59aa6f5d6d68c416a22eeea6fa6c4247fb7d7de59f69325d790f3bd7d7015581",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_23ed035dde0aa5b6a4c5b0c2605520a3",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-56",
+      "sourceLines": [
+        931,
+        931
+      ],
+      "sourceDigest": "d73ae443ec4917df0cbfbdd0f9f4f241f403da68788d72f9195b576bfc2d92b3",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-44",
+      "targetDigest": "d73ae443ec4917df0cbfbdd0f9f4f241f403da68788d72f9195b576bfc2d92b3",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_c3971ec3042b6f9fd5a3ab9d47b8f98f",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-57",
+      "sourceLines": [
+        933,
+        933
+      ],
+      "sourceDigest": "53fb6468389cdd9a308c7f0dad3422eb0bd29dcc52eb18d85eefeeeb3cb344a2",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-45",
+      "targetDigest": "53fb6468389cdd9a308c7f0dad3422eb0bd29dcc52eb18d85eefeeeb3cb344a2",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_0d8f8fd8b474f605f31bb35d82bdbea2",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-58",
+      "sourceLines": [
+        935,
+        935
+      ],
+      "sourceDigest": "0eebe0217b73affa40bc19896c099549479ffab6dc7308c33548ed1088a022bb",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-46",
+      "targetDigest": "0eebe0217b73affa40bc19896c099549479ffab6dc7308c33548ed1088a022bb",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_a770eb9e2dcb4322ef3615c199829d18",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-59",
+      "sourceLines": [
+        937,
+        939
+      ],
+      "sourceDigest": "b842ea307f8de6939cd5995947dc7452e0102aaf7a8bea6655bebaf18424dd4b",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-47",
+      "targetDigest": "b842ea307f8de6939cd5995947dc7452e0102aaf7a8bea6655bebaf18424dd4b",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_0686418ae7571d82eade8059c698709d",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "actors-access",
+      "sourceLines": [
+        941,
+        941
+      ],
+      "sourceDigest": "3f682e32dc04d19e654abc927f8a3570f8ed866f17711e4ff18302e2840461e7",
+      "targetOwner": "docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md",
+      "targetAnchor": "actors-access",
+      "targetDigest": "3f682e32dc04d19e654abc927f8a3570f8ed866f17711e4ff18302e2840461e7",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; source unit shorter than 40 characters; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_add6d13e14df87ad5d5bd46cc5bb98d4",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-60",
+      "sourceLines": [
+        943,
+        950
+      ],
+      "sourceDigest": "81c2724820c499b40d0e4d2964c798263c2ad99a479582176a95ee13b7f4d24e",
+      "targetOwner": "docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md",
+      "targetAnchor": "unheaded-block-3",
+      "targetDigest": "81c2724820c499b40d0e4d2964c798263c2ad99a479582176a95ee13b7f4d24e",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_32d366486b72925c171d9fefc84179e2",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "business-rules",
+      "sourceLines": [
+        952,
+        952
+      ],
+      "sourceDigest": "a0b653256ad485b037729003bab45b5f1bdfd1ccc0bfc100b5fc81b98e4bac64",
+      "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "targetAnchor": "business-rules",
+      "targetDigest": "a0b653256ad485b037729003bab45b5f1bdfd1ccc0bfc100b5fc81b98e4bac64",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; source unit shorter than 40 characters; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_ec700b2469e1246be43b91c26eddf42e",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-61",
+      "sourceLines": [
+        954,
+        984
+      ],
+      "sourceDigest": "86688e71bf8e6321a26a222e59c5263a5e412266e6195dfc9395e49a10e5dc2c",
+      "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "targetAnchor": "unheaded-block-3",
+      "targetDigest": "86688e71bf8e6321a26a222e59c5263a5e412266e6195dfc9395e49a10e5dc2c",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_081653fc143caaa3318040e79c4f522a",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-62",
+      "sourceLines": [
+        986,
+        986
+      ],
+      "sourceDigest": "5726b14f8d6640b427325590516eae1a3f3d5288a9c97e546d4366243ab15498",
+      "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "targetAnchor": "unheaded-block-4",
+      "targetDigest": "5726b14f8d6640b427325590516eae1a3f3d5288a9c97e546d4366243ab15498",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_3ff43c5fd67cb1df9a9c2f81a0849057",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-63",
+      "sourceLines": [
+        988,
+        996
+      ],
+      "sourceDigest": "c60f41f6b57f862e13f7d0f9d2813b90da9822cd05e4f9df5612ca6b5b7e672d",
+      "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "targetAnchor": "unheaded-block-5",
+      "targetDigest": "c60f41f6b57f862e13f7d0f9d2813b90da9822cd05e4f9df5612ca6b5b7e672d",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_4b223132b77128c46c544871c36a8e3b",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-64",
+      "sourceLines": [
+        998,
+        1005
+      ],
+      "sourceDigest": "a887e766b249d14101e5359838cc0150d1ba01b7178c3bde49ee080066ade0ce",
+      "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "targetAnchor": "unheaded-block-6",
+      "targetDigest": "a887e766b249d14101e5359838cc0150d1ba01b7178c3bde49ee080066ade0ce",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_f90bfbcb40720cb854dbd54aa96ca471",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-65",
+      "sourceLines": [
+        1007,
+        1014
+      ],
+      "sourceDigest": "1284ea220c77e37c4df1a5f38b00321fe430493c2023c777d68a6c62659d93fd",
+      "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "targetAnchor": "unheaded-block-7",
+      "targetDigest": "1284ea220c77e37c4df1a5f38b00321fe430493c2023c777d68a6c62659d93fd",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_e895ebadac51baad8019199fde064a89",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-66",
+      "sourceLines": [
+        1017,
+        1017
+      ],
+      "sourceDigest": "d365656031991e0caf85843100d2aabaff06d19fc1da0bd57440a462925a2c3a",
+      "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "targetAnchor": "unheaded-block-8",
+      "targetDigest": "d365656031991e0caf85843100d2aabaff06d19fc1da0bd57440a462925a2c3a",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_d4f2a9fea875387155e0c9f96b5b4f25",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-67",
+      "sourceLines": [
+        1019,
+        1019
+      ],
+      "sourceDigest": "df220e6361d4bda8b7556260b33e1f700eb99f3220c00e159f5c1187e4fb3778",
+      "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "targetAnchor": "unheaded-block-9",
+      "targetDigest": "df220e6361d4bda8b7556260b33e1f700eb99f3220c00e159f5c1187e4fb3778",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_b1ce68c3d6c287be9c486f49c140d0c4",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-68",
+      "sourceLines": [
+        1021,
+        1022
+      ],
+      "sourceDigest": "d9807e7e17f7294c468a67eeef53c77eee6d7eb547fb506f4c368bfdf4451d8b",
+      "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "targetAnchor": "unheaded-block-10",
+      "targetDigest": "d9807e7e17f7294c468a67eeef53c77eee6d7eb547fb506f4c368bfdf4451d8b",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_763d1aa71ce298a0878a75c449ffc899",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-69",
+      "sourceLines": [
+        1024,
+        1024
+      ],
+      "sourceDigest": "b40a27086090149d7bb30703552c0eab01f375c5e366d3aeb8e18cbd5c6fdcf8",
+      "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "targetAnchor": "unheaded-block-11",
+      "targetDigest": "b40a27086090149d7bb30703552c0eab01f375c5e366d3aeb8e18cbd5c6fdcf8",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_04863c851a3aaa5817f3a90ca9bd6402",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-70",
+      "sourceLines": [
+        1026,
+        1026
+      ],
+      "sourceDigest": "fd2b4984d52c35b9f6af54c17976db18c458287b9e5a08e3b7d5603c10c1c39d",
+      "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "targetAnchor": "unheaded-block-12",
+      "targetDigest": "fd2b4984d52c35b9f6af54c17976db18c458287b9e5a08e3b7d5603c10c1c39d",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_3a028d49aeaa66365a32d80c1795ff97",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-71",
+      "sourceLines": [
+        1028,
+        1028
+      ],
+      "sourceDigest": "93eab619825cf7b3dc5c716075a75cd59df757298fe89f16b42990d4155e4167",
+      "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "targetAnchor": "unheaded-block-13",
+      "targetDigest": "93eab619825cf7b3dc5c716075a75cd59df757298fe89f16b42990d4155e4167",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_ce394d3198a3ef11d4ccf9f12f6faa4b",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-72",
+      "sourceLines": [
+        1030,
+        1030
+      ],
+      "sourceDigest": "72bafdea3025edcdcf5ec467c77b98d924ed872ff46621e335e81a913fe65e15",
+      "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "targetAnchor": "unheaded-block-14",
+      "targetDigest": "72bafdea3025edcdcf5ec467c77b98d924ed872ff46621e335e81a913fe65e15",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_a6858e91eb2a086eb522c1e2ba9443bb",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-73",
+      "sourceLines": [
+        1032,
+        1035
+      ],
+      "sourceDigest": "19a4d868d63868afd06477aac2d7fe35a416f43cf88354a68828fa86c9b8146c",
+      "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "targetAnchor": "unheaded-block-15",
+      "targetDigest": "19a4d868d63868afd06477aac2d7fe35a416f43cf88354a68828fa86c9b8146c",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_3fb365bdb64e466e8f63d59bd39e3d9d",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-74",
+      "sourceLines": [
+        1037,
+        1037
+      ],
+      "sourceDigest": "d3528018772ae0db19e170ffb28105db782b483cf6852a5d6280458fbfb0ea62",
+      "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "targetAnchor": "unheaded-block-16",
+      "targetDigest": "d3528018772ae0db19e170ffb28105db782b483cf6852a5d6280458fbfb0ea62",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_3318ea2d7ef892c514ae6ccb0b55799d",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-75",
+      "sourceLines": [
+        1039,
+        1039
+      ],
+      "sourceDigest": "9ef8c5b09c93e03cb64a61025e6557cf29bb780de22e6c18cfb0bee27d330b1d",
+      "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "targetAnchor": "unheaded-block-17",
+      "targetDigest": "9ef8c5b09c93e03cb64a61025e6557cf29bb780de22e6c18cfb0bee27d330b1d",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_ac3cdba7f9a2e8f0008c27b3e3294d6b",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-76",
+      "sourceLines": [
+        1041,
+        1041
+      ],
+      "sourceDigest": "15e45b9a785ea2d9755c11d1b17eee0c208d6f51ee0c0f7569cd405f121bd44c",
+      "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "targetAnchor": "unheaded-block-18",
+      "targetDigest": "15e45b9a785ea2d9755c11d1b17eee0c208d6f51ee0c0f7569cd405f121bd44c",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_d7bd9448233134f785f11df97ebe9607",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-77",
+      "sourceLines": [
+        1043,
+        1043
+      ],
+      "sourceDigest": "4d77d41756946d6b1299301937d83eab594c24ee933a6ba2df60e01891df7e43",
+      "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "targetAnchor": "unheaded-block-19",
+      "targetDigest": "4d77d41756946d6b1299301937d83eab594c24ee933a6ba2df60e01891df7e43",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_476939c1712b0e0ef9aa0e70998fa89d",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-78",
+      "sourceLines": [
+        1045,
+        1050
+      ],
+      "sourceDigest": "f7d16d59dd1399ebae443bf6121e2e58e0340aaf582702be28c224f170d67fbd",
+      "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "targetAnchor": "unheaded-block-20",
+      "targetDigest": "f7d16d59dd1399ebae443bf6121e2e58e0340aaf582702be28c224f170d67fbd",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_72db080aa10123d685f79a598dc3d8d2",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-79",
+      "sourceLines": [
+        1052,
+        1052
+      ],
+      "sourceDigest": "aea8b0bfbfcaac0edb06af4fb9393945b7ba1eed6d81a52230f8e876ed87b82e",
+      "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "targetAnchor": "unheaded-block-21",
+      "targetDigest": "aea8b0bfbfcaac0edb06af4fb9393945b7ba1eed6d81a52230f8e876ed87b82e",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_09fe57dbaeb0a17c5739022624d762b0",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-80",
+      "sourceLines": [
+        1054,
+        1054
+      ],
+      "sourceDigest": "dabfa056f96ebc67b7f00b89c2121512c823a1dc5d3ba843d49617f18575ea5b",
+      "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "targetAnchor": "unheaded-block-22",
+      "targetDigest": "dabfa056f96ebc67b7f00b89c2121512c823a1dc5d3ba843d49617f18575ea5b",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_351a5dd71d4e41f657bc7dcea54178e4",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-81",
+      "sourceLines": [
+        1056,
+        1056
+      ],
+      "sourceDigest": "661c9e16abe9ed411801ccbaec1066f2cabe3fbc6dc11197bda2def6cbed3df7",
+      "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "targetAnchor": "unheaded-block-23",
+      "targetDigest": "661c9e16abe9ed411801ccbaec1066f2cabe3fbc6dc11197bda2def6cbed3df7",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_fb55febb5bc5be5f90f21d93523055e1",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-82",
+      "sourceLines": [
+        1058,
+        1058
+      ],
+      "sourceDigest": "fef782263b93aca70fc0c02f3a9bff5c262449b40ab0481084893764d805ef52",
+      "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "targetAnchor": "unheaded-block-24",
+      "targetDigest": "fef782263b93aca70fc0c02f3a9bff5c262449b40ab0481084893764d805ef52",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_199d5707b6de165732420f953d4bd3ea",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-83",
+      "sourceLines": [
+        1060,
+        1060
+      ],
+      "sourceDigest": "664070226174bdf66d7b160f7863e3cda7847d270050c87088d7b5385e5be7f1",
+      "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "targetAnchor": "unheaded-block-25",
+      "targetDigest": "664070226174bdf66d7b160f7863e3cda7847d270050c87088d7b5385e5be7f1",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_10cfde78f2f5f157606323194b7a1977",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-84",
+      "sourceLines": [
+        1062,
+        1062
+      ],
+      "sourceDigest": "fdd02dd09d4babc94db9f2d89b1782ba10c597d3aea983a7bc73c828b46e3210",
+      "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "targetAnchor": "unheaded-block-26",
+      "targetDigest": "fdd02dd09d4babc94db9f2d89b1782ba10c597d3aea983a7bc73c828b46e3210",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_8a863a1a9b4ed08f849613e746954b15",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-85",
+      "sourceLines": [
+        1064,
+        1064
+      ],
+      "sourceDigest": "e2e3f68c98e1a0b77e60fb60ae4c967a2978d7420743cfb35617fa559f3b4736",
+      "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "targetAnchor": "unheaded-block-27",
+      "targetDigest": "e2e3f68c98e1a0b77e60fb60ae4c967a2978d7420743cfb35617fa559f3b4736",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_a472c36653a127781a392af83727e4ec",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-86",
+      "sourceLines": [
+        1066,
+        1066
+      ],
+      "sourceDigest": "6c4f41f1d6eaf299c82a57c52903a0392774a6c09ef6c9b3626e94c4ebbe24ef",
+      "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "targetAnchor": "unheaded-block-28",
+      "targetDigest": "6c4f41f1d6eaf299c82a57c52903a0392774a6c09ef6c9b3626e94c4ebbe24ef",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_5b3d3f409ba7d6d15eb28a227df2b0a6",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-87",
+      "sourceLines": [
+        1068,
+        1068
+      ],
+      "sourceDigest": "aa8e537d64a0a67662bd138928a623ee2840cb8ee03432a160379aa3313952d4",
+      "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "targetAnchor": "unheaded-block-29",
+      "targetDigest": "aa8e537d64a0a67662bd138928a623ee2840cb8ee03432a160379aa3313952d4",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_04e787baa36de9d79134180195b31e0a",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-88",
+      "sourceLines": [
+        1070,
+        1070
+      ],
+      "sourceDigest": "94c19660f25bea5e4e23bbd94b090561405b7c00c8ceb2ac227eda3bcb50204a",
+      "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "targetAnchor": "unheaded-block-30",
+      "targetDigest": "94c19660f25bea5e4e23bbd94b090561405b7c00c8ceb2ac227eda3bcb50204a",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_bc77641441df2a97542ae8a615b69712",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-89",
+      "sourceLines": [
+        1072,
+        1079
+      ],
+      "sourceDigest": "bf5b2e3380001d243e07b0bd5108bd51b3c10fcac27312f02e7b3838f828fd53",
+      "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "targetAnchor": "unheaded-block-31",
+      "targetDigest": "bf5b2e3380001d243e07b0bd5108bd51b3c10fcac27312f02e7b3838f828fd53",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_14da24bed0920b9efb22bbe4bbe0bbdc",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-90",
+      "sourceLines": [
+        1081,
+        1085
+      ],
+      "sourceDigest": "8b0b585d72e6e964b858670c69a32f7c2983b02b8fd11c3fbceda65fc93daee0",
+      "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "targetAnchor": "unheaded-block-32",
+      "targetDigest": "8b0b585d72e6e964b858670c69a32f7c2983b02b8fd11c3fbceda65fc93daee0",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_64aee8ce4865f829a4973768d686f2c0",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-91",
+      "sourceLines": [
+        1087,
+        1087
+      ],
+      "sourceDigest": "bad7d014e1ab88fac6cd985b2e8d263704e8d91272d283a0e3935be1eaffb802",
+      "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "targetAnchor": "unheaded-block-33",
+      "targetDigest": "bad7d014e1ab88fac6cd985b2e8d263704e8d91272d283a0e3935be1eaffb802",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_895d9828a8b49f8148389d63d32cc0e5",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-92",
+      "sourceLines": [
+        1089,
+        1089
+      ],
+      "sourceDigest": "372be8b09ba377f713ebcbf0cb224ce126c1a066d2a4188ce414ba65daad83a9",
+      "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "targetAnchor": "unheaded-block-34",
+      "targetDigest": "372be8b09ba377f713ebcbf0cb224ce126c1a066d2a4188ce414ba65daad83a9",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_3d6994569b50320e7c89c047d3b4a8d6",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-93",
+      "sourceLines": [
+        1091,
+        1091
+      ],
+      "sourceDigest": "9029936d54618ff2f26567776f163e84f88d1811fa762e647806bcdbd89e86f8",
+      "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "targetAnchor": "unheaded-block-35",
+      "targetDigest": "9029936d54618ff2f26567776f163e84f88d1811fa762e647806bcdbd89e86f8",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_64858c3adb9ca1d1eae38e1c9bc63e10",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-94",
+      "sourceLines": [
+        1093,
+        1121
+      ],
+      "sourceDigest": "3b974a9c1a82356e256e9b6923c80104f778651f67447179efdc0ffbf09ac485",
+      "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "targetAnchor": "unheaded-block-36",
+      "targetDigest": "3b974a9c1a82356e256e9b6923c80104f778651f67447179efdc0ffbf09ac485",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_099eb566c825967cf35f9397f2d7b947",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "edge-cases-settled",
+      "sourceLines": [
+        1123,
+        1123
+      ],
+      "sourceDigest": "c1c87e9a7f22cc4d3693c5d83d5ecac2fd90fa0386e03fb890638cf059c10de4",
+      "targetOwner": "docs/platform/runner/subcomponents/h-37aced3896a8/spec.md",
+      "targetAnchor": "edge-cases-settled",
+      "targetDigest": "c1c87e9a7f22cc4d3693c5d83d5ecac2fd90fa0386e03fb890638cf059c10de4",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; source unit shorter than 40 characters; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_3332d3ab8fadd91605a8a92da08091b7",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-95",
+      "sourceLines": [
+        1125,
+        1161
+      ],
+      "sourceDigest": "968a9e65860acfe7d1f346e7b8de178845f40688a634e6cbef5c7e3d2c2841a2",
+      "targetOwner": "docs/platform/runner/subcomponents/h-37aced3896a8/spec.md",
+      "targetAnchor": "unheaded-block-3",
+      "targetDigest": "968a9e65860acfe7d1f346e7b8de178845f40688a634e6cbef5c7e3d2c2841a2",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_e3bd4567b6cb5b3e9da820c7a01da19a",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-96",
+      "sourceLines": [
+        1163,
+        1170
+      ],
+      "sourceDigest": "798124b276040909ca49f18983810c338f880ce2a7c22cd3f347736ec9582710",
+      "targetOwner": "docs/platform/runner/subcomponents/h-37aced3896a8/spec.md",
+      "targetAnchor": "unheaded-block-4",
+      "targetDigest": "798124b276040909ca49f18983810c338f880ce2a7c22cd3f347736ec9582710",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_36f4a3c4ae623f3a348faadd747dcba7",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-97",
+      "sourceLines": [
+        1172,
+        1173
+      ],
+      "sourceDigest": "153dc43f02108c3b79c7f21ae6c9814edbf96f84e14c4988eb6c802a90f6e073",
+      "targetOwner": "docs/platform/runner/subcomponents/h-37aced3896a8/spec.md",
+      "targetAnchor": "unheaded-block-5",
+      "targetDigest": "153dc43f02108c3b79c7f21ae6c9814edbf96f84e14c4988eb6c802a90f6e073",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_faf7be822c2140f22e6d5a5882f84595",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "open-gaps",
+      "sourceLines": [
+        1175,
+        1175
+      ],
+      "sourceDigest": "b0767ddee6872a0d1e26fae94c0bcca47ba8db1743e511050e4d859694c4fc02",
+      "targetOwner": "docs/platform/runner/subcomponents/h-2e032393add1/spec.md",
+      "targetAnchor": "open-gaps",
+      "targetDigest": "b0767ddee6872a0d1e26fae94c0bcca47ba8db1743e511050e4d859694c4fc02",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; source unit shorter than 40 characters; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_5c6238369ac0200472ee37488cd0e09a",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-98",
+      "sourceLines": [
+        1177,
+        1192
+      ],
+      "sourceDigest": "d18835d06937f979c98f008115c46b322ad995e2a465a6cdad4099bae761ebee",
+      "targetOwner": "docs/platform/runner/subcomponents/h-2e032393add1/spec.md",
+      "targetAnchor": "unheaded-block-3",
+      "targetDigest": "d18835d06937f979c98f008115c46b322ad995e2a465a6cdad4099bae761ebee",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_199e9de005d19f4b2d061005d959b3ed",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-99",
+      "sourceLines": [
+        1194,
+        1202
+      ],
+      "sourceDigest": "197a395073121e8ebc1dc71f8efdabbb4a02ddff6c28689ba1711e008b226e34",
+      "targetOwner": "docs/platform/runner/subcomponents/h-2e032393add1/spec.md",
+      "targetAnchor": "unheaded-block-4",
+      "targetDigest": "197a395073121e8ebc1dc71f8efdabbb4a02ddff6c28689ba1711e008b226e34",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_2bb6c6025afdbad3c1a26762f903bcd2",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-100",
+      "sourceLines": [
+        1204,
+        1205
+      ],
+      "sourceDigest": "33397038e11c79d2866f7ccc09b04d90f18eb593080a2bc3a9f2a2a39ec95136",
+      "targetOwner": "docs/platform/runner/subcomponents/h-2e032393add1/spec.md",
+      "targetAnchor": "unheaded-block-5",
+      "targetDigest": "33397038e11c79d2866f7ccc09b04d90f18eb593080a2bc3a9f2a2a39ec95136",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_cc1865a79db0c03c59f4bf30c7a0a97b",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "visuals",
+      "sourceLines": [
+        1207,
+        1207
+      ],
+      "sourceDigest": "e3d926d43e2e72f2211f195fb007e887cc2dfd1d97f6819f80e5bf203d4dfd1b",
+      "targetOwner": "docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md",
+      "targetAnchor": "visuals",
+      "targetDigest": "e3d926d43e2e72f2211f195fb007e887cc2dfd1d97f6819f80e5bf203d4dfd1b",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; source unit shorter than 40 characters; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_a76db7b113608c6dc589a0acf1050c58",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-101",
+      "sourceLines": [
+        1209,
+        1209
+      ],
+      "sourceDigest": "b0a0db080dad061ca93e63826e562c4710807db8e6f2c8ca50dc291fc0b69e09",
+      "targetOwner": "docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md",
+      "targetAnchor": "unheaded-block-3",
+      "targetDigest": "b0a0db080dad061ca93e63826e562c4710807db8e6f2c8ca50dc291fc0b69e09",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; source unit shorter than 40 characters; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_4efee765e5a47fc42f4d9cccc7a53191",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "pointers-implementation",
+      "sourceLines": [
+        1211,
+        1211
+      ],
+      "sourceDigest": "a28a44307d00f10d0da810cccc5a0d5651ce6695e180cdf502baadcf43c6e641",
+      "targetOwner": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+      "targetAnchor": "pointers-implementation",
+      "targetDigest": "a28a44307d00f10d0da810cccc5a0d5651ce6695e180cdf502baadcf43c6e641",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; source unit shorter than 40 characters; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_a64fabc06da00bb0eb8dfaba5ea0c1a6",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-102",
+      "sourceLines": [
+        1213,
+        1263
+      ],
+      "sourceDigest": "b323720a9d4e93b156af47db347755f342dd8ad9fb9720466bb161732ebef4e3",
+      "targetOwner": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+      "targetAnchor": "unheaded-block-3",
+      "targetDigest": "b323720a9d4e93b156af47db347755f342dd8ad9fb9720466bb161732ebef4e3",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_49a878f920dd60fd0449e74d71b5fc1b",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "từ-vựng-dispatch-hiện-hành",
+      "sourceLines": [
+        1265,
+        1265
+      ],
+      "sourceDigest": "f43d4e34b06779c58f17e45c31f66be1d2a0daa7d90d6fbbe78f88131ea5d609",
+      "targetOwner": "docs/platform/runner/architecture/h-7af1f0242611.md",
+      "targetAnchor": "từ-vựng-dispatch-hiện-hành",
+      "targetDigest": "f43d4e34b06779c58f17e45c31f66be1d2a0daa7d90d6fbbe78f88131ea5d609",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; source unit shorter than 40 characters; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_df3b43cb418418ef385dc9adb09adec2",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-103",
+      "sourceLines": [
+        1267,
+        1267
+      ],
+      "sourceDigest": "289d09c0638b751d56c01bb15ddd9e052c0cf73c0938e093b1efdfca3f986bba",
+      "targetOwner": "docs/platform/runner/architecture/h-7af1f0242611.md",
+      "targetAnchor": "unheaded-block-3",
+      "targetDigest": "289d09c0638b751d56c01bb15ddd9e052c0cf73c0938e093b1efdfca3f986bba",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_532692d4c5ebdea48d2a8352129cc843",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "bảng-đối-chiếu-từ-vựng-dispatch",
+      "sourceLines": [
+        1269,
+        1269
+      ],
+      "sourceDigest": "4d4c05e94bd4baf1756a0e253ce3a29ec9b73beaa546931acf49ac259e774f44",
+      "targetOwner": "docs/platform/runner/architecture/h-7af1f0242611.md",
+      "targetAnchor": "bảng-đối-chiếu-từ-vựng-dispatch",
+      "targetDigest": "4d4c05e94bd4baf1756a0e253ce3a29ec9b73beaa546931acf49ac259e774f44",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; source unit shorter than 40 characters; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_e212e87da06a0a552cc1ccde10b5aaab",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-104",
+      "sourceLines": [
+        1271,
+        1285
+      ],
+      "sourceDigest": "ea328f8878d7b1816a6b23abc0b80e08352165da8a97ee753c80b855322d41d0",
+      "targetOwner": "docs/platform/runner/architecture/h-7af1f0242611.md",
+      "targetAnchor": "unheaded-block-4",
+      "targetDigest": "ea328f8878d7b1816a6b23abc0b80e08352165da8a97ee753c80b855322d41d0",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_17f27ab085e951c529afff07f099e25b",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-105",
+      "sourceLines": [
+        1287,
+        1295
+      ],
+      "sourceDigest": "75d27c27bf35d669cd2e4899d9ed3966cc2e628a6c37bfdd78483e02c35c28bc",
+      "targetOwner": "docs/platform/runner/architecture/h-7af1f0242611.md",
+      "targetAnchor": "unheaded-block-5",
+      "targetDigest": "75d27c27bf35d669cd2e4899d9ed3966cc2e628a6c37bfdd78483e02c35c28bc",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_ef6c4ace21b84e2eeb9de2ad200e5cfb",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "executorprofile-invocation-target-vocabulary-phase-06-executor-policy-dispatch-seams-identitysupports-made-real-config-phase-c-executor-profile-schema-migration",
+      "sourceLines": [
+        1297,
+        1297
+      ],
+      "sourceDigest": "0f54c4919dedb58d73fc7cf55e8d217fb054b04f36911b7990b6e9a78a361713",
+      "targetOwner": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+      "targetAnchor": "executorprofile-invocation-target-vocabulary-phase-06-executor-policy-dispatch-seams-identitysupports-made-real-config-phase-c-executor-profile-schema-migration",
+      "targetDigest": "0f54c4919dedb58d73fc7cf55e8d217fb054b04f36911b7990b6e9a78a361713",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_66d031f3f3d5009c11d96357e48d985a",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-106",
+      "sourceLines": [
+        1299,
+        1320
+      ],
+      "sourceDigest": "5fde748feccce5cce2990f23d3f2b681442d6ec366063c45ca96204a3458fbcf",
+      "targetOwner": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+      "targetAnchor": "unheaded-block-3",
+      "targetDigest": "5fde748feccce5cce2990f23d3f2b681442d6ec366063c45ca96204a3458fbcf",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_95d2ecdb9d54c1d56116b65a9df0c04d",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-107",
+      "sourceLines": [
+        1322,
+        1323
+      ],
+      "sourceDigest": "a1e669c10b27c418810291736bbd23a74f0b8a1519cb89bd800b657e59eb921a",
+      "targetOwner": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+      "targetAnchor": "unheaded-block-4",
+      "targetDigest": "a1e669c10b27c418810291736bbd23a74f0b8a1519cb89bd800b657e59eb921a",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_cb3c65b7e70173d58c23d44f7dfe0199",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-108",
+      "sourceLines": [
+        1325,
+        1330
+      ],
+      "sourceDigest": "8b4bfaca15661a77c17a4085af210b9fd239a810c76d1c086f4978b30249c2ef",
+      "targetOwner": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+      "targetAnchor": "unheaded-block-5",
+      "targetDigest": "8b4bfaca15661a77c17a4085af210b9fd239a810c76d1c086f4978b30249c2ef",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_b8467c061279966217c968d3b0e21419",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-109",
+      "sourceLines": [
+        1332,
+        1339
+      ],
+      "sourceDigest": "770f4acda1f192cd4b53aaf5f746e4952661815dd5222849df64c42cf039e297",
+      "targetOwner": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+      "targetAnchor": "unheaded-block-6",
+      "targetDigest": "770f4acda1f192cd4b53aaf5f746e4952661815dd5222849df64c42cf039e297",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_d29be3d33893c060220d82b135fcb7c0",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-110",
+      "sourceLines": [
+        1341,
+        1345
+      ],
+      "sourceDigest": "dfa2fbd2381337a7bc8440220851e83137d4ebf9014eb9e18bc6d9161a615964",
+      "targetOwner": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+      "targetAnchor": "unheaded-block-7",
+      "targetDigest": "dfa2fbd2381337a7bc8440220851e83137d4ebf9014eb9e18bc6d9161a615964",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_2811db1449ad8dc4655f8531d5c5701e",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-111",
+      "sourceLines": [
+        1347,
+        1354
+      ],
+      "sourceDigest": "fc05b724a8cf91d0a56fcedb8c1f936f8771e44e77ae345055e5525b8bdf6bc5",
+      "targetOwner": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+      "targetAnchor": "unheaded-block-8",
+      "targetDigest": "fc05b724a8cf91d0a56fcedb8c1f936f8771e44e77ae345055e5525b8bdf6bc5",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_5f91b173c863af29efb4d8af8c734b4c",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-112",
+      "sourceLines": [
+        1356,
+        1360
+      ],
+      "sourceDigest": "8effb31b306362d3a2022b786937e6f66411717f00e1e3679117d7fa3cdf6e4d",
+      "targetOwner": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+      "targetAnchor": "unheaded-block-9",
+      "targetDigest": "8effb31b306362d3a2022b786937e6f66411717f00e1e3679117d7fa3cdf6e4d",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_55b85c1d204ea6a7b336fd6b066fc4f1",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "dispatch-operability-implementation-slice-2026-09-16",
+      "sourceLines": [
+        1416,
+        1416
+      ],
+      "sourceDigest": "aaec88b66425149e842fe7c507cd3dd0beaee9d3e0ecde88fa805637967d2f10",
+      "targetOwner": "docs/platform/runner/architecture/h-69197b459754.md",
+      "targetAnchor": "dispatch-operability-implementation-slice-2026-09-16",
+      "targetDigest": "aaec88b66425149e842fe7c507cd3dd0beaee9d3e0ecde88fa805637967d2f10",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_fca50adfa6081d799d49e2aba84a9d80",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-117",
+      "sourceLines": [
+        1418,
+        1421
+      ],
+      "sourceDigest": "225b05f175562f82288e354367b96d258adb631d94f9bc20a2db83d44cb1b00b",
+      "targetOwner": "docs/platform/runner/architecture/h-69197b459754.md",
+      "targetAnchor": "unheaded-block-3",
+      "targetDigest": "225b05f175562f82288e354367b96d258adb631d94f9bc20a2db83d44cb1b00b",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_c84ba0d82475bce8718993c8051fc740",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-118",
+      "sourceLines": [
+        1423,
+        1434
+      ],
+      "sourceDigest": "449b3f87bae94337a97b05d283c3d9756e080449f5af93d3e8e6f5047799f76b",
+      "targetOwner": "docs/platform/runner/architecture/h-69197b459754.md",
+      "targetAnchor": "unheaded-block-4",
+      "targetDigest": "449b3f87bae94337a97b05d283c3d9756e080449f5af93d3e8e6f5047799f76b",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_d7fd3778a5cbb74cad9fb5e476708647",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-119",
+      "sourceLines": [
+        1436,
+        1442
+      ],
+      "sourceDigest": "1c77f2b68620610ff91f742d28ff88584c190c8af2ade3ac6818b67a6f054288",
+      "targetOwner": "docs/platform/runner/architecture/h-69197b459754.md",
+      "targetAnchor": "unheaded-block-5",
+      "targetDigest": "1c77f2b68620610ff91f742d28ff88584c190c8af2ade3ac6818b67a6f054288",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_58aec75ea3f912db7cd71475af20983a",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-120",
+      "sourceLines": [
+        1444,
+        1452
+      ],
+      "sourceDigest": "a31f82c614a285bf04b2f5e9c37a5ab9eab7bd3994bb94472b2687ef0dc4c5a1",
+      "targetOwner": "docs/platform/runner/architecture/h-69197b459754.md",
+      "targetAnchor": "unheaded-block-6",
+      "targetDigest": "a31f82c614a285bf04b2f5e9c37a5ab9eab7bd3994bb94472b2687ef0dc4c5a1",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_ae2fbd5e11d71cda571ac0e8c8b1fb0a",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-121",
+      "sourceLines": [
+        1454,
+        1457
+      ],
+      "sourceDigest": "b4a8ef27809802f9f81c6bb3314a5a7c2f15030795c741b2f30c4b87c489b424",
+      "targetOwner": "docs/platform/runner/architecture/h-69197b459754.md",
+      "targetAnchor": "unheaded-block-7",
+      "targetDigest": "b4a8ef27809802f9f81c6bb3314a5a7c2f15030795c741b2f30c4b87c489b424",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_b2d5aa7fb7d66cddcd4766a2ea66e428",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-122",
+      "sourceLines": [
+        1459,
+        1459
+      ],
+      "sourceDigest": "c9293bc1d25e88e5ef597743143508640ec9575ce90fa5747ae686285b0d4e9c",
+      "targetOwner": "docs/platform/runner/architecture/h-69197b459754.md",
+      "targetAnchor": "unheaded-block-8",
+      "targetDigest": "c9293bc1d25e88e5ef597743143508640ec9575ce90fa5747ae686285b0d4e9c",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; source unit shorter than 40 characters; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_efe72c76747341ebd05c797fc4a847ed",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-123",
+      "sourceLines": [
+        1461,
+        1466
+      ],
+      "sourceDigest": "947db45d2ec4ed4433fb34c8730af8940c8d2ec5c9d8cd6efccafdba03ed47d8",
+      "targetOwner": "docs/platform/runner/architecture/h-69197b459754.md",
+      "targetAnchor": "unheaded-block-9",
+      "targetDigest": "947db45d2ec4ed4433fb34c8730af8940c8d2ec5c9d8cd6efccafdba03ed47d8",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_c71a4a589ecddc5c1ccc30f983c45d9f",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-124",
+      "sourceLines": [
+        1468,
+        1471
+      ],
+      "sourceDigest": "d97aff53f907d98812c5c22b0181d05a8c020c73ed4cf026fc0c44aa8e6fbd6b",
+      "targetOwner": "docs/platform/runner/architecture/h-69197b459754.md",
+      "targetAnchor": "unheaded-block-10",
+      "targetDigest": "d97aff53f907d98812c5c22b0181d05a8c020c73ed4cf026fc0c44aa8e6fbd6b",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_d940e5b03dd1e19deb086af4a0a22fa2",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-125",
+      "sourceLines": [
+        1473,
+        1480
+      ],
+      "sourceDigest": "97b0e92a0ff83b4b98002158e13f563d8738446ac64f0fcaeace320234d79b7b",
+      "targetOwner": "docs/platform/runner/architecture/h-69197b459754.md",
+      "targetAnchor": "unheaded-block-11",
+      "targetDigest": "97b0e92a0ff83b4b98002158e13f563d8738446ac64f0fcaeace320234d79b7b",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_266411b5687c45ccfcaf394c32117cb2",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-126",
+      "sourceLines": [
+        1482,
+        1482
+      ],
+      "sourceDigest": "dbc86a4eb802b0bf0cc05fb0b24c2638bf9a8af662a8f6b9518d4782c81d1d5a",
+      "targetOwner": "docs/platform/runner/architecture/h-69197b459754.md",
+      "targetAnchor": "unheaded-block-12",
+      "targetDigest": "dbc86a4eb802b0bf0cc05fb0b24c2638bf9a8af662a8f6b9518d4782c81d1d5a",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_ac655fa53e915603a6788b8cbf14d529",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-127",
+      "sourceLines": [
+        1484,
+        1484
+      ],
+      "sourceDigest": "604f27c0c0b41f7c810ab6fbdc753ca0554a9af27dbac7ef93d99156bf4cc7e9",
+      "targetOwner": "docs/platform/runner/architecture/h-69197b459754.md",
+      "targetAnchor": "unheaded-block-13",
+      "targetDigest": "604f27c0c0b41f7c810ab6fbdc753ca0554a9af27dbac7ef93d99156bf4cc7e9",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_1116c4f544e78436e0e564fa8d827cac",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-128",
+      "sourceLines": [
+        1486,
+        1486
+      ],
+      "sourceDigest": "b39158ae03ad6358028e813139d4157895186944f4a10ddd3e8756f61cbc8824",
+      "targetOwner": "docs/platform/runner/architecture/h-69197b459754.md",
+      "targetAnchor": "unheaded-block-14",
+      "targetDigest": "b39158ae03ad6358028e813139d4157895186944f4a10ddd3e8756f61cbc8824",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_7199fa94f36517e6e6624b9d1101c363",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-129",
+      "sourceLines": [
+        1488,
+        1488
+      ],
+      "sourceDigest": "225117b5a193fef425859ada402bf45ae932ce1bf9f39f3035d49ce2a538ec97",
+      "targetOwner": "docs/platform/runner/architecture/h-69197b459754.md",
+      "targetAnchor": "unheaded-block-15",
+      "targetDigest": "225117b5a193fef425859ada402bf45ae932ce1bf9f39f3035d49ce2a538ec97",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_27d6318e5b61562f3521a24fece7d015",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-130",
+      "sourceLines": [
+        1490,
+        1490
+      ],
+      "sourceDigest": "1dc2761ded279b2db8a63a37ab46622ee0857ac91ac6bddc70b647b6fd45659f",
+      "targetOwner": "docs/platform/runner/architecture/h-69197b459754.md",
+      "targetAnchor": "unheaded-block-16",
+      "targetDigest": "1dc2761ded279b2db8a63a37ab46622ee0857ac91ac6bddc70b647b6fd45659f",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_a181e4f5f88806fa1e2b473d7f4f5126",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-131",
+      "sourceLines": [
+        1492,
+        1492
+      ],
+      "sourceDigest": "2dba40515708d593a3b5bb7320e3c16c7c5ca559703402b823cd241d7829d71f",
+      "targetOwner": "docs/platform/runner/architecture/h-69197b459754.md",
+      "targetAnchor": "unheaded-block-17",
+      "targetDigest": "2dba40515708d593a3b5bb7320e3c16c7c5ca559703402b823cd241d7829d71f",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_f6c6b09386500ad22dbd1626b3ed4e6d",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-132",
+      "sourceLines": [
+        1494,
+        1494
+      ],
+      "sourceDigest": "32a75532cfbd396fe058cd272694a6ef02294148803480fb4e019377d3dadc76",
+      "targetOwner": "docs/platform/runner/architecture/h-69197b459754.md",
+      "targetAnchor": "unheaded-block-18",
+      "targetDigest": "32a75532cfbd396fe058cd272694a6ef02294148803480fb4e019377d3dadc76",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_64b0cdea180e4a5760597816f59d901b",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-133",
+      "sourceLines": [
+        1496,
+        1496
+      ],
+      "sourceDigest": "025b8b721ce848ae9047ff219539a44ddcb48627029daad0566fd065a33c2a52",
+      "targetOwner": "docs/platform/runner/architecture/h-69197b459754.md",
+      "targetAnchor": "unheaded-block-19",
+      "targetDigest": "025b8b721ce848ae9047ff219539a44ddcb48627029daad0566fd065a33c2a52",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_4cc8a229ab16588700d7367a2883e5e5",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-134",
+      "sourceLines": [
+        1498,
+        1498
+      ],
+      "sourceDigest": "20b88b9765b1528632270f740a923bdcca1df84a4a3000f87e45e1b1b177ffcd",
+      "targetOwner": "docs/platform/runner/architecture/h-69197b459754.md",
+      "targetAnchor": "unheaded-block-20",
+      "targetDigest": "20b88b9765b1528632270f740a923bdcca1df84a4a3000f87e45e1b1b177ffcd",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_927f25d69eecea02a9f490ac358f9160",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-135",
+      "sourceLines": [
+        1500,
+        1500
+      ],
+      "sourceDigest": "59d0cd5865c681d2535cd1fdfcfa91bb8062f779329ace7673d29537159e2163",
+      "targetOwner": "docs/platform/runner/architecture/h-69197b459754.md",
+      "targetAnchor": "unheaded-block-21",
+      "targetDigest": "59d0cd5865c681d2535cd1fdfcfa91bb8062f779329ace7673d29537159e2163",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_e1d796c4b41dd038701bdca812ad80e1",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-136",
+      "sourceLines": [
+        1502,
+        1502
+      ],
+      "sourceDigest": "04f51a4f5dfccd3bd32411d47268161e9a971db21e975f38699939e78a1f0c55",
+      "targetOwner": "docs/platform/runner/architecture/h-69197b459754.md",
+      "targetAnchor": "unheaded-block-22",
+      "targetDigest": "04f51a4f5dfccd3bd32411d47268161e9a971db21e975f38699939e78a1f0c55",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_ee954f73b86887b8350bd2735d3640c8",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-137",
+      "sourceLines": [
+        1504,
+        1504
+      ],
+      "sourceDigest": "124888c61ed54076f79cc849c645c99501bb225b3f323f33af973891f9a5749d",
+      "targetOwner": "docs/platform/runner/architecture/h-69197b459754.md",
+      "targetAnchor": "unheaded-block-23",
+      "targetDigest": "124888c61ed54076f79cc849c645c99501bb225b3f323f33af973891f9a5749d",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_bb7a322701d0d2aaafa73446c3ab66de",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-138",
+      "sourceLines": [
+        1506,
+        1510
+      ],
+      "sourceDigest": "c11d67db6566ba3bc0468506dfdcdc3333c4c43943db1813332d60a8e6be3278",
+      "targetOwner": "docs/platform/runner/architecture/h-69197b459754.md",
+      "targetAnchor": "unheaded-block-24",
+      "targetDigest": "c11d67db6566ba3bc0468506dfdcdc3333c4c43943db1813332d60a8e6be3278",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_9d234a2abbcec244d40fa6dd3439dd60",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-139",
+      "sourceLines": [
+        1512,
+        1526
+      ],
+      "sourceDigest": "a23e016ecbd901a3f370dd33b3fa87d0f679a24d9be45e178f34b4e24134334c",
+      "targetOwner": "docs/platform/runner/architecture/h-69197b459754.md",
+      "targetAnchor": "unheaded-block-25",
+      "targetDigest": "a23e016ecbd901a3f370dd33b3fa87d0f679a24d9be45e178f34b4e24134334c",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_a11926d30be8de43744fc81023f6dab5",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-140",
+      "sourceLines": [
+        1528,
+        1563
+      ],
+      "sourceDigest": "dceb2f2607dd441fb5cb8dbd9b126189c6d98f50e1978cdf010b77032b352e85",
+      "targetOwner": "docs/platform/runner/architecture/h-69197b459754.md",
+      "targetAnchor": "unheaded-block-26",
+      "targetDigest": "dceb2f2607dd441fb5cb8dbd9b126189c6d98f50e1978cdf010b77032b352e85",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_88d627e8f4ea6556a45d97bc81b03f28",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-141",
+      "sourceLines": [
+        1565,
+        1577
+      ],
+      "sourceDigest": "ff375152abfe9a2c14b52258ea20eac7a8626c8c59ec1c27f1e7819fa8421457",
+      "targetOwner": "docs/platform/runner/architecture/h-69197b459754.md",
+      "targetAnchor": "unheaded-block-27",
+      "targetDigest": "ff375152abfe9a2c14b52258ea20eac7a8626c8c59ec1c27f1e7819fa8421457",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_5e0cf165c59b615201e26c123abc8099",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-142",
+      "sourceLines": [
+        1579,
+        1591
+      ],
+      "sourceDigest": "67ff0ec2d25af01f6dcbc9715018d0d3113542ed4c3d9fd321c10748d2fad180",
+      "targetOwner": "docs/platform/runner/architecture/h-69197b459754.md",
+      "targetAnchor": "unheaded-block-28",
+      "targetDigest": "67ff0ec2d25af01f6dcbc9715018d0d3113542ed4c3d9fd321c10748d2fad180",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    },
+    {
+      "claimId": "claim_12073295363676caa66ef2cbc89bf5af",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-143",
+      "sourceLines": [
+        1593,
+        1607
+      ],
+      "sourceDigest": "455696e32c5e98ffca93441a2068682b5e085c16763e97e0605fa46948bff67b",
+      "targetOwner": "docs/platform/runner/architecture/h-69197b459754.md",
+      "targetAnchor": "unheaded-block-29",
+      "targetDigest": "455696e32c5e98ffca93441a2068682b5e085c16763e97e0605fa46948bff67b",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ; document exact share below one half",
+      "mandatoryDeep": false,
+      "fullSourceUnitContained": true
+    }
+  ],
+  "knownStaleCarriageNote": "Known stale carried sentences; full truth check owed at promotion. Explicit Lead A35 note for Runner; no automatic truth-threshold exception granted.",
+  "knownStaleSections": [
+    {
+      "anchor": "preamble",
+      "lines": [
+        1,
+        8
+      ],
+      "missingPaths": [],
+      "target": "docs/platform/runner/spec.md",
+      "status": "carried verbatim; truth pass owed"
+    },
+    {
+      "anchor": "gate-a-xếp-hạng-candidate-bắc-cầu-sang-việc-thật-evolve",
+      "lines": [
+        548,
+        635
+      ],
+      "missingPaths": [
+        "src/evolve/candidates.mjs"
+      ],
+      "target": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "status": "carried verbatim; truth pass owed"
+    },
+    {
+      "anchor": "business-rules",
+      "lines": [
+        952,
+        1122
+      ],
+      "missingPaths": [
+        "plans/260916-account-rotator/design.md",
+        "src/state/workflow-stage-graphs.mjs",
+        "src/state/stage-fsm.mjs",
+        "src/auth/manager.rs",
+        "src/runner/dispatch-log.mjs"
+      ],
+      "target": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "status": "carried verbatim; truth pass owed"
+    },
+    {
+      "anchor": "open-gaps",
+      "lines": [
+        1175,
+        1206
+      ],
+      "missingPaths": [],
+      "target": "docs/platform/runner/subcomponents/h-2e032393add1/spec.md",
+      "status": "carried verbatim; truth pass owed"
+    },
+    {
+      "anchor": "pointers-implementation",
+      "lines": [
+        1211,
+        1264
+      ],
+      "missingPaths": [
+        "src/intake/judge-executor.mjs",
+        "src/report/entropy.mjs",
+        "src/evolve/candidates.mjs",
+        "test/cli/fgos.test.mjs",
+        "test/report/entropy.test.mjs"
+      ],
+      "target": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+      "status": "carried verbatim; truth pass owed"
+    },
+    {
+      "anchor": "bảng-đối-chiếu-từ-vựng-dispatch",
+      "lines": [
+        1269,
+        1296
+      ],
+      "missingPaths": [],
+      "target": "docs/platform/runner/architecture/h-7af1f0242611.md",
+      "status": "carried verbatim; truth pass owed"
+    },
+    {
+      "anchor": "executorprofile-invocation-target-vocabulary-phase-06-executor-policy-dispatch-seams-identitysupports-made-real-config-phase-c-executor-profile-schema-migration",
+      "lines": [
+        1297,
+        1361
+      ],
+      "missingPaths": [
+        "plans/260915-executor-policy-dispatch-seams/design.md",
+        "plans/260917-executor-profile-schema-migration/plan.md"
+      ],
+      "target": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+      "status": "carried verbatim; truth pass owed"
+    },
+    {
+      "anchor": "coordinationsession-lịch-sử-đã-thu-hồi-per-p4-thay-bằng-collaborationpattern-workflow-runner",
+      "lines": [
+        1362,
+        1415
+      ],
+      "missingPaths": [
+        "test/runner/coordination-recheck-discharge.test.mjs"
+      ],
+      "target": "docs/platform/runner/decisions/h-aabefc85f0c9.md",
+      "status": "carried verbatim; truth pass owed"
+    },
+    {
+      "anchor": "dispatch-operability-implementation-slice-2026-09-16",
+      "lines": [
+        1416,
+        1608
+      ],
+      "missingPaths": [
+        "plans/260914-dispatch-operability-evidence-attribution/contracts/run-result-and-observation.md",
+        "plans/260914-dispatch-operability-evidence-attribution/phase-designs/inspection-surface-and-routing.md",
+        "plans/260914-dispatch-operability-evidence-attribution/phase-designs/evidence-attribution.md",
+        "plans/260914-dispatch-operability-evidence-attribution/phase-designs/guard-reconciliation.md",
+        "plans/260914-dispatch-operability-evidence-attribution/phase-designs/executor-contract-and-production-proof.md",
+        "test/fixtures/run-layout/expected.js",
+        "src/runner/coordination/session-engine.mjs",
+        "src/runner/coordination/headless-adapter.mjs",
+        "plans/260904-2329-group-thinking-plan-loop/reports/lead-260905-0400-p03-1-r5-live-proof-report.md",
+        "src/verbs/coordination/run.mjs"
+      ],
+      "target": "docs/platform/runner/architecture/h-69197b459754.md",
+      "status": "carried verbatim; truth pass owed"
+    },
+    {
+      "anchor": "ghi-chú-liên-quan-không-phải-finding-mới-của-item-này",
+      "lines": [
+        2015,
+        2031
+      ],
+      "missingPaths": [
+        "docs/decisions/0021-wire-main-checkout-hook-qua-doctor-setup.md"
+      ],
+      "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "status": "carried verbatim; truth pass owed"
+    },
+    {
+      "anchor": "hệ-quả-6",
+      "lines": [
+        2384,
+        2402
+      ],
+      "missingPaths": [
+        "test/docs/launcher-vocabulary-guard.test.mjs"
+      ],
+      "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "status": "carried verbatim; truth pass owed"
+    },
+    {
+      "anchor": "hệ-quả-7",
+      "lines": [
+        2473,
+        2491
+      ],
+      "missingPaths": [
+        "docs/decisions/0000-index.md"
+      ],
+      "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "status": "carried verbatim; truth pass owed"
+    },
+    {
+      "anchor": "tham-chiếu-1",
+      "lines": [
+        2492,
+        2504
+      ],
+      "missingPaths": [
+        "docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md",
+        "docs/decisions/0028-doi-ten-orchestrator-thanh-launcher.md"
+      ],
+      "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "status": "carried verbatim; truth pass owed"
+    },
+    {
+      "anchor": "quyết-định-9",
+      "lines": [
+        2608,
+        2641
+      ],
+      "missingPaths": [
+        "test/docs/launcher-vocabulary-guard.test.mjs",
+        "docs/decisions/0000-index.md"
+      ],
+      "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "status": "carried verbatim; truth pass owed"
+    },
+    {
+      "anchor": "hệ-quả-9",
+      "lines": [
+        2651,
+        2672
+      ],
+      "missingPaths": [
+        "test/docs/launcher-vocabulary-guard.test.mjs",
+        "scripts/check-decision-codes.baseline.js",
+        "docs/decisions/0000-index.md"
+      ],
+      "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "status": "carried verbatim; truth pass owed"
+    },
+    {
+      "anchor": "tham-chiếu-2",
+      "lines": [
+        2673,
+        2678
+      ],
+      "missingPaths": [
+        "docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md",
+        "docs/decisions/0028-doi-ten-orchestrator-thanh-launcher.md",
+        "docs/decisions/0029-sua-dinh-nghia-roottask-subtask-capacity-t1-cua-0026.md"
+      ],
+      "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "status": "carried verbatim; truth pass owed"
+    },
+    {
+      "anchor": "tham-chiếu-3",
+      "lines": [
+        2785,
+        2794
+      ],
+      "missingPaths": [
+        "docs/decisions/0030-them-release-con-nguoi-vao-thu-tu-uu-tien-san-pham.md"
+      ],
+      "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "status": "carried verbatim; truth pass owed"
+    },
+    {
+      "anchor": "phạm-vi-đổi-tên",
+      "lines": [
+        2917,
+        2938
+      ],
+      "missingPaths": [
+        "scripts/check-decision-codes.baseline.js"
+      ],
+      "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "status": "carried verbatim; truth pass owed"
+    },
+    {
+      "anchor": "0048-p2-plan-chạy-được-unit-cho-mọi-đường-vào-driver-mỏng-fgos-run-bỏ-demandfactsmatcher",
+      "lines": [
+        3114,
+        3124
+      ],
+      "missingPaths": [
+        "src/runner/capability-match.mjs"
+      ],
+      "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "status": "carried verbatim; truth pass owed"
+    },
+    {
+      "anchor": "0049-p3b-work-không-còn-stage-work-chỉ-còn-bản-ghilifecycle-workflow-runner-là-sequencer-duy-nhất-đóng-a4",
+      "lines": [
+        3125,
+        3135
+      ],
+      "missingPaths": [
+        "src/runner/definitions/workflow-adapter.mjs"
+      ],
+      "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "status": "carried verbatim; truth pass owed"
+    }
+  ],
+  "upstreamEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/step9-evidence.md",
+  "threshold": "A28: more than 10% false in independent sample stops for owner; evidence 4/24 was stratified, not the review draw."
+}
