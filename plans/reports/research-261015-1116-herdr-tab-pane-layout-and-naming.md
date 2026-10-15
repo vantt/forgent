@@ -14,7 +14,7 @@ status: completed
 2. First-principles comparison of `cli-spawn`, `herdr-spawn`, and future `tmux-spawn` $\rightarrow$ unifying Process Spawn & Supervision with pluggable Carrier Helpers (`cli`, `herdr`, `tmux`).
 3. Native Rust components `packages/terminal-control/rust` (`fgos-terminal-control`, CLI `fgos terminal`) and independent `session-identity` (`packages/host-runtime/rust/src/session_identity.rs` + `src/util/session-identity.mjs`) across all 5 CLIs (`claude`, `codex`, `agy`, `pi`, `omp`).
 4. Resolution & Aspect-Ratio-Aware TUI Layout (`cols × rows` & $R_{\text{vis}} = \frac{w}{2h}$) and Layered Naming Convention (Lower-Layer Grammar, Upper-Layer Adaptation).
-5. Codebase-wide Impact / Blast-Radius Analysis, Sizing, and **5-Milestone Low-Risk Incremental Rollout Sequence** designed for minimum disruption and fastest return to live production use.
+5. Codebase-wide Impact / Blast-Radius Analysis, Sizing, **5-Milestone Release Order**, and **Parallel Coding Wave Schedule (2 Waves × 3 Disjoint Lanes + 2 Integration Test Gates)**.
 
 ---
 
@@ -36,9 +36,10 @@ status: completed
    - [4. Independent Session & Agent Identity Authority Across 5 CLIs (Fixing Live PID `3614` Bug)](#4-independent-session--agent-identity-authority-across-5-clis-fixing-live-pid-3614-bug)
 6. [Inventory of WorkItem-Independent Orchestration Skills (Milestone 3 Surface)](#inventory-of-workitem-independent-orchestration-skills-milestone-3-surface)
 7. [Impact Analysis, Blast Radius & Sizing Assessment](#impact-analysis-blast-radius--sizing-assessment)
-   - [1. Component-by-Component Blast Radius & Sizing Table](#1-component-by-component-blast-radius--sizing-table)
-   - [2. Critical Technical Constraints Uncovered by Impact Scan](#2-critical-technical-constraints-uncovered-by-impact-scan)
-8. [Five-Milestone Low-Risk Rollout Sequence (Fastest Return to Live Use, Zero Big-Bang Breakage)](#five-milestone-low-risk-rollout-sequence-fastest-return-to-live-use-zero-big-bang-breakage)
+8. [Release Milestones vs. Parallel Coding Wave Schedule & Test-Budget Strategy](#release-milestones-vs-parallel-coding-wave-schedule--test-budget-strategy)
+   - [1. Five-Milestone Release Progression (Order of Activation)](#1-five-milestone-release-progression-order-of-activation)
+   - [2. Parallel Coding Execution: 2 Waves × 3 Disjoint Lanes + 2 Integration Gates](#2-parallel-coding-execution-2-waves--3-disjoint-lanes--2-integration-gates)
+   - [3. Fast Test-Budget Policy (Canary Per Lane, Full Suite Only at Final Gate)](#3-fast-test-budget-policy-canary-per-lane-full-suite-only-at-final-gate)
 9. [Resources & References](#resources--references)
 
 ---
@@ -54,12 +55,11 @@ status: completed
 3. **Independent `session-identity` Authority (Fixing Live PID `3614` Collision Bug):**
    - Resolves `{ fgSessionId, writerSource, agentKind, agentSessionId }` across `claude`, `codex`, `agy`, `pi`, and `omp` in any environment (Herdr, tmux, plain terminal, SSH, headless).
    - Fixes a **critical live bug discovered during this research**: in `omp` (and bare shells), `resolveWriterIdentity()` walks 3 parent PIDs (`node → zsh → herdr server`) and returns `{ id: 3614, source: 'pid' }` — the shared `herdr server` daemon PID — causing all concurrent `omp` panes across the machine to collide on `writer.id = 3614`.
-4. **Five-Milestone Low-Risk Rollout Strategy (Separating Immediate Live Value from Deep Internal Refactoring):**
-   - **Milestone 1 — Native Rust Foundations (`session-identity` + `fgos-terminal-control` + `fgos terminal` CLI):** 100% additive + PID `3614` bugfix. Zero breakage to existing dispatch. Activated immediately.
-   - **Milestone 2 — Surgical Wiring of `fgos terminal` into `fgos run` & `fgos workflow` (~40-Line Hook):** Replaces only the ~40 lines of `batchTabsByKey` / `paneSplit(down 0.3)` in `herdr-round.mjs` with `fgos terminal acquire-pane` / `release-pane` without touching process supervision internals. **Activated immediately — `fgos run` and `fgos workflow` gain full tab grouping, resolution-aware layout, and `<scope> | <role> | <cli>:<model>` naming across all projects right here!**
-   - **Milestone 3 — External Orchestration Skills Surface (`fgos-advise`, `fgos-group-thinking`, `fgos-architecture-panel`, `fgos-run`, `decide -> run`, `distill`):** Verify & polish the WorkItem-independent orchestration skills on top of M2's live engine.
-   - **Milestone 4 — Upper `WorkItem` Lifecycle Surface (`work-dispatch`, `fanout-batch`, `fgos pick`, `fgos-coding-driving`, delete `rename.sh`):** Adapt the `WorkItem` layer onto the proven engine.
-   - **Milestone 5 — Structural Consolidation of `Shared Process Supervisor` + `Carrier Helpers` (`cli` / `herdr` / `tmux`) & File Renames (`herdr-spawn.mjs`, `herdr-client.mjs`):** Perform the internal deduplication of `/proc` checks and process supervision safely behind the already-live, fully-tested M1–M4 surfaces.
+4. **Fast Parallel Execution (2 Waves × 3 Disjoint Coding Lanes + 2 Integration Gates):**
+   - **Wave 1 (3 Parallel Lanes, 0 File Overlap):** Lane 1A (`session-identity`) + Lane 1B (`fgos-terminal-control` crate) + Lane 1C (`displayContext` plumbing & `/proc` hoist).
+   - **Integration Gate 1 (~15s Targeted Suite + Stage/Activate):** Wire `fgos terminal` route & 40-line `herdr-round.mjs` hook $\rightarrow$ **Milestones 1 & 2 go LIVE immediately for all projects!**
+   - **Wave 2 (3 Parallel Lanes, 0 File Overlap):** Lane 2A (M3: 6 Orchestration Skills) + Lane 2B (M4: `WorkItem` layer & delete `rename.sh`) + Lane 2C (M5: `CarrierHelper` consolidation & `herdr-spawn.mjs` / `herdr-client.mjs` rename).
+   - **Integration Gate 2 (Final Closeout):** Run the full `cargo test --workspace && npm test` suite **once** at final integration.
 
 ---
 
@@ -225,8 +225,6 @@ pub fn choose_next_split(layout: &TabLayout, policy: &LayoutPolicy) -> SplitDeci
         };
     }
 
-    // Sort candidates by area descending; tie-break by right-most (x desc) then bottom-most (y desc)
-    // so Pane #1 (top-left / left column, the primary producer) stays full-height when pane_count = 3.
     let mut candidates: Vec<&LayoutPane> = layout.panes.iter().collect();
     candidates.sort_by(|a, b| {
         let area_a = a.rect.width * a.rect.height;
@@ -332,8 +330,6 @@ pub fn choose_next_split(layout: &TabLayout, policy: &LayoutPolicy) -> SplitDeci
 
 ## Impact Analysis, Blast Radius & Sizing Assessment
 
-### 1. Component-by-Component Blast Radius & Sizing Table
-
 | Milestone / Slice | Target Files | Blast Radius & Consumers | Risk Level | Effort / Size |
 |---|---|---|---|---|
 | **M1.1: `session-identity` (Node + Rust Host)** | `src/util/session-identity.mjs`, `packages/host-runtime/rust/src/{session_identity.rs,lib.rs}` | 12 importers (gồm `.githooks/pre-commit`); 4 test files (`session-identity.test.mjs` + 3 hook E2E tests) | **Low** (Giữ 0-dep cho `pre-commit`) | **Small** (~200 LOC) |
@@ -343,60 +339,85 @@ pub fn choose_next_split(layout: &TabLayout, policy: &LayoutPolicy) -> SplitDeci
 | **M4: Upper `WorkItem` Layer Cutover & Delete `rename.sh`** | `src/runner/{work-dispatch,fanout-batch}.mjs`, `bin/fgos.mjs` (`pick`), `core/skills/fgos-coding-driving/**`, `plugins/fgOS/skills/**`, xoá `rename.sh` | Luồng `WorkItem`, `/fgOS:pick`, `/fgOS:terminal`, `fgos-coding-driving` | **Low** | **Small** (~75 LOC, xoá `rename.sh`) |
 | **M5: Structural Consolidation of `Shared Process Supervisor` + `Carrier Helpers`** | `src/runner/dispatch/{process-identity,herdr-round->herdr-spawn,herdr-agent->herdr-client,detached-run-supervisor}.mjs`, `docs/architecture-manifest.json` | Refactor nội bộ tầng Dispatch sau khi M1–M4 đã chạy ổn định và có đủ test bảo vệ | **Medium** (Làm từng bước nhỏ sau khi tính năng đã live) | **Medium** (~300 LOC refactor, xoá code trùng) |
 
-### 2. Critical Technical Constraints Uncovered by Impact Scan
+---
 
-1. **Hook Copy Constraint (`test/e2e/main-checkout-lock-hook.test.mjs:35`, `root-file-guard-hook.test.mjs:36`):**
-   - E2E hook tests copy an explicit 5-file list into temporary repositories: `.githooks/pre-commit`, `main-checkout-lock.mjs`, `process-identity.mjs`, `run-timeout.mjs`, and `src/util/session-identity.mjs`.
-   - **Rule:** `src/util/session-identity.mjs` MUST stay 100% zero-dependency (Node builtins only).
-2. **Import-Graph Guard (`test/runner/dispatch-reconciliation-import-graph.test.mjs:82` & `test/verbs/dispatch-observe.test.mjs:95`):**
-   - Read-only / reconciliation modules (`herdr-reconcile.mjs`, `confinement/cleanup.mjs`, `worker-session-boot.mjs`, `dispatch/cli.mjs`) import the low-level client (`herdr-agent.mjs` / `herdr-client.mjs`) and are forbidden from importing the spawn driver (`herdr-round.mjs` / `herdr-spawn.mjs`).
-3. **Mock Herdr Compatibility (`test/helpers/fake-herdr-pane.mjs:52`):**
-   - Splitting `worker_pane_1` (`mock-pane-1`) off `tab create`'s `root_pane` (`mock-root`) and then closing `mock-root` preserves the exact 1-based `mock-pane-1` numbering expected by all 20+ tests in `test/runner/execution/run-herdr.test.mjs`.
+## Release Milestones vs. Parallel Coding Wave Schedule & Test-Budget Strategy
+
+### 1. Five-Milestone Release Progression (Order of Activation)
+
+- **Milestone 1:** `session-identity` + Rust `fgos-terminal-control` + `fgos terminal` CLI route active.
+- **Milestone 2:** `fgos run` & `fgos workflow` wired into `fgos terminal` (~40-line surgical hook) $\rightarrow$ **Live for all projects!**
+- **Milestone 3:** 6 External Orchestration Skills verified & live on top of M2.
+- **Milestone 4:** `WorkItem` layer (`pick`, `driving`, `fanout`) wired into M2 & `rename.sh` deleted.
+- **Milestone 5:** Internal `Shared Process Supervisor + Carrier Helpers` consolidation & file renames (`herdr-spawn.mjs`, `herdr-client.mjs`).
 
 ---
 
-## Five-Milestone Low-Risk Rollout Sequence (Fastest Return to Live Use, Zero Big-Bang Breakage)
+### 2. Parallel Coding Execution: 2 Waves × 3 Disjoint Lanes + 2 Integration Gates
 
-Nguyên tắc sắp xếp: **Tách bạch hoàn toàn việc "Đưa tính năng Tab/Layout/Naming vào sử dụng ngay với rủi ro tối thiểu" (M1 → M4) khỏi việc "Gom cấu trúc nội bộ Process Supervisor" (M5)**. Nhờ đó hệ thống không bao giờ bị bung 2 mặt trận cùng lúc và có thể stage/activate để dùng ngay từ cuối Milestone 2!
+Để đẩy tốc độ coding tối đa mà **không đụng file nhau (0 file conflict)** và **không phải chạy full test lặp lại nhiều lần**, toàn bộ công việc của 5 Milestones được chia thành **2 Đợt chạy song song (Wave 1 & Wave 2)** và **2 Điểm hội tụ tích hợp (Integration Gate 1 & Gate 2)**:
 
 ```mermaid
-flowchart LR
-    subgraph M1["MILESTONE 1: Native Rust Foundations (0 Rủi ro vỡ luồng cũ)"]
-        P1["Phase 1: Session-Identity\n(Node + Rust host-runtime)\nVá lỗi PID 3614 + nhận diện 5 CLI"]
-        P2["Phase 2: Crate fgos-terminal-control\n+ Route `fgos terminal` + Stage/Activate\n(layout, naming, HerdrDriver + Goldens)"]
-        P1 --> P2
+flowchart TB
+    subgraph W1["⚡ WAVE 1: 3 Lanes Code Song Song (0 File Overlap — Chỉ chạy Scoped Canary Test ~2s/lane)"]
+        direction LR
+        L1A["Lane 1A (M1.1): Session-Identity\nFiles: src/util/session-identity.mjs,\npackages/host-runtime/rust/src/{session_identity.rs,lib.rs},\ntest/util/session-identity.test.mjs\nCanary (2s): test:canary session-identity + cargo test -p fgos-host-runtime"]
+        
+        L1B["Lane 1B (M1.2): Crate fgos-terminal-control\nFiles: packages/terminal-control/{contracts,rust}/**\n(layout.rs, naming.rs, lock.rs, drivers/herdr.rs, golden.rs)\nCanary (2s): cargo test --manifest-path packages/terminal-control/rust/Cargo.toml"]
+        
+        L1C["Lane 1C (M2 Prep + M5a): displayContext Plumbing & /proc Hoist\nFiles: run.mjs, workflow/runner.mjs, process-identity.mjs,\nassignment-runner.mjs, cli.mjs, authority.mjs, request.mjs, transport.mjs\nCanary (3s): test:canary process-identity + run.test.mjs"]
     end
 
-    subgraph M2["MILESTONE 2: Nối Mỏng vào fgos run & workflow (Dùng ngay cho mọi Project!)"]
-        P3["Phase 3: Surgical Hook (~40 dòng)\nNối runUnit & workflow vào `fgos terminal acquire/release-pane`\n(Chưa đụng /proc hay supervisor nội bộ)"]
-        P4["Phase 4: Test & Live Smoke Proof M2\nKích hoạt dùng thật ngay cho fgos run & workflow!"]
-        P3 --> P4
+    subgraph G1["🔒 INTEGRATION GATE 1 (Hội tụ M1 + M2 — Chạy Targeted Gate Suite ~15s & Activate Release)"]
+        IG1["1. Nối Route `fgos terminal` (Cargo.toml, apps/fgos, catalog.rs, command-registry.mjs, command-routes.json)\n2. Cắm `fgos terminal acquire-pane / release-pane` (~40 dòng) vào herdr-round.mjs & herdr-agent.mjs + fake-herdr-pane.mjs\n3. Chạy Targeted Gate Suite (~15s) + Build/Stage/Activate `fgos` + 1 Live Smoke Run trên Herdr\n🚀 ĐƯA M1 & M2 VÀO SỬ DỤNG NGAY CHO MỌI PROJECT!"]
     end
 
-    subgraph M3["MILESTONE 3: External Orchestration Skills Surface"]
-        P5["Phase 5: Verify & Polish 6 Nhóm Skill Điều Phối\n(fgos-advise, group-thinking, arch-panel,\nfgos-run --plan/--units, decide->run, distill)"]
+    subgraph W2["⚡ WAVE 2: 3 Lanes Code Song Song Trên Nền M2 Đã Active (0 File Overlap — Scoped Canary Tests)"]
+        direction LR
+        L2A["Lane 2A (M3): 6 External Orchestration Skills\nFiles: core/skills/{fgos-advise,fgos-group-thinking,\nfgos-architecture-panel,fgos-run,_shared/*}\nCheck: Smoke test workflow/panel trên Herdr"]
+        
+        L2B["Lane 2B (M4): WorkItem Layer & Xoá rename.sh\nFiles: work-dispatch.mjs, fanout-batch.mjs, bin/fgos.mjs (pick),\ncore/skills/fgos-coding-driving/**, xoá rename.sh\nCanary (3s): test:canary fgos.test.mjs"]
+        
+        L2C["Lane 2C (M5b): CarrierHelper & Rename herdr-spawn/client\nFiles: herdr-round.mjs -> herdr-spawn.mjs,\nherdr-agent.mjs -> herdr-client.mjs, architecture-manifest.json\nCanary (3s): test:canary architecture.test.mjs + herdr-spawn-adapter.test.mjs"]
     end
 
-    subgraph M4["MILESTONE 4: WorkItem Lifecycle Surface"]
-        P6["Phase 6: Adapt WorkItem Layer & Xoá rename.sh\n(work-dispatch, fanout-batch, fgos pick, driving)"]
-        P7["Phase 7: Test WorkItem Layer trên Herdr"]
-        P6 --> P7
+    subgraph G2["🏁 INTEGRATION GATE 2 (Điểm chốt cuối duy nhất chạy Full Suite)"]
+        IG2["Merge Wave 2 -> `npm run build:skills` -> Cập nhật Docs & CHANGELOG.md\n-> Chạy DUY NHẤT 1 LẦN `cargo test --workspace && npm test` toàn cục!"]
     end
 
-    subgraph M5["MILESTONE 5: Gom Chuẩn Hoá Process Supervisor & Carrier Helpers"]
-        P8["Phase 8: Hoist /proc checks lên process-identity.mjs\n+ Chuẩn hoá 4-method CarrierHelper (cli / herdr / tmux)\n+ Đổi tên herdr-spawn.mjs & herdr-client.mjs + Docs"]
-    end
-
-    M1 --> M2 --> M3 --> M4 --> M5
+    L1A --> IG1
+    L1B --> IG1
+    L1C --> IG1
+    IG1 --> L2A
+    IG1 --> L2B
+    IG1 --> L2C
+    L2A --> IG2
+    L2B --> IG2
+    L2C --> IG2
 ```
 
-| Milestone | Mục tiêu & Phạm vi thay đổi | Tại sao ít đổ vỡ nhất & Dùng lại được ngay? | Trạng thái hệ thống sau khi xong Milestone |
+#### Bảng Phân Chia File Độc Lập Giữa Các Lane Song Song
+
+| Đợt | Lane song song | Tập file sở hữu độc quyền (Footprint) | Lệnh kiểm tra nhanh trong Lane (~2–3 giây) |
 |---|---|---|---|
-| **Milestone 1: Native Rust Foundations**<br>*(Phases 1–2)* | - **Phase 1:** Vá lỗi PID `3614` trong `session-identity.mjs` + thêm `session_identity.rs` (Rust).<br>- **Phase 2:** Xây crate `packages/terminal-control/rust` (`fgos-terminal-control`), nối route `fgos terminal <acquire-pane\|label\|release-pane\|plan-split\|identity>`, chạy golden tests và stage/activate binary `fgos`. | **0 dòng code trong `src/runner/` bị chạm tới.** Toàn bộ là sửa lỗi cô lập + thêm mới crate Rust. | Binary `fgos` đã có lệnh `fgos terminal` chạy thật; lỗi trùng `writer.id = 3614` trên `omp`/`pi`/`agy` được dập tắt. |
-| **Milestone 2: Nối Mỏng `fgos terminal` vào `fgos run` & `fgos workflow`**<br>*(Phases 3–4)* | - **Phase 3:** Truyền `displayContext` từ `workflow/runner.mjs` và `run.mjs` xuống `herdr-round.mjs`; thay **đúng ~40 dòng mở tab/pane** (`batchTabsByKey` + `paneSplit(down 0.3)`) bằng lời gọi `fgos terminal acquire-pane` / `release-pane`. **Giữ nguyên 100% phần `/proc`, prompt, outbox, receipt hiện có.**<br>- **Phase 4:** Cập nhật `fake-herdr-pane.mjs`, chạy unit test + live smoke test trên Herdr và activate. | Chỉ thay đúng khâu "xin `paneId` lúc đầu và trả `paneId` lúc cuối" (~40 dòng), không đụng tới cơ chế chạy process bên trong nên không sợ vỡ các ca edge-case của `bwrap`/TUI. | **🚀 ĐƯA VÀO SỬ DỤNG NGAY:** Mọi lệnh `fgos run` và `fgos workflow start` trên mọi project đã tự gom Tab, chia Layout theo độ phân giải màn hình (`cols × rows`), đóng `root_pane` thừa và đặt tên `<scope> \| <role> \| <cli>:<model>` xuyên 5 CLI! |
-| **Milestone 3: External Orchestration Skills Surface**<br>*(Phase 5)* | - **Phase 5:** Kiểm tra, tinh chỉnh và chạy smoke test thực tế cho 6 nhóm skill điều phối không cần `WorkItem` (`fgos-advise`, `fgos-group-thinking`, `fgos-architecture-panel`, `fgos-run --plan/--units`, `_shared/executor-dispatch-fallback`, `distill`). | Tầng dưới (M2) đã chạy thật ổn định; M3 chỉ kiểm tra lớp skill bề mặt gọi xuống M2. | **🚀 ĐƯA VÀO SỬ DỤNG NGAY:** Toàn bộ hội đồng panel, advise, chạy plan AgentKit hoạt động mượt mà với Tab/Pane/Layout mới trên mọi project. |
-| **Milestone 4: `WorkItem` Lifecycle Surface**<br>*(Phases 6–7)* | - **Phase 6:** Cho `work-dispatch.mjs` và `fanout-batch.mjs` truyền `displayContext` (`fg:<workId>`) xuống `runUnit`; cho `fgos pick` và `fgos-coding-driving` gọi `fgos terminal label`; xoá `rename.sh`.<br>- **Phase 7:** Test luồng `pick` / `driving` / `fanout` trên Herdr. | Cô lập hoàn toàn rủi ro của `WorkItem` vào M4 sau khi M1–M3 đã vững chắc. | **🚀 100% TÍNH NĂNG NGƯỜI DÙNG HOÀN TẤT:** Cả `fgos run`, `fgos workflow`, lẫn `WorkItem` (`pick`, `driving`, `fanout`) đều đi qua 1 cửa `fgos terminal`. |
-| **Milestone 5: Chuẩn Hoá Nội Bộ `Shared Process Supervisor` + `Carrier Helpers`**<br>*(Phase 8)* | - **Phase 8a:** Rút các hàm kiểm tra `/proc/<pid>/{exe,cmdline,cwd,environ,stat}` và `launcher.sh` từ `herdr-round.mjs` lên `process-identity.mjs` (Tầng Dispatch Chung).<br>- **Phase 8b:** Chuẩn hoá interface 4 hàm của `CarrierHelper` (`openAndExec`, `sendInput`, `readObservation`, `closeContainer`) cho `cli` / `herdr` (sẵn sàng cho `tmux`), đổi tên `herdr-round.mjs` $\rightarrow$ `herdr-spawn.mjs` & `herdr-agent.mjs` $\rightarrow$ `herdr-client.mjs`, cập nhật `docs/` & `CHANGELOG.md`. | Đây là bước dọn dẹp kiến trúc nội bộ (RUL11). Đặt ở M5 giúp toàn bộ tính năng ở M1–M4 không phải chờ đợi, và bộ test của M1–M4 trở thành lưới bảo vệ chống hồi quy tuyệt đối cho đợt gộp này. | Codebase sạch bóng, không còn chữ `round` lịch sử, sẵn sàng cắm thêm `tmux` bất cứ lúc nào. |
+| **Wave 1** | **Lane 1A** *(Session-Identity)* | `src/util/session-identity.mjs`, `packages/host-runtime/rust/src/{session_identity.rs,lib.rs}`, `test/util/session-identity.test.mjs` | `npm run test:canary -- test/util/session-identity.test.mjs test/e2e/main-checkout-lock-hook.test.mjs && cargo test -p fgos-host-runtime` |
+| **Wave 1** | **Lane 1B** *(Crate `fgos-terminal-control`)* | `packages/terminal-control/rust/**`, `packages/terminal-control/contracts/*.json` | `cargo test --manifest-path packages/terminal-control/rust/Cargo.toml` |
+| **Wave 1** | **Lane 1C** *(Plumbing `displayContext` + Hoist `/proc`)* | `src/runner/execution/run.mjs`, `src/workflow/runner.mjs`, `src/runner/dispatch/{process-identity,assignment-runner,cli,transport}.mjs`, `src/runner/dispatch/confinement/{authority,request}.mjs` | `npm run test:canary -- test/runner/execution/run.test.mjs test/architecture.test.mjs` |
+| **Gate 1** | **Integration Gate 1** *(Wire Route + M2 Cutover + Activate)* | `Cargo.toml`, `apps/fgos/**`, `catalog.rs`, `command-registry.mjs`, `command-route*.json`, `src/runner/dispatch/{herdr-agent,herdr-round}.mjs`, `test/helpers/fake-herdr-pane.mjs` | **Targeted Gate Batch (~15s)** + Stage/Activate `fgos` + 1 Live Herdr smoke run |
+| **Wave 2** | **Lane 2A** *(M3: Orchestration Skills)* | `core/skills/{fgos-advise,fgos-group-thinking,fgos-architecture-panel,fgos-run,_shared/*}` | Live smoke run `fgos workflow start council-lite` / `fgos run` |
+| **Wave 2** | **Lane 2B** *(M4: `WorkItem` + Delete `rename.sh`)* | `src/runner/{work-dispatch,fanout-batch}.mjs`, `bin/fgos.mjs`, `core/skills/fgos-coding-driving/**`, `plugins/fgOS/skills/{terminal,pick}/**`, xoá `rename.sh` | `npm run test:canary -- test/cli/fgos.test.mjs` |
+| **Wave 2** | **Lane 2C** *(M5: `CarrierHelper` + File Rename)* | `src/runner/dispatch/{herdr-round.mjs->herdr-spawn.mjs,herdr-agent.mjs->herdr-client.mjs}`, `docs/architecture-manifest.json` | `npm run test:canary -- test/architecture.test.mjs test/runner/herdr-spawn-adapter.test.mjs test/runner/herdr-agent.test.mjs` |
+| **Gate 2** | **Integration Gate 2** *(Final Merge & Docs)* | `docs/platform/component-boundary.md`, `docs/specs/runner.md`, `CHANGELOG.md` + generated skill mirrors (`npm run build:skills`) | **Full Suite (1 lần duy nhất):** `cargo test --workspace && npm test` |
+
+---
+
+### 3. Fast Test-Budget Policy (Canary Per Lane, Full Suite Only at Final Gate)
+
+| Cấp độ | Khi nào chạy? | Lệnh chạy | Thời gian ước tính | Quy tắc nghiêm ngặt |
+|---|---|---|---|---|
+| **Level 1: Per-Lane Canary** | Cuối mỗi Lane trong Wave 1 & Wave 2 | `npm run test:canary -- <file.test.mjs>`<br>`cargo test -p <crate>` | **~2–4 giây** | Worker trong Lane **CẤM** chạy `npm test` toàn cục hoặc `cargo test --workspace`. |
+| **Level 2: Gate 1 Targeted Integration** | Tại Integration Gate 1 (trước khi Activate M1+M2) | `cargo test -p fgos-host-runtime -p fgos-terminal-control -p fgos`<br>`npm run test:canary -- test/util/session-identity.test.mjs test/rust-host/command-routes.test.mjs test/cli/subcommand-flag-drift.test.mjs test/runner/herdr-agent.test.mjs test/runner/herdr-spawn-adapter.test.mjs test/runner/execution/run-herdr.test.mjs test/architecture.test.mjs` | **~15–20 giây** | Đủ chứng minh toàn bộ đường dây M1+M2 xanh mà không tốn nhiều phút chạy 2,970 tests không liên quan. |
+| **Level 3: Gate 2 Final Full Suite** | Duy nhất **1 lần** tại Integration Gate 2 (khi đóng toàn bộ track) | `cargo test --workspace && env -u CLAUDE_CODE_SESSION_ID npm test` | **1 lần duy nhất cuối đợt** | Chứng nhận toàn bộ hệ thống không hồi quy trước khi khép lại. |
 
 ---
 
@@ -407,3 +428,4 @@ flowchart LR
 - `src/runner/dispatch/{transport,process-identity,detached-run-supervisor,herdr-round,herdr-agent}.mjs`
 - `core/skills/{fgos-advise,fgos-group-thinking,fgos-architecture-panel,fgos-run}/SKILL.md`
 - `src/util/session-identity.mjs`
+- `scripts/run-test-canary.mjs` (`npm run test:canary`)
