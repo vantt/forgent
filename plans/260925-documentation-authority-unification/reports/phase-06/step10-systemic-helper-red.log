@@ -1,0 +1,97 @@
+node:internal/modules/esm/resolve:271
+    throw new ERR_MODULE_NOT_FOUND(
+          ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/home/vantt/projects/forgentX-phase00-documentation-authority-unification/scripts/doc-binding-repair.mjs' imported from /home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-binding-repair.test.mjs
+    at finalizeResolution (node:internal/modules/esm/resolve:271:11)
+    at moduleResolve (node:internal/modules/esm/resolve:865:10)
+    at defaultResolve (node:internal/modules/esm/resolve:992:11)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:701:20)
+    at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:721:38)
+    at ModuleLoader.resolveSync (node:internal/modules/esm/loader:759:56)
+    at #resolve (node:internal/modules/esm/loader:683:17)
+    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:603:35)
+    at ModuleJob.syncLink (node:internal/modules/esm/module_job:163:33)
+    at ModuleJob.link (node:internal/modules/esm/module_job:253:17) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/scripts/doc-binding-repair.mjs'
+}
+
+Node.js v24.18.0
+✖ test/scripts/doc-binding-repair.test.mjs (26.015445ms)
+✔ never repoints a source relationship or a link to its own file (1.912547ms)
+✔ source column header protects subsequent table rows (0.206145ms)
+✔ chooses a restored same-named candidate before a portal (0.243772ms)
+✔ chooses the unique per-anchor target when no same-named candidate exists (0.116649ms)
+✔ restores and classifies a portal alias with no specific target (0.122208ms)
+✔ wrapped labels are repointed and labels preserved (0.110923ms)
+✔ fences and historical referents are retained (0.099867ms)
+✔ anchored destinations preserve the explicit alias anchor (0.087ms)
+✔ ambiguous specific targets fail closed (0.081239ms)
+✔ uses the source heading alias for a split document without guessing among sections (0.160974ms)
+✔ a canonical data cell does not protect unrelated following table rows (0.248517ms)
+✔ restored same-named document takes precedence over an archived heading alias (0.12143ms)
+✔ all source relationship row labels retain legacy destinations and verbatim labels (0.195629ms)
+✔ Source and Legacy source columns protect only their own cells (0.223964ms)
+✔ canonical in narrative text is not a source relationship label (0.090419ms)
+✔ a labelled source relationship inside any cell protects that cell alone (0.148835ms)
+✔ a source relationship link label inside any cell stays verbatim (0.065108ms)
+✔ a source-column link label does not turn preservation targets into source relationships (0.094592ms)
+✖ prose destinations and bare legacy names do not protect candidate links (0.566089ms)
+✖ relationship labels protect their own link, not other links in the same cell (0.172111ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 18
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 45.500359
+
+✖ failing tests:
+
+test at test/scripts/doc-binding-repair.test.mjs:1:1
+✖ test/scripts/doc-binding-repair.test.mjs (26.015445ms)
+  'test failed'
+
+test at test/scripts/doc-link-pass.test.mjs:102:1
+✖ prose destinations and bare legacy names do not protect candidate links (0.566089ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  0 !== 1
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-link-pass.test.mjs:103:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/scripts/doc-link-pass.test.mjs:106:1
+✖ relationship labels protect their own link, not other links in the same cell (0.172111ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  0 !== 1
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-link-pass.test.mjs:108:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

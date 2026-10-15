@@ -1,0 +1,41 @@
+✔ inserted paragraphs move anchors without substituting neighbouring text (0.560498ms)
+✔ identical footers keep their occurrence within the prior content sequence (0.11298ms)
+✔ ambiguous or absent content fails closed instead of retaining old anchor (0.257209ms)
+✔ unchanged bindings never overwrite truthful rationale (0.599536ms)
+✔ ownership check reports two distinct claims at one target (0.182035ms)
+✔ position-exact link replay rejects swapped table cells despite string presence (0.683938ms)
+✔ stale prior anchor uses reviewed ancestry to distinguish repeated footer text (0.105931ms)
+✖ expanding digest prefixes or shifting an unchanged content anchor preserves rationale (0.622082ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 7
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 43.02172
+
+✖ failing tests:
+
+test at test/scripts/doc-binding-repair.test.mjs:36:1
+✖ expanding digest prefixes or shifting an unchanged content anchor preserves rationale (0.622082ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'Untrue target changed boilerplate'
+  - 'Whole source retained.'
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-binding-repair.test.mjs:38:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'Untrue target changed boilerplate',
+    expected: 'Whole source retained.',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

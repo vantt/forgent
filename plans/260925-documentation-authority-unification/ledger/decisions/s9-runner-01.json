@@ -301,19 +301,13 @@
       "targetAnchor": "data-dictionary",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792066534402-cb278bf5@2026-10-15",
-      "rationale": "Judgment: A42 evidenced current-state correction or labelled header/navigation hygiene in this bound unit. Judgment: A41/A19 truth correction or explicitly labelled candidate navigation/link/scaffolding repair. Complete original source remains in immutable docs/specs/runner.md; candidate supersedes the identified false current assertion or rebases the same link referent, with unchanged dated decision semantics. A41 F-D: capacity lock is a directory; A41 F-D: recovery has 14 classes; A41 F-E: item log receives pointer and settled output; A41 F-E: remove raw live-chunk claim Full before/after text and evidence in reports/phase-06/step9-rebound-units.json. A22 rebind, pending independent bounded review; no approval carry, retirement or promotion.",
-      "reviewNote": "deep: heading Data Dictionary source L71-71 to subcomponents/h-02842f76ffd2/spec.md#data-dictionary; token-level source-to-target diff read both directions, every hunk lies inside an edit range (truth-04, truth-05, truth-06, truth-07, followup-truth-13, followup-truth-14) and is labelled in the carrier, nothing else added or lost; rationale names the A41 labels and the A42 prefix covers the later follow-up ranges (followup-truth-13, followup-truth-14); disposition stays supersede, legal for a labelled correction and the rationale names the correction; shard row equals pack, anchors exist, source and target digests recomputed by script",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "7e314f375af7ee7c1dca812544d9968b65e002c91f205f58d104b9057b22e2a8",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "rationale": "Judgment: A42 evidenced current-state correction or labelled header/navigation hygiene in this bound unit. Judgment: A41/A19 truth correction or explicitly labelled candidate navigation/link/scaffolding repair. Complete original source remains in immutable docs/specs/runner.md; candidate supersedes the identified false current assertion or rebases the same link referent, with unchanged dated decision semantics. A41 F-D: capacity lock is a directory; A41 F-D: recovery has 14 classes; A41 F-E: item log receives pointer and settled output; A41 F-E: remove raw live-chunk claim Full before/after text and evidence in reports/phase-06/step9-rebound-units.json. A22 rebind, pending independent bounded review; no approval carry, retirement or promotion. L10-20: the labelled evolve correction now cites bin/fgos.mjs:4415 (actual unknown-verb throw at content pin 19ca8de23); the old 4373 citation and reversed/stale scaffold ranges are corrected. Historical contract text and source digest retained.",
+      "targetUnitDigest": "3ffc347bf68707fd1a1b4d6d8673db7d38467fae324107ddf64e6151d03a3c41",
       "targetAncestry": [
         "Added in candidate: Runner Data Dictionary"
-      ],
-      "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9"
+      ]
     },
     {
       "claimId": "claim_5a944093894be93c5792a1c5e14990c6",
@@ -322,20 +316,14 @@
       "targetAnchor": "unheaded-block-3",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792066534402-cb278bf5@2026-10-15",
-      "rationale": "Judgment: A42 evidenced current-state correction or labelled header/navigation hygiene in this bound unit. Judgment: A41/A19 truth correction or explicitly labelled candidate navigation/link/scaffolding repair. Complete original source remains in immutable docs/specs/runner.md; candidate supersedes the identified false current assertion or rebases the same link referent, with unchanged dated decision semantics. A41 F-D: capacity lock is a directory; A41 F-D: recovery has 14 classes; A41 F-E: item log receives pointer and settled output; A41 F-E: remove raw live-chunk claim Full before/after text and evidence in reports/phase-06/step9-rebound-units.json. A22 rebind, pending independent bounded review; no approval carry, retirement or promotion.",
-      "reviewNote": "deep: block Unheaded block 9 source L73-87 to subcomponents/h-02842f76ffd2/spec.md#unheaded-block-3; token-level source-to-target diff read both directions, every hunk lies inside an edit range (truth-04, truth-05, truth-06, truth-07, followup-truth-13, followup-truth-14) and is labelled in the carrier, nothing else added or lost; rationale names the A41 labels and the A42 prefix covers the later follow-up ranges (followup-truth-13, followup-truth-14); disposition stays supersede, legal for a labelled correction and the rationale names the correction; shard row equals pack, anchors exist, source and target digests recomputed by script",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "fb31e222bd67854fd1f83cc81922b2000b03d972159a7c2b390a993e38177894",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "rationale": "Judgment: A42 evidenced current-state correction or labelled header/navigation hygiene in this bound unit. Judgment: A41/A19 truth correction or explicitly labelled candidate navigation/link/scaffolding repair. Complete original source remains in immutable docs/specs/runner.md; candidate supersedes the identified false current assertion or rebases the same link referent, with unchanged dated decision semantics. A41 F-D: capacity lock is a directory; A41 F-D: recovery has 14 classes; A41 F-E: item log receives pointer and settled output; A41 F-E: remove raw live-chunk claim Full before/after text and evidence in reports/phase-06/step9-rebound-units.json. A22 rebind, pending independent bounded review; no approval carry, retirement or promotion. L10-20: the labelled evolve correction now cites bin/fgos.mjs:4415 (actual unknown-verb throw at content pin 19ca8de23); the old 4373 citation and reversed/stale scaffold ranges are corrected. Historical contract text and source digest retained.",
+      "targetUnitDigest": "417a56fd2a82950722e3a35187fe79050d444a85b8b55a4106d3e45059fa1b39",
       "targetAncestry": [
         "Added in candidate: Runner Data Dictionary",
         "Data Dictionary"
-      ],
-      "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9"
+      ]
     },
     {
       "claimId": "claim_2c3300909e21da9dd0feb02e991c5f0a",
@@ -1405,20 +1393,14 @@
       "targetAnchor": "gate-a-xếp-hạng-candidate-bắc-cầu-sang-việc-thật-evolve",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792061517080-61c43e58@2026-10-15",
-      "rationale": "Judgment: A41 addition under Lead A42; Gate A introductory current-state assertion corrected to explicitly dated legacy contract. CLI unknown-verb evidence bin/fgos.mjs:4373,4461; ranking removal 120af6b3d. Complete source retained in docs/specs/runner.md. A22 rebind; independent truth re-review pending, no approval carry.",
-      "reviewNote": "deep: heading source L548-548 to operations/h-51f5cd7279fd.md#gate-a-xếp-hạng-candidate-bắc-cầu-sang-việc-thật-evolve; before/after read in both directions, change is only: Gate A heading: inline Added in candidate correction paragraph, past-tense reframing of the intro and one replaced bullet; the old contract text stays and is scoped as legacy; disposition move to supersede is legal and the rationale names the correction; shard row equals pack, anchor exists, digests recomputed by script, before target equalled the source",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1803-runner-bounded-rereview-26f5f6119-part1.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "63cc24d991ad0f3cf493ab1b3e3ca046ea24aa1944a4c85411abef6612626aea",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "rationale": "Judgment: A41 addition under Lead A42; Gate A introductory current-state assertion corrected to explicitly dated legacy contract. CLI unknown-verb evidence bin/fgos.mjs:4373,4461; ranking removal 120af6b3d. Complete source retained in docs/specs/runner.md. A22 rebind; independent truth re-review pending, no approval carry. L10-20: the labelled evolve correction now cites bin/fgos.mjs:4415 (actual unknown-verb throw at content pin 19ca8de23); the old 4373 citation and reversed/stale scaffold ranges are corrected. Historical contract text and source digest retained.",
+      "targetUnitDigest": "48228ecbc2881bfaccdcf13a294876cf74c3afe8670c137132403a9a037999b2",
       "targetAncestry": [
         "Added in candidate: Runner Behaviors & Operations",
         "Behaviors & Operations"
-      ],
-      "reviewReportCommit": "42cf37c15047a8144366252d23f16f1a82787424"
+      ]
     },
     {
       "claimId": "claim_979ec4a61acca9e1b6a0a3967b1d0c88",
@@ -1427,21 +1409,15 @@
       "targetAnchor": "unheaded-block-26",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792061517080-61c43e58@2026-10-15",
-      "rationale": "Judgment: A41 addition under Lead A42; Gate A introductory current-state assertion corrected to explicitly dated legacy contract. CLI unknown-verb evidence bin/fgos.mjs:4373,4461; ranking removal 120af6b3d. Complete source retained in docs/specs/runner.md. A22 rebind; independent truth re-review pending, no approval carry.",
-      "reviewNote": "deep: unheaded-block source L550-560 to operations/h-51f5cd7279fd.md#unheaded-block-26; before/after read in both directions, change is only: same inline correction paragraph and intro reframing inside the block; disposition move to supersede is legal and the rationale names the correction; shard row equals pack, anchor exists, digests recomputed by script, before target equalled the source",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1803-runner-bounded-rereview-26f5f6119-part1.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "30bbabf9219560dd2744a98e42e43b53e9fbaf15c4282e68860a8682f2b63059",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "rationale": "Judgment: A41 addition under Lead A42; Gate A introductory current-state assertion corrected to explicitly dated legacy contract. CLI unknown-verb evidence bin/fgos.mjs:4373,4461; ranking removal 120af6b3d. Complete source retained in docs/specs/runner.md. A22 rebind; independent truth re-review pending, no approval carry. L10-20: the labelled evolve correction now cites bin/fgos.mjs:4415 (actual unknown-verb throw at content pin 19ca8de23); the old 4373 citation and reversed/stale scaffold ranges are corrected. Historical contract text and source digest retained.",
+      "targetUnitDigest": "0dce2b78b5d497ab9dbe1b9cc6d0d8a00ad2ff468b97fe5964c8e86464b0a3b2",
       "targetAncestry": [
         "Added in candidate: Runner Behaviors & Operations",
         "Behaviors & Operations",
         "Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)"
-      ],
-      "reviewReportCommit": "42cf37c15047a8144366252d23f16f1a82787424"
+      ]
     },
     {
       "claimId": "claim_d55d7b0f484d74f056db873f5466dca5",
@@ -2066,19 +2042,13 @@
       "targetAnchor": "actors-access",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792066534402-cb278bf5@2026-10-15",
-      "rationale": "Judgment: supersede the source unit at docs/specs/runner.md#actors-access with docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md#actors-access. Labelled follow-up corrections followup-truth-12 changed this unit; source and target native unit digests differ. The token-level source-to-target changes are the labelled follow-up edits, with no other source loss or unlabelled addition, as documented in step9-a42-followup-corrections.json. Complete original source remains immutable; dated decision semantics are retained. Full source and current target, concrete correction evidence, and before/after rationale are in the bounded rationale re-review request. Pending independent review; full truth check and revalidation/rebinding remain owed at promotion and legacy cutover.",
-      "reviewNote": "deep: stale carried/digest-equal sentence is gone from the committed shard rationale and pack afterRationale (shard equals pack); rationale names followup-truth-12; reversing exactly those labelled carrier edit(s) on the target text reproduces the source text with no other loss or addition (section-level digest of the Actors & Access heading changes only through the labelled edit in the following block (evolve door removed, 120af6b3d)); supersede legal, row otherwise unchanged vs 11fc7590f, still pending, anchors exist, digests recomputed by script",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-rationale-rereview-b80e8c16c.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "b860dec045aac1ef7bd041e99451ae747df3b3bdcedee268b427ec9eda3ee667",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "rationale": "Judgment: supersede the source unit at docs/specs/runner.md#actors-access with docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md#actors-access. Labelled follow-up corrections followup-truth-12 changed this unit; source and target native unit digests differ. The token-level source-to-target changes are the labelled follow-up edits, with no other source loss or unlabelled addition, as documented in step9-a42-followup-corrections.json. Complete original source remains immutable; dated decision semantics are retained. Full source and current target, concrete correction evidence, and before/after rationale are in the bounded rationale re-review request. Pending independent review; full truth check and revalidation/rebinding remain owed at promotion and legacy cutover. L10-20: the labelled evolve correction now cites bin/fgos.mjs:4415 (actual unknown-verb throw at content pin 19ca8de23); the old 4373 citation and reversed/stale scaffold ranges are corrected. Historical contract text and source digest retained.",
+      "targetUnitDigest": "704500af02588d8c934f08e738fc13445896cc4feba37d83c162b866d7d59e42",
       "targetAncestry": [
         "Added in candidate: Runner Actors & Access"
-      ],
-      "reviewReportCommit": "25351590ab8743233619407c9a9f20da2b830299"
+      ]
     },
     {
       "claimId": "claim_add6d13e14df87ad5d5bd46cc5bb98d4",
@@ -2087,20 +2057,14 @@
       "targetAnchor": "unheaded-block-3",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792066534402-cb278bf5@2026-10-15",
-      "rationale": "Judgment: supersede the source unit at docs/specs/runner.md#unheaded-block-60 with docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md#unheaded-block-3. Labelled follow-up corrections followup-truth-12 changed this unit; source and target native unit digests differ. The token-level source-to-target changes are the labelled follow-up edits, with no other source loss or unlabelled addition, as documented in step9-a42-followup-corrections.json. Complete original source remains immutable; dated decision semantics are retained. Full source and current target, concrete correction evidence, and before/after rationale are in the bounded rationale re-review request. Pending independent review; full truth check and revalidation/rebinding remain owed at promotion and legacy cutover.",
-      "reviewNote": "deep: stale carried/digest-equal sentence is gone from the committed shard rationale and pack afterRationale (shard equals pack); rationale names followup-truth-12; reversing exactly those labelled carrier edit(s) on the target text reproduces the source text with no other loss or addition (adds the former-evolve / door-removed annotation and renames the role cell to Historical operator role); supersede legal, row otherwise unchanged vs 11fc7590f, still pending, anchors exist, digests recomputed by script",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-rationale-rereview-b80e8c16c.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "69f0927ed54ab08aa5fc1e9f43beca35a3ad76e034a98945ea39674b4dc4cb2f",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "rationale": "Judgment: supersede the source unit at docs/specs/runner.md#unheaded-block-60 with docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md#unheaded-block-3. Labelled follow-up corrections followup-truth-12 changed this unit; source and target native unit digests differ. The token-level source-to-target changes are the labelled follow-up edits, with no other source loss or unlabelled addition, as documented in step9-a42-followup-corrections.json. Complete original source remains immutable; dated decision semantics are retained. Full source and current target, concrete correction evidence, and before/after rationale are in the bounded rationale re-review request. Pending independent review; full truth check and revalidation/rebinding remain owed at promotion and legacy cutover. L10-20: the labelled evolve correction now cites bin/fgos.mjs:4415 (actual unknown-verb throw at content pin 19ca8de23); the old 4373 citation and reversed/stale scaffold ranges are corrected. Historical contract text and source digest retained.",
+      "targetUnitDigest": "6ee82017c754d1ebcfed7fcd146851cdd954235737f350c0dbd70a9629516110",
       "targetAncestry": [
         "Added in candidate: Runner Actors & Access",
         "Actors & Access"
-      ],
-      "reviewReportCommit": "25351590ab8743233619407c9a9f20da2b830299"
+      ]
     },
     {
       "claimId": "claim_32d366486b72925c171d9fefc84179e2",
@@ -2878,19 +2842,13 @@
       "targetAnchor": "edge-cases-settled",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792066534402-cb278bf5@2026-10-15",
-      "rationale": "Judgment: supersede the source unit at docs/specs/runner.md#edge-cases-settled with docs/platform/runner/subcomponents/h-37aced3896a8/spec.md#edge-cases-settled. Labelled follow-up corrections followup-truth-11 changed this unit; source and target native unit digests differ. The token-level source-to-target changes are the labelled follow-up edits, with no other source loss or unlabelled addition, as documented in step9-a42-followup-corrections.json. Complete original source remains immutable; dated decision semantics are retained. Full source and current target, concrete correction evidence, and before/after rationale are in the bounded rationale re-review request. Pending independent review; full truth check and revalidation/rebinding remain owed at promotion and legacy cutover.",
-      "reviewNote": "deep: stale carried/digest-equal sentence is gone from the committed shard rationale and pack afterRationale (shard equals pack); rationale names followup-truth-11; reversing exactly those labelled carrier edit(s) on the target text reproduces the source text with no other loss or addition (heading digest folds in the section payload, whose only change is the labelled evolve-historical e2e note); supersede legal, row otherwise unchanged vs 11fc7590f, still pending, anchors exist, digests recomputed by script",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-rationale-rereview-b80e8c16c.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "42f7d3b5bc55faa2dccd8f8d20cb008002957c8a31549f3fda4d1568c161b894",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "rationale": "Judgment: supersede the source unit at docs/specs/runner.md#edge-cases-settled with docs/platform/runner/subcomponents/h-37aced3896a8/spec.md#edge-cases-settled. Labelled follow-up corrections followup-truth-11 changed this unit; source and target native unit digests differ. The token-level source-to-target changes are the labelled follow-up edits, with no other source loss or unlabelled addition, as documented in step9-a42-followup-corrections.json. Complete original source remains immutable; dated decision semantics are retained. Full source and current target, concrete correction evidence, and before/after rationale are in the bounded rationale re-review request. Pending independent review; full truth check and revalidation/rebinding remain owed at promotion and legacy cutover. L10-20: the labelled evolve correction now cites bin/fgos.mjs:4415 (actual unknown-verb throw at content pin 19ca8de23); the old 4373 citation and reversed/stale scaffold ranges are corrected. Historical contract text and source digest retained.",
+      "targetUnitDigest": "8fbc6ed74d8d0c274acc53ef231e5bdb2172c02bd6c16f6aadf861a096623f9e",
       "targetAncestry": [
         "Added in candidate: Runner Edge Cases Settled"
-      ],
-      "reviewReportCommit": "25351590ab8743233619407c9a9f20da2b830299"
+      ]
     },
     {
       "claimId": "claim_3332d3ab8fadd91605a8a92da08091b7",
@@ -2943,20 +2901,14 @@
       "targetAnchor": "unheaded-block-5",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792066534402-cb278bf5@2026-10-15",
-      "rationale": "Judgment: supersede the source unit at docs/specs/runner.md#unheaded-block-97 with docs/platform/runner/subcomponents/h-37aced3896a8/spec.md#unheaded-block-5. Labelled follow-up corrections followup-truth-11 changed this unit; source and target native unit digests differ. The token-level source-to-target changes are the labelled follow-up edits, with no other source loss or unlabelled addition, as documented in step9-a42-followup-corrections.json. Complete original source remains immutable; dated decision semantics are retained. Full source and current target, concrete correction evidence, and before/after rationale are in the bounded rationale re-review request. Pending independent review; full truth check and revalidation/rebinding remain owed at promotion and legacy cutover.",
-      "reviewNote": "deep: stale carried/digest-equal sentence is gone from the committed shard rationale and pack afterRationale (shard equals pack); rationale names followup-truth-11; reversing exactly those labelled carrier edit(s) on the target text reproduces the source text with no other loss or addition (adds the historical-e2e note for the removed evolve door, nothing else changed); supersede legal, row otherwise unchanged vs 11fc7590f, still pending, anchors exist, digests recomputed by script",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-rationale-rereview-b80e8c16c.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "2e0561425f15bad2d92bbd21e6b7f837523159beb3b8de7fe250e67cbed1a27c",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "rationale": "Judgment: supersede the source unit at docs/specs/runner.md#unheaded-block-97 with docs/platform/runner/subcomponents/h-37aced3896a8/spec.md#unheaded-block-5. Labelled follow-up corrections followup-truth-11 changed this unit; source and target native unit digests differ. The token-level source-to-target changes are the labelled follow-up edits, with no other source loss or unlabelled addition, as documented in step9-a42-followup-corrections.json. Complete original source remains immutable; dated decision semantics are retained. Full source and current target, concrete correction evidence, and before/after rationale are in the bounded rationale re-review request. Pending independent review; full truth check and revalidation/rebinding remain owed at promotion and legacy cutover. L10-20: the labelled evolve correction now cites bin/fgos.mjs:4415 (actual unknown-verb throw at content pin 19ca8de23); the old 4373 citation and reversed/stale scaffold ranges are corrected. Historical contract text and source digest retained.",
+      "targetUnitDigest": "b4abd2b685fe57f6a2616db1b22d4ddc28196279ade0c0307087370b59671964",
       "targetAncestry": [
         "Added in candidate: Runner Edge Cases Settled",
         "Edge Cases Settled"
-      ],
-      "reviewReportCommit": "25351590ab8743233619407c9a9f20da2b830299"
+      ]
     },
     {
       "claimId": "claim_faf7be822c2140f22e6d5a5882f84595",
@@ -3096,20 +3048,14 @@
       "claimKind": "specification",
       "targetOwner": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
       "targetAnchor": "pointers-implementation",
-      "targetUnitDigest": "077e4456152fabdeec033b95bef9434aacc5236a1b550dd1e752bd1b36f876a9",
+      "targetUnitDigest": "850878a688f3b9c613114ddcb166a7fd1038b2865e113b41b99251817f40721e",
       "targetAncestry": [
         "Added in candidate: Runner Pointers (implementation)"
       ],
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
-      "rationale": "L10-14 / A31: every changed upstream span carried verbatim into mapped runner/root carrier; prior labelled truth corrections in the enclosing pointer list remain. Source and target unit digests disclose their inequality where applicable. Native identity resolved by the one sync at 2300d65571968bb3bcb80123a273272586e3f1db; pending independent review; no approval carry.",
-      "reviewNote": "deep: Pointers heading section; I recomputed the word-level source-to-target diff (39 hunks) and it is identical to the 39 hunks of the accepted aecdc30aa pair, so the only target changes this turn are lines 73 and 75 which equal source lines 1268 and 1270 exactly; remaining differences are the labelled entropy/evolve corrections; supersede with source 4bed9c69 and target 077e4456 unequal by design is true",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-i01-2300d6557.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "rationale": "L10-14 / A31: every changed upstream span carried verbatim into mapped runner/root carrier; prior labelled truth corrections in the enclosing pointer list remain. Source and target unit digests disclose their inequality where applicable. Native identity resolved by the one sync at 2300d65571968bb3bcb80123a273272586e3f1db; pending independent review; no approval carry. L10-20: the labelled evolve correction now cites bin/fgos.mjs:4415 (actual unknown-verb throw at content pin 19ca8de23); the old 4373 citation and reversed/stale scaffold ranges are corrected. Historical contract text and source digest retained."
     },
     {
       "claimId": "claim_49a878f920dd60fd0449e74d71b5fc1b",
@@ -11371,14 +11317,13 @@
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "rationale": "Judgment: labelled candidate addition. Whole heading docs/specs/runner.md#0063-work-chỉ-là-bên-dùng-dispatch-nhận-input-generic-thay-phần-đầu-vào-còn-lại-của-rul73-dispatch-does-not-know-work2 (lines 3320–3320) carried at docs/platform/runner/decisions/h-36d872fbb0e5.md#0063-work-chỉ-là-bên-dùng-dispatch-nhận-input-generic-thay-phần-đầu-vào-còn-lại-của-rul73-dispatch-does-not-know-work2. Source/target digests differ because the labelled 0064 introduction blockquote (Added in candidate: Settled runner decision carried from the retained source) sits at the end of the 0063 direct section; source decision text remains verbatim. Supersede records that labelled addition. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover. L10-13/L10-14: specific candidate link correction or explicit added-decision wrapper changes this direct unit; current target binding re-decided pending. Historical decision semantics remain; all text differences shown in step10-correction-edits.json. No approval carry.",
+      "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "rationale": "Judgment: labelled candidate addition. Whole heading docs/specs/runner.md#0063-work-chỉ-là-bên-dùng-dispatch-nhận-input-generic-thay-phần-đầu-vào-còn-lại-của-rul73-dispatch-does-not-know-work2 (lines 3329–3329) carried at docs/platform/runner/decisions/h-36d872fbb0e5.md#0063-work-chỉ-là-bên-dùng-dispatch-nhận-input-generic-thay-phần-đầu-vào-còn-lại-của-rul73-dispatch-does-not-know-work2. Source/target digests differ because the labelled 0064 introduction blockquote (Added in candidate: Settled runner decision carried from the retained source) sits at the end of the 0063 direct section; source decision text remains verbatim. Supersede records that labelled addition. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover. L10-13/L10-14: specific candidate link correction or explicit added-decision wrapper changes this direct unit; current target binding re-decided pending. Historical decision semantics remain; all text differences shown in step10-correction-edits.json. No approval carry.",
       "targetUnitDigest": "3a1f30f7334b753a47a5c620be560d11b00e969789882a65e594c96d92177f55",
       "targetAncestry": [
         "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
         "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)"
-      ],
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+      ]
     },
     {
       "claimId": "claim_6eb47bc2e3c271b4af46b09fc2c4e90c",
@@ -11436,16 +11381,15 @@
       "claimKind": "specification",
       "targetOwner": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
       "targetAnchor": "unheaded-block-3",
-      "targetUnitDigest": "eb280e498fa6fc523bdcb534532de95023a5a82ec1ffaa2be5f5f36a4e618891",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "rationale": "L10-14 / A31: every changed upstream span carried verbatim into mapped runner/root carrier; prior labelled truth corrections in the enclosing pointer list remain. Source and target unit digests disclose their inequality where applicable. Native identity resolved by the one sync at 2300d65571968bb3bcb80123a273272586e3f1db; pending independent review; no approval carry. L10-17: the actual 51-line Pointers list is spec.md#unheaded-block-3; block-2 is scaffolding. Correct list binding, pending. L10-20: the labelled evolve correction now cites bin/fgos.mjs:4415 (actual unknown-verb throw at content pin 19ca8de23); the old 4373 citation and reversed/stale scaffold ranges are corrected. Historical contract text and source digest retained.",
+      "targetUnitDigest": "853cf58afec64a9d7b507305bfadf959cf0f88ef17e3b90b199a85bf3ed71c43",
       "targetAncestry": [
         "Added in candidate: Runner Pointers (implementation)",
         "Pointers (implementation)"
-      ],
-      "disposition": "supersede",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "rationale": "L10-14 / A31: every changed upstream span carried verbatim into mapped runner/root carrier; prior labelled truth corrections in the enclosing pointer list remain. Source and target unit digests disclose their inequality where applicable. Native identity resolved by the one sync at 2300d65571968bb3bcb80123a273272586e3f1db; pending independent review; no approval carry. L10-17: the actual 51-line Pointers list is spec.md#unheaded-block-3; block-2 is scaffolding. Correct list binding, pending.",
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+      ]
     },
     {
       "claimId": "claim_40c0caf4bd105994712dd37578f27746",
@@ -11502,7 +11446,7 @@
       "claimId": "claim_a63132a3f76d6b8ea05461c48c818836",
       "sourcePath": "docs/specs/runner.md",
       "sourceUnitDigest": "3f6a59c3d3764c1b978073ad68eb16ce1b0382d6bf362815f45ad79dd1625224",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
       "reviewStatus": "pending",
       "disposition": "supersede",
       "targetOwner": "docs/specs/runner.md",
@@ -11512,8 +11456,7 @@
         "Spec: Runner (vòng tự hành)",
         "Pointers (implementation)"
       ],
-      "rationale": "A34 pending predecessor disposition: All 49 historical lines remain in order; only unit-sync/run-timeout implementation pointers are inserted. Bound immutable witness and full current successor in step9-a42-predecessor-dispositions.json. No identity graft, truth approval or inherited review; revalidate/rebind at legacy cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "rationale": "A34 predecessor supersession: the 49-line historical Pointers unit is replaced by the current successor with unit-sync/run-timeout pointers inserted AND two historical lines rewritten. The main-checkout-lock pointer changes from acquireMainCheckoutLock/releaseMainCheckoutLock self-refresh and TTL semantics to inspectMainCheckoutLock with a separate activity indicator. The pre-commit pointer changes from acquiring/refreshing the lock to one read under git index.lock, FGOS_MAIN_LOCK_HOLDER_PID checks, and the 20-second activity indicator. This is an explicit rewrite, not insertion-only containment or a claim that every historical line survives. Full before/current witnesses and digests: step10-systemic-a63132a3-witness.json. Supersede accounts replacement without claiming partial-carry, truth approval, identity graft or inherited review.",
       "reviewEntryId": "gap-claim_a63132a3f76d6b8ea05461c48c818836",
       "evidenceDigest": "ddcc63f3f14921ed816bab258b99f56ff4d776c73598149b35351a162a6f22fa",
       "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."

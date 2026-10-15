@@ -82,15 +82,14 @@
       "sourceUnitDigest": "e24cc26161b017265526e8e287d7ddb0777cabce83f1effd56099a3ea79814e5",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "targetAnchor": "unheaded-block-24",
-      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
-      "targetUnitDigest": "131cc0704d753f35dcbec3ebba7be49a0d103732b6f4ee8c5ecc175d5c46167e",
+      "targetAnchor": "unheaded-block-25",
+      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. L10-21: content-based rebind from reviewed prior target unheaded-block-24 (cb6381a3b69f2fdd99ff81b06cafbce1f45add19c7076005c59ad0e093d49be8) to unheaded-block-25 (cb6381a3b69f2fdd99ff81b06cafbce1f45add19c7076005c59ad0e093d49be8); inserted paragraphs shift the anchor, prior target text is unchanged.",
+      "targetUnitDigest": "cb6381a3b69f2fdd99ff81b06cafbce1f45add19c7076005c59ad0e093d49be8",
       "targetAncestry": [
         "CLI I/O Contract",
-        "4. Exit Codes"
+        "5. Reasoned Envelope Exceptions"
       ]
     },
     {
@@ -100,12 +99,11 @@
       "sourceUnitDigest": "74809b036d96332c8fd99e73be67a5abacbef4b899eb741b946b39aed1ce1fa6",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "targetAnchor": "unheaded-block-25",
-      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
-      "targetUnitDigest": "cb6381a3b69f2fdd99ff81b06cafbce1f45add19c7076005c59ad0e093d49be8",
+      "targetAnchor": "unheaded-block-26",
+      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. L10-21: content-based rebind from reviewed prior target unheaded-block-25 (f58253403717e416cd5aa169d971bc332b43ab40f16ab6845c90d959d4283221) to unheaded-block-26 (f58253403717e416cd5aa169d971bc332b43ab40f16ab6845c90d959d4283221); inserted paragraphs shift the anchor, prior target text is unchanged.",
+      "targetUnitDigest": "f58253403717e416cd5aa169d971bc332b43ab40f16ab6845c90d959d4283221",
       "targetAncestry": [
         "CLI I/O Contract",
         "5. Reasoned Envelope Exceptions"

@@ -54,7 +54,7 @@ Node payload tests may spawn `bin/fgos.mjs` directly because they test the paylo
 
 | Relationship | File |
 | --- | --- |
-| legacy transition | [../../../architect/host-invocation-routing/legacy-cli-transition.md](../../../architect/host-invocation-routing/legacy-cli-transition.md) |
+| legacy transition | [../architecture/legacy-cli-transition.md](../architecture/legacy-cli-transition.md) |
 | command route descriptor | [command-route-descriptor.md](command-route-descriptor.md) |
 | release manifest | [../../packaging-distribution/contracts/release-manifest.md](../../packaging-distribution/contracts/release-manifest.md) |
 | source transition | [../../../architect/host-invocation-routing/legacy-cli-transition.md](../../../architect/host-invocation-routing/legacy-cli-transition.md) |

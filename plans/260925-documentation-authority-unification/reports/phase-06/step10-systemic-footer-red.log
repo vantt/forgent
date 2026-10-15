@@ -1,0 +1,38 @@
+✔ inserted paragraphs move anchors without substituting neighbouring text (0.5229ms)
+✔ identical footers keep their occurrence within the prior content sequence (0.107733ms)
+✔ ambiguous or absent content fails closed instead of retaining old anchor (0.25245ms)
+✔ unchanged bindings never overwrite truthful rationale (0.124418ms)
+✔ ownership check reports two distinct claims at one target (0.639128ms)
+✔ position-exact link replay rejects swapped table cells despite string presence (0.71023ms)
+✖ stale prior anchor uses reviewed ancestry to distinguish repeated footer text (0.572875ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 6
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 39.526745
+
+✖ failing tests:
+
+test at test/scripts/doc-binding-repair.test.mjs:31:1
+✖ stale prior anchor uses reviewed ancestry to distinguish repeated footer text (0.572875ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  'b2' !== 'b4'
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-binding-repair.test.mjs:34:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'b2',
+    expected: 'b4',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

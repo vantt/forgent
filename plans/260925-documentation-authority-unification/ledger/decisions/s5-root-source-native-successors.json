@@ -83,14 +83,19 @@
       "targetOwner": "docs/platform/work-state/spec.md",
       "targetAnchor": "unheaded-block-93",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Authorized U8/RUL60 second-fragment correction under A19 creates a native predecessor gap. Exact old/current same-file units are shown; A22 requires this real successor pending, no truth approval or identity graft. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "reviewNote": "deep: diff read: rules RUL55, RUL59, RUL60 reworded upstream (help text, intent retired, submit flow), 51 of 54 lines identical; line map 1032-1085 to 1041-1094 equals bound unit-93",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "9098a0e9ed02a324a16abe3c1016fad73ad261bfc4459aed889be5baeb1515b3",
       "targetAncestry": [
         "Work State Specification",
         "11. Business Rules"
-      ]
+      ],
+      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
     }
   ]
 }

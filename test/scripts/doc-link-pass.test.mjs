@@ -99,3 +99,11 @@ test('a source-column link label does not turn preservation targets into source 
  const text='| Legacy source | Preservation target |\n|---|---|\n| [Legacy source](../../architect/a/design.md) | [design](../../architect/a/design.md) |';
  const r=run(text);assert.equal(r.classified.length,1);assert.equal(r.edits.length,1);
 });
+test('prose destinations and bare legacy names do not protect candidate links', () => {
+ assert.equal(run('Read the [legacy design](../../architect/a/design.md).').edits.length,1);
+ assert.equal(run('[Design](../../architect/a/design.md) and [Source](../../architect/a/design.md)').edits.length,1);
+});
+test('relationship labels protect their own link, not other links in the same cell', () => {
+ const text='| Read |\n|---|\n| [Original source](../../architect/a/design.md), [Design](../../architect/a/design.md) |';
+ assert.equal(run(text).edits.length,1);
+});

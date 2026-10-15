@@ -289,3 +289,15 @@ Lead also directs b01’s 36-wrapper correction/evidence and seven-truth-correct
 ## L10-19 — A42 Session Identity candidate route
 
 Lead decision supplied in assignment `unit-run-1792090455209-159fbfed/producer/1`, content pin `19ca8de23`: add `docs/platform/session-identity/**` as a candidate route, in the same shape as other docs/platform candidate routes; no other switchboard change and no existing area status change. Session Identity specification defines a separate component ownership boundary; no existing area owns that component, so a new candidate Session Identity area holds the single additive route. This records routing only, without promotion or acceptance of descriptive Canonical metadata.
+
+
+## L10-20–L10-22 and L10-18b — Lead A42 execution instruction
+
+Source: assignment unit-run-1792093168554-f28af963/producer/1, based on committed re-review reports at4a18f35ff (content19ca8de23/request62d147641). These record the Lead decisions supplied to this author; no new owner choice or authority change.
+
+- L10-20: rationale generation must preserve unchanged bound content and be truthful per row. Restore six retain-in-place explanations, specific heading/rewrite/link/label wording, remove165 imprecise sentences, refresh stale source ranges and receipt/report evidence. Regenerate accounting030/042 afterward.
+- L10-21: bind every row by prior target digest/source text in current content; never keep an old positional anchor and pick its new occupant. Test inserted paragraphs; check duplicate ownership. Sweep all affected shards and match every reviewer anchor, including eight repeated footer rows.
+- L10-22: retain the earlier reviewed native dispositions for500d588a andc3ef3a4d; remove duplicate pending reclassify rows, one disposition per claim.
+- L10-18b: link relationship labels are per cell/per link label, excluding raw destinations and bare legacy. Restore source-preservation audit cells, work-state vision sentence order and legacy-payload candidate link from first-authored bytes; replay every edit at its exact link position.
+
+Executed with tests-first helper repairs under A9. Author/docs turn only; package next at runner commit with one sync and one bounded re-review of every changed row/entry. Evidence: step10-systemic-* artifacts and step-10-report.md.

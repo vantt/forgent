@@ -8,8 +8,12 @@ const root=process.cwd(),P='plans/260925-documentation-authority-unification/',R
 const gen=await import(path.join(root,'scripts/generate-doc-inventory.mjs'));
 const git=(...args)=>{assert.equal(process.cwd(),root);assert.equal(execFileSync('git',['branch','--show-current'],{encoding:'utf8'}).trim(),'plan/260925-documentation-authority-unification');return execFileSync('git',args,{encoding:'utf8',maxBuffer:40e6}).trim();};
 const sha=s=>crypto.createHash('sha256').update(s).digest('hex'),write=(f,x)=>fs.writeFileSync(R+f,typeof x==='string'?x:JSON.stringify(x,null,2)+'\n');
-const pin=git('rev-parse','HEAD'),sync=git('rev-parse','63fa6f152'),mapPin='fd6c9ab9e8aac12f99462a1d4f1bf78448d6e9f7',text=fs.readFileSync(source,'utf8'),lines=text.split('\n'),units=gen.extractMarkdownConservationUnits(text),headings=units.filter(u=>u.unitKind==='heading');
-assert.equal(units.length,495);assert.equal(headings.length,166);
+const pin=git('rev-parse','HEAD'),sync=git('rev-parse',JSON.parse(fs.readFileSync(R+'working-identity-registry.json','utf8')).commit),mapPin='fd6c9ab9e8aac12f99462a1d4f1bf78448d6e9f7',text=fs.readFileSync(source,'utf8'),lines=text.split('\n'),units=gen.extractMarkdownConservationUnits(text),headings=units.filter(u=>u.unitKind==='heading');
+// Main may add direct units/headings after the original scan. Authenticate the
+// complete current source population against the existing native registry,
+// rather than treating the old 495/166 observation as a permanent limit.
+const registered=JSON.parse(fs.readFileSync(R+'working-identity-registry.json','utf8')).units.filter(u=>u.sourcePath===source);
+assert.deepEqual(units.map(u=>[u.anchor,u.textDigest]).sort(),registered.map(u=>[u.sourceAnchor,u.sourceUnitDigest]).sort());
 const roots=['src','packages','apps','bin','core','domains','scripts','docs','test','AGENTS.md','CLAUDE.md','README.md'].filter(fs.existsSync);
 let hits='';try{hits=execFileSync('rg',['-n','--no-heading','-e','specs/runner\\.md|runner\\.md:[0-9]+|\\bRUL[0-9]+\\b',...roots,'-g','!docs/platform/**','-g','!docs/history/**','-g','!**/node_modules/**','-g','!**/target/**','-g','!**/generated/**','-g','!**/secrets.local.env'],{encoding:'utf8',maxBuffer:25e6});}catch(e){if(e.status!==1)throw e;}
 const refs=hits.split('\n').filter(Boolean).map(l=>{const m=l.match(/^([^:]+):(\d+):(.*)$/);return m?{path:m[1],line:+m[2],text:m[3]}:null;}).filter(r=>r&&r.path!==source);

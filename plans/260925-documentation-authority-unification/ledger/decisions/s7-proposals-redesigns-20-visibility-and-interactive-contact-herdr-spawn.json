@@ -24,12 +24,17 @@
       "targetAnchor": "visibility-và-interactive-contact-trong-dispatch-execution-herdr-spawn-là-candidate-đầu-tiên",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject input report’s no-direct-ref finding: RUL40 is a live spec citation. Keep map proposal as design evidence; dated transport line numbers and unbuilt recommendations stay verbatim. Evidence: docs/specs/runner.md:1008 RUL40 directly cites this exact proposal sections 3.3,4,14 H1. src/runner/dispatch/herdr-agent.mjs, herdr-round.mjs, herdr-reconcile.mjs and herdr-diagnosis.mjs implement current transport/outcome machinery. Complete source heading docs/architect/proposals/visibility-and-interactive-contact-herdr-spawn.md#visibility-và-interactive-contact-trong-dispatch-execution-herdr-spawn-là-candidate-đầu-tiên (lines 1–1) is carried at docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md#visibility-và-interactive-contact-trong-dispatch-execution-herdr-spawn-là-candidate-đầu-tiên (lines 1–1); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by native retained identity. Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding. Final L10-18/nit author correction disclosed in step10-review-final-target-bindings.json; current target binding pending independent re-review.",
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "reviewNote": "deep: docs/architect/proposals/visibility-and-interactive-contact-herdr-spawn.md#visibility-và-interactive-contact-trong-dispatch-execution-herdr-spawn-là-candidate-đầu-tiên (L1-1) to docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md#visibility-và-interactive-contact-trong-dispatch-execution-herdr-spawn-là-candidate-đầu-tiên (L1-1): the target H1 section equals the source section plus a labelled candidate metadata fence, an Added in candidate paragraph and a Source relationship line (diff has 0 removed lines), so the unequal digests are explained by the rationale; the RUL40 citation now reads docs/specs/runner.md:1008 and line 1008 does cite this proposal at sections 3.3, 4 and 14 H1; in the mandatory unequal set, digests hand-recomputed",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-04-19ca8de23.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "1de89cd93411550ab19ca6146e4b61cf288419a4490f70c29f5082900ee797d4",
-      "targetAncestry": []
+      "targetAncestry": [],
+      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
     },
     {
       "claimId": "claim_7082c16a8b1598cae59022ce455b9597",
@@ -59,14 +64,19 @@
       "targetAnchor": "unheaded-block-5",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "Weak-exact: current source and target unit digests are equal; placement ancestry is disclosed.; mandatory A36 deep read. place verbatim: Reject input report’s no-direct-ref finding: RUL40 is a live spec citation. Keep map proposal as design evidence; dated transport line numbers and unbuilt recommendations stay verbatim. Evidence: docs/specs/runner.md:1008 RUL40 directly cites this exact proposal sections 3.3,4,14 H1. src/runner/dispatch/herdr-agent.mjs, herdr-round.mjs, herdr-reconcile.mjs and herdr-diagnosis.mjs implement current transport/outcome machinery. Complete source unheaded-block docs/architect/proposals/visibility-and-interactive-contact-herdr-spawn.md#unheaded-block-2 (lines 10–15) is carried at docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md#unheaded-block-5 (lines 34–39); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "reviewNote": "deep: docs/architect/proposals/visibility-and-interactive-contact-herdr-spawn.md#unheaded-block-2 (L10-15) to docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md#unheaded-block-5 (L34-39) (pack class Unit-exact, the rationale opens with the Weak-exact wording, harmless because the digests are equal): shard row equals pack, source and target digests recomputed by extractor and equal, anchors pass, whole section diffed source vs target byte-identical, ancestry equal, rationale evidence cites live files that exist; whole-pack escalation read",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-04-19ca8de23.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "96cc53c4805e83d00d148109c625bb58ce48ca514b3907c4007ed3ece6d410a1",
       "targetAncestry": [
         "Visibility và Interactive Contact trong Dispatch & Execution — herdr-spawn là candidate đầu tiên"
-      ]
+      ],
+      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
     },
     {
       "claimId": "claim_76a87648ab887934fefe3e9c9d24f068",
@@ -2421,15 +2431,20 @@
       "targetAnchor": "12b-kết-quả-probe-đã-chạy-2026-09-06-herdr-082-default-session-tab-tạm-fgos-probe-p7-không-agent",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "Weak-exact: current source and target unit digests are equal; placement ancestry is disclosed.; mandatory A36 deep read. place verbatim: Reject input report’s no-direct-ref finding: RUL40 is a live spec citation. Keep map proposal as design evidence; dated transport line numbers and unbuilt recommendations stay verbatim. Evidence: docs/specs/runner.md:1008 RUL40 directly cites this exact proposal sections 3.3,4,14 H1. src/runner/dispatch/herdr-agent.mjs, herdr-round.mjs, herdr-reconcile.mjs and herdr-diagnosis.mjs implement current transport/outcome machinery. Complete source heading docs/architect/proposals/visibility-and-interactive-contact-herdr-spawn.md#12b-kết-quả-probe-đã-chạy-2026-09-06-herdr-082-default-session-tab-tạm-fgos-probe-p7-không-agent (lines 483–483) is carried at docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md#12b-kết-quả-probe-đã-chạy-2026-09-06-herdr-082-default-session-tab-tạm-fgos-probe-p7-không-agent (lines 507–507); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "reviewNote": "deep: docs/architect/proposals/visibility-and-interactive-contact-herdr-spawn.md#12b-kết-quả-probe-đã-chạy-2026-09-06-herdr-082-default-session-tab-tạm-fgos-probe-p7-không-agent (L483-483) to docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md#12b-kết-quả-probe-đã-chạy-2026-09-06-herdr-082-default-session-tab-tạm-fgos-probe-p7-không-agent (L507-507) (pack class Unit-exact, the rationale opens with the Weak-exact wording, harmless because the digests are equal): shard row equals pack, source and target digests recomputed by extractor and equal, anchors pass, whole section diffed source vs target byte-identical, ancestry equal, rationale evidence cites live files that exist; whole-pack escalation read",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-04-19ca8de23.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "00e6c7dfdba65c3d4cd3e2a2f8592d83a52d5a70d1cb65d0d4ce87e99be86b00",
       "targetAncestry": [
         "Visibility và Interactive Contact trong Dispatch & Execution — herdr-spawn là candidate đầu tiên",
         "12. Minimal probes trước implementation plan (read-only với repo, live với herdr thật, disposable dir)"
-      ]
+      ],
+      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
     },
     {
       "claimId": "claim_9da7c5f236f54e3c812f4c488a6f044f",
@@ -2438,16 +2453,21 @@
       "targetAnchor": "unheaded-block-77",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "Weak-exact: current source and target unit digests are equal; placement ancestry is disclosed.; mandatory A36 deep read. place verbatim: Reject input report’s no-direct-ref finding: RUL40 is a live spec citation. Keep map proposal as design evidence; dated transport line numbers and unbuilt recommendations stay verbatim. Evidence: docs/specs/runner.md:1008 RUL40 directly cites this exact proposal sections 3.3,4,14 H1. src/runner/dispatch/herdr-agent.mjs, herdr-round.mjs, herdr-reconcile.mjs and herdr-diagnosis.mjs implement current transport/outcome machinery. Complete source unheaded-block docs/architect/proposals/visibility-and-interactive-contact-herdr-spawn.md#unheaded-block-74 (lines 485–496) is carried at docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md#unheaded-block-77 (lines 509–520); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "reviewNote": "deep: docs/architect/proposals/visibility-and-interactive-contact-herdr-spawn.md#unheaded-block-74 (L485-496) to docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md#unheaded-block-77 (L509-520) (pack class Unit-exact, the rationale opens with the Weak-exact wording, harmless because the digests are equal): shard row equals pack, source and target digests recomputed by extractor and equal, anchors pass, whole section diffed source vs target byte-identical, ancestry equal, rationale evidence cites live files that exist; whole-pack escalation read",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-04-19ca8de23.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "8a6c208de4b598018b53e22005d82c98c74f09235ee19ae7b5659c75e8786450",
       "targetAncestry": [
         "Visibility và Interactive Contact trong Dispatch & Execution — herdr-spawn là candidate đầu tiên",
         "12. Minimal probes trước implementation plan (read-only với repo, live với herdr thật, disposable dir)",
         "12b. Kết quả probe đã chạy 2026-09-06 (herdr 0.8.2, default session, tab tạm `fgos-probe-p7`, không agent)"
-      ]
+      ],
+      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
     },
     {
       "claimId": "claim_60fb5d5fe3c44d3a9d1c14acb8cc7ef6",

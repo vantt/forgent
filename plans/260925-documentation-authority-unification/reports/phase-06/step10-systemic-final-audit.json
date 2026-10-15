@@ -1,0 +1,426 @@
+{
+  "inputCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2",
+  "scopeViolations": [],
+  "legacyBytes": [
+    {
+      "path": "AGENTS.md",
+      "unchanged": true
+    },
+    {
+      "path": "CLAUDE.md",
+      "unchanged": true
+    },
+    {
+      "path": "docs/io-contract.md",
+      "unchanged": true
+    },
+    {
+      "path": "docs/specs/distribution.md",
+      "unchanged": true
+    },
+    {
+      "path": "docs/specs/observe.md",
+      "unchanged": true
+    },
+    {
+      "path": "docs/specs/reading-map.md",
+      "unchanged": true
+    },
+    {
+      "path": "docs/specs/runner.md",
+      "unchanged": true
+    },
+    {
+      "path": "docs/architecture-manifest.json",
+      "unchanged": true
+    },
+    {
+      "path": "docs/specs/confinement-authority.md",
+      "unchanged": true
+    }
+  ],
+  "registryUnchanged": true,
+  "application": {
+    "applied": 389,
+    "retained": 221,
+    "revoked": 168,
+    "revokedIds": [
+      "claim_ae1f21106b52006a2ff377f9104a1fce",
+      "claim_192ebab9dbc6cec8b8957683e3ff8c82",
+      "claim_5412ac73c702e4ec33e4b59dd9ad1940",
+      "claim_0201a1d648765d578fb8fd96673da674",
+      "claim_f8e2b48d6234ca8a73e15cdaad7d9c07",
+      "claim_faeaa8e46158de47c45810fb0a595dcc",
+      "claim_310b7c85756d5a5631a83fd5b6f51450",
+      "claim_5b6cd72833b3ee7ea7a2862b4eadb328",
+      "claim_6f1392a7f197c9824233896cf218bda9",
+      "claim_e8b18c86c4297b05e04a14793817bf6a",
+      "claim_6bf5e5b90a15803e49010737491afdb9",
+      "claim_c56e0ea4200729ae5cf5542803b2fe10",
+      "claim_0e062808f47ce5c348b6b44a91650ecc",
+      "claim_75f47ef3fd99abd07c138f106f1ca023",
+      "claim_70c83eabb546f46e040404b3b908a02e",
+      "claim_c6a1314c4583518f5100cc53e78b1979",
+      "claim_45c662066b6e70bac4ff5991ee40afca",
+      "claim_f161fbd15476131b86b7c2fd2f1d8f59",
+      "claim_0f85275ad3f392256b805bf226c9562d",
+      "claim_c57c39536b983d5f172833853e8b3344",
+      "claim_5908b357cb98d52934398e26e43fcb39",
+      "claim_67494c7de8ad006fcb01b825ea00e6b2",
+      "claim_c23f1c3ed45f72de28f6ed3c605bc43a",
+      "claim_4a9e0c360118d90051bb7c03002ff4d9",
+      "claim_4063855a9287de7cf5b27cb77d96955f",
+      "claim_93d9f629f8c7258d208b1c2d3fc413ab",
+      "claim_0b4d53be3903ac1ce9299b5d7174feab",
+      "claim_664fd1639ad346a2d2d240596a2a6604",
+      "claim_7bc17cd130d9b9600e3a8db9bd57ca88",
+      "claim_dbc0da98acd1c90327ebd67850cc8983",
+      "claim_a79114f19bb479ea6b69c50166af8972",
+      "claim_423abdded73e62ffd62a773173555583",
+      "claim_0fe4212f0537cfd4b9232280e9e6781b",
+      "claim_99fa84eefd3c917530ef1a453f08be21",
+      "claim_9283d5a06984f8b7a0bb9b53cb947051",
+      "claim_6175bd55a942311ba1056efd762f44be",
+      "claim_e482cc83d02ca103ac12e881c2a712ee",
+      "claim_e602fe2731b631f7be06ccebc5cf8e91",
+      "claim_453534a2ccfccba30980d90ae47b6e63",
+      "claim_ad95e550092bec4474133ac2a451649d",
+      "claim_2f1ede55aaf8adff2f15c46ffc646e8d",
+      "claim_208f5cc84da2b23ab24abde2c91c4f06",
+      "claim_5f4f81607ad69719e2fed9631a8dcd2b",
+      "claim_886f9acc902249e303bacc887ffb9882",
+      "claim_37315ade5a8ca0c583456c157daaecba",
+      "claim_4c29ddf395edf0a905c5cf76729c2d26",
+      "claim_9faf2f6fcfad6a089f7077f61abb3b56",
+      "claim_d0aa35a58456de6d8e5f552bdad1b08c",
+      "claim_576e295be7d60ab95a555f11ada15da5",
+      "claim_e375b70390617716823280eb03a82a87",
+      "claim_a93bf40197e2bf32890a9cf931226e15",
+      "claim_bad3eb429a52fae0b9100c7468c2d4d6",
+      "claim_33c9953761a4fe99a4072b008cefc634",
+      "claim_ff4510bb2afe125aedac972ed943ce2c",
+      "claim_50eed5d7ed0c4f2107e50cca1ffcee82",
+      "claim_6346dec77f2dff715949806586e100d3",
+      "claim_0dd6189a9d8ed1bcdd656127bf71774e",
+      "claim_9be26c9507109484cc9b1663ca4ca2d9",
+      "claim_08dc68ef23395b8f3f5b095508348e00",
+      "claim_e3c928a8fca5c645487d1b574f0c5d36",
+      "claim_386a8c90d7f9d79a52190add7a82f33f",
+      "claim_4806fa4d3041b4b051cddf6a2490730b",
+      "claim_d1d70b955b085baafa10ffcec2702b8d",
+      "claim_dc663544c2f4766e60ca2ce841c6ffd6",
+      "claim_3b4da5c5b12c6780b24e84b53ca73e49",
+      "claim_f44a3645601fbc48b21a8d73b3ac3426",
+      "claim_c6a32a1e4ab8c7078b89199236f3d5e0",
+      "claim_4da244a64b6f33711d89feb47331b4f0",
+      "claim_a7c2e1310de5bcd152e86f3833e90033",
+      "claim_2d27908b73621a411fcf708b067b6ba2",
+      "claim_e68c14be45a430e3676761d7bdc9e6db",
+      "claim_62c3b825e8cc887ad822b8d1b5316769",
+      "claim_2591914de0c8f3b95488576fb8643dfb",
+      "claim_1f9265c6ad8bc4b9e8cf754fb1b8b164",
+      "claim_e2589be21644922e0424a20d39bbd6e3",
+      "claim_ebf8d11889aea2db10db3f7d03fb7d50",
+      "claim_afaa4b9499e137528bcf889ef6ef93f0",
+      "claim_185e1f6f4d1ef50fead4ce341980898d",
+      "claim_fc4d5078de5528578407ea0e3715e723",
+      "claim_df1ec9feeaeb131a98f44cebcd3c8f6c",
+      "claim_b8d85d30862c55869062b5418f430f69",
+      "claim_9f56719f95c81edecfe6dfda00ca0268",
+      "claim_a4c7eec1fc96a1ad212a5de75a8942c5",
+      "claim_4e04420f3322b42d6a313faa72216ae9",
+      "claim_bd1c7b0191b236990a4740f007de2397",
+      "claim_fe29583fb3eaae959e22d8ea42f76e6d",
+      "claim_8beebc48272beb4cf5dd32b6ed94d5d0",
+      "claim_e763e03b02e0c2d677ef4b49f30a9ad3",
+      "claim_a9ff1aae0ff13bbce2c3ba5e9f30b19e",
+      "claim_b87e27dca1c9e551eb4d296c858d0f08",
+      "claim_5770fe5a53057464d4c4795b24abb38a",
+      "claim_86e1127b120054dafe55e52585c2a1d9",
+      "claim_ef05e66d20bc35c8c80ac2a83dbe7d92",
+      "claim_16901b7106220f70f44d600ba4dbb40f",
+      "claim_6ce44d19e0f7b99b1c363579bf6eb68e",
+      "claim_9974f7370cd9be4ca66f08057a94d3d7",
+      "claim_38fc27aadc8aecf157c5db30cda1862b",
+      "claim_ebfb0421fa0d9c6693aaf57a262dd471",
+      "claim_aa501f53cee0b7ec6adc656971266a97",
+      "claim_7d0cfc9e7e784ee0492be9c2d04fa93b",
+      "claim_67c5f9d1a031030f5bd1f3ab27320130",
+      "claim_7a2a3390e3beca0100dbfebb57cb6aab",
+      "claim_69ddf8650201dae7cbe8fe80373c6a7c",
+      "claim_5fb4a29b7884b27f3d265612f67e4f31",
+      "claim_5eca88140b6e1a8d5c14095b6cb31045",
+      "claim_b1c9fa89736c52b8bff6d5ec328cc553",
+      "claim_ec3bfee565512c6d032778295c5838c1",
+      "claim_82f766f5320ab6bbe5174aeda52e710b",
+      "claim_aa3cf298aaa31c6dc9b4c8382434bc9c",
+      "claim_818a58278988ed797931b14ca91614e2",
+      "claim_2d89ae63cbc81e492eb80e9a28174b67",
+      "claim_a92d8b1ad203c61b04078fa8b94c9b17",
+      "claim_a3944b679053b61dc2d743795cde3d77",
+      "claim_466331635349f55e32c11e0fcf56d334",
+      "claim_3f65fc24d3eeb760ecc11ff781159152",
+      "claim_a4a77d7c336663f81a9bc8ac697ab518",
+      "claim_a4ed529f5ed4745e1c6bbbb06eb3a4b2",
+      "claim_f3d9c6dbb704d09c37ab5cfd4f65927e",
+      "claim_6c5753df306960b46d20e133a2a36894",
+      "claim_1d98a4a5c3391d5318f53153b3f5f442",
+      "claim_546450931dd47024138ce0a32699cd72",
+      "claim_0da8b597cb243173df9f5eb46a34ec76",
+      "claim_0cabbd5a6b95edeb9aab6832ad276c50",
+      "claim_7889671f1f2783b634ef6d90a251f3e9",
+      "claim_fc0f124b5b1368034455207d6378bc00",
+      "claim_c0adce3f717a031d4159eee6dd0aaaa1",
+      "claim_d97ba7f5ff310af83839fea58329acdd",
+      "claim_84950cfff9d75392b847739c4812768a",
+      "claim_ebfe14fc1ae59246f7b3c8871b402520",
+      "claim_72ee6b558f807216affeb2559c6a597d",
+      "claim_6a85836cdc08fbdfde62f6d3fd9c2d8f",
+      "claim_4fceb5ca59ea256ccd77c0975d3576e1",
+      "claim_f1507b5008c678f9474202706e018774",
+      "claim_042b85c001dab92b6ae561f89eac6337",
+      "claim_3fbb7ac76d27f06cc8e095a1d0e6b88e",
+      "claim_c5f9a98133b0fd6692dd0c7555d775e1",
+      "claim_e2d3709ee991f35ec6153e7e84c46e2f",
+      "claim_8eeec687713e79da23a9339df1179b60",
+      "claim_217bf9908c0941c13b1eaf2f7a2d9d64",
+      "claim_63db75c2d22d1861c69845d62518ee60",
+      "claim_e6ae96517c239248948c36255ae4dcac",
+      "claim_634d509e158ed8fc22f610e4c51030ba",
+      "claim_7e0016df70b7640b0337c5daf5f80e90",
+      "claim_a9be2da803446c73efbfcac40ee82637",
+      "claim_f30f58465c33adf6343057d6c3fcb2b3",
+      "claim_6f7a10c04ee1414d39b0b2ef8d7d2d6d",
+      "claim_45840c035132a9c46aa748567ae37648",
+      "claim_10986602d5cab816cf923616dc6b58f8",
+      "claim_7baf6e6911d7bdc8cbb66425d0aff57a",
+      "claim_2e0270967476b583f5548c2d0632c6f7",
+      "claim_b7d1849e7cde5d799b984dbf0ea3bcff",
+      "claim_fd3c6c93c220012e1e08d65c9276ab24",
+      "claim_963bf3272df983c42aead0351a429ce4",
+      "claim_68304d9e3c8f531fd5dcc25392c6d072",
+      "claim_8d8de83dcecd115c8b517cbf12d08795",
+      "claim_331e9d0a3a7f29b20ec75ed8981f7fb7",
+      "claim_c696887f984b8248a620d445d341cf0b",
+      "claim_092f7d288e8617bb3b8abff586e988f8",
+      "claim_cf9060b6664b21d6e5fac0b31aac0ff6",
+      "claim_be0cd74b4a0bd4c5860e9116aa8dd6c6",
+      "claim_581643ec8243af5744e04c222f13c214",
+      "claim_690988881136792349476d55b83bd81d",
+      "claim_e24e9588d1d0d0ec87a1a90db87e62b9",
+      "claim_6866da75d153e251a298ec889e5e67f8",
+      "claim_48a16587298cde876c7142378489c618",
+      "claim_1be7573f879e8eda05723b6d40b3b84e",
+      "claim_e5cc66ff5930f04b7ebd9a8acbc52942",
+      "claim_4599d55c9de4262714d378be2b9eaf80"
+    ]
+  },
+  "reviewFailures": [],
+  "bindingsReplayed": 39,
+  "bindings": [
+    {
+      "claimId": "claim_6dfbaa59a2f49bc668d9729fed01878a",
+      "anchor": "unheaded-block-15",
+      "digest": "8b3e099723160029770c62469f14db6ce2e484a6f7b4a1354cb4bf34288af9d4"
+    },
+    {
+      "claimId": "claim_140216d27eb5609e8b5d51f718ecf493",
+      "anchor": "unheaded-block-19",
+      "digest": "5d70ebc5bbf14b4604424fe9dc4e05c75110a85c0c24b6b1cb6e7a998bfaddc4"
+    },
+    {
+      "claimId": "claim_52b54d49826d7ff8fd38f29925505f2a",
+      "anchor": "unheaded-block-20",
+      "digest": "75bf5b6af00287e081d243556f44f8e1c495da7238737ccd1b15d2a8191f196b"
+    },
+    {
+      "claimId": "claim_ce947d10ed900598bde4df5b552e0265",
+      "anchor": "unheaded-block-34",
+      "digest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2"
+    },
+    {
+      "claimId": "claim_15a24dbb1f2d0470f04cdf8900da67a0",
+      "anchor": "unheaded-block-28",
+      "digest": "2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9"
+    },
+    {
+      "claimId": "claim_5dcb56608e17caeb53c197186ae33827",
+      "anchor": "unheaded-block-37",
+      "digest": "3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62"
+    },
+    {
+      "claimId": "claim_6fe86521fead9cec7253443e3275a3cf",
+      "anchor": "unheaded-block-41",
+      "digest": "a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798"
+    },
+    {
+      "claimId": "claim_9959e82e2874baeb627a8441faa07e9a",
+      "anchor": "unheaded-block-31",
+      "digest": "878d708db7a0afb3e23a0829f98be122c83ac562946b51ab1989e73e5e4a8bfe"
+    },
+    {
+      "claimId": "claim_19495d2772ced1aa1af4b20d4640fa3a",
+      "anchor": "unheaded-block-33",
+      "digest": "51dd3c8aa026a8f5a15e4c12c522b3bf2ad7c29238c49bf9ba51324806e10e23"
+    },
+    {
+      "claimId": "claim_e2377849e4ba8e3d3beaf70880e4ed23",
+      "anchor": "unheaded-block-35",
+      "digest": "e013c5b05d6ff58782aa8231ab4a55967bd5ef853dac4015aec8f16f5fcf9c68"
+    },
+    {
+      "claimId": "claim_2fa062c56cf4226e8519e768a5b5cab4",
+      "anchor": "unheaded-block-23",
+      "digest": "d1af2d5a982f5d139fda776a23b4ad0b3776cc40c1fc0177636c44bdc91b968d"
+    },
+    {
+      "claimId": "claim_15308eb4847ddd38be79bd87bd69a0b6",
+      "anchor": "unheaded-block-141",
+      "digest": "0291bfb160d8cd95cf9b5d305ba952d9f824993e04ebbfdde79b629f8b1a92dc"
+    },
+    {
+      "claimId": "claim_97479b13a60800e856813bfd4f0cbb78",
+      "anchor": "unheaded-block-150",
+      "digest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+    },
+    {
+      "claimId": "claim_50dca4885019ac5125d941ea5a86f448",
+      "anchor": "unheaded-block-155",
+      "digest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+    },
+    {
+      "claimId": "claim_07ae72c4d2c93884a120cf2ca12250a8",
+      "anchor": "unheaded-block-167",
+      "digest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+    },
+    {
+      "claimId": "claim_211f0b98400863f2a0e9b9cdaa2259fe",
+      "anchor": "unheaded-block-176",
+      "digest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+    },
+    {
+      "claimId": "claim_1d8baa1def0cea7595b62de99846b489",
+      "anchor": "unheaded-block-241",
+      "digest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+    },
+    {
+      "claimId": "claim_012bfa2639fb107eeb3baee4fb502f54",
+      "anchor": "unheaded-block-250",
+      "digest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+    },
+    {
+      "claimId": "claim_99806d8b21d05eb7a8e8744d765bea00",
+      "anchor": "unheaded-block-274",
+      "digest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+    },
+    {
+      "claimId": "claim_a6f43d98b3eebe97802fd01a4ac7863b",
+      "anchor": "unheaded-block-286",
+      "digest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+    },
+    {
+      "claimId": "claim_de531cd96f9f92540f16d2ec822dbaf3",
+      "anchor": "unheaded-block-145",
+      "digest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3"
+    },
+    {
+      "claimId": "claim_04703f011b22383992b94545055b9e56",
+      "anchor": "unheaded-block-145",
+      "digest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3"
+    },
+    {
+      "claimId": "claim_4a023fa2faa879fb0e1dfd8bc5c051e7",
+      "anchor": "unheaded-block-34",
+      "digest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2"
+    },
+    {
+      "claimId": "claim_7333c439fa8d29886b82168e015ca113",
+      "anchor": "unheaded-block-34",
+      "digest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2"
+    },
+    {
+      "claimId": "claim_665eb7f4bfb9bee7ba3f5e58368eaba1",
+      "anchor": "unheaded-block-35",
+      "digest": "e013c5b05d6ff58782aa8231ab4a55967bd5ef853dac4015aec8f16f5fcf9c68"
+    },
+    {
+      "claimId": "claim_e597b776163803dcf6e4194962ea4f6e",
+      "anchor": "unheaded-block-35",
+      "digest": "e013c5b05d6ff58782aa8231ab4a55967bd5ef853dac4015aec8f16f5fcf9c68"
+    },
+    {
+      "claimId": "claim_cbc7ad17e0764ac8d1d4d386e3b62e74",
+      "anchor": "unheaded-block-33",
+      "digest": "51dd3c8aa026a8f5a15e4c12c522b3bf2ad7c29238c49bf9ba51324806e10e23"
+    },
+    {
+      "claimId": "claim_b8fa7fa2cd614433de754bbb92302140",
+      "anchor": "unheaded-block-35",
+      "digest": "e013c5b05d6ff58782aa8231ab4a55967bd5ef853dac4015aec8f16f5fcf9c68"
+    },
+    {
+      "claimId": "claim_9c7dc2d7af79db454e4d63ffffe3d6f6",
+      "anchor": "unheaded-block-31",
+      "digest": "878d708db7a0afb3e23a0829f98be122c83ac562946b51ab1989e73e5e4a8bfe"
+    },
+    {
+      "claimId": "claim_045b588f4d839f90c40b48fbc0fc3f4d",
+      "anchor": "unheaded-block-32",
+      "digest": "a5128895b71f07c2e1baa3ecb90cd302f016fdb4191518ef02835a768c8dc156"
+    },
+    {
+      "claimId": "claim_e8c37a28267ca355475a2286b90ba453",
+      "anchor": "unheaded-block-39",
+      "digest": "7cb2dbfd3b698c923c15d17222daf08e96f5fcbf54aa79afd3e1248fdd8d9b2e"
+    },
+    {
+      "claimId": "claim_b69096018a7da1d3dc629b5d37f6fdac",
+      "anchor": "unheaded-block-40",
+      "digest": "9b711cb5a088ede56ad00207289f1fed2ccc05887597169bbc41eb2e55429db3"
+    },
+    {
+      "claimId": "claim_4217ac86de0ba075ca046202b2ce4284",
+      "anchor": "unheaded-block-26",
+      "digest": "f58253403717e416cd5aa169d971bc332b43ab40f16ab6845c90d959d4283221"
+    },
+    {
+      "claimId": "claim_0bf4d10d1c0f4cda16abe6091d639b64",
+      "anchor": "unheaded-block-31",
+      "digest": "878d708db7a0afb3e23a0829f98be122c83ac562946b51ab1989e73e5e4a8bfe"
+    },
+    {
+      "claimId": "claim_bc055098a9e2bedf2ed30ab0dfcacf79",
+      "anchor": "unheaded-block-33",
+      "digest": "51dd3c8aa026a8f5a15e4c12c522b3bf2ad7c29238c49bf9ba51324806e10e23"
+    },
+    {
+      "claimId": "claim_b92ac199356ff830e5554647ab143a90",
+      "anchor": "unheaded-block-25",
+      "digest": "cb6381a3b69f2fdd99ff81b06cafbce1f45add19c7076005c59ad0e093d49be8"
+    },
+    {
+      "claimId": "claim_6a8087a3f502f37f9c7b729e871bee9c",
+      "anchor": "unheaded-block-26",
+      "digest": "f58253403717e416cd5aa169d971bc332b43ab40f16ab6845c90d959d4283221"
+    },
+    {
+      "claimId": "claim_bc091727d4f9526a57978e0ccc1cd5f7",
+      "anchor": "unheaded-block-23",
+      "digest": "d1af2d5a982f5d139fda776a23b4ad0b3776cc40c1fc0177636c44bdc91b968d"
+    },
+    {
+      "claimId": "claim_812873a889bd4222ea0ab3dc9194e1ad",
+      "anchor": "unheaded-block-24",
+      "digest": "131cc0704d753f35dcbec3ebba7be49a0d103732b6f4ee8c5ecc175d5c46167e"
+    }
+  ],
+  "reviewerAnchorFailures": [],
+  "contentExceptions": 29,
+  "allCurrentBindingsExact": true,
+  "nativePlatformTargetIdentityDuplicates": 0,
+  "checks": true,
+  "nativeSyncCount": 0,
+  "nativeRebindCount": 0,
+  "reviewPackCount": 0,
+  "ok": true
+}

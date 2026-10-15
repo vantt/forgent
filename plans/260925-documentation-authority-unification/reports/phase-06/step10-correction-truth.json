@@ -14,10 +14,11 @@
       "entryLine": 155,
       "before": "- `plugins/fgOS/` (`.claude-plugin/plugin.json` + `skills/<verb>/SKILL.md`) — bề mặt slash-command `/fgOS:<verb>` cho Claude Code, 12 verb wrapper (submit, pick, move, return, ask, answer, ready, stale, rollup, check, graph, conflicts), mỗi verb một wrapper one-door-write qua `bin/fgos.mjs <verb>`; spec: docs/specs/fgos-plugin.md",
       "after": "- `plugins/fgOS/` (`.claude-plugin/plugin.json` + `skills/<verb>/SKILL.md`) — bề mặt slash-command `/fgOS:<verb>` cho Claude Code, 36 wrapper không có tiền tố fgos- trong 55 thư mục skill; `_shared` không có SKILL.md và không phải wrapper; `check` không có wrapper. Mỗi wrapper giữ hướng dẫn cửa gọi của riêng nó; spec: docs/specs/fgos-plugin.md **Truth correction:** `find plugins/fgOS/skills -mindepth 2 -maxdepth 2 -name SKILL.md` gives 54 files, of which 18 have the fgos- prefix and 36 do not; 55 directories include `_shared` without SKILL.md (enumerated at SYNC 59b9b7087).",
-      "evidence": "plugins/fgOS/.claude-plugin/plugin.json:1; plugins/fgOS/skills/submit/SKILL.md:1; plugins/fgOS/skills/answer/SKILL.md:1 (directory enumeration at e7393ea3c)",
+      "evidence": "Read-only enumeration of plugins/fgOS/skills at content pin 19ca8de23 and HEAD 4a18f35ff: 54 immediate SKILL.md files, 18 with fgos- prefix and 36 wrappers without it; 55 immediate skill directories include _shared without SKILL.md. Exact paths and counts: step10-systemic-wrapper-evidence.json. Earlier directory-only evidence retained as historicalEvidence.",
       "historicalAfter": "- `plugins/fgOS/` (`.claude-plugin/plugin.json` + `skills/<verb>/SKILL.md`) — bề mặt slash-command `/fgOS:<verb>` cho Claude Code, 37 wrapper không có tiền tố fgos- trong 55 thư mục skill; `check` không có wrapper. Mỗi wrapper giữ hướng dẫn cửa gọi của riêng nó; spec: docs/specs/fgos-plugin.md **Truth correction:** plugins/fgOS/.claude-plugin/plugin.json:1; plugins/fgOS/skills/submit/SKILL.md:1; plugins/fgOS/skills/answer/SKILL.md:1 (directory enumeration at e7393ea3c).",
       "correctionSYNC": "59b9b7087",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "historicalEvidence": "plugins/fgOS/.claude-plugin/plugin.json:1; plugins/fgOS/skills/submit/SKILL.md:1; plugins/fgOS/skills/answer/SKILL.md:1 (directory enumeration at e7393ea3c)"
     },
     {
       "entryLine": 172,

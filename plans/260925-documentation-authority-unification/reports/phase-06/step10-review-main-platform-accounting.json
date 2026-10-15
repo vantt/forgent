@@ -50,7 +50,7 @@
     },
     {
       "path": "docs/platform/session-identity/spec.md",
-      "status": "unrouted",
+      "status": "candidate",
       "routeFacts": "candidate",
       "classificationFacts": {
         "fileClass": "maintained-authority",
@@ -183,7 +183,8 @@
       ],
       "unchangedMainBytes": true,
       "authorEdits": "No author edit.",
-      "followup": "New main source has no explicit switchboard route. Phase 7/8 must decide routing/classification; next package accounts all native units and root-reader edges. Its descriptive metadata does not grant platform cutover authority."
+      "followup": "L10-19 additive candidate route and native 24-unit accounting completed at 62d147641. Candidate metadata grants no authority or cutover; global refresh still owed.",
+      "historicalStatus": "unrouted"
     }
   ],
   "ioContractRatchet": "docs/io-contract.md is outside ratchet roots; accounted in main-carry receipt, no unused exception added.",

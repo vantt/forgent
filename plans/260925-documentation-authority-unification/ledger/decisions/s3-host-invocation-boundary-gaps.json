@@ -13,12 +13,17 @@
       "disposition": "supersede",
       "targetOwner": "docs/architecture-manifest.json",
       "targetAnchor": "file-block",
-      "targetUnitDigest": "2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "reviewNote": "deep: file-block; sha256 of docs/architecture-manifest.json at the witness commit 6f67a4441 and of the target at HEAD equal the shown digests; JSON diff read: dispatch-log.mjs entry removed (file is gone from src/runner), fanout-batch and work-dispatch move infra to use-case, 13 entries added; upstream manifest edit, same file, so supersede fits",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a",
       "targetAncestry": [],
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
     },
     {
       "claimId": "claim_d52f4222d940558ef34a2d7c0f174628",
@@ -49,15 +54,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/component-boundary.md",
       "targetAnchor": "unheaded-block-11",
-      "targetUnitDigest": "973ee5615eeb755822f8032d8d11c080f21e340bd20a87952b300cde23661e95",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "reviewNote": "deep: diff read: the Dispatch Transport row gains the credential-renewal clause and one new Session Identity row is appended (its link session-identity/spec.md resolves); 15 of 16 old lines identical; line map 60-75 at 209824610 to 66-81 at HEAD equals bound unit-11; upstream edit under A31, generic rationale holds",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "973ee5615eeb755822f8032d8d11c080f21e340bd20a87952b300cde23661e95",
       "targetAncestry": [
         "Component Boundary",
         "4. Current High-Level Components"
       ],
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
     },
     {
       "claimId": "claim_9c0e5bb670fb2957bb0998cbe5d8d51e",
@@ -66,15 +76,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
       "targetAnchor": "unheaded-block-4",
-      "targetUnitDigest": "fd8f41577cf07e6e6713f2a48792d88071e7fa072e87b32c08ec0be373173c6c",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "reviewNote": "deep: diff read: a new fgos launcher row is inserted and the fgctl upgrade row is rewritten (release choice by --from, FGCTL_FROM, FGCTL_VERSION, latest); all other rows identical; line map 28-42 to 36-51 equals bound unit-4; same-file upstream edit",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "fd8f41577cf07e6e6713f2a48792d88071e7fa072e87b32c08ec0be373173c6c",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "2. Entry Points"
       ],
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
     },
     {
       "claimId": "claim_15308eb4847ddd38be79bd87bd69a0b6",
@@ -82,17 +97,16 @@
       "sourceUnitDigest": "a58b4be15c55c3d02464399b2586a140a5570426f09c064077121b88783931f6",
       "disposition": "supersede",
       "targetOwner": "docs/specs/confinement-authority.md",
-      "targetAnchor": "unheaded-block-140",
-      "targetUnitDigest": "09081a2c1a3eb4536192eed72162efca188fdf9b084170519b57415f216c32c3",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "targetAnchor": "unheaded-block-141",
+      "targetUnitDigest": "0291bfb160d8cd95cf9b5d305ba952d9f824993e04ebbfdde79b629f8b1a92dc",
+      "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
       "reviewStatus": "pending",
-      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. L10-21: content-based rebind from reviewed prior target unheaded-block-140 (0291bfb160d8cd95cf9b5d305ba952d9f824993e04ebbfdde79b629f8b1a92dc) to unheaded-block-141 (0291bfb160d8cd95cf9b5d305ba952d9f824993e04ebbfdde79b629f8b1a92dc); inserted paragraphs shift the anchor, prior target text is unchanged.",
       "targetAncestry": [
         "Spec: Agent Confinement Authority",
         "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
         "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
-      ],
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+      ]
     },
     {
       "claimId": "claim_65b61a54c10aa48c0dc423cf65cff0a2",
@@ -101,15 +115,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/specs/distribution.md",
       "targetAnchor": "unheaded-block-14",
-      "targetUnitDigest": "8f37278a54ba85348e6348a445d2720dd1ece4dfd86426d2c12798a9ae13e69e",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "reviewNote": "deep: diff read: RUL14 becomes a moved pointer to runner.md RUL74 (RUL74 exists there), RUL15 upgrade lines edited, RUL17 launcher rule added; best-matching unit by line overlap (0.79) is the bound unit-14 and the line map 297-315 to 297-320 agrees; upstream edit, the RUL14 body now lives in runner.md",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "8f37278a54ba85348e6348a445d2720dd1ece4dfd86426d2c12798a9ae13e69e",
       "targetAncestry": [
         "Spec: Distribution",
         "Business Rules"
       ],
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
     },
     {
       "claimId": "claim_0f4d968b593902731bd334f9ed2af711",
@@ -119,14 +138,19 @@
       "targetOwner": "docs/specs/distribution.md",
       "targetAnchor": "unheaded-block-5",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "reviewNote": "deep: diff read: table rows 5d, 7 and 7b edited upstream (project-fgos-launcher check, credential-copies-retained fix), the other 14 rows identical; line map 57-73 to 57-73 equals bound unit-5",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e",
       "targetAncestry": [
         "Spec: Distribution",
         "Data Dictionary"
-      ]
+      ],
+      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
     },
     {
       "claimId": "claim_97479b13a60800e856813bfd4f0cbb78",
@@ -134,18 +158,17 @@
       "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
       "disposition": "supersede",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-148",
-      "targetUnitDigest": "9ab04443daf84a8574e1b4c6ae3c99098cbac4eb4a3e49af85c145cba700b73d",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "targetAnchor": "unheaded-block-150",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
       "reviewStatus": "pending",
-      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. L10-21: content-based rebind from reviewed prior target unheaded-block-148 (95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104) to unheaded-block-150 (95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104); inserted paragraphs shift the anchor, prior target text is unchanged.",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
         "0005 — Runner & cô lập worker",
-        "Quyết định"
-      ],
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+        "Hệ quả"
+      ]
     },
     {
       "claimId": "claim_50dca4885019ac5125d941ea5a86f448",
@@ -153,18 +176,17 @@
       "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
       "disposition": "supersede",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-153",
-      "targetUnitDigest": "e42d5e19a449f4279faa1d1d32033bafdc01e1a595a641547d91962bc24ba63d",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "targetAnchor": "unheaded-block-155",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
       "reviewStatus": "pending",
-      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. L10-21: content-based rebind from reviewed prior target unheaded-block-153 (95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104) to unheaded-block-155 (95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104); inserted paragraphs shift the anchor, prior target text is unchanged.",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
         "0008 — Routing theo audience của từng interface",
-        "Quyết định"
-      ],
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+        "Hệ quả"
+      ]
     },
     {
       "claimId": "claim_07ae72c4d2c93884a120cf2ca12250a8",
@@ -172,19 +194,17 @@
       "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
       "disposition": "supersede",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-165",
-      "targetUnitDigest": "a864acacd269750cf31c62618e5f4d294754bc7393bdb5dd130eec00cf278527",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "targetAnchor": "unheaded-block-167",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
       "reviewStatus": "pending",
-      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. L10-21: content-based rebind from reviewed prior target unheaded-block-165 (95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104) to unheaded-block-167 (95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104); inserted paragraphs shift the anchor, prior target text is unchanged.",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
         "0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập)",
-        "Quyết định",
-        "Vì sao chặn-cây"
-      ],
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+        "Hệ quả"
+      ]
     },
     {
       "claimId": "claim_211f0b98400863f2a0e9b9cdaa2259fe",
@@ -192,19 +212,17 @@
       "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
       "disposition": "supersede",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-174",
-      "targetUnitDigest": "439edeebfe8f7843e4e29586c6fe3f3d0ab942285ef564447c8ab1de76a130d3",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "targetAnchor": "unheaded-block-176",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
       "reviewStatus": "pending",
-      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. L10-21: content-based rebind from reviewed prior target unheaded-block-174 (95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104) to unheaded-block-176 (95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104); inserted paragraphs shift the anchor, prior target text is unchanged.",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
         "0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence",
-        "Quyết định",
-        "Vì sao không epoch-fence-merge-gate"
-      ],
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+        "Hệ quả"
+      ]
     },
     {
       "claimId": "claim_1d8baa1def0cea7595b62de99846b489",
@@ -212,18 +230,17 @@
       "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
       "disposition": "supersede",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-239",
-      "targetUnitDigest": "ba2849d909619a304171ccece011f39238a3516f95643631c023e0699eaef99f",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "targetAnchor": "unheaded-block-241",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
       "reviewStatus": "pending",
-      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. L10-21: content-based rebind from reviewed prior target unheaded-block-239 (95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104) to unheaded-block-241 (95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104); inserted paragraphs shift the anchor, prior target text is unchanged.",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
         "0028 — Đổi tên pinned term `orchestrator` thành `launcher`",
-        "Quyết định"
-      ],
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+        "Hệ quả"
+      ]
     },
     {
       "claimId": "claim_012bfa2639fb107eeb3baee4fb502f54",
@@ -231,19 +248,17 @@
       "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
       "disposition": "supersede",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-248",
-      "targetUnitDigest": "4f37e3101303fb13398d4b292c695eb061d36e653b3c4aafb275f4949238bc1e",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "targetAnchor": "unheaded-block-250",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
       "reviewStatus": "pending",
-      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. L10-21: content-based rebind from reviewed prior target unheaded-block-248 (95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104) to unheaded-block-250 (95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104); inserted paragraphs shift the anchor, prior target text is unchanged.",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
         "0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị",
-        "Quyết định",
-        "— T1 (vai trò bên gọi) hai giá trị: `launcher`/`driver`; `orchestrator` = tầng hợp thành T0"
-      ],
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+        "Hệ quả"
+      ]
     },
     {
       "claimId": "claim_99806d8b21d05eb7a8e8744d765bea00",
@@ -251,18 +266,17 @@
       "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
       "disposition": "supersede",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-272",
-      "targetUnitDigest": "1f2b182749f127340bb8dcd372d42350e304ea1f1d9b4f4ba4819b49f277cf19",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "targetAnchor": "unheaded-block-274",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
       "reviewStatus": "pending",
-      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. L10-21: content-based rebind from reviewed prior target unheaded-block-272 (95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104) to unheaded-block-274 (95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104); inserted paragraphs shift the anchor, prior target text is unchanged.",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
         "0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới",
-        "Từ vựng sau record này"
-      ],
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+        "Hệ quả"
+      ]
     },
     {
       "claimId": "claim_a6f43d98b3eebe97802fd01a4ac7863b",
@@ -270,18 +284,17 @@
       "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
       "disposition": "supersede",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-284",
-      "targetUnitDigest": "c496763228fcdb86cf688d7f082a09a001756e2cb92ef03fef99831934360e7b",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "targetAnchor": "unheaded-block-286",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
       "reviewStatus": "pending",
-      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. L10-21: content-based rebind from reviewed prior target unheaded-block-284 (95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104) to unheaded-block-286 (95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104); inserted paragraphs shift the anchor, prior target text is unchanged.",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
         "0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người",
-        "Vì sao `supersedes:` trống"
-      ],
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+        "Hệ quả"
+      ]
     },
     {
       "claimId": "claim_b91c86788522c3516bef2c7bab859093",
@@ -312,15 +325,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/specs/runner.md",
       "targetAnchor": "unheaded-block-9",
-      "targetUnitDigest": "43f03eb4dffdeff420f464531d60be7e37e13192429963b10ba302be1e9b777e",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "reviewNote": "deep: diff read: two Data Dictionary table rows (1, 1b) edited upstream, 13 of 15 lines identical; line map 73-87 equals bound unit-9",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "43f03eb4dffdeff420f464531d60be7e37e13192429963b10ba302be1e9b777e",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Data Dictionary"
       ],
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
     }
   ]
 }

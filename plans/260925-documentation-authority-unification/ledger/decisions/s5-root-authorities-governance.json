@@ -1605,9 +1605,8 @@
       "claimKind": "contract",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "rationale": "Whole Related Files section is retained. Nine relative link spellings are adjusted across governance.md to preserve the original repository destinations, including the documentation portal README.md now written ../README.md (docs/README.md), distinct from the platform portal. This unit contains no component-boundary plain path. No governance rule or authority changes. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "rationale": "Whole Related Files section retained, with nine relative link adjustments. Three destinations are repointed to candidate carriers: docs/README.md to docs/platform/documentation/operations/portals/docs-portal.md; docs/transitional-switchboard.md to docs/platform/documentation/switchboard.md; the platform portal to docs/platform/README.md. These repoints do not retain the legacy portal destinations. Other link spellings preserve their repository referents. No authority flip or current-truth approval.",
       "targetUnitDigest": "12cc18517f23da3cdd1de3e0a0090371e92f19fce30063363466eb6fdea56cb6",
       "targetAncestry": [
         "Documentation Governance"
@@ -1621,9 +1620,8 @@
       "claimKind": "contract",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "rationale": "Whole Related Files table is retained. Nine relative link spellings are adjusted across governance.md to preserve the original repository destinations, including the documentation portal README.md now written ../README.md (docs/README.md), distinct from the platform portal. This unit contains no component-boundary plain path. No governance rule or authority changes. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "rationale": "Whole Related Files table retained, with nine relative link adjustments. Three destinations are repointed to candidate carriers: docs/README.md to docs/platform/documentation/operations/portals/docs-portal.md; docs/transitional-switchboard.md to docs/platform/documentation/switchboard.md; the platform portal to docs/platform/README.md. These repoints do not retain the legacy portal destinations. Other link spellings preserve their repository referents. No authority flip or current-truth approval.",
       "targetUnitDigest": "f389738a959bded8d713ae3139c654c123eed5d9a93ae8b439562d84aca629ae",
       "targetAncestry": [
         "Documentation Governance",

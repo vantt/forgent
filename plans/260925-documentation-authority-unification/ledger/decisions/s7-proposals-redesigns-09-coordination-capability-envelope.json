@@ -1141,15 +1141,20 @@
       "targetAnchor": "unheaded-block-43",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "Judgment: candidate link repoint. place verbatim: Reject inference that engine retirement retires this alternative recommendation. Preserve the complete map proposal, with stale code citations literal; no assumption the proposed envelope shipped. Evidence: Source section 2 cites surviving src/runner/dispatch/assignment-runner.mjs and assignment.mjs, while the session-engine/store/coordination verbs it criticizes were removed in 2180b4e72. Source lines 34–43 recommends an alternative to graph-owned deliberation, not merely use of the old graph. Complete source unheaded-block docs/architect/proposals/coordination-capability-envelope.md#unheaded-block-40 (lines 250–253) is carried at docs/platform/proposals/coordination-capability-envelope.md#unheaded-block-43 (lines 277–280); Frozen map target and kind retained. Source and target unit digests differ because the contract link is repointed to its mapped candidate; the original link label and surrounding text remain; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "reviewNote": "deep: answers the earlier rework: the rationale now says Judgment and that the digests differ only because the contract link is repointed to its mapped candidate; the masked diff is empty, source lines 250-253 and target lines 277-280 are right, full digests recomputed equal",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "cf4d4ac0a274cf811024779a39918371bcf922db8ec1d3893163c0fc3d3c660a",
       "targetAncestry": [
         "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
         "7. Recommendation and reversal conditions"
-      ]
+      ],
+      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
     },
     {
       "claimId": "claim_282b6362035c0d1bc2db4ba997a1870f",
@@ -1856,14 +1861,19 @@
       "targetAnchor": "10-smallest-experiments-before-implementation-planning",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "Weak-exact: current source and target unit digests are equal; placement ancestry is disclosed.; mandatory A36 deep read. place verbatim: Reject inference that engine retirement retires this alternative recommendation. Preserve the complete map proposal, with stale code citations literal; no assumption the proposed envelope shipped. Evidence: Source section 2 cites surviving src/runner/dispatch/assignment-runner.mjs and assignment.mjs, while the session-engine/store/coordination verbs it criticizes were removed in 2180b4e72. Source lines 34–43 recommends an alternative to graph-owned deliberation, not merely use of the old graph. Complete source heading docs/architect/proposals/coordination-capability-envelope.md#10-smallest-experiments-before-implementation-planning (lines 386–386) is carried at docs/platform/proposals/coordination-capability-envelope.md#10-smallest-experiments-before-implementation-planning (lines 413–413); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "reviewNote": "deep: heading section 10; shown source and target digests are equal and the text is byte-identical (2860 chars); rationale now says Weak-exact with equal digests, matching the data; link spelling is identical though it resolves to the moved probe contract",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "c35e33bb5e4d4fc730ef52f6b5823601188c474715bde9adaf98fbfd83276415",
       "targetAncestry": [
         "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation"
-      ]
+      ],
+      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
     },
     {
       "claimId": "claim_63e205836d7968a5141e0350e70ad8a8",
@@ -1872,15 +1882,20 @@
       "targetAnchor": "unheaded-block-65",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "Weak-exact: current source and target unit digests are equal; placement ancestry is disclosed.; mandatory A36 deep read. place verbatim: Reject inference that engine retirement retires this alternative recommendation. Preserve the complete map proposal, with stale code citations literal; no assumption the proposed envelope shipped. Evidence: Source section 2 cites surviving src/runner/dispatch/assignment-runner.mjs and assignment.mjs, while the session-engine/store/coordination verbs it criticizes were removed in 2180b4e72. Source lines 34–43 recommends an alternative to graph-owned deliberation, not merely use of the old graph. Complete source unheaded-block docs/architect/proposals/coordination-capability-envelope.md#unheaded-block-62 (lines 388–394) is carried at docs/platform/proposals/coordination-capability-envelope.md#unheaded-block-65 (lines 415–421); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+      "reviewNote": "deep: block unit-65; source and target digests equal and the text is byte-identical (568 chars); rationale wording corrected to equal digests; ancestry equal",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "d7fa9577c7921ff566d2e242f7c0a358a6f81a0c611c500eb7f923ba3d18a211",
       "targetAncestry": [
         "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
         "10. Smallest experiments before implementation planning"
-      ]
+      ],
+      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
     },
     {
       "claimId": "claim_6163ea1b7781f128baa4ecf5d0ad746f",

@@ -1,3 +1,21 @@
+# Step 10 systemic author reworks complete — package next
+
+Assignment `unit-run-1792093168554-f28af963/producer/1`; input `4a18f35ff`, content `19ca8de23`, request `62d147641`. All14 reports’ Notes/Concerns read; A42 L10-18b/L10-20/L10-21/L10-22 executed. **39 rows re-anchored / nine shards**, all reviewer anchors match; eight duplicate-text footer bindings preserve ancestry. **366+98 link positions replayed, zero findings**; source/target cells, vision sentence order and legacy-transition candidate link restored.
+
+Tests-first tools: content-based binding + collision audit, cell/link-label semantics without bare legacy, preserve unchanged rationale (including32→64 digest expansion); liveness stale495/166/old-sync assertions replaced by full current registered tuple/pin equality. **88/88 helper tests pass**. Six retain-in-place rationales restored;165 imprecise unchanged-row sentences removed;74 stale source ranges fixed (49 reported +25 siblings); specific rewrite/link/label/receipt/evolve corrections complete. Accounting030/042 regenerated. L10-22 keeps one earlier reviewed disposition per claim.
+
+**389 ok applied /221 retained /168 reopened**, verbatim notes, no approval carry to changed rationale. **A/B/H pass; candidate-status zero findings/unresolved links. I baseline unchanged; readers equal HEAD, one historical upstream route delta disclosed. Scoped FAST D zero fatal both priors together/each; E remains open16 partial/22 pending/one group/two gaps/301 reverse.** Full audit passes: zero scope violations, target drift or reviewer-anchor mismatch; native target identities unique; existing historical many-to-one references enumerated. Registry/legacy bytes unchanged. [Report](step-10-report.md), [audit](step10-systemic-final-audit.json), [reproduction](step10-systemic-reproduction.json).
+
+**NEXT = PACKAGE at this turn’s runner commit: ONE native sync and ONE bounded re-review of EVERY changed row/entry and affected native tuple.** Use the content-binding helper. Existing global/A34/holds/consumer/checkpoint obligations remain; Phase6 open. **Zero native sync/--rebind/review packs this turn**, no CLI/git writes, workspace .fgos mutation, protected gate/checker/vocabulary/extractor/baseline edits or legacy edits. No owner-direction blocker; runner commits.
+
+---
+
+# Step 10 systemic rework — author/docs turn in progress
+
+Assignment `unit-run-1792093168554-f28af963/producer/1`; HEAD `4a18f35ff`, content `19ca8de23`, request `62d147641`. Lead L10-18b/L10-20/L10-21/L10-22 under A42: tests-first helper corrections, content-based target rebinding, position-exact link replay, truthful rationale repairs and matching ok application. No native sync or review packs this turn. Next turn packages this runner commit with one native sync and ONE bounded re-review of every changed row/entry. Runner commits.
+
+---
+
 # Step 10 native sync and bounded re-review complete
 
 Assignment `unit-run-1792090455209-159fbfed/producer/1`; **SYNC/content `19ca8de23`**, comparison `ab4d6274a`. L10-19/A42 recorded: one additive Session Identity candidate area/route; no existing area/status change and no docs byte change.

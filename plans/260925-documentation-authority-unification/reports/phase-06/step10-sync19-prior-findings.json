@@ -15,15 +15,14 @@
         "claimKind": "specification",
         "disposition": "supersede",
         "reviewStatus": "pending",
-        "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
-        "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried. Native identity resolved at 19ca8de23908e161c34c91626e41041b7813167c from the sole native sync. Historical gaps remain separate; no provisional ID is persisted as a decision and no approval carries.",
+        "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+        "rationale": "Heading translated and renumbered: “Chiều vào — verb + danh tính” becomes “2. Input Direction Verb And Identity”. Its forty-line direct source body is carried under new H3 subsections, each body unit has its own decision row. Heading and section digests differ because of translation, numbering and structural relocation, in addition to the disclosed Session Identity relative link rebase. Native identity resolved at 19ca8de23; no provisional identity, source retirement, authority flip or truth approval.",
         "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
         "targetAnchor": "2-input-direction-verb-and-identity",
         "targetUnitDigest": "7c4e0214ec4c8c108c24c1b00a560516fbc5de0bc1a26d70a082eca5ccafb23c",
         "targetAncestry": [
           "CLI I/O Contract"
-        ],
-        "reviewNote": "Pending independent review at 19ca8de23; no historical approval carried."
+        ]
       },
       "native": {
         "kind": "units",
@@ -84,16 +83,21 @@
         "disposition": "partial-carry",
         "targetOwner": "docs/io-contract.md",
         "targetAnchor": "unheaded-block-5",
+        "rationale": "A22/A31/A34: one native sync at 19ca8de23908e161c34c91626e41041b7813167c preserves this historical predecessor as a gap; current upstream source successor is separately native-accounted and carried to the candidate. Historical lines changed; exact untransferred residual is retained verbatim with SHA256, independent representation review required; cutover remains blocked. Full source/current witnesses and residual: step10-sync19-predecessor-residuals.json. No identity graft or approval carry.",
+        "reviewStatus": "reviewed",
+        "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
+        "reviewNote": "deep: historical unit docs/io-contract.md#unheaded-block-5 at witness 2300d6557 (L24-31, digest recomputed equal) against the current successor L24-34 (digest d3828696 recomputed equal): the longest-common-subsequence of lines leaves exactly the 3 residual lines the residual file records (their text equals residualText and its SHA256 b276baca recomputes), the successor is carried to the candidate by claim_57f11d83, so partial-carry with a named verbatim remainder is accurate; A34 acceptance stays false until this review, and the residual file SHA binding belongs to closure",
+        "remainder": "Verbatim historical residual in plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-residuals.json, claim claim_f5365b8e40fb58c75adc56a574263242, residual SHA256 b276baca8168777f55bdba5a90f6ca6334a7e6e1e5d0c9ebef8df5b362313957. Source fa53d50b84fef3025e7b4e5e8e810a83f885e4aab37a760652c1bcb9e676a5a9; primary target d38286962b4133b3c55926e513b03625483e4bd0b6b885a6fd3dde23c00686b8. Residual file SHA256 recorded in step10-sync19-predecessor-reconciliation.json. A34 independent acceptance pending; cutover blocked.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-16",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-19ca8de23.md",
+        "reviewMode": "ordinary",
         "targetUnitDigest": "d38286962b4133b3c55926e513b03625483e4bd0b6b885a6fd3dde23c00686b8",
         "targetAncestry": [
           "Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner`",
           "Chiều vào — verb + danh tính"
         ],
-        "rationale": "A22/A31/A34: one native sync at 19ca8de23908e161c34c91626e41041b7813167c preserves this historical predecessor as a gap; current upstream source successor is separately native-accounted and carried to the candidate. Historical lines changed; exact untransferred residual is retained verbatim with SHA256, independent representation review required; cutover remains blocked. Full source/current witnesses and residual: step10-sync19-predecessor-residuals.json. No identity graft or approval carry.",
-        "reviewStatus": "pending",
-        "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
-        "reviewNote": "Pending independent review at 19ca8de23; no historical approval carried.",
-        "remainder": "Verbatim historical residual in plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-residuals.json, claim claim_f5365b8e40fb58c75adc56a574263242, residual SHA256 b276baca8168777f55bdba5a90f6ca6334a7e6e1e5d0c9ebef8df5b362313957. Source fa53d50b84fef3025e7b4e5e8e810a83f885e4aab37a760652c1bcb9e676a5a9; primary target d38286962b4133b3c55926e513b03625483e4bd0b6b885a6fd3dde23c00686b8. Residual file SHA256 recorded in step10-sync19-predecessor-reconciliation.json. A34 independent acceptance pending; cutover blocked."
+        "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
       },
       "native": {
         "kind": "identityGaps",
@@ -145,9 +149,8 @@
         "claimKind": "navigation",
         "disposition": "reclassify-out-of-platform-scope",
         "reviewStatus": "pending",
-        "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
-        "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried. Native identity resolved at 19ca8de23908e161c34c91626e41041b7813167c from the sole native sync. Historical gaps remain separate; no provisional ID is persisted as a decision and no approval carries.",
-        "reviewNote": "Pending independent review at 19ca8de23; no historical approval carried."
+        "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+        "rationale": "Retain in place outside platform documentation authority: AGENTS.md#legacy-node-cli-ownership-boundary, source unit SHA256 fed79e2e75d57ab326d97e74e6b2cd4b8fd1474aa6df3abb284ae2bb6d46f817, source file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. Pending independent review; no authority flip or truth certificate."
       },
       "native": {
         "kind": "units",
@@ -207,11 +210,16 @@
         "targetAnchor": null,
         "claimKind": "procedure",
         "disposition": "reclassify-out-of-platform-scope",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
         "rationale": "L10-3 / A31: historical native instruction/navigation identity claim_251b389b227a62ef26b0fd3e1f0bebd9 records AGENTS.md#unheaded-block-14 at digest 9babb9141d90b2e3a99f353c735db9e64679ea4be0bc12cf27432d1cd728df8f. The numbered anchor identifies historical text, not a claim of current byte equality. Retain root instructions and repository navigation outside platform authority. Current changed unit is separately drafted at SYNC 59b9b7087; native sync must determine retained identity or predecessor gap, preserving all history. No platform copy, source-to-self carry proof, truth approval or retirement. Native sync at 19ca8de23908e161c34c91626e41041b7813167c confirms a predecessor gap; retain historical root/navigation identity outside platform scope. Current successor is separately native-resolved. No live old-anchor claim.",
-        "reviewNote": "Pending independent review at 19ca8de23; no historical approval carried.",
-        "sourcePath": "AGENTS.md"
+        "reviewNote": "deep: historical AGENTS.md#unheaded-block-14 at witness 2300d6557 (L85-91, digest 9babb914 recomputed equal): retain outside platform authority with no live old-anchor claim is accurate, AGENTS.md at HEAD is byte-identical to SYNC 59b9b7087 (current unit L85-94 is the separate claim_c328f1aa) and the rationale correctly says the numbered anchor names historical text",
+        "sourcePath": "AGENTS.md",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-16",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-19ca8de23.md",
+        "reviewMode": "ordinary",
+        "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
       },
       "native": {
         "kind": "identityGaps",
@@ -262,18 +270,23 @@
         "sourceUnitDigest": "04f89e98512b5fd7af474ab2abbf362b9a0d30a25b5a911d011037539b3a9d3f",
         "claimKind": "specification",
         "disposition": "supersede",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
         "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried. Native identity resolved at 19ca8de23908e161c34c91626e41041b7813167c from the sole native sync. Historical gaps remain separate; no provisional ID is persisted as a decision and no approval carries.",
         "targetOwner": "docs/platform/packaging-distribution/spec.md",
         "targetAnchor": "data-dictionary",
+        "reviewNote": "deep: docs/specs/distribution.md#data-dictionary to docs/platform/packaging-distribution/spec.md#data-dictionary: the 20-line section is byte-identical except the heading depth (## becomes ####), a nesting change that the rationale does not name but that is a heading-depth change only; mandatory unequal row, digests recomputed, anchors pass",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-16",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-19ca8de23.md",
+        "reviewMode": "ordinary",
         "targetUnitDigest": "3dd2d51fac193d78f712a83b2f0918c9f5f48a0e8eb65572afda4bb678b1de95",
         "targetAncestry": [
           "Spec: Packaging-Distribution",
           "Retained Distribution Source Detail",
           "Spec: Distribution"
         ],
-        "reviewNote": "Pending independent review at 19ca8de23; no historical approval carried."
+        "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
       },
       "native": {
         "kind": "units",
@@ -334,16 +347,21 @@
         "disposition": "partial-carry",
         "targetOwner": "docs/specs/distribution.md",
         "targetAnchor": "unheaded-block-5",
+        "rationale": "A22/A31/A34: one native sync at 19ca8de23908e161c34c91626e41041b7813167c preserves this historical predecessor as a gap; current upstream source successor is separately native-accounted and carried to the candidate. Historical lines changed; exact untransferred residual is retained verbatim with SHA256, independent representation review required; cutover remains blocked. Full source/current witnesses and residual: step10-sync19-predecessor-residuals.json. No identity graft or approval carry.",
+        "reviewStatus": "reviewed",
+        "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
+        "reviewNote": "deep: historical unit docs/specs/distribution.md#unheaded-block-5 at witness 2300d6557 (L57-73, digest 034305c4 recomputed equal) against the current successor L57-73 (digest 59297ed6 recomputed equal): the line comparison leaves exactly one residual line (table row 7 Doctor check), its text and SHA256 4894dcf4 match the residual file, the successor is carried to the candidate by claim_d9185072 (byte-identical), so partial-carry is accurate",
+        "remainder": "Verbatim historical residual in plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-residuals.json, claim claim_26f62a1ae1abc17d0f02706788bfd399, residual SHA256 4894dcf4de3a1254ebc5e89c78ffed0afafc58859c82fa2b2781ac8216b08424. Source 034305c494ee289535b1b4121c8b90ed9d2eb5b850364e1c2a63e936221d40e3; primary target 59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e. Residual file SHA256 recorded in step10-sync19-predecessor-reconciliation.json. A34 independent acceptance pending; cutover blocked.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-16",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-19ca8de23.md",
+        "reviewMode": "ordinary",
         "targetUnitDigest": "59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e",
         "targetAncestry": [
           "Spec: Distribution",
           "Data Dictionary"
         ],
-        "rationale": "A22/A31/A34: one native sync at 19ca8de23908e161c34c91626e41041b7813167c preserves this historical predecessor as a gap; current upstream source successor is separately native-accounted and carried to the candidate. Historical lines changed; exact untransferred residual is retained verbatim with SHA256, independent representation review required; cutover remains blocked. Full source/current witnesses and residual: step10-sync19-predecessor-residuals.json. No identity graft or approval carry.",
-        "reviewStatus": "pending",
-        "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
-        "reviewNote": "Pending independent review at 19ca8de23; no historical approval carried.",
-        "remainder": "Verbatim historical residual in plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-residuals.json, claim claim_26f62a1ae1abc17d0f02706788bfd399, residual SHA256 4894dcf4de3a1254ebc5e89c78ffed0afafc58859c82fa2b2781ac8216b08424. Source 034305c494ee289535b1b4121c8b90ed9d2eb5b850364e1c2a63e936221d40e3; primary target 59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e. Residual file SHA256 recorded in step10-sync19-predecessor-reconciliation.json. A34 independent acceptance pending; cutover blocked."
+        "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
       },
       "native": {
         "kind": "identityGaps",
@@ -394,9 +412,14 @@
         "disposition": "reclassify-out-of-platform-scope",
         "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
         "rationale": "L10-3 / A31: historical native instruction/navigation identity claim_d956ba3fb9a8cce9589194e5f59d021f records docs/specs/reading-map.md#unheaded-block-2 at digest 3cb37dbc28864019579211dcadd7e189fb667783946e770ad45a9a81c2ca5b30. The numbered anchor identifies historical text, not a claim of current byte equality. Retain root instructions and repository navigation outside platform authority. Current changed unit is separately drafted at SYNC 59b9b7087; native sync must determine retained identity or predecessor gap, preserving all history. No platform copy, source-to-self carry proof, truth approval or retirement. Final b01 clarification: the current merged section 5 carries 53 original entries, with seven entries explicitly labelled truth corrections and evidence, plus one verbatim Session Identity entry from main. It does not assert that all 53 are still verbatim or defer those seven known truth fixes to promotion; wrapper count is 36 in 55 directories (_shared has no SKILL.md). Historical source binding and current navigation are separately pending independent review. Native sync at 19ca8de23908e161c34c91626e41041b7813167c confirms a predecessor gap; retain historical root/navigation identity outside platform scope. Current successor is separately native-resolved. No live old-anchor claim.",
-        "reviewStatus": "pending",
-        "reviewNote": "Pending independent review at 19ca8de23; no historical approval carried.",
-        "sourcePath": "docs/specs/reading-map.md"
+        "reviewStatus": "reviewed",
+        "reviewNote": "deep: historical docs/specs/reading-map.md#unheaded-block-2 at witness 2300d6557 (L11-63, digest 3cb37dbc recomputed equal): the rationale now says the merged section 5 carries 53 entries with seven labelled truth corrections plus one Session Identity entry and a 36-wrapper count; checked: seven Truth correction labels in docs/reading-map.md, entries 24, 25, 42, 44, 48, 51, 52 differ from docs/specs/reading-map.md, the other 47 entries are byte-equal (Session Identity entry included), plugins/fgOS/skills has 55 directories, 54 SKILL.md, 18 fgos- prefixed, 36 wrappers, _shared has no SKILL.md; previous rework answered",
+        "sourcePath": "docs/specs/reading-map.md",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-16",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-19ca8de23.md",
+        "reviewMode": "ordinary",
+        "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
       },
       "native": {
         "kind": "identityGaps",
@@ -447,12 +470,17 @@
         "disposition": "supersede",
         "targetOwner": "docs/architecture-manifest.json",
         "targetAnchor": "file-block",
+        "rationale": "A22/A31/A34: one native sync at 19ca8de23908e161c34c91626e41041b7813167c preserves this historical predecessor as a gap; current upstream source successor is separately native-accounted and carried to the candidate. All historical source lines occur verbatim in order in current successor; insertion-only containment. Full source/current witnesses and residual: step10-sync19-predecessor-residuals.json. No identity graft or approval carry.",
+        "reviewStatus": "reviewed",
+        "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
+        "reviewNote": "deep: historical file docs/architecture-manifest.json at witness 2300d6557 (digest 92391ce6 recomputed equal) against the current file (digest 2d55be82 recomputed equal): line comparison shows zero historical lines lost and one inserted line (src/util/host-bin-path.mjs kernel entry), matching the residual file (empty, SHA e3b0c442), so supersede with insertion-only containment is accurate; the current file is carried by claim_03ef50e8",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-16",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-19ca8de23.md",
+        "reviewMode": "ordinary",
         "targetUnitDigest": "2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a",
         "targetAncestry": [],
-        "rationale": "A22/A31/A34: one native sync at 19ca8de23908e161c34c91626e41041b7813167c preserves this historical predecessor as a gap; current upstream source successor is separately native-accounted and carried to the candidate. All historical source lines occur verbatim in order in current successor; insertion-only containment. Full source/current witnesses and residual: step10-sync19-predecessor-residuals.json. No identity graft or approval carry.",
-        "reviewStatus": "pending",
-        "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
-        "reviewNote": "Pending independent review at 19ca8de23; no historical approval carried."
+        "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
       },
       "native": {
         "kind": "identityGaps",
@@ -502,9 +530,8 @@
         "claimKind": "navigation",
         "disposition": "reclassify-out-of-platform-scope",
         "reviewStatus": "pending",
-        "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
-        "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried. Native identity resolved at 19ca8de23908e161c34c91626e41041b7813167c from the sole native sync. Historical gaps remain separate; no provisional ID is persisted as a decision and no approval carries.",
-        "reviewNote": "Pending independent review at 19ca8de23; no historical approval carried."
+        "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+        "rationale": "Retain in place outside platform documentation authority: docs/specs/reading-map.md#reading-map-sản-phẩm, source unit SHA256 19c2ff247fb664d39a56d6194b1d47b6dce16ea18c8ee19369bd2884efbf918a, source file SHA256 22606348608523b94c6a25f1540007aec5512d340278efea1f835713a7e67250 at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. docs/reading-map.md section 5 contains seven labelled truth corrections plus the Session Identity entry; retained legacy docs/specs/reading-map.md is untouched. Pending independent review; no authority flip or truth certificate."
       },
       "native": {
         "kind": "units",
@@ -563,9 +590,8 @@
         "claimKind": "navigation",
         "disposition": "reclassify-out-of-platform-scope",
         "reviewStatus": "pending",
-        "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
-        "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried. Native identity resolved at 19ca8de23908e161c34c91626e41041b7813167c from the sole native sync. Historical gaps remain separate; no provisional ID is persisted as a decision and no approval carries.",
-        "reviewNote": "Pending independent review at 19ca8de23; no historical approval carried."
+        "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+        "rationale": "Retain in place outside platform documentation authority: docs/reading-map.md#5-detailed-product-and-source-map, source unit SHA256 01204e281f177e257efc7b015d93651c874a149f0e4bb3a68054b943a66d2e91, source file SHA256 f4fce87549f728da23d13a9ff8c8c85efc397956bfacf5c5cf83badf13dc5abb at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. docs/reading-map.md section 5 contains seven labelled truth corrections plus the Session Identity entry; retained legacy docs/specs/reading-map.md is untouched. Pending independent review; no authority flip or truth certificate."
       },
       "native": {
         "kind": "units",
@@ -623,11 +649,16 @@
         "sourceUnitDigest": "9a08a47745ab1aaa1c00c35a181813b16ff2e9f12eb14332d3993c9009d36219",
         "claimKind": "navigation",
         "disposition": "reclassify-out-of-platform-scope",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
         "rationale": "L10-3 / A31: historical native instruction/navigation identity claim_2bdbea8cb68325ec8b5b8d1a62447f4d records docs/reading-map.md#unheaded-block-16 at digest 9a08a47745ab1aaa1c00c35a181813b16ff2e9f12eb14332d3993c9009d36219. The numbered anchor identifies historical text, not a claim of current byte equality. Retain root instructions and repository navigation outside platform authority. Current changed unit is separately drafted at SYNC 59b9b7087; native sync must determine retained identity or predecessor gap, preserving all history. No platform copy, source-to-self carry proof, truth approval or retirement. Native sync at 19ca8de23908e161c34c91626e41041b7813167c confirms a predecessor gap; retain historical root/navigation identity outside platform scope. Current successor is separately native-resolved. No live old-anchor claim.",
-        "reviewNote": "Pending independent review at 19ca8de23; no historical approval carried.",
-        "sourcePath": "docs/reading-map.md"
+        "reviewNote": "deep: historical docs/reading-map.md#unheaded-block-16 at witness 2300d6557 (L131-183, digest 9a08a477 recomputed equal): the previous rework (37 wrappers should be 36) is fixed in the retained file, a line comparison of the witness block against current section 5 shows exactly the L155 correction (37 to 36, _shared note and Truth correction label) and one inserted Session Identity entry; the gap rationale (historical identity, no live old-anchor claim, retain outside platform scope) is accurate",
+        "sourcePath": "docs/reading-map.md",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-16",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-19ca8de23.md",
+        "reviewMode": "ordinary",
+        "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
       },
       "native": {
         "kind": "identityGaps",
@@ -679,17 +710,22 @@
         "sourceUnitDigest": "ca2fd76b4ca2fe575e858e1f9ae76cf0ddf0f7300593c6a58b11ac2249b4d1b2",
         "claimKind": "specification",
         "disposition": "supersede",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
         "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried. Native identity resolved at 19ca8de23908e161c34c91626e41041b7813167c from the sole native sync. Historical gaps remain separate; no provisional ID is persisted as a decision and no approval carries.",
         "targetOwner": "docs/platform/observe/spec.md",
         "targetAnchor": "owns",
+        "reviewNote": "deep: docs/specs/observe.md#owns to docs/platform/observe/spec.md#owns: section differs by the friction ping and migrate additions to the first bullet (labelled Truth correction in the candidate scaffold, with evidence friction_cli.rs:7-9) and one link destination rebased (../platform/session-identity/spec.md becomes ../session-identity/spec.md, not named in the scaffold list of rebased links but a pure destination change); nothing lost; mandatory unequal row, digests recomputed, anchors pass",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-16",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-19ca8de23.md",
+        "reviewMode": "ordinary",
         "targetUnitDigest": "a03c9cf9107371c2ec305cd2efea93cc9ca0f549ec485158bdb5e9ecc05c63aa",
         "targetAncestry": [
           "Observe Component Specification",
           "1. Overview & Boundaries"
         ],
-        "reviewNote": "Pending independent review at 19ca8de23; no historical approval carried."
+        "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
       },
       "native": {
         "kind": "units",
@@ -751,17 +787,22 @@
         "disposition": "partial-carry",
         "targetOwner": "docs/specs/observe.md",
         "targetAnchor": "unheaded-block-3",
+        "rationale": "A22/A31/A34: one native sync at 19ca8de23908e161c34c91626e41041b7813167c preserves this historical predecessor as a gap; current upstream source successor is separately native-accounted and carried to the candidate. Historical lines changed; exact untransferred residual is retained verbatim with SHA256, independent representation review required; cutover remains blocked. Full source/current witnesses and residual: step10-sync19-predecessor-residuals.json. No identity graft or approval carry.",
+        "reviewStatus": "reviewed",
+        "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
+        "reviewNote": "deep: historical unit docs/specs/observe.md#unheaded-block-3 at witness 2300d6557 (L13-17, digest 1840cc4b recomputed equal) against the current successor L13-17 (digest 36f5428d recomputed equal): exactly one historical line (the store lock bullet) is not in the successor, its text and SHA256 ca9a59c1 match the residual file, the successor is carried by claim_bf1888a0, so partial-carry is accurate",
+        "remainder": "Verbatim historical residual in plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-residuals.json, claim claim_a7278e1567e5432cfb079506cf2f5050, residual SHA256 ca9a59c18839e81d0f58c6602e5c373a161cbeb6a20721e23fbff39be36107af. Source 1840cc4b1da22587ed69755276cad9a882139c62a36179d8fba2269905414623; primary target 36f5428de433214eb4a9a17e3a2366471095b9bb658faa4f11d4bb108beea137. Residual file SHA256 recorded in step10-sync19-predecessor-reconciliation.json. A34 independent acceptance pending; cutover blocked.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-16",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-19ca8de23.md",
+        "reviewMode": "ordinary",
         "targetUnitDigest": "36f5428de433214eb4a9a17e3a2366471095b9bb658faa4f11d4bb108beea137",
         "targetAncestry": [
           "Observe Component Specification",
           "1. Overview & Boundaries",
           "Owns"
         ],
-        "rationale": "A22/A31/A34: one native sync at 19ca8de23908e161c34c91626e41041b7813167c preserves this historical predecessor as a gap; current upstream source successor is separately native-accounted and carried to the candidate. Historical lines changed; exact untransferred residual is retained verbatim with SHA256, independent representation review required; cutover remains blocked. Full source/current witnesses and residual: step10-sync19-predecessor-residuals.json. No identity graft or approval carry.",
-        "reviewStatus": "pending",
-        "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
-        "reviewNote": "Pending independent review at 19ca8de23; no historical approval carried.",
-        "remainder": "Verbatim historical residual in plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-residuals.json, claim claim_a7278e1567e5432cfb079506cf2f5050, residual SHA256 ca9a59c18839e81d0f58c6602e5c373a161cbeb6a20721e23fbff39be36107af. Source 1840cc4b1da22587ed69755276cad9a882139c62a36179d8fba2269905414623; primary target 36f5428de433214eb4a9a17e3a2366471095b9bb658faa4f11d4bb108beea137. Residual file SHA256 recorded in step10-sync19-predecessor-reconciliation.json. A34 independent acceptance pending; cutover blocked."
+        "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
       },
       "native": {
         "kind": "identityGaps",
@@ -804,5 +845,10 @@
   ],
   "remainingPriorFindings": [],
   "fullNativeDStillRequired": false,
-  "nativeDEvidence": "step10-sync19-D-summary.json"
+  "nativeDEvidence": "step10-sync19-D-summary.json",
+  "currentAuthorReconciliation": {
+    "inputCommit": "4a18f35ff",
+    "reason": "L10-20 truthful current dispositions regenerated from shards; historical before/witness records preserved",
+    "evidence": "plans/260925-documentation-authority-unification/reports/phase-06/step10-systemic-rationale-edits.json"
+  }
 }

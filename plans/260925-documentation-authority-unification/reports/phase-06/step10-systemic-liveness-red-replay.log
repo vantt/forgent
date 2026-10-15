@@ -1,0 +1,20 @@
+Reproduction of unchanged HEAD helper failure after original pre-fix failure was observed in the tool transcript. No source or registry mutation.
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+497 !== 495
+
+    at file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/[eval1]:12:8
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: 497,
+  expected: 495,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.18.0

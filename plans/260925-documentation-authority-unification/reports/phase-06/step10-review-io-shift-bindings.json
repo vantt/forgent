@@ -382,15 +382,20 @@
         "targetAnchor": "unheaded-block-41",
         "claimKind": "contract",
         "disposition": "promote",
-        "reviewStatus": "pending",
-        "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
-        "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-        "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
-        "targetUnitDigest": "a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798",
+        "reviewStatus": "reviewed",
+        "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+        "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+        "reviewNote": "deep: unequal digests ae0e60ec vs a378c81f; diff read: only the 0011 link target rewritten to ../decisions/retired-decision-history.md in the carrier, unchanged by this merge (digest equal before and after, shift 40 to 41); promote unchanged",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1526-specs-ui-reworks-main-recarry.md",
+        "reviewMode": "ordinary",
+        "targetUnitDigest": "a378c81f6a84c5e3ed9b38917f7136c55dcc4af85295bcf105fa9ac9d6792532",
         "targetAncestry": [
           "CLI I/O Contract",
-          "9. Per-Verb Help"
-        ]
+          "10. Version Tokens"
+        ],
+        "reviewReportCommit": "0e8ce7710ac67ad038927b242b2461876bf8c90d"
       },
       "after": {
         "claimId": "claim_e9ee744c6e1847ef25b3eb0bf180f577",
@@ -408,7 +413,26 @@
           "CLI I/O Contract",
           "10. Version Tokens"
         ]
-      }
+      },
+      "beforeUncommittedAuthorState": {
+        "claimId": "claim_e9ee744c6e1847ef25b3eb0bf180f577",
+        "sourceUnitDigest": "ae0e60ec193e0ac5ad026b2cf78a37ba3156fea7043460714946bfe66311ab5e",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-41",
+        "claimKind": "contract",
+        "disposition": "promote",
+        "reviewStatus": "pending",
+        "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+        "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+        "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+        "targetUnitDigest": "a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "9. Per-Verb Help"
+        ]
+      },
+      "beforeCommit": "59b9b7087",
+      "beforeNote": "Actual committed row; prior in-memory author state retained explicitly."
     },
     {
       "before": {

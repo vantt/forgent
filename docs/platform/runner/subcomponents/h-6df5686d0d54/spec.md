@@ -31,4 +31,4 @@ Superseded by: None
 | Commit trong worktree/nhánh riêng | — | — | ✓ |
 | Sửa cây làm việc chính | ✓ | — | — CẤM (bằng chỉ dẫn + kết quả chỉ là đề xuất) |
 | Đồng bộ lại một việc đỗ vì gãy nhập (`catchup`) | ✓ | — | — |
-| Xếp hạng/xem candidate tự cải thiện (Gate A, former `evolve`; Added in candidate: door removed in `120af6b3d`, `bin/fgos.mjs:4373`) | Historical operator role | — | — |
+| Xếp hạng/xem candidate tự cải thiện (Gate A, former `evolve`; Added in candidate: door removed in `120af6b3d`, `bin/fgos.mjs:4415`) | Historical operator role | — | — |

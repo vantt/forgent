@@ -1,0 +1,37 @@
+✔ inserted paragraphs move anchors without substituting neighbouring text (0.573156ms)
+✔ identical footers keep their occurrence within the prior content sequence (0.110291ms)
+✔ ambiguous or absent content fails closed instead of retaining old anchor (0.234173ms)
+✔ unchanged bindings never overwrite truthful rationale (0.60245ms)
+✔ ownership check reports two distinct claims at one target (0.168162ms)
+✔ position-exact link replay rejects swapped table cells despite string presence (0.723738ms)
+✔ stale prior anchor uses reviewed ancestry to distinguish repeated footer text (0.114211ms)
+✔ expanding digest prefixes or shifting an unchanged content anchor preserves rationale (0.09023ms)
+✖ repeated content with a stale anchor and no ancestry is rejected rather than taking occurrence one (0.391624ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 8
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 39.740281
+
+✖ failing tests:
+
+test at test/scripts/doc-binding-repair.test.mjs:40:1
+✖ repeated content with a stale anchor and no ancestry is rejected rather than taking occurrence one (0.391624ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-binding-repair.test.mjs:42:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /content/,
+    operator: 'throws',
+    diff: 'simple'
+  }

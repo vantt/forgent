@@ -1,0 +1,43 @@
+{
+  "changes": [
+    {
+      "file": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+      "line": 41,
+      "before": "| [../architecture/external-provider-protocol.md](../architecture/external-provider-protocol.md) | Component class versus invocation mechanism, built-in/process/WASM protocol placement, JSON-RPC 2.0 semantics over length-prefixed stdio frames, static manifest discovery, registry/linker meaning, namespace and replacement rules. | [external-provider-protocol.md](../../../architect/host-invocation-routing/external-provider-protocol.md), [../contracts/component-protocol.md](../contracts/component-protocol.md), [../contracts/external-provider-manifest.md](../contracts/external-provider-manifest.md), [../architecture/provider-routing.md](../architecture/provider-routing.md), [r2-external-process-proof.md](r2-external-process-proof.md), ledger rows HI-I020 through HI-I024. |",
+      "after": "| [external-provider-protocol.md](../../../architect/host-invocation-routing/external-provider-protocol.md) | Component class versus invocation mechanism, built-in/process/WASM protocol placement, JSON-RPC 2.0 semantics over length-prefixed stdio frames, static manifest discovery, registry/linker meaning, namespace and replacement rules. | [../architecture/external-provider-protocol.md](../architecture/external-provider-protocol.md), [../contracts/component-protocol.md](../contracts/component-protocol.md), [../contracts/external-provider-manifest.md](../contracts/external-provider-manifest.md), [../architecture/provider-routing.md](../architecture/provider-routing.md), [r2-external-process-proof.md](r2-external-process-proof.md), ledger rows HI-I020 through HI-I024. |",
+      "intent": "L10-18b original Legacy source and Preservation target cells"
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+      "line": 42,
+      "before": "| [../architecture/legacy-cli-transition.md](../architecture/legacy-cli-transition.md) | Separate `LegacyCliPassthroughProvider` and `LegacySemanticProvider`, `legacy-node` identity, `bin/fgos.mjs` immovability, activation-manifest resolution, caller inventory, `CommandRouteDescriptor`, Rust parser ownership, `fgos.v1` presentation boundary, Rust host benefit/cost. | [legacy-cli-transition.md](../../../architect/host-invocation-routing/legacy-cli-transition.md), [../contracts/legacy-payload.md](../contracts/legacy-payload.md), [../contracts/command-route-descriptor.md](../contracts/command-route-descriptor.md), [compatibility-harness.md](compatibility-harness.md), [../history/host-invocation-baseline.md](../history/host-invocation-baseline.md), ledger rows HI-I025 through HI-I033. |",
+      "after": "| [legacy-cli-transition.md](../../../architect/host-invocation-routing/legacy-cli-transition.md) | Separate `LegacyCliPassthroughProvider` and `LegacySemanticProvider`, `legacy-node` identity, `bin/fgos.mjs` immovability, activation-manifest resolution, caller inventory, `CommandRouteDescriptor`, Rust parser ownership, `fgos.v1` presentation boundary, Rust host benefit/cost. | [../architecture/legacy-cli-transition.md](../architecture/legacy-cli-transition.md), [../contracts/legacy-payload.md](../contracts/legacy-payload.md), [../contracts/command-route-descriptor.md](../contracts/command-route-descriptor.md), [compatibility-harness.md](compatibility-harness.md), [../history/host-invocation-baseline.md](../history/host-invocation-baseline.md), ledger rows HI-I025 through HI-I033. |",
+      "intent": "L10-18b original Legacy source and Preservation target cells"
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+      "line": 43,
+      "before": "| [../architecture/node-to-rust-migration.md](../architecture/node-to-rust-migration.md) | Chosen migration strategy, rejected migration options, R1/R2/R3 sequence, release readiness categories, component-boundary repetition rule, read-model-before-writer rule, writer migration constraints, Node removal gate, rollback rules, verification gate, remaining decisions. | [node-to-rust-component-migration.md](../../../architect/host-invocation-routing/node-to-rust-component-migration.md), [../architecture/release-boundaries.md](../architecture/release-boundaries.md), [r1-rust-host-proof.md](r1-rust-host-proof.md), [r2-external-process-proof.md](r2-external-process-proof.md), [r3-remote-peer-proof.md](r3-remote-peer-proof.md), [../history/host-invocation-baseline.md](../history/host-invocation-baseline.md), ledger rows HI-I034 through HI-I038. |",
+      "after": "| [node-to-rust-component-migration.md](../../../architect/host-invocation-routing/node-to-rust-component-migration.md) | Chosen migration strategy, rejected migration options, R1/R2/R3 sequence, release readiness categories, component-boundary repetition rule, read-model-before-writer rule, writer migration constraints, Node removal gate, rollback rules, verification gate, remaining decisions. | [../architecture/node-to-rust-migration.md](../architecture/node-to-rust-migration.md), [../architecture/release-boundaries.md](../architecture/release-boundaries.md), [r1-rust-host-proof.md](r1-rust-host-proof.md), [r2-external-process-proof.md](r2-external-process-proof.md), [r3-remote-peer-proof.md](r3-remote-peer-proof.md), [../history/host-invocation-baseline.md](../history/host-invocation-baseline.md), ledger rows HI-I034 through HI-I038. |",
+      "intent": "L10-18b original Legacy source and Preservation target cells"
+    },
+    {
+      "file": "docs/platform/work-state/README.md",
+      "line": 61,
+      "before": "A third retained source, [vision.md](../vision.md), is not covered by this candidate area. It belongs to the platform vision candidate [docs/work-item-lifecycle-vision.md](../../work-item-lifecycle-vision.md).",
+      "after": "A third retained source, [docs/work-item-lifecycle-vision.md](../../work-item-lifecycle-vision.md), is not covered by this candidate area. It belongs to the platform vision candidate [vision.md](../vision.md).",
+      "intent": "f-667 retained source first; platform vision candidate second"
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/contracts/legacy-payload.md",
+      "line": 57,
+      "before": "| legacy transition | [../../../architect/host-invocation-routing/legacy-cli-transition.md](../../../architect/host-invocation-routing/legacy-cli-transition.md) |",
+      "after": "| legacy transition | [../architecture/legacy-cli-transition.md](../architecture/legacy-cli-transition.md) |",
+      "intent": "first-authored 05b6bf861 candidate link verbatim; bare legacy is not a source label"
+    }
+  ],
+  "firstAuthoredPins": [
+    "05b6bf861",
+    "f0cadf365"
+  ]
+}

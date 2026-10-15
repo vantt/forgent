@@ -58,7 +58,7 @@ The documents listed here are candidate material. No reader reads them yet. The 
 
 Canonical until the cutover: [docs/specs/work-state.md](../../specs/work-state.md), [docs/io-contract.md](../../io-contract.md)
 
-A third retained source, [vision.md](../vision.md), is not covered by this candidate area. It belongs to the platform vision candidate [docs/work-item-lifecycle-vision.md](../../work-item-lifecycle-vision.md).
+A third retained source, [docs/work-item-lifecycle-vision.md](../../work-item-lifecycle-vision.md), is not covered by this candidate area. It belongs to the platform vision candidate [vision.md](../vision.md).
 
 ## 5. Related Files
 

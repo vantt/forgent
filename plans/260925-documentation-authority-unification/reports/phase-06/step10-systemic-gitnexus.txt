@@ -1,0 +1,10 @@
+Changes: 59 files, 5 symbols
+Affected processes: 0
+Risk level: low
+
+Changed symbols:
+  Symbol Host Invocation Source Preservation Audit → docs/platform/host-invocation-routing/verification/source-preservation-audit.md
+  Symbol 3. Disposition Coverage → docs/platform/host-invocation-routing/verification/source-preservation-audit.md
+  Symbol Work State → docs/platform/work-state/README.md
+  Symbol 5. Related Files → docs/platform/work-state/README.md
+  Symbol Execution progress → plans/260925-documentation-authority-unification/reports/phase-06/progress.md

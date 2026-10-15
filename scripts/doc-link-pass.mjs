@@ -2,7 +2,7 @@
 // callers own writes and retain the returned classification/evidence records.
 import path from 'node:path';
 const posix = path.posix;
-const relation = /\b(?:source|legacy|retained|original|canonical)\b|nguồn (?:gốc|chuẩn)/i;
+const relation = /\b(?:source|retained|original|canonical)\b|nguồn (?:gốc|chuẩn)/i;
 export function specificTarget(legacy, aliases, candidates, primaryAnchor) {
   const name = posix.basename(legacy);
   const same = candidates.filter(p => posix.basename(p) === name && name !== 'README.md');
@@ -33,12 +33,11 @@ export function planLinkPass({file, text, aliases, candidates, sourceHeadings = 
     const protectedCells = cells.filter((c,i) => {
       const prefix = c.text.split('[')[0].trim();
       const labelledRelationship = prefix.endsWith(':') && relation.test(prefix);
-      const sourceLinkLabel = [...c.text.matchAll(/\[([^\]]+)\]\(/g)].some(m => relation.test(m[1]));
-      return rowRelationship || sourceColumns[i] || labelledRelationship || sourceLinkLabel;
+      return rowRelationship || sourceColumns[i] || labelledRelationship;
     });
     inTable = tableRow;
     ranges.push({start:offset, end:offset+line.length+1, protected:!!fence||!!mark,
-      relation:tableRow ? false : relation.test(line),
+      relation:tableRow ? false : /:\s*$/.test(line.split('[')[0].trim()) && relation.test(line.split('[')[0]),
       protectedCells:protectedCells.map(c=>({start:offset+c.start,end:offset+c.end}))});
     offset += line.length + 1;
   }
@@ -51,7 +50,7 @@ export function planLinkPass({file, text, aliases, candidates, sourceHeadings = 
     if (!alias) return whole;
     let target = alias.toOwner, anchor = alias.toAnchor || null, reason = 'explicit-alias';
     const record = {file, line:text.slice(0,index).split('\n').length, label, legacy, before:destination};
-    const sourceRelationship = range.relation || range.protectedCells.some(c=>c.start <= index && index < c.end);
+    const sourceRelationship = relation.test(label) || range.relation || range.protectedCells.some(c=>c.start <= index && index < c.end);
     if (sourceRelationship || target === file) {
       classified.push({...record, reason:sourceRelationship?'provenance/legacy-owner':'self-link', disposition:'retain-legacy-until-cutover'}); return whole;
     }
