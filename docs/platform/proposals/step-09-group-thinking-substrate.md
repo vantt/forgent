@@ -19,7 +19,7 @@ Supersedes: None; legacy source remains intact
 Superseded by: None
 ```
 
-Added in candidate: Candidate carriage; Reject whole-file archive because live guidance still consumes its unfulfilled intent. Keep map proposal verbatim; old shipped slice is not claimed current and deferred obligations are not dropped. Original source metadata and text follow. Physical relative-link destinations alone are rebased to the same repository paths. Units with inherited missing links are preserved as literal fenced source text, without substituting another design or changing any assertion. Source metadata is provenance, not candidate authority.
+Added in candidate: Candidate proposal retaining deferred capabilities referenced by docs/how-to/use-fgos-group-thinking.md:196–200. Current group-thinking guidance uses Workflows/presets; the old pack was removed in 2180b4e72. Source implementation and deferred-status statements remain dated metadata. Original source metadata and text follow. Physical relative-link destinations alone are rebased to the same repository paths. Units with inherited missing links are preserved as literal fenced source text, without substituting another design or changing any assertion. Source metadata is provenance, not candidate authority.
 
 Source relationship: [original source](../../architect/proposals/step-09-group-thinking-substrate.md).
 

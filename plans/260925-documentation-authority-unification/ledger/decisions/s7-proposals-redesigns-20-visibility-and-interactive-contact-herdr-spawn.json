@@ -22,12 +22,12 @@
       "sourceUnitDigest": "011ff1ead4b5626955fb4c368e23c5c0e43dea44b10d06bf5ab9b9ac30631b24",
       "targetOwner": "docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md",
       "targetAnchor": "visibility-v\u00e0-interactive-contact-trong-dispatch-execution-herdr-spawn-l\u00e0-candidate-\u0111\u1ea7u-ti\u00ean",
-      "targetUnitDigest": "dea69ad933aaa53c695ab63a63f3428ae105495bec43da7772b19e34eb99c737",
+      "targetUnitDigest": "151ad429b2747f33872adfaece97118eebd64b153feb127ad195eeec175b9caa",
       "targetAncestry": [],
       "claimKind": "architecture",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
       "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject input report\u2019s no-direct-ref finding: RUL40 is a live spec citation. Keep map proposal as design evidence; dated transport line numbers and unbuilt recommendations stay verbatim. Evidence: docs/specs/runner.md:999 RUL40 directly cites this exact proposal sections 3.3,4,14 H1. src/runner/dispatch/herdr-agent.mjs, herdr-round.mjs, herdr-reconcile.mjs and herdr-diagnosis.mjs implement current transport/outcome machinery. Complete source heading docs/architect/proposals/visibility-and-interactive-contact-herdr-spawn.md#visibility-v\u00e0-interactive-contact-trong-dispatch-execution-herdr-spawn-l\u00e0-candidate-\u0111\u1ea7u-ti\u00ean (lines 1\u20131) is carried at docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md#visibility-v\u00e0-interactive-contact-trong-dispatch-execution-herdr-spawn-l\u00e0-candidate-\u0111\u1ea7u-ti\u00ean (lines 1\u20131); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary\u2019s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
     },
     {
@@ -1993,5 +1993,6 @@
       "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Reject input report\u2019s no-direct-ref finding: RUL40 is a live spec citation. Keep map proposal as design evidence; dated transport line numbers and unbuilt recommendations stay verbatim. Evidence: docs/specs/runner.md:999 RUL40 directly cites this exact proposal sections 3.3,4,14 H1. src/runner/dispatch/herdr-agent.mjs, herdr-round.mjs, herdr-reconcile.mjs and herdr-diagnosis.mjs implement current transport/outcome machinery. Complete source unheaded-block docs/architect/proposals/visibility-and-interactive-contact-herdr-spawn.md#unheaded-block-81 (lines 571\u2013574) is carried at docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md#unheaded-block-84 (lines 595\u2013598); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary\u2019s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
     }
-  ]
+  ],
+  "correctionSession": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15"
 }

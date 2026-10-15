@@ -646,10 +646,10 @@ This proves the writer is registry-first. Migration tooling proves folding. They
 ## 17. Pointers
 
 - Source discussion: `docs/history/compound-learn-artifact-registry/DISCUSSION.md`.
-- Advisor prompt/report: `.claude/worktrees/tsk-28x-JQyqK4/plans/reports/for-external-advisor-260825-1209-doc-identity-axis-topic-registry-design-report.md`.
+- Advisor prompt/report: `plans/reports/for-external-advisor-260825-1209-doc-identity-axis-topic-registry-design-report.md`.
 - Current write-side spec: `docs/specs/enduser-docs-authoring.md`.
 - Current read-side spec: `docs/specs/enduser-docs-index.md`.
-- Current compounding skill: `domains/coding/skills/fgos-coding-compounding/SKILL.md`.
+- Current compounding skill: `domains/coding/skills/fgos-coding-knowledge/SKILL.md`.
 - Current producer command: `bin/fgos.mjs`, legacy `compound` branch.
 - Current authoritative-topic helper: `src/report/authoritative-match.mjs`.
 - Current frontmatter helper: `src/report/frontmatter.mjs`.

@@ -10,7 +10,7 @@
     {
       "path": "docs/architect/knowledge-registry-redesign.md",
       "disposition": "move",
-      "rationale": "place verbatim: Retain map proposal kind: implementation alone does not promote a design. Full truth remains owed at promotion. Evidence: src/state/knowledge-registry.mjs:20,88,211,537,646,733–748 and bin/fgos.mjs:1701,1767 explicitly cite the source. domains/coding/skills/fgos-coding-knowledge/SKILL.md:44 is an additional canonical skill-source consumer; setup registrations:3977,4001,4035 remain. Frozen map target unchanged. Source remains intact until cutover.",
+      "rationale": "place verbatim: Retain map proposal kind: implementation alone does not promote a design. Full truth remains owed at promotion. Evidence: src/state/knowledge-registry.mjs:20,88,211,537,646,733–748 and bin/fgos.mjs:1701,1767 explicitly cite the source. domains/coding/skills/fgos-coding-knowledge/SKILL.md:44 is an additional canonical skill-source consumer; setup registrations:3977,4001,4035 remain. Frozen map target unchanged. Source remains intact until cutover. Exception: exactly two current-path sentences in section 17 are corrected under A19/A28 item 3(a); that block and its heading consequence use pending supersede. All other source wording remains verbatim.",
       "targets": [
         "docs/platform/proposals/knowledge-registry-redesign.md"
       ]
@@ -2905,31 +2905,31 @@
       "sourceUnitDigest": "b019979bf1d88eeaf2cfa68ad8d7e8fc951959e46faac8093a52b666c753490b",
       "targetOwner": "docs/platform/proposals/knowledge-registry-redesign.md",
       "targetAnchor": "17-pointers",
-      "targetUnitDigest": "b019979bf1d88eeaf2cfa68ad8d7e8fc951959e46faac8093a52b666c753490b",
+      "targetUnitDigest": "b9e92e3f9e07c42ec76e70ea5444f77e324c9ada6d5afcd03e3e239097da7b6d",
       "targetAncestry": [
         "Knowledge Registry Redesign"
       ],
       "claimKind": "architecture",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Weak-exact: source unit shorter than 40 characters. place verbatim: Retain map proposal kind: implementation alone does not promote a design. Full truth remains owed at promotion. Evidence: src/state/knowledge-registry.mjs:20,88,211,537,646,733–748 and bin/fgos.mjs:1701,1767 explicitly cite the source. domains/coding/skills/fgos-coding-knowledge/SKILL.md:44 is an additional canonical skill-source consumer; setup registrations:3977,4001,4035 remain. Complete source heading docs/architect/knowledge-registry-redesign.md#17-pointers (lines 622–622) is carried at docs/platform/proposals/knowledge-registry-redesign.md#17-pointers (lines 646–646); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "rationale": "Judgment: authorized correction changes target digest; mandatory A36 deep read. supersede: Retain map proposal kind: implementation alone does not promote a design. Full truth remains owed at promotion. Evidence: src/state/knowledge-registry.mjs:20,88,211,537,646,733–748 and bin/fgos.mjs:1701,1767 explicitly cite the source. domains/coding/skills/fgos-coding-knowledge/SKILL.md:44 is an additional canonical skill-source consumer; setup registrations:3977,4001,4035 remain. Complete source heading docs/architect/knowledge-registry-redesign.md#17-pointers (lines 622–622) is carried at docs/platform/proposals/knowledge-registry-redesign.md#17-pointers (lines 646–646); Frozen map target and kind retained. Target digest differs; the full unit requires A36 deep read against its source and the recorded correction. Only the two authorized false path sentences differ semantically; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Authorized A19/A28 item 3(a) correction of exactly two current-path sentences: compounding skill is domains/coding/skills/fgos-coding-knowledge/SKILL.md (c1768fa51); advisor report is plans/reports/for-external-advisor-260825-1209-doc-identity-axis-topic-registry-design-report.md. A22 binding consequence only; independent truth review still pending."
     },
     {
       "claimId": "claim_0662afe5df2b25be15d682a21eb1117a",
       "sourceUnitDigest": "26b28b7c0822bb346cf937db7a127d9a48eb0b128f1eb8fc9284c4e5e1cabfd0",
       "targetOwner": "docs/platform/proposals/knowledge-registry-redesign.md",
       "targetAnchor": "unheaded-block-129",
-      "targetUnitDigest": "26b28b7c0822bb346cf937db7a127d9a48eb0b128f1eb8fc9284c4e5e1cabfd0",
+      "targetUnitDigest": "c1b2102209e23ddb3b0855a4c061f4185abe5e5cbbc0fb8fb7c3665623b6527f",
       "targetAncestry": [
         "Knowledge Registry Redesign",
         "17. Pointers"
       ],
       "claimKind": "architecture",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Retain map proposal kind: implementation alone does not promote a design. Full truth remains owed at promotion. Evidence: src/state/knowledge-registry.mjs:20,88,211,537,646,733–748 and bin/fgos.mjs:1701,1767 explicitly cite the source. domains/coding/skills/fgos-coding-knowledge/SKILL.md:44 is an additional canonical skill-source consumer; setup registrations:3977,4001,4035 remain. Complete source unheaded-block docs/architect/knowledge-registry-redesign.md#unheaded-block-126 (lines 624–632) is carried at docs/platform/proposals/knowledge-registry-redesign.md#unheaded-block-129 (lines 648–656); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "rationale": "Judgment: authorized correction changes target digest; mandatory A36 deep read. supersede: Retain map proposal kind: implementation alone does not promote a design. Full truth remains owed at promotion. Evidence: src/state/knowledge-registry.mjs:20,88,211,537,646,733–748 and bin/fgos.mjs:1701,1767 explicitly cite the source. domains/coding/skills/fgos-coding-knowledge/SKILL.md:44 is an additional canonical skill-source consumer; setup registrations:3977,4001,4035 remain. Complete source unheaded-block docs/architect/knowledge-registry-redesign.md#unheaded-block-126 (lines 624–632) is carried at docs/platform/proposals/knowledge-registry-redesign.md#unheaded-block-129 (lines 648–656); Frozen map target and kind retained. Target digest differs; the full unit requires A36 deep read against its source and the recorded correction. Only the two authorized false path sentences differ semantically; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Authorized A19/A28 item 3(a) correction of exactly two current-path sentences: compounding skill is domains/coding/skills/fgos-coding-knowledge/SKILL.md (c1768fa51); advisor report is plans/reports/for-external-advisor-260825-1209-doc-identity-axis-topic-registry-design-report.md. A22 binding consequence only; independent truth review still pending."
     },
     {
       "claimId": "claim_ba79e248cfab93db23161396b94070c1",
@@ -3240,5 +3240,6 @@
       "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Retain map proposal kind: implementation alone does not promote a design. Full truth remains owed at promotion. Evidence: src/state/knowledge-registry.mjs:20,88,211,537,646,733–748 and bin/fgos.mjs:1701,1767 explicitly cite the source. domains/coding/skills/fgos-coding-knowledge/SKILL.md:44 is an additional canonical skill-source consumer; setup registrations:3977,4001,4035 remain. Complete source unheaded-block docs/architect/knowledge-registry-redesign.md#unheaded-block-137 (lines 741–743) is carried at docs/platform/proposals/knowledge-registry-redesign.md#unheaded-block-140 (lines 765–767); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
     }
-  ]
+  ],
+  "correctionSession": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15"
 }

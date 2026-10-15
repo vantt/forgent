@@ -19,7 +19,7 @@ Supersedes: None; legacy source remains intact
 Superseded by: None
 ```
 
-Added in candidate: Candidate carriage; Reject input report’s no-direct-ref finding: RUL40 is a live spec citation. Keep map proposal as design evidence; dated transport line numbers and unbuilt recommendations stay verbatim. Original source metadata and text follow. Physical relative-link destinations alone are rebased to the same repository paths. Units with inherited missing links are preserved as literal fenced source text, without substituting another design or changing any assertion. Source metadata is provenance, not candidate authority.
+Added in candidate: Candidate design evidence cited by docs/specs/runner.md:999 RUL40, sections 3.3, 4 and 14 H1. Source transport line references and proposed recommendations are preserved as dated text. Original source metadata and text follow. Physical relative-link destinations alone are rebased to the same repository paths. Units with inherited missing links are preserved as literal fenced source text, without substituting another design or changing any assertion. Source metadata is provenance, not candidate authority.
 
 Source relationship: [original source](../../architect/proposals/visibility-and-interactive-contact-herdr-spawn.md).
 

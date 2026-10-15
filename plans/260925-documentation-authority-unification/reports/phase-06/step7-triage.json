@@ -10,7 +10,7 @@
       "sourceBlob": "6d66e789fbe1fdf433d1c9a72d8ab3de32b0f8b1",
       "status": "current pointer",
       "evidence": "docs/specs/runner.md:1273,1277\u20131278 still cites the redesign; source lines 3\u201313 redirect to the surviving area architecture/proposal. Full body remains at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md.",
-      "reason": "Keep the map proposal carrier: A17/A19 live-spec protection beats archiving a cited pointer. No redirect or root retirement here.",
+      "reason": "Keep the mapped pointer carrier; the full proposal lives at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md. Its three inline-code legacy destinations remain owed repoints at cutover.",
       "target": "docs/platform/proposals/dispatch-control-plane-redesign.md",
       "kind": "proposal",
       "triageDisposition": "place verbatim",
@@ -148,13 +148,13 @@
       "mapTarget": "docs/platform/proposals/coordination-envelope-probe-contract.md",
       "mapKind": "proposal",
       "sourceBlob": "4dab0986384d5f813e8a502e817c9b78cd5ba716",
-      "status": "historical bounded experiment specification",
-      "evidence": "Source lines 17\u201359 binds the experiment to the September Advisory track and its P02/P03 convergence; source scenario uses the retired CoordinationSession/FlowDefinition public path. Commit 2180b4e72 deletes that engine; no required-root direct consumer except ratchet.",
-      "reason": "Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link.",
-      "target": "docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md",
-      "kind": "history",
-      "triageDisposition": "archive-with-reason",
-      "rowDisposition": "archive-with-reason"
+      "status": "live bounded experiment specification; execution unproven",
+      "evidence": "Source scenario uses Assignment/Run, read-only executors and independent-first reveal; it contains neither CoordinationSession nor FlowDefinition. Live coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 cite this probe contract. Its retired-facility gap observations are dated, not proof the alternative experiment is retired.",
+      "reason": "Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim.",
+      "target": "docs/platform/proposals/coordination-envelope-probe-contract.md",
+      "kind": "proposal",
+      "triageDisposition": "place verbatim",
+      "rowDisposition": "supersede"
     },
     {
       "number": 12,
@@ -163,9 +163,9 @@
       "mapKind": "proposal",
       "sourceBlob": "40132546e70e23fed654bf5d4cc84ea86ac3cd2b",
       "status": "historical chat progress snapshot",
-      "evidence": "Source lines 26\u201348 records a dated capability-fit audit, OS-only checks and unbuilt fixture. Source Concurrent Architecture Advisory session and Next work describe that chat, not a reusable current contract. Required-root references are ratchet only.",
-      "reason": "Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete.",
-      "target": "docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-progress.md",
+      "evidence": "Source lines 26\u201348 records a dated capability-fit audit, OS-only checks and unbuilt fixture. Source Concurrent Architecture Advisory session and Next work describe that chat, not a reusable current contract. Required-root references are ratchet only. Live proposals 9, 10 and 13 cite this dated status pointer; these links consume provenance/next-work context, not an accepted current contract. Preserve and queue their navigation explicitly.",
+      "reason": "Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism.",
+      "target": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
       "kind": "history",
       "triageDisposition": "archive-with-reason",
       "rowDisposition": "archive-with-reason"
@@ -191,9 +191,9 @@
       "mapKind": "proposal",
       "sourceBlob": "4df6e977ab05371234ac550da29fa3d8da553f2a",
       "status": "historical implemented-then-retired plan-loop design",
-      "evidence": "Source frontmatter and section 1 explicitly builds on CoordinationSession and standalone-master-coordination-loop.yaml; 2180b4e72 deletes that fixture and the group-thinking pack. docs/specs/runner.md:1590\u20131603 is a dated live-proof/plan-track note, not a direct citation to this proposal; archive/plans/260904-2329-group-thinking-plan-loop/ preserves proof.",
-      "reason": "Archive that retired mechanism, retaining its explicit external-coordinator constraints as historical intent. Current plan-loop skills do not revive the retired session engine. Not started is stale and remains verbatim.",
-      "target": "docs/platform/system-architecture/history/proposals-redesigns/group-thinking-plan-loop.md",
+      "evidence": "Source frontmatter and section 1 explicitly builds on CoordinationSession and standalone-master-coordination-loop.yaml; 2180b4e72 deletes that fixture and the group-thinking pack. docs/specs/runner.md:1590\u20131603 is a dated live-proof/plan-track note, not a direct citation to this proposal; archive/plans/260904-2329-group-thinking-plan-loop/ preserves proof. docs/specs/runner.md:3117 records fgos-plan-loop as replaced by fgos-run.",
+      "reason": "Archive that retired mechanism, retaining its explicit external-coordinator constraints as historical intent. Current plan-loop skills do not revive the retired session engine. Not started is stale and remains verbatim. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism.",
+      "target": "docs/platform/agent-coordination/history/proposals-redesigns/group-thinking-plan-loop.md",
       "kind": "history",
       "triageDisposition": "archive-with-reason",
       "rowDisposition": "archive-with-reason"
@@ -235,8 +235,8 @@
       "sourceBlob": "fd6e47f8aa7a75c77a37fb3ef1b5ae0593a90a70",
       "status": "historical one-shot handoff prompt",
       "evidence": "Source lines 3\u201310 says Handoff prompt, Canonical for nothing, use only to start a fresh design chat. Source code block preserves inputs for subsequent Step 09/10 discussions; no specific live required-root consumer.",
-      "reason": "Archive the consumed prompt, with provenance value for the surviving adoption proposals. No delete-as-obsolete recommendation.",
-      "target": "docs/platform/system-architecture/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md",
+      "reason": "Archive the consumed prompt, with provenance value for the surviving adoption proposals. No delete-as-obsolete recommendation. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism.",
+      "target": "docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md",
       "kind": "history",
       "triageDisposition": "archive-with-reason",
       "rowDisposition": "archive-with-reason"
@@ -283,5 +283,44 @@
       "triageDisposition": "place verbatim",
       "rowDisposition": "supersede"
     }
-  ]
+  ],
+  "mapTargetOverrides": [
+    {
+      "number": 3,
+      "source": "docs/architect/documentation-system-discussion.md",
+      "mapTarget": "docs/platform/proposals/documentation-system-discussion.md",
+      "target": "docs/platform/documentation/history/proposals-redesigns/documentation-system-discussion.md",
+      "kind": "history",
+      "reason": "Archive the discussion as provenance, not deletion; open ideas remain literally available. The map proposal target is overridden by a documentation history carrier.",
+      "authority": "Lead assignment under Q3/A17/A19/A22/A28; frozen map not rewritten"
+    },
+    {
+      "number": 12,
+      "source": "docs/architect/proposals/coordination-envelope-progress.md",
+      "mapTarget": "docs/platform/proposals/coordination-envelope-progress.md",
+      "target": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+      "kind": "history",
+      "reason": "Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism.",
+      "authority": "Lead assignment under Q3/A17/A19/A22/A28; frozen map not rewritten"
+    },
+    {
+      "number": 14,
+      "source": "docs/architect/proposals/group-thinking-plan-loop.md",
+      "mapTarget": "docs/platform/proposals/group-thinking-plan-loop.md",
+      "target": "docs/platform/agent-coordination/history/proposals-redesigns/group-thinking-plan-loop.md",
+      "kind": "history",
+      "reason": "Archive that retired mechanism, retaining its explicit external-coordinator constraints as historical intent. Current plan-loop skills do not revive the retired session engine. Not started is stale and remains verbatim. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism.",
+      "authority": "Lead assignment under Q3/A17/A19/A22/A28; frozen map not rewritten"
+    },
+    {
+      "number": 17,
+      "source": "docs/architect/proposals/step-09-step-10-replan-handoff-prompt.md",
+      "mapTarget": "docs/platform/proposals/step-09-step-10-replan-handoff-prompt.md",
+      "target": "docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md",
+      "kind": "history",
+      "reason": "Archive the consumed prompt, with provenance value for the surviving adoption proposals. No delete-as-obsolete recommendation. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism.",
+      "authority": "Lead assignment under Q3/A17/A19/A22/A28; frozen map not rewritten"
+    }
+  ],
+  "correctionAuthority": "Lead assignment unit-run-1792036612167-eb65d2cd/producer/1 resolves R7-1 through R7-6 under existing Q3/A17/A19/A22/A28; no additional owner question. Frozen map remains the input; explicit overrides here and in carriage accounting describe actual targets."
 }

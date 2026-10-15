@@ -505,6 +505,9 @@
           "authorityStatus": "legacy-current",
           "role": "Runner integration and dispatch lifecycle"
         },
+        {"route":"docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md","authorityStatus":"candidate","scope":"candidate-transformation","role":"Candidate placement only; retained source authority and existing area status are unchanged."},
+        {"route":"docs/platform/agent-coordination/history/proposals-redesigns/group-thinking-plan-loop.md","authorityStatus":"candidate","scope":"candidate-transformation","role":"Candidate placement only; retained source authority and existing area status are unchanged."},
+        {"route":"docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md","authorityStatus":"candidate","scope":"candidate-transformation","role":"Candidate placement only; retained source authority and existing area status are unchanged."},
         {"route":"docs/platform/agent-coordination/architecture/coordination-continuation-recovery.md","authorityStatus":"candidate","scope":"candidate-transformation","role":"Candidate placement only; retained source authority and existing area status are unchanged."},
         {"route":"docs/platform/agent-coordination/architecture/coordination-foundation-baseline.md","authorityStatus":"candidate","scope":"candidate-transformation","role":"Candidate placement only; retained source authority and existing area status are unchanged."},
         {"route":"docs/platform/agent-coordination/architecture/dispatch-control-plane.md","authorityStatus":"candidate","scope":"candidate-transformation","role":"Candidate placement only; retained source authority and existing area status are unchanged."},

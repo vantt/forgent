@@ -3,7 +3,7 @@
   "authorSession": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
   "sourceCommit": "fb046210539cbcbe8ca1dab254763f5e78c573d2",
   "registryInputSha256": "1ec13215600551ffdb9cb2f3a6e1260fdbd0cf0e829171d95f42309221384d02",
-  "method": "Local extraction of exactly the 20 unchanged source files using the persisted registry identity index. No native repo-wide refresh, carry-forward, inventory rebuild or registry mutation. Candidate metadata is inserted; original H1 reused; relative links physically rebased to the exact same repository path; units with unresolved source links and pre-H1 YAML retained in literal fences. Every original source line is recoverable by the recorded line map and reverse link substitutions.",
+  "method": "Local extraction of exactly the 20 unchanged source files using the persisted registry identity index. No native repo-wide refresh, carry-forward, inventory rebuild or registry mutation. Candidate metadata is inserted; original H1 reused; relative links physically rebased to the exact same repository path; units with unresolved source links and pre-H1 YAML retained in literal fences. Every original source line is recoverable by the recorded line map and reverse link substitutions. Bounded Lead corrections: file 11 is a live mapped proposal, coordination-family history uses Agent Coordination, one wrapped-label link is rebased, five labelled additions state neutral placement facts. Exactly two current-path sentences in file 6 are authorized A19 truth corrections, recorded separately and reversed only for source-line recovery. No other source content is rewritten. All rows pending; no native sync or D/E certification.",
   "files": [
     {
       "number": 1,
@@ -13,15 +13,15 @@
       "sourceBlob": "6d66e789fbe1fdf433d1c9a72d8ab3de32b0f8b1",
       "status": "current pointer",
       "evidence": "docs/specs/runner.md:1273,1277\u20131278 still cites the redesign; source lines 3\u201313 redirect to the surviving area architecture/proposal. Full body remains at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md.",
-      "reason": "Keep the map proposal carrier: A17/A19 live-spec protection beats archiving a cited pointer. No redirect or root retirement here.",
+      "reason": "Keep the mapped pointer carrier; the full proposal lives at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md. Its three inline-code legacy destinations remain owed repoints at cutover.",
       "target": "docs/platform/proposals/dispatch-control-plane-redesign.md",
       "kind": "proposal",
       "triageDisposition": "place verbatim",
       "rowDisposition": "move",
       "sourceSha256": "ee67263b92b3c9fed2a88995f5eab3bc7768e237de7022d62e1fe7de7c8ce42a",
-      "targetSha256": "6fc518e3329e371cc81cd26bb9e57d116c73d9bdd5f094097c964aeaec50a903",
+      "targetSha256": "1f7fd2299fd6c451f8a983c87a5be2056e158c664fa19aeb0de787b641b6aaf9",
       "sourceByteLength": 371,
-      "targetByteLength": 1829,
+      "targetByteLength": 1895,
       "sourceLineMap": [
         {
           "sourceLine": 1,
@@ -94,7 +94,7 @@
           "targetStartLine": 1,
           "targetEndLine": 1,
           "sourceUnitDigest": "7b5d3df68b88c26058760be3ed0d7f21c05f84e1512a07212d26e953156fc154",
-          "targetUnitDigest": "c5529f675233bdd0307872cb2a5404c4fde626c39567f9ba459ea5a1d13cf94f",
+          "targetUnitDigest": "b836a91ed4d5753a3192ae3a992e713477fc30524d664dc173024fb8ad889741",
           "class": "Judgment",
           "classificationReason": "recorded transformations change target unit digest",
           "differingDigest": true
@@ -23960,9 +23960,9 @@
       "triageDisposition": "place verbatim",
       "rowDisposition": "move",
       "sourceSha256": "e589e9af6fc3ca57d5fa39127a0bf9e6597c8b8af6e2c183595982ed71a87827",
-      "targetSha256": "99939f23a4144a84e442bae36211da2339fa04f5eed5207db9f6a80f502c2945",
+      "targetSha256": "c99d64dce0271f88987c865b7a07348464a8320dcb58ad36d094eadd034b6030",
       "sourceByteLength": 33903,
-      "targetByteLength": 35331,
+      "targetByteLength": 35296,
       "sourceLineMap": [
         {
           "sourceLine": 1,
@@ -29419,10 +29419,10 @@
           "targetStartLine": 646,
           "targetEndLine": 646,
           "sourceUnitDigest": "b019979bf1d88eeaf2cfa68ad8d7e8fc951959e46faac8093a52b666c753490b",
-          "targetUnitDigest": "b019979bf1d88eeaf2cfa68ad8d7e8fc951959e46faac8093a52b666c753490b",
-          "class": "Weak-exact",
-          "classificationReason": "source unit shorter than 40 characters",
-          "differingDigest": false
+          "targetUnitDigest": "b9e92e3f9e07c42ec76e70ea5444f77e324c9ada6d5afcd03e3e239097da7b6d",
+          "class": "Judgment",
+          "classificationReason": "Authorized correction changes target digest; mandatory A36 deep read, no exact proof carried.",
+          "differingDigest": true
         },
         {
           "claimId": "claim_0662afe5df2b25be15d682a21eb1117a",
@@ -29433,10 +29433,10 @@
           "targetStartLine": 648,
           "targetEndLine": 656,
           "sourceUnitDigest": "26b28b7c0822bb346cf937db7a127d9a48eb0b128f1eb8fc9284c4e5e1cabfd0",
-          "targetUnitDigest": "26b28b7c0822bb346cf937db7a127d9a48eb0b128f1eb8fc9284c4e5e1cabfd0",
-          "class": "Unit-exact",
-          "classificationReason": "unique long digest match, equal ancestry, sufficient document exact share",
-          "differingDigest": false
+          "targetUnitDigest": "c1b2102209e23ddb3b0855a4c061f4185abe5e5cbbc0fb8fb7c3665623b6527f",
+          "class": "Judgment",
+          "classificationReason": "Authorized correction changes target digest; mandatory A36 deep read, no exact proof carried.",
+          "differingDigest": true
         },
         {
           "claimId": "claim_ba79e248cfab93db23161396b94070c1",
@@ -29706,7 +29706,25 @@
         }
       ],
       "differingDigestClaimIds": [
-        "claim_44f33af5bfe639da4877db2c7693d7d9"
+        "claim_44f33af5bfe639da4877db2c7693d7d9",
+        "claim_c262ad8c4a5f18b68948f937e3361128",
+        "claim_0662afe5df2b25be15d682a21eb1117a"
+      ],
+      "truthCorrections": [
+        {
+          "sourceLine": 625,
+          "before": ".claude/worktrees/tsk-28x-JQyqK4/plans/reports/for-external-advisor-260825-1209-doc-identity-axis-topic-registry-design-report.md",
+          "after": "plans/reports/for-external-advisor-260825-1209-doc-identity-axis-topic-registry-design-report.md",
+          "authority": "A19 / A28 item 3(a), Lead assignment; rebind under A22",
+          "evidence": "plans/reports/for-external-advisor-260825-1209-doc-identity-axis-topic-registry-design-report.md"
+        },
+        {
+          "sourceLine": 628,
+          "before": "domains/coding/skills/fgos-coding-compounding/SKILL.md",
+          "after": "domains/coding/skills/fgos-coding-knowledge/SKILL.md",
+          "authority": "A19 / A28 item 3(a), Lead assignment; rebind under A22",
+          "evidence": "c1768fa51; domains/coding/skills/fgos-coding-knowledge/SKILL.md"
+        }
       ]
     },
     {
@@ -29723,9 +29741,9 @@
       "triageDisposition": "place verbatim",
       "rowDisposition": "supersede",
       "sourceSha256": "89184422386302e25b111cf6fb84317dc5a7802102654b3f57c0f0db960f4766",
-      "targetSha256": "689cff91fee4891b4da5332bbb84f9d8157fda1ce5363ba1cdb771ddfec0dc19",
+      "targetSha256": "e8b4a02dc2624c928d6186df90c4e03b29727e4e98407b4a01e04c6a0775c2f6",
       "sourceByteLength": 31566,
-      "targetByteLength": 33161,
+      "targetByteLength": 33231,
       "sourceLineMap": [
         {
           "sourceLine": 1,
@@ -32602,7 +32620,7 @@
           "targetStartLine": 1,
           "targetEndLine": 1,
           "sourceUnitDigest": "aef9241c6773a4fee5177cccf3d4f1288dde72d533970dc7ca230f4dd117bdf6",
-          "targetUnitDigest": "320bf20b62d31599e6906394bd5aaecbf1c0fc395fd1179adfac45b3cdade80f",
+          "targetUnitDigest": "e82955a32175ed9d12dfcadf8373ba47a507a1e58d54bab7a9a30065d78d977d",
           "class": "Judgment",
           "classificationReason": "recorded transformations change target unit digest",
           "differingDigest": true
@@ -38523,9 +38541,9 @@
       "triageDisposition": "place verbatim",
       "rowDisposition": "supersede",
       "sourceSha256": "98788f9d29c5cc9215a492a95513abfee6f22c5a95fda0c3c9136f9750676492",
-      "targetSha256": "977c569c93d29280f04049d8d7049de75802c43b96001e4e40aaa0131b631218",
+      "targetSha256": "2d9a133a5678fee8be2b49cce51230376904b3353f6be3bf843acf5947b0bfc7",
       "sourceByteLength": 28280,
-      "targetByteLength": 30052,
+      "targetByteLength": 30042,
       "sourceLineMap": [
         {
           "sourceLine": 1,
@@ -40390,7 +40408,7 @@
           "targetStartLine": 1,
           "targetEndLine": 1,
           "sourceUnitDigest": "9f5435e86966d369799bacf179050534948e66a37db38f3a0dd6bfef8d86600e",
-          "targetUnitDigest": "f2b880ee1d8dbfdaf6585f2167972aa8a9e61839ab7828c253ddd1bf4b33527c",
+          "targetUnitDigest": "478a72d4b4897394c014166b8178ea78fe90f112f248bf150611ececcf54bd1a",
           "class": "Judgment",
           "classificationReason": "recorded transformations change target unit digest",
           "differingDigest": true
@@ -43549,17 +43567,17 @@
       "mapTarget": "docs/platform/proposals/coordination-envelope-probe-contract.md",
       "mapKind": "proposal",
       "sourceBlob": "4dab0986384d5f813e8a502e817c9b78cd5ba716",
-      "status": "historical bounded experiment specification",
-      "evidence": "Source lines 17\u201359 binds the experiment to the September Advisory track and its P02/P03 convergence; source scenario uses the retired CoordinationSession/FlowDefinition public path. Commit 2180b4e72 deletes that engine; no required-root direct consumer except ratchet.",
-      "reason": "Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link.",
-      "target": "docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md",
-      "kind": "history",
-      "triageDisposition": "archive-with-reason",
-      "rowDisposition": "archive-with-reason",
+      "status": "live bounded experiment specification; execution unproven",
+      "evidence": "Source scenario uses Assignment/Run, read-only executors and independent-first reveal; it contains neither CoordinationSession nor FlowDefinition. Live coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 cite this probe contract. Its retired-facility gap observations are dated, not proof the alternative experiment is retired.",
+      "reason": "Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim.",
+      "target": "docs/platform/proposals/coordination-envelope-probe-contract.md",
+      "kind": "proposal",
+      "triageDisposition": "place verbatim",
+      "rowDisposition": "supersede",
       "sourceSha256": "676bc6b9b123411fd38aa75f022213035332048547ebca3bd805a82f3b8b5336",
-      "targetSha256": "a27fdb1ee2aacbd59ea016002c9df2e16264bdce5213a335489ff93ebf4ff3d1",
+      "targetSha256": "629f329fbbabd1661d02af614177491dc1f4de6064e78af411655e77a2f5ced3",
       "sourceByteLength": 10532,
-      "targetByteLength": 12233,
+      "targetByteLength": 12169,
       "sourceLineMap": [
         {
           "sourceLine": 1,
@@ -44194,13 +44212,13 @@
         {
           "sourceLine": 17,
           "from": "coordination-envelope-progress.md",
-          "to": "../../../../architect/proposals/coordination-envelope-progress.md",
+          "to": "../../architect/proposals/coordination-envelope-progress.md",
           "repositoryReferent": "docs/architect/proposals/coordination-envelope-progress.md"
         },
         {
           "sourceLine": 119,
           "from": "coordination-worker-provider-boundary.md",
-          "to": "../../../../architect/proposals/coordination-worker-provider-boundary.md",
+          "to": "../../architect/proposals/coordination-worker-provider-boundary.md",
           "repositoryReferent": "docs/architect/proposals/coordination-worker-provider-boundary.md"
         }
       ],
@@ -44230,7 +44248,7 @@
           "targetStartLine": 1,
           "targetEndLine": 1,
           "sourceUnitDigest": "8c76171338f06c9d0f6acc6d85970beb6670faaaf86d454e8564ce49d9ce6174",
-          "targetUnitDigest": "df61c80f1cb1a8b37f403dff755ec551baecee444b9c83030577caa41976fd8d",
+          "targetUnitDigest": "f92a789a540939691e20447ee95c7ed09c52c3653a7b6f3d54255d2035c524bf",
           "class": "Judgment",
           "classificationReason": "recorded transformations change target unit digest",
           "differingDigest": true
@@ -44272,7 +44290,7 @@
           "targetStartLine": 42,
           "targetEndLine": 42,
           "sourceUnitDigest": "7e0ef28d24edc54f79c72bd0187d4694113c404225ec15f48587f3f93dc1c01c",
-          "targetUnitDigest": "e686c9dff84cbda0b30637ae4f4282094f512dcefa50dc6ffc104a1d1a40fa40",
+          "targetUnitDigest": "581f762d9bd7fb06cb26f50da5c57d1cd675964bc365b8119c1fee97c8481d35",
           "class": "Judgment",
           "classificationReason": "recorded transformations change target unit digest",
           "differingDigest": true
@@ -44286,7 +44304,7 @@
           "targetStartLine": 44,
           "targetEndLine": 45,
           "sourceUnitDigest": "9be4fcac494b78d194db5543e93d531d1e7b423e7803ceb2ff9732709b6ebfa7",
-          "targetUnitDigest": "366ec130bb2c8c323ecf518e671d2ca7dbc98a3239aee09bd6cd40a8250a61ce",
+          "targetUnitDigest": "61bc9c777d9bafbd37cb101e5d29e381c5b01430151805890a1320270d768195",
           "class": "Judgment",
           "classificationReason": "recorded transformations change target unit digest",
           "differingDigest": true
@@ -44524,7 +44542,7 @@
           "targetStartLine": 144,
           "targetEndLine": 144,
           "sourceUnitDigest": "51371604be3b8c08e83a306d3cd53e9df9b39691bf09284fdf3b3aa93ec9c606",
-          "targetUnitDigest": "810e0a4d53cadfbfcb355b3df077318955647c34aec65e7145eff8442fa3d988",
+          "targetUnitDigest": "143bc6e840ceaf9525c2fc9e8233ced35158fb0609808877a7bdbc81d14b3353",
           "class": "Judgment",
           "classificationReason": "recorded transformations change target unit digest",
           "differingDigest": true
@@ -44538,7 +44556,7 @@
           "targetStartLine": 146,
           "targetEndLine": 148,
           "sourceUnitDigest": "7a88cd1367a1f061fc69550b02958ba2b792609b6d814a30debb96fcc4d92b16",
-          "targetUnitDigest": "37b1b1139b6b872f754876b7fd697348e074b29fd18d57bee3e506e57fed012b",
+          "targetUnitDigest": "1408e2e7647fc0cf78b232a9f331f4b24330a0ec471ca070226f0316d92a108b",
           "class": "Judgment",
           "classificationReason": "recorded transformations change target unit digest",
           "differingDigest": true
@@ -44630,9 +44648,9 @@
       "mapKind": "proposal",
       "sourceBlob": "40132546e70e23fed654bf5d4cc84ea86ac3cd2b",
       "status": "historical chat progress snapshot",
-      "evidence": "Source lines 26\u201348 records a dated capability-fit audit, OS-only checks and unbuilt fixture. Source Concurrent Architecture Advisory session and Next work describe that chat, not a reusable current contract. Required-root references are ratchet only.",
-      "reason": "Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete.",
-      "target": "docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-progress.md",
+      "evidence": "Source lines 26\u201348 records a dated capability-fit audit, OS-only checks and unbuilt fixture. Source Concurrent Architecture Advisory session and Next work describe that chat, not a reusable current contract. Required-root references are ratchet only. Live proposals 9, 10 and 13 cite this dated status pointer; these links consume provenance/next-work context, not an accepted current contract. Preserve and queue their navigation explicitly.",
+      "reason": "Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism.",
+      "target": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
       "kind": "history",
       "triageDisposition": "archive-with-reason",
       "rowDisposition": "archive-with-reason",
@@ -45758,9 +45776,9 @@
       "triageDisposition": "place verbatim",
       "rowDisposition": "supersede",
       "sourceSha256": "73266b42990980ecedc53ff3b950f65ab470264de03d66cafcf57ddb1336967d",
-      "targetSha256": "21e56bf48155e2fa849a483fcdf1f5bb42995f31effdb65861b274c922f1396a",
+      "targetSha256": "856126b63fc70fc53b10038288ef3913dd2d000888886d45f54e7e93b8fbc9d0",
       "sourceByteLength": 13423,
-      "targetByteLength": 15072,
+      "targetByteLength": 15085,
       "sourceLineMap": [
         {
           "sourceLine": 1,
@@ -46585,6 +46603,12 @@
           "from": "../agent-coordination/verification/coordination-envelope/proofs/2026-09-06-boundary/environment.mjs",
           "to": "../../architect/agent-coordination/verification/coordination-envelope/proofs/2026-09-06-boundary/environment.mjs",
           "repositoryReferent": "docs/architect/agent-coordination/verification/coordination-envelope/proofs/2026-09-06-boundary/environment.mjs"
+        },
+        {
+          "sourceLine": 19,
+          "from": "../agent-coordination/architecture/dispatch-control-plane.md",
+          "to": "../../architect/agent-coordination/architecture/dispatch-control-plane.md",
+          "repositoryReferent": "docs/architect/agent-coordination/architecture/dispatch-control-plane.md"
         }
       ],
       "literalSourceUnits": [],
@@ -46642,10 +46666,10 @@
           "targetStartLine": 40,
           "targetEndLine": 40,
           "sourceUnitDigest": "c291e7aed9e1f0c5311835f5621af5e5167792f70834bf18993cfc5cce3597ad",
-          "targetUnitDigest": "c291e7aed9e1f0c5311835f5621af5e5167792f70834bf18993cfc5cce3597ad",
-          "class": "Weak-exact",
-          "classificationReason": "source unit shorter than 40 characters",
-          "differingDigest": false
+          "targetUnitDigest": "76f745dee6472d327d95766bc195c770277b33104b7a7f31e2efefc195302984",
+          "class": "Judgment",
+          "classificationReason": "Authorized correction changes target digest; mandatory A36 deep read, no exact proof carried.",
+          "differingDigest": true
         },
         {
           "claimId": "claim_e44d052c8d8bf3a682a81ae9eee0344b",
@@ -46656,10 +46680,10 @@
           "targetStartLine": 42,
           "targetEndLine": 46,
           "sourceUnitDigest": "9b028155e909cdb7306c3ad94330b573fb28acf32d599af019c04784201efbb8",
-          "targetUnitDigest": "9b028155e909cdb7306c3ad94330b573fb28acf32d599af019c04784201efbb8",
-          "class": "Unit-exact",
-          "classificationReason": "unique long digest match, equal ancestry, sufficient document exact share",
-          "differingDigest": false
+          "targetUnitDigest": "068d5ba8a9141f442f0fb4176ba27c6c3522623b322b5765e83afd20eab98d15",
+          "class": "Judgment",
+          "classificationReason": "Authorized correction changes target digest; mandatory A36 deep read, no exact proof carried.",
+          "differingDigest": true
         },
         {
           "claimId": "claim_72f2d77d548d91ccefbe50ed5179a5a6",
@@ -47113,6 +47137,8 @@
       "differingDigestClaimIds": [
         "claim_b14ddf97149f92e5affb869808ca149a",
         "claim_0f93665c6afb3f743c01e1202e1818af",
+        "claim_af86398e2f1675cee4c1d79bcc7024b9",
+        "claim_e44d052c8d8bf3a682a81ae9eee0344b",
         "claim_8dc6683dbb0a864d34d8649af015ce4a",
         "claim_339a0cb071824020b79d4945db284748"
       ]
@@ -47124,9 +47150,9 @@
       "mapKind": "proposal",
       "sourceBlob": "4df6e977ab05371234ac550da29fa3d8da553f2a",
       "status": "historical implemented-then-retired plan-loop design",
-      "evidence": "Source frontmatter and section 1 explicitly builds on CoordinationSession and standalone-master-coordination-loop.yaml; 2180b4e72 deletes that fixture and the group-thinking pack. docs/specs/runner.md:1590\u20131603 is a dated live-proof/plan-track note, not a direct citation to this proposal; archive/plans/260904-2329-group-thinking-plan-loop/ preserves proof.",
-      "reason": "Archive that retired mechanism, retaining its explicit external-coordinator constraints as historical intent. Current plan-loop skills do not revive the retired session engine. Not started is stale and remains verbatim.",
-      "target": "docs/platform/system-architecture/history/proposals-redesigns/group-thinking-plan-loop.md",
+      "evidence": "Source frontmatter and section 1 explicitly builds on CoordinationSession and standalone-master-coordination-loop.yaml; 2180b4e72 deletes that fixture and the group-thinking pack. docs/specs/runner.md:1590\u20131603 is a dated live-proof/plan-track note, not a direct citation to this proposal; archive/plans/260904-2329-group-thinking-plan-loop/ preserves proof. docs/specs/runner.md:3117 records fgos-plan-loop as replaced by fgos-run.",
+      "reason": "Archive that retired mechanism, retaining its explicit external-coordinator constraints as historical intent. Current plan-loop skills do not revive the retired session engine. Not started is stale and remains verbatim. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism.",
+      "target": "docs/platform/agent-coordination/history/proposals-redesigns/group-thinking-plan-loop.md",
       "kind": "history",
       "triageDisposition": "archive-with-reason",
       "rowDisposition": "archive-with-reason",
@@ -49234,9 +49260,9 @@
       "triageDisposition": "place verbatim",
       "rowDisposition": "supersede",
       "sourceSha256": "c1dc2a2a03dc76402b83dc4cdacbf51f3693b17b8c3b9a8a8c9c286dfc3f9035",
-      "targetSha256": "171824b6b88a6f65df56d1d78881dc6d32bf4b3cd91c88105b6a78e0fa9d01b3",
+      "targetSha256": "1bd6abb956e71005a22a7800eda55253c84404377cc12aea866d3d60ea6b66b6",
       "sourceByteLength": 30684,
-      "targetByteLength": 32529,
+      "targetByteLength": 32597,
       "sourceLineMap": [
         {
           "sourceLine": 1,
@@ -51742,7 +51768,7 @@
           "targetStartLine": 1,
           "targetEndLine": 1,
           "sourceUnitDigest": "4704ac59101e08fe8aaeb92ea9ac4d855c6ba41023b8e11344b39ccc2f56a65e",
-          "targetUnitDigest": "0a1f9df2d96fcb963b53b0ffc677d95447d61c576f2c829bc511cf743fb41350",
+          "targetUnitDigest": "3cf00a3c56f5c4f25a61320fd95f88fd93e01903118d429d576e70347dac8396",
           "class": "Judgment",
           "classificationReason": "recorded transformations change target unit digest",
           "differingDigest": true
@@ -53057,8 +53083,8 @@
       "sourceBlob": "fd6e47f8aa7a75c77a37fb3ef1b5ae0593a90a70",
       "status": "historical one-shot handoff prompt",
       "evidence": "Source lines 3\u201310 says Handoff prompt, Canonical for nothing, use only to start a fresh design chat. Source code block preserves inputs for subsequent Step 09/10 discussions; no specific live required-root consumer.",
-      "reason": "Archive the consumed prompt, with provenance value for the surviving adoption proposals. No delete-as-obsolete recommendation.",
-      "target": "docs/platform/system-architecture/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md",
+      "reason": "Archive the consumed prompt, with provenance value for the surviving adoption proposals. No delete-as-obsolete recommendation. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism.",
+      "target": "docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md",
       "kind": "history",
       "triageDisposition": "archive-with-reason",
       "rowDisposition": "archive-with-reason",
@@ -63317,9 +63343,9 @@
       "triageDisposition": "place verbatim",
       "rowDisposition": "supersede",
       "sourceSha256": "9c45a9383a65bd4ee40738dfb6c7de39549e4d5efe079525e8e20dfd55b2c4ec",
-      "targetSha256": "b8d9b36481487214778a14aac5ca79b7b01630ff08eeaa8c61be52b22a76a9b3",
+      "targetSha256": "8007091c8dd2542d7fdf63817b0843e8f6ea568ea00737e3ab09321e76d4385b",
       "sourceByteLength": 67568,
-      "targetByteLength": 69263,
+      "targetByteLength": 69240,
       "sourceLineMap": [
         {
           "sourceLine": 1,
@@ -65673,7 +65699,7 @@
           "targetStartLine": 1,
           "targetEndLine": 1,
           "sourceUnitDigest": "011ff1ead4b5626955fb4c368e23c5c0e43dea44b10d06bf5ab9b9ac30631b24",
-          "targetUnitDigest": "dea69ad933aaa53c695ab63a63f3428ae105495bec43da7772b19e34eb99c737",
+          "targetUnitDigest": "151ad429b2747f33872adfaece97118eebd64b153feb127ad195eeec175b9caa",
           "class": "Judgment",
           "classificationReason": "recorded transformations change target unit digest",
           "differingDigest": true
@@ -67399,13 +67425,54 @@
     "files": 20,
     "claims": 1815,
     "classes": {
-      "Judgment": 84,
-      "Weak-exact": 440,
-      "Unit-exact": 1291
+      "Judgment": 88,
+      "Weak-exact": 438,
+      "Unit-exact": 1289
     },
-    "differingDigests": 84,
+    "differingDigests": 88,
     "reviewed": 0,
     "pending": 1815,
     "authorRemaining": 0
-  }
+  },
+  "mapTargetOverrides": [
+    {
+      "number": 3,
+      "source": "docs/architect/documentation-system-discussion.md",
+      "mapTarget": "docs/platform/proposals/documentation-system-discussion.md",
+      "target": "docs/platform/documentation/history/proposals-redesigns/documentation-system-discussion.md",
+      "kind": "history",
+      "reason": "Archive the discussion as provenance, not deletion; open ideas remain literally available. The map proposal target is overridden by a documentation history carrier.",
+      "authority": "Lead assignment under Q3/A17/A19/A22/A28; frozen map not rewritten"
+    },
+    {
+      "number": 12,
+      "source": "docs/architect/proposals/coordination-envelope-progress.md",
+      "mapTarget": "docs/platform/proposals/coordination-envelope-progress.md",
+      "target": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+      "kind": "history",
+      "reason": "Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism.",
+      "authority": "Lead assignment under Q3/A17/A19/A22/A28; frozen map not rewritten"
+    },
+    {
+      "number": 14,
+      "source": "docs/architect/proposals/group-thinking-plan-loop.md",
+      "mapTarget": "docs/platform/proposals/group-thinking-plan-loop.md",
+      "target": "docs/platform/agent-coordination/history/proposals-redesigns/group-thinking-plan-loop.md",
+      "kind": "history",
+      "reason": "Archive that retired mechanism, retaining its explicit external-coordinator constraints as historical intent. Current plan-loop skills do not revive the retired session engine. Not started is stale and remains verbatim. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism.",
+      "authority": "Lead assignment under Q3/A17/A19/A22/A28; frozen map not rewritten"
+    },
+    {
+      "number": 17,
+      "source": "docs/architect/proposals/step-09-step-10-replan-handoff-prompt.md",
+      "mapTarget": "docs/platform/proposals/step-09-step-10-replan-handoff-prompt.md",
+      "target": "docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md",
+      "kind": "history",
+      "reason": "Archive the consumed prompt, with provenance value for the surviving adoption proposals. No delete-as-obsolete recommendation. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism.",
+      "authority": "Lead assignment under Q3/A17/A19/A22/A28; frozen map not rewritten"
+    }
+  ],
+  "correctionSession": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+  "correctionInputCommit": "4ee263d09",
+  "correctionEvidenceCommit": "f060a66fc"
 }

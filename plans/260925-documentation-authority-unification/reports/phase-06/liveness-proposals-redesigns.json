@@ -2498,14 +2498,14 @@
         }
       ],
       "ownerCurrent": true,
-      "reviewVerdict": "Keep the map proposal carrier: A17/A19 live-spec protection beats archiving a cited pointer. No redirect or root retirement here.",
+      "reviewVerdict": "Keep the mapped pointer carrier; the full proposal lives at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md. Its three inline-code legacy destinations remain owed repoints at cutover.",
       "sections": [
         {
           "startLine": 1,
           "endLine": 14,
           "reviewLabel": "current",
           "authorClassification": "current-by-default retained intent",
-          "reason": "Keep the map proposal carrier: A17/A19 live-spec protection beats archiving a cited pointer. No redirect or root retirement here.",
+          "reason": "Keep the mapped pointer carrier; the full proposal lives at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md. Its three inline-code legacy destinations remain owed repoints at cutover.",
           "sourceSha256": "ee67263b92b3c9fed2a88995f5eab3bc7768e237de7022d62e1fe7de7c8ce42a",
           "symbols": [],
           "liveSymbolHitCount": 0,
@@ -2521,7 +2521,7 @@
         "triageDisposition": "place verbatim",
         "target": "docs/platform/proposals/dispatch-control-plane-redesign.md",
         "evidence": "docs/specs/runner.md:1273,1277\u20131278 still cites the redesign; source lines 3\u201313 redirect to the surviving area architecture/proposal. Full body remains at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md.",
-        "rationale": "Keep the map proposal carrier: A17/A19 live-spec protection beats archiving a cited pointer. No redirect or root retirement here.",
+        "rationale": "Keep the mapped pointer carrier; the full proposal lives at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md. Its three inline-code legacy destinations remain owed repoints at cutover.",
         "mechanicalHitLimits": "Ratchet and exception-file path inventories are not semantic consumers; unqualified README.md basename matches are collisions. Generic symbol matches are retained in raw output, not treated as proof of this exact retired experiment or chat. Current concepts and surviving referenced implementation protect retained proposal intent by default.",
         "reviewStatus": "pending"
       }
@@ -10956,15 +10956,15 @@
           "text": "\"docs/architect/proposals/coordination-envelope-probe-contract.md\": {"
         }
       ],
-      "ownerCurrent": false,
-      "reviewVerdict": "Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link.",
+      "ownerCurrent": true,
+      "reviewVerdict": "Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim.",
       "sections": [
         {
           "startLine": 1,
           "endLine": 14,
-          "reviewLabel": "retired",
-          "authorClassification": "historical snapshot",
-          "reason": "Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link.",
+          "reviewLabel": "current",
+          "authorClassification": "live intent retained",
+          "reason": "Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim.",
           "sourceSha256": "ecfb71414d9176574408f9d7cccef367505a685aba4a1eb245eb1d5bac357b11",
           "symbols": [],
           "liveSymbolHitCount": 0,
@@ -10977,9 +10977,9 @@
         {
           "startLine": 15,
           "endLine": 30,
-          "reviewLabel": "retired",
-          "authorClassification": "historical snapshot",
-          "reason": "Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link.",
+          "reviewLabel": "current",
+          "authorClassification": "live intent retained",
+          "reason": "Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim.",
           "sourceSha256": "5b73be19a1f5ac1c44acd4cb876d7c13377a8f5f2462dae3fef53d6240bb6810",
           "symbols": [],
           "liveSymbolHitCount": 0,
@@ -10992,9 +10992,9 @@
         {
           "startLine": 31,
           "endLine": 58,
-          "reviewLabel": "retired",
-          "authorClassification": "historical snapshot",
-          "reason": "Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link.",
+          "reviewLabel": "current",
+          "authorClassification": "live intent retained",
+          "reason": "Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim.",
           "sourceSha256": "0bbdb96a4e22327dbd204493ec47646378ae2eaf8c1494c05e1173bccd19261b",
           "symbols": [],
           "liveSymbolHitCount": 0,
@@ -11007,9 +11007,9 @@
         {
           "startLine": 59,
           "endLine": 85,
-          "reviewLabel": "retired",
-          "authorClassification": "historical snapshot",
-          "reason": "Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link.",
+          "reviewLabel": "current",
+          "authorClassification": "live intent retained",
+          "reason": "Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim.",
           "sourceSha256": "9c75ba9461e5c75246d2b0bfe74a0f89b3b2093554c9a4c75f1d94cee5eb3dbd",
           "symbols": [],
           "liveSymbolHitCount": 0,
@@ -11022,9 +11022,9 @@
         {
           "startLine": 86,
           "endLine": 98,
-          "reviewLabel": "retired",
-          "authorClassification": "historical snapshot",
-          "reason": "Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link.",
+          "reviewLabel": "current",
+          "authorClassification": "live intent retained",
+          "reason": "Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim.",
           "sourceSha256": "8939a044ff037de010e90ec0d2b33b0de2bba680597fd3d8ae293152c9cad9f0",
           "symbols": [],
           "liveSymbolHitCount": 0,
@@ -11037,9 +11037,9 @@
         {
           "startLine": 99,
           "endLine": 116,
-          "reviewLabel": "retired",
-          "authorClassification": "historical snapshot",
-          "reason": "Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link.",
+          "reviewLabel": "current",
+          "authorClassification": "live intent retained",
+          "reason": "Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim.",
           "sourceSha256": "f663dc0472025c53c7392b7676c9a8776a629c9bc65c506af2c4c369e314c573",
           "symbols": [
             "RunResult"
@@ -11250,14 +11250,15 @@
           "implementationPaths": [],
           "defaultClassification": "current-by-default",
           "retirementEligible": false,
-          "note": "Direct file citations protect all sections until individually adjudicated. Symbol examples are capped at 25; the count includes all matches. Historical/comment references are not silently excluded. A lexical hit protects content by default, but is not proof that every old sentence is implemented."
+          "note": "Direct file citations protect all sections until individually adjudicated. Symbol examples are capped at 25; the count includes all matches. Historical/comment references are not silently excluded. A lexical hit protects content by default, but is not proof that every old sentence is implemented.",
+          "sectionLivenessNote": "RunResult hits describe the shared execution substrate. They do not prove this experiment ran; the live proposal consumers keep this section current with the probe contract."
         },
         {
           "startLine": 117,
           "endLine": 140,
-          "reviewLabel": "retired",
-          "authorClassification": "historical snapshot",
-          "reason": "Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link.",
+          "reviewLabel": "current",
+          "authorClassification": "live intent retained",
+          "reason": "Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim.",
           "sourceSha256": "1301a942b14f26040972ee6a2aa47c4fa65e28fe5f27b614c3bff410891e0722",
           "symbols": [
             "RunResult"
@@ -11468,14 +11469,15 @@
           "implementationPaths": [],
           "defaultClassification": "current-by-default",
           "retirementEligible": false,
-          "note": "Direct file citations protect all sections until individually adjudicated. Symbol examples are capped at 25; the count includes all matches. Historical/comment references are not silently excluded. A lexical hit protects content by default, but is not proof that every old sentence is implemented."
+          "note": "Direct file citations protect all sections until individually adjudicated. Symbol examples are capped at 25; the count includes all matches. Historical/comment references are not silently excluded. A lexical hit protects content by default, but is not proof that every old sentence is implemented.",
+          "sectionLivenessNote": "RunResult hits support a surviving result boundary. The pass/fail experiment remains unproven and retained as live intent because proposals 9 and 13 cite the probe."
         },
         {
           "startLine": 141,
           "endLine": 157,
-          "reviewLabel": "retired",
-          "authorClassification": "historical snapshot",
-          "reason": "Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link.",
+          "reviewLabel": "current",
+          "authorClassification": "live intent retained",
+          "reason": "Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim.",
           "sourceSha256": "04b7fc8d718b2fa82e1933cdc8277778f5a0edbb925866fc9acf22388d8c6b69",
           "symbols": [],
           "liveSymbolHitCount": 0,
@@ -11488,12 +11490,22 @@
       ],
       "wholeFileRetirementEligible": false,
       "authorAdjudication": {
-        "triageDisposition": "archive-with-reason",
-        "target": "docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md",
-        "evidence": "Source lines 17\u201359 binds the experiment to the September Advisory track and its P02/P03 convergence; source scenario uses the retired CoordinationSession/FlowDefinition public path. Commit 2180b4e72 deletes that engine; no required-root direct consumer except ratchet.",
-        "rationale": "Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link.",
+        "triageDisposition": "place verbatim",
+        "target": "docs/platform/proposals/coordination-envelope-probe-contract.md",
+        "evidence": "Source scenario uses Assignment/Run, read-only executors and independent-first reveal; it contains neither CoordinationSession nor FlowDefinition. Live coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 cite this probe contract. Its retired-facility gap observations are dated, not proof the alternative experiment is retired.",
+        "rationale": "Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim.",
         "mechanicalHitLimits": "Ratchet and exception-file path inventories are not semantic consumers; unqualified README.md basename matches are collisions. Generic symbol matches are retained in raw output, not treated as proof of this exact retired experiment or chat. Current concepts and surviving referenced implementation protect retained proposal intent by default.",
-        "reviewStatus": "pending"
+        "reviewStatus": "pending",
+        "additionalConsumerEvidence": [
+          {
+            "path": "docs/architect/proposals/coordination-capability-envelope.md",
+            "line": 388
+          },
+          {
+            "path": "docs/architect/proposals/coordination-worker-provider-boundary.md",
+            "line": 11
+          }
+        ]
       }
     },
     {
@@ -11507,14 +11519,14 @@
         }
       ],
       "ownerCurrent": false,
-      "reviewVerdict": "Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete.",
+      "reviewVerdict": "Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism.",
       "sections": [
         {
           "startLine": 1,
           "endLine": 9,
           "reviewLabel": "retired",
           "authorClassification": "historical snapshot",
-          "reason": "Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete.",
+          "reason": "Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism.",
           "sourceSha256": "d28130acfa596645703dbc5fd436126ad30e6642ee8c443b5922f50011b905df",
           "symbols": [],
           "liveSymbolHitCount": 0,
@@ -11529,7 +11541,7 @@
           "endLine": 23,
           "reviewLabel": "retired",
           "authorClassification": "historical snapshot",
-          "reason": "Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete.",
+          "reason": "Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism.",
           "sourceSha256": "07cbb7f1248d0e4865dd00ad67c8edfa928af70899f88c9f80bc55e18fa9591b",
           "symbols": [],
           "liveSymbolHitCount": 0,
@@ -11544,7 +11556,7 @@
           "endLine": 53,
           "reviewLabel": "retired",
           "authorClassification": "historical snapshot",
-          "reason": "Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete.",
+          "reason": "Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism.",
           "sourceSha256": "e53bc51b7c2077e0d2515a95afc116555ec3d1faef436636858096aad1908ac1",
           "symbols": [
             "GitNexus"
@@ -11659,14 +11671,15 @@
           "implementationPaths": [],
           "defaultClassification": "current-by-default",
           "retirementEligible": false,
-          "note": "Direct file citations protect all sections until individually adjudicated. Symbol examples are capped at 25; the count includes all matches. Historical/comment references are not silently excluded. A lexical hit protects content by default, but is not proof that every old sentence is implemented."
+          "note": "Direct file citations protect all sections until individually adjudicated. Symbol examples are capped at 25; the count includes all matches. Historical/comment references are not silently excluded. A lexical hit protects content by default, but is not proof that every old sentence is implemented.",
+          "sectionLivenessNote": "GitNexus hits in AGENTS.md and workflow guidance describe the general analysis tool, not a consumer of this dated capability-fit/OS-probe status table. Live proposal links consume this snapshot as provenance; they do not make the unbuilt fixture current."
         },
         {
           "startLine": 54,
           "endLine": 71,
           "reviewLabel": "retired",
           "authorClassification": "historical snapshot",
-          "reason": "Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete.",
+          "reason": "Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism.",
           "sourceSha256": "c608cf168009b436b903e55ede550e80df242e7b5d0d7fb99f96a99eac65fa0a",
           "symbols": [
             "FlowDefinition"
@@ -11829,14 +11842,15 @@
           "implementationPaths": [],
           "defaultClassification": "current-by-default",
           "retirementEligible": false,
-          "note": "Direct file citations protect all sections until individually adjudicated. Symbol examples are capped at 25; the count includes all matches. Historical/comment references are not silently excluded. A lexical hit protects content by default, but is not proof that every old sentence is implemented."
+          "note": "Direct file citations protect all sections until individually adjudicated. Symbol examples are capped at 25; the count includes all matches. Historical/comment references are not silently excluded. A lexical hit protects content by default, but is not proof that every old sentence is implemented.",
+          "sectionLivenessNote": "FlowDefinition hits include the explicit retirement note at docs/specs/runner.md:1361 and metrics harness fixtures. Neither implements this chat\u2019s family recommendation or re-proves its dated mutation-safety findings; the historical findings remain available verbatim."
         },
         {
           "startLine": 72,
           "endLine": 103,
           "reviewLabel": "retired",
           "authorClassification": "historical snapshot",
-          "reason": "Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete.",
+          "reason": "Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism.",
           "sourceSha256": "b8bf3e81b60cf700b2fff5e4bffebfa9339e52a1469103d8e0a8c6f061b31722",
           "symbols": [],
           "liveSymbolHitCount": 0,
@@ -11851,7 +11865,7 @@
           "endLine": 135,
           "reviewLabel": "retired",
           "authorClassification": "historical snapshot",
-          "reason": "Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete.",
+          "reason": "Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism.",
           "sourceSha256": "a3fdcd820556ce6a6cfe0d4afe834513a210f96882cc7a94425b222959ff7ba0",
           "symbols": [],
           "liveSymbolHitCount": 0,
@@ -11866,7 +11880,7 @@
           "endLine": 162,
           "reviewLabel": "retired",
           "authorClassification": "historical snapshot",
-          "reason": "Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete.",
+          "reason": "Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism.",
           "sourceSha256": "9eb3d5442ceef37fbfad9fcff56f8db12c897c39c8c2ed692186b3134253e479",
           "symbols": [],
           "liveSymbolHitCount": 0,
@@ -11880,9 +11894,9 @@
       "wholeFileRetirementEligible": false,
       "authorAdjudication": {
         "triageDisposition": "archive-with-reason",
-        "target": "docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-progress.md",
-        "evidence": "Source lines 26\u201348 records a dated capability-fit audit, OS-only checks and unbuilt fixture. Source Concurrent Architecture Advisory session and Next work describe that chat, not a reusable current contract. Required-root references are ratchet only.",
-        "rationale": "Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete.",
+        "target": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "evidence": "Source lines 26\u201348 records a dated capability-fit audit, OS-only checks and unbuilt fixture. Source Concurrent Architecture Advisory session and Next work describe that chat, not a reusable current contract. Required-root references are ratchet only. Live proposals 9, 10 and 13 cite this dated status pointer; these links consume provenance/next-work context, not an accepted current contract. Preserve and queue their navigation explicitly.",
+        "rationale": "Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism.",
         "mechanicalHitLimits": "Ratchet and exception-file path inventories are not semantic consumers; unqualified README.md basename matches are collisions. Generic symbol matches are retained in raw output, not treated as proof of this exact retired experiment or chat. Current concepts and surviving referenced implementation protect retained proposal intent by default.",
         "reviewStatus": "pending"
       }
@@ -12289,14 +12303,14 @@
         }
       ],
       "ownerCurrent": false,
-      "reviewVerdict": "Archive that retired mechanism, retaining its explicit external-coordinator constraints as historical intent. Current plan-loop skills do not revive the retired session engine. Not started is stale and remains verbatim.",
+      "reviewVerdict": "Archive that retired mechanism, retaining its explicit external-coordinator constraints as historical intent. Current plan-loop skills do not revive the retired session engine. Not started is stale and remains verbatim. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism.",
       "sections": [
         {
           "startLine": 1,
           "endLine": 10,
           "reviewLabel": "retired",
           "authorClassification": "historical snapshot",
-          "reason": "Archive that retired mechanism, retaining its explicit external-coordinator constraints as historical intent. Current plan-loop skills do not revive the retired session engine. Not started is stale and remains verbatim.",
+          "reason": "Archive that retired mechanism, retaining its explicit external-coordinator constraints as historical intent. Current plan-loop skills do not revive the retired session engine. Not started is stale and remains verbatim. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism.",
           "sourceSha256": "d1d709928e5f456396428c88c5dbdbf9e02cd1dbf6cbb8334c478b8405d493a5",
           "symbols": [
             "CoordinationSession"
@@ -12435,14 +12449,15 @@
           "implementationPaths": [],
           "defaultClassification": "current-by-default",
           "retirementEligible": false,
-          "note": "Direct file citations protect all sections until individually adjudicated. Symbol examples are capped at 25; the count includes all matches. Historical/comment references are not silently excluded. A lexical hit protects content by default, but is not proof that every old sentence is implemented."
+          "note": "Direct file citations protect all sections until individually adjudicated. Symbol examples are capped at 25; the count includes all matches. Historical/comment references are not silently excluded. A lexical hit protects content by default, but is not proof that every old sentence is implemented.",
+          "sectionLivenessNote": "CoordinationSession hits include the historical CLI comment and runner retirement section. They do not revive the frontmatter\u2019s retired group-thinking substrate; runner.md:3117 names fgos-run as the replacement."
         },
         {
           "startLine": 11,
           "endLine": 27,
           "reviewLabel": "retired",
           "authorClassification": "historical snapshot",
-          "reason": "Archive that retired mechanism, retaining its explicit external-coordinator constraints as historical intent. Current plan-loop skills do not revive the retired session engine. Not started is stale and remains verbatim.",
+          "reason": "Archive that retired mechanism, retaining its explicit external-coordinator constraints as historical intent. Current plan-loop skills do not revive the retired session engine. Not started is stale and remains verbatim. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism.",
           "sourceSha256": "702ce022bbe5fcd554d9434a373039013fb7eeff78a5c4c6d1d94fe3260e9b46",
           "symbols": [
             "CoordinationSession"
@@ -12581,14 +12596,15 @@
           "implementationPaths": [],
           "defaultClassification": "current-by-default",
           "retirementEligible": false,
-          "note": "Direct file citations protect all sections until individually adjudicated. Symbol examples are capped at 25; the count includes all matches. Historical/comment references are not silently excluded. A lexical hit protects content by default, but is not proof that every old sentence is implemented."
+          "note": "Direct file citations protect all sections until individually adjudicated. Symbol examples are capped at 25; the count includes all matches. Historical/comment references are not silently excluded. A lexical hit protects content by default, but is not proof that every old sentence is implemented.",
+          "sectionLivenessNote": "CoordinationSession mentions in the historical runner section do not implement the source metadata\u2019s plan contract or its linked standalone-master fixture, removed in 2180b4e72."
         },
         {
           "startLine": 28,
           "endLine": 80,
           "reviewLabel": "retired",
           "authorClassification": "historical snapshot",
-          "reason": "Archive that retired mechanism, retaining its explicit external-coordinator constraints as historical intent. Current plan-loop skills do not revive the retired session engine. Not started is stale and remains verbatim.",
+          "reason": "Archive that retired mechanism, retaining its explicit external-coordinator constraints as historical intent. Current plan-loop skills do not revive the retired session engine. Not started is stale and remains verbatim. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism.",
           "sourceSha256": "9c063b34736e327b843aa351af4372f131f46a29a9c81a56d9eb7f1f1a11edc1",
           "symbols": [
             "CoordinationSession",
@@ -12800,14 +12816,15 @@
           "implementationPaths": [],
           "defaultClassification": "current-by-default",
           "retirementEligible": false,
-          "note": "Direct file citations protect all sections until individually adjudicated. Symbol examples are capped at 25; the count includes all matches. Historical/comment references are not silently excluded. A lexical hit protects content by default, but is not proof that every old sentence is implemented."
+          "note": "Direct file citations protect all sections until individually adjudicated. Symbol examples are capped at 25; the count includes all matches. Historical/comment references are not silently excluded. A lexical hit protects content by default, but is not proof that every old sentence is implemented.",
+          "sectionLivenessNote": "CoordinationSession hits are historical; generic RunResult use proves only the shared result shape. This problem/constraint section binds the retired session-cell mechanism, not a live consumer of this exact plan loop."
         },
         {
           "startLine": 81,
           "endLine": 123,
           "reviewLabel": "retired",
           "authorClassification": "historical snapshot",
-          "reason": "Archive that retired mechanism, retaining its explicit external-coordinator constraints as historical intent. Current plan-loop skills do not revive the retired session engine. Not started is stale and remains verbatim.",
+          "reason": "Archive that retired mechanism, retaining its explicit external-coordinator constraints as historical intent. Current plan-loop skills do not revive the retired session engine. Not started is stale and remains verbatim. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism.",
           "sourceSha256": "81f2fec66899a6533c011cf23e1be93427ee7f922f7e4707f1b7052c8f97a826",
           "symbols": [
             "FlowDefinition"
@@ -12970,14 +12987,15 @@
           "implementationPaths": [],
           "defaultClassification": "current-by-default",
           "retirementEligible": false,
-          "note": "Direct file citations protect all sections until individually adjudicated. Symbol examples are capped at 25; the count includes all matches. Historical/comment references are not silently excluded. A lexical hit protects content by default, but is not proof that every old sentence is implemented."
+          "note": "Direct file citations protect all sections until individually adjudicated. Symbol examples are capped at 25; the count includes all matches. Historical/comment references are not silently excluded. A lexical hit protects content by default, but is not proof that every old sentence is implemented.",
+          "sectionLivenessNote": "FlowDefinition hits in metrics fixtures and retirement commentary do not restore session-engine.mjs pinning or quorum operations discussed in the rejected options. The option analysis remains historical design rationale."
         },
         {
           "startLine": 124,
           "endLine": 263,
           "reviewLabel": "retired",
           "authorClassification": "historical snapshot",
-          "reason": "Archive that retired mechanism, retaining its explicit external-coordinator constraints as historical intent. Current plan-loop skills do not revive the retired session engine. Not started is stale and remains verbatim.",
+          "reason": "Archive that retired mechanism, retaining its explicit external-coordinator constraints as historical intent. Current plan-loop skills do not revive the retired session engine. Not started is stale and remains verbatim. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism.",
           "sourceSha256": "3f9a6ea968876956b319b44ebd843c5febb1b34c5682c04e33ee4def6a21c03b",
           "symbols": [
             "RunResult",
@@ -13190,14 +13208,15 @@
           "implementationPaths": [],
           "defaultClassification": "current-by-default",
           "retirementEligible": false,
-          "note": "Direct file citations protect all sections until individually adjudicated. Symbol examples are capped at 25; the count includes all matches. Historical/comment references are not silently excluded. A lexical hit protects content by default, but is not proof that every old sentence is implemented."
+          "note": "Direct file citations protect all sections until individually adjudicated. Symbol examples are capped at 25; the count includes all matches. Historical/comment references are not silently excluded. A lexical hit protects content by default, but is not proof that every old sentence is implemented.",
+          "sectionLivenessNote": "RunResult/RunResults are generic execution terms; FlowDefinition hits include harness fixtures. None restores the accepted design\u2019s removed standalone-master-coordination-loop.yaml and group-thinking pack; runner.md:3117 explicitly replaces fgos-plan-loop with fgos-run."
         },
         {
           "startLine": 264,
           "endLine": 279,
           "reviewLabel": "retired",
           "authorClassification": "historical snapshot",
-          "reason": "Archive that retired mechanism, retaining its explicit external-coordinator constraints as historical intent. Current plan-loop skills do not revive the retired session engine. Not started is stale and remains verbatim.",
+          "reason": "Archive that retired mechanism, retaining its explicit external-coordinator constraints as historical intent. Current plan-loop skills do not revive the retired session engine. Not started is stale and remains verbatim. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism.",
           "sourceSha256": "aa088c79763bcffa38a0b63cc42613e8727d4cd3701016d1743803f25c68c391",
           "symbols": [],
           "liveSymbolHitCount": 0,
@@ -13212,7 +13231,7 @@
           "endLine": 288,
           "reviewLabel": "retired",
           "authorClassification": "historical snapshot",
-          "reason": "Archive that retired mechanism, retaining its explicit external-coordinator constraints as historical intent. Current plan-loop skills do not revive the retired session engine. Not started is stale and remains verbatim.",
+          "reason": "Archive that retired mechanism, retaining its explicit external-coordinator constraints as historical intent. Current plan-loop skills do not revive the retired session engine. Not started is stale and remains verbatim. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism.",
           "sourceSha256": "dbaf3efdf17528b7e375789b12f1c6f3a915c62192f9971ff0a156604a09e0a8",
           "symbols": [],
           "liveSymbolHitCount": 0,
@@ -13226,9 +13245,9 @@
       "wholeFileRetirementEligible": false,
       "authorAdjudication": {
         "triageDisposition": "archive-with-reason",
-        "target": "docs/platform/system-architecture/history/proposals-redesigns/group-thinking-plan-loop.md",
-        "evidence": "Source frontmatter and section 1 explicitly builds on CoordinationSession and standalone-master-coordination-loop.yaml; 2180b4e72 deletes that fixture and the group-thinking pack. docs/specs/runner.md:1590\u20131603 is a dated live-proof/plan-track note, not a direct citation to this proposal; archive/plans/260904-2329-group-thinking-plan-loop/ preserves proof.",
-        "rationale": "Archive that retired mechanism, retaining its explicit external-coordinator constraints as historical intent. Current plan-loop skills do not revive the retired session engine. Not started is stale and remains verbatim.",
+        "target": "docs/platform/agent-coordination/history/proposals-redesigns/group-thinking-plan-loop.md",
+        "evidence": "Source frontmatter and section 1 explicitly builds on CoordinationSession and standalone-master-coordination-loop.yaml; 2180b4e72 deletes that fixture and the group-thinking pack. docs/specs/runner.md:1590\u20131603 is a dated live-proof/plan-track note, not a direct citation to this proposal; archive/plans/260904-2329-group-thinking-plan-loop/ preserves proof. docs/specs/runner.md:3117 records fgos-plan-loop as replaced by fgos-run.",
+        "rationale": "Archive that retired mechanism, retaining its explicit external-coordinator constraints as historical intent. Current plan-loop skills do not revive the retired session engine. Not started is stale and remains verbatim. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism.",
         "mechanicalHitLimits": "Ratchet and exception-file path inventories are not semantic consumers; unqualified README.md basename matches are collisions. Generic symbol matches are retained in raw output, not treated as proof of this exact retired experiment or chat. Current concepts and surviving referenced implementation protect retained proposal intent by default.",
         "reviewStatus": "pending"
       }
@@ -15408,14 +15427,14 @@
         }
       ],
       "ownerCurrent": false,
-      "reviewVerdict": "Archive the consumed prompt, with provenance value for the surviving adoption proposals. No delete-as-obsolete recommendation.",
+      "reviewVerdict": "Archive the consumed prompt, with provenance value for the surviving adoption proposals. No delete-as-obsolete recommendation. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism.",
       "sections": [
         {
           "startLine": 1,
           "endLine": 146,
           "reviewLabel": "retired",
           "authorClassification": "historical snapshot",
-          "reason": "Archive the consumed prompt, with provenance value for the surviving adoption proposals. No delete-as-obsolete recommendation.",
+          "reason": "Archive the consumed prompt, with provenance value for the surviving adoption proposals. No delete-as-obsolete recommendation. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism.",
           "sourceSha256": "6ebc8ec8c2454e97177809c1e0dcc96f5c59a3d120624ec4bae3190b9faa444c",
           "symbols": [
             "FlowDefinition",
@@ -15632,15 +15651,16 @@
           ],
           "defaultClassification": "current-by-default",
           "retirementEligible": false,
-          "note": "Direct file citations protect all sections until individually adjudicated. Symbol examples are capped at 25; the count includes all matches. Historical/comment references are not silently excluded. A lexical hit protects content by default, but is not proof that every old sentence is implemented."
+          "note": "Direct file citations protect all sections until individually adjudicated. Symbol examples are capped at 25; the count includes all matches. Historical/comment references are not silently excluded. A lexical hit protects content by default, but is not proof that every old sentence is implemented.",
+          "sectionLivenessNote": "FlowDefinition/CoordinationSession hits are historical comments, retirement notes and metrics fixtures, not consumers of this one-shot prompt. Its own Canonical for nothing/use only to start a fresh design chat text and retired Step 08 premise make it historical provenance."
         }
       ],
       "wholeFileRetirementEligible": false,
       "authorAdjudication": {
         "triageDisposition": "archive-with-reason",
-        "target": "docs/platform/system-architecture/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md",
+        "target": "docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md",
         "evidence": "Source lines 3\u201310 says Handoff prompt, Canonical for nothing, use only to start a fresh design chat. Source code block preserves inputs for subsequent Step 09/10 discussions; no specific live required-root consumer.",
-        "rationale": "Archive the consumed prompt, with provenance value for the surviving adoption proposals. No delete-as-obsolete recommendation.",
+        "rationale": "Archive the consumed prompt, with provenance value for the surviving adoption proposals. No delete-as-obsolete recommendation. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism.",
         "mechanicalHitLimits": "Ratchet and exception-file path inventories are not semantic consumers; unqualified README.md basename matches are collisions. Generic symbol matches are retained in raw output, not treated as proof of this exact retired experiment or chat. Current concepts and surviving referenced implementation protect retained proposal intent by default.",
         "reviewStatus": "pending"
       }
@@ -20127,5 +20147,6 @@
         "reviewStatus": "pending"
       }
     }
-  ]
+  ],
+  "classificationScope": "reviewLabel and authorClassification express the file-level carriage adjudication; sectionLivenessNote individually adjudicates all 10 formerly archived sections with live-symbol hits. Two probe sections remain current after reconsideration; eight remain historical. Raw symbol hits, examples, scan roots and input hashes are unchanged."
 }

@@ -16,7 +16,7 @@
           "sourceAnchor": "dispatch-control-plane-redesign",
           "targetAnchor": "dispatch-control-plane-redesign",
           "sourceUnitDigest": "7b5d3df68b88c26058760be3ed0d7f21c05f84e1512a07212d26e953156fc154",
-          "targetUnitDigest": "c5529f675233bdd0307872cb2a5404c4fde626c39567f9ba459ea5a1d13cf94f"
+          "targetUnitDigest": "b836a91ed4d5753a3192ae3a992e713477fc30524d664dc173024fb8ad889741"
         },
         {
           "claimId": "claim_c1d6c7e71ac871df50ade9fbd9c197ef",
@@ -33,7 +33,52 @@
           "sourceAnchor": "dispatch-control-plane-redesign",
           "targetAnchor": "dispatch-control-plane-redesign",
           "sourceUnitDigest": "7b5d3df68b88c26058760be3ed0d7f21c05f84e1512a07212d26e953156fc154",
-          "targetUnitDigest": "c5529f675233bdd0307872cb2a5404c4fde626c39567f9ba459ea5a1d13cf94f"
+          "targetUnitDigest": "b836a91ed4d5753a3192ae3a992e713477fc30524d664dc173024fb8ad889741"
+        }
+      ],
+      "changedRows": [
+        {
+          "claimId": "claim_2ec7fc22c79d18b5f8d57cc79ec5e587",
+          "reasons": [
+            "R7-1/R7-6 labelled neutral placement metadata and extracted-unit consequence",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_c1d6c7e71ac871df50ade9fbd9c197ef",
+          "reasons": [
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_6f1c18985eba573f3f0bc7af216dff30",
+          "reasons": [
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_2aa7df6a5ea4807463b81b5181821702",
+          "reasons": [
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_62153be70af7b764bdb0d17617240bbf",
+          "reasons": [
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_47245c890a656f03be28dee6020f095a",
+          "reasons": [
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_3811942485f2624b620b36b3a3aba933",
+          "reasons": [
+            "Corrected evidence, placement rationale or A36 class"
+          ]
         }
       ]
     },
@@ -2158,11 +2203,19 @@
         },
         {
           "claimId": "claim_c262ad8c4a5f18b68948f937e3361128",
-          "class": "Weak-exact",
+          "class": "Judgment",
           "sourceAnchor": "17-pointers",
           "targetAnchor": "17-pointers",
           "sourceUnitDigest": "b019979bf1d88eeaf2cfa68ad8d7e8fc951959e46faac8093a52b666c753490b",
-          "targetUnitDigest": "b019979bf1d88eeaf2cfa68ad8d7e8fc951959e46faac8093a52b666c753490b"
+          "targetUnitDigest": "b9e92e3f9e07c42ec76e70ea5444f77e324c9ada6d5afcd03e3e239097da7b6d"
+        },
+        {
+          "claimId": "claim_0662afe5df2b25be15d682a21eb1117a",
+          "class": "Judgment",
+          "sourceAnchor": "unheaded-block-126",
+          "targetAnchor": "unheaded-block-129",
+          "sourceUnitDigest": "26b28b7c0822bb346cf937db7a127d9a48eb0b128f1eb8fc9284c4e5e1cabfd0",
+          "targetUnitDigest": "c1b2102209e23ddb3b0855a4c061f4185abe5e5cbbc0fb8fb7c3665623b6527f"
         },
         {
           "claimId": "claim_ba79e248cfab93db23161396b94070c1",
@@ -2204,6 +2257,38 @@
           "targetAnchor": "knowledge-registry-redesign",
           "sourceUnitDigest": "cc375c4be5acee5826f56134d7ba92e21e6e55e338798fa15f1aa49f03a3c213",
           "targetUnitDigest": "dc2da928b0906d4329164efd39fe02fc8445b01bb03546887963170d5d909a81"
+        },
+        {
+          "claimId": "claim_c262ad8c4a5f18b68948f937e3361128",
+          "sourceAnchor": "17-pointers",
+          "targetAnchor": "17-pointers",
+          "sourceUnitDigest": "b019979bf1d88eeaf2cfa68ad8d7e8fc951959e46faac8093a52b666c753490b",
+          "targetUnitDigest": "b9e92e3f9e07c42ec76e70ea5444f77e324c9ada6d5afcd03e3e239097da7b6d"
+        },
+        {
+          "claimId": "claim_0662afe5df2b25be15d682a21eb1117a",
+          "sourceAnchor": "unheaded-block-126",
+          "targetAnchor": "unheaded-block-129",
+          "sourceUnitDigest": "26b28b7c0822bb346cf937db7a127d9a48eb0b128f1eb8fc9284c4e5e1cabfd0",
+          "targetUnitDigest": "c1b2102209e23ddb3b0855a4c061f4185abe5e5cbbc0fb8fb7c3665623b6527f"
+        }
+      ],
+      "changedRows": [
+        {
+          "claimId": "claim_c262ad8c4a5f18b68948f937e3361128",
+          "reasons": [
+            "A19/A28 two-sentence truth correction; A22 binding consequence",
+            "A19 truth correction and extracted-unit consequence",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_0662afe5df2b25be15d682a21eb1117a",
+          "reasons": [
+            "A19/A28 two-sentence truth correction; A22 binding consequence",
+            "A19 truth correction and extracted-unit consequence",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
         }
       ]
     },
@@ -2219,7 +2304,7 @@
           "sourceAnchor": "architecture-advisory-panel",
           "targetAnchor": "architecture-advisory-panel",
           "sourceUnitDigest": "aef9241c6773a4fee5177cccf3d4f1288dde72d533970dc7ca230f4dd117bdf6",
-          "targetUnitDigest": "320bf20b62d31599e6906394bd5aaecbf1c0fc395fd1179adfac45b3cdade80f"
+          "targetUnitDigest": "e82955a32175ed9d12dfcadf8373ba47a507a1e58d54bab7a9a30065d78d977d"
         },
         {
           "claimId": "claim_b7d291d64adeb83b2093e6be3990a41c",
@@ -2484,7 +2569,7 @@
           "sourceAnchor": "architecture-advisory-panel",
           "targetAnchor": "architecture-advisory-panel",
           "sourceUnitDigest": "aef9241c6773a4fee5177cccf3d4f1288dde72d533970dc7ca230f4dd117bdf6",
-          "targetUnitDigest": "320bf20b62d31599e6906394bd5aaecbf1c0fc395fd1179adfac45b3cdade80f"
+          "targetUnitDigest": "e82955a32175ed9d12dfcadf8373ba47a507a1e58d54bab7a9a30065d78d977d"
         },
         {
           "claimId": "claim_b7d291d64adeb83b2093e6be3990a41c",
@@ -2513,6 +2598,14 @@
           "targetAnchor": "unheaded-block-8",
           "sourceUnitDigest": "1931a38a18229f97e8363e60a58fa6c9259c0209faaf59506fedd68c64cc348c",
           "targetUnitDigest": "aea9f69a683ed485fba138c7d4c9740fec96e8ad7b715680fdc065a60bca1694"
+        }
+      ],
+      "changedRows": [
+        {
+          "claimId": "claim_45a73c31fae3d141bfa8135d542a01b4",
+          "reasons": [
+            "R7-1/R7-6 labelled neutral placement metadata and extracted-unit consequence"
+          ]
         }
       ]
     },
@@ -2740,7 +2833,7 @@
           "sourceAnchor": "agent-coordination-capability-envelope-v\u00e0-coordinator-owned-deliberation",
           "targetAnchor": "agent-coordination-capability-envelope-v\u00e0-coordinator-owned-deliberation",
           "sourceUnitDigest": "9f5435e86966d369799bacf179050534948e66a37db38f3a0dd6bfef8d86600e",
-          "targetUnitDigest": "f2b880ee1d8dbfdaf6585f2167972aa8a9e61839ab7828c253ddd1bf4b33527c"
+          "targetUnitDigest": "478a72d4b4897394c014166b8178ea78fe90f112f248bf150611ececcf54bd1a"
         },
         {
           "claimId": "claim_8bbbe1991d78a43f3a8ac34904ff529c",
@@ -2941,7 +3034,7 @@
           "sourceAnchor": "agent-coordination-capability-envelope-v\u00e0-coordinator-owned-deliberation",
           "targetAnchor": "agent-coordination-capability-envelope-v\u00e0-coordinator-owned-deliberation",
           "sourceUnitDigest": "9f5435e86966d369799bacf179050534948e66a37db38f3a0dd6bfef8d86600e",
-          "targetUnitDigest": "f2b880ee1d8dbfdaf6585f2167972aa8a9e61839ab7828c253ddd1bf4b33527c"
+          "targetUnitDigest": "478a72d4b4897394c014166b8178ea78fe90f112f248bf150611ececcf54bd1a"
         },
         {
           "claimId": "claim_8bbbe1991d78a43f3a8ac34904ff529c",
@@ -2998,6 +3091,14 @@
           "targetAnchor": "unheaded-block-65",
           "sourceUnitDigest": "d7fa9577c7921ff566d2e242f7c0a358a6f81a0c611c500eb7f923ba3d18a211",
           "targetUnitDigest": "8b90e05654b92caa7c9d8602c64cd9e17bb44e3e76cd183246906b942958423f"
+        }
+      ],
+      "changedRows": [
+        {
+          "claimId": "claim_a13a8579792632b5553ba4e6971523e3",
+          "reasons": [
+            "R7-1/R7-6 labelled neutral placement metadata and extracted-unit consequence"
+          ]
         }
       ]
     },
@@ -3131,7 +3232,7 @@
     },
     {
       "source": "docs/architect/proposals/coordination-envelope-probe-contract.md",
-      "target": "docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md",
+      "target": "docs/platform/proposals/coordination-envelope-probe-contract.md",
       "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-11-coordination-envelope-probe-contract.json",
       "sourceRows": 28,
       "weakExactAndJudgment": [
@@ -3141,7 +3242,7 @@
           "sourceAnchor": "coordination-envelope-minimal-probe-contract",
           "targetAnchor": "coordination-envelope-minimal-probe-contract",
           "sourceUnitDigest": "8c76171338f06c9d0f6acc6d85970beb6670faaaf86d454e8564ce49d9ce6174",
-          "targetUnitDigest": "df61c80f1cb1a8b37f403dff755ec551baecee444b9c83030577caa41976fd8d"
+          "targetUnitDigest": "f92a789a540939691e20447ee95c7ed09c52c3653a7b6f3d54255d2035c524bf"
         },
         {
           "claimId": "claim_c27d23444e0f710c7a81bb6784aacccd",
@@ -3157,7 +3258,7 @@
           "sourceAnchor": "authorization-and-purpose",
           "targetAnchor": "authorization-and-purpose",
           "sourceUnitDigest": "7e0ef28d24edc54f79c72bd0187d4694113c404225ec15f48587f3f93dc1c01c",
-          "targetUnitDigest": "e686c9dff84cbda0b30637ae4f4282094f512dcefa50dc6ffc104a1d1a40fa40"
+          "targetUnitDigest": "581f762d9bd7fb06cb26f50da5c57d1cd675964bc365b8119c1fee97c8481d35"
         },
         {
           "claimId": "claim_13c25d9b019d45c29e0889c7c9ef1398",
@@ -3165,7 +3266,7 @@
           "sourceAnchor": "unheaded-block-3",
           "targetAnchor": "unheaded-block-6",
           "sourceUnitDigest": "9be4fcac494b78d194db5543e93d531d1e7b423e7803ceb2ff9732709b6ebfa7",
-          "targetUnitDigest": "366ec130bb2c8c323ecf518e671d2ca7dbc98a3239aee09bd6cd40a8250a61ce"
+          "targetUnitDigest": "61bc9c777d9bafbd37cb101e5d29e381c5b01430151805890a1320270d768195"
         },
         {
           "claimId": "claim_2a58d7097e18ab7222789d6a2dd7b63b",
@@ -3189,7 +3290,7 @@
           "sourceAnchor": "current-substrate-fit-and-gaps",
           "targetAnchor": "current-substrate-fit-and-gaps",
           "sourceUnitDigest": "51371604be3b8c08e83a306d3cd53e9df9b39691bf09284fdf3b3aa93ec9c606",
-          "targetUnitDigest": "810e0a4d53cadfbfcb355b3df077318955647c34aec65e7145eff8442fa3d988"
+          "targetUnitDigest": "143bc6e840ceaf9525c2fc9e8233ced35158fb0609808877a7bdbc81d14b3353"
         },
         {
           "claimId": "claim_92e903b30cfd63a63027bfff4d7a109d",
@@ -3197,7 +3298,7 @@
           "sourceAnchor": "unheaded-block-16",
           "targetAnchor": "unheaded-block-19",
           "sourceUnitDigest": "7a88cd1367a1f061fc69550b02958ba2b792609b6d814a30debb96fcc4d92b16",
-          "targetUnitDigest": "37b1b1139b6b872f754876b7fd697348e074b29fd18d57bee3e506e57fed012b"
+          "targetUnitDigest": "1408e2e7647fc0cf78b232a9f331f4b24330a0ec471ca070226f0316d92a108b"
         },
         {
           "claimId": "claim_393aa5d8ac2d559d959a3a49e94c6258",
@@ -3214,7 +3315,7 @@
           "sourceAnchor": "coordination-envelope-minimal-probe-contract",
           "targetAnchor": "coordination-envelope-minimal-probe-contract",
           "sourceUnitDigest": "8c76171338f06c9d0f6acc6d85970beb6670faaaf86d454e8564ce49d9ce6174",
-          "targetUnitDigest": "df61c80f1cb1a8b37f403dff755ec551baecee444b9c83030577caa41976fd8d"
+          "targetUnitDigest": "f92a789a540939691e20447ee95c7ed09c52c3653a7b6f3d54255d2035c524bf"
         },
         {
           "claimId": "claim_c27d23444e0f710c7a81bb6784aacccd",
@@ -3228,34 +3329,265 @@
           "sourceAnchor": "authorization-and-purpose",
           "targetAnchor": "authorization-and-purpose",
           "sourceUnitDigest": "7e0ef28d24edc54f79c72bd0187d4694113c404225ec15f48587f3f93dc1c01c",
-          "targetUnitDigest": "e686c9dff84cbda0b30637ae4f4282094f512dcefa50dc6ffc104a1d1a40fa40"
+          "targetUnitDigest": "581f762d9bd7fb06cb26f50da5c57d1cd675964bc365b8119c1fee97c8481d35"
         },
         {
           "claimId": "claim_13c25d9b019d45c29e0889c7c9ef1398",
           "sourceAnchor": "unheaded-block-3",
           "targetAnchor": "unheaded-block-6",
           "sourceUnitDigest": "9be4fcac494b78d194db5543e93d531d1e7b423e7803ceb2ff9732709b6ebfa7",
-          "targetUnitDigest": "366ec130bb2c8c323ecf518e671d2ca7dbc98a3239aee09bd6cd40a8250a61ce"
+          "targetUnitDigest": "61bc9c777d9bafbd37cb101e5d29e381c5b01430151805890a1320270d768195"
         },
         {
           "claimId": "claim_87bd809203f0b1b237b0afac092f6fda",
           "sourceAnchor": "current-substrate-fit-and-gaps",
           "targetAnchor": "current-substrate-fit-and-gaps",
           "sourceUnitDigest": "51371604be3b8c08e83a306d3cd53e9df9b39691bf09284fdf3b3aa93ec9c606",
-          "targetUnitDigest": "810e0a4d53cadfbfcb355b3df077318955647c34aec65e7145eff8442fa3d988"
+          "targetUnitDigest": "143bc6e840ceaf9525c2fc9e8233ced35158fb0609808877a7bdbc81d14b3353"
         },
         {
           "claimId": "claim_92e903b30cfd63a63027bfff4d7a109d",
           "sourceAnchor": "unheaded-block-16",
           "targetAnchor": "unheaded-block-19",
           "sourceUnitDigest": "7a88cd1367a1f061fc69550b02958ba2b792609b6d814a30debb96fcc4d92b16",
-          "targetUnitDigest": "37b1b1139b6b872f754876b7fd697348e074b29fd18d57bee3e506e57fed012b"
+          "targetUnitDigest": "1408e2e7647fc0cf78b232a9f331f4b24330a0ec471ca070226f0316d92a108b"
+        }
+      ],
+      "changedRows": [
+        {
+          "claimId": "claim_664c9c703db94a0b25604992cf8fea3c",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "R7-1 retain live probe with whole-unit supersede",
+            "R7-1/R7-6 labelled neutral placement metadata and extracted-unit consequence",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_35d959dc7317485a1687b0490bdf5dee",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "R7-1 retain live probe with whole-unit supersede",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_c27d23444e0f710c7a81bb6784aacccd",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "R7-1 retain live probe with whole-unit supersede",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_8022692357701e84286052d1b1ea6261",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "R7-1 retain live probe with whole-unit supersede",
+            "R7-1/R7-6 labelled neutral placement metadata and extracted-unit consequence",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_13c25d9b019d45c29e0889c7c9ef1398",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "R7-1 retain live probe with whole-unit supersede",
+            "R7-1/R7-6 labelled neutral placement metadata and extracted-unit consequence",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_c3113e9fa0c495d358c1bfd89e33474e",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "R7-1 retain live probe with whole-unit supersede",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_fe0ced206bb9a612d57a9ceb6a9b13c9",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "R7-1 retain live probe with whole-unit supersede",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_1653ce593aaca8682739221ce327d504",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "R7-1 retain live probe with whole-unit supersede",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_5939b3c22f435a05d64552c6cec7ec49",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "R7-1 retain live probe with whole-unit supersede",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_5091f9d652db0aa1a283d9341e968073",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "R7-1 retain live probe with whole-unit supersede",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_385993c6a55150e563a3b04ad2c8e75c",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "R7-1 retain live probe with whole-unit supersede",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_4392cdff3c7b1b8234bc92f651c82cf1",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "R7-1 retain live probe with whole-unit supersede",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_2a58d7097e18ab7222789d6a2dd7b63b",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "R7-1 retain live probe with whole-unit supersede",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_a2cf506e8572e8e136a2d915d7db5f3e",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "R7-1 retain live probe with whole-unit supersede",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_40ebd755f9290ca1e6f318e39c66b773",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "R7-1 retain live probe with whole-unit supersede",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_1bbfd12a1dfa9871022a7e216ada1382",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "R7-1 retain live probe with whole-unit supersede",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_b5ee1dd89a021d4d139c679b71de8241",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "R7-1 retain live probe with whole-unit supersede",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_09a718ef1a25c27dfe76656e800fc51d",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "R7-1 retain live probe with whole-unit supersede",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_cedbd5ad301c9b2bc8f48e24a7d90dcb",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "R7-1 retain live probe with whole-unit supersede",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_a111c7c5b3e15dc147f433ab7f7b17db",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "R7-1 retain live probe with whole-unit supersede",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_9c0692f05e5538977ba765c782c1e8f6",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "R7-1 retain live probe with whole-unit supersede",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_87bd809203f0b1b237b0afac092f6fda",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "R7-1 retain live probe with whole-unit supersede",
+            "R7-1/R7-6 labelled neutral placement metadata and extracted-unit consequence",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_92e903b30cfd63a63027bfff4d7a109d",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "R7-1 retain live probe with whole-unit supersede",
+            "R7-1/R7-6 labelled neutral placement metadata and extracted-unit consequence",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_6aedc38457da61c53ff781cc1dc2e6b8",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "R7-1 retain live probe with whole-unit supersede",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_284ea1dcdeac2f554e10b9fadb3e4a53",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "R7-1 retain live probe with whole-unit supersede",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_393aa5d8ac2d559d959a3a49e94c6258",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "R7-1 retain live probe with whole-unit supersede",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_e111be1a240a9afcd7b3bfa472397692",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "R7-1 retain live probe with whole-unit supersede",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_f56ba497635edeef03b086959e95d319",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "R7-1 retain live probe with whole-unit supersede",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
         }
       ]
     },
     {
       "source": "docs/architect/proposals/coordination-envelope-progress.md",
-      "target": "docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-progress.md",
+      "target": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
       "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-12-coordination-envelope-progress.json",
       "sourceRows": 27,
       "weakExactAndJudgment": [
@@ -3383,6 +3715,197 @@
           "sourceUnitDigest": "c837e2815d64ee934fd3c59bb6f806353a072722dc0fe873162fa2edc77c4629",
           "targetUnitDigest": "03b4d3a3d160d50acfe26488029d757de1de47315c19bd81df8ca04526b983bf"
         }
+      ],
+      "changedRows": [
+        {
+          "claimId": "claim_00d0fa7ca76d53660e15ea5391ed02a0",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_3c532c060e9ea8e44f6263660e741ca6",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_05b6464d12e63da61fdeb9a2e9a5fbf6",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_c8708ca9bb773cd3c3af2533a7601c4c",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_30fe6113bbab5f495ea8f0dffd64b51f",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_01e0090f579828803f2cb562581c3082",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_65021dcb7c3ea73210796a5d84020d3a",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_97aef0a406ee921e9d5e1d227e8b5462",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_a770d483907e685ceb725ec563a93200",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_3a040470917c6d0cb40a134d591d5bf4",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_c29f41965f1bfe0297c06ccb71b52b83",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_325ddcbd008ffa2e60f96c472efde2b2",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_a3df8ff955b4f5e40f7be6c15c73e019",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_bab99fcb7080b712c5a816021d87893c",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_85dc4a99df884eef40b2a7976ab784d7",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_c3b95d25e51816104561a415e8fcfb7f",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_d677fe478b630b96165c68573c437985",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_3332f531b1319a0bb847e86e2313c3db",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_6ea114423a531fe42b578513d5ce4671",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_9e5f434fafffb26a816449838283799b",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_23b1e8deb2b5fde4626bafdfea4b89d4",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_b69d053fd6963e7357fdb8071bd241a1",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_7e8b4b6b1bc65bc8f43258c17ce4b128",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_fc852966e0404556294685861ce5875f",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_59256dda58235ff69e5d3d7b8e9a3c7b",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_82d991000f182ef2c6815d8328b63d0c",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_c3318b60df0d409823e055c05d3f828c",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        }
       ]
     },
     {
@@ -3409,11 +3932,19 @@
         },
         {
           "claimId": "claim_af86398e2f1675cee4c1d79bcc7024b9",
-          "class": "Weak-exact",
+          "class": "Judgment",
           "sourceAnchor": "decision-proposed",
           "targetAnchor": "decision-proposed",
           "sourceUnitDigest": "c291e7aed9e1f0c5311835f5621af5e5167792f70834bf18993cfc5cce3597ad",
-          "targetUnitDigest": "c291e7aed9e1f0c5311835f5621af5e5167792f70834bf18993cfc5cce3597ad"
+          "targetUnitDigest": "76f745dee6472d327d95766bc195c770277b33104b7a7f31e2efefc195302984"
+        },
+        {
+          "claimId": "claim_e44d052c8d8bf3a682a81ae9eee0344b",
+          "class": "Judgment",
+          "sourceAnchor": "unheaded-block-3",
+          "targetAnchor": "unheaded-block-6",
+          "sourceUnitDigest": "9b028155e909cdb7306c3ad94330b573fb28acf32d599af019c04784201efbb8",
+          "targetUnitDigest": "068d5ba8a9141f442f0fb4176ba27c6c3522623b322b5765e83afd20eab98d15"
         },
         {
           "claimId": "claim_8dc6683dbb0a864d34d8649af015ce4a",
@@ -3480,6 +4011,20 @@
           "targetUnitDigest": "4f2d8d7b088378a76495b80a3ee3a90a30d362dbd203a70b2885b672e034636f"
         },
         {
+          "claimId": "claim_af86398e2f1675cee4c1d79bcc7024b9",
+          "sourceAnchor": "decision-proposed",
+          "targetAnchor": "decision-proposed",
+          "sourceUnitDigest": "c291e7aed9e1f0c5311835f5621af5e5167792f70834bf18993cfc5cce3597ad",
+          "targetUnitDigest": "76f745dee6472d327d95766bc195c770277b33104b7a7f31e2efefc195302984"
+        },
+        {
+          "claimId": "claim_e44d052c8d8bf3a682a81ae9eee0344b",
+          "sourceAnchor": "unheaded-block-3",
+          "targetAnchor": "unheaded-block-6",
+          "sourceUnitDigest": "9b028155e909cdb7306c3ad94330b573fb28acf32d599af019c04784201efbb8",
+          "targetUnitDigest": "068d5ba8a9141f442f0fb4176ba27c6c3522623b322b5765e83afd20eab98d15"
+        },
+        {
           "claimId": "claim_8dc6683dbb0a864d34d8649af015ce4a",
           "sourceAnchor": "new-evidence-since-the-first-capability-audit",
           "targetAnchor": "new-evidence-since-the-first-capability-audit",
@@ -3493,11 +4038,27 @@
           "sourceUnitDigest": "87f61928718040da2b901c10a384cf8eed30496a360d1ffc73db97f6a77bc46c",
           "targetUnitDigest": "7f084e6c082bbe0577d250710ee60eeaaa81f73371d2c467ec73b44bc20b43bf"
         }
+      ],
+      "changedRows": [
+        {
+          "claimId": "claim_af86398e2f1675cee4c1d79bcc7024b9",
+          "reasons": [
+            "R7-3 wrapped-label link rebase and extracted-unit consequence",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_e44d052c8d8bf3a682a81ae9eee0344b",
+          "reasons": [
+            "R7-3 wrapped-label link rebase and extracted-unit consequence",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        }
       ]
     },
     {
       "source": "docs/architect/proposals/group-thinking-plan-loop.md",
-      "target": "docs/platform/system-architecture/history/proposals-redesigns/group-thinking-plan-loop.md",
+      "target": "docs/platform/agent-coordination/history/proposals-redesigns/group-thinking-plan-loop.md",
       "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-14-group-thinking-plan-loop.json",
       "sourceRows": 40,
       "weakExactAndJudgment": [
@@ -3587,6 +4148,288 @@
           "targetAnchor": "unheaded-block-6",
           "sourceUnitDigest": "554e1ec1e847ee6ed5354c255b452260b1a39f0439193519159cdb08c02c8aca",
           "targetUnitDigest": "ff998dc846af72eaa4521c76bdf72b0257718d2b969508a8dae381b2e5210326"
+        }
+      ],
+      "changedRows": [
+        {
+          "claimId": "claim_539820032517d2a1373dd49778653ba9",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_53faecb5f88bb80e1eea8688b60afa3b",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_0b7a61a5a6ffe8d5a559080f30abf389",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_2cb573367fff4f326aefe1a995bc58ab",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_e4d14a759a9df47e09e0af3827875768",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_789f911692017a38c8503c89a9f2cb8f",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_4e5edeee68da974b1af5f005501d4018",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_0b7df2462f5e5730aa59f82ab0a8dd63",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_3566866e7ecd054e25d65cf33e5a6160",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_4b14d44c82a810e067c9596958872a89",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_da637d9b9571772d345150cf30ccc8a9",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_271da9770d66dac71b03e172496deeaa",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_d2cc6ecdd6e0cfcae4a2080fc9328510",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_bde399fc04acb57284786b3e377be823",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_e13263e22041162ec023c52c3954d507",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_881952364c83d2d309e208fd0a125a6c",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_47c93fa262298a8b26ea791f1af809b5",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_15a1d6587a352ac7dee6bf9e912527c8",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_d94c457cac95fd6c3107aaf28aa71320",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_22560951664eca0e161c86e3db8aeca1",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_f2c55c4669d870eecc8f9e877922db1c",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_0a60d905a3865056ab5a2151bf8b02c2",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_42f7bfae0cf1995cf6e3055ba411f101",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_ddee2a3da63e8adc5e369a00b3f2767f",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_db51a1e2565592f2126f5552c824f9f9",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_1cbe16317af1d90f35dc28edc30307c8",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_76ac2125ef2ef82d56756da1dc13ef45",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_ea751c0b04d3614df8c9b22ce53163c2",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_bfec8480106e2a2aea184c78641a69fa",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_f08c66de862f0cf33f5ff42a546aaade",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_c7fa56331f777c0f9382aa552358c35a",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_15209b4fcab875c81d0171cf3824b77c",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_9ca4bef6157fa95c6e9d40b9f622c78a",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_f18b13a7dc2152d724a2ce17db8e9e08",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_3d60af0ce9841e987c926852bcd07890",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_bd4786b079745d6ed798a37771f3bce0",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_889277887136a099784df362114bfec2",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_b533c925d5e208c1f4725f495c373862",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_bd0b3a01ad8e797eed240f9238846ccd",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_152ae06a49b3a5d96c546d9d9f3ff5e0",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
         }
       ]
     },
@@ -3711,7 +4554,7 @@
           "sourceAnchor": "step-09---group-thinking-substrate",
           "targetAnchor": "step-09---group-thinking-substrate",
           "sourceUnitDigest": "4704ac59101e08fe8aaeb92ea9ac4d855c6ba41023b8e11344b39ccc2f56a65e",
-          "targetUnitDigest": "0a1f9df2d96fcb963b53b0ffc677d95447d61c576f2c829bc511cf743fb41350"
+          "targetUnitDigest": "3cf00a3c56f5c4f25a61320fd95f88fd93e01903118d429d576e70347dac8396"
         },
         {
           "claimId": "claim_2b571132cc8fd45580b1ec2dba340ba9",
@@ -3904,7 +4747,7 @@
           "sourceAnchor": "step-09---group-thinking-substrate",
           "targetAnchor": "step-09---group-thinking-substrate",
           "sourceUnitDigest": "4704ac59101e08fe8aaeb92ea9ac4d855c6ba41023b8e11344b39ccc2f56a65e",
-          "targetUnitDigest": "0a1f9df2d96fcb963b53b0ffc677d95447d61c576f2c829bc511cf743fb41350"
+          "targetUnitDigest": "3cf00a3c56f5c4f25a61320fd95f88fd93e01903118d429d576e70347dac8396"
         },
         {
           "claimId": "claim_2b571132cc8fd45580b1ec2dba340ba9",
@@ -3969,11 +4812,19 @@
           "sourceUnitDigest": "472338c56495259cbf528d57d38b9fe7146d09bba7cbfdfbb143e4292d599b66",
           "targetUnitDigest": "f52aab2b10467f59440348eedf807e13063453fc0d8fc8b60557819774542a37"
         }
+      ],
+      "changedRows": [
+        {
+          "claimId": "claim_45e2e391f46f70ce6e48eb2dcdcae936",
+          "reasons": [
+            "R7-1/R7-6 labelled neutral placement metadata and extracted-unit consequence"
+          ]
+        }
       ]
     },
     {
       "source": "docs/architect/proposals/step-09-step-10-replan-handoff-prompt.md",
-      "target": "docs/platform/system-architecture/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md",
+      "target": "docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md",
       "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-17-step-09-step-10-replan-handoff-prompt.json",
       "sourceRows": 4,
       "weakExactAndJudgment": [
@@ -3993,6 +4844,36 @@
           "targetAnchor": "step-09-step-10-replan-handoff-prompt",
           "sourceUnitDigest": "d4c07b1b279fe005d92de5d9a48b608bb67a27a4f47f56b6d8ac6994f6cf3bb7",
           "targetUnitDigest": "99660662643fdbf89df15656d4aeb079b182e1b65e9740b105ec016b41c578c7"
+        }
+      ],
+      "changedRows": [
+        {
+          "claimId": "claim_748eaed66e0864f6b66db8f230941593",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_2ba1e1cf145db1520a75d592e08e6cc3",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_7b86afff62ae3c9360f7d7e884bbfaf8",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
+        },
+        {
+          "claimId": "claim_eadf79b0b7a6fd73cf80175beeff02f2",
+          "reasons": [
+            "R7-1 mapped proposal restoration / R7-2 owning-area history relocation",
+            "Corrected evidence, placement rationale or A36 class"
+          ]
         }
       ]
     },
@@ -4790,7 +5671,7 @@
           "sourceAnchor": "visibility-v\u00e0-interactive-contact-trong-dispatch-execution-herdr-spawn-l\u00e0-candidate-\u0111\u1ea7u-ti\u00ean",
           "targetAnchor": "visibility-v\u00e0-interactive-contact-trong-dispatch-execution-herdr-spawn-l\u00e0-candidate-\u0111\u1ea7u-ti\u00ean",
           "sourceUnitDigest": "011ff1ead4b5626955fb4c368e23c5c0e43dea44b10d06bf5ab9b9ac30631b24",
-          "targetUnitDigest": "dea69ad933aaa53c695ab63a63f3428ae105495bec43da7772b19e34eb99c737"
+          "targetUnitDigest": "151ad429b2747f33872adfaece97118eebd64b153feb127ad195eeec175b9caa"
         },
         {
           "claimId": "claim_7765c8384841109f54c726219b338219",
@@ -4959,7 +5840,7 @@
           "sourceAnchor": "visibility-v\u00e0-interactive-contact-trong-dispatch-execution-herdr-spawn-l\u00e0-candidate-\u0111\u1ea7u-ti\u00ean",
           "targetAnchor": "visibility-v\u00e0-interactive-contact-trong-dispatch-execution-herdr-spawn-l\u00e0-candidate-\u0111\u1ea7u-ti\u00ean",
           "sourceUnitDigest": "011ff1ead4b5626955fb4c368e23c5c0e43dea44b10d06bf5ab9b9ac30631b24",
-          "targetUnitDigest": "dea69ad933aaa53c695ab63a63f3428ae105495bec43da7772b19e34eb99c737"
+          "targetUnitDigest": "151ad429b2747f33872adfaece97118eebd64b153feb127ad195eeec175b9caa"
         },
         {
           "claimId": "claim_7765c8384841109f54c726219b338219",
@@ -4981,6 +5862,14 @@
           "targetAnchor": "unheaded-block-77",
           "sourceUnitDigest": "8a6c208de4b598018b53e22005d82c98c74f09235ee19ae7b5659c75e8786450",
           "targetUnitDigest": "bde694e15333571b2cd21bd42201653234ac96bf179e928048d9739f5c22942a"
+        }
+      ],
+      "changedRows": [
+        {
+          "claimId": "claim_427e36a559f714ab23628142cec0c7aa",
+          "reasons": [
+            "R7-1/R7-6 labelled neutral placement metadata and extracted-unit consequence"
+          ]
         }
       ]
     }

@@ -1,9 +1,9 @@
 # Coordination Envelope — Minimal Probe Contract
 
 ```txt
-Document type: History
+Document type: Proposal
 Audience: Human reviewer, architect, maintainer, agent
-Purpose: Preserve historical source text for independent conservation review
+Purpose: Preserve mapped source text for independent conservation review
 Design status: Candidate
 Implementation: Source snapshot retained; current implementation truth not certified
 Provenance: docs/architect/proposals/coordination-envelope-probe-contract.md at fb046210539cbcbe8ca1dab254763f5e78c573d2; blob 4dab0986384d5f813e8a502e817c9b78cd5ba716
@@ -19,9 +19,9 @@ Supersedes: None; legacy source remains intact
 Superseded by: None
 ```
 
-Added in candidate: Historical snapshot; Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link. Original source metadata and text follow. Physical relative-link destinations alone are rebased to the same repository paths. Units with inherited missing links are preserved as literal fenced source text, without substituting another design or changing any assertion. Source metadata is provenance, not candidate authority.
+Added in candidate: Candidate probe contract at the mapped proposals path, cited by coordination-capability-envelope.md and coordination-worker-provider-boundary.md. Execution remains unproven; the source gap observations are dated. Original source metadata and text follow. Physical relative-link destinations alone are rebased to the same repository paths. Units with inherited missing links are preserved as literal fenced source text, without substituting another design or changing any assertion. Source metadata is provenance, not candidate authority.
 
-Source relationship: [original source](../../../../architect/proposals/coordination-envelope-probe-contract.md).
+Source relationship: [original source](../../architect/proposals/coordination-envelope-probe-contract.md).
 
 
 Document type: Proposal
@@ -41,7 +41,7 @@ Related: [Conceptual architecture](coordination-capability-envelope.md),
 
 ## Authorization and purpose
 
-See [chat progress and next work](../../../../architect/proposals/coordination-envelope-progress.md) for execution
+See [chat progress and next work](../../architect/proposals/coordination-envelope-progress.md) for execution
 status and the current division of work with the still-active Advisory session.
 
 The person agreed to the proposed next step: specify and evaluate a small proof
@@ -143,7 +143,7 @@ Treat tests executing generated code as untrusted execution too.
 
 ## Current substrate fit and gaps
 
-Follow-up: [Worker/provider/control boundary sketch](../../../../architect/proposals/coordination-worker-provider-boundary.md)
+Follow-up: [Worker/provider/control boundary sketch](../../architect/proposals/coordination-worker-provider-boundary.md)
 identifies inherited environment, credential custody, private scratch, and output
 ingestion requirements before a real provider run. It remains Discussion.
 

@@ -19,7 +19,7 @@ Supersedes: None; legacy source remains intact
 Superseded by: None
 ```
 
-Added in candidate: Candidate carriage; Reject inference that engine retirement retires this alternative recommendation. Preserve the complete map proposal, with stale code citations literal; no assumption the proposed envelope shipped. Original source metadata and text follow. Physical relative-link destinations alone are rebased to the same repository paths. Units with inherited missing links are preserved as literal fenced source text, without substituting another design or changing any assertion. Source metadata is provenance, not candidate authority.
+Added in candidate: Candidate alternative recommendation using the surviving Assignment/Run execution substrate. The session engine cited by the source was removed in 2180b4e72; this envelope recommendation remains unaccepted. Original source metadata and text follow. Physical relative-link destinations alone are rebased to the same repository paths. Units with inherited missing links are preserved as literal fenced source text, without substituting another design or changing any assertion. Source metadata is provenance, not candidate authority.
 
 Source relationship: [original source](../../architect/proposals/coordination-capability-envelope.md).
 

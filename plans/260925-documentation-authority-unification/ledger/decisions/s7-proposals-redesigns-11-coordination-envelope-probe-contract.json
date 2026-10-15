@@ -9,10 +9,10 @@
   "files": [
     {
       "path": "docs/architect/proposals/coordination-envelope-probe-contract.md",
-      "disposition": "archive-with-reason",
-      "rationale": "archive-with-reason: Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link. Evidence: Source lines 17–59 binds the experiment to the September Advisory track and its P02/P03 convergence; source scenario uses the retired CoordinationSession/FlowDefinition public path. Commit 2180b4e72 deletes that engine; no required-root direct consumer except ratchet. Q3 per-file map override from docs/platform/proposals/coordination-envelope-probe-contract.md to docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md, using existing area history placement. Source remains intact until cutover.",
+      "disposition": "supersede",
+      "rationale": "supersede: Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim. Evidence: Source scenario uses Assignment/Run, read-only executors and independent-first reveal; it contains neither CoordinationSession nor FlowDefinition. Live coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 cite this probe contract. Its retired-facility gap observations are dated, not proof the alternative experiment is retired. The candidate is restored to the unchanged mapped proposal target under Lead R7-1. Source remains intact until cutover.",
       "targets": [
-        "docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md"
+        "docs/platform/proposals/coordination-envelope-probe-contract.md"
       ]
     }
   ],
@@ -20,81 +20,81 @@
     {
       "claimId": "claim_664c9c703db94a0b25604992cf8fea3c",
       "sourceUnitDigest": "8c76171338f06c9d0f6acc6d85970beb6670faaaf86d454e8564ce49d9ce6174",
-      "targetOwner": "docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md",
+      "targetOwner": "docs/platform/proposals/coordination-envelope-probe-contract.md",
       "targetAnchor": "coordination-envelope-minimal-probe-contract",
-      "targetUnitDigest": "df61c80f1cb1a8b37f403dff755ec551baecee444b9c83030577caa41976fd8d",
+      "targetUnitDigest": "f92a789a540939691e20447ee95c7ed09c52c3653a7b6f3d54255d2035c524bf",
       "targetAncestry": [],
       "claimKind": "contract",
-      "disposition": "archive-with-reason",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. archive-with-reason: Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link. Evidence: Source lines 17–59 binds the experiment to the September Advisory track and its P02/P03 convergence; source scenario uses the retired CoordinationSession/FlowDefinition public path. Commit 2180b4e72 deletes that engine; no required-root direct consumer except ratchet. Complete source heading docs/architect/proposals/coordination-envelope-probe-contract.md#coordination-envelope-minimal-probe-contract (lines 1–1) is carried at docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md#coordination-envelope-minimal-probe-contract (lines 1–1); Q3 per-file map override: docs/platform/proposals/coordination-envelope-probe-contract.md → docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. supersede: Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim. Evidence: Source scenario uses Assignment/Run, read-only executors and independent-first reveal; it contains neither CoordinationSession nor FlowDefinition. Live coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 cite this probe contract. Its retired-facility gap observations are dated, not proof the alternative experiment is retired. Complete source heading docs/architect/proposals/coordination-envelope-probe-contract.md#coordination-envelope-minimal-probe-contract (lines 1–1) is carried at docs/platform/proposals/coordination-envelope-probe-contract.md#coordination-envelope-minimal-probe-contract (lines 1–1); mapped proposal placement retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
     },
     {
       "claimId": "claim_35d959dc7317485a1687b0490bdf5dee",
       "sourceUnitDigest": "79ef95bf62eb1ef673f0fb24add061315932b03844edfdcde9ced357c7f52f49",
-      "targetOwner": "docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md",
+      "targetOwner": "docs/platform/proposals/coordination-envelope-probe-contract.md",
       "targetAnchor": "unheaded-block-4",
       "targetUnitDigest": "79ef95bf62eb1ef673f0fb24add061315932b03844edfdcde9ced357c7f52f49",
       "targetAncestry": [
         "Coordination Envelope — Minimal Probe Contract"
       ],
       "claimKind": "contract",
-      "disposition": "archive-with-reason",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link. Evidence: Source lines 17–59 binds the experiment to the September Advisory track and its P02/P03 convergence; source scenario uses the retired CoordinationSession/FlowDefinition public path. Commit 2180b4e72 deletes that engine; no required-root direct consumer except ratchet. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-1 (lines 3–8) is carried at docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md#unheaded-block-4 (lines 27–32); Q3 per-file map override: docs/platform/proposals/coordination-envelope-probe-contract.md → docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. supersede: Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim. Evidence: Source scenario uses Assignment/Run, read-only executors and independent-first reveal; it contains neither CoordinationSession nor FlowDefinition. Live coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 cite this probe contract. Its retired-facility gap observations are dated, not proof the alternative experiment is retired. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-1 (lines 3–8) is carried at docs/platform/proposals/coordination-envelope-probe-contract.md#unheaded-block-4 (lines 27–32); mapped proposal placement retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
     },
     {
       "claimId": "claim_c27d23444e0f710c7a81bb6784aacccd",
       "sourceUnitDigest": "bcb558893c21d16ea7ee2e4d7276353ce8dfaf0018223eb725539bcdb5c7eedb",
-      "targetOwner": "docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md",
+      "targetOwner": "docs/platform/proposals/coordination-envelope-probe-contract.md",
       "targetAnchor": "unheaded-block-5",
       "targetUnitDigest": "b294849a1eb3ea2aa2cd243f6321a437dee3aeb2540acf0ca4d172c93384f859",
       "targetAncestry": [
         "Coordination Envelope — Minimal Probe Contract"
       ],
       "claimKind": "contract",
-      "disposition": "archive-with-reason",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. archive-with-reason: Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link. Evidence: Source lines 17–59 binds the experiment to the September Advisory track and its P02/P03 convergence; source scenario uses the retired CoordinationSession/FlowDefinition public path. Commit 2180b4e72 deletes that engine; no required-root direct consumer except ratchet. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-2 (lines 10–13) is carried at docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md#unheaded-block-5 (lines 34–39); Q3 per-file map override: docs/platform/proposals/coordination-envelope-probe-contract.md → docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. supersede: Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim. Evidence: Source scenario uses Assignment/Run, read-only executors and independent-first reveal; it contains neither CoordinationSession nor FlowDefinition. Live coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 cite this probe contract. Its retired-facility gap observations are dated, not proof the alternative experiment is retired. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-2 (lines 10–13) is carried at docs/platform/proposals/coordination-envelope-probe-contract.md#unheaded-block-5 (lines 34–39); mapped proposal placement retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
     },
     {
       "claimId": "claim_8022692357701e84286052d1b1ea6261",
       "sourceUnitDigest": "7e0ef28d24edc54f79c72bd0187d4694113c404225ec15f48587f3f93dc1c01c",
-      "targetOwner": "docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md",
+      "targetOwner": "docs/platform/proposals/coordination-envelope-probe-contract.md",
       "targetAnchor": "authorization-and-purpose",
-      "targetUnitDigest": "e686c9dff84cbda0b30637ae4f4282094f512dcefa50dc6ffc104a1d1a40fa40",
+      "targetUnitDigest": "581f762d9bd7fb06cb26f50da5c57d1cd675964bc365b8119c1fee97c8481d35",
       "targetAncestry": [
         "Coordination Envelope — Minimal Probe Contract"
       ],
       "claimKind": "contract",
-      "disposition": "archive-with-reason",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. archive-with-reason: Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link. Evidence: Source lines 17–59 binds the experiment to the September Advisory track and its P02/P03 convergence; source scenario uses the retired CoordinationSession/FlowDefinition public path. Commit 2180b4e72 deletes that engine; no required-root direct consumer except ratchet. Complete source heading docs/architect/proposals/coordination-envelope-probe-contract.md#authorization-and-purpose (lines 15–15) is carried at docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md#authorization-and-purpose (lines 42–42); Q3 per-file map override: docs/platform/proposals/coordination-envelope-probe-contract.md → docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. supersede: Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim. Evidence: Source scenario uses Assignment/Run, read-only executors and independent-first reveal; it contains neither CoordinationSession nor FlowDefinition. Live coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 cite this probe contract. Its retired-facility gap observations are dated, not proof the alternative experiment is retired. Complete source heading docs/architect/proposals/coordination-envelope-probe-contract.md#authorization-and-purpose (lines 15–15) is carried at docs/platform/proposals/coordination-envelope-probe-contract.md#authorization-and-purpose (lines 42–42); mapped proposal placement retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
     },
     {
       "claimId": "claim_13c25d9b019d45c29e0889c7c9ef1398",
       "sourceUnitDigest": "9be4fcac494b78d194db5543e93d531d1e7b423e7803ceb2ff9732709b6ebfa7",
-      "targetOwner": "docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md",
+      "targetOwner": "docs/platform/proposals/coordination-envelope-probe-contract.md",
       "targetAnchor": "unheaded-block-6",
-      "targetUnitDigest": "366ec130bb2c8c323ecf518e671d2ca7dbc98a3239aee09bd6cd40a8250a61ce",
+      "targetUnitDigest": "61bc9c777d9bafbd37cb101e5d29e381c5b01430151805890a1320270d768195",
       "targetAncestry": [
         "Coordination Envelope — Minimal Probe Contract",
         "Authorization and purpose"
       ],
       "claimKind": "contract",
-      "disposition": "archive-with-reason",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. archive-with-reason: Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link. Evidence: Source lines 17–59 binds the experiment to the September Advisory track and its P02/P03 convergence; source scenario uses the retired CoordinationSession/FlowDefinition public path. Commit 2180b4e72 deletes that engine; no required-root direct consumer except ratchet. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-3 (lines 17–18) is carried at docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md#unheaded-block-6 (lines 44–45); Q3 per-file map override: docs/platform/proposals/coordination-envelope-probe-contract.md → docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. supersede: Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim. Evidence: Source scenario uses Assignment/Run, read-only executors and independent-first reveal; it contains neither CoordinationSession nor FlowDefinition. Live coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 cite this probe contract. Its retired-facility gap observations are dated, not proof the alternative experiment is retired. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-3 (lines 17–18) is carried at docs/platform/proposals/coordination-envelope-probe-contract.md#unheaded-block-6 (lines 44–45); mapped proposal placement retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
     },
     {
       "claimId": "claim_c3113e9fa0c495d358c1bfd89e33474e",
       "sourceUnitDigest": "ff907b46d551bd499979e56cced32cc5b6e58f0f66bd71fade93174433d0ac0d",
-      "targetOwner": "docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md",
+      "targetOwner": "docs/platform/proposals/coordination-envelope-probe-contract.md",
       "targetAnchor": "unheaded-block-7",
       "targetUnitDigest": "ff907b46d551bd499979e56cced32cc5b6e58f0f66bd71fade93174433d0ac0d",
       "targetAncestry": [
@@ -102,15 +102,15 @@
         "Authorization and purpose"
       ],
       "claimKind": "contract",
-      "disposition": "archive-with-reason",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link. Evidence: Source lines 17–59 binds the experiment to the September Advisory track and its P02/P03 convergence; source scenario uses the retired CoordinationSession/FlowDefinition public path. Commit 2180b4e72 deletes that engine; no required-root direct consumer except ratchet. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-4 (lines 20–24) is carried at docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md#unheaded-block-7 (lines 47–51); Q3 per-file map override: docs/platform/proposals/coordination-envelope-probe-contract.md → docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. supersede: Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim. Evidence: Source scenario uses Assignment/Run, read-only executors and independent-first reveal; it contains neither CoordinationSession nor FlowDefinition. Live coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 cite this probe contract. Its retired-facility gap observations are dated, not proof the alternative experiment is retired. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-4 (lines 20–24) is carried at docs/platform/proposals/coordination-envelope-probe-contract.md#unheaded-block-7 (lines 47–51); mapped proposal placement retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
     },
     {
       "claimId": "claim_fe0ced206bb9a612d57a9ceb6a9b13c9",
       "sourceUnitDigest": "a0bf2c6b1def64876f73ac1b56a1aeeb970147b7c587fad480f33396d20492f3",
-      "targetOwner": "docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md",
+      "targetOwner": "docs/platform/proposals/coordination-envelope-probe-contract.md",
       "targetAnchor": "unheaded-block-8",
       "targetUnitDigest": "a0bf2c6b1def64876f73ac1b56a1aeeb970147b7c587fad480f33396d20492f3",
       "targetAncestry": [
@@ -118,30 +118,30 @@
         "Authorization and purpose"
       ],
       "claimKind": "contract",
-      "disposition": "archive-with-reason",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link. Evidence: Source lines 17–59 binds the experiment to the September Advisory track and its P02/P03 convergence; source scenario uses the retired CoordinationSession/FlowDefinition public path. Commit 2180b4e72 deletes that engine; no required-root direct consumer except ratchet. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-5 (lines 26–29) is carried at docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md#unheaded-block-8 (lines 53–56); Q3 per-file map override: docs/platform/proposals/coordination-envelope-probe-contract.md → docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. supersede: Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim. Evidence: Source scenario uses Assignment/Run, read-only executors and independent-first reveal; it contains neither CoordinationSession nor FlowDefinition. Live coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 cite this probe contract. Its retired-facility gap observations are dated, not proof the alternative experiment is retired. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-5 (lines 26–29) is carried at docs/platform/proposals/coordination-envelope-probe-contract.md#unheaded-block-8 (lines 53–56); mapped proposal placement retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
     },
     {
       "claimId": "claim_1653ce593aaca8682739221ce327d504",
       "sourceUnitDigest": "1a5af16e35d73530db472d501bd15707b181920414685fd5ed97de4fee16d07d",
-      "targetOwner": "docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md",
+      "targetOwner": "docs/platform/proposals/coordination-envelope-probe-contract.md",
       "targetAnchor": "relationship-with-the-concurrent-advisory-track",
       "targetUnitDigest": "1a5af16e35d73530db472d501bd15707b181920414685fd5ed97de4fee16d07d",
       "targetAncestry": [
         "Coordination Envelope — Minimal Probe Contract"
       ],
       "claimKind": "contract",
-      "disposition": "archive-with-reason",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link. Evidence: Source lines 17–59 binds the experiment to the September Advisory track and its P02/P03 convergence; source scenario uses the retired CoordinationSession/FlowDefinition public path. Commit 2180b4e72 deletes that engine; no required-root direct consumer except ratchet. Complete source heading docs/architect/proposals/coordination-envelope-probe-contract.md#relationship-with-the-concurrent-advisory-track (lines 31–31) is carried at docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md#relationship-with-the-concurrent-advisory-track (lines 58–58); Q3 per-file map override: docs/platform/proposals/coordination-envelope-probe-contract.md → docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. supersede: Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim. Evidence: Source scenario uses Assignment/Run, read-only executors and independent-first reveal; it contains neither CoordinationSession nor FlowDefinition. Live coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 cite this probe contract. Its retired-facility gap observations are dated, not proof the alternative experiment is retired. Complete source heading docs/architect/proposals/coordination-envelope-probe-contract.md#relationship-with-the-concurrent-advisory-track (lines 31–31) is carried at docs/platform/proposals/coordination-envelope-probe-contract.md#relationship-with-the-concurrent-advisory-track (lines 58–58); mapped proposal placement retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
     },
     {
       "claimId": "claim_5939b3c22f435a05d64552c6cec7ec49",
       "sourceUnitDigest": "3dd3d916dc4e724662ec5620b2d9788f24ac39174fe4cbb3f0ecc6857d0ee52f",
-      "targetOwner": "docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md",
+      "targetOwner": "docs/platform/proposals/coordination-envelope-probe-contract.md",
       "targetAnchor": "unheaded-block-9",
       "targetUnitDigest": "3dd3d916dc4e724662ec5620b2d9788f24ac39174fe4cbb3f0ecc6857d0ee52f",
       "targetAncestry": [
@@ -149,15 +149,15 @@
         "Relationship with the concurrent Advisory track"
       ],
       "claimKind": "contract",
-      "disposition": "archive-with-reason",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link. Evidence: Source lines 17–59 binds the experiment to the September Advisory track and its P02/P03 convergence; source scenario uses the retired CoordinationSession/FlowDefinition public path. Commit 2180b4e72 deletes that engine; no required-root direct consumer except ratchet. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-6 (lines 33–37) is carried at docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md#unheaded-block-9 (lines 60–64); Q3 per-file map override: docs/platform/proposals/coordination-envelope-probe-contract.md → docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. supersede: Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim. Evidence: Source scenario uses Assignment/Run, read-only executors and independent-first reveal; it contains neither CoordinationSession nor FlowDefinition. Live coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 cite this probe contract. Its retired-facility gap observations are dated, not proof the alternative experiment is retired. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-6 (lines 33–37) is carried at docs/platform/proposals/coordination-envelope-probe-contract.md#unheaded-block-9 (lines 60–64); mapped proposal placement retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
     },
     {
       "claimId": "claim_5091f9d652db0aa1a283d9341e968073",
       "sourceUnitDigest": "9022a52f74e569eae2a93ba26e9871f375c58f0c9f438b733eb27e492a8f3c87",
-      "targetOwner": "docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md",
+      "targetOwner": "docs/platform/proposals/coordination-envelope-probe-contract.md",
       "targetAnchor": "unheaded-block-10",
       "targetUnitDigest": "9022a52f74e569eae2a93ba26e9871f375c58f0c9f438b733eb27e492a8f3c87",
       "targetAncestry": [
@@ -165,15 +165,15 @@
         "Relationship with the concurrent Advisory track"
       ],
       "claimKind": "contract",
-      "disposition": "archive-with-reason",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link. Evidence: Source lines 17–59 binds the experiment to the September Advisory track and its P02/P03 convergence; source scenario uses the retired CoordinationSession/FlowDefinition public path. Commit 2180b4e72 deletes that engine; no required-root direct consumer except ratchet. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-7 (lines 39–43) is carried at docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md#unheaded-block-10 (lines 66–70); Q3 per-file map override: docs/platform/proposals/coordination-envelope-probe-contract.md → docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. supersede: Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim. Evidence: Source scenario uses Assignment/Run, read-only executors and independent-first reveal; it contains neither CoordinationSession nor FlowDefinition. Live coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 cite this probe contract. Its retired-facility gap observations are dated, not proof the alternative experiment is retired. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-7 (lines 39–43) is carried at docs/platform/proposals/coordination-envelope-probe-contract.md#unheaded-block-10 (lines 66–70); mapped proposal placement retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
     },
     {
       "claimId": "claim_385993c6a55150e563a3b04ad2c8e75c",
       "sourceUnitDigest": "8a64d7f54cd9c195378972dfbd837680d65ae740ffd348bf52ccd8b22b9f73d3",
-      "targetOwner": "docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md",
+      "targetOwner": "docs/platform/proposals/coordination-envelope-probe-contract.md",
       "targetAnchor": "unheaded-block-11",
       "targetUnitDigest": "8a64d7f54cd9c195378972dfbd837680d65ae740ffd348bf52ccd8b22b9f73d3",
       "targetAncestry": [
@@ -181,15 +181,15 @@
         "Relationship with the concurrent Advisory track"
       ],
       "claimKind": "contract",
-      "disposition": "archive-with-reason",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link. Evidence: Source lines 17–59 binds the experiment to the September Advisory track and its P02/P03 convergence; source scenario uses the retired CoordinationSession/FlowDefinition public path. Commit 2180b4e72 deletes that engine; no required-root direct consumer except ratchet. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-8 (lines 45–49) is carried at docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md#unheaded-block-11 (lines 72–76); Q3 per-file map override: docs/platform/proposals/coordination-envelope-probe-contract.md → docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. supersede: Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim. Evidence: Source scenario uses Assignment/Run, read-only executors and independent-first reveal; it contains neither CoordinationSession nor FlowDefinition. Live coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 cite this probe contract. Its retired-facility gap observations are dated, not proof the alternative experiment is retired. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-8 (lines 45–49) is carried at docs/platform/proposals/coordination-envelope-probe-contract.md#unheaded-block-11 (lines 72–76); mapped proposal placement retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
     },
     {
       "claimId": "claim_4392cdff3c7b1b8234bc92f651c82cf1",
       "sourceUnitDigest": "a7b0c0b279d3168b5ad057552657f4a6ab761e0b342d511a4dcf722ba9dd3aba",
-      "targetOwner": "docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md",
+      "targetOwner": "docs/platform/proposals/coordination-envelope-probe-contract.md",
       "targetAnchor": "unheaded-block-12",
       "targetUnitDigest": "a7b0c0b279d3168b5ad057552657f4a6ab761e0b342d511a4dcf722ba9dd3aba",
       "targetAncestry": [
@@ -197,30 +197,30 @@
         "Relationship with the concurrent Advisory track"
       ],
       "claimKind": "contract",
-      "disposition": "archive-with-reason",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link. Evidence: Source lines 17–59 binds the experiment to the September Advisory track and its P02/P03 convergence; source scenario uses the retired CoordinationSession/FlowDefinition public path. Commit 2180b4e72 deletes that engine; no required-root direct consumer except ratchet. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-9 (lines 51–57) is carried at docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md#unheaded-block-12 (lines 78–84); Q3 per-file map override: docs/platform/proposals/coordination-envelope-probe-contract.md → docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. supersede: Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim. Evidence: Source scenario uses Assignment/Run, read-only executors and independent-first reveal; it contains neither CoordinationSession nor FlowDefinition. Live coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 cite this probe contract. Its retired-facility gap observations are dated, not proof the alternative experiment is retired. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-9 (lines 51–57) is carried at docs/platform/proposals/coordination-envelope-probe-contract.md#unheaded-block-12 (lines 78–84); mapped proposal placement retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
     },
     {
       "claimId": "claim_2a58d7097e18ab7222789d6a2dd7b63b",
       "sourceUnitDigest": "512067bf94319419bfc52d0a5e53ac7592799534003e4764bef9d1fe59a5b386",
-      "targetOwner": "docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md",
+      "targetOwner": "docs/platform/proposals/coordination-envelope-probe-contract.md",
       "targetAnchor": "scenario-and-envelope",
       "targetUnitDigest": "512067bf94319419bfc52d0a5e53ac7592799534003e4764bef9d1fe59a5b386",
       "targetAncestry": [
         "Coordination Envelope — Minimal Probe Contract"
       ],
       "claimKind": "contract",
-      "disposition": "archive-with-reason",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Weak-exact: source unit shorter than 40 characters. archive-with-reason: Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link. Evidence: Source lines 17–59 binds the experiment to the September Advisory track and its P02/P03 convergence; source scenario uses the retired CoordinationSession/FlowDefinition public path. Commit 2180b4e72 deletes that engine; no required-root direct consumer except ratchet. Complete source heading docs/architect/proposals/coordination-envelope-probe-contract.md#scenario-and-envelope (lines 59–59) is carried at docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md#scenario-and-envelope (lines 86–86); Q3 per-file map override: docs/platform/proposals/coordination-envelope-probe-contract.md → docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. supersede: Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim. Evidence: Source scenario uses Assignment/Run, read-only executors and independent-first reveal; it contains neither CoordinationSession nor FlowDefinition. Live coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 cite this probe contract. Its retired-facility gap observations are dated, not proof the alternative experiment is retired. Complete source heading docs/architect/proposals/coordination-envelope-probe-contract.md#scenario-and-envelope (lines 59–59) is carried at docs/platform/proposals/coordination-envelope-probe-contract.md#scenario-and-envelope (lines 86–86); mapped proposal placement retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
     },
     {
       "claimId": "claim_a2cf506e8572e8e136a2d915d7db5f3e",
       "sourceUnitDigest": "87920673a086c190f9af486210207b201113995f64e0b2ae9cab48a0436ec39f",
-      "targetOwner": "docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md",
+      "targetOwner": "docs/platform/proposals/coordination-envelope-probe-contract.md",
       "targetAnchor": "unheaded-block-13",
       "targetUnitDigest": "87920673a086c190f9af486210207b201113995f64e0b2ae9cab48a0436ec39f",
       "targetAncestry": [
@@ -228,15 +228,15 @@
         "Scenario and envelope"
       ],
       "claimKind": "contract",
-      "disposition": "archive-with-reason",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link. Evidence: Source lines 17–59 binds the experiment to the September Advisory track and its P02/P03 convergence; source scenario uses the retired CoordinationSession/FlowDefinition public path. Commit 2180b4e72 deletes that engine; no required-root direct consumer except ratchet. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-10 (lines 61–66) is carried at docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md#unheaded-block-13 (lines 88–93); Q3 per-file map override: docs/platform/proposals/coordination-envelope-probe-contract.md → docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. supersede: Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim. Evidence: Source scenario uses Assignment/Run, read-only executors and independent-first reveal; it contains neither CoordinationSession nor FlowDefinition. Live coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 cite this probe contract. Its retired-facility gap observations are dated, not proof the alternative experiment is retired. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-10 (lines 61–66) is carried at docs/platform/proposals/coordination-envelope-probe-contract.md#unheaded-block-13 (lines 88–93); mapped proposal placement retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
     },
     {
       "claimId": "claim_40ebd755f9290ca1e6f318e39c66b773",
       "sourceUnitDigest": "3b9f9f30fcf6f4db62cb9baac1f49506d892bbea0fff49e460408d3b50f27f46",
-      "targetOwner": "docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md",
+      "targetOwner": "docs/platform/proposals/coordination-envelope-probe-contract.md",
       "targetAnchor": "unheaded-block-14",
       "targetUnitDigest": "3b9f9f30fcf6f4db62cb9baac1f49506d892bbea0fff49e460408d3b50f27f46",
       "targetAncestry": [
@@ -244,15 +244,15 @@
         "Scenario and envelope"
       ],
       "claimKind": "contract",
-      "disposition": "archive-with-reason",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link. Evidence: Source lines 17–59 binds the experiment to the September Advisory track and its P02/P03 convergence; source scenario uses the retired CoordinationSession/FlowDefinition public path. Commit 2180b4e72 deletes that engine; no required-root direct consumer except ratchet. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-11 (lines 68–74) is carried at docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md#unheaded-block-14 (lines 95–101); Q3 per-file map override: docs/platform/proposals/coordination-envelope-probe-contract.md → docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. supersede: Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim. Evidence: Source scenario uses Assignment/Run, read-only executors and independent-first reveal; it contains neither CoordinationSession nor FlowDefinition. Live coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 cite this probe contract. Its retired-facility gap observations are dated, not proof the alternative experiment is retired. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-11 (lines 68–74) is carried at docs/platform/proposals/coordination-envelope-probe-contract.md#unheaded-block-14 (lines 95–101); mapped proposal placement retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
     },
     {
       "claimId": "claim_1bbfd12a1dfa9871022a7e216ada1382",
       "sourceUnitDigest": "e46430166b03bb0f64c39902561c3e0e3437162b143023c7b12dd01dd4f74028",
-      "targetOwner": "docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md",
+      "targetOwner": "docs/platform/proposals/coordination-envelope-probe-contract.md",
       "targetAnchor": "unheaded-block-15",
       "targetUnitDigest": "e46430166b03bb0f64c39902561c3e0e3437162b143023c7b12dd01dd4f74028",
       "targetAncestry": [
@@ -260,30 +260,30 @@
         "Scenario and envelope"
       ],
       "claimKind": "contract",
-      "disposition": "archive-with-reason",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link. Evidence: Source lines 17–59 binds the experiment to the September Advisory track and its P02/P03 convergence; source scenario uses the retired CoordinationSession/FlowDefinition public path. Commit 2180b4e72 deletes that engine; no required-root direct consumer except ratchet. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-12 (lines 76–84) is carried at docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md#unheaded-block-15 (lines 103–111); Q3 per-file map override: docs/platform/proposals/coordination-envelope-probe-contract.md → docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. supersede: Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim. Evidence: Source scenario uses Assignment/Run, read-only executors and independent-first reveal; it contains neither CoordinationSession nor FlowDefinition. Live coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 cite this probe contract. Its retired-facility gap observations are dated, not proof the alternative experiment is retired. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-12 (lines 76–84) is carried at docs/platform/proposals/coordination-envelope-probe-contract.md#unheaded-block-15 (lines 103–111); mapped proposal placement retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
     },
     {
       "claimId": "claim_b5ee1dd89a021d4d139c679b71de8241",
       "sourceUnitDigest": "10ec2fa776a6db9920153e2b61a73793dd4008c49f91d4229f959ff3f9bce997",
-      "targetOwner": "docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md",
+      "targetOwner": "docs/platform/proposals/coordination-envelope-probe-contract.md",
       "targetAnchor": "obligations-and-evidence",
       "targetUnitDigest": "10ec2fa776a6db9920153e2b61a73793dd4008c49f91d4229f959ff3f9bce997",
       "targetAncestry": [
         "Coordination Envelope — Minimal Probe Contract"
       ],
       "claimKind": "contract",
-      "disposition": "archive-with-reason",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Weak-exact: source unit shorter than 40 characters. archive-with-reason: Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link. Evidence: Source lines 17–59 binds the experiment to the September Advisory track and its P02/P03 convergence; source scenario uses the retired CoordinationSession/FlowDefinition public path. Commit 2180b4e72 deletes that engine; no required-root direct consumer except ratchet. Complete source heading docs/architect/proposals/coordination-envelope-probe-contract.md#obligations-and-evidence (lines 86–86) is carried at docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md#obligations-and-evidence (lines 113–113); Q3 per-file map override: docs/platform/proposals/coordination-envelope-probe-contract.md → docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. supersede: Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim. Evidence: Source scenario uses Assignment/Run, read-only executors and independent-first reveal; it contains neither CoordinationSession nor FlowDefinition. Live coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 cite this probe contract. Its retired-facility gap observations are dated, not proof the alternative experiment is retired. Complete source heading docs/architect/proposals/coordination-envelope-probe-contract.md#obligations-and-evidence (lines 86–86) is carried at docs/platform/proposals/coordination-envelope-probe-contract.md#obligations-and-evidence (lines 113–113); mapped proposal placement retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
     },
     {
       "claimId": "claim_09a718ef1a25c27dfe76656e800fc51d",
       "sourceUnitDigest": "57f05ad67c47d3a1ad310533988dc7929745598d4a2c880463787b4fda9d34e7",
-      "targetOwner": "docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md",
+      "targetOwner": "docs/platform/proposals/coordination-envelope-probe-contract.md",
       "targetAnchor": "unheaded-block-16",
       "targetUnitDigest": "57f05ad67c47d3a1ad310533988dc7929745598d4a2c880463787b4fda9d34e7",
       "targetAncestry": [
@@ -291,30 +291,30 @@
         "Obligations and evidence"
       ],
       "claimKind": "contract",
-      "disposition": "archive-with-reason",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link. Evidence: Source lines 17–59 binds the experiment to the September Advisory track and its P02/P03 convergence; source scenario uses the retired CoordinationSession/FlowDefinition public path. Commit 2180b4e72 deletes that engine; no required-root direct consumer except ratchet. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-13 (lines 88–97) is carried at docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md#unheaded-block-16 (lines 115–124); Q3 per-file map override: docs/platform/proposals/coordination-envelope-probe-contract.md → docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. supersede: Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim. Evidence: Source scenario uses Assignment/Run, read-only executors and independent-first reveal; it contains neither CoordinationSession nor FlowDefinition. Live coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 cite this probe contract. Its retired-facility gap observations are dated, not proof the alternative experiment is retired. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-13 (lines 88–97) is carried at docs/platform/proposals/coordination-envelope-probe-contract.md#unheaded-block-16 (lines 115–124); mapped proposal placement retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
     },
     {
       "claimId": "claim_cedbd5ad301c9b2bc8f48e24a7d90dcb",
       "sourceUnitDigest": "7ad24f2fd7cadf3c5ebd1f26d3c3e489003bcc1e74fd2581fbff092cc78518ff",
-      "targetOwner": "docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md",
+      "targetOwner": "docs/platform/proposals/coordination-envelope-probe-contract.md",
       "targetAnchor": "execution-observations-and-adversarial-cases",
       "targetUnitDigest": "7ad24f2fd7cadf3c5ebd1f26d3c3e489003bcc1e74fd2581fbff092cc78518ff",
       "targetAncestry": [
         "Coordination Envelope — Minimal Probe Contract"
       ],
       "claimKind": "contract",
-      "disposition": "archive-with-reason",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link. Evidence: Source lines 17–59 binds the experiment to the September Advisory track and its P02/P03 convergence; source scenario uses the retired CoordinationSession/FlowDefinition public path. Commit 2180b4e72 deletes that engine; no required-root direct consumer except ratchet. Complete source heading docs/architect/proposals/coordination-envelope-probe-contract.md#execution-observations-and-adversarial-cases (lines 99–99) is carried at docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md#execution-observations-and-adversarial-cases (lines 126–126); Q3 per-file map override: docs/platform/proposals/coordination-envelope-probe-contract.md → docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. supersede: Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim. Evidence: Source scenario uses Assignment/Run, read-only executors and independent-first reveal; it contains neither CoordinationSession nor FlowDefinition. Live coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 cite this probe contract. Its retired-facility gap observations are dated, not proof the alternative experiment is retired. Complete source heading docs/architect/proposals/coordination-envelope-probe-contract.md#execution-observations-and-adversarial-cases (lines 99–99) is carried at docs/platform/proposals/coordination-envelope-probe-contract.md#execution-observations-and-adversarial-cases (lines 126–126); mapped proposal placement retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
     },
     {
       "claimId": "claim_a111c7c5b3e15dc147f433ab7f7b17db",
       "sourceUnitDigest": "73169c683262018c9062167dfde3ca950ffab039e0453fbf5999b572bf79e581",
-      "targetOwner": "docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md",
+      "targetOwner": "docs/platform/proposals/coordination-envelope-probe-contract.md",
       "targetAnchor": "unheaded-block-17",
       "targetUnitDigest": "73169c683262018c9062167dfde3ca950ffab039e0453fbf5999b572bf79e581",
       "targetAncestry": [
@@ -322,15 +322,15 @@
         "Execution observations and adversarial cases"
       ],
       "claimKind": "contract",
-      "disposition": "archive-with-reason",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link. Evidence: Source lines 17–59 binds the experiment to the September Advisory track and its P02/P03 convergence; source scenario uses the retired CoordinationSession/FlowDefinition public path. Commit 2180b4e72 deletes that engine; no required-root direct consumer except ratchet. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-14 (lines 101–110) is carried at docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md#unheaded-block-17 (lines 128–137); Q3 per-file map override: docs/platform/proposals/coordination-envelope-probe-contract.md → docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. supersede: Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim. Evidence: Source scenario uses Assignment/Run, read-only executors and independent-first reveal; it contains neither CoordinationSession nor FlowDefinition. Live coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 cite this probe contract. Its retired-facility gap observations are dated, not proof the alternative experiment is retired. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-14 (lines 101–110) is carried at docs/platform/proposals/coordination-envelope-probe-contract.md#unheaded-block-17 (lines 128–137); mapped proposal placement retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
     },
     {
       "claimId": "claim_9c0692f05e5538977ba765c782c1e8f6",
       "sourceUnitDigest": "16a97edb792ca9b5598ba95f7cd30a0dd76da59b57c3700daaa119b2ec11bbb5",
-      "targetOwner": "docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md",
+      "targetOwner": "docs/platform/proposals/coordination-envelope-probe-contract.md",
       "targetAnchor": "unheaded-block-18",
       "targetUnitDigest": "16a97edb792ca9b5598ba95f7cd30a0dd76da59b57c3700daaa119b2ec11bbb5",
       "targetAncestry": [
@@ -338,46 +338,46 @@
         "Execution observations and adversarial cases"
       ],
       "claimKind": "contract",
-      "disposition": "archive-with-reason",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link. Evidence: Source lines 17–59 binds the experiment to the September Advisory track and its P02/P03 convergence; source scenario uses the retired CoordinationSession/FlowDefinition public path. Commit 2180b4e72 deletes that engine; no required-root direct consumer except ratchet. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-15 (lines 112–115) is carried at docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md#unheaded-block-18 (lines 139–142); Q3 per-file map override: docs/platform/proposals/coordination-envelope-probe-contract.md → docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. supersede: Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim. Evidence: Source scenario uses Assignment/Run, read-only executors and independent-first reveal; it contains neither CoordinationSession nor FlowDefinition. Live coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 cite this probe contract. Its retired-facility gap observations are dated, not proof the alternative experiment is retired. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-15 (lines 112–115) is carried at docs/platform/proposals/coordination-envelope-probe-contract.md#unheaded-block-18 (lines 139–142); mapped proposal placement retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
     },
     {
       "claimId": "claim_87bd809203f0b1b237b0afac092f6fda",
       "sourceUnitDigest": "51371604be3b8c08e83a306d3cd53e9df9b39691bf09284fdf3b3aa93ec9c606",
-      "targetOwner": "docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md",
+      "targetOwner": "docs/platform/proposals/coordination-envelope-probe-contract.md",
       "targetAnchor": "current-substrate-fit-and-gaps",
-      "targetUnitDigest": "810e0a4d53cadfbfcb355b3df077318955647c34aec65e7145eff8442fa3d988",
+      "targetUnitDigest": "143bc6e840ceaf9525c2fc9e8233ced35158fb0609808877a7bdbc81d14b3353",
       "targetAncestry": [
         "Coordination Envelope — Minimal Probe Contract"
       ],
       "claimKind": "contract",
-      "disposition": "archive-with-reason",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. archive-with-reason: Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link. Evidence: Source lines 17–59 binds the experiment to the September Advisory track and its P02/P03 convergence; source scenario uses the retired CoordinationSession/FlowDefinition public path. Commit 2180b4e72 deletes that engine; no required-root direct consumer except ratchet. Complete source heading docs/architect/proposals/coordination-envelope-probe-contract.md#current-substrate-fit-and-gaps (lines 117–117) is carried at docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md#current-substrate-fit-and-gaps (lines 144–144); Q3 per-file map override: docs/platform/proposals/coordination-envelope-probe-contract.md → docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. supersede: Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim. Evidence: Source scenario uses Assignment/Run, read-only executors and independent-first reveal; it contains neither CoordinationSession nor FlowDefinition. Live coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 cite this probe contract. Its retired-facility gap observations are dated, not proof the alternative experiment is retired. Complete source heading docs/architect/proposals/coordination-envelope-probe-contract.md#current-substrate-fit-and-gaps (lines 117–117) is carried at docs/platform/proposals/coordination-envelope-probe-contract.md#current-substrate-fit-and-gaps (lines 144–144); mapped proposal placement retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
     },
     {
       "claimId": "claim_92e903b30cfd63a63027bfff4d7a109d",
       "sourceUnitDigest": "7a88cd1367a1f061fc69550b02958ba2b792609b6d814a30debb96fcc4d92b16",
-      "targetOwner": "docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md",
+      "targetOwner": "docs/platform/proposals/coordination-envelope-probe-contract.md",
       "targetAnchor": "unheaded-block-19",
-      "targetUnitDigest": "37b1b1139b6b872f754876b7fd697348e074b29fd18d57bee3e506e57fed012b",
+      "targetUnitDigest": "1408e2e7647fc0cf78b232a9f331f4b24330a0ec471ca070226f0316d92a108b",
       "targetAncestry": [
         "Coordination Envelope — Minimal Probe Contract",
         "Current substrate fit and gaps"
       ],
       "claimKind": "contract",
-      "disposition": "archive-with-reason",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. archive-with-reason: Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link. Evidence: Source lines 17–59 binds the experiment to the September Advisory track and its P02/P03 convergence; source scenario uses the retired CoordinationSession/FlowDefinition public path. Commit 2180b4e72 deletes that engine; no required-root direct consumer except ratchet. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-16 (lines 119–121) is carried at docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md#unheaded-block-19 (lines 146–148); Q3 per-file map override: docs/platform/proposals/coordination-envelope-probe-contract.md → docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. supersede: Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim. Evidence: Source scenario uses Assignment/Run, read-only executors and independent-first reveal; it contains neither CoordinationSession nor FlowDefinition. Live coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 cite this probe contract. Its retired-facility gap observations are dated, not proof the alternative experiment is retired. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-16 (lines 119–121) is carried at docs/platform/proposals/coordination-envelope-probe-contract.md#unheaded-block-19 (lines 146–148); mapped proposal placement retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
     },
     {
       "claimId": "claim_6aedc38457da61c53ff781cc1dc2e6b8",
       "sourceUnitDigest": "95e1c1710c22b85be031507101635f84a42cb186c5110e6834ad19b1075c18b4",
-      "targetOwner": "docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md",
+      "targetOwner": "docs/platform/proposals/coordination-envelope-probe-contract.md",
       "targetAnchor": "unheaded-block-20",
       "targetUnitDigest": "95e1c1710c22b85be031507101635f84a42cb186c5110e6834ad19b1075c18b4",
       "targetAncestry": [
@@ -385,15 +385,15 @@
         "Current substrate fit and gaps"
       ],
       "claimKind": "contract",
-      "disposition": "archive-with-reason",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link. Evidence: Source lines 17–59 binds the experiment to the September Advisory track and its P02/P03 convergence; source scenario uses the retired CoordinationSession/FlowDefinition public path. Commit 2180b4e72 deletes that engine; no required-root direct consumer except ratchet. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-17 (lines 123–133) is carried at docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md#unheaded-block-20 (lines 150–160); Q3 per-file map override: docs/platform/proposals/coordination-envelope-probe-contract.md → docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. supersede: Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim. Evidence: Source scenario uses Assignment/Run, read-only executors and independent-first reveal; it contains neither CoordinationSession nor FlowDefinition. Live coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 cite this probe contract. Its retired-facility gap observations are dated, not proof the alternative experiment is retired. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-17 (lines 123–133) is carried at docs/platform/proposals/coordination-envelope-probe-contract.md#unheaded-block-20 (lines 150–160); mapped proposal placement retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
     },
     {
       "claimId": "claim_284ea1dcdeac2f554e10b9fadb3e4a53",
       "sourceUnitDigest": "c908bc2ef1f246ea6696ddca442f7f24accc0e6055014ce01d4c9b04d6f17e8d",
-      "targetOwner": "docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md",
+      "targetOwner": "docs/platform/proposals/coordination-envelope-probe-contract.md",
       "targetAnchor": "unheaded-block-21",
       "targetUnitDigest": "c908bc2ef1f246ea6696ddca442f7f24accc0e6055014ce01d4c9b04d6f17e8d",
       "targetAncestry": [
@@ -401,30 +401,30 @@
         "Current substrate fit and gaps"
       ],
       "claimKind": "contract",
-      "disposition": "archive-with-reason",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link. Evidence: Source lines 17–59 binds the experiment to the September Advisory track and its P02/P03 convergence; source scenario uses the retired CoordinationSession/FlowDefinition public path. Commit 2180b4e72 deletes that engine; no required-root direct consumer except ratchet. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-18 (lines 135–139) is carried at docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md#unheaded-block-21 (lines 162–166); Q3 per-file map override: docs/platform/proposals/coordination-envelope-probe-contract.md → docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. supersede: Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim. Evidence: Source scenario uses Assignment/Run, read-only executors and independent-first reveal; it contains neither CoordinationSession nor FlowDefinition. Live coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 cite this probe contract. Its retired-facility gap observations are dated, not proof the alternative experiment is retired. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-18 (lines 135–139) is carried at docs/platform/proposals/coordination-envelope-probe-contract.md#unheaded-block-21 (lines 162–166); mapped proposal placement retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
     },
     {
       "claimId": "claim_393aa5d8ac2d559d959a3a49e94c6258",
       "sourceUnitDigest": "7a558bf7026246b48be4f5dfdc4de474842b4a0377f4765561f50ff6003e45e3",
-      "targetOwner": "docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md",
+      "targetOwner": "docs/platform/proposals/coordination-envelope-probe-contract.md",
       "targetAnchor": "outputs-and-decision-rule",
       "targetUnitDigest": "7a558bf7026246b48be4f5dfdc4de474842b4a0377f4765561f50ff6003e45e3",
       "targetAncestry": [
         "Coordination Envelope — Minimal Probe Contract"
       ],
       "claimKind": "decision",
-      "disposition": "archive-with-reason",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Weak-exact: source unit shorter than 40 characters. archive-with-reason: Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link. Evidence: Source lines 17–59 binds the experiment to the September Advisory track and its P02/P03 convergence; source scenario uses the retired CoordinationSession/FlowDefinition public path. Commit 2180b4e72 deletes that engine; no required-root direct consumer except ratchet. Complete source heading docs/architect/proposals/coordination-envelope-probe-contract.md#outputs-and-decision-rule (lines 141–141) is carried at docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md#outputs-and-decision-rule (lines 168–168); Q3 per-file map override: docs/platform/proposals/coordination-envelope-probe-contract.md → docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. supersede: Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim. Evidence: Source scenario uses Assignment/Run, read-only executors and independent-first reveal; it contains neither CoordinationSession nor FlowDefinition. Live coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 cite this probe contract. Its retired-facility gap observations are dated, not proof the alternative experiment is retired. Complete source heading docs/architect/proposals/coordination-envelope-probe-contract.md#outputs-and-decision-rule (lines 141–141) is carried at docs/platform/proposals/coordination-envelope-probe-contract.md#outputs-and-decision-rule (lines 168–168); mapped proposal placement retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
     },
     {
       "claimId": "claim_e111be1a240a9afcd7b3bfa472397692",
       "sourceUnitDigest": "379ba636a89d5f2116b3b55b515fd69536b06a4ec770f3e8128c8358653a7013",
-      "targetOwner": "docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md",
+      "targetOwner": "docs/platform/proposals/coordination-envelope-probe-contract.md",
       "targetAnchor": "unheaded-block-22",
       "targetUnitDigest": "379ba636a89d5f2116b3b55b515fd69536b06a4ec770f3e8128c8358653a7013",
       "targetAncestry": [
@@ -432,15 +432,15 @@
         "Outputs and decision rule"
       ],
       "claimKind": "contract",
-      "disposition": "archive-with-reason",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link. Evidence: Source lines 17–59 binds the experiment to the September Advisory track and its P02/P03 convergence; source scenario uses the retired CoordinationSession/FlowDefinition public path. Commit 2180b4e72 deletes that engine; no required-root direct consumer except ratchet. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-19 (lines 143–147) is carried at docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md#unheaded-block-22 (lines 170–174); Q3 per-file map override: docs/platform/proposals/coordination-envelope-probe-contract.md → docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. supersede: Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim. Evidence: Source scenario uses Assignment/Run, read-only executors and independent-first reveal; it contains neither CoordinationSession nor FlowDefinition. Live coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 cite this probe contract. Its retired-facility gap observations are dated, not proof the alternative experiment is retired. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-19 (lines 143–147) is carried at docs/platform/proposals/coordination-envelope-probe-contract.md#unheaded-block-22 (lines 170–174); mapped proposal placement retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
     },
     {
       "claimId": "claim_f56ba497635edeef03b086959e95d319",
       "sourceUnitDigest": "ff26d8956def1366337869f03de556f136f70352bd0bd51566b00504b4839228",
-      "targetOwner": "docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md",
+      "targetOwner": "docs/platform/proposals/coordination-envelope-probe-contract.md",
       "targetAnchor": "unheaded-block-23",
       "targetUnitDigest": "ff26d8956def1366337869f03de556f136f70352bd0bd51566b00504b4839228",
       "targetAncestry": [
@@ -448,10 +448,11 @@
         "Outputs and decision rule"
       ],
       "claimKind": "contract",
-      "disposition": "archive-with-reason",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the unexecuted full-scenario experiment, not the surviving worker/provider boundary. Generic Assignment/Run symbol hits do not prove this exact experiment implemented. Preserve negative/unproven results and original plan link. Evidence: Source lines 17–59 binds the experiment to the September Advisory track and its P02/P03 convergence; source scenario uses the retired CoordinationSession/FlowDefinition public path. Commit 2180b4e72 deletes that engine; no required-root direct consumer except ratchet. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-20 (lines 149–156) is carried at docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md#unheaded-block-23 (lines 176–183); Q3 per-file map override: docs/platform/proposals/coordination-envelope-probe-contract.md → docs/platform/system-architecture/history/proposals-redesigns/coordination-envelope-probe-contract.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. supersede: Retain the probe at its mapped proposal target with the live capability-envelope and worker/provider proposals that consume it. Preserve the complete experiment, unproven results and historical gap observations; no implementation or acceptance claim. Evidence: Source scenario uses Assignment/Run, read-only executors and independent-first reveal; it contains neither CoordinationSession nor FlowDefinition. Live coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 cite this probe contract. Its retired-facility gap observations are dated, not proof the alternative experiment is retired. Complete source unheaded-block docs/architect/proposals/coordination-envelope-probe-contract.md#unheaded-block-20 (lines 149–156) is carried at docs/platform/proposals/coordination-envelope-probe-contract.md#unheaded-block-23 (lines 176–183); mapped proposal placement retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
     }
-  ]
+  ],
+  "correctionSession": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15"
 }

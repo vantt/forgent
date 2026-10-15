@@ -40,7 +40,7 @@ Related: [Conceptual architecture](../../architect/proposals/coordination-capabi
 ## Decision proposed
 
 This boundary is subordinate to the existing [Dispatch & Execution control
-plane](../agent-coordination/architecture/dispatch-control-plane.md). It does
+plane](../../architect/agent-coordination/architecture/dispatch-control-plane.md). It does
 not introduce a parallel provider or coordination runtime. The coordinator
 requests a semantic Assignment; Dispatch resolves the mechanism, including
 `in-process`, and the boundary applies to that selected mechanism.
