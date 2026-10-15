@@ -1,0 +1,1016 @@
+{
+  "scope": [
+    "AGENTS.md",
+    "CLAUDE.md",
+    "docs/specs/reading-map.md",
+    "docs/specs/runner.md",
+    "docs/specs/confinement-authority.md",
+    "docs/architecture-manifest.json"
+  ],
+  "method": "Scoped FAST unchanged native checker functions on a working-tree overlay; seven explicit identity-gap drafts included. No native sync, registry write, closure or native new-identity claim.",
+  "registryUnchanged": true,
+  "runs": [
+    {
+      "label": "both",
+      "D": {
+        "count": 5,
+        "fatalFindings": [
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s5-root-main-recarry.json: claim claim_f9c135d80cce2e8cf98c8b3b5b0db4ad is not in the claim ledger"
+          },
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s9-runner-01.json: claim claim_66c5a56d447d241a438d212c7b6222d2 is not in the claim ledger"
+          },
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s9-runner-01.json: claim claim_41571c8f42f542be1f44c9371fad823a is not in the claim ledger"
+          },
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s9-runner-01.json: claim claim_4efee765e5a47fc42f4d9cccc7a53191 is not in the claim ledger"
+          },
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s9-runner-01.json: claim claim_a64fabc06da00bb0eb8dfaba5ea0c1a6 is not in the claim ledger"
+          }
+        ]
+      },
+      "E": {
+        "open": [
+          {
+            "type": "claims-partial-carry",
+            "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+            "count": 11,
+            "examples": [
+              "docs/specs/runner.md#unheaded-block-118",
+              "docs/specs/runner.md#unheaded-block-127",
+              "docs/specs/runner.md#unheaded-block-307",
+              "docs/specs/runner.md#unheaded-block-308",
+              "docs/specs/runner.md#unheaded-block-313"
+            ]
+          },
+          {
+            "type": "claims-not-reviewed",
+            "message": "claim rows whose reviewStatus is not reviewed",
+            "count": 151,
+            "examples": [
+              "AGENTS.md#forgent",
+              "AGENTS.md#unheaded-block-1",
+              "AGENTS.md#unheaded-block-2",
+              "AGENTS.md#unheaded-block-3",
+              "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+            ]
+          },
+          {
+            "type": "candidate-blocks-unreferenced",
+            "message": "candidate conservation units not named by a source decision",
+            "count": 64,
+            "examples": [
+              "docs/platform/agent-confinement/spec.md#unheaded-block-2",
+              "docs/platform/agent-confinement/spec.md#unheaded-block-3",
+              "docs/platform/agent-confinement/spec.md#unheaded-block-46",
+              "docs/platform/agent-confinement/spec.md#added-in-candidate-current-settled-facts-and-deferred-items",
+              "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#added-in-candidate-runner-business-rules"
+            ]
+          }
+        ],
+        "strictGreen": false
+      }
+    },
+    {
+      "label": "identity",
+      "D": {
+        "count": 5,
+        "fatalFindings": [
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s5-root-main-recarry.json: claim claim_f9c135d80cce2e8cf98c8b3b5b0db4ad is not in the claim ledger"
+          },
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s9-runner-01.json: claim claim_66c5a56d447d241a438d212c7b6222d2 is not in the claim ledger"
+          },
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s9-runner-01.json: claim claim_41571c8f42f542be1f44c9371fad823a is not in the claim ledger"
+          },
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s9-runner-01.json: claim claim_4efee765e5a47fc42f4d9cccc7a53191 is not in the claim ledger"
+          },
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s9-runner-01.json: claim claim_a64fabc06da00bb0eb8dfaba5ea0c1a6 is not in the claim ledger"
+          }
+        ]
+      },
+      "E": {
+        "open": [
+          {
+            "type": "claims-partial-carry",
+            "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+            "count": 11,
+            "examples": [
+              "docs/specs/runner.md#unheaded-block-118",
+              "docs/specs/runner.md#unheaded-block-127",
+              "docs/specs/runner.md#unheaded-block-307",
+              "docs/specs/runner.md#unheaded-block-308",
+              "docs/specs/runner.md#unheaded-block-313"
+            ]
+          },
+          {
+            "type": "claims-not-reviewed",
+            "message": "claim rows whose reviewStatus is not reviewed",
+            "count": 151,
+            "examples": [
+              "AGENTS.md#forgent",
+              "AGENTS.md#unheaded-block-1",
+              "AGENTS.md#unheaded-block-2",
+              "AGENTS.md#unheaded-block-3",
+              "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+            ]
+          },
+          {
+            "type": "candidate-blocks-unreferenced",
+            "message": "candidate conservation units not named by a source decision",
+            "count": 64,
+            "examples": [
+              "docs/platform/agent-confinement/spec.md#unheaded-block-2",
+              "docs/platform/agent-confinement/spec.md#unheaded-block-3",
+              "docs/platform/agent-confinement/spec.md#unheaded-block-46",
+              "docs/platform/agent-confinement/spec.md#added-in-candidate-current-settled-facts-and-deferred-items",
+              "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#added-in-candidate-runner-business-rules"
+            ]
+          }
+        ],
+        "strictGreen": false
+      }
+    },
+    {
+      "label": "phase02",
+      "D": {
+        "count": 5,
+        "fatalFindings": [
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s5-root-main-recarry.json: claim claim_f9c135d80cce2e8cf98c8b3b5b0db4ad is not in the claim ledger"
+          },
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s9-runner-01.json: claim claim_66c5a56d447d241a438d212c7b6222d2 is not in the claim ledger"
+          },
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s9-runner-01.json: claim claim_41571c8f42f542be1f44c9371fad823a is not in the claim ledger"
+          },
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s9-runner-01.json: claim claim_4efee765e5a47fc42f4d9cccc7a53191 is not in the claim ledger"
+          },
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s9-runner-01.json: claim claim_a64fabc06da00bb0eb8dfaba5ea0c1a6 is not in the claim ledger"
+          }
+        ]
+      },
+      "E": {
+        "open": [
+          {
+            "type": "claims-partial-carry",
+            "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+            "count": 11,
+            "examples": [
+              "docs/specs/runner.md#unheaded-block-118",
+              "docs/specs/runner.md#unheaded-block-127",
+              "docs/specs/runner.md#unheaded-block-307",
+              "docs/specs/runner.md#unheaded-block-308",
+              "docs/specs/runner.md#unheaded-block-313"
+            ]
+          },
+          {
+            "type": "claims-not-reviewed",
+            "message": "claim rows whose reviewStatus is not reviewed",
+            "count": 151,
+            "examples": [
+              "AGENTS.md#forgent",
+              "AGENTS.md#unheaded-block-1",
+              "AGENTS.md#unheaded-block-2",
+              "AGENTS.md#unheaded-block-3",
+              "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+            ]
+          },
+          {
+            "type": "candidate-blocks-unreferenced",
+            "message": "candidate conservation units not named by a source decision",
+            "count": 64,
+            "examples": [
+              "docs/platform/agent-confinement/spec.md#unheaded-block-2",
+              "docs/platform/agent-confinement/spec.md#unheaded-block-3",
+              "docs/platform/agent-confinement/spec.md#unheaded-block-46",
+              "docs/platform/agent-confinement/spec.md#added-in-candidate-current-settled-facts-and-deferred-items",
+              "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#added-in-candidate-runner-business-rules"
+            ]
+          }
+        ],
+        "strictGreen": false
+      }
+    }
+  ],
+  "targetDriftQueue": [
+    {
+      "shard": "s2-agent-coordination-truth-judgment",
+      "claimId": "claim_8ed451a179a884fe1b475149f75e2b26",
+      "targetOwner": "docs/platform/agent-coordination/architecture/evidence-and-results.md",
+      "targetAnchor": "visibility-boundary",
+      "beforeDigest": "a1da561639818dab01402d79fcfe133df897986a888ab41692ed697719d470c7",
+      "currentDigest": "1e36b97aa12e851cf97ade9c39141632466db8ee2983a3d54e7bd7c3585d9f07",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s2-agent-coordination-truth-judgment",
+      "claimId": "claim_18fea1d59f08d3ca8f50ce3bfadded13",
+      "targetOwner": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+      "targetAnchor": "7-agent-facing-contract",
+      "beforeDigest": "dbb12451e148155e32f46eda7c2f8ca300e02705e53c47d359353c7e7df18f27",
+      "currentDigest": "0304740f98bdab3df44c5b9b88de64409ad96c2bd94bc3ab41aaa4afbbc2fe68",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s2-agent-coordination-truth-judgment",
+      "claimId": "claim_db593c2dbf2dbde00be1110c70e94583",
+      "targetOwner": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+      "targetAnchor": "7-agent-facing-contract",
+      "beforeDigest": "dbb12451e148155e32f46eda7c2f8ca300e02705e53c47d359353c7e7df18f27",
+      "currentDigest": "0304740f98bdab3df44c5b9b88de64409ad96c2bd94bc3ab41aaa4afbbc2fe68",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s2-agent-coordination-truth-judgment",
+      "claimId": "claim_e79e40a9ee21a51be2d37ee413a5b903",
+      "targetOwner": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+      "targetAnchor": "7-agent-facing-contract",
+      "beforeDigest": "dbb12451e148155e32f46eda7c2f8ca300e02705e53c47d359353c7e7df18f27",
+      "currentDigest": "0304740f98bdab3df44c5b9b88de64409ad96c2bd94bc3ab41aaa4afbbc2fe68",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s2-agent-coordination-truth-judgment",
+      "claimId": "claim_b15db24ee1738cb12ed454378aab1638",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "reading-down-from-the-vision",
+      "beforeDigest": "bcc498d937367343f1b0ce52884e9320bf3183d865750dd5a0e4e3c135abebc6",
+      "currentDigest": "852ed9b500d96e96ae6dfa27c123feb107277c4bd2657c708dee8bdd220d2b52",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s2-agent-coordination-truth-judgment",
+      "claimId": "claim_60a5c12e7c7c78095b2c90db75324462",
+      "targetOwner": "docs/platform/agent-coordination/vision.md",
+      "targetAnchor": "reading-down-from-the-vision",
+      "beforeDigest": "bcc498d937367343f1b0ce52884e9320bf3183d865750dd5a0e4e3c135abebc6",
+      "currentDigest": "852ed9b500d96e96ae6dfa27c123feb107277c4bd2657c708dee8bdd220d2b52",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s3-host-invocation-checkpoint",
+      "claimId": "claim_080c5cdacf820ed661ab372086ca7e41",
+      "targetOwner": "docs/platform/host-invocation-routing/spec.md",
+      "targetAnchor": "9-physical-placement",
+      "beforeDigest": "0f09d5374dc9921483fc2894bc4489678d1c3661c9758e0d20a192b984179476",
+      "currentDigest": "e95f14771b2c72fc9eb48e5c9813b74f897175763fa9b44441fb2cb6a896c1cd",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s3-host-invocation-checkpoint",
+      "claimId": "claim_6bc953eb6105342ced582ea637d33f80",
+      "targetOwner": "docs/platform/host-invocation-routing/spec.md",
+      "targetAnchor": "unheaded-block-62",
+      "beforeDigest": "7e6acfff4878dc53e903a6cdafa13e6307d5153f0e97bd0b2f127e0912f90e94",
+      "currentDigest": "e9893942d9bce6fe7bf258af1493b90e55530dec51230332c2ba0024773f0ca2",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s3-host-invocation-checkpoint",
+      "claimId": "claim_f68e3c4f62dca2243859372c4b1029cf",
+      "targetOwner": "docs/platform/host-invocation-routing/spec.md",
+      "targetAnchor": "11-open-questions",
+      "beforeDigest": "9d49b2d1a08d0b7134dfd2b353fa6b9b9c0123d7f00f4e87ce8a8fc239c9d6f1",
+      "currentDigest": "fffb2b893f3e64c16d92a761ffefe41dfdf9ca516f686a264ef6cff71e382e08",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s3-host-invocation-checkpoint",
+      "claimId": "claim_eff16b53a71c2109f97bb2e2bab25e87",
+      "targetOwner": "docs/platform/host-invocation-routing/spec.md",
+      "targetAnchor": "unheaded-block-66",
+      "beforeDigest": "1af61335a3e24de6c9d9855d31e13448abeed33f18baf7a03e98dfde08412e61",
+      "currentDigest": "c89318820321f4ab2e4103085bb297a1c0acb615407968344860a010d3c8d105",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s3-host-invocation-checkpoint",
+      "claimId": "claim_8494129121a2674191af910332dc4502",
+      "targetOwner": "docs/platform/host-invocation-routing/spec.md",
+      "targetAnchor": "related-documents",
+      "beforeDigest": "e953e3876a0782001c0fde8723c1722d8eaedad31e2981def9c5b5af50114c79",
+      "currentDigest": "33ff3bcb99aa391c43a79a13e7eba2fdbcbb96da83772fcb2be8e4902dfe6bd9",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s3-host-invocation-checkpoint",
+      "claimId": "claim_b2a8587f5b61f728d0136e54d808289f",
+      "targetOwner": "docs/platform/host-invocation-routing/spec.md",
+      "targetAnchor": "unheaded-block-67",
+      "beforeDigest": "02d4241d8191baf8df5cdcd9c44cb99ae50a0b7db6133695ec5aa9350addb5de",
+      "currentDigest": "652b3b9849349b5fe0c60e38f9f909bf4785407f9e710a318c74ba6b32129c3b",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s3-host-invocation-checkpoint",
+      "claimId": "claim_04f0605dc840e350f63e53d0e1e96843",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "2-legacy-payload-identity-ownership-and-repair-path",
+      "beforeDigest": "262d60a7d2ac5ef767de9363fece691019731c14389d464a3095f9bfc7f9d302",
+      "currentDigest": "b4dbf7eed4fee9a7d5e4844b1543c598c3f92d38f313d881c55fb088498aee1b",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s3-host-invocation-checkpoint",
+      "claimId": "claim_c1993044e428f031329f23c67bc2a1d6",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "unheaded-block-19",
+      "beforeDigest": "6e519fd8bf93a67e3ce457cd76967c9f71a28a7bb4bf8e91d43c9c0b58a78f35",
+      "currentDigest": "de0ae19bed33fc5dd3ea48d0be145d8c50690bdb1529055b40c1bd0ae22ca06f",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s3-host-invocation-checkpoint",
+      "claimId": "claim_b1e44493c254c54dc18efa2088b0018a",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "related-documents",
+      "beforeDigest": "f71b079161bcf10adee6c69da878ddbd8064f2dfed46daba90ffea8f188b960d",
+      "currentDigest": "fe124dcd355f3f421cd60d47a374615faf787606fbd70f0107ca75e8aeafc6ba",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s3-host-invocation-checkpoint",
+      "claimId": "claim_949229109da1c08a1d85f8503ea3ee9d",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "unheaded-block-37",
+      "beforeDigest": "a1f64a58daa36d11429760e17bf04236e4333dab0e6e2af8107d7b2e6e74ea52",
+      "currentDigest": "cf294a957ee6cdf9b75f573e8796e10c7c55af7e0410888ae82824005a3f6a3e",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s3-host-invocation-checkpoint",
+      "claimId": "claim_9856db4ff1c2d562e95ff0786f823389",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "targetAnchor": "5-release-r1-distributable-rust-cli-host",
+      "beforeDigest": "47e3cabcaa8b4bb6f1864e8ae6bf689bf3ada1214b57d3701ca45b6408ef911c",
+      "currentDigest": "f23f73479e16095c44d8ec679259ecd68e0c3ea28225f8c4384dc0cbc95dbec4",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s3-host-invocation-checkpoint",
+      "claimId": "claim_874ccce76215f5a036d08203211c2868",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "targetAnchor": "unheaded-block-32",
+      "beforeDigest": "7171076df64a4fb1110fe31cef72a275f7c5d907bfe09dac7ae3522f1e0bd748",
+      "currentDigest": "91f722d8c12b388d093cb119c9e679738e966c3b2ee781f4458c47734d714097",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s3-host-invocation-checkpoint",
+      "claimId": "claim_ac2177776d1a367f2d8e81699b04fc63",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "targetAnchor": "13-rollback-rules",
+      "beforeDigest": "78a99221daab969a51e4fb5d7d337a8e13cdd4d50590c657a267874982cf1134",
+      "currentDigest": "8d879f9c47c2ff7d5802b8a53b77ac6b4367b511681b018b81644f370b5abae6",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s3-host-invocation-checkpoint",
+      "claimId": "claim_485913c207130897d47aa1e1511faa50",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "targetAnchor": "unheaded-block-60",
+      "beforeDigest": "29c578de76b95abaecf05f7695411e6e1adf794307e6df6c347d098b4dbf6a72",
+      "currentDigest": "74bd29942b042b3f787699eb068cbf52e2d7148b0520745218eb9a933c78b0ab",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s3-host-invocation-checkpoint",
+      "claimId": "claim_f3092763d47af8fa8eaffec73ca0fe63",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "targetAnchor": "15-remaining-migration-decisions",
+      "beforeDigest": "7d436519b8d7fdcfff8aff852f42d696dbedaa08dbdbd6a0d43c03583eed5606",
+      "currentDigest": "01e0de573b81c443ec6839acefd2646be2033ac477ffe55c4c249e36012d9535",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s3-host-invocation-checkpoint",
+      "claimId": "claim_9abc9022ffe0e22751258bd1dca6136d",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "targetAnchor": "unheaded-block-66",
+      "beforeDigest": "9a81658a89d11e847d209ea2cab3d9733ebd5b4d101e2a4e7c777e5a58b0dc5f",
+      "currentDigest": "6bd9be4bdd4e8be6e701f92eb6312b50e92e4fce1fc6270215a27d16a4e43402",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s3-host-invocation-checkpoint",
+      "claimId": "claim_15bf45a3b2bdf1083bc63a6f10d14e82",
+      "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "targetAnchor": "rust-host-and-proof-providers-implementation-plan",
+      "beforeDigest": "db84c9540a140b4f4f0e4226b24aff2f9d0cf79016bd7be779e4bdc77ba8cba8",
+      "currentDigest": "2498365491e97a032775fb0509a9b85b208879900cc17546951af948ff26705f",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s3-host-invocation-checkpoint",
+      "claimId": "claim_182dc1f2f896d82f0cf35519579ebbbf",
+      "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "targetAnchor": "unheaded-block-61",
+      "beforeDigest": "b76d44e35a7fa3959b2ade93ce7963c30cd64a3f7da54528bd4e96443b187ac4",
+      "currentDigest": "aff8c73a22167b7d5acd8883f25f064b536e45ba923186c01132b6e4ff56f639",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s4-packaging-distribution-architecture.json",
+      "claimId": "claim_088af18a5796ed72fe6d33ff2cc5d05c",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "targetAnchor": "5-releasemanifest",
+      "beforeDigest": "cceaac3e9fc823ee407fe10f75b8c5b37118b902e0c34b6df0ef005b9e7b45dd",
+      "currentDigest": "9090616f699faf93b1b7de2b7c7c20c33961ffa832271a2e5b241d74be53d0b7",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s4-packaging-distribution-architecture.json",
+      "claimId": "claim_5b308c0d698cf4b6e679cefd4b72159e",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "targetAnchor": "unheaded-block-17",
+      "beforeDigest": "14256af7581ef2bfaa818af8fba135a0031d0fb6f3c67397f4f72dff9ab738c2",
+      "currentDigest": "18f7037414eaa3e6682d49f5477a6f75321fd6b77ffd90110ab99539dc47298b",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s4-packaging-distribution-architecture.json",
+      "claimId": "claim_163988c8973416bdd64781cc7c667f65",
+      "targetOwner": "docs/platform/packaging-distribution/spec.md",
+      "targetAnchor": "workspace-runtime-model",
+      "beforeDigest": "b17cd70e3bb848b985deb966b7c9ffc192142e8f887bfb49d3bf4d76c70efa15",
+      "currentDigest": "1ee5f39eed18d208f13a89e89e5948b69473c16dbbc29fec71b638c873ae04ee",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s4-packaging-distribution-architecture.json",
+      "claimId": "claim_d6701453661c34a2331f9d9bd12ef843",
+      "targetOwner": "docs/platform/packaging-distribution/spec.md",
+      "targetAnchor": "unheaded-block-75",
+      "beforeDigest": "9aefc76daebb502839626d20f26342d459be16ca0412bed1a7d4d3af5dd4ea9c",
+      "currentDigest": "65cb0621a4ec37ae5bfed6de55320aa96a6df5ea9f6868a9d6a0c51403366eec",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s5-root-mapped-conservation.json",
+      "claimId": "claim_1be7573f879e8eda05723b6d40b3b84e",
+      "targetOwner": "docs/platform/documentation/switchboard.md",
+      "targetAnchor": "5-related-files",
+      "beforeDigest": "e0db043a10f231a131c7424e58b5cfb5e811009e5da73e64f0d02ba00c6fd2fb",
+      "currentDigest": "31d43bc08eb7f07bb47204e7cef0998d514836e35e717db722eb8e171a2c578e",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s5-root-mapped-conservation.json",
+      "claimId": "claim_e5cc66ff5930f04b7ebd9a8acbc52942",
+      "targetOwner": "docs/platform/documentation/switchboard.md",
+      "targetAnchor": "unheaded-block-7",
+      "beforeDigest": "b04b4108bd31d91b10f7316ed86c09e9d0c7368af74b5e8f887616a3852eadb9",
+      "currentDigest": "9d3f5ac3c5d03730ea68427c86f1e9e1b324a008486e9a3a1864e92f7c671672",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s6-whole-system-component-component-boundary-advisory.json",
+      "claimId": "claim_6a9ed963beadff6cbe381fe46ccd8d8d",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "targetAnchor": "fgos-component-boundary-advisory",
+      "beforeDigest": "cef01b7bcb79441b21c155752aa4ba1a0f7802df7e79f95fa41eb97ec39c80bd",
+      "currentDigest": "5d693cd0376780c965e59de839cb3db8439d9c27b2810c9c951ca99352e0c3ba",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s6-whole-system-component-component-boundary-advisory.json",
+      "claimId": "claim_b5eaf900c55b4d0160e490fd9da0de39",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "targetAnchor": "unheaded-block-15",
+      "beforeDigest": "7933a60d470d025f7fa141462dd005bff6e8b5a7c87d0fb713a808aa385c3d43",
+      "currentDigest": "6e7fac96ac571658cb549018e24770c9973cbeda56203374f2cb1b6582982288",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s6-whole-system-component-component-boundary-advisory.json",
+      "claimId": "claim_ae69ca82e388b03292f8c25fe9c998c0",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "targetAnchor": "5-high-level-component-authority-register",
+      "beforeDigest": "ab0b345ff26b19e4c70142d6b8ea5664b1dbc8bb2197a6aee83a721b72532ad4",
+      "currentDigest": "e086f83923aac7dad4e323cdf59fd7be32b2feabcc46802ad41baff5a6a406c2",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s6-whole-system-component-component-boundary-advisory.json",
+      "claimId": "claim_ab73231bdd37667748e73f92da406a7b",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "targetAnchor": "unheaded-block-39",
+      "beforeDigest": "99dad1bc2d7cc772c8aebbb5b12f97ec1c18571001a00e0b04e1e01e9d87a852",
+      "currentDigest": "57f9ce1415b601e5a7dc77c281d688b5ef47c7c84bf5620294bacf66ed5bde0f",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s6-whole-system-component-component-boundary-advisory.json",
+      "claimId": "claim_239931ca8e26fd3b19bf970e30e2ae4b",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "targetAnchor": "7-contract-authority-matrix",
+      "beforeDigest": "8f99ea365de4aed673b87511d51775ce357be6be3a54f36f8bf013ee9338d083",
+      "currentDigest": "2d963824a78865150ea00c06c9c03bcd89c2d0c3488c8d2148bd9038e732296a",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s6-whole-system-component-component-boundary-advisory.json",
+      "claimId": "claim_ae47f4ebf4390cd7a05bc5455deb37ed",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "targetAnchor": "unheaded-block-56",
+      "beforeDigest": "cb6efa1b6c13d5803b75b7c387eb055ba4586d287d0e42c0ffea2d9e24b2cc88",
+      "currentDigest": "a204f9bca146a5ddb4f8649b79dbb07fb4d06e0f7f526c4207f00237497e3700",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s6-whole-system-component-component-boundary-advisory.json",
+      "claimId": "claim_fe1e3cdfa133bbe5a28323f30047167b",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "targetAnchor": "8-internal-boundary-map",
+      "beforeDigest": "7334b3174da2c73d1c452c30506f563c0e225c82493dcd181101f62e254f4302",
+      "currentDigest": "a9dfd52ce5279d1126f5acff4866e16263c4d65ac6777f2a6a2e692afefce479",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s6-whole-system-component-component-boundary-advisory.json",
+      "claimId": "claim_83174b29e18380691596cf50df35f0d6",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "targetAnchor": "unheaded-block-62",
+      "beforeDigest": "1ca371d0061fda0fe84b0949508a5bd0fd2015ed9e3605d7857edde7846cb8de",
+      "currentDigest": "0fbb26b5b55ac7b4a59c5822c3a1d8b7d79929464f29ff7217e322b46e2b7d63",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s6-whole-system-component-readme.json",
+      "claimId": "claim_c8d98c0008701e264eca755e375bf49f",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "targetAnchor": "1-how-to-read-this-folder",
+      "beforeDigest": "ac23ba89e02455c86ec6e6ca55ec760e7eb475d200b8c93bfa07fbb82752702d",
+      "currentDigest": "8f3acc2c9875a25d866b98dd0d4903bb68ff8cdb44ff2d653cef53aa2c4b10e8",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s6-whole-system-component-readme.json",
+      "claimId": "claim_c8d61d6eb9aba8dcc3ec841c10279546",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "targetAnchor": "unheaded-block-165",
+      "beforeDigest": "213b9ed362ae57800fa40964cfe0ae99180a2064c8cc4c0c8b8ea02d3a7a0d9d",
+      "currentDigest": "6af8570adb8504650c6d36ccc3e5e347ac8aa45cca06ff7b9c465b1c0225b903",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s6-whole-system-component-readme.json",
+      "claimId": "claim_317048c0d0e634cadad884f042e0fb41",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "targetAnchor": "component-boundary-advisory",
+      "beforeDigest": "5fd7d0b1779d9f3832ce6bfaf07313e416a59d4a4940f41ca6d13ebe0ebf6d3e",
+      "currentDigest": "457c2097e525258924d9dcf3bef70ebf0bf716e268b245048d5ae364fca41f8e",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s6-whole-system-component-readme.json",
+      "claimId": "claim_2f2826e65d051c01194cd662b5a8be9e",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "targetAnchor": "unheaded-block-177",
+      "beforeDigest": "89f837f7bac27432a74204ec499a30bd26e8cc44515300197586c5c1bedefd6d",
+      "currentDigest": "a3a418d3011a365ff46381767ed5c15547ad1a33da57b7e83405010c7c659fdd",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s6-whole-system-component-readme.json",
+      "claimId": "claim_ea14128a766600a9a0942fcc908ff4ce",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "targetAnchor": "repo-layout-vision",
+      "beforeDigest": "5d4124f7fcc6d528da92d2b1b27ce2326e1d494146da683cbacc67c4bc496711",
+      "currentDigest": "76ec7851ade9bdd4fef5b40b167bc07ec745dcedfc0e50c3672b6bd25796ad02",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s6-whole-system-component-readme.json",
+      "claimId": "claim_841c0c452b31d698f08d8460a92f8925",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "targetAnchor": "unheaded-block-182",
+      "beforeDigest": "0ac24f210a68c6ceb0d1b5bc8547d81e6dfa9d501380218a31b260b204866a6a",
+      "currentDigest": "cd07aba31d0b8612aa7585d57c57e30a9905fc2fb17d6dd0bb53d852aae0d71b",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s6-whole-system-component-readme.json",
+      "claimId": "claim_0d68eb897094a19d27659cf0925e8da3",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "targetAnchor": "host-invocation-and-provider-routing",
+      "beforeDigest": "e43aae5e0f4aded84f9747ea2895369d021a624c2db051b4aa0d55a00bb73f38",
+      "currentDigest": "31ff1014acc172147fc74a432fee687499200fb8b238a8eb6f396f2a9cee005b",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s6-whole-system-component-readme.json",
+      "claimId": "claim_9d1e7b76bcbf3b0fcf5e0edcdf130653",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "targetAnchor": "unheaded-block-186",
+      "beforeDigest": "54bd067a0978bd55658c5a83ace94b241bb26e41584dc9ede548987cb07557b8",
+      "currentDigest": "799cd5b1d42b59ffa6bf38415e7bebe742b345003b87be4a77e5b512b1185efb",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s6-whole-system-component-readme.json",
+      "claimId": "claim_88c428b7e894b8c99ecc7231259db834",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "targetAnchor": "node-to-rust-component-migration",
+      "beforeDigest": "672ff85939d0526d739a870e57a84e345a64f2626ce6d5e4ec1613ad774e180d",
+      "currentDigest": "498170b56dca7baacfcc063c115e7e7717e47be121d39342eb1c9b56e7eae861",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s6-whole-system-component-readme.json",
+      "claimId": "claim_57cd483e44658aa1583e968cc86e8ab9",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "targetAnchor": "unheaded-block-189",
+      "beforeDigest": "c3793ca21def2b6e7532509dea87e1f5f299e33a90e4fee97a2f38ca3dd953b7",
+      "currentDigest": "c7a72d8d1c40718a22b72f05a0cba1f869153d86ea9f6436082c3f56a0ef760a",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s6-whole-system-component-readme.json",
+      "claimId": "claim_d590be5f9d8551d9b4290c296c4e059a",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "targetAnchor": "canonical-architecture-and-specs",
+      "beforeDigest": "130bf89bd3541df014e8f4a75f7e1782a4ac388294b5c6a6046505abf5f08ff7",
+      "currentDigest": "d5984df97888ec0c8a79017b5053c0b6377b1109ccce2b56fa13331071ac41e3",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s6-whole-system-component-readme.json",
+      "claimId": "claim_00f11cd8215f5649d5ef7bcb34bdb737",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "targetAnchor": "unheaded-block-198",
+      "beforeDigest": "98363b3f8b197b14e53b8442501f7652eb3129a84267b8a6acf4198ba7d2ca05",
+      "currentDigest": "9c2b09723d424834b43348d027b8a5ddf18d635bc3ce3ba67fe1cbad8dc8e1cb",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s6-whole-system-component-readme.json",
+      "claimId": "claim_d060f9dfcce5f534cfa957c4245ac9e1",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "targetAnchor": "related-agent-coordination-contracts",
+      "beforeDigest": "aaf7a2843c22714d990cbfac4c06f2b5fc5ee1e9a8d40d323ce995a8c2c78f54",
+      "currentDigest": "e96eb39fc1cebb38824be7d340ccba3f4ead668994a377434a180aa976c12e33",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s6-whole-system-component-readme.json",
+      "claimId": "claim_919ee8461ba273f0a132459b308ab3ff",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "targetAnchor": "unheaded-block-199",
+      "beforeDigest": "609a405c5c21f7fe37ebb4e376220626a810a90a5b77f029940796c703a1496b",
+      "currentDigest": "db2184d7643038ad40c88bfeb7586a308ab907915fcbb5dfced23cc702ee7cce",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s7-proposals-redesigns-01-dispatch-control-plane-redesign.json",
+      "claimId": "claim_2ec7fc22c79d18b5f8d57cc79ec5e587",
+      "targetOwner": "docs/platform/proposals/dispatch-control-plane-redesign.md",
+      "targetAnchor": "dispatch-control-plane-redesign",
+      "beforeDigest": "6924296b706081656a42acc59abe25bfe820b928e4091bc63cc9e8df1a8b0069",
+      "currentDigest": "b836a91ed4d5753a3192ae3a992e713477fc30524d664dc173024fb8ad889741",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s7-proposals-redesigns-02-documentation-system-design.json",
+      "claimId": "claim_c015fd82d6f1a32273bff77ec8b4299c",
+      "targetOwner": "docs/platform/documentation/architecture/documentation-system-design.md",
+      "targetAnchor": "documentation-system-design",
+      "beforeDigest": "8c8841510e4c3e0c64556e3cec4777918ec8333869e02c0debe7aae074efd271",
+      "currentDigest": "70a02fca3bf1139d4184cea11e561982fd6536e0f124e8318d32c62116eb3f96",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s7-proposals-redesigns-04-doing-coordination-redesign.json",
+      "claimId": "claim_4da3bc7c272c4f89a0d136bfa369c877",
+      "targetOwner": "docs/platform/proposals/doing-coordination-redesign.md",
+      "targetAnchor": "doing-coordination-redesign",
+      "beforeDigest": "ef91148598cf3feecd511dc70a828bde34157e4025332bf7963cdd0b7c885b28",
+      "currentDigest": "da72635f1357888e24cffdc3a048739901fe210764c2adb2b6c2c378cfc4ec0f",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s7-proposals-redesigns-05-readme.json",
+      "claimId": "claim_a425b576168290434c2e825ea049a6c7",
+      "targetOwner": "docs/platform/domainization/architecture/domainization.md",
+      "targetAnchor": "fgos-domainization-architecture",
+      "beforeDigest": "78feb072acedefed0b4d8fa8f1fcd1798d8c69c646ac496c6e9f9f4a199eb125",
+      "currentDigest": "cb673d5ef82458d38d0c12ade3b37664b34ecd83e116c779334607279ac3a731",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s7-proposals-redesigns-05-readme.json",
+      "claimId": "claim_a65f6b3bb2c15aef0e2b9f212f68545e",
+      "targetOwner": "docs/platform/domainization/architecture/domainization.md",
+      "targetAnchor": "unheaded-block-4",
+      "beforeDigest": "dacd5e323b4421298f300e2adef85b583ce9c7dd4909af87702a820a8ce101c1",
+      "currentDigest": "06812ac14892a989397980cd115b5cddbdf986aa9311f3bff352ebec3a685c64",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s7-proposals-redesigns-06-knowledge-registry-redesign.json",
+      "claimId": "claim_44f33af5bfe639da4877db2c7693d7d9",
+      "targetOwner": "docs/platform/proposals/knowledge-registry-redesign.md",
+      "targetAnchor": "knowledge-registry-redesign",
+      "beforeDigest": "09587ae01698cf5dc29441d01db34335ea71554b2e41ed8d9b217c0ccff2c827",
+      "currentDigest": "9a493f0bbb35471b283432ed1c06dc1b182ffba794de0820fa07088fba7678c0",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s7-proposals-redesigns-07-architecture-advisory-panel.json",
+      "claimId": "claim_45a73c31fae3d141bfa8135d542a01b4",
+      "targetOwner": "docs/platform/proposals/architecture-advisory-panel.md",
+      "targetAnchor": "architecture-advisory-panel",
+      "beforeDigest": "e7448aaac301af577b2157d8e86e6bdbba67e65d887d8424707085dfb91d2a37",
+      "currentDigest": "e82955a32175ed9d12dfcadf8373ba47a507a1e58d54bab7a9a30065d78d977d",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s7-proposals-redesigns-08-component-authority-boundary-map.json",
+      "claimId": "claim_c1741ef08c45e88d276f75b668de7452",
+      "targetOwner": "docs/platform/proposals/component-authority-boundary-map.md",
+      "targetAnchor": "component-authority-boundary-map",
+      "beforeDigest": "ea76b5f02344271149099a664a5f178492877996d5e5b0b3c6f548533cd8829b",
+      "currentDigest": "1fc029214f07a1659e8e80153b343724096a37b2d465c4c3a51dcdb4ed55965a",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s7-proposals-redesigns-08-component-authority-boundary-map.json",
+      "claimId": "claim_d9bc09e7463502aa503b0e6024f5fc32",
+      "targetOwner": "docs/platform/proposals/component-authority-boundary-map.md",
+      "targetAnchor": "unheaded-block-4",
+      "beforeDigest": "f357bd2fe393c910bd82e9a5e8929b625e9707cf9473586bfa468c6c48f5b6dd",
+      "currentDigest": "ad7d204ae671235bb9bd69479588522525842b9abb9b8df79bb06651d346965e",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s7-proposals-redesigns-08-component-authority-boundary-map.json",
+      "claimId": "claim_dd861ef529a741867fc35af43d6df091",
+      "targetOwner": "docs/platform/proposals/component-authority-boundary-map.md",
+      "targetAnchor": "6-authority-ownership",
+      "beforeDigest": "6f0fccd03e3b260486fb2238b8621254a1c4ab436c1c3a70ba7d36f1fc75e464",
+      "currentDigest": "3142af64d8983cac38dd92004bf0ca844e8bfc627b6677aeb2a377d59f248b3d",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s7-proposals-redesigns-08-component-authority-boundary-map.json",
+      "claimId": "claim_21929c380c2aa47b4c919e6738c75db8",
+      "targetOwner": "docs/platform/proposals/component-authority-boundary-map.md",
+      "targetAnchor": "unheaded-block-20",
+      "beforeDigest": "600893ad856696d1ddfe3cc8d2816f6acc976d1dae272318436a8c5fc2024c20",
+      "currentDigest": "8783ca2eda7577abab8dae70890cbb413943999de555ba932680707abdc86893",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s7-proposals-redesigns-08-component-authority-boundary-map.json",
+      "claimId": "claim_1b216e6e51864d2cccf9d2e5f362893a",
+      "targetOwner": "docs/platform/proposals/component-authority-boundary-map.md",
+      "targetAnchor": "13-draft-ports",
+      "beforeDigest": "adbd3b303d38b06c5a7a651696efbc5b85bd91da9a7cdba745f6def758b673f7",
+      "currentDigest": "435d86bbc645aacf73ddb38aadfa994dae4adc4bfe425cd506b9bbd890046051",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s7-proposals-redesigns-08-component-authority-boundary-map.json",
+      "claimId": "claim_141274342ca234cf21529b9afcb645db",
+      "targetOwner": "docs/platform/proposals/component-authority-boundary-map.md",
+      "targetAnchor": "unheaded-block-63",
+      "beforeDigest": "4b3d13d7316e8fa33b32d2f73cd529cef2f253f6bcb1c3044b228765aeb9dba8",
+      "currentDigest": "38d5336c4a92d6bb904a832355ebd1b3c874afe5326ca137874fd3ab5812c3c8",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s7-proposals-redesigns-09-coordination-capability-envelope.json",
+      "claimId": "claim_a13a8579792632b5553ba4e6971523e3",
+      "targetOwner": "docs/platform/proposals/coordination-capability-envelope.md",
+      "targetAnchor": "agent-coordination-capability-envelope-và-coordinator-owned-deliberation",
+      "beforeDigest": "1691499bfcc170b63032e1425cca6313ee074c0bfe79c80b6afd1cd6545ff583",
+      "currentDigest": "478a72d4b4897394c014166b8178ea78fe90f112f248bf150611ececcf54bd1a",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s7-proposals-redesigns-09-coordination-capability-envelope.json",
+      "claimId": "claim_8bbbe1991d78a43f3a8ac34904ff529c",
+      "targetOwner": "docs/platform/proposals/coordination-capability-envelope.md",
+      "targetAnchor": "reading-context-and-authority",
+      "beforeDigest": "751324f6e5cd58dd9ab888598baedb4a53123d513a813476e39beb5979f4dfa5",
+      "currentDigest": "9a4d4d91f9f0d5d64e0c7a9d1dee6bb1917af6bf48f1ff1cc53489669b953ab5",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s7-proposals-redesigns-09-coordination-capability-envelope.json",
+      "claimId": "claim_ef60991eccbc94b8ea96109cd3a0523c",
+      "targetOwner": "docs/platform/proposals/coordination-capability-envelope.md",
+      "targetAnchor": "unheaded-block-6",
+      "beforeDigest": "a8989d0f0e0938d6e90bd9ffebb73794c6a3b05dc5f8704bb4d5ab3391524193",
+      "currentDigest": "c5234ef0267d6b3a92f4c95730fb2180771e527146db637765b455e3d01c54f9",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s7-proposals-redesigns-09-coordination-capability-envelope.json",
+      "claimId": "claim_47481f3d934351c88fe870e1bef64df2",
+      "targetOwner": "docs/platform/proposals/coordination-capability-envelope.md",
+      "targetAnchor": "unheaded-block-7",
+      "beforeDigest": "b34a824cc5642fbccf2c5c81f2cfda9a163904de3cad058c65606e7c75da78c9",
+      "currentDigest": "68a47314fd86634b1711d12f0dacc9d25e0ce890380aa7790f9adfdc4003a5ea",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s7-proposals-redesigns-10-coordination-dispatch-contract.json",
+      "claimId": "claim_63fe21c2a65de88c1fd69663557d32c6",
+      "targetOwner": "docs/platform/proposals/coordination-dispatch-contract.md",
+      "targetAnchor": "coordination-dispatch-execution-contract",
+      "beforeDigest": "82e90ef583401448e13d3d31ef8d3282808450b97089263c660247a492214e75",
+      "currentDigest": "ed6ddc6630839b95994598119c30f918fd91a1298f0778b4e451db9ffa3461bd",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s7-proposals-redesigns-10-coordination-dispatch-contract.json",
+      "claimId": "claim_3bff4a1279be63767ac64ca80a9e7ae3",
+      "targetOwner": "docs/platform/proposals/coordination-dispatch-contract.md",
+      "targetAnchor": "unheaded-block-5",
+      "beforeDigest": "b584a09e419efdcaa3c420106c969b32f6db91c76b1f8917a63dd00ce3147986",
+      "currentDigest": "b2a03516a51bc71238172fde6f40445aeaeea73d77e6f13d175fac93f7f2ef8a",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s7-proposals-redesigns-11-coordination-envelope-probe-contract.json",
+      "claimId": "claim_664c9c703db94a0b25604992cf8fea3c",
+      "targetOwner": "docs/platform/proposals/coordination-envelope-probe-contract.md",
+      "targetAnchor": "coordination-envelope-minimal-probe-contract",
+      "beforeDigest": "73c9b2b1727e37484c19f4f10f937ac217f02f3ac74c7d8f6005e0d43a5c799a",
+      "currentDigest": "f92a789a540939691e20447ee95c7ed09c52c3653a7b6f3d54255d2035c524bf",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s7-proposals-redesigns-13-coordination-worker-provider-boundary.json",
+      "claimId": "claim_b14ddf97149f92e5affb869808ca149a",
+      "targetOwner": "docs/platform/proposals/coordination-worker-provider-boundary.md",
+      "targetAnchor": "coordination-envelope-worker-provider-and-control-boundary",
+      "beforeDigest": "a3af59cfe684b859097c56dc9d60c9047b985f2b53aa22ba74790eb6a727fae9",
+      "currentDigest": "4e1184996da04acbc5df6982f9491dac2cf708daa140af5f987c9851b266c303",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s7-proposals-redesigns-13-coordination-worker-provider-boundary.json",
+      "claimId": "claim_0f93665c6afb3f743c01e1202e1818af",
+      "targetOwner": "docs/platform/proposals/coordination-worker-provider-boundary.md",
+      "targetAnchor": "unheaded-block-5",
+      "beforeDigest": "92d84affebc7949c2d85729d4a6764eb314bea43d4e70eeb001c48ebab3b184c",
+      "currentDigest": "72536c29d2df2e8697357cd9be3679c430f7d8af6dbe3d87b4564404aa394ffe",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s7-proposals-redesigns-13-coordination-worker-provider-boundary.json",
+      "claimId": "claim_af86398e2f1675cee4c1d79bcc7024b9",
+      "targetOwner": "docs/platform/proposals/coordination-worker-provider-boundary.md",
+      "targetAnchor": "decision-proposed",
+      "beforeDigest": "76f745dee6472d327d95766bc195c770277b33104b7a7f31e2efefc195302984",
+      "currentDigest": "c291e7aed9e1f0c5311835f5621af5e5167792f70834bf18993cfc5cce3597ad",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s7-proposals-redesigns-13-coordination-worker-provider-boundary.json",
+      "claimId": "claim_e44d052c8d8bf3a682a81ae9eee0344b",
+      "targetOwner": "docs/platform/proposals/coordination-worker-provider-boundary.md",
+      "targetAnchor": "unheaded-block-6",
+      "beforeDigest": "068d5ba8a9141f442f0fb4176ba27c6c3522623b322b5765e83afd20eab98d15",
+      "currentDigest": "9b028155e909cdb7306c3ad94330b573fb28acf32d599af019c04784201efbb8",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s7-proposals-redesigns-15-readme.json",
+      "claimId": "claim_5f915941b6acdfb3a08345abf0e0719e",
+      "targetOwner": "docs/platform/proposals/README.md",
+      "targetAnchor": "architect-level-proposals",
+      "beforeDigest": "ba23c9f7168a47d266068ab83548609fee3b0a4fa5dc6f7d8dd1b256df38a6b0",
+      "currentDigest": "03330e9b08cb144dc36c76550e849444c3e07f5a13ec984602cf4268698e6fc6",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s7-proposals-redesigns-16-step-09-group-thinking-substrate.json",
+      "claimId": "claim_45e2e391f46f70ce6e48eb2dcdcae936",
+      "targetOwner": "docs/platform/proposals/step-09-group-thinking-substrate.md",
+      "targetAnchor": "step-09---group-thinking-substrate",
+      "beforeDigest": "96585078e961d44eda9b2c8a7eb1c6143fc19ba767e1d9af2bd9b4c134cb0852",
+      "currentDigest": "c15fa170528c44ad2606708ed436de6f127e51ec0910cbbe6b34a37feab0208e",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s7-proposals-redesigns-16-step-09-group-thinking-substrate.json",
+      "claimId": "claim_2b571132cc8fd45580b1ec2dba340ba9",
+      "targetOwner": "docs/platform/proposals/step-09-group-thinking-substrate.md",
+      "targetAnchor": "unheaded-block-4",
+      "beforeDigest": "ddf1c9b771d35632b8996a162617a65b7ff4ec46571cb54e8243868d1b689ac6",
+      "currentDigest": "e68ebd47320c4a1fff98d30af36953f77631b9b4867e29463d085f618c2638b1",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s7-proposals-redesigns-16-step-09-group-thinking-substrate.json",
+      "claimId": "claim_3865318571c3ebc0fed1203eddbca0c1",
+      "targetOwner": "docs/platform/proposals/step-09-group-thinking-substrate.md",
+      "targetAnchor": "5-prompt-source-not-runtime-dependency",
+      "beforeDigest": "bd0c7548f4f71e9a4a22b6b6e7969d3731c12f5b68cacc813c200af23bf6b845",
+      "currentDigest": "e799486b069151affad99d34ae91de8d072b833dcc183a52ca0cfc6d7abb6457",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s7-proposals-redesigns-16-step-09-group-thinking-substrate.json",
+      "claimId": "claim_77e26521b60e819e54cd3ddaebf8f20f",
+      "targetOwner": "docs/platform/proposals/step-09-group-thinking-substrate.md",
+      "targetAnchor": "unheaded-block-20",
+      "beforeDigest": "ae1fe31eb4a902e012d8b99dd9cdc7d65ef20ba4e21c3001445d8216daeafb98",
+      "currentDigest": "74a1489a661f1f1399df4300f3d2e1ec8660b9de9ab89583d3d0b1dc05e94898",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s7-proposals-redesigns-18-step-10-a0-coding-domain-boundary-facade-plan.json",
+      "claimId": "claim_7fed1f167acdf29bf268addf2981941f",
+      "targetOwner": "docs/platform/proposals/step-10-a0-coding-domain-boundary-facade-plan.md",
+      "targetAnchor": "step-10-a0---coding-domain-boundary-and-facade-plan",
+      "beforeDigest": "5bf2a3ef2be08019d1200bfb0822da8b451c7fda67d81ec78168b0393f1d153c",
+      "currentDigest": "aa837afe6a57d9a7999aaedbc6972f2326e16b754c09f84c9104f2eff6237ec1",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s7-proposals-redesigns-18-step-10-a0-coding-domain-boundary-facade-plan.json",
+      "claimId": "claim_94e58d864019824b8d86ebfa2a2deb55",
+      "targetOwner": "docs/platform/proposals/step-10-a0-coding-domain-boundary-facade-plan.md",
+      "targetAnchor": "unheaded-block-5",
+      "beforeDigest": "8c989b699666efde304cf6ad263caa69bc1cb02b3842a87f09dbae166602755a",
+      "currentDigest": "ae8249b8edf47c319ae13ee94acf20330568d2567ee9937b6909d1d76f9ad039",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s7-proposals-redesigns-19-step-10-coding-domain-adoption.json",
+      "claimId": "claim_7539ce5504b8ca9079f56a1ea32d72d9",
+      "targetOwner": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+      "targetAnchor": "step-10---coding-domain-adoption-of-the-coordination-foundation",
+      "beforeDigest": "0f62bfc397e8c3151ffac4d9ae7849d7222516c0708ba4c41a649c7c560251ce",
+      "currentDigest": "5dbab26a094bf907350b2791dbc50948793875dcc8b0d410619d08e38e8b57b5",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s7-proposals-redesigns-19-step-10-coding-domain-adoption.json",
+      "claimId": "claim_be4eaf1334073b4789d9465ca073ca10",
+      "targetOwner": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+      "targetAnchor": "1-how-to-read-this-draft",
+      "beforeDigest": "6b25a37938e9866fcdd2d75b1146dcd8f169f3f79b77ee811d51226951caa2f6",
+      "currentDigest": "8dd84be02faf5679c0ebb4d1bb391dec8708a7d05a1415a72f80d3ea733f8d1a",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s7-proposals-redesigns-19-step-10-coding-domain-adoption.json",
+      "claimId": "claim_b8e7045d6255883081d81c5e4113fc56",
+      "targetOwner": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+      "targetAnchor": "unheaded-block-8",
+      "beforeDigest": "9a72764f43e157ead45583cb9c4c767db45439bc8754e850f2594e1dc750de89",
+      "currentDigest": "b57ad9fd56b40bee0fb7af1950580d38253328cb42477445ca2645ad79cb6f5c",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s7-proposals-redesigns-20-visibility-and-interactive-contact-herdr-spawn.json",
+      "claimId": "claim_427e36a559f714ab23628142cec0c7aa",
+      "targetOwner": "docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md",
+      "targetAnchor": "visibility-và-interactive-contact-trong-dispatch-execution-herdr-spawn-là-candidate-đầu-tiên",
+      "beforeDigest": "123a08add0c34cce298f2c769a965c59ce4abc1cf6bb75a326e23615980e5b51",
+      "currentDigest": "e9394c246cbe0e27e30ac12ce4b84e8fde484d51f3e4faff3b167e77fb80f786",
+      "status": "next-package native --rebind ALL drift and independent review"
+    },
+    {
+      "shard": "s7-proposals-redesigns-20-visibility-and-interactive-contact-herdr-spawn.json",
+      "claimId": "claim_7765c8384841109f54c726219b338219",
+      "targetOwner": "docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md",
+      "targetAnchor": "unheaded-block-5",
+      "beforeDigest": "1553f0c7bb5f4fcb29b30874cad24453111978f09fed4d8d7cbbce0d2ffec371",
+      "currentDigest": "96cc53c4805e83d00d148109c625bb58ce48ca514b3907c4007ed3ece6d410a1",
+      "status": "next-package native --rebind ALL drift and independent review"
+    }
+  ],
+  "newUnitDrafts": 7
+}

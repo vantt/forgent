@@ -21,7 +21,7 @@ Superseded by: None
 
 Added in candidate: Candidate alternative recommendation using the surviving Assignment/Run execution substrate. The session engine cited by the source was removed in 2180b4e72; this envelope recommendation remains unaccepted. Original source metadata and text follow. Physical relative-link destinations alone are rebased to the same repository paths. Units with inherited missing links are preserved as literal fenced source text, without substituting another design or changing any assertion. Source metadata is provenance, not candidate authority.
 
-Source relationship: [original source](coordination-capability-envelope.md).
+Source relationship: [original source](../../architect/proposals/coordination-capability-envelope.md).
 
 
 Document type: Proposal
@@ -36,9 +36,9 @@ State class: State — current conceptual recommendation; independent review rem
 Current investigation status and next steps:
 [Chat progress and handoff](../agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md).
 
-Read [Reading Map](../../specs/reading-map.md), [Runner spec](../runner/README.md),
-[Agent Coordination Vision](../agent-coordination/README.md),
-[Intent Preservation Ledger](../agent-coordination/README.md), and
+Read [Reading Map](../../specs/reading-map.md), [Runner spec](../runner/spec.md),
+[Agent Coordination Vision](../agent-coordination/vision.md),
+[Intent Preservation Ledger](../agent-coordination/history/retired-engine/legacy/intent-preservation-ledger.md), and
 [System Vision: Trong Mem Ngoai Cung](../system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md) first.
 
 Inputs:
@@ -48,7 +48,7 @@ Inputs:
 - [Foundation baseline](../agent-coordination/history/retired-engine/files/architecture/coordination-foundation-baseline.md),
   [FlowDefinition contract](../agent-coordination/history/retired-engine/files/contracts/flow-definition.md),
   [CoordinationSession contract](../agent-coordination/history/retired-engine/files/contracts/coordination-session.md).
-- [Raw master-coordination prompt](../agent-coordination/README.md),
+- [Raw master-coordination prompt](../agent-coordination/playbooks/prompts/master-coordinator.md),
   [Architecture Advisory proposal](architecture-advisory-panel.md), and
   [Plan Loop proposal](../agent-coordination/history/proposals-redesigns/group-thinking-plan-loop.md).
 

@@ -1,0 +1,93 @@
+{
+  "SYNC": "e7393ea3c",
+  "scopeViolations": [],
+  "protectedTools": [
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "expected": "a52981ff2862cc2c553dbb3181e4e822a26b146b",
+      "actual": "a52981ff2862cc2c553dbb3181e4e822a26b146b"
+    },
+    {
+      "path": "scripts/doc-inventory-artifact.mjs",
+      "expected": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64",
+      "actual": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64"
+    },
+    {
+      "path": "scripts/generate-shipped-path-inventory.mjs",
+      "expected": "0f1cd7e1cee308772c0b56c37f3190333039cfb3",
+      "actual": "0f1cd7e1cee308772c0b56c37f3190333039cfb3"
+    },
+    {
+      "path": "scripts/check-legacy-docs-ratchet.mjs",
+      "expected": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d",
+      "actual": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d"
+    },
+    {
+      "path": "scripts/lib/is-main-module.mjs",
+      "expected": "680570946fa1381474900c9192795514b5b88f48",
+      "actual": "680570946fa1381474900c9192795514b5b88f48"
+    }
+  ],
+  "legacySourceByteEquality": {
+    "docs/specs/reading-map.md": true,
+    "docs/specs/runner.md": true,
+    "docs/architecture-manifest.json": true,
+    "docs/explanation/orphaned-runtime-claim-recovery-unclaim-verb.md": true,
+    "docs/specs/confinement-authority.md": true,
+    "AGENTS.md": true,
+    "CLAUDE.md": true
+  },
+  "registryUnchanged": true,
+  "nativeSyncCount": 0,
+  "reviewPacks": 0,
+  "mainVerbatimCarry": [
+    {
+      "sourceStartLine": 889,
+      "target": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "verbatim": true
+    },
+    {
+      "sourceStartLine": 904,
+      "target": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "verbatim": true
+    },
+    {
+      "sourceStartLine": 1268,
+      "target": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+      "verbatim": true
+    },
+    {
+      "sourceStartLine": 1270,
+      "target": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+      "verbatim": true
+    },
+    {
+      "sourceStartLine": 3345,
+      "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "verbatim": true
+    }
+  ],
+  "readingMap": {
+    "sourceEntries": 53,
+    "targetEntries": 53,
+    "correctedEntries": 7,
+    "labelledCorrections": 7
+  },
+  "headerDuplicateFieldsRemaining": [],
+  "linkFindings": [],
+  "ABHI": {
+    "A": true,
+    "B": true,
+    "H": true,
+    "I": true
+  },
+  "scopedDCounts": [
+    5,
+    5,
+    5
+  ],
+  "nativeTransitionBlockers": 5,
+  "targetDriftQueued": 88,
+  "gitDiffCheck": "",
+  "authoringAuditPass": true
+}

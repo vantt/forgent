@@ -1,0 +1,138 @@
+{
+  "SYNC": "e7393ea3c",
+  "native": false,
+  "nativeSyncCount": 0,
+  "note": "Explicit draft rows only; native identities are intentionally not minted in a docs turn. Next package resolves all seven drafts after sync, preserving all predecessors. Do not treat gap ids as settled native claims.",
+  "claims": [
+    {
+      "claimId": "claim_identity_gap_f051910ffa6cb7a164ca1943",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "khóa-hoạt-động-cây-chính-chặn-commit-trần-khi-phiên-khác-đang-hoạt-động-str65",
+      "sourceUnitDigest": "1c46bbd825e116160efeadcef33dab9d2fa69c0ba9985af5de2d4e717cf7b577",
+      "claimKind": "specification",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "khóa-hoạt-động-cây-chính-chặn-commit-trần-khi-phiên-khác-đang-hoạt-động-str65",
+      "targetUnitDigest": "1c46bbd825e116160efeadcef33dab9d2fa69c0ba9985af5de2d4e717cf7b577",
+      "targetAncestry": [
+        "Added in candidate: Runner Behaviors & Operations",
+        "Behaviors & Operations"
+      ],
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792079321432-41fe2051@2026-10-15",
+      "rationale": "L10-14 / A31: every changed upstream span carried verbatim into mapped runner/root carrier; prior labelled truth corrections in the enclosing pointer list remain. Source and target unit digests disclose their inequality where applicable. Explicit identity-gap draft from unchanged buildInventoryRow, not a native identity assignment. Next package must resolve this draft to its native identity after ONE sync; no review or approval carry.",
+      "provisionalIdentity": true
+    },
+    {
+      "claimId": "claim_identity_gap_36c87c85d4985dcca94d8f5d",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-52",
+      "sourceUnitDigest": "325f9c8c7a59c1dfe6ece4b1b20bb12769d8239db1ad80a0e8c3b20d236ea62c",
+      "claimKind": "specification",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-40",
+      "targetUnitDigest": "325f9c8c7a59c1dfe6ece4b1b20bb12769d8239db1ad80a0e8c3b20d236ea62c",
+      "targetAncestry": [
+        "Added in candidate: Runner Behaviors & Operations",
+        "Behaviors & Operations",
+        "Khóa hoạt động cây chính — chặn commit trần khi phiên khác đang hoạt động (STR65)"
+      ],
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792079321432-41fe2051@2026-10-15",
+      "rationale": "L10-14 / A31: every changed upstream span carried verbatim into mapped runner/root carrier; prior labelled truth corrections in the enclosing pointer list remain. Source and target unit digests disclose their inequality where applicable. Explicit identity-gap draft from unchanged buildInventoryRow, not a native identity assignment. Next package must resolve this draft to its native identity after ONE sync; no review or approval carry.",
+      "provisionalIdentity": true
+    },
+    {
+      "claimId": "claim_identity_gap_80056d28731c311a228dfd22",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "pointers-implementation",
+      "sourceUnitDigest": "4bed9c69a1de3312aca4a42931d4d848718ce35f6e8ee2c964b4395748e3cf10",
+      "claimKind": "specification",
+      "targetOwner": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+      "targetAnchor": "pointers-implementation",
+      "targetUnitDigest": "077e4456152fabdeec033b95bef9434aacc5236a1b550dd1e752bd1b36f876a9",
+      "targetAncestry": [
+        "Added in candidate: Runner Pointers (implementation)"
+      ],
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792079321432-41fe2051@2026-10-15",
+      "rationale": "L10-14 / A31: every changed upstream span carried verbatim into mapped runner/root carrier; prior labelled truth corrections in the enclosing pointer list remain. Source and target unit digests disclose their inequality where applicable. Explicit identity-gap draft from unchanged buildInventoryRow, not a native identity assignment. Next package must resolve this draft to its native identity after ONE sync; no review or approval carry.",
+      "provisionalIdentity": true
+    },
+    {
+      "claimId": "claim_identity_gap_9fe663cdce2f5027860ac5df",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-102",
+      "sourceUnitDigest": "29fd80cd85f3529f3dcc99950563df4461655efc9d0550abe9dc52b199d07854",
+      "claimKind": "specification",
+      "targetOwner": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+      "targetAnchor": "unheaded-block-2",
+      "targetUnitDigest": "ae0e268fad727f5deda17cf43d013aa1710f5cea2506fdd844809c3c8e98511f",
+      "targetAncestry": [
+        "Added in candidate: Runner Pointers (implementation)"
+      ],
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792079321432-41fe2051@2026-10-15",
+      "rationale": "L10-14 / A31: every changed upstream span carried verbatim into mapped runner/root carrier; prior labelled truth corrections in the enclosing pointer list remain. Source and target unit digests disclose their inequality where applicable. Explicit identity-gap draft from unchanged buildInventoryRow, not a native identity assignment. Next package must resolve this draft to its native identity after ONE sync; no review or approval carry.",
+      "provisionalIdentity": true
+    },
+    {
+      "claimId": "claim_identity_gap_8a4c242ba1875eec061aa8f5",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "0064-hook-commit-để-lại-đèn-hoạt-động-riêng-không-ghi-main-checkoutlock-người-tranh-xét-record-theo-ttlms-của-chính-holder-checkpoint-dưới-merge-slot-giữ-main-mutex",
+      "sourceUnitDigest": "dbd2125739c4bcd43eae0e2abb00500fb4b4f309a84d2ba6ef751cc5141b674e",
+      "claimKind": "specification",
+      "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "targetAnchor": "0064-hook-commit-để-lại-đèn-hoạt-động-riêng-không-ghi-main-checkoutlock-người-tranh-xét-record-theo-ttlms-của-chính-holder-checkpoint-dưới-merge-slot-giữ-main-mutex",
+      "targetUnitDigest": "dbd2125739c4bcd43eae0e2abb00500fb4b4f309a84d2ba6ef751cc5141b674e",
+      "targetAncestry": [
+        "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)"
+      ],
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792079321432-41fe2051@2026-10-15",
+      "rationale": "L10-14 / A31: every changed upstream span carried verbatim into mapped runner/root carrier; prior labelled truth corrections in the enclosing pointer list remain. Source and target unit digests disclose their inequality where applicable. Explicit identity-gap draft from unchanged buildInventoryRow, not a native identity assignment. Next package must resolve this draft to its native identity after ONE sync; no review or approval carry.",
+      "provisionalIdentity": true
+    },
+    {
+      "claimId": "claim_identity_gap_f3edfc78bd62d582720dd91c",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-330",
+      "sourceUnitDigest": "2b6d9c95cda4a9c5c9e36a2acd67da0f030a9cfd01e83e7932e10cdbcd814ce8",
+      "claimKind": "specification",
+      "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "targetAnchor": "unheaded-block-190",
+      "targetUnitDigest": "2b6d9c95cda4a9c5c9e36a2acd67da0f030a9cfd01e83e7932e10cdbcd814ce8",
+      "targetAncestry": [
+        "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "0064 — Hook commit để lại đèn hoạt động riêng, không ghi `main-checkout.lock`; người tranh xét record theo `ttlMs` của chính holder; checkpoint dưới merge slot giữ main mutex"
+      ],
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792079321432-41fe2051@2026-10-15",
+      "rationale": "L10-14 / A31: every changed upstream span carried verbatim into mapped runner/root carrier; prior labelled truth corrections in the enclosing pointer list remain. Source and target unit digests disclose their inequality where applicable. Explicit identity-gap draft from unchanged buildInventoryRow, not a native identity assignment. Next package must resolve this draft to its native identity after ONE sync; no review or approval carry.",
+      "provisionalIdentity": true
+    },
+    {
+      "claimId": "claim_identity_gap_9631653c23ccae49e3f81306",
+      "sourcePath": "docs/architecture-manifest.json",
+      "sourceAnchor": "file-block",
+      "sourceUnitDigest": "92391ce631b0c3602a5e22947a73182a6fd37f148e4b052cb4749a55b7657a6d",
+      "claimKind": "contract",
+      "targetOwner": "docs/platform/contracts/architecture-manifest.json",
+      "targetAnchor": "file-block",
+      "targetUnitDigest": "92391ce631b0c3602a5e22947a73182a6fd37f148e4b052cb4749a55b7657a6d",
+      "targetAncestry": [],
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792079321432-41fe2051@2026-10-15",
+      "rationale": "L10-14 / A31: every changed upstream span carried verbatim into mapped runner/root carrier; prior labelled truth corrections in the enclosing pointer list remain. Source and target unit digests disclose their inequality where applicable. Explicit identity-gap draft from unchanged buildInventoryRow, not a native identity assignment. Next package must resolve this draft to its native identity after ONE sync; no review or approval carry.",
+      "provisionalIdentity": true
+    }
+  ]
+}

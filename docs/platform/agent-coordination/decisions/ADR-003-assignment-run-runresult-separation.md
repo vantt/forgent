@@ -20,7 +20,7 @@ Added in candidate: Current-owner evidence and explicit historical section separ
 ```
 ## Current Scope
 
-This candidate retains the surviving owner and boundary below. It is not a second runtime schema or an approval of the former engine. Current execution authority remains [the runner spec](../../runner/README.md).
+This candidate retains the surviving owner and boundary below. It is not a second runtime schema or an approval of the former engine. Current execution authority remains [the runner spec](../../runner/spec.md).
 
 The normalizer takes distinct Assignment and Run identifiers; Unit execution identity and round are separate inputs. Evidence: `src/runner/dispatch/run-result.mjs:350-355`.
 

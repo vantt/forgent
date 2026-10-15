@@ -200,7 +200,7 @@ surface is this platform area.
 | preservation audit | [verification/source-preservation-audit.md](verification/source-preservation-audit.md) |
 | code-panel rollout plan | [code-panel-rollout-plan.md](code-panel-rollout-plan.md) |
 | historical source | [history/distribution-baseline.md](history/distribution-baseline.md) |
-| platform boundary map | [../../architect/component-boundary/README.md](../component-boundary.md) |
+| platform boundary map | [../component-boundary.md](../component-boundary.md) |
 
 
 ## Retained Readme Source Detail

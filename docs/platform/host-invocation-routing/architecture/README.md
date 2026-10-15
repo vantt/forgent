@@ -5,10 +5,8 @@ Document type: Architecture index
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Route readers through accepted and planned host-invocation architecture
 Design status: Draft
-Implementation status: R1/R2/R3 implemented preview plus future host/component migrations
 Canonical: Yes, after review
 Owner: Host invocation
-Source type: Promoted from docs/architect/host-invocation-routing/**
 Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/README.md

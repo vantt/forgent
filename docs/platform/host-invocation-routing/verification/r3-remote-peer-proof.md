@@ -5,10 +5,8 @@ Document type: Verification
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Preserve the proof gate for production remote peer adoption
 Design status: Draft
-Implementation status: Implemented preview (R3-P0 frozen; R3-P1 adapter implemented preview; R3-P2/P3 route and proof closed; R3-P4 inventory recorded)
 Canonical: Yes, after review
 Owner: Host invocation
-Source type: Promoted from docs/architect/host-invocation-routing/node-to-rust-component-migration.md and rust-cli-and-proof-components-plan.md
 Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/architecture/host-use-cases.md
@@ -111,4 +109,4 @@ Migrating any remaining routes is strictly out of R3 scope. Writes stay out of t
 | execution record | [../../../../plans/260918-host-invocation-r3-remote-peer/plan.md](../../../../archive/plans/260918-host-invocation-r3-remote-peer/plan.md) |
 | host use cases | [../architecture/host-use-cases.md](../architecture/host-use-cases.md) |
 | release boundaries | [../architecture/release-boundaries.md](../architecture/release-boundaries.md) |
-| source migration | [../../../architect/host-invocation-routing/node-to-rust-component-migration.md](../README.md) |
+| source migration | [../architecture/node-to-rust-migration.md](../architecture/node-to-rust-migration.md) |

@@ -5,10 +5,8 @@ Document type: Verification
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Preserve the proof gate for the distributable Rust CLI host
 Design status: Draft
-Implementation status: Published preview installed/default proof plus open stable graduation
 Canonical: Yes, after review
 Owner: Host invocation
-Source type: Promoted from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md
 Last reviewed: 2026-09-21
 Related:
 - docs/platform/host-invocation-routing/architecture/release-boundaries.md
@@ -91,4 +89,4 @@ Post-release CI: 35498322149, success, including external consumer proof
 | release boundaries | [../architecture/release-boundaries.md](../architecture/release-boundaries.md) |
 | compatibility harness | [compatibility-harness.md](compatibility-harness.md) |
 | release manifest contract | [../../packaging-distribution/contracts/release-manifest.md](../../packaging-distribution/contracts/release-manifest.md) |
-| source plan | [../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../README.md) |
+| source plan | [../roadmap.md](../roadmap.md) |

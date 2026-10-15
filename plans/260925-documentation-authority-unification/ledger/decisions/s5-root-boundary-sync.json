@@ -265,8 +265,8 @@
       "sourceUnitDigest": "3cb37dbc28864019579211dcadd7e189fb667783946e770ad45a9a81c2ca5b30",
       "claimKind": "navigation",
       "disposition": "reclassify-out-of-platform-scope",
-      "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
-      "rationale": "L10-1/L10-4: retain repository-wide navigation outside platform authority. The complete 53-entry curated list from docs/specs/reading-map.md is now preserved verbatim in docs/reading-map.md#5-detailed-product-and-source-map, including the two pre-existing portal routes with reconciled descriptions. Legacy source and paths remain intact; Phase 9 owns consumer repointing. Known stale carried sentences; full truth check owed at promotion (A35). No truth approval or cutover authority is inferred. This native source unit #unheaded-block-2 is re-decided pending independent navigation/conservation review.",
+      "authoredBy": "codex-session:unit-run-1792079321432-41fe2051@2026-10-15",
+      "rationale": "Retained repository navigation outside platform authority; merged 53-entry list with seven labelled truth corrections. Legacy source unchanged; no cutover authority. L10-12 truth correction: seven false reading-map entries corrected with labelled file:line evidence; retained legacy source untouched. Full before/after in step10-correction-truth.json.",
       "reviewStatus": "pending"
     },
     {

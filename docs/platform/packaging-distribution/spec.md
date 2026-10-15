@@ -436,7 +436,7 @@ Last reviewed: 2026-09-13
 ```
 
 > Status: historical redirect. Active topology remains
-> [docs/architect/workspace-topology.md](../system-architecture/architecture/workspace-topology.md), while active
+> [docs/platform/system-architecture/architecture/workspace-topology.md](../system-architecture/architecture/workspace-topology.md), while active
 > packaging-distribution runtime records live under
 > [docs/platform/packaging-distribution/](README.md).
 > Keep this file only as the old pointer that explains the split.

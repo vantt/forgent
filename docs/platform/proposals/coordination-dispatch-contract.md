@@ -21,7 +21,7 @@ Superseded by: None
 
 Added in candidate: Candidate carriage; Keep the map proposal conservatively: the shared dispatch boundary survives. No acceptance of its unbuilt coordinator-facing contract or historical observations as current truth. Original source metadata and text follow. Physical relative-link destinations alone are rebased to the same repository paths. Units with inherited missing links are preserved as literal fenced source text, without substituting another design or changing any assertion. Source metadata is provenance, not candidate authority.
 
-Source relationship: [original source](coordination-dispatch-contract.md).
+Source relationship: [original source](../../architect/proposals/coordination-dispatch-contract.md).
 
 
 Document type: Proposal
@@ -31,7 +31,7 @@ Last reviewed: 2026-09-06
 Canonical for: nothing until accepted; conceptual boundary for the current architecture review
 State class: State
 
-Related: [Dispatch Control Plane](../agent-coordination/README.md),
+Related: [Dispatch Control Plane](../agent-coordination/architecture/dispatch-control-plane.md),
 [Coordination capability envelope](coordination-capability-envelope.md),
 [Worker/provider/control boundary](coordination-worker-provider-boundary.md),
 [Progress](../agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md).

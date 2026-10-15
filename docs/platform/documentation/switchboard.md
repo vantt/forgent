@@ -112,7 +112,7 @@ and reader guesswork before atomic cutover.
 |---|---|
 | reader orientation | [docs/reading-map.md](../../reading-map.md) |
 | platform portal | [docs/platform/README.md](../README.md) |
-| documentation governance | [docs/doc-governance.md](../governance.md) |
+| documentation governance | [docs/platform/governance.md](../governance.md) |
 | migration authoring rules | [docs/platform/migration-authoring-rules.md](../migration-authoring-rules.md) |
 | Phase 00 authority map (evidence) | [plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md](../../../plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md) |
 | active unification plan | [plans/260925-documentation-authority-unification/plan.md](../../../plans/260925-documentation-authority-unification/plan.md) |

@@ -28,7 +28,7 @@ The former coordination engine was retired in `2180b4e72701bb090288af8fe8021008d
 CollaborationPattern owns Unit collaboration patterns in `src/runner/execution/patterns/index.mjs`; Unit execution enters through `src/runner/execution/run.mjs`. Workflow execution belongs to `src/workflow/runner.mjs` and its Unit execution-core integration.
 The surviving Assignment/Run dispatch chain is also current: Assignment building, DispatchPlan compilation, governed execution and RunResult normalization are owned by `src/runner/dispatch/assignment.mjs`, `plan.mjs`, `assignment-runner.mjs` and `run-result.mjs`.
 
-Read [the runner spec](../runner/README.md) for the current execution contract, then [this area's current-owner map](spec.md). Do not treat CoordinationSession, CoordinationProtocol or FlowDefinition in the preserved documents as current implemented engine entities.
+Read [the runner spec](../runner/spec.md) for the current execution contract, then [this area's current-owner map](spec.md). Do not treat CoordinationSession, CoordinationProtocol or FlowDefinition in the preserved documents as current implemented engine entities.
 
 > **Ghi chú (2026-10-14, decision 0062 trong `docs/specs/runner.md`):** các cửa dispatch thô mà tài liệu, proof và roadmap trong thư mục này nhắc tới — `dispatch execute` (cả `--contract`, `--assignment`), `dispatch log`, `dispatch fanout-batch` — đã bị xoá. Việc chạy qua `fgos run "<prompt>"` / `fgos run --unit` hoặc `fgos workflow start`. Các bản ghi verification/proof giữ nguyên lệnh đã chạy lúc đó, như bằng chứng lịch sử.
 

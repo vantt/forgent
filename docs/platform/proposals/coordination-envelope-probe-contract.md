@@ -21,7 +21,7 @@ Superseded by: None
 
 Added in candidate: Candidate probe contract at the mapped proposals path, cited by coordination-capability-envelope.md and coordination-worker-provider-boundary.md. Execution remains unproven; the source gap observations are dated. Original source metadata and text follow. Physical relative-link destinations alone are rebased to the same repository paths. Units with inherited missing links are preserved as literal fenced source text, without substituting another design or changing any assertion. Source metadata is provenance, not candidate authority.
 
-Source relationship: [original source](coordination-envelope-probe-contract.md).
+Source relationship: [original source](../../architect/proposals/coordination-envelope-probe-contract.md).
 
 
 Document type: Proposal

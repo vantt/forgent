@@ -5,10 +5,8 @@ Document type: Verification
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Preserve the planned Node/Rust compatibility harness requirements
 Design status: Draft
-Implementation status: Current harness plus R2/R3 preview extensions
 Canonical: Yes, after review
 Owner: Host invocation
-Source type: Promoted from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md
 Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/contracts/command-route-descriptor.md
@@ -51,7 +49,7 @@ use from intentional legacy fallback use until that window closes.
 | --- | --- |
 | descriptor contract | [../contracts/command-route-descriptor.md](../contracts/command-route-descriptor.md) |
 | legacy transition | [../architecture/legacy-cli-transition.md](../architecture/legacy-cli-transition.md) |
-| source plan | [../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../README.md) |
+| source plan | [../roadmap.md](../roadmap.md) |
 
 ## Restored registry linker procedure and its input output formula
 

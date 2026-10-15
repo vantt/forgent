@@ -5,10 +5,8 @@ Document type: Architecture
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Define the transitional Node CLI lane and semantic Node bridge boundary
 Design status: Draft
-Implementation status: Implemented preview with legacy-current payload behavior
 Canonical: Yes, after review
 Owner: Host invocation
-Source type: Promoted from docs/architect/host-invocation-routing/legacy-cli-transition.md
 Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/contracts/command-route-descriptor.md
@@ -41,8 +39,8 @@ Node transition uses two distinct adapters. `LegacyCliPassthroughProvider` is CL
 | Design claim | Implementation status | Evidence | Gap / next action |
 | --- | --- | --- | --- |
 | Existing Node CLI remains legacy-current. | `legacy-current` | [../../../../bin/fgos.mjs](../../../../bin/fgos.mjs) and current tests | Keep valid during transition. |
-| `legacy-cli` route bypasses `InvocationService`. | `implemented preview` | [source transition §1](legacy-cli-transition.md#1-two-distinct-adapters), [../../../../apps/fgos/src/main.rs](../../../../apps/fgos/src/main.rs), [../../../../apps/fgos/src/legacy_exec.rs](../../../../apps/fgos/src/legacy_exec.rs), [../verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md) | Keep until each selector migrates from `legacy-cli` to `native`. |
-| `fgos.v1` belongs to CLI presenter. | `implemented preview` | [source transition §4](legacy-cli-transition.md#4-public-presentation-versus-semantic-outcome), [../verification/compatibility-harness.md](../verification/compatibility-harness.md), [../verification/r3-remote-peer-proof.md](../verification/r3-remote-peer-proof.md) | R3 proves remote `/runtime` does not parse or emit the CLI `fgos.v1` envelope. Keep compatibility vectors current while legacy selectors remain. |
+| `legacy-cli` route bypasses `InvocationService`. | `implemented preview` | [source transition §1](../../../architect/host-invocation-routing/legacy-cli-transition.md#1-two-distinct-adapters), [../../../../apps/fgos/src/main.rs](../../../../apps/fgos/src/main.rs), [../../../../apps/fgos/src/legacy_exec.rs](../../../../apps/fgos/src/legacy_exec.rs), [../verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md) | Keep until each selector migrates from `legacy-cli` to `native`. |
+| `fgos.v1` belongs to CLI presenter. | `implemented preview` | [source transition §4](../../../architect/host-invocation-routing/legacy-cli-transition.md#4-public-presentation-versus-semantic-outcome), [../verification/compatibility-harness.md](../verification/compatibility-harness.md), [../verification/r3-remote-peer-proof.md](../verification/r3-remote-peer-proof.md) | R3 proves remote `/runtime` does not parse or emit the CLI `fgos.v1` envelope. Keep compatibility vectors current while legacy selectors remain. |
 
 ## 4. Related Files
 
@@ -51,7 +49,7 @@ Node transition uses two distinct adapters. `LegacyCliPassthroughProvider` is CL
 | command route descriptor | [../contracts/command-route-descriptor.md](../contracts/command-route-descriptor.md) |
 | legacy payload contract | [../contracts/legacy-payload.md](../contracts/legacy-payload.md) |
 | compatibility harness | [../verification/compatibility-harness.md](../verification/compatibility-harness.md) |
-| source transition | [../../../architect/host-invocation-routing/legacy-cli-transition.md](../README.md) |
+| source transition | [../../../architect/host-invocation-routing/legacy-cli-transition.md](../../../architect/host-invocation-routing/legacy-cli-transition.md) |
 
 ## Retained selected source material
 
@@ -105,7 +103,7 @@ Three things are separated that the name `bin/fgos.mjs` currently conflates:
 
 **The Node program is not relocated and not renamed in the source tree** (decided 2026-09-10). `bin/fgos.mjs` computes its package root from its own file location and imports `../src/...` relatively, so moving the entry alone breaks it, and moving the whole Node package would decide the Node-side repo layout that [Repo Layout Vision](../../component-boundary.md) §7 deliberately defers (and would mislabel `src/state`, `src/runner` — which `fgos-runner` keeps using — as "legacy"). The payload is therefore the current npm package exactly as `package.json` `files` defines it, staged whole by the release builder under the manifest's `components.legacyNode.root` (`libexec/legacy-node/` in a staged release) with the same relative layout as the source tree — zero import changes, `bin/fgos.mjs` and `bin/fgos-runner.mjs` both inside it. The identity is renamed (`legacy-node`), the file is not; a filesystem rename happens only when the payload is deleted.
 
-The public `fgos` executable is the platform Rust host. It resolves the legacy payload as `join(activeReleasePath, components.legacyNode.root, components.legacyNode.entry)` read from the activation binding's manifest — never from `PATH`, never from the caller's cwd, never as an alternate package-manager `bin` entry, and never hardcoded. A `dev:<rev>` source activation declares `root: "."`, `entry: "bin/fgos.mjs"`, `entries.fgos: "target/release/fgos"`; a staged release declares `root: "libexec/legacy-node"`, `entries.fgos: "bin/fgos"`. One mechanism serves dogfood and production ([Runtime Identity And Activation](../../packaging-distribution/README.md) §5).
+The public `fgos` executable is the platform Rust host. It resolves the legacy payload as `join(activeReleasePath, components.legacyNode.root, components.legacyNode.entry)` read from the activation binding's manifest — never from `PATH`, never from the caller's cwd, never as an alternate package-manager `bin` entry, and never hardcoded. A `dev:<rev>` source activation declares `root: "."`, `entry: "bin/fgos.mjs"`, `entries.fgos: "target/release/fgos"`; a staged release declares `root: "libexec/legacy-node"`, `entries.fgos: "bin/fgos"`. One mechanism serves dogfood and production ([Runtime Identity And Activation](../../packaging-distribution/architecture/runtime-identity-and-activation.md) §5).
 
 Added in candidate — checked resolver status (2026-10-13): the preceding activation-binding paragraph is retained selected design. `apps/fgos/src/legacy_exec.rs:69-154` selects the release root from explicit release/dev environment bindings or executable-relative manifest discovery, then verifies the manifest and confined entry. The target identity status in spec.md remains `accepted-not-implemented`; checked resolver behavior does not certify the entire target contract. The ownership rule remains never from PATH, never from caller cwd, never as an alternate package-manager bin entry, and never hardcoded.
 
@@ -163,4 +161,4 @@ Added in candidate: this retained source detail is carried verbatim in [the drop
 
 - [Host Invocation And Provider Routing](../spec.md) — kernel contract this document depends on.
 - [External Provider Protocol](external-provider-protocol.md)
-- [Runtime Identity And Activation](../../packaging-distribution/README.md) — owns the legacy payload's actual on-disk location, `fgctl` rollback mechanics, and the `fgos init` / `fgos doctor --fix` / `fgos doctor` tail that supersedes deprecated legacy `fgos setup` onboarding behavior.
+- [Runtime Identity And Activation](../../packaging-distribution/architecture/runtime-identity-and-activation.md) — owns the legacy payload's actual on-disk location, `fgctl` rollback mechanics, and the `fgos init` / `fgos doctor --fix` / `fgos doctor` tail that supersedes deprecated legacy `fgos setup` onboarding behavior.

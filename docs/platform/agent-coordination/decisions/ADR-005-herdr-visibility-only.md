@@ -20,7 +20,7 @@ Added in candidate: Current-owner evidence and explicit historical section separ
 ```
 ## Current Scope
 
-This candidate retains the surviving owner and boundary below. It is not a second runtime schema or an approval of the former engine. Current execution authority remains [the runner spec](../../runner/README.md).
+This candidate retains the surviving owner and boundary below. It is not a second runtime schema or an approval of the former engine. Current execution authority remains [the runner spec](../../runner/spec.md).
 
 Visibility detachment changes only visibility state, not Run settlement truth. Evidence: `src/runner/dispatch/visibility-session.mjs:130-133`.
 

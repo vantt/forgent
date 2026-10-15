@@ -5,10 +5,8 @@ Document type: Architecture
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Define the target semantic invocation kernel and lifecycle shape
 Design status: Draft
-Implementation status: Current partial
 Canonical: Yes, after review
 Owner: Host invocation
-Source type: Promoted from docs/architect/host-invocation-routing/host-invocation-provider-routing.md
 Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/contracts/operation-request-outcome.md
@@ -54,4 +52,4 @@ The native kernel has exactly one semantic input/output boundary: `OperationRequ
 | operation request/outcome contract | [../contracts/operation-request-outcome.md](../contracts/operation-request-outcome.md) |
 | provider contract | [../contracts/operation-provider.md](../contracts/operation-provider.md) |
 | alignment | [../verification/implementation-alignment.md](../verification/implementation-alignment.md) |
-| source architecture | [../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../README.md) |
+| source architecture | [../spec.md](../spec.md) |

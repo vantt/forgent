@@ -21,7 +21,7 @@ Superseded by: None
 
 Added in candidate: Candidate proposal for the architecture-advisory use case, now served by core/workflows/architecture-advisory.yaml and core/skills/fgos-architecture-panel/SKILL.md. The original protocol was removed in 2180b4e72; its source Not started header is preserved as dated metadata. Original source metadata and text follow. Physical relative-link destinations alone are rebased to the same repository paths. Units with inherited missing links are preserved as literal fenced source text, without substituting another design or changing any assertion. Source metadata is provenance, not candidate authority.
 
-Source relationship: [original source](architecture-advisory-panel.md).
+Source relationship: [original source](../../architect/proposals/architecture-advisory-panel.md).
 
 
 Document type: Proposal

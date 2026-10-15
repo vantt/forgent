@@ -5,10 +5,8 @@ Document type: Area spec
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: State current and transition-state behavior for fgOS host invocation
 Design status: Draft
-Implementation status: R1/R2/R3 implemented preview plus partial route migration
 Canonical: Yes, after review
 Owner: Host invocation
-Source type: Promoted from docs/architect/host-invocation-routing/**
 Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/README.md
@@ -304,7 +302,7 @@ Added in candidate: this retained source detail is carried verbatim in [the drop
 
 R1 is three crates: `fgos`, `fgos-host-runtime`, `fgos-distribution`. The legacy exec lane is a module inside `apps/fgos`, not a crate, because it is CLI-adapter-local (§4). `component-protocol` waits for R2 (only an external-process adapter needs `EncodedMessage`). Extract further crates only when pressure is real. Neither app owns provider selection; neither host use case imports another; every host feeds the shared authority/router/contracts layer, and provider adapters depend on component protocols, not host presentation. A component is not created merely because one proof verb is convenient (`gate-bypass` stays under its settled authority, not a manufactured `gate-policy` component).
 
-Distribution selects and activates the trusted runtime (`fgctl`: acquire/stage/verify/activate/upgrade/rollback); host invocation routes inside the activated runtime. Packaging-distribution owns the onboarding command vocabulary: local `fgos init` adopts a workspace under the active identity on first use, `fgos doctor --fix` performs every later registered repair, and the target architecture has no separate `setup` verb. See [Runtime Identity And Activation](../packaging-distribution/README.md).
+Distribution selects and activates the trusted runtime (`fgctl`: acquire/stage/verify/activate/upgrade/rollback); host invocation routes inside the activated runtime. Packaging-distribution owns the onboarding command vocabulary: local `fgos init` adopts a workspace under the active identity on first use, `fgos doctor --fix` performs every later registered repair, and the target architecture has no separate `setup` verb. See [Runtime Identity And Activation](../packaging-distribution/architecture/runtime-identity-and-activation.md).
 
 #### 10. Release Boundaries
 
@@ -324,7 +322,7 @@ Chat is a valid future peer but does not gate R1/R2 until a real chat adapter an
 4. Does a later protocol version add a local socket transport after framed stdio has production evidence?
 5. What integrity/signature policy separates local development plugins from distributable ecosystem plugins?
 
-Target matrix, install/upgrade mechanism, and R1 definition are owned by packaging — see [Runtime Identity And Activation](../packaging-distribution/README.md).
+Target matrix, install/upgrade mechanism, and R1 definition are owned by packaging — see [Runtime Identity And Activation](../packaging-distribution/architecture/runtime-identity-and-activation.md).
 
 #### Related Documents
 
@@ -333,4 +331,4 @@ Target matrix, install/upgrade mechanism, and R1 definition are owned by packagi
 - [Node To Rust Component Migration](architecture/node-to-rust-migration.md)
 - [Rust Host And Proof Providers Implementation Plan](roadmap.md)
 - [Component Boundary Advisory](../component-boundary.md)
-- [Runtime Identity And Activation](../packaging-distribution/README.md)
+- [Runtime Identity And Activation](../packaging-distribution/architecture/runtime-identity-and-activation.md)

@@ -31,13 +31,13 @@ Superseded by: None recorded
 
 This document is the entry point of the candidate documents of the work state area. It holds navigation only.
 
-The documents listed here are candidate material. No reader reads them yet. The legacy documents stay canonical until the cutover: [docs/specs/work-state.md](README.md), [docs/io-contract.md](contracts/cli-io-contract.md).
+The documents listed here are candidate material. No reader reads them yet. The legacy documents stay canonical until the cutover: [docs/specs/work-state.md](../../specs/work-state.md), [docs/io-contract.md](../../io-contract.md).
 
 ## 2. Read First
 
 | Reader goal | Read |
 | --- | --- |
-| Find the canonical text today | [docs/specs/work-state.md](README.md), [docs/io-contract.md](contracts/cli-io-contract.md) |
+| Find the canonical text today | [docs/specs/work-state.md](../../specs/work-state.md), [docs/io-contract.md](../../io-contract.md) |
 | Open the candidate spec | [spec.md](spec.md) |
 | Open the candidate CLI input/output contract | [contracts/cli-io-contract.md](contracts/cli-io-contract.md) |
 | Open the candidate implementation pointers | [architecture/implementation-pointers.md](architecture/implementation-pointers.md) |
@@ -56,9 +56,9 @@ The documents listed here are candidate material. No reader reads them yet. The 
 
 ## 4. Legacy Source Pointers
 
-Canonical until the cutover: [docs/specs/work-state.md](README.md), [docs/io-contract.md](contracts/cli-io-contract.md)
+Canonical until the cutover: [docs/specs/work-state.md](../../specs/work-state.md), [docs/io-contract.md](../../io-contract.md)
 
-A third retained source, [docs/work-item-lifecycle-vision.md](../../work-item-lifecycle-vision.md), is not covered by this candidate area. It belongs to the platform vision candidate [vision.md](../vision.md).
+A third retained source, [docs/platform/vision.md](../vision.md), is not covered by this candidate area. It belongs to the platform vision candidate [vision.md](../vision.md).
 
 ## 5. Related Files
 
@@ -69,7 +69,7 @@ A third retained source, [docs/work-item-lifecycle-vision.md](../../work-item-li
 | candidate implementation pointers | [architecture/implementation-pointers.md](architecture/implementation-pointers.md) |
 | candidate retired decision history | [decisions/retired-decision-history.md](decisions/retired-decision-history.md) |
 | candidate harness distill record | [history/multi-role-harness-distill-record.md](history/multi-role-harness-distill-record.md) |
-| legacy owner | [../../specs/work-state.md](README.md) |
-| legacy owner | [../../io-contract.md](contracts/cli-io-contract.md) |
-| retained source for the platform vision candidate | [../../work-item-lifecycle-vision.md](../../work-item-lifecycle-vision.md) |
+| legacy owner | [../../specs/work-state.md](../../specs/work-state.md) |
+| legacy owner | [../../io-contract.md](../../io-contract.md) |
+| retained source for the platform vision candidate | [../vision.md](../vision.md) |
 | platform vision candidate | [../vision.md](../vision.md) |

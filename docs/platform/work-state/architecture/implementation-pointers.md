@@ -55,4 +55,4 @@ This document lists which implementation module owns which responsibility of the
 
 - [Work state area portal](../README.md)
 - [Work state spec](../spec.md)
-- [Legacy source: docs/specs/work-state.md](../README.md)
+- [Legacy source: docs/specs/work-state.md](../../../specs/work-state.md)

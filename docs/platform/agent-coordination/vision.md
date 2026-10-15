@@ -353,6 +353,6 @@ Vision. They must be answered without reopening V-001 through V-012 implicitly.
    and [Step 08](history/retired-engine/files/proposals/step-08-standalone-coordination-protocols.md#literal-snapshot)
    preserve their earlier frontier; they do not define current execution doors.
 6. Current sequencing and binding implementation is linked by
-   [the runner spec](../runner/README.md). The two recorded spec/code conflicts
+   [the runner spec](../runner/spec.md). The two recorded spec/code conflicts
    require separate main-owner investigation, not inference from old acceptance.
 

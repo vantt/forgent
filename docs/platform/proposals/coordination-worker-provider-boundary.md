@@ -21,7 +21,7 @@ Superseded by: None
 
 Added in candidate: Candidate carriage; Keep map proposal in full. Supporting OS probes and private HOME are not full implementation; retain Not started statement as source metadata. Original source metadata and text follow. Physical relative-link destinations alone are rebased to the same repository paths. Units with inherited missing links are preserved as literal fenced source text, without substituting another design or changing any assertion. Source metadata is provenance, not candidate authority.
 
-Source relationship: [original source](coordination-worker-provider-boundary.md).
+Source relationship: [original source](../../architect/proposals/coordination-worker-provider-boundary.md).
 
 
 Document type: Proposal
@@ -35,12 +35,12 @@ Related: [Conceptual architecture](coordination-capability-envelope.md),
 [Probe contract](coordination-envelope-probe-contract.md),
 [Progress](../agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md),
 [Capability audit](../agent-coordination/verification/coordination-envelope/capability-fit-2026-09-06.md),
-[Dispatch control plane](../agent-coordination/README.md).
+[Dispatch control plane](../agent-coordination/architecture/dispatch-control-plane.md).
 
 ## Decision proposed
 
 This boundary is subordinate to the existing [Dispatch & Execution control
-plane](../../architect/agent-coordination/architecture/dispatch-control-plane.md). It does
+plane](../agent-coordination/architecture/dispatch-control-plane.md). It does
 not introduce a parallel provider or coordination runtime. The coordinator
 requests a semantic Assignment; Dispatch resolves the mechanism, including
 `in-process`, and the boundary applies to that selected mechanism.

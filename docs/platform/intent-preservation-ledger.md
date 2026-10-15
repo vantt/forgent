@@ -5,10 +5,8 @@ Document type: Intent preservation ledger
 Audience: Human reviewer, architect, maintainer, agent
 Purpose: Preserve full platform intent across simplified implementation slices
 Design status: Draft
-Implementation status: Partial
 Canonical: Proposed preservation surface; requires explicit acceptance
 Owner: Platform documentation
-Source type: Promoted from documentation-system discussion and existing area ledgers
 Last reviewed: 2026-09-25
 Related:
 - docs/platform/vision.md
@@ -110,4 +108,4 @@ The remaining constitution deferrals are covered by existing entries: origin and
 | platform vision | [vision.md](vision.md) |
 | platform laws | [platform-foundations.md](platform-foundations.md) |
 | component boundary map | [component-boundary.md](component-boundary.md) |
-| documentation governance | [../doc-governance.md](governance.md) |
+| documentation governance | [governance.md](governance.md) |

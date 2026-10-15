@@ -21,7 +21,7 @@ Superseded by: Runtime ownership in docs/specs/runner.md
 Added in candidate: Retirement framing and current-owner navigation
 ```
 
-The coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`. This page routes current execution to [the runner spec](../runner/README.md) and preserves verified boundaries; the [complete former spec](history/retired-engine/spec.md#literal-snapshot) is non-authority history.
+The coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`. This page routes current execution to [the runner spec](../runner/spec.md) and preserves verified boundaries; the [complete former spec](history/retired-engine/spec.md#literal-snapshot) is non-authority history.
 
 ## Current Summary
 
@@ -34,12 +34,12 @@ Current execution owners are:
 
 - CollaborationPattern for Unit runs: `src/runner/execution/patterns/index.mjs`.
 - The Workflow runner: `src/workflow/runner.mjs`.
-- Their current contract: [docs/specs/runner.md](../runner/README.md), not the retired CoordinationSession engine.
+- Their current contract: [docs/platform/runner/spec.md](../runner/spec.md), not the retired CoordinationSession engine.
 - Assignment/Run dispatch: `src/runner/dispatch/assignment.mjs`, `plan.mjs`, `assignment-runner.mjs` and `run-result.mjs`; the current [dispatch contract](contracts/assignment-run-runresult.md) and [control-plane owner](architecture/dispatch-control-plane.md) retain that boundary.
 
 ## Scope
 
-For current execution ownership read [the runner spec](../runner/README.md). The complete former scope is preserved in the [retired-engine snapshot](history/retired-engine/spec.md#literal-snapshot); it is not an ownership claim for a current engine.
+For current execution ownership read [the runner spec](../runner/spec.md). The complete former scope is preserved in the [retired-engine snapshot](history/retired-engine/spec.md#literal-snapshot); it is not an ownership claim for a current engine.
 
 ## Non-Scope
 
@@ -72,11 +72,11 @@ Current sequencing and collaboration belong to the [Workflow runner](../../../sr
 
 ## Contracts Owned
 
-Unit/Workflow execution ownership is described by [docs/specs/runner.md](../runner/README.md). The surviving Assignment/Run dispatch contract is retained in this area's current contract and architecture documents; the runner spec does not supersede their complete recovery/control details.
+Unit/Workflow execution ownership is described by [docs/platform/runner/spec.md](../runner/spec.md). The surviving Assignment/Run dispatch contract is retained in this area's current contract and architecture documents; the runner spec does not supersede their complete recovery/control details.
 
 | Contract reading | Owner |
 |---|---|
-| Current execution | [Runner spec](../runner/README.md) and its executable owners |
+| Current execution | [Runner spec](../runner/spec.md) and its executable owners |
 | Assignment, Run, RunResult and recovery/control boundaries | [Assignment contract](contracts/assignment-run-runresult.md), [dispatch architecture](architecture/dispatch-control-plane.md), [recovery](architecture/runtime-recovery-design.md), [run control](architecture/run-handle.md) |
 | Former coordination engine | [Verbatim historical spec](history/retired-engine/spec.md#literal-snapshot); not current schema authority |
 
@@ -87,7 +87,7 @@ Unit/Workflow execution ownership is described by [docs/specs/runner.md](../runn
 | Work lifecycle and state | Work-state / runner specs | Optional Work integration; Work remains lifecycle authority. |
 | Host invocation and provider routing | [host-invocation-routing](../host-invocation-routing/README.md) | Adjacent process-routing authority; this page does not claim that every Node dispatch path consumes that component. |
 | Packaging/distribution | [packaging-distribution](../packaging-distribution/README.md) | Runtime identity, activation, setup/doctor, and release packaging are link-only external authority. |
-| Confinement Authority | [confinement-authority spec](../agent-confinement/README.md) | Execution confinement evidence and attestation may be consumed by dispatch paths. |
+| Confinement Authority | [confinement-authority spec](../agent-confinement/spec.md) | Execution confinement evidence and attestation may be consumed by dispatch paths. |
 
 ## Implementation Status
 
@@ -97,13 +97,13 @@ The former claim-by-claim evidence table is [retained history](history/retired-e
 
 ## Known Gaps
 
-The former gap/status list is [retained verbatim](history/retired-engine/spec.md#literal-snapshot). It is not a current implementation backlog; use [the current owner](../runner/README.md) when assessing present execution.
+The former gap/status list is [retained verbatim](history/retired-engine/spec.md#literal-snapshot). It is not a current implementation backlog; use [the current owner](../runner/spec.md) when assessing present execution.
 
 ## Related Files
 
 | Relationship | File |
 |---|---|
 | area portal | [README.md](README.md) |
-| current owner | [runner spec](../runner/README.md) |
+| current owner | [runner spec](../runner/spec.md) |
 | complete former spec | [retired-engine snapshot](history/retired-engine/spec.md#literal-snapshot) |
 | former implementation alignment | [historical snapshot](history/retired-engine/verification/implementation-alignment.md#literal-snapshot) |

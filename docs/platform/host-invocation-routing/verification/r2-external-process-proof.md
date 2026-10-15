@@ -5,10 +5,8 @@ Document type: Verification
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Preserve the proof gate for external process provider preview
 Design status: Draft
-Implementation status: Implemented preview (R2-P0 through R2-P5 closed 2026-09-15; R3, marketplace, signatures, and production WASM remain future work)
 Canonical: Yes, after review
 Owner: Host invocation
-Source type: Promoted from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md
 Last reviewed: 2026-09-15
 Related:
 - docs/platform/host-invocation-routing/contracts/component-protocol.md
@@ -104,4 +102,4 @@ Marketplace, publisher trust, signature system, production WASM, and core-provid
 | provider manifest | [../contracts/external-provider-manifest.md](../contracts/external-provider-manifest.md) |
 | implementation alignment | [implementation-alignment.md](implementation-alignment.md) |
 | R1 proof | [r1-rust-host-proof.md](r1-rust-host-proof.md) |
-| source plan | [../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../README.md) |
+| source plan | [../roadmap.md](../roadmap.md) |

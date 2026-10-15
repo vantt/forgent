@@ -29,12 +29,12 @@ the target structure.
 
 | Target doc | Role | Current source during migration |
 |---|---|---|
-| [vision.md](vision.md) | Whole-platform mission, scope, non-scope, direction | [../platform-foundations.md](platform-foundations.md), [../work-item-lifecycle-vision.md](../work-item-lifecycle-vision.md), design discussions |
-| [intent-preservation-ledger.md](intent-preservation-ledger.md) | Whole-platform preserved intent across simplified implementation slices | Documentation-system discussion, [../architect/agent-coordination/intent-preservation-ledger.md](agent-coordination/README.md) |
-| [platform-foundations.md](platform-foundations.md) | Platform laws and durable constraints | [../platform-foundations.md](platform-foundations.md), [../specs/platform-foundations.md](../specs/platform-foundations.md) |
-| [architecture-map.md](architecture-map.md) | Whole-system architecture map | [../architecture-map.md](architecture-map.md) |
+| [vision.md](vision.md) | Whole-platform mission, scope, non-scope, direction | [../platform-foundations.md](../platform-foundations.md), [../work-item-lifecycle-vision.md](../work-item-lifecycle-vision.md), design discussions |
+| [intent-preservation-ledger.md](intent-preservation-ledger.md) | Whole-platform preserved intent across simplified implementation slices | Documentation-system discussion, [../architect/agent-coordination/intent-preservation-ledger.md](../architect/agent-coordination/intent-preservation-ledger.md) |
+| [platform-foundations.md](platform-foundations.md) | Platform laws and durable constraints | [../platform-foundations.md](../platform-foundations.md), [../specs/platform-foundations.md](../specs/platform-foundations.md) |
+| [architecture-map.md](architecture-map.md) | Whole-system architecture map | [../architecture-map.md](../architecture-map.md) |
 | [component-boundary.md](component-boundary.md) | Layers, parent/child components, responsibilities, authority boundaries | [../architect/component-boundary/](../architect/component-boundary/) |
-| [../contracts/](../contracts/) | Cross-area contracts during migration | [../routing-handoff-contract.md](runner/contracts/routing-handoff.md), [../contracts/](../contracts/) |
+| [../contracts/](../contracts/) | Cross-area contracts during migration | [../routing-handoff-contract.md](../routing-handoff-contract.md), [../contracts/](../contracts/) |
 
 ## 2. Area Registry
 
@@ -42,9 +42,9 @@ Target area docs live at `docs/platform/<area>/`.
 
 | Area | Current source during migration |
 |---|---|
-| `runner` | [../specs/runner.md](runner/README.md), runner architecture docs |
-| `work-state` | [../specs/work-state.md](work-state/README.md) |
-| [packaging-distribution](packaging-distribution/README.md) | [packaging-distribution/README.md](packaging-distribution/README.md), [../specs/distribution.md](packaging-distribution/README.md), [../distribution-vision.md](../distribution-vision.md), [../architect/packaging-distribution/](../architect/packaging-distribution/) |
+| `runner` | [../specs/runner.md](../specs/runner.md), runner architecture docs |
+| `work-state` | [../specs/work-state.md](../specs/work-state.md) |
+| [packaging-distribution](packaging-distribution/README.md) | [packaging-distribution/README.md](packaging-distribution/README.md), [../specs/distribution.md](../specs/distribution.md), [../distribution-vision.md](../distribution-vision.md), [../architect/packaging-distribution/](../architect/packaging-distribution/) |
 | [host-invocation-routing](host-invocation-routing/README.md) | [host-invocation-routing/README.md](host-invocation-routing/README.md), [../architect/host-invocation-routing/](../architect/host-invocation-routing/) |
 | [convention](convention/spec.md) | [convention/spec.md](convention/spec.md) — implemented executable naming and placement authority; no document-body health rules |
 | [agent-coordination](agent-coordination/README.md) | [agent-coordination/README.md](agent-coordination/README.md), [../architect/agent-coordination/](../architect/agent-coordination/), runner coordination specs |
@@ -65,7 +65,7 @@ Target area docs live at `docs/platform/<area>/`.
 ## 4. How To Change Platform Docs
 
 1. Read `docs/doc-governance.md`.
-2. Read [migration-authoring-rules.md](migration-authoring-rules.md) and [../transitional-switchboard.md](documentation/switchboard.md).
+2. Read [migration-authoring-rules.md](migration-authoring-rules.md) and [documentation/switchboard.md](documentation/switchboard.md).
 3. Read this portal and the relevant area portal/spec.
 4. Read the relevant vision and intent-preservation ledger when the change
    narrows, stages, or simplifies the full design.
@@ -77,8 +77,8 @@ Target area docs live at `docs/platform/<area>/`.
 
 | Relationship | File |
 |---|---|
-| governs docs | [../doc-governance.md](governance.md) |
-| operative transitional switchboard | [../transitional-switchboard.md](documentation/switchboard.md) |
+| governs docs | [governance.md](governance.md) |
+| operative transitional switchboard | [documentation/switchboard.md](documentation/switchboard.md) |
 | migration authoring rules | [migration-authoring-rules.md](migration-authoring-rules.md) |
 | routes readers | [../reading-map.md](../reading-map.md) |
 | defines platform direction | [vision.md](vision.md) |

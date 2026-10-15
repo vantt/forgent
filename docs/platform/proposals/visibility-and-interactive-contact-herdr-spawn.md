@@ -21,7 +21,7 @@ Superseded by: None
 
 Added in candidate: Candidate design evidence cited by docs/specs/runner.md:999 RUL40, sections 3.3, 4 and 14 H1. Source transport line references and proposed recommendations are preserved as dated text. Original source metadata and text follow. Physical relative-link destinations alone are rebased to the same repository paths. Units with inherited missing links are preserved as literal fenced source text, without substituting another design or changing any assertion. Source metadata is provenance, not candidate authority.
 
-Source relationship: [original source](visibility-and-interactive-contact-herdr-spawn.md).
+Source relationship: [original source](../../architect/proposals/visibility-and-interactive-contact-herdr-spawn.md).
 
 
 Document type: Proposal (investigation, lượt conceptual đầu — read-only)
@@ -31,8 +31,8 @@ Last reviewed: 2026-09-06
 Canonical for: nothing until accepted; reconstruct hiện trạng + failure modes + boundary + conceptual design cho visibility/contact của mechanism interactive
 State class: State
 
-Related: [Visibility And Herdr](../agent-coordination/README.md),
-[Dispatch Control Plane](../agent-coordination/README.md),
+Related: [Visibility And Herdr](../agent-coordination/architecture/visibility-and-herdr.md),
+[Dispatch Control Plane](../agent-coordination/architecture/dispatch-control-plane.md),
 [Coordination ↔ Dispatch contract](coordination-dispatch-contract.md),
 [Worker/provider/control boundary](coordination-worker-provider-boundary.md),
 [herdr-spawn adapter history](../../explanation/herdr-spawn-adapter-fresh-pane.md),

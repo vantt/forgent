@@ -21,7 +21,7 @@ Superseded by: None
 
 Added in candidate: Candidate carriage; Retain mapped architecture; preserve advisory and partial status verbatim. Original source metadata and text follow. Physical relative-link destinations alone are rebased to the same repository paths. Units with inherited missing links are preserved as literal fenced source text, without substituting another design or changing any assertion. Source metadata is provenance, not candidate authority.
 
-Source relationship: [original source](domainization.md).
+Source relationship: [original source](../../../architect/domainization/README.md).
 
 
 Document type: Architecture advisory
@@ -29,7 +29,7 @@ Design status: Discussion / Visionary advisory
 Implementation: Partial
 Last reviewed: 2026-09-03
 Canonical for: domainization direction only; owning contracts still live in specs, domain files, and engine contracts
-Related: [Component Boundary Advisory](../../component-boundary.md), [System Overview](../../system-overview/spec.md), [Work Item Lifecycle Vision](../../../work-item-lifecycle-vision.md), [Work-State Spec](../../work-state/README.md)
+Related: [Component Boundary Advisory](../../component-boundary.md), [System Overview](../../system-overview/spec.md), [Work Item Lifecycle Vision](../../vision.md), [Work-State Spec](../../work-state/spec.md)
 
 ## 1. Purpose
 

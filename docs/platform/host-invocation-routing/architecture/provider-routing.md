@@ -5,10 +5,8 @@ Document type: Architecture
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Define provider selection, registry snapshot, replacement, and authority gates
 Design status: Draft
-Implementation status: Current partial
 Canonical: Yes, after review
 Owner: Host invocation
-Source type: Promoted from docs/architect/host-invocation-routing/host-invocation-provider-routing.md and external-provider-protocol.md
 Last reviewed: 2026-09-15
 Related:
 - docs/platform/host-invocation-routing/contracts/operation-catalog.md
@@ -60,4 +58,4 @@ The selected provider receives only the least-privilege grant through `Invocatio
 | operation catalog | [../contracts/operation-catalog.md](../contracts/operation-catalog.md) |
 | provider contract | [../contracts/operation-provider.md](../contracts/operation-provider.md) |
 | manifest contract | [../contracts/external-provider-manifest.md](../contracts/external-provider-manifest.md) |
-| source architecture | [../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../README.md) |
+| source architecture | [../spec.md](../spec.md) |

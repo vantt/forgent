@@ -5,10 +5,8 @@ Document type: Verification
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Track implementation status for host-invocation design claims
 Design status: Draft
-Implementation status: Preview installed/default proof plus current route-migration and R3 remote peer implemented preview snapshot
 Canonical: Yes, after review
 Owner: Host invocation
-Source type: Created from documentation migration scan plus 2026-09-14 code scan of Rust host/runtime paths
 Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/README.md

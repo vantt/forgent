@@ -5,10 +5,8 @@ Document type: Vision
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Preserve the durable direction for fgOS host invocation and provider routing
 Design status: Draft
-Implementation status: Partial
 Canonical: Yes, after review
 Owner: Platform documentation
-Source type: Promoted from docs/architect/host-invocation-routing/host-invocation-provider-routing.md and node-to-rust-component-migration.md
 Last reviewed: 2026-09-14
 Related:
 - docs/platform/host-invocation-routing/README.md
@@ -62,10 +60,10 @@ Host invocation does not own:
 
 | Direction | Status | Alignment |
 | --- | --- | --- |
-| CLI, remote, and chat are peer hosts that feed one semantic invocation service. | `accepted-not-implemented` | Preserved from [host-invocation-provider-routing.md](README.md); proof gap in [verification/implementation-alignment.md](verification/implementation-alignment.md). |
-| Legacy Node compatibility is transitional and CLI-local unless a per-operation semantic bridge is needed. | `accepted-not-implemented` with `legacy-current` behavior | Preserved from [legacy-cli-transition.md](README.md). |
-| Provider manifests describe capability requests and operation claims but never grant authority. | `accepted-not-implemented` | Preserved from [external-provider-protocol.md](README.md). |
-| Rust host migration proceeds by complete component/use-case boundaries, reads before writers, and no write dual-run. | `planned` | Preserved from [node-to-rust-component-migration.md](README.md). |
+| CLI, remote, and chat are peer hosts that feed one semantic invocation service. | `accepted-not-implemented` | Preserved from [host-invocation-provider-routing.md](spec.md); proof gap in [verification/implementation-alignment.md](verification/implementation-alignment.md). |
+| Legacy Node compatibility is transitional and CLI-local unless a per-operation semantic bridge is needed. | `accepted-not-implemented` with `legacy-current` behavior | Preserved from [legacy-cli-transition.md](architecture/legacy-cli-transition.md). |
+| Provider manifests describe capability requests and operation claims but never grant authority. | `accepted-not-implemented` | Preserved from [external-provider-protocol.md](architecture/external-provider-protocol.md). |
+| Rust host migration proceeds by complete component/use-case boundaries, reads before writers, and no write dual-run. | `planned` | Preserved from [node-to-rust-component-migration.md](architecture/node-to-rust-migration.md). |
 | Rollback of native R1/R2 behavior is a release rollback through `fgctl`, not a runtime provider-selection toggle. | `accepted-not-implemented` | Depends on packaging-distribution contracts. |
 
 ## 6. Related Files
@@ -76,6 +74,6 @@ Host invocation does not own:
 | preserved intent | [intent-preservation-ledger.md](intent-preservation-ledger.md) |
 | current state | [spec.md](spec.md) |
 | implementation alignment | [verification/implementation-alignment.md](verification/implementation-alignment.md) |
-| source architecture | [../../architect/host-invocation-routing/host-invocation-provider-routing.md](README.md) |
-| source migration strategy | [../../architect/host-invocation-routing/node-to-rust-component-migration.md](README.md) |
+| source architecture | [spec.md](spec.md) |
+| source migration strategy | [architecture/node-to-rust-migration.md](architecture/node-to-rust-migration.md) |
 

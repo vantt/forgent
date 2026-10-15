@@ -83,7 +83,7 @@ The current policy resolver accepts caller `policyInputs` (with its existing
 from the proposed `DispatchRequest` schema: a design request name must not be
 treated as an exported normalizer or an additional Work write door.
 
-See the [area portal](../README.md) and [runner spec](../../runner/README.md).
+See the [area portal](../README.md) and [runner spec](../../runner/spec.md).
 
 ## Isolation
 

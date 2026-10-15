@@ -21,7 +21,7 @@ Superseded by: None
 
 Added in candidate: Candidate carriage; Retain proposal kind at the map target; source gap/header are dated claims, not newly certified current behavior. Original source metadata and text follow. Physical relative-link destinations alone are rebased to the same repository paths. Units with inherited missing links are preserved as literal fenced source text, without substituting another design or changing any assertion. Source metadata is provenance, not candidate authority.
 
-Source relationship: [original source](doing-coordination-redesign.md).
+Source relationship: [original source](../../architect/doing-coordination-redesign.md).
 
 
 Status: partially implemented — shipped via tsk-40m (mergedInto main,

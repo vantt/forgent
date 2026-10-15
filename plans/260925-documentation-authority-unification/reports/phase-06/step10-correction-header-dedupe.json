@@ -1,0 +1,342 @@
+[
+  {
+    "path": "docs/platform/architecture-map.md",
+    "removed": [
+      "Implementation status: Partial",
+      "Source type: Promoted anchor from docs/architecture-map.md"
+    ],
+    "retainedFields": [
+      "Implementation",
+      "Provenance"
+    ]
+  },
+  {
+    "path": "docs/platform/component-boundary.md",
+    "removed": [
+      "Implementation status: Partial",
+      "Source type: Promoted anchor for docs/architect/component-boundary/**"
+    ],
+    "retainedFields": [
+      "Implementation",
+      "Provenance"
+    ]
+  },
+  {
+    "path": "docs/platform/convention/spec.md",
+    "removed": [
+      "Implementation status: Implemented"
+    ],
+    "retainedFields": [
+      "Implementation",
+      "Provenance"
+    ]
+  },
+  {
+    "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+    "removed": [
+      "Implementation status: External process implemented preview; WASM/provider ecosystem planned",
+      "Source type: Promoted from docs/architect/host-invocation-routing/external-provider-protocol.md"
+    ],
+    "retainedFields": [
+      "Implementation",
+      "Provenance"
+    ]
+  },
+  {
+    "path": "docs/platform/host-invocation-routing/architecture/host-use-cases.md",
+    "removed": [
+      "Implementation status: Accepted; R3 remote peer implemented preview for distribution.build.show",
+      "Source type: Promoted from docs/architect/host-invocation-routing/host-invocation-provider-routing.md"
+    ],
+    "retainedFields": [
+      "Implementation",
+      "Provenance"
+    ]
+  },
+  {
+    "path": "docs/platform/host-invocation-routing/architecture/invocation-kernel.md",
+    "removed": [
+      "Implementation status: Current partial",
+      "Source type: Promoted from docs/architect/host-invocation-routing/host-invocation-provider-routing.md"
+    ],
+    "retainedFields": [
+      "Implementation",
+      "Provenance"
+    ]
+  },
+  {
+    "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+    "removed": [
+      "Implementation status: Implemented preview with legacy-current payload behavior",
+      "Source type: Promoted from docs/architect/host-invocation-routing/legacy-cli-transition.md"
+    ],
+    "retainedFields": [
+      "Implementation",
+      "Provenance"
+    ]
+  },
+  {
+    "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+    "removed": [
+      "Implementation status: R1/R2/R3 implemented preview plus remaining component migrations",
+      "Source type: Promoted from docs/architect/host-invocation-routing/node-to-rust-component-migration.md"
+    ],
+    "retainedFields": [
+      "Implementation",
+      "Provenance"
+    ]
+  },
+  {
+    "path": "docs/platform/host-invocation-routing/architecture/provider-routing.md",
+    "removed": [
+      "Implementation status: Current partial",
+      "Source type: Promoted from docs/architect/host-invocation-routing/host-invocation-provider-routing.md and external-provider-protocol.md"
+    ],
+    "retainedFields": [
+      "Implementation",
+      "Provenance"
+    ]
+  },
+  {
+    "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+    "removed": [
+      "Implementation status: R1/R2/R3 implemented preview plus current partial route migration",
+      "Source type: Promoted from docs/architect/host-invocation-routing/host-invocation-provider-routing.md and rust-cli-and-proof-components-plan.md"
+    ],
+    "retainedFields": [
+      "Implementation",
+      "Provenance"
+    ]
+  },
+  {
+    "path": "docs/platform/host-invocation-routing/contracts/command-route-descriptor.md",
+    "removed": [
+      "Implementation status: Current partial",
+      "Source type: Promoted from docs/architect/host-invocation-routing/legacy-cli-transition.md"
+    ],
+    "retainedFields": [
+      "Implementation",
+      "Provenance"
+    ]
+  },
+  {
+    "path": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+    "removed": [
+      "Implementation status: Implemented preview",
+      "Source type: Promoted from docs/architect/host-invocation-routing/external-provider-protocol.md"
+    ],
+    "retainedFields": [
+      "Implementation",
+      "Provenance"
+    ]
+  },
+  {
+    "path": "docs/platform/host-invocation-routing/contracts/external-provider-manifest.md",
+    "removed": [
+      "Implementation status: Implemented preview",
+      "Source type: Promoted from docs/architect/host-invocation-routing/external-provider-protocol.md"
+    ],
+    "retainedFields": [
+      "Implementation",
+      "Provenance"
+    ]
+  },
+  {
+    "path": "docs/platform/host-invocation-routing/contracts/legacy-payload.md",
+    "removed": [
+      "Implementation status: Legacy-current plus implemented-preview release manifest binding",
+      "Source type: Promoted from docs/architect/host-invocation-routing/legacy-cli-transition.md"
+    ],
+    "retainedFields": [
+      "Implementation",
+      "Provenance"
+    ]
+  },
+  {
+    "path": "docs/platform/host-invocation-routing/contracts/operation-catalog.md",
+    "removed": [
+      "Implementation status: Current partial",
+      "Source type: Promoted from docs/architect/host-invocation-routing/host-invocation-provider-routing.md"
+    ],
+    "retainedFields": [
+      "Implementation",
+      "Provenance"
+    ]
+  },
+  {
+    "path": "docs/platform/host-invocation-routing/contracts/operation-provider.md",
+    "removed": [
+      "Implementation status: Current partial",
+      "Source type: Promoted from docs/architect/host-invocation-routing/host-invocation-provider-routing.md"
+    ],
+    "retainedFields": [
+      "Implementation",
+      "Provenance"
+    ]
+  },
+  {
+    "path": "docs/platform/host-invocation-routing/contracts/operation-request-outcome.md",
+    "removed": [
+      "Implementation status: Current partial",
+      "Source type: Promoted from docs/architect/host-invocation-routing/host-invocation-provider-routing.md"
+    ],
+    "retainedFields": [
+      "Implementation",
+      "Provenance"
+    ]
+  },
+  {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "removed": [
+      "Implementation status: Active",
+      "Source type: Migrated from docs/architect/host-invocation-routing/**"
+    ],
+    "retainedFields": [
+      "Implementation",
+      "Provenance"
+    ]
+  },
+  {
+    "path": "docs/platform/host-invocation-routing/spec.md",
+    "removed": [
+      "Implementation status: R1/R2/R3 implemented preview plus partial route migration",
+      "Source type: Promoted from docs/architect/host-invocation-routing/**"
+    ],
+    "retainedFields": [
+      "Implementation",
+      "Provenance"
+    ]
+  },
+  {
+    "path": "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
+    "removed": [
+      "Implementation status: Current harness plus R2/R3 preview extensions",
+      "Source type: Promoted from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md"
+    ],
+    "retainedFields": [
+      "Implementation",
+      "Provenance"
+    ]
+  },
+  {
+    "path": "docs/platform/host-invocation-routing/verification/implementation-alignment.md",
+    "removed": [
+      "Implementation status: Preview installed/default proof plus current route-migration and R3 remote peer implemented preview snapshot",
+      "Source type: Created from documentation migration scan plus 2026-09-14 code scan of Rust host/runtime paths"
+    ],
+    "retainedFields": [
+      "Implementation",
+      "Provenance"
+    ]
+  },
+  {
+    "path": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+    "removed": [
+      "Implementation status: Published preview installed/default proof plus open stable graduation",
+      "Source type: Promoted from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md"
+    ],
+    "retainedFields": [
+      "Implementation",
+      "Provenance"
+    ]
+  },
+  {
+    "path": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+    "removed": [
+      "Implementation status: Implemented preview (R2-P0 through R2-P5 closed 2026-09-15; R3, marketplace, signatures, and production WASM remain future work)",
+      "Source type: Promoted from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md"
+    ],
+    "retainedFields": [
+      "Implementation",
+      "Provenance"
+    ]
+  },
+  {
+    "path": "docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md",
+    "removed": [
+      "Implementation status: Implemented preview (R3-P0 frozen; R3-P1 adapter implemented preview; R3-P2/P3 route and proof closed; R3-P4 inventory recorded)",
+      "Source type: Promoted from docs/architect/host-invocation-routing/node-to-rust-component-migration.md and rust-cli-and-proof-components-plan.md"
+    ],
+    "retainedFields": [
+      "Implementation",
+      "Provenance"
+    ]
+  },
+  {
+    "path": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+    "removed": [
+      "Implementation status: Historical migration snapshot plus R2/R3 status deltas",
+      "Source type: Audit over docs/architect/host-invocation-routing/** and docs/platform/host-invocation-routing/**"
+    ],
+    "retainedFields": [
+      "Implementation",
+      "Provenance"
+    ]
+  },
+  {
+    "path": "docs/platform/host-invocation-routing/vision.md",
+    "removed": [
+      "Implementation status: Partial",
+      "Source type: Promoted from docs/architect/host-invocation-routing/host-invocation-provider-routing.md and node-to-rust-component-migration.md"
+    ],
+    "retainedFields": [
+      "Implementation",
+      "Provenance"
+    ]
+  },
+  {
+    "path": "docs/platform/intent-preservation-ledger.md",
+    "removed": [
+      "Implementation status: Partial",
+      "Source type: Promoted from documentation-system discussion and existing area ledgers"
+    ],
+    "retainedFields": [
+      "Implementation",
+      "Provenance"
+    ]
+  },
+  {
+    "path": "docs/platform/host-invocation-routing/architecture/README.md",
+    "removed": [
+      "Implementation status: R1/R2/R3 implemented preview plus future host/component migrations",
+      "Source type: Promoted from docs/architect/host-invocation-routing/**"
+    ],
+    "retainedFields": [
+      "Implementation",
+      "Provenance"
+    ]
+  },
+  {
+    "path": "docs/platform/host-invocation-routing/contracts/README.md",
+    "removed": [
+      "Implementation status: Current partial plus implemented preview provider protocol",
+      "Source type: Promoted from docs/architect/host-invocation-routing/**"
+    ],
+    "retainedFields": [
+      "Implementation",
+      "Provenance"
+    ]
+  },
+  {
+    "path": "docs/platform/host-invocation-routing/decisions/README.md",
+    "removed": [
+      "Implementation status: Active",
+      "Source type: Created during host-invocation documentation migration"
+    ],
+    "retainedFields": [
+      "Implementation",
+      "Provenance"
+    ]
+  },
+  {
+    "path": "docs/platform/host-invocation-routing/verification/README.md",
+    "removed": [
+      "Implementation status: Active",
+      "Source type: Created during host-invocation documentation migration"
+    ],
+    "retainedFields": [
+      "Implementation",
+      "Provenance"
+    ]
+  }
+]

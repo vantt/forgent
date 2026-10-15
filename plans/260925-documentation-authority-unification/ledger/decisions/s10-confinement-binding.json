@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "shard": "s10-confinement-binding",
+  "authorSession": "codex-session:unit-run-1792079321432-41fe2051@2026-10-15",
+  "authorshipRequired": true,
+  "sources": [
+    "docs/specs/confinement-authority.md"
+  ],
+  "claims": [
+    {
+      "claimId": "claim_d572bb9dc8501362ae23e6d4a71975d2",
+      "sourceUnitDigest": "a7af69f1674754e516550a8802a2acc64dd3a49655a4cdd01fa82d43a540d5ed",
+      "targetOwner": "docs/platform/agent-confinement/spec.md",
+      "targetAnchor": "unheaded-block-47",
+      "targetUnitDigest": "a7af69f1674754e516550a8802a2acc64dd3a49655a4cdd01fa82d43a540d5ed",
+      "targetAncestry": [
+        "Spec: Agent Confinement Authority",
+        "8. Policy resolution và edge cases",
+        "8.6 Crash và cleanup"
+      ],
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792079321432-41fe2051@2026-10-15",
+      "rationale": "L10-14 current-source re-decision completes the binding addition carried in the prior docs turn. Complete source paragraph equals target text byte for byte, with limitations retained; identity already native in the prior package registry. Independent review required; no current-truth, promotion or cutover approval."
+    }
+  ]
+}

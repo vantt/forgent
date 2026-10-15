@@ -5,10 +5,8 @@ Document type: Contract
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Define operation identity, descriptors, catalog authorship, and version matching
 Design status: Draft
-Implementation status: Current partial
 Canonical: Yes, after review
 Owner: Host invocation
-Source type: Promoted from docs/architect/host-invocation-routing/host-invocation-provider-routing.md
 Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/architecture/provider-routing.md
@@ -44,4 +42,4 @@ Superseded by: None recorded
 | --- | --- |
 | provider routing | [../architecture/provider-routing.md](../architecture/provider-routing.md) |
 | operation provider | [operation-provider.md](operation-provider.md) |
-| source architecture | [../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../README.md) |
+| source architecture | [../spec.md](../spec.md) |

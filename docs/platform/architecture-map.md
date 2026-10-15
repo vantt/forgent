@@ -5,10 +5,8 @@ Document type: Platform architecture map
 Audience: Human reviewer, architect, maintainer, agent
 Purpose: Route readers through the whole-system architecture map
 Design status: Draft
-Implementation status: Partial
 Canonical: Yes, after review
 Owner: Platform documentation
-Source type: Promoted anchor from docs/architecture-map.md
 Last reviewed: 2026-09-13
 Related:
 - docs/platform/README.md

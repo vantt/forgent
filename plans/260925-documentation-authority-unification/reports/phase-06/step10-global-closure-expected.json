@@ -2635,13 +2635,6 @@
       "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/packaging-partial-carry-residual.json"
     },
     {
-      "claimId": "claim_5c520fcb1a68ba27e2093341834258c7",
-      "sourcePath": "AGENTS.md",
-      "sourceAnchor": "unheaded-block-22",
-      "sourceUnitDigest": "938342cd7dfcb965b91bb4ab13461c296dbda391d975bca9d1f5e296e9b75895",
-      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/root-instructions-partial-carry-residual.json"
-    },
-    {
       "claimId": "claim_f64fa4a36030f89feab71dc5943015c0",
       "sourcePath": "docs/specs/runner.md",
       "sourceAnchor": "unheaded-block-118",
@@ -22930,7 +22923,7 @@
       {
         "claimId": "claim_2bebe6c55e6d3140c1fa481d8a9dee77",
         "path": "docs/platform/runner/architecture/h-7af1f0242611.md",
-        "anchor": "added-in-candidate-runner-từ-vựng-dispatch-hiện-hành",
+        "anchor": "added-in-candidate-runner-t\u1eeb-v\u1ef1ng-dispatch-hi\u1ec7n-h\u00e0nh",
         "unitDigest": "ccc8696ed438ee4a84d995cf26b810c12311b606f9fdaf4928b18ac5efe48247"
       },
       {
@@ -22984,7 +22977,7 @@
       {
         "claimId": "claim_c868bc8d5e9e5a6f4859364834528dd6",
         "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
-        "anchor": "added-in-candidate-runner-lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4",
+        "anchor": "added-in-candidate-runner-l\u1ecbch-s\u1eed-quy\u1ebft-\u0111\u1ecbnh-retired-t\u1eeb-docsdecisions-tsk-1lv-4",
         "unitDigest": "742978b083aa9746696bc18a99d5e6d67ebe568eed7ea0dfb77f9d0486ce9ab8"
       },
       {
@@ -23002,7 +22995,7 @@
       {
         "claimId": "claim_8cd28ca6800c45c489bed67870072181",
         "path": "docs/platform/runner/decisions/h-aabefc85f0c9.md",
-        "anchor": "added-in-candidate-runner-coordinationsession-lịch-sử-đã-thu-hồi-per-p4-thay-bằng-collaborationpattern-workflow-runner",
+        "anchor": "added-in-candidate-runner-coordinationsession-l\u1ecbch-s\u1eed-\u0111\u00e3-thu-h\u1ed3i-per-p4-thay-b\u1eb1ng-collaborationpattern-workflow-runner",
         "unitDigest": "f74b367ba72da0fae4ac7a34c339c75b4607fab83af330e735270c0963684444"
       },
       {
@@ -24406,7 +24399,8 @@
     ],
     "candidateRawRows": 3609,
     "candidateUniqueTuples": 2293,
-    "partialCount": 25,
-    "note": "Committed current inputs, not filtered by what a gate happened to report. After docs edits refresh lists from native accounting, preserve obligations and separately review changes. Root L10-2 will remove one partial only after its actual redecision and independent review."
+    "partialCount": 24,
+    "note": "L10-13 expected-set refresh: 24 currently authored partial-carry identities after the pending closing-instruction reclassification. This does not approve that row. Candidate list tuples/group sets remain the earlier native snapshot; refresh after next single native sync and rebind. No global closure proof.",
+    "correctionSYNC": "e7393ea3c"
   }
 }

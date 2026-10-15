@@ -1,0 +1,51 @@
+{
+  "inputHEAD": "e7393ea3c",
+  "population": 7,
+  "falseUnits": 1,
+  "newDraw": false,
+  "entries": [
+    {
+      "entryLine": 154,
+      "before": "- `domains/coding/AGENTS.md` `## fgOS Workflow` + `.claude/skills/` (`.agents/skills/` mirror byte-identical) — lớp hướng dẫn P50: entry skill (`fgos-routing`) + skill giai đoạn (`fgos-coding-discovering`/`fgos-coding-exploring`/`fgos-coding-planning`/`fgos-coding-validating`/`fgos-coding-implement`/`fgos-coding-knowledge`) trỏ một phiên tự mở tới đúng skill theo `stage` của item; từ str89-fgos-domain-skills, tra cứu này domain-pluggable — đọc trường `domain` + `stage` của item rồi tra qua `skillForStage`/`getDomain` (`src/state/workflow-stage-graphs.mjs`), không còn giả định ngầm domain `coding`; `fgos-routing` nay có hàng khoá theo **status** `retrospective → fgos-coding-knowledge` (skill tổng hợp cấp nhãn Diataxis + soạn tài liệu người-dùng-cuối) — stage `compound-learn` đã rút, việc tổng hợp nó từng canh nay là việc của status `retrospective`; skill ĐỘC LẬP `fgos-submit-assist` (str51-llm-assist-classify) đã rút (tsk-6ar) — `/fgOS:submit` bước 6 (`plugins/fgOS/skills/submit/SKILL.md`) nay tự chạy clarify+classify trong cùng phiên sống, cùng việc mà skill đó từng làm nhưng trên bản mô tả SẠCH hơn; spec: docs/specs/work-state.md §RUL60 (hành vi), docs/specs/runner.md (lớp hướng dẫn)",
+      "after": "- `domains/coding/AGENTS.md` `## fgOS Workflow` + `.claude/skills/` (`.agents/skills/` mirror byte-identical) — lớp hướng dẫn P50: entry skill (`fgos-routing`) + skill giai đoạn (`fgos-coding-discovering`/`fgos-coding-exploring`/`fgos-coding-planning`/`fgos-coding-validating`/`fgos-coding-implement`/`fgos-coding-knowledge`) trỏ một phiên tự mở tới đúng skill theo `stage` của item; từ str89-fgos-domain-skills, tra cứu này domain-pluggable — đọc trường `domain` + `stage` của item rồi tra qua `skillForStep`/`getDomain` (`src/state/domain-registry.mjs`), không còn giả định ngầm domain `coding`; `fgos-routing` nay có hàng khoá theo **status** `retrospective → fgos-coding-knowledge` (skill tổng hợp cấp nhãn Diataxis + soạn tài liệu người-dùng-cuối) — stage `compound-learn` đã rút, việc tổng hợp nó từng canh nay là việc của status `retrospective`; skill ĐỘC LẬP `fgos-submit-assist` (str51-llm-assist-classify) đã rút (tsk-6ar) — `/fgOS:submit` bước 6 (`plugins/fgOS/skills/submit/SKILL.md`) nay tự chạy clarify+classify trong cùng phiên sống, cùng việc mà skill đó từng làm nhưng trên bản mô tả SẠCH hơn; spec: docs/specs/work-state.md §RUL60 (hành vi), docs/specs/runner.md (lớp hướng dẫn) **Truth correction:** src/state/domain-registry.mjs:193,240; core/skills/fgos-routing/SKILL.md:124-136.",
+      "evidence": "src/state/domain-registry.mjs:193,240; core/skills/fgos-routing/SKILL.md:124-136"
+    },
+    {
+      "entryLine": 155,
+      "before": "- `plugins/fgOS/` (`.claude-plugin/plugin.json` + `skills/<verb>/SKILL.md`) — bề mặt slash-command `/fgOS:<verb>` cho Claude Code, 12 verb wrapper (submit, pick, move, return, ask, answer, ready, stale, rollup, check, graph, conflicts), mỗi verb một wrapper one-door-write qua `bin/fgos.mjs <verb>`; spec: docs/specs/fgos-plugin.md",
+      "after": "- `plugins/fgOS/` (`.claude-plugin/plugin.json` + `skills/<verb>/SKILL.md`) — bề mặt slash-command `/fgOS:<verb>` cho Claude Code, 37 wrapper không có tiền tố fgos- trong 55 thư mục skill; `check` không có wrapper. Mỗi wrapper giữ hướng dẫn cửa gọi của riêng nó; spec: docs/specs/fgos-plugin.md **Truth correction:** plugins/fgOS/.claude-plugin/plugin.json:1; plugins/fgOS/skills/submit/SKILL.md:1; plugins/fgOS/skills/answer/SKILL.md:1 (directory enumeration at e7393ea3c).",
+      "evidence": "plugins/fgOS/.claude-plugin/plugin.json:1; plugins/fgOS/skills/submit/SKILL.md:1; plugins/fgOS/skills/answer/SKILL.md:1 (directory enumeration at e7393ea3c)"
+    },
+    {
+      "entryLine": 172,
+      "before": "- `src/report/enduser-index.mjs` — bộ sinh CHỈ MỤC đọc-theo-tag tài liệu người-dùng-cuối (thuần, không I/O — mirror `entropy.mjs`): `QUADRANTS`, bảng nguồn-sự-thật `QUADRANT_META` (quadrant→{purpose,audience}), `QUADRANT_DIR_ALIASES` (quadrant→vị trí thay thế trên đĩa, theo str64-backfill; hiện `explanation`→`['decisions']`), `findSourceCaptureId` (gom một, cho chỉ mục), `findSourceCaptureIds` (gom mọi capture của một đường dẫn, cho `doc-sources`), `buildEnduserIndex`; I/O + verb `fgos docs-index` (quét cả thư mục chính lẫn `QUADRANT_DIR_ALIASES`, ghi manifest `docs/enduser-docs-index.json`) và verb `fgos doc-sources <docPath>` (gom nguồn của một đường dẫn) sống ở `bin/fgos.mjs`, cả hai quyền `read`; vận hành chỉ mục: kỹ năng `fgos-indexing`; spec: docs/specs/enduser-docs-index.md",
+      "after": "- `src/report/enduser-index.mjs` — bộ sinh CHỈ MỤC đọc-theo-tag tài liệu người-dùng-cuối (biến đổi dữ liệu, không tự thực hiện I/O; ghi chú mirror entropy trong source là lịch sử, `src/report/entropy.mjs` không còn): `QUADRANTS`, bảng nguồn-sự-thật `QUADRANT_META` (quadrant→{purpose,audience}), `QUADRANT_DIR_ALIASES` (quadrant→vị trí thay thế trên đĩa, theo str64-backfill; hiện `explanation`→`['decisions']`), `findSourceCaptureId` (gom một, cho chỉ mục), `findSourceCaptureIds` (gom mọi capture của một đường dẫn, cho `doc-sources`), `buildEnduserIndex`; I/O + verb `fgos docs-index` (quét cả thư mục chính lẫn `QUADRANT_DIR_ALIASES`, ghi manifest `docs/enduser-docs-index.json`) và verb `fgos doc-sources <docPath>` (gom nguồn của một đường dẫn) sống ở `bin/fgos.mjs`, cả hai quyền `read`; vận hành chỉ mục: kỹ năng `fgos-indexing`; spec: docs/specs/enduser-docs-index.md **Truth correction:** src/report/enduser-index.mjs:1-17; packages/observe/rust/src/metrics_cli/entropy.rs:1.",
+      "evidence": "src/report/enduser-index.mjs:1-17; packages/observe/rust/src/metrics_cli/entropy.rs:1"
+    },
+    {
+      "entryLine": 174,
+      "before": "- `src/evolve/candidates.mjs` — Gate A candidate ranking cho vòng tự cải thiện (self-improve loop, STR13 Slice 1): thuần, đọc trên view work-state, dùng lại `entropy.mjs`'s `listUnsettledFrictionsByWork`/`WEIGHTS.frictionUnsettled` (không tự định nghĩa lại); surfaced qua `fgos evolve` (liệt kê + `--pick <id>`, hai bước, không stdin); spec: docs/specs/runner.md",
+      "after": "- Historical `src/evolve/candidates.mjs` — path not present at this commit; `src/report/entropy.mjs`, `listUnsettledFrictionsByWork` và verb `fgos evolve` cũng không còn. Tín hiệu entropy hiện ở `packages/observe/rust/src/metrics_cli/entropy.rs`, qua `fgos metrics entropy`; không có cửa candidate ranking được mô tả ở câu cũ. **Truth correction:** src/cli/command-registry.mjs:98,204-207; packages/observe/rust/src/metrics_cli/entropy.rs:1; src/evolve/iron-law.mjs:1 (only current src/evolve file; full src/bin/packages symbol search has no old ranking symbol).",
+      "evidence": "src/cli/command-registry.mjs:98,204-207; packages/observe/rust/src/metrics_cli/entropy.rs:1; src/evolve/iron-law.mjs:1 (only current src/evolve file; full src/bin/packages symbol search has no old ranking symbol)"
+    },
+    {
+      "entryLine": 178,
+      "before": "- `src/evolve/iron-law.mjs` — Iron Law risk classifier cho vòng tự cải thiện (self-improve loop, STR13 Slice 2): thuần, chưa có call site (Slice 3 wiring); spec: docs/specs/runner.md",
+      "after": "- `src/evolve/iron-law.mjs` — Iron Law risk classifier cho vòng tự cải thiện (self-improve loop, STR13 Slice 2): thuần, đã được gọi qua `src/runner/iron-law-gate.mjs` (import và gọi `classifyIronLaw`); spec: docs/specs/runner.md **Truth correction:** src/evolve/iron-law.mjs:64; src/runner/iron-law-gate.mjs:20,59.",
+      "evidence": "src/evolve/iron-law.mjs:64; src/runner/iron-law-gate.mjs:20,59"
+    },
+    {
+      "entryLine": 180,
+      "before": "- `test/` — node:test suite (`npm test`, 2970 test): smoke + state + cli + runner + report + e2e (rebuild-determinism, runner-loop — gồm kịch bản cửa pull S2-pull + con fork từ tip nhánh gốc, pr-gate — 4 kịch bản trọn vòng review/approve/reject, dispatch song song thật với cửa sổ chồng-lấn đo được); benchmark ngoài suite (F4) tại `docs/history/phase-3-compound-learning/reports/f4-benchmark.md`",
+      "after": "- `test/` — node:test suite (`npm test`; tổng số test lịch sử 2970 chưa được đếm lại): smoke + state + cli + runner + report + e2e (rebuild-determinism, runner-loop — gồm kịch bản cửa pull S2-pull + con fork từ tip nhánh gốc, pr-gate — 4 kịch bản trọn vòng review/approve/reject, dispatch song song thật với cửa sổ chồng-lấn đo được); benchmark lịch sử ngoài suite (F4): `docs/history/phase-3-compound-learning/reports/f4-benchmark.md` — path not present at this commit; không có benchmark hiện hành ở đường dẫn này **Truth correction:** package.json:28 (scripts.test); git ls-tree e7393ea3c docs/history/phase-3-compound-learning (no entries).",
+      "evidence": "package.json:28 (scripts.test); git ls-tree e7393ea3c docs/history/phase-3-compound-learning (no entries)"
+    },
+    {
+      "entryLine": 181,
+      "before": "- `scripts/run-test-canary.mjs` (`npm run test:canary -- <file...>`) + `scripts/test-select.mjs` (`npm run test:related -- --explain`, plus `test:related:shadow` for evidence-gathering; manifest: `test/test-ownership.mjs`) — additive fast test-feedback doors, `npm test` unchanged/authoritative either way; how-to: `docs/how-to/use-fast-test-feedback-commands.md`; plan: `plans/260920-immediate-test-feedback-reduction/plan.md`",
+      "after": "- `scripts/run-test-canary.mjs` (`npm run test:canary -- <file...>`) + `scripts/test-select.mjs` (`npm run test:related -- --explain`, plus `test:related:shadow` for evidence-gathering; manifest: `test/test-ownership.mjs`) — additive fast test-feedback doors, `npm test` unchanged/authoritative either way; how-to: `docs/how-to/use-fast-test-feedback-commands.md`; plan: `archive/plans/260920-immediate-test-feedback-reduction/plan.md` **Truth correction:** archive/plans/260920-immediate-test-feedback-reduction/plan.md:5.",
+      "evidence": "archive/plans/260920-immediate-test-feedback-reduction/plan.md:5"
+    }
+  ],
+  "reviewStatus": "pending; whole population already checked"
+}

@@ -459,3 +459,17 @@ L10-8, input `980cb2931`: 366 mapped links across 70 files, non-portals first an
 | docs/platform/work-state/README.md | 51:85 | [docs/io-contract.md](../../io-contract.md) | [docs/io-contract.md](contracts/cli-io-contract.md) |
 | docs/platform/work-state/README.md | 64:18 | [../../specs/work-state.md](../../specs/work-state.md) | [../../specs/work-state.md](README.md) |
 | docs/platform/work-state/README.md | 65:18 | [../../io-contract.md](../../io-contract.md) | [../../io-contract.md](contracts/cli-io-contract.md) |
+
+
+## Step 10 correction docs turn at SYNC e7393ea3c
+
+Lead L10-12/L10-13/L10-14 under A42 authorize this correction pass; no self-review verdict, native sync or review pack. Requests from `8d38b18ed` are superseded and will not be reviewed.
+
+- Seven map truth corrections: exact old/new entries and file:line evidence in `step10-correction-truth.json`; legacy source unchanged. All three detailed-map routes now use section 5; full map diff also in promoted-edits.md.
+- All 366 old link decisions are enumerated in `step10-correction-link-audit.json`. 36 self-links restored; 86 architect portal links become 76 specific candidate destinations and ten retained legacy-source relationships. In total 72 old repoints restored, 74 classified links, 29 repointed path labels corrected. Wrapped label repointed. Of ten lifecycle/distribution vision links, eight repointed to their Step 5 mapping and two retained in the Current source column as provenance/legacy-owner until cutover. No missing-specific case was guessed. Full old/new/label/destination classifications: `step10-correction-links.json` and `step10-correction-labels.json`.
+- History README purpose/provenance corrected; 31 headers deduplicated using required `Implementation`/`Provenance` spellings. Expected partial population refreshed from 25 to 24 without implying acceptance. Group count deltas +4 duplicate / +68 semantic remain open.
+- SYNC runner five changed hunks carried exactly; new settled 0064 record added with candidate marker. Existing Pointers truth corrections preserved and whole-unit inequality disclosed. Byte-equal manifest candidate and current hash sidecar refreshed. Orphan explanation outside frozen maps and ratchet roots; no edit or candidate. Runner ratchet accounting updated, ratchet clean.
+- 13 pending authored decisions/re-decisions; seven current-source identity-gap drafts; registry unchanged. Source confinement stale digest corrected; existing native binding paragraph gets a pending decision. Five source predecessors remain a scoped D blocker until next native sync/gap transition. 88 target-drift consequences queued; no approval carried.
+- New versioned pure link-pass helper replaces scratch-only per-line method; tests first, red logs then 12 helper tests green. Protected gates/checkers/vocabulary/extractor/baselines unchanged. Current full diffs and hashes for every doc, decision, snapshot and helper/test edit are in `step10-correction-edits.json`; reproducible commands/scripts and all check logs are in `step10-correction-reproduction.json` and `step10-correction-checks.json`.
+
+Next: package at this runner commit with ONE native sync, all drift rebounds and ONE replacement review set covering 41b plus this turn. Phase 6 open; global D/E, holds/rehearsal/consumers/checkpoint/truth/promotion obligations remain as listed in step-10-report.md.

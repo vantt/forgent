@@ -5,10 +5,8 @@ Document type: Architecture
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Define R1, R2, R3, and later proof boundaries for host invocation
 Design status: Draft
-Implementation status: R1/R2/R3 implemented preview plus current partial route migration
 Canonical: Yes, after review
 Owner: Host invocation
-Source type: Promoted from docs/architect/host-invocation-routing/host-invocation-provider-routing.md and rust-cli-and-proof-components-plan.md
 Last reviewed: 2026-09-21
 Related:
 - docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md
@@ -59,7 +57,7 @@ Added in candidate — checked route snapshot (2026-10-13): `packages/host-runti
 | R2 proof | [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) |
 | R3 proof | [../verification/r3-remote-peer-proof.md](../verification/r3-remote-peer-proof.md) |
 | compatibility harness | [../verification/compatibility-harness.md](../verification/compatibility-harness.md) |
-| source plan | [../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../README.md) |
+| source plan | [../roadmap.md](../roadmap.md) |
 
 ## Restored physical placement layout tree
 

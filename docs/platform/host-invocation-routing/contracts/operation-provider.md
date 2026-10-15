@@ -5,10 +5,8 @@ Document type: Contract
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Define provider descriptors, provider invocation, control, and events
 Design status: Draft
-Implementation status: Current partial
 Canonical: Yes, after review
 Owner: Host invocation
-Source type: Promoted from docs/architect/host-invocation-routing/host-invocation-provider-routing.md
 Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/architecture/invocation-kernel.md

@@ -1,3 +1,19 @@
+# Step 10 correction docs turn complete — package next
+
+Assignment `unit-run-1792079321432-41fe2051/producer/1`; **SYNC `e7393ea3c`**. Lead L10-12/L10-13/L10-14 recorded in [report](step-10-report.md). **Seven truth entries corrected with labelled code evidence**, legacy reading map unchanged; detailed-map reader routes now point to merged section 5. **36/36 self-links restored; 86 architect portal links → 76 specific targets + ten source referents restored**; all 366 original decisions accounted, 72 original repoints restored overall. Wrapped link plus eight vision links repointed, two vision source links classified; 29 path labels corrected. Pure helper + **12 tests**, tests first; no protected-tool/baseline edits. History Purpose/provenance corrected, 31 header synonym sets deduplicated; expected partial population now 24, no acceptance implied.
+
+**Five main runner hunks carried verbatim**, including settled 0064; manifest candidate byte-equal and current sidecar hashes refreshed. Existing Pointers truth corrections preserved (whole-unit inequality explicit). Ratchet clean. **13 pending decisions/re-decisions + seven explicit new-unit drafts**, no native IDs fabricated. Confinement stale source digest fixed, carried binding paragraph decided pending. **A/B/H/I pass; candidate-status zero findings/unresolved links; 59/59 targeted tests pass** with `env -u CLAUDE_CODE_SESSION_ID`. Scoped FAST D with both priors together/each has **five source-predecessor unknown-claim findings pending the forbidden-this-turn native sync**; E remains **11 partial / 151 pending / 64 candidate reverse**. No scoped target-drift or source-digest-stale findings; no global-green/full-suite claim. **88 target drift rows** queued for all-drift native rebind. [Checks](step10-correction-checks.json), [D/E](step10-correction-fast-check.json), [edits](step10-correction-edits.json).
+
+**NEXT = PACKAGE at this turn's runner commit: native sync ONCE, resolve seven drafts and five predecessor-gap transitions without identity loss, --rebind ALL drift, ONE review request set covering 41b + this turn.** Requests packaged at **`8d38b18ed` are superseded and will not be reviewed**. No new draw (whole population checked), sync or packs this turn. Existing holds/A34/dashboard/cutover/consumers/groups/T9/rehearsal/checkpoint/scorecard/effort obligations remain; Phase 6 open. Final scope/hash/carriage audit passes; `git diff --check` clean. MDView preview attempted once but external database is read-only; no preview URL. No new owner-direction question. No CLI/git write, .fgos workspace touch, authority flip, source retirement, deletion, push or landing; runner commits.
+
+---
+
+# Step 10 correction docs turn in progress
+
+Assignment `unit-run-1792079321432-41fe2051/producer/1`; SYNC `e7393ea3c`. Lead L10-12/L10-13/L10-14 accepted: seven map truth corrections, semantic link repairs with tests first, main runner/manifest re-carry and pending source re-decisions. No native sync or review packs this turn. Review requests packaged at `8d38b18ed` are superseded and will not be reviewed. Next turn packages this runner commit: native sync once, rebind all drift, ONE review request set covering 41b plus this turn. Runner owns commits.
+
+---
+
 # Step 10 package complete — independent review next
 
 Assignment `unit-run-1792077702187-860e8753/producer/1`; content **aecdc30aa**. **One background native sync 857.092s (~14m17s)**; compact persistence once; **4,485 files / 91,343 active units**, known IDs **99,090 → 99,300, zero loss**; **210 new active / 198 preserved gaps**, active inventory/registry tuples equal. **196 target drift rows / 30 shards rebound pending**, no approval carry or other applications.

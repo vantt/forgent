@@ -27,7 +27,7 @@ and blocks the atomic cutover gate.
 1. **One Claim, One Canonical Owner:**
    Every normative, descriptive, behavioral, architectural, or decisional claim has exactly one
    physical owner. You must look up the declared current owner in
-   [docs/transitional-switchboard.md](documentation/switchboard.md).
+   [docs/platform/documentation/switchboard.md](documentation/switchboard.md).
 2. **Never Dual-Author Prose:**
    Never write the same substantive design, specification, or contract claim in both a legacy document
    (`docs/specs/**`, `docs/architect/**`) and a candidate target document (`docs/platform/**`).
@@ -87,8 +87,8 @@ When authoring new platform documentation under `docs/platform/<area>/`:
 
 | Relationship | File |
 |---|---|
-| authority switchboard | [docs/transitional-switchboard.md](documentation/switchboard.md) |
-| documentation governance | [docs/doc-governance.md](governance.md) |
+| authority switchboard | [docs/platform/documentation/switchboard.md](documentation/switchboard.md) |
+| documentation governance | [docs/platform/governance.md](governance.md) |
 | ratchet script | [scripts/check-legacy-docs-ratchet.mjs](../../scripts/check-legacy-docs-ratchet.mjs) |
 | checked-in baseline | [scripts/check-legacy-docs-ratchet.baseline.json](../../scripts/check-legacy-docs-ratchet.baseline.json) |
 | exceptions ledger | [scripts/check-legacy-docs-ratchet.exceptions.json](../../scripts/check-legacy-docs-ratchet.exceptions.json) |

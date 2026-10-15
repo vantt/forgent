@@ -1,0 +1,147 @@
+[
+  {
+    "file": "docs/platform/README.md",
+    "before": "[../transitional-switchboard.md](documentation/switchboard.md)",
+    "after": "[documentation/switchboard.md](documentation/switchboard.md)"
+  },
+  {
+    "file": "docs/platform/README.md",
+    "before": "[../doc-governance.md](governance.md)",
+    "after": "[governance.md](governance.md)"
+  },
+  {
+    "file": "docs/platform/agent-coordination/spec.md",
+    "before": "[docs/specs/runner.md](../runner/spec.md)",
+    "after": "[docs/platform/runner/spec.md](../runner/spec.md)"
+  },
+  {
+    "file": "docs/platform/component-boundary.md",
+    "before": "[../architect/proposals/component-authority-boundary-map.md](proposals/component-authority-boundary-map.md)",
+    "after": "[proposals/component-authority-boundary-map.md](proposals/component-authority-boundary-map.md)"
+  },
+  {
+    "file": "docs/platform/component-boundary.md",
+    "before": "[../specs/observe.md](observe/spec.md)",
+    "after": "[observe/spec.md](observe/spec.md)"
+  },
+  {
+    "file": "docs/platform/documentation/switchboard.md",
+    "before": "[docs/doc-governance.md](../governance.md)",
+    "after": "[docs/platform/governance.md](../governance.md)"
+  },
+  {
+    "file": "docs/platform/host-invocation-routing/architecture/host-use-cases.md",
+    "before": "[../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../spec.md)",
+    "after": "[../spec.md](../spec.md)"
+  },
+  {
+    "file": "docs/platform/host-invocation-routing/architecture/invocation-kernel.md",
+    "before": "[../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../spec.md)",
+    "after": "[../spec.md](../spec.md)"
+  },
+  {
+    "file": "docs/platform/host-invocation-routing/architecture/provider-routing.md",
+    "before": "[../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../spec.md)",
+    "after": "[../spec.md](../spec.md)"
+  },
+  {
+    "file": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+    "before": "[../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../roadmap.md)",
+    "after": "[../roadmap.md](../roadmap.md)"
+  },
+  {
+    "file": "docs/platform/host-invocation-routing/contracts/legacy-payload.md",
+    "before": "[../../../architect/host-invocation-routing/legacy-cli-transition.md](../architecture/legacy-cli-transition.md)",
+    "after": "[../architecture/legacy-cli-transition.md](../architecture/legacy-cli-transition.md)"
+  },
+  {
+    "file": "docs/platform/host-invocation-routing/contracts/operation-catalog.md",
+    "before": "[../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../spec.md)",
+    "after": "[../spec.md](../spec.md)"
+  },
+  {
+    "file": "docs/platform/host-invocation-routing/contracts/operation-request-outcome.md",
+    "before": "[../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../spec.md)",
+    "after": "[../spec.md](../spec.md)"
+  },
+  {
+    "file": "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
+    "before": "[../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../roadmap.md)",
+    "after": "[../roadmap.md](../roadmap.md)"
+  },
+  {
+    "file": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+    "before": "[../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../roadmap.md)",
+    "after": "[../roadmap.md](../roadmap.md)"
+  },
+  {
+    "file": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+    "before": "[../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../roadmap.md)",
+    "after": "[../roadmap.md](../roadmap.md)"
+  },
+  {
+    "file": "docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md",
+    "before": "[../../../architect/host-invocation-routing/node-to-rust-component-migration.md](../architecture/node-to-rust-migration.md)",
+    "after": "[../architecture/node-to-rust-migration.md](../architecture/node-to-rust-migration.md)"
+  },
+  {
+    "file": "docs/platform/host-invocation-routing/vision.md",
+    "before": "[../../architect/host-invocation-routing/host-invocation-provider-routing.md](spec.md)",
+    "after": "[spec.md](spec.md)"
+  },
+  {
+    "file": "docs/platform/host-invocation-routing/vision.md",
+    "before": "[../../architect/host-invocation-routing/node-to-rust-component-migration.md](architecture/node-to-rust-migration.md)",
+    "after": "[architecture/node-to-rust-migration.md](architecture/node-to-rust-migration.md)"
+  },
+  {
+    "file": "docs/platform/intent-preservation-ledger.md",
+    "before": "[../doc-governance.md](governance.md)",
+    "after": "[governance.md](governance.md)"
+  },
+  {
+    "file": "docs/platform/migration-authoring-rules.md",
+    "before": "[docs/transitional-switchboard.md](documentation/switchboard.md)",
+    "after": "[docs/platform/documentation/switchboard.md](documentation/switchboard.md)"
+  },
+  {
+    "file": "docs/platform/migration-authoring-rules.md",
+    "before": "[docs/doc-governance.md](governance.md)",
+    "after": "[docs/platform/governance.md](governance.md)"
+  },
+  {
+    "file": "docs/platform/packaging-distribution/README.md",
+    "before": "[../../architect/component-boundary/README.md](../component-boundary.md)",
+    "after": "[../component-boundary.md](../component-boundary.md)"
+  },
+  {
+    "file": "docs/platform/packaging-distribution/spec.md",
+    "before": "[docs/architect/workspace-topology.md](../system-architecture/architecture/workspace-topology.md)",
+    "after": "[docs/platform/system-architecture/architecture/workspace-topology.md](../system-architecture/architecture/workspace-topology.md)"
+  },
+  {
+    "file": "docs/platform/vision.md",
+    "before": "[../doc-governance.md](governance.md)",
+    "after": "[governance.md](governance.md)"
+  },
+  {
+    "file": "docs/platform/vision.md",
+    "before": "[../platform-foundations.md](platform-foundations.md)",
+    "after": "[platform-foundations.md](platform-foundations.md)"
+  },
+  {
+    "file": "docs/platform/work-state/README.md",
+    "before": "[docs/work-item-lifecycle-vision.md](../vision.md)",
+    "after": "[docs/platform/vision.md](../vision.md)"
+  },
+  {
+    "file": "docs/platform/work-state/README.md",
+    "before": "[../../work-item-lifecycle-vision.md](../vision.md)",
+    "after": "[../vision.md](../vision.md)"
+  },
+  {
+    "file": "docs/platform/work-state/spec.md",
+    "before": "[docs/io-contract.md](contracts/cli-io-contract.md)",
+    "after": "[docs/platform/work-state/contracts/cli-io-contract.md](contracts/cli-io-contract.md)"
+  }
+]

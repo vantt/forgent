@@ -3,10 +3,10 @@
 ```txt
 Document type: History
 Audience: Maintainer and independent reviewer
-Purpose: Locate the immutable migration evidence and dry-run snapshot
+Purpose: Locate the migration evidence records
 Design status: Candidate
 Implementation: Evidence only
-Provenance: plans/260925-documentation-authority-unification/ at SYNC 17b751966
+Provenance: plans/260925-documentation-authority-unification/ at SYNC e7393ea3c
 Writer type: Agent draft writer
 Canonical: No
 Canonical for: None; historical evidence

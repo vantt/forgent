@@ -21,7 +21,7 @@ Superseded by: None
 
 Added in candidate: Candidate carriage; Keep the mapped architecture rationale, not a new governance authority. Original source metadata and text follow. Physical relative-link destinations alone are rebased to the same repository paths. Units with inherited missing links are preserved as literal fenced source text, without substituting another design or changing any assertion. Source metadata is provenance, not candidate authority.
 
-Source relationship: [original source](documentation-system-design.md).
+Source relationship: [original source](../../../architect/documentation-system-design.md).
 
 
 ```txt

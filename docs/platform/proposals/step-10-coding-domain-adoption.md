@@ -21,7 +21,7 @@ Superseded by: None
 
 Added in candidate: Candidate carriage; Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Original source metadata and text follow. Physical relative-link destinations alone are rebased to the same repository paths. Units with inherited missing links are preserved as literal fenced source text, without substituting another design or changing any assertion. Source metadata is provenance, not candidate authority.
 
-Source relationship: [original source](step-10-coding-domain-adoption.md).
+Source relationship: [original source](../../architect/proposals/step-10-coding-domain-adoption.md).
 
 
 ````markdown
@@ -69,7 +69,7 @@ This document uses three labels:
 - **Open** identifies a decision that still requires human review or proof.
 
 Nothing labeled Proposed is an approved contract or plan. The
-[Agent Coordination Vision](../agent-coordination/README.md) is accepted authority
+[Agent Coordination Vision](../agent-coordination/vision.md) is accepted authority
 above this proposal. In particular, V-002 (Work is optional integration),
 V-008 (domain augmentation), V-011 (small core), and V-012 (two unlike
 consumers) constrain every idea below.

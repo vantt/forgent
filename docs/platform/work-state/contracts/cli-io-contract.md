@@ -435,5 +435,5 @@ khoá, plan.md bốn lát).
 - [Work State portal](../README.md)
 - [Work State spec](../spec.md)
 - [Retired decision history](../decisions/retired-decision-history.md)
-- [Legacy source: docs/specs/work-state.md](../README.md)
-- [Legacy source: docs/io-contract.md](cli-io-contract.md)
+- [Legacy source: docs/specs/work-state.md](../../../specs/work-state.md)
+- [Legacy source: docs/io-contract.md](../../../io-contract.md)

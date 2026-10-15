@@ -88,8 +88,8 @@ Humans should stay present for judgment, review, and direction. They should not 
 | Platform laws | [platform-foundations.md](platform-foundations.md) |
 | Whole-system architecture | [architecture-map.md](architecture-map.md) |
 | Component authority map | [component-boundary.md](component-boundary.md) |
-| Documentation governance | [../doc-governance.md](governance.md) |
-| Legacy full law source | [../platform-foundations.md](platform-foundations.md) |
+| Documentation governance | [governance.md](governance.md) |
+| Legacy full law source | [platform-foundations.md](platform-foundations.md) |
 
 
 ## Chu trình Work-Item của fgOS — tầm nhìn nền tảng

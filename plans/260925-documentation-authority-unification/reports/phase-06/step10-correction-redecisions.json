@@ -1,0 +1,693 @@
+{
+  "SYNC": "e7393ea3c",
+  "changes": [
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "kind": "source-predecessor-redecision",
+      "before": {
+        "claimId": "claim_66c5a56d447d241a438d212c7b6222d2",
+        "sourceUnitDigest": "df9402da4e0b1087fb0b38c82b93963f70524eff5988cad5d9e4715eade7953a",
+        "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+        "targetAnchor": "khóa-hoạt-động-cây-chính-chặn-commit-trần-khi-phiên-khác-đang-hoạt-động-str65",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "reviewed",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole heading docs/specs/runner.md#khóa-hoạt-động-cây-chính-chặn-commit-trần-khi-phiên-khác-đang-hoạt-động-str65 (lines 878–878) carried at docs/platform/runner/operations/h-51f5cd7279fd.md#khóa-hoạt-động-cây-chính-chặn-commit-trần-khi-phiên-khác-đang-hoạt-động-str65. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "reviewNote": "mechanical: heading unit source lines 878-878 to target lines 802-802, extractor digests and line range byte-equal, anchors resolve, shard equals pack, owner matches map row",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1706-runner-source-07-81d0ed074.md",
+        "reviewMode": "ordinary",
+        "targetUnitDigest": "df9402da4e0b1087fb0b38c82b93963f70524eff5988cad5d9e4715eade7953a",
+        "targetAncestry": [
+          "Added in candidate: Runner Behaviors & Operations",
+          "Behaviors & Operations"
+        ],
+        "reviewReportCommit": "edffd7c6b9cfb0461eec9e0fef65c9b4a2487acc"
+      },
+      "after": {
+        "claimId": "claim_66c5a56d447d241a438d212c7b6222d2",
+        "sourceUnitDigest": "df9402da4e0b1087fb0b38c82b93963f70524eff5988cad5d9e4715eade7953a",
+        "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+        "targetAnchor": "khóa-hoạt-động-cây-chính-chặn-commit-trần-khi-phiên-khác-đang-hoạt-động-str65",
+        "claimKind": "specification",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792079321432-41fe2051@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole heading docs/specs/runner.md#khóa-hoạt-động-cây-chính-chặn-commit-trần-khi-phiên-khác-đang-hoạt-động-str65 (lines 878–878) carried at docs/platform/runner/operations/h-51f5cd7279fd.md#khóa-hoạt-động-cây-chính-chặn-commit-trần-khi-phiên-khác-đang-hoạt-động-str65. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover. L10-14 / A31: predecessor text conserved in source history; upstream replaced this unit at SYNC e7393ea3c. Pending supersession to current verbatim carrier; source digest remains the predecessor digest. Native gap transition and current identity binding owed next package; no approval carry.",
+        "targetUnitDigest": "1c46bbd825e116160efeadcef33dab9d2fa69c0ba9985af5de2d4e717cf7b577",
+        "targetAncestry": [
+          "Added in candidate: Runner Behaviors & Operations",
+          "Behaviors & Operations"
+        ]
+      },
+      "currentDraftId": "claim_identity_gap_f051910ffa6cb7a164ca1943"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "kind": "source-predecessor-redecision",
+      "before": {
+        "claimId": "claim_41571c8f42f542be1f44c9371fad823a",
+        "sourceUnitDigest": "1b272bfab383f72def5df026184449f797cb7723c812253713808d6aed302988",
+        "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+        "targetAnchor": "unheaded-block-40",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "reviewed",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-52 (lines 886–906) carried at docs/platform/runner/operations/h-51f5cd7279fd.md#unheaded-block-40. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "reviewNote": "deep: read block unit text in both files, source lines 886-906 to target lines 810-830, byte-equal, no extra target text, anchors resolve, owner matches map row, rationale lines/anchors true, digest hand-recomputed by raw sha256",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1706-runner-source-07-81d0ed074.md",
+        "reviewMode": "ordinary",
+        "targetUnitDigest": "1b272bfab383f72def5df026184449f797cb7723c812253713808d6aed302988",
+        "targetAncestry": [
+          "Added in candidate: Runner Behaviors & Operations",
+          "Behaviors & Operations",
+          "Khóa hoạt động cây chính — chặn commit trần khi phiên khác đang hoạt động (STR65)"
+        ],
+        "reviewReportCommit": "edffd7c6b9cfb0461eec9e0fef65c9b4a2487acc"
+      },
+      "after": {
+        "claimId": "claim_41571c8f42f542be1f44c9371fad823a",
+        "sourceUnitDigest": "1b272bfab383f72def5df026184449f797cb7723c812253713808d6aed302988",
+        "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+        "targetAnchor": "unheaded-block-40",
+        "claimKind": "specification",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792079321432-41fe2051@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-52 (lines 886–906) carried at docs/platform/runner/operations/h-51f5cd7279fd.md#unheaded-block-40. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover. L10-14 / A31: predecessor text conserved in source history; upstream replaced this unit at SYNC e7393ea3c. Pending supersession to current verbatim carrier; source digest remains the predecessor digest. Native gap transition and current identity binding owed next package; no approval carry.",
+        "targetUnitDigest": "325f9c8c7a59c1dfe6ece4b1b20bb12769d8239db1ad80a0e8c3b20d236ea62c",
+        "targetAncestry": [
+          "Added in candidate: Runner Behaviors & Operations",
+          "Behaviors & Operations",
+          "Khóa hoạt động cây chính — chặn commit trần khi phiên khác đang hoạt động (STR65)"
+        ]
+      },
+      "currentDraftId": "claim_identity_gap_36c87c85d4985dcca94d8f5d"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "kind": "source-predecessor-redecision",
+      "before": {
+        "claimId": "claim_4efee765e5a47fc42f4d9cccc7a53191",
+        "sourceUnitDigest": "a28a44307d00f10d0da810cccc5a0d5651ce6695e180cdf502baadcf43c6e641",
+        "targetOwner": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+        "targetAnchor": "pointers-implementation",
+        "claimKind": "specification",
+        "disposition": "supersede",
+        "reviewStatus": "reviewed",
+        "authoredBy": "codex-session:unit-run-1792066534402-cb278bf5@2026-10-15",
+        "rationale": "Judgment: A42 evidenced current-state correction or labelled header/navigation hygiene in this bound unit. Judgment: A41/A19 truth correction or explicitly labelled candidate navigation/link/scaffolding repair. Complete original source remains in immutable docs/specs/runner.md; candidate supersedes the identified false current assertion or rebases the same link referent, with unchanged dated decision semantics. A41 F2: replace deleted entropy pointer; A41 F1: replace deleted ranking pointer Full before/after text and evidence in reports/phase-06/step9-rebound-units.json. A22 rebind, pending independent bounded review; no approval carry, retirement or promotion.",
+        "reviewNote": "deep: heading Pointers (implementation) source L1211-1211 to subcomponents/h-f34e0d170d89/spec.md#pointers-implementation; token-level source-to-target diff read both directions, every hunk lies inside an edit range (truth-17, truth-18, followup-truth-10) and is labelled in the carrier, nothing else added or lost; rationale names the A41 labels and the A42 prefix covers the later follow-up ranges (followup-truth-10); disposition stays supersede, legal for a labelled correction and the rationale names the correction; shard row equals pack, anchors exist, source and target digests recomputed by script",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewMode": "ordinary",
+        "targetUnitDigest": "43d4ced9f756905411d3bc4e014339b78c9aedf6aab456b69a9840ec9adbe900",
+        "targetAncestry": [
+          "Added in candidate: Runner Pointers (implementation)"
+        ],
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9"
+      },
+      "after": {
+        "claimId": "claim_4efee765e5a47fc42f4d9cccc7a53191",
+        "sourceUnitDigest": "a28a44307d00f10d0da810cccc5a0d5651ce6695e180cdf502baadcf43c6e641",
+        "targetOwner": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+        "targetAnchor": "pointers-implementation",
+        "claimKind": "specification",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792079321432-41fe2051@2026-10-15",
+        "rationale": "Judgment: A42 evidenced current-state correction or labelled header/navigation hygiene in this bound unit. Judgment: A41/A19 truth correction or explicitly labelled candidate navigation/link/scaffolding repair. Complete original source remains in immutable docs/specs/runner.md; candidate supersedes the identified false current assertion or rebases the same link referent, with unchanged dated decision semantics. A41 F2: replace deleted entropy pointer; A41 F1: replace deleted ranking pointer Full before/after text and evidence in reports/phase-06/step9-rebound-units.json. A22 rebind, pending independent bounded review; no approval carry, retirement or promotion. L10-14 / A31: predecessor text conserved in source history; upstream replaced this unit at SYNC e7393ea3c. Pending supersession to current verbatim carrier; source digest remains the predecessor digest. Native gap transition and current identity binding owed next package; no approval carry.",
+        "targetUnitDigest": "077e4456152fabdeec033b95bef9434aacc5236a1b550dd1e752bd1b36f876a9",
+        "targetAncestry": [
+          "Added in candidate: Runner Pointers (implementation)"
+        ]
+      },
+      "currentDraftId": "claim_identity_gap_80056d28731c311a228dfd22"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "kind": "source-predecessor-redecision",
+      "before": {
+        "claimId": "claim_a64fabc06da00bb0eb8dfaba5ea0c1a6",
+        "sourceUnitDigest": "b323720a9d4e93b156af47db347755f342dd8ad9fb9720466bb161732ebef4e3",
+        "targetOwner": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+        "targetAnchor": "unheaded-block-3",
+        "claimKind": "specification",
+        "disposition": "supersede",
+        "reviewStatus": "reviewed",
+        "authoredBy": "codex-session:unit-run-1792066534402-cb278bf5@2026-10-15",
+        "rationale": "Judgment: A42 evidenced current-state correction or labelled header/navigation hygiene in this bound unit. Judgment: A41/A19 truth correction or explicitly labelled candidate navigation/link/scaffolding repair. Complete original source remains in immutable docs/specs/runner.md; candidate supersedes the identified false current assertion or rebases the same link referent, with unchanged dated decision semantics. A41 F2: replace deleted entropy pointer; A41 F1: replace deleted ranking pointer Full before/after text and evidence in reports/phase-06/step9-rebound-units.json. A22 rebind, pending independent bounded review; no approval carry, retirement or promotion.",
+        "reviewNote": "deep: block Unheaded block 102 source L1213-1263 to subcomponents/h-f34e0d170d89/spec.md#unheaded-block-3; token-level source-to-target diff read both directions, every hunk lies inside an edit range (truth-17, truth-18, followup-truth-10) and is labelled in the carrier, nothing else added or lost; rationale names the A41 labels and the A42 prefix covers the later follow-up ranges (followup-truth-10); disposition stays supersede, legal for a labelled correction and the rationale names the correction; shard row equals pack, anchors exist, source and target digests recomputed by script",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewMode": "ordinary",
+        "targetUnitDigest": "63a11d09197b4754933539dc36fa029c17b386dd35b6b32aa2e4dc3ae2da399b",
+        "targetAncestry": [
+          "Added in candidate: Runner Pointers (implementation)",
+          "Pointers (implementation)"
+        ],
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9"
+      },
+      "after": {
+        "claimId": "claim_a64fabc06da00bb0eb8dfaba5ea0c1a6",
+        "sourceUnitDigest": "b323720a9d4e93b156af47db347755f342dd8ad9fb9720466bb161732ebef4e3",
+        "targetOwner": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+        "targetAnchor": "unheaded-block-2",
+        "claimKind": "specification",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792079321432-41fe2051@2026-10-15",
+        "rationale": "Judgment: A42 evidenced current-state correction or labelled header/navigation hygiene in this bound unit. Judgment: A41/A19 truth correction or explicitly labelled candidate navigation/link/scaffolding repair. Complete original source remains in immutable docs/specs/runner.md; candidate supersedes the identified false current assertion or rebases the same link referent, with unchanged dated decision semantics. A41 F2: replace deleted entropy pointer; A41 F1: replace deleted ranking pointer Full before/after text and evidence in reports/phase-06/step9-rebound-units.json. A22 rebind, pending independent bounded review; no approval carry, retirement or promotion. L10-14 / A31: predecessor text conserved in source history; upstream replaced this unit at SYNC e7393ea3c. Pending supersession to current verbatim carrier; source digest remains the predecessor digest. Native gap transition and current identity binding owed next package; no approval carry.",
+        "targetUnitDigest": "ae0e268fad727f5deda17cf43d013aa1710f5cea2506fdd844809c3c8e98511f",
+        "targetAncestry": [
+          "Added in candidate: Runner Pointers (implementation)"
+        ]
+      },
+      "currentDraftId": "claim_identity_gap_9fe663cdce2f5027860ac5df"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+      "kind": "source-predecessor-redecision",
+      "before": {
+        "claimId": "claim_f9c135d80cce2e8cf98c8b3b5b0db4ad",
+        "sourceUnitDigest": "70c00c205578fc34084e5bf8701a6bde0999cb6f05a1b58f8424ad95ed4c28d4",
+        "targetOwner": "docs/platform/contracts/architecture-manifest.json",
+        "targetAnchor": "file-block",
+        "claimKind": "contract",
+        "disposition": "move",
+        "reviewStatus": "reviewed",
+        "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+        "rationale": "A31 native current source identity; full changed source unit carried verbatim in existing candidate owner. Main-only before/after retained in step8-final-rework-accounting.json. No predecessor identity graft or approval carry; no current-truth or promotion approval.",
+        "reviewNote": "deep: new native claim for the changed legacy manifest (70c00c20); carrier file byte-equal (cmp, sha256 equal, 12267 bytes both, blob ae8c66912 at the merge); the single upstream line executor-posture-coverage.mjs: use-case is the only difference from the old copy; move true; pending, distinct from predecessors 15, 16, 20, 21, 24",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1526-specs-ui-reworks-main-recarry.md",
+        "reviewMode": "ordinary",
+        "targetUnitDigest": "70c00c205578fc34084e5bf8701a6bde0999cb6f05a1b58f8424ad95ed4c28d4",
+        "targetAncestry": [],
+        "reviewReportCommit": "0e8ce7710ac67ad038927b242b2461876bf8c90d"
+      },
+      "after": {
+        "claimId": "claim_f9c135d80cce2e8cf98c8b3b5b0db4ad",
+        "sourceUnitDigest": "70c00c205578fc34084e5bf8701a6bde0999cb6f05a1b58f8424ad95ed4c28d4",
+        "targetOwner": "docs/platform/contracts/architecture-manifest.json",
+        "targetAnchor": "file-block",
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792079321432-41fe2051@2026-10-15",
+        "rationale": "A31 native current source identity; full changed source unit carried verbatim in existing candidate owner. Main-only before/after retained in step8-final-rework-accounting.json. No predecessor identity graft or approval carry; no current-truth or promotion approval. L10-14 / A31: predecessor text conserved in source history; upstream replaced this unit at SYNC e7393ea3c. Pending supersession to current verbatim carrier; source digest remains the predecessor digest. Native gap transition and current identity binding owed next package; no approval carry.",
+        "targetUnitDigest": "92391ce631b0c3602a5e22947a73182a6fd37f148e4b052cb4749a55b7657a6d",
+        "targetAncestry": []
+      },
+      "currentDraftId": "claim_identity_gap_9631653c23ccae49e3f81306"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "kind": "source-or-truth-redecision",
+      "before": {
+        "claimId": "claim_d956ba3fb9a8cce9589194e5f59d021f",
+        "sourceUnitDigest": "3cb37dbc28864019579211dcadd7e189fb667783946e770ad45a9a81c2ca5b30",
+        "claimKind": "navigation",
+        "disposition": "reclassify-out-of-platform-scope",
+        "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+        "rationale": "L10-1/L10-4: retain repository-wide navigation outside platform authority. The complete 53-entry curated list from docs/specs/reading-map.md is now preserved verbatim in docs/reading-map.md#5-detailed-product-and-source-map, including the two pre-existing portal routes with reconciled descriptions. Legacy source and paths remain intact; Phase 9 owns consumer repointing. Known stale carried sentences; full truth check owed at promotion (A35). No truth approval or cutover authority is inferred. This native source unit #unheaded-block-2 is re-decided pending independent navigation/conservation review.",
+        "reviewStatus": "pending"
+      },
+      "after": {
+        "claimId": "claim_d956ba3fb9a8cce9589194e5f59d021f",
+        "sourceUnitDigest": "3cb37dbc28864019579211dcadd7e189fb667783946e770ad45a9a81c2ca5b30",
+        "claimKind": "navigation",
+        "disposition": "reclassify-out-of-platform-scope",
+        "authoredBy": "codex-session:unit-run-1792079321432-41fe2051@2026-10-15",
+        "rationale": "Retained repository navigation outside platform authority; merged 53-entry list with seven labelled truth corrections. Legacy source unchanged; no cutover authority. L10-12 truth correction: seven false reading-map entries corrected with labelled file:line evidence; retained legacy source untouched. Full before/after in step10-correction-truth.json.",
+        "reviewStatus": "pending"
+      },
+      "sourceWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-2",
+        "githubAnchor": "unheaded-block-2",
+        "stableAnchor": "unheaded-block-2",
+        "title": "Unheaded block 2",
+        "startLine": 11,
+        "endLine": 63,
+        "textDigest": "3cb37dbc28864019579211dcadd7e189fb667783946e770ad45a9a81c2ca5b30",
+        "sample": "- `docs/platform-foundations.md` — văn bản gốc 8 luật nền platform (L1–L8); spec: docs/specs/platform-foundations.md\n- `docs/backlog.md` — product backlog (PBI rows, scribing-owned",
+        "identityFingerprint": "ec317fc75a4fbe4a7f332e9360a594eb87ec74142e07972863d7b27c3df2dd49",
+        "ancestry": [
+          "Reading Map (sản phẩm)"
+        ],
+        "text": "- `docs/platform-foundations.md` — văn bản gốc 8 luật nền platform (L1–L8); spec: docs/specs/platform-foundations.md\n- `docs/backlog.md` — product backlog (PBI rows, scribing-owned)\n- `docs/architecture-map.md` — bản chuẩn kiến trúc (v0.2, record ADR0010 (bản đồ kiến trúc là bản chuẩn)): 5 tầng + 2 lớp phủ, sổ component + sổ contract (CTR001–CTR009), nghi thức thẻ-căn-cước-trước-code\n- `docs/work-item-lifecycle-vision.md` — tầm nhìn nền tảng: chu trình sống của work-item (mixed-autonomy, base-workflow + domain-extension); khung cho các PBI STR14-STR18\n- `docs/platform/packaging-distribution/README.md` — portal hiện hành cho packaging/distribution: `fgctl` bootstrap/init/repair/upgrade, workspace activation, doctor/fix readiness, legacy Node compatibility, skill/instruction projections. Khi mục này mâu thuẫn với `docs/specs/distribution.md`, đọc portal + implementation-alignment trước; `docs/specs/distribution.md` hiện là legacy/generated-curated source trong lúc migration.\n- `docs/distribution-vision.md` — tầm nhìn nền tảng lịch sử: cài đặt/setup/doctor ổn định + tái dùng được (không cần clone, global/project không xung đột — project ghi đè global, doctor/setup tự fix hạ tầng + merge config thiếu, module mới tự đăng ký năng lực config, CI như một phần của setup); đã được promote/supersede từng phần vào `docs/platform/packaging-distribution/vision.md`.\n- `docs/specs/` — state layer: area spec + system-overview + bản đồ này\n- `docs/routing-handoff-contract.md` — hợp đồng handoff agent↔agent + ranh giới tin cậy\n- `docs/io-contract.md` — hợp đồng giao tiếp VÀO/RA của cửa CLI + bề mặt stdout `fgos-runner` (str46-io-contract): danh tính `writer`/`role`, envelope `fgos.v1` + ngoại lệ có lý do, exit-code một nguồn, sổ verb (`touchesState`/`externalEffect`/`paginated`/`multiValueFormat`), version token, ranh giới ngoài (STR38/STR48/STR83)\n- `docs/coexistence.md` — doctrine chạy cạnh một harness agent khác (record ADR0009 (chống giao thoa lúc cài — fgOS khi cài không giao thoa tiến trình với harness khác)): lãnh địa, một-nhạc-trưởng-mỗi-phiên, nhường-nhịn lúc `init`, manifest `.fgos/coexistence.json`, Known Gaps chưa flip; `src/install/coexist.mjs` — cài đặt detection + manifest (read-only, không đè)\n- `package.json` (`version`, `files`, `bin.fgos`, `bin.fgos-runner`) + `README.md` (mục `## Install`) — cài `fgos` VÀ `fgos-runner` từ ngoài source repo qua GitHub install, cả hai executable ngay sau cài; `test/install-packaging.test.mjs` — proof e2e (pack → install → chạy từ project ngoài, gồm cả hai binary); spec: docs/specs/distribution.md\n- `scripts/fgos-shell-integration.sh` — dev checkout shell helper (STR87 first slice): hàm `fgos`/`fgos-runner` tự resolve root qua `git rev-parse --git-common-dir` (worktree-safe), source từ shell profile của contributor, không cài đặt gì; test: `test/scripts/fgos-shell-integration.test.mjs`; spec: docs/specs/distribution.md §Dev checkout shell helpers\n- `src/setup/` (`ansi.mjs`, `config-merge.mjs`, `shell-rc.mjs`, `checks.mjs`) + `bin/fgos.mjs`'s current legacy `setup`/`doctor` verbs + `src/cli/command-registry.mjs` entries — doctor/fix registry and legacy setup compatibility: `doctor` chẩn đoán read-only, `doctor --fix` chạy registered fixes, current Node `fgos setup` vẫn tồn tại nhưng target architecture supersedes onboarding bằng `fgctl init` + local `fgos init` / `fgos doctor --fix` / `fgos doctor`; manifest: `docs/architecture-manifest.json`; test: `test/setup/*.test.mjs`; current portal: `docs/platform/packaging-distribution/README.md`; legacy spec: docs/specs/distribution.md §Setup, §Doctor\n- `docs/decisions/` — hồ sơ quyết định dài hạn cho người ngoài (decision records); từ str64-backfill, mỗi record còn mang đầu-mô-tả OKF-style (loại/tiêu đề/nhãn/thời điểm/móc-liên-kết-nguồn, xem `frontmatter.mjs` dòng dưới) và được `fgos docs-index` công nhận là vị trí thay thế của ngăn `explanation` (R10, spec: docs/specs/enduser-docs-index.md) — thân ADR không đổi, chỉ thêm đầu-mô-tả; lưu ý `orchestrator` là pinned term đã đổi nghĩa giữa chừng (0026→0028 nghĩa cũ \"launcher\", 0029 nghĩa mới \"tầng hợp thành T0\"; xem chuỗi quyết định tại `docs/decisions/index.md` dòng 28-32)\n- `scripts/check-decision-citation-drift.mjs` + `test/scripts/check-decision-citation-drift.test.mjs` — quét `docs/backlog.md` + `docs/specs/*.md` tìm dòng còn trích một quyết định đã bị supersede mà không nhắc quyết định thay thế trên cùng dòng (STR72 CoS clause 2, PBI p-2d71dfc3); chỉ phát hiện, không tự sửa; spec: docs/specs/decision-citation-drift.md\n- `scripts/check-decision-codes.mjs` + `test/scripts/check-decision-codes.test.mjs` — quét `test/**/*.test.mjs` tìm tên test còn nhúng mã quyết định nội bộ (str##/D#/RUL##/STR##/tsk-xxx) thay vì mô tả bất biến bằng lời thường (review-audit-self-decision.md mục Stable Code Artifacts); chặn (ratchet) chỉ vi phạm MỚI so với `scripts/check-decision-codes.baseline.json` đã chốt, không chặn ngược nợ cũ; `npm test` tự chạy qua glob `test/**/*.test.mjs`, không hook riêng\n- `docs/id-systems-audit.md` — audit + quyết định hình dạng mọi hệ id/mã đang sống trong hệ thống (work.id/kind/Story/ADR/Rule/Contract phía fgOS; D-hex/D-local/cell-id/feature-slug/severity phía bee) — nguồn cho `work.id`'s `tsk-<hash>` và các migration STR53-STR58 (tất cả đã `done`); boundary appendix: `docs/architecture-map.md` Phụ lục B\n- `bin/fgos.mjs` — CLI một cửa của work-state; chạy `node bin/fgos.mjs <verb>`; gồm verb `edit` — sửa đè các trường (title/kind/risk/verify/tier/refs/deps/acceptance/priority/intent — str7-str8-priority-intent) trên một item đã có, cùng cửa ghi CTR002 như `add`/`move`; gồm verb `take`/`return` — cửa pull giao–nhận việc cho tác nhân ngoài runner; gồm verb `pick` — cửa pull GỘP `take` + dựng workspace (`createWorktree`), role cố định `session`, không cờ `--role` (theo str83-fgos-slash-commands); gồm verb `review`/`approve`/`reject` — cổng duyệt PR nội bộ, một cổng cho mọi đề xuất `awaiting-approval`, nay leaf-vs-root-aware (con nhập vào nhánh của gốc, gốc nhập vào cây chính); `review`/`approve` nay chấp nhận thêm `--github [--pr <n>]` — vận chuyển thay thế CÙNG cổng duyệt qua GitHub thay vì diff/merge cục bộ (chỉ nguồn runner, theo github-adapter, spec: docs/specs/runner.md); gồm verb `catchup` — đồng bộ lại một việc đỗ vì gãy nhập/trôi tích hợp (spec: docs/specs/runner.md); gồm verb `session` (`start`/`end`/`list`) — vòng đời phiên checkout đa-phiên tùy chọn, mỗi phiên một worktree detached-HEAD cho cây nguồn, dùng chung MỘT kho `.fgos/` qua symlink (spec: docs/specs/runner.md); spec: docs/specs/work-state.md\n- `src/state/` — lõi work-state: events (nhật ký; `appendEvent` nay khóa liên-tiến-trình `.fgos/events.lock`, per fgos-multi-session-checkout Epic 3/STR35 — xem spec Work-State RUL10 (tiền đề có ngưỡng — một người ghi tại một thời điểm; multi-agent ghi đồng thời qua `.fgos/events.lock`)), work (schema — STATUSES + STAGES + field `parent` lineage + field `domain`), fsm (bảng chuyển status + CAS), stage (bảng chuyển stage + CAS, chiều vĩ mô song song fsm; cạnh chuyển-stage tra theo domain của item — `coding`: `discovery → exploring → planning → executing`, trong đó phán-quyết `clear` ở `discovery` bỏ qua `exploring` để sang thẳng `planning` còn `unclear` đi qua `exploring`; tên `decompose` vẫn còn nhưng chỉ là bí danh legacy chỉ-để-rút-cạn (không việc MỚI nào vào được nữa); `synthetic`: một stage, không cạnh nào), domains (sổ đăng ký domain — stage list + step-mapping base-workflow + cạnh-chuyển mỗi domain; `coding` + ba domain minh họa/thử-nghiệm `synthetic` (đúng một stage), `triage`, `fixture-marketing`; base-workflow-model STR18, hoàn tất S1+S2), replay (fold), frontier (truy vấn sẵn-sàng — lọc theo status, stage domain-aware, VÀ lineage qua `parent`), dep-graph (dò chu trình trên `deps` — bất biến phi-chu-trình tại cửa ghi, per work-graph-intelligence S1), store (chủ ghi duy nhất + readRawEvents), envelope (phong bì output CTR001, `wrapEnvelope` — nay bọc MỌI verb ở một cửa in trong `bin/fgos.mjs main()`, STR37; spec: docs/specs/work-state.md §envelope)\n- `src/cli/command-registry.mjs` — sổ verb máy-đọc của CLI (STR37, kernel, thuần dữ liệu): `SCHEMA_VERSION` + `COMMAND_REGISTRY` (mọi verb với `{name, invoke, description, parameters, examples, access read|mutation, deprecated}`); `bin/fgos.mjs` `--help [--json]` và `<verb> [<sub>] --help [--json]` sinh sổ từ đây; verb có sub-verb mang `subcommands`, `HELP_SELECTORS` (`--help`, `-h`) thành route của Rust host qua `scripts/export-command-selectors.mjs`; test chống-lệch `test/cli/fgos-manifest.test.mjs`, `test/cli/subcommand-flag-drift.test.mjs` (cờ handler ↔ schema sub-verb), `test/cli/fgos-verb-help-json.test.mjs`, `test/rust-host/help-routes.test.mjs` (qua host thật); spec: docs/specs/work-state.md §sổ verb\n- `src/intake/classify.mjs` — logic thuần của `fgos submit`: deriveTitle, classify (tier/kind/risk cơ học), generateId (`tsk-<hash>` chống trùng, STR53)\n- `src/intake/discovery.mjs` — context-discovery của stage `discovery` (stage đầu tiên của domain `coding`): `resolveDiscovery` (đọc-phán-ghi, dùng chung bởi verb `discover` và vòng tự hành) ĐÒI phán-quyết do người gọi cấp — judge lồng `judgeDiscovery` đã rút; phán-quyết `clear` chuyển item sang stage `planning`, `unclear` sang `exploring`\n- `src/intake/plan.mjs` — phán chia-việc của stage `planning`: `resolvePlan` (đọc-phán-ghi, dùng chung bởi verb `plan` và vòng tự hành khi item ở stage `planning`, hoặc ở bí danh legacy `decompose`) ĐÒI phán-quyết do người gọi cấp — judge lồng `judgeDecompose` đã rút, cùng lý do `judgeDiscovery` rút; sinh con qua lineage `parent`, không qua `deps`\n- `domains/coding/AGENTS.md` `## fgOS Workflow` + `.claude/skills/` (`.agents/skills/` mirror byte-identical) — lớp hướng dẫn P50: entry skill (`fgos-routing`) + skill giai đoạn (`fgos-coding-discovering`/`fgos-coding-exploring`/`fgos-coding-planning`/`fgos-coding-validating`/`fgos-coding-implement`/`fgos-coding-knowledge`) trỏ một phiên tự mở tới đúng skill theo `stage` của item; từ str89-fgos-domain-skills, tra cứu này domain-pluggable — đọc trường `domain` + `stage` của item rồi tra qua `skillForStage`/`getDomain` (`src/state/workflow-stage-graphs.mjs`), không còn giả định ngầm domain `coding`; `fgos-routing` nay có hàng khoá theo **status** `retrospective → fgos-coding-knowledge` (skill tổng hợp cấp nhãn Diataxis + soạn tài liệu người-dùng-cuối) — stage `compound-learn` đã rút, việc tổng hợp nó từng canh nay là việc của status `retrospective`; skill ĐỘC LẬP `fgos-submit-assist` (str51-llm-assist-classify) đã rút (tsk-6ar) — `/fgOS:submit` bước 6 (`plugins/fgOS/skills/submit/SKILL.md`) nay tự chạy clarify+classify trong cùng phiên sống, cùng việc mà skill đó từng làm nhưng trên bản mô tả SẠCH hơn; spec: docs/specs/work-state.md §RUL60 (hành vi), docs/specs/runner.md (lớp hướng dẫn)\n- `plugins/fgOS/` (`.claude-plugin/plugin.json` + `skills/<verb>/SKILL.md`) — bề mặt slash-command `/fgOS:<verb>` cho Claude Code, 12 verb wrapper (submit, pick, move, return, ask, answer, ready, stale, rollup, check, graph, conflicts), mỗi verb một wrapper one-door-write qua `bin/fgos.mjs <verb>`; spec: docs/specs/fgos-plugin.md\n- `apps/fgos-gateway/` + `apps/fgos-gateway/web/` — fgos gateway (REST, MCP, bundle web dashboard nhúng sẵn; vòng đời `fgos gateway`) và bề mặt web dashboard: client trình duyệt ĐỘC LẬP (không phải code máy chủ trong gateway, theo tsk-7l9 + decision 0014); `herdr-dashboard/` là plugin herdr (TUI trong pane), `packages/herdr-fgos-common/rust` là adapter CLI fgos dùng chung của cả hai, gọi API REST/RPC của gateway từ ngoài; ba màn đọc (taskboard, task-detail, câu hỏi cần trả lời — phủ cả kênh `ask` lẫn `gate-approve`) cộng các hành động ghi đi qua verb một-cửa-ghi của fgOS (`answer`/`approve`/`add`/`edit`/`move`), không có đường ghi thứ hai; bật mặc định, port 8788, token bắt buộc; spec: docs/specs/herdr-web-dashboard.md (lớp UI/wireframe: docs/reference/herdr-web-dashboard-layout.md)\n- `docs/how-to/`, `docs/tutorials/`, `docs/reference/`, `docs/explanation/` — tài liệu NGƯỜI-DÙNG-CUỐI theo bốn quadrant Diataxis (audience-facing, khác `docs/specs/` là BA-reference nội bộ); sinh bởi kỹ năng `fgos-coding-knowledge` ở status `retrospective` (grow-or-create một tài liệu SỐNG mỗi đường dẫn: gom mọi capture qua `fgos doc-sources` rồi tích luỹ không mất, ngăn Diataxis là trục cấu trúc duy nhất — write-side, spec: docs/specs/enduser-docs-authoring.md), quadrant khớp `docType` capture; `docs/explanation/` từ str64-backfill còn có 6 tài liệu chưng cất từ critical-patterns.md (learnings vận hành bee thật sự thuộc tiến trình hình thành fgOS); chỉ mục đọc-theo-tag máy-đọc-được: `docs/enduser-docs-index.json` (sinh bởi verb `fgos docs-index` / kỹ năng `fgos-indexing`, thay cho việc liệt-kê-tay từng tài liệu — supersedes con trỏ văn xuôi cũ, theo compound-learn-enduser-docs; ngăn `explanation` còn quét thêm `docs/decisions/` làm vị trí thay thế, theo str64-backfill); spec read-side: docs/specs/enduser-docs-index.md\n- `src/runner/` + `bin/fgos-runner.mjs` — vòng tự hành (loop/dispatch/worktree/recovery/anti-loop/write-queue/root-affinity); `loop.mjs`'s `runWatch` + `write-queue.mjs`'s `onCommit` — chế độ `--watch` bền, tín hiệu-cơ-học + nghỉ dự phòng, ghép `runOnce` không đổi làm hộp đen (str7-str8-priority-intent, spec: docs/specs/runner.md §RUL53 (`--watch` — vòng cầm-giao bền, dừng chỉ khi có tín hiệu tường minh)); loop giao việc theo mẻ song song có giới hạn hai tầng (cấu hình `parallel` trong `.fgos/config.json`'s `runner` section, theo tsk-5vf), giữ quyền-sở-hữu-gốc trong một lượt chạy, quét làm-rõ rồi quét chia-việc trước mọi dispatch thi công; gặt-lại bỏ qua claim của cửa pull (`claimRole` human/session); `dispatch.mjs`'s executor là port có tên CTR009 v2 (`EXECUTOR_ADAPTERS`, per-tier qua config's `executors`, STR41), `ensureRunnerConfigForDir` tự sinh cấu hình mặc định tại `.fgos/config.json` khi vắng mặt (không áp dụng cho `--config` tường minh, str76-runner-bootstrap; tsk-5hv xoá hẳn fallback về file flat legacy cũ); worker của loop và fan-out chạy như một Unit run qua `runUnit` (`work-dispatch.mjs`'s `spawnWorker`), `fgos-runner` không còn `--config` (spec: docs/specs/runner.md §RUL93 (the runner loop's worker and the fan-out batch run as one Unit run each)) và prompt worker được tách sang `prompt-templates.mjs` + `prompt-templates/*.txt` (chọn template qua bảng cơ học kind/tier/domain, substitution `{placeholder}` thuần, log dispatch kèm tên+hash template, STR49); `goal-check.mjs` — hàm goal-check dùng chung giữa vòng tự hành và verb `return`; `write-queue.mjs` — cửa ghi tuần tự giữ một-người-ghi dưới song song; `root-affinity.mjs` — quyền-sở-hữu-gốc, giữ mọi con của một gốc chung một chủ trong một lượt chạy; `resolveRepoRoot` nay còn xác nhận HEAD repo resolve được trước khi runner claim bất kỳ item nào (fail-fast, str86-runner-headless-git D ecfd0d1a); config: `.fgos/config.json`'s `runner` section (tự sinh khi vắng mặt tại đường mặc định, nguồn config duy nhất kể từ tsk-5hv); spec: docs/specs/runner.md\n- `docs/specs/confinement-authority.md` + `src/runner/dispatch/confinement/` — Agent Confinement Authority: runtime one-door confinement enforcement (`executeThroughConfinement`), machine backend registry `~/.fgos/confinement-backends.json`, local `bwrap` v1 driver with 8 falsification probes, required fail-closed checks, attestation storage (`confinement-attestation.v1`), herdr convergence with shared `evaluateBypassPairing`, setup defaults and doctor checks; spec: docs/specs/confinement-authority.md Pane herdr confine cho agent không phải claude (codex/agy/pi): công thức private-home + account inventory + lịch sử các commit đã đi qua (và vì sao từng bị quên) ở §13.1.\n- `docs/architect/README.md` + `docs/architect/architecture-intent.md` + `docs/architect/domainization/README.md` — portal architect-level, registry intention xuyên-khu-vực, và deep-dive domainization (core đóng vs `domains/<name>/` adapter mở: manifest/workflow YAML, task-spec, skill, knowledge, doctrine, agent, resolver, enforcement); active thread đầu tiên giữ intent mở rộng fgOS từ fan-out/fan-in + artifact mediation thành năng lực group-thinking/problem-solving rộng hơn (Delphi/NGT/RFC/adversarial/master-coordinator), giữ `group-cognition-framework.yaml` isolation-heavy không bị nới ngầm; liên quan Step 09 group-thinking substrate, Step 10 coding-domain adoption, component authority boundary map, và Domain Components And Extension Layer\n- `src/workflow/` (`definition.mjs`, `runner.mjs`, `step-fsm.mjs`, `units-source.mjs`) + `core/workflows/*.yaml` — Workflow engine (Request-to-Run P3a/P4): DAG steps, human gates, dependency scheduling, runner integration; `units-source.mjs` dịch units file của `fgos workflow start --units` thành Workflow tạm (RUL89 (workflow start --units)); spec: `docs/specs/runner.md`\n- `src/runner/execution/` (`unit.mjs`, `bind.mjs`, `run.mjs`, `patterns/`) — Execution Core (Request-to-Run P1/P2/P4): Unit (hợp đồng dữ liệu duy nhất), `bind()` (chọn executor 5 mức), `fgos run` (cửa chạy mới, herdr mặc định), CollaborationPattern (`solo`, `reviewed`, `panel` + presets `consult`, `research-fan-out`, `rfc`, `code-change`); `src/runner/dispatch/write-scope.mjs` — matcher duy nhất của phạm vi ghi Unit (RUL84 (one write-scope matcher)), dùng cho runner commit, settlement và Workflow; spec: `docs/specs/runner.md`\n- `docs/architect/agent-coordination/` — thiết kế agent-coordination lịch sử (đã thu hồi ở P4 per D-0050, thay bằng Workflow runner và Execution Core); `README.md` là portal ghi nhận chuyển tiếp; `contracts/` lưu giữ hợp đồng lịch sử (`coordination-session.md`, `flow-definition.md`).\n- `docs/architect/host-invocation-routing/` — kiến trúc định tuyến và host runtime Rust (5 tệp: `host-invocation-provider-routing.md` — hợp đồng kernel canonical OperationRequest/ProviderOutcome, pure Router, InvocationService; `legacy-cli-transition.md` — chiến lược exec payload Node với parity harness và descriptor command-routes; `external-provider-protocol.md` — giao thức external provider R2; `node-to-rust-component-migration.md` — lộ trình chuyển dịch component từ Node sang Rust; `rust-cli-and-proof-components-plan.md` — kế hoạch triển khai Rust CLI host và proof components); spec: docs/specs/distribution.md\n- `src/runner/merge.mjs` — cơ chế cổng duyệt PR nội bộ (`classifySource`/`reviewDiff`/`mergeRunnerItem`/`cleanupMergedBranch`), dùng bởi `bin/fgos.mjs` verb `review`/`approve`/`reject`, nay tham số hóa được nhánh đích (cây chính hoặc nhánh của gốc — cây nhánh tích hợp); `catchup` (bin/fgos.mjs) dùng lại cùng cơ chế git cho cả tầng con→gốc lẫn gốc→cây chính; `isMainWorktree` (STR44) — chặn cấu trúc (không dựa sổ đăng ký session) xác nhận `cwd` LÀ worktree chính trước khi `approve` merge/verify, bắt cả worktree tay không đăng ký qua `fgos session start` — cùng `detectTrunk` nay ở `src/runner/worktree.mjs` (theo tsk-49i), không còn ở file này; spec: docs/specs/runner.md\n- `src/verbs/<domain>/<verb>.mjs` — tầng use-case của CLI (theo tsk-49i): logic nghiệp vụ của một verb, chữ ký thống nhất `<verb>UseCase(ctx, options)` — `ctx` là thứ adapter tính từ môi trường (`{dir, cwd?, repoRoot?}`, use-case KHÔNG BAO GIỜ tự đọc `process.cwd()`/`process.env`/argv), `options` là flag đã parse; trả đúng payload `fgos.v1` (bọc envelope + map exit-code vẫn ở `bin/fgos.mjs`), refusal vẫn `throw StoreError`. Cụm đầu tiên: `src/verbs/merge/` (`merge`/`approve`/`review`/`sync-root`/`catchup`/`reject`/`promote-to-component`) — `bin/fgos.mjs` cho 7 verb này nay chỉ parse args, tính `repoRoot` theo chính sách RIÊNG của từng verb, gọi một hàm use-case. Không ngụ ý migrate 7 file use-case-rank sẵn có (`runner/loop.mjs`, `intake/*`, `setup/*`, `state/cursor.mjs`); spec: docs/specs/runner.md\n- `src/report/item-trace.mjs` — trace outcome/friction của MỘT item, đọc thuần trên view (`collectOutcomeEntry`/`collectFrictionData`/`collectReviewTrace`); dùng chung bởi `review` (use-case) và `check`/`show`/`doc-sources`/`evolve` (`bin/fgos.mjs`); spec: docs/specs/runner.md\n- `src/runner/github-adapter.mjs` — vận chuyển GitHub thuần cho cổng duyệt PR nội bộ (`createGitHubPR`/`viewGitHubPRStatus`/`mergeGitHubPR`/`classifyGhFailure`, shell ra `gh` CLI thật, layer infra), dùng bởi `bin/fgos.mjs` verb `review`/`approve --github`; spec: docs/specs/runner.md\n- `src/runner/worker-log.mjs` — cửa ghi DUY NHẤT cho bản ghi output cục bộ của trợ lý (`.fgos/logs/<id>.log`, git-ignored): `appendWorkerLog` — khối kết-cục cuối, gọi bởi `loop.mjs` sau mỗi lượt dispatch; `appendWorkerLogChunk` — live tee từng chunk stdout/stderr khi đến (STR39), gọi bởi `dispatch.mjs`'s `spawnWorker` qua `opts.onChunk`; spec: docs/specs/runner.md\n- `src/runner/session.mjs` — vòng đời phiên checkout đa-phiên tùy chọn (fgos-multi-session-checkout, STR35): `createSession`/`endSession`/`listSessions`/`reclaimOrphanedSessions`, worktree detached-HEAD mỗi phiên (`git worktree add --detach`), `.fgos` symlink dùng chung (KHÔNG BAO GIỜ sao chép), sổ `.fgos/sessions.json` canh bởi `.fgos/sessions.lock` riêng; dùng bởi `bin/fgos.mjs` verb `session`; spec: docs/specs/runner.md\n- `packages/observe/rust/src/metrics_cli/entropy.rs` — tín hiệu entropy-trend + đếm compounding (thuần, đọc trên view work-state), surfaced qua `fgos metrics entropy`; spec: docs/specs/runner.md\n- `src/report/enduser-index.mjs` — bộ sinh CHỈ MỤC đọc-theo-tag tài liệu người-dùng-cuối (thuần, không I/O — mirror `entropy.mjs`): `QUADRANTS`, bảng nguồn-sự-thật `QUADRANT_META` (quadrant→{purpose,audience}), `QUADRANT_DIR_ALIASES` (quadrant→vị trí thay thế trên đĩa, theo str64-backfill; hiện `explanation`→`['decisions']`), `findSourceCaptureId` (gom một, cho chỉ mục), `findSourceCaptureIds` (gom mọi capture của một đường dẫn, cho `doc-sources`), `buildEnduserIndex`; I/O + verb `fgos docs-index` (quét cả thư mục chính lẫn `QUADRANT_DIR_ALIASES`, ghi manifest `docs/enduser-docs-index.json`) và verb `fgos doc-sources <docPath>` (gom nguồn của một đường dẫn) sống ở `bin/fgos.mjs`, cả hai quyền `read`; vận hành chỉ mục: kỹ năng `fgos-indexing`; spec: docs/specs/enduser-docs-index.md\n- `src/report/frontmatter.mjs` — bộ đọc/ghi đầu-mô-tả OKF-style của mỗi tài liệu người-dùng-cuối (thuần, không I/O, không phụ thuộc thư viện ngoài — theo str64-backfill): `parseFrontmatter`/`renderFrontmatter` (loại/tiêu đề/nhãn/thời điểm/móc-liên-kết-nguồn); tách biệt với bộ sinh chỉ mục — đầu-mô-tả là bản sao ghi-lúc-soạn, KHÔNG phải nguồn thẩm quyền của linkage; spec: docs/specs/enduser-docs-index.md\n- `src/evolve/candidates.mjs` — Gate A candidate ranking cho vòng tự cải thiện (self-improve loop, STR13 Slice 1): thuần, đọc trên view work-state, dùng lại `entropy.mjs`'s `listUnsettledFrictionsByWork`/`WEIGHTS.frictionUnsettled` (không tự định nghĩa lại); surfaced qua `fgos evolve` (liệt kê + `--pick <id>`, hai bước, không stdin); spec: docs/specs/runner.md\n- `src/state/impact.mjs` — backlog-triage impact ranking (STR21, cửa 2 của triage — tách bạch khỏi STR14 intake-triage): thuần, xếp hạng item CHƯA `done` theo `blocks` (số item khác chưa `done` liệt kê nó trong `deps`); surfaced qua `fgos triage`; spec: docs/specs/work-state.md\n- `src/state/awaiting-context.mjs` — neo gốc cho cổng chờ-người (str61-chat-context-continuity): thuần, đọc trên view work-state, tính `{parent, changedSinceAsk?}` cho một item `awaiting-human` có `parent` mỗi lần đọc (không lưu trữ); surfaced qua `fgos list`'s khóa cộng thêm `awaitingContext`; spec: docs/specs/work-state.md §RUL45 (awaitingContext — neo gốc cho cổng chờ-người, dẫn xuất đọc-thời-điểm)\n- `src/intake/risk-keywords.mjs` — nguồn duy nhất của `HEAVY_KEYWORDS` (self-improve loop STR13 Slice 2, kernel layer, dùng chung giữa `classify.mjs` và `iron-law.mjs`); spec: docs/specs/runner.md\n- `src/evolve/iron-law.mjs` — Iron Law risk classifier cho vòng tự cải thiện (self-improve loop, STR13 Slice 2): thuần, chưa có call site (Slice 3 wiring); spec: docs/specs/runner.md\n- `docs/specs/observe.md` — spec thành phần Observe (đo lường `fgos metrics` và ghi nhận `fgos friction` trọn sang Rust); source: `packages/observe/rust`, contracts: `packages/observe/contracts/`, store `.fgos/observe/`. `metrics discussions` đọc summary do Node Execution ghi (`src/runner/execution/unit-summary.mjs`, `packages/run-result/contracts/unit-summary.read.v2.json`), `metrics eval` ghi journal `.fgos/observe/evals/`. Rubric: `docs/reference/discussion-quality-rubric.md`; cách so sánh mù: `docs/how-to/compare-discussion-setups-with-metrics-eval.md`.\n- `test/` — node:test suite (`npm test`, 2970 test): smoke + state + cli + runner + report + e2e (rebuild-determinism, runner-loop — gồm kịch bản cửa pull S2-pull + con fork từ tip nhánh gốc, pr-gate — 4 kịch bản trọn vòng review/approve/reject, dispatch song song thật với cửa sổ chồng-lấn đo được); benchmark ngoài suite (F4) tại `docs/history/phase-3-compound-learning/reports/f4-benchmark.md`\n- `scripts/run-test-canary.mjs` (`npm run test:canary -- <file...>`) + `scripts/test-select.mjs` (`npm run test:related -- --explain`, plus `test:related:shadow` for evidence-gathering; manifest: `test/test-ownership.mjs`) — additive fast test-feedback doors, `npm test` unchanged/authoritative either way; how-to: `docs/how-to/use-fast-test-feedback-commands.md`; plan: `plans/260920-immediate-test-feedback-reduction/plan.md`\n- `.fgos/events.jsonl` — nhật ký sự kiện work-state (truth, committed); `.fgos/state.json` là view gitignored; `.fgos/logs/<id>.log` — bản ghi output cục bộ của trợ lý theo từng việc, gitignored (spec: docs/specs/runner.md)\n- `AGENTS.md`, `CLAUDE.md` — doctrine layer nạp mọi phiên agent (bản sản phẩm — thuần forgent)"
+      },
+      "targetWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-16",
+        "githubAnchor": "unheaded-block-16",
+        "stableAnchor": "unheaded-block-16",
+        "title": "Unheaded block 16",
+        "startLine": 131,
+        "endLine": 183,
+        "textDigest": "3305a95673e54327a31e169da4c03bf36ba96a5841fbba89a87daf158cae7a8a",
+        "sample": "- `docs/platform-foundations.md` — văn bản gốc 8 luật nền platform (L1–L8); spec: docs/specs/platform-foundations.md\n- `docs/backlog.md` — product backlog (PBI rows, scribing-owned",
+        "identityFingerprint": "583eec1a363e99da21209509697e7c6a98b710fb418db463b3a125f51d5beb99",
+        "ancestry": [
+          "Documentation Reading Map",
+          "5. Detailed Product And Source Map"
+        ],
+        "text": "- `docs/platform-foundations.md` — văn bản gốc 8 luật nền platform (L1–L8); spec: docs/specs/platform-foundations.md\n- `docs/backlog.md` — product backlog (PBI rows, scribing-owned)\n- `docs/architecture-map.md` — bản chuẩn kiến trúc (v0.2, record ADR0010 (bản đồ kiến trúc là bản chuẩn)): 5 tầng + 2 lớp phủ, sổ component + sổ contract (CTR001–CTR009), nghi thức thẻ-căn-cước-trước-code\n- `docs/work-item-lifecycle-vision.md` — tầm nhìn nền tảng: chu trình sống của work-item (mixed-autonomy, base-workflow + domain-extension); khung cho các PBI STR14-STR18\n- `docs/platform/packaging-distribution/README.md` — portal hiện hành cho packaging/distribution: `fgctl` bootstrap/init/repair/upgrade, workspace activation, doctor/fix readiness, legacy Node compatibility, skill/instruction projections. Khi mục này mâu thuẫn với `docs/specs/distribution.md`, đọc portal + implementation-alignment trước; `docs/specs/distribution.md` hiện là legacy/generated-curated source trong lúc migration.\n- `docs/distribution-vision.md` — tầm nhìn nền tảng lịch sử: cài đặt/setup/doctor ổn định + tái dùng được (không cần clone, global/project không xung đột — project ghi đè global, doctor/setup tự fix hạ tầng + merge config thiếu, module mới tự đăng ký năng lực config, CI như một phần của setup); đã được promote/supersede từng phần vào `docs/platform/packaging-distribution/vision.md`.\n- `docs/specs/` — state layer: area spec + system-overview + bản đồ này\n- `docs/routing-handoff-contract.md` — hợp đồng handoff agent↔agent + ranh giới tin cậy\n- `docs/io-contract.md` — hợp đồng giao tiếp VÀO/RA của cửa CLI + bề mặt stdout `fgos-runner` (str46-io-contract): danh tính `writer`/`role`, envelope `fgos.v1` + ngoại lệ có lý do, exit-code một nguồn, sổ verb (`touchesState`/`externalEffect`/`paginated`/`multiValueFormat`), version token, ranh giới ngoài (STR38/STR48/STR83)\n- `docs/coexistence.md` — doctrine chạy cạnh một harness agent khác (record ADR0009 (chống giao thoa lúc cài — fgOS khi cài không giao thoa tiến trình với harness khác)): lãnh địa, một-nhạc-trưởng-mỗi-phiên, nhường-nhịn lúc `init`, manifest `.fgos/coexistence.json`, Known Gaps chưa flip; `src/install/coexist.mjs` — cài đặt detection + manifest (read-only, không đè)\n- `package.json` (`version`, `files`, `bin.fgos`, `bin.fgos-runner`) + `README.md` (mục `## Install`) — cài `fgos` VÀ `fgos-runner` từ ngoài source repo qua GitHub install, cả hai executable ngay sau cài; `test/install-packaging.test.mjs` — proof e2e (pack → install → chạy từ project ngoài, gồm cả hai binary); spec: docs/specs/distribution.md\n- `scripts/fgos-shell-integration.sh` — dev checkout shell helper (STR87 first slice): hàm `fgos`/`fgos-runner` tự resolve root qua `git rev-parse --git-common-dir` (worktree-safe), source từ shell profile của contributor, không cài đặt gì; test: `test/scripts/fgos-shell-integration.test.mjs`; spec: docs/specs/distribution.md §Dev checkout shell helpers\n- `src/setup/` (`ansi.mjs`, `config-merge.mjs`, `shell-rc.mjs`, `checks.mjs`) + `bin/fgos.mjs`'s current legacy `setup`/`doctor` verbs + `src/cli/command-registry.mjs` entries — doctor/fix registry and legacy setup compatibility: `doctor` chẩn đoán read-only, `doctor --fix` chạy registered fixes, current Node `fgos setup` vẫn tồn tại nhưng target architecture supersedes onboarding bằng `fgctl init` + local `fgos init` / `fgos doctor --fix` / `fgos doctor`; manifest: `docs/architecture-manifest.json`; test: `test/setup/*.test.mjs`; current portal: `docs/platform/packaging-distribution/README.md`; legacy spec: docs/specs/distribution.md §Setup, §Doctor\n- `docs/decisions/` — hồ sơ quyết định dài hạn cho người ngoài (decision records); từ str64-backfill, mỗi record còn mang đầu-mô-tả OKF-style (loại/tiêu đề/nhãn/thời điểm/móc-liên-kết-nguồn, xem `frontmatter.mjs` dòng dưới) và được `fgos docs-index` công nhận là vị trí thay thế của ngăn `explanation` (R10, spec: docs/specs/enduser-docs-index.md) — thân ADR không đổi, chỉ thêm đầu-mô-tả; lưu ý `orchestrator` là pinned term đã đổi nghĩa giữa chừng (0026→0028 nghĩa cũ \"launcher\", 0029 nghĩa mới \"tầng hợp thành T0\"; xem chuỗi quyết định tại `docs/decisions/index.md` dòng 28-32)\n- `scripts/check-decision-citation-drift.mjs` + `test/scripts/check-decision-citation-drift.test.mjs` — quét `docs/backlog.md` + `docs/specs/*.md` tìm dòng còn trích một quyết định đã bị supersede mà không nhắc quyết định thay thế trên cùng dòng (STR72 CoS clause 2, PBI p-2d71dfc3); chỉ phát hiện, không tự sửa; spec: docs/specs/decision-citation-drift.md\n- `scripts/check-decision-codes.mjs` + `test/scripts/check-decision-codes.test.mjs` — quét `test/**/*.test.mjs` tìm tên test còn nhúng mã quyết định nội bộ (str##/D#/RUL##/STR##/tsk-xxx) thay vì mô tả bất biến bằng lời thường (review-audit-self-decision.md mục Stable Code Artifacts); chặn (ratchet) chỉ vi phạm MỚI so với `scripts/check-decision-codes.baseline.json` đã chốt, không chặn ngược nợ cũ; `npm test` tự chạy qua glob `test/**/*.test.mjs`, không hook riêng\n- `docs/id-systems-audit.md` — audit + quyết định hình dạng mọi hệ id/mã đang sống trong hệ thống (work.id/kind/Story/ADR/Rule/Contract phía fgOS; D-hex/D-local/cell-id/feature-slug/severity phía bee) — nguồn cho `work.id`'s `tsk-<hash>` và các migration STR53-STR58 (tất cả đã `done`); boundary appendix: `docs/architecture-map.md` Phụ lục B\n- `bin/fgos.mjs` — CLI một cửa của work-state; chạy `node bin/fgos.mjs <verb>`; gồm verb `edit` — sửa đè các trường (title/kind/risk/verify/tier/refs/deps/acceptance/priority/intent — str7-str8-priority-intent) trên một item đã có, cùng cửa ghi CTR002 như `add`/`move`; gồm verb `take`/`return` — cửa pull giao–nhận việc cho tác nhân ngoài runner; gồm verb `pick` — cửa pull GỘP `take` + dựng workspace (`createWorktree`), role cố định `session`, không cờ `--role` (theo str83-fgos-slash-commands); gồm verb `review`/`approve`/`reject` — cổng duyệt PR nội bộ, một cổng cho mọi đề xuất `awaiting-approval`, nay leaf-vs-root-aware (con nhập vào nhánh của gốc, gốc nhập vào cây chính); `review`/`approve` nay chấp nhận thêm `--github [--pr <n>]` — vận chuyển thay thế CÙNG cổng duyệt qua GitHub thay vì diff/merge cục bộ (chỉ nguồn runner, theo github-adapter, spec: docs/specs/runner.md); gồm verb `catchup` — đồng bộ lại một việc đỗ vì gãy nhập/trôi tích hợp (spec: docs/specs/runner.md); gồm verb `session` (`start`/`end`/`list`) — vòng đời phiên checkout đa-phiên tùy chọn, mỗi phiên một worktree detached-HEAD cho cây nguồn, dùng chung MỘT kho `.fgos/` qua symlink (spec: docs/specs/runner.md); spec: docs/specs/work-state.md\n- `src/state/` — lõi work-state: events (nhật ký; `appendEvent` nay khóa liên-tiến-trình `.fgos/events.lock`, per fgos-multi-session-checkout Epic 3/STR35 — xem spec Work-State RUL10 (tiền đề có ngưỡng — một người ghi tại một thời điểm; multi-agent ghi đồng thời qua `.fgos/events.lock`)), work (schema — STATUSES + STAGES + field `parent` lineage + field `domain`), fsm (bảng chuyển status + CAS), stage (bảng chuyển stage + CAS, chiều vĩ mô song song fsm; cạnh chuyển-stage tra theo domain của item — `coding`: `discovery → exploring → planning → executing`, trong đó phán-quyết `clear` ở `discovery` bỏ qua `exploring` để sang thẳng `planning` còn `unclear` đi qua `exploring`; tên `decompose` vẫn còn nhưng chỉ là bí danh legacy chỉ-để-rút-cạn (không việc MỚI nào vào được nữa); `synthetic`: một stage, không cạnh nào), domains (sổ đăng ký domain — stage list + step-mapping base-workflow + cạnh-chuyển mỗi domain; `coding` + ba domain minh họa/thử-nghiệm `synthetic` (đúng một stage), `triage`, `fixture-marketing`; base-workflow-model STR18, hoàn tất S1+S2), replay (fold), frontier (truy vấn sẵn-sàng — lọc theo status, stage domain-aware, VÀ lineage qua `parent`), dep-graph (dò chu trình trên `deps` — bất biến phi-chu-trình tại cửa ghi, per work-graph-intelligence S1), store (chủ ghi duy nhất + readRawEvents), envelope (phong bì output CTR001, `wrapEnvelope` — nay bọc MỌI verb ở một cửa in trong `bin/fgos.mjs main()`, STR37; spec: docs/specs/work-state.md §envelope)\n- `src/cli/command-registry.mjs` — sổ verb máy-đọc của CLI (STR37, kernel, thuần dữ liệu): `SCHEMA_VERSION` + `COMMAND_REGISTRY` (mọi verb với `{name, invoke, description, parameters, examples, access read|mutation, deprecated}`); `bin/fgos.mjs` `--help [--json]` và `<verb> [<sub>] --help [--json]` sinh sổ từ đây; verb có sub-verb mang `subcommands`, `HELP_SELECTORS` (`--help`, `-h`) thành route của Rust host qua `scripts/export-command-selectors.mjs`; test chống-lệch `test/cli/fgos-manifest.test.mjs`, `test/cli/subcommand-flag-drift.test.mjs` (cờ handler ↔ schema sub-verb), `test/cli/fgos-verb-help-json.test.mjs`, `test/rust-host/help-routes.test.mjs` (qua host thật); spec: docs/specs/work-state.md §sổ verb\n- `src/intake/classify.mjs` — logic thuần của `fgos submit`: deriveTitle, classify (tier/kind/risk cơ học), generateId (`tsk-<hash>` chống trùng, STR53)\n- `src/intake/discovery.mjs` — context-discovery của stage `discovery` (stage đầu tiên của domain `coding`): `resolveDiscovery` (đọc-phán-ghi, dùng chung bởi verb `discover` và vòng tự hành) ĐÒI phán-quyết do người gọi cấp — judge lồng `judgeDiscovery` đã rút; phán-quyết `clear` chuyển item sang stage `planning`, `unclear` sang `exploring`\n- `src/intake/plan.mjs` — phán chia-việc của stage `planning`: `resolvePlan` (đọc-phán-ghi, dùng chung bởi verb `plan` và vòng tự hành khi item ở stage `planning`, hoặc ở bí danh legacy `decompose`) ĐÒI phán-quyết do người gọi cấp — judge lồng `judgeDecompose` đã rút, cùng lý do `judgeDiscovery` rút; sinh con qua lineage `parent`, không qua `deps`\n- `domains/coding/AGENTS.md` `## fgOS Workflow` + `.claude/skills/` (`.agents/skills/` mirror byte-identical) — lớp hướng dẫn P50: entry skill (`fgos-routing`) + skill giai đoạn (`fgos-coding-discovering`/`fgos-coding-exploring`/`fgos-coding-planning`/`fgos-coding-validating`/`fgos-coding-implement`/`fgos-coding-knowledge`) trỏ một phiên tự mở tới đúng skill theo `stage` của item; từ str89-fgos-domain-skills, tra cứu này domain-pluggable — đọc trường `domain` + `stage` của item rồi tra qua `skillForStep`/`getDomain` (`src/state/domain-registry.mjs`), không còn giả định ngầm domain `coding`; `fgos-routing` nay có hàng khoá theo **status** `retrospective → fgos-coding-knowledge` (skill tổng hợp cấp nhãn Diataxis + soạn tài liệu người-dùng-cuối) — stage `compound-learn` đã rút, việc tổng hợp nó từng canh nay là việc của status `retrospective`; skill ĐỘC LẬP `fgos-submit-assist` (str51-llm-assist-classify) đã rút (tsk-6ar) — `/fgOS:submit` bước 6 (`plugins/fgOS/skills/submit/SKILL.md`) nay tự chạy clarify+classify trong cùng phiên sống, cùng việc mà skill đó từng làm nhưng trên bản mô tả SẠCH hơn; spec: docs/specs/work-state.md §RUL60 (hành vi), docs/specs/runner.md (lớp hướng dẫn) **Truth correction:** src/state/domain-registry.mjs:193,240; core/skills/fgos-routing/SKILL.md:124-136.\n- `plugins/fgOS/` (`.claude-plugin/plugin.json` + `skills/<verb>/SKILL.md`) — bề mặt slash-command `/fgOS:<verb>` cho Claude Code, 37 wrapper không có tiền tố fgos- trong 55 thư mục skill; `check` không có wrapper. Mỗi wrapper giữ hướng dẫn cửa gọi của riêng nó; spec: docs/specs/fgos-plugin.md **Truth correction:** plugins/fgOS/.claude-plugin/plugin.json:1; plugins/fgOS/skills/submit/SKILL.md:1; plugins/fgOS/skills/answer/SKILL.md:1 (directory enumeration at e7393ea3c).\n- `apps/fgos-gateway/` + `apps/fgos-gateway/web/` — fgos gateway (REST, MCP, bundle web dashboard nhúng sẵn; vòng đời `fgos gateway`) và bề mặt web dashboard: client trình duyệt ĐỘC LẬP (không phải code máy chủ trong gateway, theo tsk-7l9 + decision 0014); `herdr-dashboard/` là plugin herdr (TUI trong pane), `packages/herdr-fgos-common/rust` là adapter CLI fgos dùng chung của cả hai, gọi API REST/RPC của gateway từ ngoài; ba màn đọc (taskboard, task-detail, câu hỏi cần trả lời — phủ cả kênh `ask` lẫn `gate-approve`) cộng các hành động ghi đi qua verb một-cửa-ghi của fgOS (`answer`/`approve`/`add`/`edit`/`move`), không có đường ghi thứ hai; bật mặc định, port 8788, token bắt buộc; spec: docs/specs/herdr-web-dashboard.md (lớp UI/wireframe: docs/reference/herdr-web-dashboard-layout.md)\n- `docs/how-to/`, `docs/tutorials/`, `docs/reference/`, `docs/explanation/` — tài liệu NGƯỜI-DÙNG-CUỐI theo bốn quadrant Diataxis (audience-facing, khác `docs/specs/` là BA-reference nội bộ); sinh bởi kỹ năng `fgos-coding-knowledge` ở status `retrospective` (grow-or-create một tài liệu SỐNG mỗi đường dẫn: gom mọi capture qua `fgos doc-sources` rồi tích luỹ không mất, ngăn Diataxis là trục cấu trúc duy nhất — write-side, spec: docs/specs/enduser-docs-authoring.md), quadrant khớp `docType` capture; `docs/explanation/` từ str64-backfill còn có 6 tài liệu chưng cất từ critical-patterns.md (learnings vận hành bee thật sự thuộc tiến trình hình thành fgOS); chỉ mục đọc-theo-tag máy-đọc-được: `docs/enduser-docs-index.json` (sinh bởi verb `fgos docs-index` / kỹ năng `fgos-indexing`, thay cho việc liệt-kê-tay từng tài liệu — supersedes con trỏ văn xuôi cũ, theo compound-learn-enduser-docs; ngăn `explanation` còn quét thêm `docs/decisions/` làm vị trí thay thế, theo str64-backfill); spec read-side: docs/specs/enduser-docs-index.md\n- `src/runner/` + `bin/fgos-runner.mjs` — vòng tự hành (loop/dispatch/worktree/recovery/anti-loop/write-queue/root-affinity); `loop.mjs`'s `runWatch` + `write-queue.mjs`'s `onCommit` — chế độ `--watch` bền, tín hiệu-cơ-học + nghỉ dự phòng, ghép `runOnce` không đổi làm hộp đen (str7-str8-priority-intent, spec: docs/specs/runner.md §RUL53 (`--watch` — vòng cầm-giao bền, dừng chỉ khi có tín hiệu tường minh)); loop giao việc theo mẻ song song có giới hạn hai tầng (cấu hình `parallel` trong `.fgos/config.json`'s `runner` section, theo tsk-5vf), giữ quyền-sở-hữu-gốc trong một lượt chạy, quét làm-rõ rồi quét chia-việc trước mọi dispatch thi công; gặt-lại bỏ qua claim của cửa pull (`claimRole` human/session); `dispatch.mjs`'s executor là port có tên CTR009 v2 (`EXECUTOR_ADAPTERS`, per-tier qua config's `executors`, STR41), `ensureRunnerConfigForDir` tự sinh cấu hình mặc định tại `.fgos/config.json` khi vắng mặt (không áp dụng cho `--config` tường minh, str76-runner-bootstrap; tsk-5hv xoá hẳn fallback về file flat legacy cũ); worker của loop và fan-out chạy như một Unit run qua `runUnit` (`work-dispatch.mjs`'s `spawnWorker`), `fgos-runner` không còn `--config` (spec: docs/specs/runner.md §RUL93 (the runner loop's worker and the fan-out batch run as one Unit run each)) và prompt worker được tách sang `prompt-templates.mjs` + `prompt-templates/*.txt` (chọn template qua bảng cơ học kind/tier/domain, substitution `{placeholder}` thuần, log dispatch kèm tên+hash template, STR49); `goal-check.mjs` — hàm goal-check dùng chung giữa vòng tự hành và verb `return`; `write-queue.mjs` — cửa ghi tuần tự giữ một-người-ghi dưới song song; `root-affinity.mjs` — quyền-sở-hữu-gốc, giữ mọi con của một gốc chung một chủ trong một lượt chạy; `resolveRepoRoot` nay còn xác nhận HEAD repo resolve được trước khi runner claim bất kỳ item nào (fail-fast, str86-runner-headless-git D ecfd0d1a); config: `.fgos/config.json`'s `runner` section (tự sinh khi vắng mặt tại đường mặc định, nguồn config duy nhất kể từ tsk-5hv); spec: docs/specs/runner.md\n- `docs/specs/confinement-authority.md` + `src/runner/dispatch/confinement/` — Agent Confinement Authority: runtime one-door confinement enforcement (`executeThroughConfinement`), machine backend registry `~/.fgos/confinement-backends.json`, local `bwrap` v1 driver with 8 falsification probes, required fail-closed checks, attestation storage (`confinement-attestation.v1`), herdr convergence with shared `evaluateBypassPairing`, setup defaults and doctor checks; spec: docs/specs/confinement-authority.md Pane herdr confine cho agent không phải claude (codex/agy/pi): công thức private-home + account inventory + lịch sử các commit đã đi qua (và vì sao từng bị quên) ở §13.1.\n- `docs/architect/README.md` + `docs/architect/architecture-intent.md` + `docs/architect/domainization/README.md` — portal architect-level, registry intention xuyên-khu-vực, và deep-dive domainization (core đóng vs `domains/<name>/` adapter mở: manifest/workflow YAML, task-spec, skill, knowledge, doctrine, agent, resolver, enforcement); active thread đầu tiên giữ intent mở rộng fgOS từ fan-out/fan-in + artifact mediation thành năng lực group-thinking/problem-solving rộng hơn (Delphi/NGT/RFC/adversarial/master-coordinator), giữ `group-cognition-framework.yaml` isolation-heavy không bị nới ngầm; liên quan Step 09 group-thinking substrate, Step 10 coding-domain adoption, component authority boundary map, và Domain Components And Extension Layer\n- `src/workflow/` (`definition.mjs`, `runner.mjs`, `step-fsm.mjs`, `units-source.mjs`) + `core/workflows/*.yaml` — Workflow engine (Request-to-Run P3a/P4): DAG steps, human gates, dependency scheduling, runner integration; `units-source.mjs` dịch units file của `fgos workflow start --units` thành Workflow tạm (RUL89 (workflow start --units)); spec: `docs/specs/runner.md`\n- `src/runner/execution/` (`unit.mjs`, `bind.mjs`, `run.mjs`, `patterns/`) — Execution Core (Request-to-Run P1/P2/P4): Unit (hợp đồng dữ liệu duy nhất), `bind()` (chọn executor 5 mức), `fgos run` (cửa chạy mới, herdr mặc định), CollaborationPattern (`solo`, `reviewed`, `panel` + presets `consult`, `research-fan-out`, `rfc`, `code-change`); `src/runner/dispatch/write-scope.mjs` — matcher duy nhất của phạm vi ghi Unit (RUL84 (one write-scope matcher)), dùng cho runner commit, settlement và Workflow; spec: `docs/specs/runner.md`\n- `docs/architect/agent-coordination/` — thiết kế agent-coordination lịch sử (đã thu hồi ở P4 per D-0050, thay bằng Workflow runner và Execution Core); `README.md` là portal ghi nhận chuyển tiếp; `contracts/` lưu giữ hợp đồng lịch sử (`coordination-session.md`, `flow-definition.md`).\n- `docs/architect/host-invocation-routing/` — kiến trúc định tuyến và host runtime Rust (5 tệp: `host-invocation-provider-routing.md` — hợp đồng kernel canonical OperationRequest/ProviderOutcome, pure Router, InvocationService; `legacy-cli-transition.md` — chiến lược exec payload Node với parity harness và descriptor command-routes; `external-provider-protocol.md` — giao thức external provider R2; `node-to-rust-component-migration.md` — lộ trình chuyển dịch component từ Node sang Rust; `rust-cli-and-proof-components-plan.md` — kế hoạch triển khai Rust CLI host và proof components); spec: docs/specs/distribution.md\n- `src/runner/merge.mjs` — cơ chế cổng duyệt PR nội bộ (`classifySource`/`reviewDiff`/`mergeRunnerItem`/`cleanupMergedBranch`), dùng bởi `bin/fgos.mjs` verb `review`/`approve`/`reject`, nay tham số hóa được nhánh đích (cây chính hoặc nhánh của gốc — cây nhánh tích hợp); `catchup` (bin/fgos.mjs) dùng lại cùng cơ chế git cho cả tầng con→gốc lẫn gốc→cây chính; `isMainWorktree` (STR44) — chặn cấu trúc (không dựa sổ đăng ký session) xác nhận `cwd` LÀ worktree chính trước khi `approve` merge/verify, bắt cả worktree tay không đăng ký qua `fgos session start` — cùng `detectTrunk` nay ở `src/runner/worktree.mjs` (theo tsk-49i), không còn ở file này; spec: docs/specs/runner.md\n- `src/verbs/<domain>/<verb>.mjs` — tầng use-case của CLI (theo tsk-49i): logic nghiệp vụ của một verb, chữ ký thống nhất `<verb>UseCase(ctx, options)` — `ctx` là thứ adapter tính từ môi trường (`{dir, cwd?, repoRoot?}`, use-case KHÔNG BAO GIỜ tự đọc `process.cwd()`/`process.env`/argv), `options` là flag đã parse; trả đúng payload `fgos.v1` (bọc envelope + map exit-code vẫn ở `bin/fgos.mjs`), refusal vẫn `throw StoreError`. Cụm đầu tiên: `src/verbs/merge/` (`merge`/`approve`/`review`/`sync-root`/`catchup`/`reject`/`promote-to-component`) — `bin/fgos.mjs` cho 7 verb này nay chỉ parse args, tính `repoRoot` theo chính sách RIÊNG của từng verb, gọi một hàm use-case. Không ngụ ý migrate 7 file use-case-rank sẵn có (`runner/loop.mjs`, `intake/*`, `setup/*`, `state/cursor.mjs`); spec: docs/specs/runner.md\n- `src/report/item-trace.mjs` — trace outcome/friction của MỘT item, đọc thuần trên view (`collectOutcomeEntry`/`collectFrictionData`/`collectReviewTrace`); dùng chung bởi `review` (use-case) và `check`/`show`/`doc-sources`/`evolve` (`bin/fgos.mjs`); spec: docs/specs/runner.md\n- `src/runner/github-adapter.mjs` — vận chuyển GitHub thuần cho cổng duyệt PR nội bộ (`createGitHubPR`/`viewGitHubPRStatus`/`mergeGitHubPR`/`classifyGhFailure`, shell ra `gh` CLI thật, layer infra), dùng bởi `bin/fgos.mjs` verb `review`/`approve --github`; spec: docs/specs/runner.md\n- `src/runner/worker-log.mjs` — cửa ghi DUY NHẤT cho bản ghi output cục bộ của trợ lý (`.fgos/logs/<id>.log`, git-ignored): `appendWorkerLog` — khối kết-cục cuối, gọi bởi `loop.mjs` sau mỗi lượt dispatch; `appendWorkerLogChunk` — live tee từng chunk stdout/stderr khi đến (STR39), gọi bởi `dispatch.mjs`'s `spawnWorker` qua `opts.onChunk`; spec: docs/specs/runner.md\n- `src/runner/session.mjs` — vòng đời phiên checkout đa-phiên tùy chọn (fgos-multi-session-checkout, STR35): `createSession`/`endSession`/`listSessions`/`reclaimOrphanedSessions`, worktree detached-HEAD mỗi phiên (`git worktree add --detach`), `.fgos` symlink dùng chung (KHÔNG BAO GIỜ sao chép), sổ `.fgos/sessions.json` canh bởi `.fgos/sessions.lock` riêng; dùng bởi `bin/fgos.mjs` verb `session`; spec: docs/specs/runner.md\n- `packages/observe/rust/src/metrics_cli/entropy.rs` — tín hiệu entropy-trend + đếm compounding (thuần, đọc trên view work-state), surfaced qua `fgos metrics entropy`; spec: docs/specs/runner.md\n- `src/report/enduser-index.mjs` — bộ sinh CHỈ MỤC đọc-theo-tag tài liệu người-dùng-cuối (biến đổi dữ liệu, không tự thực hiện I/O; ghi chú mirror entropy trong source là lịch sử, `src/report/entropy.mjs` không còn): `QUADRANTS`, bảng nguồn-sự-thật `QUADRANT_META` (quadrant→{purpose,audience}), `QUADRANT_DIR_ALIASES` (quadrant→vị trí thay thế trên đĩa, theo str64-backfill; hiện `explanation`→`['decisions']`), `findSourceCaptureId` (gom một, cho chỉ mục), `findSourceCaptureIds` (gom mọi capture của một đường dẫn, cho `doc-sources`), `buildEnduserIndex`; I/O + verb `fgos docs-index` (quét cả thư mục chính lẫn `QUADRANT_DIR_ALIASES`, ghi manifest `docs/enduser-docs-index.json`) và verb `fgos doc-sources <docPath>` (gom nguồn của một đường dẫn) sống ở `bin/fgos.mjs`, cả hai quyền `read`; vận hành chỉ mục: kỹ năng `fgos-indexing`; spec: docs/specs/enduser-docs-index.md **Truth correction:** src/report/enduser-index.mjs:1-17; packages/observe/rust/src/metrics_cli/entropy.rs:1.\n- `src/report/frontmatter.mjs` — bộ đọc/ghi đầu-mô-tả OKF-style của mỗi tài liệu người-dùng-cuối (thuần, không I/O, không phụ thuộc thư viện ngoài — theo str64-backfill): `parseFrontmatter`/`renderFrontmatter` (loại/tiêu đề/nhãn/thời điểm/móc-liên-kết-nguồn); tách biệt với bộ sinh chỉ mục — đầu-mô-tả là bản sao ghi-lúc-soạn, KHÔNG phải nguồn thẩm quyền của linkage; spec: docs/specs/enduser-docs-index.md\n- Historical `src/evolve/candidates.mjs` — path not present at this commit; `src/report/entropy.mjs`, `listUnsettledFrictionsByWork` và verb `fgos evolve` cũng không còn. Tín hiệu entropy hiện ở `packages/observe/rust/src/metrics_cli/entropy.rs`, qua `fgos metrics entropy`; không có cửa candidate ranking được mô tả ở câu cũ. **Truth correction:** src/cli/command-registry.mjs:98,204-207; packages/observe/rust/src/metrics_cli/entropy.rs:1; src/evolve/iron-law.mjs:1 (only current src/evolve file; full src/bin/packages symbol search has no old ranking symbol).\n- `src/state/impact.mjs` — backlog-triage impact ranking (STR21, cửa 2 của triage — tách bạch khỏi STR14 intake-triage): thuần, xếp hạng item CHƯA `done` theo `blocks` (số item khác chưa `done` liệt kê nó trong `deps`); surfaced qua `fgos triage`; spec: docs/specs/work-state.md\n- `src/state/awaiting-context.mjs` — neo gốc cho cổng chờ-người (str61-chat-context-continuity): thuần, đọc trên view work-state, tính `{parent, changedSinceAsk?}` cho một item `awaiting-human` có `parent` mỗi lần đọc (không lưu trữ); surfaced qua `fgos list`'s khóa cộng thêm `awaitingContext`; spec: docs/specs/work-state.md §RUL45 (awaitingContext — neo gốc cho cổng chờ-người, dẫn xuất đọc-thời-điểm)\n- `src/intake/risk-keywords.mjs` — nguồn duy nhất của `HEAVY_KEYWORDS` (self-improve loop STR13 Slice 2, kernel layer, dùng chung giữa `classify.mjs` và `iron-law.mjs`); spec: docs/specs/runner.md\n- `src/evolve/iron-law.mjs` — Iron Law risk classifier cho vòng tự cải thiện (self-improve loop, STR13 Slice 2): thuần, đã được gọi qua `src/runner/iron-law-gate.mjs` (import và gọi `classifyIronLaw`); spec: docs/specs/runner.md **Truth correction:** src/evolve/iron-law.mjs:64; src/runner/iron-law-gate.mjs:20,59.\n- `docs/specs/observe.md` — spec thành phần Observe (đo lường `fgos metrics` và ghi nhận `fgos friction` trọn sang Rust); source: `packages/observe/rust`, contracts: `packages/observe/contracts/`, store `.fgos/observe/`. `metrics discussions` đọc summary do Node Execution ghi (`src/runner/execution/unit-summary.mjs`, `packages/run-result/contracts/unit-summary.read.v2.json`), `metrics eval` ghi journal `.fgos/observe/evals/`. Rubric: `docs/reference/discussion-quality-rubric.md`; cách so sánh mù: `docs/how-to/compare-discussion-setups-with-metrics-eval.md`.\n- `test/` — node:test suite (`npm test`; tổng số test lịch sử 2970 chưa được đếm lại): smoke + state + cli + runner + report + e2e (rebuild-determinism, runner-loop — gồm kịch bản cửa pull S2-pull + con fork từ tip nhánh gốc, pr-gate — 4 kịch bản trọn vòng review/approve/reject, dispatch song song thật với cửa sổ chồng-lấn đo được); benchmark lịch sử ngoài suite (F4): `docs/history/phase-3-compound-learning/reports/f4-benchmark.md` — path not present at this commit; không có benchmark hiện hành ở đường dẫn này **Truth correction:** package.json:1 (scripts.test); git ls-tree e7393ea3c docs/history/phase-3-compound-learning (no entries).\n- `scripts/run-test-canary.mjs` (`npm run test:canary -- <file...>`) + `scripts/test-select.mjs` (`npm run test:related -- --explain`, plus `test:related:shadow` for evidence-gathering; manifest: `test/test-ownership.mjs`) — additive fast test-feedback doors, `npm test` unchanged/authoritative either way; how-to: `docs/how-to/use-fast-test-feedback-commands.md`; plan: `archive/plans/260920-immediate-test-feedback-reduction/plan.md` **Truth correction:** archive/plans/260920-immediate-test-feedback-reduction/plan.md:5.\n- `.fgos/events.jsonl` — nhật ký sự kiện work-state (truth, committed); `.fgos/state.json` là view gitignored; `.fgos/logs/<id>.log` — bản ghi output cục bộ của trợ lý theo từng việc, gitignored (spec: docs/specs/runner.md)\n- `AGENTS.md`, `CLAUDE.md` — doctrine layer nạp mọi phiên agent (bản sản phẩm — thuần forgent)"
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "kind": "source-or-truth-redecision",
+      "before": {
+        "claimId": "claim_46c173824da77fbf25f59072ae8e1620",
+        "sourceUnitDigest": "a021e5594432d44b1543517b1219a7406a72c4ba9503363e1f8eef3f8085524a",
+        "targetOwner": "docs/platform/agent-confinement/spec.md",
+        "targetAnchor": "86-crash-và-cleanup",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/confinement-authority.md#86-crash-và-cleanup (source lines 1084-1084) is carried at docs/platform/agent-confinement/spec.md#86-crash-và-cleanup (candidate lines 348-348). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/confinement-authority.md verbatim in docs/platform/agent-confinement/spec.md, docs/platform/agent-confinement/contracts/confinement-authority-v1.md, docs/platform/agent-confinement/history/rollout-and-settled-facts.md, docs/platform/agent-confinement/decisions/confinement-authority-decisions.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+        "reviewNote": "Independent review required for this package binding; no approval carried.",
+        "targetUnitDigest": "c3306e72572f72945df91c96305a90f6835935407a5d2027b1b60aad89695133",
+        "targetAncestry": [
+          "Spec: Agent Confinement Authority",
+          "8. Policy resolution và edge cases"
+        ]
+      },
+      "after": {
+        "claimId": "claim_46c173824da77fbf25f59072ae8e1620",
+        "sourceUnitDigest": "018713d3e9d6a59a7fb677b2dfa0225a5461509d1b26c27c0cfde12103d9d67a",
+        "targetOwner": "docs/platform/agent-confinement/spec.md",
+        "targetAnchor": "86-crash-và-cleanup",
+        "claimKind": "specification",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792079321432-41fe2051@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/confinement-authority.md#86-crash-và-cleanup (source lines 1084-1084) is carried at docs/platform/agent-confinement/spec.md#86-crash-và-cleanup (candidate lines 348-348). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/confinement-authority.md verbatim in docs/platform/agent-confinement/spec.md, docs/platform/agent-confinement/contracts/confinement-authority-v1.md, docs/platform/agent-confinement/history/rollout-and-settled-facts.md, docs/platform/agent-confinement/decisions/confinement-authority-decisions.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. L10-14: re-decided against current confinement §8.6 full direct-section source digest after binding paragraph addition; complete paragraph already carried verbatim. Current source/target binding is pending independent review.",
+        "targetUnitDigest": "c3306e72572f72945df91c96305a90f6835935407a5d2027b1b60aad89695133",
+        "targetAncestry": [
+          "Spec: Agent Confinement Authority",
+          "8. Policy resolution và edge cases"
+        ]
+      },
+      "sourceWitness": {
+        "unitKind": "heading",
+        "level": 3,
+        "title": "8.6 Crash và cleanup",
+        "anchor": "86-crash-và-cleanup",
+        "githubAnchor": "86-crash-và-cleanup",
+        "stableAnchor": "h-1205ca9f66bb",
+        "startLine": 1084,
+        "endLine": 1084,
+        "textDigest": "018713d3e9d6a59a7fb677b2dfa0225a5461509d1b26c27c0cfde12103d9d67a",
+        "sample": "8.6 Crash và cleanup",
+        "sectionPayloadDigest": "7b0ab41c70e8c9929e8eabf4ce27fcb6002d42ffb743c088f8b515b41ee7dffb",
+        "followingBlockDigest": "237461836affe4167aaf89d08ee087d9de21a39a3afc2f10e54bfe6bcaeaeb2b",
+        "identityFingerprint": "441230ba30298939db103b7e3881ba13af5d98c36ffb0a75a891f2b60a81c7e2",
+        "ancestry": [
+          "Spec: Agent Confinement Authority",
+          "8. Policy resolution và edge cases"
+        ],
+        "text": "### 8.6 Crash và cleanup"
+      },
+      "targetWitness": {
+        "unitKind": "heading",
+        "level": 3,
+        "title": "8.6 Crash và cleanup",
+        "anchor": "86-crash-và-cleanup",
+        "githubAnchor": "86-crash-và-cleanup",
+        "stableAnchor": "h-d76fbbdc6f2f",
+        "startLine": 348,
+        "endLine": 348,
+        "textDigest": "c3306e72572f72945df91c96305a90f6835935407a5d2027b1b60aad89695133",
+        "sample": "8.6 Crash và cleanup",
+        "sectionPayloadDigest": "6ad22d623e5bbbe5815d1aa4bf27adff6fd3ed5f57e234b40c1bc35b86a9aa42",
+        "followingBlockDigest": "237461836affe4167aaf89d08ee087d9de21a39a3afc2f10e54bfe6bcaeaeb2b",
+        "identityFingerprint": "c4e561fb2eb468c282be4fcd119a69b37cb1cc3bf20272269d17feb11ac2ce1a",
+        "ancestry": [
+          "Spec: Agent Confinement Authority",
+          "8. Policy resolution và edge cases"
+        ],
+        "text": "### 8.6 Crash và cleanup"
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "kind": "affected-runner-target-redecision",
+      "before": {
+        "claimId": "claim_532692d4c5ebdea48d2a8352129cc843",
+        "sourceUnitDigest": "4d4c05e94bd4baf1756a0e253ce3a29ec9b73beaa546931acf49ac259e774f44",
+        "targetOwner": "docs/platform/runner/architecture/h-7af1f0242611.md",
+        "targetAnchor": "bảng-đối-chiếu-từ-vựng-dispatch",
+        "claimKind": "specification",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+        "rationale": "Judgment: A41/A19 truth correction or explicitly labelled candidate navigation/link/scaffolding repair. Complete original source remains in immutable docs/specs/runner.md; candidate supersedes the identified false current assertion or rebases the same link referent, with unchanged dated decision semantics. R9-1: link-only rebase; label and repository referent preserved Full before/after text and evidence in reports/phase-06/step9-rebound-units.json. A22 rebind, pending independent bounded review; no approval carry, retirement or promotion. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+        "reviewNote": "Independent review required for this package binding; no approval carried.",
+        "targetUnitDigest": "dd171406c5d055a93ca63bb5de0d73cac56e1256a0f30e7e07831ccdca6d0fd3",
+        "targetAncestry": [
+          "Added in candidate: Runner Từ vựng dispatch hiện hành",
+          "Từ vựng dispatch hiện hành"
+        ]
+      },
+      "after": {
+        "claimId": "claim_532692d4c5ebdea48d2a8352129cc843",
+        "sourceUnitDigest": "4d4c05e94bd4baf1756a0e253ce3a29ec9b73beaa546931acf49ac259e774f44",
+        "targetOwner": "docs/platform/runner/architecture/h-7af1f0242611.md",
+        "targetAnchor": "bảng-đối-chiếu-từ-vựng-dispatch",
+        "claimKind": "specification",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792079321432-41fe2051@2026-10-15",
+        "rationale": "Judgment: A41/A19 truth correction or explicitly labelled candidate navigation/link/scaffolding repair. Complete original source remains in immutable docs/specs/runner.md; candidate supersedes the identified false current assertion or rebases the same link referent, with unchanged dated decision semantics. R9-1: link-only rebase; label and repository referent preserved Full before/after text and evidence in reports/phase-06/step9-rebound-units.json. A22 rebind, pending independent bounded review; no approval carry, retirement or promotion. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. L10-13/L10-14: specific candidate link correction or explicit added-decision wrapper changes this direct unit; current target binding re-decided pending. Historical decision semantics remain; all text differences shown in step10-correction-edits.json. No approval carry.",
+        "targetUnitDigest": "767949937a2525c56502463613b8139902f928a8e10a71918d969626d6b2ab50",
+        "targetAncestry": [
+          "Added in candidate: Runner Từ vựng dispatch hiện hành",
+          "Từ vựng dispatch hiện hành"
+        ]
+      },
+      "targetWitness": {
+        "unitKind": "heading",
+        "level": 3,
+        "title": "Bảng đối chiếu từ vựng dispatch",
+        "anchor": "bảng-đối-chiếu-từ-vựng-dispatch",
+        "githubAnchor": "bảng-đối-chiếu-từ-vựng-dispatch",
+        "stableAnchor": "h-445fb5718888",
+        "startLine": 29,
+        "endLine": 29,
+        "textDigest": "767949937a2525c56502463613b8139902f928a8e10a71918d969626d6b2ab50",
+        "sample": "Bảng đối chiếu từ vựng dispatch",
+        "sectionPayloadDigest": "193b562402bdb1778832ec848c3f9d3985bbbeabcb1b529d3888713e9983ef1b",
+        "followingBlockDigest": "ea328f8878d7b1816a6b23abc0b80e08352165da8a97ee753c80b855322d41d0",
+        "identityFingerprint": "7e9c7d3fa213dc0b991fc0237a657ee755add79ff5bef4d5b7131669ad0c2e02",
+        "text": "### Bảng đối chiếu từ vựng dispatch",
+        "ancestry": [
+          "Added in candidate: Runner Từ vựng dispatch hiện hành",
+          "Từ vựng dispatch hiện hành"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "kind": "affected-runner-target-redecision",
+      "before": {
+        "claimId": "claim_17f27ab085e951c529afff07f099e25b",
+        "sourceUnitDigest": "75d27c27bf35d669cd2e4899d9ed3966cc2e628a6c37bfdd78483e02c35c28bc",
+        "targetOwner": "docs/platform/runner/architecture/h-7af1f0242611.md",
+        "targetAnchor": "unheaded-block-5",
+        "claimKind": "specification",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+        "rationale": "Judgment: A41/A19 truth correction or explicitly labelled candidate navigation/link/scaffolding repair. Complete original source remains in immutable docs/specs/runner.md; candidate supersedes the identified false current assertion or rebases the same link referent, with unchanged dated decision semantics. R9-1: link-only rebase; label and repository referent preserved Full before/after text and evidence in reports/phase-06/step9-rebound-units.json. A22 rebind, pending independent bounded review; no approval carry, retirement or promotion. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+        "reviewNote": "Independent review required for this package binding; no approval carried.",
+        "targetUnitDigest": "ef1e4aaed5e7b7406e56e522c11bb11808a36eda45a25947196a5a45d208bd9e",
+        "targetAncestry": [
+          "Added in candidate: Runner Từ vựng dispatch hiện hành",
+          "Từ vựng dispatch hiện hành",
+          "Bảng đối chiếu từ vựng dispatch"
+        ]
+      },
+      "after": {
+        "claimId": "claim_17f27ab085e951c529afff07f099e25b",
+        "sourceUnitDigest": "75d27c27bf35d669cd2e4899d9ed3966cc2e628a6c37bfdd78483e02c35c28bc",
+        "targetOwner": "docs/platform/runner/architecture/h-7af1f0242611.md",
+        "targetAnchor": "unheaded-block-5",
+        "claimKind": "specification",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792079321432-41fe2051@2026-10-15",
+        "rationale": "Judgment: A41/A19 truth correction or explicitly labelled candidate navigation/link/scaffolding repair. Complete original source remains in immutable docs/specs/runner.md; candidate supersedes the identified false current assertion or rebases the same link referent, with unchanged dated decision semantics. R9-1: link-only rebase; label and repository referent preserved Full before/after text and evidence in reports/phase-06/step9-rebound-units.json. A22 rebind, pending independent bounded review; no approval carry, retirement or promotion. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. L10-13/L10-14: specific candidate link correction or explicit added-decision wrapper changes this direct unit; current target binding re-decided pending. Historical decision semantics remain; all text differences shown in step10-correction-edits.json. No approval carry.",
+        "targetUnitDigest": "1702495da58fddb8ee5de52016375666e4b4f2f1697f5c12267319b7b6fb4224",
+        "targetAncestry": [
+          "Added in candidate: Runner Từ vựng dispatch hiện hành",
+          "Từ vựng dispatch hiện hành",
+          "Bảng đối chiếu từ vựng dispatch"
+        ]
+      },
+      "targetWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 47,
+        "endLine": 55,
+        "textDigest": "1702495da58fddb8ee5de52016375666e4b4f2f1697f5c12267319b7b6fb4224",
+        "sample": "*Ghi chú:*\n- Gom thang tier/rigor (RUL72 (Gom thang tier/rigor: 2 thang + 1 bảng, xoá mọi lớp chồng), 0046): phân định triệt để bên cầu (`rigor`) và bên cung (`tier` qua bảng `rigo",
+        "identityFingerprint": "0006c6babe4c5f21ac1e4918adfe853cda573f1ea14c9419b20404620fc02d04",
+        "text": "*Ghi chú:*\n- Gom thang tier/rigor (RUL72 (Gom thang tier/rigor: 2 thang + 1 bảng, xoá mọi lớp chồng), 0046): phân định triệt để bên cầu (`rigor`) và bên cung (`tier` qua bảng `rigorToTier`). Xoá hoàn toàn các lớp trung gian, cầu nối và overrides cũ. Sàn duy nhất theo loại việc là `capabilities.<cap>.rigor`.\n- Về vai trò bên gọi `launcher` / `driver` / `orchestrator`: xem lưới 2×2 tại `runner.md:2172-2180` (kỷ yếu `0031`) tóm tắt trục T1/T0.\n- Khái niệm `capacity` trong lịch sử từng đại diện cho cả năng lực lẫn đơn vị thực thi; từ ADR 0034 (`runner.md:2434`), các cấu hình `capacities.<id>` được chuyển thành `executors.<id>` và `capabilities.<id>`.\n- `rootTask` và `subTask` đã bị loại bỏ khỏi từ vựng dispatch per ADR 0029 (xem `docs/decisions/index.md`).\n- `purpose` (tham số nội bộ `resolve.mjs`/`plan.mjs`) và flag CLI `--for <purpose>` KHÔNG phải một ontology thứ ba — cả hai đặt tên cho một giá trị `capability`, chỉ là cú pháp tương thích lịch sử (compatibility syntax), không phải một identity định tuyến riêng.\n- `job` KHÔNG phải một routing identity — ADR-004 dành riêng tên này cho một scheduler tương lai (chưa dùng); nếu xuất hiện trong log, nó chỉ là nhãn ngữ cảnh của một request, không phải mục tiêu dispatch resolve tới. Một `Run` là một lần thực thi cụ thể cho một Assignment, không phải job/operation identity.\n- Dispatch core chỉ nhận đúng hai target identity — `capability` và `executor-id` — cùng hợp đồng `DispatchRequest`/`PolicyPatch`/`DispatchPlan` chính tắc và danh sách sở hữu component-internal (8 thẩm quyền + forbidden dependencies): xem [Dispatch Control Plane](../../agent-coordination/architecture/dispatch-control-plane.md).\n- `Unit` và canonical capability (thay thế matching đa tầng L2 per 0048): Unit khai báo các thuộc tính nhu cầu của đơn vị việc và capability (`domain:verb`); `bind()` chọn executor theo 5 mức (xem `core/skills/_shared/capability-matching.md`).",
+        "ancestry": [
+          "Added in candidate: Runner Từ vựng dispatch hiện hành",
+          "Từ vựng dispatch hiện hành",
+          "Bảng đối chiếu từ vựng dispatch"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "kind": "affected-runner-target-redecision",
+      "before": {
+        "claimId": "claim_65304cc9e0b7cd5027ee9a2589b612c8",
+        "sourceUnitDigest": "b5019011cdace996fa7f74d74340bbdc14ae0b3b5ae3f479975e336bccd9679f",
+        "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "targetAnchor": "0050-p6-nối-thật-herdr-là-transport-mặc-định-posture-một-đường-fallback-quota-qua-pane-mới",
+        "claimKind": "specification",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+        "rationale": "Judgment: A41/A19 truth correction or explicitly labelled candidate navigation/link/scaffolding repair. Complete original source remains in immutable docs/specs/runner.md; candidate supersedes the identified false current assertion or rebases the same link referent, with unchanged dated decision semantics. R9-1: link-only rebase; label and repository referent preserved; R9-1: link-only rebase; label and repository referent preserved. Full before/after text and evidence in reports/phase-06/step9-rebound-units.json. A22 rebind, pending independent bounded review; no approval carry, retirement or promotion. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+        "reviewNote": "Independent review required for this package binding; no approval carried.",
+        "targetUnitDigest": "d2cdc4e9f454fb873be67d3d0f50d13d58e6cd3539581768aee9acfc0610a475",
+        "targetAncestry": [
+          "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)"
+        ]
+      },
+      "after": {
+        "claimId": "claim_65304cc9e0b7cd5027ee9a2589b612c8",
+        "sourceUnitDigest": "b5019011cdace996fa7f74d74340bbdc14ae0b3b5ae3f479975e336bccd9679f",
+        "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "targetAnchor": "0050-p6-nối-thật-herdr-là-transport-mặc-định-posture-một-đường-fallback-quota-qua-pane-mới",
+        "claimKind": "specification",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792079321432-41fe2051@2026-10-15",
+        "rationale": "Judgment: A41/A19 truth correction or explicitly labelled candidate navigation/link/scaffolding repair. Complete original source remains in immutable docs/specs/runner.md; candidate supersedes the identified false current assertion or rebases the same link referent, with unchanged dated decision semantics. R9-1: link-only rebase; label and repository referent preserved; R9-1: link-only rebase; label and repository referent preserved. Full before/after text and evidence in reports/phase-06/step9-rebound-units.json. A22 rebind, pending independent bounded review; no approval carry, retirement or promotion. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. L10-13/L10-14: specific candidate link correction or explicit added-decision wrapper changes this direct unit; current target binding re-decided pending. Historical decision semantics remain; all text differences shown in step10-correction-edits.json. No approval carry.",
+        "targetUnitDigest": "162eb443e72c02c49ca128d1375888137f6cf59155bb7cc0642751aba85da01b",
+        "targetAncestry": [
+          "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)"
+        ]
+      },
+      "targetWitness": {
+        "unitKind": "heading",
+        "level": 3,
+        "title": "0050 — P6 Nối thật: herdr là transport mặc định, posture một đường, fallback quota qua pane mới",
+        "anchor": "0050-p6-nối-thật-herdr-là-transport-mặc-định-posture-một-đường-fallback-quota-qua-pane-mới",
+        "githubAnchor": "0050-p6-nối-thật-herdr-là-transport-mặc-định-posture-một-đường-fallback-quota-qua-pane-mới",
+        "stableAnchor": "h-d816b15a192b",
+        "startLine": 1552,
+        "endLine": 1552,
+        "textDigest": "162eb443e72c02c49ca128d1375888137f6cf59155bb7cc0642751aba85da01b",
+        "sample": "0050 — P6 Nối thật: herdr là transport mặc định, posture một đường, fallback quota qua pane mới",
+        "sectionPayloadDigest": "617e0eea3b3a670b3fdba20b0026eb1b9d5f6232873d576073713a734db114ad",
+        "followingBlockDigest": "617e0eea3b3a670b3fdba20b0026eb1b9d5f6232873d576073713a734db114ad",
+        "identityFingerprint": "0d14f49df9de5705eddcbb56fec2eaf7d44d26ed87f0339e4e78a766e89731bb",
+        "text": "### 0050 — P6 Nối thật: herdr là transport mặc định, posture một đường, fallback quota qua pane mới",
+        "ancestry": [
+          "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "kind": "affected-runner-target-redecision",
+      "before": {
+        "claimId": "claim_dc4ce18e6e9fb14f1c49564fb00173ba",
+        "sourceUnitDigest": "187780a987ac947043008e2cd2c7b5035b28dee6258ee03e9275cb2483f18ce3",
+        "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "targetAnchor": "unheaded-block-176",
+        "claimKind": "specification",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+        "rationale": "Judgment: A41/A19 truth correction or explicitly labelled candidate navigation/link/scaffolding repair. Complete original source remains in immutable docs/specs/runner.md; candidate supersedes the identified false current assertion or rebases the same link referent, with unchanged dated decision semantics. R9-1: link-only rebase; label and repository referent preserved; R9-1: link-only rebase; label and repository referent preserved. Full before/after text and evidence in reports/phase-06/step9-rebound-units.json. A22 rebind, pending independent bounded review; no approval carry, retirement or promotion. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+        "reviewNote": "Independent review required for this package binding; no approval carried.",
+        "targetUnitDigest": "03328a2f6bf124219beb8730571e4adce1e26aa452657605713c4887aa8f866f",
+        "targetAncestry": [
+          "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "0050 — P6 Nối thật: herdr là transport mặc định, posture một đường, fallback quota qua pane mới"
+        ]
+      },
+      "after": {
+        "claimId": "claim_dc4ce18e6e9fb14f1c49564fb00173ba",
+        "sourceUnitDigest": "187780a987ac947043008e2cd2c7b5035b28dee6258ee03e9275cb2483f18ce3",
+        "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "targetAnchor": "unheaded-block-176",
+        "claimKind": "specification",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792079321432-41fe2051@2026-10-15",
+        "rationale": "Judgment: A41/A19 truth correction or explicitly labelled candidate navigation/link/scaffolding repair. Complete original source remains in immutable docs/specs/runner.md; candidate supersedes the identified false current assertion or rebases the same link referent, with unchanged dated decision semantics. R9-1: link-only rebase; label and repository referent preserved; R9-1: link-only rebase; label and repository referent preserved. Full before/after text and evidence in reports/phase-06/step9-rebound-units.json. A22 rebind, pending independent bounded review; no approval carry, retirement or promotion. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. L10-13/L10-14: specific candidate link correction or explicit added-decision wrapper changes this direct unit; current target binding re-decided pending. Historical decision semantics remain; all text differences shown in step10-correction-edits.json. No approval carry.",
+        "targetUnitDigest": "617e0eea3b3a670b3fdba20b0026eb1b9d5f6232873d576073713a734db114ad",
+        "targetAncestry": [
+          "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "0050 — P6 Nối thật: herdr là transport mặc định, posture một đường, fallback quota qua pane mới"
+        ]
+      },
+      "targetWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-176",
+        "githubAnchor": "unheaded-block-176",
+        "stableAnchor": "unheaded-block-176",
+        "title": "Unheaded block 176",
+        "startLine": 1554,
+        "endLine": 1572,
+        "textDigest": "617e0eea3b3a670b3fdba20b0026eb1b9d5f6232873d576073713a734db114ad",
+        "sample": "- **Trạng thái:** Settled cho ca 1, 2, 3, 4, 6; ca 5 NOT RUN (xem bằng chứng)\n- **Bối cảnh:** Sau 0047, `bind().transport`, `resolvePosture` và `nextCandidate` tồn tại nhưng không ",
+        "identityFingerprint": "d244e91b2d4ba3a7e30b297424cb09cadb21ea7e2c4a42ff727029b4a88fb378",
+        "text": "- **Trạng thái:** Settled cho ca 1, 2, 3, 4, 6; ca 5 NOT RUN (xem bằng chứng)\n- **Bối cảnh:** Sau 0047, `bind().transport`, `resolvePosture` và `nextCandidate` tồn tại nhưng không ai gọi: mọi lần chạy thật là cli headless, posture tự dựng `bwrapArgs` riêng song song với driver confinement, `canApplyPosture` luôn `true`.\n- **Quyết định:**\n  1. **Transport do `bind()` quyết, `run.mjs` đọc.** herdr khi herdr có mặt trong session **và** executor có invocation `herdr-spawn` có id mà `canApplyPosture` chấp nhận; ngược lại cli (lý do ghi ở `provenance.transport.source`). Transport và invocation thật nằm trong `assignment.json` / `unit.json`, không chỉ ở giá trị trả về. Executor có CLI vẫn out-of-process (D-ADR0033 (một cơ chế dispatch, executor có CLI luôn chạy ngoài process)).\n  2. **Posture một đường.** `resolvePosture` chỉ ánh xạ posture -> `requirement` (policy built-in); `requirement` đi vào `buildConfinementRequest` -> Confinement Authority -> driver bwrap, cho cả pane herdr lẫn cli. Không còn `bwrapArgs` tự dựng trong `policies.mjs` (guard test). `resolvePostureInvocation` (`canApplyPosture` là dạng boolean của nó) là nơi duy nhất quyết: invocation khai `confinement.backend`, backend bật trong registry máy, executable chạy được; thiếu thì bind lọc candidate hoặc từ chối `posture-unavailable`, không chạy không confine. Nó cũng trả về invocation đã duyệt: khi `prefer` không nêu invocation, bind ghi đúng invocation cli thường đầu tiên mang được posture (không phải invocation cli đầu tiên của executor; `herdr-spawn` chỉ tính khi session ở trong herdr) vào binding, và `run.mjs` ghim đúng nó. Entry `prefer` nêu invocation thì giữ nguyên. Nên mọi invocation muốn được chọn phải khai `confinement`, và invocation của agent ghi state ngoài thư mục chỉ-đọc (codex, agy, pi) phải khai thêm `resourceBindings` private-home.\n  5. **Tra capability.** `bind()` tìm `capabilities[domain:verb]` trước, rồi `capabilities[verb]`, nhưng entry chỉ thắng khi có `prefer` dùng được: slot chỉ có `description` (loại `fgos setup` ghi) không che bare-verb có `prefer`. Không có `prefer` ở đâu cả thì headless bị từ chối `headless-no-executor`; `fgos doctor` (`workflow-capabilities-configured`) cảnh báo đúng capability đó. Mặc định headless chỉ chạy được với Workflow đã khai `prefer`, không phải mọi Workflow `fgos setup` đã ghi slot.\n  3. **Fallback quota.** `provider-limit` (herdr đọc màn hình qua detector của herdr, mặc định idle 5 phút nếu config không đặt `idleTimeoutMs`) -> `nextCandidate` đi tiếp `prefer[]` -> pane mới dưới assignment id `<unitRun>/<role>/<round>-fb<n>`; pane cũ giữ nguyên; `fallbackFrom` ghi lại; hết candidate thì outcome vẫn `provider-limit`. cli-spawn không có phát hiện limit nên headless không fallback (*cập nhật 2026-10-14:* nay có, qua câu hạn mức ở đuôi stderr, xem đoạn decision 0058 ở RUL65b). Pane idle (không `working`) quá 15 giây bị đọc màn hình để tìm credential chết (`AUTH_FAILURE_PATTERNS`, vd pi \"OAuth refresh failed ... invalid_grant\"): thấy thì cũng kết thúc `provider-limit` ngay, không chờ idle timeout, để walk sang candidate kế; classifier ghi quarantine `auth-token` kiểu `manual-clear` (tới khi người login lại và `fgos dispatch reconcile provider-capacity clear-quarantine`), không phải `quota-limit`. Quarantine quota dùng đúng thời gian reset provider ghi trên màn hình (\"Resets in 24m1s\", cả giờ/phút/giây), mặc định 1 giờ khi không ghi.\n  4. **Pane confine cho cả năm họ** (claude, claude qua OpenRouter, codex, agy, pi): mỗi agent giữ state trong private home dựng từ account được lease; công thức và lý do ở [confinement-authority.md §13.1](../../agent-confinement/spec.md), account inventory toàn máy ở RUL65b (trên).\n  - **Pane không nhận HOME riêng của worker.** Vòng herdr confine mở pane không kèm `HOME` private (launcher script tự `export` nó trước khi `exec`): shell của pane mà bắt đầu trong một home không có file khởi động thì zsh chạy trình hướng dẫn lần đầu và nuốt lệnh khởi chạy gõ ngay sau, nên vòng agy báo `foreground process ... does not match prepared command argv` dù argv không sai.\n  - **Prompt delivery trong pane herdr (`inline` mặc định, `file-pointer` tuỳ chọn).** Mặc định `herdr-spawn` gửi toàn bộ nội dung `brief-<round>.md` trực tiếp vào pane qua `herdr agent prompt` (bracketed paste) để người quan sát thấy trọn vẹn prompt trong TUI, đồng thời vẫn ghi `brief-<round>.md` xuống đĩa kèm dòng trỏ đường dẫn phục hồi sau compaction; `promptDelivery: \"file-pointer\"` (hoặc `FGOS_HERDR_PROMPT_DELIVERY=file-pointer`) giữ cơ chế gõ con trỏ một dòng. `confirmBriefSubmitted` nhận diện cả paste chip thu gọn (`[Pasted text #1 +N lines]`, `[paste #1 +N lines]`, `[Paste]`, `#1 … +N lines`, menu `Pasted N lines`) ở vùng composer cuối màn hình; `SHELL_MANAGED_ENV` giữ nguyên `TERM`/`HERDR_PANE_ID` của pane mới (không để `TERM=dumb` hay `HERDR_PANE_ID` của process gọi ghi đè), `workerBaseEnv` loại bỏ `OMPCODE`/`OMP_PROFILE`/`PI_PROFILE`/`PI_CONFIG_FILES` của phiên cha, và `executors.xai` có thêm invocation `omp-herdr-vantt` chạy `omp` trong pane `bwrap`.\n- **Bằng chứng:** [acceptance-herdr.md](../../../../plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/acceptance-herdr.md): ca 1 (Unit `reviewed`), 2 (reviewer bị chặn ghi repo, ghi được outbox), 3 (Workflow `architecture-advisory` 9 role trong pane, 4 họ provider), 4 (fallback, pane cũ giữ), 6 (headless cli cùng posture) Accepted; transport đọc từ `assignment.json`.\n- **Giới hạn đã biết:**\n  - Ca 5 (so cùng câu hỏi với engine cũ, tag `pre-engine-retirement`) **NOT RUN**: engine cũ cần Lead tự viết và authorize từng bước, nên \"Lead-active\" sẽ đo chính thao tác tay, không đo engine.\n  - Ca 4 dùng màn hình limit **giả** (executor `fake-limit`); `DEFAULT_USAGE_LIMIT_PATTERNS` chưa đo trên màn hình limit thật của claude/codex. *Cập nhật 2026-10-05:* câu chữ đo được đầu tiên là của codex, \"■ Selected model is at capacity. Please try a different model.\" (đã thêm vào mẫu mặc định). Ngoài ra, thang liveness chỉ đọc màn hình khi tiến độ dừng, mà `working` tính là tiến độ, nên pane vẫn báo `working` nhưng đang kẹt ở lỗi nhà cung cấp chạy tới trần 15 phút không fallback (thấy khi dogfood mdview). Nay vòng thăm dò đọc 15 dòng cuối của agent đang `working` mỗi 30 giây và kết luận `provider-limit` khi cùng một dòng bắt đầu bằng dấu lỗi của CLI (`■`) và nêu điều kiện (`WORKING_STALL_PATTERNS`, chỉ câu chữ đã đo) còn nằm đó sau một khoảng thăm dò đầy đủ; chữ thường nhắc tới capacity hay rate limit không bị đụng tới.\n  - **Trạng thái agent trong herdr (đo 2026-10-05, herdr 0.9.1-vantt.1).** herdr có đúng một nguồn trạng thái cho mỗi pane; fgos từng `pane report-agent --state working` lúc khởi động pane bị cô lập, nên fgos thành nguồn đó và `agent get` đứng yên ở `working` cả vòng (commit `2e9b53f6c` chỉ là đường vòng: đọc `agent explain` trước, hai lần gọi herdr mỗi nhịp thăm dò). Thí nghiệm trong pane thật: claude, codex, agy, pi chạy sau bwrap (không tách pid namespace) đều được herdr nhận ra không cần `HERDR_AGENT`, `agent get` khớp `agent explain`, và `agent prompt --wait` trả `done` sau ~2 giây; sau khi fgos báo `working`, `agent get` kẹt `working` còn `explain` nói `idle`, `agent prompt --wait` quá thời gian; `pane release-agent` trả lại quyền, trạng thái hồi phục sau vài giây. Nay fgos không báo trạng thái; chỉ khi herdr không nhận ra tiến trình là agent (sau 6 giây) mới báo, vì đó là cách duy nhất đánh địa chỉ nó (`ensureHerdrKnowsAgent`). Vòng thăm dò đọc `agent get`, chỉ hỏi `explain` khi `unknown`. Giới hạn: herdr chỉ biết `idle/working/blocked/done/unknown`, không biết lý do; manifest codex khớp ký tự xoay trong tiêu đề terminal là `working` (rule `osc_title_working`), nên pane codex kẹt ở lỗi nhà cung cấp vẫn là `working` và vẫn cần phần đọc màn hình ở trên. Mỗi vòng không bình thường để lại `herdr-diagnosis.json` (lời giải thích của chính herdr).\n  - **Agent kẹt ở prompt chỉ người trả lời được (đo 2026-10-05, codex \"Trust this folder?\").** herdr báo đúng `blocked` (luật `trust_directory`), thang liveness kết luận `blocked` kèm dòng màn hình, nhưng bước settle coi mọi lỗi mang lớp `worker-timeout` là timeout nên run ghi `execution-timeout` và Unit ra `execution-failure`. Nay `blocked` (như `provider-limit`) đi thẳng qua `adapterOutcome`: `failure.code = blocked`, `outcome.category = blocked`, Unit outcome `blocked`, pane giữ nguyên, thông báo nêu cách sửa (trả lời prompt hoặc cấp trust cho project trong home của agent). Không thêm mẫu màn hình vì detector của herdr đã nhận ra màn hình này; màn hình không đọc được vẫn không phải bằng chứng.\n  - Inventory account (`runner.providers.<provider>.accounts`) chỉ ở `~/.fgos/config.json` toàn máy; mỗi máy phải tự khai, `fgos setup` không tạo; `fgos doctor` (`confined-pane-accounts`) đọc inventory từ config toàn máy bất kể cwd (không cần project config) và chỉ ra pane thiếu entry; config toàn máy không đọc được thì check FAIL, nêu mã lỗi và đường dẫn.\n  - bind chọn invocation herdr **đầu tiên** của executor; executor nhiều account cần luật chọn tường minh về sau.\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+        "ancestry": [
+          "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "0050 — P6 Nối thật: herdr là transport mặc định, posture một đường, fallback quota qua pane mới"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "kind": "affected-runner-target-redecision",
+      "before": {
+        "claimId": "claim_5788dd19c4378fbb442c6a455f0e7857",
+        "sourceUnitDigest": "29d41a45489095b7ca89fd6570c786bc74bce025d8b3c4cb995cf315b3c653d9",
+        "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "targetAnchor": "0063-work-chỉ-là-bên-dùng-dispatch-nhận-input-generic-thay-phần-đầu-vào-còn-lại-của-rul73-dispatch-does-not-know-work2",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "reviewed",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ. Whole heading docs/specs/runner.md#0063-work-chỉ-là-bên-dùng-dispatch-nhận-input-generic-thay-phần-đầu-vào-còn-lại-của-rul73-dispatch-does-not-know-work2 (lines 3320–3320) carried at docs/platform/runner/decisions/h-36d872fbb0e5.md#0063-work-chỉ-là-bên-dùng-dispatch-nhận-input-generic-thay-phần-đầu-vào-còn-lại-của-rul73-dispatch-does-not-know-work2. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "reviewNote": "mechanical: heading source L3320-3320 to target L1736-1736 in section 0063-work-chỉ-là-bên-dùng-dispatch-nhận-; added map row; digests recomputed by script, anchor exists, byte-equal text in same enclosing target section, shard claim equals pack",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1706-runner-source-23-81d0ed074.md",
+        "reviewMode": "ordinary",
+        "targetUnitDigest": "29d41a45489095b7ca89fd6570c786bc74bce025d8b3c4cb995cf315b3c653d9",
+        "targetAncestry": [
+          "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)"
+        ],
+        "reviewReportCommit": "edffd7c6b9cfb0461eec9e0fef65c9b4a2487acc"
+      },
+      "after": {
+        "claimId": "claim_5788dd19c4378fbb442c6a455f0e7857",
+        "sourceUnitDigest": "29d41a45489095b7ca89fd6570c786bc74bce025d8b3c4cb995cf315b3c653d9",
+        "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "targetAnchor": "0063-work-chỉ-là-bên-dùng-dispatch-nhận-input-generic-thay-phần-đầu-vào-còn-lại-của-rul73-dispatch-does-not-know-work2",
+        "claimKind": "specification",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792079321432-41fe2051@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ. Whole heading docs/specs/runner.md#0063-work-chỉ-là-bên-dùng-dispatch-nhận-input-generic-thay-phần-đầu-vào-còn-lại-của-rul73-dispatch-does-not-know-work2 (lines 3320–3320) carried at docs/platform/runner/decisions/h-36d872fbb0e5.md#0063-work-chỉ-là-bên-dùng-dispatch-nhận-input-generic-thay-phần-đầu-vào-còn-lại-của-rul73-dispatch-does-not-know-work2. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover. L10-13/L10-14: specific candidate link correction or explicit added-decision wrapper changes this direct unit; current target binding re-decided pending. Historical decision semantics remain; all text differences shown in step10-correction-edits.json. No approval carry.",
+        "targetUnitDigest": "3a1f30f7334b753a47a5c620be560d11b00e969789882a65e594c96d92177f55",
+        "targetAncestry": [
+          "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)"
+        ]
+      },
+      "targetWitness": {
+        "unitKind": "heading",
+        "level": 3,
+        "title": "0063 — Work chỉ là bên dùng: dispatch nhận input generic (thay phần đầu vào còn lại của RUL73 (dispatch does not know Work).2)",
+        "anchor": "0063-work-chỉ-là-bên-dùng-dispatch-nhận-input-generic-thay-phần-đầu-vào-còn-lại-của-rul73-dispatch-does-not-know-work2",
+        "githubAnchor": "0063-work-chỉ-là-bên-dùng-dispatch-nhận-input-generic-thay-phần-đầu-vào-còn-lại-của-rul73-dispatch-does-not-know-work2",
+        "stableAnchor": "h-a01a1b8194f2",
+        "startLine": 1736,
+        "endLine": 1736,
+        "textDigest": "3a1f30f7334b753a47a5c620be560d11b00e969789882a65e594c96d92177f55",
+        "sample": "0063 — Work chỉ là bên dùng: dispatch nhận input generic (thay phần đầu vào còn lại của RUL73 (dispatch does not know Work).2)",
+        "sectionPayloadDigest": "337311871481a8ce4d215e13d79ad78069801bbfc90fd6d9c24fe214abd0021b",
+        "followingBlockDigest": "61e128436645d5127c2050899a6e209b13206523fe4a641557c4277ffda23d97",
+        "identityFingerprint": "98d8a57da42f33a1bcd932e0a4156a41f1891142907ac4b5a54a9af3cdf9b097",
+        "text": "### 0063 — Work chỉ là bên dùng: dispatch nhận input generic (thay phần đầu vào còn lại của RUL73 (dispatch does not know Work).2)",
+        "ancestry": [
+          "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-confinement-binding.json",
+      "kind": "current-native-binding-paragraph-decision",
+      "before": null,
+      "after": {
+        "claimId": "claim_d572bb9dc8501362ae23e6d4a71975d2",
+        "sourceUnitDigest": "a7af69f1674754e516550a8802a2acc64dd3a49655a4cdd01fa82d43a540d5ed",
+        "targetOwner": "docs/platform/agent-confinement/spec.md",
+        "targetAnchor": "unheaded-block-47",
+        "targetUnitDigest": "a7af69f1674754e516550a8802a2acc64dd3a49655a4cdd01fa82d43a540d5ed",
+        "targetAncestry": [
+          "Spec: Agent Confinement Authority",
+          "8. Policy resolution và edge cases",
+          "8.6 Crash và cleanup"
+        ],
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792079321432-41fe2051@2026-10-15",
+        "rationale": "L10-14 current-source re-decision completes the binding addition carried in the prior docs turn. Complete source paragraph equals target text byte for byte, with limitations retained; identity already native in the prior package registry. Independent review required; no current-truth, promotion or cutover approval."
+      },
+      "sourceWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-113",
+        "githubAnchor": "unheaded-block-113",
+        "stableAnchor": "unheaded-block-113",
+        "title": "Unheaded block 113",
+        "startLine": 1104,
+        "endLine": 1104,
+        "textDigest": "a7af69f1674754e516550a8802a2acc64dd3a49655a4cdd01fa82d43a540d5ed",
+        "sample": "**Gắn home với tiến trình đang chạy worker (binding, 2026-10-15).** Authority cấp cho mỗi dispatch đã prepare hai hàm `bind`/`markLaunched` (`drivers/bwrap.mjs`, gom qua `bindingFo",
+        "identityFingerprint": "366466fa3653ce725f560e106699a897d40f8681ab982ea93931357b67616fcc",
+        "text": "**Gắn home với tiến trình đang chạy worker (binding, 2026-10-15).** Authority cấp cho mỗi dispatch đã prepare hai hàm `bind`/`markLaunched` (`drivers/bwrap.mjs`, gom qua `bindingForPrepared` ở `authority.mjs`); adapter chỉ gọi hàm, không thấy đường dẫn home, không tự ghi marker. Round herdr confined (mọi round, có assignment hay không) gọi `bind` trước `pane run` với `paneId`, endpoint herdr mà client của round thật sự dùng (`herdrEndpoint` = socket path từ env của client, hoặc socket của session nó đặt tên, hoặc socket mặc định herdr tự rơi về; `herdrSession` chỉ khi env có đặt tên), `binderPid` + `binderStartTime` của controller và `boundAt`; ghi atomic (tmp + rename). Ghi không được thì đóng pane, round fail trước khi có worker. Ngay trước `pane run` (hoặc khi round resume thấy worker đã chạy) ghi `launchedAt`. Round cli-spawn confined gắn home với run supervisor tách rời ngay khi supervisor khởi động (`binderPid` = pid supervisor, không có pane); ghi không được thì báo mã `confinement-bind-failed` và giữ marker như prepare (supervisor đã chạy rồi). Luật reaper cho marker đã bind mà chưa `retainedAt`: binder còn sống (pid + start time) thì giữ tới `boundAt + max(maxAgeMs, 2 phút launch grace + run timeout + 10 phút settle)` bất kể pane trả lời gì; binder chết hoặc quá cửa sổ thì: không có pane → dọn; có pane mà chưa `launchedAt` và binder chết → dọn và đóng pane rỗng; còn lại hỏi pane trên endpoint đã ghi (true giữ, null theo luật hết hạn, false dọn). Marker `retainedAt` giữ luật pane cũ, nhưng giờ hỏi được cả round default-session nhờ endpoint đã ghi. Trước khi xoá, reaper đọc lại marker; khác với bản nó đã dựa vào để quyết thì bỏ qua lượt này. Finalizer chấp nhận đúng các field binding (`paneId`, `herdrEndpoint`, `herdrSession`, `binderPid`, `binderStartTime`, `boundAt`, `launchedAt`) cộng `credentialKept` là thay đổi sau prepare; mọi thay đổi khác vẫn là `ownership-marker-mismatch`. Chưa có (để cho run supervisor + holder-lock): từ chối bind khi home đã quá cửa sổ run tính từ lúc tạo, kiểm trước/sau launch, claim độc quyền khi reap; nên khe \"reaper đã đọc lại xong, controller bind + launch ngay trước lúc xoá\" (RT2-1) vẫn còn.",
+        "ancestry": [
+          "Spec: Agent Confinement Authority",
+          "8. Policy resolution và edge cases",
+          "8.6 Crash và cleanup"
+        ]
+      },
+      "targetWitness": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-47",
+        "githubAnchor": "unheaded-block-47",
+        "stableAnchor": "unheaded-block-47",
+        "title": "Unheaded block 47",
+        "startLine": 370,
+        "endLine": 370,
+        "textDigest": "a7af69f1674754e516550a8802a2acc64dd3a49655a4cdd01fa82d43a540d5ed",
+        "sample": "**Gắn home với tiến trình đang chạy worker (binding, 2026-10-15).** Authority cấp cho mỗi dispatch đã prepare hai hàm `bind`/`markLaunched` (`drivers/bwrap.mjs`, gom qua `bindingFo",
+        "identityFingerprint": "366466fa3653ce725f560e106699a897d40f8681ab982ea93931357b67616fcc",
+        "text": "**Gắn home với tiến trình đang chạy worker (binding, 2026-10-15).** Authority cấp cho mỗi dispatch đã prepare hai hàm `bind`/`markLaunched` (`drivers/bwrap.mjs`, gom qua `bindingForPrepared` ở `authority.mjs`); adapter chỉ gọi hàm, không thấy đường dẫn home, không tự ghi marker. Round herdr confined (mọi round, có assignment hay không) gọi `bind` trước `pane run` với `paneId`, endpoint herdr mà client của round thật sự dùng (`herdrEndpoint` = socket path từ env của client, hoặc socket của session nó đặt tên, hoặc socket mặc định herdr tự rơi về; `herdrSession` chỉ khi env có đặt tên), `binderPid` + `binderStartTime` của controller và `boundAt`; ghi atomic (tmp + rename). Ghi không được thì đóng pane, round fail trước khi có worker. Ngay trước `pane run` (hoặc khi round resume thấy worker đã chạy) ghi `launchedAt`. Round cli-spawn confined gắn home với run supervisor tách rời ngay khi supervisor khởi động (`binderPid` = pid supervisor, không có pane); ghi không được thì báo mã `confinement-bind-failed` và giữ marker như prepare (supervisor đã chạy rồi). Luật reaper cho marker đã bind mà chưa `retainedAt`: binder còn sống (pid + start time) thì giữ tới `boundAt + max(maxAgeMs, 2 phút launch grace + run timeout + 10 phút settle)` bất kể pane trả lời gì; binder chết hoặc quá cửa sổ thì: không có pane → dọn; có pane mà chưa `launchedAt` và binder chết → dọn và đóng pane rỗng; còn lại hỏi pane trên endpoint đã ghi (true giữ, null theo luật hết hạn, false dọn). Marker `retainedAt` giữ luật pane cũ, nhưng giờ hỏi được cả round default-session nhờ endpoint đã ghi. Trước khi xoá, reaper đọc lại marker; khác với bản nó đã dựa vào để quyết thì bỏ qua lượt này. Finalizer chấp nhận đúng các field binding (`paneId`, `herdrEndpoint`, `herdrSession`, `binderPid`, `binderStartTime`, `boundAt`, `launchedAt`) cộng `credentialKept` là thay đổi sau prepare; mọi thay đổi khác vẫn là `ownership-marker-mismatch`. Chưa có (để cho run supervisor + holder-lock): từ chối bind khi home đã quá cửa sổ run tính từ lúc tạo, kiểm trước/sau launch, claim độc quyền khi reap; nên khe \"reaper đã đọc lại xong, controller bind + launch ngay trước lúc xoá\" (RT2-1) vẫn còn.",
+        "ancestry": [
+          "Spec: Agent Confinement Authority",
+          "8. Policy resolution và edge cases",
+          "8.6 Crash và cleanup"
+        ]
+      }
+    }
+  ]
+}

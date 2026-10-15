@@ -5,10 +5,8 @@ Document type: Verification index
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Route readers to host-invocation implementation alignment and proof records
 Design status: Draft
-Implementation status: Active
 Canonical: Yes, after review
 Owner: Host invocation
-Source type: Created during host-invocation documentation migration
 Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/verification/implementation-alignment.md

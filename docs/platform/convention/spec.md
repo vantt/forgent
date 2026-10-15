@@ -5,7 +5,6 @@ Document type: BA-grade area specification
 Audience: Human reviewer, maintainer, implementation agent, tool author
 Purpose: Define the executable source of truth for fgOS names and repository-relative placement
 Design status: Accepted
-Implementation status: Implemented
 Canonical: Yes
 Owner: Convention component
 Source: packages/convention/rust

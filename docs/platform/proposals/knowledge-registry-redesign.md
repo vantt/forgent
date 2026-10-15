@@ -21,7 +21,7 @@ Superseded by: None
 
 Added in candidate: Candidate carriage; implementation alone does not promote a design. Full truth remains owed at promotion. Physical relative-link destinations are rebased to the same repository paths. Two section 17 pointers are corrected under A19: the current knowledge skill is `domains/coding/skills/fgos-coding-knowledge/SKILL.md`, and the advisor report is `plans/reports/for-external-advisor-260825-1209-doc-identity-axis-topic-registry-design-report.md`. Other source wording and source metadata are retained; source metadata is provenance, not candidate authority.
 
-Source relationship: [original source](knowledge-registry-redesign.md).
+Source relationship: [original source](../../architect/knowledge-registry-redesign.md).
 
 
 Status: design target

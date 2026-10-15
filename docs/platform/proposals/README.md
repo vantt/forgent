@@ -21,7 +21,7 @@ Superseded by: None
 
 Added in candidate: Candidate carriage; Keep the map collection-index as a candidate snapshot. Its active list is historical source wording and will not describe the final live/history split; navigation owner owes reviewed update, no silent rewrite now. Original source metadata and text follow. Physical relative-link destinations alone are rebased to the same repository paths. Units with inherited missing links are preserved as literal fenced source text, without substituting another design or changing any assertion. Source metadata is provenance, not candidate authority.
 
-Source relationship: [original source](README.md).
+Source relationship: [original source](../../architect/proposals/README.md).
 
 
 Document type: Index

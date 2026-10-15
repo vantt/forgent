@@ -5,10 +5,8 @@ Document type: Architecture
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Define CLI, remote, chat, and future hosts as peer invocation surfaces
 Design status: Draft
-Implementation status: Accepted; R3 remote peer implemented preview for distribution.build.show
 Canonical: Yes, after review
 Owner: Host invocation
-Source type: Promoted from docs/architect/host-invocation-routing/host-invocation-provider-routing.md
 Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/architecture/invocation-kernel.md
@@ -51,4 +49,4 @@ Superseded by: None recorded
 | R3 proof | [../verification/r3-remote-peer-proof.md](../verification/r3-remote-peer-proof.md) |
 | R3 execution record | [../../../../plans/260918-host-invocation-r3-remote-peer/plan.md](../../../../archive/plans/260918-host-invocation-r3-remote-peer/plan.md) |
 | packaging future constraint | [../../packaging-distribution/architecture/future-constraints.md](../../packaging-distribution/architecture/future-constraints.md) |
-| source architecture | [../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../README.md) |
+| source architecture | [../spec.md](../spec.md) |

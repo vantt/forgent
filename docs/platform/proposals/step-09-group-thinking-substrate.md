@@ -21,7 +21,7 @@ Superseded by: None
 
 Added in candidate: Candidate proposal retaining deferred capabilities referenced by docs/how-to/use-fgos-group-thinking.md:196–200. Current group-thinking guidance uses Workflows/presets; the old pack was removed in 2180b4e72. Source implementation and deferred-status statements remain dated metadata. Original source metadata and text follow. Physical relative-link destinations alone are rebased to the same repository paths. Units with inherited missing links are preserved as literal fenced source text, without substituting another design or changing any assertion. Source metadata is provenance, not candidate authority.
 
-Source relationship: [original source](step-09-group-thinking-substrate.md).
+Source relationship: [original source](../../architect/proposals/step-09-group-thinking-substrate.md).
 
 
 Document type: Proposal
@@ -55,11 +55,11 @@ Step 08: make fgOS able to express richer group-thinking and problem-solving
 collaboration patterns without weakening the isolation-heavy fixtures already
 proved by Step 08.
 Intent traceability: [Architecture Intent](../system-architecture/architecture/architecture-intent.md),
-[Agent Coordination Intent Preservation Ledger](../agent-coordination/README.md)
+[Agent Coordination Intent Preservation Ledger](../agent-coordination/history/retired-engine/legacy/intent-preservation-ledger.md)
 Related: [Coordination Foundation Baseline](../agent-coordination/history/retired-engine/files/architecture/coordination-foundation-baseline.md),
 [CoordinationSession Contract](../agent-coordination/history/retired-engine/files/contracts/coordination-session.md),
 [FlowDefinition Contract](../agent-coordination/history/retired-engine/files/contracts/flow-definition.md),
-[Team Communication Protocol V1](../agent-coordination/README.md),
+[Team Communication Protocol V1](../agent-coordination/proposals/team-communication-protocol-v1.md),
 [Component Authority Boundary Map](component-authority-boundary-map.md),
 [Step 10 Coding Domain Adoption](step-10-coding-domain-adoption.md),
 [Step 09 MVP1/MVP2 group-thinking verification](../agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/index.md),
@@ -191,9 +191,9 @@ disposition, and decides terminal session status within declared bounds.
 ## 5. Prompt Source, Not Runtime Dependency
 
 The manual proof source is
-[Master Multi-Agent Implementation Coordinator](../agent-coordination/README.md),
+[Master Multi-Agent Implementation Coordinator](../agent-coordination/playbooks/prompts/master-coordinator.md),
 backed by the
-[Coordination Operating Harness](../agent-coordination/README.md).
+[Coordination Operating Harness](../agent-coordination/playbooks/coordination-operating-harness.md).
 Those playbooks are not loaded by runtime and must not become hidden runtime
 prose. Their value for Step 09 is the operating shape they proved:
 
