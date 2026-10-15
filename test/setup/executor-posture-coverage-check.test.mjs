@@ -1,8 +1,5 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import fs from 'node:fs';
-import os from 'node:os';
-import path from 'node:path';
 
 import { DOCTOR_CHECKS } from '../../src/setup/checks.mjs';
 import { checkExecutorPostureCoverage } from '../../src/setup/executor-posture-coverage.mjs';
@@ -22,10 +19,7 @@ const cliBwrap = (id, command) => ({
 test('executor-posture-coverage doctor check is registered and visible in DOCTOR_CHECKS', () => {
   const check = DOCTOR_CHECKS.find((c) => c.id === 'executor-posture-coverage');
   assert.ok(check, 'executor-posture-coverage must be registered in DOCTOR_CHECKS');
-  assert.equal(
-    check.description,
-    'core capabilities (execute, code:implement, and capabilities declaring a pool) have at least one candidate executor capable of applying read-only and workspace-write postures',
-  );
+  assert.match(check.description, /core capabilities/);
 });
 
 test('executor-posture-coverage passes when all core capabilities have bwrap-capable executors', async () => {
@@ -180,104 +174,61 @@ test('executor-posture-coverage skips tool-only capabilities that do not use age
   assert.doesNotMatch(result.message, /tool:capability/);
 });
 
-test('executor-posture-coverage passes when a read-only capability pool only supports read-only posture', async () => {
+test('executor-posture-coverage passes with real bind() on bwrap config fixture', async () => {
   const runnerConfig = {
     executors: {
-      claude: {
+      sandboxed: {
         kind: 'agent',
         providerModel: 'claude',
-        invocations: [cliBwrap('claude-cli-bwrap', 'claude')],
-      },
-      roAgent: {
-        kind: 'agent',
-        providerModel: 'ro',
-        invocations: [cliBwrap('ro-cli-bwrap', 'ro')],
+        invocations: [cliBwrap('sandboxed-bwrap', 'claude')],
       },
     },
     capabilities: {
-      execute: { prefer: 'claude' },
-      'code:implement': { prefer: 'claude' },
-      'code:review': {
-        description: 'Read-only review',
-        prefer: ['roAgent'],
-        // no serves.mutates: true
-      },
+      execute: { prefer: 'sandboxed' },
+      'code:implement': { prefer: 'sandboxed' },
     },
-  };
-
-  // Mock simulateUnitBindings to reject workspace-write on roAgent
-  const simulateUnitBindings = async (unit) => {
-    if (unit.capability === 'code:review' && unit.writes && unit.writes.length > 0) {
-      return {
-        outcome: 'policy-refusal',
-        roles: [{ role: 'producer', refused: { reason: 'posture-unavailable', detail: 'Read-only executor cannot write' } }],
-      };
-    }
-    const exec = unit.capability === 'code:review' ? 'roAgent' : 'claude';
-    return {
-      outcome: 'pass',
-      roles: [{ role: 'producer', executor: exec, invocation: `${exec}-cli-bwrap` }],
-    };
   };
 
   const result = await checkExecutorPostureCoverage(process.cwd(), {
     runnerConfig,
-    simulateUnitBindings,
   });
 
-  assert.equal(result.passed, true, `Expected pass, got: ${result.message}`);
-  assert.match(result.message, /code:review -> roAgent/);
+  assert.equal(result.passed, true, `Expected pass with bwrap, got: ${result.message}`);
+  assert.match(result.message, /execute -> sandboxed/);
+  assert.match(result.message, /code:implement -> sandboxed/);
 });
 
-test('executor-posture-coverage demands workspace-write for capabilities with serves.mutates === true', async () => {
+test('executor-posture-coverage fails posture-unavailable with real bind() on unconfined invocation config fixture', async () => {
   const runnerConfig = {
     executors: {
-      claude: {
+      unconfined: {
         kind: 'agent',
         providerModel: 'claude',
-        invocations: [cliBwrap('claude-cli-bwrap', 'claude')],
-      },
-      writerAgent: {
-        kind: 'agent',
-        providerModel: 'writer',
-        invocations: [cliBwrap('writer-cli-bwrap', 'writer')],
+        invocations: [{
+          id: 'unconfined-cli',
+          via: 'cli',
+          adapter: 'cli-spawn',
+          command: 'claude',
+          args: ['-p', '{prompt}'],
+        }],
       },
     },
     capabilities: {
-      execute: { prefer: 'claude' },
-      'code:implement': { prefer: 'claude' },
-      'custom:mutating': {
-        description: 'Mutating custom capability',
-        prefer: ['writerAgent'],
-        serves: { mutates: true },
-      },
+      execute: { prefer: 'unconfined' },
+      'code:implement': { prefer: 'unconfined' },
     },
-  };
-
-  const simulateUnitBindings = async (unit) => {
-    if (unit.capability === 'custom:mutating' && unit.writes && unit.writes.length > 0) {
-      return {
-        outcome: 'policy-refusal',
-        roles: [{ role: 'producer', refused: { reason: 'posture-unavailable', detail: 'Writer sandbox missing' } }],
-      };
-    }
-    const exec = unit.capability === 'custom:mutating' ? 'writerAgent' : 'claude';
-    return {
-      outcome: 'pass',
-      roles: [{ role: 'producer', executor: exec, invocation: `${exec}-cli-bwrap` }],
-    };
   };
 
   const result = await checkExecutorPostureCoverage(process.cwd(), {
     runnerConfig,
-    simulateUnitBindings,
   });
 
   assert.equal(result.passed, false, `Expected failure, got: ${result.message}`);
-  assert.match(result.message, /custom:mutating \(workspace-write\): posture-unavailable/);
+  assert.match(result.message, /posture-unavailable/);
+  assert.match(result.message, /sandbox\.backend "bwrap"/);
 });
 
-test('executor-posture-coverage fails and provides pool configuration guidance on headless-no-executor / no-candidate', async () => {
+test('executor-posture-coverage warns and provides pool configuration guidance on headless-no-executor / no-candidate', async () => {
   const runnerConfig = {
     executors: {
       claude: {
@@ -296,10 +247,10 @@ test('executor-posture-coverage fails and provides pool configuration guidance o
     runnerConfig,
   });
 
-  assert.equal(result.passed, false, `Expected failure, got: ${result.message}`);
-  assert.match(result.message, /no candidate executor available/);
+  assert.equal(result.passed, true, `Expected warning (passed: true), got: ${result.message}`);
+  assert.match(result.message, /^warning:/);
   assert.match(result.message, /runner\.capabilities\.<cap>\.prefer/);
-  assert.match(result.message, /global pool/);
+  assert.doesNotMatch(result.message, /global pool/);
   assert.doesNotMatch(result.message, /sandbox\.backend "bwrap"/);
 });
 

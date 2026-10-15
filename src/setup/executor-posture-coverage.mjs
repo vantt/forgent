@@ -1,21 +1,16 @@
-// src/setup/executor-posture-coverage.mjs — doctor check verifying core capabilities can apply read-only and workspace-write postures
+// src/setup/executor-posture-coverage.mjs — doctor check verifying core capabilities have candidates capable of applying posture
 // Architecture guard: Runs completely dry (no processes spawned, no files written).
-// Simulates bindings through simulateUnitBindings / bind().
+// Evaluates bindings through dry bind().
 
 import { loadRunnerConfigFromDir } from '../runner/dispatch/config.mjs';
-import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
+import { bind, hasUsablePrefer } from '../runner/execution/bind.mjs';
 import { detectHerdrPresent } from '../runner/execution/run.mjs';
-import { hasUsablePrefer } from '../runner/execution/bind.mjs';
 
 const CORE_CAPABILITIES = ['execute', 'code:implement'];
-const POSTURES = [
-  { id: 'read-only', writes: [] },
-  { id: 'workspace-write', writes: ['scratch/placeholder'] },
-];
 
 /**
  * Verify that core capabilities (execute, code:implement, and any capability declaring an agent pool)
- * have at least one candidate executor capable of applying both read-only and workspace-write postures.
+ * have at least one candidate executor capable of applying required posture.
  *
  * @param {string} cwd Project directory.
  * @param {object} [options]
@@ -59,102 +54,71 @@ export async function checkExecutorPostureCoverage(cwd, options = {}) {
     herdrPresent: detectHerdrPresent(),
     ...(options.session ?? {}),
   };
-  const simulate = options.simulateUnitBindings ?? simulateUnitBindings;
 
-  const failures = [];
+  const postureFailures = [];
+  const missingPoolWarnings = [];
+  const otherFailures = [];
   const coverage = [];
 
   for (const cap of capsToCheck) {
-    const entry = capabilities[cap];
-    const requiresWorkspaceWrite = CORE_CAPABILITIES.includes(cap) || entry?.serves?.mutates === true;
-    const posturesToCheck = requiresWorkspaceWrite
-      ? POSTURES
-      : POSTURES.filter((p) => p.id === 'read-only');
+    const unit = {
+      id: `posture-check-${cap.replace(/[^a-zA-Z0-9_-]/g, '-')}`,
+      capability: cap,
+      objective: `Check posture for ${cap}`,
+      writes: ['scratch/placeholder'],
+    };
 
-    const capResults = [];
-    for (const posture of posturesToCheck) {
-      const unit = {
-        id: `posture-check-${cap.replace(/[^a-zA-Z0-9_-]/g, '-')}-${posture.id}`,
-        capability: cap,
-        objective: `Check ${posture.id} posture`,
-        writes: posture.writes,
-      };
-
-      try {
-        const { roles } = await simulate(unit, runnerConfig, { session });
-        const primaryRole = roles?.[0];
-        if (!primaryRole || primaryRole.refused || !primaryRole.executor) {
-          const reason = primaryRole?.refused?.reason ?? 'posture-unavailable';
-          const detail = primaryRole?.refused?.detail ? ` (${primaryRole.refused.detail})` : '';
-          failures.push({
-            cap,
-            posture: posture.id,
-            reason,
-            detail,
-          });
-        } else {
-          capResults.push({
-            posture: posture.id,
-            executor: primaryRole.executor,
-            invocation: primaryRole.invocation,
-          });
-        }
-      } catch (err) {
-        failures.push({
-          cap,
-          posture: posture.id,
-          reason: 'error',
-          detail: ` (${err.message})`,
-        });
-      }
-    }
-
-    if (capResults.length === posturesToCheck.length) {
-      const ro = capResults.find((r) => r.posture === 'read-only');
-      const ww = capResults.find((r) => r.posture === 'workspace-write');
-      if (!ww) {
-        coverage.push(`${cap} -> ${ro.executor}${ro.invocation ? ` (${ro.invocation})` : ''}`);
-      } else if (ro.executor === ww.executor) {
-        coverage.push(`${cap} -> ${ro.executor}${ro.invocation ? ` (${ro.invocation})` : ''}`);
+    const bound = bind({ unit, role: 'producer' }, { runnerConfig, session });
+    if (bound.refused) {
+      const reason = bound.refused.reason;
+      const detail = bound.refused.detail ? ` (${bound.refused.detail})` : '';
+      if (reason === 'posture-unavailable') {
+        postureFailures.push({ cap, detail });
+      } else if (reason === 'headless-no-executor' || reason === 'no-candidate') {
+        missingPoolWarnings.push({ cap, detail });
       } else {
-        coverage.push(`${cap} -> read-only: ${ro.executor}, workspace-write: ${ww.executor}`);
+        otherFailures.push({ cap, reason, detail });
       }
+    } else if (bound.executor) {
+      coverage.push(`${cap} -> ${bound.executor}${bound.invocation ? ` (${bound.invocation})` : ''}`);
     }
   }
 
-  if (failures.length === 0) {
+  const hasHardFailure = postureFailures.length > 0 || otherFailures.length > 0;
+  if (!hasHardFailure) {
+    if (missingPoolWarnings.length > 0) {
+      const list = missingPoolWarnings.map((w) => w.cap).join(', ');
+      return {
+        passed: true,
+        message: `warning: no candidate executor available for capabilities: ${list}. Fix: Declare runner.capabilities.<cap>.prefer in .fgos/config.json.`,
+      };
+    }
     return {
       passed: true,
-      message: `all core capabilities have executors capable of read-only and workspace-write: ${coverage.join(', ')}`,
+      message: `all core capabilities have executors capable of applying posture: ${coverage.join(', ')}`,
     };
   }
 
-  const failureSections = [];
-
-  const postureFailures = failures.filter((f) => f.reason === 'posture-unavailable');
+  const sections = [];
   if (postureFailures.length > 0) {
-    const list = postureFailures.map((f) => `${f.cap} (${f.posture}): ${f.reason}${f.detail}`).join('; ');
-    failureSections.push(
+    const list = postureFailures.map((f) => `${f.cap}: posture-unavailable${f.detail}`).join('; ');
+    sections.push(
       `executors lack required posture confinement: ${list}. Fix: (1) Add an invocation with sandbox.backend "bwrap" to executors.<id> in .fgos/config.json, or (2) remove project-level executors.<id> overrides from .fgos/config.json to inherit healthy global executors from ~/.fgos/config.json.`,
     );
   }
-
-  const noCandidateFailures = failures.filter((f) => f.reason === 'headless-no-executor' || f.reason === 'no-candidate');
-  if (noCandidateFailures.length > 0) {
-    const list = noCandidateFailures.map((f) => `${f.cap} (${f.posture}): ${f.reason}${f.detail}`).join('; ');
-    failureSections.push(
-      `no candidate executor available: ${list}. Fix: Declare runner.capabilities.<cap>.prefer in .fgos/config.json (or rely on global pool in ~/.fgos/config.json).`,
+  if (missingPoolWarnings.length > 0) {
+    const list = missingPoolWarnings.map((w) => `${w.cap}`).join('; ');
+    sections.push(
+      `no candidate executor available: ${list}. Fix: Declare runner.capabilities.<cap>.prefer in .fgos/config.json.`,
     );
   }
-
-  const otherFailures = failures.filter((f) => f.reason !== 'posture-unavailable' && f.reason !== 'headless-no-executor' && f.reason !== 'no-candidate');
   if (otherFailures.length > 0) {
-    const list = otherFailures.map((f) => `${f.cap} (${f.posture}): ${f.reason}${f.detail}`).join('; ');
-    failureSections.push(`other failures: ${list}.`);
+    const list = otherFailures.map((f) => `${f.cap}: ${f.reason}${f.detail}`).join('; ');
+    sections.push(`other failures: ${list}.`);
   }
 
   return {
     passed: false,
-    message: `core capabilities lack executors capable of applying required postures: ${failureSections.join(' ')}`,
+    message: `core capabilities lack executors capable of applying required postures: ${sections.join(' ')}`,
   };
 }

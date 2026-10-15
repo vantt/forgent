@@ -73,14 +73,14 @@ lệ có lý do" dưới) có thể tự chứa output của trợ lý bắt đ�
 ### Mã thoát (exit code) — một nguồn duy nhất
 
 `src/state/store.mjs`'s `EXIT_CODES` (2 precondition [bao gồm not-found / run-not-found / missing-run] · 3 conflict ·
-4 validation / policy-refusal · 5 corrupt-log · 7 lock-timeout · 8 session-fail ·
-9 merge-fail · 10 provider-limit · 11 execution-failure · 12 partial-writes ·
+4 validation · 5 corrupt-log · 7 lock-timeout · 8 session-fail · 9 merge-fail · 4 not-found) cộng
+`OUTCOME_EXIT_CODES` (4 policy-refusal · 10 provider-limit · 11 execution-failure · 12 partial-writes ·
 13 blocked · 14 findings) cộng `src/runner/loop.mjs`'s `EXIT_BUSY` (6, riêng của
 runner) là bảng DUY NHẤT. 0 = ok / pass, 1 = bất ngờ (mọi thứ chưa phân loại).
 Consumer rẽ nhánh theo mã thoát phạm trù, không bao giờ theo thông điệp.
 
-**Kết cục thực thi (`fgos run` và `fgos workflow start --foreground`, RUL99):**
-Khi lệnh chạy kết thúc với một outcome không phải `pass`, tiến trình CLI trả mã lỗi tương ứng theo bảng mã kết cục thực thi (`policy-refusal`: 4, `provider-limit`: 10, `execution-failure`: 11, `partial-writes`: 12, `blocked`: 13, `findings`: 14), trong khi toàn bộ luồng stdout JSON envelope `fgos.v1` vẫn được giữ nguyên vẹn 100%. Lệnh `fgos workflow start` chạy detached trả exit code 0 khi tiến trình daemon được kích hoạt thành công.
+**Kết cục thực thi (`fgos run` và `fgos workflow start|resume|answer --foreground`, RUL99):**
+Khi lệnh chạy kết thúc với một outcome không phải `pass`, tiến trình CLI trả mã lỗi tương ứng theo bảng mã kết cục thực thi (`policy-refusal`: 4, `provider-limit`: 10, `execution-failure`: 11, `partial-writes`: 12, `blocked`: 13, `findings`: 14), trong khi toàn bộ luồng stdout JSON envelope `fgos.v1` vẫn được giữ nguyên vẹn 100%. Ngoại lệ bàn giao inline bình thường (`outcome: 'blocked'` kèm `pendingInline` để chờ người chạy `fgos run record`) trả mã thoát 0. Các lệnh chỉ-đọc như `fgos workflow status` luôn trả mã thoát 0 bất kể outcome của workflow run. Lệnh `fgos workflow start` chạy detached trả exit code 0 khi tiến trình daemon được kích hoạt thành công.
 ### Ngoại lệ có lý do
 
 Năm luồng KHÔNG bọc phong bì, mỗi luồng mang một lý do riêng — dùng chung

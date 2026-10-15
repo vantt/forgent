@@ -89,7 +89,7 @@ test('workflow start from another project warns on stderr and in the output, and
   const planDir = makePlan(there);
 
   const result = fgos(['workflow', 'start', '--plan', planDir, '--dir', there, '--foreground'], here);
-  assert.equal(result.status, 0, result.stderr);
+  assert.equal(result.status, 4, result.stderr);
   const warningLines = result.stderr.split('\n').filter((line) => line.includes('dir-differs-from-cwd'));
   assert.equal(warningLines.length, 1, result.stderr);
   assert.ok(warningLines[0].includes(`cd ${there}`), warningLines[0]);
@@ -107,7 +107,7 @@ test('workflow start from inside the project says nothing about --dir', () => {
   const planDir = makePlan(there);
 
   const result = fgos(['workflow', 'start', '--plan', planDir, '--dir', there, '--foreground'], there);
-  assert.equal(result.status, 0, result.stderr);
+  assert.equal(result.status, 4, result.stderr);
   assert.ok(!result.stderr.includes('dir-differs-from-cwd'), result.stderr);
   assert.equal(JSON.parse(result.stdout).data.warnings, undefined);
 });

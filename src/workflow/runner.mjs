@@ -30,6 +30,7 @@ import { digestContextRefs } from './ref-digests.mjs';
 import { seatProviders } from './seat-providers.mjs';
 import { resolveAgentDefinition } from '../runner/agent-definitions.mjs';
 import { RunnerConfigError, assertReasoningEffort, parseRunTimeout, assertRunTimeoutMs } from '../runner/dispatch/config.mjs';
+import { providerAccountInventory } from '../runner/dispatch/provider-capacity.mjs';
 import { matchesWriteScope } from '../runner/dispatch/write-scope.mjs';
 import { nulPaths } from '../util/git-paths.mjs';
 import { normalizeStanceOptions } from '../runner/execution/unit.mjs';
@@ -614,11 +615,30 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
               cwd: unitWorktree,
               worktree: unitWorktree,
               pattern: unitPatternOf(u.template),
-              overrides: unitOverridesOf(u, state.seats?.personas, {
-                effort: state.effort,
-                timeoutMs: state.timeoutMs,
-                account: state.account,
-              }),
+              overrides: await (async () => {
+                let unitAccount = state.account;
+                if (unitAccount !== null) {
+                  const runnerConfig = snapshotRunnerConfig(mainRoot).runner;
+                  const testOverrides = unitOverridesOf(u, state.seats?.personas, {
+                    effort: state.effort,
+                    timeoutMs: state.timeoutMs,
+                    account: unitAccount,
+                  });
+                  const dry = await simulateUnitBindings(
+                    { ...unitData, pattern: unitPatternOf(u.template) || 'solo' },
+                    runnerConfig,
+                    { session: { headless: true, herdrPresent: detectHerdrPresent() }, overrides: testOverrides },
+                  );
+                  if (!dry.roles.some((r) => r.account)) {
+                    unitAccount = null;
+                  }
+                }
+                return unitOverridesOf(u, state.seats?.personas, {
+                  effort: state.effort,
+                  timeoutMs: state.timeoutMs,
+                  account: unitAccount,
+                });
+              })(),
               workflow: { runId: workflowRunId, stepId: step.id, unitId: u.id },
               ...(resumeUnitRunId ? { resumeUnitRunId } : {
                 onUnitRunCreated: (unitRunId) => {
@@ -1024,7 +1044,16 @@ export async function preflightWorkflowSeats(params = {}) {
  */
 function prepareWorkflowRun(params) {
   const { mainRoot, worktreePath, workflow, workflowId, contextRefs, seats, effort, timeoutMs, account } = resolveStart(params);
-  const configSnapshot = snapshotRunnerConfig(mainRoot);
+  const configSnapshot = snapshotRunnerConfig(mainRoot, params.runnerConfig);
+  if (account !== null) {
+    const inventory = providerAccountInventory(configSnapshot.runner);
+    const exists = Object.values(inventory).some(
+      (entry) => entry?.accounts && Object.hasOwn(entry.accounts, account),
+    );
+    if (!exists) {
+      throw new RunnerConfigError(`account "${account}" is not configured in runner.providers.*.accounts`);
+    }
+  }
   const { workflowRunId, runDir } = createWorkflowRun({
     repoRoot: mainRoot,
     workflowId,

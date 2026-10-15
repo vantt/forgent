@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { executeExecutorCli } from '../../src/runner/dispatch/cli.mjs';
 import { renderReasoningEffortArgs, checkLaunchedModel, collectModelWarnings } from '../../src/runner/dispatch/provider-adapter.mjs';
 import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
@@ -22,6 +22,12 @@ import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helpe
 
 // posture filtering consults the machine backend registry; keep it file-local
 seedFileLocalBwrapRegistry();
+if (!process.env.XDG_STATE_HOME) {
+  process.env.XDG_STATE_HOME = path.join(os.tmpdir(), 'fgos-state');
+}
+const testHome = path.join(os.tmpdir(), 'fgos-test-home');
+fs.mkdirSync(testHome, { recursive: true });
+process.env.HOME = testHome;
 import { assertReasoningEffort, RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
 
 test('renderReasoningEffortArgs puts codex effort in a config override after the exec subcommand', () => {
@@ -266,7 +272,11 @@ test('fgos run with an effort override renders it into the CLI the bound executo
   fs.writeFileSync(path.join(repoRoot, '.gitignore'), '.fgos/\n');
   execFileSync('git', ['add', '.'], { cwd: repoRoot });
   execFileSync('git', ['commit', '-q', '-m', 'initial'], { cwd: repoRoot });
-  const binDir = makeFixtureDir('fgos-run-effort-bin-');
+  const worktreeDir = makeFixtureDir('fgos-run-effort-wt-');
+  fs.rmSync(worktreeDir, { recursive: true, force: true });
+  execFileSync('git', ['worktree', 'add', '-q', '-b', 'wt', worktreeDir], { cwd: repoRoot });
+  const binDir = path.join(worktreeDir, '.bin');
+  fs.mkdirSync(binDir, { recursive: true });
   const cli = path.join(binDir, 'codex');
   // Prints its argv; the run keeps the worker's stdout in the run directory.
   fs.writeFileSync(cli, `#!${process.execPath}\nprocess.stdout.write('ARGV' + JSON.stringify(process.argv.slice(2)) + '\\n');\n`);
@@ -279,9 +289,6 @@ test('fgos run with an effort override renders it into the CLI the bound executo
   };
   fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
   fs.writeFileSync(path.join(repoRoot, '.fgos', 'config.json'), JSON.stringify({ runner }, null, 2));
-  const worktreeDir = makeFixtureDir('fgos-run-effort-wt-');
-  fs.rmSync(worktreeDir, { recursive: true, force: true });
-  execFileSync('git', ['worktree', 'add', '-q', '-b', 'wt', worktreeDir], { cwd: repoRoot });
 
   const res = await runUnit({
     unitData: { id: 'u-effort', objective: 'Touch the readme', capability: 'docs:write', writes: ['README.md'] },
@@ -319,8 +326,9 @@ test('fgos run --effort reaches bind() as an override, and a level the executor 
   execFileSync('git', ['worktree', 'add', '-q', '-b', 'wt', wt], { cwd: repo });
   const unitFile = path.join(wt, 'unit.json');
   fs.writeFileSync(unitFile, JSON.stringify({ id: 'u', objective: 'x', capability: 'docs:write', writes: ['README.md'] }));
-  const out = execFileSync(process.execPath, [path.resolve('bin/fgos.mjs'), 'run', '--unit', unitFile, '--dir', repo, '--effort', 'max', '--json'], { cwd: wt, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
-  const { data } = JSON.parse(out);
+  const res = spawnSync(process.execPath, [path.resolve('bin/fgos.mjs'), 'run', '--unit', unitFile, '--dir', repo, '--effort', 'max', '--json'], { cwd: wt, encoding: 'utf8' });
+  assert.equal(res.status, 4, res.stderr);
+  const { data } = JSON.parse(res.stdout);
   assert.equal(data.outcome, 'policy-refusal');
   assert.deepEqual(data.results[0].refused, { reason: 'reasoning-effort', detail: 'executor "claude" supports reasoningEffort [low, medium, high], not "max"' });
 });

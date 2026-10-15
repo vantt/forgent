@@ -2064,7 +2064,7 @@ export const COMMAND_REGISTRY = [
             },
             account: {
               type: 'string',
-              description: 'Pin the provider account every unit runs on; kept for resume. Refused if any seat binds an executor whose provider has no matching account.',
+              description: 'Pin the provider account for seats belonging to that provider; kept for resume. Seats on another provider run unpinned; refused if the account does not exist in any runner.providers.*.accounts.',
             },
             request: { type: 'string', description: 'The owner request this run serves; every unit receives it in its objective.' },
             'stance-options': { type: 'string', description: 'Pipe-separated option labels a measured panelist picks a stance from ("a|b|c"); refused on resume with different options.' },

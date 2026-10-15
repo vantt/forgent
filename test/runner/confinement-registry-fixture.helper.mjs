@@ -18,9 +18,17 @@ export function seedFileLocalBwrapRegistry(executable = '/usr/bin/bwrap') {
   }));
   const previous = process.env[ENV_KEY];
   process.env[ENV_KEY] = registryPath;
+  const prevXdgState = process.env.XDG_STATE_HOME;
+  if (!process.env.XDG_STATE_HOME) {
+    const stateDir = path.join(dir, 'fgos-state');
+    fs.mkdirSync(stateDir, { recursive: true });
+    process.env.XDG_STATE_HOME = stateDir;
+  }
   after(() => {
     if (previous === undefined) delete process.env[ENV_KEY];
     else process.env[ENV_KEY] = previous;
+    if (prevXdgState === undefined) delete process.env.XDG_STATE_HOME;
+    else process.env.XDG_STATE_HOME = prevXdgState;
     fs.rmSync(dir, { recursive: true, force: true });
   });
   return registryPath;

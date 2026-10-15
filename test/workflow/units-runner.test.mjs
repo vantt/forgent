@@ -12,6 +12,9 @@ import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixtu
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 
 seedFileLocalBwrapRegistry();
+if (!process.env.XDG_STATE_HOME) {
+  process.env.XDG_STATE_HOME = makeFixtureDir('fgos-state-');
+}
 
 // makeFixtureDir removes these at exit (FGOS_KEEP_TEST_FIXTURES=1 keeps them for debugging).
 const fixtures = [];
@@ -501,6 +504,73 @@ test('workflow start with invalid --timeout or --account is refused before run e
 
   await assert.rejects(() => startWorkflow({ workflow, account: '', ...opts(tmp) }), /account/);
   assert.equal(fs.existsSync(path.join(tmp, '.fgos', 'workflow-runs')), false);
+
+  await assert.rejects(() => startWorkflow({ workflow, account: 'unknown-acct', ...opts(tmp) }), /not configured in runner\.providers/);
+  assert.equal(fs.existsSync(path.join(tmp, '.fgos', 'workflow-runs')), false);
+});
+
+test('workflow with two units on different providers pins account only on matching unit and both run', async () => {
+  const tmp = setupRepo();
+  const fakeHome = makeFixtureDir('fgos-diff-home-');
+  fixtures.push(fakeHome);
+  fs.writeFileSync(path.join(tmp, 'login'), 'token\n');
+  fs.mkdirSync(path.join(fakeHome, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(fakeHome, '.fgos', 'config.json'), JSON.stringify({
+    runner: {
+      providers: {
+        alpha: {
+          accounts: {
+            'acct-alpha': { label: 'acct-alpha', credentialSource: { kind: 'home-files', home: tmp, files: ['login'] } },
+          },
+        },
+      },
+    },
+  }, null, 2));
+
+  const cfgPath = path.join(tmp, '.fgos', 'config.json');
+  const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+  const worker = path.join(tmp, 'worker.mjs');
+  cfg.runner.executors = {};
+  for (const name of ['alpha', 'beta']) {
+    const command = path.join(tmp, `${name}-bin`);
+    if (!fs.existsSync(command)) fs.symlinkSync(process.execPath, command);
+    const args = [worker, '{prompt}'];
+    cfg.runner.executors[name] = {
+      kind: 'agent', allowCrossProvider: true, command, args, providerModel: name,
+      invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command, args }],
+    };
+  }
+  cfg.runner.capabilities = {
+    'cap-alpha': { prefer: [{ executor: 'alpha' }], rigor: 'standard' },
+    'cap-beta': { prefer: [{ executor: 'beta' }], rigor: 'standard' },
+  };
+  fs.writeFileSync(cfgPath, JSON.stringify(cfg, null, 2));
+
+  const prevHome = process.env.HOME;
+  process.env.HOME = fakeHome;
+  try {
+    const workflow = validateWorkflow({
+      id: 'diff-provider-workflow',
+      steps: [
+        { id: 's1', units: [{ id: 'u1', template: { capability: 'cap-alpha', objective: 'Task 1' } }] },
+        { id: 's2', dependsOn: ['s1'], units: [{ id: 'u2', template: { capability: 'cap-beta', objective: 'Task 2' } }] },
+      ],
+    });
+    const state = await startWorkflow({ workflow, account: 'acct-alpha', ...opts(tmp) });
+    assert.equal(state.status, 'completed', JSON.stringify(state.steps));
+
+    const u1RunId = state.steps.s1.units.u1.unitRunId;
+    const u2RunId = state.steps.s2.units.u2.unitRunId;
+
+    const b1 = producerAssignment(tmp, u1RunId).binding;
+    const b2 = producerAssignment(tmp, u2RunId).binding;
+
+    assert.deepEqual(b1.account, { provider: 'alpha', id: 'acct-alpha' });
+    assert.equal(b2.account, undefined);
+  } finally {
+    if (prevHome === undefined) delete process.env.HOME;
+    else process.env.HOME = prevHome;
+  }
 });
 
 test('CLI workflow start accepts --timeout and --account, while resume refuses them', async () => {

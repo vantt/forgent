@@ -85,7 +85,13 @@ export const EXIT_CODES = Object.freeze({
   // 'refused' (category:'validation') outcome by a future DAG scheduler
   // classifier (dag-request-scheduler.md §4).
   'not-found': 4,
-  // Execution outcome codes of `fgos run` and a foreground workflow run (RUL99):
+});
+
+/**
+ * Execution outcome codes of `fgos run` and foreground workflow runs (RUL99).
+ * Separate from EXIT_CODES to prevent error categories from colliding with outcome names.
+ */
+export const OUTCOME_EXIT_CODES = Object.freeze({
   'policy-refusal': 4,
   'provider-limit': 10,
   'execution-failure': 11,
@@ -96,7 +102,7 @@ export const EXIT_CODES = Object.freeze({
 
 /**
  * Map an execution outcome (e.g. from runUnit or workflowRun) onto a canonical exit code.
- * Non-pass outcomes map to EXIT_CODES[outcome] or 1 when unrecognized. 'pass' maps to 0.
+ * Non-pass outcomes map to OUTCOME_EXIT_CODES[outcome] or 1 when unrecognized. 'pass' maps to 0.
  *
  * @param {string} outcome
  * @returns {number}
@@ -104,7 +110,7 @@ export const EXIT_CODES = Object.freeze({
 export function exitCodeForOutcome(outcome) {
   if (outcome === 'pass') return 0;
   if (typeof outcome !== 'string') return 1;
-  return EXIT_CODES[outcome] ?? 1;
+  return OUTCOME_EXIT_CODES[outcome] ?? 1;
 }
 
 /**

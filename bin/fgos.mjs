@@ -16,9 +16,10 @@
 // (R4), and callers should branch on the code, never on the message text.
 //
 // Exit codes (R4): The canonical exit-code table lives in src/state/store.mjs's
-// EXIT_CODES export (codes 2-5, 7-9 for store/preflight; 10-14 for execution outcomes:
-// provider-limit=10, execution-failure=11, partial-writes=12, blocked=13, findings=14;
-// 0=ok, 1=unexpected) plus src/runner/loop.mjs's EXIT_BUSY (code 6, runner-only state).
+// EXIT_CODES export (codes 2-5, 7-9 for store/preflight; 0=ok, 1=unexpected),
+// OUTCOME_EXIT_CODES (execution outcomes: policy-refusal=4, provider-limit=10,
+// execution-failure=11, partial-writes=12, blocked=13, findings=14; RUL99),
+// plus src/runner/loop.mjs's EXIT_BUSY (code 6, runner-only state).
 //
 // This file never writes to `.fgos/` itself — every mutation goes through
 // src/state/store.mjs, the sole write door.
@@ -28,7 +29,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync, execSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { initStore, addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, recordFriction, listWork, readyWork, isDepsAndLineageReady, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, categoryOf, exitCodeForOutcome, parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, demoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore, attestDocStore } from '../src/state/store.mjs';
+import { initStore, addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, recordFriction, listWork, readyWork, isDepsAndLineageReady, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, OUTCOME_EXIT_CODES, categoryOf, exitCodeForOutcome, parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, demoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore, attestDocStore } from '../src/state/store.mjs';
 import { resolveDocPath } from '../src/report/knowledge-resolver.mjs';
 import { resolveDocId } from '../src/state/knowledge-registry.mjs';
 import { computeKnowledgeProjection } from '../src/report/knowledge-projection.mjs';
@@ -5054,10 +5055,17 @@ async function main() {
     // `plan-lint` is the verb whose exit code is data-dependent (0 clean, 1 a hard finding present).
     // `doctor --strict` exits 1 when any check still fails after optional fixes ran.
     const isExecutionRun = verb === 'run';
-    const isForegroundWorkflow = verb === 'workflow' && data?.status !== 'running' && data?.outcome !== undefined && data?.outcome !== null;
+    const isForegroundWorkflow = verb === 'workflow'
+      && ['start', 'resume', 'answer'].includes(positional[0])
+      && Boolean(flags.foreground)
+      && data?.status !== 'running'
+      && data?.outcome !== undefined
+      && data?.outcome !== null;
     const doctorFailed = verb === 'doctor' && flags.strict === true && data.checks.some((c) => !c.passed);
 
-    if (isExecutionRun && data?.outcome) {
+    if (data?.pendingInline) {
+      process.exitCode = 0;
+    } else if (isExecutionRun && data?.outcome) {
       process.exitCode = exitCodeForOutcome(data.outcome);
     } else if (isForegroundWorkflow) {
       process.exitCode = exitCodeForOutcome(data.outcome);
