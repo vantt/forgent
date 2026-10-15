@@ -16,6 +16,7 @@ import {
   resolveConfinementTempRoot,
   ensurePrivateDir,
   readOwnershipMarker,
+  paneOpenUnlessClosed,
 } from '../../src/runner/dispatch/confinement/cleanup.mjs';
 
 // A private home holds a copy of an account login. These tests pin the three
@@ -291,6 +292,45 @@ fi
   } finally {
     if (savedBin === undefined) delete process.env.FGOS_HERDR_BIN; else process.env.FGOS_HERDR_BIN = savedBin;
     if (savedSession === undefined) delete process.env.HERDR_SESSION; else process.env.HERDR_SESSION = savedSession;
+    f.cleanup();
+  }
+});
+
+test('the sweep after a probe removes the homes of panes it closed and keeps an expired home whose pane is still open', async () => {
+  const f = fixture();
+  const savedBin = process.env.FGOS_HERDR_BIN;
+  try {
+    // A fake herdr that still lists both panes: the probe's own record of what it closed decides for
+    // its pane, and herdr's answer decides for every other one, exactly as in the regular sweep.
+    const bin = path.join(f.tmp, 'fake-herdr.sh');
+    fs.writeFileSync(bin, `#!/bin/sh
+echo '{"result":{"panes":[{"pane_id":"p-open"},{"pane_id":"p-closed"}]}}'
+`, { mode: 0o755 });
+    process.env.FGOS_HERDR_BIN = bin;
+
+    const homes = {};
+    for (const [dispatchId, paneId] of [['disp_kept', 'p-open'], ['disp_probe', 'p-closed']]) {
+      const plan = planFor(f.tempRoot, dispatchId);
+      const prepared = await prepareBwrap(
+        plan,
+        requestFor(dispatchId, { kind: 'home-files', home: f.accountHome, files: ['plain-auth.json'] }),
+        { id: 'bwrap', type: 'bwrap', config: {} },
+      );
+      prepared.retain({ paneId, herdrSession: 'fgos-worker' });
+      homes[paneId] = plan.resources[0].hostTarget;
+    }
+
+    const res = reapOrphanedConfinementResources({
+      tempRoot: f.tempRoot,
+      maxAgeMs: -1, // both homes are past the maximum age
+      checkLiveness: () => false,
+      checkPaneOpen: paneOpenUnlessClosed(new Set(['p-closed'])),
+    });
+    assert.deepEqual(res.reaped.map((r) => r.dispatchId), ['disp_probe'], 'only the home of the pane the probe closed goes');
+    assert.equal(fs.existsSync(path.dirname(homes['p-closed'])), false);
+    assert.ok(fs.existsSync(path.join(homes['p-open'], 'plain-auth.json')), 'an open pane keeps its login even past the maximum age');
+  } finally {
+    if (savedBin === undefined) delete process.env.FGOS_HERDR_BIN; else process.env.FGOS_HERDR_BIN = savedBin;
     f.cleanup();
   }
 });

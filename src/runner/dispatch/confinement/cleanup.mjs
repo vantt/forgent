@@ -359,6 +359,12 @@ function defaultPaneOpen(paneId, herdrSession) {
   }
 }
 
+/** The pane check for a sweep run right after the caller closed some panes itself: those panes are
+ * closed, and every other pane is asked exactly as the regular sweep asks it. */
+export function paneOpenUnlessClosed(closedPanes) {
+  return (paneId, herdrSession) => (closedPanes.has(paneId) ? false : defaultPaneOpen(paneId, herdrSession));
+}
+
 function isProcessAlive(pid) {
   if (typeof pid !== 'number' || pid <= 0) return false;
   try {

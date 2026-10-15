@@ -35,7 +35,7 @@ import { buildDispatchResult } from './result-ladder.mjs';
 import { collectModelWarnings } from './provider-adapter.mjs';
 import { executeAssignment, reconcileCliSpawnRun } from './assignment-runner.mjs';
 import { runAccountProbe } from './provider-account-probe.mjs';
-import { reapOrphanedConfinementResources, resolveConfinementTempRoot, createConfinementCredentialRenewal } from './confinement/cleanup.mjs';
+import { reapOrphanedConfinementResources, resolveConfinementTempRoot, createConfinementCredentialRenewal, paneOpenUnlessClosed } from './confinement/cleanup.mjs';
 import { defaultConfinementTempRoots } from './confinement/backend-registry.mjs';
 import { createHerdrClient } from './herdr-agent.mjs';
 import { resolveHerdrBin } from './transport.mjs';
@@ -1229,7 +1229,7 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
           try {
             reapOrphanedConfinementResources({
               tempRoot: resolveConfinementTempRoot(),
-              checkPaneOpen: (paneId) => (closedPanes.has(paneId) ? false : null),
+              checkPaneOpen: paneOpenUnlessClosed(closedPanes),
             });
           } catch { /* the regular sweep removes it later */ }
         }
