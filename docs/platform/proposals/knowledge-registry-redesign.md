@@ -19,7 +19,7 @@ Supersedes: None; legacy source remains intact
 Superseded by: None
 ```
 
-Added in candidate: Candidate carriage; Retain map proposal kind: implementation alone does not promote a design. Full truth remains owed at promotion. Original source metadata and text follow. Physical relative-link destinations alone are rebased to the same repository paths. Units with inherited missing links are preserved as literal fenced source text, without substituting another design or changing any assertion. Source metadata is provenance, not candidate authority.
+Added in candidate: Candidate carriage; implementation alone does not promote a design. Full truth remains owed at promotion. Physical relative-link destinations are rebased to the same repository paths. Two section 17 pointers are corrected under A19: the current knowledge skill is `domains/coding/skills/fgos-coding-knowledge/SKILL.md`, and the advisor report is `plans/reports/for-external-advisor-260825-1209-doc-identity-axis-topic-registry-design-report.md`. Other source wording and source metadata are retained; source metadata is provenance, not candidate authority.
 
 Source relationship: [original source](../../architect/knowledge-registry-redesign.md).
 

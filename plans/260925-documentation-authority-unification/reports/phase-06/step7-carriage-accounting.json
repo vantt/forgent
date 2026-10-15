@@ -3,7 +3,7 @@
   "authorSession": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
   "sourceCommit": "fb046210539cbcbe8ca1dab254763f5e78c573d2",
   "registryInputSha256": "1ec13215600551ffdb9cb2f3a6e1260fdbd0cf0e829171d95f42309221384d02",
-  "method": "Local extraction of exactly the 20 unchanged source files using the persisted registry identity index. No native repo-wide refresh, carry-forward, inventory rebuild or registry mutation. Candidate metadata is inserted; original H1 reused; relative links physically rebased to the exact same repository path; units with unresolved source links and pre-H1 YAML retained in literal fences. Every original source line is recoverable by the recorded line map and reverse link substitutions. Bounded Lead corrections: file 11 is a live mapped proposal, coordination-family history uses Agent Coordination, one wrapped-label link is rebased, five labelled additions state neutral placement facts. Exactly two current-path sentences in file 6 are authorized A19 truth corrections, recorded separately and reversed only for source-line recovery. No other source content is rewritten. All rows pending; no native sync or D/E certification.",
+  "method": "Original carriage method (the original all-pending/no-sync statements describe its authoring checkpoint; current review state is in totals and verdictApplication): Local extraction of exactly the 20 unchanged source files using the persisted registry identity index. No native repo-wide refresh, carry-forward, inventory rebuild or registry mutation. Candidate metadata is inserted; original H1 reused; relative links physically rebased to the exact same repository path; units with unresolved source links and pre-H1 YAML retained in literal fences. Every original source line is recoverable by the recorded line map and reverse link substitutions. Bounded Lead corrections: file 11 is a live mapped proposal, coordination-family history uses Agent Coordination, one wrapped-label link is rebased, five labelled additions state neutral placement facts. Exactly two current-path sentences in file 6 are authorized A19 truth corrections, recorded separately and reversed only for source-line recovery. No other source content is rewritten. All rows pending; no native sync or D/E certification.",
   "files": [
     {
       "number": 1,
@@ -23953,16 +23953,16 @@
       "mapKind": "proposal",
       "sourceBlob": "ace04a2ddb00e44cf28f39f1f9cfd20d37362d75",
       "status": "implemented design still consumed",
-      "evidence": "src/state/knowledge-registry.mjs:20,88,211,537,646,733\u2013748 and bin/fgos.mjs:1701,1767 explicitly cite the source. domains/coding/skills/fgos-coding-knowledge/SKILL.md:44 is an additional canonical skill-source consumer; setup registrations:3977,4001,4035 remain.",
+      "evidence": "src/state/knowledge-registry.mjs:20,88,211,537,646,733\u2013748 and bin/fgos.mjs:1701,1767 explicitly cite the source. domains/coding/skills/fgos-coding-knowledge/SKILL.md:44 is an additional canonical skill-source consumer; setup registrations:3977,4001,4035 remain. The candidate Added paragraph explicitly labels the two A19 section-17 pointer corrections (knowledge skill and advisor report).",
       "reason": "Retain map proposal kind: implementation alone does not promote a design. Full truth remains owed at promotion.",
       "target": "docs/platform/proposals/knowledge-registry-redesign.md",
       "kind": "proposal",
       "triageDisposition": "place verbatim",
       "rowDisposition": "move",
       "sourceSha256": "e589e9af6fc3ca57d5fa39127a0bf9e6597c8b8af6e2c183595982ed71a87827",
-      "targetSha256": "c99d64dce0271f88987c865b7a07348464a8320dcb58ad36d094eadd034b6030",
+      "targetSha256": "86eeb55d9643c559469f49cdb6fd2981722cbe52bf7cac6a2b6365faa12fe113",
       "sourceByteLength": 33903,
-      "targetByteLength": 35296,
+      "targetByteLength": 35396,
       "sourceLineMap": [
         {
           "sourceLine": 1,
@@ -29725,7 +29725,18 @@
           "authority": "A19 / A28 item 3(a), Lead assignment; rebind under A22",
           "evidence": "c1768fa51; domains/coding/skills/fgos-coding-knowledge/SKILL.md"
         }
-      ]
+      ],
+      "priorTargetBinding": {
+        "targetSha256": "c99d64dce0271f88987c865b7a07348464a8320dcb58ad36d094eadd034b6030",
+        "targetByteLength": 35296
+      },
+      "candidateParagraphCorrection": {
+        "path": "docs/platform/proposals/knowledge-registry-redesign.md",
+        "beforeSHA256": "c99d64dce0271f88987c865b7a07348464a8320dcb58ad36d094eadd034b6030",
+        "afterSHA256": "86eeb55d9643c559469f49cdb6fd2981722cbe52bf7cac6a2b6365faa12fe113",
+        "beforeParagraph": "Added in candidate: Candidate carriage; Retain map proposal kind: implementation alone does not promote a design. Full truth remains owed at promotion. Original source metadata and text follow. Physical relative-link destinations alone are rebased to the same repository paths. Units with inherited missing links are preserved as literal fenced source text, without substituting another design or changing any assertion. Source metadata is provenance, not candidate authority.",
+        "afterParagraph": "Added in candidate: Candidate carriage; implementation alone does not promote a design. Full truth remains owed at promotion. Physical relative-link destinations are rebased to the same repository paths. Two section 17 pointers are corrected under A19: the current knowledge skill is `domains/coding/skills/fgos-coding-knowledge/SKILL.md`, and the advisor report is `plans/reports/for-external-advisor-260825-1209-doc-identity-axis-topic-registry-design-report.md`. Other source wording and source metadata are retained; source metadata is provenance, not candidate authority."
+      }
     },
     {
       "number": 7,
@@ -44648,7 +44659,7 @@
       "mapKind": "proposal",
       "sourceBlob": "40132546e70e23fed654bf5d4cc84ea86ac3cd2b",
       "status": "historical chat progress snapshot",
-      "evidence": "Source lines 26\u201348 records a dated capability-fit audit, OS-only checks and unbuilt fixture. Source Concurrent Architecture Advisory session and Next work describe that chat, not a reusable current contract. Required-root references are ratchet only. Live proposals 9, 10 and 13 cite this dated status pointer; these links consume provenance/next-work context, not an accepted current contract. Preserve and queue their navigation explicitly.",
+      "evidence": "Source lines 26\u201348 records a dated capability-fit audit, OS-only checks and unbuilt fixture. Source Concurrent Architecture Advisory session and Next work describe that chat, not a reusable current contract. Required-root references are ratchet only. Live proposals 9, 10, 11 and 13 cite this dated status pointer (file 11: docs/architect/proposals/coordination-envelope-probe-contract.md:17; live carrier docs/platform/proposals/coordination-envelope-probe-contract.md:44); these links consume provenance/next-work context, not an accepted current contract. Preserve and queue their navigation explicitly. Also queue docs/platform/agent-coordination/verification/coordination-envelope/capability-fit-2026-09-06.md:11: it points to the former docs/platform/proposals/coordination-envelope-progress.md path, now absent; repoint to docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md at cutover.",
       "reason": "Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism.",
       "target": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
       "kind": "history",
@@ -48938,7 +48949,7 @@
       "mapKind": "collection-index",
       "sourceBlob": "48a80d339a1f676a56153bac6677895e0d4eb377",
       "status": "retained collection navigation snapshot",
-      "evidence": "Source Active Proposals and Handoff Prompts lists six entries, with five active proposal links; it omits later siblings. The map explicitly assigns collection-index; no semantic required-root consumer was found (README.md basename matches are unrelated).",
+      "evidence": "Source Active Proposals and Handoff Prompts lists six entries, with five active proposal links; the snapshot lists 6 of the directory\u2019s 14 entries, all six carried in full. The map explicitly assigns collection-index; no semantic required-root consumer was found (README.md basename matches are unrelated).",
       "reason": "Keep the map collection-index as a candidate snapshot. Its active list is historical source wording and will not describe the final live/history split; navigation owner owes reviewed update, no silent rewrite now.",
       "target": "docs/platform/proposals/README.md",
       "kind": "proposal",
@@ -53751,7 +53762,7 @@
       "mapKind": "proposal",
       "sourceBlob": "e233f9878ae84ae8b23455171d80f9f4ec0acdcb",
       "status": "live unstarted adoption/facade plan",
-      "evidence": "docs/platform/system-architecture/architecture/roadmap.md:53 retains coding-domain adoption. docs/architect/proposals/step-10-coding-domain-adoption.md:18,93\u2013110 identifies A0 and its facade work. domains/coding/harness/enrich-and-validate-contract.mjs survives; no accepted whole-plan implementation is inferred.",
+      "evidence": "docs/platform/system-architecture/architecture/roadmap.md:53 retains coding-domain adoption. docs/architect/proposals/step-10-coding-domain-adoption.md:18,167\u2013172,206\u2013217 identifies A0 and its facade work. domains/coding/harness/enrich-and-validate-contract.mjs survives; no accepted whole-plan implementation is inferred.",
       "reason": "Keep map proposal; partial foundation retirement and surviving harnesses do not settle an unaccepted plan. Retain Not started and prerequisite uncertainty.",
       "target": "docs/platform/proposals/step-10-a0-coding-domain-boundary-facade-plan.md",
       "kind": "proposal",
@@ -67430,8 +67441,8 @@
       "Unit-exact": 1289
     },
     "differingDigests": 88,
-    "reviewed": 0,
-    "pending": 1815,
+    "reviewed": 1625,
+    "pending": 190,
     "authorRemaining": 0
   },
   "mapTargetOverrides": [
@@ -67474,5 +67485,14 @@
   ],
   "correctionSession": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
   "correctionInputCommit": "4ee263d09",
-  "correctionEvidenceCommit": "f060a66fc"
+  "correctionEvidenceCommit": "f060a66fc",
+  "verdictApplication": {
+    "reportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c",
+    "ordinaryApplied": 1788,
+    "refused": [],
+    "sourceReworks": 27,
+    "reboundPending": 190,
+    "remainingReviewed": 1625,
+    "nativeSync": "Deferred to next turn at runner settlement commit"
+  }
 }

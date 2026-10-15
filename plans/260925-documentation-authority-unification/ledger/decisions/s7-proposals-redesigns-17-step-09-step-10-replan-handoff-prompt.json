@@ -22,58 +22,82 @@
       "sourceUnitDigest": "d4c07b1b279fe005d92de5d9a48b608bb67a27a4f47f56b6d8ac6994f6cf3bb7",
       "targetOwner": "docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md",
       "targetAnchor": "step-09-step-10-replan-handoff-prompt",
-      "targetUnitDigest": "99660662643fdbf89df15656d4aeb079b182e1b65e9740b105ec016b41c578c7",
-      "targetAncestry": [],
       "claimKind": "architecture",
       "disposition": "archive-with-reason",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. archive-with-reason: Archive the consumed prompt, with provenance value for the surviving adoption proposals. No delete-as-obsolete recommendation. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism. Evidence: Source lines 3–10 says Handoff prompt, Canonical for nothing, use only to start a fresh design chat. Source code block preserves inputs for subsequent Step 09/10 discussions; no specific live required-root consumer. Complete source heading docs/architect/proposals/step-09-step-10-replan-handoff-prompt.md#step-09-step-10-replan-handoff-prompt (lines 1–1) is carried at docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md#step-09-step-10-replan-handoff-prompt (lines 1–1); Q3 per-file map override: docs/platform/proposals/step-09-step-10-replan-handoff-prompt.md → docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. archive-with-reason: Archive the consumed prompt, with provenance value for the surviving adoption proposals. No delete-as-obsolete recommendation. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism. Evidence: Source lines 3–10 says Handoff prompt, Canonical for nothing, use only to start a fresh design chat. Source code block preserves inputs for subsequent Step 09/10 discussions; no specific live required-root consumer. Complete source heading docs/architect/proposals/step-09-step-10-replan-handoff-prompt.md#step-09-step-10-replan-handoff-prompt (lines 1–1) is carried at docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md#step-09-step-10-replan-handoff-prompt (lines 1–1); Q3 per-file map override: docs/platform/proposals/step-09-step-10-replan-handoff-prompt.md → docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending.",
+      "reviewNote": "deep: H1 section: target adds only the txt metadata fence, labelled Added in candidate paragraph and Source relationship line before the byte-equal source payload (Document type through the Use this prompt sentence); archive-with-reason to Agent Coordination history matches the triage override and map override for file 17, evidence lines 3-10 confirmed in source; changed by the content commit only in owner path and rationale.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-17-01-0f063d18f.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "99660662643fdbf89df15656d4aeb079b182e1b65e9740b105ec016b41c578c7",
+      "targetAncestry": [],
+      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
     },
     {
       "claimId": "claim_2ba1e1cf145db1520a75d592e08e6cc3",
       "sourceUnitDigest": "55c67de7e3f08e6b2bb094056e0a51a0ad796d3da1f44561e5be4067a3739b93",
       "targetOwner": "docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md",
       "targetAnchor": "unheaded-block-4",
+      "claimKind": "architecture",
+      "disposition": "archive-with-reason",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the consumed prompt, with provenance value for the surviving adoption proposals. No delete-as-obsolete recommendation. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism. Evidence: Source lines 3–10 says Handoff prompt, Canonical for nothing, use only to start a fresh design chat. Source code block preserves inputs for subsequent Step 09/10 discussions; no specific live required-root consumer. Complete source unheaded-block docs/architect/proposals/step-09-step-10-replan-handoff-prompt.md#unheaded-block-1 (lines 3–7) is carried at docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md#unheaded-block-4 (lines 27–31); Q3 per-file map override: docs/platform/proposals/step-09-step-10-replan-handoff-prompt.md → docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending.",
+      "reviewNote": "deep: Unit-exact unheaded-block unheaded-block-1 src lines 3-7 -> tgt unheaded-block-4 lines 27-31; source and target shown text read in full and sha256-equal with the pack, carried verbatim and nothing added; Changed by the content commit only in target owner path (now Agent Coordination history, 100 percent rename of the carrier) and rationale (adds the owner reasoning); text digest-equal. archive-with-reason to step-09-step-10-replan-handoff-prompt.md matches the triage.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-17-01-0f063d18f.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "55c67de7e3f08e6b2bb094056e0a51a0ad796d3da1f44561e5be4067a3739b93",
       "targetAncestry": [
         "Step 09 / Step 10 Replan Handoff Prompt"
       ],
-      "claimKind": "architecture",
-      "disposition": "archive-with-reason",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the consumed prompt, with provenance value for the surviving adoption proposals. No delete-as-obsolete recommendation. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism. Evidence: Source lines 3–10 says Handoff prompt, Canonical for nothing, use only to start a fresh design chat. Source code block preserves inputs for subsequent Step 09/10 discussions; no specific live required-root consumer. Complete source unheaded-block docs/architect/proposals/step-09-step-10-replan-handoff-prompt.md#unheaded-block-1 (lines 3–7) is carried at docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md#unheaded-block-4 (lines 27–31); Q3 per-file map override: docs/platform/proposals/step-09-step-10-replan-handoff-prompt.md → docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
     },
     {
       "claimId": "claim_7b86afff62ae3c9360f7d7e884bbfaf8",
       "sourceUnitDigest": "705a9e6fd739bd254aa3a06a10bfe96bfe160c0e970988f15659548ee44660ff",
       "targetOwner": "docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md",
       "targetAnchor": "unheaded-block-5",
+      "claimKind": "architecture",
+      "disposition": "archive-with-reason",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the consumed prompt, with provenance value for the surviving adoption proposals. No delete-as-obsolete recommendation. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism. Evidence: Source lines 3–10 says Handoff prompt, Canonical for nothing, use only to start a fresh design chat. Source code block preserves inputs for subsequent Step 09/10 discussions; no specific live required-root consumer. Complete source unheaded-block docs/architect/proposals/step-09-step-10-replan-handoff-prompt.md#unheaded-block-2 (lines 9–10) is carried at docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md#unheaded-block-5 (lines 33–34); Q3 per-file map override: docs/platform/proposals/step-09-step-10-replan-handoff-prompt.md → docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending.",
+      "reviewNote": "deep: Unit-exact unheaded-block unheaded-block-2 src lines 9-10 -> tgt unheaded-block-5 lines 33-34; source and target shown text read in full and sha256-equal with the pack, carried verbatim and nothing added; Changed by the content commit only in target owner path (now Agent Coordination history, 100 percent rename of the carrier) and rationale (adds the owner reasoning); text digest-equal. archive-with-reason to step-09-step-10-replan-handoff-prompt.md matches the triage.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-17-01-0f063d18f.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "705a9e6fd739bd254aa3a06a10bfe96bfe160c0e970988f15659548ee44660ff",
       "targetAncestry": [
         "Step 09 / Step 10 Replan Handoff Prompt"
       ],
-      "claimKind": "architecture",
-      "disposition": "archive-with-reason",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the consumed prompt, with provenance value for the surviving adoption proposals. No delete-as-obsolete recommendation. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism. Evidence: Source lines 3–10 says Handoff prompt, Canonical for nothing, use only to start a fresh design chat. Source code block preserves inputs for subsequent Step 09/10 discussions; no specific live required-root consumer. Complete source unheaded-block docs/architect/proposals/step-09-step-10-replan-handoff-prompt.md#unheaded-block-2 (lines 9–10) is carried at docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md#unheaded-block-5 (lines 33–34); Q3 per-file map override: docs/platform/proposals/step-09-step-10-replan-handoff-prompt.md → docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
     },
     {
       "claimId": "claim_eadf79b0b7a6fd73cf80175beeff02f2",
       "sourceUnitDigest": "6348d46b8f28f477cd1e4adc0983ba6d98256daf4175b2facc6f6bd1d70d374e",
       "targetOwner": "docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md",
       "targetAnchor": "unheaded-block-6",
+      "claimKind": "architecture",
+      "disposition": "archive-with-reason",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the consumed prompt, with provenance value for the surviving adoption proposals. No delete-as-obsolete recommendation. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism. Evidence: Source lines 3–10 says Handoff prompt, Canonical for nothing, use only to start a fresh design chat. Source code block preserves inputs for subsequent Step 09/10 discussions; no specific live required-root consumer. Complete source unheaded-block docs/architect/proposals/step-09-step-10-replan-handoff-prompt.md#unheaded-block-3 (lines 12–145) is carried at docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md#unheaded-block-6 (lines 36–169); Q3 per-file map override: docs/platform/proposals/step-09-step-10-replan-handoff-prompt.md → docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending.",
+      "reviewNote": "deep: Unit-exact unheaded-block unheaded-block-3 src lines 12-145 -> tgt unheaded-block-6 lines 36-169; source and target shown text read in full and sha256-equal with the pack, carried verbatim and nothing added; Changed by the content commit only in target owner path (now Agent Coordination history, 100 percent rename of the carrier) and rationale (adds the owner reasoning); text digest-equal. archive-with-reason to step-09-step-10-replan-handoff-prompt.md matches the triage.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-17-01-0f063d18f.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "6348d46b8f28f477cd1e4adc0983ba6d98256daf4175b2facc6f6bd1d70d374e",
       "targetAncestry": [
         "Step 09 / Step 10 Replan Handoff Prompt"
       ],
-      "claimKind": "architecture",
-      "disposition": "archive-with-reason",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the consumed prompt, with provenance value for the surviving adoption proposals. No delete-as-obsolete recommendation. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism. Evidence: Source lines 3–10 says Handoff prompt, Canonical for nothing, use only to start a fresh design chat. Source code block preserves inputs for subsequent Step 09/10 discussions; no specific live required-root consumer. Complete source unheaded-block docs/architect/proposals/step-09-step-10-replan-handoff-prompt.md#unheaded-block-3 (lines 12–145) is carried at docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md#unheaded-block-6 (lines 36–169); Q3 per-file map override: docs/platform/proposals/step-09-step-10-replan-handoff-prompt.md → docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
     }
   ],
   "correctionSession": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15"
