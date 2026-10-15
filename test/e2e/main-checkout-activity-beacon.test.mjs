@@ -26,6 +26,7 @@ const HOOK_FILES = [
   ['runner/dispatch/process-identity.mjs', 'src/runner/dispatch/process-identity.mjs'],
   ['runner/dispatch/run-timeout.mjs', 'src/runner/dispatch/run-timeout.mjs'],
   ['util/session-identity.mjs', 'src/util/session-identity.mjs'],
+  ['util/host-bin-path.mjs', 'src/util/host-bin-path.mjs'],
 ];
 const MERGE_MODULE_URL = pathToFileURL(path.join(SRC, 'runner/merge.mjs')).href;
 const FGOS_BIN = path.resolve(__dirname, '../../bin/fgos.mjs');
