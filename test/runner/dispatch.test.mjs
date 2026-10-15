@@ -5193,43 +5193,51 @@ test('resolveExecutorCommand returns env block from resolved executor', () => {
 });
 
 test('registered executors.glm entry resolves command "claude" and env block', () => {
-  const { repoRoot } = mkTempGitRepo();
-  const glmConfig = {
-    executor: { command: 'claude', args: ['{prompt}'] },
-    executors: {
-      glm: {
-        kind: 'agent',
-        description: 'Claude Code CLI routing to OpenRouter GLM 5.2 model',
-        command: 'claude',
-        args: ['-p', '{prompt}', '--model', '{model}'],
-        allowCrossProvider: true,
-        env: {
-          ANTHROPIC_BASE_URL: 'https://openrouter.ai/api',
-          ANTHROPIC_AUTH_TOKEN: '${GLM_OPENROUTER_API_KEY}',
-          ANTHROPIC_MODEL: 'z-ai/glm-5.2',
-          ANTHROPIC_API_KEY: '',
+  // The project config under test merges with the global one at HOME; a real
+  // ~/.fgos/config.json on the machine must not leak executors into it.
+  const originalHome = process.env.HOME;
+  process.env.HOME = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-test-home-'));
+  try {
+    const { repoRoot } = mkTempGitRepo();
+    const glmConfig = {
+      executor: { command: 'claude', args: ['{prompt}'] },
+      executors: {
+        glm: {
+          kind: 'agent',
+          description: 'Claude Code CLI routing to OpenRouter GLM 5.2 model',
+          command: 'claude',
+          args: ['-p', '{prompt}', '--model', '{model}'],
+          allowCrossProvider: true,
+          env: {
+            ANTHROPIC_BASE_URL: 'https://openrouter.ai/api',
+            ANTHROPIC_AUTH_TOKEN: '${GLM_OPENROUTER_API_KEY}',
+            ANTHROPIC_MODEL: 'z-ai/glm-5.2',
+            ANTHROPIC_API_KEY: '',
+          },
         },
       },
-    },
-    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
-    timeoutMs: 1000,
-  };
-  const fgosDir = path.join(repoRoot, '.fgos');
-  fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({ runner: glmConfig }, null, 2));
-
-  const cfg = loadRunnerConfigFromDir(repoRoot);
-  assert.ok(cfg.executors.glm, 'executors.glm is registered');
-  assert.equal(cfg.executors.glm.kind, 'agent');
-  assert.equal(cfg.executors.glm.command, 'claude');
-  assert.equal(cfg.executors.glm.env.ANTHROPIC_BASE_URL, 'https://openrouter.ai/api');
-  assert.equal(cfg.executors.glm.env.ANTHROPIC_AUTH_TOKEN, '${GLM_OPENROUTER_API_KEY}');
-  assert.equal(cfg.executors.glm.env.ANTHROPIC_MODEL, 'z-ai/glm-5.2');
-  assert.equal(cfg.executors.glm.env.ANTHROPIC_API_KEY, '');
-
-  const res = resolveExecutorCommand(cfg, { prompt: 'test', model: 'sonnet', tier: 'standard', executorId: 'glm' });
-  assert.equal(res.command, 'claude');
-  assert.equal(res.provider, 'claude');
+      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+      timeoutMs: 1000,
+    };
+    const fgosDir = path.join(repoRoot, '.fgos');
+    fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({ runner: glmConfig }, null, 2));
+  
+    const cfg = loadRunnerConfigFromDir(repoRoot);
+    assert.ok(cfg.executors.glm, 'executors.glm is registered');
+    assert.equal(cfg.executors.glm.kind, 'agent');
+    assert.equal(cfg.executors.glm.command, 'claude');
+    assert.equal(cfg.executors.glm.env.ANTHROPIC_BASE_URL, 'https://openrouter.ai/api');
+    assert.equal(cfg.executors.glm.env.ANTHROPIC_AUTH_TOKEN, '${GLM_OPENROUTER_API_KEY}');
+    assert.equal(cfg.executors.glm.env.ANTHROPIC_MODEL, 'z-ai/glm-5.2');
+    assert.equal(cfg.executors.glm.env.ANTHROPIC_API_KEY, '');
+  
+    const res = resolveExecutorCommand(cfg, { prompt: 'test', model: 'sonnet', tier: 'standard', executorId: 'glm' });
+    assert.equal(res.command, 'claude');
+    assert.equal(res.provider, 'claude');
+  } finally {
+    process.env.HOME = originalHome;
+  }
 });
 
 // --- DispatchPlan / compileDispatchPlan & decide --for capabilities.prefer (tsk-5x7-1) ---
