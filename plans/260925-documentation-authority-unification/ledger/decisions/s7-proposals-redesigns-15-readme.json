@@ -1,0 +1,141 @@
+{
+  "version": 1,
+  "shard": "s7-proposals-redesigns-15-readme.json",
+  "authorSession": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+  "authorshipRequired": true,
+  "sources": [
+    "docs/architect/proposals/README.md"
+  ],
+  "files": [
+    {
+      "path": "docs/architect/proposals/README.md",
+      "disposition": "supersede",
+      "rationale": "place verbatim: Keep the map collection-index as a candidate snapshot. Its active list is historical source wording and will not describe the final live/history split; navigation owner owes reviewed update, no silent rewrite now. Evidence: Source Active Proposals and Handoff Prompts lists six entries, with five active proposal links; it omits later siblings. The map explicitly assigns collection-index; no semantic required-root consumer was found (README.md basename matches are unrelated). Frozen map target unchanged. Source remains intact until cutover. Whole-unit supersede is the frozen vocabulary\u2019s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
+      "targets": [
+        "docs/platform/proposals/README.md"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "claimId": "claim_5f915941b6acdfb3a08345abf0e0719e",
+      "sourceUnitDigest": "5c24a592f7b19694cd316b58db92a582e861d992ade3752bc722824e49941fca",
+      "targetOwner": "docs/platform/proposals/README.md",
+      "targetAnchor": "architect-level-proposals",
+      "targetUnitDigest": "03330e9b08cb144dc36c76550e849444c3e07f5a13ec984602cf4268698e6fc6",
+      "targetAncestry": [],
+      "claimKind": "architecture",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep the map collection-index as a candidate snapshot. Its active list is historical source wording and will not describe the final live/history split; navigation owner owes reviewed update, no silent rewrite now. Evidence: Source Active Proposals and Handoff Prompts lists six entries, with five active proposal links; it omits later siblings. The map explicitly assigns collection-index; no semantic required-root consumer was found (README.md basename matches are unrelated). Complete source heading docs/architect/proposals/README.md#architect-level-proposals (lines 1\u20131) is carried at docs/platform/proposals/README.md#architect-level-proposals (lines 1\u20131); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary\u2019s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+    },
+    {
+      "claimId": "claim_25b51a36a5abf6a4190291ac4da1f037",
+      "sourceUnitDigest": "a53e19b7b54a5568a7e7b6fdaabb2f786438aa6642d8d6629cecbd6a75326fdf",
+      "targetOwner": "docs/platform/proposals/README.md",
+      "targetAnchor": "unheaded-block-4",
+      "targetUnitDigest": "a53e19b7b54a5568a7e7b6fdaabb2f786438aa6642d8d6629cecbd6a75326fdf",
+      "targetAncestry": [
+        "Architect-Level Proposals"
+      ],
+      "claimKind": "architecture",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "rationale": "Weak-exact: document exact share below one half. place verbatim: Keep the map collection-index as a candidate snapshot. Its active list is historical source wording and will not describe the final live/history split; navigation owner owes reviewed update, no silent rewrite now. Evidence: Source Active Proposals and Handoff Prompts lists six entries, with five active proposal links; it omits later siblings. The map explicitly assigns collection-index; no semantic required-root consumer was found (README.md basename matches are unrelated). Complete source unheaded-block docs/architect/proposals/README.md#unheaded-block-1 (lines 3\u20136) is carried at docs/platform/proposals/README.md#unheaded-block-4 (lines 27\u201330); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary\u2019s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+    },
+    {
+      "claimId": "claim_09af0f2aa436ddd0e9171a866767c99b",
+      "sourceUnitDigest": "dfb4844a6695230f763089717cda3e5ad8eeeb30f1b01308fa9beeb75eb3d5af",
+      "targetOwner": "docs/platform/proposals/README.md",
+      "targetAnchor": "unheaded-block-5",
+      "targetUnitDigest": "dfb4844a6695230f763089717cda3e5ad8eeeb30f1b01308fa9beeb75eb3d5af",
+      "targetAncestry": [
+        "Architect-Level Proposals"
+      ],
+      "claimKind": "architecture",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "rationale": "Weak-exact: document exact share below one half. place verbatim: Keep the map collection-index as a candidate snapshot. Its active list is historical source wording and will not describe the final live/history split; navigation owner owes reviewed update, no silent rewrite now. Evidence: Source Active Proposals and Handoff Prompts lists six entries, with five active proposal links; it omits later siblings. The map explicitly assigns collection-index; no semantic required-root consumer was found (README.md basename matches are unrelated). Complete source unheaded-block docs/architect/proposals/README.md#unheaded-block-2 (lines 8\u201311) is carried at docs/platform/proposals/README.md#unheaded-block-5 (lines 32\u201335); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary\u2019s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+    },
+    {
+      "claimId": "claim_5ccfd7d5fd348491b4c0d6b9c9bfc7f3",
+      "sourceUnitDigest": "4ed866e51da4c0c7312090bdaf830f6bfe2310113698960d6d81412fdbb41e72",
+      "targetOwner": "docs/platform/proposals/README.md",
+      "targetAnchor": "unheaded-block-6",
+      "targetUnitDigest": "4ed866e51da4c0c7312090bdaf830f6bfe2310113698960d6d81412fdbb41e72",
+      "targetAncestry": [
+        "Architect-Level Proposals"
+      ],
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "rationale": "Weak-exact: document exact share below one half. place verbatim: Keep the map collection-index as a candidate snapshot. Its active list is historical source wording and will not describe the final live/history split; navigation owner owes reviewed update, no silent rewrite now. Evidence: Source Active Proposals and Handoff Prompts lists six entries, with five active proposal links; it omits later siblings. The map explicitly assigns collection-index; no semantic required-root consumer was found (README.md basename matches are unrelated). Complete source unheaded-block docs/architect/proposals/README.md#unheaded-block-3 (lines 13\u201314) is carried at docs/platform/proposals/README.md#unheaded-block-6 (lines 37\u201338); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary\u2019s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+    },
+    {
+      "claimId": "claim_69cd8997c627f22f069222676cc25e4d",
+      "sourceUnitDigest": "35d38e36aa9ae5117a3aba40a90d734ccb07badb2f8c4c7e19984e6f6c0b1b93",
+      "targetOwner": "docs/platform/proposals/README.md",
+      "targetAnchor": "active-proposals",
+      "targetUnitDigest": "d836846ddf01300cd1a50ab447e19e2c6b478104bf0621e9f044b37446c2feb4",
+      "targetAncestry": [
+        "Architect-Level Proposals"
+      ],
+      "claimKind": "architecture",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep the map collection-index as a candidate snapshot. Its active list is historical source wording and will not describe the final live/history split; navigation owner owes reviewed update, no silent rewrite now. Evidence: Source Active Proposals and Handoff Prompts lists six entries, with five active proposal links; it omits later siblings. The map explicitly assigns collection-index; no semantic required-root consumer was found (README.md basename matches are unrelated). Complete source heading docs/architect/proposals/README.md#active-proposals (lines 16\u201316) is carried at docs/platform/proposals/README.md#active-proposals (lines 40\u201340); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary\u2019s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+    },
+    {
+      "claimId": "claim_76cd5a79f79a23ddf7bf30b53312aadf",
+      "sourceUnitDigest": "949cee59831d5ac67c174f297bcdcc5837dca9532809923571987f7cb12a42b0",
+      "targetOwner": "docs/platform/proposals/README.md",
+      "targetAnchor": "unheaded-block-7",
+      "targetUnitDigest": "3d3d1d86ca10ef2ed0b784f13f86a69a4f06b906a73fcdf2eeca096c8119b5c0",
+      "targetAncestry": [
+        "Architect-Level Proposals",
+        "Active Proposals"
+      ],
+      "claimKind": "architecture",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep the map collection-index as a candidate snapshot. Its active list is historical source wording and will not describe the final live/history split; navigation owner owes reviewed update, no silent rewrite now. Evidence: Source Active Proposals and Handoff Prompts lists six entries, with five active proposal links; it omits later siblings. The map explicitly assigns collection-index; no semantic required-root consumer was found (README.md basename matches are unrelated). Complete source unheaded-block docs/architect/proposals/README.md#unheaded-block-4 (lines 18\u201328) is carried at docs/platform/proposals/README.md#unheaded-block-7 (lines 42\u201352); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary\u2019s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+    },
+    {
+      "claimId": "claim_86499a247b54e7e84a84c9cb0f477242",
+      "sourceUnitDigest": "a8367c95c72c4487eeb5157751fbacafc5293909f9720e69aa24993e050a5a53",
+      "targetOwner": "docs/platform/proposals/README.md",
+      "targetAnchor": "handoff-prompts",
+      "targetUnitDigest": "29d4d8ed08d8c765ae18fcd142e04c8ec693283df3c17e35ad468ad9e9480956",
+      "targetAncestry": [
+        "Architect-Level Proposals"
+      ],
+      "claimKind": "architecture",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep the map collection-index as a candidate snapshot. Its active list is historical source wording and will not describe the final live/history split; navigation owner owes reviewed update, no silent rewrite now. Evidence: Source Active Proposals and Handoff Prompts lists six entries, with five active proposal links; it omits later siblings. The map explicitly assigns collection-index; no semantic required-root consumer was found (README.md basename matches are unrelated). Complete source heading docs/architect/proposals/README.md#handoff-prompts (lines 30\u201330) is carried at docs/platform/proposals/README.md#handoff-prompts (lines 54\u201354); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary\u2019s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+    },
+    {
+      "claimId": "claim_f8e206eea9c8d807bb63e249dbc858f4",
+      "sourceUnitDigest": "7d017b02c78c810db5bc23280aebdcd6f9032fe6952b95fd9e94b0bde634bdef",
+      "targetOwner": "docs/platform/proposals/README.md",
+      "targetAnchor": "unheaded-block-8",
+      "targetUnitDigest": "7bc3dad8854efec710c29af55773f57e28c7bfeb70332fe07610570708216ecb",
+      "targetAncestry": [
+        "Architect-Level Proposals",
+        "Handoff Prompts"
+      ],
+      "claimKind": "architecture",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep the map collection-index as a candidate snapshot. Its active list is historical source wording and will not describe the final live/history split; navigation owner owes reviewed update, no silent rewrite now. Evidence: Source Active Proposals and Handoff Prompts lists six entries, with five active proposal links; it omits later siblings. The map explicitly assigns collection-index; no semantic required-root consumer was found (README.md basename matches are unrelated). Complete source unheaded-block docs/architect/proposals/README.md#unheaded-block-5 (lines 32\u201332) is carried at docs/platform/proposals/README.md#unheaded-block-8 (lines 56\u201356); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary\u2019s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+    }
+  ]
+}
