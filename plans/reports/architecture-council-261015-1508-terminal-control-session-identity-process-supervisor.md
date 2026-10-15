@@ -169,6 +169,27 @@ Kết luận: cả hai vế của T2 đã có bằng chứng live; điều kiệ
 
 Giới hạn: thử ngoài confinement (không qua bwrap/private-home), model rẻ nhất mỗi CLI, mỗi kịch bản chạy 1 lần; chưa thử resize trong lúc agent đang ở trạng thái `blocked` (hỏi quyền/trust).
 
+## 11. Reopen mục 2 (RT2-1/RT2-2), 2026-10-15 16:42–17:39
+
+Run `wf-run-1792057330643-71c4907b` (`architecture-advisory-reopen`), không chạy lại seat blind. Producer claude opus (flagship); reviewer + red-team **gemini-4-argon-high** (họ mới với packet này, cùng họ với nhau); explanation claude fable. Packet đã chốt: `.fgos/assignments/unit-run-1792057330846-367abcd4/producer/2/runs/01/outbox/report-1.md`, sha256 `e243e6d7…ecd1e`. Giải thích: `unit-run-1792060497202-2aed6723/producer`.
+
+| Vòng | Reviewer | Red-team |
+|---|---|---|
+| 1 | findings: RV3-1 (high), RV3-2, RV3-3 | findings: RT-R1-1 (high), RT-R1-2, RT-R1-3 |
+| 2 | **pass**, 0 finding mở; mô hình trạng thái riêng 1,042 trạng thái, 0 lần xoá nhầm | **pass**; mô hình riêng 68,846 trạng thái, 0 lần xoá nhầm (luật vòng 1: 560 lần trên 36,336) |
+
+Kết luận lớn **không đổi** (bác research nguyên trạng, không gộp supervisor, wave 1 Node, Rust mặc định hoãn, OQ1/OQ2 chờ anh). Thứ đã đổi:
+
+- **1a (lỗi reaper xoá home của worker sống):** (i) bind ghi paneId + **socket/endpoint herdr thật** đã dùng + pid binder + boundAt, nối hàm bind/launch-check/post-launch-check từ `bwrap.mjs`/`authority.mjs` qua `transport.mjs` xuống `herdr-round.mjs`, cho **mọi** round confined; (ii) mọi đường xoá phải **claim** (ghi pid + claimedAt) rồi đọc lại, khác thì bỏ; controller **từ chối bind khi home đã quá cửa sổ run**, chỉ launch trong launch-grace ngắn sau bind khi không có claim, **kiểm lại sau launch**, mất home thì đóng pane và fail round; (iii) home đã bind, binder còn sống, được giữ tới `boundAt + max(maxAgeMs, launchGrace + runTimeout + settleGrace)` bất kể herdr trả lời gì; **ND12** mới: claim của reaper đã chết chỉ được reaper sau tiếp quản. Red-team chấp nhận hai chỗ producer cố ý làm khác gợi ý của nó (ghi socket thật; bỏ qua câu trả lời pane khi binder còn sống trong cửa sổ — tránh đua với chính `settleRound` đóng pane trước `prepared.cleanup()`).
+- **T1 (RT2-2):** **cấm** quay về writer id chung; mở lại D1 chỉ khi chứng minh được loại trừ giữa các attempt độc lập trên mọi đường lock/claim.
+- **1c:** thêm đường thứ ba — herdr pane **không confined** hôm nay không nhận `FGOS_SESSION_ID` nào; phải mint id cả khi không có `launchCommandId`.
+- **1f (mới, thay ND2):** T2 đã kích hoạt nhờ bằng chứng mục 10: đóng root ngay sau split đầu; neo split vào pane worker sống; fallback `pane list` lọc theo tab **chỉ cho batch handle**; xoá hẳn `closeIfEmpty`. Hợp đồng tab đổi thành "một tab mỗi batch **khi tab còn pane**": pha tuần tự sau (reviewer/red-team sau producer) mở tab mới cùng nhãn nhóm; test `herdr-spawn-adapter.test.mjs:419-443` phải viết lại. **ALT-TAB1** (pane giữ chỗ) nếu anh muốn một tab xuyên các pha.
+- **missing expertise** lên 5 mục (thêm reclaim tài nguyên đồng thời: fencing theo cửa sổ thời gian, tiếp quản claim cũ).
+
+**Giới hạn của `pass`:** chỉ là hợp đồng không còn lỗi bị chỉ ra; mọi kiểm chứng của 1a là **mô hình trừu tượng** (giả định fs atomic, đồng hồ lệch nhỏ hơn launch-grace, endpoint đúng). Packet tự đặt cổng: 1a chưa được gọi là an toàn cho tới khi **S2** (test trên hàm thật `cleanup.mjs`/`authority.mjs`) pass; confidence `markerFixClosure` vẫn medium-low vì bốn luật trước đã bị counterexample chạy được đánh đổ. 1f cần **S3'** (chạy lại qua `createBatchTab` thật trong confinement). Packet viết trước khi S6 và đề xuất Rust-first có trên HEAD, nên OQ1 trong packet vẫn khuyến nghị "a, chạy S6"; S6 nay đã đo (T4 qua có điều kiện), đề xuất "d thu hẹp" chưa được seat nào phản biện.
+
+Explanation (fable) đề nghị bước kế: **(A)** viết S2 thành file test trên hàm thật trong worktree riêng, test-only, chưa chạm code production.
+
 ## Câu hỏi còn mở
 
 1. Gate `close`: mời 4 (hoặc 5, tính cả reclaim đồng thời) chuyên môn còn thiếu, hay không (`[]`)?
