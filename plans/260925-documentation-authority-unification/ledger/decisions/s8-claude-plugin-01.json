@@ -24,11 +24,17 @@
       "targetAnchor": "unheaded-block-1",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
       "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "reviewNote": "deep: front matter diff is the single line coverage full to coverage partial; rest byte-equal; digests recomputed; supersede true",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1451-specs-ui-bounded-rereview-6b8d84f9e.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "58252dca40b604e3b4e45c81a0c33677faa99a1a546c68b28956ea06d6dddeed",
-      "targetAncestry": []
+      "targetAncestry": [],
+      "reviewReportCommit": "af0057e1347f180e699d6580e7fe5d50c9319899"
     },
     {
       "claimId": "claim_c7e7f597fc9c30ce57b225834fc66afa",
@@ -37,11 +43,17 @@
       "targetAnchor": "spec-fgos-plugin-claude-code-slash-command-surface",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
       "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The heading or scaffolding binding changes while its source heading text remains. Legacy source untouched; no promotion or cutover approval.",
+      "reviewNote": "deep: title section diff = metadata block plus labelled note naming the truth corrections; source heading unchanged so move is true; digests recomputed",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1451-specs-ui-bounded-rereview-6b8d84f9e.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "d6668e44d9a9903c4991b93694cce7417b44ed7543f45451de9918a45e257245",
-      "targetAncestry": []
+      "targetAncestry": [],
+      "reviewReportCommit": "af0057e1347f180e699d6580e7fe5d50c9319899"
     },
     {
       "claimId": "claim_a3670407e66560218ba2688dd31075c7",
@@ -71,13 +83,19 @@
       "targetAnchor": "entry-points-triggers",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
       "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "reviewNote": "deep: entry-points section diff is the one /fgOS:check bullet replaced; byte-equal otherwise; digests recomputed; supersede true",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1451-specs-ui-bounded-rereview-6b8d84f9e.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "80047ed46735979a109e623515a4466175a7519b84211a9d69a44f4d89f0ac94",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)"
-      ]
+      ],
+      "reviewReportCommit": "af0057e1347f180e699d6580e7fe5d50c9319899"
     },
     {
       "claimId": "claim_d2d19426a24c78719c9ceb11bf924d33",
@@ -86,14 +104,20 @@
       "targetAnchor": "unheaded-block-5",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
       "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "reviewNote": "deep: unheaded block diff is the same /fgOS:check bullet only; digests recomputed; supersede true",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1451-specs-ui-bounded-rereview-6b8d84f9e.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "5d247f3352fcd65e47112e59a6bd5274a6236eaebc24680e7df7716c361f6871",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Entry Points & Triggers"
-      ]
+      ],
+      "reviewReportCommit": "af0057e1347f180e699d6580e7fe5d50c9319899"
     },
     {
       "claimId": "claim_74a311a5ab882fe8ee4806125167e2d4",
@@ -102,19 +126,13 @@
       "targetAnchor": "data-dictionary",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/fgos-plugin.md#data-dictionary (source lines 37-37) is carried at docs/platform/claude-plugin/spec.md#data-dictionary (candidate lines 59-59). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "reviewNote": "deep: seeded sample. Heading section data-dictionary (starts # Element Meaning Values Required Default) read in full both directions: source lines 37-37 equal target lines 59-59 byte for byte, shifted only by the 22 added lines; rationale (short heading title makes it Weak-exact, digest equal, whole unit carried) is true; no link rewrite.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-08-1276467f3.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "5f7bbc0ccb0a688217a410356a618559820b7dfd24315cdd7dde1ca8ba7df0be",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "targetUnitDigest": "80aad4984704cb2169f9b47f19b917eb49396d225f5ba07cd499b7ce6c68e015",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)"
-      ],
-      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
+      ]
     },
     {
       "claimId": "claim_b78f1258e64bd182d527105502e087be",
@@ -122,21 +140,15 @@
       "targetOwner": "docs/platform/claude-plugin/spec.md",
       "targetAnchor": "unheaded-block-6",
       "claimKind": "specification",
-      "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/fgos-plugin.md#unheaded-block-4 (source lines 39-45) is carried at docs/platform/claude-plugin/spec.md#unheaded-block-6 (candidate lines 61-67). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "reviewNote": "mechanical: unheaded block unheaded-block-4 lines 39-45 to unheaded-block-6 lines 61-67, equal full digest and ancestry, anchors exist, shard equals pack, source blob equals its pin; text not read line by line. Digest also hand-recomputed in a seeded independent script.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-08-1276467f3.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "c4423a6e79bd0e75d2d4ddce1e935e386ad69ad08b3411958a40879bf0a320f9",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "targetUnitDigest": "8341c4c3c7e2671f39ab511ae332704e9a4b035737fd9539169c805b7093eeae",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Data Dictionary"
-      ],
-      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
+      ]
     },
     {
       "claimId": "claim_3ec4250ed3c32495b43a85a96c5cff70",
@@ -571,14 +583,20 @@
       "targetAnchor": "check",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
       "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "reviewNote": "deep: check heading section diff is the single Runs-when line (legacy only, no skill shipped); digests recomputed; supersede true",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1451-specs-ui-bounded-rereview-6b8d84f9e.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "dc17e82d43d791ef16b8c9321ad8ddc5160f98ef5595cae774118463ea650e47",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Behaviors & Operations"
-      ]
+      ],
+      "reviewReportCommit": "af0057e1347f180e699d6580e7fe5d50c9319899"
     },
     {
       "claimId": "claim_511605d386df9bae4aa29fb1baad15ac",
@@ -586,10 +604,10 @@
       "targetOwner": "docs/platform/claude-plugin/spec.md",
       "targetAnchor": "unheaded-block-16",
       "claimKind": "specification",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
-      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The heading or scaffolding binding changes while its source heading text remains. Legacy source untouched; no promotion or cutover approval.",
+      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+      "rationale": "A19 corrected Runs-when text supersedes stale unheaded block; no heading-binding rationale. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
       "targetUnitDigest": "198b783f76cc48a151d57bb5ecad73617c356411d147ae4374d67c274934918b",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
@@ -694,19 +712,13 @@
       "targetAnchor": "actors-access",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/fgos-plugin.md#actors-access (source lines 133-133) is carried at docs/platform/claude-plugin/spec.md#actors-access (candidate lines 155-155). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "reviewNote": "deep: seeded sample. Heading section actors-access (starts Capability Person in a Claude Code session) read in full both directions: source lines 133-133 equal target lines 155-155 byte for byte, shifted only by the 22 added lines; rationale (short heading title makes it Weak-exact, digest equal, whole unit carried) is true; no link rewrite.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-08-1276467f3.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "4be8acef415d77200e8b8bef2f2f78665c99cf7882f2395a2597c5b9b99c8f01",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "targetUnitDigest": "b1405975f4c717c854a7bb988a6af790be278401ffa1d415b2a24ec69c442c50",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)"
-      ],
-      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
+      ]
     },
     {
       "claimId": "claim_32b42cc343ea5bed231dbfd43ef4b433",
@@ -714,21 +726,15 @@
       "targetOwner": "docs/platform/claude-plugin/spec.md",
       "targetAnchor": "unheaded-block-19",
       "claimKind": "specification",
-      "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/fgos-plugin.md#unheaded-block-17 (source lines 135-138) is carried at docs/platform/claude-plugin/spec.md#unheaded-block-19 (candidate lines 157-160). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "reviewNote": "mechanical: unheaded block unheaded-block-17 lines 135-138 to unheaded-block-19 lines 157-160, equal full digest and ancestry, anchors exist, shard equals pack, source blob equals its pin; text not read line by line.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-08-1276467f3.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "e02f12896615760aad3f55c30a0d47c09cf0019eb7e05580b82722c372172891",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "targetUnitDigest": "f88a5c11a70dda7a7cf1102658cb21c3ee1d7b7f469f764954a389a4ca599993",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Actors & Access"
-      ],
-      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
+      ]
     },
     {
       "claimId": "claim_dd811f34a76357f46fd5bdf22fc90c93",
@@ -759,13 +765,19 @@
       "targetAnchor": "business-rules",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
       "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "reviewNote": "deep: business-rules section diff is exactly R1 and R4 replaced (corrections 09 and 10); byte-equal otherwise; digests recomputed",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1451-specs-ui-bounded-rereview-6b8d84f9e.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "cfa6959da586958a88ea42331b22902773cd833a358b142574d13593c9af525e",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)"
-      ]
+      ],
+      "reviewReportCommit": "af0057e1347f180e699d6580e7fe5d50c9319899"
     },
     {
       "claimId": "claim_9ab01867539b225be5a4ee39b7034cd5",
@@ -774,14 +786,20 @@
       "targetAnchor": "unheaded-block-21",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
       "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "reviewNote": "deep: unheaded block diff is exactly R1 and R4 replaced; digests recomputed (hand sha256 not needed, extractor equal); supersede true",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1451-specs-ui-bounded-rereview-6b8d84f9e.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "542aa6780221f52af7820095996d0b162a74cba2340128ff3ea4dbbeb4a119e3",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Business Rules"
-      ]
+      ],
+      "reviewReportCommit": "af0057e1347f180e699d6580e7fe5d50c9319899"
     },
     {
       "claimId": "claim_4ce8e817a2b14600b8261d72b1e36eb7",
@@ -833,13 +851,19 @@
       "targetAnchor": "open-gaps",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
       "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "reviewNote": "deep: open-gaps section diff is the single none bullet replaced (correction 11); digests recomputed; supersede true",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1451-specs-ui-bounded-rereview-6b8d84f9e.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "1c4c9c17c18d25d57bc4e8eac5addd11d18c6461579925842e2abb6a21966d9e",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)"
-      ]
+      ],
+      "reviewReportCommit": "af0057e1347f180e699d6580e7fe5d50c9319899"
     },
     {
       "claimId": "claim_2a1e1a761f429a1927ca41e55ee824a1",
@@ -848,14 +872,20 @@
       "targetAnchor": "unheaded-block-23",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
       "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "reviewNote": "deep: one-line block replaced by the partial-spec statement; byte-equal otherwise; digests recomputed",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1451-specs-ui-bounded-rereview-6b8d84f9e.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "493f04e9b160ae52c07e87a65bdb834ae38825f834a6ba98e9d398d49d7950cc",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Open Gaps"
-      ]
+      ],
+      "reviewReportCommit": "af0057e1347f180e699d6580e7fe5d50c9319899"
     },
     {
       "claimId": "claim_b205316c744392664543f72460d2d7c9",
@@ -907,13 +937,19 @@
       "targetAnchor": "pointers-implementation",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
       "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "reviewNote": "deep: pointers section diff is the one skills-per-verb bullet (correction 12); digests recomputed; supersede true",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1451-specs-ui-bounded-rereview-6b8d84f9e.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "a59342013a31dbacd5d48cdbbb4b6ddd5e842c1e76558f9305e6f18ab5eab0b0",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)"
-      ]
+      ],
+      "reviewReportCommit": "af0057e1347f180e699d6580e7fe5d50c9319899"
     },
     {
       "claimId": "claim_7937db7d5974c226d7e05f97326a5bc9",
@@ -922,14 +958,20 @@
       "targetAnchor": "unheaded-block-25",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
       "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "reviewNote": "deep: unheaded block diff is the same single bullet; digests recomputed",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1451-specs-ui-bounded-rereview-6b8d84f9e.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "4e3b4f507555fb6843e8d5e9f62011e33500cb02d4d6ca4f36628f94071df1dd",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Pointers (implementation)"
-      ]
+      ],
+      "reviewReportCommit": "af0057e1347f180e699d6580e7fe5d50c9319899"
     }
   ]
 }

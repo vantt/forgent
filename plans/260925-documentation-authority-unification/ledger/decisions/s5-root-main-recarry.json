@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "shard": "s5-root-main-recarry.json",
+  "authorSession": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+  "authorshipRequired": true,
+  "sources": [
+    "docs/architecture-manifest.json",
+    "docs/io-contract.md"
+  ],
+  "claims": [
+    {
+      "claimId": "claim_f9c135d80cce2e8cf98c8b3b5b0db4ad",
+      "sourceUnitDigest": "70c00c205578fc34084e5bf8701a6bde0999cb6f05a1b58f8424ad95ed4c28d4",
+      "targetOwner": "docs/platform/contracts/architecture-manifest.json",
+      "targetAnchor": "file-block",
+      "targetUnitDigest": "70c00c205578fc34084e5bf8701a6bde0999cb6f05a1b58f8424ad95ed4c28d4",
+      "targetAncestry": [],
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+      "rationale": "A31 native current source identity; full changed source unit carried verbatim in existing candidate owner. Main-only before/after retained in step8-final-rework-accounting.json. No predecessor identity graft or approval carry; no current-truth or promotion approval."
+    },
+    {
+      "claimId": "claim_bc091727d4f9526a57978e0ccc1cd5f7",
+      "sourceUnitDigest": "d1af2d5a982f5d139fda776a23b4ad0b3776cc40c1fc0177636c44bdc91b968d",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-22",
+      "targetUnitDigest": "d1af2d5a982f5d139fda776a23b4ad0b3776cc40c1fc0177636c44bdc91b968d",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "4. Exit Codes"
+      ],
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+      "rationale": "A31 native current source identity; full changed source unit carried verbatim in existing candidate owner. Main-only before/after retained in step8-final-rework-accounting.json. No predecessor identity graft or approval carry; no current-truth or promotion approval."
+    },
+    {
+      "claimId": "claim_812873a889bd4222ea0ab3dc9194e1ad",
+      "sourceUnitDigest": "131cc0704d753f35dcbec3ebba7be49a0d103732b6f4ee8c5ecc175d5c46167e",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-23",
+      "targetUnitDigest": "131cc0704d753f35dcbec3ebba7be49a0d103732b6f4ee8c5ecc175d5c46167e",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "4. Exit Codes"
+      ],
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+      "rationale": "A31 native current source identity; full changed source unit carried verbatim in existing candidate owner. Main-only before/after retained in step8-final-rework-accounting.json. No predecessor identity graft or approval carry; no current-truth or promotion approval."
+    }
+  ]
+}

@@ -823,8 +823,8 @@
       "path": "docs/platform/claude-plugin/spec.md",
       "kind": "spec",
       "source": "docs/specs/fgos-plugin.md",
-      "sha256": "d12fb761a43ea55a866cdb590de3a8c091ab98e0326efe49e86a856b579336b4",
-      "bytes": 11727,
+      "sha256": "428f4043212d8b0fc7e635957f956db9be01549b6ddc9c9228cf5a79da8007bb",
+      "bytes": 11817,
       "designStatus": "Candidate",
       "canonical": false,
       "units": 47
@@ -833,8 +833,8 @@
       "path": "docs/platform/herdr-web-dashboard/spec.md",
       "kind": "spec",
       "source": "docs/specs/herdr-web-dashboard.md",
-      "sha256": "3138949a469601d3824d0ddf792954e23c7c155c4be8473243cffb1fe38c33ad",
-      "bytes": 22983,
+      "sha256": "7b5fe48ff585963bfbfc903ac1aa840fa7db58a80a51d72d8cbf73008d9cff80",
+      "bytes": 22973,
       "designStatus": "Candidate",
       "canonical": false,
       "units": 46
@@ -1962,11 +1962,12 @@
       "sourceDigest": "5f7bbc0ccb0a688217a410356a618559820b7dfd24315cdd7dde1ca8ba7df0be",
       "targetOwner": "docs/platform/claude-plugin/spec.md",
       "targetAnchor": "data-dictionary",
-      "targetDigest": "5f7bbc0ccb0a688217a410356a618559820b7dfd24315cdd7dde1ca8ba7df0be",
-      "class": "Weak-exact",
-      "classReason": "source unit shorter than 40 characters",
-      "mandatoryDeep": false,
-      "fullSourceUnitContained": true
+      "targetDigest": "80aad4984704cb2169f9b47f19b917eb49396d225f5ba07cd499b7ce6c68e015",
+      "class": "Judgment",
+      "classReason": "A40/A19 corrected target requires bounded review",
+      "mandatoryDeep": true,
+      "fullSourceUnitContained": false,
+      "truthCorrection": true
     },
     {
       "claimId": "claim_b78f1258e64bd182d527105502e087be",
@@ -1979,11 +1980,12 @@
       "sourceDigest": "c4423a6e79bd0e75d2d4ddce1e935e386ad69ad08b3411958a40879bf0a320f9",
       "targetOwner": "docs/platform/claude-plugin/spec.md",
       "targetAnchor": "unheaded-block-6",
-      "targetDigest": "c4423a6e79bd0e75d2d4ddce1e935e386ad69ad08b3411958a40879bf0a320f9",
-      "class": "Unit-exact",
-      "classReason": "unique long digest match, equal ancestry, sufficient document exact share",
-      "mandatoryDeep": false,
-      "fullSourceUnitContained": true
+      "targetDigest": "8341c4c3c7e2671f39ab511ae332704e9a4b035737fd9539169c805b7093eeae",
+      "class": "Judgment",
+      "classReason": "A40/A19 corrected target requires bounded review",
+      "mandatoryDeep": true,
+      "fullSourceUnitContained": false,
+      "truthCorrection": true
     },
     {
       "claimId": "claim_3ec4250ed3c32495b43a85a96c5cff70",
@@ -2339,7 +2341,7 @@
       "targetAnchor": "unheaded-block-16",
       "targetDigest": "198b783f76cc48a151d57bb5ecad73617c356411d147ae4374d67c274934918b",
       "class": "Judgment",
-      "classReason": "no target digest match",
+      "classReason": "A40/A19 corrected target requires bounded review",
       "mandatoryDeep": true,
       "fullSourceUnitContained": false,
       "truthCorrection": true
@@ -2423,11 +2425,12 @@
       "sourceDigest": "4be8acef415d77200e8b8bef2f2f78665c99cf7882f2395a2597c5b9b99c8f01",
       "targetOwner": "docs/platform/claude-plugin/spec.md",
       "targetAnchor": "actors-access",
-      "targetDigest": "4be8acef415d77200e8b8bef2f2f78665c99cf7882f2395a2597c5b9b99c8f01",
-      "class": "Weak-exact",
-      "classReason": "source unit shorter than 40 characters",
-      "mandatoryDeep": false,
-      "fullSourceUnitContained": true
+      "targetDigest": "b1405975f4c717c854a7bb988a6af790be278401ffa1d415b2a24ec69c442c50",
+      "class": "Judgment",
+      "classReason": "A40/A19 corrected target requires bounded review",
+      "mandatoryDeep": true,
+      "fullSourceUnitContained": false,
+      "truthCorrection": true
     },
     {
       "claimId": "claim_32b42cc343ea5bed231dbfd43ef4b433",
@@ -2440,11 +2443,12 @@
       "sourceDigest": "e02f12896615760aad3f55c30a0d47c09cf0019eb7e05580b82722c372172891",
       "targetOwner": "docs/platform/claude-plugin/spec.md",
       "targetAnchor": "unheaded-block-19",
-      "targetDigest": "e02f12896615760aad3f55c30a0d47c09cf0019eb7e05580b82722c372172891",
-      "class": "Unit-exact",
-      "classReason": "unique long digest match, equal ancestry, sufficient document exact share",
-      "mandatoryDeep": false,
-      "fullSourceUnitContained": true
+      "targetDigest": "f88a5c11a70dda7a7cf1102658cb21c3ee1d7b7f469f764954a389a4ca599993",
+      "class": "Judgment",
+      "classReason": "A40/A19 corrected target requires bounded review",
+      "mandatoryDeep": true,
+      "fullSourceUnitContained": false,
+      "truthCorrection": true
     },
     {
       "claimId": "claim_dd811f34a76357f46fd5bdf22fc90c93",
@@ -2789,9 +2793,9 @@
       "sourceDigest": "44a01f946d9c3f460bbcf473ebb31d1c1911d455e66846c50ddd05c3fd30471e",
       "targetOwner": "docs/platform/herdr-web-dashboard/spec.md",
       "targetAnchor": "entry-points-triggers",
-      "targetDigest": "8a8bbf7b6a16f552ae3fbb6a38fdf71f7e86b7de9853c6da29e9958ab0aba79a",
+      "targetDigest": "6b9ec38a44ed69f50f87f21ed48ebb13d3955c582b4df66d5759e5a79b6eca37",
       "class": "Judgment",
-      "classReason": "no target digest match",
+      "classReason": "A40/A19 corrected target requires bounded review",
       "mandatoryDeep": true,
       "fullSourceUnitContained": false,
       "truthCorrection": true
@@ -2807,9 +2811,9 @@
       "sourceDigest": "6fe8b44476ba00c6aa3e5c46960ec7e060c6186fffd0f444669a3bc8950cb176",
       "targetOwner": "docs/platform/herdr-web-dashboard/spec.md",
       "targetAnchor": "unheaded-block-9",
-      "targetDigest": "8de029edb99b82340cfc8c7d129d09c9cb7d493ac7e17bc2008056f4eb0290ec",
+      "targetDigest": "d6b2d0ae401b9c164dcb2da55dd7163e754c2dacd1b7b3bd7071a71b3be46cb7",
       "class": "Judgment",
-      "classReason": "no target digest match",
+      "classReason": "A40/A19 corrected target requires bounded review",
       "mandatoryDeep": true,
       "fullSourceUnitContained": false,
       "truthCorrection": true
@@ -3303,9 +3307,9 @@
       "sourceDigest": "7eb0dd6b83a72e530a30575cbf43286ab809b83fba028d19ff465496a540375f",
       "targetOwner": "docs/platform/herdr-web-dashboard/spec.md",
       "targetAnchor": "open-gaps",
-      "targetDigest": "b6cb7f404452ffa2bd04ddc9e4af9a41e9c0a8471018381a226eb374d84e4448",
+      "targetDigest": "ec3d3fa7611b4dd2fbad534d5dbf7a81055e2a0da7577b194a486ee26103dbe3",
       "class": "Judgment",
-      "classReason": "no target digest match",
+      "classReason": "A40/A19 corrected target requires bounded review",
       "mandatoryDeep": true,
       "fullSourceUnitContained": false,
       "truthCorrection": true
@@ -3321,9 +3325,9 @@
       "sourceDigest": "ef410a08c708a2f590fd777deb282577a8712b80ca1eee9522247534cc06ad99",
       "targetOwner": "docs/platform/herdr-web-dashboard/spec.md",
       "targetAnchor": "unheaded-block-25",
-      "targetDigest": "c1636dcb33981d273c811c4a29d9f600b05a8b16d83d96b73cee5f7a6be11a4a",
+      "targetDigest": "550e42d570ef825d96c3d1f339b8fc0d20b82e1b486ba6d4529191fb45cafda4",
       "class": "Judgment",
-      "classReason": "no target digest match",
+      "classReason": "A40/A19 corrected target requires bounded review",
       "mandatoryDeep": true,
       "fullSourceUnitContained": false,
       "truthCorrection": true
@@ -10832,9 +10836,9 @@
     }
   ],
   "classCounts": {
-    "Unit-exact": 254,
-    "Weak-exact": 242,
-    "Judgment": 70
+    "Unit-exact": 252,
+    "Weak-exact": 240,
+    "Judgment": 74
   },
   "pendingRows": 566,
   "reviewedRows": 0,

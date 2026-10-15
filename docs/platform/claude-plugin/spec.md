@@ -60,7 +60,7 @@ convenience layer on top of that.
 
 | # | Element | Meaning | Values | Required | Default |
 |---|---------|---------|--------|----------|---------|
-| 1 | Work item id | The identifier of the item a command acts on or reports on | free text, must match an existing item for verbs that require one | required for `move`/`return`/`ask`/`answer`/`rollup`; optional for `pick`/`check`/`graph` | — (no default; an optional id omitted means "every item" for `check`, "the frontier head" for `pick`, "full metrics" for `graph`) |
+| 1 | Work item id | The identifier of the item a command acts on or reports on | free text, must match an existing item for verbs that require one | required for `move`/`return`/`ask`/`answer`/`rollup`; optional for `pick`/`graph`; `check` has no shipped plugin skill | — (no default; an optional id omitted means "the frontier head" for `pick`, "full metrics" for `graph`; the legacy `check` description does not define a shipped skill) |
 | 2 | Target status | The status `move` transitions a work item to | any status in the item's lifecycle (owned by Work-State) | yes, for `move` | — |
 | 3 | Question text | The question attached when parking an item | free text | yes, for `ask` | — |
 | 4 | Answer text | The answer recorded to resume a parked item | free text | yes, for `answer` | — |
@@ -157,7 +157,7 @@ convenience layer on top of that.
 | Capability | Person in a Claude Code session |
 |---|---|
 | Submit / pick / move / return / ask / answer (mutating verbs) | ✓ |
-| Read frontier / staleness / rollup / check / graph / conflicts | ✓ |
+| Read frontier / staleness / rollup / graph / conflicts (`check` has no shipped skill) | ✓ |
 
 Every command runs as whatever role the underlying tool itself assigns (a
 human role for the mutating verbs) — the plugin layer introduces no separate

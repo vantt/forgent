@@ -344,46 +344,18 @@
     },
     {
       "claimId": "claim_f50b3640275fce5d0a7e8d4f4077c0c9",
-      "sourceUnitDigest": "3f95d2bd43575ae5",
+      "sourceUnitDigest": "f985a572644eee3e4fdf9f719940e9078fecbc2c2fe0ec50ff8cd7fdfdbd67f7",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "4-exit-codes",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "H3 'Mã thoát (exit code) — một nguồn duy nhất' becomes the H2 '4. Exit Codes' in the frozen layout (level and title changed, single-source claim kept in the body).",
-      "authoredBy": "codex-session:1@2026-10-08",
-      "reviewNote": "Provenance re-confirmation: row byte-equal to its reviewed form at 7df871822 apart from the added authoredBy and the reset review fields; source L73-73 -> target L168-168 (contract/promote); target differs from source by 2 changed line(s), as the row rationale declares; the sidecar digests extend the decision's short digests and are unchanged since the prior pass. Old approval not carried: now pending.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
-      "reviewedAt": "2026-10-09",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-b-io-contract.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "36cd92b838deaea9ab436d4ea4f625f0d9659abe608c13cb7a46f674d704461f",
+      "reviewStatus": "pending",
+      "rationale": "A31 current source digest rebound; decision-digest-stale resolved. A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+      "targetUnitDigest": "a029b383e97c19e4f3b02c023dee86e46857fbf21c1429b169d5568fd40e723f",
       "targetAncestry": [
         "CLI I/O Contract"
-      ],
-      "reviewReportCommit": "7f8d12784d642097c17e7a7ebdfa4cff43aabbee"
-    },
-    {
-      "claimId": "claim_2fa062c56cf4226e8519e768a5b5cab4",
-      "sourceUnitDigest": "3727b3fa0ee79f8b",
-      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "targetAnchor": "unheaded-block-22",
-      "claimKind": "contract",
-      "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "EXIT_CODES table plus EXIT_BUSY (6) as the only exit-code table, branch on category not message, carried verbatim under 4. Exit Codes.",
-      "authoredBy": "codex-session:1@2026-10-08",
-      "reviewNote": "Provenance re-confirmation: row byte-equal to its reviewed form at 7df871822 apart from the added authoredBy and the reset review fields; source L75-79 -> target L170-174 (contract/promote); target text byte-equal to source; the sidecar digests extend the decision's short digests and are unchanged since the prior pass. Old approval not carried: now pending.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
-      "reviewedAt": "2026-10-09",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-b-io-contract.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "3727b3fa0ee79f8b0b38d0e9fc868e336e85f10e12f7dbd47a34d140f3681127",
-      "targetAncestry": [
-        "CLI I/O Contract",
-        "4. Exit Codes"
-      ],
-      "reviewReportCommit": "7f8d12784d642097c17e7a7ebdfa4cff43aabbee"
+      ]
     },
     {
       "claimId": "claim_27d4d4dca46d6a8859628c443df0b31e",
@@ -408,47 +380,35 @@
     },
     {
       "claimId": "claim_da21278ab32966f6631c82420552ed2b",
-      "sourceUnitDigest": "c34e8e9c9dbf41ce",
-      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "targetAnchor": "unheaded-block-27",
-      "claimKind": "contract",
-      "disposition": "merge",
-      "reviewStatus": "reviewed",
-      "rationale": "Opaque-cursor paragraph (four paginated verbs, {items, nextCursor}, validation error for a departed item, conflicts not paginated) carried verbatim; it is a strict subset of the longer work-state.md 678-702 paragraph held in the preceding block under the same heading (map section 6).",
-      "authoredBy": "codex-session:1@2026-10-08",
-      "reviewNote": "Provenance re-confirmation: row byte-equal to its reviewed form at 7df871822 apart from the added authoredBy and the reset review fields; source L106-115 -> target L228-237 (contract/merge); target text byte-equal to source; the sidecar digests extend the decision's short digests and are unchanged since the prior pass. Old approval not carried: now pending.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
-      "reviewedAt": "2026-10-09",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-b-io-contract.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "c34e8e9c9dbf41ceba76b86cd175dcb894ce3eb3de6e988c2bd68a77ece385e4",
-      "targetAncestry": [
-        "CLI I/O Contract",
-        "6. Cursor Pagination"
-      ],
-      "reviewReportCommit": "7f8d12784d642097c17e7a7ebdfa4cff43aabbee"
-    },
-    {
-      "claimId": "claim_b38e730cc466114aa1e1ebba6fa880ed",
-      "sourceUnitDigest": "b82a558166f118f3",
+      "sourceUnitDigest": "c34e8e9c9dbf41ceba76b86cd175dcb894ce3eb3de6e988c2bd68a77ece385e4",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-28",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "reviewed",
-      "rationale": "The paginated field is declared on every verb in the manifest; carried verbatim as the last block of 6. Cursor Pagination, where the work-state.md paragraph also states the paginated flag.",
-      "authoredBy": "codex-session:1@2026-10-08",
-      "reviewNote": "Provenance re-confirmation: row byte-equal to its reviewed form at 7df871822 apart from the added authoredBy and the reset review fields; source L117-118 -> target L239-240 (contract/merge); target text byte-equal to source; the sidecar digests extend the decision's short digests and are unchanged since the prior pass. Old approval not carried: now pending.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
-      "reviewedAt": "2026-10-09",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-b-io-contract.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+      "targetUnitDigest": "c34e8e9c9dbf41ceba76b86cd175dcb894ce3eb3de6e988c2bd68a77ece385e4",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "6. Cursor Pagination"
+      ]
+    },
+    {
+      "claimId": "claim_b38e730cc466114aa1e1ebba6fa880ed",
+      "sourceUnitDigest": "b82a558166f118f339210d9a475214042a603bd09f64a3a2a8795d96fbdf57ce",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-29",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
       "targetUnitDigest": "b82a558166f118f339210d9a475214042a603bd09f64a3a2a8795d96fbdf57ce",
       "targetAncestry": [
         "CLI I/O Contract",
         "6. Cursor Pagination"
-      ],
-      "reviewReportCommit": "7f8d12784d642097c17e7a7ebdfa4cff43aabbee"
+      ]
     },
     {
       "claimId": "claim_fda67d0dfc15159dc0e4c62b9dfddd87",
@@ -475,24 +435,18 @@
       "claimId": "claim_535f1aeb31d616e2138a5b3719cb4cd0",
       "sourceUnitDigest": "78393c0183b6bda3ff166520f4601ab2793cbdf85e2669949001a73b9102f293",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "targetAnchor": "unheaded-block-34",
+      "targetAnchor": "unheaded-block-35",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "reviewed",
-      "rationale": "Both axes remain declarative only; the who-may-call-which-verb gate belongs to STR38. Carried verbatim under Entry Fields And Effect Axes, where work-state.md 665-676 states the same declarative-only point. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "reviewNote": "deep: Sampled. Text byte-equal, renumbered 33 to 34.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
       "targetUnitDigest": "78393c0183b6bda3ff166520f4601ab2793cbdf85e2669949001a73b9102f293",
       "targetAncestry": [
         "CLI I/O Contract",
         "7. Machine-Readable Verb Registry",
         "Entry Fields And Effect Axes"
-      ],
-      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+      ]
     },
     {
       "claimId": "claim_ba1c2ac95c9c161d9fd345e3bfa63741",
@@ -519,23 +473,17 @@
       "claimId": "claim_d0e16d088cdecf2dd0b491f819009aa6",
       "sourceUnitDigest": "a8eaefe3669a194a9fa84ca8fa92d4d58a5f7c8405e4d7c970fac1ce183148a5",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "targetAnchor": "unheaded-block-36",
+      "targetAnchor": "unheaded-block-37",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "reviewed",
-      "rationale": "multiValueFormat csv vs json-array convention (deps/refs/footprint/targets vs acceptance), carried verbatim under 8. Multi-Value Flag Convention; duplicate of work-state.md 704-711 held in the preceding block. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "reviewNote": "deep: Sampled. Text byte-equal, renumbered 35 to 36.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
       "targetUnitDigest": "a8eaefe3669a194a9fa84ca8fa92d4d58a5f7c8405e4d7c970fac1ce183148a5",
       "targetAncestry": [
         "CLI I/O Contract",
         "8. Multi-Value Flag Convention"
-      ],
-      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+      ]
     },
     {
       "claimId": "claim_6c529b87f6073cc75fdf836d3507d21d",
@@ -562,67 +510,49 @@
       "claimId": "claim_e9ee744c6e1847ef25b3eb0bf180f577",
       "sourceUnitDigest": "ae0e60ec193e0ac5ad026b2cf78a37ba3156fea7043460714946bfe66311ab5e",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "targetAnchor": "unheaded-block-40",
+      "targetAnchor": "unheaded-block-41",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "Version-token lead sentence carried into 10. Version Tokens, but CHANGED in the link: the 0011 link decisions/0011-version-tuong-minh-cho-moi-contract.md (dead) is repointed to ../decisions/retired-decision-history.md#7-adr-0011-explicit-version-for-every-contract; the wording is otherwise verbatim. The located-file match missed it for that reason. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "reviewNote": "deep: Only difference is the repointed ADR link already accepted earlier; source text digest unchanged by the merge, anchor 38 to 40.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
       "targetUnitDigest": "a378c81f6a84c5e3ed9b38917f7136c55dcc4af85295bcf105fa9ac9d6792532",
       "targetAncestry": [
         "CLI I/O Contract",
         "10. Version Tokens"
-      ],
-      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+      ]
     },
     {
       "claimId": "claim_6f7c99f38f64abb5af7f07c1e2690730",
       "sourceUnitDigest": "c9d3ad96d4b03b02fbcf8e5bd0261ab7c77109320f204a18b9a43eef0f4f1fd3",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "targetAnchor": "unheaded-block-41",
+      "targetAnchor": "unheaded-block-42",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "The five-row version-token table (fgos.v1, runner reuse, manifest 2.0, event v 3, gates CTR004/v1), carried verbatim under 10. Version Tokens. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "reviewNote": "deep: Sampled. Version-token table byte-equal, renumbered 39 to 41.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
       "targetUnitDigest": "c9d3ad96d4b03b02fbcf8e5bd0261ab7c77109320f204a18b9a43eef0f4f1fd3",
       "targetAncestry": [
         "CLI I/O Contract",
         "10. Version Tokens"
-      ],
-      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+      ]
     },
     {
       "claimId": "claim_ea280fa29dca090fe3306f6161ac6ae7",
       "sourceUnitDigest": "03c9a0137385cea34764f24cc92708d2c2c2c6a722f1e24345441232595f92cb",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "targetAnchor": "unheaded-block-42",
+      "targetAnchor": "unheaded-block-43",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "CTR006 routing-handoff is outside the version tokens (full spec but no code yet), carried verbatim. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "reviewNote": "deep: Sampled. Byte-equal, renumbered 40 to 42.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
       "targetUnitDigest": "03c9a0137385cea34764f24cc92708d2c2c2c6a722f1e24345441232595f92cb",
       "targetAncestry": [
         "CLI I/O Contract",
         "10. Version Tokens"
-      ],
-      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+      ]
     },
     {
       "claimId": "claim_95a909b7be1252ba8de3be4c15f3638e",
@@ -649,89 +579,65 @@
       "claimId": "claim_8999e61e46d6c02b407b84263d7a2d67",
       "sourceUnitDigest": "36d44c8bdf5ad1f062c83e623e68e7d429939c8bc1bc44c0b5bf36aba736078d",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "targetAnchor": "unheaded-block-43",
+      "targetAnchor": "unheaded-block-44",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "STR46 unifies existing in/out directions and does not extend to push; three items locked outside the boundary, carried verbatim under 11. Scope Boundary. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "reviewNote": "mechanical: Digests, anchor and shard/pack equality pass; text script-equal (renumbered).",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
       "targetUnitDigest": "36d44c8bdf5ad1f062c83e623e68e7d429939c8bc1bc44c0b5bf36aba736078d",
       "targetAncestry": [
         "CLI I/O Contract",
         "11. Scope Boundary"
-      ],
-      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+      ]
     },
     {
       "claimId": "claim_f10fba22a20755dc700bb1720f98f451",
       "sourceUnitDigest": "fa405ec4333b43518de9831ea52cd47228294303f0b3374b8d4a981a669414ea",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "targetAnchor": "unheaded-block-44",
+      "targetAnchor": "unheaded-block-45",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "Three out-of-scope bullets with named owners (STR48 initiating output, STR83/STR38 terminal/chat increment, STR38 permission layer), carried verbatim; a contract boundary obligation. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "reviewNote": "mechanical: Digests, anchor and shard/pack equality pass; text script-equal (renumbered).",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
       "targetUnitDigest": "fa405ec4333b43518de9831ea52cd47228294303f0b3374b8d4a981a669414ea",
       "targetAncestry": [
         "CLI I/O Contract",
         "11. Scope Boundary"
-      ],
-      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+      ]
     },
     {
       "claimId": "claim_cf56f4a8b7679435c6bf59abd8c23093",
       "sourceUnitDigest": "30a3d1465b852976e30a3aad9f6729d1f40caacbc299c7fb07e87ff06d42cff7",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "targetAnchor": "unheaded-block-45",
+      "targetAnchor": "unheaded-block-46",
       "claimKind": "historical-context",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "Explains why the original STR46 close-of-story (written when the backlog item opened) was deliberately narrowed to the spec-contract part: provenance of a past scope decision, not a normative obligation, so historical-context per the vocabulary (provenance / retired context). Text carried verbatim under 11. Scope Boundary; owner and anchor unchanged because the candidate keeps it there as part of the boundary section. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "reviewNote": "mechanical: Digests, anchor and shard/pack equality pass; text script-equal (renumbered).",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
       "targetUnitDigest": "30a3d1465b852976e30a3aad9f6729d1f40caacbc299c7fb07e87ff06d42cff7",
       "targetAncestry": [
         "CLI I/O Contract",
         "11. Scope Boundary"
-      ],
-      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+      ]
     },
     {
       "claimId": "claim_deb4b4da2abbc3d6190dfce1c75cabf2",
       "sourceUnitDigest": "fd7e473ad76cf591e6a132079c9b744fc4a8cfa5672127e446ae7c4f6f323e75",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "targetAnchor": "unheaded-block-46",
+      "targetAnchor": "unheaded-block-47",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "Also out of scope: the daemon, core verb-logic extracted as a lib, and the fgos-discovered block; carried verbatim. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "reviewNote": "deep: Sampled. Byte-equal, renumbered 44 to 46.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
       "targetUnitDigest": "fd7e473ad76cf591e6a132079c9b744fc4a8cfa5672127e446ae7c4f6f323e75",
       "targetAncestry": [
         "CLI I/O Contract",
         "11. Scope Boundary"
-      ],
-      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+      ]
     },
     {
       "claimId": "claim_7524deb4b2a1c12d1652076040bfec36",
@@ -758,23 +664,17 @@
       "claimId": "claim_d802aabd387ae98595c102f0e857f9b1",
       "sourceUnitDigest": "7fddf59545c800c11029e0609a32bd908db3409f458829aaf1afecc47bd7f4cf",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "targetAnchor": "unheaded-block-47",
+      "targetAnchor": "unheaded-block-48",
       "claimKind": "navigation",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "Reference list of legacy paths (decisions 0014/0011, specs, architecture-map, history) carried verbatim as inline code, not links; the map flags that authoring may later rewrite them, but the candidate text is currently identical to the source. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "reviewNote": "mechanical: Digests, anchor and shard/pack equality pass; text script-equal (renumbered).",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
       "targetUnitDigest": "7fddf59545c800c11029e0609a32bd908db3409f458829aaf1afecc47bd7f4cf",
       "targetAncestry": [
         "CLI I/O Contract",
         "12. References"
-      ],
-      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+      ]
     },
     {
       "claimId": "claim_2b155082055823ccabf6fb40242abe42",
@@ -824,53 +724,41 @@
   "registryGaps": [
     {
       "claimId": "claim_19495d2772ced1aa1af4b20d4640fa3a",
-      "sourceUnitDigest": "83773dda67db8d5f",
+      "sourceUnitDigest": "83773dda67db8d5f71205bb8c7106186023672125b08cbe4f33b09b0578163ca",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "targetAnchor": "unheaded-block-31",
+      "targetAnchor": "unheaded-block-32",
       "claimKind": "contract",
-      "disposition": "merge",
-      "reviewStatus": "reviewed",
-      "rationale": "fgos --help --json returns {schema_version, commands}, schema_version 2.0 raised from 1.0 because access was removed; carried verbatim under Manifest Shape, duplicating the manifest claim of work-state.md 647-663 (which adds the positional-parameter rule). A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
-      "authoredBy": "codex-session:27@2026-10-14",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
       "sourcePath": "docs/io-contract.md",
       "sourceAnchor": "unheaded-block-18",
-      "reviewNote": "deep: Old block-18 gap row; successor block-31 now holds the 3.0 text and the --help --json verb-entry sentences, matching the upstream io-contract diff.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
-      "reviewMode": "ordinary",
       "targetUnitDigest": "51dd3c8aa026a8f5a15e4c12c522b3bf2ad7c29238c49bf9ba51324806e10e23",
       "targetAncestry": [
         "CLI I/O Contract",
         "7. Machine-Readable Verb Registry",
         "Manifest Shape"
-      ],
-      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+      ]
     },
     {
       "claimId": "claim_e2377849e4ba8e3d3beaf70880e4ed23",
-      "sourceUnitDigest": "39e4ab1f30a6acc9",
+      "sourceUnitDigest": "39e4ab1f30a6acc99de534a9fd16bd348b9ef8c1827664c0a7a50487f0587c0c",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "targetAnchor": "unheaded-block-33",
+      "targetAnchor": "unheaded-block-34",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "rationale": "Whole source unit is carried. Besides replacing the coordination example with run, the diff replaces the fgos --help --json deferral with explicit current assertions: COMMAND_REGISTRY is the source, 15 verbs carry externalEffect: true, and coordination is absent. The review/approve/run examples, dispatch executor qualifier, other bullets and field definitions are conserved; no approval carries. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
-      "authoredBy": "codex-session:27@2026-10-14",
+      "reviewStatus": "pending",
+      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
       "sourcePath": "docs/io-contract.md",
       "sourceAnchor": "unheaded-block-19",
-      "reviewNote": "deep: Old block-19 gap row; successor block-33 adds the subcommands bullet verbatim and keeps the earlier registry-backed externalEffect correction.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
-      "reviewMode": "ordinary",
       "targetUnitDigest": "e013c5b05d6ff58782aa8231ab4a55967bd5ef853dac4015aec8f16f5fcf9c68",
       "targetAncestry": [
         "CLI I/O Contract",
         "7. Machine-Readable Verb Registry",
         "Entry Fields And Effect Axes"
-      ],
-      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+      ]
     },
     {
       "claimId": "claim_dd296404e1163caafba00641cf0adc79",
@@ -894,6 +782,23 @@
         "CLI I/O Contract"
       ],
       "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+    },
+    {
+      "claimId": "claim_2fa062c56cf4226e8519e768a5b5cab4",
+      "sourceUnitDigest": "3727b3fa0ee79f8b0b38d0e9fc868e336e85f10e12f7dbd47a34d140f3681127",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-22",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "A31 native source predecessor became identity gap; retain native ID, supersede accounting to current carrier. A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+      "targetUnitDigest": "d1af2d5a982f5d139fda776a23b4ad0b3776cc40c1fc0177636c44bdc91b968d",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "4. Exit Codes"
+      ],
+      "sourcePath": "docs/io-contract.md"
     }
   ]
 }

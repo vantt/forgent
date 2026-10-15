@@ -81,22 +81,16 @@
       "sourceAnchor": "unheaded-block-14",
       "sourceUnitDigest": "e24cc26161b017265526e8e287d7ddb0777cabce83f1effd56099a3ea79814e5",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:23@2026-10-14",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "targetAnchor": "unheaded-block-23",
-      "rationale": "The historical four-stream introduction is replaced by the already-reviewed current five-stream introduction in the mapped CLI I/O contract. All four original exception categories remain in the adjoining complete successor list; merged upstream explicitly adds the agent hook transport as the fifth category. This is historical-count supersession with full old/current text and immutable source provenance, not deletion inferred from absence or truth correction. The native predecessor identity stays intact, and independent acceptance of this gap disposition is still required.",
-      "reviewNote": "deep: old block 14 (05d6fc7ca, lines 83-84) reads \"Bốn luồng ...\" and the target unheaded-block-23 (lines 178-179, anchor ok) reads \"Năm luồng ...\" with the rest of the two lines identical; old to current docs/io-contract.md diff is exactly Bốn to Năm plus a fifth list item, so supersede with a count change is truthful",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261014-2105-root-closure.md",
-      "reviewMode": "ordinary",
+      "targetAnchor": "unheaded-block-24",
+      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
       "targetUnitDigest": "cb6381a3b69f2fdd99ff81b06cafbce1f45add19c7076005c59ad0e093d49be8",
       "targetAncestry": [
         "CLI I/O Contract",
         "5. Reasoned Envelope Exceptions"
-      ],
-      "reviewReportCommit": "b20dc73158d6c0a636522555da23de8428e1fc59"
+      ]
     },
     {
       "claimId": "claim_6a8087a3f502f37f9c7b729e871bee9c",
@@ -104,22 +98,16 @@
       "sourceAnchor": "unheaded-block-15",
       "sourceUnitDigest": "74809b036d96332c8fd99e73be67a5abacbef4b899eb741b946b39aed1ce1fa6",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:23@2026-10-14",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "targetAnchor": "unheaded-block-24",
-      "rationale": "The complete historical four-item exception list remains word-for-word at the beginning of the already-reviewed current five-item list. The merged upstream addition is the agent-hook exception only; the four original rationales, progress trace and stop lifecycle clause are conserved. The historical native predecessor is superseded by this exact mapped current unit, with real digest/ancestry and no identity graft, approval carry or truth certification.",
-      "reviewNote": "deep: old block 15 (lines 86-95) is a character-exact prefix of target unheaded-block-24 (lines 181-194, anchor ok); the target adds only item 5 (agent hook door, hook-transport protocol) and the old four categories, progress-trace and watch-mode clause are all intact, so the author claim of four categories plus a fifth holds; whole old unit carried so supersede (not partial-carry) is right",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261014-2105-root-closure.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "4a338e4d813b275ce1c923da4f814881eaab30a4bdca231382fd7df5c5fe9b4a",
+      "targetAnchor": "unheaded-block-25",
+      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "targetUnitDigest": "f58253403717e416cd5aa169d971bc332b43ab40f16ab6845c90d959d4283221",
       "targetAncestry": [
         "CLI I/O Contract",
         "5. Reasoned Envelope Exceptions"
-      ],
-      "reviewReportCommit": "b20dc73158d6c0a636522555da23de8428e1fc59"
+      ]
     }
   ]
 }

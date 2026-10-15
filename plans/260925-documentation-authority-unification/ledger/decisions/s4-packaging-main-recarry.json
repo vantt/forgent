@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "shard": "s4-packaging-main-recarry.json",
+  "authorSession": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+  "authorshipRequired": true,
+  "sources": [
+    "docs/specs/distribution.md"
+  ],
+  "claims": [
+    {
+      "claimId": "claim_26f62a1ae1abc17d0f02706788bfd399",
+      "sourceUnitDigest": "034305c494ee289535b1b4121c8b90ed9d2eb5b850364e1c2a63e936221d40e3",
+      "targetOwner": "docs/platform/packaging-distribution/spec.md",
+      "targetAnchor": "unheaded-block-85",
+      "targetUnitDigest": "034305c494ee289535b1b4121c8b90ed9d2eb5b850364e1c2a63e936221d40e3",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution",
+        "Data Dictionary"
+      ],
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+      "rationale": "A31 native current source identity; full changed source unit carried verbatim in existing candidate owner. Main-only before/after retained in step8-final-rework-accounting.json. No predecessor identity graft or approval carry; no current-truth or promotion approval."
+    }
+  ]
+}

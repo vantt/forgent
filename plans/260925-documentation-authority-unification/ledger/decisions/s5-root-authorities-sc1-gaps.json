@@ -12,22 +12,16 @@
       "sourceUnitDigest": "857ad2167a0283ad4b9f08a4493f324f899b84211e10234b9d0eddfb9683c63f",
       "disposition": "supersede",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "targetAnchor": "unheaded-block-32",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "reviewStatus": "reviewed",
-      "rationale": "The predecessor block 31 at 9881f8622 already states COMMAND_REGISTRY, 15 externalEffect verbs and no coordination. The only delta to the real same-file successor is adding review/approve/run examples. All other wording is retained, including field definitions, review rationale and STR38 clause. Native predecessor identity is conserved without graft or approval carry. A31 current target follows its real native identity at the current anchor; independent conservation re-review pending, no approval carry.",
-      "reviewNote": "deep: previously ok, reset to pending; target block 31 to 32 only, text digest 0b3d8cfa unchanged and unique; the predecessor differs from the target by the review/approve/run example list as the unchanged rationale says",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
-      "reviewMode": "ordinary",
+      "targetAnchor": "unheaded-block-33",
+      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+      "reviewStatus": "pending",
+      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
       "targetUnitDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2",
       "targetAncestry": [
         "CLI I/O Contract",
         "7. Machine-Readable Verb Registry",
         "Entry Fields And Effect Axes"
-      ],
-      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+      ]
     },
     {
       "claimId": "claim_7333c439fa8d29886b82168e015ca113",
@@ -35,22 +29,16 @@
       "sourceUnitDigest": "97e661532202da60735c985f4cda6302e805d100441b148cd8b0ff05c9c914b2",
       "disposition": "supersede",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "targetAnchor": "unheaded-block-32",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "reviewStatus": "reviewed",
-      "rationale": "The native predecessor docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-31 at 01fe216b4 is superseded by the complete same-file effect-axis unit. It preserves the field definitions, review/--github rationale where present, every list item and the external dispatch qualifier, adds explicit COMMAND_REGISTRY/15/no-coordination manifest wording, and keeps the valid review/approve/run examples. Whole source and target are shown; no identity graft or approval carry. A31 current target follows its real native identity at the current anchor; independent conservation re-review pending, no approval carry.",
-      "reviewNote": "deep: previously ok, reset to pending; same target block 31 to 32 as the sibling row, digest unchanged; old see-fgos-help pointer is rewritten into the COMMAND_REGISTRY sentence as the retained rationale states",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
-      "reviewMode": "ordinary",
+      "targetAnchor": "unheaded-block-33",
+      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+      "reviewStatus": "pending",
+      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
       "targetUnitDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2",
       "targetAncestry": [
         "CLI I/O Contract",
         "7. Machine-Readable Verb Registry",
         "Entry Fields And Effect Axes"
-      ],
-      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+      ]
     },
     {
       "claimId": "claim_665eb7f4bfb9bee7ba3f5e58368eaba1",
@@ -58,22 +46,16 @@
       "sourceUnitDigest": "ba9c9d6e641e3049b46d0596077eabd74593dd83e12391cd7336986f7733d796",
       "disposition": "supersede",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "targetAnchor": "unheaded-block-32",
-      "authoredBy": "codex-session:17@2026-10-14",
-      "reviewStatus": "reviewed",
-      "rationale": "The native predecessor docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-32 at 01fe216b4 is superseded by the complete same-file effect-axis unit. It preserves the field definitions, review/--github rationale where present, every list item and the external dispatch qualifier, adds explicit COMMAND_REGISTRY/15/no-coordination manifest wording, and keeps the valid review/approve/run examples. Whole source and target are shown; no identity graft or approval carry.",
-      "reviewNote": "Predecessor is block 32 at 01fe216b4 (digest recomputed, new gap row, previously live). Successor e1577e3b rewrites only the deferral sentence and adds the registry/15/no-coordination statement; examples, the dispatch executor qualifier and all other bullets are carried unchanged. Rationale wording \"review/--github rationale where present\" is generic but not false.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-sc1.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "e1577e3b51decf45fde9d2754d740429b7714340ec90baf7e5e4156b316e33d1",
+      "targetAnchor": "unheaded-block-33",
+      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+      "reviewStatus": "pending",
+      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "targetUnitDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2",
       "targetAncestry": [
         "CLI I/O Contract",
         "7. Machine-Readable Verb Registry",
         "Entry Fields And Effect Axes"
-      ],
-      "reviewReportCommit": "563247893e1b8fd795c43d611fd1d5ed28d150b5"
+      ]
     },
     {
       "claimId": "claim_e597b776163803dcf6e4194962ea4f6e",
@@ -81,22 +63,16 @@
       "sourceUnitDigest": "5bed5c61440ab7ef0a9c595d18e3485c47c1952c78cbd07a0ea354db8ad750c3",
       "disposition": "supersede",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "targetAnchor": "unheaded-block-32",
-      "authoredBy": "codex-session:17@2026-10-14",
-      "reviewStatus": "reviewed",
-      "rationale": "The predecessor block 32 at 9881f8622 already states COMMAND_REGISTRY, 15 externalEffect verbs and no coordination. The only delta to the real same-file successor is adding review/approve/run examples. All other wording, list items and dispatch executor qualifier are retained. Native predecessor identity is conserved without graft or approval carry.",
-      "reviewNote": "Predecessor block 32 at 9881f8622 (digest verified) differs from the current unit only by the added example list plus a line reflow, which is whitespace only; the dispatch executor qualifier and all bullets are retained, and the rationale no longer claims the manifest wording is new.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-rework.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "e1577e3b51decf45fde9d2754d740429b7714340ec90baf7e5e4156b316e33d1",
+      "targetAnchor": "unheaded-block-33",
+      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+      "reviewStatus": "pending",
+      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "targetUnitDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2",
       "targetAncestry": [
         "CLI I/O Contract",
         "7. Machine-Readable Verb Registry",
         "Entry Fields And Effect Axes"
-      ],
-      "reviewReportCommit": "18962827a371c629b91475e6b2540a998fa30e9a"
+      ]
     }
   ]
 }

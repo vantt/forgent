@@ -213,11 +213,17 @@
       "targetAnchor": "herdr-web-dashboard-ui-spec-overview",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
       "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "reviewNote": "deep: title section = metadata block plus labelled note plus the human-readable-companion path rewrite; supersede true; digests recomputed",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1451-specs-ui-bounded-rereview-6b8d84f9e.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "a6b43dc0113eb342bfaa10ceae3e840b28bfab1589dbb6b846f2e3899bc50874",
-      "targetAncestry": []
+      "targetAncestry": [],
+      "reviewReportCommit": "af0057e1347f180e699d6580e7fe5d50c9319899"
     },
     {
       "claimId": "claim_a6ab93a6bd86cc14f83e5022a2323387",
@@ -268,13 +274,19 @@
       "targetAnchor": "unheaded-block-6",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
       "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "reviewNote": "deep: unheaded block diff is the one companion-path line; digests recomputed",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1451-specs-ui-bounded-rereview-6b8d84f9e.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "e5ba41fce76696fe402892f4d2b6108a436c364cb752b08b397507ea263e8f4d",
       "targetAncestry": [
         "herdr web dashboard — UI spec overview"
-      ]
+      ],
+      "reviewReportCommit": "af0057e1347f180e699d6580e7fe5d50c9319899"
     },
     {
       "claimId": "claim_93f7e5f60f6407a6ff0969b5e85302fd",
@@ -391,13 +403,19 @@
       "targetAnchor": "how-to-work-on-this-spec",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
       "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "reviewNote": "deep: how-to section diff is the generated is-gitignored sentence replaced (correction 23); digests recomputed",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1451-specs-ui-bounded-rereview-6b8d84f9e.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "35bb9af04cb01c193eeea48d2fbc2b61d222e90eea33f4fddd57147442625c3d",
       "targetAncestry": [
         "herdr web dashboard — UI spec overview"
-      ]
+      ],
+      "reviewReportCommit": "af0057e1347f180e699d6580e7fe5d50c9319899"
     },
     {
       "claimId": "claim_f5414fdf7b56dcc5ecfee0dbbe5b9cd2",
@@ -450,14 +468,20 @@
       "targetAnchor": "unheaded-block-12",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
       "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "reviewNote": "deep: unheaded block diff is the same sentence only; digests recomputed",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1451-specs-ui-bounded-rereview-6b8d84f9e.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "7e07d5abf293de68419126409ea6c5451f1ddc4d70e5a7202e679c44d5e63759",
       "targetAncestry": [
         "herdr web dashboard — UI spec overview",
         "How to work on this spec"
-      ]
+      ],
+      "reviewReportCommit": "af0057e1347f180e699d6580e7fe5d50c9319899"
     },
     {
       "claimId": "claim_2361b06eda9a97678fdb502cb5949d3e",

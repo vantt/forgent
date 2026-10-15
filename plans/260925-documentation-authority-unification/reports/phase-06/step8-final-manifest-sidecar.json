@@ -1,0 +1,11 @@
+{
+  "source": "docs/architecture-manifest.json",
+  "target": "docs/platform/contracts/architecture-manifest.json",
+  "sourceCommit": "af0057e1347f180e699d6580e7fe5d50c9319899",
+  "sourceBlob": "ae8c66912fbf631381632347382108e7e6835a4d",
+  "sourceSHA256": "70c00c205578fc34084e5bf8701a6bde0999cb6f05a1b58f8424ad95ed4c28d4",
+  "targetSHA256": "70c00c205578fc34084e5bf8701a6bde0999cb6f05a1b58f8424ad95ed4c28d4",
+  "sourceBytes": 12267,
+  "targetBytes": 12267,
+  "byteEqual": true
+}

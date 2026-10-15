@@ -46,11 +46,17 @@
       "targetAnchor": "spec-agent-confinement-authority",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
       "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "reviewNote": "deep: title section = metadata block plus labelled Added-in-candidate note (A40/A19 label names evidence) plus the status-paragraph bwrap sentence corrected (diff read); extractor digests recomputed equal; supersede is true because a corrected sentence lives in this section",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1451-specs-ui-bounded-rereview-6b8d84f9e.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "07f260af60693c5d02d4348272875ed2db88c37847b8bca5d708739f37e43e39",
-      "targetAncestry": []
+      "targetAncestry": [],
+      "reviewReportCommit": "af0057e1347f180e699d6580e7fe5d50c9319899"
     },
     {
       "claimId": "claim_ba0b2e1a3bc56167392758ded5e83687",
@@ -59,13 +65,19 @@
       "targetAnchor": "unheaded-block-4",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
       "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "reviewNote": "deep: diff is exactly the three status lines (executor ids and live-migration claim) replaced; rest of the block byte-equal; digests recomputed; anchor checked; supersede true",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1451-specs-ui-bounded-rereview-6b8d84f9e.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "6531cbd5a0586a09857a76ca282d787526c86006b41db6f4cd10b98542977f67",
       "targetAncestry": [
         "Spec: Agent Confinement Authority"
-      ]
+      ],
+      "reviewReportCommit": "af0057e1347f180e699d6580e7fe5d50c9319899"
     },
     {
       "claimId": "claim_f28782f0b3d1c34833072a10b026b808",
@@ -849,14 +861,20 @@
       "targetAnchor": "52-quy-tắc-dependency",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
       "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "reviewNote": "deep: heading section diff is only the two locus lines (remote-http, herdr-pane); everything else byte-equal; digests recomputed; anchor checked",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1451-specs-ui-bounded-rereview-6b8d84f9e.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "e8c7eee6176e190b96b95b1e3b176acd116578dd43dd17332d7d3924d54c81c0",
       "targetAncestry": [
         "Spec: Agent Confinement Authority",
         "5. Component boundary"
-      ]
+      ],
+      "reviewReportCommit": "af0057e1347f180e699d6580e7fe5d50c9319899"
     },
     {
       "claimId": "claim_467d37a7c682201f64cf45145bb77633",
@@ -911,15 +929,21 @@
       "targetAnchor": "unheaded-block-32",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
       "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "reviewNote": "deep: unheaded block diff is only the two locus lines; byte-equal otherwise; digests recomputed (hand sha256 of the block text also equal, seed 261015)",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1451-specs-ui-bounded-rereview-6b8d84f9e.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "872e36adb904d7de53366a46ce523413a6460409a990194cefc392bc5edd90d7",
       "targetAncestry": [
         "Spec: Agent Confinement Authority",
         "5. Component boundary",
         "5.2 Quy tắc dependency"
-      ]
+      ],
+      "reviewReportCommit": "af0057e1347f180e699d6580e7fe5d50c9319899"
     },
     {
       "claimId": "claim_3c32f6e251ad5b14894ad90eed79d494",

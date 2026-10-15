@@ -74,9 +74,9 @@ spec states what an actor expects to be able to do, never how it is drawn.
   waiting on a person — covering **both** channels, `ask` questions and
   `gate-approve` questions (question-needing-answer covers both channels), not just the `ask` channel.
 - **Availability trigger (not a person's action).** The dashboard is reachable
-  whenever its own process is running. That process is started and stopped
-  from the cockpit but **outlives the cockpit pane** — closing the cockpit does
-  not stop the dashboard (it runs as a child process outliving the cockpit pane). Static serving defaults ON (`herdrWebDashboard.staticServing`); the gateway started with `fgos gateway start` listens on the
+  whenever the gateway process is running. Start and stop it with
+  `fgos gateway start` and `fgos gateway stop`; it is detached from the CLI
+  and **outlives the cockpit pane** — closing that pane does not stop it. Static serving defaults ON (`herdrWebDashboard.staticServing`); the gateway started with `fgos gateway start` listens on the
   configured bind address (default reaches beyond loopback — binds 0.0.0.0 by default, bind address configurable, warns when non-loopback) and on port
   4170 by default (`gateway.port` overrides it).
 - **No outbound trigger exists.** Nothing notifies the person that a question
@@ -297,7 +297,8 @@ leaving a reader to discover them:
   client.
 - **The gateway's own API contract now exists** —
   `docs/contracts/fgos-gateway-api-v1.yaml`, landed by tsk-7l9, carrying 19
-  paths that match `apps/fgos-gateway/src/gateway.rs`'s registered routes 1-to-1.
+  paths; the gateway also registers `GET /runtime` and nests `/mcp` outside
+  this contract.
   This spec still describes operations in product terms rather than
   restating endpoint shapes, but that contract — not this prose — is the
   boundary's source of truth, and any surface built against it cites it

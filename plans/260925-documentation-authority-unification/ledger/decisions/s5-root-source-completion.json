@@ -2180,21 +2180,15 @@
       "sourceUnitDigest": "c1c230462d8e6a3a59005658d279246afcdcee727e89f03ff08b0f9ce8b14e85",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:39@2026-10-15",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
       "targetOwner": "docs/platform/contracts/architecture-manifest.json",
       "targetAnchor": "file-block",
-      "rationale": "A31 / A22: historical c1c230462d8e6a3a59005658d279246afcdcee727e89f03ff08b0f9ce8b14e85 to current 5a7e59abe736f2b6d3af229d70366d3b7c83484c682540ec4bcf79c3ec0a1657 differs in exactly ten manifest entries: (1) remove src/runner/dispatch-log.mjs (infra); add (2) src/runner/dispatch/write-scope.mjs (kernel), (3) src/util/git-paths.mjs (kernel), (4) src/runner/execution/account-pin.mjs (infra), (5) src/runner/execution/partial-writes.mjs (infra), (6) src/workflow/units-source.mjs (infra), (7) src/runner/dispatch/run-timeout.mjs (kernel), (8) src/runner/execution/unit-sync.mjs (infra); (9) src/runner/fanout-batch.mjs and (10) src/runner/work-dispatch.mjs change from infra to use-case. Entries 7 and 8 are this merge 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539's two added lines; entries 1–6 and 9–10 preserve the earlier source-to-target difference. The complete target is byte-identical to main. Preserve original predecessor identity and digest; no ID graft, truth approval or promotion. Corrected rationale pending independent review; no approval carry.",
+      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
       "sourcePath": "docs/architecture-manifest.json",
       "sourceAnchor": "file-block",
-      "reviewNote": "deep: same corrected ten-entry rationale as the sibling row, true against the manifests (source c1c23046 at 1b818c586, target 5a7e59ab, only the files map differs, all other top-level keys equal); history side kept pending, carry unchanged and correct",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "5a7e59abe736f2b6d3af229d70366d3b7c83484c682540ec4bcf79c3ec0a1657",
-      "targetAncestry": [],
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7"
+      "targetUnitDigest": "70c00c205578fc34084e5bf8701a6bde0999cb6f05a1b58f8424ad95ed4c28d4",
+      "targetAncestry": []
     }
   ]
 }

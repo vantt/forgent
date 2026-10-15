@@ -1,0 +1,546 @@
+{
+  "version": 1,
+  "sync": {
+    "pin": "af0057e1347f180e699d6580e7fe5d50c9319899",
+    "startedAt": "2026-10-15T08:21:47.516Z",
+    "completedAt": "2026-10-15T08:30:56.375Z",
+    "durationSeconds": 548.859,
+    "items": 4467,
+    "claims": 90773,
+    "registryBytes": 61570791,
+    "registrySHA256": "c90e0bf9fc03dbaae765edd612e31bf394999566cab656868530a98bc785ffe2",
+    "knownBefore": 98457,
+    "knownAfter": 98462,
+    "zeroKnownIDLoss": true,
+    "activeTupleEquality": true,
+    "carryForward": {
+      "fromCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f",
+      "toCommit": "af0057e1347f180e699d6580e7fe5d50c9319899",
+      "oldUnits": 90772,
+      "newUnits": 90773,
+      "kept": 90399,
+      "paired": 366,
+      "moved": 0,
+      "editedKept": 3,
+      "added": 5,
+      "gaps": 4,
+      "retired": 0,
+      "retiredDocuments": 0
+    }
+  },
+  "registry": {
+    "path": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+    "bytes": 61570791,
+    "SHA256": "c90e0bf9fc03dbaae765edd612e31bf394999566cab656868530a98bc785ffe2",
+    "persistCount": 1,
+    "knownIDLoss": 0,
+    "scope": "committed HEAD only"
+  },
+  "scope": [
+    "docs/specs/confinement-authority.md",
+    "docs/specs/decision-citation-drift.md",
+    "docs/specs/distillery.md",
+    "docs/specs/fgos-plugin.md",
+    "docs/specs/herdr-web-dashboard.md",
+    "docs/specs/observe.md",
+    "docs/ui-spec/00-overview.md",
+    "docs/ui-spec/15-system-events.md",
+    "docs/ui-spec/20-domain-rules.md",
+    "docs/ui-spec/30-states-and-errors.md",
+    "docs/ui-spec/components/C01-item-card.md",
+    "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+    "docs/ui-spec/flows/F02-approve-a-merge.md",
+    "docs/ui-spec/generated/action-registry.csv",
+    "docs/ui-spec/generated/coverage-report.md",
+    "docs/ui-spec/generated/navigation-graph.yaml",
+    "docs/ui-spec/generated/surface-registry.yaml",
+    "docs/ui-spec/generated/wireframe-v2.html",
+    "docs/ui-spec/modals/M01-answer-question.md",
+    "docs/ui-spec/modals/M02-approve-merge.md",
+    "docs/ui-spec/modals/M03-add-edit-item.md",
+    "docs/ui-spec/schema/surface-contract.schema.json",
+    "docs/ui-spec/screens/S01-sign-in.md",
+    "docs/ui-spec/screens/S02-taskboard.md",
+    "docs/ui-spec/screens/S03-task-detail.md",
+    "docs/ui-spec/screens/S04-questions-needing-answer.md",
+    "docs/ui-spec/spec.config.yaml",
+    "docs/io-contract.md",
+    "docs/specs/distribution.md",
+    "docs/architecture-manifest.json"
+  ],
+  "nativeRuns": [
+    {
+      "name": "D-both",
+      "mode": "native HEAD",
+      "scope": null,
+      "priors": [
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json"
+      ],
+      "durationSeconds": 80.211,
+      "fatalCount": 36,
+      "fatalTypes": [
+        "decision-target-drift"
+      ],
+      "open": [
+        {
+          "type": "files-unknown-blocking",
+          "count": 1161
+        },
+        {
+          "type": "claims-unknown-blocking",
+          "count": 22612
+        },
+        {
+          "type": "claims-partial-carry",
+          "count": 14
+        },
+        {
+          "type": "claims-not-reviewed",
+          "count": 22876
+        },
+        {
+          "type": "claims-without-own-rationale",
+          "count": 22612
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "count": 361
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "count": 492
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 2364
+        }
+      ]
+    },
+    {
+      "name": "E-both",
+      "mode": "native HEAD",
+      "scope": [
+        "docs/specs/confinement-authority.md",
+        "docs/specs/decision-citation-drift.md",
+        "docs/specs/distillery.md",
+        "docs/specs/fgos-plugin.md",
+        "docs/specs/herdr-web-dashboard.md",
+        "docs/specs/observe.md",
+        "docs/ui-spec/00-overview.md",
+        "docs/ui-spec/15-system-events.md",
+        "docs/ui-spec/20-domain-rules.md",
+        "docs/ui-spec/30-states-and-errors.md",
+        "docs/ui-spec/components/C01-item-card.md",
+        "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+        "docs/ui-spec/flows/F02-approve-a-merge.md",
+        "docs/ui-spec/generated/action-registry.csv",
+        "docs/ui-spec/generated/coverage-report.md",
+        "docs/ui-spec/generated/navigation-graph.yaml",
+        "docs/ui-spec/generated/surface-registry.yaml",
+        "docs/ui-spec/generated/wireframe-v2.html",
+        "docs/ui-spec/modals/M01-answer-question.md",
+        "docs/ui-spec/modals/M02-approve-merge.md",
+        "docs/ui-spec/modals/M03-add-edit-item.md",
+        "docs/ui-spec/schema/surface-contract.schema.json",
+        "docs/ui-spec/screens/S01-sign-in.md",
+        "docs/ui-spec/screens/S02-taskboard.md",
+        "docs/ui-spec/screens/S03-task-detail.md",
+        "docs/ui-spec/screens/S04-questions-needing-answer.md",
+        "docs/ui-spec/spec.config.yaml",
+        "docs/io-contract.md",
+        "docs/specs/distribution.md",
+        "docs/architecture-manifest.json"
+      ],
+      "priors": [
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json"
+      ],
+      "durationSeconds": 80.529,
+      "fatalCount": 39,
+      "fatalTypes": [
+        "decision-target-drift",
+        "claims-not-reviewed",
+        "identical-units-multiple-owners",
+        "candidate-blocks-unreferenced"
+      ],
+      "open": [
+        {
+          "type": "claims-not-reviewed",
+          "count": 29
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "count": 1
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 866
+        }
+      ]
+    },
+    {
+      "name": "D-identity",
+      "mode": "native HEAD",
+      "scope": null,
+      "priors": [
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json"
+      ],
+      "durationSeconds": 80.181,
+      "fatalCount": 36,
+      "fatalTypes": [
+        "decision-target-drift"
+      ],
+      "open": [
+        {
+          "type": "files-unknown-blocking",
+          "count": 1161
+        },
+        {
+          "type": "claims-unknown-blocking",
+          "count": 22612
+        },
+        {
+          "type": "claims-partial-carry",
+          "count": 14
+        },
+        {
+          "type": "claims-not-reviewed",
+          "count": 22876
+        },
+        {
+          "type": "claims-without-own-rationale",
+          "count": 22612
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "count": 361
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "count": 492
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 2364
+        }
+      ]
+    },
+    {
+      "name": "E-identity",
+      "mode": "native HEAD",
+      "scope": [
+        "docs/specs/confinement-authority.md",
+        "docs/specs/decision-citation-drift.md",
+        "docs/specs/distillery.md",
+        "docs/specs/fgos-plugin.md",
+        "docs/specs/herdr-web-dashboard.md",
+        "docs/specs/observe.md",
+        "docs/ui-spec/00-overview.md",
+        "docs/ui-spec/15-system-events.md",
+        "docs/ui-spec/20-domain-rules.md",
+        "docs/ui-spec/30-states-and-errors.md",
+        "docs/ui-spec/components/C01-item-card.md",
+        "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+        "docs/ui-spec/flows/F02-approve-a-merge.md",
+        "docs/ui-spec/generated/action-registry.csv",
+        "docs/ui-spec/generated/coverage-report.md",
+        "docs/ui-spec/generated/navigation-graph.yaml",
+        "docs/ui-spec/generated/surface-registry.yaml",
+        "docs/ui-spec/generated/wireframe-v2.html",
+        "docs/ui-spec/modals/M01-answer-question.md",
+        "docs/ui-spec/modals/M02-approve-merge.md",
+        "docs/ui-spec/modals/M03-add-edit-item.md",
+        "docs/ui-spec/schema/surface-contract.schema.json",
+        "docs/ui-spec/screens/S01-sign-in.md",
+        "docs/ui-spec/screens/S02-taskboard.md",
+        "docs/ui-spec/screens/S03-task-detail.md",
+        "docs/ui-spec/screens/S04-questions-needing-answer.md",
+        "docs/ui-spec/spec.config.yaml",
+        "docs/io-contract.md",
+        "docs/specs/distribution.md",
+        "docs/architecture-manifest.json"
+      ],
+      "priors": [
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json"
+      ],
+      "durationSeconds": 85.124,
+      "fatalCount": 39,
+      "fatalTypes": [
+        "decision-target-drift",
+        "claims-not-reviewed",
+        "identical-units-multiple-owners",
+        "candidate-blocks-unreferenced"
+      ],
+      "open": [
+        {
+          "type": "claims-not-reviewed",
+          "count": 29
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "count": 1
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 866
+        }
+      ]
+    },
+    {
+      "name": "D-phase02",
+      "mode": "native HEAD",
+      "scope": null,
+      "priors": [
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json"
+      ],
+      "durationSeconds": 82.909,
+      "fatalCount": 36,
+      "fatalTypes": [
+        "decision-target-drift"
+      ],
+      "open": [
+        {
+          "type": "files-unknown-blocking",
+          "count": 1161
+        },
+        {
+          "type": "claims-unknown-blocking",
+          "count": 22612
+        },
+        {
+          "type": "claims-partial-carry",
+          "count": 14
+        },
+        {
+          "type": "claims-not-reviewed",
+          "count": 22876
+        },
+        {
+          "type": "claims-without-own-rationale",
+          "count": 22612
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "count": 361
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "count": 492
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 2364
+        }
+      ]
+    },
+    {
+      "name": "E-phase02",
+      "mode": "native HEAD",
+      "scope": [
+        "docs/specs/confinement-authority.md",
+        "docs/specs/decision-citation-drift.md",
+        "docs/specs/distillery.md",
+        "docs/specs/fgos-plugin.md",
+        "docs/specs/herdr-web-dashboard.md",
+        "docs/specs/observe.md",
+        "docs/ui-spec/00-overview.md",
+        "docs/ui-spec/15-system-events.md",
+        "docs/ui-spec/20-domain-rules.md",
+        "docs/ui-spec/30-states-and-errors.md",
+        "docs/ui-spec/components/C01-item-card.md",
+        "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+        "docs/ui-spec/flows/F02-approve-a-merge.md",
+        "docs/ui-spec/generated/action-registry.csv",
+        "docs/ui-spec/generated/coverage-report.md",
+        "docs/ui-spec/generated/navigation-graph.yaml",
+        "docs/ui-spec/generated/surface-registry.yaml",
+        "docs/ui-spec/generated/wireframe-v2.html",
+        "docs/ui-spec/modals/M01-answer-question.md",
+        "docs/ui-spec/modals/M02-approve-merge.md",
+        "docs/ui-spec/modals/M03-add-edit-item.md",
+        "docs/ui-spec/schema/surface-contract.schema.json",
+        "docs/ui-spec/screens/S01-sign-in.md",
+        "docs/ui-spec/screens/S02-taskboard.md",
+        "docs/ui-spec/screens/S03-task-detail.md",
+        "docs/ui-spec/screens/S04-questions-needing-answer.md",
+        "docs/ui-spec/spec.config.yaml",
+        "docs/io-contract.md",
+        "docs/specs/distribution.md",
+        "docs/architecture-manifest.json"
+      ],
+      "priors": [
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json"
+      ],
+      "durationSeconds": 88.074,
+      "fatalCount": 39,
+      "fatalTypes": [
+        "decision-target-drift",
+        "claims-not-reviewed",
+        "identical-units-multiple-owners",
+        "candidate-blocks-unreferenced"
+      ],
+      "open": [
+        {
+          "type": "claims-not-reviewed",
+          "count": 29
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "count": 1
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 866
+        }
+      ]
+    }
+  ],
+  "overlayRuns": [
+    {
+      "name": "D-both",
+      "structuralFatalCount": 0,
+      "fatalTypes": [],
+      "open": [
+        {
+          "type": "claims-not-reviewed",
+          "count": 29
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "count": 1
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 867
+        }
+      ],
+      "candidateCount": 867
+    },
+    {
+      "name": "E-both",
+      "structuralFatalCount": 0,
+      "fatalTypes": [],
+      "open": [
+        {
+          "type": "claims-not-reviewed",
+          "count": 29
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "count": 1
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 867
+        }
+      ],
+      "candidateCount": 867
+    },
+    {
+      "name": "D-identity",
+      "structuralFatalCount": 0,
+      "fatalTypes": [],
+      "open": [
+        {
+          "type": "claims-not-reviewed",
+          "count": 29
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "count": 1
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 867
+        }
+      ],
+      "candidateCount": 867
+    },
+    {
+      "name": "E-identity",
+      "structuralFatalCount": 0,
+      "fatalTypes": [],
+      "open": [
+        {
+          "type": "claims-not-reviewed",
+          "count": 29
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "count": 1
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 867
+        }
+      ],
+      "candidateCount": 867
+    },
+    {
+      "name": "D-phase02",
+      "structuralFatalCount": 0,
+      "fatalTypes": [],
+      "open": [
+        {
+          "type": "claims-not-reviewed",
+          "count": 29
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "count": 1
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 867
+        }
+      ],
+      "candidateCount": 867
+    },
+    {
+      "name": "E-phase02",
+      "structuralFatalCount": 0,
+      "fatalTypes": [],
+      "open": [
+        {
+          "type": "claims-not-reviewed",
+          "count": 29
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "count": 1
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 867
+        }
+      ],
+      "candidateCount": 867
+    }
+  ],
+  "applicationFindings": [],
+  "workingNativeEquality": false,
+  "blocker": "Native generator requires committed treeish; no git writes authorized. One HEAD native sync plus separately labelled working-tree conservation overlay, not native certification of changed bytes.",
+  "docsWorkingSHA256": {
+    "docs/platform/herdr-web-dashboard/spec.md": "7b5fe48ff585963bfbfc903ac1aa840fa7db58a80a51d72d8cbf73008d9cff80",
+    "docs/platform/claude-plugin/spec.md": "428f4043212d8b0fc7e635957f956db9be01549b6ddc9c9228cf5a79da8007bb",
+    "docs/platform/work-state/contracts/cli-io-contract.md": "1226302831032c9f18ce9520be648bbc94540eb5f8dbc0ca25495526a83f1daa",
+    "docs/platform/packaging-distribution/spec.md": "61529fe14c328c32ffca8d0222c794bbf6dd8b07bcb7dab5c625530897df228b",
+    "docs/platform/contracts/architecture-manifest.json": "70c00c205578fc34084e5bf8701a6bde0999cb6f05a1b58f8424ad95ed4c28d4"
+  },
+  "candidateList": {
+    "path": "plans/260925-documentation-authority-unification/reports/phase-06/step8-final-candidate-overlay.json",
+    "count": 867,
+    "threeOverlayEEquality": true,
+    "nativeEquality": false
+  },
+  "reproduction": {
+    "native": "import fs from 'node:fs';import v8 from 'node:v8';import assert from 'node:assert/strict';import {execFileSync} from 'node:child_process';import crypto from 'node:crypto';\nconst root=process.cwd(),R='plans/260925-documentation-authority-unification/reports/phase-06/',S='/tmp/fgos-work/step8-final/',pin=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),start=Date.now();\nconst gen=await import(root+'/scripts/generate-doc-inventory.mjs');\nfs.copyFileSync(R+'working-identity-registry.json',S+'prior-registry.json');\nconsole.log('START',new Date().toISOString(),pin);\nconst registry=gen.carryForwardIdentityRegistryRepoWide(root,{commit:pin,identityRegistryPath:S+'prior-registry.json'});\nconst bytes=Buffer.from(JSON.stringify(registry)+'\\n');assert(bytes.length<90000000,'STOP: registry >= 90 MB');fs.writeFileSync(S+'identity-registry.json',bytes);console.log('CARRY',new Date().toISOString(),bytes.length,JSON.stringify(registry.carryForward));\nconst inv=gen.generateInventory(root,{commit:pin,identityRegistryPath:S+'identity-registry.json'});fs.writeFileSync(S+'inventory.bin',v8.serialize(inv));\nconst tuple=u=>JSON.stringify([u.claimId,u.sourcePath,u.sourceAnchor,u.sourceUnitDigest]),known=j=>['units','retiredUnits','identityGaps'].flatMap(k=>j[k]||[]),old=JSON.parse(fs.readFileSync(S+'prior-registry.json')),ids=new Set(known(registry).map(x=>x.claimId));assert(known(old).every(x=>ids.has(x.claimId)));assert.deepEqual(inv.claimLedger.map(tuple).sort(),registry.units.map(tuple).sort());\nconst result={pin,startedAt:new Date(start).toISOString(),completedAt:new Date().toISOString(),durationSeconds:(Date.now()-start)/1000,items:inv.items.length,claims:inv.claimLedger.length,registryBytes:bytes.length,registrySHA256:crypto.createHash('sha256').update(bytes).digest('hex'),knownBefore:known(old).length,knownAfter:known(registry).length,zeroKnownIDLoss:true,activeTupleEquality:true,carryForward:registry.carryForward};fs.writeFileSync(S+'sync-result.json',JSON.stringify(result,null,2)+'\\n');console.log('DONE',JSON.stringify(result));\n",
+    "rebind": "import fs from 'node:fs';import assert from 'node:assert/strict';import crypto from 'node:crypto';import {execFileSync as exec} from 'node:child_process';\nconst root=process.cwd(),P='plans/260925-documentation-authority-unification/',R=P+'reports/phase-06/',S='/tmp/fgos-work/step8-final/',read=p=>JSON.parse(fs.readFileSync(p)),write=(p,j)=>fs.writeFileSync(p,JSON.stringify(j,null,2)+'\\n'),sha=b=>crypto.createHash('sha256').update(b).digest('hex'),author='codex-session:unit-run-1792052396770-6f1c5957@2026-10-15';\nconst gen=await import(root+'/scripts/generate-doc-inventory.mjs'),g=await import(root+'/scripts/check-doc-inventory-gates.mjs'),review=await import(root+'/scripts/propose-doc-decisions.mjs'),audit=read(R+'step8-final-rework-accounting.json'),oldReg=read(R+'working-identity-registry.json'),reg=read(S+'identity-registry.json');\nconst regById=new Map(reg.units.map(u=>[u.claimId,u])),oldById=new Map(oldReg.units.map(u=>[u.claimId,u]));\nconst show=p=>exec('git',['show','HEAD:'+p],{encoding:'utf8',maxBuffer:20e6}),extract=(p,t)=>{const ls=t.split('\\n'),heads=[],ex=p.endsWith('.md')?gen.extractMarkdownConservationUnits(t):gen.extractMixedFileConservationUnit(p,t);return ex.map((u,i)=>{if(u.unitKind==='heading')while(heads.length&&heads.at(-1).level>=u.level)heads.pop();const ancestry=heads.map(h=>h.title);if(u.unitKind==='heading')heads.push(u);return {...u,ancestry,text:ls.slice(u.startLine-1,u.endLine).join('\\n').trim(),sectionText:ls.slice(u.startLine-1,u.unitKind==='heading'?(ex.slice(i+1).find(o=>o.unitKind==='heading')?.startLine-1||ls.length):u.endLine).join('\\n').trim()};});};\nconst changedPaths=[...new Set(audit.changes.filter(c=>c.path.startsWith('docs/platform/')).map(c=>c.path))],before=new Map(changedPaths.map(p=>[p,extract(p,show(p))])),after=new Map(changedPaths.map(p=>[p,extract(p,fs.readFileSync(p,'utf8'))])),mainSources=['docs/specs/distribution.md','docs/io-contract.md','docs/architecture-manifest.json'],unitsOf=p=>after.get(p)||extract(p,fs.readFileSync(p,'utf8'));\nconst shards=['ledger/decisions','pilot/decisions'].flatMap(dir=>fs.readdirSync(P+dir).filter(f=>f.endsWith('.json')).map(f=>({file:P+dir+'/'+f,data:read(P+dir+'/'+f)})));audit.reboundRows=[];audit.predecessorRows=[];audit.newSourceRows=[];\nconst pending=d=>{d.reviewStatus='pending';for(const k of Object.keys(d))if(k.startsWith('review')&&k!=='reviewStatus')delete d[k];d.authoredBy=author;};\nfunction matching(d){const prev=before.get(d.targetOwner)?.find(u=>u.anchor===d.targetAnchor);const us=after.get(d.targetOwner);if(!prev||!us)return null;let candidates=us.filter(u=>u.textDigest===prev.textDigest&&JSON.stringify(u.ancestry)===JSON.stringify(prev.ancestry));if(candidates.length)return candidates.find(u=>u.anchor===prev.anchor)||candidates[0];if(prev.unitKind==='heading')return us.find(u=>u.unitKind==='heading'&&u.title===prev.title&&JSON.stringify(u.ancestry)===JSON.stringify(prev.ancestry));return us.find(u=>u.anchor===prev.anchor&&JSON.stringify(u.ancestry)===JSON.stringify(prev.ancestry));}\nfor(const {file,data:s} of shards){const visited=new Set();for(const channel of ['claims','registryGaps'])for(const d of [...s[channel]||[]]){if(visited.has(d.claimId))continue;visited.add(d.claimId);const original=structuredClone(d),src=regById.get(d.claimId),oldSrc=oldById.get(d.claimId),newTarget=matching(d);let reason=[];\n if(channel==='claims'&&oldSrc&&mainSources.includes(oldSrc.sourcePath)&&!src){s.claims=s.claims.filter(x=>x!==d);s.registryGaps??=[];d.sourcePath=oldSrc.sourcePath;s.registryGaps.push(d);reason.push('A31 native source predecessor became identity gap; retain native ID, supersede accounting to current carrier');d.disposition='supersede';}\n if(src&&mainSources.includes(src.sourcePath)&&!src.sourceUnitDigest.startsWith(d.sourceUnitDigest)){d.sourceUnitDigest=src.sourceUnitDigest;reason.push('A31 current source digest rebound; decision-digest-stale resolved');}\n if(newTarget&&((before.get(d.targetOwner).find(u=>u.anchor===d.targetAnchor).textDigest!==newTarget.textDigest)||d.targetAnchor!==newTarget.anchor)){d.targetUnitDigest=newTarget.textDigest;d.targetAnchor=newTarget.anchor;d.targetAncestry=newTarget.ancestry;reason.push('A22 actual working target digest/anchor rebound');if(!mainSources.includes(oldSrc?.sourcePath)&&newTarget.unitKind!=='heading')d.disposition='supersede';}\n if(d.claimId==='claim_511605d386df9bae4aa29fb1baad15ac'){d.disposition='supersede';reason.push('A19 corrected Runs-when text supersedes stale unheaded block; no heading-binding rationale');}\n if(reason.length){pending(d);d.rationale=reason.join('. ')+'. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.';const rec={section:mainSources.includes(oldSrc?.sourcePath)||['docs/platform/contracts/architecture-manifest.json','docs/platform/work-state/contracts/cli-io-contract.md','docs/platform/packaging-distribution/spec.md'].includes(d.targetOwner)?'b':'a',claimId:d.claimId,shard:file,channel:s.claims.includes(d)?'claims':'registryGaps',sourcePath:src?.sourcePath||oldSrc?.sourcePath||d.sourcePath,sourceAnchor:src?.sourceAnchor||oldSrc?.sourceAnchor,sourceBefore:oldSrc,sourceAfter:src||null,beforeDecision:original,decision:structuredClone(d),beforeTarget:before.get(d.targetOwner)?.find(u=>u.anchor===original.targetAnchor),afterTarget:newTarget||unitsOf(d.targetOwner).find(u=>u.anchor===d.targetAnchor)};audit.reboundRows.push(rec);if(rec.channel==='registryGaps')audit.predecessorRows.push(rec);}\n }\n}\nconst declared=new Set(shards.flatMap(x=>x.data.claims||[]).map(d=>d.claimId));\nfor(const src of reg.units.filter(u=>mainSources.includes(u.sourcePath)&&!declared.has(u.claimId))){const owner=src.sourcePath==='docs/io-contract.md'?'docs/platform/work-state/contracts/cli-io-contract.md':src.sourcePath==='docs/specs/distribution.md'?'docs/platform/packaging-distribution/spec.md':'docs/platform/contracts/architecture-manifest.json',su=unitsOf(src.sourcePath).find(u=>u.anchor===src.sourceAnchor),matches=unitsOf(owner).filter(u=>u.textDigest===su.textDigest);assert.equal(matches.length,1,src.sourcePath+'#'+src.sourceAnchor+' exact target');const tu=matches[0],d={claimId:src.claimId,sourceUnitDigest:src.sourceUnitDigest,targetOwner:owner,targetAnchor:tu.anchor,targetUnitDigest:tu.textDigest,targetAncestry:tu.ancestry,claimKind:src.claimKind||'contract',disposition:'move',reviewStatus:'pending',authoredBy:author,rationale:'A31 native current source identity; full changed source unit carried verbatim in existing candidate owner. Main-only before/after retained in step8-final-rework-accounting.json. No predecessor identity graft or approval carry; no current-truth or promotion approval.'};const file=P+'ledger/decisions/'+(src.sourcePath.includes('distribution')?'s4-packaging-main-recarry.json':'s5-root-main-recarry.json');let s=shards.find(x=>x.file===file);if(!s){s={file,data:{version:1,shard:file.split('/').at(-1),authorSession:author,authorshipRequired:true,sources:[],claims:[]}};shards.push(s);}if(!s.data.sources.includes(src.sourcePath))s.data.sources.push(src.sourcePath);s.data.claims.push(d);audit.newSourceRows.push({section:'b',claimId:src.claimId,shard:file,sourcePath:src.sourcePath,sourceAnchor:src.sourceAnchor,sourceNativeUnit:su,sourceDigest:src.sourceUnitDigest,afterTarget:tu,decision:d});}\n// Accept only unchanged rows from the committed ordinary review, using the unchanged applicator.\nconst request=read(R+'review-request-261015-1451-specs-ui-bounded-rereview-6b8d84f9e.md.json'),reportPath=R+'review-261015-1451-specs-ui-bounded-rereview-6b8d84f9e.md',report=fs.readFileSync(reportPath,'utf8'),reviewer=report.match(/^Reviewer:\\s*(.+)$/m)[1].trim(),verdicts=review.parseReviewVerdicts(report,reviewer),applied=[];\nfor(const {file,data:s} of shards){const keep=(s.claims||[]).filter(d=>{const e=request.entries.find(e=>e.entryId===d.claimId&&e.channel==='source-carriage-rebinding'),v=verdicts.find(v=>v.claimId===d.claimId);return e&&v?.verdict==='ok'&&JSON.stringify(e.currentPendingDecision)===JSON.stringify(d)&&v.targetUnitDigest===(unitsOf(d.targetOwner).find(u=>u.anchor===d.targetAnchor)?.textDigest);});if(keep.length){const inv={commit:audit.inputCommit,claimLedger:reg.units},u=review.applyReviewVerdicts({repoRoot:root,inventory:inv,unitsOf},{...s,claims:keep},{verdicts:keep.map(d=>verdicts.find(v=>v.claimId===d.claimId)),reviewer,reportPath,ordinaryReview:true,reviewedAt:'2026-10-15'});const m=new Map(u.claims.map(d=>[d.claimId,d]));s.claims=s.claims.map(d=>m.get(d.claimId)||d);applied.push(...u.claims.map(d=>({claimId:d.claimId,shard:file,reviewReportCommit:d.reviewReportCommit})));}}\naudit.previousBoundedSourceApplications=applied;audit.changedCandidateUnits=[];for(const p of changedPaths)for(const u of after.get(p)){const b=before.get(p).find(b=>b.anchor===u.anchor);if(!b||b.textDigest!==u.textDigest)audit.changedCandidateUnits.push({section:p.includes('/claude-plugin/')||p.includes('/herdr-web-dashboard/')?'a':'b',path:p,anchor:u.anchor,before:b||null,after:u,beforeDigest:b?.textDigest||null,afterDigest:u.textDigest,reviewStatus:'pending',noApprovalCarry:true});}\n// truth-unit-20 corrected-sentence entry is an addendum, leaving the reviewed historical request immutable.\nconst old20=request.entries.find(e=>e.entryId==='truth-unit-20');audit.truthUnit20={...old20,correctedSentences:[{path:'docs/platform/claude-plugin/spec.md',before:'- **Runs when:** invoked with or without an id.',after:'- **Runs when:** legacy description only; no `/fgOS:check` skill is shipped.',evidence:'git ls-files plugins/fgOS/skills: no check/SKILL.md'}],meaning:'Bookkeeping addendum to historical truth-unit-20, no text change to the unit this turn.'};\nfor(const {file,data:s}of shards){if(fs.existsSync(file)&&JSON.stringify(read(file))===JSON.stringify(s))continue;write(file,s);}\nconst manifest='docs/platform/contracts/architecture-manifest.json';audit.manifestCopySidecar={source:'docs/architecture-manifest.json',target:manifest,sourceCommit:audit.inputCommit,sourceBlob:exec('git',['rev-parse','HEAD:docs/architecture-manifest.json'],{encoding:'utf8'}).trim(),sourceSHA256:sha(fs.readFileSync('docs/architecture-manifest.json')),targetSHA256:sha(fs.readFileSync(manifest)),sourceBytes:fs.statSync('docs/architecture-manifest.json').size,targetBytes:fs.statSync(manifest).size,byteEqual:fs.readFileSync(manifest).equals(fs.readFileSync('docs/architecture-manifest.json'))};assert(audit.manifestCopySidecar.byteEqual);\nconst ac=read(R+'step8-carriage-accounting.json');for(const c of ac.candidateFiles)if(after.has(c.path)){c.sha256=sha(fs.readFileSync(c.path));c.bytes=fs.statSync(c.path).size;c.units=after.get(c.path).length;}for(const x of audit.reboundRows.filter(x=>x.section==='a')){const pair=ac.pairs.find(p=>p.claimId===x.claimId);if(pair){pair.targetDigest=x.decision.targetUnitDigest;pair.class='Judgment';pair.classReason='A40/A19 corrected target requires bounded review';pair.truthCorrection=true;pair.mandatoryDeep=true;pair.fullSourceUnitContained=false;}}\nac.classCounts=Object.fromEntries(['Unit-exact','Weak-exact','Judgment'].map(c=>[c,ac.pairs.filter(p=>p.class===c).length]));write(R+'step8-carriage-accounting.json',ac);write(R+'step8-final-rework-accounting.json',audit);console.log(JSON.stringify({rebound:audit.reboundRows.map(x=>[x.section,x.claimId,x.channel]),newSourceRows:audit.newSourceRows.length,changedUnits:audit.changedCandidateUnits.length,applied:applied.length}));\n",
+    "verification": "import fs from 'node:fs';import v8 from 'node:v8';import assert from 'node:assert/strict';import crypto from 'node:crypto';\nconst root=process.cwd(),P='plans/260925-documentation-authority-unification/',R=P+'reports/phase-06/',S='/tmp/fgos-work/step8-final/',read=p=>JSON.parse(fs.readFileSync(p)),write=(p,j)=>fs.writeFileSync(p,JSON.stringify(j,null,2)+'\\n'),sha=b=>crypto.createHash('sha256').update(b).digest('hex'),sync=read(S+'sync-result.json'),pin=sync.pin;\nconst gen=await import(root+'/scripts/generate-doc-inventory.mjs'),g=await import(root+'/scripts/check-doc-inventory-gates.mjs'),inv=v8.deserialize(fs.readFileSync(S+'inventory.bin')),reg=read(S+'identity-registry.json'),bytes=fs.readFileSync(S+'identity-registry.json'),audit=read(R+'step8-final-rework-accounting.json'),vocabulary=read(P+'claim-and-disposition-vocabulary.json'),droppedClaimsRegister=read(P+'dropped-claims-register.json'),decisions=[...g.loadDecisionShards(P+'pilot/decisions'),...g.loadDecisionShards(P+'ledger/decisions')],priors=[P+'reports/identity-registry.json',P+'reports/phase-02-identity-registry.json'].map(label=>({label,registry:read(label)})),scope=[...read(R+'step8-liveness.json').files.map(f=>f.source),'docs/io-contract.md','docs/specs/distribution.md','docs/architecture-manifest.json'],ratchetResult=g.loadRatchetResult(root);\nassert(!fs.existsSync(S+'persisted.json'));assert(bytes.length<90000000);fs.writeFileSync(R+'working-identity-registry.json',bytes);write(S+'persisted.json',{count:1,bytes:bytes.length,SHA256:sha(bytes),contentCommit:pin,meaning:'HEAD native registry, not uncommitted target bytes'});\nconst common={repoRoot:root,inventory:inv,vocabulary,identityRegistry:reg,droppedClaimsRegister,ratchetResult,headCommit:pin,registryBytes:bytes,missingInputs:[],decisions},runs=[];\nfor(const [label,previousRegistries]of [['both',priors],['identity',[priors[0]]],['phase02',[priors[1]]]])for(const strict of [false,true]){const name=(strict?'E':'D')+'-'+label;console.log('START native',name,new Date().toISOString());const t=Date.now(),result=g.checkInventory({...common,previousRegistries,strict,scope:strict?scope:null});write(S+'native-'+name+'.json',result);runs.push({name,mode:'native HEAD',scope:strict?scope:null,priors:previousRegistries.map(x=>x.label),durationSeconds:(Date.now()-t)/1000,fatalCount:result.fatalFindings.length,fatalTypes:[...new Set(result.fatalFindings.map(x=>x.type))],open:result.conservationOpen.map(x=>({type:x.type,count:x.count}))});console.log('DONE',JSON.stringify(runs.at(-1)));}\n// Complete native HEAD inventory with a separately labelled current-target overlay.\n// Native identity registry is NOT edited or represented as current to these bytes.\nconst index=gen.buildIdentityRegistryIndex(reg),sb=gen.buildSwitchboardIndex(read(P+'transitional-switchboard.json')),changed=[...new Set(audit.changes.filter(x=>x.path.startsWith('docs/platform/')).map(x=>x.path))],overlayItems=new Map(changed.map(p=>[p,gen.buildInventoryRow(p,{content:fs.readFileSync(p,'utf8'),blobSize:fs.statSync(p).size,switchboardIndex:sb,identityIndex:index})])),overlay={...inv,items:inv.items.map(i=>overlayItems.get(i.path)||i),claimLedger:[...inv.claimLedger.filter(u=>!overlayItems.has(u.sourcePath)),...[...overlayItems.values()].flatMap(i=>i.claims)]};\nconst cache=new Map();const unitsOf=p=>{if(!cache.has(p)){const t=fs.readFileSync(p,'utf8'),ls=t.split('\\n'),heads=[],us=p.endsWith('.md')?gen.extractMarkdownConservationUnits(t):gen.extractMixedFileConservationUnit(p,t);cache.set(p,us.map(u=>{if(u.unitKind==='heading')while(heads.length&&heads.at(-1).level>=u.level)heads.pop();const ancestry=heads.map(h=>h.title);if(u.unitKind==='heading')heads.push(u);return {...u,ancestry,text:ls.slice(u.startLine-1,u.endLine).join('\\n').trim()};}));}return cache.get(p);};\nconst applied=g.applyDecisions(overlay,decisions,{vocabulary,targetAnchorsOf:p=>new Set(unitsOf(p).map(u=>u.anchor)),targetUnitDigestOf:(p,a)=>unitsOf(p).find(u=>u.anchor===a)?.textDigest,unitsOf,registry:reg,repoRoot:root}),overlayRuns=[],candidateRows=[];\nfor(const [label,previousRegistries]of [['both',priors],['identity',[priors[0]]],['phase02',[priors[1]]]]){const c=g.checkConservation({inventory:applied.inventory,registry:applied.registry,previousRegistries,vocabulary,droppedClaimsRegister,ratchetResult,scope,decisions,repoRoot:root});const structural=[...applied.findings,...c.invariant];const normalize=x=>{const t=fs.readFileSync(x.path,'utf8');return {...x,fileStatus:{designStatus:t.match(/^Design status:\\s*(.+)$/m)?.[1]||null,canonical:t.match(/^Canonical:\\s*(.+)$/m)?.[1]||null,authorityStatus:overlay.items.find(i=>i.path===x.path)?.authorityStatus}};};const rows=c.unreferencedCandidateRows.map(normalize);candidateRows.push({prior:label,rows});for(const strict of [false,true]){const result={mode:'working-tree overlay; NOT native committed-tree D/E',strict,scope,structuralFatal:structural,conservationOpen:c.open,unreferencedCandidateRows:rows,fatalCount:structural.length+(strict?c.open.length:0)};write(S+'overlay-'+(strict?'E':'D')+'-'+label+'.json',result);overlayRuns.push({name:(strict?'E':'D')+'-'+label,structuralFatalCount:structural.length,fatalTypes:[...new Set(structural.map(x=>x.type))],open:c.open.map(x=>({type:x.type,count:x.count})),candidateCount:rows.length});}}\nconst key=x=>JSON.stringify([x.claimId,x.path,x.anchor,x.unitDigest,x.fileStatus]),sorted=rows=>rows.map(key).sort();for(const l of candidateRows)assert.deepEqual(sorted(l.rows),sorted(candidateRows[0].rows));write(R+'step8-final-candidate-overlay.json',{version:1,mode:'provisional working-tree overlay; no current native identity equality claimed',scope,rows:candidateRows[0].rows,threeOverlayEListEquality:true,tupleFields:['claimId','path','anchor','unitDigest','fileStatus'],tupleSHA256:sha(sorted(candidateRows[0].rows).join('\\n'))});\nconst proof={version:1,sync,registry:{path:R+'working-identity-registry.json',bytes:bytes.length,SHA256:sha(bytes),persistCount:1,knownIDLoss:0,scope:'committed HEAD only'},scope,nativeRuns:runs,overlayRuns,applicationFindings:applied.findings,workingNativeEquality:false,blocker:audit.nativeWorkingStateBlocker,docsWorkingSHA256:Object.fromEntries(changed.map(p=>[p,sha(fs.readFileSync(p))])),candidateList:{path:R+'step8-final-candidate-overlay.json',count:candidateRows[0].rows.length,threeOverlayEEquality:true,nativeEquality:false},reproduction:{native:fs.readFileSync(S+'native-sync.mjs','utf8'),rebind:fs.readFileSync(S+'rebind.mjs','utf8'),verification:fs.readFileSync(S+'check.mjs','utf8'),edits:fs.readFileSync(S+'edit.py','utf8')}};write(R+'step8-final-verification.json',proof);for(const name of ['native-sync.log','tests.log','candidate-status.json',...runs.map(r=>'native-'+r.name+'.json'),...overlayRuns.map(r=>'overlay-'+r.name+'.json')])fs.copyFileSync(S+name,R+'step8-final-'+name);console.log('FINISHED',JSON.stringify({native:runs,overlay:overlayRuns}));\n",
+    "edits": "import json,pathlib,subprocess,hashlib\nP=pathlib.Path('plans/260925-documentation-authority-unification');R=P/'reports/phase-06';changes=[]\nsha=lambda b:hashlib.sha256(b if isinstance(b,bytes) else b.encode()).hexdigest()\ndef edit(p,old,new,evidence,section='a'):\n p=pathlib.Path(p);s=p.read_text();assert old in s or new in s,(str(p),old);n=s.count(old) or s.count(new);p.write_text(s.replace(old,new) if old in s else s);changes.append(dict(path=str(p),before=old,after=new,occurrences=n,evidence=evidence,section=section))\nh='docs/platform/herdr-web-dashboard/spec.md';c='docs/platform/claude-plugin/spec.md'\nedit(h,\"paths that match `apps/fgos-gateway/src/gateway.rs`'s registered routes 1-to-1.\",\"paths; the gateway also registers `GET /runtime` and nests `/mcp` outside\\n  this contract.\",['apps/fgos-gateway/src/gateway.rs:1244-1245','docs/contracts/fgos-gateway-api-v1.yaml:paths (19 keys, no /runtime or /mcp)'])\nedit(c,'optional for `pick`/`check`/`graph`','optional for `pick`/`graph`; `check` has no shipped plugin skill',['plugins/fgOS/skills/ (git ls-files: no check/SKILL.md)'])\nedit(c,'an optional id omitted means \"every item\" for `check`, \"the frontier head\" for `pick`, \"full metrics\" for `graph`','an optional id omitted means \"the frontier head\" for `pick`, \"full metrics\" for `graph`; the legacy `check` description does not define a shipped skill',['plugins/fgOS/skills/ (git ls-files: no check/SKILL.md)'])\nedit(c,'| Read frontier / staleness / rollup / check / graph / conflicts | ✓ |','| Read frontier / staleness / rollup / graph / conflicts (`check` has no shipped skill) | ✓ |',['plugins/fgOS/skills/ (git ls-files: no check/SKILL.md)'])\nedit(h,'whenever its own process is running. That process is started and stopped\\n  from the cockpit but **outlives the cockpit pane** — closing the cockpit does\\n  not stop the dashboard (it runs as a child process outliving the cockpit pane).','whenever the gateway process is running. Start and stop it with\\n  `fgos gateway start` and `fgos gateway stop`; it is detached from the CLI\\n  and **outlives the cockpit pane** — closing that pane does not stop it.', ['src/runner/gateway-control.mjs:256-309','src/runner/gateway-control.mjs:363-380'])\n# Carry exactly the main diff, preserving all surrounding candidate prose.\nbase='af0057e13^1'\nfor src,target in [('docs/io-contract.md','docs/platform/work-state/contracts/cli-io-contract.md'),('docs/specs/distribution.md','docs/platform/packaging-distribution/spec.md')]:\n old=subprocess.check_output(['git','show',base+':'+src]).decode();new=pathlib.Path(src).read_text()\n import difflib\n if src=='docs/io-contract.md':\n  start=\"`src/state/store.mjs`'s `EXIT_CODES`\"\n  end='Consumer rẽ nhánh theo mã thoát phạm trù, không bao giờ theo thông điệp.'\n  ob=old[old.index(start):old.index(end)+len(end)]\n  nb=new[new.index(start):new.index('### Ngoại lệ có lý do')].rstrip()\n  edit(target,ob,nb,[src+' at af0057e13 (main re-carry; verbatim)'],'b')\n else:\n  ob=next(l for l in old.splitlines() if l.startswith('| 7 | Doctor check |'))\n  nb=next(l for l in new.splitlines() if l.startswith('| 7 | Doctor check |'))\n  edit(target,ob,nb,[src+' at af0057e13 (main re-carry; verbatim)'],'b')\nsrc=pathlib.Path('docs/architecture-manifest.json');target=pathlib.Path('docs/platform/contracts/architecture-manifest.json');old=subprocess.check_output(['git','show','HEAD:'+str(target)]);target.write_bytes(src.read_bytes());changes.append(dict(section='b',path=str(target),before=old.decode(),after=target.read_text(),occurrences=1,evidence=['docs/architecture-manifest.json at af0057e13'],byteEqual=True))\n# Existing sidecar is plan-local, preserve keys and update only current manifest hashes later.\nex=pathlib.Path('scripts/check-legacy-docs-ratchet.exceptions.json');d=json.loads(ex.read_text())\nfor src in ['docs/io-contract.md','docs/specs/distribution.md','docs/architecture-manifest.json','docs/specs/runner.md']:\n row=next((x for x in d['exceptions'] if x['path']==src),None)\n if row is None:\n  row=dict(path=src,kind='allowed-edit',rationale='',approvedBy='',owner='documentation-authority-unification-lead',revisitTrigger='Phase 08 cutover');d['exceptions'].append(row)\n before=dict(row);row['expectedDigest']=sha(pathlib.Path(src).read_bytes());row['rationale']+=' A31 main merge af0057e13: upstream bytes accounted unchanged; '+('new RUL98/RUL99/RUL100 recorded for Step 9 only, no carriage now.' if src.endswith('/runner.md') else 'changed units re-carried verbatim to existing Step 4/5 candidates; independent re-review pending.');row['approvedBy']+='; assignment unit-run-1792052396770-6f1c5957 authorizes main-merge accounting, not content approval';row['reviewedAt']='2026-10-15'\n changes.append(dict(section='b',path=str(ex),source=src,before=before,after=dict(row),accountingOnly=True))\nex.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\\n')\nout=dict(version=1,inputCommit=subprocess.check_output(['git','rev-parse','HEAD']).decode().strip(),changes=changes,runnerDeferred=dict(path='docs/specs/runner.md',rules=['RUL98','RUL99','RUL100'],carried=False),nativeWorkingStateBlocker='Native generator requires committed treeish; no git writes authorized. One HEAD native sync plus separately labelled working-tree conservation overlay, not native certification of changed bytes.')\n(R/'step8-final-rework-accounting.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\\n')\nprint('edits',len(changes))\n",
+    "bindingVerification": "import fs from 'node:fs';import assert from 'node:assert/strict';import crypto from 'node:crypto';\nconst root=process.cwd(),R='plans/260925-documentation-authority-unification/reports/phase-06/',a=JSON.parse(fs.readFileSync(R+'step8-final-rework-accounting.json')),gen=await import(root+'/scripts/generate-doc-inventory.mjs'),reg=JSON.parse(fs.readFileSync('/tmp/fgos-work/step8-final/identity-registry.json')),native=new Map(['units','retiredUnits','identityGaps'].flatMap(k=>reg[k]).map(u=>[u.claimId,u])),sha=b=>crypto.createHash('sha256').update(b).digest('hex'),cache=new Map();\nconst extract=p=>{if(!cache.has(p)){const t=fs.readFileSync(p,'utf8');cache.set(p,p.endsWith('.md')?gen.extractMarkdownConservationUnits(t):gen.extractMixedFileConservationUnit(p,t));}return cache.get(p);};\nlet blocks=0;const checked=[];for(const x of [...a.reboundRows,...a.newSourceRows]){const d=x.decision,s=JSON.parse(fs.readFileSync(x.shard)),live=[...(s.claims||[]),...(s.registryGaps||[])].find(r=>r.claimId===d.claimId);assert.deepEqual(live,d);assert.match(d.sourceUnitDigest,/^[0-9a-f]{64}$/);assert.equal(native.get(d.claimId).sourceUnitDigest,d.sourceUnitDigest);assert.equal(d.reviewStatus,'pending');assert(!d.reviewedBy&&!d.reviewReportCommit);const u=extract(d.targetOwner).find(u=>u.anchor===d.targetAnchor);assert.equal(u.textDigest,d.targetUnitDigest);if(u.unitKind!=='heading'&&d.targetOwner.endsWith('.md')){const t=fs.readFileSync(d.targetOwner,'utf8').split('\\n').slice(u.startLine-1,u.endLine).join('\\n').trim();assert.equal(sha(t),u.textDigest);blocks++;}checked.push(d.claimId);}\nassert.equal(new Set(checked).size,checked.length);const sourceChecks={};for(const p of ['docs/io-contract.md','docs/specs/distribution.md','docs/architecture-manifest.json','docs/specs/runner.md'])sourceChecks[p]=sha(fs.readFileSync(p));\nconst sourceByteEquality=a.manifestCopySidecar.byteEqual;assert(fs.readFileSync('docs/architecture-manifest.json').equals(fs.readFileSync('docs/platform/contracts/architecture-manifest.json')));\nconst result={checkedPendingBindings:checked.length,claimIds:checked,sourceNativeDigestEquality:true,realTargetDigestEquality:true,decisionSidecarEquality:true,noApprovalCarry:true,independentHandSHA256Blocks:blocks,sourceSHA256:sourceChecks,manifestByteEquality:sourceByteEquality};fs.writeFileSync(R+'step8-final-binding-proof.json',JSON.stringify(result,null,2)+'\\n');console.log(JSON.stringify(result));\n",
+    "packaging": "import json,pathlib,subprocess,hashlib,collections\nP=pathlib.Path('plans/260925-documentation-authority-unification');R=P/'reports/phase-06';S=pathlib.Path('/tmp/fgos-work/step8-final');read=lambda p:json.loads(p.read_text());write=lambda p,x:p.write_text(json.dumps(x,ensure_ascii=False,indent=2)+'\\n');sha=lambda b:hashlib.sha256(b if isinstance(b,bytes) else b.encode()).hexdigest()\na=read(R/'step8-final-rework-accounting.json');proof=read(R/'step8-final-verification.json');entries=[]\nfor x in a['reboundRows']:\n entries.append(dict(entryId=x['claimId'],section=x['section'],channel='source-carriage-rebinding' if x['channel']=='claims' else 'predecessor-accounting-rebinding',reviewStatus='pending',sourceDigest=x['sourceDigest'],sourcePath=x['sourcePath'],sourceAnchor=x.get('sourceAnchor'),beforeDigest=x['beforeTarget']['textDigest'] if x.get('beforeTarget') else None,afterDigest=x['afterTarget']['textDigest'] if x.get('afterTarget') else None,**{k:x[k] for k in ['shard','beforeDecision','decision','beforeTarget','afterTarget','sourceNativeUnit']}))\nfor e,x in zip(entries,a['reboundRows']):\n for k in ['sourceShownText','inheritedSourceWitness']:\n  if k in x:e[k]=x[k]\n if x.get('beforeMainSourceUnit'):e['beforeMainSameAnchorWitness']={'unit':x['beforeMainSourceUnit'],'meaning':'Positional same-anchor witness before main merge, not an identity or semantic-equivalence assertion.'}\nfor x in a['newSourceRows']:entries.append(dict(entryId=x['claimId'],section='b',channel='new-native-main-source',reviewStatus='pending',**{k:v for k,v in x.items() if k not in ['section','claimId']}))\nfor i,x in enumerate(a['changedCandidateUnits'],1):entries.append(dict(entryId=('truth-rework-' if x['section']=='a' else 'main-carrier-unit-')+str(i).zfill(2),channel='changed-target-unit',**x))\nentries.append(dict(entryId='truth-unit-20-bookkeeping',section='a',channel='corrected-sentence-addendum',reviewStatus='pending',**{k:v for k,v in a['truthUnit20'].items() if k not in ['entryId','channel','reviewStatus']}))\nfor x in a['ratchetAccounting']['rows']:entries.append(dict(entryId='main-accounting-'+x['path'],section='b',channel='main-merge-accounting',reviewStatus='pending',row=x,beforeDigest=sha(subprocess.check_output(['git','show','af0057e13^1:'+x['path']])),afterDigest=sha(pathlib.Path(x['path']).read_bytes()),diff=subprocess.check_output(['git','diff','af0057e13^1','af0057e13','--',x['path']]).decode()))\nentries.append(dict(entryId='main-manifest-byte-equality',section='b',channel='machine-copy-sidecar',reviewStatus='pending',evidence=a['manifestCopySidecar']))\nentries.append(dict(entryId='main-distribution-plan-b',section='b',channel='plan-b-repin',reviewStatus='pending',evidence=a['planBCheck']))\nname='review-request-261015-1526-specs-ui-reworks-main-recarry.md';out=R/name\npayload=dict(version=1,authorSession='codex-session:unit-run-1792052396770-6f1c5957@2026-10-15',sourceCommit=a['inputCommit'],reviewMode='ordinary',reviewStatus='pending',count=len(entries),counts=dict(collections.Counter(x['section'] for x in entries)),binding='Legacy sources at af0057e13; target bytes are the file SHA256 set below. Runner commits these bytes after this turn. Reviewer must obtain and record that immutable runner commit and verify the hashes before issuing verdicts. Input HEAD is not a content pin for changed candidate files.',docsSHA256=proof['docsWorkingSHA256'],limitations={'nativeWorkingStateEquality':False,'blocker':a['nativeWorkingStateBlocker'],'nativeHEADProof':'step8-final-verification.json','overlayList':'step8-final-candidate-overlay.json','currentNativeListEquality':'UNPROVEN; no changed tuple is approved from an old list'},instructions='Choose no author-provided seed or verdict: none is supplied. Reviewer independently chooses all seeds, draws and verdicts. Deep-read every changed-text/digest row; match full shown decisions, source and target digests, ancestry and before/after units. Accounting and eligibility verdicts never certify current truth or promotion. Unchanged accepted verdicts are not reopened. Section (a) closes Step 8 when accepted and applied; section (b) separately closes main-merge accounting when accepted and applied, subject to a native sync of the runner commit. Runner RUL98/99/100 are deferred to Step 9, never carried in this packet.',correctedSentences=[x for x in a['changes'] if x['section']=='a'],priorBoundedReview={'report':'review-261015-1451-specs-ui-bounded-rereview-6b8d84f9e.md','reportCommit':subprocess.check_output(['git','rev-parse','88a1f4720']).decode().strip(),'counts':{'ok':96,'rework':5},'unchangedSourceVerdictsApplied':a['previousBoundedSourceApplications'],'notesRetained':True,'notes':a['priorReviewNotes'],'unchangedOutOfScopeObservation':a['unchangedOutOfScopeObservation']},entries=entries)\nwrite(out.with_suffix('.md.json'),payload)\nmd=['# Specs/UI corrections and main re-carry bounded re-review','','Author: '+payload['authorSession'],'Review mode: ordinary; review status: pending.','',f\"**{len(entries)} entries: section (a) {payload['counts']['a']}; section (b) {payload['counts']['b']}.**\",'',payload['binding'],'',payload['instructions'],'','Native current-working-state sync/list equality remain **UNPROVEN** under the no-git-write boundary. The one sync covers HEAD af0057e13. Inspect [verification](step8-final-verification.json) and raw native/overlay outputs; a green overlay cannot substitute for native evidence. This is a concrete review packet, not closure.','',f'Full machine packet: [{name}.json]({name}.json). [Before/after accounting](step8-final-rework-accounting.json). [Manifest hashes](step8-final-manifest-sidecar.json).','','## (a) Step 8 reworks and truth evidence','']\nfor x in payload['correctedSentences']:md+=['### Corrected sentence: '+x['path'],'','Before:','```text',x['before'],'```','After:','```text',x['after'],'```','Evidence: '+ '; '.join(x['evidence']),'']\nmd+=['`truth-unit-20` now explicitly lists the corrected Runs-when sentence in the addendum. Its text remains unchanged this turn. The historical reviewed request remains immutable. Residual dashboard lifetime independence (R6) is true because startGateway spawns detached and unrefs its child (`src/runner/gateway-control.mjs:295-309`); only the false cockpit lifecycle clause is replaced.','']\nfor section in ['a','b']:\n if section=='b':md+=['## (b) Main re-carry and merge accounting','','Verbatim distribution row 7 and CLI outcome/exit-code paragraph; byte-equal manifest. Source blobs and all source/candidate SHA256 values are in the packet. Distribution was re-pinned after the Lead merge under the completed Plan B rule. Runner new lines are recorded for Step 9 only. Ancestor and unheaded-block anchor consequences are included, and changed bindings stay pending. Historical predecessor IDs are retained with distinct current native successors.','']\n for e in [x for x in entries if x['section']==section]:\n  md+=['### '+e['entryId'],'','Channel: '+e['channel']+'. Status: pending.']\n  for k in ['sourcePath','sourceAnchor','sourceDigest','beforeDigest','afterDigest']:\n   if e.get(k) is not None:md+=['- '+k+': `'+str(e[k])+'`']\n  md+=['','```json',json.dumps(e,ensure_ascii=False,indent=2),'```','']\nmd+=['## Verification and remaining work','',f\"One HEAD native sync: {proof['sync']['durationSeconds']}s; {proof['sync']['knownBefore']} → {proof['sync']['knownAfter']} known IDs, no loss; compact registry persisted once ({proof['registry']['bytes']} bytes).\",'', 'Native and overlay D/E with both priors and each separately:','', '| Run | Native fatal | Overlay structural fatal |','|---|---:|---:|']\nfor n,o in zip(proof['nativeRuns'],proof['overlayRuns']):md += [f\"| {n['name']} | {n['fatalCount']} | {o['structuralFatalCount']} |\"]\nmd+=['','Native failures and open categories remain visible in raw outputs. Current native candidate tuple equality is not certified. Working overlay lists match across all three strict E overlays; IDs newly produced in an overlay are provisional. 44/44 review/conservation tests pass with `env -u CLAUDE_CODE_SESSION_ID`, zero skips. Ratchet clean. No legacy source, checker, gate, vocabulary, extractor, baseline or .fgos workspace write; no git write. No component-boundary change. No promotion, retirement or cutover.','']\nout.write_text('\\n'.join(md));write(S/'package-result.json',{'path':str(out),'entries':len(entries),'counts':payload['counts'],'SHA256':sha(out.read_bytes())});print(json.dumps(read(S/'package-result.json')))\n",
+    "finalization": "import json,pathlib,subprocess,hashlib\nP=pathlib.Path('plans/260925-documentation-authority-unification');R=P/'reports/phase-06';S=pathlib.Path('/tmp/fgos-work/step8-final');a=json.load(open(R/'step8-final-rework-accounting.json'));v=json.load(open(R/'step8-final-verification.json'));packet=json.load(open(S/'package-result.json'));sync=v['sync'];request=pathlib.Path(packet['path']).name\nnative=' / '.join(str(x['fatalCount']) for x in v['nativeRuns']);overlay=' / '.join(str(x['structuralFatalCount']) for x in v['overlayRuns']);pending=[x for x in a['reboundRows'] if x['section']=='a'];assert len(pending)==9\ntext=f'''# Candidate corrections and main re-carry prepared — committed-working-state native proof blocked\n\nAssignment unit-run-1792052396770-6f1c5957/producer/1. Input **{a['inputCommit']}** (Lead main merge af0057e13); prior independent bounded review **88a1f4720**, 96 ok / 5 rework. This checkpoint supersedes counts above/below at earlier pins; all earlier entries are historical.\n\n**Section (a): 9 source rows rebound, pending**, including claim_511605d3 now `supersede` with the corrected unheaded-block Runs-when rationale; claim_2aae8d68 / claim_83dd4d99 and truth-unit-41/42 now say the contract has 19 paths and the gateway additionally registers GET /runtime and nests /mcp (gateway.rs:1244-1245). Code-checked residual plugin dictionary/role mentions state that check has no shipped skill; dashboard start/stop is the detached gateway CLI lifecycle (gateway-control.mjs:256-309,363-380). R6 lifetime independence is true and retained. The truth-unit-20 addendum explicitly records correction 08. Eight actual changed candidate truth units. **40 unchanged ordinary source verdicts applied** with the unchanged applicator and exact committed report pin; two prior ok rows changed again under the optional lifecycle fix and returned pending. No old approval carried to changed bytes.\n\n**Section (b): 45 existing bindings rebound (24 source claims, 21 predecessor/gap accounting rows) plus 4 current native source rows, all pending.** Distribution doctor row 7 and CLI exit-code/outcome paragraphs are carried verbatim in existing Step 4/5 owners. Architecture manifest is byte-equal with source/target byte lengths, blob and full SHA256 in [sidecar](step8-final-manifest-sidecar.json). Every related heading/anchor consequence is shown. Three newly gapped source IDs stay in registry-gap accounting; distinct native successors are named, never identity-grafted. All four upstream edits are accounted in the ratchet exceptions ledger: distribution and runner are active exceptions; io-contract and manifest are explicit accounting-only rows outside the frozen ratchet roots. Ratchet: clean, 995 files, 26 edits / 1 new. **Runner RUL98/99/100 are recorded for Step 9 only, not carried now.** Completed Plan B, Lead merge and distribution current/frozen blob comparison are recorded without editing a baseline. No component-boundary change.\n\nOne background native sync at committed HEAD with its own polled log: **{sync['durationSeconds']}s**, **{sync['items']} files / {sync['claims']} claims**; known IDs **{sync['knownBefore']} → {sync['knownAfter']}**, zero loss. Native active inventory/registry tuples equal. Compact registry persisted exactly once: **{v['registry']['bytes']} bytes**, SHA256 `{v['registry']['SHA256']}`, below 90 MB. This is **HEAD native evidence only**. The generator requires a committed treeish (`generate-doc-inventory.mjs:1453-1458,1655-1661`); assignment forbids every git write, and the runner commits only after this turn. Therefore it cannot certify these new working docs bytes in this turn. No second sync or fabricated content pin.\n\nD / E, ordered both-priors then identity then phase02: native fatal **{native}**; working overlay structural fatal **{overlay}**. Native target-drift is expected against the pre-edit HEAD and remains a real open failure, not reclassified as green. No decision-digest-stale remains. [Verification and raw six native/six overlay results](step8-final-verification.json). Overlay reverse-list equality across all three strict E runs is checked on all five fields, but current **native** tuple equality is UNPROVEN; prior native candidate lists remain historical. [Provisional overlay list](step8-final-candidate-overlay.json). Strict E remains open; full truth/promotion is not certified.\n\nAll **58 pending decisions** match actual native source digests, real current target digests and packet decisions; **46 Markdown block hashes** independently recompute. [Binding proof](step8-final-binding-proof.json). Tests **44/44 pass**, zero fail/skip/cancel/todo, `env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/scripts/doc-decision-conservation.test.mjs test/scripts/doc-decision-review.test.mjs test/scripts/doc-review-format.test.mjs`. Candidate metadata/link report has zero findings; `git diff --check` passes. Legacy source bytes remain equal to input HEAD.\n\n**One bounded request: [{request}]({request}), {packet['entries']} entries: (a) {packet['counts']['a']}; (b) {packet['counts']['b']}.** Complete before/after text, full source/target digests, shown decisions, truth evidence and corrected-sentence bookkeeping are in its JSON sidecar and [accounting](step8-final-rework-accounting.json). Convention generated the basename using the existing Rust binary (plain fgos lacks an activation in this checkout). Reviewer supplies every verdict and any seeds/draws; none authored here. The reviewer must pin the runner commit and compare the supplied working-file SHA256 values, not use input HEAD as the changed-doc content pin.\n\n**Blocker:** native sync and native candidate tuple equality at the runner commit remain required. The no-git-write execution boundary prevents producing that immutable input before this turn ends. After runner commit, run native sync and D/E at that commit before declaring closure; do not present the provisional overlay as native evidence. Section (a) closes Step 8 only when accepted and applied; section (b) separately closes main-merge accounting. **Step 9 is next after those closures.** No owner-direction question. Preserve full-truth-at-promotion, Rings holds, A34 residuals, token checkpoint, strict fresh-reader/isolation limits and navigation/consumer/alias/cutover obligations.\n\nNo gate/checker/vocabulary/extractor/baseline, legacy source, .fgos workspace, secret, lifecycle or git write. Scratch only /tmp/fgos-work; runner owns commit. Required external result artifact is the sole write-scope exception; needsWrites empty. MDView MCP unavailable; preview cannot be started within the assignment's write boundary.\n'''\nfor path in [R/'progress.md',R/'step-08-report.md']:\n old=path.read_text();path.write_text(text+'\\n---\\n\\n'+old)\n# Preserve the exact helpers used for verification and request generation as evidence, never as a checker change.\nv['reproduction']['bindingVerification']=(S/'verify-bindings.mjs').read_text();v['reproduction']['packaging']=(S/'package.py').read_text();v['reproduction']['finalization']=(S/'finalize.py').read_text();(R/'step8-final-verification.json').write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\\n')\nsummary=f'''fix(docs): correct candidate assertions and account upstream contract changes\n\nAnh, em đã sửa clause route, plugin check và gateway lifecycle; bổ sung truth-unit-20. Rebind (a) 9 row; (b) 45 row cũ + 4 row native mới, tất cả pending; áp dụng 40 verdict cũ còn nguyên binding. Sync HEAD {sync['durationSeconds']}s, không mất ID, persist compact một lần. Native D/E còn target drift; overlay structural {overlay}. Tests 44/44, ratchet sạch. Request: {packet['path']} ({packet['entries']} entries). Blocker: cần native sync/list equality tại runner commit; native API chỉ đọc commit, lượt này cấm git write nên không thể chứng nhận bytes chưa commit. Step 8 và main accounting chưa đóng; Step 9 tiếp theo sau review/application và native proof.'''\nout=pathlib.Path('/home/vantt/projects/forgentX/.fgos/assignments/unit-run-1792052396770-6f1c5957/producer/1/runs/01/worker-output/outbox');out.mkdir(parents=True,exist_ok=True)\nclaim={'contract':{'id':'agent-result-claim','version':2},'status':'blocked','summary':summary,'blocker':a['nativeWorkingStateBlocker'],'evidenceRefs':[packet['path'],packet['path']+'.json',str(R/'step8-final-verification.json'),str(R/'step8-final-binding-proof.json'),str(R/'step8-final-rework-accounting.json'),str(R/'progress.md')],'needsWrites':[]};(out/'agent-result.json').write_text(json.dumps(claim,ensure_ascii=False,indent=2)+'\\n');(out/'agent-report.md').write_text(summary+'\\n')\nprint(summary)\n"
+  }
+}
