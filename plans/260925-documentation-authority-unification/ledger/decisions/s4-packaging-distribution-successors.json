@@ -472,23 +472,18 @@
       "claimId": "claim_40aafcee52b22eda087c5f85eacb9392",
       "sourcePath": "docs/specs/runner.md",
       "sourceUnitDigest": "95e75f7d43d50bbae0d6a7979aa0db2f01326f00fc290507fdf8bf046403a547",
-      "disposition": "supersede",
-      "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-92",
-      "authoredBy": "codex-session:15@2026-10-14",
-      "reviewStatus": "reviewed",
-      "rationale": "A31 main-only text change has this native same-file successor from the upstream diff. Conservation proposal only; no code truth review or identity graft.",
-      "reviewNote": "Historical runner#92 (95e75f7d, 31f676749) superseded by 4fc5044d, which keeps the redundancy rule and syncing sentence and adds the stranded-copy, torn and tmp-staging rules; replaced wording is stated; supersede truthful",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-boundary-gaps.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "4fc5044db3e9bb5826d7ea2dd979fdc39e1190356326c84170e2b3df69d8204e",
+      "disposition": "partial-carry",
+      "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "targetAnchor": "unheaded-block-3",
+      "authoredBy": "codex-session:unit-run-1792062144702-ef1d2734@2026-10-15",
+      "reviewStatus": "pending",
+      "rationale": "L9-9/A22 re-decision: upstream edits removed or rewrote RUL77 posture and pending-copy cap obligations, so whole-unit successor containment no longer holds. The mapped candidate retains only part. Partial-carry preserves the omitted wording in the full digest-bound residual; no retirement, truth or approval carry. Independent conservation and A34 representation review owed; blocks cutover.",
+      "targetUnitDigest": "d52805501d986df922e8ca582cc5ec3f5a78c7ece11bdac910f4e6ffdf9e2bdb",
       "targetAncestry": [
-        "Spec: Runner (vòng tự hành)",
+        "Added in candidate: Runner Business Rules",
         "Business Rules"
       ],
-      "reviewReportCommit": "4f99b9ec9eaf90f9db38e9073f92ca76c6808d1e"
+      "remainder": "Full original and missing/rewritten lines retained verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-l9-9-partial-carry-residual.json, SHA256 e9e0f0c0c4f9c47ea8c51c7564a2892059d6697cfec6d1654d915f26f28c8e69; bound to source 95e75f7d43d50bbae0d6a7979aa0db2f01326f00fc290507fdf8bf046403a547 and primary target d52805501d986df922e8ca582cc5ec3f5a78c7ece11bdac910f4e6ffdf9e2bdb. Pending independent A34 review; blocks cutover."
     },
     {
       "claimId": "claim_c2aa4371cc420cd24793da9c23497e42",

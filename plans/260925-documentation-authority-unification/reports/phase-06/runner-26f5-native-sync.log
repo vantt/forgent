@@ -1,0 +1,3 @@
+START 2026-10-15T11:03:32.011Z 99020
+CARRIED 2026-10-15T11:03:35.084Z 91331
+DONE {"contentCommit":"26f5f6119e3ee61631797d49f2938c5f164424a5","syncSeconds":1808.898,"items":4484,"claims":91331,"knownBefore":99020,"knownAfter":99062,"zeroKnownIDLoss":true,"activeTupleEquality":true,"persistenceCount":1,"compact":true,"registryBytes":61889509,"registrySHA256":"be15d0569dd4f0014a37ecc232a233754f445f056698f63edb9a8359c0dbbcad","carryForward":{"fromCommit":"81d0ed0747014e976c0d29222439fd6e3592b468","toCommit":"26f5f6119e3ee61631797d49f2938c5f164424a5","oldUnits":91324,"newUnits":91331,"kept":90885,"paired":374,"moved":0,"editedKept":30,"added":42,"gaps":35,"retired":0,"retiredDocuments":0},"newUnits":42,"newGaps":35,"newRetired":0}

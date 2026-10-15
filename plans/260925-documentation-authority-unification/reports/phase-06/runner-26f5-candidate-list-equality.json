@@ -1,0 +1,1123 @@
+{
+  "contentCommit": "26f5f6119e3ee61631797d49f2938c5f164424a5",
+  "tupleFields": [
+    "claimId",
+    "path",
+    "anchor",
+    "unitDigest",
+    "fileStatus"
+  ],
+  "runner": {
+    "contentCommit": "26f5f6119e3ee61631797d49f2938c5f164424a5",
+    "fullFiveFieldTupleEquality": true,
+    "tupleFields": [
+      "claimId",
+      "path",
+      "anchor",
+      "unitDigest",
+      "fileStatus"
+    ],
+    "tupleSHA256": "c5ca80615d334ca3fc3d6950aa880e3bf1030825c10675c7409285e56e3723ee",
+    "count": 62,
+    "allThreePriors": true
+  },
+  "root": {
+    "contentCommit": "26f5f6119e3ee61631797d49f2938c5f164424a5",
+    "fullFiveFieldTupleEquality": true,
+    "tupleFields": [
+      "claimId",
+      "path",
+      "anchor",
+      "unitDigest",
+      "fileStatus"
+    ],
+    "tupleSHA256": "dec5b4a2c3e5629ec0eb858785f741c2cb54ea5fa59121beff766c9786c3b6d8",
+    "count": 846,
+    "allThreePriors": true
+  },
+  "rootDelta": {
+    "before": 846,
+    "after": 846,
+    "added": [],
+    "removed": []
+  },
+  "runnerDelta": {
+    "before": 81,
+    "after": 62,
+    "added": [
+      {
+        "claimId": "claim_6d9574a227eda87b677fe47f217fc8f6",
+        "path": "docs/platform/runner/architecture/h-69197b459754.md",
+        "anchor": "added-in-candidate-runner-dispatch-operability-implementation-slice-2026-09-16",
+        "unitDigest": "913385a974e2a0aa1ab32b2a4ef833ae8918ebac297479a4f0823ac88f6d94e5",
+        "fileStatus": "Candidate",
+        "shownText": "# Added in candidate: Runner Dispatch operability implementation slice (2026-09-16)\n\n\n```txt\nDocument type: Architecture\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve frozen-map runner content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; implementation truth not certified\nProvenance: docs/specs/runner.md at 63fa6f15266f45c881f610235e0be8d61ff07120; blob ddfa78cc7183cf1f7db8ee64d2339653a0aa0023\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing runner carriage, placement and conservation\nDo not use this for: Canonical behavior, source retirement or current truth proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/specs/runner.md\nSupersedes: None; legacy authority retained\nSuperseded by: None\n```\n\n> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: A41 F-F: reconcile supports three actions (src/runner/dispatch/reconciliation-planner.mjs:203-206; src/runner/dispatch/reconciliation-planner.mjs:225-233; src/runner/dispatch/reconciliation-planner.mjs:529-534); R9-1: link-only rebase; label and repository referent preserved (src/runner/dispatch/assignment-layout.mjs); R9-1: link-only rebase; label and repository referent preserved (test/fixtures/run-layout/expected.json); R9-1: link-only rebase; label and repository referent preserved (plans/reports/observe-unit-summary-stance-prior-art-261005.md); R9-5: remove decisions-placement boilerplate from non-decision carrier ().",
+        "shownTextDigest": "756b0b6d9f99e74539860bda776c59b0cb361d0056296d83c47fcfd1ce0ac050",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_402c67504d85360a3c302ec4bd0b36f8",
+        "path": "docs/platform/runner/architecture/h-69197b459754.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "afdcc70dbdf7e1b68a36cbd6b77105a3b34f755e399fa7a7973fe5d189759024",
+        "fileStatus": "Candidate",
+        "shownText": "> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: A41 F-F: reconcile supports three actions (src/runner/dispatch/reconciliation-planner.mjs:203-206; src/runner/dispatch/reconciliation-planner.mjs:225-233; src/runner/dispatch/reconciliation-planner.mjs:529-534); R9-1: link-only rebase; label and repository referent preserved (src/runner/dispatch/assignment-layout.mjs); R9-1: link-only rebase; label and repository referent preserved (test/fixtures/run-layout/expected.json); R9-1: link-only rebase; label and repository referent preserved (plans/reports/observe-unit-summary-stance-prior-art-261005.md); R9-5: remove decisions-placement boilerplate from non-decision carrier ().",
+        "shownTextDigest": "afdcc70dbdf7e1b68a36cbd6b77105a3b34f755e399fa7a7973fe5d189759024",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_2bebe6c55e6d3140c1fa481d8a9dee77",
+        "path": "docs/platform/runner/architecture/h-7af1f0242611.md",
+        "anchor": "added-in-candidate-runner-từ-vựng-dispatch-hiện-hành",
+        "unitDigest": "8ddb38877d5d538692dfdf0018157dfa7734a5f808423606ec55ddb67f4593d6",
+        "fileStatus": "Candidate",
+        "shownText": "# Added in candidate: Runner Từ vựng dispatch hiện hành\n\n\n```txt\nDocument type: Architecture\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve frozen-map runner content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; implementation truth not certified\nProvenance: docs/specs/runner.md at 63fa6f15266f45c881f610235e0be8d61ff07120; blob ddfa78cc7183cf1f7db8ee64d2339653a0aa0023\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing runner carriage, placement and conservation\nDo not use this for: Canonical behavior, source retirement or current truth proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/specs/runner.md\nSupersedes: None; legacy authority retained\nSuperseded by: None\n```\n\n> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: R9-1: link-only rebase; label and repository referent preserved (docs/architect/agent-coordination/architecture/dispatch-control-plane.md); R9-5: remove decisions-placement boilerplate from non-decision carrier (). Carried `runner.md:<line>` self-citations are stale line references; numbers retained, not corrected.",
+        "shownTextDigest": "732fc50702b8b2d9792e3701c04f642d83ef05442b95417493c5904b30f360ec",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_76d002b3dbeb785e9559579959af3377",
+        "path": "docs/platform/runner/architecture/h-7af1f0242611.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "9da9bcc76bc76956e634af3c85fd1b118ed4fd9d68d5aa69e908dcb552c0b890",
+        "fileStatus": "Candidate",
+        "shownText": "> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: R9-1: link-only rebase; label and repository referent preserved (docs/architect/agent-coordination/architecture/dispatch-control-plane.md); R9-5: remove decisions-placement boilerplate from non-decision carrier (). Carried `runner.md:<line>` self-citations are stale line references; numbers retained, not corrected.",
+        "shownTextDigest": "9da9bcc76bc76956e634af3c85fd1b118ed4fd9d68d5aa69e908dcb552c0b890",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_c0471bfea95775f46bd4fdb1fe053d52",
+        "path": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+        "anchor": "added-in-candidate-runner-dispatch-runtime-inspection",
+        "unitDigest": "c5f31ae242c1977967adaa4642af4bfd11c3e7c5d0f6cc180ff6eccd4e15fa7c",
+        "fileStatus": "Candidate",
+        "shownText": "# Added in candidate: Runner Dispatch runtime inspection\n\n\n```txt\nDocument type: Architecture\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve frozen-map runner content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; implementation truth not certified\nProvenance: docs/specs/runner.md at 63fa6f15266f45c881f610235e0be8d61ff07120; blob ddfa78cc7183cf1f7db8ee64d2339653a0aa0023\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing runner carriage, placement and conservation\nDo not use this for: Canonical behavior, source retirement or current truth proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/specs/runner.md\nSupersedes: None; legacy authority retained\nSuperseded by: None\n```\n\n> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: A41 F-F: remove unsupported action description (src/runner/dispatch/reconciliation-planner.mjs:225-233); A41 F-F: reconcile action count (src/runner/dispatch/reconciliation-planner.mjs:225-233); R9-5: remove decisions-placement boilerplate from non-decision carrier ().",
+        "shownTextDigest": "f492aab0716334cac4c903b13d2afd874b2ce7fd8256f8b92fcd9bcd009a8bd5",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_6db9fcda9f7e1ffb80586641d2606ae5",
+        "path": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "84546f2c20181a173d1a54c3f40841709e9759c605891f226849ce8bdbe14f9e",
+        "fileStatus": "Candidate",
+        "shownText": "> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: A41 F-F: remove unsupported action description (src/runner/dispatch/reconciliation-planner.mjs:225-233); A41 F-F: reconcile action count (src/runner/dispatch/reconciliation-planner.mjs:225-233); R9-5: remove decisions-placement boilerplate from non-decision carrier ().",
+        "shownTextDigest": "84546f2c20181a173d1a54c3f40841709e9759c605891f226849ce8bdbe14f9e",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_fc303a330af62e1b12720d8a10028efb",
+        "path": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+        "anchor": "added-in-candidate-runner-executorprofile-invocation-target-vocabulary-phase-06-executor-policy-dispatch-seams-identitysupports-made-real-config-phase-c-executor-profile-schema-migration",
+        "unitDigest": "84f1cee4092802ca08dd88ab4e7a5b523eedb4fdc49f5ae769568833d4bae5eb",
+        "fileStatus": "Candidate",
+        "shownText": "# Added in candidate: Runner ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)\n\n\n```txt\nDocument type: Contract\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve frozen-map runner content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; implementation truth not certified\nProvenance: docs/specs/runner.md at 63fa6f15266f45c881f610235e0be8d61ff07120; blob ddfa78cc7183cf1f7db8ee64d2339653a0aa0023\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing runner carriage, placement and conservation\nDo not use this for: Canonical behavior, source retirement or current truth proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/specs/runner.md\nSupersedes: None; legacy authority retained\nSuperseded by: None\n```\n\n> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: R9-5: remove decisions-placement boilerplate from non-decision carrier ().",
+        "shownTextDigest": "cedde29f8e67c2108bb4c0f8a61eab07eb52dd683bf08a27b72f527eb489af6e",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_59711e037dea1dfd34303ae5a58f932f",
+        "path": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "e7ce04bde149d71aaeeaa5e11376aef97254251762c25855601d09c2a34ddc94",
+        "fileStatus": "Candidate",
+        "shownText": "> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: R9-5: remove decisions-placement boilerplate from non-decision carrier ().",
+        "shownTextDigest": "e7ce04bde149d71aaeeaa5e11376aef97254251762c25855601d09c2a34ddc94",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_c868bc8d5e9e5a6f4859364834528dd6",
+        "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "anchor": "added-in-candidate-runner-lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4",
+        "unitDigest": "927a165271f854c0ac600617f142b76a2ffeb45941b078f4de43e8f20213cd5b",
+        "fileStatus": "Candidate",
+        "shownText": "# Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)\n\n\n```txt\nDocument type: Decision record\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve frozen-map runner content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; implementation truth not certified\nProvenance: docs/specs/runner.md at 63fa6f15266f45c881f610235e0be8d61ff07120; blob ddfa78cc7183cf1f7db8ee64d2339653a0aa0023\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing runner carriage, placement and conservation\nDo not use this for: Canonical behavior, source retirement or current truth proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/specs/runner.md\nSupersedes: None; legacy authority retained\nSuperseded by: None\n```\n\n> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Placement in decisions does not declare the subject retired. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: R9-1: link-only rebase; label and repository referent preserved (docs/specs/confinement-authority.md); R9-1: link-only rebase; label and repository referent preserved (plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/acceptance-herdr.md). Carried `runner.md:<line>` self-citations are stale line references; numbers retained, not corrected. The verbatim carried retired heading holds 11 current decision records: 0047, 0052 and 0055–0063; partly superseded clauses keep their dated historical meaning (including 0062 R3_PENDING_WORK_CALLERS, superseded by 0063). Carried `runner.md:<line>` self-citations are stale line references; numbers and historical decision text retained.",
+        "shownTextDigest": "f4133cb6f91d1addb100212db9cb708c2fdc2ded6b3f9e8e6e9f15569dc526ff",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_f422f916cb0bf672b9cbbcd606db80c3",
+        "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "975a5c93a18cfc1f8d109b6f18c8f71ced525d11c69f96dcb84b4eecc6cccab6",
+        "fileStatus": "Candidate",
+        "shownText": "> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Placement in decisions does not declare the subject retired. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: R9-1: link-only rebase; label and repository referent preserved (docs/specs/confinement-authority.md); R9-1: link-only rebase; label and repository referent preserved (plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/acceptance-herdr.md). Carried `runner.md:<line>` self-citations are stale line references; numbers retained, not corrected. The verbatim carried retired heading holds 11 current decision records: 0047, 0052 and 0055–0063; partly superseded clauses keep their dated historical meaning (including 0062 R3_PENDING_WORK_CALLERS, superseded by 0063). Carried `runner.md:<line>` self-citations are stale line references; numbers and historical decision text retained.",
+        "shownTextDigest": "975a5c93a18cfc1f8d109b6f18c8f71ced525d11c69f96dcb84b4eecc6cccab6",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_068de0851cd81c1c38d509d107fd11a3",
+        "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+        "anchor": "added-in-candidate-runner-behaviors-operations",
+        "unitDigest": "426191be471fa6d93af350ba339fdbf4dea6034d1c8a04cf93481994e108423f",
+        "fileStatus": "Candidate",
+        "shownText": "# Added in candidate: Runner Behaviors & Operations\n\n\n```txt\nDocument type: Guide / Runbook\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve frozen-map runner content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; implementation truth not certified\nProvenance: docs/specs/runner.md at 63fa6f15266f45c881f610235e0be8d61ff07120; blob ddfa78cc7183cf1f7db8ee64d2339653a0aa0023\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing runner carriage, placement and conservation\nDo not use this for: Canonical behavior, source retirement or current truth proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/specs/runner.md\nSupersedes: None; legacy authority retained\nSuperseded by: None\n```\n\n> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: A41 F-B: remove model-call denial (src/runner/loop.mjs:1641-1655); A41 F-B continuation: validation precedes plan resolution (src/runner/loop.mjs:1641-1678); A41 F-E: replace removed live tee with run capture (src/runner/loop.mjs:349-351; src/runner/loop.mjs:1110-1112; src/runner/loop.mjs:1150-1163); A41 F-E: item-log tail does not stream worker chunks (src/runner/loop.mjs:349-351; src/runner/loop.mjs:1150-1163); A41 F-G: Iron Law has no entropy-module rule (src/evolve/iron-law.mjs:20-45); A41 F-C: evolve/ranking is absent; remaining Gate A contract explicitly scoped to legacy (bin/fgos.mjs:4373-4380; bin/fgos.mjs:4640-4643); R9-5: remove decisions-placement boilerplate from non-decision carrier (). The remaining Gate A evolve bullets describe the legacy contract, not a current shipped verb; full truth check owed at promotion.",
+        "shownTextDigest": "2b4f6eadd4231e276227b7faa9eccfa8b01c9f775781194dfc511c75be3c2dce",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_c1794577b56452c92d31a9032d43f13a",
+        "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "c605fe1f984894646aeab8f24dc4648e4438ef349329343163b66fe4d55b3941",
+        "fileStatus": "Candidate",
+        "shownText": "> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: A41 F-B: remove model-call denial (src/runner/loop.mjs:1641-1655); A41 F-B continuation: validation precedes plan resolution (src/runner/loop.mjs:1641-1678); A41 F-E: replace removed live tee with run capture (src/runner/loop.mjs:349-351; src/runner/loop.mjs:1110-1112; src/runner/loop.mjs:1150-1163); A41 F-E: item-log tail does not stream worker chunks (src/runner/loop.mjs:349-351; src/runner/loop.mjs:1150-1163); A41 F-G: Iron Law has no entropy-module rule (src/evolve/iron-law.mjs:20-45); A41 F-C: evolve/ranking is absent; remaining Gate A contract explicitly scoped to legacy (bin/fgos.mjs:4373-4380; bin/fgos.mjs:4640-4643); R9-5: remove decisions-placement boilerplate from non-decision carrier (). The remaining Gate A evolve bullets describe the legacy contract, not a current shipped verb; full truth check owed at promotion.",
+        "shownTextDigest": "c605fe1f984894646aeab8f24dc4648e4438ef349329343163b66fe4d55b3941",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_9f5ad7a613eda620cc6d0bffa3cfcd34",
+        "path": "docs/platform/runner/README.md",
+        "anchor": "added-in-candidate-verification-and-boundary",
+        "unitDigest": "6555feeeb25154ecf2a283ece563450bd4561250eaae96f72a787fdb608184aa",
+        "fileStatus": "Candidate",
+        "shownText": "## Added in candidate: Verification and boundary\n\nThe original RUL ids, decision ids and headings remain verbatim. The source heading containing retired is preserved as source wording; decision placement grants no retirement judgment. Known stale carried sentences; full truth check owed at promotion. Independent conservation, liveness/triage, truth sampling, fresh readers, red-team, native sync and scoped strict E remain owed. See `plans/260925-documentation-authority-unification/reports/phase-06/step-09-report.md` and `plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json`. No component-boundary change. Legacy authority stays unchanged.\n\n> Added in candidate: [Decision records](decisions/h-36d872fbb0e5.md) include current records 0047, 0052 and 0055–0063 under the verbatim carried retired-history heading; later records partly supersede earlier rules.",
+        "shownTextDigest": "b862140a8d39105c87d87d0da7760f34e757c42ac5e01aee112519b4d07404fb",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_9838cce08185802e1cf15f277e4aeba7",
+        "path": "docs/platform/runner/README.md",
+        "anchor": "unheaded-block-6",
+        "unitDigest": "36261a6f2886595e5f8b23c9b2b062f2bc062cb9fbb1635ef30e3102ad5766bb",
+        "fileStatus": "Candidate",
+        "shownText": "> Added in candidate: [Decision records](decisions/h-36d872fbb0e5.md) include current records 0047, 0052 and 0055–0063 under the verbatim carried retired-history heading; later records partly supersede earlier rules.",
+        "shownTextDigest": "36261a6f2886595e5f8b23c9b2b062f2bc062cb9fbb1635ef30e3102ad5766bb",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_ca5a587e419f78a1c7814b569019f5df",
+        "path": "docs/platform/runner/README.md",
+        "anchor": "added-in-candidate-known-conflicts-in-carried-text",
+        "unitDigest": "52df31f5ea305e546421fbdbfbcc912333bc5a63c5a6edbdb7de620213dfdd5e",
+        "fileStatus": "Candidate",
+        "shownText": "## Added in candidate: Known conflicts in carried text\n\nThese are reading cautions from the fresh-reader key, not current behavior proof. Known stale carried sentences; full truth check owed at promotion.\n\n1. The [history heading](decisions/h-36d872fbb0e5.md) says “retired” while carrying live settled decisions. Placement grants no retirement.\n2. The key found a Data Dictionary compat mention of `dispatch execute --effort` against RUL90/0062 removing that door. The candidate [dictionary](subcomponents/h-02842f76ffd2/spec.md) now labels its removal under A41; independent truth re-review is pending.\n3. Decision 0062 records the R3 pending-callers gate; RUL93/RUL95 and 0063 record it reached. These are dated stages of supersession, not code verification.\n4. The carried source front matter says August 2026 and `coverage: full` against an October body. The candidate [preamble](spec.md) is labelled corrected; the source's old claim proves no coverage.\n5. Deleted ranking/entropy pointers and the literal-main Open Gap were stale code claims. Candidate corrections are labelled in [Pointers](subcomponents/h-f34e0d170d89/spec.md), [Open Gaps](subcomponents/h-2e032393add1/spec.md) and [Gate A](operations/h-51f5cd7279fd.md); remaining carried claims are unverified.\n6. The [vocabulary table](architecture/h-7af1f0242611.md) keeps stale `runner.md:<line>` self-citations with a label; those numbers are not navigable candidate evidence.\n7. RUL76 already names `--idle-timeout-ms` and `runner.idleTimeoutMs` in the [carried rules](subcomponents/h-6979005beaf7/spec.md). Check its partial supersession and implementation before proposing a new idle-timeout rule.",
+        "shownTextDigest": "41f633f6c542988167e57a9a6b529afd73e421f4fa31bdad426dc7b190ec5561",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_26d342980833dcb3f02ad6f6943dbbc7",
+        "path": "docs/platform/runner/README.md",
+        "anchor": "unheaded-block-7",
+        "unitDigest": "d2954fca5e057016b72481aaa2d6871b94cc20bf700b0279f2e1031ec0349adc",
+        "fileStatus": "Candidate",
+        "shownText": "These are reading cautions from the fresh-reader key, not current behavior proof. Known stale carried sentences; full truth check owed at promotion.",
+        "shownTextDigest": "d2954fca5e057016b72481aaa2d6871b94cc20bf700b0279f2e1031ec0349adc",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_7d66cb9f2b9ec5287c811e85f2a018fd",
+        "path": "docs/platform/runner/README.md",
+        "anchor": "unheaded-block-8",
+        "unitDigest": "f1863a4fb726546440255dabac5d12389bf657b0102139fd2e1a7f8abccd8daf",
+        "fileStatus": "Candidate",
+        "shownText": "1. The [history heading](decisions/h-36d872fbb0e5.md) says “retired” while carrying live settled decisions. Placement grants no retirement.\n2. The key found a Data Dictionary compat mention of `dispatch execute --effort` against RUL90/0062 removing that door. The candidate [dictionary](subcomponents/h-02842f76ffd2/spec.md) now labels its removal under A41; independent truth re-review is pending.\n3. Decision 0062 records the R3 pending-callers gate; RUL93/RUL95 and 0063 record it reached. These are dated stages of supersession, not code verification.\n4. The carried source front matter says August 2026 and `coverage: full` against an October body. The candidate [preamble](spec.md) is labelled corrected; the source's old claim proves no coverage.\n5. Deleted ranking/entropy pointers and the literal-main Open Gap were stale code claims. Candidate corrections are labelled in [Pointers](subcomponents/h-f34e0d170d89/spec.md), [Open Gaps](subcomponents/h-2e032393add1/spec.md) and [Gate A](operations/h-51f5cd7279fd.md); remaining carried claims are unverified.\n6. The [vocabulary table](architecture/h-7af1f0242611.md) keeps stale `runner.md:<line>` self-citations with a label; those numbers are not navigable candidate evidence.\n7. RUL76 already names `--idle-timeout-ms` and `runner.idleTimeoutMs` in the [carried rules](subcomponents/h-6979005beaf7/spec.md). Check its partial supersession and implementation before proposing a new idle-timeout rule.",
+        "shownTextDigest": "f1863a4fb726546440255dabac5d12389bf657b0102139fd2e1a7f8abccd8daf",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_a26fab4d087508024f378ab4f06376de",
+        "path": "docs/platform/runner/spec.md",
+        "anchor": "unheaded-block-3",
+        "unitDigest": "095a95d4a43a6c25cb89add9758dd488193630fd6acad5a86e944e65fbf89251",
+        "fileStatus": "Candidate",
+        "shownText": "> Added in candidate: Metadata and map-based placement scaffolding. The area introduction follows the frozen map into architecture/h-e53a3a9829a8.md. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: A41 F4: candidate authoring date (docs/specs/runner.md:3193-3200); A41 F4: no current full-coverage certification (docs/specs/runner.md:3193-3200). Front-matter sources/decisions retain legacy provenance lists, not a completeness claim.",
+        "shownTextDigest": "095a95d4a43a6c25cb89add9758dd488193630fd6acad5a86e944e65fbf89251",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_9bb824887d1322330e8ada20aa456983",
+        "path": "docs/platform/runner/spec.md",
+        "anchor": "added-in-candidate-navigation",
+        "unitDigest": "4e9c9be998ff8941bdc5d7e38f3baf4769e048bb9199004378093fa6d1bc6871",
+        "fileStatus": "Candidate",
+        "shownText": "## Added in candidate: Navigation\n\n[Runner portal](README.md); [area introduction](architecture/h-e53a3a9829a8.md#guard-reconciliation). Each mapped carrier:\n\n- [architecture/h-e53a3a9829a8.md](architecture/h-e53a3a9829a8.md)\n- [subcomponents/h-ce5b9771a26a/spec.md](subcomponents/h-ce5b9771a26a/spec.md)\n- [subcomponents/h-02842f76ffd2/spec.md](subcomponents/h-02842f76ffd2/spec.md)\n- [operations/h-51f5cd7279fd.md](operations/h-51f5cd7279fd.md)\n- [subcomponents/h-6df5686d0d54/spec.md](subcomponents/h-6df5686d0d54/spec.md)\n- [subcomponents/h-6979005beaf7/spec.md](subcomponents/h-6979005beaf7/spec.md)\n- [subcomponents/h-37aced3896a8/spec.md](subcomponents/h-37aced3896a8/spec.md)\n- [subcomponents/h-2e032393add1/spec.md](subcomponents/h-2e032393add1/spec.md)\n- [subcomponents/h-d3b49ef7edf5/spec.md](subcomponents/h-d3b49ef7edf5/spec.md)\n- [subcomponents/h-f34e0d170d89/spec.md](subcomponents/h-f34e0d170d89/spec.md)\n- [architecture/h-7af1f0242611.md](architecture/h-7af1f0242611.md)\n- [contracts/h-b3eb60fb4d2b.md](contracts/h-b3eb60fb4d2b.md)\n- [decisions/h-aabefc85f0c9.md](decisions/h-aabefc85f0c9.md)\n- [architecture/h-69197b459754.md](architecture/h-69197b459754.md)\n- [decisions/h-36d872fbb0e5.md](decisions/h-36d872fbb0e5.md)",
+        "shownTextDigest": "2fd0929b7af7da8e8b3376cb799754d54cd124ffb4beff95b64599c29a6f0515",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_a6a41ce4075ee03c8960dcbb6fd9092d",
+        "path": "docs/platform/runner/spec.md",
+        "anchor": "unheaded-block-4",
+        "unitDigest": "9e73c6d5e5c7dbd4da71ee88258d31f418f0aa2a6e6e2a38aa790d78320dd572",
+        "fileStatus": "Candidate",
+        "shownText": "[Runner portal](README.md); [area introduction](architecture/h-e53a3a9829a8.md#guard-reconciliation). Each mapped carrier:",
+        "shownTextDigest": "9e73c6d5e5c7dbd4da71ee88258d31f418f0aa2a6e6e2a38aa790d78320dd572",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_2b28d055391c3a7a63ba302e0162afd1",
+        "path": "docs/platform/runner/spec.md",
+        "anchor": "unheaded-block-5",
+        "unitDigest": "d04a63b10c472c05f2b9cd8944994893cc66c74b4d82cb3e508337222ed9c4ec",
+        "fileStatus": "Candidate",
+        "shownText": "- [architecture/h-e53a3a9829a8.md](architecture/h-e53a3a9829a8.md)\n- [subcomponents/h-ce5b9771a26a/spec.md](subcomponents/h-ce5b9771a26a/spec.md)\n- [subcomponents/h-02842f76ffd2/spec.md](subcomponents/h-02842f76ffd2/spec.md)\n- [operations/h-51f5cd7279fd.md](operations/h-51f5cd7279fd.md)\n- [subcomponents/h-6df5686d0d54/spec.md](subcomponents/h-6df5686d0d54/spec.md)\n- [subcomponents/h-6979005beaf7/spec.md](subcomponents/h-6979005beaf7/spec.md)\n- [subcomponents/h-37aced3896a8/spec.md](subcomponents/h-37aced3896a8/spec.md)\n- [subcomponents/h-2e032393add1/spec.md](subcomponents/h-2e032393add1/spec.md)\n- [subcomponents/h-d3b49ef7edf5/spec.md](subcomponents/h-d3b49ef7edf5/spec.md)\n- [subcomponents/h-f34e0d170d89/spec.md](subcomponents/h-f34e0d170d89/spec.md)\n- [architecture/h-7af1f0242611.md](architecture/h-7af1f0242611.md)\n- [contracts/h-b3eb60fb4d2b.md](contracts/h-b3eb60fb4d2b.md)\n- [decisions/h-aabefc85f0c9.md](decisions/h-aabefc85f0c9.md)\n- [architecture/h-69197b459754.md](architecture/h-69197b459754.md)\n- [decisions/h-36d872fbb0e5.md](decisions/h-36d872fbb0e5.md)",
+        "shownTextDigest": "d04a63b10c472c05f2b9cd8944994893cc66c74b4d82cb3e508337222ed9c4ec",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_49177b68129a3fdba6d52e708f7d4ae1",
+        "path": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+        "anchor": "added-in-candidate-runner-data-dictionary",
+        "unitDigest": "cd7a3b60a257af9b5ff40caedf589714f1327db0d593be0b22be2a191991aa74",
+        "fileStatus": "Candidate",
+        "shownText": "# Added in candidate: Runner Data Dictionary\n\n\n```txt\nDocument type: Specification\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve frozen-map runner content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; implementation truth not certified\nProvenance: docs/specs/runner.md at 63fa6f15266f45c881f610235e0be8d61ff07120; blob ddfa78cc7183cf1f7db8ee64d2339653a0aa0023\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing runner carriage, placement and conservation\nDo not use this for: Canonical behavior, source retirement or current truth proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/specs/runner.md\nSupersedes: None; legacy authority retained\nSuperseded by: None\n```\n\n> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: A41 F-D: capacity lock is a directory (src/runner/dispatch/provider-capacity.mjs:44-49); A41 F-D: recovery has 14 classes (src/runner/recovery.mjs:126-141); A41 F-E: item log receives pointer and settled output (src/runner/loop.mjs:349-351; src/runner/loop.mjs:1110-1112; src/runner/loop.mjs:1150-1163); A41 F-E: remove raw live-chunk claim (src/runner/loop.mjs:1110-1112); A41 Data Dictionary: removed effort door (bin/fgos.mjs:960-980; src/runner/dispatch/cli.mjs:1268-1274); R9-5: remove decisions-placement boilerplate from non-decision carrier ().",
+        "shownTextDigest": "2992fc7b2be5b135023b89b50c226463d50e116d5d6246e9bda3b0f382ee3bda",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_4042a487be1420af2d968219f85c5569",
+        "path": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "12afe71586a21c7df7b4e1368d025a7ade7f746c924589f56f5c545efc2194e3",
+        "fileStatus": "Candidate",
+        "shownText": "> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: A41 F-D: capacity lock is a directory (src/runner/dispatch/provider-capacity.mjs:44-49); A41 F-D: recovery has 14 classes (src/runner/recovery.mjs:126-141); A41 F-E: item log receives pointer and settled output (src/runner/loop.mjs:349-351; src/runner/loop.mjs:1110-1112; src/runner/loop.mjs:1150-1163); A41 F-E: remove raw live-chunk claim (src/runner/loop.mjs:1110-1112); A41 Data Dictionary: removed effort door (bin/fgos.mjs:960-980; src/runner/dispatch/cli.mjs:1268-1274); R9-5: remove decisions-placement boilerplate from non-decision carrier ().",
+        "shownTextDigest": "12afe71586a21c7df7b4e1368d025a7ade7f746c924589f56f5c545efc2194e3",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_9d7592baf3f614958fbbe584ce57f31a",
+        "path": "docs/platform/runner/subcomponents/h-2e032393add1/spec.md",
+        "anchor": "added-in-candidate-runner-open-gaps",
+        "unitDigest": "edd260cf048949e914a793da4c03dc23fec17184aa5ad1d837a7da2f111ae842",
+        "fileStatus": "Candidate",
+        "shownText": "# Added in candidate: Runner Open Gaps\n\n\n```txt\nDocument type: Specification\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve frozen-map runner content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; implementation truth not certified\nProvenance: docs/specs/runner.md at 63fa6f15266f45c881f610235e0be8d61ff07120; blob ddfa78cc7183cf1f7db8ee64d2339653a0aa0023\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing runner carriage, placement and conservation\nDo not use this for: Canonical behavior, source retirement or current truth proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/specs/runner.md\nSupersedes: None; legacy authority retained\nSuperseded by: None\n```\n\n> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: A41 F3: trunk detection already exists (src/runner/merge.mjs:38-40; src/runner/merge.mjs:267; src/runner/worktree.mjs:255-290); R9-5: remove decisions-placement boilerplate from non-decision carrier ().",
+        "shownTextDigest": "b6236e2c47e6ee42ceabc6ee43e4b1c0000cda78699f5966a7aa57e7e30fe247",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_df9bb8c65a63baf3cda6c0db904ea89a",
+        "path": "docs/platform/runner/subcomponents/h-2e032393add1/spec.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "64d6757c0b7b5ada58be0d7aaad95388b2345f6c9ce9d0dcd7b18ec3d2e806e6",
+        "fileStatus": "Candidate",
+        "shownText": "> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: A41 F3: trunk detection already exists (src/runner/merge.mjs:38-40; src/runner/merge.mjs:267; src/runner/worktree.mjs:255-290); R9-5: remove decisions-placement boilerplate from non-decision carrier ().",
+        "shownTextDigest": "64d6757c0b7b5ada58be0d7aaad95388b2345f6c9ce9d0dcd7b18ec3d2e806e6",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_ad70929630fb898fe8888fcf6c6921dc",
+        "path": "docs/platform/runner/subcomponents/h-37aced3896a8/spec.md",
+        "anchor": "added-in-candidate-runner-edge-cases-settled",
+        "unitDigest": "e3c568be88ac6ac015c12b3aa2eb128a37560b799bba578c6b7150ee2b329cf3",
+        "fileStatus": "Candidate",
+        "shownText": "# Added in candidate: Runner Edge Cases Settled\n\n\n```txt\nDocument type: Specification\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve frozen-map runner content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; implementation truth not certified\nProvenance: docs/specs/runner.md at 63fa6f15266f45c881f610235e0be8d61ff07120; blob ddfa78cc7183cf1f7db8ee64d2339653a0aa0023\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing runner carriage, placement and conservation\nDo not use this for: Canonical behavior, source retirement or current truth proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/specs/runner.md\nSupersedes: None; legacy authority retained\nSuperseded by: None\n```\n\n> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: R9-5: remove decisions-placement boilerplate from non-decision carrier ().",
+        "shownTextDigest": "f50c4dc32e1702d8337b1d10c9494378bb008142b6d4e2979deefd81d976d294",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_8d3d4c9864a4bba02b9bfae99772b16b",
+        "path": "docs/platform/runner/subcomponents/h-37aced3896a8/spec.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "e7ce04bde149d71aaeeaa5e11376aef97254251762c25855601d09c2a34ddc94",
+        "fileStatus": "Candidate",
+        "shownText": "> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: R9-5: remove decisions-placement boilerplate from non-decision carrier ().",
+        "shownTextDigest": "e7ce04bde149d71aaeeaa5e11376aef97254251762c25855601d09c2a34ddc94",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_2258b72fc59cd09924b643a610315df2",
+        "path": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "anchor": "added-in-candidate-runner-business-rules",
+        "unitDigest": "4189e9ae76f3d2a898a691b67b58e85dc50e079ac0d8beb2b0de927d60bc9095",
+        "fileStatus": "Candidate",
+        "shownText": "# Added in candidate: Runner Business Rules\n\n\n```txt\nDocument type: Specification\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve frozen-map runner content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; implementation truth not certified\nProvenance: docs/specs/runner.md at 63fa6f15266f45c881f610235e0be8d61ff07120; blob ddfa78cc7183cf1f7db8ee64d2339653a0aa0023\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing runner carriage, placement and conservation\nDo not use this for: Canonical behavior, source retirement or current truth proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/specs/runner.md\nSupersedes: None; legacy authority retained\nSuperseded by: None\n```\n\n> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: A41 F-A: plan sweep may dispatch reviewer (src/runner/loop.mjs:1641-1655; domains/coding/workflows/feature.yaml:75-82); A41 F-H: replace stale live-config assertion with verified current schema; live config not read under assignment boundary (src/runner/dispatch/config.mjs:457; src/runner/dispatch/config.mjs:1015-1023); R9-5: remove decisions-placement boilerplate from non-decision carrier ().",
+        "shownTextDigest": "134692521ce034a59fe01af7575138e408fc482be78e9fc5bca16ab99174c12b",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_e9b68f8601da77a4fa8a8b5c44c452dd",
+        "path": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "ae342758588a4f31d8bfb6d8d2c6d912a8501b041245cbfa52e2f3bce8916bf3",
+        "fileStatus": "Candidate",
+        "shownText": "> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: A41 F-A: plan sweep may dispatch reviewer (src/runner/loop.mjs:1641-1655; domains/coding/workflows/feature.yaml:75-82); A41 F-H: replace stale live-config assertion with verified current schema; live config not read under assignment boundary (src/runner/dispatch/config.mjs:457; src/runner/dispatch/config.mjs:1015-1023); R9-5: remove decisions-placement boilerplate from non-decision carrier ().",
+        "shownTextDigest": "ae342758588a4f31d8bfb6d8d2c6d912a8501b041245cbfa52e2f3bce8916bf3",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_c210db5b5144b6e3616278a941b91006",
+        "path": "docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md",
+        "anchor": "added-in-candidate-runner-actors-access",
+        "unitDigest": "5823940dd52f5b50249d7b4014325f3e64b1f333c3272107f61dbf4817a43007",
+        "fileStatus": "Candidate",
+        "shownText": "# Added in candidate: Runner Actors & Access\n\n\n```txt\nDocument type: Specification\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve frozen-map runner content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; implementation truth not certified\nProvenance: docs/specs/runner.md at 63fa6f15266f45c881f610235e0be8d61ff07120; blob ddfa78cc7183cf1f7db8ee64d2339653a0aa0023\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing runner carriage, placement and conservation\nDo not use this for: Canonical behavior, source retirement or current truth proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/specs/runner.md\nSupersedes: None; legacy authority retained\nSuperseded by: None\n```\n\n> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: R9-5: remove decisions-placement boilerplate from non-decision carrier ().",
+        "shownTextDigest": "1c192c2ff79de73b026b279b394883bb5e91e602e9449365a5a06417ad88f3e7",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_b9757bf357a4ab755863a9eba71d36f5",
+        "path": "docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "e7ce04bde149d71aaeeaa5e11376aef97254251762c25855601d09c2a34ddc94",
+        "fileStatus": "Candidate",
+        "shownText": "> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: R9-5: remove decisions-placement boilerplate from non-decision carrier ().",
+        "shownTextDigest": "e7ce04bde149d71aaeeaa5e11376aef97254251762c25855601d09c2a34ddc94",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_54603609b547a6f66e5bac303a3557be",
+        "path": "docs/platform/runner/subcomponents/h-ce5b9771a26a/spec.md",
+        "anchor": "added-in-candidate-runner-entry-points-triggers",
+        "unitDigest": "dca40b73e987eebe48befec979de8f526062a6fdeab95899d18f9a7441457052",
+        "fileStatus": "Candidate",
+        "shownText": "# Added in candidate: Runner Entry Points & Triggers\n\n\n```txt\nDocument type: Specification\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve frozen-map runner content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; implementation truth not certified\nProvenance: docs/specs/runner.md at 63fa6f15266f45c881f610235e0be8d61ff07120; blob ddfa78cc7183cf1f7db8ee64d2339653a0aa0023\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing runner carriage, placement and conservation\nDo not use this for: Canonical behavior, source retirement or current truth proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/specs/runner.md\nSupersedes: None; legacy authority retained\nSuperseded by: None\n```\n\n> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: A41 F1: remove unavailable entry point (bin/fgos.mjs:4373-4380; bin/fgos.mjs:4640-4643); R9-5: remove decisions-placement boilerplate from non-decision carrier ().",
+        "shownTextDigest": "91f50531f1f8a3f196b5ff3683915065b6f8235040a931a8abdfa42808bd00ae",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_4016ee4724e3aeb2b4c4ffecf0b4be4d",
+        "path": "docs/platform/runner/subcomponents/h-ce5b9771a26a/spec.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "2c32a6554efb07f8fa18ae444d76717650a45d72c198563f123de04550645cee",
+        "fileStatus": "Candidate",
+        "shownText": "> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: A41 F1: remove unavailable entry point (bin/fgos.mjs:4373-4380; bin/fgos.mjs:4640-4643); R9-5: remove decisions-placement boilerplate from non-decision carrier ().",
+        "shownTextDigest": "2c32a6554efb07f8fa18ae444d76717650a45d72c198563f123de04550645cee",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_1a0a3569f863262c63e2072db1faa392",
+        "path": "docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md",
+        "anchor": "added-in-candidate-runner-visuals",
+        "unitDigest": "0fb55bf9f5d9f5e1ddceca659abd521fa74453966effc11e9d535b3b9dde277e",
+        "fileStatus": "Candidate",
+        "shownText": "# Added in candidate: Runner Visuals\n\n\n```txt\nDocument type: Specification\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve frozen-map runner content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; implementation truth not certified\nProvenance: docs/specs/runner.md at 63fa6f15266f45c881f610235e0be8d61ff07120; blob ddfa78cc7183cf1f7db8ee64d2339653a0aa0023\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing runner carriage, placement and conservation\nDo not use this for: Canonical behavior, source retirement or current truth proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/specs/runner.md\nSupersedes: None; legacy authority retained\nSuperseded by: None\n```\n\n> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: R9-5: remove decisions-placement boilerplate from non-decision carrier ().",
+        "shownTextDigest": "028fbcf0fc99f8381c6d5e211c97ca4e3224f7a7859bc990721cd5ae66da6488",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_89e23b48adf0741d229e0f3501b0209e",
+        "path": "docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "e7ce04bde149d71aaeeaa5e11376aef97254251762c25855601d09c2a34ddc94",
+        "fileStatus": "Candidate",
+        "shownText": "> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: R9-5: remove decisions-placement boilerplate from non-decision carrier ().",
+        "shownTextDigest": "e7ce04bde149d71aaeeaa5e11376aef97254251762c25855601d09c2a34ddc94",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_589f838032f1c0475587257a362d4cc0",
+        "path": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+        "anchor": "added-in-candidate-runner-pointers-implementation",
+        "unitDigest": "7833792da5c1a06fdfd5726012ae0299848817737213acf5f81a625f27fbe5a3",
+        "fileStatus": "Candidate",
+        "shownText": "# Added in candidate: Runner Pointers (implementation)\n\n\n```txt\nDocument type: Specification\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve frozen-map runner content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; implementation truth not certified\nProvenance: docs/specs/runner.md at 63fa6f15266f45c881f610235e0be8d61ff07120; blob ddfa78cc7183cf1f7db8ee64d2339653a0aa0023\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing runner carriage, placement and conservation\nDo not use this for: Canonical behavior, source retirement or current truth proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/specs/runner.md\nSupersedes: None; legacy authority retained\nSuperseded by: None\n```\n\n> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: A41 F2: replace deleted entropy pointer (packages/observe/rust/src/metrics_cli/entropy.rs:1-8; packages/observe/rust/src/metrics_cli/entropy.rs:107-127); A41 F1: replace deleted ranking pointer (bin/fgos.mjs:4640-4643; bin/fgos.mjs:4373-4380); R9-5: remove decisions-placement boilerplate from non-decision carrier ().",
+        "shownTextDigest": "2370023af90b2fec362c3f8b2d22610f32e61fa706645fb2e17728d438fbe17d",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_9824e58661fb19d46865b853068a114b",
+        "path": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "eb834d486d3ef390293a114a64ebfb5824ac982e5d3bf897e151cb35c216f173",
+        "fileStatus": "Candidate",
+        "shownText": "> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: A41 F2: replace deleted entropy pointer (packages/observe/rust/src/metrics_cli/entropy.rs:1-8; packages/observe/rust/src/metrics_cli/entropy.rs:107-127); A41 F1: replace deleted ranking pointer (bin/fgos.mjs:4640-4643; bin/fgos.mjs:4373-4380); R9-5: remove decisions-placement boilerplate from non-decision carrier ().",
+        "shownTextDigest": "eb834d486d3ef390293a114a64ebfb5824ac982e5d3bf897e151cb35c216f173",
+        "reviewStatus": "pending"
+      }
+    ],
+    "removed": [
+      {
+        "claimId": "claim_identity_gap_b95f9d4ef49c941000bb285c",
+        "path": "docs/platform/runner/spec.md",
+        "anchor": "unheaded-block-3",
+        "unitDigest": "095a95d4a43a6c25cb89add9758dd488193630fd6acad5a86e944e65fbf89251",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_identity_gap_5bac15a29bfc4371775b58de",
+        "path": "docs/platform/runner/spec.md",
+        "anchor": "added-in-candidate-navigation",
+        "unitDigest": "4e9c9be998ff8941bdc5d7e38f3baf4769e048bb9199004378093fa6d1bc6871",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_identity_gap_7f12f4d42afe0ee5b2230e7d",
+        "path": "docs/platform/runner/spec.md",
+        "anchor": "unheaded-block-4",
+        "unitDigest": "9e73c6d5e5c7dbd4da71ee88258d31f418f0aa2a6e6e2a38aa790d78320dd572",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_identity_gap_48b1cd9f4df8b2eb7ef3b86d",
+        "path": "docs/platform/runner/spec.md",
+        "anchor": "unheaded-block-5",
+        "unitDigest": "d04a63b10c472c05f2b9cd8944994893cc66c74b4d82cb3e508337222ed9c4ec",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_identity_gap_0ac0ca825566e66c51c7cff0",
+        "path": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+        "anchor": "added-in-candidate-runner-dispatch-runtime-inspection",
+        "unitDigest": "c5f31ae242c1977967adaa4642af4bfd11c3e7c5d0f6cc180ff6eccd4e15fa7c",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_identity_gap_d6a437edf9e9ed98ba08f4a8",
+        "path": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "84546f2c20181a173d1a54c3f40841709e9759c605891f226849ce8bdbe14f9e",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_identity_gap_28ab0135cbe5b7f83802145b",
+        "path": "docs/platform/runner/subcomponents/h-ce5b9771a26a/spec.md",
+        "anchor": "added-in-candidate-runner-entry-points-triggers",
+        "unitDigest": "dca40b73e987eebe48befec979de8f526062a6fdeab95899d18f9a7441457052",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_identity_gap_0a5a7b37d791c590f9b0e092",
+        "path": "docs/platform/runner/subcomponents/h-ce5b9771a26a/spec.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "2c32a6554efb07f8fa18ae444d76717650a45d72c198563f123de04550645cee",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_identity_gap_e86891d9a8821f1ac1c9a062",
+        "path": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+        "anchor": "added-in-candidate-runner-data-dictionary",
+        "unitDigest": "cd7a3b60a257af9b5ff40caedf589714f1327db0d593be0b22be2a191991aa74",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_identity_gap_45c44df6febb521b787f9773",
+        "path": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "12afe71586a21c7df7b4e1368d025a7ade7f746c924589f56f5c545efc2194e3",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_identity_gap_e5cdccf379e2fe72c082c2af",
+        "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+        "anchor": "added-in-candidate-runner-behaviors-operations",
+        "unitDigest": "426191be471fa6d93af350ba339fdbf4dea6034d1c8a04cf93481994e108423f",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_identity_gap_0ac1d35b429e332acf6dfc68",
+        "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "c605fe1f984894646aeab8f24dc4648e4438ef349329343163b66fe4d55b3941",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_identity_gap_a209e7a5fcc917697d25eab3",
+        "path": "docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md",
+        "anchor": "added-in-candidate-runner-actors-access",
+        "unitDigest": "5823940dd52f5b50249d7b4014325f3e64b1f333c3272107f61dbf4817a43007",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_identity_gap_78fa60560803e33fe4a4b2ce",
+        "path": "docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "e7ce04bde149d71aaeeaa5e11376aef97254251762c25855601d09c2a34ddc94",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_identity_gap_a76e8dee10d20a564ac5febd",
+        "path": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "anchor": "added-in-candidate-runner-business-rules",
+        "unitDigest": "4189e9ae76f3d2a898a691b67b58e85dc50e079ac0d8beb2b0de927d60bc9095",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_identity_gap_c09ca06e475eddcbf95f31ca",
+        "path": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "ae342758588a4f31d8bfb6d8d2c6d912a8501b041245cbfa52e2f3bce8916bf3",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_identity_gap_d3cb7f5f3f9995496fcc2231",
+        "path": "docs/platform/runner/subcomponents/h-37aced3896a8/spec.md",
+        "anchor": "added-in-candidate-runner-edge-cases-settled",
+        "unitDigest": "e3c568be88ac6ac015c12b3aa2eb128a37560b799bba578c6b7150ee2b329cf3",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_identity_gap_d4bf4be431b94a28762bef48",
+        "path": "docs/platform/runner/subcomponents/h-37aced3896a8/spec.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "e7ce04bde149d71aaeeaa5e11376aef97254251762c25855601d09c2a34ddc94",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_identity_gap_3103dd1c3b5fcda511f3503d",
+        "path": "docs/platform/runner/subcomponents/h-2e032393add1/spec.md",
+        "anchor": "added-in-candidate-runner-open-gaps",
+        "unitDigest": "edd260cf048949e914a793da4c03dc23fec17184aa5ad1d837a7da2f111ae842",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_identity_gap_1df3581fc8948aaa4f147fb2",
+        "path": "docs/platform/runner/subcomponents/h-2e032393add1/spec.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "64d6757c0b7b5ada58be0d7aaad95388b2345f6c9ce9d0dcd7b18ec3d2e806e6",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_identity_gap_d4e3c5cbc9a34fada1880cb8",
+        "path": "docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md",
+        "anchor": "added-in-candidate-runner-visuals",
+        "unitDigest": "0fb55bf9f5d9f5e1ddceca659abd521fa74453966effc11e9d535b3b9dde277e",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_identity_gap_b4be205d3e0167276fd63ac3",
+        "path": "docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "e7ce04bde149d71aaeeaa5e11376aef97254251762c25855601d09c2a34ddc94",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_identity_gap_ce8dcc3e25f75772fa76b468",
+        "path": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+        "anchor": "added-in-candidate-runner-pointers-implementation",
+        "unitDigest": "7833792da5c1a06fdfd5726012ae0299848817737213acf5f81a625f27fbe5a3",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_identity_gap_13375ee8a6d9b4d85ffbc391",
+        "path": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "eb834d486d3ef390293a114a64ebfb5824ac982e5d3bf897e151cb35c216f173",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_identity_gap_3dc5d34f003ff2aa1b16db4a",
+        "path": "docs/platform/runner/architecture/h-7af1f0242611.md",
+        "anchor": "added-in-candidate-runner-từ-vựng-dispatch-hiện-hành",
+        "unitDigest": "8ddb38877d5d538692dfdf0018157dfa7734a5f808423606ec55ddb67f4593d6",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_identity_gap_9b78881e50143f7961bfde03",
+        "path": "docs/platform/runner/architecture/h-7af1f0242611.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "9da9bcc76bc76956e634af3c85fd1b118ed4fd9d68d5aa69e908dcb552c0b890",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_identity_gap_9bc12935d926b0e4a6ef1f76",
+        "path": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+        "anchor": "added-in-candidate-runner-executorprofile-invocation-target-vocabulary-phase-06-executor-policy-dispatch-seams-identitysupports-made-real-config-phase-c-executor-profile-schema-migration",
+        "unitDigest": "84f1cee4092802ca08dd88ab4e7a5b523eedb4fdc49f5ae769568833d4bae5eb",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_identity_gap_493de5f2968dbea5773d9d35",
+        "path": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "e7ce04bde149d71aaeeaa5e11376aef97254251762c25855601d09c2a34ddc94",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_identity_gap_55c99c9c8af211401a5fc059",
+        "path": "docs/platform/runner/architecture/h-69197b459754.md",
+        "anchor": "added-in-candidate-runner-dispatch-operability-implementation-slice-2026-09-16",
+        "unitDigest": "913385a974e2a0aa1ab32b2a4ef833ae8918ebac297479a4f0823ac88f6d94e5",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_identity_gap_62100d5a432c4653cd37ac8b",
+        "path": "docs/platform/runner/architecture/h-69197b459754.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "afdcc70dbdf7e1b68a36cbd6b77105a3b34f755e399fa7a7973fe5d189759024",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_identity_gap_2b2a9566f064227514c1f39b",
+        "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "anchor": "added-in-candidate-runner-lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4",
+        "unitDigest": "927a165271f854c0ac600617f142b76a2ffeb45941b078f4de43e8f20213cd5b",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_identity_gap_8680134559c8583a79e937b9",
+        "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "975a5c93a18cfc1f8d109b6f18c8f71ced525d11c69f96dcb84b4eecc6cccab6",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_identity_gap_e59ab49f43c24e226a307b68",
+        "path": "docs/platform/runner/README.md",
+        "anchor": "added-in-candidate-verification-and-boundary",
+        "unitDigest": "6555feeeb25154ecf2a283ece563450bd4561250eaae96f72a787fdb608184aa",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_identity_gap_e0c87306be43c98a769ee0a8",
+        "path": "docs/platform/runner/README.md",
+        "anchor": "unheaded-block-6",
+        "unitDigest": "36261a6f2886595e5f8b23c9b2b062f2bc062cb9fbb1635ef30e3102ad5766bb",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_identity_gap_f08579d589bbd63a0db5d61f",
+        "path": "docs/platform/runner/README.md",
+        "anchor": "added-in-candidate-known-conflicts-in-carried-text",
+        "unitDigest": "52df31f5ea305e546421fbdbfbcc912333bc5a63c5a6edbdb7de620213dfdd5e",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_identity_gap_3d96214ba7b8d92f4bfecc45",
+        "path": "docs/platform/runner/README.md",
+        "anchor": "unheaded-block-7",
+        "unitDigest": "d2954fca5e057016b72481aaa2d6871b94cc20bf700b0279f2e1031ec0349adc",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_identity_gap_d38d0017d52ef756ddaf5fd2",
+        "path": "docs/platform/runner/README.md",
+        "anchor": "unheaded-block-8",
+        "unitDigest": "f1863a4fb726546440255dabac5d12389bf657b0102139fd2e1a7f8abccd8daf",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_48259d331309769ef723354a13067ae0",
+        "path": "docs/platform/runner/contracts/routing-handoff.md",
+        "anchor": "routing-handoff-contract-fgos-runner",
+        "unitDigest": "8a4633a098112bd85e3e30b3926de510983a1a6b5470193e311d1b0dea3b4348",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_bfcdf45c17e89867cdb4446149fd795b",
+        "path": "docs/platform/runner/contracts/routing-handoff.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "509c09f8d9c5d789b48446cbc179231de7fa268133ade3900676a574f08732b9",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_20417aee4ca634fbf4dab8b19af5d271",
+        "path": "docs/platform/runner/contracts/routing-handoff.md",
+        "anchor": "khung-prompt-4-phần",
+        "unitDigest": "01d501eb1f1ae75195d040a9c33e8682c418f2c05d344067525f67dd74521e67",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_9367df2fda6ccfd64b492221b3ccb2ce",
+        "path": "docs/platform/runner/contracts/routing-handoff.md",
+        "anchor": "unheaded-block-3",
+        "unitDigest": "8b5e7c62b0389dfd419b8d3e3e2c0e14badeaeb32f1af3abaa200bfc5019b1a4",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_d19685eef13fb0f7793fbd168603a7cb",
+        "path": "docs/platform/runner/contracts/routing-handoff.md",
+        "anchor": "unheaded-block-4",
+        "unitDigest": "3bad6f8df905ee9bbfa79324205fbc11cd21b56a1c356970c1edffc66da6e9e9",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_e27fc5457539bc6e31ea82a1881d536d",
+        "path": "docs/platform/runner/contracts/routing-handoff.md",
+        "anchor": "bảng-entry-router",
+        "unitDigest": "6aee4cda6fa5543ab0d85ea338daa2d784e1f0d1736606c4531bbc1425a8ece1",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_14b98e16e698b83d2fd20b0c6c3c0c0e",
+        "path": "docs/platform/runner/contracts/routing-handoff.md",
+        "anchor": "unheaded-block-5",
+        "unitDigest": "c2073ac3afb840a1f4cb863f52b45bf5cd07e78d59648c98514d7ce35f0d3851",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_2864848618f8c97ee8feee1223a3fe69",
+        "path": "docs/platform/runner/contracts/routing-handoff.md",
+        "anchor": "unheaded-block-6",
+        "unitDigest": "55329ade338d4cc7a7821d3882f0a03a86507a60c965554267a1c548a7fa5aa6",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_e5de2c463178e7bed21edbf52e4dd8b2",
+        "path": "docs/platform/runner/contracts/routing-handoff.md",
+        "anchor": "câu-handoff-chuẩn",
+        "unitDigest": "236a8445d1599c3c1542451ef41fe6c5e9a6a46f0d2d1f97671462b9b6e9aff6",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_b097cfe02712fd82b1723c1182939f50",
+        "path": "docs/platform/runner/contracts/routing-handoff.md",
+        "anchor": "unheaded-block-7",
+        "unitDigest": "3e9d4aa6375656eb6da53d2a48f93c789d3f65e2ba76b742fe84a39aff8dde6d",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_5217639e14288f74c6007f12a095928b",
+        "path": "docs/platform/runner/contracts/routing-handoff.md",
+        "anchor": "unheaded-block-8",
+        "unitDigest": "fda20ea3a88124927805fa832f84a08e91ca15e620654154c14427693839ec3b",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_13a4216f8c74525fcad2a0712a4e22ff",
+        "path": "docs/platform/runner/contracts/routing-handoff.md",
+        "anchor": "unheaded-block-9",
+        "unitDigest": "b3cb0726462123aa6e4ef13561a6ad5ec6a0cf099f8d3cfd13007eb2a886a508",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_7f557c80e647be8772086b6df12369c2",
+        "path": "docs/platform/runner/contracts/routing-handoff.md",
+        "anchor": "unheaded-block-10",
+        "unitDigest": "d40d1f008afc0371c6d83fe1704cd8d0e2f73f6c960d5f961abe8fac6aa1192f",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_034fd2504f4e04a503c2caf2b884bc8b",
+        "path": "docs/platform/runner/contracts/routing-handoff.md",
+        "anchor": "ranh-giới-tin-cậy",
+        "unitDigest": "77aa919785f50fd937355d98bc8012d9e5315375a1608f94ac9a315c6aecd871",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_5a85eef20e5da9f327a2330ac46b4015",
+        "path": "docs/platform/runner/contracts/routing-handoff.md",
+        "anchor": "unheaded-block-11",
+        "unitDigest": "4be0ec5bb2c597e320711f0bc22ad295d520b86c3fea127231150e767f8903cb",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_15ea8720bb2e7e74fc0b6184a5dcf8dd",
+        "path": "docs/platform/runner/contracts/routing-handoff.md",
+        "anchor": "unheaded-block-12",
+        "unitDigest": "ef3f75a61f26da65653effa99f98b85a4a62e97464397094f73bd956124d892c",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_6eeffde2515915efa565732c72bad473",
+        "path": "docs/platform/runner/contracts/routing-handoff.md",
+        "anchor": "unheaded-block-13",
+        "unitDigest": "219e04ff1e7f76c513c2326948e78ac7da7e7393b66fac04d3df089886479771",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_52d239740f29231316ce1e1033f6608d",
+        "path": "docs/platform/runner/contracts/routing-handoff.md",
+        "anchor": "tham-chiếu",
+        "unitDigest": "e6b3b341d3f8554716e1c13ad7c0278c8a34b5aed0d849640494c8f84d57e946",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      },
+      {
+        "claimId": "claim_27aff750d0ba834c746a5841770667cb",
+        "path": "docs/platform/runner/contracts/routing-handoff.md",
+        "anchor": "unheaded-block-14",
+        "unitDigest": "7aca3755b9d4f4f1826236f51b161291ff58d7dca9d6e1dc2bf1f26a10bcc792",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "nativeIdentityVerified": false,
+        "note": "known stale carried sentences; full truth check owed at promotion"
+      }
+    ]
+  },
+  "ownershipPartition": {
+    "rawRootReverseCount": 908,
+    "runnerOwnedExcludedFromRoot": [
+      "claim_6d9574a227eda87b677fe47f217fc8f6",
+      "claim_a00058f732ff3f5f959bc023f5dab54c",
+      "claim_402c67504d85360a3c302ec4bd0b36f8",
+      "claim_2bebe6c55e6d3140c1fa481d8a9dee77",
+      "claim_62449a7ec4cf3758e59a93fa89921c32",
+      "claim_76d002b3dbeb785e9559579959af3377",
+      "claim_c0471bfea95775f46bd4fdb1fe053d52",
+      "claim_4d33abd2d86a6dbd2691ef45fbd72ebd",
+      "claim_6db9fcda9f7e1ffb80586641d2606ae5",
+      "claim_fc303a330af62e1b12720d8a10028efb",
+      "claim_e5b18e5bf91ff764a8288da43d33e12e",
+      "claim_59711e037dea1dfd34303ae5a58f932f",
+      "claim_c868bc8d5e9e5a6f4859364834528dd6",
+      "claim_79517a5f05ccd6be621a18a7c7a98714",
+      "claim_f422f916cb0bf672b9cbbcd606db80c3",
+      "claim_8cd28ca6800c45c489bed67870072181",
+      "claim_8de8c7bdc502afd58b4d75f001b91bd3",
+      "claim_0b95b48991ba8b3703fb0ba9ff9b380b",
+      "claim_068de0851cd81c1c38d509d107fd11a3",
+      "claim_6f375c15f6d73810511f8228671620f6",
+      "claim_c1794577b56452c92d31a9032d43f13a",
+      "claim_cbdc399021bf4d700ad7f55d34b413f7",
+      "claim_8755cd90056a7db16f977ebfd49d6d44",
+      "claim_e274a1bf8b3546008c7ea4e050cccc95",
+      "claim_997ab51b299e374cc0c7947d1d70358c",
+      "claim_add510fa8493bdaa634555223d699708",
+      "claim_1688ef5c2d30c660af230f977c66d657",
+      "claim_9f5ad7a613eda620cc6d0bffa3cfcd34",
+      "claim_97b5d6bd0377d31702eaedf06cddb99a",
+      "claim_9838cce08185802e1cf15f277e4aeba7",
+      "claim_ca5a587e419f78a1c7814b569019f5df",
+      "claim_26d342980833dcb3f02ad6f6943dbbc7",
+      "claim_7d66cb9f2b9ec5287c811e85f2a018fd",
+      "claim_80a96a43136cb3939188618789412816",
+      "claim_a26fab4d087508024f378ab4f06376de",
+      "claim_9bb824887d1322330e8ada20aa456983",
+      "claim_a6a41ce4075ee03c8960dcbb6fd9092d",
+      "claim_2b28d055391c3a7a63ba302e0162afd1",
+      "claim_49177b68129a3fdba6d52e708f7d4ae1",
+      "claim_022d58c830c9e5ed3c2ef32102c33dec",
+      "claim_4042a487be1420af2d968219f85c5569",
+      "claim_9d7592baf3f614958fbbe584ce57f31a",
+      "claim_2227a29cb3a3a468c121defc7e25585f",
+      "claim_df9bb8c65a63baf3cda6c0db904ea89a",
+      "claim_ad70929630fb898fe8888fcf6c6921dc",
+      "claim_3fc2416e78fe3e707e31fce5d737a883",
+      "claim_8d3d4c9864a4bba02b9bfae99772b16b",
+      "claim_2258b72fc59cd09924b643a610315df2",
+      "claim_4272e803e24a1f935b95aa6015973fd7",
+      "claim_e9b68f8601da77a4fa8a8b5c44c452dd",
+      "claim_c210db5b5144b6e3616278a941b91006",
+      "claim_343e7511912cf596cc65643a064979eb",
+      "claim_b9757bf357a4ab755863a9eba71d36f5",
+      "claim_54603609b547a6f66e5bac303a3557be",
+      "claim_0256872e0f6bca4850be3078e4f573b1",
+      "claim_4016ee4724e3aeb2b4c4ffecf0b4be4d",
+      "claim_1a0a3569f863262c63e2072db1faa392",
+      "claim_0d135e06680406874b6b7857041b56f7",
+      "claim_89e23b48adf0741d229e0f3501b0209e",
+      "claim_589f838032f1c0475587257a362d4cc0",
+      "claim_09b4f6799a33cebb70d576cb66c676b3",
+      "claim_9824e58661fb19d46865b853068a114b"
+    ],
+    "rootOwnedExcludedFromRunner": [
+      "claim_fecee46f6c7c699047ffdb436bfdebe1"
+    ],
+    "rule": "Runner owns its new candidate scaffolding; root owns previously placed routing-handoff metadata. Source-scope native reverse sets overlap through the runner namespace. Lists partition their native union; no row is discarded."
+  },
+  "rootChecks": [
+    {
+      "label": "both",
+      "invariant": [],
+      "open": [
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 908,
+          "examples": [
+            "docs/platform/coexistence/spec.md#unheaded-block-1",
+            "docs/platform/coexistence/spec.md#source-metadata-added-in-candidate",
+            "docs/platform/documentation/architecture/documentation-system-design.md#unheaded-block-1",
+            "docs/platform/documentation/architecture/documentation-system-design.md#unheaded-block-2",
+            "docs/platform/documentation/architecture/documentation-system-design.md#unheaded-block-3"
+          ]
+        }
+      ],
+      "reverseCount": 908
+    },
+    {
+      "label": "identity",
+      "invariant": [],
+      "open": [
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 908,
+          "examples": [
+            "docs/platform/coexistence/spec.md#unheaded-block-1",
+            "docs/platform/coexistence/spec.md#source-metadata-added-in-candidate",
+            "docs/platform/documentation/architecture/documentation-system-design.md#unheaded-block-1",
+            "docs/platform/documentation/architecture/documentation-system-design.md#unheaded-block-2",
+            "docs/platform/documentation/architecture/documentation-system-design.md#unheaded-block-3"
+          ]
+        }
+      ],
+      "reverseCount": 908
+    },
+    {
+      "label": "phase02",
+      "invariant": [],
+      "open": [
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 908,
+          "examples": [
+            "docs/platform/coexistence/spec.md#unheaded-block-1",
+            "docs/platform/coexistence/spec.md#source-metadata-added-in-candidate",
+            "docs/platform/documentation/architecture/documentation-system-design.md#unheaded-block-1",
+            "docs/platform/documentation/architecture/documentation-system-design.md#unheaded-block-2",
+            "docs/platform/documentation/architecture/documentation-system-design.md#unheaded-block-3"
+          ]
+        }
+      ],
+      "reverseCount": 908
+    }
+  ],
+  "duplicate": {
+    "claimId": "claim_fecee46f6c7c699047ffdb436bfdebe1",
+    "rootCount": 1,
+    "runnerCount": 0
+  },
+  "union": {
+    "count": 908,
+    "unique": true,
+    "tupleSHA256": "b48d8bebab467ce3323a98c8f98b1637534024b177cf05d21cf7ded38888f510"
+  },
+  "meaning": "All five fields from native reverse rows plus committed actual file status; root-owned duplicate excluded once from runner scope; runner-owned namespace rows excluded once from root scope. Full deltas pending review; no classification or truth approval."
+}
