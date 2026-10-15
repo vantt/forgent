@@ -247,6 +247,7 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
       && isReclaimEligible(repoRoot, id, effectiveClaimRole)
     ) {
       try {
+        let adminRelease = null;
         if (activeClaim) {
           // tsk-40m code-review finding (high, D4/D8): releasing a claim
           // used to just delete the runtime claim file, with no durable
@@ -263,7 +264,8 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
           recordClaimAttempt(dir, { id, phase: claimPhase, result: 'reclaimed', claimId: activeClaim.claimId, actor: activeClaim.actor });
           // Another session's claim, past its liveness threshold: released
           // through the named admin path, never the owner-only default.
-          releaseClaim(dir, { id, claimId: activeClaim.claimId, adminReason: 'stale-claim-reclaim' });
+          const rel = releaseClaim(dir, { id, claimId: activeClaim.claimId, adminReason: 'stale-claim-reclaim' });
+          if (rel.admin) adminRelease = { ...rel.admin, claimId: activeClaim.claimId };
         } else if (item.status === 'doing') {
           moveWork(dir, { id, to: 'todo', expectedStatus: 'doing' });
         }
@@ -274,6 +276,8 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
           source: 'claimWork',
           kind: 'engine',
           rationale: `docs/history/session-claim-liveness/CONTEXT.md D2/D4/D5 — worktree activity signal past the ${effectiveClaimRole === 'runner' ? 'agentMs' : 'humanMs'} threshold, reclaimed by a live ${actor} claim attempt`,
+          // Another writer's claim was released: keep who owned it and who released it.
+          ...(adminRelease ? { admin: adminRelease } : {}),
         });
       } catch (err) {
         if (!(err instanceof FsmError) || err.category !== 'conflict') throw err;

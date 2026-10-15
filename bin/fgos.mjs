@@ -4149,9 +4149,24 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // Operator recovery: the claim may belong to another (often dead)
       // session, so both release paths name their reason through the admin
       // option; the owner-only default would refuse them.
+      // Releasing another writer's claim leaves a durable engine decision naming
+      // both writers, so the release can be audited after the claim file is gone.
+      const recordAdminRelease = (rel) => {
+        if (!rel.admin) return;
+        const known = durableView.work[id] !== undefined;
+        addDecision(dir, {
+          ...(known ? { id } : {}),
+          text: `admin claim release (${rel.admin.reason}): released claim ${claim.claimId} on "${id}" owned by writer ${rel.admin.ownerWriterId}, as writer ${rel.admin.releasedByWriterId}`,
+          source: 'unclaim',
+          kind: 'engine',
+          rationale: 'operator recovery of an orphaned or stale runtime claim through fgos unclaim',
+          admin: { ...rel.admin, claimId: claim.claimId, ...(known ? {} : { itemId: id }) },
+        });
+      };
       if (durableStatus !== 'doing') {
         const rel = releaseClaim(dir, { id, claimId: claim.claimId, adminReason: 'unclaim:durable-status-mismatch' });
         if (!rel.released) return rel;
+        recordAdminRelease(rel);
         return { released: true, reason: 'durable-status-mismatch', durableStatus: durableStatus ?? 'not-found', ...(rel.admin ? { admin: rel.admin } : {}) };
       }
       if (!isReclaimEligible(repoRoot, id, claim.claimRole)) {
@@ -4165,6 +4180,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       }
       const rel = releaseClaim(dir, { id, claimId: claim.claimId, adminReason: 'unclaim:stale-liveness' });
       if (!rel.released) return rel;
+      recordAdminRelease(rel);
       return { released: true, reason: 'stale-liveness', ...(rel.admin ? { admin: rel.admin } : {}) };
     }
 
