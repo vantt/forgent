@@ -249,3 +249,17 @@ Lead decisions under A42 (2026-10-15, Step 9; each also recorded in the step-09 
 - L9-8 The 31 liveness sections whose class was positional (decisions 0020, 0021, 0026, 0033, 0046-0063 and present-tense notes) become current-decision by evidence; no new truth draw (A41 item 3); they carry the A35 note.
 - L9-9 claim_40aafcee52b22eda087c5f85eacb9392 and claim_f033905b059f073c62ec27f0ee6da620 (earlier reviewed supersedes whose successor containment no longer holds after upstream edits) are re-decided and sent to re-review; the four earlier supersedes that target the retiring runner.md are queued for rebinding at cutover.
 Earlier this session, Step 8 Lead decisions not otherwise recorded here: docs/history and CHANGELOG.md hits are excluded from repointing (point-in-time records); the main re-carry was folded into the Step 8 rework turn so one sync and one review covered both.
+
+Lead decisions under A42 for Step 10 (2026-10-15; evidence `step10-evidence.md` section 8):
+- L10-1 Reading-map merge (item 1a): additive allowed-paths amendment for exactly `docs/reading-map.md`; entries merged verbatim, diff logged in `promoted-edits.md`, legacy paths kept (check I), repoint at Phase 9.
+- L10-2 `claim_5c520fcb1a68ba27e2093341834258c7` becomes `reclassify-out-of-platform-scope` with a rationale quoting both lines, the old digest, the two new digests, the residual SHA256 and both native identities; `claim_2ae81c7bed935553943d6777b81e2114` stays; the A34 acceptance is superseded by that recorded note; independent review.
+- L10-3 All other AGENTS.md and CLAUDE.md rows: `reclassify-out-of-platform-scope`, one shard, decided after the last main sync, re-pinned on any AGENTS.md change.
+- L10-4 Stale reading-map entries carried verbatim with the A35 note; A28 truth draw over Step 10 current units; above 10% applies the A40/A41 shape without asking (A42).
+- L10-5 Close-by-rule groups: `history-no-authority` for the history semantic-conflict groups, `retain-as-evidence` for the history duplicate groups and the 78-file group, counts recomputed with `--summary` at the final pin; no file deleted.
+- L10-6 Global closure: one committed comparison helper equates strict-E open data with pending holds + identical-unit exceptions + the union of candidate-unverified lists + A34 partial carries; `holds.md` lists the 3 Coordination Rings holds; this A28 reading replaces the literal snippet.
+- L10-7 The full-corpus Step 10 rehearsal also records the Step 2 reduced rehearsal that was never written.
+- L10-8 Link pass: repoint markdown links to legacy sources that have a mapped candidate target, outside fenced blocks, portals included (logged in `promoted-edits.md`); keep verbatim fenced snapshots, `docs/history/**`, `CHANGELOG.md` and history-carrier referents; inline-code paths and non-docs consumers stay queued for Phases 8 and 9, each classified.
+- L10-9 The 37 promotion-incomplete headers get header fields only; changed digests are rebound and reviewed.
+- L10-10 R6-6: the switchboard `candidate` route outranks a carried `Draft` header for list eligibility (A28 item 2); recorded in the Step 10 report.
+- L10-11 Step 10 runs no fresh readers (no new area text; Phase 7 owns the cross-area reader review).
+- Not delegated and not done in Step 10: landing on main, push, Phase 9 cutover (alias table stays empty, no status flips, nothing retired), file deletion. Phase 6 ends at "awaiting owner review"; closing it is the owner's act.
