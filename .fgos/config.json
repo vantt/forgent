@@ -233,6 +233,9 @@
             "executor": "openai"
           },
           {
+            "executor": "claude-herdr"
+          },
+          {
             "executor": "gemini"
           },
           {
@@ -240,27 +243,24 @@
           },
           {
             "executor": "deepseek"
-          },
-          {
-            "executor": "claude-herdr"
           }
         ],
-        "rigor": "high"
+        "rigor": "critical"
       },
       "architecture:critique": {
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "openai"
+            "executor": "xai"
+          },
+          {
+            "executor": "deepseek"
           },
           {
             "executor": "gemini"
           },
           {
-            "executor": "xai"
-          },
-          {
-            "executor": "deepseek"
+            "executor": "openai"
           },
           {
             "executor": "claude-herdr"
@@ -272,6 +272,9 @@
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
+            "executor": "claude-herdr"
+          },
+          {
             "executor": "openai"
           },
           {
@@ -282,9 +285,6 @@
           },
           {
             "executor": "deepseek"
-          },
-          {
-            "executor": "claude-herdr"
           }
         ],
         "rigor": "high"
@@ -293,6 +293,9 @@
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
+            "executor": "claude-herdr"
+          },
+          {
             "executor": "openai"
           },
           {
@@ -303,12 +306,9 @@
           },
           {
             "executor": "deepseek"
-          },
-          {
-            "executor": "claude-herdr"
           }
         ],
-        "rigor": "high"
+        "rigor": "critical"
       },
       "business:frame": {
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
