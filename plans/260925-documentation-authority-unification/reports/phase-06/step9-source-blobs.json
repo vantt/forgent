@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "head": "24be6cb1db1b16fd1b1dc244f1c7b46d851a330b",
+  "head": "edffd7c6b9cfb0461eec9e0fef65c9b4a2487acc",
   "sync": "63fa6f15266f45c881f610235e0be8d61ff07120",
   "mapPin": "fd6c9ab9e8aac12f99462a1d4f1bf78448d6e9f7",
   "source": "docs/specs/runner.md",
@@ -1070,6 +1070,6 @@
       }
     ],
     "headSidePercent": 10.505050505050505,
-    "headSideReading": "52/495 = 10.51%, exceeds 10% under head-side reading; not the selected denominator. Lead retains changed pin digests 27/470 = 5.74%; new units are growth, not drift. Remeasure every sync."
+    "headSideReading": "52/495 = 10.51%; selected pin-side reading stays 27/470 = 5.74%; growth separate."
   }
 }

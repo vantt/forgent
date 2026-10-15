@@ -1,3 +1,25 @@
+# Runner A42 author pass complete — 452 matching approvals, 43 pending
+
+Assignment `unit-run-1792061517080-61c43e58/producer/1`; input **edffd7c6b**. Source reports pin **81d0ed074**, request **98603fffe**. Read all supplied report Notes/Concerns. **452 ok applied** through unchanged ordinary applicator, notes verbatim, complete shown bindings compared; **43 pending**: previous 34 + eight contextual identical footers + one additional Gate A row. Eight ancestry-paired targets **9/14/26/35/100/109/133/145**, seven anchor values change and first reconfirmed; all eight pending. Gate A introduction labelled and scoped to former evolve contract with unknown-verb/code/deletion evidence. **72 changed candidate units**, full before/after in [accounting](step9-rebound-units.json). Classes **460 Weak-exact / 35 Judgment**.
+
+**All 31 liveness reworks current-decision** after generated full-record evidence scan; 13 required rows newly reclassified, **56 sections changed overall**, 95 current-decision sections. Truth eligibility **409 units / 226 decision units**; dated supersession and decisions/ placement unchanged. Plan-local helper regression red before fix, green afterward; no protected tool change. A35 note in candidate accounting; no new truth draw under A41. All seven Lead A42 decisions recorded in owner answers and [Step 9 report](step-09-report.md).
+
+README has labelled six-conflict list plus RUL76 idle-timeout caveat. Rest queued: individual anchors/index, RUL92/RUL96 decision records, 0054 gap, component-boundary route, operative switchboard wording. **Fresh-reader lenient PASS both; strict B/C FAIL both**, independence limits retained. Root-authorities solely owns duplicated routing-handoff metadata row; runner removes it.
+
+**FAST D/E 0 structural fatal**, both priors together and each; E open **43 pending / 32 historical gaps / 82 overlay reverse entries**. Runner-owned list **81** plus one root-owned fence; no native equality or strict green. Candidate-status **607 files / 216 checked / 0 findings / 0 unresolved links**. Tests **45/45 pass**, env -u CLAUDE_CODE_SESSION_ID, no skips. Registry unchanged. Native sync and review pack count this turn **zero**. [Verification](step9-fast-check.json), [tooling](tooling.md).
+
+**Next turn = native sync once at this turn's runner commit, apply remaining non-source verdicts, package ONE bounded re-review of every pending runner row and changed accounting entry.** Old truth-population requests are superseded by the independent review-9 draw plus A41 correction re-review, not a new draw. Step 9 remains open; existing predecessor/Rings/A34/final-main-sync/Step 10/cutover obligations persist. No new owner-direction blocker.
+
+Deliberate writes only docs/platform, this plan and the regression test; no git writes, legacy/gate/checker/vocabulary/extractor/baseline/registry edit, config/secret access or lifecycle verbs. **One unintended side effect:** the unknown-verb CLI help probe automatically logged an invocation fault under `.fgos/logs`; disclosed, no direct access/cleanup or further CLI probe. Scratch /tmp/fgos-work; mandatory external outbox exception. Runner owns commit. MDView unavailable.
+
+---
+
+# Runner A42 source verdict application in progress
+
+Assignment `unit-run-1792061517080-61c43e58/producer/1`. Read progress first. Applying only binding-matching committed source ok verdicts pinned to 81d0ed074; rebinding eight contextual duplicate sentences, correcting Gate A evolve wording, confirming 31 liveness reworks and accounting ownership. Author run only: no native sync or review pack; next turn syncs once at this runner commit, applies remaining non-source verdicts and packages one bounded re-review. Runner owns commit.
+
+---
+
 # Step 8 closed; runner truth and red-team corrections authored
 
 Assignment `unit-run-1792060810360-fc3c5695/producer/1`; input HEAD **24be6cb1d**. **Step 8 closed**: final 1 ok applied through unchanged ordinary applicator with verbatim reviewer note and exact digests. Step 8 document bytes unchanged.

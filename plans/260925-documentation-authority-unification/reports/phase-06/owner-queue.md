@@ -431,3 +431,17 @@ No component-boundary change. Source consumers (41 code files citing RUL ids), a
 ## Runner red-team rule-reading clarification (existing Lead decisions)
 
 Stop 6 uses changed pin digests **27/470 = 5.74%**. Alternative head-side **52/495 = 10.51%** exceeds 10%, but is not used because new-unit growth is separate under the approved pin-denominator reading (Step 8 precedent); net +25, remeasure each sync. Stop 9 concerns another plan writing this open batch’s target paths: no such write into `docs/platform/runner/**`; 64 runner source commits are drift under 6, while 36 Packaging commits concern another already-processed area (33 this plan, three upstream). No new owner question. A41 correction/review scope and A42 delegation unchanged.
+
+
+## Runner A42 author follow-up — 2026-10-15
+
+No new owner-direction blocker. Lead decisions are in owner-answers.md under A42. Both fresh readers have a **lenient pass** (partial counts), strict B/C fail; isolation and scorer/key independence remain unproven. The README now lists six carried-text conflicts plus RUL76's existing idle-timeout names; these are cautions, not truth approval.
+
+Queued from the fresh-reader report, without changing source ids or adding anchors this turn:
+
+- Individual RUL90/RUL92/RUL96 and 0058/0062 routes or a rule index are missing; no per-RUL anchors were added.
+- No decision record for RUL92 or RUL96, and unexplained decision-id 0054 gap; do not invent a record or force a next id.
+- `component-boundary.md` is not reachable from runner README routes; a later route repair needs its own changed-unit accounting.
+- Candidate versus root switchboard operative wording remains ambiguous; settle once across the shared surface.
+
+Next turn must sync native identity once at this author turn's runner commit, apply remaining non-source verdicts (including the still-running triage/map, owner-queue, predecessor/generation and report review), then produce **one bounded re-review** of 43 pending source rows, all changed candidate/accounting entries, regenerated liveness and the list ownership change. Candidate scaffolding remains truth-unverified. Old runner truth-population request sets are superseded by the independent review-9 draw plus A41 correction re-review; no new draw. Existing predecessor dispositions, Rings/A34, final main sync, Step 10 and cutover obligations persist.

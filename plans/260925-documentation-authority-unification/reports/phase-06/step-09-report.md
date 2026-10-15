@@ -1,3 +1,43 @@
+# Runner matching verdicts applied — bounded re-review remains open
+
+Assignment `unit-run-1792061517080-61c43e58/producer/1`; input **edffd7c6b**. Reviews bind content **81d0ed0747014e976c0d29222439fd6e3592b468**, request **98603fffe**. This author checkpoint supersedes current counts below; historical proofs keep their original pins. **No native sync or review pack this turn; runner owns commit.**
+
+## Source application and review results
+
+Read all Notes/Concerns of the 23 source reports, three liveness reports, candidate-list report and fresh-reader result. Source Notes are retained verbatim in [application accounting](step9-carriage-accounting.json), property `a42ReviewApplication`; non-source reports remain unchanged and unapplied this turn.
+
+- **Source: 494 ok / 1 rework of 495** (0.202% rework). The sole rework is in source pack 22, **1/69 = 1.45%**; no author-selected sample or new verdict. **452 ok applied** through unchanged `applyReviewVerdicts` ordinary mode, with reviewer notes verbatim and committed report pin. Each complete shown decision, source digest, target owner/anchor, full target text/direct section and ancestry was compared before application. All 34 rows rebound at `b90f757e5` remain pending. No stale approval is carried.
+- **43 source rows pending**: the previous 34, **8 contextual identical-unit rows**, and **1 additional Gate A introductory row**. Gate A's heading also changes but was already among the 34. [Cumulative full before/after accounting](step9-rebound-units.json): 43 rows, **72 changed candidate units**, pending independent review. Classes **460 Weak-exact / 35 Judgment**; reviewed 452, pending 43.
+- All eight copies of “Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.” were deterministically paired by enclosing decision ancestry, excluding only the wrapper H1. Anchors are **unheaded-block-9/14/26/35/100/109/133/145**; seven anchor values change, the first is reconfirmed. Every row in the contextual identical-unit group remains pending, including seven old ok verdicts. No classifyExactCarry/proposer/gate fix was necessary.
+- **Liveness: 136 ok / 31 rework of 167** (18.56%). Regeneration confirms **31/31 current-decision**, including 13 previously missed sections. Consistent complete-record consumer evidence changes **56 sections overall**; **95 current-decision** sections and **409 protected current units**, including **226 decision units**, are now disclosed. This is conservative truth eligibility, not an assertion that dated/superseded statements describe current behavior. Decisions/ placement is unchanged. A35's exact note, “known stale carried sentences; full truth check owed at promotion”, is attached to current decision-section accounting. [Class changes and witnesses](step9-liveness-class-changes.json), [scan](step9-liveness.json).
+- **Candidate list: 63 ok at the old native pin**, no rework. Its Notes identified seven unclaimed footer copies and the duplicated routing-handoff fence owner; both accounting causes are addressed, with changed accounting pending re-review. Root-authorities owns `claim_fecee46f6c7c699047ffdb436bfdebe1`, because that step placed it. Only the runner-list duplicate is removed; root list remains unchanged.
+
+## Lead A42 directions and truth follow-up
+
+The seven supplied Lead decisions, their causes, alternatives/costs, chosen approach and scope are recorded in [owner answers](owner-answers.md) under A42. No new owner-direction blocker or component-boundary change.
+
+The residual Gate A opening now carries an inline `Added in candidate` correction and explicitly past-tense legacy introduction. Evidence: `bin/fgos.mjs:4373,4461`, the CLI's unknown-verb result and ranking deletion `120af6b3d`. Two source bindings are pending, one already in the previous 34. Remaining Gate A details retain their explicitly former-contract scope; decision history is not rewritten. [Exact truth evidence](step9-truth-corrections.json). All old truth-population requests are **superseded by the independent review-9 draw plus correction re-review under A41 item 3**. No new truth draw was selected or run; full truth is still owed at promotion.
+
+[Runner README](../../../../docs/platform/runner/README.md) now exposes a short labelled list of all six conflicts from the fresh-reader key plus RUL76 already naming `--idle-timeout-ms` / `runner.idleTimeoutMs`. It distinguishes historical/source conflicts from already corrected candidate assertions. The [owner queue](owner-queue.md) retains absent individual anchors/index, missing RUL92/RUL96 records, unexplained 0054 gap, unreachable component-boundary route and candidate/root operative-switchboard wording. No per-RUL anchor or invented record was added.
+
+**Fresh readers: lenient PASS for both**, with partial counted (6/6/6 each). **Strict FAIL for both on B and C (4/6)**, not a strict acceptance. 17 distinct anchors, none missing; each opened seven files within the eight-file budget. Isolation is unproven and scorer shares the key author's session. [Committed scoring report](fresh-reader-261015-runner.md); no fresh-reader rerun or independence claim in this author turn.
+
+## Verification and limitations
+
+[Scoped FAST D/E](step9-fast-check.json), scope `docs/specs/runner.md`, using unchanged production applicator/vocabulary/conservation exports and committed review validation, with both priors together and each separately: **D 0 fatal, E 0 structural fatal**. E remains open with **43 unreviewed, 32 historical identity gaps, 82 reverse entries** in the conservative runner-only overlay. [Runner list](candidate-unverified-runner.json) owns **81**; the excluded fence remains owned once in root-authorities. Extra earlier-batch routing-handoff reverse entries remain an overlay caveat. This is not native identity equality, union closure or strict green. Registry unchanged: **61,883,121 bytes**, SHA256 `dbf89fc898e1107d69bd60ad2f277fde74562732edf79d3a74b2ce1bd63e2b16`.
+
+Candidate-status: **607 files, 216 checked, 0 findings / 0 unresolved links**. Relevant tests **45/45 pass**, env -u CLAUDE_CODE_SESSION_ID, TMPDIR=/tmp/fgos-work, no skip/fail/cancel/todo. Four files: existing conservation, review and review-format tests plus the new liveness regression. [Raw log](step9-tests.log), preserving the earlier historical failure/rerun. The liveness helper correction was tests-first (13 required ids red, all 31 green); regression executes the real scan, redirects only its report writes into scratch, and checks actual record bounds/consumer bytes/path existence. [Tooling record](tooling.md). No protected tool/gate/checker/vocabulary/extractor/baseline changed. No full npm suite, installed-release or native proof claimed.
+
+**Disclosed command side effect:** the single unknown-verb help probe caused the CLI itself to report writing an invocation fault under `.fgos/logs/invocation-faults.jsonl`. This unintended output was outside the author write set; no direct log read/write, cleanup, config or secret access followed. It is recorded in tooling and fast verification. All deliberate repository writes are in the authorized docs/plan/test scope. No git write or lifecycle verb. MDView MCP is unavailable; no preview registration outside the assignment scope.
+
+## Next turn
+
+**Native sync once at this turn's runner commit**, preserve known IDs, then scoped native D/E and full five-field accounting; **apply remaining non-source verdicts**, including the still-running triage/map, owner-queue, predecessor/generation and report review; package **ONE bounded re-review of every pending runner row and changed accounting entry** (43 source rows, changed candidate/truth/liveness/list/queue/report entries). No old pack/request is edited; no author seed/draw/verdict. Step 9 remains open for those independent checks, predecessor dispositions, final main sync, red-team acceptance and existing Rings/A34/Step 10/aliases/consumers/cutover obligations. Step 8 remains closed; no promotion or legacy retirement.
+
+---
+
+# Historical checkpoints (superseded for current content)
+
 # Runner corrections checkpoint — committed sync and matching verdict application next
 
 Input HEAD **24be6cb1d**. This checkpoint supersedes the current-state assertions of the historical checkpoints below. Candidate text and 34 source-row bindings changed in this turn; the earlier native proof at 81d0ed074 is historical proof, never current committed-native proof of these edits. **No native sync or review/request pack edit was performed.** Runner owns the new content commit.

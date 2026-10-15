@@ -3,8 +3,8 @@
   "inputCommit": "24be6cb1db1b16fd1b1dc244f1c7b46d851a330b",
   "native": false,
   "status": "pending bounded re-review after one committed native sync; not a review pack",
-  "changedCandidateUnits": 68,
-  "reboundSourceRows": 34,
+  "changedCandidateUnits": 72,
+  "reboundSourceRows": 43,
   "rows": [
     {
       "claimId": "claim_a5f8435c8d549e5b41a34cf3e1f3e351",
@@ -743,9 +743,9 @@
         "claimKind": "specification",
         "disposition": "supersede",
         "reviewStatus": "pending",
-        "authoredBy": "codex-session:unit-run-1792060810360-fc3c5695@2026-10-15",
-        "rationale": "Judgment: A41/A19 truth correction or explicitly labelled candidate navigation/link/scaffolding repair. Complete original source remains in immutable docs/specs/runner.md; candidate supersedes the identified false current assertion or rebases the same link referent, with unchanged dated decision semantics. A41 F-C: evolve/ranking is absent; R9-5: remove decisions-placement boilerplate from non-decision carrier; A41 F-C: scope the old Gate A contract explicitly; unavailable verb is not described as current. Full before/after text and evidence in reports/phase-06/step9-rebound-units.json. A22 rebind, pending independent bounded review; no approval carry, retirement or promotion.",
-        "targetUnitDigest": "3845d9321f8a37fba215930405872813a31e1de686b4776bc763e604145c29ad",
+        "authoredBy": "codex-session:unit-run-1792061517080-61c43e58@2026-10-15",
+        "rationale": "Judgment: A41 addition under Lead A42; Gate A introductory current-state assertion corrected to explicitly dated legacy contract. CLI unknown-verb evidence bin/fgos.mjs:4373,4461; ranking removal 120af6b3d. Complete source retained in docs/specs/runner.md. A22 rebind; independent truth re-review pending, no approval carry.",
+        "targetUnitDigest": "63cc24d991ad0f3cf493ab1b3e3ca046ea24aa1944a4c85411abef6612626aea",
         "targetAncestry": [
           "Added in candidate: Runner Behaviors & Operations",
           "Behaviors & Operations"
@@ -754,7 +754,7 @@
       "beforeText": "### Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)",
       "afterText": "### Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)",
       "beforeSectionText": "### Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)\n\nBước vào của vòng tự cải thiện (self-improve loop, STR13 — CONTEXT.md):\nfgOS xếp hạng chính friction chưa ngã-ngũ của nó thành\nmột danh sách candidate, người chọn đúng một hoặc dừng (Slice 1), rồi có thể\nbắc cầu candidate đã chọn sang một việc thật để runner thi công (Slice 3,\n`--submit`). Loop này chỉ nhắm vào chính `repo/src` của fgOS — không\nphải một tính năng mở cho host project ngoài — và chạy khi người gọi tay,\nkhông bao giờ là một nhánh tự động của vòng dispatch thường. Vòng khép\nkín đầy đủ: `evolve` (liệt kê) → `evolve --pick` (xem một candidate, đọc-thuần)\n→ `evolve --submit` (bắc cầu, HÀNH ĐỘNG GHI duy nhất của cả bề mặt evolve) →\nrunner dispatch việc mới như mọi việc khác → `review`/`approve` qua cổng duyệt\nPR nội bộ, với `approve` chạy thêm phán Iron Law (xem dưới) trước khi merge.\n\n- **Runs when:** người vận hành gọi `fgos evolve` (liệt kê), `fgos evolve\n  --pick <id>` (xem chi tiết một candidate), hoặc `fgos evolve --submit <id>`\n (bắc cầu candidate sang một việc thật) — không có input tương tác nào\n khác, không vòng lặp chờ trả lời (hai bước, không stdin).\n- **Blocked when:** `--pick <id>`/`--submit <id>` không khớp candidate nào\n đang mở — `validation`, thông điệp rõ ràng, KHÔNG BAO GIỜ hỏi lại (\n  \"input sai là lỗi sạch, không re-prompt\"), không việc nào được tạo ra cho\n  `--submit` khi không khớp; `--pick`/`--submit` mang cờ trần (không giá trị)\n  cũng bị từ chối cùng khuôn `validation` như mọi verb khác dùng\n  `requireField`.\n- **What changes:**\n  - `fgos evolve` (không `--pick`/`--submit`) và `fgos evolve --pick <id>` —\n ĐỌC-THUẦN TUYỆT ĐỐI, cùng request-class với `ready`/`list`/`check`:\n    đọc view qua `listWork(dir)` DUY NHẤT, không bao giờ\n    `rebuild`/`refreshView`/`initStore` (những cửa GHI view/log).\n    - `fgos evolve` — xếp hạng MỖI id còn friction chưa ngã-ngũ\n (`src/evolve/candidates.mjs`'s `rankCandidates`, tái dùng cơ học\n      `listUnsettledFrictionsByWork`/`WEIGHTS.frictionUnsettled` của\n      `entropy.mjs`, không tự định nghĩa lại \"chưa ngã-ngũ\" hay trọng số\n      riêng) rồi in TOÀN BỘ danh sách — mỗi dòng mang đủ id/score/\n      disposition/errorClass/layer/attempts/detail, không cắt bớt (cùng kỷ\n      luật \"mọi trường người cần để phán\" như phần friction của `check`).\n      Không friction chưa ngã-ngũ nào → một thông điệp trạng-thái-rỗng rõ\n      ràng, exit 0 — chưa khởi tạo `.fgos/` nếu nó chưa tồn tại, giữ đúng hợp\n      đồng đọc-thuần của `ready`/`list`.\n    - `fgos evolve --pick <id>` — xếp hạng lại CÙNG một view rồi tìm `id`\n      trong danh sách; khớp → in bản ghi friction đầy đủ của candidate đó,\n      TÁI DÙNG đúng formatter friction sẵn có của `check` (không viết\n      formatter mới); không khớp → lỗi `validation` sạch, không đổi trạng\n      thái. Chạy `fgos evolve` không mang `--pick`/`--submit` CHÍNH LÀ kết\n cục \"dừng\" của Gate A — không có input hủy/dừng riêng nào khác\n      cần xử lý.\n - `fgos evolve --submit <id>` (self-improve loop STR13 Slice 3) — HÀNH\n    ĐỘNG GHI DUY NHẤT của cả bề mặt evolve: xếp hạng lại CÙNG một view, tìm\n    `id`; khớp → soạn một mô tả người-đọc-được từ các trường của candidate\n    (id/disposition/errorClass/layer/attempts/detail — trường vắng mặt được\n    bỏ qua, không bao giờ in literal \"undefined\") rồi tạo đúng MỘT việc thật\n    qua CÙNG cửa `submitWork` mà `fgos submit` tự dùng (không logic tạo-việc\n    thứ hai) — `status: todo`, stage vào-vòng theo domain (stage đầu tiên\n    domain đó khai; với `coding` là `discovery`), `tier`/`risk` dẫn xuất\n    mechanically từ chính mô tả đó qua\n    `classify()` giống hệt một `submit` bình thường. `evolve --submit` không\n    mang cờ `--async`/`--unattended`/`--domain` riêng của nó (bề mặt cờ tối\n    thiểu, YAGNI) — luôn gọi `submitWork` với mặc định. Việc mới tạo ra đi\n    đúng vòng đời runner thường (quét nghiên-cứu → quét chia-việc → dispatch →\n    `awaiting-approval`) như mọi việc khác — Gate A không có cơ chế dispatch/wiring\n    riêng nào cho việc bắc cầu này.\n- **Side effects:** `evolve`/`evolve --pick` — không có: không sự kiện nào\n  vào nhật ký, không dòng nào vào `state.json`, không tiến trình con git nào.\n  `evolve --submit` — đúng MỘT sự kiện `work.add` mới (qua `submitWork`), y\n  hệt một `fgos submit` bình thường; không tiến trình con git nào (việc mới\n  chưa dispatch, chưa có nhánh).\n- **Afterwards:** `evolve`/`evolve --pick` — người vận hành thấy đúng\n  candidate mình cần để quyết định có bắc cầu hay không; không candidate nào\n  bị chọn tự động, không việc nào được tạo ra chỉ vì `evolve` chạy.\n  `evolve --submit` — việc mới nằm trong hàng chờ runner thường, sẵn sàng cho\n  quét làm-rõ/chia-việc/dispatch như mọi việc khác; khi đề xuất của nó tới\n  `awaiting-approval`, nó đi qua đúng cổng duyệt PR nội bộ ở trên — nếu diff của nó\n  chạm cờ/module Iron Law (xem dưới), `approve` từ chối cho tới khi người\n  vận hành xác nhận bằng `--acknowledge-iron-law`.\n  **Tương tác đã biết (chứng minh bằng e2e thật, STR13 Slice 3):** vì Iron\n  Law's phép thử từ khóa TÁI DÙNG đúng `HEAVY_KEYWORDS` mà `classify()` cũng\n dùng, một mô tả candidate chứa từ khóa rủi ro nặng — điều kiện tự\n  nhiên để một fix thật sự cần Iron Law — cũng khiến chính việc mới đó nhận\n  `risk: 'heavy'` ngay lúc `submitWork` chạy. Root mang `risk: 'heavy'` đi\n  đúng nhánh \"cần người quyết\" của quét chia-việc (xem \"Edge Cases Settled\"\n  dưới, mục risk `heavy`) — đậu `awaiting-human` TRƯỚC KHI kịp dispatch, dù\n  không phải vì thiếu rõ. Đây không phải bug — người vận hành cần một bước\n  thao tác thường (vd `fgos edit <id> --risk standard`, verb công khai đã có\n  từ work-item-verb-surface) giữa `evolve --submit` và khi item tới dispatch,\n  nếu muốn bỏ qua cửa chia-việc cho trường hợp này; `description` giữ\n  nguyên nên Iron Law's phép thử từ khóa tại `approve` vẫn chạy đúng như\n  thiết kế bất kể `risk` bị đổi sau đó.",
-      "afterSectionText": "### Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)\n\nBước vào của vòng tự cải thiện (self-improve loop, STR13 — CONTEXT.md):\nfgOS xếp hạng chính friction chưa ngã-ngũ của nó thành\nmột danh sách candidate, người chọn đúng một hoặc dừng (Slice 1), rồi có thể\nbắc cầu candidate đã chọn sang một việc thật để runner thi công (Slice 3,\n`--submit`). Loop này chỉ nhắm vào chính `repo/src` của fgOS — không\nphải một tính năng mở cho host project ngoài — và chạy khi người gọi tay,\nkhông bao giờ là một nhánh tự động của vòng dispatch thường. Vòng khép\nkín đầy đủ: `evolve` (liệt kê) → `evolve --pick` (xem một candidate, đọc-thuần)\n→ `evolve --submit` (bắc cầu, HÀNH ĐỘNG GHI duy nhất của cả bề mặt evolve) →\nrunner dispatch việc mới như mọi việc khác → `review`/`approve` qua cổng duyệt\nPR nội bộ, với `approve` chạy thêm phán Iron Law (xem dưới) trước khi merge.\n\n- **Runs when:** CLI hiện hành không có `fgos evolve`; phần còn lại của mục này lưu hợp đồng Gate A trước khi module ranking bị xoá, không mô tả hành vi hiện hành. Theo hợp đồng cũ, người vận hành gọi `fgos evolve` (liệt kê), `fgos evolve\n  --pick <id>` (xem chi tiết một candidate), hoặc `fgos evolve --submit <id>`\n (bắc cầu candidate sang một việc thật) — không có input tương tác nào\n khác, không vòng lặp chờ trả lời (hai bước, không stdin).\n- **Blocked when:** `--pick <id>`/`--submit <id>` không khớp candidate nào\n đang mở — `validation`, thông điệp rõ ràng, KHÔNG BAO GIỜ hỏi lại (\n  \"input sai là lỗi sạch, không re-prompt\"), không việc nào được tạo ra cho\n  `--submit` khi không khớp; `--pick`/`--submit` mang cờ trần (không giá trị)\n  cũng bị từ chối cùng khuôn `validation` như mọi verb khác dùng\n  `requireField`.\n- **What changes:**\n  - `fgos evolve` (không `--pick`/`--submit`) và `fgos evolve --pick <id>` —\n ĐỌC-THUẦN TUYỆT ĐỐI, cùng request-class với `ready`/`list`/`check`:\n    đọc view qua `listWork(dir)` DUY NHẤT, không bao giờ\n    `rebuild`/`refreshView`/`initStore` (những cửa GHI view/log).\n    - CLI hiện hành không có verb `fgos evolve`; module `src/evolve/candidates.mjs` đã bị xoá và không có hàm `rankCandidates` đang chạy.\n    - `fgos evolve --pick <id>` — xếp hạng lại CÙNG một view rồi tìm `id`\n      trong danh sách; khớp → in bản ghi friction đầy đủ của candidate đó,\n      TÁI DÙNG đúng formatter friction sẵn có của `check` (không viết\n      formatter mới); không khớp → lỗi `validation` sạch, không đổi trạng\n      thái. Chạy `fgos evolve` không mang `--pick`/`--submit` CHÍNH LÀ kết\n cục \"dừng\" của Gate A — không có input hủy/dừng riêng nào khác\n      cần xử lý.\n - `fgos evolve --submit <id>` (self-improve loop STR13 Slice 3) — HÀNH\n    ĐỘNG GHI DUY NHẤT của cả bề mặt evolve: xếp hạng lại CÙNG một view, tìm\n    `id`; khớp → soạn một mô tả người-đọc-được từ các trường của candidate\n    (id/disposition/errorClass/layer/attempts/detail — trường vắng mặt được\n    bỏ qua, không bao giờ in literal \"undefined\") rồi tạo đúng MỘT việc thật\n    qua CÙNG cửa `submitWork` mà `fgos submit` tự dùng (không logic tạo-việc\n    thứ hai) — `status: todo`, stage vào-vòng theo domain (stage đầu tiên\n    domain đó khai; với `coding` là `discovery`), `tier`/`risk` dẫn xuất\n    mechanically từ chính mô tả đó qua\n    `classify()` giống hệt một `submit` bình thường. `evolve --submit` không\n    mang cờ `--async`/`--unattended`/`--domain` riêng của nó (bề mặt cờ tối\n    thiểu, YAGNI) — luôn gọi `submitWork` với mặc định. Việc mới tạo ra đi\n    đúng vòng đời runner thường (quét nghiên-cứu → quét chia-việc → dispatch →\n    `awaiting-approval`) như mọi việc khác — Gate A không có cơ chế dispatch/wiring\n    riêng nào cho việc bắc cầu này.\n- **Side effects:** `evolve`/`evolve --pick` — không có: không sự kiện nào\n  vào nhật ký, không dòng nào vào `state.json`, không tiến trình con git nào.\n  `evolve --submit` — đúng MỘT sự kiện `work.add` mới (qua `submitWork`), y\n  hệt một `fgos submit` bình thường; không tiến trình con git nào (việc mới\n  chưa dispatch, chưa có nhánh).\n- **Afterwards:** `evolve`/`evolve --pick` — người vận hành thấy đúng\n  candidate mình cần để quyết định có bắc cầu hay không; không candidate nào\n  bị chọn tự động, không việc nào được tạo ra chỉ vì `evolve` chạy.\n  `evolve --submit` — việc mới nằm trong hàng chờ runner thường, sẵn sàng cho\n  quét làm-rõ/chia-việc/dispatch như mọi việc khác; khi đề xuất của nó tới\n  `awaiting-approval`, nó đi qua đúng cổng duyệt PR nội bộ ở trên — nếu diff của nó\n  chạm cờ/module Iron Law (xem dưới), `approve` từ chối cho tới khi người\n  vận hành xác nhận bằng `--acknowledge-iron-law`.\n  **Tương tác đã biết (chứng minh bằng e2e thật, STR13 Slice 3):** vì Iron\n  Law's phép thử từ khóa TÁI DÙNG đúng `HEAVY_KEYWORDS` mà `classify()` cũng\n dùng, một mô tả candidate chứa từ khóa rủi ro nặng — điều kiện tự\n  nhiên để một fix thật sự cần Iron Law — cũng khiến chính việc mới đó nhận\n  `risk: 'heavy'` ngay lúc `submitWork` chạy. Root mang `risk: 'heavy'` đi\n  đúng nhánh \"cần người quyết\" của quét chia-việc (xem \"Edge Cases Settled\"\n  dưới, mục risk `heavy`) — đậu `awaiting-human` TRƯỚC KHI kịp dispatch, dù\n  không phải vì thiếu rõ. Đây không phải bug — người vận hành cần một bước\n  thao tác thường (vd `fgos edit <id> --risk standard`, verb công khai đã có\n  từ work-item-verb-surface) giữa `evolve --submit` và khi item tới dispatch,\n  nếu muốn bỏ qua cửa chia-việc cho trường hợp này; `description` giữ\n  nguyên nên Iron Law's phép thử từ khóa tại `approve` vẫn chạy đúng như\n  thiết kế bất kể `risk` bị đổi sau đó.",
+      "afterSectionText": "### Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)\n\nAdded in candidate — A41/A42 correction: CLI hiện hành không có verb `evolve` (`bin/fgos.mjs:4373,4461`; `evolve --help` trả \"unknown verb\"). Module ranking đã bị xoá ở commit `120af6b3d`. Đoạn dưới ghi lại hợp đồng Gate A trước khi bị gỡ, không xác nhận triển khai hiện hành; full truth check owed at promotion.\nBước vào trước đây của vòng tự cải thiện (self-improve loop, STR13 — CONTEXT.md):\nTheo hợp đồng cũ, fgOS xếp hạng chính friction chưa ngã-ngũ của nó thành\nmột danh sách candidate, người chọn đúng một hoặc dừng (Slice 1), rồi có thể\nbắc cầu candidate đã chọn sang một việc thật để runner thi công (Slice 3,\n`--submit`). Loop này chỉ nhắm vào chính `repo/src` của fgOS — không\nphải một tính năng mở cho host project ngoài — và chạy khi người gọi tay,\nkhông bao giờ là một nhánh tự động của vòng dispatch thường. Vòng khép\nkín đầy đủ: `evolve` (liệt kê) → `evolve --pick` (xem một candidate, đọc-thuần)\n→ `evolve --submit` (bắc cầu, HÀNH ĐỘNG GHI duy nhất của cả bề mặt evolve) →\nrunner dispatch việc mới như mọi việc khác → `review`/`approve` qua cổng duyệt\nPR nội bộ, với `approve` chạy thêm phán Iron Law (xem dưới) trước khi merge.\n\n- **Runs when:** CLI hiện hành không có `fgos evolve`; phần còn lại của mục này lưu hợp đồng Gate A trước khi module ranking bị xoá, không mô tả hành vi hiện hành. Theo hợp đồng cũ, người vận hành gọi `fgos evolve` (liệt kê), `fgos evolve\n  --pick <id>` (xem chi tiết một candidate), hoặc `fgos evolve --submit <id>`\n (bắc cầu candidate sang một việc thật) — không có input tương tác nào\n khác, không vòng lặp chờ trả lời (hai bước, không stdin).\n- **Blocked when:** `--pick <id>`/`--submit <id>` không khớp candidate nào\n đang mở — `validation`, thông điệp rõ ràng, KHÔNG BAO GIỜ hỏi lại (\n  \"input sai là lỗi sạch, không re-prompt\"), không việc nào được tạo ra cho\n  `--submit` khi không khớp; `--pick`/`--submit` mang cờ trần (không giá trị)\n  cũng bị từ chối cùng khuôn `validation` như mọi verb khác dùng\n  `requireField`.\n- **What changes:**\n  - `fgos evolve` (không `--pick`/`--submit`) và `fgos evolve --pick <id>` —\n ĐỌC-THUẦN TUYỆT ĐỐI, cùng request-class với `ready`/`list`/`check`:\n    đọc view qua `listWork(dir)` DUY NHẤT, không bao giờ\n    `rebuild`/`refreshView`/`initStore` (những cửa GHI view/log).\n    - CLI hiện hành không có verb `fgos evolve`; module `src/evolve/candidates.mjs` đã bị xoá và không có hàm `rankCandidates` đang chạy.\n    - `fgos evolve --pick <id>` — xếp hạng lại CÙNG một view rồi tìm `id`\n      trong danh sách; khớp → in bản ghi friction đầy đủ của candidate đó,\n      TÁI DÙNG đúng formatter friction sẵn có của `check` (không viết\n      formatter mới); không khớp → lỗi `validation` sạch, không đổi trạng\n      thái. Chạy `fgos evolve` không mang `--pick`/`--submit` CHÍNH LÀ kết\n cục \"dừng\" của Gate A — không có input hủy/dừng riêng nào khác\n      cần xử lý.\n - `fgos evolve --submit <id>` (self-improve loop STR13 Slice 3) — HÀNH\n    ĐỘNG GHI DUY NHẤT của cả bề mặt evolve: xếp hạng lại CÙNG một view, tìm\n    `id`; khớp → soạn một mô tả người-đọc-được từ các trường của candidate\n    (id/disposition/errorClass/layer/attempts/detail — trường vắng mặt được\n    bỏ qua, không bao giờ in literal \"undefined\") rồi tạo đúng MỘT việc thật\n    qua CÙNG cửa `submitWork` mà `fgos submit` tự dùng (không logic tạo-việc\n    thứ hai) — `status: todo`, stage vào-vòng theo domain (stage đầu tiên\n    domain đó khai; với `coding` là `discovery`), `tier`/`risk` dẫn xuất\n    mechanically từ chính mô tả đó qua\n    `classify()` giống hệt một `submit` bình thường. `evolve --submit` không\n    mang cờ `--async`/`--unattended`/`--domain` riêng của nó (bề mặt cờ tối\n    thiểu, YAGNI) — luôn gọi `submitWork` với mặc định. Việc mới tạo ra đi\n    đúng vòng đời runner thường (quét nghiên-cứu → quét chia-việc → dispatch →\n    `awaiting-approval`) như mọi việc khác — Gate A không có cơ chế dispatch/wiring\n    riêng nào cho việc bắc cầu này.\n- **Side effects:** `evolve`/`evolve --pick` — không có: không sự kiện nào\n  vào nhật ký, không dòng nào vào `state.json`, không tiến trình con git nào.\n  `evolve --submit` — đúng MỘT sự kiện `work.add` mới (qua `submitWork`), y\n  hệt một `fgos submit` bình thường; không tiến trình con git nào (việc mới\n  chưa dispatch, chưa có nhánh).\n- **Afterwards:** `evolve`/`evolve --pick` — người vận hành thấy đúng\n  candidate mình cần để quyết định có bắc cầu hay không; không candidate nào\n  bị chọn tự động, không việc nào được tạo ra chỉ vì `evolve` chạy.\n  `evolve --submit` — việc mới nằm trong hàng chờ runner thường, sẵn sàng cho\n  quét làm-rõ/chia-việc/dispatch như mọi việc khác; khi đề xuất của nó tới\n  `awaiting-approval`, nó đi qua đúng cổng duyệt PR nội bộ ở trên — nếu diff của nó\n  chạm cờ/module Iron Law (xem dưới), `approve` từ chối cho tới khi người\n  vận hành xác nhận bằng `--acknowledge-iron-law`.\n  **Tương tác đã biết (chứng minh bằng e2e thật, STR13 Slice 3):** vì Iron\n  Law's phép thử từ khóa TÁI DÙNG đúng `HEAVY_KEYWORDS` mà `classify()` cũng\n dùng, một mô tả candidate chứa từ khóa rủi ro nặng — điều kiện tự\n  nhiên để một fix thật sự cần Iron Law — cũng khiến chính việc mới đó nhận\n  `risk: 'heavy'` ngay lúc `submitWork` chạy. Root mang `risk: 'heavy'` đi\n  đúng nhánh \"cần người quyết\" của quét chia-việc (xem \"Edge Cases Settled\"\n  dưới, mục risk `heavy`) — đậu `awaiting-human` TRƯỚC KHI kịp dispatch, dù\n  không phải vì thiếu rõ. Đây không phải bug — người vận hành cần một bước\n  thao tác thường (vd `fgos edit <id> --risk standard`, verb công khai đã có\n  từ work-item-verb-surface) giữa `evolve --submit` và khi item tới dispatch,\n  nếu muốn bỏ qua cửa chia-việc cho trường hợp này; `description` giữ\n  nguyên nên Iron Law's phép thử từ khóa tại `approve` vẫn chạy đúng như\n  thiết kế bất kể `risk` bị đổi sau đó.",
       "evidence": [
         {
           "ref": "bin/fgos.mjs:4373-4380",
@@ -772,7 +772,8 @@
           "ref": "git log -- src/evolve/candidates.mjs",
           "text": "c36f8d746 deletes legacy module"
         }
-      ]
+      ],
+      "contextualIdenticalUnit": false
     },
     {
       "claimId": "claim_d55d7b0f484d74f056db873f5466dca5",
@@ -1700,6 +1701,391 @@
           "ref": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/acceptance-herdr.md"
         }
       ]
+    },
+    {
+      "claimId": "claim_979ec4a61acca9e1b6a0a3967b1d0c88",
+      "before": {
+        "claimId": "claim_979ec4a61acca9e1b6a0a3967b1d0c88",
+        "sourceUnitDigest": "c7182f609c029616bc8c23ef95b7fb69ade8fc943ebf7aba8f339003c4437459",
+        "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+        "targetAnchor": "unheaded-block-26",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-38 (lines 550–560) carried at docs/platform/runner/operations/h-51f5cd7279fd.md#unheaded-block-26. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetUnitDigest": "c7182f609c029616bc8c23ef95b7fb69ade8fc943ebf7aba8f339003c4437459",
+        "targetAncestry": [
+          "Added in candidate: Runner Behaviors & Operations",
+          "Behaviors & Operations",
+          "Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)"
+        ]
+      },
+      "beforeText": "Bước vào của vòng tự cải thiện (self-improve loop, STR13 — CONTEXT.md):\nfgOS xếp hạng chính friction chưa ngã-ngũ của nó thành\nmột danh sách candidate, người chọn đúng một hoặc dừng (Slice 1), rồi có thể\nbắc cầu candidate đã chọn sang một việc thật để runner thi công (Slice 3,\n`--submit`). Loop này chỉ nhắm vào chính `repo/src` của fgOS — không\nphải một tính năng mở cho host project ngoài — và chạy khi người gọi tay,\nkhông bao giờ là một nhánh tự động của vòng dispatch thường. Vòng khép\nkín đầy đủ: `evolve` (liệt kê) → `evolve --pick` (xem một candidate, đọc-thuần)\n→ `evolve --submit` (bắc cầu, HÀNH ĐỘNG GHI duy nhất của cả bề mặt evolve) →\nrunner dispatch việc mới như mọi việc khác → `review`/`approve` qua cổng duyệt\nPR nội bộ, với `approve` chạy thêm phán Iron Law (xem dưới) trước khi merge.",
+      "evidence": [],
+      "contextualIdenticalUnit": false,
+      "after": {
+        "claimId": "claim_979ec4a61acca9e1b6a0a3967b1d0c88",
+        "sourceUnitDigest": "c7182f609c029616bc8c23ef95b7fb69ade8fc943ebf7aba8f339003c4437459",
+        "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+        "targetAnchor": "unheaded-block-26",
+        "claimKind": "specification",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792061517080-61c43e58@2026-10-15",
+        "rationale": "Judgment: A41 addition under Lead A42; Gate A introductory current-state assertion corrected to explicitly dated legacy contract. CLI unknown-verb evidence bin/fgos.mjs:4373,4461; ranking removal 120af6b3d. Complete source retained in docs/specs/runner.md. A22 rebind; independent truth re-review pending, no approval carry.",
+        "targetUnitDigest": "30bbabf9219560dd2744a98e42e43b53e9fbaf15c4282e68860a8682f2b63059",
+        "targetAncestry": [
+          "Added in candidate: Runner Behaviors & Operations",
+          "Behaviors & Operations",
+          "Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)"
+        ]
+      },
+      "afterText": "Added in candidate — A41/A42 correction: CLI hiện hành không có verb `evolve` (`bin/fgos.mjs:4373,4461`; `evolve --help` trả \"unknown verb\"). Module ranking đã bị xoá ở commit `120af6b3d`. Đoạn dưới ghi lại hợp đồng Gate A trước khi bị gỡ, không xác nhận triển khai hiện hành; full truth check owed at promotion.\nBước vào trước đây của vòng tự cải thiện (self-improve loop, STR13 — CONTEXT.md):\nTheo hợp đồng cũ, fgOS xếp hạng chính friction chưa ngã-ngũ của nó thành\nmột danh sách candidate, người chọn đúng một hoặc dừng (Slice 1), rồi có thể\nbắc cầu candidate đã chọn sang một việc thật để runner thi công (Slice 3,\n`--submit`). Loop này chỉ nhắm vào chính `repo/src` của fgOS — không\nphải một tính năng mở cho host project ngoài — và chạy khi người gọi tay,\nkhông bao giờ là một nhánh tự động của vòng dispatch thường. Vòng khép\nkín đầy đủ: `evolve` (liệt kê) → `evolve --pick` (xem một candidate, đọc-thuần)\n→ `evolve --submit` (bắc cầu, HÀNH ĐỘNG GHI duy nhất của cả bề mặt evolve) →\nrunner dispatch việc mới như mọi việc khác → `review`/`approve` qua cổng duyệt\nPR nội bộ, với `approve` chạy thêm phán Iron Law (xem dưới) trước khi merge."
+    },
+    {
+      "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
+      "before": {
+        "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
+        "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "targetAnchor": "unheaded-block-9",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: target digest repeats; ancestor headings differ. Whole unheaded-block docs/specs/runner.md#unheaded-block-150 (lines 1656–1656) carried at docs/platform/runner/decisions/h-36d872fbb0e5.md#unheaded-block-9. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetAncestry": [
+          "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "0005 — Runner & cô lập worker",
+          "Hệ quả"
+        ]
+      },
+      "beforeText": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+      "evidence": [],
+      "contextualIdenticalUnit": true,
+      "after": {
+        "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
+        "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "targetAnchor": "unheaded-block-9",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792061517080-61c43e58@2026-10-15",
+        "rationale": "Weak-exact: repeated digest, paired deterministically by complete enclosing-decision ancestry after removing only the candidate wrapper H1. Contextual identical-unit group of eight; each source footer belongs to its own decision, not the first digest match. Exact text and digest retained. A42/A22 pending independent re-review for all eight, including the first unchanged anchor; no approval carry.",
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetAncestry": [
+          "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "0005 — Runner & cô lập worker",
+          "Hệ quả"
+        ]
+      },
+      "afterText": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+    },
+    {
+      "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
+      "before": {
+        "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
+        "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "targetAnchor": "unheaded-block-9",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: target digest repeats; ancestor headings differ. Whole unheaded-block docs/specs/runner.md#unheaded-block-155 (lines 1684–1684) carried at docs/platform/runner/decisions/h-36d872fbb0e5.md#unheaded-block-9. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetAncestry": [
+          "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "0005 — Runner & cô lập worker",
+          "Hệ quả"
+        ]
+      },
+      "beforeText": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+      "evidence": [],
+      "contextualIdenticalUnit": true,
+      "after": {
+        "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
+        "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "targetAnchor": "unheaded-block-14",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792061517080-61c43e58@2026-10-15",
+        "rationale": "Weak-exact: repeated digest, paired deterministically by complete enclosing-decision ancestry after removing only the candidate wrapper H1. Contextual identical-unit group of eight; each source footer belongs to its own decision, not the first digest match. Exact text and digest retained. A42/A22 pending independent re-review for all eight, including the first unchanged anchor; no approval carry.",
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetAncestry": [
+          "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "0008 — Routing theo audience của từng interface",
+          "Hệ quả"
+        ]
+      },
+      "afterText": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+    },
+    {
+      "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
+      "before": {
+        "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
+        "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "targetAnchor": "unheaded-block-9",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: target digest repeats; ancestor headings differ. Whole unheaded-block docs/specs/runner.md#unheaded-block-167 (lines 1793–1793) carried at docs/platform/runner/decisions/h-36d872fbb0e5.md#unheaded-block-9. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetAncestry": [
+          "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "0005 — Runner & cô lập worker",
+          "Hệ quả"
+        ]
+      },
+      "beforeText": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+      "evidence": [],
+      "contextualIdenticalUnit": true,
+      "after": {
+        "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
+        "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "targetAnchor": "unheaded-block-26",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792061517080-61c43e58@2026-10-15",
+        "rationale": "Weak-exact: repeated digest, paired deterministically by complete enclosing-decision ancestry after removing only the candidate wrapper H1. Contextual identical-unit group of eight; each source footer belongs to its own decision, not the first digest match. Exact text and digest retained. A42/A22 pending independent re-review for all eight, including the first unchanged anchor; no approval carry.",
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetAncestry": [
+          "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập)",
+          "Hệ quả"
+        ]
+      },
+      "afterText": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+    },
+    {
+      "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
+      "before": {
+        "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
+        "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "targetAnchor": "unheaded-block-9",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: target digest repeats; ancestor headings differ. Whole unheaded-block docs/specs/runner.md#unheaded-block-176 (lines 1877–1877) carried at docs/platform/runner/decisions/h-36d872fbb0e5.md#unheaded-block-9. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetAncestry": [
+          "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "0005 — Runner & cô lập worker",
+          "Hệ quả"
+        ]
+      },
+      "beforeText": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+      "evidence": [],
+      "contextualIdenticalUnit": true,
+      "after": {
+        "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
+        "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "targetAnchor": "unheaded-block-35",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792061517080-61c43e58@2026-10-15",
+        "rationale": "Weak-exact: repeated digest, paired deterministically by complete enclosing-decision ancestry after removing only the candidate wrapper H1. Contextual identical-unit group of eight; each source footer belongs to its own decision, not the first digest match. Exact text and digest retained. A42/A22 pending independent re-review for all eight, including the first unchanged anchor; no approval carry.",
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetAncestry": [
+          "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence",
+          "Hệ quả"
+        ]
+      },
+      "afterText": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+    },
+    {
+      "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
+      "before": {
+        "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
+        "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "targetAnchor": "unheaded-block-9",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: target digest repeats; ancestor headings differ. Whole unheaded-block docs/specs/runner.md#unheaded-block-241 (lines 2401–2401) carried at docs/platform/runner/decisions/h-36d872fbb0e5.md#unheaded-block-9. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetAncestry": [
+          "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "0005 — Runner & cô lập worker",
+          "Hệ quả"
+        ]
+      },
+      "beforeText": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+      "evidence": [],
+      "contextualIdenticalUnit": true,
+      "after": {
+        "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
+        "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "targetAnchor": "unheaded-block-100",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792061517080-61c43e58@2026-10-15",
+        "rationale": "Weak-exact: repeated digest, paired deterministically by complete enclosing-decision ancestry after removing only the candidate wrapper H1. Contextual identical-unit group of eight; each source footer belongs to its own decision, not the first digest match. Exact text and digest retained. A42/A22 pending independent re-review for all eight, including the first unchanged anchor; no approval carry.",
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetAncestry": [
+          "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "0028 — Đổi tên pinned term `orchestrator` thành `launcher`",
+          "Hệ quả"
+        ]
+      },
+      "afterText": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+    },
+    {
+      "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
+      "before": {
+        "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
+        "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "targetAnchor": "unheaded-block-9",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: target digest repeats; ancestor headings differ. Whole unheaded-block docs/specs/runner.md#unheaded-block-250 (lines 2490–2490) carried at docs/platform/runner/decisions/h-36d872fbb0e5.md#unheaded-block-9. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetAncestry": [
+          "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "0005 — Runner & cô lập worker",
+          "Hệ quả"
+        ]
+      },
+      "beforeText": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+      "evidence": [],
+      "contextualIdenticalUnit": true,
+      "after": {
+        "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
+        "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "targetAnchor": "unheaded-block-109",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792061517080-61c43e58@2026-10-15",
+        "rationale": "Weak-exact: repeated digest, paired deterministically by complete enclosing-decision ancestry after removing only the candidate wrapper H1. Contextual identical-unit group of eight; each source footer belongs to its own decision, not the first digest match. Exact text and digest retained. A42/A22 pending independent re-review for all eight, including the first unchanged anchor; no approval carry.",
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetAncestry": [
+          "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị",
+          "Hệ quả"
+        ]
+      },
+      "afterText": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+    },
+    {
+      "claimId": "claim_825b8970950e755e43c8c1740612eac4",
+      "before": {
+        "claimId": "claim_825b8970950e755e43c8c1740612eac4",
+        "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "targetAnchor": "unheaded-block-9",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: target digest repeats; ancestor headings differ. Whole unheaded-block docs/specs/runner.md#unheaded-block-274 (lines 2671–2671) carried at docs/platform/runner/decisions/h-36d872fbb0e5.md#unheaded-block-9. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetAncestry": [
+          "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "0005 — Runner & cô lập worker",
+          "Hệ quả"
+        ]
+      },
+      "beforeText": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+      "evidence": [],
+      "contextualIdenticalUnit": true,
+      "after": {
+        "claimId": "claim_825b8970950e755e43c8c1740612eac4",
+        "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "targetAnchor": "unheaded-block-133",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792061517080-61c43e58@2026-10-15",
+        "rationale": "Weak-exact: repeated digest, paired deterministically by complete enclosing-decision ancestry after removing only the candidate wrapper H1. Contextual identical-unit group of eight; each source footer belongs to its own decision, not the first digest match. Exact text and digest retained. A42/A22 pending independent re-review for all eight, including the first unchanged anchor; no approval carry.",
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetAncestry": [
+          "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới",
+          "Hệ quả"
+        ]
+      },
+      "afterText": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+    },
+    {
+      "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
+      "before": {
+        "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
+        "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "targetAnchor": "unheaded-block-9",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: target digest repeats; ancestor headings differ. Whole unheaded-block docs/specs/runner.md#unheaded-block-286 (lines 2783–2783) carried at docs/platform/runner/decisions/h-36d872fbb0e5.md#unheaded-block-9. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetAncestry": [
+          "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "0005 — Runner & cô lập worker",
+          "Hệ quả"
+        ]
+      },
+      "beforeText": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+      "evidence": [],
+      "contextualIdenticalUnit": true,
+      "after": {
+        "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
+        "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "targetAnchor": "unheaded-block-145",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792061517080-61c43e58@2026-10-15",
+        "rationale": "Weak-exact: repeated digest, paired deterministically by complete enclosing-decision ancestry after removing only the candidate wrapper H1. Contextual identical-unit group of eight; each source footer belongs to its own decision, not the first digest match. Exact text and digest retained. A42/A22 pending independent re-review for all eight, including the first unchanged anchor; no approval carry.",
+        "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetAncestry": [
+          "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người",
+          "Hệ quả"
+        ]
+      },
+      "afterText": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
     }
   ],
   "candidateUnitChanges": [
@@ -3162,17 +3548,17 @@
         "stableAnchor": "h-011429750b1b",
         "startLine": 454,
         "endLine": 454,
-        "textDigest": "3845d9321f8a37fba215930405872813a31e1de686b4776bc763e604145c29ad",
+        "textDigest": "63cc24d991ad0f3cf493ab1b3e3ca046ea24aa1944a4c85411abef6612626aea",
         "sample": "Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)",
-        "sectionPayloadDigest": "354bf9df962c12ab3fb4cfd8ba63dbf92b76d75a5322f9a2162378466684f211",
-        "followingBlockDigest": "c7182f609c029616bc8c23ef95b7fb69ade8fc943ebf7aba8f339003c4437459",
-        "identityFingerprint": "e3e407e7a777967d793d923855192ab6ac4c4fbd9ab42ab21632f4abb40fb9a9",
+        "sectionPayloadDigest": "5d5b5e904dd6b4809498a379dc055aff53689afb72ea8391693de0a3718d66eb",
+        "followingBlockDigest": "30bbabf9219560dd2744a98e42e43b53e9fbaf15c4282e68860a8682f2b63059",
+        "identityFingerprint": "c3fca777febb129395f40b84d1cf86f28090120d83e331e35f6f34d8819edd40",
         "ancestry": [
           "Added in candidate: Runner Behaviors & Operations",
           "Behaviors & Operations"
         ],
         "text": "### Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)",
-        "sectionText": "### Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)\n\nBước vào của vòng tự cải thiện (self-improve loop, STR13 — CONTEXT.md):\nfgOS xếp hạng chính friction chưa ngã-ngũ của nó thành\nmột danh sách candidate, người chọn đúng một hoặc dừng (Slice 1), rồi có thể\nbắc cầu candidate đã chọn sang một việc thật để runner thi công (Slice 3,\n`--submit`). Loop này chỉ nhắm vào chính `repo/src` của fgOS — không\nphải một tính năng mở cho host project ngoài — và chạy khi người gọi tay,\nkhông bao giờ là một nhánh tự động của vòng dispatch thường. Vòng khép\nkín đầy đủ: `evolve` (liệt kê) → `evolve --pick` (xem một candidate, đọc-thuần)\n→ `evolve --submit` (bắc cầu, HÀNH ĐỘNG GHI duy nhất của cả bề mặt evolve) →\nrunner dispatch việc mới như mọi việc khác → `review`/`approve` qua cổng duyệt\nPR nội bộ, với `approve` chạy thêm phán Iron Law (xem dưới) trước khi merge.\n\n- **Runs when:** CLI hiện hành không có `fgos evolve`; phần còn lại của mục này lưu hợp đồng Gate A trước khi module ranking bị xoá, không mô tả hành vi hiện hành. Theo hợp đồng cũ, người vận hành gọi `fgos evolve` (liệt kê), `fgos evolve\n  --pick <id>` (xem chi tiết một candidate), hoặc `fgos evolve --submit <id>`\n (bắc cầu candidate sang một việc thật) — không có input tương tác nào\n khác, không vòng lặp chờ trả lời (hai bước, không stdin).\n- **Blocked when:** `--pick <id>`/`--submit <id>` không khớp candidate nào\n đang mở — `validation`, thông điệp rõ ràng, KHÔNG BAO GIỜ hỏi lại (\n  \"input sai là lỗi sạch, không re-prompt\"), không việc nào được tạo ra cho\n  `--submit` khi không khớp; `--pick`/`--submit` mang cờ trần (không giá trị)\n  cũng bị từ chối cùng khuôn `validation` như mọi verb khác dùng\n  `requireField`.\n- **What changes:**\n  - `fgos evolve` (không `--pick`/`--submit`) và `fgos evolve --pick <id>` —\n ĐỌC-THUẦN TUYỆT ĐỐI, cùng request-class với `ready`/`list`/`check`:\n    đọc view qua `listWork(dir)` DUY NHẤT, không bao giờ\n    `rebuild`/`refreshView`/`initStore` (những cửa GHI view/log).\n    - CLI hiện hành không có verb `fgos evolve`; module `src/evolve/candidates.mjs` đã bị xoá và không có hàm `rankCandidates` đang chạy.\n    - `fgos evolve --pick <id>` — xếp hạng lại CÙNG một view rồi tìm `id`\n      trong danh sách; khớp → in bản ghi friction đầy đủ của candidate đó,\n      TÁI DÙNG đúng formatter friction sẵn có của `check` (không viết\n      formatter mới); không khớp → lỗi `validation` sạch, không đổi trạng\n      thái. Chạy `fgos evolve` không mang `--pick`/`--submit` CHÍNH LÀ kết\n cục \"dừng\" của Gate A — không có input hủy/dừng riêng nào khác\n      cần xử lý.\n - `fgos evolve --submit <id>` (self-improve loop STR13 Slice 3) — HÀNH\n    ĐỘNG GHI DUY NHẤT của cả bề mặt evolve: xếp hạng lại CÙNG một view, tìm\n    `id`; khớp → soạn một mô tả người-đọc-được từ các trường của candidate\n    (id/disposition/errorClass/layer/attempts/detail — trường vắng mặt được\n    bỏ qua, không bao giờ in literal \"undefined\") rồi tạo đúng MỘT việc thật\n    qua CÙNG cửa `submitWork` mà `fgos submit` tự dùng (không logic tạo-việc\n    thứ hai) — `status: todo`, stage vào-vòng theo domain (stage đầu tiên\n    domain đó khai; với `coding` là `discovery`), `tier`/`risk` dẫn xuất\n    mechanically từ chính mô tả đó qua\n    `classify()` giống hệt một `submit` bình thường. `evolve --submit` không\n    mang cờ `--async`/`--unattended`/`--domain` riêng của nó (bề mặt cờ tối\n    thiểu, YAGNI) — luôn gọi `submitWork` với mặc định. Việc mới tạo ra đi\n    đúng vòng đời runner thường (quét nghiên-cứu → quét chia-việc → dispatch →\n    `awaiting-approval`) như mọi việc khác — Gate A không có cơ chế dispatch/wiring\n    riêng nào cho việc bắc cầu này.\n- **Side effects:** `evolve`/`evolve --pick` — không có: không sự kiện nào\n  vào nhật ký, không dòng nào vào `state.json`, không tiến trình con git nào.\n  `evolve --submit` — đúng MỘT sự kiện `work.add` mới (qua `submitWork`), y\n  hệt một `fgos submit` bình thường; không tiến trình con git nào (việc mới\n  chưa dispatch, chưa có nhánh).\n- **Afterwards:** `evolve`/`evolve --pick` — người vận hành thấy đúng\n  candidate mình cần để quyết định có bắc cầu hay không; không candidate nào\n  bị chọn tự động, không việc nào được tạo ra chỉ vì `evolve` chạy.\n  `evolve --submit` — việc mới nằm trong hàng chờ runner thường, sẵn sàng cho\n  quét làm-rõ/chia-việc/dispatch như mọi việc khác; khi đề xuất của nó tới\n  `awaiting-approval`, nó đi qua đúng cổng duyệt PR nội bộ ở trên — nếu diff của nó\n  chạm cờ/module Iron Law (xem dưới), `approve` từ chối cho tới khi người\n  vận hành xác nhận bằng `--acknowledge-iron-law`.\n  **Tương tác đã biết (chứng minh bằng e2e thật, STR13 Slice 3):** vì Iron\n  Law's phép thử từ khóa TÁI DÙNG đúng `HEAVY_KEYWORDS` mà `classify()` cũng\n dùng, một mô tả candidate chứa từ khóa rủi ro nặng — điều kiện tự\n  nhiên để một fix thật sự cần Iron Law — cũng khiến chính việc mới đó nhận\n  `risk: 'heavy'` ngay lúc `submitWork` chạy. Root mang `risk: 'heavy'` đi\n  đúng nhánh \"cần người quyết\" của quét chia-việc (xem \"Edge Cases Settled\"\n  dưới, mục risk `heavy`) — đậu `awaiting-human` TRƯỚC KHI kịp dispatch, dù\n  không phải vì thiếu rõ. Đây không phải bug — người vận hành cần một bước\n  thao tác thường (vd `fgos edit <id> --risk standard`, verb công khai đã có\n  từ work-item-verb-surface) giữa `evolve --submit` và khi item tới dispatch,\n  nếu muốn bỏ qua cửa chia-việc cho trường hợp này; `description` giữ\n  nguyên nên Iron Law's phép thử từ khóa tại `approve` vẫn chạy đúng như\n  thiết kế bất kể `risk` bị đổi sau đó."
+        "sectionText": "### Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)\n\nAdded in candidate — A41/A42 correction: CLI hiện hành không có verb `evolve` (`bin/fgos.mjs:4373,4461`; `evolve --help` trả \"unknown verb\"). Module ranking đã bị xoá ở commit `120af6b3d`. Đoạn dưới ghi lại hợp đồng Gate A trước khi bị gỡ, không xác nhận triển khai hiện hành; full truth check owed at promotion.\nBước vào trước đây của vòng tự cải thiện (self-improve loop, STR13 — CONTEXT.md):\nTheo hợp đồng cũ, fgOS xếp hạng chính friction chưa ngã-ngũ của nó thành\nmột danh sách candidate, người chọn đúng một hoặc dừng (Slice 1), rồi có thể\nbắc cầu candidate đã chọn sang một việc thật để runner thi công (Slice 3,\n`--submit`). Loop này chỉ nhắm vào chính `repo/src` của fgOS — không\nphải một tính năng mở cho host project ngoài — và chạy khi người gọi tay,\nkhông bao giờ là một nhánh tự động của vòng dispatch thường. Vòng khép\nkín đầy đủ: `evolve` (liệt kê) → `evolve --pick` (xem một candidate, đọc-thuần)\n→ `evolve --submit` (bắc cầu, HÀNH ĐỘNG GHI duy nhất của cả bề mặt evolve) →\nrunner dispatch việc mới như mọi việc khác → `review`/`approve` qua cổng duyệt\nPR nội bộ, với `approve` chạy thêm phán Iron Law (xem dưới) trước khi merge.\n\n- **Runs when:** CLI hiện hành không có `fgos evolve`; phần còn lại của mục này lưu hợp đồng Gate A trước khi module ranking bị xoá, không mô tả hành vi hiện hành. Theo hợp đồng cũ, người vận hành gọi `fgos evolve` (liệt kê), `fgos evolve\n  --pick <id>` (xem chi tiết một candidate), hoặc `fgos evolve --submit <id>`\n (bắc cầu candidate sang một việc thật) — không có input tương tác nào\n khác, không vòng lặp chờ trả lời (hai bước, không stdin).\n- **Blocked when:** `--pick <id>`/`--submit <id>` không khớp candidate nào\n đang mở — `validation`, thông điệp rõ ràng, KHÔNG BAO GIỜ hỏi lại (\n  \"input sai là lỗi sạch, không re-prompt\"), không việc nào được tạo ra cho\n  `--submit` khi không khớp; `--pick`/`--submit` mang cờ trần (không giá trị)\n  cũng bị từ chối cùng khuôn `validation` như mọi verb khác dùng\n  `requireField`.\n- **What changes:**\n  - `fgos evolve` (không `--pick`/`--submit`) và `fgos evolve --pick <id>` —\n ĐỌC-THUẦN TUYỆT ĐỐI, cùng request-class với `ready`/`list`/`check`:\n    đọc view qua `listWork(dir)` DUY NHẤT, không bao giờ\n    `rebuild`/`refreshView`/`initStore` (những cửa GHI view/log).\n    - CLI hiện hành không có verb `fgos evolve`; module `src/evolve/candidates.mjs` đã bị xoá và không có hàm `rankCandidates` đang chạy.\n    - `fgos evolve --pick <id>` — xếp hạng lại CÙNG một view rồi tìm `id`\n      trong danh sách; khớp → in bản ghi friction đầy đủ của candidate đó,\n      TÁI DÙNG đúng formatter friction sẵn có của `check` (không viết\n      formatter mới); không khớp → lỗi `validation` sạch, không đổi trạng\n      thái. Chạy `fgos evolve` không mang `--pick`/`--submit` CHÍNH LÀ kết\n cục \"dừng\" của Gate A — không có input hủy/dừng riêng nào khác\n      cần xử lý.\n - `fgos evolve --submit <id>` (self-improve loop STR13 Slice 3) — HÀNH\n    ĐỘNG GHI DUY NHẤT của cả bề mặt evolve: xếp hạng lại CÙNG một view, tìm\n    `id`; khớp → soạn một mô tả người-đọc-được từ các trường của candidate\n    (id/disposition/errorClass/layer/attempts/detail — trường vắng mặt được\n    bỏ qua, không bao giờ in literal \"undefined\") rồi tạo đúng MỘT việc thật\n    qua CÙNG cửa `submitWork` mà `fgos submit` tự dùng (không logic tạo-việc\n    thứ hai) — `status: todo`, stage vào-vòng theo domain (stage đầu tiên\n    domain đó khai; với `coding` là `discovery`), `tier`/`risk` dẫn xuất\n    mechanically từ chính mô tả đó qua\n    `classify()` giống hệt một `submit` bình thường. `evolve --submit` không\n    mang cờ `--async`/`--unattended`/`--domain` riêng của nó (bề mặt cờ tối\n    thiểu, YAGNI) — luôn gọi `submitWork` với mặc định. Việc mới tạo ra đi\n    đúng vòng đời runner thường (quét nghiên-cứu → quét chia-việc → dispatch →\n    `awaiting-approval`) như mọi việc khác — Gate A không có cơ chế dispatch/wiring\n    riêng nào cho việc bắc cầu này.\n- **Side effects:** `evolve`/`evolve --pick` — không có: không sự kiện nào\n  vào nhật ký, không dòng nào vào `state.json`, không tiến trình con git nào.\n  `evolve --submit` — đúng MỘT sự kiện `work.add` mới (qua `submitWork`), y\n  hệt một `fgos submit` bình thường; không tiến trình con git nào (việc mới\n  chưa dispatch, chưa có nhánh).\n- **Afterwards:** `evolve`/`evolve --pick` — người vận hành thấy đúng\n  candidate mình cần để quyết định có bắc cầu hay không; không candidate nào\n  bị chọn tự động, không việc nào được tạo ra chỉ vì `evolve` chạy.\n  `evolve --submit` — việc mới nằm trong hàng chờ runner thường, sẵn sàng cho\n  quét làm-rõ/chia-việc/dispatch như mọi việc khác; khi đề xuất của nó tới\n  `awaiting-approval`, nó đi qua đúng cổng duyệt PR nội bộ ở trên — nếu diff của nó\n  chạm cờ/module Iron Law (xem dưới), `approve` từ chối cho tới khi người\n  vận hành xác nhận bằng `--acknowledge-iron-law`.\n  **Tương tác đã biết (chứng minh bằng e2e thật, STR13 Slice 3):** vì Iron\n  Law's phép thử từ khóa TÁI DÙNG đúng `HEAVY_KEYWORDS` mà `classify()` cũng\n dùng, một mô tả candidate chứa từ khóa rủi ro nặng — điều kiện tự\n  nhiên để một fix thật sự cần Iron Law — cũng khiến chính việc mới đó nhận\n  `risk: 'heavy'` ngay lúc `submitWork` chạy. Root mang `risk: 'heavy'` đi\n  đúng nhánh \"cần người quyết\" của quét chia-việc (xem \"Edge Cases Settled\"\n  dưới, mục risk `heavy`) — đậu `awaiting-human` TRƯỚC KHI kịp dispatch, dù\n  không phải vì thiếu rõ. Đây không phải bug — người vận hành cần một bước\n  thao tác thường (vd `fgos edit <id> --risk standard`, verb công khai đã có\n  từ work-item-verb-surface) giữa `evolve --submit` và khi item tới dispatch,\n  nếu muốn bỏ qua cửa chia-việc cho trường hợp này; `description` giữ\n  nguyên nên Iron Law's phép thử từ khóa tại `approve` vẫn chạy đúng như\n  thiết kế bất kể `risk` bị đổi sau đó."
       },
       "status": "pending",
       "approvalCarried": false,
@@ -5381,7 +5767,775 @@
       "sourceClaimIds": [],
       "evidence": [],
       "reasons": []
+    },
+    {
+      "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "anchor": "unheaded-block-26",
+      "unitKind": "unheaded-block",
+      "before": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-26",
+        "githubAnchor": "unheaded-block-26",
+        "stableAnchor": "unheaded-block-26",
+        "title": "Unheaded block 26",
+        "startLine": 456,
+        "endLine": 466,
+        "textDigest": "c7182f609c029616bc8c23ef95b7fb69ade8fc943ebf7aba8f339003c4437459",
+        "sample": "Bước vào của vòng tự cải thiện (self-improve loop, STR13 — CONTEXT.md):\nfgOS xếp hạng chính friction chưa ngã-ngũ của nó thành\nmột danh sách candidate, người chọn đúng một hoặc dừn",
+        "identityFingerprint": "5c19ee6d921866ed46a3f9a75733d3ea03cdc16aec9116a52bce3c5c2f715f93",
+        "ancestry": [
+          "Added in candidate: Runner Behaviors & Operations",
+          "Behaviors & Operations",
+          "Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)"
+        ],
+        "text": "Bước vào của vòng tự cải thiện (self-improve loop, STR13 — CONTEXT.md):\nfgOS xếp hạng chính friction chưa ngã-ngũ của nó thành\nmột danh sách candidate, người chọn đúng một hoặc dừng (Slice 1), rồi có thể\nbắc cầu candidate đã chọn sang một việc thật để runner thi công (Slice 3,\n`--submit`). Loop này chỉ nhắm vào chính `repo/src` của fgOS — không\nphải một tính năng mở cho host project ngoài — và chạy khi người gọi tay,\nkhông bao giờ là một nhánh tự động của vòng dispatch thường. Vòng khép\nkín đầy đủ: `evolve` (liệt kê) → `evolve --pick` (xem một candidate, đọc-thuần)\n→ `evolve --submit` (bắc cầu, HÀNH ĐỘNG GHI duy nhất của cả bề mặt evolve) →\nrunner dispatch việc mới như mọi việc khác → `review`/`approve` qua cổng duyệt\nPR nội bộ, với `approve` chạy thêm phán Iron Law (xem dưới) trước khi merge."
+      },
+      "status": "pending",
+      "approvalCarried": false,
+      "sourceClaimIds": [
+        "claim_979ec4a61acca9e1b6a0a3967b1d0c88"
+      ],
+      "evidence": [],
+      "reasons": [
+        "Lead A42 Gate A correction or labelled fresh-reader conflict navigation"
+      ],
+      "after": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-26",
+        "githubAnchor": "unheaded-block-26",
+        "stableAnchor": "unheaded-block-26",
+        "title": "Unheaded block 26",
+        "startLine": 456,
+        "endLine": 467,
+        "textDigest": "30bbabf9219560dd2744a98e42e43b53e9fbaf15c4282e68860a8682f2b63059",
+        "sample": "Added in candidate — A41/A42 correction: CLI hiện hành không có verb `evolve` (`bin/fgos.mjs:4373,4461`; `evolve --help` trả \"unknown verb\"). Module ranking đã bị xoá ở commit `120",
+        "identityFingerprint": "92766f188ccb99457e7d20d05483082de50a478b057e56d43490c8b5ad918147",
+        "ancestry": [
+          "Added in candidate: Runner Behaviors & Operations",
+          "Behaviors & Operations",
+          "Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)"
+        ],
+        "text": "Added in candidate — A41/A42 correction: CLI hiện hành không có verb `evolve` (`bin/fgos.mjs:4373,4461`; `evolve --help` trả \"unknown verb\"). Module ranking đã bị xoá ở commit `120af6b3d`. Đoạn dưới ghi lại hợp đồng Gate A trước khi bị gỡ, không xác nhận triển khai hiện hành; full truth check owed at promotion.\nBước vào trước đây của vòng tự cải thiện (self-improve loop, STR13 — CONTEXT.md):\nTheo hợp đồng cũ, fgOS xếp hạng chính friction chưa ngã-ngũ của nó thành\nmột danh sách candidate, người chọn đúng một hoặc dừng (Slice 1), rồi có thể\nbắc cầu candidate đã chọn sang một việc thật để runner thi công (Slice 3,\n`--submit`). Loop này chỉ nhắm vào chính `repo/src` của fgOS — không\nphải một tính năng mở cho host project ngoài — và chạy khi người gọi tay,\nkhông bao giờ là một nhánh tự động của vòng dispatch thường. Vòng khép\nkín đầy đủ: `evolve` (liệt kê) → `evolve --pick` (xem một candidate, đọc-thuần)\n→ `evolve --submit` (bắc cầu, HÀNH ĐỘNG GHI duy nhất của cả bề mặt evolve) →\nrunner dispatch việc mới như mọi việc khác → `review`/`approve` qua cổng duyệt\nPR nội bộ, với `approve` chạy thêm phán Iron Law (xem dưới) trước khi merge."
+      }
+    },
+    {
+      "path": "docs/platform/runner/README.md",
+      "anchor": "added-in-candidate-known-conflicts-in-carried-text",
+      "unitKind": "heading",
+      "before": null,
+      "status": "pending",
+      "approvalCarried": false,
+      "sourceClaimIds": [],
+      "evidence": [],
+      "reasons": [
+        "Lead A42 Gate A correction or labelled fresh-reader conflict navigation"
+      ],
+      "after": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Added in candidate: Known conflicts in carried text",
+        "anchor": "added-in-candidate-known-conflicts-in-carried-text",
+        "githubAnchor": "added-in-candidate-known-conflicts-in-carried-text",
+        "stableAnchor": "h-b1151522ac1e",
+        "startLine": 52,
+        "endLine": 52,
+        "textDigest": "52df31f5ea305e546421fbdbfbcc912333bc5a63c5a6edbdb7de620213dfdd5e",
+        "sample": "Added in candidate: Known conflicts in carried text",
+        "sectionPayloadDigest": "48fbd56559050e0f33e48c079fc3007b0c6d905ed6a48bffdbd069d55925764f",
+        "followingBlockDigest": "d2954fca5e057016b72481aaa2d6871b94cc20bf700b0279f2e1031ec0349adc",
+        "identityFingerprint": "48c83fcff7034777072c433468b9c3c4385021e9433a8473284b15078de4888e",
+        "ancestry": [
+          "Runner candidate area"
+        ],
+        "text": "## Added in candidate: Known conflicts in carried text",
+        "sectionText": "## Added in candidate: Known conflicts in carried text\n\nThese are reading cautions from the fresh-reader key, not current behavior proof. Known stale carried sentences; full truth check owed at promotion.\n\n1. The [history heading](decisions/h-36d872fbb0e5.md) says “retired” while carrying live settled decisions. Placement grants no retirement.\n2. The key found a Data Dictionary compat mention of `dispatch execute --effort` against RUL90/0062 removing that door. The candidate [dictionary](subcomponents/h-02842f76ffd2/spec.md) now labels its removal under A41; independent truth re-review is pending.\n3. Decision 0062 records the R3 pending-callers gate; RUL93/RUL95 and 0063 record it reached. These are dated stages of supersession, not code verification.\n4. The carried source front matter says August 2026 and `coverage: full` against an October body. The candidate [preamble](spec.md) is labelled corrected; the source's old claim proves no coverage.\n5. Deleted ranking/entropy pointers and the literal-main Open Gap were stale code claims. Candidate corrections are labelled in [Pointers](subcomponents/h-f34e0d170d89/spec.md), [Open Gaps](subcomponents/h-2e032393add1/spec.md) and [Gate A](operations/h-51f5cd7279fd.md); remaining carried claims are unverified.\n6. The [vocabulary table](architecture/h-7af1f0242611.md) keeps stale `runner.md:<line>` self-citations with a label; those numbers are not navigable candidate evidence.\n7. RUL76 already names `--idle-timeout-ms` and `runner.idleTimeoutMs` in the [carried rules](subcomponents/h-6979005beaf7/spec.md). Check its partial supersession and implementation before proposing a new idle-timeout rule."
+      }
+    },
+    {
+      "path": "docs/platform/runner/README.md",
+      "anchor": "unheaded-block-7",
+      "unitKind": "unheaded-block",
+      "before": null,
+      "status": "pending",
+      "approvalCarried": false,
+      "sourceClaimIds": [],
+      "evidence": [],
+      "reasons": [
+        "Lead A42 Gate A correction or labelled fresh-reader conflict navigation"
+      ],
+      "after": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 54,
+        "endLine": 54,
+        "textDigest": "d2954fca5e057016b72481aaa2d6871b94cc20bf700b0279f2e1031ec0349adc",
+        "sample": "These are reading cautions from the fresh-reader key, not current behavior proof. Known stale carried sentences; full truth check owed at promotion.",
+        "identityFingerprint": "8929f13f1f99f7b72183bd4a15ae6b4eab620a9ee0c5cb05bfabf029ccda351b",
+        "ancestry": [
+          "Runner candidate area",
+          "Added in candidate: Known conflicts in carried text"
+        ],
+        "text": "These are reading cautions from the fresh-reader key, not current behavior proof. Known stale carried sentences; full truth check owed at promotion."
+      }
+    },
+    {
+      "path": "docs/platform/runner/README.md",
+      "anchor": "unheaded-block-8",
+      "unitKind": "unheaded-block",
+      "before": null,
+      "status": "pending",
+      "approvalCarried": false,
+      "sourceClaimIds": [],
+      "evidence": [],
+      "reasons": [
+        "Lead A42 Gate A correction or labelled fresh-reader conflict navigation"
+      ],
+      "after": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-8",
+        "githubAnchor": "unheaded-block-8",
+        "stableAnchor": "unheaded-block-8",
+        "title": "Unheaded block 8",
+        "startLine": 56,
+        "endLine": 62,
+        "textDigest": "f1863a4fb726546440255dabac5d12389bf657b0102139fd2e1a7f8abccd8daf",
+        "sample": "1. The [history heading](decisions/h-36d872fbb0e5.md) says “retired” while carrying live settled decisions. Placement grants no retirement.\n2. The key found a Data Dictionary compa",
+        "identityFingerprint": "f7417b76e0582c52ccc09b14a1d457e2e34066dc1e9ecb6d2d57f119118d83b9",
+        "ancestry": [
+          "Runner candidate area",
+          "Added in candidate: Known conflicts in carried text"
+        ],
+        "text": "1. The [history heading](decisions/h-36d872fbb0e5.md) says “retired” while carrying live settled decisions. Placement grants no retirement.\n2. The key found a Data Dictionary compat mention of `dispatch execute --effort` against RUL90/0062 removing that door. The candidate [dictionary](subcomponents/h-02842f76ffd2/spec.md) now labels its removal under A41; independent truth re-review is pending.\n3. Decision 0062 records the R3 pending-callers gate; RUL93/RUL95 and 0063 record it reached. These are dated stages of supersession, not code verification.\n4. The carried source front matter says August 2026 and `coverage: full` against an October body. The candidate [preamble](spec.md) is labelled corrected; the source's old claim proves no coverage.\n5. Deleted ranking/entropy pointers and the literal-main Open Gap were stale code claims. Candidate corrections are labelled in [Pointers](subcomponents/h-f34e0d170d89/spec.md), [Open Gaps](subcomponents/h-2e032393add1/spec.md) and [Gate A](operations/h-51f5cd7279fd.md); remaining carried claims are unverified.\n6. The [vocabulary table](architecture/h-7af1f0242611.md) keeps stale `runner.md:<line>` self-citations with a label; those numbers are not navigable candidate evidence.\n7. RUL76 already names `--idle-timeout-ms` and `runner.idleTimeoutMs` in the [carried rules](subcomponents/h-6979005beaf7/spec.md). Check its partial supersession and implementation before proposing a new idle-timeout rule."
+      }
     }
   ],
-  "reproductionSource": "import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';import crypto from 'node:crypto';import {execFileSync} from 'node:child_process';\nconst root=process.cwd(),P='plans/260925-documentation-authority-unification/',R=P+'reports/phase-06/',read=f=>JSON.parse(fs.readFileSync(f,'utf8')),write=(f,v)=>fs.writeFileSync(f,JSON.stringify(v,null,2)+'\\n'),sha=s=>crypto.createHash('sha256').update(s).digest('hex');\nconst {extractMarkdownConservationUnits}=await import(path.join(root,'scripts/generate-doc-inventory.mjs'));\nfunction units(text){let stack=[];const ls=text.split('\\n'),us=extractMarkdownConservationUnits(text);return us.map((u,i)=>{if(u.unitKind==='heading')while(stack.length&&stack.at(-1).level>=u.level)stack.pop();const ancestry=stack.map(x=>x.title);if(u.unitKind==='heading')stack.push(u);const next=us.slice(i+1).find(x=>x.unitKind==='heading');return {...u,ancestry,text:ls.slice(u.startLine-1,u.endLine).join('\\n').trim(),...(u.unitKind==='heading'?{sectionText:ls.slice(u.startLine-1,next?next.startLine-1:ls.length).join('\\n').trim()}:{})};});}\nconst head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),committed=f=>JSON.parse(execFileSync('git',['show',head+':'+f],{encoding:'utf8',maxBuffer:6e6})),ac=committed(R+'step9-carriage-accounting.json'),s=committed(P+'ledger/decisions/s9-runner-01.json'),cor=read(R+'step9-truth-corrections.json'),oldFiles=new Map(),nowFiles=new Map(),delta=[];\nfor(const f of ac.candidateFiles){const old=execFileSync('git',['show',head+':'+f.path],{encoding:'utf8',maxBuffer:3e6}),now=fs.readFileSync(f.path,'utf8'),before=units(old),after=units(now);oldFiles.set(f.path,before);nowFiles.set(f.path,after);f.bytes=Buffer.byteLength(now);f.sha256=sha(now);\n for(const u of after){const b=before.find(x=>x.anchor===u.anchor);if(!b||b.textDigest!==u.textDigest||JSON.stringify(b.ancestry)!==JSON.stringify(u.ancestry)||b.sectionText!==u.sectionText){const edits=cor.edits.filter(e=>e.path===f.path&&(b?.text.includes(e.before)||b?.sectionText?.includes(e.before)||u.text.includes(e.after)||u.sectionText?.includes(e.after)));delta.push({path:f.path,anchor:u.anchor,unitKind:u.unitKind,before:b??null,after:u,status:'pending',approvalCarried:false,sourceClaimIds:[],evidence:edits.flatMap(e=>e.evidence),reasons:edits.map(e=>e.reason)});}}\n for(const b of before)assert(after.some(u=>u.anchor===b.anchor),'removed unit '+f.path+'#'+b.anchor);\n}\nconst rebound=[];\nfor(const d of s.claims){const old=oldFiles.get(d.targetOwner).find(u=>u.anchor===d.targetAnchor),now=nowFiles.get(d.targetOwner).find(u=>u.anchor===d.targetAnchor);assert(old&&now);assert.equal(old.textDigest,d.targetUnitDigest);assert.deepEqual(old.ancestry,d.targetAncestry);const changed=old.textDigest!==now.textDigest||old.sectionText!==now.sectionText||JSON.stringify(old.ancestry)!==JSON.stringify(now.ancestry);\n if(changed){const before=structuredClone(d),entry=delta.find(e=>e.path===d.targetOwner&&e.anchor===d.targetAnchor);assert(entry);entry.sourceClaimIds.push(d.claimId);d.targetUnitDigest=now.textDigest;d.targetAncestry=now.ancestry;d.reviewStatus='pending';d.authoredBy='codex-session:unit-run-1792060810360-fc3c5695@2026-10-15';for(const k of ['reviewedBy','reviewedAt','reviewReport','reviewReportCommit','reviewMode','reviewNote','reviewPackCommit','reviewPackId','seedScoreId'])delete d[k];d.disposition='supersede';d.rationale='Judgment: A41/A19 truth correction or explicitly labelled candidate navigation/link/scaffolding repair. Complete original source remains in immutable docs/specs/runner.md; candidate supersedes the identified false current assertion or rebases the same link referent, with unchanged dated decision semantics. '+(entry.reasons.join('; ')||'Labelled root navigation changes the heading direct section.')+'. Full before/after text and evidence in reports/phase-06/step9-rebound-units.json. A22 rebind, pending independent bounded review; no approval carry, retirement or promotion.';rebound.push({claimId:d.claimId,before,after:d,beforeText:old.text,afterText:now.text,beforeSectionText:old.sectionText,afterSectionText:now.sectionText,evidence:entry.evidence});const pair=ac.pairs.find(p=>p.claimId===d.claimId);pair.targetDigest=now.textDigest;pair.class='Judgment';pair.classReason='A41 corrected text or labelled link/navigation/scaffolding delta; complete before/after bound for re-review';pair.mandatoryDeep=true;pair.fullSourceUnitContained=now.text===old.text&&now.sectionText===old.sectionText;}\n}\nac.classCounts=Object.fromEntries(['Mirror','Unit-exact','Weak-exact','Judgment'].map(k=>[k,ac.pairs.filter(p=>p.class===k).length]));ac.postCarriageCorrections={inputCommit:head,rule:'A41/A22 and R9 repairs',reboundRows:rebound.length,evidence:R+'step9-rebound-units.json',nativeSyncRun:false,fullSourceTextCarried:false,sourceTextPreservedAt:head+':docs/specs/runner.md'};ac.nativeSyncRun=false;\nwrite(P+'ledger/decisions/s9-runner-01.json',s);write(R+'step9-carriage-accounting.json',ac);write(R+'step9-rebound-units.json',{version:1,inputCommit:head,native:false,status:'pending bounded re-review after one committed native sync; not a review pack',changedCandidateUnits:delta.length,reboundSourceRows:rebound.length,rows:rebound,candidateUnitChanges:delta});\nconst oldScan=JSON.parse(execFileSync('git',['show',head+':'+R+'step9-liveness.json'],{encoding:'utf8',maxBuffer:4e6})),scan=read(R+'step9-liveness.json'),classChanges=scan.sections.filter(s=>oldScan.sections.find(o=>o.anchor===s.anchor)?.classification!==s.classification).map(s=>({anchor:s.anchor,heading:s.heading,before:oldScan.sections.find(o=>o.anchor===s.anchor)?.classification,after:s.classification,reason:s.reason}));write(R+'step9-liveness-class-changes.json',{inputCommit:head,classificationChanges:classChanges.length,sections:classChanges});\nconst truth=read(R+'truth-ledger-runner.json');truth.currentByDefaultUnits=ac.pairs.filter(p=>scan.sections.find(s=>s.startLine<=p.sourceLines[0]&&p.sourceLines[1]<=s.endLine)?.classification!=='historical-or-decision-carriage');truth.currentByDefaultUnitCount=truth.currentByDefaultUnits.length;truth.method='R9-2 regenerated evidence-based section liveness; current-by-default and current-decision units included. Dated superseded claims remain history. A41: prior draw plus corrected-unit re-review meets batch truth obligation; no further draw. No truth certified; full truth owed at promotion.';truth.currentDecisionUnitCount=truth.currentByDefaultUnits.filter(p=>scan.sections.find(s=>s.startLine<=p.sourceLines[0]&&p.sourceLines[1]<=s.endLine)?.classification==='current-decision').length;truth.classChanges=R+'step9-liveness-class-changes.json';write(R+'truth-ledger-runner.json',truth);\nconst pins=read(R+'step9-source-blobs.json');pins.drift.headSidePercent=100*pins.drift.newDigestUnits/pins.units;pins.drift.headSideReading='52/495 = 10.51%, exceeds 10% under head-side reading; not the selected denominator. Lead retains changed pin digests 27/470 = 5.74%; new units are growth, not drift. Remeasure every sync.';write(R+'step9-source-blobs.json',pins);\nconsole.log(JSON.stringify({changedUnits:delta.length,rebound:rebound.length,classes:ac.classCounts,livenessChanged:classChanges.length,population:truth.currentByDefaultUnitCount,currentDecisionUnits:truth.currentDecisionUnitCount}));\n"
+  "reproductionSource": "import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';import crypto from 'node:crypto';import {execFileSync} from 'node:child_process';\nconst root=process.cwd(),P='plans/260925-documentation-authority-unification/',R=P+'reports/phase-06/',read=p=>JSON.parse(fs.readFileSync(p,'utf8')),write=(p,x)=>fs.writeFileSync(p,JSON.stringify(x,null,2)+'\\n'),sha=x=>crypto.createHash('sha256').update(x).digest('hex'),head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();\nconst gen=await import(path.join(root,'scripts/generate-doc-inventory.mjs')),pro=await import(path.join(root,'scripts/propose-doc-decisions.mjs'));\nfunction units(p){const text=fs.readFileSync(p,'utf8'),ls=text.split('\\n'),us=gen.extractMarkdownConservationUnits(text),stack=[];return us.map((u,i)=>{if(u.unitKind==='heading')while(stack.length&&stack.at(-1).level>=u.level)stack.pop();const ancestry=stack.map(x=>x.title);if(u.unitKind==='heading')stack.push(u);const next=us.slice(i+1).find(x=>x.unitKind==='heading');return {...u,ancestry,text:ls.slice(u.startLine-1,u.endLine).join('\\n').trim(),...(u.unitKind==='heading'?{sectionText:ls.slice(u.startLine-1,next?next.startLine-1:ls.length).join('\\n').trim()}:{})};});}\nconst ac=read(R+'step9-carriage-accounting.json'),sp=P+'ledger/decisions/s9-runner-01.json',s=read(sp),beforeShard=structuredClone(s),rebound=read(R+'step9-rebound-units.json'),beforeFiles=new Map(ac.candidateFiles.map(f=>[f.path,units(f.path)]));\n// Only the residual present-tense introduction is corrected; the remaining legacy contract stays scoped.\nconst gate='docs/platform/runner/operations/h-51f5cd7279fd.md';let text=fs.readFileSync(gate,'utf8');const before='Bước vào của vòng tự cải thiện (self-improve loop, STR13 — CONTEXT.md):\\nfgOS xếp hạng chính friction chưa ngã-ngũ của nó thành';const after='Added in candidate — A41/A42 correction: CLI hiện hành không có verb `evolve` (`bin/fgos.mjs:4373,4461`; `evolve --help` trả \"unknown verb\"). Module ranking đã bị xoá ở commit `120af6b3d`. Đoạn dưới ghi lại hợp đồng Gate A trước khi bị gỡ, không xác nhận triển khai hiện hành; full truth check owed at promotion.\\nBước vào trước đây của vòng tự cải thiện (self-improve loop, STR13 — CONTEXT.md):\\nTheo hợp đồng cũ, fgOS xếp hạng chính friction chưa ngã-ngũ của nó thành';assert(text.includes(before));text=text.replace(before,after);fs.writeFileSync(gate,text);\nconst portal='docs/platform/runner/README.md';fs.appendFileSync(portal,`\\n## Added in candidate: Known conflicts in carried text\\n\\nThese are reading cautions from the fresh-reader key, not current behavior proof. Known stale carried sentences; full truth check owed at promotion.\\n\\n1. The [history heading](decisions/h-36d872fbb0e5.md) says “retired” while carrying live settled decisions. Placement grants no retirement.\\n2. The key found a Data Dictionary compat mention of \\`dispatch execute --effort\\` against RUL90/0062 removing that door. The candidate [dictionary](subcomponents/h-02842f76ffd2/spec.md) now labels its removal under A41; independent truth re-review is pending.\\n3. Decision 0062 records the R3 pending-callers gate; RUL93/RUL95 and 0063 record it reached. These are dated stages of supersession, not code verification.\\n4. The carried source front matter says August 2026 and \\`coverage: full\\` against an October body. The candidate [preamble](spec.md) is labelled corrected; the source's old claim proves no coverage.\\n5. Deleted ranking/entropy pointers and the literal-main Open Gap were stale code claims. Candidate corrections are labelled in [Pointers](subcomponents/h-f34e0d170d89/spec.md), [Open Gaps](subcomponents/h-2e032393add1/spec.md) and [Gate A](operations/h-51f5cd7279fd.md); remaining carried claims are unverified.\\n6. The [vocabulary table](architecture/h-7af1f0242611.md) keeps stale \\`runner.md:<line>\\` self-citations with a label; those numbers are not navigable candidate evidence.\\n7. RUL76 already names \\`--idle-timeout-ms\\` and \\`runner.idleTimeoutMs\\` in the [carried rules](subcomponents/h-6979005beaf7/spec.md). Check its partial supersession and implementation before proposing a new idle-timeout rule.\\n`);\nconst cache=new Map(ac.candidateFiles.map(f=>[f.path,units(f.path)])),changed=[];\nfor(const d of s.claims){const old=beforeFiles.get(d.targetOwner).find(u=>u.anchor===d.targetAnchor),now=cache.get(d.targetOwner).find(u=>u.anchor===d.targetAnchor);assert(old&&now);if(old.textDigest!==now.textDigest||old.sectionText!==now.sectionText){const beforeDecision=structuredClone(d);d.targetUnitDigest=now.textDigest;d.targetAncestry=now.ancestry;d.authoredBy='codex-session:unit-run-1792061517080-61c43e58@2026-10-15';d.disposition='supersede';d.rationale='Judgment: A41 addition under Lead A42; Gate A introductory current-state assertion corrected to explicitly dated legacy contract. CLI unknown-verb evidence bin/fgos.mjs:4373,4461; ranking removal 120af6b3d. Complete source retained in docs/specs/runner.md. A22 rebind; independent truth re-review pending, no approval carry.';changed.push({claimId:d.claimId,before:beforeDecision,after:structuredClone(d),beforeUnit:old,afterUnit:now});}}\nconst sentence='Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.',sourceUnits=units(ac.source),group=s.claims.filter(d=>sourceUnits.find(u=>u.anchor===ac.pairs.find(p=>p.claimId===d.claimId).sourceAnchor)?.text===sentence);assert.equal(group.length,8);\nconst contextual=[];\nfor(const d of group){const pair=ac.pairs.find(p=>p.claimId===d.claimId),su=sourceUnits.find(u=>u.anchor===pair.sourceAnchor),matches=cache.get(d.targetOwner).filter(u=>u.text===sentence&&JSON.stringify(u.ancestry.slice(1))===JSON.stringify(su.ancestry.slice(1)));assert.equal(matches.length,1);const tu=matches[0],before=structuredClone(d);d.targetAnchor=tu.anchor;d.targetUnitDigest=tu.textDigest;d.targetAncestry=tu.ancestry;d.authoredBy='codex-session:unit-run-1792061517080-61c43e58@2026-10-15';d.rationale='Weak-exact: repeated digest, paired deterministically by complete enclosing-decision ancestry after removing only the candidate wrapper H1. Contextual identical-unit group of eight; each source footer belongs to its own decision, not the first digest match. Exact text and digest retained. A42/A22 pending independent re-review for all eight, including the first unchanged anchor; no approval carry.';contextual.push({claimId:d.claimId,sourceUnit:su,before,after:structuredClone(d),targetUnit:tu});}\nassert.deepEqual(contextual.map(x=>x.after.targetAnchor).sort(),['unheaded-block-9','unheaded-block-14','unheaded-block-26','unheaded-block-35','unheaded-block-100','unheaded-block-109','unheaded-block-133','unheaded-block-145'].sort());\nconst held=new Set([...rebound.rows,...changed,...contextual].map(x=>x.claimId)),application=[],skipped=[],allNotes=[];\n// Ordinary unchanged applicator per bounded subset: every eligible row must be in\n// the committed report AND the original complete shown decision must still equal.\nfor(const name of fs.readdirSync(R).filter(f=>/^review-261015-1706-runner-source-\\d+-81d0ed074\\.md$/.test(f)).sort()){\n const reportPath=R+name,report=fs.readFileSync(reportPath,'utf8'),reviewer=report.match(/^Reviewer:\\s*(.+)$/m)[1].trim(),verdicts=pro.parseReviewVerdicts(report,reviewer),pack=read(R+name.replace(/^review-/,'review-request-')+'.json'),eligible=[];\n allNotes.push({report:reportPath,notes:report.slice(report.search(/^## Notes/m))});\n for(const v of verdicts){const d=s.claims.find(x=>x.claimId===v.claimId),shown=pack.rows.find(x=>x.claimId===v.claimId),tu=cache.get(d.targetOwner).find(x=>x.anchor===d.targetAnchor);assert(shown);const reasons=[];if(v.verdict!=='ok')reasons.push('committed '+v.verdict);if(held.has(v.claimId))reasons.push('A22 rebound/contextual group pending');if(JSON.stringify(d)!==JSON.stringify(shown.decision))reasons.push('complete shown decision changed');if(tu.textDigest!==v.targetUnitDigest||tu.text!==shown.target.text||tu.sectionText!==shown.target.sectionText||JSON.stringify(tu.ancestry)!==JSON.stringify(shown.target.ancestry))reasons.push('target unit binding changed');if(reasons.length)skipped.push({claimId:v.claimId,report:reportPath,verdict:v,reasons});else eligible.push(v);}\n if(!eligible.length)continue;\n const ids=new Set(eligible.map(x=>x.claimId)),subset={...s,claims:s.claims.filter(d=>ids.has(d.claimId))},inventory={commit:head,items:[],claimLedger:ac.pairs.map(p=>({claimId:p.claimId,sourcePath:ac.source,sourceAnchor:p.sourceAnchor,sourceUnitDigest:p.sourceDigest}))},context={repoRoot:root,inventory,unitsOf:p=>cache.get(p)||units(p)};\n const result=pro.applyReviewVerdicts(context,subset,{verdicts:eligible,reviewer,reportPath,ordinaryReview:true,reviewedAt:'2026-10-15'});for(const d of result.claims){const index=s.claims.findIndex(x=>x.claimId===d.claimId);assert.equal(d.reviewNote,eligible.find(v=>v.claimId===d.claimId).note);s.claims[index]=d;application.push({claimId:d.claimId,reviewReport:d.reviewReport,reviewReportCommit:d.reviewReportCommit,reviewNote:d.reviewNote,sourceUnitDigest:d.sourceUnitDigest,targetUnitDigest:d.targetUnitDigest});}\n}\nfor(const d of s.claims){if(held.has(d.claimId)){d.reviewStatus='pending';for(const k of ['reviewedBy','reviewedAt','reviewReport','reviewReportCommit','reviewMode','reviewNote','reviewPackCommit','reviewPackId','seedScoreId'])delete d[k];}const p=ac.pairs.find(p=>p.claimId===d.claimId);p.targetAnchor=d.targetAnchor;p.targetDigest=d.targetUnitDigest;if(changed.some(c=>c.claimId===d.claimId)){p.class='Judgment';p.classReason='A41 additional Gate A introductory correction';p.mandatoryDeep=true;p.fullSourceUnitContained=false;}}\nfor(const f of ac.candidateFiles){const bytes=fs.readFileSync(f.path);f.bytes=bytes.length;f.sha256=sha(bytes);}\nac.pendingRows=s.claims.filter(d=>d.reviewStatus==='pending').length;ac.reviewedRows=application.length;ac.classCounts=Object.fromEntries(['Mirror','Unit-exact','Weak-exact','Judgment'].map(c=>[c,ac.pairs.filter(p=>p.class===c).length]));ac.a42ReviewApplication={inputCommit:head,contentPin:'81d0ed0747014e976c0d29222439fd6e3592b468',requestCommit:'98603fffe',applied:application.length,pending:ac.pendingRows,sourceVerdicts:{ok:494,rework:1,total:495},changedBindings:changed,contextualIdenticalUnitGroup:{text:sentence,count:8,allPending:true,rows:contextual},appliedRows:application,skippedRows:skipped,notesVerbatim:allNotes,nonSourceVerdictsApplied:false,next:'One native sync at this runner commit; remaining non-source verdict application; one bounded pending-row and changed-accounting re-review. No review pack authored here.'};\nwrite(sp,s);write(R+'step9-carriage-accounting.json',ac);\nconst truth=read(R+'truth-ledger-runner.json'),scan=read(R+'step9-liveness.json');truth.currentByDefaultUnits=ac.pairs.filter(p=>scan.sections.find(s=>s.startLine<=p.sourceLines[0]&&p.sourceLines[1]<=s.endLine)?.classification!=='historical-or-decision-carriage');truth.currentByDefaultUnitCount=truth.currentByDefaultUnits.length;truth.currentDecisionUnitCount=truth.currentByDefaultUnits.filter(p=>scan.sections.find(s=>s.startLine<=p.sourceLines[0]&&p.sourceLines[1]<=s.endLine)?.classification==='current-decision').length;truth.method='A42 evidence-based complete-record liveness, code/skills/specs consumers and current-class restatement check; includes all 31 liveness reworks. A41 item 3: independent review-9 draw plus corrections and independent correction re-review supersede old truth-population requests; no new draw. Full truth check owed at promotion.';write(R+'truth-ledger-runner.json',truth);\nconst oldScan=JSON.parse(execFileSync('git',['show',head+':'+R+'step9-liveness.json'],{encoding:'utf8',maxBuffer:8e6}));write(R+'step9-liveness-class-changes.json',{inputCommit:head,rule:'A42 full-record live evidence; scan generated, no hand classification',classificationChanges:scan.sections.filter((s,i)=>s.classification!==oldScan.sections[i].classification).length,sections:scan.sections.map((s,i)=>({anchor:s.anchor,heading:s.heading,before:oldScan.sections[i].classification,after:s.classification,reason:s.reason,recordEvidence:s.recordEvidence})).filter(s=>s.before!==s.after),required31:[54,56,61,63,90,125,126,129,139,140,141,142,145,146,...Array.from({length:17},(_,i)=>151+i)].map(i=>({id:'liveness-'+String(i).padStart(3,'0'),...scan.sections[i-1]})),regression:{red:'13 of 31 failed before the helper correction',green:'31/31 current-decision',testSource:fs.readFileSync('/tmp/fgos-work/liveness-regression.mjs','utf8')}});\nconst pins=read(R+'step9-source-blobs.json');pins.drift.headSidePercent=100*pins.drift.newDigestUnits/pins.units;pins.drift.headSideReading='52/495 = 10.51%; selected pin-side reading stays 27/470 = 5.74%; growth separate.';write(R+'step9-source-blobs.json',pins);\nconsole.log(JSON.stringify({applied:application.length,pending:ac.pendingRows,changedBindings:changed.length,contextual:contextual.length,classes:ac.classCounts,truthPopulation:truth.currentByDefaultUnitCount,currentDecisionUnits:truth.currentDecisionUnitCount}));\n\n// Accounting follow-up\nimport fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';import {execFileSync} from 'node:child_process';\nconst P='plans/260925-documentation-authority-unification/',R=P+'reports/phase-06/',read=p=>JSON.parse(fs.readFileSync(p,'utf8')),write=(p,x)=>fs.writeFileSync(p,JSON.stringify(x,null,2)+'\\n'),ac=read(R+'step9-carriage-accounting.json'),a=ac.a42ReviewApplication,s=read(P+'ledger/decisions/s9-runner-01.json'),rebound=read(R+'step9-rebound-units.json');\nconst {extractMarkdownConservationUnits}=await import(path.resolve('scripts/generate-doc-inventory.mjs'));\nfunction units(text){const ls=text.split('\\n'),us=extractMarkdownConservationUnits(text),stack=[];return us.map((u,i)=>{if(u.unitKind==='heading')while(stack.length&&stack.at(-1).level>=u.level)stack.pop();const ancestry=stack.map(x=>x.title);if(u.unitKind==='heading')stack.push(u);const next=us.slice(i+1).find(x=>x.unitKind==='heading');return {...u,ancestry,text:ls.slice(u.startLine-1,u.endLine).join('\\n').trim(),...(u.unitKind==='heading'?{sectionText:ls.slice(u.startLine-1,next?next.startLine-1:ls.length).join('\\n').trim()}:{})};});}\nconst now=new Map(ac.candidateFiles.map(f=>[f.path,units(fs.readFileSync(f.path,'utf8'))]));\nfor(const ch of [...a.changedBindings,...a.contextualIdenticalUnitGroup.rows]){let e=rebound.rows.find(r=>r.claimId===ch.claimId);const d=s.claims.find(d=>d.claimId===ch.claimId),tu=now.get(d.targetOwner).find(u=>u.anchor===d.targetAnchor),old=ch.beforeUnit||ch.targetUnit;if(!e){e={claimId:d.claimId,before:ch.before,beforeText:old.text,beforeSectionText:old.sectionText,evidence:[],contextualIdenticalUnit:!!ch.targetUnit};rebound.rows.push(e);}e.after=d;e.afterText=tu.text;e.afterSectionText=tu.sectionText;e.contextualIdenticalUnit=!!ch.targetUnit;}\nfor(const e of rebound.rows){const d=s.claims.find(d=>d.claimId===e.claimId),tu=now.get(d.targetOwner).find(u=>u.anchor===d.targetAnchor);e.after=d;e.afterText=tu.text;e.afterSectionText=tu.sectionText;assert.equal(d.reviewStatus,'pending');}\nfor(const f of ac.candidateFiles){const previous=units(execFileSync('git',['show','HEAD:'+f.path],{encoding:'utf8',maxBuffer:4e6}));for(const u of now.get(f.path)){const before=previous.find(o=>o.anchor===u.anchor);if(before&&before.textDigest===u.textDigest&&before.sectionText===u.sectionText)continue;let e=rebound.candidateUnitChanges.find(e=>e.path===f.path&&e.anchor===u.anchor);if(!e){e={path:f.path,anchor:u.anchor,unitKind:u.unitKind,before:before??null,status:'pending',approvalCarried:false,sourceClaimIds:[],evidence:[],reasons:['Lead A42 Gate A correction or labelled fresh-reader conflict navigation']};rebound.candidateUnitChanges.push(e);}e.after=u;e.sourceClaimIds=s.claims.filter(d=>d.targetOwner===f.path&&d.targetAnchor===u.anchor).map(d=>d.claimId);}}\nrebound.reboundSourceRows=rebound.rows.length;rebound.changedCandidateUnits=rebound.candidateUnitChanges.length;rebound.a42InputCommit=a.inputCommit;rebound.originalReboundRows=34;rebound.a42ContextualIdenticalUnitGroup=a.contextualIdenticalUnitGroup;rebound.reproductionSource=fs.readFileSync('/tmp/fgos-work/author-a42.mjs','utf8')+'\\n// Accounting follow-up\\n'+fs.readFileSync('/tmp/fgos-work/update-a42-accounting.mjs','utf8');write(R+'step9-rebound-units.json',rebound);\nac.postCarriageCorrections.reboundRows=rebound.rows.length;ac.postCarriageCorrections.nativeSyncRun=false;write(R+'step9-carriage-accounting.json',ac);\nconsole.log(JSON.stringify({pending:rebound.rows.length,candidateUnits:rebound.candidateUnitChanges.length}));\n",
+  "a42InputCommit": "edffd7c6b9cfb0461eec9e0fef65c9b4a2487acc",
+  "originalReboundRows": 34,
+  "a42ContextualIdenticalUnitGroup": {
+    "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+    "count": 8,
+    "allPending": true,
+    "rows": [
+      {
+        "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
+        "sourceUnit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-150",
+          "githubAnchor": "unheaded-block-150",
+          "stableAnchor": "unheaded-block-150",
+          "title": "Unheaded block 150",
+          "startLine": 1656,
+          "endLine": 1656,
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+          "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0005 — Runner & cô lập worker",
+            "Hệ quả"
+          ],
+          "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+        },
+        "before": {
+          "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
+          "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "targetAnchor": "unheaded-block-9",
+          "claimKind": "specification",
+          "disposition": "move",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+          "rationale": "Weak-exact: target digest repeats; ancestor headings differ. Whole unheaded-block docs/specs/runner.md#unheaded-block-150 (lines 1656–1656) carried at docs/platform/runner/decisions/h-36d872fbb0e5.md#unheaded-block-9. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetAncestry": [
+            "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0005 — Runner & cô lập worker",
+            "Hệ quả"
+          ]
+        },
+        "after": {
+          "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
+          "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "targetAnchor": "unheaded-block-9",
+          "claimKind": "specification",
+          "disposition": "move",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:unit-run-1792061517080-61c43e58@2026-10-15",
+          "rationale": "Weak-exact: repeated digest, paired deterministically by complete enclosing-decision ancestry after removing only the candidate wrapper H1. Contextual identical-unit group of eight; each source footer belongs to its own decision, not the first digest match. Exact text and digest retained. A42/A22 pending independent re-review for all eight, including the first unchanged anchor; no approval carry.",
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetAncestry": [
+            "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0005 — Runner & cô lập worker",
+            "Hệ quả"
+          ]
+        },
+        "targetUnit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-9",
+          "githubAnchor": "unheaded-block-9",
+          "stableAnchor": "unheaded-block-9",
+          "title": "Unheaded block 9",
+          "startLine": 72,
+          "endLine": 72,
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+          "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+          "ancestry": [
+            "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0005 — Runner & cô lập worker",
+            "Hệ quả"
+          ],
+          "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+        }
+      },
+      {
+        "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
+        "sourceUnit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-155",
+          "githubAnchor": "unheaded-block-155",
+          "stableAnchor": "unheaded-block-155",
+          "title": "Unheaded block 155",
+          "startLine": 1684,
+          "endLine": 1684,
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+          "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0008 — Routing theo audience của từng interface",
+            "Hệ quả"
+          ],
+          "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+        },
+        "before": {
+          "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
+          "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "targetAnchor": "unheaded-block-9",
+          "claimKind": "specification",
+          "disposition": "move",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+          "rationale": "Weak-exact: target digest repeats; ancestor headings differ. Whole unheaded-block docs/specs/runner.md#unheaded-block-155 (lines 1684–1684) carried at docs/platform/runner/decisions/h-36d872fbb0e5.md#unheaded-block-9. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetAncestry": [
+            "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0005 — Runner & cô lập worker",
+            "Hệ quả"
+          ]
+        },
+        "after": {
+          "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
+          "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "targetAnchor": "unheaded-block-14",
+          "claimKind": "specification",
+          "disposition": "move",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:unit-run-1792061517080-61c43e58@2026-10-15",
+          "rationale": "Weak-exact: repeated digest, paired deterministically by complete enclosing-decision ancestry after removing only the candidate wrapper H1. Contextual identical-unit group of eight; each source footer belongs to its own decision, not the first digest match. Exact text and digest retained. A42/A22 pending independent re-review for all eight, including the first unchanged anchor; no approval carry.",
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetAncestry": [
+            "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0008 — Routing theo audience của từng interface",
+            "Hệ quả"
+          ]
+        },
+        "targetUnit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-14",
+          "githubAnchor": "unheaded-block-14",
+          "stableAnchor": "unheaded-block-14",
+          "title": "Unheaded block 14",
+          "startLine": 100,
+          "endLine": 100,
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+          "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+          "ancestry": [
+            "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0008 — Routing theo audience của từng interface",
+            "Hệ quả"
+          ],
+          "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+        }
+      },
+      {
+        "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
+        "sourceUnit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-167",
+          "githubAnchor": "unheaded-block-167",
+          "stableAnchor": "unheaded-block-167",
+          "title": "Unheaded block 167",
+          "startLine": 1793,
+          "endLine": 1793,
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+          "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập)",
+            "Hệ quả"
+          ],
+          "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+        },
+        "before": {
+          "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
+          "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "targetAnchor": "unheaded-block-9",
+          "claimKind": "specification",
+          "disposition": "move",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+          "rationale": "Weak-exact: target digest repeats; ancestor headings differ. Whole unheaded-block docs/specs/runner.md#unheaded-block-167 (lines 1793–1793) carried at docs/platform/runner/decisions/h-36d872fbb0e5.md#unheaded-block-9. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetAncestry": [
+            "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0005 — Runner & cô lập worker",
+            "Hệ quả"
+          ]
+        },
+        "after": {
+          "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
+          "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "targetAnchor": "unheaded-block-26",
+          "claimKind": "specification",
+          "disposition": "move",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:unit-run-1792061517080-61c43e58@2026-10-15",
+          "rationale": "Weak-exact: repeated digest, paired deterministically by complete enclosing-decision ancestry after removing only the candidate wrapper H1. Contextual identical-unit group of eight; each source footer belongs to its own decision, not the first digest match. Exact text and digest retained. A42/A22 pending independent re-review for all eight, including the first unchanged anchor; no approval carry.",
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetAncestry": [
+            "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập)",
+            "Hệ quả"
+          ]
+        },
+        "targetUnit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-26",
+          "githubAnchor": "unheaded-block-26",
+          "stableAnchor": "unheaded-block-26",
+          "title": "Unheaded block 26",
+          "startLine": 209,
+          "endLine": 209,
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+          "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+          "ancestry": [
+            "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập)",
+            "Hệ quả"
+          ],
+          "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+        }
+      },
+      {
+        "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
+        "sourceUnit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-176",
+          "githubAnchor": "unheaded-block-176",
+          "stableAnchor": "unheaded-block-176",
+          "title": "Unheaded block 176",
+          "startLine": 1877,
+          "endLine": 1877,
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+          "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence",
+            "Hệ quả"
+          ],
+          "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+        },
+        "before": {
+          "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
+          "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "targetAnchor": "unheaded-block-9",
+          "claimKind": "specification",
+          "disposition": "move",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+          "rationale": "Weak-exact: target digest repeats; ancestor headings differ. Whole unheaded-block docs/specs/runner.md#unheaded-block-176 (lines 1877–1877) carried at docs/platform/runner/decisions/h-36d872fbb0e5.md#unheaded-block-9. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetAncestry": [
+            "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0005 — Runner & cô lập worker",
+            "Hệ quả"
+          ]
+        },
+        "after": {
+          "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
+          "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "targetAnchor": "unheaded-block-35",
+          "claimKind": "specification",
+          "disposition": "move",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:unit-run-1792061517080-61c43e58@2026-10-15",
+          "rationale": "Weak-exact: repeated digest, paired deterministically by complete enclosing-decision ancestry after removing only the candidate wrapper H1. Contextual identical-unit group of eight; each source footer belongs to its own decision, not the first digest match. Exact text and digest retained. A42/A22 pending independent re-review for all eight, including the first unchanged anchor; no approval carry.",
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetAncestry": [
+            "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence",
+            "Hệ quả"
+          ]
+        },
+        "targetUnit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-35",
+          "githubAnchor": "unheaded-block-35",
+          "stableAnchor": "unheaded-block-35",
+          "title": "Unheaded block 35",
+          "startLine": 293,
+          "endLine": 293,
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+          "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+          "ancestry": [
+            "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence",
+            "Hệ quả"
+          ],
+          "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+        }
+      },
+      {
+        "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
+        "sourceUnit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-241",
+          "githubAnchor": "unheaded-block-241",
+          "stableAnchor": "unheaded-block-241",
+          "title": "Unheaded block 241",
+          "startLine": 2401,
+          "endLine": 2401,
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+          "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0028 — Đổi tên pinned term `orchestrator` thành `launcher`",
+            "Hệ quả"
+          ],
+          "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+        },
+        "before": {
+          "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
+          "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "targetAnchor": "unheaded-block-9",
+          "claimKind": "specification",
+          "disposition": "move",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+          "rationale": "Weak-exact: target digest repeats; ancestor headings differ. Whole unheaded-block docs/specs/runner.md#unheaded-block-241 (lines 2401–2401) carried at docs/platform/runner/decisions/h-36d872fbb0e5.md#unheaded-block-9. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetAncestry": [
+            "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0005 — Runner & cô lập worker",
+            "Hệ quả"
+          ]
+        },
+        "after": {
+          "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
+          "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "targetAnchor": "unheaded-block-100",
+          "claimKind": "specification",
+          "disposition": "move",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:unit-run-1792061517080-61c43e58@2026-10-15",
+          "rationale": "Weak-exact: repeated digest, paired deterministically by complete enclosing-decision ancestry after removing only the candidate wrapper H1. Contextual identical-unit group of eight; each source footer belongs to its own decision, not the first digest match. Exact text and digest retained. A42/A22 pending independent re-review for all eight, including the first unchanged anchor; no approval carry.",
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetAncestry": [
+            "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0028 — Đổi tên pinned term `orchestrator` thành `launcher`",
+            "Hệ quả"
+          ]
+        },
+        "targetUnit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-100",
+          "githubAnchor": "unheaded-block-100",
+          "stableAnchor": "unheaded-block-100",
+          "title": "Unheaded block 100",
+          "startLine": 817,
+          "endLine": 817,
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+          "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+          "ancestry": [
+            "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0028 — Đổi tên pinned term `orchestrator` thành `launcher`",
+            "Hệ quả"
+          ],
+          "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+        }
+      },
+      {
+        "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
+        "sourceUnit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-250",
+          "githubAnchor": "unheaded-block-250",
+          "stableAnchor": "unheaded-block-250",
+          "title": "Unheaded block 250",
+          "startLine": 2490,
+          "endLine": 2490,
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+          "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị",
+            "Hệ quả"
+          ],
+          "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+        },
+        "before": {
+          "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
+          "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "targetAnchor": "unheaded-block-9",
+          "claimKind": "specification",
+          "disposition": "move",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+          "rationale": "Weak-exact: target digest repeats; ancestor headings differ. Whole unheaded-block docs/specs/runner.md#unheaded-block-250 (lines 2490–2490) carried at docs/platform/runner/decisions/h-36d872fbb0e5.md#unheaded-block-9. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetAncestry": [
+            "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0005 — Runner & cô lập worker",
+            "Hệ quả"
+          ]
+        },
+        "after": {
+          "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
+          "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "targetAnchor": "unheaded-block-109",
+          "claimKind": "specification",
+          "disposition": "move",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:unit-run-1792061517080-61c43e58@2026-10-15",
+          "rationale": "Weak-exact: repeated digest, paired deterministically by complete enclosing-decision ancestry after removing only the candidate wrapper H1. Contextual identical-unit group of eight; each source footer belongs to its own decision, not the first digest match. Exact text and digest retained. A42/A22 pending independent re-review for all eight, including the first unchanged anchor; no approval carry.",
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetAncestry": [
+            "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị",
+            "Hệ quả"
+          ]
+        },
+        "targetUnit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-109",
+          "githubAnchor": "unheaded-block-109",
+          "stableAnchor": "unheaded-block-109",
+          "title": "Unheaded block 109",
+          "startLine": 906,
+          "endLine": 906,
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+          "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+          "ancestry": [
+            "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị",
+            "Hệ quả"
+          ],
+          "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+        }
+      },
+      {
+        "claimId": "claim_825b8970950e755e43c8c1740612eac4",
+        "sourceUnit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-274",
+          "githubAnchor": "unheaded-block-274",
+          "stableAnchor": "unheaded-block-274",
+          "title": "Unheaded block 274",
+          "startLine": 2671,
+          "endLine": 2671,
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+          "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới",
+            "Hệ quả"
+          ],
+          "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+        },
+        "before": {
+          "claimId": "claim_825b8970950e755e43c8c1740612eac4",
+          "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "targetAnchor": "unheaded-block-9",
+          "claimKind": "specification",
+          "disposition": "move",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+          "rationale": "Weak-exact: target digest repeats; ancestor headings differ. Whole unheaded-block docs/specs/runner.md#unheaded-block-274 (lines 2671–2671) carried at docs/platform/runner/decisions/h-36d872fbb0e5.md#unheaded-block-9. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetAncestry": [
+            "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0005 — Runner & cô lập worker",
+            "Hệ quả"
+          ]
+        },
+        "after": {
+          "claimId": "claim_825b8970950e755e43c8c1740612eac4",
+          "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "targetAnchor": "unheaded-block-133",
+          "claimKind": "specification",
+          "disposition": "move",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:unit-run-1792061517080-61c43e58@2026-10-15",
+          "rationale": "Weak-exact: repeated digest, paired deterministically by complete enclosing-decision ancestry after removing only the candidate wrapper H1. Contextual identical-unit group of eight; each source footer belongs to its own decision, not the first digest match. Exact text and digest retained. A42/A22 pending independent re-review for all eight, including the first unchanged anchor; no approval carry.",
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetAncestry": [
+            "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới",
+            "Hệ quả"
+          ]
+        },
+        "targetUnit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-133",
+          "githubAnchor": "unheaded-block-133",
+          "stableAnchor": "unheaded-block-133",
+          "title": "Unheaded block 133",
+          "startLine": 1087,
+          "endLine": 1087,
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+          "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+          "ancestry": [
+            "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới",
+            "Hệ quả"
+          ],
+          "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+        }
+      },
+      {
+        "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
+        "sourceUnit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-286",
+          "githubAnchor": "unheaded-block-286",
+          "stableAnchor": "unheaded-block-286",
+          "title": "Unheaded block 286",
+          "startLine": 2783,
+          "endLine": 2783,
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+          "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+          "ancestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người",
+            "Hệ quả"
+          ],
+          "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+        },
+        "before": {
+          "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
+          "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "targetAnchor": "unheaded-block-9",
+          "claimKind": "specification",
+          "disposition": "move",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+          "rationale": "Weak-exact: target digest repeats; ancestor headings differ. Whole unheaded-block docs/specs/runner.md#unheaded-block-286 (lines 2783–2783) carried at docs/platform/runner/decisions/h-36d872fbb0e5.md#unheaded-block-9. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetAncestry": [
+            "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0005 — Runner & cô lập worker",
+            "Hệ quả"
+          ]
+        },
+        "after": {
+          "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
+          "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "targetAnchor": "unheaded-block-145",
+          "claimKind": "specification",
+          "disposition": "move",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:unit-run-1792061517080-61c43e58@2026-10-15",
+          "rationale": "Weak-exact: repeated digest, paired deterministically by complete enclosing-decision ancestry after removing only the candidate wrapper H1. Contextual identical-unit group of eight; each source footer belongs to its own decision, not the first digest match. Exact text and digest retained. A42/A22 pending independent re-review for all eight, including the first unchanged anchor; no approval carry.",
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetAncestry": [
+            "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người",
+            "Hệ quả"
+          ]
+        },
+        "targetUnit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-145",
+          "githubAnchor": "unheaded-block-145",
+          "stableAnchor": "unheaded-block-145",
+          "title": "Unheaded block 145",
+          "startLine": 1199,
+          "endLine": 1199,
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+          "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+          "ancestry": [
+            "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người",
+            "Hệ quả"
+          ],
+          "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+        }
+      }
+    ]
+  }
 }

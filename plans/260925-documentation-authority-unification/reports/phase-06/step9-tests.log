@@ -77,3 +77,62 @@ test at test/scripts/doc-review-format.test.mjs:64:1
     operator: 'strictEqual',
     diff: 'simple'
   }
+
+
+A42 AUTHOR CHECKPOINT — env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work; conservation, review, format and plan-local liveness regression. Prior run above retained as historical.
+✔ coverage honors explicit source paths and prefix maps but not target mentions or neighboring prefixes (1.33984ms)
+✔ rebind preserves review only for one digest match and otherwise returns rows to pending (0.333525ms)
+✔ snapshot uses merged decisions in the ledger schema shape and verifies both content and digest (2.031487ms)
+✔ identical text moved under another heading loses review while same-context anchor shifts retain it (0.148473ms)
+✔ coverage excludes canonical and non-authority items and a heading range covers only its rows (0.439728ms)
+✔ review pack contains full source and target units and reverse unmatched candidate blocks (2.313605ms)
+✔ seeded review uses six real text mutations and scores missed defects and false flags (9.365659ms)
+✔ review application binds current digest and keeps rework and hold pending without inventing approval (3.997177ms)
+✔ valid source digest prefixes survive pack and review application with full seen-text bindings (1.840888ms)
+✔ verdict table names the reviewer and requires an explicit verdict and own note for each row (0.600344ms)
+✔ unknown dispositions remain blocking after a hold verdict and pass decision validation (1.901932ms)
+✔ unknown dispositions remain blocking after a rework verdict and pass decision validation (0.955179ms)
+✔ the same reviewer session on another date is still the author session (0.20743ms)
+✔ pre-reviewed hand rows without committed evidence are rejected instead of skipped (0.269198ms)
+✔ a public seeded pack does not expose its replay inputs or retain original mutated digests (1.514743ms)
+✔ review application requires a passing sensitivity result for the exact shown pack (1.59651ms)
+✔ approval cannot attach to target text or heading ancestry changed after the pack (1.891767ms)
+✔ approved rows retain the seen unit binding and their own report across review rounds (1.551824ms)
+✔ sensitivity controls must belong to the bound batch even when the sensitivity score passes (1.431204ms)
+✔ reviewers receive full text and a unified diff in Markdown with safely nested fences (92.39709ms)
+✔ the public seeded Markdown can be scored without exposing the seed or private selection key (214.448398ms)
+✔ script-proven carries supply batch sensitivity controls without reopening accepted decisions (233.66485ms)
+✔ a new shard cannot claim legacy compatibility by deleting author fields (56.352294ms)
+✔ ordinary committed reviews approve seen text without a sensitivity pack and retain their report pin (170.053841ms)
+▶ ordinary reviews cannot approve a changed digest, an unauthored row or their own session
+  ✔ target-digest (75.429732ms)
+  ✔ source-digest (66.806409ms)
+  ✔ authoredBy (67.698453ms)
+  ✔ authorSession (71.356211ms)
+  ✔ same-session (74.823198ms)
+✔ ordinary reviews cannot approve a changed digest, an unauthored row or their own session (356.925021ms)
+▶ checkpoint reports cannot use the ordinary channel to omit sensitivity proof
+  ✔ checkpoint 3 (162.678058ms)
+  ✔ checkpoint 6 (144.932566ms)
+  ✔ checkpoint 10 (143.324661ms)
+✔ checkpoint reports cannot use the ordinary channel to omit sensitivity proof (451.463171ms)
+✔ the review lint accepts a well-formed ordinary report before application and writes nothing (70.051558ms)
+✔ the review lint uses the recorded target digest of an applied shard without an inventory (108.967127ms)
+▶ the review lint names the line and claim of each malformed verdict row
+  ✔ source-digest-not-64-hex (65.114666ms)
+  ✔ wrong-cell-count (67.568437ms)
+  ✔ non-bare-first-cell (70.823992ms)
+  ✔ target-digest-mismatch (67.771096ms)
+  ✔ source-digest-mismatch (70.012103ms)
+  ✔ bad-verdict (71.935252ms)
+✔ the review lint names the line and claim of each malformed verdict row (414.076112ms)
+✔ the review lint allows labelled non-claim rows but reports unknown claims and missing headers (210.096727ms)
+✔ runner liveness retains current decision assertions with complete-record consumer evidence (2464.027768ms)
+ℹ tests 45
+ℹ suites 0
+ℹ pass 45
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2507.280941

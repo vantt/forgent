@@ -2,11 +2,11 @@
   "version": 2,
   "native": false,
   "status": "Working-tree conservative overlay after A41/R9; not current native proof",
-  "inputCommit": "24be6cb1d",
+  "inputCommit": "edffd7c6b9cfb0461eec9e0fef65c9b4a2487acc",
   "scope": [
     "docs/specs/runner.md"
   ],
-  "count": 86,
+  "count": 81,
   "tupleFields": [
     "claimId",
     "path",
@@ -516,76 +516,6 @@
       "note": "known stale carried sentences; full truth check owed at promotion"
     },
     {
-      "claimId": "claim_615c89816f18dcc968d827c51509c8e5",
-      "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
-      "anchor": "unheaded-block-14",
-      "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
-      "fileStatus": "Candidate",
-      "canonical": false,
-      "nativeIdentityVerified": false,
-      "note": "known stale carried sentences; full truth check owed at promotion"
-    },
-    {
-      "claimId": "claim_41ffaa2e561891fd04d89e675fd2dc49",
-      "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
-      "anchor": "unheaded-block-26",
-      "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
-      "fileStatus": "Candidate",
-      "canonical": false,
-      "nativeIdentityVerified": false,
-      "note": "known stale carried sentences; full truth check owed at promotion"
-    },
-    {
-      "claimId": "claim_4af9a02d95c0ae6b2e3505a451a9fe15",
-      "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
-      "anchor": "unheaded-block-35",
-      "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
-      "fileStatus": "Candidate",
-      "canonical": false,
-      "nativeIdentityVerified": false,
-      "note": "known stale carried sentences; full truth check owed at promotion"
-    },
-    {
-      "claimId": "claim_8815557cbcdc80d7977f750aa6ce4ae2",
-      "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
-      "anchor": "unheaded-block-100",
-      "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
-      "fileStatus": "Candidate",
-      "canonical": false,
-      "nativeIdentityVerified": false,
-      "note": "known stale carried sentences; full truth check owed at promotion"
-    },
-    {
-      "claimId": "claim_561d499394403169d2bd53f9677d20f0",
-      "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
-      "anchor": "unheaded-block-109",
-      "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
-      "fileStatus": "Candidate",
-      "canonical": false,
-      "nativeIdentityVerified": false,
-      "note": "known stale carried sentences; full truth check owed at promotion"
-    },
-    {
-      "claimId": "claim_f09fee23c2e1fbb32df0f0faf01ce470",
-      "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
-      "anchor": "unheaded-block-133",
-      "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
-      "fileStatus": "Candidate",
-      "canonical": false,
-      "nativeIdentityVerified": false,
-      "note": "known stale carried sentences; full truth check owed at promotion"
-    },
-    {
-      "claimId": "claim_2b2b4a64ed2b326d73e4bdb061618239",
-      "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
-      "anchor": "unheaded-block-145",
-      "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
-      "fileStatus": "Candidate",
-      "canonical": false,
-      "nativeIdentityVerified": false,
-      "note": "known stale carried sentences; full truth check owed at promotion"
-    },
-    {
       "claimId": "claim_cbdc399021bf4d700ad7f55d34b413f7",
       "path": "docs/platform/runner/README.md",
       "anchor": "runner-candidate-area",
@@ -676,20 +606,40 @@
       "note": "known stale carried sentences; full truth check owed at promotion"
     },
     {
-      "claimId": "claim_48259d331309769ef723354a13067ae0",
-      "path": "docs/platform/runner/contracts/routing-handoff.md",
-      "anchor": "routing-handoff-contract-fgos-runner",
-      "unitDigest": "8a4633a098112bd85e3e30b3926de510983a1a6b5470193e311d1b0dea3b4348",
+      "claimId": "claim_identity_gap_f08579d589bbd63a0db5d61f",
+      "path": "docs/platform/runner/README.md",
+      "anchor": "added-in-candidate-known-conflicts-in-carried-text",
+      "unitDigest": "52df31f5ea305e546421fbdbfbcc912333bc5a63c5a6edbdb7de620213dfdd5e",
       "fileStatus": "Candidate",
       "canonical": false,
       "nativeIdentityVerified": false,
       "note": "known stale carried sentences; full truth check owed at promotion"
     },
     {
-      "claimId": "claim_fecee46f6c7c699047ffdb436bfdebe1",
+      "claimId": "claim_identity_gap_3d96214ba7b8d92f4bfecc45",
+      "path": "docs/platform/runner/README.md",
+      "anchor": "unheaded-block-7",
+      "unitDigest": "d2954fca5e057016b72481aaa2d6871b94cc20bf700b0279f2e1031ec0349adc",
+      "fileStatus": "Candidate",
+      "canonical": false,
+      "nativeIdentityVerified": false,
+      "note": "known stale carried sentences; full truth check owed at promotion"
+    },
+    {
+      "claimId": "claim_identity_gap_d38d0017d52ef756ddaf5fd2",
+      "path": "docs/platform/runner/README.md",
+      "anchor": "unheaded-block-8",
+      "unitDigest": "f1863a4fb726546440255dabac5d12389bf657b0102139fd2e1a7f8abccd8daf",
+      "fileStatus": "Candidate",
+      "canonical": false,
+      "nativeIdentityVerified": false,
+      "note": "known stale carried sentences; full truth check owed at promotion"
+    },
+    {
+      "claimId": "claim_48259d331309769ef723354a13067ae0",
       "path": "docs/platform/runner/contracts/routing-handoff.md",
-      "anchor": "unheaded-block-1",
-      "unitDigest": "2cf8b2804c543a24a8069e49f7298d2469fabb5efa38f475bfeb6782000fab7f",
+      "anchor": "routing-handoff-contract-fgos-runner",
+      "unitDigest": "8a4633a098112bd85e3e30b3926de510983a1a6b5470193e311d1b0dea3b4348",
       "fileStatus": "Candidate",
       "canonical": false,
       "nativeIdentityVerified": false,
@@ -933,9 +883,9 @@
         "sourceDigest": "52a283ef3e1356d53fc5ae6efb44c1c8c687858b70009ef970c11e151b896b6d",
         "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
         "targetAnchor": "gate-a-xếp-hạng-candidate-bắc-cầu-sang-việc-thật-evolve",
-        "targetDigest": "3845d9321f8a37fba215930405872813a31e1de686b4776bc763e604145c29ad",
+        "targetDigest": "63cc24d991ad0f3cf493ab1b3e3ca046ea24aa1944a4c85411abef6612626aea",
         "class": "Judgment",
-        "classReason": "A41 corrected text or labelled link/navigation/scaffolding delta; complete before/after bound for re-review",
+        "classReason": "A41 additional Gate A introductory correction",
         "mandatoryDeep": true,
         "fullSourceUnitContained": false,
         "status": "current candidate, truth unverified",
@@ -953,11 +903,11 @@
         "sourceDigest": "c7182f609c029616bc8c23ef95b7fb69ade8fc943ebf7aba8f339003c4437459",
         "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
         "targetAnchor": "unheaded-block-26",
-        "targetDigest": "c7182f609c029616bc8c23ef95b7fb69ade8fc943ebf7aba8f339003c4437459",
-        "class": "Weak-exact",
-        "classReason": "ancestor headings differ; document exact share below one half",
-        "mandatoryDeep": false,
-        "fullSourceUnitContained": true,
+        "targetDigest": "30bbabf9219560dd2744a98e42e43b53e9fbaf15c4282e68860a8682f2b63059",
+        "class": "Judgment",
+        "classReason": "A41 additional Gate A introductory correction",
+        "mandatoryDeep": true,
+        "fullSourceUnitContained": false,
         "status": "current candidate, truth unverified",
         "nativeCandidateIdentityVerified": false,
         "note": "known stale carried sentences; full truth check owed at promotion"
@@ -2772,7 +2722,7 @@
         ],
         "sourceDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
         "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
-        "targetAnchor": "unheaded-block-9",
+        "targetAnchor": "unheaded-block-100",
         "targetDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
         "class": "Weak-exact",
         "classReason": "target digest repeats; ancestor headings differ",
@@ -2832,7 +2782,7 @@
         ],
         "sourceDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
         "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
-        "targetAnchor": "unheaded-block-9",
+        "targetAnchor": "unheaded-block-109",
         "targetDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
         "class": "Weak-exact",
         "classReason": "target digest repeats; ancestor headings differ",
@@ -3072,7 +3022,7 @@
         ],
         "sourceDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
         "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
-        "targetAnchor": "unheaded-block-9",
+        "targetAnchor": "unheaded-block-133",
         "targetDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
         "class": "Weak-exact",
         "classReason": "target digest repeats; ancestor headings differ",
@@ -3292,5 +3242,910 @@
     "current": false
   },
   "overlayCaveat": "Full routing-handoff carrier included conservatively, but its earlier-batch decisions are not in runner-only overlay: 19 extra reverse entries versus full native context. Four new navigation/note units added. Native comparison next turn must settle the exact current list; do not compare 86 with 63 as an identity-loss count.",
-  "next": "Native sync once at this turn commit; recompute full five-field equality. Apply committed runner verdicts only when all shown bindings still match; package bounded rebound truth re-review."
+  "next": "Next turn: one native sync at this runner commit, apply remaining non-source verdicts, one bounded re-review of every pending runner row and changed accounting entry.",
+  "ownership": {
+    "claimId": "claim_fecee46f6c7c699047ffdb436bfdebe1",
+    "owner": "candidate-unverified-root-authorities.json",
+    "reason": "Earlier root-authorities step placed the routing-handoff metadata; runner list duplicate removed under Lead A42.",
+    "excludedFromRunnerCount": 1
+  },
+  "currentDecisionSections": {
+    "note": "known stale carried sentences; full truth check owed at promotion",
+    "rule": "A35 item 2 extended under A41/A42; full truth at promotion, no new A41 draw",
+    "count": 95,
+    "sections": [
+      {
+        "anchor": "0020-chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập",
+        "owningDecision": "0020",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_fc2a29f61b3b82c22ab9271e70a866b7"
+        ]
+      },
+      {
+        "anchor": "bối-cảnh-2",
+        "owningDecision": "0020",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_6c3d0086a14dc2c147748d7549f12f27",
+          "claim_82947d03f0ca3597b1759f46bd72bde9",
+          "claim_2640520d4eb496a0a00f90c7046b7ad3",
+          "claim_d710eacb7b0c198b6feb1bb7cfe2f9d4"
+        ]
+      },
+      {
+        "anchor": "quyết-định-2",
+        "owningDecision": "0020",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_b3e99ecb4c96ba9df259b1da12621dfb",
+          "claim_e8959424bce46c72d71990506da547d4",
+          "claim_83e19a7229586ffd422226045900c35f"
+        ]
+      },
+      {
+        "anchor": "vì-sao-không-khóa-trong-cây-symlink-như-sessionmjs",
+        "owningDecision": "0020",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_7bdaab988a25b47521c865264de5bda2",
+          "claim_a851d1084ff0574381b28ba862edd3e4"
+        ]
+      },
+      {
+        "anchor": "vì-sao-không-cô-lập-cây-đầy-đủ-bootstrap-copy-union-merge-kiểu-beegogsymphony",
+        "owningDecision": "0020",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_b272040e723c24b073c0927d9cc44ec3",
+          "claim_84afd5693c0006c1f53f0c1cf891e59e"
+        ]
+      },
+      {
+        "anchor": "vì-sao-chặn-cây",
+        "owningDecision": "0020",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_97b71c7b8325cf01a893754c17c27dc7",
+          "claim_63334a97536dcef6c54b64f986b6bd58",
+          "claim_3e65bf4753fcc751b792f8cf4b67419e",
+          "claim_fc1455edf4ca2acbae01ff194cd71951"
+        ]
+      },
+      {
+        "anchor": "hệ-quả-2",
+        "owningDecision": "0020",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_f5934f88d357e84d390235e5863c051c",
+          "claim_3b408585d46b76cfa21775dddce07417",
+          "claim_e4beb2d579963a35d9b26b2265967d27"
+        ]
+      },
+      {
+        "anchor": "0021-wire-main-checkout-lock-hook-qua-fgos-doctorsetup-không-epoch-fence",
+        "owningDecision": "0021",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_ae62e94e555e534f15f87337b38c4fca"
+        ]
+      },
+      {
+        "anchor": "bối-cảnh-3",
+        "owningDecision": "0021",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_22c8f33258e3b20ea891e98973ca284c",
+          "claim_3e051db17c926cdbfaf6104e2d13c25c",
+          "claim_0b6d3350fdb4cb44459bdee8caf09daf",
+          "claim_652a2b350f1c46e429e00a80d9e01248"
+        ]
+      },
+      {
+        "anchor": "quyết-định-3",
+        "owningDecision": "0021",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_cfc4f47f0ecd03e0836b6bedd3158f60",
+          "claim_14857a18ae008301d5870e0a4bc9f6ac",
+          "claim_d21867cff8a51dfc4fdea3c3e95096d7"
+        ]
+      },
+      {
+        "anchor": "vì-sao-không-app-level-lock-wrap-trong-approve",
+        "owningDecision": "0021",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_5afb8f3b4089acd884d2c3cd6b9bbb57",
+          "claim_4b5ecfb051da3efc45ee7640277b768d"
+        ]
+      },
+      {
+        "anchor": "vì-sao-không-epoch-fence-merge-gate",
+        "owningDecision": "0021",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_e5fcd366a66ba29887d712945fd7e3ff",
+          "claim_a5bb50fb4f64e842334fe353a955524c"
+        ]
+      },
+      {
+        "anchor": "hệ-quả-3",
+        "owningDecision": "0021",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_7a7eaa509c57c203757dafb1ef42c770",
+          "claim_b20e1919dacb2d2fa0de0d4ca2c47db0",
+          "claim_acd0fb1e35440535fc61d9ee0b15864b"
+        ]
+      },
+      {
+        "anchor": "0022-khảo-sát-choke-point-fgos-quyết-định-lặplệch-xuyên-clirunnerskill",
+        "owningDecision": "0022",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_8b22a5fd98d87a35c5c2d50c57060b46"
+        ]
+      },
+      {
+        "anchor": "bối-cảnh-4",
+        "owningDecision": "0022",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_3e759fdd13b85a14dca58cfdc902cb5d",
+          "claim_589c5bca305535fea6cc0109ac66b668"
+        ]
+      },
+      {
+        "anchor": "candidates",
+        "owningDecision": "0022",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_6403b0907bb0a7415a2e48bfdcd576bb"
+        ]
+      },
+      {
+        "anchor": "xác-nhận-thật-choke-point-có-bằng-chứng-cụ-thể",
+        "owningDecision": "0022",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_317aead16cf595b7cf55ed42eaa18ddc"
+        ]
+      },
+      {
+        "anchor": "1-take-vs-pick-2-định-nghĩa-khác-nhau-cho-item-này-claim-được-không",
+        "owningDecision": "0022",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_b016edf6f12e3024cb092606bb771b0a",
+          "claim_368c6ea350e45900fcada35e67122f8a",
+          "claim_b9de9d038f79f0e9cfa52561fca4181a",
+          "claim_2d17f3a10e99a9da564808a8ca3e56c8",
+          "claim_f5e397112a36967f6c2057456eb9b173",
+          "claim_12825427c0cb1d693c6eb2f803952181"
+        ]
+      },
+      {
+        "anchor": "2-kiểm-tra-working-tree-sạch-2-định-nghĩa-độc-lập-cho-return-và-approve",
+        "owningDecision": "0022",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_e991f8dfb06ca966ca78f96b15566357",
+          "claim_d5eb90c8adeb096822ac8d727dab7cd6",
+          "claim_336e0302249c006e88efde8a4d27255e",
+          "claim_e20450852b8cc81b71efd44e9774d4dc",
+          "claim_9cf9f5275922a28d295ca75d7080371c"
+        ]
+      },
+      {
+        "anchor": "3-createworktree-6-call-site-mỗi-nơi-tự-xử-lý-baserefcleanup-riêng",
+        "owningDecision": "0022",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_9121a224604fce68e66e2bf9877a4231",
+          "claim_533802b60054f03ee6b48aea33340ecf",
+          "claim_5f90a4f4debb0109bb2b0dadef12b6dc",
+          "claim_6c453d9e400adf8c1bdadb6e6fb688f3"
+        ]
+      },
+      {
+        "anchor": "đã-kiểm-tra-không-phải-choke-point-loại-khỏi-danh-sách-có-bằng-chứng",
+        "owningDecision": "0022",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_cbdb1b45324e09cc15d67abf3193f88a",
+          "claim_eac67903478bf345629ba008d8a46d91",
+          "claim_3eb8339e6534b30ba7e1214255a11800"
+        ]
+      },
+      {
+        "anchor": "ghi-chú-liên-quan-không-phải-finding-mới-của-item-này",
+        "owningDecision": "0022",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_6c5782d3c915607c1c05c83fb5ebd255",
+          "claim_76fb7a95c77c1134d95835418caae508"
+        ]
+      },
+      {
+        "anchor": "ranked-priority",
+        "owningDecision": "0022",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_ab17d2e0d5e4c02ee484af949c0ed6d9",
+          "claim_e69c1ad0321ac1bab192b7b445e12c32",
+          "claim_ea8cffbdab27d692943b9b21f17cff59"
+        ]
+      },
+      {
+        "anchor": "no-fixes-applied",
+        "owningDecision": "0022",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_5d4011da92ecd1ef38890896ddec0b30",
+          "claim_5e0493e873f065e86c03c915d2b9f47a"
+        ]
+      },
+      {
+        "anchor": "0023-thứ-tự-ưu-tiên-sản-phẩm-ship-faster-dod-result-docs-hoàn-thiện-sau-ngưỡng",
+        "owningDecision": "0023",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_8e7177164c1170f64004f6394da10f28"
+        ]
+      },
+      {
+        "anchor": "bối-cảnh-5",
+        "owningDecision": "0023",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_ace313a6fdc22d289460ebc961626058",
+          "claim_e1b08b2f6139de01967d11160e3596c7",
+          "claim_f9464aa89f3ee921a37fdc007aa49b88",
+          "claim_815885047389d9a4fdfb9d753114482a"
+        ]
+      },
+      {
+        "anchor": "quyết-định-4",
+        "owningDecision": "0023",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_cfcf01219968c9c43844432a9bf45106",
+          "claim_61a2d3a97785a1fa8dfe590c11569dbb",
+          "claim_65654a30d9d13cf2fbea182b95d19049"
+        ]
+      },
+      {
+        "anchor": "hệ-quả-4",
+        "owningDecision": "0023",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_34f4766922b81e1632751f0946d57c19",
+          "claim_191a42c1761f116fda00b3a25ca22d4c"
+        ]
+      },
+      {
+        "anchor": "0026-native-first-dispatch-doctrine-launcherroottaskcapacity",
+        "owningDecision": "0026",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_5ecb968b071f9bff993acfbb3fd36127",
+          "claim_1a361f01db5a6e6a64ce5d65a0bfa934"
+        ]
+      },
+      {
+        "anchor": "bối-cảnh-7",
+        "owningDecision": "0026",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_94a01565f18c613f6e7502977d54e6ac",
+          "claim_ba1ff7b7666e08aeca20821318df3132"
+        ]
+      },
+      {
+        "anchor": "đơn-vị-vận-hành-vocabulary-chốt-dùng-xuyên-suốt-từ-đây",
+        "owningDecision": "0026",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_9c4e625714d537e186cddc9ec62ae473",
+          "claim_f461a9f790d3acb7c125568c286f05a4",
+          "claim_d5143ddef51fde2e51f8743fa3e87b64",
+          "claim_b1f4c90d19ab3249e717f89facdbde86",
+          "claim_91f16f1801511650e3092f03db9a7c19",
+          "claim_7482a6b245a0f7034787e7d8bd0b7d24"
+        ]
+      },
+      {
+        "anchor": "quy-tắc-chọn-cơ-chế-dispatch-áp-dụng-y-hệt-cho-subtask-lẫn-capacity",
+        "owningDecision": "0026",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_60fa2dd65b4761863bd7399ade02f9c6",
+          "claim_f5f5082cfab9ed213a69e6329a943711",
+          "claim_399a6a1ad4caf2bbe46bc11bc69083dc",
+          "claim_8e13478f818abae09e212614ce693dd5",
+          "claim_7ef4616208cde18e71e68840794ddc68",
+          "claim_42c30fd183662e4169a2a222ae977402"
+        ]
+      },
+      {
+        "anchor": "lớp-còn-thiếu-llm-đủ-thông-minh-để-tự-nhận-ra-khi-nào-dùng-nhánh-nào-đã-hoàn-thành-45-pha-pha-5-hoãnyagni",
+        "owningDecision": "0026",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_e0885603b38fb62d780a5ab48de1269e",
+          "claim_8d91631a900ec4103a5c2b0d5b989fc2",
+          "claim_4698df498321c7999068e58b926bc2de",
+          "claim_61d64e215a358590a29fd961d4859d04",
+          "claim_9e03e34162628933345e9e0a920f11a0"
+        ]
+      },
+      {
+        "anchor": "quan-hệ-với-việc-đã-khoá-không-mâu-thuẫn-chỉ-hẹp-hơn",
+        "owningDecision": "0026",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_da73abd735dca12fcb4d508d11f9f975",
+          "claim_29551bf7cdd778fb08c7cd0565514abf"
+        ]
+      },
+      {
+        "anchor": "ranh-giới-quan-sát-được-observability-tránh-ngộ-nhận",
+        "owningDecision": "0026",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_4434041dbcdebe16d090670b036ca41f",
+          "claim_4e7c489e21608b903806cd5da65a1697"
+        ]
+      },
+      {
+        "anchor": "việc-chưa-quyết-để-lại-cho-item-build-lớp-quyết-định-thật-đã-hoàn-tất-qua-dispatchmjs-decide-pha-1-4-pha-5-hoãn",
+        "owningDecision": "0026",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_6c06438943e64ad92cb4fe0f910c6deb",
+          "claim_371dbd6e2f5537ded0fafe4e6956c7c3"
+        ]
+      },
+      {
+        "anchor": "kế-hoạch-triển-khai-5-pha-đã-file-thành-work-item-deps-thật",
+        "owningDecision": "0026",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_6ba08f50d0899a95fc8a30c738430037",
+          "claim_55a57bfcf543d71d662fa9c4578853f6"
+        ]
+      },
+      {
+        "anchor": "tham-chiếu",
+        "owningDecision": "0026",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_c534a1d34445a9c84f0ac6d415c6ac94",
+          "claim_62f02199d351a194094cfb027a5afbf0"
+        ]
+      },
+      {
+        "anchor": "0029-sửa-ba-mệnh-đề-từ-vựng-dispatch-của-0026-bỏ-roottasksubtask-capacity-là-năng-lực-có-tên-t1-hai-giá-trị",
+        "owningDecision": "0029",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_02222a3adca323c42d68bfc1e3ef0074"
+        ]
+      },
+      {
+        "anchor": "bối-cảnh-9",
+        "owningDecision": "0029",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_95df09dc4b082eed910954ae3d9f2982",
+          "claim_41d42bb1d41f1b439c2ac09d70e441e5"
+        ]
+      },
+      {
+        "anchor": "quyết-định-7",
+        "owningDecision": "0029",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_d6ffa6438e88873e2ab109de98c88b8e"
+        ]
+      },
+      {
+        "anchor": "bỏ-roottasksubtask-khỏi-từ-vựng-dispatch",
+        "owningDecision": "0029",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_90bc8da9f3ac54b28ee99c0571f3d644",
+          "claim_1ce072ed299f65792cb14a111469678b",
+          "claim_04a03bbcf22da92e35c076a333a441cb"
+        ]
+      },
+      {
+        "anchor": "capacity-một-năng-lực-có-tên-behavior-promise-functional-helper",
+        "owningDecision": "0029",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_4cf1caaebb2f42d74bcb0fbf1f5ad1fe",
+          "claim_073eea178ddb52f6cf281cd4d98dc9b0",
+          "claim_ab7ac45bddc789eb97d376bbd3116f67"
+        ]
+      },
+      {
+        "anchor": "t1-vai-trò-bên-gọi-hai-giá-trị-launcherdriver-orchestrator-tầng-hợp-thành-t0",
+        "owningDecision": "0029",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_670f343b35cc44d578eb070e60695f68",
+          "claim_c481c65d7e4150af235f82f2f0ce81c8",
+          "claim_75c377796c78c0790f896c905ce6eeab"
+        ]
+      },
+      {
+        "anchor": "hệ-quả-7",
+        "owningDecision": "0029",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_ca231ef093c8bd2a5ac89d1299e01853",
+          "claim_f73d4e0517ee0f38c84cd30da94db052",
+          "claim_7f67d9c0b123003373f3df421c4140c4"
+        ]
+      },
+      {
+        "anchor": "tham-chiếu-1",
+        "owningDecision": "0029",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_5f006128a4aace4f23ca9e593da3fed3",
+          "claim_d85e776b378f3d21aed4edcf1a875b99"
+        ]
+      },
+      {
+        "anchor": "0032-cổng-iron-law-chỉ-hỏi-ở-ranh-giới-trunk-thêm-mức-warn-agent-gõ-lệnh-thay-người",
+        "owningDecision": "0032",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_c0672ae1fee3b8e0cf510d20e0a8182e"
+        ]
+      },
+      {
+        "anchor": "bối-cảnh-12",
+        "owningDecision": "0032",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_002a6b92116ec28d662640e1e89671b7",
+          "claim_f244a49b381b84f2265eb19cc53b1e0d",
+          "claim_e4fdc42773a81841395569ebfc329b9c",
+          "claim_a5af409c9d028a46e92aa8895092fbe6",
+          "claim_1b4b4a395908f7637698bb42f056c13e"
+        ]
+      },
+      {
+        "anchor": "quyết-định-10",
+        "owningDecision": "0032",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_00ce8ef23aaec1a6dd9be0251ba0ca3b",
+          "claim_371222afa35d71e431880dad1784cf04",
+          "claim_536d52a6ffb586e443eb108fd484321c",
+          "claim_9f2a1ccb4acc02d2d0ad5184a15f279d",
+          "claim_0163048a257e22c77a1e44259494c98f"
+        ]
+      },
+      {
+        "anchor": "vì-sao-supersedes-trống",
+        "owningDecision": "0032",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_b7ccfa65fda08cc020c57ffa801d1c38",
+          "claim_85060cd9275d780186c1c7955e5c9b38"
+        ]
+      },
+      {
+        "anchor": "hệ-quả-10",
+        "owningDecision": "0032",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_48f4ffa8956be8bea3cda3d930af48ac",
+          "claim_3819de81bd71f836fc98fa1001d93cf0",
+          "claim_49d987137a47fb3d97c468550abee8dc"
+        ]
+      },
+      {
+        "anchor": "tham-chiếu-3",
+        "owningDecision": "0032",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_d06b2ce15133866437a691773e465006",
+          "claim_c566d2915315a14071f537397117652a"
+        ]
+      },
+      {
+        "anchor": "0033-capacity-cli-spawn-shaped-thắng-haslivetaskaccess-thu-hẹp-0026-rule-2",
+        "owningDecision": "0033",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_6347e924083dea028ded2fda743ce159"
+        ]
+      },
+      {
+        "anchor": "quyết-định-11",
+        "owningDecision": "0033",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_c1782e7b7f51dd2fa7de56e718cb2bff",
+          "claim_ea01435fbfce2b1e73381c5d9a7c6066"
+        ]
+      },
+      {
+        "anchor": "người-quyết",
+        "owningDecision": "0033",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_68e9ce61dbff7a530b70a2ccf6531a45",
+          "claim_da653bb7293a682b05f3dcc0a1b3753b"
+        ]
+      },
+      {
+        "anchor": "lý-do-0026-rule-2-không-áp-dụng-ở-đây",
+        "owningDecision": "0033",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_42f9bfce702ea73a320ebcbe6cd80249",
+          "claim_90ca441a35296b4601a31f2cf224e3b3"
+        ]
+      },
+      {
+        "anchor": "cơ-chế-phân-biệt-không-phải-heuristic-mới",
+        "owningDecision": "0033",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_b9b783d16e302d9058489856e6cde481",
+          "claim_d6be3a263e08b4c045ee002b60f4ede5",
+          "claim_b45337089f8c74230dd66cd48ffe7825"
+        ]
+      },
+      {
+        "anchor": "bằng-chứng-đã-kiểm",
+        "owningDecision": "0033",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_f63e378b765126fb5426a7286a0a46c9",
+          "claim_6ab28f921687d640ffb6ca17a5624261"
+        ]
+      },
+      {
+        "anchor": "việc-chưa-quyết-để-lại",
+        "owningDecision": "0033",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_b41ad20350f43a6ae7e49e01615baf5a",
+          "claim_87b482a8b3e86d2d207141caad98379c"
+        ]
+      },
+      {
+        "anchor": "tham-chiếu-4",
+        "owningDecision": "0033",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_8f08ea8e31fecc895af7d5e5a5e729ba",
+          "claim_66d9ed7d6c7312c4cde589fe1599d01c"
+        ]
+      },
+      {
+        "anchor": "0034-đổi-tên-capacitycapacities-thành-executorexecutors-chốt-tách-capability",
+        "owningDecision": "0034",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_6b073340e38b94b93db36f74a464f9c1"
+        ]
+      },
+      {
+        "anchor": "quyết-định-12",
+        "owningDecision": "0034",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_de74e982f45712c6d325e6a73eff45d6",
+          "claim_b3a64f399876516efe3d00b4947b5d2b",
+          "claim_02823a65efd2dfedd5ede5d38c5a7cbc"
+        ]
+      },
+      {
+        "anchor": "chính-thức-hóa-việc-tách-capabilitycapacity-mà-0029-để-ngỏ",
+        "owningDecision": "0034",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_23287bcf7f6983bd1851efd037ced88f",
+          "claim_8c90d9e626770349175e1bb0b1d9d46f"
+        ]
+      },
+      {
+        "anchor": "phạm-vi-đổi-tên",
+        "owningDecision": "0034",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_ea470beddec07b87fdc8d614f0e8c5c1",
+          "claim_ddda01d789306855b66939663369488f"
+        ]
+      },
+      {
+        "anchor": "một-collision-đã-xử-lý-khi-thực-thi",
+        "owningDecision": "0034",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_b8231625af5863b35986d15572ab7041",
+          "claim_c68d7217ca0e657d27be51d28bb0cc14"
+        ]
+      },
+      {
+        "anchor": "tham-chiếu-5",
+        "owningDecision": "0034",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_b92bcaec50873a4ba6513926553e9df2",
+          "claim_eef0985b1a2daecb884c83023fd1a14c"
+        ]
+      },
+      {
+        "anchor": "capability-aware-dispatch-activation-tsk-46f",
+        "owningDecision": "0034",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_f88e4e8f91d884a569207232482994b8"
+        ]
+      },
+      {
+        "anchor": "quyết-định-13",
+        "owningDecision": "0034",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_ea6c7805244cf8d32e0049344304793c",
+          "claim_01c7bf35907bf840b28be6434de1f73c"
+        ]
+      },
+      {
+        "anchor": "agent-coordination-foundation-shared-capability-catalog-planning-awareness-cluster-docshistoryagent-coordination-foundationplanmd",
+        "owningDecision": "0034",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_f47c2464ff9bf0ea6de9116bdbe10a7e"
+        ]
+      },
+      {
+        "anchor": "quyết-định-14",
+        "owningDecision": "0034",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_9a32cf51438ebcc2dbfcd8e4a11de03f",
+          "claim_da1e3a8deb956d81d89ec3070c143658"
+        ]
+      },
+      {
+        "anchor": "0035-ranh-giới-tin-cậy-của-cổng-mutation-gate-caller-trong-tiến-trình-cùng-lớp-tin-cậy-với-user-không-phải-kẻ-tấn-công",
+        "owningDecision": "0035",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_fe16812176a17d9c4073dd71e177ead9"
+        ]
+      },
+      {
+        "anchor": "quyết-định-15",
+        "owningDecision": "0035",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_98c9deafd1078e8774b93960ce4d5b3a",
+          "claim_6ef3646b241b71499ad9cd9d02350ca5"
+        ]
+      },
+      {
+        "anchor": "confinement-authority-một-cửa-kiểm-soát-giam-giữ-runtime-executethroughconfinement",
+        "owningDecision": "0035",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_c1357150cb5532d69feff97882984ccd",
+          "claim_a943de3a0ff8cc96f993fec6c3cc3a1e",
+          "claim_c11b67ceb76902b9ab0c1b9cab4c30c3"
+        ]
+      },
+      {
+        "anchor": "đổi-sang-atomic-cas-commit-tree-cho-merge-gate-d-adr0042-atomic-cas-commit-tree-cho-merge-gate",
+        "owningDecision": "0035",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_fc981ac524ca57bc04c4ead8ea3161fe",
+          "claim_d924302fcdb23d9601a6054fb6957ec0"
+        ]
+      },
+      {
+        "anchor": "0043-vocabulary-bound-invocation-supervisor-vs-detached-run-supervisor",
+        "owningDecision": "0043",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_e79647f02e8a3507c31e2e57c75b929c"
+        ]
+      },
+      {
+        "anchor": "bối-cảnh-13",
+        "owningDecision": "0043",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_cdf96a5e899850a9fdb3343d9d6c4fcd",
+          "claim_3f61f80f487a94e1e4bb0963bf6348b5"
+        ]
+      },
+      {
+        "anchor": "quyết-định-16",
+        "owningDecision": "0043",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_bd37b242f88115e67cb9870bf1741376",
+          "claim_755111c889e95014f99c54a41a112ca3",
+          "claim_dc3c8fc66a4e43d514339862bcc10846",
+          "claim_0a282d6aafb1cee14928a469d20dbcf2"
+        ]
+      },
+      {
+        "anchor": "hệ-quả-11",
+        "owningDecision": "0043",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_b34c6fba42019062dea0b1058540985e",
+          "claim_44294c754f97f771769d49ebd6a0614d"
+        ]
+      },
+      {
+        "anchor": "0046-gom-thang-tierrigor-2-thang-1-bảng-xoá-mọi-lớp-chồng",
+        "owningDecision": "0046",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_b2d081ec1426e138bd79fc0703ba645a",
+          "claim_c7fbd134619006f07ca2281f69601c5d"
+        ]
+      },
+      {
+        "anchor": "0047-p1-lõi-thực-thi-unit-một-bind-một-cửa-chạy-fgos-run-3-pattern-cộng-tác-đóng-4-mối-authority-l5-1-đã-bị-thay-một-phần-bởi-0061",
+        "owningDecision": "0047",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_de96b9e2eda969f6cf15d3c98779e1ee",
+          "claim_65ec90fc672e6d1a8dff764c3e3dd516"
+        ]
+      },
+      {
+        "anchor": "0048-p2-plan-chạy-được-unit-cho-mọi-đường-vào-driver-mỏng-fgos-run-bỏ-demandfactsmatcher",
+        "owningDecision": "0048",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_8f31a4f2f6b6f91fcbf89cace7be6bff",
+          "claim_6f695d26a139ec834153e132e8024107"
+        ]
+      },
+      {
+        "anchor": "0049-p3b-work-không-còn-stage-work-chỉ-còn-bản-ghilifecycle-workflow-runner-là-sequencer-duy-nhất-đóng-a4",
+        "owningDecision": "0049",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_5f10674a9a170a84bfd02d6b1462ea18",
+          "claim_5348a42561949a4c0042f0196fe52f56"
+        ]
+      },
+      {
+        "anchor": "0050-p6-nối-thật-herdr-là-transport-mặc-định-posture-một-đường-fallback-quota-qua-pane-mới",
+        "owningDecision": "0050",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_65304cc9e0b7cd5027ee9a2589b612c8",
+          "claim_dc4ce18e6e9fb14f1c49564fb00173ba"
+        ]
+      },
+      {
+        "anchor": "0051-cổng-ghi-file-đi-theo-chuỗi-fallback-quyền-git-của-invocation-giữ-lại-cho-work-loop",
+        "owningDecision": "0051",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_c7b6b863e630f2b685c29f09b5db02c4",
+          "claim_0ff1945d9de2483e7c615450e71b8bcf"
+        ]
+      },
+      {
+        "anchor": "0052-worker-không-bao-giờ-có-quyền-git-runner-commit-trên-mọi-đường-thay-mục-2-của-0051-đã-bị-thay-một-phần-bởi-0060",
+        "owningDecision": "0052",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_a3e251ef31f006e7fd01ebc9640b94ca",
+          "claim_46e3a4ecadf497d511207c7a4e5c87a8"
+        ]
+      },
+      {
+        "anchor": "0053-một-cơ-chế-truyền-kết-quả-đường-dẫn-report-trong-contextrefs-phân-giải-một-lần",
+        "owningDecision": "0053",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_f9fd15e1ac6018eabd8bcfc94a50e77d",
+          "claim_9152712f05f3390687f5b4d9ef102e75"
+        ]
+      },
+      {
+        "anchor": "0055-panel-khác-họ-provider-giữa-các-ghế-là-ưu-tiên-mềm-bind-rải-ghế-theo-thứ-tự-prefer-reviewed-vẫn-cứng",
+        "owningDecision": "0055",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_f58bf45ca4affd0474b1e864c26c6e62",
+          "claim_a2f67de75a538ea78e1bb035e6d1c0a9"
+        ]
+      },
+      {
+        "anchor": "0056---seats-chuyên-biệt-hoá-ghế-panel-bằng-lens-khi-khởi-động-không-thêm-workflow-yaml-hay-registry",
+        "owningDecision": "0056",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_5e6715ecc0c3c71e135748edf54d4271",
+          "claim_9a5a4c7c4939080ea71ffaf460d87e7a"
+        ]
+      },
+      {
+        "anchor": "0057---seats-name-persona-có-tên-theo-ba-tầng-tra-cứu-ghim-nội-dung-lúc-start-gắn-đúng-một-ghế",
+        "owningDecision": "0057",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_17061fbe7eb887241536b870f6d10a12",
+          "claim_89cb129252c64e683e06902d3a1e2516"
+        ]
+      },
+      {
+        "anchor": "0058-provider-failure-fails-over-inside-execution-core-another-account-of-the-same-provider-first-then-the-next-candidate",
+        "owningDecision": "0058",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_fd4f7bc3b9f656db315c5f1320b8dab4",
+          "claim_2cc4d2b5012fb6dd687f1c357d95a466"
+        ]
+      },
+      {
+        "anchor": "0059-a-domain-persona-pack-is-a-folder-what-a-seat-can-name-what-it-pinned-and-who-ran-it-are-each-stated-by-one-read",
+        "owningDecision": "0059",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_5279f84afaf9f09dd512101da18905c5",
+          "claim_ab04d755d36af00cb6ce157d829c8181"
+        ]
+      },
+      {
+        "anchor": "0060-runner-commit-theo-writes-của-unit-một-matcher-preflight-index-resume-chỉ-commit-brief-ghi-file-nói-rõ-phạm-vi-thay-mục-1-2-của-0052",
+        "owningDecision": "0060",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_a28c06e333e3d09c3801e2b56ebd04a1",
+          "claim_b31ad90d68cd5644cca87a4c3f74a438"
+        ]
+      },
+      {
+        "anchor": "0061-unit-ad-hoc-được-preferpersona-mềm-one-liner-fgos-run-workflow-start---units--effort-unit-ghi-nối-nhánh-thay-một-phần-mục-1-của-0047",
+        "owningDecision": "0061",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_ad2cb8f645df6b08658a2b32ae2a8dcb",
+          "claim_e1abc43e9b408449d93b9fa00a00dd68"
+        ]
+      },
+      {
+        "anchor": "0062-xoá-cửa-thô-dispatch-là-tầng-thấp-fanout-về-tầng-work-thay-phần-purpose-door-của-rul68-2-tầng-dispatch-và-phần-mỗi-cửa-một-lane-posture-của-rul77-posture-belongs-to-the-capability",
+        "owningDecision": "0062",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_f679b132df0a3819847b51552ab3a9b6",
+          "claim_77e723624e1ae0a9c2e5e7e043fca4be"
+        ]
+      },
+      {
+        "anchor": "0063-work-chỉ-là-bên-dùng-dispatch-nhận-input-generic-thay-phần-đầu-vào-còn-lại-của-rul73-dispatch-does-not-know-work2",
+        "owningDecision": "0063",
+        "note": "known stale carried sentences; full truth check owed at promotion",
+        "sourceClaimIds": [
+          "claim_5788dd19c4378fbb442c6a455f0e7857",
+          "claim_6eb47bc2e3c271b4af46b09fc2c4e90c"
+        ]
+      }
+    ]
+  },
+  "pendingAccountingReview": true
 }

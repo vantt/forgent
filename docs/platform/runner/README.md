@@ -48,3 +48,15 @@ Start with [spec.md](spec.md) for the carried preamble and source identity. The 
 The original RUL ids, decision ids and headings remain verbatim. The source heading containing retired is preserved as source wording; decision placement grants no retirement judgment. Known stale carried sentences; full truth check owed at promotion. Independent conservation, liveness/triage, truth sampling, fresh readers, red-team, native sync and scoped strict E remain owed. See `plans/260925-documentation-authority-unification/reports/phase-06/step-09-report.md` and `plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json`. No component-boundary change. Legacy authority stays unchanged.
 
 > Added in candidate: [Decision records](decisions/h-36d872fbb0e5.md) include current records 0047, 0052 and 0055–0063 under the verbatim carried retired-history heading; later records partly supersede earlier rules.
+
+## Added in candidate: Known conflicts in carried text
+
+These are reading cautions from the fresh-reader key, not current behavior proof. Known stale carried sentences; full truth check owed at promotion.
+
+1. The [history heading](decisions/h-36d872fbb0e5.md) says “retired” while carrying live settled decisions. Placement grants no retirement.
+2. The key found a Data Dictionary compat mention of `dispatch execute --effort` against RUL90/0062 removing that door. The candidate [dictionary](subcomponents/h-02842f76ffd2/spec.md) now labels its removal under A41; independent truth re-review is pending.
+3. Decision 0062 records the R3 pending-callers gate; RUL93/RUL95 and 0063 record it reached. These are dated stages of supersession, not code verification.
+4. The carried source front matter says August 2026 and `coverage: full` against an October body. The candidate [preamble](spec.md) is labelled corrected; the source's old claim proves no coverage.
+5. Deleted ranking/entropy pointers and the literal-main Open Gap were stale code claims. Candidate corrections are labelled in [Pointers](subcomponents/h-f34e0d170d89/spec.md), [Open Gaps](subcomponents/h-2e032393add1/spec.md) and [Gate A](operations/h-51f5cd7279fd.md); remaining carried claims are unverified.
+6. The [vocabulary table](architecture/h-7af1f0242611.md) keeps stale `runner.md:<line>` self-citations with a label; those numbers are not navigable candidate evidence.
+7. RUL76 already names `--idle-timeout-ms` and `runner.idleTimeoutMs` in the [carried rules](subcomponents/h-6979005beaf7/spec.md). Check its partial supersession and implementation before proposing a new idle-timeout rule.

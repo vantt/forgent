@@ -545,6 +545,30 @@
         }
       ],
       "kind": "truth"
+    },
+    {
+      "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "before": "Bước vào của vòng tự cải thiện (self-improve loop, STR13 — CONTEXT.md):\nfgOS xếp hạng chính friction chưa ngã-ngũ của nó thành\nmột danh sách candidate, người chọn đúng một hoặc dừng (Slice 1), rồi có thể\nbắc cầu candidate đã chọn sang một việc thật để runner thi công (Slice 3,\n`--submit`). Loop này chỉ nhắm vào chính `repo/src` của fgOS — không\nphải một tính năng mở cho host project ngoài — và chạy khi người gọi tay,\nkhông bao giờ là một nhánh tự động của vòng dispatch thường. Vòng khép\nkín đầy đủ: `evolve` (liệt kê) → `evolve --pick` (xem một candidate, đọc-thuần)\n→ `evolve --submit` (bắc cầu, HÀNH ĐỘNG GHI duy nhất của cả bề mặt evolve) →\nrunner dispatch việc mới như mọi việc khác → `review`/`approve` qua cổng duyệt\nPR nội bộ, với `approve` chạy thêm phán Iron Law (xem dưới) trước khi merge.",
+      "after": "Added in candidate — A41/A42 correction: CLI hiện hành không có verb `evolve` (`bin/fgos.mjs:4373,4461`; `evolve --help` trả \"unknown verb\"). Module ranking đã bị xoá ở commit `120af6b3d`. Đoạn dưới ghi lại hợp đồng Gate A trước khi bị gỡ, không xác nhận triển khai hiện hành; full truth check owed at promotion.\nBước vào trước đây của vòng tự cải thiện (self-improve loop, STR13 — CONTEXT.md):\nTheo hợp đồng cũ, fgOS xếp hạng chính friction chưa ngã-ngũ của nó thành\nmột danh sách candidate, người chọn đúng một hoặc dừng (Slice 1), rồi có thể\nbắc cầu candidate đã chọn sang một việc thật để runner thi công (Slice 3,\n`--submit`). Loop này chỉ nhắm vào chính `repo/src` của fgOS — không\nphải một tính năng mở cho host project ngoài — và chạy khi người gọi tay,\nkhông bao giờ là một nhánh tự động của vòng dispatch thường. Vòng khép\nkín đầy đủ: `evolve` (liệt kê) → `evolve --pick` (xem một candidate, đọc-thuần)\n→ `evolve --submit` (bắc cầu, HÀNH ĐỘNG GHI duy nhất của cả bề mặt evolve) →\nrunner dispatch việc mới như mọi việc khác → `review`/`approve` qua cổng duyệt\nPR nội bộ, với `approve` chạy thêm phán Iron Law (xem dưới) trước khi merge.",
+      "reason": "A41 addition under Lead A42: scope remaining present-tense Gate A introduction to removed legacy evolve surface",
+      "evidence": [
+        {
+          "ref": "bin/fgos.mjs:4373",
+          "text": "      throw new StoreError('validation', `unknown verb \"${verb ?? ''}\". Usage: fgos <version|init|add|submit|discover|plan|move|retrospective|cleanup|compound|edit|item|ask|answer|decision|list|ready|rebuild|repair|rollup|take|return|review|approve|sync-root|reject|catchup|triage|session|gateway|goal|tool|setup|doctor|unlock|lock-status|main-checkout-reset> ...`);"
+        },
+        {
+          "ref": "bin/fgos.mjs:4461",
+          "text": "    refuseHelp(`unknown verb \"${verb}\". Usage: fgos --help [<verb> [<sub>]] [--json]`);"
+        },
+        {
+          "ref": "120af6b3d",
+          "text": "git log -S rankCandidates -- bin/fgos.mjs src/evolve/candidates.mjs identifies ranking deletion; no legacy edit"
+        },
+        {
+          "ref": "single CLI evidence probe, env -u CLAUDE_CODE_SESSION_ID node bin/fgos.mjs evolve --help",
+          "text": "fgos: unknown verb \"evolve\". CLI additionally reported invocation-fault logging under .fgos; unintended side effect disclosed, no direct log access."
+        }
+      ]
     }
   ],
   "trueOrHistoryLeft": [
@@ -581,5 +605,7 @@
       ]
     }
   ],
-  "noFullTruthSweep": true
+  "noFullTruthSweep": true,
+  "a42AdditionalEditRanges": 1,
+  "totalEditRanges": 43
 }

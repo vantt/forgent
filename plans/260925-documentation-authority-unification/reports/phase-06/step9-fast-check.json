@@ -25,13 +25,13 @@
           {
             "type": "claims-not-reviewed",
             "message": "claim rows whose reviewStatus is not reviewed",
-            "count": 495,
+            "count": 43,
             "examples": [
               "docs/specs/runner.md#unheaded-block-1",
               "docs/specs/runner.md#spec-runner-vòng-tự-hành",
-              "docs/specs/runner.md#dispatch-runtime-inspection",
               "docs/specs/runner.md#guard-reconciliation",
-              "docs/specs/runner.md#unheaded-block-2"
+              "docs/specs/runner.md#unheaded-block-3",
+              "docs/specs/runner.md#entry-points-triggers"
             ]
           },
           {
@@ -49,7 +49,7 @@
           {
             "type": "candidate-blocks-unreferenced",
             "message": "candidate conservation units not named by a source decision",
-            "count": 86,
+            "count": 82,
             "examples": [
               "docs/platform/runner/spec.md#unheaded-block-2",
               "docs/platform/runner/spec.md#unheaded-block-3",
@@ -74,13 +74,13 @@
           {
             "type": "claims-not-reviewed",
             "message": "claim rows whose reviewStatus is not reviewed",
-            "count": 495,
+            "count": 43,
             "examples": [
               "docs/specs/runner.md#unheaded-block-1",
               "docs/specs/runner.md#spec-runner-vòng-tự-hành",
-              "docs/specs/runner.md#dispatch-runtime-inspection",
               "docs/specs/runner.md#guard-reconciliation",
-              "docs/specs/runner.md#unheaded-block-2"
+              "docs/specs/runner.md#unheaded-block-3",
+              "docs/specs/runner.md#entry-points-triggers"
             ]
           },
           {
@@ -98,7 +98,7 @@
           {
             "type": "candidate-blocks-unreferenced",
             "message": "candidate conservation units not named by a source decision",
-            "count": 86,
+            "count": 82,
             "examples": [
               "docs/platform/runner/spec.md#unheaded-block-2",
               "docs/platform/runner/spec.md#unheaded-block-3",
@@ -123,13 +123,13 @@
           {
             "type": "claims-not-reviewed",
             "message": "claim rows whose reviewStatus is not reviewed",
-            "count": 495,
+            "count": 43,
             "examples": [
               "docs/specs/runner.md#unheaded-block-1",
               "docs/specs/runner.md#spec-runner-vòng-tự-hành",
-              "docs/specs/runner.md#dispatch-runtime-inspection",
               "docs/specs/runner.md#guard-reconciliation",
-              "docs/specs/runner.md#unheaded-block-2"
+              "docs/specs/runner.md#unheaded-block-3",
+              "docs/specs/runner.md#entry-points-triggers"
             ]
           },
           {
@@ -147,7 +147,7 @@
           {
             "type": "candidate-blocks-unreferenced",
             "message": "candidate conservation units not named by a source decision",
-            "count": 86,
+            "count": 82,
             "examples": [
               "docs/platform/runner/spec.md#unheaded-block-2",
               "docs/platform/runner/spec.md#unheaded-block-3",
@@ -163,10 +163,80 @@
   ],
   "stats": {
     "sourceRows": 495,
-    "pending": 495,
-    "reboundRows": 34,
-    "changedCandidateUnits": 68,
-    "reverse": 86
+    "pending": 43,
+    "reviewed": 452,
+    "reboundRows": 43,
+    "changedCandidateUnits": 72,
+    "reverse": 82
   },
-  "reproductionSource": "import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';import crypto from 'node:crypto';\nconst root=process.cwd(),P='plans/260925-documentation-authority-unification/',R=P+'reports/phase-06/',read=f=>JSON.parse(fs.readFileSync(f,'utf8')),write=(f,v)=>fs.writeFileSync(R+f,JSON.stringify(v,null,2)+'\\n'),sha=s=>crypto.createHash('sha256').update(s).digest('hex');\nconst gen=await import(path.join(root,'scripts/generate-doc-inventory.mjs')),g=await import(path.join(root,'scripts/check-doc-inventory-gates.mjs'));\nconst ac=read(R+'step9-carriage-accounting.json'),pins=read(R+'step9-source-blobs.json'),regpath=R+'working-identity-registry.json',regbytes=fs.readFileSync(regpath),registry=JSON.parse(regbytes),identity=gen.buildIdentityRegistryIndex(registry),sb=gen.buildSwitchboardIndex(read(P+'transitional-switchboard.json')),vocabulary=read(P+'claim-and-disposition-vocabulary.json'),shard=read(P+'ledger/decisions/s9-runner-01.json'),rebound=read(R+'step9-rebound-units.json'),targets=[...ac.candidateFiles.map(f=>f.path),'docs/platform/runner/contracts/routing-handoff.md'],cache=new Map();\nconst unitsOf=p=>{if(cache.has(p))return cache.get(p);const text=fs.readFileSync(p,'utf8'),ls=text.split('\\n'),us=gen.extractMarkdownConservationUnits(text),stack=[];const out=us.map((u,i)=>{if(u.unitKind==='heading')while(stack.length&&stack.at(-1).level>=u.level)stack.pop();const ancestry=stack.map(h=>h.title);if(u.unitKind==='heading')stack.push(u);const next=us.slice(i+1).find(o=>o.unitKind==='heading');return {...u,ancestry,text:ls.slice(u.startLine-1,u.endLine).join('\\n').trim(),...(u.unitKind==='heading'?{sectionText:ls.slice(u.startLine-1,next?next.startLine-1:ls.length).join('\\n').trim()}:{})};});cache.set(p,out);return out;};\nconst items=[ac.source,...targets].map(p=>{const content=fs.readFileSync(p,'utf8');return gen.buildInventoryRow(p,{content,blobSha:p===ac.source?pins.headBlob:null,blobSize:Buffer.byteLength(content),switchboardIndex:sb,identityIndex:identity});}),claims=items.flatMap(i=>i.claims),inventory={version:3,commit:null,items,claimLedger:claims,consumerEdges:[],scanGaps:[],duplicateContentGroups:[],semanticConflictGroups:[]},scopes=[ac.source];\nassert.equal(sha(fs.readFileSync(ac.source)),pins.sourceSHA256);assert.equal(shard.claims.length,495);\nfor(const f of ac.candidateFiles)assert.equal(sha(fs.readFileSync(f.path)),f.sha256);\nfor(const d of shard.claims){const src=claims.find(c=>c.claimId===d.claimId),target=unitsOf(d.targetOwner).find(u=>u.anchor===d.targetAnchor);assert.equal(src.sourceUnitDigest,d.sourceUnitDigest);assert.equal(target.textDigest,d.targetUnitDigest);assert.deepEqual(target.ancestry,d.targetAncestry);assert.equal(d.reviewStatus,'pending');assert(!d.reviewedBy);const changed=rebound.rows.find(r=>r.claimId===d.claimId);if(changed){assert.equal(changed.afterText,target.text);assert.equal(changed.after.targetUnitDigest,d.targetUnitDigest);assert.equal(d.disposition,'supersede');}else{const srcUnit=unitsOf(ac.source).find(u=>u.anchor===src.sourceAnchor);assert.equal(target.text,srcUnit.text);}}\nfor(const delta of rebound.candidateUnitChanges){const u=unitsOf(delta.path).find(u=>u.anchor===delta.anchor);assert.equal(u.textDigest,delta.after.textDigest);assert.equal(u.text,delta.after.text);assert.deepEqual(u.ancestry,delta.after.ancestry);assert.equal(delta.status,'pending');}\nconst applied=g.applyDecisions(inventory,[shard],{vocabulary,unitsOf,registry,targetAnchorsOf:p=>new Set(unitsOf(p).map(u=>u.anchor)),targetUnitDigestOf:(p,a)=>unitsOf(p).find(u=>u.anchor===a)?.textDigest}),sourceOnly={...applied.inventory,items:applied.inventory.items.filter(i=>scopes.includes(i.path)),claimLedger:applied.inventory.claimLedger.filter(r=>scopes.includes(r.sourcePath))},vf=g.validateAgainstVocabulary(sourceOnly,vocabulary,new Set(targets),{targetAnchorsOf:p=>new Set(unitsOf(p).map(u=>u.anchor))}),priors=[P+'reports/identity-registry.json',P+'reports/phase-02-identity-registry.json'].map(f=>({label:f,registry:read(f)})),runs=[];\nfor(const [label,previousRegistries] of [['both',priors],['identity',[priors[0]]],['phase02',[priors[1]]]]){const c=g.checkConservation({inventory:applied.inventory,registry:applied.registry,previousRegistries,vocabulary,scope:scopes,decisions:[shard]}),fatal=[...applied.findings,...vf,...c.invariant];runs.push({label,D:{count:fatal.length,fatalFindings:fatal},E:{structuralFatal:fatal.length,conservationOpen:c.open,strictGreen:false},reverse:c.unreferencedCandidateRows});}\nassert.equal(sha(fs.readFileSync(regpath)),sha(regbytes));for(const r of runs)assert.deepEqual(r.reverse,runs[0].reverse);\nconst old=read(R+'candidate-unverified-runner.json'),currentCarriers=targets.filter(p=>!p.includes('/decisions/')&&!p.endsWith('/README.md')),note='known stale carried sentences; full truth check owed at promotion';\nconst knownRisk=ac.pairs.filter(p=>read(R+'step9-liveness.json').sections.some(s=>s.startLine<=p.sourceLines[0]&&p.sourceLines[1]<=s.endLine&&(s.missingCitedPaths.length||['preamble','open-gaps','bảng-đối-chiếu-từ-vựng-dispatch'].includes(s.anchor)))).map(p=>({...p,status:'current candidate, truth unverified',nativeCandidateIdentityVerified:false,note}));\nwrite('candidate-unverified-runner.json',{version:2,native:false,status:'Working-tree conservative overlay after A41/R9; not current native proof',inputCommit:'24be6cb1d',scope:scopes,count:runs[0].reverse.length,tupleFields:['claimId','path','anchor','unitDigest','fileStatus'],rows:runs[0].reverse.map(r=>({...r,fileStatus:'Candidate',canonical:false,nativeIdentityVerified:false,note})),currentCarriers:{rule:'A41 item 2 extends A35 item 2',note,count:currentCarriers.length,paths:currentCarriers},knownRiskCarriageBindings:{channel:'Referenced source carriage; separate from reverse list',count:knownRisk.length,rows:knownRisk,nativeCandidateIdentityVerified:false},historicalNativeProof:{contentCommit:'81d0ed0747014e976c0d29222439fd6e3592b468',count:63,proof:'step9-native-verification.json',current:false},overlayCaveat:'Full routing-handoff carrier included conservatively, but its earlier-batch decisions are not in runner-only overlay: 19 extra reverse entries versus full native context. Four new navigation/note units added. Native comparison next turn must settle the exact current list; do not compare 86 with 63 as an identity-loss count.',next:'Native sync once at this turn commit; recompute full five-field equality. Apply committed runner verdicts only when all shown bindings still match; package bounded rebound truth re-review.'});\nwrite('step9-fast-check.json',{version:2,native:false,method:'Scoped working-tree overlay with unchanged production applyDecisions/validateAgainstVocabulary/checkConservation; all changed target units independently recomputed against exact before/after audit. Not committed native equality or full coverage.',scopeArguments:['--scope',ac.source],registry:{path:regpath,bytes:regbytes.length,sha256:sha(regbytes),unchanged:true},runs:runs.map(({reverse,...r})=>r),stats:{sourceRows:495,pending:495,reboundRows:rebound.rows.length,changedCandidateUnits:rebound.candidateUnitChanges.length,reverse:runs[0].reverse.length},reproductionSource:fs.readFileSync('/tmp/fgos-work/fast-corrected.mjs','utf8')});\nconsole.log(JSON.stringify(runs.map(r=>({label:r.label,D:r.D.count,fatal:r.D.fatalFindings,E:r.E.conservationOpen,reverse:r.reverse.length}))));\n"
+  "reproductionSource": "import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';import crypto from 'node:crypto';\nconst root=process.cwd(),P='plans/260925-documentation-authority-unification/',R=P+'reports/phase-06/',read=f=>JSON.parse(fs.readFileSync(f,'utf8')),write=(f,v)=>fs.writeFileSync(R+f,JSON.stringify(v,null,2)+'\\n'),sha=s=>crypto.createHash('sha256').update(s).digest('hex');\nconst gen=await import(path.join(root,'scripts/generate-doc-inventory.mjs')),g=await import(path.join(root,'scripts/check-doc-inventory-gates.mjs'));\nconst ac=read(R+'step9-carriage-accounting.json'),pins=read(R+'step9-source-blobs.json'),regpath=R+'working-identity-registry.json',regbytes=fs.readFileSync(regpath),registry=JSON.parse(regbytes),identity=gen.buildIdentityRegistryIndex(registry),sb=gen.buildSwitchboardIndex(read(P+'transitional-switchboard.json')),vocabulary=read(P+'claim-and-disposition-vocabulary.json'),shard=read(P+'ledger/decisions/s9-runner-01.json'),rebound=read(R+'step9-rebound-units.json'),targets=[...ac.candidateFiles.map(f=>f.path),'docs/platform/runner/contracts/routing-handoff.md'],cache=new Map();\nconst unitsOf=p=>{if(cache.has(p))return cache.get(p);const text=fs.readFileSync(p,'utf8'),ls=text.split('\\n'),us=gen.extractMarkdownConservationUnits(text),stack=[];const out=us.map((u,i)=>{if(u.unitKind==='heading')while(stack.length&&stack.at(-1).level>=u.level)stack.pop();const ancestry=stack.map(h=>h.title);if(u.unitKind==='heading')stack.push(u);const next=us.slice(i+1).find(o=>o.unitKind==='heading');return {...u,ancestry,text:ls.slice(u.startLine-1,u.endLine).join('\\n').trim(),...(u.unitKind==='heading'?{sectionText:ls.slice(u.startLine-1,next?next.startLine-1:ls.length).join('\\n').trim()}:{})};});cache.set(p,out);return out;};\nconst items=[ac.source,...targets].map(p=>{const content=fs.readFileSync(p,'utf8');return gen.buildInventoryRow(p,{content,blobSha:p===ac.source?pins.headBlob:null,blobSize:Buffer.byteLength(content),switchboardIndex:sb,identityIndex:identity});}),claims=items.flatMap(i=>i.claims),inventory={version:3,commit:ac.a42ReviewApplication.inputCommit,items,claimLedger:claims,consumerEdges:[],scanGaps:[],duplicateContentGroups:[],semanticConflictGroups:[]},scopes=[ac.source];\nassert.equal(sha(fs.readFileSync(ac.source)),pins.sourceSHA256);assert.equal(shard.claims.length,495);\nfor(const f of ac.candidateFiles)assert.equal(sha(fs.readFileSync(f.path)),f.sha256);\nfor(const d of shard.claims){const src=claims.find(c=>c.claimId===d.claimId),target=unitsOf(d.targetOwner).find(u=>u.anchor===d.targetAnchor);assert.equal(src.sourceUnitDigest,d.sourceUnitDigest);assert.equal(target.textDigest,d.targetUnitDigest);assert.deepEqual(target.ancestry,d.targetAncestry);if(d.reviewStatus==='pending')assert(!d.reviewedBy);else assert.equal(d.reviewStatus,'reviewed');const changed=rebound.rows.find(r=>r.claimId===d.claimId);if(changed){assert.equal(changed.afterText,target.text);assert.equal(changed.after.targetUnitDigest,d.targetUnitDigest);if(!changed.contextualIdenticalUnit)assert.equal(d.disposition,'supersede');}else{const srcUnit=unitsOf(ac.source).find(u=>u.anchor===src.sourceAnchor);assert.equal(target.text,srcUnit.text);}}\nfor(const delta of rebound.candidateUnitChanges){const u=unitsOf(delta.path).find(u=>u.anchor===delta.anchor);assert.equal(u.textDigest,delta.after.textDigest);assert.equal(u.text,delta.after.text);assert.deepEqual(u.ancestry,delta.after.ancestry);assert.equal(delta.status,'pending');}\nconst applied=g.applyDecisions(inventory,[shard],{vocabulary,unitsOf,registry,repoRoot:root,targetAnchorsOf:p=>new Set(unitsOf(p).map(u=>u.anchor)),targetUnitDigestOf:(p,a)=>unitsOf(p).find(u=>u.anchor===a)?.textDigest}),sourceOnly={...applied.inventory,items:applied.inventory.items.filter(i=>scopes.includes(i.path)),claimLedger:applied.inventory.claimLedger.filter(r=>scopes.includes(r.sourcePath))},vf=g.validateAgainstVocabulary(sourceOnly,vocabulary,new Set(targets),{targetAnchorsOf:p=>new Set(unitsOf(p).map(u=>u.anchor))}),priors=[P+'reports/identity-registry.json',P+'reports/phase-02-identity-registry.json'].map(f=>({label:f,registry:read(f)})),runs=[];\nfor(const [label,previousRegistries] of [['both',priors],['identity',[priors[0]]],['phase02',[priors[1]]]]){const c=g.checkConservation({inventory:applied.inventory,registry:applied.registry,previousRegistries,vocabulary,scope:scopes,decisions:[shard]}),fatal=[...applied.findings,...vf,...c.invariant];runs.push({label,D:{count:fatal.length,fatalFindings:fatal},E:{structuralFatal:fatal.length,conservationOpen:c.open,strictGreen:false},reverse:c.unreferencedCandidateRows});}\nassert.equal(sha(fs.readFileSync(regpath)),sha(regbytes));for(const r of runs)assert.deepEqual(r.reverse,runs[0].reverse);\nconst old=read(R+'candidate-unverified-runner.json'),currentCarriers=targets.filter(p=>!p.includes('/decisions/')&&!p.endsWith('/README.md')),note='known stale carried sentences; full truth check owed at promotion';\nconst knownRisk=ac.pairs.filter(p=>read(R+'step9-liveness.json').sections.some(s=>s.startLine<=p.sourceLines[0]&&p.sourceLines[1]<=s.endLine&&(s.missingCitedPaths.length||['preamble','open-gaps','bảng-đối-chiếu-từ-vựng-dispatch'].includes(s.anchor)))).map(p=>({...p,status:'current candidate, truth unverified',nativeCandidateIdentityVerified:false,note}));\nconst rootList=read(R+'candidate-unverified-root-authorities.json'),rootOwned=new Set(rootList.rows.map(r=>r.claimId)),ownedReverse=runs[0].reverse.filter(r=>r.claimId!=='claim_fecee46f6c7c699047ffdb436bfdebe1');assert(rootOwned.has('claim_fecee46f6c7c699047ffdb436bfdebe1'));\nwrite('candidate-unverified-runner.json',{version:2,native:false,status:'Working-tree conservative overlay after A41/R9; not current native proof',inputCommit:ac.a42ReviewApplication.inputCommit,scope:scopes,count:ownedReverse.length,tupleFields:['claimId','path','anchor','unitDigest','fileStatus'],rows:ownedReverse.map(r=>({...r,fileStatus:'Candidate',canonical:false,nativeIdentityVerified:false,note})),currentCarriers:{rule:'A41 item 2 extends A35 item 2',note,count:currentCarriers.length,paths:currentCarriers},knownRiskCarriageBindings:{channel:'Referenced source carriage; separate from reverse list',count:knownRisk.length,rows:knownRisk,nativeCandidateIdentityVerified:false},historicalNativeProof:{contentCommit:'81d0ed0747014e976c0d29222439fd6e3592b468',count:63,proof:'step9-native-verification.json',current:false},overlayCaveat:'Full routing-handoff carrier included conservatively, but its earlier-batch decisions are not in runner-only overlay: 19 extra reverse entries versus full native context. Four new navigation/note units added. Native comparison next turn must settle the exact current list; do not compare 86 with 63 as an identity-loss count.',next:'Native sync once at this turn commit; recompute full five-field equality. Apply committed runner verdicts only when all shown bindings still match; package bounded rebound truth re-review.'});\nconst list=read(R+'candidate-unverified-runner.json');list.ownership={claimId:'claim_fecee46f6c7c699047ffdb436bfdebe1',owner:'candidate-unverified-root-authorities.json',reason:'Earlier root-authorities step placed the routing-handoff metadata; runner list duplicate removed under Lead A42.',excludedFromRunnerCount:1};const scan=read(R+'step9-liveness.json');list.currentDecisionSections={note,rule:'A35 item 2 extended under A41/A42; full truth at promotion, no new A41 draw',count:scan.sections.filter(s=>s.classification==='current-decision').length,sections:scan.sections.filter(s=>s.classification==='current-decision').map(s=>({anchor:s.anchor,owningDecision:s.owningDecision,note,sourceClaimIds:ac.pairs.filter(p=>s.startLine<=p.sourceLines[0]&&p.sourceLines[1]<=s.endLine).map(p=>p.claimId)}))};list.pendingAccountingReview=true;list.next='Next turn: one native sync at this runner commit, apply remaining non-source verdicts, one bounded re-review of every pending runner row and changed accounting entry.';write('candidate-unverified-runner.json',list);\nwrite('step9-fast-check.json',{version:2,native:false,method:'Scoped working-tree overlay with unchanged production applyDecisions/validateAgainstVocabulary/checkConservation; all changed target units independently recomputed against exact before/after audit. Not committed native equality or full coverage.',scopeArguments:['--scope',ac.source],registry:{path:regpath,bytes:regbytes.length,sha256:sha(regbytes),unchanged:true},runs:runs.map(({reverse,...r})=>r),stats:{sourceRows:495,pending:ac.pendingRows,reviewed:ac.reviewedRows,reboundRows:rebound.rows.length,changedCandidateUnits:rebound.candidateUnitChanges.length,reverse:runs[0].reverse.length},reproductionSource:fs.readFileSync('/tmp/fgos-work/fast-corrected.mjs','utf8')});\nconsole.log(JSON.stringify(runs.map(r=>({label:r.label,D:r.D.count,fatal:r.D.fatalFindings,E:r.E.conservationOpen,reverse:r.reverse.length}))));\n",
+  "a42Verification": {
+    "inputCommit": "edffd7c6b9cfb0461eec9e0fef65c9b4a2487acc",
+    "tests": {
+      "files": [
+        "test/scripts/doc-runner-liveness.test.mjs",
+        "test/scripts/doc-decision-conservation.test.mjs",
+        "test/scripts/doc-decision-review.test.mjs",
+        "test/scripts/doc-review-format.test.mjs"
+      ],
+      "pass": 45,
+      "fail": 0,
+      "skipped": 0,
+      "env": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work",
+      "log": "step9-tests.log"
+    },
+    "candidateStatus": {
+      "counts": {
+        "files": 607,
+        "byStatus": {
+          "promoted": 3,
+          "candidate": 213,
+          "legacy-current": 0,
+          "non-authority": 1,
+          "unrouted": 390
+        },
+        "exemptUnrouted": 302,
+        "checked": 216,
+        "findings": 0,
+        "byType": {}
+      },
+      "findings": []
+    },
+    "reviewApplication": "step9-carriage-accounting.json#a42ReviewApplication",
+    "runnerListOwned": 81,
+    "rawOverlayReverse": 82,
+    "rootOwnedReverse": 1,
+    "nativeSync": false,
+    "reviewPacksWritten": false,
+    "boundarySideEffect": "One unknown-verb CLI help probe automatically logged invocation fault under .fgos; no direct access or cleanup; disclosed in tooling.md.",
+    "finalAudit": {
+      "expectedSourceReviewed": 452,
+      "expectedSourcePending": 43,
+      "pendingSetEqualsReboundRows": true,
+      "notesVerbatim": true,
+      "reviewReportCommit": "edffd7c6b9cfb0461eec9e0fef65c9b4a2487acc",
+      "registryUnchanged": true,
+      "protectedToolsAndReviewPacksUnchanged": true,
+      "candidateStatus": {
+        "counts": {
+          "files": 607,
+          "byStatus": {
+            "promoted": 3,
+            "candidate": 213,
+            "legacy-current": 0,
+            "non-authority": 1,
+            "unrouted": 390
+          },
+          "exemptUnrouted": 302,
+          "checked": 216,
+          "findings": 0,
+          "byType": {}
+        },
+        "findings": []
+      },
+      "gitDiffCheck": "pass",
+      "deliberateWriteScope": "docs/platform, plan reports/ledger, test/scripts/doc-runner-liveness.test.mjs",
+      "disclosedAutomaticCliFaultLog": "See tooling.md; no direct access or cleanup."
+    }
+  }
 }
