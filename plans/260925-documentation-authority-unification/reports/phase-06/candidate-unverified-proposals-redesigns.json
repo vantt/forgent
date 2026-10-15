@@ -25,7 +25,7 @@
     "docs/architect/proposals/visibility-and-interactive-contact-herdr-spawn.md"
   ],
   "count": 665,
-  "reviewStatus": "pending",
+  "reviewStatus": "reviewed",
   "meaning": "Complete native reverse population for the Step 7 source scopes. Namespace expansion is native checker behavior and includes pre-existing candidate units in owning areas. Eligibility review is not truth approval or a classification receipt; no source approval is carried.",
   "rows": [
     {
@@ -13642,14 +13642,21 @@
       "anchor": "unheaded-block-2",
       "unitDigest": "de3e1dcc9904ca6c2d29f5acf92611a7e9ad15f8f494643539357a1583d5caea",
       "status": "candidate-unverified",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792040421980-b4e79fd1@2026-10-15",
       "fileStatus": {
         "kind": "proposal",
         "kindCanonical": false,
         "designStatus": "Candidate",
         "authorityStatus": "candidate"
-      }
+      },
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1205-proposals-redesigns-bounded-rereview-d39fe9033.md",
+      "reviewReportCommit": "953b7d38bc52a5cf42b0289c90b34aafb1a30640",
+      "reviewContentCommit": "d39fe9033928edc45d03a56e66a2d9949cfc4bdb",
+      "reviewNote": "channel candidate-eligibility: native successor for the file 6 Added paragraph (unheaded-block-2, line 22 at both pins); predecessor claim_40f7fa9b4ed19... digest 9c2d0ce7 equals the base text and successor de3e1dcc equals the HEAD text, both recomputed; it replaces the predecessor in the list as a pending unverified row, the predecessor stays an explicit native gap, no approval carried; file is Design status Candidate so it is eligible under A28."
     },
     {
       "claimId": "claim_39828e8cbb222195b82d37264fc5d908",
@@ -14112,5 +14119,12 @@
     "independentScopedEEquality": true,
     "tupleSHA256": "b8898b5319e405ea21bf7a49ddf468395e9eed5c423bead9fc41371419836efc",
     "nativeReverseCount": 665
-  }
+  },
+  "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+  "reviewedAt": "2026-10-15",
+  "reviewMode": "ordinary",
+  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1205-proposals-redesigns-bounded-rereview-d39fe9033.md",
+  "reviewReportCommit": "953b7d38bc52a5cf42b0289c90b34aafb1a30640",
+  "reviewContentCommit": "d39fe9033928edc45d03a56e66a2d9949cfc4bdb",
+  "reviewNote": "channel list: 665 rows at HEAD, compact sorted five-field serialization hashes to e6424a2d (before 115cdfcf equals the base list); the only tuple change is the file 6 predecessor replaced by its successor, all rows candidate-unverified, 664 retained approvals; the list file at d39fe9033 still held the predecessor and the HEAD sync commit carries the successor, so the pin is the HEAD list."
 }

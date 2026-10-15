@@ -131,9 +131,14 @@
       "triageDisposition": "place verbatim",
       "rowDisposition": "move",
       "review": {
-        "reviewStatus": "pending",
-        "authoredBy": "codex-session:unit-run-1792039975351-ac5d331e@2026-10-15",
-        "reason": "Authorized correction; bounded independent re-review owed, no approval carry."
+        "reviewStatus": "reviewed",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1205-proposals-redesigns-bounded-rereview-d39fe9033.md",
+        "reviewReportCommit": "953b7d38bc52a5cf42b0289c90b34aafb1a30640",
+        "reviewContentCommit": "d39fe9033928edc45d03a56e66a2d9949cfc4bdb",
+        "reviewNote": "channel triage: row now records the Added paragraph label of the two A19 section 17 corrections in its evidence; status pending with priorReview, no approval carried; before and after hashes recomputed from git blobs equal the request; disposition move unchanged and legal."
       },
       "priorReview": {
         "reviewStatus": "pending",
@@ -269,9 +274,14 @@
       "triageDisposition": "archive-with-reason",
       "rowDisposition": "archive-with-reason",
       "review": {
-        "reviewStatus": "pending",
-        "authoredBy": "codex-session:unit-run-1792039975351-ac5d331e@2026-10-15",
-        "reason": "Authorized correction; bounded independent re-review owed, no approval carry."
+        "reviewStatus": "reviewed",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1205-proposals-redesigns-bounded-rereview-d39fe9033.md",
+        "reviewReportCommit": "953b7d38bc52a5cf42b0289c90b34aafb1a30640",
+        "reviewContentCommit": "d39fe9033928edc45d03a56e66a2d9949cfc4bdb",
+        "reviewNote": "channel triage: evidence now names live proposals 9, 10, 11 and 13 with file 11 source :17 and carrier :44 and queues capability-fit :11; both facts verified in the files; pending, no approval carried; hashes recomputed equal."
       },
       "priorReview": {
         "reviewStatus": "pending",
@@ -339,9 +349,14 @@
       "rowDisposition": "supersede",
       "constitutionPlacementNote": "Frozen map intends collection-index, but the unchanged constitution classifies the reserved platform-wide proposals/README.md path as proposal. Keep the explicit map target and record this kind discrepancy for independent review/navigation owner; no marker, pattern, vocabulary or baseline change.",
       "review": {
-        "reviewStatus": "pending",
-        "authoredBy": "codex-session:unit-run-1792039975351-ac5d331e@2026-10-15",
-        "reason": "Authorized correction; bounded independent re-review owed, no approval carry."
+        "reviewStatus": "reviewed",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1205-proposals-redesigns-bounded-rereview-d39fe9033.md",
+        "reviewReportCommit": "953b7d38bc52a5cf42b0289c90b34aafb1a30640",
+        "reviewContentCommit": "d39fe9033928edc45d03a56e66a2d9949cfc4bdb",
+        "reviewNote": "channel triage: evidence swaps omits for the 6-of-14 snapshot statement, true against the README and the 14-entry directory listing; pending, no approval carried; hashes recomputed equal."
       },
       "priorReview": {
         "reviewStatus": "reviewed",
@@ -413,9 +428,14 @@
       "triageDisposition": "place verbatim",
       "rowDisposition": "supersede",
       "review": {
-        "reviewStatus": "pending",
-        "authoredBy": "codex-session:unit-run-1792039975351-ac5d331e@2026-10-15",
-        "reason": "Authorized correction; bounded independent re-review owed, no approval carry."
+        "reviewStatus": "reviewed",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1205-proposals-redesigns-bounded-rereview-d39fe9033.md",
+        "reviewReportCommit": "953b7d38bc52a5cf42b0289c90b34aafb1a30640",
+        "reviewContentCommit": "d39fe9033928edc45d03a56e66a2d9949cfc4bdb",
+        "reviewNote": "channel triage: evidence cites adoption lines 18,167-172,206-217, read and correct; pending, no approval carried; hashes recomputed equal."
       },
       "priorReview": {
         "reviewStatus": "reviewed",

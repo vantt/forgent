@@ -1,5 +1,43 @@
 # Proposals and redesigns batch report
 
+## Step 7 closed — final conservation accounting
+
+Date: 2026-10-15. Assignment: unit-run-1792042755899-96d1fce0/producer/1. This closure supersedes all historical open/pending/native-sync/next-review wording below. Content pin **d39fe9033928edc45d03a56e66a2d9949cfc4bdb**; committed independent report **953b7d38b** ([bounded re-review](review-261015-1205-proposals-redesigns-bounded-rereview-d39fe9033.md)). The evidence commit is **953b7d38bc52a5cf42b0289c90b34aafb1a30640**, where that report actually exists; it is distinct from the d39fe9033 content pin. Runner supplies the output commit.
+
+Applied **190/190 ordinary ok source verdicts** through unchanged `applyReviewVerdicts`, preserving notes verbatim. **Zero refusals; source-01-01 pending list: empty** (the earlier header mismatch causes no remaining pending row). All **1,625 unchanged source approvals** and **664 unchanged eligibility observations** remain byte-for-byte equal as row objects. No decision semantics, dispositions, owners or anchors changed.
+
+| Final accounting | Result |
+|---|---:|
+| Source files / rows | 20 / 1,815 |
+| Reviewed / pending source rows | **1,815 / 0** |
+| Dispositions: move / supersede / archive-with-reason | 844 / 900 / 71 |
+| Candidate carriers / archives | 16 / 4 |
+| File triage accepted / pending | 20 / 0 |
+| Candidate eligibility accepted / pending | 665 / 0 |
+| Separate bounded non-source verdicts | 8/8 ok, 0 rework, 0 hold |
+| Both-prior D: together / identity / phase02 | **0 / 0 / 0 fatal** |
+| Scoped strict E: structural fatal, all three runs | **0** |
+| Scoped strict E: pending Step 7 source rows | **0** |
+| Scoped strict E: closure-allowed open lists | **3 identical-unit groups + 665 candidate-unverified tuples** |
+
+The bounded round is **190/190 source ok, 8/8 non-source ok, 0 rework, 0 hold**. Reviewer reports **41 deep reads / 0 deep rework**, with the 149 mechanical-only notes retained honestly. Final bounded and unresolved rework rates are **0%** (0/190 and 0/1,815); initial source-round rate remains historical **1.49%** (27/1,815); cumulative source-verdict occurrence rate is **1.35%** (27/2,005). The original 2 triage reworks also have accepted corrections. These denominators do not replace A36's 0/41 deep result.
+
+Applied the other eight verdicts in their separate channels: four file-triage rows, one native successor eligibility, one full reverse-list verdict, owner-queue and pinned batch-report accounting. Accounting acceptance of the pinned report is historical; it does not imply independent review of this new closure text. Candidate content remains candidate-unverified after eligibility acceptance.
+
+Reused the registry synced at **2d6d53884** unchanged: **61,217,378 bytes**, SHA256 **b5b11092ccd69cf70bda295c50c614fb5d76a9b18440ae2ca6df3aa68ef96e54**. **No new native sync, carry, refresh or registry write.** Inventory is regenerated read-only at the committed review tree using that existing registry (4,432 files / 90,099 claims); its active ID/path/anchor/digest tuples exactly match the registry. docs/ bytes are unchanged since d39fe9033. Complete five-field reverse-list equality passes against native applied conservation and all three scoped E outputs; exact duplicate member/owner bindings equal the prior proof. Strict E stays **open** (two expected open-category findings per run), with only the two closure-allowed lists; strict-global-E green, promotion and cutover are not claimed.
+
+Non-blocking observations are **accepted as accounting**: file 6's generic “rebased” sentence is vacuous because the source has no relative links; it causes no conservation rework. **runner.md:1273,1277–1278** must later point to the full proposal, and **both documentation-system-design Related lists** must later point to Documentation discussion history; all remain queued in [owner-queue.md](owner-queue.md). No consumer edits are made here.
+
+**No component-boundary change.** Preserve all earlier Rings holds, A34 residuals, fresh-reader/truth limitations, token-total checkpoint, and promotion/navigation/consumer/alias obligations.
+
+Proof: [final D/E verification](verification-261015-1300-proposals-redesigns-closure.md), [raw outputs, exact lists and reproduction](verification-261015-1300-proposals-redesigns-closure.md.json), and [test log](verification-261015-1300-proposals-redesigns-closure.tests.log). Existing relevant tests **59/59 pass**, zero fail/cancel/skip/todo, with `env -u CLAUDE_CODE_SESSION_ID`. All workspace writes stay under this plan; no docs/gates/checkers/vocabulary/extractor/baselines, workspace .fgos, git writes, lifecycle verbs or secrets. Markdown preview omitted because this assignment authorizes no external viewer-state writes. No needsWrites.
+
+**Next: Step 8. Lead will merge main first and send the Step 8 brief.** No Step 8 work starts in this assignment.
+
+---
+
+## Historical checkpoints (superseded by the closure above)
+
 ## Current native checkpoint
 
 Date: 2026-10-15. Assignment: unit-run-1792040421980-b4e79fd1/producer/1. Content pin **d39fe9033928edc45d03a56e66a2d9949cfc4bdb**; comparison base **f5ca5d9e73b46d31bebf81e8e1cada96d022a09c**. Read progress first and wrote it early. This checkpoint supersedes the next-native-sync and stale predecessor-list wording below. **Step 7 remains open for independent bounded verdicts and their committed application.**
