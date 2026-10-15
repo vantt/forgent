@@ -14,7 +14,7 @@ Thiết kế: [phase-00 §6–§8, §11](phase-00-design-and-review.md).
 |---|---|
 | viết lại | `src/util/session-identity.mjs`, `test/util/session-identity.test.mjs` |
 | tạo | `test/state/identity-before-lock.test.mjs`, `src/util/host-bin-path.mjs`, `test/util/host-bin-path.test.mjs` |
-| sửa | `src/util/host-bin.mjs` (`resolveHostBin` dùng `resolveActiveHostBin`) + test của nó |
+| sửa | `src/setup/bin-discovery.mjs` (`resolveWorkspaceInstallationBin` gọi `hostBinFromActivation`), `test/setup/bin-discovery.test.mjs`, test cửa caller `test/util/host-bin.test.mjs` |
 | sửa | `src/state/events.mjs`, `src/state/runtime-coordination.mjs`, `src/state/store.mjs`, `src/state/porting-store.mjs`, `src/state/events-compaction.mjs`, `src/runner/claim-port.mjs` |
 | sửa | `.githooks/pre-commit`, `bin/fgos.mjs` (5 chỗ nhả lock), `src/runner/lock-wait.mjs`, `src/cli/invocation-fault-log.mjs`, comment `src/runner/dispatch/execution-contract.mjs:244` |
 | sửa | `.github/workflows/release-assets-check.yml` job `focused-tests` (Linux + Windows): `cargo test -p fgos-session-identity`, test Node facade + `host-bin-path` với `FGOS_HOST_BIN` = binary release |

@@ -17,4 +17,12 @@ Lead chính làm phase này. Agent 5.1 chỉ chuẩn bị runbook.
 
 ## Rollback
 
-Trước activate: revert merge. Sau activate, theo đúng thứ tự: quiesce → drain mọi claim **bằng bản mới** (resolver cũ có thể không còn nhận mình là chủ claim mới) → activate release trước (`previousArtifactDigest`) → restart process sống lâu → doctor.
+Đây là runbook rollback duy nhất (phase-00 chỉ trỏ tới đây).
+
+- **Trước activate:** revert merge trên main; không có gì khác phải làm.
+- **Sau activate**, giữ quiesce suốt quá trình, theo đúng thứ tự:
+  1. Quiesce mọi writer (như bước 3 ở trên).
+  2. Drain mọi claim **bằng bản mới** (resolver cũ có thể không nhận mình là chủ claim lấy dưới id mới).
+  3. Đưa source về code cũ: commit revert 5.1 trên main bằng `git commit` trần với `FGOS_HOST_BIN=<binary mới đã pin>` (hook working tree lúc đó vẫn là facade mới, cần binary có verb `identity`). Catch-up các worktree đã nhận 5.1.
+  4. Activate release trước (`previousArtifactDigest`). Lúc này source/hook và release cùng là bản cũ, khớp nhau.
+  5. Restart process sống lâu. Chạy doctor của bản cũ (bản cũ không có `writer-identity-resolvable`; dựa vào `active-release-matches-checkout`). Kiểm commit trần ở main, `node bin/fgos.mjs` trực tiếp và lệnh qua shim đều chạy. Kiểm thư mục claim rỗng rồi mới mở lại việc.

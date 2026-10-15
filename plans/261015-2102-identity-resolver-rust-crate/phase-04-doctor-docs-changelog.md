@@ -27,4 +27,4 @@ Thiết kế: [phase-00 §12](phase-00-design-and-review.md).
 
 ## Rủi ro / rollback
 
-Thấp. Doctor check gọi facade, nên dùng chung cách tìm binary; không có luật thứ hai.
+Thấp. Doctor check gọi `probeIdentity` với từng binary (không qua cache), dùng chung luật tìm binary và cửa exec với facade; không có luật thứ hai.
