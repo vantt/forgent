@@ -154,7 +154,8 @@ Loại: **code** = viết test rồi code luôn; **plan** = plan có phase rồi
 | 6.2 | Lõi supervisor Rust + driver cli | plan (cần 4.4) | 3 |
 | 6.3 | Driver herdr + 5.2 + supervisor làm chủ home; xoá phần canh pane trong `herdr-round` và bản vá reaper tạm; S2 phải xanh hết | plan | 4 |
 | 6.4 | Hoàn tất việc khi process điều khiển chết (`result.json`, `unit-summary`, trả credential); đóng lần chạy treo `running` | plan | 4 |
-| — | Tab/pane herdr: gom tab (2.3), bỏ root pane (2.4) | code | 1 |
+| 6.5 | **terminal-control core (Rust, component nền độc lập dưới supervisor)** + driver herdr; tmux và loại khác sau này chỉ là thêm driver. Core giữ mô hình tab/pane, luật gom tab, luật tách pane, nhãn hiển thị; driver khai báo khả năng, core trả "không hỗ trợ/không rõ" thay vì đoán | thiết kế (trong 4.1+6.1) → plan | 4 (cùng 6.3) |
+| — | Tab/pane herdr trên Node: gom tab (2.3), bỏ root pane (2.4) — là **luật của terminal-control core**, bản Rust kế thừa nguyên luật + test | code | 1 |
 
 Đường găng: 4.1+6.1 → 4.2/4.3 → 4.4 → 6.2 → 6.3/6.4. **Quyết định thời điểm Rust (OQ1):** identity — nửa resolver sang Rust ngay (5.1), nửa launcher đi cùng run supervisor Rust (6.3); lock và supervisor viết Rust theo thiết kế 4.1+6.1.
 
