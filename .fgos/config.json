@@ -275,16 +275,16 @@
             "executor": "claude-herdr"
           },
           {
-            "executor": "openai"
+            "executor": "gemini"
           },
           {
-            "executor": "gemini"
+            "executor": "deepseek"
           },
           {
             "executor": "xai"
           },
           {
-            "executor": "deepseek"
+            "executor": "openai"
           }
         ],
         "rigor": "high"
