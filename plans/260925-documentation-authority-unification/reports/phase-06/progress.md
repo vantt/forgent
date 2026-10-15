@@ -1,3 +1,25 @@
+# Native sync complete — bounded re-review requested
+
+Date: 2026-10-15. Assignment: unit-run-1792040421980-b4e79fd1/producer/1. Content pin **d39fe9033928edc45d03a56e66a2d9949cfc4bdb**; comparison base **f5ca5d9e73b46d31bebf81e8e1cada96d022a09c**. Read progress first and wrote it early. This checkpoint supersedes the next-native-sync and stale predecessor-list wording below. **Step 7 remains open for independent bounded verdicts and their committed application.**
+
+One background native sync, polled own log: **693.797s**, **4432 files / 90099 claims**. Known IDs **97756 → 97757**, zero loss; active native tuples equal persisted registry. Compact one-line registry **61217378 bytes (<90 MB)**, SHA256 b5b11092ccd69cf70bda295c50c614fb5d76a9b18440ae2ca6df3aa68ef96e54, byte-equal to native scratch. One actual successor plus explicit predecessor gap; zero retired, no identity graft or approval carry.
+
+**D both priors together and each separately: zero fatal (3/3).** Scoped strict **E: exactly 190 pending source rows / 3 identical-owner groups / 665 candidate-unverified tuples**, zero structural fatal (3/3); E is open, not strict green. Complete duplicate member/owner equality and all-three-E/native/list five-field tuple equality pass. Earlier lists plus Step 7 cover current native namespaces exactly; no prior tuple lost. Unchanged **1,625 source approvals** and **664 eligibility observations** retain exact notes/pins; the new native successor is pending.
+
+One request: [review-request-261015-1205-proposals-redesigns-bounded-rereview-d39fe9033.md](review-request-261015-1205-proposals-redesigns-bounded-rereview-d39fe9033.md), **198 entries** (190 source, 4 triage, 1 actual successor eligibility, 1 full reverse list, queue/report 2). Includes all full before/after text and decisions since f5ca5d9e7, full digests, all fix evidence, unchanged disposition audit and A36 deep-read lists. Source corrections: file 12 27, file 15 8, file 18 154, file 6 1. A36: read all 190 changed rationales, independently seed/sample at least 11/72 Weak-exact/Judgment, plus 14 differing pairs and all 27 file-12 rows after prior escalation; zero absent targets. Producer supplies no seed/draw/verdict.
+
+Proof: [verification-261015-1205-native-bounded-rereview-d39fe9033.md](verification-261015-1205-native-bounded-rereview-d39fe9033.md) and full raw-result/reproduction sidecar; native log alongside. Relevant tests **59/59 pass**, env -u CLAUDE_CODE_SESSION_ID, zero fail/cancel/skip/todo. All workspace writes stay under this plan; scratch only /tmp/fgos-work/. No docs/decision/checker/extractor/vocabulary/baseline edits, .fgos workspace writes, git writes, lifecycle verbs or secrets read. Checkout Rust convention names used; preview tool unavailable. No needsWrites.
+
+**Next turn:** Lead independently reviews exactly this bounded 198-entry request pinned to d39fe9033 and commits ordinary source verdicts plus separate triage/list/accounting verdicts. Then an authorized Doer applies committed verdicts through unchanged channels, preserving notes/pins, rebinds only changed evidence without approval carry, and verifies settled D/E/native/list proof. Source/eligibility/triage/accounting channels never substitute for each other. Step 7 closes only after bounded acceptance, application and settled proof with expected open lists explicitly accounted. No Step 8, promotion, strict-global-E green or cutover is claimed. Preserve all earlier Rings holds, A34 residuals, fresh-reader/truth limitations, token-total checkpoint and promotion/navigation/consumer/alias obligations.
+
+---
+
+# Native sync and bounded re-review packaging in progress
+
+Date: 2026-10-15. Assignment: `unit-run-1792040421980-b4e79fd1/producer/1`. Read progress first. Content pin `d39fe9033928edc45d03a56e66a2d9949cfc4bdb`. Running exactly one background native sync, then both-prior D, scoped strict E, native/list equality and one bounded changed-row re-review package. Runner owns commits. Writes only within the plan; scratch `/tmp/fgos-work/`.
+
+---
+
 # Step 7 ordinary verdicts applied — one bounded re-review and native sync next
 
 Date: 2026-10-15. Assignment: `unit-run-1792039975351-ac5d331e/producer/1`. Read progress first; wrote it early and finalized before finishing. Input/report pin **f5ca5d9e73b46d31bebf81e8e1cada96d022a09c**. Output commit is the runner settlement. This checkpoint supersedes the all-pending and eight-unfixed-rationales wording below. **Step 7 remains open for one bounded re-review and the native sync.**

@@ -1,0 +1,32 @@
+{
+  "validated": true,
+  "contentCommit": "d39fe9033928edc45d03a56e66a2d9949cfc4bdb",
+  "entries": 198,
+  "sources": 190,
+  "sourceBeforeAfterAndFullShownHashEquality": true,
+  "requestPackProofHashes": true,
+  "threeDZeroFatal": true,
+  "threeEExactOpen": {
+    "claims-not-reviewed": 190,
+    "identical-units-multiple-owners": 3,
+    "candidate-blocks-unreferenced": 665
+  },
+  "nativeCandidateTupleEquality": true,
+  "zeroKnownIDLoss": true,
+  "registryBytes": 61217378,
+  "workspacePathsWithinScope": true,
+  "changedPaths": [
+    "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-proposals-redesigns.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/progress.md",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step-07-report.md",
+    "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json"
+  ],
+  "newPaths": [
+    "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1205-proposals-redesigns-bounded-rereview-d39fe9033.md",
+    "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1205-proposals-redesigns-bounded-rereview-d39fe9033.md.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1205-proposals-redesigns-bounded-rereview-d39fe9033.md",
+    "plans/260925-documentation-authority-unification/reports/phase-06/verification-261015-1205-native-bounded-rereview-d39fe9033.md",
+    "plans/260925-documentation-authority-unification/reports/phase-06/verification-261015-1205-native-bounded-rereview-d39fe9033.md.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/verification-261015-1205-native-bounded-rereview-d39fe9033.md.native-sync.log"
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "version": 1,
   "authorSession": "codex-session:unit-run-1792037090725-b6a675fa@2026-10-15",
-  "contentCommit": "0f063d18fdab01cb6f2c915bb60ff528c5e0f238",
+  "contentCommit": "d39fe9033928edc45d03a56e66a2d9949cfc4bdb",
   "scope": [
     "docs/architect/dispatch-control-plane-redesign.md",
     "docs/architect/documentation-system-design.md",
@@ -13637,47 +13637,18 @@
       "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
     },
     {
-      "claimId": "claim_40f7fa9b4ed1904607421c77803123b3",
+      "claimId": "claim_3c3434a44e370516cb624e9769af1eaa",
       "path": "docs/platform/proposals/knowledge-registry-redesign.md",
       "anchor": "unheaded-block-2",
-      "unitDigest": "9c2d0ce7355c4142b9af30325b1b4a0cf36f57bc8db3a4ce68d1c8470008b97a",
+      "unitDigest": "de3e1dcc9904ca6c2d29f5acf92611a7e9ad15f8f494643539357a1583d5caea",
       "status": "candidate-unverified",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792039975351-ac5d331e@2026-10-15",
+      "authoredBy": "codex-session:unit-run-1792040421980-b4e79fd1@2026-10-15",
       "fileStatus": {
         "kind": "proposal",
         "kindCanonical": false,
         "designStatus": "Candidate",
         "authorityStatus": "candidate"
-      },
-      "priorReview": {
-        "claimId": "claim_40f7fa9b4ed1904607421c77803123b3",
-        "path": "docs/platform/proposals/knowledge-registry-redesign.md",
-        "anchor": "unheaded-block-2",
-        "unitDigest": "9c2d0ce7355c4142b9af30325b1b4a0cf36f57bc8db3a4ce68d1c8470008b97a",
-        "status": "candidate-unverified",
-        "reviewStatus": "reviewed",
-        "authoredBy": "codex-session:unit-run-1792037090725-b6a675fa@2026-10-15",
-        "fileStatus": {
-          "kind": "proposal",
-          "kindCanonical": false,
-          "designStatus": "Candidate",
-          "authorityStatus": "candidate"
-        },
-        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-        "reviewNote": "deep: Added-in-candidate label L22 for knowledge-registry-redesign.md; sentence \"Candidate carriage; Retain map proposal kind: implementation alone does not promote a desi\" is the triage reason (place verbatim) plus the fixed carriage boilerplate; labelled addition, no source claim",
-        "reviewedAt": "2026-10-15",
-        "reviewMode": "ordinary",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-candidates-0f063d18f.md",
-        "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
-      },
-      "pendingNativeRebinding": {
-        "reason": "Added paragraph changed under triage-file-06; preserved native predecessor tuple is not asserted current",
-        "oldUnitDigest": "9c2d0ce7355c4142b9af30325b1b4a0cf36f57bc8db3a4ce68d1c8470008b97a",
-        "currentLocalUnitDigest": "de3e1dcc9904ca6c2d29f5acf92611a7e9ad15f8f494643539357a1583d5caea",
-        "currentLocalAnchor": "unheaded-block-2",
-        "noIdentityGraft": true,
-        "noApprovalCarry": true
       }
     },
     {
@@ -14018,10 +13989,10 @@
     }
   ],
   "nativeEquality": {
-    "contentCommit": "0f063d18fdab01cb6f2c915bb60ff528c5e0f238",
+    "contentCommit": "d39fe9033928edc45d03a56e66a2d9949cfc4bdb",
     "fullFiveFieldTupleEquality": true,
     "independentScopedEEquality": true,
-    "tupleSHA256": "b8898b5319e405ea21bf7a49ddf468395e9eed5c423bead9fc41371419836efc",
+    "tupleSHA256": "a76c6acc292549316a42529a34f016f3caf21eb0148b7b17bab436959653c3cd",
     "nativeReverseCount": 665
   },
   "priorReview": {
@@ -14034,7 +14005,112 @@
     "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
   },
   "nativeRebinding": {
-    "status": "pending-one-native-sync",
-    "meaning": "664 untouched eligibility approvals retained. One predecessor tuple preserved pending native identity reconciliation; prior nativeEquality is historical at contentCommit, not proof of this changed tree."
+    "contentCommit": "d39fe9033928edc45d03a56e66a2d9949cfc4bdb",
+    "predecessor": {
+      "claimId": "claim_40f7fa9b4ed1904607421c77803123b3",
+      "path": "docs/platform/proposals/knowledge-registry-redesign.md",
+      "anchor": "unheaded-block-2",
+      "unitDigest": "9c2d0ce7355c4142b9af30325b1b4a0cf36f57bc8db3a4ce68d1c8470008b97a",
+      "status": "candidate-unverified",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792039975351-ac5d331e@2026-10-15",
+      "fileStatus": {
+        "kind": "proposal",
+        "kindCanonical": false,
+        "designStatus": "Candidate",
+        "authorityStatus": "candidate"
+      },
+      "priorReview": {
+        "claimId": "claim_40f7fa9b4ed1904607421c77803123b3",
+        "path": "docs/platform/proposals/knowledge-registry-redesign.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "9c2d0ce7355c4142b9af30325b1b4a0cf36f57bc8db3a4ce68d1c8470008b97a",
+        "status": "candidate-unverified",
+        "reviewStatus": "reviewed",
+        "authoredBy": "codex-session:unit-run-1792037090725-b6a675fa@2026-10-15",
+        "fileStatus": {
+          "kind": "proposal",
+          "kindCanonical": false,
+          "designStatus": "Candidate",
+          "authorityStatus": "candidate"
+        },
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewNote": "deep: Added-in-candidate label L22 for knowledge-registry-redesign.md; sentence \"Candidate carriage; Retain map proposal kind: implementation alone does not promote a desi\" is the triage reason (place verbatim) plus the fixed carriage boilerplate; labelled addition, no source claim",
+        "reviewedAt": "2026-10-15",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-candidates-0f063d18f.md",
+        "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      },
+      "pendingNativeRebinding": {
+        "reason": "Added paragraph changed under triage-file-06; preserved native predecessor tuple is not asserted current",
+        "oldUnitDigest": "9c2d0ce7355c4142b9af30325b1b4a0cf36f57bc8db3a4ce68d1c8470008b97a",
+        "currentLocalUnitDigest": "de3e1dcc9904ca6c2d29f5acf92611a7e9ad15f8f494643539357a1583d5caea",
+        "currentLocalAnchor": "unheaded-block-2",
+        "noIdentityGraft": true,
+        "noApprovalCarry": true
+      }
+    },
+    "successor": {
+      "claimId": "claim_3c3434a44e370516cb624e9769af1eaa",
+      "path": "docs/platform/proposals/knowledge-registry-redesign.md",
+      "anchor": "unheaded-block-2",
+      "unitDigest": "de3e1dcc9904ca6c2d29f5acf92611a7e9ad15f8f494643539357a1583d5caea",
+      "status": "candidate-unverified",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792040421980-b4e79fd1@2026-10-15",
+      "fileStatus": {
+        "kind": "proposal",
+        "kindCanonical": false,
+        "designStatus": "Candidate",
+        "authorityStatus": "candidate"
+      }
+    },
+    "actualNativeGap": {
+      "sourcePath": "docs/platform/proposals/knowledge-registry-redesign.md",
+      "unitDigest": "de6c2b6c52dd2a5778d8deb462fd44ec66793d3d5471df693e68aecb02bb1217",
+      "identityFingerprint": "de6c2b6c52dd2a5778d8deb462fd44ec66793d3d5471df693e68aecb02bb1217",
+      "claimId": "claim_40f7fa9b4ed1904607421c77803123b3",
+      "sourceAnchor": "unheaded-block-2",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "9c2d0ce7355c4142b9af30325b1b4a0cf36f57bc8db3a4ce68d1c8470008b97a",
+      "claimKind": "unclassified",
+      "status": "future",
+      "origin": "added-since-2a1304393b9b284ad9566b6542ba78554f54b100",
+      "identityStatus": "identity-gap",
+      "gapReason": "edited unit whose anchor unheaded-block-2 is not a stable heading anchor"
+    },
+    "predecessorUnit": {
+      "sourcePath": "docs/platform/proposals/knowledge-registry-redesign.md",
+      "unitDigest": "de6c2b6c52dd2a5778d8deb462fd44ec66793d3d5471df693e68aecb02bb1217",
+      "identityFingerprint": "de6c2b6c52dd2a5778d8deb462fd44ec66793d3d5471df693e68aecb02bb1217",
+      "claimId": "claim_40f7fa9b4ed1904607421c77803123b3",
+      "sourceAnchor": "unheaded-block-2",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "9c2d0ce7355c4142b9af30325b1b4a0cf36f57bc8db3a4ce68d1c8470008b97a",
+      "claimKind": "unclassified",
+      "status": "future",
+      "origin": "added-since-2a1304393b9b284ad9566b6542ba78554f54b100"
+    },
+    "successorUnit": {
+      "sourcePath": "docs/platform/proposals/knowledge-registry-redesign.md",
+      "unitDigest": "422bc1e438dfed24ccab83d9fc2acd6d2a4c6f89920e16497393cc8ca84d6a0f",
+      "identityFingerprint": "422bc1e438dfed24ccab83d9fc2acd6d2a4c6f89920e16497393cc8ca84d6a0f",
+      "claimId": "claim_3c3434a44e370516cb624e9769af1eaa",
+      "sourceAnchor": "unheaded-block-2",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "de3e1dcc9904ca6c2d29f5acf92611a7e9ad15f8f494643539357a1583d5caea",
+      "claimKind": "unclassified",
+      "status": "future",
+      "origin": "added-since-0f063d18fdab01cb6f2c915bb60ff528c5e0f238"
+    },
+    "noIdentityGraft": true,
+    "noApprovalCarry": true
+  },
+  "historicalNativeEquality": {
+    "contentCommit": "0f063d18fdab01cb6f2c915bb60ff528c5e0f238",
+    "fullFiveFieldTupleEquality": true,
+    "independentScopedEEquality": true,
+    "tupleSHA256": "b8898b5319e405ea21bf7a49ddf468395e9eed5c423bead9fc41371419836efc",
+    "nativeReverseCount": 665
   }
 }
