@@ -5057,15 +5057,13 @@ async function main() {
     const isExecutionRun = verb === 'run';
     const isForegroundWorkflow = verb === 'workflow'
       && ['start', 'resume', 'answer'].includes(positional[0])
-      && Boolean(flags.foreground)
+      && flags.foreground === true
       && data?.status !== 'running'
       && data?.outcome !== undefined
       && data?.outcome !== null;
     const doctorFailed = verb === 'doctor' && flags.strict === true && data.checks.some((c) => !c.passed);
 
-    if (data?.pendingInline) {
-      process.exitCode = 0;
-    } else if (isExecutionRun && data?.outcome) {
+    if (isExecutionRun && data?.outcome) {
       process.exitCode = exitCodeForOutcome(data.outcome);
     } else if (isForegroundWorkflow) {
       process.exitCode = exitCodeForOutcome(data.outcome);

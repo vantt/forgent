@@ -22,12 +22,8 @@ import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helpe
 
 // posture filtering consults the machine backend registry; keep it file-local
 seedFileLocalBwrapRegistry();
-if (!process.env.XDG_STATE_HOME) {
-  process.env.XDG_STATE_HOME = path.join(os.tmpdir(), 'fgos-state');
-}
-const testHome = path.join(os.tmpdir(), 'fgos-test-home');
-fs.mkdirSync(testHome, { recursive: true });
-process.env.HOME = testHome;
+// The machine's ~/.fgos/config.json must not leak executors into these runs.
+process.env.HOME = makeFixtureDir('fgos-effort-home-');
 import { assertReasoningEffort, RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
 
 test('renderReasoningEffortArgs puts codex effort in a config override after the exec subcommand', () => {

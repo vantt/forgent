@@ -369,6 +369,7 @@ function progressLine({ ts, type, payload }) {
   else if (type === 'step.complete') what = 'completed';
   else if (type === 'step.fail') what = `failed: ${payload.reason ?? payload.outcome}`;
   else if (type === 'gate.park') what = 'parked, waiting for an answer';
+  else if (type === 'unit.account-unpinned') what = `unit ${payload.unitId} runs without account ${payload.account}: none of its seats is on that provider`;
   else return null;
   return `[${ts}] step ${step} ${what}`.slice(0, PROGRESS_LINE_LIMIT);
 }
@@ -616,7 +617,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
               worktree: unitWorktree,
               pattern: unitPatternOf(u.template),
               overrides: await (async () => {
-                let unitAccount = state.account;
+                let unitAccount = state.account ?? null;
                 if (unitAccount !== null) {
                   const runnerConfig = snapshotRunnerConfig(mainRoot).runner;
                   const testOverrides = unitOverridesOf(u, state.seats?.personas, {
@@ -630,6 +631,13 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
                     { session: { headless: true, herdrPresent: detectHerdrPresent() }, overrides: testOverrides },
                   );
                   if (!dry.roles.some((r) => r.account)) {
+                    // No seat of this unit runs on the account's provider: the unit runs unpinned,
+                    // and the run says so instead of dropping the pin silently.
+                    recordEvent({
+                      repoRoot: mainRoot,
+                      workflowRunId,
+                      event: { type: 'unit.account-unpinned', payload: { stepId: step.id, unitId: u.id, account: unitAccount } },
+                    });
                     unitAccount = null;
                   }
                 }
@@ -1044,7 +1052,7 @@ export async function preflightWorkflowSeats(params = {}) {
  */
 function prepareWorkflowRun(params) {
   const { mainRoot, worktreePath, workflow, workflowId, contextRefs, seats, effort, timeoutMs, account } = resolveStart(params);
-  const configSnapshot = snapshotRunnerConfig(mainRoot, params.runnerConfig);
+  const configSnapshot = snapshotRunnerConfig(mainRoot);
   if (account !== null) {
     const inventory = providerAccountInventory(configSnapshot.runner);
     const exists = Object.values(inventory).some(

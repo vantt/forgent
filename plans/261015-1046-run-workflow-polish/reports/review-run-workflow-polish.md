@@ -43,3 +43,42 @@ Independent read-only review of commits a2c33e2c3..f974299f3: workflow `--timeou
 
 Status: DONE
 Summary: The exit-code change breaks 3 existing CLI tests. `--account` can fail a whole mixed-provider workflow mid-run, and only an empty id is refused at start. `workflow status` and the inline handoff get non-zero exits. The posture check's read-only/workspace-write split is dead logic backed by mock-only tests, and it hard-fails fresh projects that the existing check only warns about.
+
+## Re-review
+
+Re-review of fix commit e764ab215 against the original findings. Read-only; not committed.
+
+### How this was checked
+
+- **Tests:** ran the touched files with `env -u CLAUDE_CODE_SESSION_ID node --test`: executor-posture-coverage-check, execution-outcome-exit-codes, dir-differs-from-cwd, dispatch-execute-effort, units-runner, subcommand-flag-drift. 83 pass, 0 fail.
+- **Doctor check:** re-ran `checkExecutorPostureCoverage` against this worktree (pass) and mcp-skill-hub (now `passed: true`, `warning:` about execute and code:implement).
+
+### Original findings
+
+| Original finding | Verdict | Evidence |
+|---|---|---|
+| H: exit-code change broke 3 existing tests | **Fixed** | test/cli/dir-differs-from-cwd.test.mjs:92,110 assert 4. test/runner/dispatch-execute-effort.test.mjs uses `spawnSync` and asserts `status 4`. All pass. |
+| M: workflow `--account` fails a unit with no seat on the account's provider | **Fixed** (see new issue N2) | src/workflow/runner.mjs:618-641 dry-binds each unit with the account overrides and drops the account when no role takes it (:632). units-runner "two units on different providers" test: unit 1 pinned, unit 2 unpinned, workflow completes. |
+| M: unknown account accepted at start | **Fixed** | src/workflow/runner.mjs:1048-1055 checks `providerAccountInventory` before `createWorkflowRun`. The test asserts the rejection and that no `workflow-runs` dir was created. |
+| M: `--account` help text wrong | **Fixed** | src/cli/command-registry.mjs:2067 now says seats on another provider run unpinned. |
+| M: `workflow status` / resume / answer exit codes | **Fixed** (edge case in N3) | bin/fgos.mjs:5058-5063 gate on `start\|resume\|answer` plus foreground. New test "workflow status on a failed run always exits 0" passes. Docs (io-contract, RUL99, CHANGELOG) now name resume/answer. |
+| M: inline handoff exits 13 | **Finding withdrawn; the fix is dead code** | The original finding was wrong for the CLI path. `fgos run` calls `runUnit` without a session, so `headless` defaults to true (src/runner/execution/run.mjs:652), and `bind()` never picks the inline fallback headless (bind.mjs:294, `isLeadPresent` needs `!isHeadless`). Also, `bin/fgos.mjs:5066` tests `data?.pendingInline`, but `pendingInline` sits on the role result (run.mjs:747), wrapped in `results[]` (patterns/solo.mjs:42), never at the top level. The branch can never fire, and the RUL99/io-contract/CHANGELOG sentence "inline handoff exits 0" describes behaviour that does not exist. See N1. |
+| M: posture split was dead logic, tested with mocks | **Fixed** | src/setup/executor-posture-coverage.mjs binds each capability once with real `bind()` (:66-81). The `simulateUnitBindings` injection seam and both mock-only tests are gone, replaced by real-bind tests for a bwrap config (pass) and an unconfined one (fail). |
+| M: missing pool hard-fails fresh projects | **Fixed** | executor-posture-coverage.mjs:78 collects `headless-no-executor`/`no-candidate` as warnings. With no hard failure it returns `passed: true` with a `warning:` prefix. Only `posture-unavailable` and other refusals fail. The "rely on global pool" hint is removed. mcp-skill-hub re-run: warning, passed. |
+| L: outcome names inside EXIT_CODES | **Fixed** | src/state/store.mjs:94 has `OUTCOME_EXIT_CODES`; `exitCodeForOutcome` reads only that table. `EXIT_CODES` no longer holds outcome keys (test asserts `EXIT_CODES['execution-failure'] === undefined`). |
+| L: tests (CLI coverage, /tmp, leaked state, detached race) | **Partially fixed** (see N4) | execution-outcome-exit-codes now uses `makeFixtureDir`, per-test state dirs removed in `finally`, a real-CLI `execution-failure` → 11 case, and waits for the detached child before cleanup. |
+| L: RUL98 meta.json, unnumbered bullet, precedence not stated | **Fixed** | runner.md RUL98 now says `workflow.start` event payload and states both the `--timeout` precedence difference and the account rule. The doctor bullet became RUL100. |
+| L: CHANGELOG formatting | **Fixed** | The blank line and the "Added:" prefix are gone, and the posture wording is corrected. The one remaining false sentence is the inline-handoff claim from N1. |
+
+### New problems
+
+| Severity | File:line | Problem | Concrete fix |
+|---|---|---|---|
+| Low (N1) | bin/fgos.mjs:5066; docs/specs/runner.md RUL99; docs/io-contract.md (Kết cục thực thi); CHANGELOG.md `### Changed` | The `data?.pendingInline` branch never fires (see above), and three docs promise a behaviour that does not exist. If the CLI ever gains a non-headless session, a real inline handoff would still exit 13. | Remove the branch and the doc sentences. Or, if the handoff is meant to be reachable, test `data.results?.some((r) => r.pendingInline)` and add a CLI test that produces one. |
+| Low (N2) | src/workflow/runner.mjs:632 | A unit where the account is dropped leaves no trace: the overrides simply omit it, and no event or provenance records "account skipped". A workflow where no unit's provider owns the account runs fully unpinned and gives no signal; the start check only proves the account exists somewhere in the inventory. | Record the skip, e.g. `accountSkipped: { account, reason }` on the `unit.scheduled`/`unit.started` payload. Optionally refuse at start when no unit of the workflow dry-binds the account. |
+| Low (N3) | bin/fgos.mjs:5060 | `Boolean(flags.foreground)` treats `--foreground false` as foreground, while the verb itself (bin/fgos.mjs:2252) runs detached when the value is `'false'`. A detached `resume --foreground false` of an already-failed run would then exit non-zero. | Use the same test as the verb: `flags.foreground !== undefined && flags.foreground !== 'false'`. |
+| Low (N4) | test/runner/dispatch-execute-effort.test.mjs:26,28; test/runner/confinement-registry-fixture.helper.mjs:21-31 | Test-environment changes outside the findings' scope, of the same kind as the reverted fixture-dir change. (1) The effort test pins `HOME` and `XDG_STATE_HOME` for the whole file to fixed shared dirs (`os.tmpdir()/fgos-test-home`, `os.tmpdir()/fgos-state`) that are never removed; `/tmp/fgos-test-home` exists after the run. That is the leaked-state pattern the original L finding flagged. (2) The shared bwrap-registry helper now sets `XDG_STATE_HOME` process-wide for every test file that seeds it. That makes those files more hermetic, but it silently changes the environment of many runner tests. (3) The effort test also moved its fake bin dir into the worktree, which is unrelated churn. | Use `makeFixtureDir` dirs cleaned in `after()` instead of fixed names. Confirm with Lead that the helper-wide `XDG_STATE_HOME` change is wanted; if it is a sandbox workaround like fixture-dir, revert it the same way. |
+| Low | src/workflow/runner.mjs:1047 | New `params.runnerConfig` input to `prepareWorkflowRun`; nothing in src or test passes it. If it were ever used, the workflow's `configSnapshot` would differ from the live config `runUnit` and the account dry-bind (:621) read. | Remove the parameter. |
+
+Status: DONE
+Summary: All original High and Medium findings are fixed except the inline-handoff one: that finding was wrong for the CLI path and I withdraw it, but its fix is dead code and three docs describe behaviour that does not exist. The fix commit adds 5 Low issues: that dead branch and its docs, the account skip is never recorded, `--foreground false` is misread, test env vars are pinned to shared, never-removed dirs, and an unused `runnerConfig` parameter.

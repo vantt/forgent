@@ -567,6 +567,10 @@ test('workflow with two units on different providers pins account only on matchi
 
     assert.deepEqual(b1.account, { provider: 'alpha', id: 'acct-alpha' });
     assert.equal(b2.account, undefined);
+    // The unit the account did not reach is recorded, not dropped silently.
+    const unpinned = readWorkflowEvents({ repoRoot: tmp, workflowRunId: state.workflowRunId })
+      .filter((e) => e.type === 'unit.account-unpinned');
+    assert.deepEqual(unpinned.map((e) => [e.payload.unitId, e.payload.account]), [['u2', 'acct-alpha']]);
   } finally {
     if (prevHome === undefined) delete process.env.HOME;
     else process.env.HOME = prevHome;
