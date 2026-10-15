@@ -1215,6 +1215,39 @@
             "env": {
               "HOME": "${HOME}/.agy-homes/tetnu"
             }
+          },
+          {
+            "id": "omp-gemini-tetcu72",
+            "via": "cli",
+            "adapter": "herdr-spawn",
+            "confinement": {
+              "backend": "bwrap"
+            },
+            "command": "omp",
+            "args": [
+              "--thinking",
+              "medium",
+              "--tools",
+              "read,write,edit,bash,grep,glob",
+              "--auto-approve"
+            ],
+            "interactiveMode": {
+              "exitCommand": "/exit",
+              "kind": "omp"
+            },
+            "env": {
+              "PI_CODING_AGENT_DIR": "${HOME}/.omp/profiles/gemini-tetcu72/agent",
+              "PI_CONFIG_DIR": "../../tmp/fgos-omp-config"
+            },
+            "resourceBindings": [
+              {
+                "resource": "private-home",
+                "target": {
+                  "kind": "env",
+                  "name": "PI_CODING_AGENT_DIR"
+                }
+              }
+            ]
           }
         ]
       },
@@ -1546,9 +1579,14 @@
     "generatedPaths": [
       {
         "from": "core/skills/**",
-        "also": [".agents/skills/**", "plugins/fgOS/skills/**", ".claude/skills/**"]
+        "also": [
+          ".agents/skills/**",
+          "plugins/fgOS/skills/**",
+          ".claude/skills/**"
+        ]
       }
-    ]
+    ],
+    "idleTimeoutMs": 1500000
   },
   "gateBypass": {
     "level": "standard"

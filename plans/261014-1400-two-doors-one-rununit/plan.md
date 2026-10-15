@@ -143,6 +143,13 @@ Người giữ các file dùng chung theo từng bước được ghi ở [proto
   - `fgos doctor` chưa có check "không executor nào mang được posture read-only/workspace-write". Lỗi này chỉ lộ khi chạy thật.
   - Từ lane timeout: `workflow start` chưa có `--timeout`. Từ lane sync: Q2 (`--sync` bắt buộc `--writes`) và Q3 (producer inline).
 
+- 2026-10-15 sáng, owner duyệt:
+  - Gỡ gói pnpm global `forgent`, cài `fgctl` vào `~/.local/bin`, ghi launcher `fgos` (doctor `project-fgos-launcher` xanh).
+  - Đồng bộ `runner.executors` của mdview và mcp-skill-hub theo bản đã commit của forgentX (xai qua `omp-*`); trust mcp-skill-hub trong `~/.codex-fgovn/config.toml`.
+  - Phương án (a): `~/.fgos/config.json` nhận bộ executor agent có confine và `modelPolicies` (backup `config.json.bak-20261015-confined-executors`). Một project mới (`fgctl init`, không khai executor) chạy được `fgos run --provider xai` ngay.
+  - Gỡ 7 worktree của plan cũ và xoá nhánh của chúng, gồm `fix/dispatch-followups` (`af132275b`).
+- Item riêng mới: project nằm dưới `/tmp` thì worker read-only không thấy file, vì bwrap mount `/tmp` riêng. fgOS không báo gì, chỉ ra `no-evidence`. Nên từ chối sớm hoặc bind đúng thư mục.
+
 ## Disposition review
 
 V = [validate-plan-against-code.md](reports/validate-plan-against-code.md), R = [red-team-plan.md](reports/red-team-plan.md).

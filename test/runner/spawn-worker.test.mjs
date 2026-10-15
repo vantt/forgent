@@ -8,6 +8,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import os from 'node:os';
 import { execFileSync } from 'node:child_process';
 
 import { spawnWorker } from '../../src/runner/work-dispatch.mjs';
@@ -385,26 +386,34 @@ test('spawnWorker passes an executor\'s own resolved env to the worker, never in
 });
 
 test('spawnWorker applies the capability rigor as a raise-only tier floor', async () => {
-  const echo = writeScript(scriptDir(), 'echo', ECHO);
-  const args = [echo, '{prompt}', '--model', '{model}'];
-  const fx = fixture({
-    executors: {
-      agy: {
-        kind: 'agent', command: process.execPath, args, providerModel: 'gemini', allowCrossProvider: true,
-        invocations: [{ id: 'cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: process.execPath, args }],
+  // The project config under test merges with the global one at HOME; a real
+  // ~/.fgos/config.json on the machine must not leak executors into it.
+  const originalHome = process.env.HOME;
+  process.env.HOME = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-test-home-'));
+  try {
+    const echo = writeScript(scriptDir(), 'echo', ECHO);
+    const args = [echo, '{prompt}', '--model', '{model}'];
+    const fx = fixture({
+      executors: {
+        agy: {
+          kind: 'agent', command: process.execPath, args, providerModel: 'gemini', allowCrossProvider: true,
+          invocations: [{ id: 'cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: process.execPath, args }],
+        },
       },
-    },
-    capabilities: { 'code:implement': { prefer: [{ executor: 'agy' }], rigor: 'high' } },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
-    modelPolicies: { claude: { standard: 'sonnet' }, gemini: { standard: 'gemini-flash', flagship: 'gemini-pro' } },
-    timeoutMs: 20000,
-  });
-
-  const result = await fx.run(sampleWork({ domain: 'coding' }));
-
-  assert.equal(result.executorId, 'agy');
-  assert.equal(result.model, 'gemini-pro');
-  assert.deepEqual(echoed(result.stdout).args.slice(-2), ['--model', 'gemini-pro']);
+      capabilities: { 'code:implement': { prefer: [{ executor: 'agy' }], rigor: 'high' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+      modelPolicies: { claude: { standard: 'sonnet' }, gemini: { standard: 'gemini-flash', flagship: 'gemini-pro' } },
+      timeoutMs: 20000,
+    });
+  
+    const result = await fx.run(sampleWork({ domain: 'coding' }));
+  
+    assert.equal(result.executorId, 'agy');
+    assert.equal(result.model, 'gemini-pro');
+    assert.deepEqual(echoed(result.stdout).args.slice(-2), ['--model', 'gemini-pro']);
+  } finally {
+    process.env.HOME = originalHome;
+  }
 });
 
 test('spawnWorker rejects a work item it cannot turn into a Unit before any worker starts', async () => {
