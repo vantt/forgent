@@ -957,23 +957,30 @@
   ],
   "count": 67,
   "previousCount": 82,
-  "authoredCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
+  "authoredCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
   "nativeRebinding": {
-    "fullNativeTupleEquality": false,
+    "fullNativeTupleEquality": true,
     "knownIDsPreserved": true,
     "noApprovalCarry": true,
-    "verifiedCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
-    "verification": "reports/phase-06/native-rereview-verification.json",
+    "verifiedCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
+    "verification": "plans/260925-documentation-authority-unification/reports/phase-06/verification-261015-0710-native-sync-bounded-rereview.md",
     "reviewStatus": "candidate-unverified; no approval or truth certification",
     "meaning": "Actual native conservation output; all newly allocated identities and predecessor gaps retained without graft or invented disposition.",
-    "currentVerification": "Deferred until next authorized native sync; prior proof belongs only to its verifiedCommit."
+    "currentVerification": "Completed from the once-run native inventory at dfff335d3; all five-field tuples directly equal native output. Formal classification approval remains separate.",
+    "partitionTupleEquality": true,
+    "currentFullTupleEquality": true
   },
   "nativeEquality": {
-    "priorContentCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
-    "priorFullTupleEquality": true,
-    "currentFullTupleEquality": false,
-    "status": "deferred: no native sync this turn; next comparison must account 67 eligible tuples plus 15 pending portal receipts, holds, exceptions and residuals",
-    "meaning": "Accepted canonical portal units are not A28 candidate-unverified; no fresh native equality claimed."
+    "contentCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
+    "fullTupleEquality": true,
+    "eligibleTupleEquality": true,
+    "nativeReverseCount": 67,
+    "candidateUnverifiedCount": 67,
+    "pendingCanonicalReceiptCount": 0,
+    "separatePortalProtocolReceipts": 15,
+    "portalReceiptsOutsideScopedReverse": true,
+    "partitionTupleEquality": true,
+    "meaning": "Full five-field native tuple equality; no truth approval. Fifteen portal protocol receipts remain separate obligations outside the whole-system reverse namespace after the file-level target moved to History."
   },
   "portalCorrection": {
     "reportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
@@ -1208,5 +1215,28 @@
         "status": "candidate-unverified"
       }
     ]
+  },
+  "previousNativeVerificationMetadata": {
+    "contentCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
+    "values": {
+      "nativeRebinding": {
+        "fullNativeTupleEquality": false,
+        "knownIDsPreserved": true,
+        "noApprovalCarry": true,
+        "verifiedCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
+        "verification": "reports/phase-06/native-rereview-verification.json",
+        "reviewStatus": "candidate-unverified; no approval or truth certification",
+        "meaning": "Actual native conservation output; all newly allocated identities and predecessor gaps retained without graft or invented disposition.",
+        "currentVerification": "Deferred until next authorized native sync; prior proof belongs only to its verifiedCommit."
+      },
+      "nativeEquality": {
+        "priorContentCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
+        "priorFullTupleEquality": true,
+        "currentFullTupleEquality": false,
+        "status": "deferred: no native sync this turn; next comparison must account 67 eligible tuples plus 15 pending portal receipts, holds, exceptions and residuals",
+        "meaning": "Accepted canonical portal units are not A28 candidate-unverified; no fresh native equality claimed."
+      }
+    },
+    "meaning": "Historical metadata at input pin, superseded by the current native proof only; no review or truth acceptance."
   }
 }

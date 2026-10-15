@@ -1,0 +1,850 @@
+{
+  "pin": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
+  "entries": 4,
+  "receiptSet": {
+    "label": "machine",
+    "path": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-step6-repin.json",
+    "receiptCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
+    "authorSession": "codex-session:37@2026-10-15",
+    "receipts": [
+      {
+        "receipt": {
+          "claimId": "claim_366503bd4dadea43469f1586f4f25f60",
+          "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+          "anchor": "unheaded-block-39",
+          "unitDigest": "8bb122f565c4d0f699793e476fde329f81c045340d35c03b49952e2263f052d3",
+          "shownText": "Current compiled fields (`src/runner/dispatch/plan.mjs:455-472`) are\n`selector`, `caller`, `mechanism`, `executorId`, `capability`, `invocation`,\n`governance`, `reasonCodes`, optional `agentType`/`mcpTool`, `configured`,\n`bindingSource`, `tier`, `model`, `providerModel`, `provenance`, and `policy`.\nGovernance uses its actual provider/egress shape; there is no top-level\n`target`, `handback` or `execution` wrapper and no `egress.allowed` flag.",
+          "shownTextDigest": "8bb122f565c4d0f699793e476fde329f81c045340d35c03b49952e2263f052d3",
+          "class": "candidate-native-content",
+          "authoredBy": "codex-session:1@2026-10-10",
+          "rationale": "The current sentence cites the actual compiled DispatchPlan return object at plan.mjs:455-472 and optional capability fields at 464-465. Only the stale line numbers changed; independent classification/content review remains pending.",
+          "truthSection": {
+            "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+            "anchor": "61-shape",
+            "status": "verified",
+            "reason": null
+          },
+          "currentEvidence": {
+            "commit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+            "finding": "true-and-current",
+            "citations": [
+              {
+                "path": "src/runner/dispatch/plan.mjs",
+                "startLine": 91,
+                "endLine": 104,
+                "blobSha": "819f4727c6f348e03d2c6c42a2714c0ec49857ab"
+              },
+              {
+                "path": "src/runner/dispatch/plan.mjs",
+                "startLine": 455,
+                "endLine": 472,
+                "blobSha": "819f4727c6f348e03d2c6c42a2714c0ec49857ab"
+              }
+            ],
+            "scope": "Author checked current code; independent review pending.",
+            "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/accounting-261015-0700-whole-system-verdict-corrections.md.json"
+          },
+          "recoveryProvenance": {
+            "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+            "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+            "receiptClaimId": "claim_de1bde6579325220fa5ddea79b9cd77f",
+            "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+            "reportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+            "verdictClaimId": "claim_de1bde6579325220fa5ddea79b9cd77f",
+            "unitDigest": "2f26ef793b85a9534c07f2080df713367086ccdf91e96a8cf0652d28acf971a6",
+            "originalAuthorSession": "codex-session:1@2026-10-10"
+          },
+          "amendedBy": "codex-session:42@2026-10-15",
+          "reviewStatus": "pending",
+          "rebindingReason": "A19 line-number-only correction; A22 digest/section rebind. Native ID allocation deferred to the next sync; no identity graft or approval carry."
+        },
+        "before": {
+          "claimId": "claim_366503bd4dadea43469f1586f4f25f60",
+          "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+          "anchor": "unheaded-block-39",
+          "unitDigest": "2f26ef793b85a9534c07f2080df713367086ccdf91e96a8cf0652d28acf971a6",
+          "shownText": "Current compiled fields (`src/runner/dispatch/plan.mjs:444-461`) are\n`selector`, `caller`, `mechanism`, `executorId`, `capability`, `invocation`,\n`governance`, `reasonCodes`, optional `agentType`/`mcpTool`, `configured`,\n`bindingSource`, `tier`, `model`, `providerModel`, `provenance`, and `policy`.\nGovernance uses its actual provider/egress shape; there is no top-level\n`target`, `handback` or `execution` wrapper and no `egress.allowed` flag.",
+          "shownTextDigest": "2f26ef793b85a9534c07f2080df713367086ccdf91e96a8cf0652d28acf971a6",
+          "class": "candidate-native-content",
+          "authoredBy": "codex-session:1@2026-10-10",
+          "rationale": "This current unit belongs to the truth-only section Dispatch Control Plane Redesign > 6. DispatchPlan > 6.1 Shape, pinned at 96a13ab21670e1f5d9748c02cd615ea5598b53f5. Its full shown text, class and code/design boundary require independent review. The accepted carriage and all historical/payload bytes are unchanged. Author section status: verified. No prior verdict is carried to this receipt.",
+          "truthSection": {
+            "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+            "anchor": "61-shape",
+            "status": "verified",
+            "reason": null
+          },
+          "currentEvidence": {
+            "commit": "69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539",
+            "finding": "true-and-current",
+            "citations": [
+              {
+                "path": "src/runner/dispatch/plan.mjs",
+                "startLine": 91,
+                "endLine": 104,
+                "blobSha": "819f4727c6f348e03d2c6c42a2714c0ec49857ab"
+              },
+              {
+                "path": "src/runner/dispatch/plan.mjs",
+                "startLine": 455,
+                "endLine": 472,
+                "blobSha": "819f4727c6f348e03d2c6c42a2714c0ec49857ab"
+              }
+            ],
+            "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. The specific current code/consumer boundary is checked in the cited section.",
+            "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json"
+          },
+          "recoveryProvenance": {
+            "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+            "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+            "receiptClaimId": "claim_de1bde6579325220fa5ddea79b9cd77f",
+            "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+            "reportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+            "verdictClaimId": "claim_de1bde6579325220fa5ddea79b9cd77f",
+            "unitDigest": "2f26ef793b85a9534c07f2080df713367086ccdf91e96a8cf0652d28acf971a6",
+            "originalAuthorSession": "codex-session:1@2026-10-10"
+          }
+        },
+        "shown": {
+          "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+          "anchor": "unheaded-block-39",
+          "commit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
+          "unitDigest": "8bb122f565c4d0f699793e476fde329f81c045340d35c03b49952e2263f052d3",
+          "shownText": "Current compiled fields (`src/runner/dispatch/plan.mjs:455-472`) are\n`selector`, `caller`, `mechanism`, `executorId`, `capability`, `invocation`,\n`governance`, `reasonCodes`, optional `agentType`/`mcpTool`, `configured`,\n`bindingSource`, `tier`, `model`, `providerModel`, `provenance`, and `policy`.\nGovernance uses its actual provider/egress shape; there is no top-level\n`target`, `handback` or `execution` wrapper and no `egress.allowed` flag.",
+          "shownTextDigest": "8bb122f565c4d0f699793e476fde329f81c045340d35c03b49952e2263f052d3",
+          "ancestry": [
+            "Dispatch Control Plane Redesign",
+            "6. DispatchPlan",
+            "6.1 Shape"
+          ]
+        },
+        "referenceChanges": [
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-registry-projection.json",
+            "collection": "candidateClassifications",
+            "claimId": "claim_366503bd4dadea43469f1586f4f25f60",
+            "before": {
+              "claimId": "claim_366503bd4dadea43469f1586f4f25f60",
+              "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-step6-repin.json",
+              "receiptCommit": "a8a10abc1a24218518a14764f68c8d86f4810f91",
+              "authoredBy": "codex-session:1@2026-10-10",
+              "reviewStatus": "reviewed",
+              "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+              "reviewedAt": "2026-10-15",
+              "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0451-whole-system-merge.md",
+              "reviewReportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930",
+              "reviewMode": "ordinary",
+              "reviewNote": "deep: machine re-pin proven by script, both spans of plan.mjs byte-identical (80-93 to 91-104, 444-461 to 455-472, unique match), shown text equals unit lines 172-177, digest 2f26ef79 recomputed, pending, original author and class kept; the candidate prose still says plan.mjs:444-461 which is stale as a line number but is a preserved byte, truth deferred to promotion"
+            },
+            "after": {
+              "claimId": "claim_366503bd4dadea43469f1586f4f25f60",
+              "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-step6-repin.json",
+              "authoredBy": "codex-session:1@2026-10-10",
+              "reviewStatus": "pending",
+              "ordinaryAssessment": {
+                "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+                "reviewedAt": "2026-10-15",
+                "reviewMode": "ordinary",
+                "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
+                "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+                "reviewNote": "deep: shown text cites `src/runner/dispatch/plan.mjs:444-461` for the compiled DispatchPlan fields but after the main merge the returned object is at plan.mjs 455-472 (lines 444-461 are now the executor-mismatch handling); the receipt evidence was re-pinned to 455-472 while the candidate text kept the old numbers, so a content sentence is stale by 11 lines. Field list itself matches the return object. Machine equivalence is not truth acceptance; also still owed the separate formal classification report. Fix by an A19 line-number correction or reclassify as candidate-unverified under A31",
+                "verdict": "rework",
+                "sourceUnitDigest": "2f26ef793b85a9534c07f2080df713367086ccdf91e96a8cf0652d28acf971a6",
+                "targetUnitDigest": "2f26ef793b85a9534c07f2080df713367086ccdf91e96a8cf0652d28acf971a6",
+                "scope": "Ordinary assessment; does not satisfy the separate Receipt commit / Class-column report contract."
+              },
+              "priorReview": {
+                "claimId": "claim_366503bd4dadea43469f1586f4f25f60",
+                "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-step6-repin.json",
+                "receiptCommit": "a8a10abc1a24218518a14764f68c8d86f4810f91",
+                "authoredBy": "codex-session:1@2026-10-10",
+                "reviewStatus": "reviewed",
+                "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+                "reviewedAt": "2026-10-15",
+                "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0451-whole-system-merge.md",
+                "reviewReportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930",
+                "reviewMode": "ordinary",
+                "reviewNote": "deep: machine re-pin proven by script, both spans of plan.mjs byte-identical (80-93 to 91-104, 444-461 to 455-472, unique match), shown text equals unit lines 172-177, digest 2f26ef79 recomputed, pending, original author and class kept; the candidate prose still says plan.mjs:444-461 which is stale as a line number but is a preserved byte, truth deferred to promotion"
+              },
+              "pendingReceiptCommit": "Bind the actual runner settlement artifact next turn after native identity reconciliation.",
+              "rebindingReason": "A19 line-number-only correction; A22 digest/section rebind. Native ID allocation deferred to the next sync; no identity graft or approval carry."
+            }
+          }
+        ],
+        "evidenceDigest": "48eca430cc7733450e5d0e0cf5c254e787cb5214b9537ddf21693f00c6afab3f"
+      },
+      {
+        "receipt": {
+          "claimId": "claim_fa99f4d5cfcd0ea169efdf450e007955",
+          "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+          "anchor": "unheaded-block-40",
+          "unitDigest": "008c98d9c6445268a4d6e33133ec0871b7c7a23a48e51369cad11c0b20caa857",
+          "shownText": "Values and reason codes depend on the resolved request/configuration. Inspect\nthe actual returned plan rather than treating an illustrative schema or an\nold executor selection as a observed result.",
+          "shownTextDigest": "008c98d9c6445268a4d6e33133ec0871b7c7a23a48e51369cad11c0b20caa857",
+          "class": "candidate-native-content",
+          "authoredBy": "codex-session:1@2026-10-10",
+          "rationale": "This current unit belongs to the truth-only section Dispatch Control Plane Redesign > 6. DispatchPlan > 6.1 Shape, pinned at 96a13ab21670e1f5d9748c02cd615ea5598b53f5. Its full shown text, class and code/design boundary require independent review. The accepted carriage and all historical/payload bytes are unchanged. Author section status: verified. No prior verdict is carried to this receipt.",
+          "truthSection": {
+            "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+            "anchor": "61-shape",
+            "status": "verified",
+            "reason": null
+          },
+          "currentEvidence": {
+            "commit": "69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539",
+            "finding": "true-and-current",
+            "citations": [
+              {
+                "path": "src/runner/dispatch/plan.mjs",
+                "startLine": 91,
+                "endLine": 104,
+                "blobSha": "819f4727c6f348e03d2c6c42a2714c0ec49857ab"
+              },
+              {
+                "path": "src/runner/dispatch/plan.mjs",
+                "startLine": 455,
+                "endLine": 472,
+                "blobSha": "819f4727c6f348e03d2c6c42a2714c0ec49857ab"
+              }
+            ],
+            "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. The specific current code/consumer boundary is checked in the cited section.",
+            "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json"
+          },
+          "recoveryProvenance": {
+            "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+            "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+            "receiptClaimId": "claim_271c8a780dde80cb18e612f908a4eca1",
+            "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+            "reportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+            "verdictClaimId": "claim_271c8a780dde80cb18e612f908a4eca1",
+            "unitDigest": "008c98d9c6445268a4d6e33133ec0871b7c7a23a48e51369cad11c0b20caa857",
+            "originalAuthorSession": "codex-session:1@2026-10-10"
+          }
+        },
+        "before": {
+          "claimId": "claim_fa99f4d5cfcd0ea169efdf450e007955",
+          "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+          "anchor": "unheaded-block-40",
+          "unitDigest": "008c98d9c6445268a4d6e33133ec0871b7c7a23a48e51369cad11c0b20caa857",
+          "shownText": "Values and reason codes depend on the resolved request/configuration. Inspect\nthe actual returned plan rather than treating an illustrative schema or an\nold executor selection as a observed result.",
+          "shownTextDigest": "008c98d9c6445268a4d6e33133ec0871b7c7a23a48e51369cad11c0b20caa857",
+          "class": "candidate-native-content",
+          "authoredBy": "codex-session:1@2026-10-10",
+          "rationale": "This current unit belongs to the truth-only section Dispatch Control Plane Redesign > 6. DispatchPlan > 6.1 Shape, pinned at 96a13ab21670e1f5d9748c02cd615ea5598b53f5. Its full shown text, class and code/design boundary require independent review. The accepted carriage and all historical/payload bytes are unchanged. Author section status: verified. No prior verdict is carried to this receipt.",
+          "truthSection": {
+            "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+            "anchor": "61-shape",
+            "status": "verified",
+            "reason": null
+          },
+          "currentEvidence": {
+            "commit": "69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539",
+            "finding": "true-and-current",
+            "citations": [
+              {
+                "path": "src/runner/dispatch/plan.mjs",
+                "startLine": 91,
+                "endLine": 104,
+                "blobSha": "819f4727c6f348e03d2c6c42a2714c0ec49857ab"
+              },
+              {
+                "path": "src/runner/dispatch/plan.mjs",
+                "startLine": 455,
+                "endLine": 472,
+                "blobSha": "819f4727c6f348e03d2c6c42a2714c0ec49857ab"
+              }
+            ],
+            "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. The specific current code/consumer boundary is checked in the cited section.",
+            "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json"
+          },
+          "recoveryProvenance": {
+            "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+            "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+            "receiptClaimId": "claim_271c8a780dde80cb18e612f908a4eca1",
+            "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+            "reportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+            "verdictClaimId": "claim_271c8a780dde80cb18e612f908a4eca1",
+            "unitDigest": "008c98d9c6445268a4d6e33133ec0871b7c7a23a48e51369cad11c0b20caa857",
+            "originalAuthorSession": "codex-session:1@2026-10-10"
+          }
+        },
+        "shown": {
+          "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+          "anchor": "unheaded-block-40",
+          "commit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
+          "unitDigest": "008c98d9c6445268a4d6e33133ec0871b7c7a23a48e51369cad11c0b20caa857",
+          "shownText": "Values and reason codes depend on the resolved request/configuration. Inspect\nthe actual returned plan rather than treating an illustrative schema or an\nold executor selection as a observed result.",
+          "shownTextDigest": "008c98d9c6445268a4d6e33133ec0871b7c7a23a48e51369cad11c0b20caa857",
+          "ancestry": [
+            "Dispatch Control Plane Redesign",
+            "6. DispatchPlan",
+            "6.1 Shape"
+          ]
+        },
+        "referenceChanges": [
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-registry-projection.json",
+            "collection": "candidateClassifications",
+            "claimId": "claim_fa99f4d5cfcd0ea169efdf450e007955",
+            "before": {
+              "claimId": "claim_fa99f4d5cfcd0ea169efdf450e007955",
+              "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-step6-repin.json",
+              "receiptCommit": "a8a10abc1a24218518a14764f68c8d86f4810f91",
+              "authoredBy": "codex-session:1@2026-10-10",
+              "reviewStatus": "reviewed",
+              "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+              "reviewedAt": "2026-10-15",
+              "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0451-whole-system-merge.md",
+              "reviewReportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930",
+              "reviewMode": "ordinary",
+              "reviewNote": "mechanical: same two spans of plan.mjs byte-identical and uniquely located, unit digest 008c98d9 recomputed from lines 179-181 and equals shownText, anchor unheaded-block-40 ok, receipt pending with original authorship; this is machine equivalence only"
+            },
+            "after": {
+              "claimId": "claim_fa99f4d5cfcd0ea169efdf450e007955",
+              "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-step6-repin.json",
+              "receiptCommit": "a8a10abc1a24218518a14764f68c8d86f4810f91",
+              "authoredBy": "codex-session:1@2026-10-10",
+              "reviewStatus": "pending",
+              "ordinaryAssessment": {
+                "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+                "reviewedAt": "2026-10-15",
+                "reviewMode": "ordinary",
+                "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
+                "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+                "reviewNote": "deep: sentence is guidance (values depend on resolved request, inspect the returned plan) with no file:line or behaviour claim to falsify; digest recomputed. The formal classification report for the earlier machine-only acceptance is still owed and not supplied by this ordinary verdict",
+                "verdict": "ok",
+                "sourceUnitDigest": "008c98d9c6445268a4d6e33133ec0871b7c7a23a48e51369cad11c0b20caa857",
+                "targetUnitDigest": "008c98d9c6445268a4d6e33133ec0871b7c7a23a48e51369cad11c0b20caa857",
+                "scope": "Ordinary assessment; does not satisfy the separate Receipt commit / Class-column report contract."
+              },
+              "priorReview": {
+                "claimId": "claim_fa99f4d5cfcd0ea169efdf450e007955",
+                "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-step6-repin.json",
+                "receiptCommit": "a8a10abc1a24218518a14764f68c8d86f4810f91",
+                "authoredBy": "codex-session:1@2026-10-10",
+                "reviewStatus": "reviewed",
+                "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+                "reviewedAt": "2026-10-15",
+                "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0451-whole-system-merge.md",
+                "reviewReportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930",
+                "reviewMode": "ordinary",
+                "reviewNote": "mechanical: same two spans of plan.mjs byte-identical and uniquely located, unit digest 008c98d9 recomputed from lines 179-181 and equals shownText, anchor unheaded-block-40 ok, receipt pending with original authorship; this is machine equivalence only"
+              }
+            }
+          }
+        ],
+        "evidenceDigest": "2f5e23426e0685a7cf79304fb003fab8eb3f975eaef265b93f2407eb7311f9ad"
+      },
+      {
+        "receipt": {
+          "claimId": "claim_ad38a91ec63db8a175d99078bcf6e158",
+          "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+          "anchor": "unheaded-block-43",
+          "unitDigest": "4097ad349f818789dbce9534ea72cb57d15de4064f1996e24c34588a47c75d9e",
+          "shownText": "- `work` - dispatch decision for a lifecycle work item.\n- `purpose` - dispatch decision for a named capability/purpose.\n- `executor` - dispatch decision for a concrete executor id.\n- `assignment` - dispatch decision for an actual Assignment or its id.\n- `adHocAgent` - dispatch decision for a runtime-composed agent assignment.",
+          "shownTextDigest": "4097ad349f818789dbce9534ea72cb57d15de4064f1996e24c34588a47c75d9e",
+          "class": "candidate-native-content",
+          "authoredBy": "codex-session:1@2026-10-10",
+          "rationale": "This current unit belongs to the truth-only section Dispatch Control Plane Redesign > 6. DispatchPlan > 6.2 Selector, pinned at 96a13ab21670e1f5d9748c02cd615ea5598b53f5. Its full shown text, class and code/design boundary require independent review. The accepted carriage and all historical/payload bytes are unchanged. Author section status: verified. No prior verdict is carried to this receipt.",
+          "truthSection": {
+            "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+            "anchor": "62-selector",
+            "status": "verified",
+            "reason": null
+          },
+          "currentEvidence": {
+            "commit": "69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539",
+            "finding": "true-and-current",
+            "citations": [
+              {
+                "path": "src/runner/dispatch/plan.mjs",
+                "startLine": 91,
+                "endLine": 104,
+                "blobSha": "819f4727c6f348e03d2c6c42a2714c0ec49857ab"
+              },
+              {
+                "path": "src/runner/dispatch/plan.mjs",
+                "startLine": 455,
+                "endLine": 472,
+                "blobSha": "819f4727c6f348e03d2c6c42a2714c0ec49857ab"
+              }
+            ],
+            "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. The specific current code/consumer boundary is checked in the cited section.",
+            "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json"
+          },
+          "recoveryProvenance": {
+            "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+            "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+            "receiptClaimId": "claim_c66cf74ca521ea390c33065fc83b28d7",
+            "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+            "reportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+            "verdictClaimId": "claim_c66cf74ca521ea390c33065fc83b28d7",
+            "unitDigest": "4097ad349f818789dbce9534ea72cb57d15de4064f1996e24c34588a47c75d9e",
+            "originalAuthorSession": "codex-session:1@2026-10-10"
+          }
+        },
+        "before": {
+          "claimId": "claim_ad38a91ec63db8a175d99078bcf6e158",
+          "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+          "anchor": "unheaded-block-43",
+          "unitDigest": "4097ad349f818789dbce9534ea72cb57d15de4064f1996e24c34588a47c75d9e",
+          "shownText": "- `work` - dispatch decision for a lifecycle work item.\n- `purpose` - dispatch decision for a named capability/purpose.\n- `executor` - dispatch decision for a concrete executor id.\n- `assignment` - dispatch decision for an actual Assignment or its id.\n- `adHocAgent` - dispatch decision for a runtime-composed agent assignment.",
+          "shownTextDigest": "4097ad349f818789dbce9534ea72cb57d15de4064f1996e24c34588a47c75d9e",
+          "class": "candidate-native-content",
+          "authoredBy": "codex-session:1@2026-10-10",
+          "rationale": "This current unit belongs to the truth-only section Dispatch Control Plane Redesign > 6. DispatchPlan > 6.2 Selector, pinned at 96a13ab21670e1f5d9748c02cd615ea5598b53f5. Its full shown text, class and code/design boundary require independent review. The accepted carriage and all historical/payload bytes are unchanged. Author section status: verified. No prior verdict is carried to this receipt.",
+          "truthSection": {
+            "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+            "anchor": "62-selector",
+            "status": "verified",
+            "reason": null
+          },
+          "currentEvidence": {
+            "commit": "69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539",
+            "finding": "true-and-current",
+            "citations": [
+              {
+                "path": "src/runner/dispatch/plan.mjs",
+                "startLine": 91,
+                "endLine": 104,
+                "blobSha": "819f4727c6f348e03d2c6c42a2714c0ec49857ab"
+              },
+              {
+                "path": "src/runner/dispatch/plan.mjs",
+                "startLine": 455,
+                "endLine": 472,
+                "blobSha": "819f4727c6f348e03d2c6c42a2714c0ec49857ab"
+              }
+            ],
+            "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. The specific current code/consumer boundary is checked in the cited section.",
+            "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json"
+          },
+          "recoveryProvenance": {
+            "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+            "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+            "receiptClaimId": "claim_c66cf74ca521ea390c33065fc83b28d7",
+            "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+            "reportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+            "verdictClaimId": "claim_c66cf74ca521ea390c33065fc83b28d7",
+            "unitDigest": "4097ad349f818789dbce9534ea72cb57d15de4064f1996e24c34588a47c75d9e",
+            "originalAuthorSession": "codex-session:1@2026-10-10"
+          }
+        },
+        "shown": {
+          "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+          "anchor": "unheaded-block-43",
+          "commit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
+          "unitDigest": "4097ad349f818789dbce9534ea72cb57d15de4064f1996e24c34588a47c75d9e",
+          "shownText": "- `work` - dispatch decision for a lifecycle work item.\n- `purpose` - dispatch decision for a named capability/purpose.\n- `executor` - dispatch decision for a concrete executor id.\n- `assignment` - dispatch decision for an actual Assignment or its id.\n- `adHocAgent` - dispatch decision for a runtime-composed agent assignment.",
+          "shownTextDigest": "4097ad349f818789dbce9534ea72cb57d15de4064f1996e24c34588a47c75d9e",
+          "ancestry": [
+            "Dispatch Control Plane Redesign",
+            "6. DispatchPlan",
+            "6.2 Selector"
+          ]
+        },
+        "referenceChanges": [
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-registry-projection.json",
+            "collection": "candidateClassifications",
+            "claimId": "claim_ad38a91ec63db8a175d99078bcf6e158",
+            "before": {
+              "claimId": "claim_ad38a91ec63db8a175d99078bcf6e158",
+              "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-step6-repin.json",
+              "receiptCommit": "a8a10abc1a24218518a14764f68c8d86f4810f91",
+              "authoredBy": "codex-session:1@2026-10-10",
+              "reviewStatus": "reviewed",
+              "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+              "reviewedAt": "2026-10-15",
+              "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0451-whole-system-merge.md",
+              "reviewReportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930",
+              "reviewMode": "ordinary",
+              "reviewNote": "mechanical: same two spans byte-identical and unique, unit digest 4097ad34 recomputed from lines 189-193 and equals shownText, anchor unheaded-block-43 ok, pending, original authorship kept; machine equivalence only"
+            },
+            "after": {
+              "claimId": "claim_ad38a91ec63db8a175d99078bcf6e158",
+              "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-step6-repin.json",
+              "receiptCommit": "a8a10abc1a24218518a14764f68c8d86f4810f91",
+              "authoredBy": "codex-session:1@2026-10-10",
+              "reviewStatus": "pending",
+              "ordinaryAssessment": {
+                "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+                "reviewedAt": "2026-10-15",
+                "reviewMode": "ordinary",
+                "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
+                "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+                "reviewNote": "deep: the five selector types work, purpose, executor, assignment, adHocAgent match plan.mjs selector construction at lines 91-104 (executor, assignment, work, purpose, adHocAgent); descriptions are consistent; digest recomputed. Formal classification report for the earlier machine-only acceptance still owed",
+                "verdict": "ok",
+                "sourceUnitDigest": "4097ad349f818789dbce9534ea72cb57d15de4064f1996e24c34588a47c75d9e",
+                "targetUnitDigest": "4097ad349f818789dbce9534ea72cb57d15de4064f1996e24c34588a47c75d9e",
+                "scope": "Ordinary assessment; does not satisfy the separate Receipt commit / Class-column report contract."
+              },
+              "priorReview": {
+                "claimId": "claim_ad38a91ec63db8a175d99078bcf6e158",
+                "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-step6-repin.json",
+                "receiptCommit": "a8a10abc1a24218518a14764f68c8d86f4810f91",
+                "authoredBy": "codex-session:1@2026-10-10",
+                "reviewStatus": "reviewed",
+                "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+                "reviewedAt": "2026-10-15",
+                "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0451-whole-system-merge.md",
+                "reviewReportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930",
+                "reviewMode": "ordinary",
+                "reviewNote": "mechanical: same two spans byte-identical and unique, unit digest 4097ad34 recomputed from lines 189-193 and equals shownText, anchor unheaded-block-43 ok, pending, original authorship kept; machine equivalence only"
+              }
+            }
+          }
+        ],
+        "evidenceDigest": "2f5e23426e0685a7cf79304fb003fab8eb3f975eaef265b93f2407eb7311f9ad"
+      },
+      {
+        "receipt": {
+          "claimId": "claim_c5395a2e8480ce44d27f2873c02b8746",
+          "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+          "anchor": "unheaded-block-47",
+          "unitDigest": "23216df99f389ab83588aeb312e949c92c3ed1817396047257e860a356f47613",
+          "shownText": "For in-process plans, native capability fields are top-level `agentType` or\n`mcpTool` when supplied (`plan.mjs:464-465`), not a `handback` object.\nThe caller must actually possess the returned live facility; the decision\ndoes not invoke that facility itself.",
+          "shownTextDigest": "23216df99f389ab83588aeb312e949c92c3ed1817396047257e860a356f47613",
+          "class": "candidate-native-content",
+          "authoredBy": "codex-session:1@2026-10-10",
+          "rationale": "The current sentence cites the actual compiled DispatchPlan return object at plan.mjs:455-472 and optional capability fields at 464-465. Only the stale line numbers changed; independent classification/content review remains pending.",
+          "truthSection": {
+            "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+            "anchor": "63-mechanism",
+            "status": "verified",
+            "reason": null
+          },
+          "currentEvidence": {
+            "commit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+            "finding": "true-and-current",
+            "citations": [
+              {
+                "path": "src/runner/dispatch/plan.mjs",
+                "startLine": 91,
+                "endLine": 104,
+                "blobSha": "819f4727c6f348e03d2c6c42a2714c0ec49857ab"
+              },
+              {
+                "path": "src/runner/dispatch/plan.mjs",
+                "startLine": 455,
+                "endLine": 472,
+                "blobSha": "819f4727c6f348e03d2c6c42a2714c0ec49857ab"
+              }
+            ],
+            "scope": "Author checked current code; independent review pending.",
+            "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/accounting-261015-0700-whole-system-verdict-corrections.md.json"
+          },
+          "recoveryProvenance": {
+            "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+            "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+            "receiptClaimId": "claim_56af2fc53f516253db192a78f0dddc70",
+            "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+            "reportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+            "verdictClaimId": "claim_56af2fc53f516253db192a78f0dddc70",
+            "unitDigest": "1e2dd90c75bf8049d0ad5d55ea4677898a163a1229eb4528d65cc2ae4323effa",
+            "originalAuthorSession": "codex-session:1@2026-10-10"
+          },
+          "amendedBy": "codex-session:42@2026-10-15",
+          "reviewStatus": "pending",
+          "rebindingReason": "A19 line-number-only correction; A22 digest/section rebind. Native ID allocation deferred to the next sync; no identity graft or approval carry."
+        },
+        "before": {
+          "claimId": "claim_c5395a2e8480ce44d27f2873c02b8746",
+          "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+          "anchor": "unheaded-block-47",
+          "unitDigest": "1e2dd90c75bf8049d0ad5d55ea4677898a163a1229eb4528d65cc2ae4323effa",
+          "shownText": "For in-process plans, native capability fields are top-level `agentType` or\n`mcpTool` when supplied (`plan.mjs:453-454`), not a `handback` object.\nThe caller must actually possess the returned live facility; the decision\ndoes not invoke that facility itself.",
+          "shownTextDigest": "1e2dd90c75bf8049d0ad5d55ea4677898a163a1229eb4528d65cc2ae4323effa",
+          "class": "candidate-native-content",
+          "authoredBy": "codex-session:1@2026-10-10",
+          "rationale": "This current unit belongs to the truth-only section Dispatch Control Plane Redesign > 6. DispatchPlan > 6.3 Mechanism, pinned at 96a13ab21670e1f5d9748c02cd615ea5598b53f5. Its full shown text, class and code/design boundary require independent review. The accepted carriage and all historical/payload bytes are unchanged. Author section status: verified. No prior verdict is carried to this receipt.",
+          "truthSection": {
+            "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+            "anchor": "63-mechanism",
+            "status": "verified",
+            "reason": null
+          },
+          "currentEvidence": {
+            "commit": "69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539",
+            "finding": "true-and-current",
+            "citations": [
+              {
+                "path": "src/runner/dispatch/plan.mjs",
+                "startLine": 91,
+                "endLine": 104,
+                "blobSha": "819f4727c6f348e03d2c6c42a2714c0ec49857ab"
+              },
+              {
+                "path": "src/runner/dispatch/plan.mjs",
+                "startLine": 455,
+                "endLine": 472,
+                "blobSha": "819f4727c6f348e03d2c6c42a2714c0ec49857ab"
+              }
+            ],
+            "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. The specific current code/consumer boundary is checked in the cited section.",
+            "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json"
+          },
+          "recoveryProvenance": {
+            "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+            "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+            "receiptClaimId": "claim_56af2fc53f516253db192a78f0dddc70",
+            "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+            "reportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+            "verdictClaimId": "claim_56af2fc53f516253db192a78f0dddc70",
+            "unitDigest": "1e2dd90c75bf8049d0ad5d55ea4677898a163a1229eb4528d65cc2ae4323effa",
+            "originalAuthorSession": "codex-session:1@2026-10-10"
+          }
+        },
+        "shown": {
+          "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+          "anchor": "unheaded-block-47",
+          "commit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
+          "unitDigest": "23216df99f389ab83588aeb312e949c92c3ed1817396047257e860a356f47613",
+          "shownText": "For in-process plans, native capability fields are top-level `agentType` or\n`mcpTool` when supplied (`plan.mjs:464-465`), not a `handback` object.\nThe caller must actually possess the returned live facility; the decision\ndoes not invoke that facility itself.",
+          "shownTextDigest": "23216df99f389ab83588aeb312e949c92c3ed1817396047257e860a356f47613",
+          "ancestry": [
+            "Dispatch Control Plane Redesign",
+            "6. DispatchPlan",
+            "6.3 Mechanism"
+          ]
+        },
+        "referenceChanges": [
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-registry-projection.json",
+            "collection": "candidateClassifications",
+            "claimId": "claim_c5395a2e8480ce44d27f2873c02b8746",
+            "before": {
+              "claimId": "claim_c5395a2e8480ce44d27f2873c02b8746",
+              "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-step6-repin.json",
+              "receiptCommit": "a8a10abc1a24218518a14764f68c8d86f4810f91",
+              "authoredBy": "codex-session:1@2026-10-10",
+              "reviewStatus": "reviewed",
+              "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+              "reviewedAt": "2026-10-15",
+              "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0451-whole-system-merge.md",
+              "reviewReportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930",
+              "reviewMode": "ordinary",
+              "reviewNote": "mechanical: same two spans byte-identical and unique, unit digest 1e2dd90c recomputed from lines 210-213 and equals shownText, anchor unheaded-block-47 ok, pending, original authorship kept; machine equivalence only"
+            },
+            "after": {
+              "claimId": "claim_c5395a2e8480ce44d27f2873c02b8746",
+              "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-step6-repin.json",
+              "authoredBy": "codex-session:1@2026-10-10",
+              "reviewStatus": "pending",
+              "ordinaryAssessment": {
+                "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+                "reviewedAt": "2026-10-15",
+                "reviewMode": "ordinary",
+                "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
+                "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+                "reviewNote": "deep: text cites `plan.mjs:453-454` for the top-level agentType and mcpTool fields; they are now at plan.mjs 464-465 (shift of 11 after the merge), so the cited lines are stale although the substance (top-level fields, no handback object) is true. Same remedy as the sibling row; formal classification report still owed",
+                "verdict": "rework",
+                "sourceUnitDigest": "1e2dd90c75bf8049d0ad5d55ea4677898a163a1229eb4528d65cc2ae4323effa",
+                "targetUnitDigest": "1e2dd90c75bf8049d0ad5d55ea4677898a163a1229eb4528d65cc2ae4323effa",
+                "scope": "Ordinary assessment; does not satisfy the separate Receipt commit / Class-column report contract."
+              },
+              "priorReview": {
+                "claimId": "claim_c5395a2e8480ce44d27f2873c02b8746",
+                "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-step6-repin.json",
+                "receiptCommit": "a8a10abc1a24218518a14764f68c8d86f4810f91",
+                "authoredBy": "codex-session:1@2026-10-10",
+                "reviewStatus": "reviewed",
+                "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+                "reviewedAt": "2026-10-15",
+                "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0451-whole-system-merge.md",
+                "reviewReportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930",
+                "reviewMode": "ordinary",
+                "reviewNote": "mechanical: same two spans byte-identical and unique, unit digest 1e2dd90c recomputed from lines 210-213 and equals shownText, anchor unheaded-block-47 ok, pending, original authorship kept; machine equivalence only"
+              },
+              "pendingReceiptCommit": "Bind the actual runner settlement artifact next turn after native identity reconciliation.",
+              "rebindingReason": "A19 line-number-only correction; A22 digest/section rebind. Native ID allocation deferred to the next sync; no identity graft or approval carry."
+            }
+          }
+        ],
+        "evidenceDigest": "48eca430cc7733450e5d0e0cf5c254e787cb5214b9537ddf21693f00c6afab3f"
+      }
+    ]
+  },
+  "nativeConsequences": [
+    {
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-step6-repin.json",
+      "receiptCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
+      "receiptClaimId": "claim_366503bd4dadea43469f1586f4f25f60",
+      "native": {
+        "sourcePath": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+        "unitDigest": "e5816f50616899a52ab9d4268c9fcb8add5a6f9e3a5051a74613ffbae3f3a78c",
+        "identityFingerprint": "e5816f50616899a52ab9d4268c9fcb8add5a6f9e3a5051a74613ffbae3f3a78c",
+        "claimId": "claim_32d158caabf5001ae13d5c627496b6ab",
+        "sourceAnchor": "unheaded-block-39",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "8bb122f565c4d0f699793e476fde329f81c045340d35c03b49952e2263f052d3",
+        "claimKind": "unclassified",
+        "status": "future",
+        "origin": "added-since-2c228f69c85f3ab3176e71ff3ad9ae2a07603890"
+      },
+      "identityMatches": false,
+      "proposedSuccessorReceipt": {
+        "claimId": "claim_32d158caabf5001ae13d5c627496b6ab",
+        "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+        "anchor": "unheaded-block-39",
+        "unitDigest": "8bb122f565c4d0f699793e476fde329f81c045340d35c03b49952e2263f052d3",
+        "shownText": "Current compiled fields (`src/runner/dispatch/plan.mjs:455-472`) are\n`selector`, `caller`, `mechanism`, `executorId`, `capability`, `invocation`,\n`governance`, `reasonCodes`, optional `agentType`/`mcpTool`, `configured`,\n`bindingSource`, `tier`, `model`, `providerModel`, `provenance`, and `policy`.\nGovernance uses its actual provider/egress shape; there is no top-level\n`target`, `handback` or `execution` wrapper and no `egress.allowed` flag.",
+        "shownTextDigest": "8bb122f565c4d0f699793e476fde329f81c045340d35c03b49952e2263f052d3",
+        "class": "candidate-native-content",
+        "authoredBy": "codex-session:1@2026-10-10",
+        "rationale": "The current sentence cites the actual compiled DispatchPlan return object at plan.mjs:455-472 and optional capability fields at 464-465. Only the stale line numbers changed; independent classification/content review remains pending.",
+        "truthSection": {
+          "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+          "anchor": "61-shape",
+          "status": "verified",
+          "reason": null
+        },
+        "currentEvidence": {
+          "commit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+          "finding": "true-and-current",
+          "citations": [
+            {
+              "path": "src/runner/dispatch/plan.mjs",
+              "startLine": 91,
+              "endLine": 104,
+              "blobSha": "819f4727c6f348e03d2c6c42a2714c0ec49857ab"
+            },
+            {
+              "path": "src/runner/dispatch/plan.mjs",
+              "startLine": 455,
+              "endLine": 472,
+              "blobSha": "819f4727c6f348e03d2c6c42a2714c0ec49857ab"
+            }
+          ],
+          "scope": "Author checked current code; independent review pending.",
+          "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/accounting-261015-0700-whole-system-verdict-corrections.md.json"
+        },
+        "recoveryProvenance": {
+          "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+          "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+          "receiptClaimId": "claim_de1bde6579325220fa5ddea79b9cd77f",
+          "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+          "reportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+          "verdictClaimId": "claim_de1bde6579325220fa5ddea79b9cd77f",
+          "unitDigest": "2f26ef793b85a9534c07f2080df713367086ccdf91e96a8cf0652d28acf971a6",
+          "originalAuthorSession": "codex-session:1@2026-10-10"
+        },
+        "amendedBy": "codex-session:43@2026-10-15",
+        "reviewStatus": "pending",
+        "rebindingReason": "A19 line-number-only correction; A22 digest/section rebind. Native ID allocation deferred to the next sync; no identity graft or approval carry."
+      },
+      "successorArtifactCommit": null,
+      "status": "Proposal only. Committed dfff artifact names preserved predecessor; a current-ID artifact needs its actual later commit and separate reference before reverse closure."
+    },
+    {
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-step6-repin.json",
+      "receiptCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
+      "receiptClaimId": "claim_fa99f4d5cfcd0ea169efdf450e007955",
+      "native": {
+        "sourcePath": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+        "unitDigest": "6aac4236a8850f948cf4697248c8a75b25b88481bf704f2750abc75bd2262bd4",
+        "identityFingerprint": "6aac4236a8850f948cf4697248c8a75b25b88481bf704f2750abc75bd2262bd4",
+        "claimId": "claim_fa99f4d5cfcd0ea169efdf450e007955",
+        "sourceAnchor": "unheaded-block-40",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "008c98d9c6445268a4d6e33133ec0871b7c7a23a48e51369cad11c0b20caa857",
+        "claimKind": "contract",
+        "status": "future"
+      },
+      "identityMatches": true,
+      "proposedSuccessorReceipt": null,
+      "successorArtifactCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
+      "status": "current binding; independent acceptance pending"
+    },
+    {
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-step6-repin.json",
+      "receiptCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
+      "receiptClaimId": "claim_ad38a91ec63db8a175d99078bcf6e158",
+      "native": {
+        "sourcePath": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+        "unitDigest": "51ef8dcb17ca8cec35d54b4797f30f493a2e544eefc65c31a1caa9bdd0fec6db",
+        "identityFingerprint": "51ef8dcb17ca8cec35d54b4797f30f493a2e544eefc65c31a1caa9bdd0fec6db",
+        "claimId": "claim_ad38a91ec63db8a175d99078bcf6e158",
+        "sourceAnchor": "unheaded-block-43",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "4097ad349f818789dbce9534ea72cb57d15de4064f1996e24c34588a47c75d9e",
+        "claimKind": "decision",
+        "status": "future"
+      },
+      "identityMatches": true,
+      "proposedSuccessorReceipt": null,
+      "successorArtifactCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
+      "status": "current binding; independent acceptance pending"
+    },
+    {
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-step6-repin.json",
+      "receiptCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
+      "receiptClaimId": "claim_c5395a2e8480ce44d27f2873c02b8746",
+      "native": {
+        "sourcePath": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+        "unitDigest": "31ebd999e29e9ac7f23771697363df655bf89b8805357dcaaab17a751bd0fd33",
+        "identityFingerprint": "31ebd999e29e9ac7f23771697363df655bf89b8805357dcaaab17a751bd0fd33",
+        "claimId": "claim_4f6feca8cda6aa723bb9bd72ca956657",
+        "sourceAnchor": "unheaded-block-47",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "23216df99f389ab83588aeb312e949c92c3ed1817396047257e860a356f47613",
+        "claimKind": "unclassified",
+        "status": "future",
+        "origin": "added-since-2c228f69c85f3ab3176e71ff3ad9ae2a07603890"
+      },
+      "identityMatches": false,
+      "proposedSuccessorReceipt": {
+        "claimId": "claim_4f6feca8cda6aa723bb9bd72ca956657",
+        "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+        "anchor": "unheaded-block-47",
+        "unitDigest": "23216df99f389ab83588aeb312e949c92c3ed1817396047257e860a356f47613",
+        "shownText": "For in-process plans, native capability fields are top-level `agentType` or\n`mcpTool` when supplied (`plan.mjs:464-465`), not a `handback` object.\nThe caller must actually possess the returned live facility; the decision\ndoes not invoke that facility itself.",
+        "shownTextDigest": "23216df99f389ab83588aeb312e949c92c3ed1817396047257e860a356f47613",
+        "class": "candidate-native-content",
+        "authoredBy": "codex-session:1@2026-10-10",
+        "rationale": "The current sentence cites the actual compiled DispatchPlan return object at plan.mjs:455-472 and optional capability fields at 464-465. Only the stale line numbers changed; independent classification/content review remains pending.",
+        "truthSection": {
+          "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+          "anchor": "63-mechanism",
+          "status": "verified",
+          "reason": null
+        },
+        "currentEvidence": {
+          "commit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+          "finding": "true-and-current",
+          "citations": [
+            {
+              "path": "src/runner/dispatch/plan.mjs",
+              "startLine": 91,
+              "endLine": 104,
+              "blobSha": "819f4727c6f348e03d2c6c42a2714c0ec49857ab"
+            },
+            {
+              "path": "src/runner/dispatch/plan.mjs",
+              "startLine": 455,
+              "endLine": 472,
+              "blobSha": "819f4727c6f348e03d2c6c42a2714c0ec49857ab"
+            }
+          ],
+          "scope": "Author checked current code; independent review pending.",
+          "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/accounting-261015-0700-whole-system-verdict-corrections.md.json"
+        },
+        "recoveryProvenance": {
+          "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+          "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+          "receiptClaimId": "claim_56af2fc53f516253db192a78f0dddc70",
+          "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+          "reportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+          "verdictClaimId": "claim_56af2fc53f516253db192a78f0dddc70",
+          "unitDigest": "1e2dd90c75bf8049d0ad5d55ea4677898a163a1229eb4528d65cc2ae4323effa",
+          "originalAuthorSession": "codex-session:1@2026-10-10"
+        },
+        "amendedBy": "codex-session:43@2026-10-15",
+        "reviewStatus": "pending",
+        "rebindingReason": "A19 line-number-only correction; A22 digest/section rebind. Native ID allocation deferred to the next sync; no identity graft or approval carry."
+      },
+      "successorArtifactCommit": null,
+      "status": "Proposal only. Committed dfff artifact names preserved predecessor; a current-ID artifact needs its actual later commit and separate reference before reverse closure."
+    }
+  ]
+}

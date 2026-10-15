@@ -11,8 +11,8 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal.json",
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
-      "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
-      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
+      "receiptBinding": "Committed artifact at dfff335d3; independent classification acceptance pending. Current native ID consequences are shown separately; no approval carry or identity graft.",
+      "receiptCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
       "ordinaryAssessment": {
         "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
         "reviewedAt": "2026-10-15",
@@ -31,8 +31,8 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal.json",
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
-      "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
-      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
+      "receiptBinding": "Committed artifact at dfff335d3; independent classification acceptance pending. Current native ID consequences are shown separately; no approval carry or identity graft.",
+      "receiptCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
       "ordinaryAssessment": {
         "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
         "reviewedAt": "2026-10-15",
@@ -51,8 +51,8 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal.json",
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
-      "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
-      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
+      "receiptBinding": "Committed artifact at dfff335d3; independent classification acceptance pending. Current native ID consequences are shown separately; no approval carry or identity graft.",
+      "receiptCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
       "ordinaryAssessment": {
         "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
         "reviewedAt": "2026-10-15",
@@ -71,8 +71,8 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal.json",
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
-      "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
-      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
+      "receiptBinding": "Committed artifact at dfff335d3; independent classification acceptance pending. Current native ID consequences are shown separately; no approval carry or identity graft.",
+      "receiptCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
       "ordinaryAssessment": {
         "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
         "reviewedAt": "2026-10-15",
@@ -91,8 +91,8 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal.json",
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
-      "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
-      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
+      "receiptBinding": "Committed artifact at dfff335d3; independent classification acceptance pending. Current native ID consequences are shown separately; no approval carry or identity graft.",
+      "receiptCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
       "ordinaryAssessment": {
         "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
         "reviewedAt": "2026-10-15",
@@ -111,8 +111,8 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal.json",
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
-      "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
-      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
+      "receiptBinding": "Committed artifact at dfff335d3; independent classification acceptance pending. Current native ID consequences are shown separately; no approval carry or identity graft.",
+      "receiptCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
       "ordinaryAssessment": {
         "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
         "reviewedAt": "2026-10-15",
@@ -131,7 +131,7 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal.json",
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
-      "receiptBinding": "Current authored receipt is pending independent classification review; actual native consequences must be reconciled at next sync.",
+      "receiptBinding": "Committed artifact at dfff335d3; independent classification acceptance pending. Current native ID consequences are shown separately; no approval carry or identity graft.",
       "ordinaryAssessment": {
         "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
         "reviewedAt": "2026-10-15",
@@ -145,15 +145,16 @@
         "scope": "Ordinary assessment; does not satisfy the separate Receipt commit / Class-column report contract."
       },
       "pendingReceiptCommit": "Bind the actual runner settlement commit next turn; no current artifact commit invented.",
-      "amendedBy": "codex-session:42@2026-10-15"
+      "amendedBy": "codex-session:42@2026-10-15",
+      "receiptCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452"
     },
     {
       "claimId": "claim_cb178b2f0832cfa84b1cbd611e0f7e3a",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal.json",
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
-      "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
-      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
+      "receiptBinding": "Committed artifact at dfff335d3; independent classification acceptance pending. Current native ID consequences are shown separately; no approval carry or identity graft.",
+      "receiptCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
       "ordinaryAssessment": {
         "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
         "reviewedAt": "2026-10-15",
@@ -172,7 +173,7 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal.json",
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
-      "receiptBinding": "Current authored receipt is pending independent classification review; actual native consequences must be reconciled at next sync.",
+      "receiptBinding": "Committed artifact at dfff335d3; independent classification acceptance pending. Current native ID consequences are shown separately; no approval carry or identity graft.",
       "ordinaryAssessment": {
         "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
         "reviewedAt": "2026-10-15",
@@ -186,15 +187,16 @@
         "scope": "Ordinary assessment; does not satisfy the separate Receipt commit / Class-column report contract."
       },
       "pendingReceiptCommit": "Bind the actual runner settlement commit next turn; no current artifact commit invented.",
-      "amendedBy": "codex-session:42@2026-10-15"
+      "amendedBy": "codex-session:42@2026-10-15",
+      "receiptCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452"
     },
     {
       "claimId": "claim_e6c39f56c4d05238618e1a7fb7004af1",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal.json",
       "authoredBy": "codex-session:40@2026-10-15",
       "reviewStatus": "pending",
-      "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
-      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
+      "receiptBinding": "Committed artifact at dfff335d3; independent classification acceptance pending. Current native ID consequences are shown separately; no approval carry or identity graft.",
+      "receiptCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
       "ordinaryAssessment": {
         "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
         "reviewedAt": "2026-10-15",
@@ -213,7 +215,7 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal.json",
       "authoredBy": "codex-session:40@2026-10-15",
       "reviewStatus": "pending",
-      "receiptBinding": "Current authored receipt is pending independent classification review; actual native consequences must be reconciled at next sync.",
+      "receiptBinding": "Committed artifact at dfff335d3; independent classification acceptance pending. Current native ID consequences are shown separately; no approval carry or identity graft.",
       "ordinaryAssessment": {
         "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
         "reviewedAt": "2026-10-15",
@@ -228,15 +230,16 @@
       },
       "predecessorClaimId": "claim_afcdab4a068dfd573dfa7ec5a5f21c34",
       "pendingReceiptCommit": "Bind the actual runner settlement commit next turn; no current artifact commit invented.",
-      "amendedBy": "codex-session:42@2026-10-15"
+      "amendedBy": "codex-session:42@2026-10-15",
+      "receiptCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452"
     },
     {
       "claimId": "claim_6143f65cb5e3d4d41e7b957306ab6e4e",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal.json",
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
-      "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
-      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
+      "receiptBinding": "Committed artifact at dfff335d3; independent classification acceptance pending. Current native ID consequences are shown separately; no approval carry or identity graft.",
+      "receiptCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
       "ordinaryAssessment": {
         "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
         "reviewedAt": "2026-10-15",
@@ -255,8 +258,8 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal.json",
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
-      "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
-      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
+      "receiptBinding": "Committed artifact at dfff335d3; independent classification acceptance pending. Current native ID consequences are shown separately; no approval carry or identity graft.",
+      "receiptCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
       "ordinaryAssessment": {
         "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
         "reviewedAt": "2026-10-15",
@@ -275,8 +278,8 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal.json",
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
-      "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
-      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
+      "receiptBinding": "Committed artifact at dfff335d3; independent classification acceptance pending. Current native ID consequences are shown separately; no approval carry or identity graft.",
+      "receiptCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
       "ordinaryAssessment": {
         "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
         "reviewedAt": "2026-10-15",
@@ -295,8 +298,8 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal.json",
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
-      "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
-      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
+      "receiptBinding": "Committed artifact at dfff335d3; independent classification acceptance pending. Current native ID consequences are shown separately; no approval carry or identity graft.",
+      "receiptCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
       "ordinaryAssessment": {
         "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
         "reviewedAt": "2026-10-15",

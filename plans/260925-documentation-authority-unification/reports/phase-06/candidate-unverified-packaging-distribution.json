@@ -2,7 +2,7 @@
   "version": 1,
   "batch": "packaging-distribution",
   "authorization": "A28",
-  "authoredCommit": "7e9fd4bd5d9eff9ef748190256cbe182c5ace00c",
+  "authoredCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
   "meaning": "Exact native reverse-open units; candidate-unverified, never a truth approval or cutover waiver.",
   "count": 694,
   "rows": [
@@ -10375,10 +10375,13 @@
     "knownIDsPreserved": true,
     "noApprovalCarry": true,
     "meaning": "Exact individual native checkConservation reverse-open tuples; full tuple union equals union-scoped E. Candidate-unverified, no truth approval.",
-    "verifiedCommit": "7e9fd4bd5d9eff9ef748190256cbe182c5ace00c",
-    "verification": "reports/phase-06/root-boundary-native-verification.json nativeProofResume",
+    "verifiedCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
+    "verification": "plans/260925-documentation-authority-unification/reports/phase-06/verification-261015-0710-native-sync-bounded-rereview.md",
     "reviewStatus": "pending independent conservation review of changed tuples only",
-    "supplementalMetadata": "Preserved receipt/reason metadata is historical evidence from the prior list; current decisions/classification refs are read from unchanged shards at the verified commit. It does not grant current truth approval."
+    "supplementalMetadata": "Preserved receipt/reason metadata is historical evidence from the prior list; current decisions/classification refs are read from unchanged shards at the verified commit. It does not grant current truth approval.",
+    "partitionTupleEquality": true,
+    "currentFullTupleEquality": true,
+    "currentVerification": "Completed from the once-run native inventory at dfff335d3; all five-field tuples directly equal native output. Formal classification approval remains separate."
   },
   "resolutionRebinding": {
     "ownerResolutionCommit": "5563bcb70d1c9f0706925271e8209e7eb49fd28b",
@@ -10396,5 +10399,35 @@
       "reviewReportCommit": "ff3ec502574afd0e703076c0ea5702d4069d04e0",
       "reviewMode": "ordinary"
     }
-  ]
+  ],
+  "nativeEquality": {
+    "contentCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
+    "fullTupleEquality": true,
+    "eligibleTupleEquality": true,
+    "nativeReverseCount": 694,
+    "candidateUnverifiedCount": 694,
+    "pendingCanonicalReceiptCount": 0,
+    "separatePortalProtocolReceipts": 0,
+    "portalReceiptsOutsideScopedReverse": false,
+    "partitionTupleEquality": true,
+    "meaning": "Full five-field native tuple equality; no truth approval. Fifteen portal protocol receipts remain separate obligations outside the whole-system reverse namespace after the file-level target moved to History."
+  },
+  "previousNativeVerificationMetadata": {
+    "contentCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
+    "values": {
+      "nativeRebinding": {
+        "authorization": "A28 + A31",
+        "fullNativeTupleEquality": true,
+        "knownIDsPreserved": true,
+        "noApprovalCarry": true,
+        "meaning": "Exact individual native checkConservation reverse-open tuples; full tuple union equals union-scoped E. Candidate-unverified, no truth approval.",
+        "verifiedCommit": "7e9fd4bd5d9eff9ef748190256cbe182c5ace00c",
+        "verification": "reports/phase-06/root-boundary-native-verification.json nativeProofResume",
+        "reviewStatus": "pending independent conservation review of changed tuples only",
+        "supplementalMetadata": "Preserved receipt/reason metadata is historical evidence from the prior list; current decisions/classification refs are read from unchanged shards at the verified commit. It does not grant current truth approval."
+      },
+      "authorization": "A28"
+    },
+    "meaning": "Historical metadata at input pin, superseded by the current native proof only; no review or truth acceptance."
+  }
 }

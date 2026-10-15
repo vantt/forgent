@@ -1,3 +1,50 @@
+# Native registry persisted — bounded re-review ready; external D blocker remains
+
+Date: 2026-10-15. Executor: codex-session:43@2026-10-15. Assignment: unit-run-1792022850970-b0cc0000/producer/1. Session counter: 43. Step 6: ready-for-review, not closed. Content/receipt pin: `dfff335d3f620b49403e4e4b2f70cedee5ca0452`. Actual output/proof artifact commit: runner settlement pending; no invented SHA. B0: `dbe5c432852837ea01e6025b35868bcb7271495d`. SYNC: `69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539`. Last D-green source remains `f0d4d030b06d36e3e9f55f7a1e3e5df623cc9860`; ancestry verified; current D is red.
+
+Read progress first and wrote it early and again here. Exactly one background native sync at dfff335d3, carrying the committed working registry directly, with own polled log. Background sync plus attached pre-persistence proofs: 1229.189s; native carry/generate 488.032s. Registry persisted compact one-line: 60,268,763 bytes (<90 MB). Both-prior D after persistence: one fatal, exactly the existing out-of-scope runner ratchet mismatch. Eight retired carriage dispositions have no missing-disposition finding. Both priors were supplied together to every fresh D/E check; raw outputs and labels are preserved.
+
+Whole-system scoped E open: {"candidate-blocks-unreferenced": 67, "claims-not-reviewed": 11, "identical-units-multiple-owners": 2}. Exact open-data comparison passes against the two reviewed contextual exceptions, 67 candidate tuples, and 11 pending source rows of this re-review. Fifteen portal receipts remain separate protocol obligations outside the current whole-system reverse namespace. No unexpected scoped open category/ID. E remains red, D is not zero, and closure is not claimed.
+
+Native known/live equality passes: 95,876 old known IDs retained; 95,879 current known IDs; 88,224 live tuples equal native output. All four direct full native-list tuple comparisons pass: root=830, agent=572, packaging=694, whole=67 native reverse units. Whole list is exactly 67 and directly native-equal, with no canonical portal unit. Fifteen portal receipts remain separately owed outside the current whole-system reverse namespace. All actual file statuses/eligibility validate. Native created three current IDs and three preserved predecessor gaps; three headings changed; no new retired unit.
+
+One bounded re-review set, content pinned to dfff335d3, complete before/after text and digests, A19 code evidence, eight new dispositions, twelve rationale changes, fourteen target bindings, every other changed row since 36d79ddcc, and actual native consequences:
+
+| Request | Entries |
+|---|---:|
+| [review-request-261015-0710-whole-system-bounded-rereview.md](review-request-261015-0710-whole-system-bounded-rereview.md) | 65 |
+| [review-request-261015-0710-whole-system-portal-receipts.md](review-request-261015-0710-whole-system-portal-receipts.md) | 15 |
+| [review-request-261015-0710-agent-code-receipts.md](review-request-261015-0710-agent-code-receipts.md) | 4 |
+| [review-request-261015-0710-whole-system-candidate-tuples.md](review-request-261015-0710-whole-system-candidate-tuples.md) | 67 |
+
+The 15 portal receipts are a separate formal classification request with the real Receipt commit header and six-column request table; content verdict extensions carry the required Evidence digest. Four machine debts are separately exposed. All nineteen pending refs bind the actual dfff artifact. Sixteen IDs match native; three artifacts still name predecessor IDs and their full current-ID proposals are explicit. A later current-ID receipt artifact needs its own actual committed pin and independent Class-column approval. No identity graft, approval carry or false receipt commit. Seven retained accepted source/gap metadata rows are audited, not reopened.
+
+External blocker / needsWrites: `scripts/check-legacy-docs-ratchet.exceptions.json`, existing `docs/specs/runner.md` merge-pin entry only; source/SYNC/main blobs agree, expected 10b2de40… vs imported dcad9c17…. Exact append-only rationale/expectedDigest accounting is in the proof. This prohibited file was not changed. No new owner question.
+
+Next turn: Lead applies the out-of-scope existing runner ratchet accounting through an authorized writer, independently reviews only this bounded set, and commits ordinary/formal classification verdicts under their separate protocols. Bind any three current-ID successor artifacts to their actual commit before applying classification acceptance; do not claim that dfff contains those new IDs. Apply accepted notes verbatim, mechanically account the three new gaps without guessing, rerun both-prior D/E and full persisted tuple equality, then assess closure. No author-produced sensitivity pack.
+
+Step 6 closure still owes:
+
+- Reviewer-selected 30-unit current-content truth sample (A28).
+- Independent checkpoint red-team; zero open Critical/High unless owner-accepted.
+- Reviewer-selected stratified 50-block sample with recorded seed/population.
+- Committed fresh-reader key and two independent fresh readers, with scoring/anchor evidence.
+- Closing Step 6 checkpoint review with genuine passing sensitivity proof; sensitivity pack/key held by reviewer.
+- Consumer/link rewrite preview, draft aliases and validation; no consumer mutation or active alias change in this turn.
+- Final batch/effort report, counts/residuals/owner queue and component-boundary statement.
+
+Preserve Rings holds, A34 residuals, owner queue and every truth/navigation/promotion/consumer/alias/native-gap/cutover obligation. No Step 7, promotion, git write, main write, workspace .fgos access or secret read. Scratch only /tmp/fgos-work/; required external result is the assignment exception. Tests 74/74 with env -u CLAUDE_CODE_SESSION_ID; candidate findings zero; protection/scope checks pass. Decision content/docs/checkers/vocabulary/extractor/baselines remain byte-identical to dfff. Preview unavailable within scope.
+
+Evidence: [verification-261015-0710-native-sync-bounded-rereview.md](verification-261015-0710-native-sync-bounded-rereview.md), [complete machine proof](verification-261015-0710-native-sync-bounded-rereview.md.json).
+
+---
+
+# Native sync and bounded re-review — running
+
+Session 43, 2026-10-15. Assignment unit-run-1792022850970-b0cc0000/producer/1. Content pin dfff335d3f620b49403e4e4b2f70cedee5ca0452. Read progress first; clean starting tree confirmed. Native sync will run once in background with its own polled log, carrying the persisted registry. Step 6 remains open. Only plan files and the required external result will be written; scratch is /tmp/fgos-work/.
+
+---
+
 # Verdicts and authorized corrections applied — native sync and bounded re-review next
 
 Date: 2026-10-15. Executor: codex-session:42@2026-10-15. Assignment: unit-run-1792022332309-f93bf042/producer/1. Session counter: 42. Step 6: rework authored; independent review and closure open.

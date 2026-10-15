@@ -1,8 +1,8 @@
 {
   "version": 1,
   "batch": "agent-coordination",
-  "authorization": "A28 + A31; existing accepted list plus four interim machine-repin-review tuples; native equality owed next turn",
-  "authoredCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
+  "authorization": "A28 + A31; existing accepted list plus four interim machine-repin-review tuples; native equality verified at dfff335d3; formal classification acceptance still pending",
+  "authoredCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
   "meaning": "Conservation-only candidate-unverified units, exactly the native scoped strict E reverse-open set after committed evidence-only re-pin review. The 134 actually changed-code receipts remain unverified; truth is sampled under A28 and checked in full at promotion.",
   "count": 572,
   "rows": [
@@ -6971,22 +6971,35 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_366503bd4dadea43469f1586f4f25f60",
+      "claimId": "claim_32d158caabf5001ae13d5c627496b6ab",
       "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "anchor": "unheaded-block-39",
-      "unitDigest": "2f26ef793b85a9534c07f2080df713367086ccdf91e96a8cf0652d28acf971a6",
+      "unitDigest": "8bb122f565c4d0f699793e476fde329f81c045340d35c03b49952e2263f052d3",
       "status": "candidate-unverified",
-      "pendingNativeRebinding": {
-        "oldNativeTuple": {
+      "nativeRebinding": {
+        "contentCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
+        "predecessor": {
           "claimId": "claim_366503bd4dadea43469f1586f4f25f60",
           "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
           "anchor": "unheaded-block-39",
           "unitDigest": "2f26ef793b85a9534c07f2080df713367086ccdf91e96a8cf0652d28acf971a6",
-          "status": "candidate-unverified"
+          "status": "candidate-unverified",
+          "pendingNativeRebinding": {
+            "oldNativeTuple": {
+              "claimId": "claim_366503bd4dadea43469f1586f4f25f60",
+              "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+              "anchor": "unheaded-block-39",
+              "unitDigest": "2f26ef793b85a9534c07f2080df713367086ccdf91e96a8cf0652d28acf971a6",
+              "status": "candidate-unverified"
+            },
+            "currentUnitDigest": "8bb122f565c4d0f699793e476fde329f81c045340d35c03b49952e2263f052d3",
+            "currentShownTextDigest": "8bb122f565c4d0f699793e476fde329f81c045340d35c03b49952e2263f052d3",
+            "status": "pending next native sync; do not assume the old non-stable block ID survives"
+          }
         },
-        "currentUnitDigest": "8bb122f565c4d0f699793e476fde329f81c045340d35c03b49952e2263f052d3",
-        "currentShownTextDigest": "8bb122f565c4d0f699793e476fde329f81c045340d35c03b49952e2263f052d3",
-        "status": "pending next native sync; do not assume the old non-stable block ID survives"
+        "reviewStatus": "pending",
+        "noApprovalCarry": true,
+        "reason": "Authorized text correction changed the actual native tuple. A28 eligibility retained; independent tuple/correction review pending."
       }
     },
     {
@@ -7033,22 +7046,35 @@
       }
     },
     {
-      "claimId": "claim_c5395a2e8480ce44d27f2873c02b8746",
+      "claimId": "claim_4f6feca8cda6aa723bb9bd72ca956657",
       "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "anchor": "unheaded-block-47",
-      "unitDigest": "1e2dd90c75bf8049d0ad5d55ea4677898a163a1229eb4528d65cc2ae4323effa",
+      "unitDigest": "23216df99f389ab83588aeb312e949c92c3ed1817396047257e860a356f47613",
       "status": "candidate-unverified",
-      "pendingNativeRebinding": {
-        "oldNativeTuple": {
+      "nativeRebinding": {
+        "contentCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
+        "predecessor": {
           "claimId": "claim_c5395a2e8480ce44d27f2873c02b8746",
           "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
           "anchor": "unheaded-block-47",
           "unitDigest": "1e2dd90c75bf8049d0ad5d55ea4677898a163a1229eb4528d65cc2ae4323effa",
-          "status": "candidate-unverified"
+          "status": "candidate-unverified",
+          "pendingNativeRebinding": {
+            "oldNativeTuple": {
+              "claimId": "claim_c5395a2e8480ce44d27f2873c02b8746",
+              "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+              "anchor": "unheaded-block-47",
+              "unitDigest": "1e2dd90c75bf8049d0ad5d55ea4677898a163a1229eb4528d65cc2ae4323effa",
+              "status": "candidate-unverified"
+            },
+            "currentUnitDigest": "23216df99f389ab83588aeb312e949c92c3ed1817396047257e860a356f47613",
+            "currentShownTextDigest": "23216df99f389ab83588aeb312e949c92c3ed1817396047257e860a356f47613",
+            "status": "pending next native sync; do not assume the old non-stable block ID survives"
+          }
         },
-        "currentUnitDigest": "23216df99f389ab83588aeb312e949c92c3ed1817396047257e860a356f47613",
-        "currentShownTextDigest": "23216df99f389ab83588aeb312e949c92c3ed1817396047257e860a356f47613",
-        "status": "pending next native sync; do not assume the old non-stable block ID survives"
+        "reviewStatus": "pending",
+        "noApprovalCarry": true,
+        "reason": "Authorized text correction changed the actual native tuple. A28 eligibility retained; independent tuple/correction review pending."
       }
     },
     {
@@ -9507,16 +9533,18 @@
     "fullNativeTupleEquality": true,
     "knownIDsPreserved": true,
     "noApprovalCarry": true,
-    "verifiedCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
-    "verification": "reports/phase-06/native-rereview-verification.json",
+    "verifiedCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
+    "verification": "plans/260925-documentation-authority-unification/reports/phase-06/verification-261015-0710-native-sync-bounded-rereview.md",
     "reviewStatus": "candidate-unverified; no approval or truth certification",
     "meaning": "Actual native conservation output; all newly allocated identities and predecessor gaps retained without graft or invented disposition.",
-    "currentFullTupleEquality": false
+    "currentFullTupleEquality": true,
+    "partitionTupleEquality": true,
+    "currentVerification": "Completed from the once-run native inventory at dfff335d3; all five-field tuples directly equal native output. Formal classification approval remains separate."
   },
   "currentOverlay": {
-    "sourceCommit": "69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539",
-    "fullNativeTupleEquality": false,
-    "status": "local four-tuple overlay; full native equality deferred to next turn"
+    "sourceCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
+    "fullNativeTupleEquality": true,
+    "status": "All current tuples reconciled with actual native IDs; protocol receipts remain pending, without approval carry."
   },
   "machineRepinAcceptance": {
     "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0451-whole-system-merge.md",
@@ -9527,13 +9555,58 @@
       "claim_ad38a91ec63db8a175d99078bcf6e158",
       "claim_c5395a2e8480ce44d27f2873c02b8746"
     ],
-    "nativeEquality": "pending next turn native validation; A31 ordinary machine acceptance does not fabricate a seven-column classification truth verdict"
+    "nativeEquality": "Full current candidate-list tuple equality proved at dfff335d3. This historical ordinary machine assessment does not supply the separate committed Class-column receipt acceptance."
   },
   "nativeEquality": {
-    "contentCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
+    "contentCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
     "fullTupleEquality": true,
-    "meaning": "Native identity/list equality only; no classification or truth acceptance.",
-    "currentFullTupleEquality": false,
-    "status": "Prior proof only; two authorized line-number corrections require actual native reconciliation next turn."
+    "eligibleTupleEquality": true,
+    "nativeReverseCount": 572,
+    "candidateUnverifiedCount": 572,
+    "pendingCanonicalReceiptCount": 0,
+    "separatePortalProtocolReceipts": 0,
+    "portalReceiptsOutsideScopedReverse": false,
+    "partitionTupleEquality": true,
+    "meaning": "Full five-field native tuple equality; no truth approval. Fifteen portal protocol receipts remain separate obligations outside the whole-system reverse namespace after the file-level target moved to History."
+  },
+  "previousNativeVerificationMetadata": {
+    "contentCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
+    "values": {
+      "nativeRebinding": {
+        "fullNativeTupleEquality": true,
+        "knownIDsPreserved": true,
+        "noApprovalCarry": true,
+        "verifiedCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
+        "verification": "reports/phase-06/native-rereview-verification.json",
+        "reviewStatus": "candidate-unverified; no approval or truth certification",
+        "meaning": "Actual native conservation output; all newly allocated identities and predecessor gaps retained without graft or invented disposition.",
+        "currentFullTupleEquality": false
+      },
+      "nativeEquality": {
+        "contentCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
+        "fullTupleEquality": true,
+        "meaning": "Native identity/list equality only; no classification or truth acceptance.",
+        "currentFullTupleEquality": false,
+        "status": "Prior proof only; two authorized line-number corrections require actual native reconciliation next turn."
+      },
+      "currentOverlay": {
+        "sourceCommit": "69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539",
+        "fullNativeTupleEquality": false,
+        "status": "local four-tuple overlay; full native equality deferred to next turn"
+      },
+      "machineRepinAcceptance": {
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0451-whole-system-merge.md",
+        "reportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930",
+        "claimIds": [
+          "claim_366503bd4dadea43469f1586f4f25f60",
+          "claim_fa99f4d5cfcd0ea169efdf450e007955",
+          "claim_ad38a91ec63db8a175d99078bcf6e158",
+          "claim_c5395a2e8480ce44d27f2873c02b8746"
+        ],
+        "nativeEquality": "pending next turn native validation; A31 ordinary machine acceptance does not fabricate a seven-column classification truth verdict"
+      },
+      "authorization": "A28 + A31; existing accepted list plus four interim machine-repin-review tuples; native equality owed next turn"
+    },
+    "meaning": "Historical metadata at input pin, superseded by the current native proof only; no review or truth acceptance."
   }
 }
