@@ -13,7 +13,7 @@ created: 2026-10-15
 
 ## Trạng thái
 
-Completed — Cả 3 phase đã được hiện thực và kiểm thử đạt toàn diện 100% acceptance criteria.
+Completed 2026-10-15. Plan và 3 phase do Gemini 3.8 Flash (omp, profile gemini-tetcu72) viết và cook qua `fgos run`; Lead review từng phase, sửa manifest/nhãn phase, hoàn tác một helper test né sandbox, sửa bug account `undefined`. Review độc lập + re-review: [review-run-workflow-polish.md](reports/review-run-workflow-polish.md). Suite đầy đủ: 7653 pass, 0 fail. Merge `24b8785d6`; release `sha256:1c4c84a0…` activate cho forgentX, mdview, mcp-skill-hub.
 
 Kế hoạch này kế thừa kết quả của plan `plans/261014-1400-two-doors-one-rununit` (sau khi hai cửa `fgos run` và `fgos workflow start` đã hội tụ trên `runUnit`), giải quyết dứt điểm 3 vấn đề vận hành phát sinh trong thực tế triển khai (đặc biệt sau đợt activate trên `mcp-skill-hub` và `mdview`):
 1. `fgos workflow start` chưa truyền được trần thời gian (`--timeout`) và account ghim (`--account`) xuống các Unit con.
