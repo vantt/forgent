@@ -167,6 +167,30 @@ pub fn parse_lock_content(raw: &str) -> Option<LockRecord> {
     })
 }
 
+/// The lock protocol this release speaks (`LOCK_PROTOCOL_VERSION` in the Node module).
+pub const LOCK_PROTOCOL_VERSION: u64 = 1;
+
+/// Whether `.fgos/runtime/locks/main-checkout/protocol.json` is absent or names this release's
+/// protocol (`{"writer": 1}`). Unreadable JSON or any other writer fails closed (false); an I/O
+/// error other than "not found" is returned to the caller.
+pub fn protocol_marker_is_supported(workspace_root: &Path) -> Result<bool, std::io::Error> {
+    let marker = workspace_root
+        .join(".fgos")
+        .join("runtime")
+        .join("locks")
+        .join("main-checkout")
+        .join("protocol.json");
+    let raw = match std::fs::read_to_string(&marker) {
+        Ok(raw) => raw,
+        Err(err) if err.kind() == std::io::ErrorKind::NotFound => return Ok(true),
+        Err(err) => return Err(err),
+    };
+    Ok(serde_json::from_str::<serde_json::Value>(&raw)
+        .ok()
+        .and_then(|v| v.get("writer").and_then(|w| w.as_u64()))
+        == Some(LOCK_PROTOCOL_VERSION))
+}
+
 /// True when `raw` is a JSON object carrying a `v` field: a record from a versioned lock protocol,
 /// never the unversioned format this release reads.
 pub fn is_unsupported_schema(raw: &str) -> bool {
@@ -179,6 +203,11 @@ pub fn is_unsupported_schema(raw: &str) -> bool {
 /// Performs a read-only liveness check on `.fgos/main-checkout.lock` under `workspace_root`.
 /// Never creates, refreshes, or clears the lock.
 pub fn check_main_checkout_lock(workspace_root: &Path) -> Result<(), MainCheckoutLockError> {
+    // The protocol marker decides first: a resource moved to another lock protocol is never free,
+    // whether or not this protocol's file exists (same rule as the Node module).
+    if !protocol_marker_is_supported(workspace_root)? {
+        return Err(MainCheckoutLockError::Unsupported);
+    }
     let lock_path = workspace_root.join(".fgos").join("main-checkout.lock");
     if !lock_path.exists() {
         return Ok(()); // free
@@ -339,6 +368,37 @@ mod tests {
                 Err(MainCheckoutLockError::Unsupported)
             ));
         });
+    }
+
+    #[test]
+    fn test_marker_only_state_is_refused_without_a_lock_file() {
+        for (case, content) in [
+            ("two", r#"{"writer": 2}"#),
+            ("bad", "not json"),
+            ("future", r#"{"writer": "future"}"#),
+        ] {
+            let temp = std::env::temp_dir().join(format!(
+                "test_lock_marker_{}_{}",
+                case,
+                std::process::id()
+            ));
+            let marker_dir = temp.join(".fgos/runtime/locks/main-checkout");
+            let _ = std::fs::create_dir_all(&marker_dir);
+            std::fs::write(marker_dir.join("protocol.json"), content).unwrap();
+            assert!(
+                matches!(
+                    check_main_checkout_lock(&temp),
+                    Err(MainCheckoutLockError::Unsupported)
+                ),
+                "marker {case} must refuse"
+            );
+            std::fs::write(marker_dir.join("protocol.json"), r#"{"writer": 1}"#).unwrap();
+            assert!(
+                check_main_checkout_lock(&temp).is_ok(),
+                "marker 1 is this protocol"
+            );
+            let _ = std::fs::remove_dir_all(&temp);
+        }
     }
 
     #[test]

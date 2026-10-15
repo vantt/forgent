@@ -33,28 +33,20 @@ import crypto from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { recordMainCheckoutGuardWarning } from "./main-checkout-guard-warnings.mjs";
 import { resolveFgosFile, FGOS_FILE } from "./fgos-file-registry.mjs";
-import { acquireMainCheckoutLock, ACQUIRED, DEFAULT_TTL_MS, HOLDER_PID_ENV_VAR } from "../runner/main-checkout-lock.mjs";
-
 /**
- * Runs `fn(holderPid)` -- the checkpoint's whole add -> commit ->
- * reset-on-error -- inside the main-checkout mutex. A caller that already
- * holds that mutex (claim, a merge without a target slot) passes the pid it
- * holds it under as `mainLockHolder`; nothing is acquired again then. A
- * caller that does not (the merge-slot path) gets the mutex acquired here
- * and released right after the transaction, so a checkpoint commit and a
- * land never write the main checkout's index at the same time. When the
- * mutex is held by someone else the checkpoint is skipped: it is
- * opportunistic, and the next caller retries it.
+ * The checkpoint writes the main checkout's index, so its whole add ->
+ * commit -> reset-on-error runs only inside the main-checkout mutex, which
+ * the runner layer owns. The caller passes `mainCheckoutWriter(txn)`: it
+ * runs `txn(commitEnv)` while holding the mutex (or skips it when the mutex
+ * is held elsewhere), and `commitEnv` is what the commit needs so the
+ * pre-commit hook recognizes fgOS's own commit (see
+ * src/runner/main-checkout-lock.mjs: heldMainCheckoutWriter,
+ * acquiringMainCheckoutWriter). Without a writer the checkpoint never
+ * commits: an unguarded commit would race a land.
  */
-function withCheckpointMainLock(fgosDir, mainLockHolder, fn) {
-  if (Number.isInteger(mainLockHolder) && mainLockHolder > 0) return fn(mainLockHolder);
-  const lock = acquireMainCheckoutLock(fgosDir, { identity: process.pid, ttlMs: DEFAULT_TTL_MS, releaseOnExit: true });
-  if (lock.status !== ACQUIRED) return undefined;
-  try {
-    return fn(process.pid);
-  } finally {
-    lock.release();
-  }
+function runUnderMainCheckoutWriter(mainCheckoutWriter, txn) {
+  if (typeof mainCheckoutWriter !== "function") return;
+  mainCheckoutWriter(txn);
 }
 
 function lastNonEmptyLine(raw) {
@@ -365,9 +357,10 @@ export function getUncommittedEventCount(fgosDir, repoRoot) {
  * @param {number} [opts.nowSec] - mock current timestamp (unix seconds)
  * @param {number} [opts.fallbackIntervalSec] - override fallback threshold seconds (default 3600)
  * @param {string} [opts.rawLog] - mock raw log text for testing
- * @param {number} [opts.mainLockHolder] - the pid under which the caller
- *   already holds `.fgos/main-checkout.lock`. Omitted, the checkpoint
- *   acquires that mutex itself around add -> commit -> reset-on-error.
+ * @param {Function} [opts.mainCheckoutWriter] - `(txn) => void`, runs
+ *   `txn(commitEnv)` inside the main-checkout mutex (see
+ *   runUnderMainCheckoutWriter). Omitted, the fallback checkpoint never
+ *   commits.
  */
 export function runOpportunisticMainCheckoutChecks(
   dir,
@@ -376,7 +369,7 @@ export function runOpportunisticMainCheckoutChecks(
     nowSec = null,
     fallbackIntervalSec = null,
     rawLog = null,
-    mainLockHolder = null,
+    mainCheckoutWriter = null,
   } = {}
 ) {
   if (process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS === "1") return;
@@ -512,18 +505,16 @@ export function runOpportunisticMainCheckoutChecks(
           currentTimeSec - refSec >= effectiveFallbackIntervalSec;
 
         if (fallbackIntervalMet) {
-          withCheckpointMainLock(fgosDir, mainLockHolder, (holderPid) => {
+          runUnderMainCheckoutWriter(mainCheckoutWriter, (commitEnv) => {
             execFileSync("git", ["add", ...pathspecs], {
               cwd: realRepoRoot,
               stdio: ["ignore", "pipe", "ignore"],
             });
             try {
-              // HOLDER_PID_ENV_VAR tells the pre-commit hook this commit is
-              // made under the main-checkout mutex held by `holderPid`.
               execFileSync("git", ["commit", "-m", "chore(.fgos): fallback events checkpoint", "--", ...pathspecs], {
                 cwd: realRepoRoot,
                 stdio: ["ignore", "pipe", "ignore"],
-                env: { ...process.env, [HOLDER_PID_ENV_VAR]: String(holderPid) },
+                env: { ...process.env, ...commitEnv },
               });
             } catch (commitErr) {
               try {

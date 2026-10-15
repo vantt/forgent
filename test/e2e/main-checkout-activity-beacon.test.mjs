@@ -28,6 +28,7 @@ const HOOK_FILES = [
   ['util/session-identity.mjs', 'src/util/session-identity.mjs'],
 ];
 const MERGE_MODULE_URL = pathToFileURL(path.join(SRC, 'runner/merge.mjs')).href;
+const FGOS_BIN = path.resolve(__dirname, '../../bin/fgos.mjs');
 
 function git(cwd, args, env) {
   return execFileSync('git', args, { cwd, encoding: 'utf8', ...(env ? { env } : {}) });
@@ -60,8 +61,26 @@ function seedStore(repoRoot) {
   return dir;
 }
 
+// scripts/run-tests.mjs sets FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 for the
+// whole suite. The checkpoint is exactly what some tests below exercise, so
+// they clear it explicitly: in the env of every process they spawn, and
+// in-process around the claim that runs the checkpoint.
 function sessionEnv(overlay = {}) {
-  return { ...process.env, FGOS_SESSION_ID: undefined, CLAUDE_CODE_SESSION_ID: undefined, FGOS_MAIN_LOCK_HOLDER_PID: undefined, ...overlay };
+  const env = { ...process.env, ...overlay };
+  for (const name of ['FGOS_SESSION_ID', 'CLAUDE_CODE_SESSION_ID', 'FGOS_MAIN_LOCK_HOLDER_PID', 'FGOS_DISABLE_OPPORTUNISTIC_CHECKS']) {
+    if (!(name in overlay)) delete env[name];
+  }
+  return env;
+}
+
+function withOpportunisticChecksEnabled(fn) {
+  const saved = process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS;
+  delete process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS;
+  try {
+    return fn();
+  } finally {
+    if (saved !== undefined) process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS = saved;
+  }
 }
 
 let counter = 0;
@@ -88,9 +107,14 @@ function makeCheckpointDue(dir) {
 
 const sleep = (ms) => new Promise((resolve) => { setTimeout(resolve, ms); });
 
-async function waitForFile(file, timeoutMs = 20_000) {
+/** Waits until `file` exists; fails at once, with the child's stderr, if the
+ * child exits first (the checkpoint never reached its commit). */
+async function waitForFileWhileChildRuns(file, exited, timeoutMs = 60_000) {
+  let result = null;
+  exited.then((r) => { result = r; });
   const deadline = Date.now() + timeoutMs;
   while (!fs.existsSync(file)) {
+    if (result) throw new Error(`the child exited (${result.code}) before reaching ${file}: ${result.stderr}`);
     if (Date.now() > deadline) throw new Error(`timed out waiting for ${file}`);
     await sleep(25);
   }
@@ -199,6 +223,32 @@ test('a main-checkout.lock record from a newer lock protocol refuses the commit 
   assert.equal(fs.readFileSync(path.join(dir, LOCK_FILE), 'utf8'), record);
 });
 
+test('a protocol marker naming another protocol, with no lock file, refuses the commit and reads as held in lock-status; unlock never clears a lock under it', () => {
+  const repoRoot = initRepo();
+  const dir = path.join(repoRoot, '.fgos');
+  const markerDir = path.join(dir, 'runtime', 'locks', 'main-checkout');
+  fs.mkdirSync(markerDir, { recursive: true });
+  fs.writeFileSync(path.join(markerDir, 'protocol.json'), JSON.stringify({ writer: 2 }));
+
+  const before = log(repoRoot);
+  const commit = commitAsSession(repoRoot, { FGOS_SESSION_ID: 'session-a' });
+  assert.notEqual(commit.status, 0);
+  assert.match(commit.stderr, /newer fgOS lock protocol/);
+  assert.equal(log(repoRoot), before);
+
+  const status = spawnSync(process.execPath, [FGOS_BIN, 'lock-status', '--dir', repoRoot], { cwd: repoRoot, encoding: 'utf8', env: sessionEnv() });
+  assert.equal(status.status, 0, status.stderr);
+  const data = JSON.parse(status.stdout).data;
+  assert.equal(data.outcome, 'live');
+  assert.equal(data.reason, 'unsupported-protocol');
+
+  fs.writeFileSync(path.join(dir, LOCK_FILE), 'corrupt {{{');
+  const unlock = spawnSync(process.execPath, [FGOS_BIN, 'unlock', '--dir', repoRoot], { cwd: repoRoot, encoding: 'utf8', env: sessionEnv() });
+  assert.notEqual(unlock.status, 0, 'unlock must refuse, never report cleared');
+  assert.doesNotMatch(unlock.stdout, /"cleared":\s*true/);
+  assert.equal(fs.readFileSync(path.join(dir, LOCK_FILE), 'utf8'), 'corrupt {{{');
+});
+
 test('a claim right after another session commits still runs its checkpoint: the checkpoint commit is fgOS\'s own, not blocked by the beacon', () => {
   const repoRoot = initRepo();
   const dir = seedStore(repoRoot);
@@ -206,7 +256,7 @@ test('a claim right after another session commits still runs its checkpoint: the
   const window = { FGOS_MAIN_CHECKOUT_LOCK_TTL_MS: String(15 * 60 * 1000) };
   assert.equal(commitAsSession(repoRoot, { FGOS_SESSION_ID: 'session-other', ...window }).status, 0);
 
-  const claim = claimWork(dir, { id: 'item-a', actor: 'session', isolate: false, repoRoot });
+  const claim = withOpportunisticChecksEnabled(() => claimWork(dir, { id: 'item-a', actor: 'session', isolate: false, repoRoot }));
   assert.equal(claim.to, 'doing');
   assert.match(log(repoRoot), /chore\(\.fgos\): fallback events checkpoint/);
   assert.equal(git(repoRoot, ['diff', '--cached', '--name-only']).trim(), '', 'nothing may be left staged');
@@ -234,7 +284,7 @@ test('a checkpoint under a merge slot holds main-checkout.lock across its whole 
 
   const { child, exited } = runSlotCheckpointChild(repoRoot);
   try {
-    await waitForFile(path.join(signalDir, 'paused'));
+    await waitForFileWhileChildRuns(path.join(signalDir, 'paused'), exited);
     const land = acquireMainCheckoutLock(dir, { identity: process.pid, ttlMs: DEFAULT_TTL_MS });
     assert.equal(land.status, HELD, 'a land must not acquire the main checkout while the checkpoint commit runs');
     assert.equal(land.holderPid, child.pid);

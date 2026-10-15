@@ -23,6 +23,7 @@ import {
   HOOK_TTL_MS,
   UNSUPPORTED_PROTOCOL,
   lockRefusalDetail,
+  acquiringMainCheckoutWriter,
 } from '../../src/runner/main-checkout-lock.mjs';
 import {
   isProcessAlive,
@@ -654,6 +655,65 @@ test('a record from a newer lock protocol (a `v` field) is HELD with the unsuppo
   assert.equal(inspected.outcome, 'live');
   assert.equal(inspected.reason, UNSUPPORTED_PROTOCOL);
   assert.equal(fs.readFileSync(lockPathFor(dir), 'utf8'), V2_RECORD, 'no primitive may remove or rewrite it');
+});
+
+// A record of another protocol that also carries this format's pid/ts must
+// still never be released, renewed or rewritten.
+test('a `v` record carrying full legacy pid/ts fields is never released, renewed or rewritten, by id or by a prior hold\'s closure', () => {
+  const { dir } = setup();
+  const hybrid = JSON.stringify({ v: 2, kind: 'future-mutex', pid: process.pid, ts: Date.now(), ttlMs: DEFAULT_TTL_MS, token: 'keep-me' });
+
+  const hold = acquireMainCheckoutLock(dir, { identity: process.pid, ttlMs: DEFAULT_TTL_MS });
+  assert.equal(hold.status, ACQUIRED);
+  fs.writeFileSync(lockPathFor(dir), hybrid);
+
+  assert.equal(acquireMainCheckoutLock(dir, { identity: process.pid + 1, ttlMs: DEFAULT_TTL_MS }).reason, UNSUPPORTED_PROTOCOL);
+  assert.equal(inspectMainCheckoutLock(dir).reason, UNSUPPORTED_PROTOCOL);
+  assert.equal(releaseMainCheckoutLockIfOwn(dir, process.pid).status, 'ambiguous');
+  assert.equal(renewMainCheckoutLockIfOwn(dir, process.pid).status, 'ambiguous');
+  assert.equal(releaseMainCheckoutLock(dir), UNSUPPORTED_PROTOCOL);
+  hold.release();
+  assert.equal(acquireMainCheckoutLock(dir, { identity: process.pid, ttlMs: DEFAULT_TTL_MS }).reason, UNSUPPORTED_PROTOCOL, 'self-recognition never refreshes it either');
+  assert.equal(fs.readFileSync(lockPathFor(dir), 'utf8'), hybrid);
+});
+
+test('a protocol marker naming another protocol makes every door refuse before the v1 file is read: acquire, inspect, reclaim', () => {
+  for (const marker of [JSON.stringify({ writer: 2 }), 'not json', JSON.stringify({ writer: 'future' })]) {
+    const { dir } = setup();
+    const markerDir = path.join(dir, 'runtime', 'locks', 'main-checkout');
+    fs.mkdirSync(markerDir, { recursive: true });
+    fs.writeFileSync(path.join(markerDir, 'protocol.json'), marker);
+
+    // Marker only, no v1 file: never "free".
+    assert.equal(inspectMainCheckoutLock(dir).outcome, 'live');
+    assert.equal(inspectMainCheckoutLock(dir).reason, UNSUPPORTED_PROTOCOL);
+    const refused = acquireMainCheckoutLock(dir, { identity: process.pid, ttlMs: DEFAULT_TTL_MS });
+    assert.equal(refused.reason, UNSUPPORTED_PROTOCOL);
+    assert.equal(fs.existsSync(lockPathFor(dir)), false, 'the refused acquire writes nothing');
+
+    // Marker plus a corrupt v1 file: the ambiguous-reclaim repair never runs.
+    fs.writeFileSync(lockPathFor(dir), 'corrupt {{{');
+    assert.equal(forceReclaimAmbiguousLock(dir).status, UNSUPPORTED_PROTOCOL);
+    assert.equal(fs.readFileSync(lockPathFor(dir), 'utf8'), 'corrupt {{{');
+  }
+});
+
+test('the checkpoint\'s acquiring writer never runs inside, nor releases, a hold another operation of the same process has', () => {
+  const { dir } = setup();
+  const merge = acquireMainCheckoutLock(dir, { identity: process.pid, ttlMs: DEFAULT_TTL_MS });
+  assert.equal(merge.status, ACQUIRED);
+  const before = fs.readFileSync(lockPathFor(dir), 'utf8');
+
+  let ran = false;
+  acquiringMainCheckoutWriter(dir)(() => { ran = true; });
+  assert.equal(ran, false, 'a same-pid holder is another operation: skip, never re-enter');
+  assert.equal(fs.readFileSync(lockPathFor(dir), 'utf8'), before, 'the merge\'s hold is untouched');
+
+  merge.release();
+  let env;
+  acquiringMainCheckoutWriter(dir)((commitEnv) => { env = commitEnv; });
+  assert.deepEqual(env, { FGOS_MAIN_LOCK_HOLDER_PID: String(process.pid) });
+  assert.equal(fs.existsSync(lockPathFor(dir)), false, 'released right after the transaction');
 });
 
 test('the protocol marker is re-read after acquire: a marker naming another protocol releases the v1 hold and refuses', () => {

@@ -50,7 +50,7 @@ import { runGoalCheck, runInvariantChecks, invariantFailureAsCheck } from './goa
 import { readInvariantCheckCommands } from '../config/shared-config-file.mjs';
 import { normalizePath } from '../util/normalize-path.mjs';
 import { nulPaths, statusPaths, nameStatusPaths, GIT_LIST_MAX_BUFFER } from '../util/git-paths.mjs';
-import { acquireMainCheckoutLock, renewMainCheckoutLockIfOwn, mergeSlotLockFile, HELD, AMBIGUOUS, DEFAULT_TTL_MS, HOLDER_PID_ENV_VAR, formatLockDurationMs, lockRefusalDetail } from './main-checkout-lock.mjs';
+import { acquireMainCheckoutLock, renewMainCheckoutLockIfOwn, mergeSlotLockFile, HELD, AMBIGUOUS, DEFAULT_TTL_MS, HOLDER_PID_ENV_VAR, formatLockDurationMs, lockRefusalDetail, heldMainCheckoutWriter, acquiringMainCheckoutWriter } from './main-checkout-lock.mjs';
 import { listSessions } from './session.mjs';
 import { listWork } from '../state/store.mjs';
 import { openLeavesSharingTarget, classifyPostLandDrift } from '../state/graph-harness.mjs';
@@ -804,7 +804,7 @@ export async function withMergeTargetSlot(lockRoot, targetRef, fn) {
   // This path holds only the target's slot, never main-checkout.lock: the
   // checkpoint acquires the main mutex itself around its add -> commit ->
   // reset and releases it right after, so it never races a land.
-  runOpportunisticMainCheckoutChecks(fgosDir, lockRoot);
+  runOpportunisticMainCheckoutChecks(fgosDir, lockRoot, { mainCheckoutWriter: acquiringMainCheckoutWriter(fgosDir) });
 
   const heartbeatStatus = {
     status: 'renewed',
@@ -936,7 +936,7 @@ export async function mergeRunnerItem(repoRoot, item, { timeoutMs, lockRoot = re
 
   // Already holding main-checkout.lock as `identity`: the checkpoint
   // commits under this hold, never acquiring the mutex a second time.
-  runOpportunisticMainCheckoutChecks(fgosDir, lockRoot, { mainLockHolder: identity });
+  runOpportunisticMainCheckoutChecks(fgosDir, lockRoot, { mainCheckoutWriter: heldMainCheckoutWriter(identity) });
 
   // Heartbeat (tsk-4l8): renews the lock's timestamp every
   // HEARTBEAT_INTERVAL_MS for as long as this call holds it, so its age

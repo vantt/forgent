@@ -230,7 +230,9 @@ function isUnsupportedSchema(raw) {
  * non-empty string (the on-disk field name stays literally `pid` even though
  * its value may now be an opaque string identity). Returns null when the
  * content isn't a well-formed record — the caller treats null as
- * AMBIGUOUS, never as free or stale. */
+ * AMBIGUOUS, never as free or stale. A record carrying `v` is never a
+ * record of this format, even when it also has `pid`/`ts`: it parses to
+ * null, so release/renew (and their re-reads) never touch it. */
 function parseLockContent(raw) {
   let parsed;
   try {
@@ -238,7 +240,8 @@ function parseLockContent(raw) {
   } catch {
     return null;
   }
-  if (!parsed || typeof parsed !== 'object') return null;
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return null;
+  if (Object.hasOwn(parsed, 'v')) return null;
   const { pid, ts, ttlMs } = parsed;
   if (!isUsableIdentity(pid)) return null;
   if (!Number.isInteger(ts) || ts <= 0) return null;
@@ -483,6 +486,11 @@ export function acquireMainCheckoutLock(dir, { identity = process.pid, ttlMs, no
   fs.mkdirSync(dir, { recursive: true });
   const lockPath = path.join(dir, lockFile);
 
+  // One marker decision for every door (acquire, inspect, reclaim, unlock,
+  // the hook, the Rust reader): checked before anything is written or
+  // judged, and again after acquiring (below).
+  if (!protocolMarkerIsSupported(dir, lockFile)) return unsupportedHeld(lockPath);
+
   for (let attempt = 0; attempt < 2; attempt += 1) {
     const res = tryAcquireOnce(lockPath, identity, now, ttlMs, allowSelfRecognition);
     if (res.status === ACQUIRED && !protocolMarkerIsSupported(dir, lockFile)) {
@@ -553,11 +561,59 @@ export function acquireMainCheckoutLock(dir, { identity = process.pid, ttlMs, no
   return { status: HELD, holderPid: null, lockAgeMs: null, remainingTtlMs: null, lockPath };
 }
 
+/**
+ * Main-checkout writers for the `.fgos` checkpoint
+ * (`runOpportunisticMainCheckoutChecks`'s `mainCheckoutWriter`): each runs a
+ * transaction `txn(commitEnv)` -- add -> commit -> reset-on-error -- inside
+ * this mutex, with `commitEnv` carrying HOLDER_PID_ENV_VAR so the pre-commit
+ * hook recognizes fgOS's own commit.
+ *
+ * heldMainCheckoutWriter: the caller already holds the mutex as
+ * `holderPid` (claim, a merge without a target slot); nothing is acquired
+ * again, so there is no nested acquire and no identity-based re-entry.
+ */
+export function heldMainCheckoutWriter(holderPid) {
+  return (txn) => txn({ [HOLDER_PID_ENV_VAR]: String(holderPid) });
+}
+
+/**
+ * acquiringMainCheckoutWriter: the caller does not hold the mutex (the
+ * merge-slot path). Acquires it as this process for the transaction only
+ * and releases it right after, so a checkpoint commit never interleaves
+ * with a land. When someone else holds it the transaction is skipped: the
+ * checkpoint is opportunistic and the next caller retries it.
+ * `allowSelfRecognition: false`: another operation of THIS process (a merge
+ * awaiting its verify) may hold the mutex under the same pid. Recognizing
+ * that record as our own would let this transaction run inside that
+ * operation's hold and then release it from under it; a same-pid holder is
+ * a different holder here, so the checkpoint skips instead.
+ */
+export function acquiringMainCheckoutWriter(dir) {
+  return (txn) => {
+    const lock = acquireMainCheckoutLock(dir, { identity: process.pid, ttlMs: DEFAULT_TTL_MS, releaseOnExit: true, allowSelfRecognition: false });
+    if (lock.status !== ACQUIRED) return;
+    try {
+      txn({ [HOLDER_PID_ENV_VAR]: String(process.pid) });
+    } finally {
+      lock.release();
+    }
+  };
+}
+
 /** Removes `.fgos/main-checkout.lock` under `dir` if present. Idempotent — a
  * caller releasing a lock already reclaimed/removed by someone else is not
- * an error. */
+ * an error. A record of an unsupported lock protocol is never removed
+ * (returns UNSUPPORTED_PROTOCOL instead). */
 export function releaseMainCheckoutLock(dir, { lockFile = LOCK_FILE } = {}) {
   const lockPath = path.join(dir, lockFile);
+  let raw;
+  try {
+    raw = fs.readFileSync(lockPath, 'utf8');
+  } catch (err) {
+    if (err.code === 'ENOENT') return undefined;
+    throw err;
+  }
+  if (isUnsupportedSchema(raw)) return UNSUPPORTED_PROTOCOL;
   try {
     fs.unlinkSync(lockPath);
   } catch (err) {
@@ -711,6 +767,10 @@ export function renewMainCheckoutLockIfOwn(dir, identity, { now = Date.now(), lo
 export function inspectMainCheckoutLock(dir, { now = Date.now(), lockFile = LOCK_FILE } = {}) {
   const lockPath = path.join(dir, lockFile);
 
+  // Marker first: a resource moved to another protocol is never "free",
+  // whether or not this protocol's file exists.
+  if (!protocolMarkerIsSupported(dir, lockFile)) return { outcome: 'live', reason: UNSUPPORTED_PROTOCOL, holderPid: null };
+
   let raw;
   try {
     raw = fs.readFileSync(lockPath, 'utf8');
@@ -758,11 +818,14 @@ export function inspectMainCheckoutLock(dir, { now = Date.now(), lockFile = LOCK
  *     valid record between the caller's own read and this call; untouched
  *   - 'reclaimed'         -- content still unparseable on the second read;
  *     removed
- *   - UNSUPPORTED_PROTOCOL -- a record of a lock protocol this release does
- *     not speak; never removed here, whatever its age
+ *   - UNSUPPORTED_PROTOCOL -- the resource's protocol marker, or the record
+ *     itself, belongs to a lock protocol this release does not speak;
+ *     nothing is removed, whatever its age or content
  */
 export function forceReclaimAmbiguousLock(dir, { lockFile = LOCK_FILE } = {}) {
   const lockPath = path.join(dir, lockFile);
+
+  if (!protocolMarkerIsSupported(dir, lockFile)) return { status: UNSUPPORTED_PROTOCOL };
 
   let raw;
   try {

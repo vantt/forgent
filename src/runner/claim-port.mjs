@@ -15,7 +15,7 @@ import { foldEvents } from '../state/replay.mjs';
 import { isResolvedStatus, resolveRoot } from '../state/frontier.mjs';
 import { getDomain, stepForPhase, effectiveStep } from '../state/domain-registry.mjs';
 import { visitCount } from './anti-loop.mjs';
-import { acquireMainCheckoutLock, forceReclaimAmbiguousLock, HELD, AMBIGUOUS, DEFAULT_TTL_MS, formatLockDurationMs, lockRefusalDetail } from './main-checkout-lock.mjs';
+import { acquireMainCheckoutLock, forceReclaimAmbiguousLock, HELD, AMBIGUOUS, DEFAULT_TTL_MS, formatLockDurationMs, lockRefusalDetail, heldMainCheckoutWriter } from './main-checkout-lock.mjs';
 import { createClaimWorktree, branchNameFor, branchExists } from './worktree.mjs';
 import { lastActivityAt, isReclaimEligible } from './claim-liveness.mjs';
 import { hasWorkerSlotRoom } from '../state/worker-slots.mjs';
@@ -157,11 +157,11 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
     // no longer passes one at all, letting the checks do their own real
     // multi-file discovery from disk.
     const rawEvents = readRawEvents(dir);
-    // mainLockHolder: this call already holds main-checkout.lock (identity
+    // heldMainCheckoutWriter: this call already holds main-checkout.lock (identity
     // process.pid, acquired above), so the checkpoint commits under that
     // same hold instead of acquiring the mutex again; its git commit carries
     // the pid so .githooks/pre-commit recognizes fgOS's own commit (tsk-32v).
-    runOpportunisticMainCheckoutChecks(dir, repoRoot, { mainLockHolder: process.pid });
+    runOpportunisticMainCheckoutChecks(dir, repoRoot, { mainCheckoutWriter: heldMainCheckoutWriter(process.pid) });
     const durableView = foldEvents(rawEvents);
     const claims = readClaims(dir);
     const view = buildEffectiveView(durableView, claims);

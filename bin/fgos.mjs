@@ -112,6 +112,7 @@ import {
   DEFAULT_TTL_MS,
   formatLockDurationMs,
   lockRefusalDetail,
+  UNSUPPORTED_PROTOCOL,
 } from '../src/runner/main-checkout-lock.mjs';
 import { clearBeaconIfOwn, readBeacon } from '../src/runner/main-checkout-activity.mjs';
 import { resolveWriterIdentity } from '../src/util/session-identity.mjs';
@@ -4269,6 +4270,9 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       }
       // AMBIGUOUS
       const reclaim = forceReclaimAmbiguousLock(dir);
+      if (reclaim.status === UNSUPPORTED_PROTOCOL) {
+        throw new StoreError('lock-timeout', `unlock: refusing to clear the main checkout lock${lockRefusalDetail({ reason: UNSUPPORTED_PROTOCOL })}.`);
+      }
       return { cleared: reclaim.status === 'reclaimed', reason: reclaim.status };
     }
 
