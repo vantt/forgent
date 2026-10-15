@@ -1,4 +1,4 @@
-// test/cli/execution-outcome-exit-codes.test.mjs — Exit codes for execution outcomes (Phase 03, RUL99)
+// test/cli/execution-outcome-exit-codes.test.mjs — exit codes for execution outcomes (RUL99)
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -63,7 +63,7 @@ test('exitCodeForOutcome maps outcomes onto canonical exit codes', () => {
   assert.equal(exitCodeForOutcome(123), 1);
 });
 
-test('CLI outcome exit code mappings match RUL99 specification', () => {
+test('each run outcome maps to its documented exit code', () => {
   const table = [
     ['pass', 0],
     ['policy-refusal', 4],

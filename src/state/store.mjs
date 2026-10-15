@@ -85,7 +85,7 @@ export const EXIT_CODES = Object.freeze({
   // 'refused' (category:'validation') outcome by a future DAG scheduler
   // classifier (dag-request-scheduler.md §4).
   'not-found': 4,
-  // Execution outcome codes (Phase 03, RUL99):
+  // Execution outcome codes of `fgos run` and a foreground workflow run (RUL99):
   'policy-refusal': 4,
   'provider-limit': 10,
   'execution-failure': 11,
