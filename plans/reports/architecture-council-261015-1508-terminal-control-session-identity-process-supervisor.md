@@ -48,6 +48,8 @@ Giới hạn độc lập (packet tự ghi R10, Lead xác nhận):
 
 Bất ngờ đáng chú ý nhất của hội đồng (critique Attack 2, F06): **"root pane rỗng là lãng phí"** là giả định chung của research và cả 3 shaper. Code (`herdr-agent.mjs:144-150, 451-490`) cho thấy nó là địa chỉ để split. Bỏ nó mà không đổi predicate `paneCount <= 1` sẽ đóng tab đang có đúng một worker chạy.
 
+> **Cập nhật sau hội đồng (Lead đo trên herdr live, 2026-10-15 16:14):** quyết định "giữ root pane" của hội đồng chỉ chờ trace live S3 / trigger T2. Bằng chứng ở [mục 10](#10-bằng-chứng-live-sau-hội-đồng-bỏ-root-pane-rỗng) đã thoả điều kiện của T2, nên **đề nghị bỏ root pane rỗng ngay trong wave 1**, không giữ.
+
 ## 3. Ba thiết kế độc lập (shaping, blind)
 
 | | Panelist-1 — gpt-6-astra (system) | Panelist-2 — fable (alternative) | Panelist-3 — argon-high (constraint) |
@@ -119,6 +121,27 @@ Reviewer round 2 (cùng model) cho pass, nhưng tự ghi rằng luật 1a-ii là
 - Bài học: pool synthesis cần sắp để reviewer và red-team rơi vào hai họ khác nhau. Hiện cả hai ra openai vì bind chỉ tránh họ của producer.
 - `~/.fgos/config.json` (global) vẫn còn `gemini-3.1-pro-*` ở flagship/frontier; chưa sửa vì nhiều workspace cùng đọc file này.
 - Doctor `model-policy-tier-coverage` fail sẵn từ trước (xai thiếu tier `nano`), không liên quan đến lần này.
+
+## 10. Bằng chứng live sau hội đồng: bỏ root pane rỗng
+
+Hội đồng không quan sát herdr live (V13) nên giữ root pane làm mặc định và đặt điều kiện mở lại ở T2: *"S3 cho thấy split từ pane worker đang chạy không làm hỏng TUI và pane lỗi được giữ không chặn sibling → bỏ root pane và đổi predicate `paneCount <= 1` trong cùng một lần cutover"*. Lead đo trực tiếp trên herdr thật (tab tạm `probe-root-pane`, `probe-resize`, đã tự biến mất sau thử):
+
+| # | Thử | Kết quả |
+|---|---|---|
+| 1 | Tạo tab → split worker A từ root → **đóng root** | Đóng được; tab còn 1 pane (A) |
+| 2 | Split pane mới từ worker A (không dùng root làm neo) | Pane mới nằm đúng tab đó (`pane_count` 2) |
+| 3 | Đóng lần lượt mọi pane | Khi pane cuối đóng, **herdr tự xoá tab** (`tab get` → `tab_not_found`) |
+| 4 | Chạy `claude --model haiku` ở A, giao việc in 1..120 + `DONE-MARKER`; **trong lúc A đang `working`**, split B (down) rồi C (right) từ chính A | A vẫn `working` sau 2 lần split, kết thúc `done`; đủ 120 dòng + marker, không mất/vỡ dòng; khung TUI tự vẽ lại theo bề rộng mới |
+
+Vì sao tab rỗng hôm nay bị bỏ lại: root pane rỗng giữ tab sống; `closeIfEmpty()` chỉ chạy ở exit hook của chính process tạo tab và chỉ khi `paneCount <= 1`. Process đó bị kill/crash (ví dụ run workflow bị dừng) thì không còn ai đóng tab.
+
+**Đề xuất (thay ND2, đưa vào wave 1, trong `createBatchTab` ở `src/runner/dispatch/herdr-agent.mjs`):**
+1. Worker đầu tiên split từ root như hiện nay; split xong **đóng root ngay**.
+2. Neo split cho worker sau = một pane worker còn sống trong tab; nếu nó đã đóng thì lấy pane khác của tab, không còn pane nào thì `invalidate()` và mở tab mới (cơ chế đã có).
+3. **Xoá hẳn `closeIfEmpty()`** (không chỉ đổi predicate): herdr tự xoá tab khi pane cuối đóng; giữ predicate `paneCount <= 1` sau khi bỏ root sẽ đóng nhầm tab có đúng một worker (F07).
+4. Pane của round lỗi vẫn giữ lại để xem như hiện nay; tab chỉ biến mất khi người đóng pane đó.
+
+Còn chưa đo: (a) worker đang ở bước paste brief/chờ prompt mà bị resize, (b) pane lỗi được giữ lại có cản sibling launch hay không (vế thứ hai của T2). Cả hai kiểm được ở lần chạy panel thật đầu tiên sau khi sửa. Nếu (a) hỏng thì quay về giữ root làm neo; giới hạn: đây là một lần thử với một agent (claude), chưa thử codex/agy/omp/pi.
 
 ## Câu hỏi còn mở
 
