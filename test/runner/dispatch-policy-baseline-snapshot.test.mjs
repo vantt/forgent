@@ -445,7 +445,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     workTier: 'heavy',
     bindingSource: 'executor-id',
     provider: 'gemini',
-    model: 'gemini-3.1-pro-high',
+    model: 'gemini-4-argon-high',
     command: 'agy',
     args: [
       '-p',
@@ -456,7 +456,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '--print-timeout',
       '30m',
       '--model',
-      'gemini-3.1-pro-high'
+      'gemini-4-argon-high'
     ],
     envKeys: [
       'HOME'
@@ -534,14 +534,14 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     workTier: 'heavy',
     bindingSource: 'executor-id',
     provider: 'gemini',
-    model: 'gemini-3.1-pro-high',
+    model: 'gemini-4-argon-high',
     command: 'agy',
     args: [
       '--mode',
       'accept-edits',
       '--new-project',
       '--model',
-      'gemini-3.1-pro-high'
+      'gemini-4-argon-high'
     ],
     envKeys: [
       'HOME'
@@ -627,14 +627,14 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     workTier: 'heavy',
     bindingSource: 'capability.prefer',
     provider: 'gemini',
-    model: 'gemini-3.1-pro-high',
+    model: 'gemini-4-argon-high',
     command: 'agy',
     args: [
       '--mode',
       'accept-edits',
       '--new-project',
       '--model',
-      'gemini-3.1-pro-high'
+      'gemini-4-argon-high'
     ],
     envKeys: [
       'HOME'
@@ -1216,26 +1216,26 @@ describe('dispatch policy baseline snapshot harness (Phase 00)', () => {
   });
 
   describe('named explicit baseline facts', () => {
-    // (a) raw agy-cli heavy AND agy-herdr heavy both resolve model to gemini-3.1-pro-high (policy tier frontier, D15)
-    test('fact (a): raw agy-cli heavy and agy-herdr heavy resolve to gemini-3.1-pro-high (policy tier frontier, D15)', () => {
+    // (a) raw agy-cli heavy AND agy-herdr heavy both resolve model to gemini-4-argon-high (policy tier frontier, D15)
+    test('fact (a): raw agy-cli heavy and agy-herdr heavy resolve to gemini-4-argon-high (policy tier frontier, D15)', () => {
       const agyCliHeavy = resolveSnapshotRowByLabel(cfg, 'agy-cli', 'heavy', throwawayDir);
       const agyHerdrHeavy = resolveSnapshotRowByLabel(cfg, 'agy-herdr', 'heavy', throwawayDir);
 
-      assert.equal(agyCliHeavy.model, 'gemini-3.1-pro-high', 'agy-cli heavy model must be gemini-3.1-pro-high');
-      assert.equal(agyHerdrHeavy.model, 'gemini-3.1-pro-high', 'agy-herdr heavy model must be gemini-3.1-pro-high');
+      assert.equal(agyCliHeavy.model, 'gemini-4-argon-high', 'agy-cli heavy model must be gemini-4-argon-high');
+      assert.equal(agyHerdrHeavy.model, 'gemini-4-argon-high', 'agy-herdr heavy model must be gemini-4-argon-high');
       assert.equal(agyCliHeavy.provider, 'gemini');
       assert.equal(agyHerdrHeavy.provider, 'gemini');
     });
 
-    // (b) fgos-coding-implement heavy resolves model to gemini-3.1-pro-high (policy tier frontier, D15)
-    test('fact (b): fgos-coding-implement heavy resolves model to gemini-3.1-pro-high without overrides (D15)', () => {
+    // (b) fgos-coding-implement heavy resolves model to gemini-4-argon-high (policy tier frontier, D15)
+    test('fact (b): fgos-coding-implement heavy resolves model to gemini-4-argon-high without overrides (D15)', () => {
       const { executorId: resolvedExecutorId, invocationId: resolvedInvocationId, bindingSource } = resolveExecutorAndOverrides(cfg, 'fgos-coding-implement');
       assert.equal(bindingSource, 'capability.prefer', 'bindingSource must be capability.prefer');
       assert.equal(resolvedExecutorId, 'gemini', 'resolvedExecutorId resolves to gemini (executor-provider-naming 2026-09-17 -- was agy)');
       assert.equal(resolvedInvocationId, 'agy-herdr-mucdong', 'resolvedInvocationId pins agy\'s herdr-mucdong invocation');
 
       const fgosImplementHeavy = resolveSnapshotRowByLabel(cfg, 'fgos-coding-implement', 'heavy', throwawayDir);
-      assert.equal(fgosImplementHeavy.model, 'gemini-3.1-pro-high', 'fgos-coding-implement heavy model must be gemini-3.1-pro-high');
+      assert.equal(fgosImplementHeavy.model, 'gemini-4-argon-high', 'fgos-coding-implement heavy model must be gemini-4-argon-high');
       assert.equal(fgosImplementHeavy.selector, 'fgos-coding-implement');
       assert.equal(fgosImplementHeavy.bindingSource, 'capability.prefer');
     });
