@@ -21,7 +21,8 @@ import { lastActivityAt, isReclaimEligible } from './claim-liveness.mjs';
 import { hasWorkerSlotRoom } from '../state/worker-slots.mjs';
 import { readSharedConfigOrEmpty } from '../config/shared-config-file.mjs';
 import { runOpportunisticMainCheckoutChecks } from '../state/events-jsonl-truncation-guard.mjs';
-import { acquireClaim, releaseClaim, readClaims, readClaim, buildEffectiveView, getItemDurableRevision } from '../state/runtime-coordination.mjs';
+import { acquireClaim, releaseClaim, readClaims, readClaim, buildEffectiveView, getItemDurableRevision, getMainFgosDir } from '../state/runtime-coordination.mjs';
+import { resolveWriterIdentity } from '../util/session-identity.mjs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
@@ -298,6 +299,9 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
     // being written — the read-validate-write sequence is now atomic with
     // respect to every other writer, not just this call's own prior
     // reclaim.
+    // acquireClaim takes claims.lock inside events.lock, for the main
+    // checkout's .fgos: resolve that identity now, before either lock.
+    resolveWriterIdentity(getMainFgosDir(dir));
     const runtimeClaim = withEventsLock(path.join(dir, 'events.jsonl'), () => {
       const freshDurableView = foldEvents(readRawEvents(dir));
       const freshStatus = freshDurableView.work[id]?.status;
@@ -321,7 +325,7 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
         preClaimRevision: freshRevision,
         claimRole: actor,
       });
-    });
+    }, dir);
 
     if (!skipOutcome) {
       addOutcome(dir, {

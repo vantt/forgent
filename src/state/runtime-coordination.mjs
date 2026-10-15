@@ -9,7 +9,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { resolveFgosFile, FGOS_FILE } from './fgos-file-registry.mjs';
 import { resolveMainCheckoutRoot, fgosDirFromRoot } from '../runner/paths.mjs';
-import { resolveWriterIdentity } from '../util/session-identity.mjs';
+import { noteLockHeld, noteLockReleased, resolveWriterIdentity } from '../util/session-identity.mjs';
 
 export function getMainFgosDir(dir) {
   if (!dir) return dir;
@@ -57,6 +57,10 @@ export function getItemDurableRevision(view, id) {
  */
 export function withClaimsLock(fgosDirInput, fn, { timeoutMs = 2000, retryMs = 10 } = {}) {
   const fgosDir = getMainFgosDir(fgosDirInput);
+  // Resolve (and cache) the writer identity before taking the lock: the code
+  // inside resolves it for this same dir, and the identity bridge never
+  // execs while the lock is held.
+  resolveWriterIdentity(fgosDir);
   const lockPath = resolveFgosFile(fgosDir, FGOS_FILE.CLAIMS_LOCK);
   fs.mkdirSync(path.dirname(lockPath), { recursive: true });
   const deadline = Date.now() + timeoutMs;
@@ -99,6 +103,7 @@ export function withClaimsLock(fgosDirInput, fn, { timeoutMs = 2000, retryMs = 1
     throw new ClaimError('lock-timeout', `Timed out acquiring claims.lock at "${lockPath}"`);
   }
 
+  noteLockHeld();
   try {
     return fn();
   } finally {
@@ -106,6 +111,8 @@ export function withClaimsLock(fgosDirInput, fn, { timeoutMs = 2000, retryMs = 1
       fs.unlinkSync(lockPath);
     } catch (err) {
       if (err.code !== 'ENOENT') throw err;
+    } finally {
+      noteLockReleased();
     }
   }
 }
@@ -215,8 +222,8 @@ export function acquireClaim(fgosDirInput, {
     // tsk-40m code-review finding (blocker, confirmed needed by product
     // decision): the session/shell identity fgOS already resolves for
     // every mutation (session-identity.mjs — stable across separate CLI
-    // invocations from the SAME terminal, via its own env-session-var/
-    // pid-ancestor-walk). Recorded here so settleClaim can verify, at
+    // invocations from the SAME terminal, via an env session id or the
+    // terminal root / session id). Recorded here so settleClaim can verify, at
     // settle time, that the caller is really the same actor/session that
     // acquired this claim — independent of claimId, which a caller with no
     // in-process token (a fresh CLI invocation, e.g. `fgos return`,

@@ -1141,7 +1141,7 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
             // The Unit run that carries this dispatch's binding, logs and result.
             unitRunId: worker.unitRunId,
           },
-        });
+        }, dir);
       });
       // The runner committed the worker's file changes inside the Unit run, so
       // goal-check judges the committed branch.

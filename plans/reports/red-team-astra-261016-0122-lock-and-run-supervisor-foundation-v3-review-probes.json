@@ -1,0 +1,601 @@
+{
+  "schema": "fgos-independent-review-probes.v1",
+  "reviewCommit": "fb3b6113ebedf0b6ee34f8b4abaf75f7187e2407",
+  "headAtCapture": "61cb21f9b6a7d259db62f0fd8c3a524d26479317",
+  "capturedAt": "2026-10-15T15:10:29.093919+00:00",
+  "environment": {
+    "uname": "Linux design-lap 6.8.0-138-generic #138~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC Fri Aug  7 13:43:15 UTC  x86_64 x86_64 x86_64 GNU/Linux",
+    "node": "v24.18.0",
+    "python": "Python 3.10.12",
+    "git": "git version 2.34.1",
+    "flock": "flock from util-linux 2.37.2",
+    "note": "All running state fixtures under mkdtemp outside repository. /tmp and /dev/shm are tmpfs. /var/tmp is read-only; no ext/overlay/network/platform probe certified. Git alias probe creates no commits."
+  },
+  "sourceSha256": {
+    "plans/reports/design-261015-2103-lock-and-run-supervisor-foundation-v3.md": {
+      "workspaceSha256": "11dc9e4eb642f29256d61f7c94a3c4c966a8773384c748e53ec4324692a19a3f",
+      "reviewCommitSha256": "11dc9e4eb642f29256d61f7c94a3c4c966a8773384c748e53ec4324692a19a3f",
+      "sameAsReviewCommit": true
+    },
+    "plans/reports/design-261015-2103-lock-and-run-supervisor-foundation-v3-probes.json": {
+      "workspaceSha256": "d27073c005174a5ec2b5f1d2ed634341781d1de44eb9177caf74e4a7123b438d",
+      "reviewCommitSha256": "d27073c005174a5ec2b5f1d2ed634341781d1de44eb9177caf74e4a7123b438d",
+      "sameAsReviewCommit": true
+    },
+    "src/runner/main-checkout-lock.mjs": {
+      "workspaceSha256": "357187dfd26d76155c3d1dc0c4fc6ec3122a0ed69849c803cf38ef53bfa83ede",
+      "reviewCommitSha256": "357187dfd26d76155c3d1dc0c4fc6ec3122a0ed69849c803cf38ef53bfa83ede",
+      "sameAsReviewCommit": true
+    },
+    "src/state/events.mjs": {
+      "workspaceSha256": "523af5d56c895370027568a8714c93a772e708e1f9651f158deaf3b906508098",
+      "reviewCommitSha256": "523af5d56c895370027568a8714c93a772e708e1f9651f158deaf3b906508098",
+      "sameAsReviewCommit": true
+    },
+    "src/state/runtime-coordination.mjs": {
+      "workspaceSha256": "28674baf5331a902262bdb447def49c2c4d001dd8385ff7587a95516d72f97ec",
+      "reviewCommitSha256": "28674baf5331a902262bdb447def49c2c4d001dd8385ff7587a95516d72f97ec",
+      "sameAsReviewCommit": true
+    },
+    "src/state/store.mjs": {
+      "workspaceSha256": "f6c6b285282fec3f78c88daf6b96d70680d87b37e757ea2e5224ea561d08bb90",
+      "reviewCommitSha256": "f6c6b285282fec3f78c88daf6b96d70680d87b37e757ea2e5224ea561d08bb90",
+      "sameAsReviewCommit": true
+    },
+    "src/runner/dispatch/provider-capacity.mjs": {
+      "workspaceSha256": "304997f8deb606eca128f433364673988b8760791977ba39c31b77fe6b312591",
+      "reviewCommitSha256": "304997f8deb606eca128f433364673988b8760791977ba39c31b77fe6b312591",
+      "sameAsReviewCommit": true
+    },
+    "src/runner/dispatch/run-lock.mjs": {
+      "workspaceSha256": "4fe905899159baa52755203570a56efd376deb5262cbd6d0ee0a88cfd1c287e6",
+      "reviewCommitSha256": "4fe905899159baa52755203570a56efd376deb5262cbd6d0ee0a88cfd1c287e6",
+      "sameAsReviewCommit": true
+    },
+    "src/runner/dispatch/settlement.mjs": {
+      "workspaceSha256": "a88414d0dfb50da6a103b8c80839db6beb983802fe0489d85be21e0c13e47617",
+      "reviewCommitSha256": "a88414d0dfb50da6a103b8c80839db6beb983802fe0489d85be21e0c13e47617",
+      "sameAsReviewCommit": true
+    },
+    "src/runner/dispatch/confinement/cleanup.mjs": {
+      "workspaceSha256": "70b3d7f10c4c95d0d1b618df3671e73b76d26b77d74d472c35095e11ba014f7e",
+      "reviewCommitSha256": "70b3d7f10c4c95d0d1b618df3671e73b76d26b77d74d472c35095e11ba014f7e",
+      "sameAsReviewCommit": true
+    },
+    "src/runner/dispatch/confinement/authority.mjs": {
+      "workspaceSha256": "3f127d8753c9c7cce876139bcc5f790740af73a40a6532192f48dc1a1b9fa9b7",
+      "reviewCommitSha256": "3f127d8753c9c7cce876139bcc5f790740af73a40a6532192f48dc1a1b9fa9b7",
+      "sameAsReviewCommit": true
+    },
+    "src/runner/dispatch/transport.mjs": {
+      "workspaceSha256": "c43372f4317fb9883584c53ac1c4c2cd26c6ac782dc4b2811d2e6a53413f98f0",
+      "reviewCommitSha256": "c43372f4317fb9883584c53ac1c4c2cd26c6ac782dc4b2811d2e6a53413f98f0",
+      "sameAsReviewCommit": true
+    },
+    "src/runner/merge.mjs": {
+      "workspaceSha256": "71ec4b71bee39e0e1ef07bd10a13b3348b70bebc5adda06289945c6af6e9a799",
+      "reviewCommitSha256": "71ec4b71bee39e0e1ef07bd10a13b3348b70bebc5adda06289945c6af6e9a799",
+      "sameAsReviewCommit": true
+    },
+    "src/runner/claim-port.mjs": {
+      "workspaceSha256": "3fea550d1f2523de93407337b1beb63f88994d1d6c995aab4119fa54252da371",
+      "reviewCommitSha256": "c92ebff7243ad602cc0aec7e2ab05acbe1925e482b37b909f2c7114f0a5b31f2",
+      "sameAsReviewCommit": false
+    },
+    "src/runner/execution/run.mjs": {
+      "workspaceSha256": "fdf46d097f34af3ace44bed3a6a24906f59f83ecbeae7b563966f3dd2a514634",
+      "reviewCommitSha256": "fdf46d097f34af3ace44bed3a6a24906f59f83ecbeae7b563966f3dd2a514634",
+      "sameAsReviewCommit": true
+    },
+    "packages/distribution/rust/src/lock.rs": {
+      "workspaceSha256": "f5392eb1279552382f76099e8378ebd79ffad3b2d27829617ce3861df6a5cb3e",
+      "reviewCommitSha256": "f5392eb1279552382f76099e8378ebd79ffad3b2d27829617ce3861df6a5cb3e",
+      "sameAsReviewCommit": true
+    },
+    "packages/distribution/rust/src/store.rs": {
+      "workspaceSha256": "196aa18795ada88fdef91613be8954a38993974231c82b6185e94141930abb94",
+      "reviewCommitSha256": "196aa18795ada88fdef91613be8954a38993974231c82b6185e94141930abb94",
+      "sameAsReviewCommit": true
+    },
+    "packages/distribution/rust/src/init.rs": {
+      "workspaceSha256": "f96375ad1bf7fb8807d693509c7710844416fb936bd122b4bec3709d676312be",
+      "reviewCommitSha256": "f96375ad1bf7fb8807d693509c7710844416fb936bd122b4bec3709d676312be",
+      "sameAsReviewCommit": true
+    },
+    "packages/observe/rust/src/store_lock.rs": {
+      "workspaceSha256": "8508e2cde14603febb4c0a0bd57566b0e429d2acd67d47535650fb418fd98b85",
+      "reviewCommitSha256": "8508e2cde14603febb4c0a0bd57566b0e429d2acd67d47535650fb418fd98b85",
+      "sameAsReviewCommit": true
+    },
+    ".githooks/pre-commit": {
+      "workspaceSha256": "6f612eae7f22cc6f1b129086fb478af8bb2ac677cb30308017716dc38c6f0d63",
+      "reviewCommitSha256": "6f612eae7f22cc6f1b129086fb478af8bb2ac677cb30308017716dc38c6f0d63",
+      "sameAsReviewCommit": true
+    }
+  },
+  "scripts": {
+    "r3-legacy.mjs": "import fs from 'node:fs';\nimport path from 'node:path';\nimport {spawnSync,spawn} from 'node:child_process';\nimport {tryAcquireAccountLock,providerAccountDir} from '/home/vantt/projects/forgentX/src/runner/dispatch/provider-capacity.mjs';\nimport {acquireMainCheckoutLock,dispatchLockFile} from '/home/vantt/projects/forgentX/src/runner/main-checkout-lock.mjs';\nimport {withEventsLock} from '/home/vantt/projects/forgentX/src/state/events.mjs';\nimport {withClaimsLock} from '/home/vantt/projects/forgentX/src/state/runtime-coordination.mjs';\nconst root=fs.mkdtempSync('/tmp/fgos-r3-legacy-');\nconst reports=[];\nconst rd=path.join(root,'provider-runtime');\nconst old=path.join(providerAccountDir(rd,'fixture','account'),'lock');\nfs.mkdirSync(old,{recursive:true}); fs.writeFileSync(path.join(old,'TOMBSTONE'),'v3 elsewhere');\nconst newPath=path.join(root,'v3-account.lock');\nconst fd=fs.openSync(newPath,'w+');\nconst native=spawnSync('flock',['-n','3'],{stdio:['ignore','ignore','ignore',fd]}).status;\nconst h=tryAcquireAccountLock({runtimeDir:rd,provider:'fixture',accountId:'account'});\nreports.push({case:'production provider account acquire with directory tombstone',v3KernelAcquired:native===0,v1Acquired:!!h,files:fs.readdirSync(old),twoProtocolsHeld:!!h&&native===0});\nh?.release(); fs.closeSync(fd);\nfor(const kind of ['main','events','claims']) {\n const d=path.join(root,kind,'.fgos'); fs.mkdirSync(d,{recursive:true});\n const lp=path.join(d,kind==='claims'?'runtime/claims.lock':kind==='main'?'main-checkout.lock':'events.lock'); fs.mkdirSync(lp,{recursive:true});fs.writeFileSync(path.join(lp,'TOMBSTONE'),'v3');\n let entered=false,code=null;\n try {if(kind==='main')entered=acquireMainCheckoutLock(d,{identity:process.pid}).status==='acquired';\n else if(kind==='events')withEventsLock(path.join(d,'events.jsonl'),()=>{entered=true});\n else withClaimsLock(d,()=>{entered=true},{timeoutMs:50});}catch(e){code=e.code}\n reports.push({case:'production tombstone '+kind,entered,code,tombstoneIntact:fs.existsSync(path.join(lp,'TOMBSTONE'))});\n}\n// Same physical cwd, two legacy fgosDir namespaces. V3 can only tombstone its supplied legacy path.\nconst cwd=path.join(root,'cwd');fs.mkdirSync(cwd);\nconst a=path.join(root,'projectA','.fgos'),b=path.join(root,'projectB','.fgos');fs.mkdirSync(a,{recursive:true});fs.mkdirSync(b,{recursive:true});\nconst lf=dispatchLockFile(cwd);fs.mkdirSync(path.join(a,lf),{recursive:true});fs.writeFileSync(path.join(a,lf,'TOMBSTONE'),'v3');\nconst machine=fs.openSync(path.join(root,'v3-cwd.lock'),'w+');spawnSync('flock',['-n','3'],{stdio:['ignore','ignore','ignore',machine]});\nlet res=acquireMainCheckoutLock(b,{identity:process.pid,lockFile:lf});\nreports.push({case:'same cwd, legacy fgosDir B not tombstoned by A',v3KernelHeld:true,v1Status:res.status,legacyFile:lf,twoProtocolsHeld:res.status==='acquired'});res.release?.();fs.closeSync(machine);\nconsole.log(JSON.stringify({root,reports},null,2));\n",
+    "r3-cutover.mjs": "import fs from 'node:fs';import path from 'node:path';import {spawn,spawnSync} from 'node:child_process';\nimport {acquireMainCheckoutLock} from '/home/vantt/projects/forgentX/src/runner/main-checkout-lock.mjs';\nconst self=new URL(import.meta.url).pathname;const delay=ms=>new Promise(r=>setTimeout(r,ms));\nif(process.argv[2]==='old-holder'){\n const d=process.argv[3];const a=acquireMainCheckoutLock(d,{identity:process.pid,ttlMs:80});fs.writeFileSync(path.join(d,'A-status'),a.status);fs.writeFileSync(path.join(d,'A-inside'),'yes');\n setInterval(()=>fs.writeFileSync(path.join(d,'A-heartbeat'),String(Date.now())),10);\n}else{\n const root=fs.mkdtempSync('/tmp/fgos-r3-cutover-');const d=path.join(root,'.fgos');fs.mkdirSync(d);\n const scanBeforeLaunch=[]; // harness has not launched any legacy writer yet: exact empty process set for this fixture.\n const a=spawn(process.execPath,[self,'old-holder',d],{stdio:'ignore'});\n for(let i=0;i<500&&!fs.existsSync(path.join(d,'A-inside'));i++)await delay(5);\n await delay(140);\n const b=acquireMainCheckoutLock(d,{identity:process.pid,ttlMs:80});const bStatus=b.status;b.release?.();\n const old=path.join(d,'main-checkout.lock');const absentBeforeTombstone=!fs.existsSync(old);fs.mkdirSync(old);fs.writeFileSync(path.join(old,'TOMBSTONE'),'v3');\n const newFd=fs.openSync(path.join(root,'v3.lock'),'w+');const v3=spawnSync('flock',['-n','3'],{stdio:['ignore','ignore','ignore',newFd]}).status===0;\n const hb=fs.readFileSync(path.join(d,'A-heartbeat'),'utf8');await delay(40);\n const continued=hb!==fs.readFileSync(path.join(d,'A-heartbeat'),'utf8');\n const report={case:'new legacy launch after quiescence scan; TTL steal hides still-live A before tombstone',root,scanBeforeLaunch,AStatus:fs.readFileSync(path.join(d,'A-status'),'utf8'),BStatus:bStatus,absentBeforeTombstone,v3Acquired:v3,AStillWriting:continued,twoHolders:v3&&continued};\n a.kill('SIGKILL');await new Promise(r=>a.on('exit',r));fs.closeSync(newFd);console.log(JSON.stringify(report,null,2));\n}\n",
+    "r3-process.py": "import os,sys,json,time,tempfile,pathlib,subprocess,fcntl,signal,ctypes\nHERE=pathlib.Path(__file__).resolve().parent\nROOT=pathlib.Path(tempfile.mkdtemp(prefix='fgos-r3-process-'))\nlibc=ctypes.CDLL(None);libc.prctl(36,1,0,0,0) # own orphan descendants to reap them\nresults=[]\ndef waitfile(p,timeout=5):\n end=time.monotonic()+timeout\n while not p.exists():\n  if time.monotonic()>end: raise RuntimeError('timeout '+str(p))\n  time.sleep(.005)\ndef alive(pid):\n try:return pathlib.Path(f'/proc/{pid}/stat').read_text().rsplit(')',1)[1].split()[0]!='Z'\n except FileNotFoundError:return False\ndef kill(pid):\n try:os.kill(pid,signal.SIGKILL)\n except ProcessLookupError:pass\ndef free(p):\n fd=os.open(p,os.O_RDWR|os.O_CREAT,0o600)\n try:\n  try:fcntl.flock(fd,fcntl.LOCK_EX|fcntl.LOCK_NB);return True\n  except BlockingIOError:return False\n finally:os.close(fd)\ndef script(n,s):\n p=HERE/n;p.write_text(s);return p\n# Primitive + platform-local fs: no unlink, two opens conflict, duplicate close does not release.\nfor base in [ROOT,pathlib.Path('/dev/shm'),pathlib.Path('/var/tmp')]:\n try:d=pathlib.Path(tempfile.mkdtemp(prefix='r3-flock-',dir=base))\n except OSError as e:\n  results.append({'case':'local filesystem probe unavailable','base':str(base),'errno':e.errno,'error':str(e)});continue\n p=d/'lock'\n fd=os.open(p,os.O_RDWR|os.O_CREAT,0o600);fcntl.flock(fd,fcntl.LOCK_EX)\n dup=os.dup(fd);os.close(dup)\n results.append({'case':'local filesystem exclusion','fs':subprocess.check_output(['stat','-f','-c','%T',str(d)],text=True).strip(),'secondOpenRefused':not free(p)})\n os.close(fd);assert free(p);p.unlink();d.rmdir()\n# Borrower can explicitly unlock the shared description. Close-only wrapper is a required discipline.\np=ROOT/'borrow.lock';fd=os.open(p,os.O_RDWR|os.O_CREAT,0o600);fcntl.flock(fd,fcntl.LOCK_EX)\nr=subprocess.run([sys.executable,'-c','import fcntl,sys;fcntl.flock(int(sys.argv[1]),fcntl.LOCK_UN)',str(fd)],pass_fds=(fd,))\nresults.append({'case':'borrower LOCK_UN while parent still holds fd','childExit':r.returncode,'parentFdOpen':os.fstat(fd).st_ino>0,'contenderAcquired':free(p)});os.close(fd)\n# Parent-death signal is not inherited by grandchildren. Use exact bundled gate and normal agent fork.\nworker=script('r3-grandchild.py',r'''import os,sys,time,pathlib\np=pathlib.Path(sys.argv[1]);kid=os.fork()\nif kid==0:\n os.setsid();(p/'grandchild.pid').write_text(str(os.getpid()))\n while True:\n  (p/'grandchild-heartbeat').write_text(str(time.monotonic()));time.sleep(.02)\nelse:\n (p/'agent.pid').write_text(str(os.getpid()))\n while True:time.sleep(.1)\n''')\nd=ROOT/'gate-death';d.mkdir();p=d/'attempt.lock';fd=os.open(p,os.O_RDWR|os.O_CREAT,0o600);fcntl.flock(fd,fcntl.LOCK_EX)\ngate=subprocess.Popen([sys.executable,str(HERE/'p4_gate.py'),'--fd',str(fd),'--ceiling-ms','1500','--report',str(d/'gate-exit.json'),'--stdout',str(d/'stdout'),'--stderr',str(d/'stderr'),'--',sys.executable,str(worker),str(d)],pass_fds=(fd,));os.close(fd)\nwaitfile(d/'grandchild.pid');waitfile(d/'agent.pid');ap=int((d/'agent.pid').read_text());gp=int((d/'grandchild.pid').read_text());before=not free(p)\ngate.kill();gate.wait();time.sleep(.15);hb=(d/'grandchild-heartbeat').read_text();time.sleep(.12)\nresults.append({'case':'gate SIGKILL, PDEATHSIG direct child, subreaper','lockHeldBeforeKill':before,'directAgentAlive':alive(ap),'grandchildAlive':alive(gp),'grandchildStillWriting':hb!=(d/'grandchild-heartbeat').read_text(),'contenderAcquiredAfterGateDeath':free(p),'gateExitPresent':(d/'gate-exit.json').exists()});kill(gp);kill(ap)\n# Exact bundled gate's hard-ceiling only sends SIGTERM until root exits.\nignore=script('r3-ignore-term.py',r'''import signal,time,sys,pathlib\nsignal.signal(signal.SIGTERM,signal.SIG_IGN)\npathlib.Path(sys.argv[1]).write_text(str(__import__('os').getpid()))\nwhile True:time.sleep(.1)\n''')\nd=ROOT/'ceiling';d.mkdir();fd=os.open(d/'attempt.lock',os.O_RDWR|os.O_CREAT,0o600);fcntl.flock(fd,fcntl.LOCK_EX)\ngate=subprocess.Popen([sys.executable,str(HERE/'p4_gate.py'),'--fd',str(fd),'--ceiling-ms','150','--report',str(d/'gate-exit.json'),'--stdout',str(d/'stdout'),'--stderr',str(d/'stderr'),'--',sys.executable,str(ignore),str(d/'agent.pid')],pass_fds=(fd,));os.close(fd)\nwaitfile(d/'agent.pid');ap=int((d/'agent.pid').read_text());time.sleep(.75)\nresults.append({'case':'bundled hard ceiling 150ms versus SIGTERM-ignore agent at >=750ms','gateAlive':gate.poll() is None,'agentAlive':alive(ap),'lockHeld':not free(d/'attempt.lock'),'gateExitPresent':(d/'gate-exit.json').exists()});gate.kill();gate.wait();kill(ap)\n# Deterministic handoff crash after result publication but before finalize. Adopter is UNCHANGED bundle.\nsup=script('r3-result-before-finalize.py',r'''import os,sys,pathlib,json,time\np=pathlib.Path(sys.argv[1]);fd=int(sys.argv[2]);(p/'result.json').write_text(json.dumps({'status':'pass'}));(p/'published').write_text('')\nwhile not (p/'finalize-go').exists():time.sleep(.01)\n(p/'credential-returned').write_text('yes')\n''')\nd=ROOT/'post-result-crash';d.mkdir();(d/'home').mkdir();(d/'home'/'credential').write_text('fixture-not-secret')\nfd=os.open(d/'attempt.lock',os.O_RDWR|os.O_CREAT,0o600);fcntl.flock(fd,fcntl.LOCK_EX)\ns=subprocess.Popen([sys.executable,str(sup),str(d),str(fd)],pass_fds=(fd,));os.close(fd);waitfile(d/'published');s.kill();s.wait()\na=subprocess.run(['node',str(HERE/'p4-adopt.mjs'),str(d)],capture_output=True,text=True,timeout=10)\nresults.append({'case':'supervisor killed after result before finalize, exact bundled adopter','adopterExit':a.returncode,'adopter':a.stdout.strip(),'homeRemains':(d/'home').exists(),'credentialReturned':(d/'credential-returned').exists(),'lockFree':free(d/'attempt.lock')})\n# Controller remains observer after supervisor dies: retaining fd blocks ALL adoption.\nd=ROOT/'observer';d.mkdir();fd=os.open(d/'attempt.lock',os.O_RDWR|os.O_CREAT,0o600);fcntl.flock(fd,fcntl.LOCK_EX)\na=subprocess.run(['node',str(HERE/'p4-adopt.mjs'),str(d)],capture_output=True,text=True,timeout=10)\nresults.append({'case':'only controller observer retains attempt fd','agentAlive':False,'supervisorAlive':False,'adopter':a.stdout.strip(),'lockFree':free(d/'attempt.lock')});os.close(fd)\n# PDEATHSIG registration race: parent dies before child sets it. Barrier, not probabilistic pid reuse.\nlate=script('r3-late-pdeath.py',r'''import os,sys,time,pathlib,ctypes,signal\np=pathlib.Path(sys.argv[1]);pid=os.fork()\nif pid:\n (p/'child.pid').write_text(str(pid));os._exit(0)\nwhile not (p/'go').exists():time.sleep(.01)\nctypes.CDLL(None).prctl(1,signal.SIGKILL,0,0,0)\n(p/'after-prctl').write_text(str(os.getppid()))\nwhile True:time.sleep(.1)\n''')\nd=ROOT/'late-pdeath';d.mkdir();pa=subprocess.Popen([sys.executable,str(late),str(d)]);pa.wait();waitfile(d/'child.pid');pid=int((d/'child.pid').read_text());(d/'go').touch();waitfile(d/'after-prctl');time.sleep(.05)\nresults.append({'case':'parent dies before prctl without post-registration parent check','childStillAlive':alive(pid),'actualParent':(d/'after-prctl').read_text()});kill(pid)\n# Reap only descendants created by this harness.\ntime.sleep(.15)\nwhile True:\n try:\n  if os.waitpid(-1,os.WNOHANG)==(0,0):break\n except ChildProcessError:break\nprint(json.dumps({'root':str(ROOT),'reports':results},indent=2))\n",
+    "r3-process-attempt1.py": "import os,sys,json,time,tempfile,pathlib,subprocess,fcntl,signal,ctypes\nHERE=pathlib.Path(__file__).resolve().parent\nROOT=pathlib.Path(tempfile.mkdtemp(prefix='fgos-r3-process-'))\nlibc=ctypes.CDLL(None);libc.prctl(36,1,0,0,0) # own orphan descendants to reap them\nresults=[]\ndef waitfile(p,timeout=5):\n end=time.monotonic()+timeout\n while not p.exists():\n  if time.monotonic()>end: raise RuntimeError('timeout '+str(p))\n  time.sleep(.005)\ndef alive(pid):\n try:return pathlib.Path(f'/proc/{pid}/stat').read_text().rsplit(')',1)[1].split()[0]!='Z'\n except FileNotFoundError:return False\ndef kill(pid):\n try:os.kill(pid,signal.SIGKILL)\n except ProcessLookupError:pass\ndef free(p):\n fd=os.open(p,os.O_RDWR|os.O_CREAT,0o600)\n try:\n  try:fcntl.flock(fd,fcntl.LOCK_EX|fcntl.LOCK_NB);return True\n  except BlockingIOError:return False\n finally:os.close(fd)\ndef script(n,s):\n p=HERE/n;p.write_text(s);return p\n# Primitive + platform-local fs: no unlink, two opens conflict, duplicate close does not release.\nfor base in [ROOT,pathlib.Path('/dev/shm'),pathlib.Path('/var/tmp')]:\n d=pathlib.Path(tempfile.mkdtemp(prefix='r3-flock-',dir=base));p=d/'lock'\n fd=os.open(p,os.O_RDWR|os.O_CREAT,0o600);fcntl.flock(fd,fcntl.LOCK_EX)\n dup=os.dup(fd);os.close(dup)\n results.append({'case':'local filesystem exclusion','fs':subprocess.check_output(['stat','-f','-c','%T',str(d)],text=True).strip(),'secondOpenRefused':not free(p)})\n os.close(fd);assert free(p);p.unlink();d.rmdir()\n# Borrower can explicitly unlock the shared description. Close-only wrapper is a required discipline.\np=ROOT/'borrow.lock';fd=os.open(p,os.O_RDWR|os.O_CREAT,0o600);fcntl.flock(fd,fcntl.LOCK_EX)\nr=subprocess.run([sys.executable,'-c','import fcntl,sys;fcntl.flock(int(sys.argv[1]),fcntl.LOCK_UN)',str(fd)],pass_fds=(fd,))\nresults.append({'case':'borrower LOCK_UN while parent still holds fd','childExit':r.returncode,'parentFdOpen':os.fstat(fd).st_ino>0,'contenderAcquired':free(p)});os.close(fd)\n# Parent-death signal is not inherited by grandchildren. Use exact bundled gate and normal agent fork.\nworker=script('r3-grandchild.py',r'''import os,sys,time,pathlib\np=pathlib.Path(sys.argv[1]);kid=os.fork()\nif kid==0:\n os.setsid();(p/'grandchild.pid').write_text(str(os.getpid()))\n while True:\n  (p/'grandchild-heartbeat').write_text(str(time.monotonic()));time.sleep(.02)\nelse:\n (p/'agent.pid').write_text(str(os.getpid()))\n while True:time.sleep(.1)\n''')\nd=ROOT/'gate-death';d.mkdir();p=d/'attempt.lock';fd=os.open(p,os.O_RDWR|os.O_CREAT,0o600);fcntl.flock(fd,fcntl.LOCK_EX)\ngate=subprocess.Popen([sys.executable,str(HERE/'p4_gate.py'),'--fd',str(fd),'--ceiling-ms','1500','--report',str(d/'gate-exit.json'),'--stdout',str(d/'stdout'),'--stderr',str(d/'stderr'),'--',sys.executable,str(worker),str(d)],pass_fds=(fd,));os.close(fd)\nwaitfile(d/'grandchild.pid');waitfile(d/'agent.pid');ap=int((d/'agent.pid').read_text());gp=int((d/'grandchild.pid').read_text());before=not free(p)\ngate.kill();gate.wait();time.sleep(.15);hb=(d/'grandchild-heartbeat').read_text();time.sleep(.12)\nresults.append({'case':'gate SIGKILL, PDEATHSIG direct child, subreaper','lockHeldBeforeKill':before,'directAgentAlive':alive(ap),'grandchildAlive':alive(gp),'grandchildStillWriting':hb!=(d/'grandchild-heartbeat').read_text(),'contenderAcquiredAfterGateDeath':free(p),'gateExitPresent':(d/'gate-exit.json').exists()});kill(gp);kill(ap)\n# Exact bundled gate's hard-ceiling only sends SIGTERM until root exits.\nignore=script('r3-ignore-term.py',r'''import signal,time,sys,pathlib\nsignal.signal(signal.SIGTERM,signal.SIG_IGN)\npathlib.Path(sys.argv[1]).write_text(str(__import__('os').getpid()))\nwhile True:time.sleep(.1)\n''')\nd=ROOT/'ceiling';d.mkdir();fd=os.open(d/'attempt.lock',os.O_RDWR|os.O_CREAT,0o600);fcntl.flock(fd,fcntl.LOCK_EX)\ngate=subprocess.Popen([sys.executable,str(HERE/'p4_gate.py'),'--fd',str(fd),'--ceiling-ms','150','--report',str(d/'gate-exit.json'),'--stdout',str(d/'stdout'),'--stderr',str(d/'stderr'),'--',sys.executable,str(ignore),str(d/'agent.pid')],pass_fds=(fd,));os.close(fd)\nwaitfile(d/'agent.pid');ap=int((d/'agent.pid').read_text());time.sleep(.75)\nresults.append({'case':'bundled hard ceiling 150ms versus SIGTERM-ignore agent at >=750ms','gateAlive':gate.poll() is None,'agentAlive':alive(ap),'lockHeld':not free(d/'attempt.lock'),'gateExitPresent':(d/'gate-exit.json').exists()});gate.kill();gate.wait();kill(ap)\n# Deterministic handoff crash after result publication but before finalize. Adopter is UNCHANGED bundle.\nsup=script('r3-result-before-finalize.py',r'''import os,sys,pathlib,json,time\np=pathlib.Path(sys.argv[1]);fd=int(sys.argv[2]);(p/'result.json').write_text(json.dumps({'status':'pass'}));(p/'published').write_text('')\nwhile not (p/'finalize-go').exists():time.sleep(.01)\n(p/'credential-returned').write_text('yes')\n''')\nd=ROOT/'post-result-crash';d.mkdir();(d/'home').mkdir();(d/'home'/'credential').write_text('fixture-not-secret')\nfd=os.open(d/'attempt.lock',os.O_RDWR|os.O_CREAT,0o600);fcntl.flock(fd,fcntl.LOCK_EX)\ns=subprocess.Popen([sys.executable,str(sup),str(d),str(fd)],pass_fds=(fd,));os.close(fd);waitfile(d/'published');s.kill();s.wait()\na=subprocess.run(['node',str(HERE/'p4-adopt.mjs'),str(d)],capture_output=True,text=True,timeout=10)\nresults.append({'case':'supervisor killed after result before finalize, exact bundled adopter','adopterExit':a.returncode,'adopter':a.stdout.strip(),'homeRemains':(d/'home').exists(),'credentialReturned':(d/'credential-returned').exists(),'lockFree':free(d/'attempt.lock')})\n# Controller remains observer after supervisor dies: retaining fd blocks ALL adoption.\nd=ROOT/'observer';d.mkdir();fd=os.open(d/'attempt.lock',os.O_RDWR|os.O_CREAT,0o600);fcntl.flock(fd,fcntl.LOCK_EX)\na=subprocess.run(['node',str(HERE/'p4-adopt.mjs'),str(d)],capture_output=True,text=True,timeout=10)\nresults.append({'case':'only controller observer retains attempt fd','agentAlive':False,'supervisorAlive':False,'adopter':a.stdout.strip(),'lockFree':free(d/'attempt.lock')});os.close(fd)\n# PDEATHSIG registration race: parent dies before child sets it. Barrier, not probabilistic pid reuse.\nlate=script('r3-late-pdeath.py',r'''import os,sys,time,pathlib,ctypes,signal\np=pathlib.Path(sys.argv[1]);pid=os.fork()\nif pid:\n (p/'child.pid').write_text(str(pid));os._exit(0)\nwhile not (p/'go').exists():time.sleep(.01)\nctypes.CDLL(None).prctl(1,signal.SIGKILL,0,0,0)\n(p/'after-prctl').write_text(str(os.getppid()))\nwhile True:time.sleep(.1)\n''')\nd=ROOT/'late-pdeath';d.mkdir();pa=subprocess.Popen([sys.executable,str(late),str(d)]);pa.wait();waitfile(d/'child.pid');pid=int((d/'child.pid').read_text());(d/'go').touch();waitfile(d/'after-prctl');time.sleep(.05)\nresults.append({'case':'parent dies before prctl without post-registration parent check','childStillAlive':alive(pid),'actualParent':(d/'after-prctl').read_text()});kill(pid)\n# Reap only descendants created by this harness.\ntime.sleep(.15)\nwhile True:\n try:\n  if os.waitpid(-1,os.WNOHANG)==(0,0):break\n except ChildProcessError:break\nprint(json.dumps({'root':str(ROOT),'reports':results},indent=2))\n",
+    "r3-grandchild.py": "import os,sys,time,pathlib\np=pathlib.Path(sys.argv[1]);kid=os.fork()\nif kid==0:\n os.setsid();(p/'grandchild.pid').write_text(str(os.getpid()))\n while True:\n  (p/'grandchild-heartbeat').write_text(str(time.monotonic()));time.sleep(.02)\nelse:\n (p/'agent.pid').write_text(str(os.getpid()))\n while True:time.sleep(.1)\n",
+    "r3-ignore-term.py": "import signal,time,sys,pathlib\nsignal.signal(signal.SIGTERM,signal.SIG_IGN)\npathlib.Path(sys.argv[1]).write_text(str(__import__('os').getpid()))\nwhile True:time.sleep(.1)\n",
+    "r3-result-before-finalize.py": "import os,sys,pathlib,json,time\np=pathlib.Path(sys.argv[1]);fd=int(sys.argv[2]);(p/'result.json').write_text(json.dumps({'status':'pass'}));(p/'published').write_text('')\nwhile not (p/'finalize-go').exists():time.sleep(.01)\n(p/'credential-returned').write_text('yes')\n",
+    "r3-late-pdeath.py": "import os,sys,time,pathlib,ctypes,signal\np=pathlib.Path(sys.argv[1]);pid=os.fork()\nif pid:\n (p/'child.pid').write_text(str(pid));os._exit(0)\nwhile not (p/'go').exists():time.sleep(.01)\nctypes.CDLL(None).prctl(1,signal.SIGKILL,0,0,0)\n(p/'after-prctl').write_text(str(os.getppid()))\nwhile True:time.sleep(.1)\n",
+    "r3-git-hot.mjs": "import fs from 'node:fs';import path from 'node:path';import cp from 'node:child_process';import {syncBuiltinESMExports} from 'node:module';\nconst root=fs.mkdtempSync('/tmp/fgos-r3-git-hot-');const reports=[];\nconst sleep=ms=>new Promise(r=>setTimeout(r,ms));\nconst until=async(p)=>{for(let n=0;n<500&&!fs.existsSync(p);n++)await sleep(10);if(!fs.existsSync(p))throw Error('timeout '+p)};\nconst free=p=>cp.spawnSync('flock',['-n',p,'true']).status===0;\n// Real git hook execution; no commit. Shell's background child inherits fd 3 automatically.\nconst repo=path.join(root,'repo');cp.execFileSync('git',['init','-q',repo]);\nconst hook=path.join(repo,'.git/hooks/post-checkout');const pidFile=path.join(root,'leaked.pid');const flags=path.join(root,'flags');\nfs.writeFileSync(hook,`#!/bin/sh\\nflock -n 3 || exit 1\\ncat /proc/self/fdinfo/3 > \"$R3_FLAGS\"\\nsleep 30 &\\necho $! > \"$R3_PID\"\\n`,{mode:0o755});\nconst p=path.join(root,'main.lock'),fd=fs.openSync(p,'w+');cp.spawnSync('flock',['-n','3'],{stdio:['ignore','ignore','ignore',fd]});\nconst git=cp.spawnSync('git',['-C',repo,'-c','alias.probe=!sh .git/hooks/post-checkout','probe'],{stdio:['ignore','ignore','ignore',fd],env:{...process.env,R3_PID:pidFile,R3_FLAGS:flags}});\nfs.closeSync(fd);\nlet pid=fs.existsSync(pidFile)?Number(fs.readFileSync(pidFile,'utf8')):null;\nreports.push({case:'real git shell alias -> background shell child inherits lock fd without explicit pass',gitVersion:cp.execFileSync('git',['--version'],{encoding:'utf8'}).trim(),gitExit:git.status,gitStderr:git.stderr?.toString()??'',ownerFdClosed:true,contenderAcquiredAfterGitExit:free(p),backgroundPid:pid,fdinfo:fs.existsSync(flags)?fs.readFileSync(flags,'utf8'):null});\nif(pid){try{process.kill(pid,'SIGKILL')}catch{}}await sleep(100);reports.push({case:'after killing leaked child',contenderAcquired:free(p)});\n// Default Node spawn does not inherit lock descriptor unless supplied in stdio.\nconst fd2=fs.openSync(p,'r+');cp.spawnSync('flock',['-n','3'],{stdio:['ignore','ignore','ignore',fd2]});\nconst child=cp.spawn('sleep',['3'],{stdio:'ignore'});fs.closeSync(fd2);reports.push({case:'Node default spawn fd discipline',contenderAcquiredDespiteLiveUnrelatedChild:free(p)});child.kill('SIGKILL');\n// Production assertPlanEvidence can exec under events lock in moveWork(delivered).\nconst actual=cp.execFileSync;let calls=[];\ncp.execFileSync=function(file,args,opts){calls.push({file,args,underHotLock:fs.existsSync(path.join(root,'state/events.lock'))});return actual(file,args,opts)};syncBuiltinESMExports();\nconst {withEventsLock}=await import('/home/vantt/projects/forgentX/src/state/events.mjs');\nconst {assertPlanEvidence}=await import('/home/vantt/projects/forgentX/src/state/store.mjs');\nconst state=path.join(root,'state');fs.mkdirSync(state);fs.mkdirSync(path.join(root,'docs/history/fixture'),{recursive:true});fs.writeFileSync(path.join(root,'docs/history/fixture/plan.md'),'fixture');\nwithEventsLock(path.join(state,'events.jsonl'),()=>assertPlanEvidence('fixture',{risk:'heavy'},root));\ncp.execFileSync=actual;syncBuiltinESMExports();reports.push({case:'production assertPlanEvidence called under events.lock (moveWork path)',calls});\n// Literal v3 thenable rejection cannot cancel an already-started async continuation.\nconst hot=path.join(root,'model-hot.lock');const inside=path.join(root,'B-inside');const go=path.join(root,'B-go');const done=path.join(root,'B-done');\nconst b=cp.spawn(process.execPath,['--input-type=module','-e',`import fs from 'node:fs';const [hot,inside,go,done]=process.argv.slice(1);const s=()=>Atomics.wait(new Int32Array(new SharedArrayBuffer(4)),0,0,2);while(!fs.existsSync(go))s();fs.writeFileSync(hot,'B',{flag:'wx'});fs.writeFileSync(inside,'');while(!fs.existsSync(done))s();fs.unlinkSync(hot);`,hot,inside,go,done],{stdio:'ignore'});\nlet error=null,overlap=false,pending;\nfunction hotV3(fn){fs.writeFileSync(hot,'A',{flag:'wx'});try{const r=fn();if(r&&typeof r.then==='function')throw Error('hot-lock-async-body');return r;}finally{fs.unlinkSync(hot)}}\ntry{hotV3(()=>{pending=(async()=>{await until(inside);overlap=fs.readFileSync(hot,'utf8')==='B';fs.writeFileSync(path.join(root,'A-write-during-B'),'yes');fs.writeFileSync(done,'')})();return pending})}catch(e){error=e.message}\nfs.writeFileSync(go,'');await pending;await new Promise(r=>b.on('exit',r));\nreports.push({case:'literal v3 thenable guard with separate process B',rejected:error,AContinuedAfterRelease:true,AWriteWhileBHeld:overlap});\nconsole.log(JSON.stringify({root,reports},null,2));\n",
+    "r3-admission-terminal.py": "import os,sys,json,time,subprocess,tempfile,pathlib,signal,fcntl\nroot=pathlib.Path(tempfile.mkdtemp(prefix='fgos-r3-admission-'));reports=[]\ndef wait(p):\n end=time.monotonic()+5\n while not p.exists():\n  if time.monotonic()>end:raise RuntimeError('timeout '+str(p))\n  time.sleep(.005)\ndef free(p):\n fd=os.open(p,os.O_CREAT|os.O_RDWR,0o600)\n try:\n  try:fcntl.flock(fd,fcntl.LOCK_EX|fcntl.LOCK_NB);return True\n  except BlockingIOError:return False\n finally:os.close(fd)\n# A real process supplies the remote launch side effect before the launched record can be published.\nd=root/'terminal';d.mkdir();(d/'allocation.json').write_text(json.dumps({'key':'attempt-fixture','paneId':'fake-pane','allocatedAt':0}))\nlauncher=d/'launcher.py';launcher.write_text('''import subprocess,sys,pathlib,time,os\np=pathlib.Path(sys.argv[1]);child=subprocess.Popen(['sleep','30']);(p/'agent.pid').write_text(str(child.pid));(p/'launch-side-effect').touch()\nwhile not (p/'publish-go').exists():time.sleep(.01)\n(p/'launched').write_text(str(child.pid))\n''')\na=subprocess.Popen([sys.executable,str(launcher),str(d)]);wait(d/'launch-side-effect');pid=int((d/'agent.pid').read_text());a.kill();a.wait();os.kill(pid,0)\nreports.append({'case':'terminal launch effect happened; launcher killed before launched marker','allocationPresent':True,'launchedPresent':(d/'launched').exists(),'liveAgent':True,'allocationGraceExpired':True,'v3SweepWouldClose':not (d/'launched').exists()});os.kill(pid,signal.SIGKILL)\n# Literal 9.4 prepare-before-lock vs 9.8 reaper. State root fixture only.\nd=root/'prepare-gap';d.mkdir();(d/'home').mkdir();(d/'home'/'credential').write_text('fixture')\nreaper=d/'reaper.py';reaper.write_text('''import os,sys,pathlib,fcntl,shutil\np=pathlib.Path(sys.argv[1]);fd=os.open(p/'attempt.lock',os.O_CREAT|os.O_RDWR,0o600);fcntl.flock(fd,fcntl.LOCK_EX|fcntl.LOCK_NB);shutil.rmtree(p/'home');(p/'reaper-did-finalize').touch();os.close(fd)\n''')\nr=subprocess.run([sys.executable,str(reaper),str(d)],capture_output=True,text=True)\nreports.append({'case':'prepared home before controller first takes attempt lock','reaperExit':r.returncode,'controllerCanTakeLockAfterReap':free(d/'attempt.lock'),'homeDeletedBeforeHandoff':not (d/'home').exists()})\nprint(json.dumps({'root':str(root),'reports':reports},indent=2))\n",
+    "r3-settlement.mjs": "import fs from 'node:fs';import path from 'node:path';import {spawnSync} from 'node:child_process';\nimport {acquireRunControl,settleRunControl,buildRunControlHolder} from '/home/vantt/projects/forgentX/src/runner/dispatch/run-lock.mjs';\nconst here=new URL('.',import.meta.url).pathname;\nif(process.argv[2]==='child'){\n const d=process.argv[3];const fd=fs.openSync(path.join(d,'attempt.lock'),'w+');spawnSync('flock',['-n','3'],{stdio:['ignore','ignore','ignore',fd]});\n const c=acquireRunControl(d,{holder:buildRunControlHolder('fixture'),purpose:'worker-spawn'});\n fs.writeFileSync(path.join(d,'control-token.json'),JSON.stringify(c));\n fs.writeFileSync(path.join(d,'receipt.json'),JSON.stringify({kind:'exited',workerResultPresent:true}));\n const s=settleRunControl(d,c);fs.writeFileSync(path.join(d,'CAS-observed.json'),JSON.stringify(s));\n process.kill(process.pid,'SIGKILL');\n}else{\n const d=fs.mkdtempSync('/tmp/fgos-r3-settlement-');fs.mkdirSync(path.join(d,'outbox'));fs.writeFileSync(path.join(d,'outbox/result-1.json'),JSON.stringify({status:'done'}));\n const child=spawnSync(process.execPath,[new URL(import.meta.url).pathname,'child',d]);\n const a=spawnSync(process.execPath,[path.join(here,'p4-adopt.mjs'),d],{encoding:'utf8'});\n console.log(JSON.stringify({case:'SIGKILL after real settleRunControl before result publish',root:d,childSignal:child.signal,CAS:JSON.parse(fs.readFileSync(path.join(d,'CAS-observed.json'),'utf8')),adopterExit:a.status,adopter:a.stdout.trim(),resultStillAbsent:!fs.existsSync(path.join(d,'result.json'))},null,2));\n}\n",
+    "r3-positive.mjs": "import fs from 'node:fs';import path from 'node:path';import {spawn,spawnSync} from 'node:child_process';\nconst root=process.argv[3]??fs.mkdtempSync('/tmp/fgos-r3-positive-');const me=new URL(import.meta.url).pathname;\nconst free=p=>spawnSync('flock',['-n',p,'true'],{stdio:'ignore'}).status===0;\nconst lock=fd=>spawnSync('flock',['-n','3'],{stdio:['ignore','ignore','ignore',fd]}).status===0;\nif(process.argv[2]==='worker'){\n const lp=path.join(root,'stress.lock');let n=0,v=0;\n for(let i=0;i<50;i++){\n  const f=fs.openSync(lp,'r+');while(!lock(f))Atomics.wait(new Int32Array(new SharedArrayBuffer(4)),0,0,1);\n  if(fs.readdirSync(path.join(root,'inside')).length)v++;\n  fs.writeFileSync(path.join(root,'inside',String(process.pid)),'');n++;\n  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)),0,0,1);\n  fs.unlinkSync(path.join(root,'inside',String(process.pid)));fs.closeSync(f);\n }\n fs.writeFileSync(path.join(root,'done-'+process.pid),JSON.stringify({n,v}));\n}else{\n const p=path.join(root,'lock');fs.writeFileSync(p,'');const results=[];\n const f=fs.openSync(p,'r+'),g=fs.openSync(p,'r+');const first=lock(f),second=lock(g);fs.closeSync(f);const after=lock(g);fs.closeSync(g);\n results.push({case:'same Node process, two open descriptions',first,second,afterFirstClose:after});\n const fd=fs.openSync(p,'r+');const t=Date.now();const helper=spawnSync('python3',['-c','import fcntl,time;fcntl.flock(3,fcntl.LOCK_EX);time.sleep(3)'],{stdio:['ignore','ignore','ignore',fd],timeout:80,killSignal:'SIGKILL'});\n const heldBeforeParentClose=!free(p);fs.closeSync(fd);results.push({case:'helper acquired then timed out before reporting',signal:helper.signal,error:helper.error?.code,elapsedMs:Date.now()-t,heldBeforeParentClose,freeAfterParentClose:free(p)});\n fs.writeFileSync(path.join(root,'stress.lock'),'');fs.mkdirSync(path.join(root,'inside'));\n await Promise.all(Array.from({length:4},()=>new Promise((r,j)=>{const c=spawn(process.execPath,[me,'worker',root],{stdio:'inherit'});c.on('exit',code=>code===0?r():j(Error('worker '+code)))})));\n const ds=fs.readdirSync(root).filter(n=>n.startsWith('done-')).map(n=>JSON.parse(fs.readFileSync(path.join(root,n),'utf8')));\n results.push({case:'4 processes x 50 acquisitions',acquisitions:ds.reduce((s,x)=>s+x.n,0),violations:ds.reduce((s,x)=>s+x.v,0),lockFreeAtEnd:free(path.join(root,'stress.lock'))});\n console.log(JSON.stringify({root,reports:results},null,2));\n}\n",
+    "r3-reaper-migration.mjs": "import fs from 'node:fs';import path from 'node:path';import {spawn,spawnSync} from 'node:child_process';\nimport {writeOwnershipMarker,extendOwnershipMarker,reapOrphanedConfinementResources} from '/home/vantt/projects/forgentX/src/runner/dispatch/confinement/cleanup.mjs';\nconst root=fs.mkdtempSync('/tmp/fgos-r3-reaper-');const tempRoot=path.join(root,'homes');const home=path.join(tempRoot,'fixture','home');fs.mkdirSync(home,{recursive:true});\nconst dead=spawnSync('true').pid;\nwriteOwnershipMarker(home,{dispatchId:'fixture',pid:dead,timeoutMs:30000});\nconst lockPath=path.join(root,'attempt.lock');const fd=fs.openSync(lockPath,'w+');spawnSync('flock',['-n','3'],{stdio:['ignore','ignore','ignore',fd]});\nextendOwnershipMarker(home,{attemptId:'fixture',attemptLockPath:lockPath});\nconst worker=spawn('sleep',['30'],{cwd:root,stdio:'ignore'});\nconst res=reapOrphanedConfinementResources({tempRoot});\nlet workerAlive=true;try{process.kill(worker.pid,0)}catch{workerAlive=false}\nconst contender=spawnSync('flock',['-n',lockPath,'true'],{stdio:'ignore'}).status;\nconsole.log(JSON.stringify({case:'6.2 removes binding but 6.3 still owns reaper migration',root,oldReaper:res,homeExists:fs.existsSync(home),workerAlive,attemptLockStillHeld:contender!==0},null,2));\nworker.kill('SIGKILL');fs.closeSync(fd);\n",
+    "probe_terminal_gate_fd_passing.py": "#!/usr/bin/env python3\n\"\"\"Probe: terminal launch mode. The gate does not descend from the supervisor\n(herdr starts it inside a pane), so it cannot inherit the attempt lock. It\nconnects to the supervisor's per-attempt unix socket and receives the lock\ndescription by SCM_RIGHTS together with GO. Cases:\n  1. supervisor SIGKILL after handing over: the lock stays held by the gate\n     until the worker ends; a stranger cannot take it meanwhile.\n  2. gate started after the supervisor died: connect refused, no worker runs.\n  3. supervisor SIGKILL while the gate waits for GO: EOF, no worker runs.\nStand-ins: python for the Rust supervisor/gate, `setsid` for the herdr pane.\nRun: python3 probe_terminal_gate_fd_passing.py\n\"\"\"\nimport fcntl, json, os, signal, socket, subprocess, sys, tempfile, time\n\nHERE = os.path.dirname(os.path.abspath(__file__))\n\ndef stranger_can_lock(path):\n    fd = os.open(path, os.O_RDONLY)\n    try:\n        fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB); return True\n    except BlockingIOError:\n        return False\n    finally:\n        os.close(fd)\n\ndef wait_file(p, s=20):\n    end = time.time() + s\n    while not os.path.exists(p):\n        if time.time() > end: raise TimeoutError(p)\n        time.sleep(0.01)\n\nif len(sys.argv) > 1 and sys.argv[1] == \"supervisor\":\n    d, mode = sys.argv[2], sys.argv[3]\n    fd = os.open(os.path.join(d, \"attempt.lock\"), os.O_RDWR | os.O_CREAT)\n    fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)\n    srv = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)\n    os.chdir(d); srv.bind(\"attempt.sock\"); srv.listen(1)  # sun_path limit (~107 bytes): bind relative\n    open(os.path.join(d, \"sup-ready\"), \"w\").write(str(os.getpid()))\n    conn, _ = srv.accept()\n    if mode == \"hold-before-go\":\n        open(os.path.join(d, \"sup-accepted\"), \"w\").write(\"\")\n        time.sleep(60)\n    socket.send_fds(conn, [b\"GO\"], [fd])\n    open(os.path.join(d, \"sup-sent-go\"), \"w\").write(\"\")\n    time.sleep(60)\n\nif len(sys.argv) > 1 and sys.argv[1] == \"gate\":\n    d, work_s = sys.argv[2], float(sys.argv[3])\n    s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)\n    try:\n        os.chdir(d); s.connect(\"attempt.sock\")\n    except OSError as e:\n        open(os.path.join(d, \"gate-exit.json\"), \"w\").write(json.dumps({\"ran\": False, \"why\": f\"connect:{e.errno}\"})); sys.exit(3)\n    msg, fds, _f, _a = socket.recv_fds(s, 16, 4)\n    if msg != b\"GO\" or not fds:\n        open(os.path.join(d, \"gate-exit.json\"), \"w\").write(json.dumps({\"ran\": False, \"why\": \"eof-before-go\"})); sys.exit(3)\n    lock_fd = fds[0]\n    t0 = time.time()\n    w = subprocess.run([\"sh\", \"-c\", f\"sleep {work_s}; echo done >> {d}/worker.log\"])\n    open(os.path.join(d, \"gate-exit.json\"), \"w\").write(json.dumps({\"ran\": True, \"exit\": w.returncode, \"heldLockFd\": lock_fd, \"seconds\": round(time.time() - t0, 2)}))\n    sys.exit(0)\n\ndef case(name, sup_mode, kill_sup_at, start_gate_after_kill=False):\n    d = tempfile.mkdtemp(prefix=f\"run-term-{name}-\", dir=HERE)\n    sup = subprocess.Popen([sys.executable, __file__, \"supervisor\", d, sup_mode])\n    wait_file(os.path.join(d, \"sup-ready\"))\n    res = {\"case\": name}\n    if start_gate_after_kill:\n        sup.send_signal(signal.SIGKILL); sup.wait()\n    gate = subprocess.Popen([\"setsid\", sys.executable, __file__, \"gate\", d, \"1.2\"])  # not a descendant of the supervisor\n    if not start_gate_after_kill:\n        wait_file(os.path.join(d, kill_sup_at))\n        sup.send_signal(signal.SIGKILL); sup.wait()\n        time.sleep(0.2)\n        res[\"strangerCanLockAfterSupervisorDeath\"] = stranger_can_lock(os.path.join(d, \"attempt.lock\"))\n    gate.wait()\n    res[\"gateExit\"] = json.load(open(os.path.join(d, \"gate-exit.json\")))\n    res[\"workerRan\"] = os.path.exists(os.path.join(d, \"worker.log\"))\n    res[\"strangerCanLockAfterGateExit\"] = stranger_can_lock(os.path.join(d, \"attempt.lock\"))\n    return res\n\nif len(sys.argv) == 1:\n    out = [\n        case(\"handover-then-supervisor-dies\", \"go\", \"sup-sent-go\"),\n        case(\"gate-starts-after-supervisor-died\", \"go\", None, start_gate_after_kill=True),\n        case(\"supervisor-dies-while-gate-waits-for-go\", \"hold-before-go\", \"sup-accepted\"),\n    ]\n    json.dump(out, open(os.path.join(HERE, \"probe-terminal-gate-results.json\"), \"w\"), indent=1)\n    for o in out: print(json.dumps(o))\n",
+    "probe-hot-reclaim.mjs": "// Probe the interim Node hot-path mutex (events.lock): keep today's link/unlink\n// fast path, but reclaim a dead holder's record only while holding a kernel\n// \"reclaim\" lock (flock via helper exec, util-linux stand-in). Record = {pid,\n// startTime, boot}. A1 schedule: R1 judged X dead and re-read it, then pauses\n// right before unlink; R2 reclaims meanwhile. Run: node probe-hot-reclaim.mjs\nimport fs from 'node:fs';\nimport path from 'node:path';\nimport { spawn, spawnSync } from 'node:child_process';\nimport { fileURLToPath } from 'node:url';\nimport { startTimeOf, currentBoot, judgeOwner, self } from './era-ledger.mjs';\n\nconst HERE = path.dirname(fileURLToPath(import.meta.url));\nconst ME = fileURLToPath(import.meta.url);\nconst sleepMs = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);\nconst waitFile = (f, ms = 20000) => { const end = Date.now() + ms; while (!fs.existsSync(f)) { if (Date.now() > end) throw new Error(`timeout ${f}`); sleepMs(2); } };\n\nfunction lockFd(fd) { return spawnSync('flock', ['-n', '3'], { stdio: ['ignore', 'ignore', 'ignore', fd] }).status === 0; }\n\n/** One attempt: 'acquired' | 'held'. */\nexport function hotTryAcquire(lockPath, { reclaimLock = true, beforeUnlink } = {}) {\n  const tmp = `${lockPath}.tmp-${process.pid}-${Math.random().toString(36).slice(2)}`;\n  fs.writeFileSync(tmp, JSON.stringify({ ...self(), boot: currentBoot() }));\n  try { fs.linkSync(tmp, lockPath); return 'acquired'; } catch (e) { if (e.code !== 'EEXIST') throw e; } finally { fs.unlinkSync(tmp); }\n  let raw; try { raw = fs.readFileSync(lockPath, 'utf8'); } catch (e) { if (e.code === 'ENOENT') return 'retry'; throw e; }\n  let rec = null; try { rec = JSON.parse(raw); } catch {}\n  const dead = (r) => r && (r.boot !== currentBoot() || judgeOwner(r) === 'dead');\n  if (!dead(rec)) return 'held'; // alive, unknown or unreadable: never reclaimed\n  let rfd = null;\n  if (reclaimLock) { rfd = fs.openSync(`${lockPath}.reclaim`, fs.constants.O_RDWR | fs.constants.O_CREAT); if (!lockFd(rfd)) { fs.closeSync(rfd); return 'held'; } }\n  try {\n    let cur; try { cur = fs.readFileSync(lockPath, 'utf8'); } catch (e) { if (e.code === 'ENOENT') return 'retry'; throw e; }\n    if (cur !== raw) return 'retry';\n    beforeUnlink?.();\n    fs.unlinkSync(lockPath);\n    return 'retry';\n  } finally { if (rfd !== null) fs.closeSync(rfd); }\n}\nexport function hotAcquire(lockPath, opts = {}) {\n  for (let i = 0; i < 100000; i++) { const r = hotTryAcquire(lockPath, opts); if (r === 'acquired') return true; sleepMs(r === 'retry' ? 0 : 1); }\n  return false;\n}\n\nconst role = process.argv[2];\nif (role === 'deadholder') { const [lp] = process.argv.slice(3); fs.writeFileSync(lp, JSON.stringify({ ...self(), boot: currentBoot() })); process.exit(0); }\nif (role === 'R1') {\n  const [lp, work, useLock] = process.argv.slice(3);\n  const opts = { reclaimLock: useLock === '1', beforeUnlink: () => { if (!fs.existsSync(path.join(work, 'R1-go'))) { fs.writeFileSync(path.join(work, 'R1-paused'), ''); waitFile(path.join(work, 'R1-go')); } } };\n  let r; do { r = hotTryAcquire(lp, opts); } while (r === 'retry');\n  const others = r === 'acquired' ? fs.readdirSync(path.join(work, 'cs')).length : null;\n  if (r === 'acquired') fs.writeFileSync(path.join(work, 'cs', 'R1'), '');\n  fs.writeFileSync(path.join(work, 'R1.json'), JSON.stringify({ result: r, othersInsideOnEntry: others }));\n  process.exit(0);\n}\nif (role === 'R2') {\n  const [lp, work, useLock] = process.argv.slice(3);\n  const ok = hotAcquire(lp, { reclaimLock: useLock === '1' });\n  fs.writeFileSync(path.join(work, 'cs', 'R2'), '');\n  fs.writeFileSync(path.join(work, 'R2-inside'), String(ok));\n  waitFile(path.join(work, 'R2-leave'));\n  fs.rmSync(path.join(work, 'cs', 'R2')); fs.unlinkSync(lp); process.exit(0);\n}\nif (role === 'stress') {\n  const [lp, work, iters, useLock] = process.argv.slice(3);\n  let v = 0, n = 0;\n  for (let i = 0; i < Number(iters); i++) {\n    hotAcquire(lp, { reclaimLock: useLock === '1', beforeUnlink: () => { if (Math.random() < 0.2) sleepMs(3); } }); n++;\n    if (fs.readdirSync(path.join(work, 'cs')).filter((x) => x !== String(process.pid)).length) v++;\n    fs.writeFileSync(path.join(work, 'cs', String(process.pid)), '');\n    sleepMs(Math.floor(Math.random() * 2));\n    fs.rmSync(path.join(work, 'cs', String(process.pid)), { force: true });\n    fs.unlinkSync(lp);\n  }\n  fs.writeFileSync(path.join(work, `done-${process.pid}.json`), JSON.stringify({ n, v }));\n  process.exit(0);\n}\n\nif (!role) {\n  const report = [];\n  const done = (cp) => new Promise((r) => cp.on('exit', r));\n  for (const useLock of ['0', '1']) {\n    const work = fs.mkdtempSync(path.join(HERE, `run-hot-a1-${useLock}-`)); fs.mkdirSync(path.join(work, 'cs'));\n    const lp = path.join(work, 'events.lock');\n    await done(spawn(process.execPath, [ME, 'deadholder', lp], { stdio: 'inherit' })); // X: holder died inside\n    const R1 = spawn(process.execPath, [ME, 'R1', lp, work, useLock], { stdio: 'inherit' });\n    waitFile(path.join(work, 'R1-paused'));\n    const R2 = spawn(process.execPath, [ME, 'R2', lp, work, useLock], { stdio: 'inherit' });\n    const t0 = Date.now(); while (!fs.existsSync(path.join(work, 'R2-inside')) && Date.now() - t0 < 1500) sleepMs(5);\n    const r2InsideWhileR1Paused = fs.existsSync(path.join(work, 'R2-inside'));\n    fs.writeFileSync(path.join(work, 'R1-go'), '');\n    await done(R1);\n    fs.writeFileSync(path.join(work, 'R2-leave'), '');\n    if (!r2InsideWhileR1Paused) { /* R2 may enter only after R1 left */ }\n    await new Promise((r) => setTimeout(r, 300));\n    const r1 = JSON.parse(fs.readFileSync(path.join(work, 'R1.json'), 'utf8'));\n    report.push({ case: `A1 schedule on events.lock, reclaim under kernel lock = ${useLock === '1'}`, r2EnteredWhileR1PausedBeforeUnlink: r2InsideWhileR1Paused, R1: r1, twoHolders: r1.result === 'acquired' && r1.othersInsideOnEntry > 0 });\n    R2.kill('SIGKILL');\n  }\n  for (const useLock of ['0', '1']) {\n    const work = fs.mkdtempSync(path.join(HERE, `run-hot-stress-${useLock}-`)); fs.mkdirSync(path.join(work, 'cs'));\n    const lp = path.join(work, 'events.lock');\n    const kids = [];\n    let kills = 0;\n    const startKid = (n) => { const k = spawn(process.execPath, [ME, 'stress', lp, work, String(n), useLock], { stdio: 'inherit' }); kids.push(k); return k; };\n    for (let i = 0; i < 8; i++) startKid(150);\n    const killer = setInterval(() => { // kill a holder inside the CS now and then, replace it\n      if (kills >= 20) return; const inside = fs.readdirSync(path.join(work, 'cs')); if (!inside.length) return;\n      const pid = Number(inside[0]); try { process.kill(pid, 'SIGSTOP'); fs.rmSync(path.join(work, 'cs', inside[0]), { force: true }); process.kill(pid, 'SIGKILL'); kills++; startKid(40); } catch {}\n    }, 50);\n    const t0 = Date.now();\n    while (kids.some((k) => k.exitCode === null && k.signalCode === null) && Date.now() - t0 < 60000) await new Promise((r) => setTimeout(r, 50));\n    clearInterval(killer);\n    const ds = fs.readdirSync(work).filter((f) => f.startsWith('done-')).map((f) => JSON.parse(fs.readFileSync(path.join(work, f), 'utf8')));\n    report.push({ case: `stress 8 procs, ${kills} holders SIGKILLed in CS, reclaim under kernel lock = ${useLock === '1'}`, acquisitions: ds.reduce((a, d) => a + d.n, 0), csViolations: ds.reduce((a, d) => a + d.v, 0), finishedWorkers: ds.length, elapsedMs: Date.now() - t0 });\n  }\n  fs.writeFileSync(path.join(HERE, 'probe-hot-reclaim-results.json'), JSON.stringify(report, null, 1));\n  for (const r of report) console.log(JSON.stringify(r));\n}\n",
+    "era-ledger.mjs": "// Model of the v3 holder-lock protocol (\"era ledger\"). Probe code, not an\n// implementation. Writes only under the lockDir a probe passes in.\n//\n// Layout:\n//   <lockDir>/current                 {\"era\": \"<name>\"}; created by link-if-absent,\n//                                     replaced by rename only by the current holder\n//   <lockDir>/eras/<era>/gen/<epoch>  one generation per acquire; NEVER deleted\n//                                     while its era is reachable from `current`\n//   <lockDir>/eras/<era>/rel/<epoch>  one-shot release marker\n// Era name: <firstEpoch10>-<bootIdHex>-<rand>. The boot of every record in an\n// era is the era's boot (no mtime anywhere).\n//\n// Acquire linearizes at a successful link of gen/<max+1> in era e, confirmed\n// by a post-check that `current` still names e. GC = the holder moves the\n// ledger to a new era (copy of its own record), swaps `current`, then deletes\n// the old era. A stale contender can only link into an unreachable era (post\n// check fails) or into a deleted one (ENOENT).\nimport fs from 'node:fs';\nimport path from 'node:path';\nimport crypto from 'node:crypto';\n\nexport function currentBoot() {\n  if (process.env.PROBE_BOOT_ID) return process.env.PROBE_BOOT_ID;\n  try { return fs.readFileSync('/proc/sys/kernel/random/boot_id', 'utf8').trim().replace(/-/g, ''); } catch { return 'unknown'; }\n}\nexport function startTimeOf(pid) {\n  try {\n    const s = fs.readFileSync(`/proc/${pid}/stat`, 'utf8');\n    return s.slice(s.lastIndexOf(')') + 2).split(' ')[19] || null;\n  } catch { return null; }\n}\nfunction kill0(pid) { try { process.kill(pid, 0); return true; } catch (e) { return e.code === 'EPERM'; } }\n\n/** alive | dead | unknown. Never reads mtime. */\nexport function judgeOwner(owner) {\n  if (!owner || !Number.isInteger(owner.pid)) return 'unknown';\n  if (!kill0(owner.pid)) return 'dead';\n  const st = startTimeOf(owner.pid);\n  if (st === null || !owner.startTime) return 'unknown';\n  return st === owner.startTime ? 'alive' : 'dead';\n}\nexport function self() { return { pid: process.pid, startTime: startTimeOf(process.pid) }; }\n\nconst pad = (n) => String(n).padStart(10, '0');\nconst GEN_RE = /^(\\d{10})$/;\nconst eraBoot = (era) => era.split('-')[1];\nconst eraFirst = (era) => Number(era.split('-')[0]);\n\nfunction readPointer(lockDir) {\n  try { return JSON.parse(fs.readFileSync(path.join(lockDir, 'current'), 'utf8')).era; }\n  catch (e) { if (e.code === 'ENOENT') return null; throw e; }\n}\nfunction writeFileFsync(p, content) {\n  const fd = fs.openSync(p, 'w'); try { fs.writeSync(fd, content); fs.fsyncSync(fd); } finally { fs.closeSync(fd); }\n}\nfunction newEraName(firstEpoch) { return `${pad(firstEpoch)}-${currentBoot()}-${crypto.randomBytes(4).toString('hex')}`; }\n\nfunction bootstrap(lockDir) {\n  const era = newEraName(0);\n  fs.mkdirSync(path.join(lockDir, 'eras', era, 'gen'), { recursive: true });\n  fs.mkdirSync(path.join(lockDir, 'eras', era, 'rel'), { recursive: true });\n  const tmp = path.join(lockDir, `.ptr-${process.pid}-${crypto.randomBytes(4).toString('hex')}`);\n  writeFileFsync(tmp, JSON.stringify({ era }));\n  try { fs.linkSync(tmp, path.join(lockDir, 'current')); }\n  catch (e) { if (e.code !== 'EEXIST') throw e; fs.rmSync(path.join(lockDir, 'eras', era), { recursive: true, force: true }); }\n  fs.unlinkSync(tmp);\n}\n\n/** Name-based max of a reachable era. Null for an era with no generations. */\nfunction maxEpochByName(genDir) {\n  const names = fs.readdirSync(genDir); // throws ENOENT when the era was deleted\n  let max = null;\n  for (const n of names) { const m = GEN_RE.exec(n); if (m && (max === null || Number(m[1]) > max)) max = Number(m[1]); }\n  return max;\n}\n\n/**\n * One acquire attempt loop. Returns {status:'acquired', handle} or\n * {status:'held', reason}. Hooks let probes pause at the dangerous gaps.\n */\nexport function tryAcquire(lockDir, { owner = self(), compactEvery = 64, hooks = {}, stats = {}, extraHeld = null } = {}) {\n  fs.mkdirSync(path.join(lockDir, 'eras'), { recursive: true });\n  for (let loops = 0; loops < 10000; loops++) {\n    let era = readPointer(lockDir);\n    if (era === null) { bootstrap(lockDir); continue; }\n    hooks.afterPointer?.({ era });\n    const eraDir = path.join(lockDir, 'eras', era);\n    let max;\n    try { max = maxEpochByName(path.join(eraDir, 'gen')); }\n    catch (e) { if (e.code === 'ENOENT') { stats.eraGone = (stats.eraGone || 0) + 1; continue; } throw e; }\n    const bootDead = eraBoot(era) !== 'unknown' && eraBoot(era) !== currentBoot();\n    if (max !== null && !bootDead) {\n      let rec;\n      try { rec = fs.readFileSync(path.join(eraDir, 'gen', pad(max)), 'utf8'); }\n      catch (e) { if (e.code === 'ENOENT') { stats.eraGone = (stats.eraGone || 0) + 1; continue; } throw e; }\n      let parsed = null; try { parsed = JSON.parse(rec); } catch {}\n      if (parsed === null) return { status: 'held', reason: 'unknown-record' };\n      const released = fs.existsSync(path.join(eraDir, 'rel', pad(max)));\n      if (!released) {\n        const verdict = judgeOwner(parsed.owner);\n        if (verdict !== 'dead') return { status: 'held', reason: verdict, holder: parsed.owner };\n        // Generation stays held while a bound borrower of it is alive.\n        if (extraHeld?.(parsed)) return { status: 'held', reason: 'borrower-alive' };\n      }\n    }\n    const next = (max ?? eraFirst(era)) + 1;\n    hooks.beforeLink?.({ era, next });\n    const token = crypto.randomUUID();\n    const tmp = path.join(lockDir, `.tmp-${process.pid}-${crypto.randomBytes(4).toString('hex')}`);\n    fs.writeFileSync(tmp, JSON.stringify({ v: 3, epoch: next, token, owner }));\n    try { fs.linkSync(tmp, path.join(eraDir, 'gen', pad(next))); }\n    catch (e) {\n      fs.unlinkSync(tmp);\n      if (e.code === 'EEXIST' || e.code === 'ENOENT') { stats.lostLink = (stats.lostLink || 0) + 1; continue; }\n      throw e;\n    }\n    fs.unlinkSync(tmp);\n    hooks.beforePostCheck?.({ era, next });\n    if (process.env.PROBE_NO_POSTCHECK !== '1' && readPointer(lockDir) !== era) { stats.unreachableLink = (stats.unreachableLink || 0) + 1; continue; }\n    const handle = { lockDir, era, epoch: next, token, owner };\n    if (bootDead || next - eraFirst(era) >= compactEvery) compact(handle, stats);\n    return { status: 'acquired', handle };\n  }\n  throw new Error('acquire loop bound');\n}\n\n/** Holder-only: move the ledger to a fresh era holding a copy of our record. */\nfunction compact(handle, stats) {\n  const { lockDir, era: oldEra, epoch } = handle;\n  const era = newEraName(epoch);\n  const eraDir = path.join(lockDir, 'eras', era);\n  fs.mkdirSync(eraDir); // exclusive: a fresh, unique name\n  fs.mkdirSync(path.join(eraDir, 'gen'));\n  fs.mkdirSync(path.join(eraDir, 'rel'));\n  fs.copyFileSync(path.join(lockDir, 'eras', oldEra, 'gen', pad(epoch)), path.join(eraDir, 'gen', pad(epoch)));\n  const tmp = path.join(lockDir, `.ptr-${process.pid}-${crypto.randomBytes(4).toString('hex')}`);\n  writeFileFsync(tmp, JSON.stringify({ era }));\n  fs.renameSync(tmp, path.join(lockDir, 'current'));\n  handle.era = era;\n  stats.compactions = (stats.compactions || 0) + 1;\n  // Delete every era other than the one we just made current.\n  if (process.env.PROBE_KEEP_OLD_ERAS === '1') return;\n  for (const name of fs.readdirSync(path.join(lockDir, 'eras'))) {\n    if (name !== era) { try { fs.rmSync(path.join(lockDir, 'eras', name), { recursive: true, force: true }); } catch {} }\n  }\n}\n\nexport function release(handle) {\n  const p = path.join(handle.lockDir, 'eras', handle.era, 'rel', pad(handle.epoch));\n  const tmp = `${p}.tmp-${process.pid}`;\n  fs.writeFileSync(tmp, '{}');\n  try { fs.linkSync(tmp, p); } catch (e) { if (e.code !== 'EEXIST') throw e; }\n  fs.unlinkSync(tmp);\n}\n\nexport function sleepMs(ms) { Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms); }\n",
+    "p4_gate.py": "#!/usr/bin/env python3\n\"\"\"P4 gate (stand-in for the Rust `fgos gate`): the attempt's process root.\nHolds the attempt lock description (inherited fd, close-on-exec for the\nworker), child subreaper, hard ceiling independent of the supervisor, tree\nkill on exit or SIGTERM, exit report published once.\nargv: --fd N --ceiling-ms MS --report PATH --stdout P --stderr P -- worker...\n\"\"\"\nimport ctypes, json, os, signal, sys, time\n\na = sys.argv[1:]\nsep = a.index(\"--\")\nopts = dict(zip(a[:sep:2], a[1:sep:2]))\nworker = a[sep + 1:]\nlock_fd = int(opts[\"--fd\"])\nceiling_s = int(opts[\"--ceiling-ms\"]) / 1000\nreport = opts[\"--report\"]\nlibc = ctypes.CDLL(None, use_errno=True)\nlibc.prctl(36, 1, 0, 0, 0)                       # PR_SET_CHILD_SUBREAPER\nos.set_inheritable(lock_fd, False)\n\nout = os.open(opts[\"--stdout\"], os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o600)\nerr = os.open(opts[\"--stderr\"], os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o600)\npid = os.fork()\nif pid == 0:\n    libc.prctl(1, signal.SIGKILL, 0, 0, 0)       # PR_SET_PDEATHSIG\n    os.setpgid(0, 0)\n    os.dup2(out, 1); os.dup2(err, 2)             # capture to files, never a pipe to the supervisor\n    os.execvp(worker[0], worker)\n\nstop = {\"why\": None}\ndef on_term(_s, _f):\n    stop[\"why\"] = \"stopped\"\nsignal.signal(signal.SIGTERM, on_term)\n\nstart = time.monotonic()\nstatus = None\nwhile status is None:\n    if stop[\"why\"] is None and time.monotonic() - start > ceiling_s:\n        stop[\"why\"] = \"hard-ceiling\"\n    if stop[\"why\"]:\n        try: os.killpg(pid, signal.SIGTERM)\n        except ProcessLookupError: pass\n    try:\n        p, st = os.waitpid(pid, os.WNOHANG)\n        if p == pid:\n            status = st\n    except ChildProcessError:\n        status = -1\n    time.sleep(0.02)\n\nkilled = []\nfor sig in (signal.SIGTERM, signal.SIGKILL):\n    try:\n        kids = [int(x) for x in open(f\"/proc/{os.getpid()}/task/{os.getpid()}/children\").read().split()]\n    except Exception:\n        kids = []\n    for k in kids:\n        try: os.kill(k, sig); killed.append(k)\n        except ProcessLookupError: pass\n    time.sleep(0.05)\n    while True:\n        try:\n            if os.waitpid(-1, os.WNOHANG) == (0, 0): break\n        except ChildProcessError: break\n\nrec = {\"workerPid\": pid, \"waitStatus\": status, \"exitCode\": os.waitstatus_to_exitcode(status) if status >= 0 else None,\n       \"stoppedBy\": stop[\"why\"], \"descendantsKilled\": sorted(set(killed))}\ntmp = report + f\".tmp{os.getpid()}\"\nopen(tmp, \"w\").write(json.dumps(rec))\ntry: os.link(tmp, report)                         # published once\nexcept FileExistsError: pass\nos.unlink(tmp)\n",
+    "p4-adopt.mjs": "// P4 adopter (stand-in for `fgos run --resume` / the reaper sweep). The only\n// question it asks: is the attempt lock held? Held -> somebody of the attempt\n// is alive (supervisor, gate or worker): keep everything. Free -> nobody is:\n// acquire it, take run control (old holder provably dead), publish an adopted\n// receipt from the evidence on disk (gate exit report, worker outbox) instead\n// of rerunning, settle through the same CAS, release. argv: attemptDir\nimport fs from 'node:fs';\nimport path from 'node:path';\nimport { spawnSync } from 'node:child_process';\nimport { acquireRunControl, buildRunControlHolder } from '/home/vantt/projects/forgentX/src/runner/dispatch/run-lock.mjs';\n\nconst d = process.argv[2];\nconst here = path.dirname(new URL(import.meta.url).pathname);\nconst lockFd = fs.openSync(path.join(d, 'attempt.lock'), 'r');\nconst a = spawnSync('flock', ['-n', '3'], { stdio: ['ignore', 'ignore', 'ignore', lockFd] });\nif (a.status !== 0) {\n  fs.closeSync(lockFd);\n  console.log(JSON.stringify({ adopt: 'kept', reason: 'attempt-lock-held' }));\n  process.exit(0);\n}\nif (fs.existsSync(path.join(d, 'result.json'))) {\n  console.log(JSON.stringify({ adopt: 'nothing-to-do', reason: 'already-settled' }));\n  process.exit(0);\n}\nconst control = acquireRunControl(d, { holder: buildRunControlHolder(`adopt:${process.pid}`), purpose: 'adopt' });\nif (control.status !== 'acquired') { console.log(JSON.stringify({ adopt: 'refused', control })); process.exit(0); }\nfs.writeFileSync(path.join(d, 'adopt-token.json'), JSON.stringify({ controlEpoch: control.controlEpoch, controlToken: control.controlToken }), { mode: 0o600 });\nconst gx = fs.existsSync(path.join(d, 'gate-exit.json')) ? JSON.parse(fs.readFileSync(path.join(d, 'gate-exit.json'), 'utf8')) : null;\nconst receipt = {\n  by: 'adopter',\n  kind: !gx ? 'worker-state-unknown' : gx.stoppedBy === 'hard-ceiling' ? 'timeout' : gx.exitCode === 0 ? 'exited' : 'failed',\n  gateExit: gx,\n  workerResultPresent: fs.existsSync(path.join(d, 'outbox', 'result-1.json')),\n};\nconst tmp = path.join(d, `receipt.tmp${process.pid}`);\nfs.writeFileSync(tmp, JSON.stringify(receipt));\nlet published = true;\ntry { fs.linkSync(tmp, path.join(d, 'receipt.json')); } catch { published = false; }\nfs.unlinkSync(tmp);\nconst settle = spawnSync(process.execPath, [path.join(here, 'p4-settle.mjs'), d, path.join(d, 'adopt-token.json')], { stdio: ['ignore', 'ignore', 'ignore', lockFd] });\nspawnSync('sh', ['-c', `rm -rf ${JSON.stringify(path.join(d, 'home'))}`]);\nconsole.log(JSON.stringify({ adopt: 'adopted', receiptPublishedByAdopter: published, settleExit: settle.status, controlEpoch: control.controlEpoch }));\n",
+    "p4-settle.mjs": "// P4 settle step (stand-in for the Node `settleRunOutcome` door run as a\n// supervisor child). Reads the receipt, writes result.json only through the\n// production run-control CAS (settleRunControl, read-only import), so a second\n// settler is refused. argv: attemptDir tokenFile\nimport fs from 'node:fs';\nimport path from 'node:path';\nimport { settleRunControl } from '/home/vantt/projects/forgentX/src/runner/dispatch/run-lock.mjs';\n\nconst [d, tokenFile] = process.argv.slice(2);\nconst { controlEpoch, controlToken } = JSON.parse(fs.readFileSync(tokenFile, 'utf8'));\nconst receipt = JSON.parse(fs.readFileSync(path.join(d, 'receipt.json'), 'utf8'));\nconst cas = settleRunControl(d, { controlEpoch, controlToken });\nif (cas.status !== 'settled') {\n  fs.writeFileSync(path.join(d, `settle-refused-${process.pid}.json`), JSON.stringify(cas));\n  process.exit(2);\n}\nconst outbox = path.join(d, 'outbox', 'result-1.json');\nconst result = {\n  status: receipt.kind === 'timeout' ? 'timeout' : receipt.workerResultPresent ? 'pass' : 'failed',\n  receiptBy: receipt.by,\n  workerClaim: fs.existsSync(outbox) ? JSON.parse(fs.readFileSync(outbox, 'utf8')) : null,\n  settledEpoch: cas.controlEpoch,\n};\nfs.writeFileSync(path.join(d, 'result.json'), JSON.stringify(result));\n",
+    "run-probes.py": "import subprocess,json,pathlib,time,os,signal,hashlib,datetime\np=pathlib.Path(__file__).resolve().parent\ncommands=[['node','r3-legacy.mjs'],['node','r3-cutover.mjs'],['python3','r3-process.py'],['node','r3-git-hot.mjs'],['python3','r3-admission-terminal.py'],['node','r3-settlement.mjs'],['node','r3-positive.mjs'],['python3','probe_terminal_gate_fd_passing.py'],['node','probe-hot-reclaim.mjs']]\nresults=[]\nfor cmd in commands:\n start=time.monotonic();c=subprocess.Popen(cmd,cwd=p,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,start_new_session=True)\n try:out,err=c.communicate(timeout=90);timed=False\n except subprocess.TimeoutExpired:\n  os.killpg(c.pid,signal.SIGKILL);out,err=c.communicate();timed=True\n rec={'argv':cmd,'cwd':str(p),'exitCode':c.returncode,'timeout':timed,'elapsedSeconds':round(time.monotonic()-start,3),'stdout':out,'stderr':err}\n try:rec['parsed']=json.loads(out)\n except ValueError:\n  try:rec['parsed']=[json.loads(x) for x in out.splitlines() if x.strip()]\n  except ValueError:pass\n results.append(rec)\n print(json.dumps({'argv':cmd,'exit':c.returncode,'seconds':rec['elapsedSeconds'],'timeout':timed}),flush=True)\n(p/'captured-results.json').write_text(json.dumps(results,ensure_ascii=False,indent=2))\n",
+    "capture-final.py": "import pathlib,json,subprocess,time,hashlib,datetime,os\np=pathlib.Path(__file__).resolve().parent;repo=pathlib.Path('/home/vantt/projects/forgentX')\nresults=json.loads((p/'captured-results.json').read_text())\nresults[2]['scriptVersion']='r3-process-attempt1.py'\nfor cmd in [['python3','r3-process.py'],['node','r3-reaper-migration.mjs']]:\n t=time.monotonic();r=subprocess.run(cmd,cwd=p,capture_output=True,text=True,timeout=15)\n x={'argv':cmd,'cwd':str(p),'exitCode':r.returncode,'elapsedSeconds':round(time.monotonic()-t,3),'stdout':r.stdout,'stderr':r.stderr}\n try:x['parsed']=json.loads(r.stdout)\n except ValueError:pass\n results.append(x)\n print(json.dumps({'argv':cmd,'exit':r.returncode,'seconds':x['elapsedSeconds']}))\npaths=['plans/reports/design-261015-2103-lock-and-run-supervisor-foundation-v3.md','plans/reports/design-261015-2103-lock-and-run-supervisor-foundation-v3-probes.json','src/runner/main-checkout-lock.mjs','src/state/events.mjs','src/state/runtime-coordination.mjs','src/state/store.mjs','src/runner/dispatch/provider-capacity.mjs','src/runner/dispatch/run-lock.mjs','src/runner/dispatch/settlement.mjs','src/runner/dispatch/confinement/cleanup.mjs','src/runner/dispatch/confinement/authority.mjs','src/runner/dispatch/transport.mjs','src/runner/merge.mjs','src/runner/claim-port.mjs','src/runner/execution/run.mjs','packages/distribution/rust/src/lock.rs','packages/distribution/rust/src/store.rs','packages/distribution/rust/src/init.rs','packages/observe/rust/src/store_lock.rs','.githooks/pre-commit']\nhashes={}\nfor n in paths:\n data=(repo/n).read_bytes();old=subprocess.check_output(['git','show','fb3b6113e:'+n],cwd=repo)\n hashes[n]={'workspaceSha256':hashlib.sha256(data).hexdigest(),'reviewCommitSha256':hashlib.sha256(old).hexdigest(),'sameAsReviewCommit':data==old}\nused=['r3-legacy.mjs','r3-cutover.mjs','r3-process.py','r3-process-attempt1.py','r3-grandchild.py','r3-ignore-term.py','r3-result-before-finalize.py','r3-late-pdeath.py','r3-git-hot.mjs','r3-admission-terminal.py','r3-settlement.mjs','r3-positive.mjs','r3-reaper-migration.mjs','probe_terminal_gate_fd_passing.py','probe-hot-reclaim.mjs','era-ledger.mjs','p4_gate.py','p4-adopt.mjs','p4-settle.mjs','run-probes.py','capture-final.py']\nobj={'schema':'fgos-independent-review-probes.v1','reviewCommit':'fb3b6113ebedf0b6ee34f8b4abaf75f7187e2407','headAtCapture':subprocess.check_output(['git','rev-parse','HEAD'],cwd=repo,text=True).strip(),'capturedAt':datetime.datetime.now(datetime.timezone.utc).isoformat(),'environment':{'uname':subprocess.check_output(['uname','-a'],text=True).strip(),'node':subprocess.check_output(['node','--version'],text=True).strip(),'python':subprocess.check_output(['python3','--version'],text=True).strip(),'git':subprocess.check_output(['git','--version'],text=True).strip(),'flock':subprocess.check_output(['flock','--version'],text=True).strip(),'note':'All running state fixtures under mkdtemp outside repository. /tmp and /dev/shm are tmpfs. /var/tmp is read-only; no ext/overlay/network/platform probe certified. Git alias probe creates no commits.'},'sourceSha256':hashes,'scripts':{n:(p/n).read_text() for n in used},'scriptSha256':{n:hashlib.sha256((p/n).read_bytes()).hexdigest() for n in used},'executions':results,'limitations':['Rust v3 crates do not exist; native flock and Python model used.','Terminal allocation/sweep probe models specified policy with real subprocess side effect; no live herdr mutation.','Git alias fd propagation is not a replay of actual git pre-commit invocation; original design bundle contains that narrower positive proof.','Initial r3-process.py run failed only at /var/tmp EROFS; final run records this unsupported mount then executes remaining cases.','probe-hot-reclaim.mjs negative-control stress emits expected ENOENT crashes; zero violations only applies to serialized-reclaim case.']}\n(p/'evidence-probes.json').write_text(json.dumps(obj,ensure_ascii=False,indent=2))\nprint('Evidence bytes', (p/'evidence-probes.json').stat().st_size)\n"
+  },
+  "scriptSha256": {
+    "r3-legacy.mjs": "e00ed661bbeef11dc1e6078e4a7f753330b03162ed73ad26325a7e66aa371f61",
+    "r3-cutover.mjs": "b30effbb5bd428cf61adc9df2afed7eeb7b5510306938d715543c3744665fb65",
+    "r3-process.py": "74c72c4b657f3032854f6af1a70045e3d6ec13bc1b1ecdedb2f632cf25af2848",
+    "r3-process-attempt1.py": "aed53fb907d159cdefe86ce473f965fcf4b32af5c95417fc1b2afa59c55d98d2",
+    "r3-grandchild.py": "bc0382d0f62df4464008505f376945e575a311aa26d6ff898b916044c2d76fbb",
+    "r3-ignore-term.py": "9847d62311fac1346cb90971cad5ea66493472dff547c212cd11e3c07e78dcd0",
+    "r3-result-before-finalize.py": "a2c81c27e4c5cb9b46174b4dc00e9a14f9d8c1641e96749a68364c82393f7b96",
+    "r3-late-pdeath.py": "8dfa66b38b79b087312c6e059e2dff10206fd5a6fc5911005aa83533534f781a",
+    "r3-git-hot.mjs": "79db438c5e0e645c102651ef22f67125f477b1121354f62f41640ab70b04fecc",
+    "r3-admission-terminal.py": "afa0bab362b21bf9d80f06388c846f03b031b669c1f73e5d618cada2a2c252b9",
+    "r3-settlement.mjs": "b66945aff5eab34c4fffbfc8804851bb37b898c75cead0610c6833c8fe750866",
+    "r3-positive.mjs": "feef9dab698dcfd9b0fd07b787010a29ac07e4e1ad42bf0e5649afefc0835649",
+    "r3-reaper-migration.mjs": "dca11c51645a830b13ab84a01f29d9be6d575c57d388bf40e3bc50320638b051",
+    "probe_terminal_gate_fd_passing.py": "b2fa5a1f01d1befc08780a45fe42fec9974b93c32479f0eb3c0ef929e70e2f68",
+    "probe-hot-reclaim.mjs": "7e83f9a9eca1c5ad514b317e7328dc033c579cfb68a8b30194398f3b129d6271",
+    "era-ledger.mjs": "dd5d8d2eff94a59f0b71932f9bb9615f56980712a24886265d0fc714e98e6771",
+    "p4_gate.py": "dc5aa852c3d826d0af37918e437d8a880a7354784812fd8e90bea858db3d7b0e",
+    "p4-adopt.mjs": "a81a4267b01588890889c375a27970df1bf0d1502d459c70f040231dd3755477",
+    "p4-settle.mjs": "cda134018ba107ac2c4d73baa5a296f1a28e647e5aba80d31c64cb88bf5d61a0",
+    "run-probes.py": "6244efec88607056e8eca67b95d848df71900c07b8f75d3a33d4fc36836eca66",
+    "capture-final.py": "a0d73990ed4ce1b20e1893b5b21113f3bfa255852ff1667b7d3a6a51fcfb02dd"
+  },
+  "executions": [
+    {
+      "argv": [
+        "node",
+        "r3-legacy.mjs"
+      ],
+      "cwd": "/tmp/fgos-r3-redteam-rkxqjbbb",
+      "exitCode": 0,
+      "timeout": false,
+      "elapsedSeconds": 0.054,
+      "stdout": "{\n  \"root\": \"/tmp/fgos-r3-legacy-B6Ueh8\",\n  \"reports\": [\n    {\n      \"case\": \"production provider account acquire with directory tombstone\",\n      \"v3KernelAcquired\": true,\n      \"v1Acquired\": true,\n      \"files\": [\n        \"0000000001.json\",\n        \"TOMBSTONE\"\n      ],\n      \"twoProtocolsHeld\": true\n    },\n    {\n      \"case\": \"production tombstone main\",\n      \"entered\": false,\n      \"code\": \"EISDIR\",\n      \"tombstoneIntact\": true\n    },\n    {\n      \"case\": \"production tombstone events\",\n      \"entered\": false,\n      \"code\": \"EISDIR\",\n      \"tombstoneIntact\": true\n    },\n    {\n      \"case\": \"production tombstone claims\",\n      \"entered\": false,\n      \"code\": \"EISDIR\",\n      \"tombstoneIntact\": true\n    },\n    {\n      \"case\": \"same cwd, legacy fgosDir B not tombstoned by A\",\n      \"v3KernelHeld\": true,\n      \"v1Status\": \"acquired\",\n      \"legacyFile\": \"dispatch--%2Ftmp%2Ffgos-r3-legacy-B6Ueh8%2Fcwd.lock\",\n      \"twoProtocolsHeld\": true\n    }\n  ]\n}\n",
+      "stderr": "",
+      "parsed": {
+        "root": "/tmp/fgos-r3-legacy-B6Ueh8",
+        "reports": [
+          {
+            "case": "production provider account acquire with directory tombstone",
+            "v3KernelAcquired": true,
+            "v1Acquired": true,
+            "files": [
+              "0000000001.json",
+              "TOMBSTONE"
+            ],
+            "twoProtocolsHeld": true
+          },
+          {
+            "case": "production tombstone main",
+            "entered": false,
+            "code": "EISDIR",
+            "tombstoneIntact": true
+          },
+          {
+            "case": "production tombstone events",
+            "entered": false,
+            "code": "EISDIR",
+            "tombstoneIntact": true
+          },
+          {
+            "case": "production tombstone claims",
+            "entered": false,
+            "code": "EISDIR",
+            "tombstoneIntact": true
+          },
+          {
+            "case": "same cwd, legacy fgosDir B not tombstoned by A",
+            "v3KernelHeld": true,
+            "v1Status": "acquired",
+            "legacyFile": "dispatch--%2Ftmp%2Ffgos-r3-legacy-B6Ueh8%2Fcwd.lock",
+            "twoProtocolsHeld": true
+          }
+        ]
+      }
+    },
+    {
+      "argv": [
+        "node",
+        "r3-cutover.mjs"
+      ],
+      "cwd": "/tmp/fgos-r3-redteam-rkxqjbbb",
+      "exitCode": 0,
+      "timeout": false,
+      "elapsedSeconds": 0.232,
+      "stdout": "{\n  \"case\": \"new legacy launch after quiescence scan; TTL steal hides still-live A before tombstone\",\n  \"root\": \"/tmp/fgos-r3-cutover-QyfFPK\",\n  \"scanBeforeLaunch\": [],\n  \"AStatus\": \"acquired\",\n  \"BStatus\": \"acquired\",\n  \"absentBeforeTombstone\": true,\n  \"v3Acquired\": true,\n  \"AStillWriting\": true,\n  \"twoHolders\": true\n}\n",
+      "stderr": "",
+      "parsed": {
+        "case": "new legacy launch after quiescence scan; TTL steal hides still-live A before tombstone",
+        "root": "/tmp/fgos-r3-cutover-QyfFPK",
+        "scanBeforeLaunch": [],
+        "AStatus": "acquired",
+        "BStatus": "acquired",
+        "absentBeforeTombstone": true,
+        "v3Acquired": true,
+        "AStillWriting": true,
+        "twoHolders": true
+      }
+    },
+    {
+      "argv": [
+        "python3",
+        "r3-process.py"
+      ],
+      "cwd": "/tmp/fgos-r3-redteam-rkxqjbbb",
+      "exitCode": 1,
+      "timeout": false,
+      "elapsedSeconds": 0.1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"/tmp/fgos-r3-redteam-rkxqjbbb/r3-process.py\", line 27, in <module>\n    d=pathlib.Path(tempfile.mkdtemp(prefix='r3-flock-',dir=base));p=d/'lock'\n  File \"/usr/lib/python3.10/tempfile.py\", line 523, in mkdtemp\n    _os.mkdir(file, 0o700)\nOSError: [Errno 30] Read-only file system: '/var/tmp/r3-flock-c2ya9utn'\n",
+      "parsed": [],
+      "scriptVersion": "r3-process-attempt1.py"
+    },
+    {
+      "argv": [
+        "node",
+        "r3-git-hot.mjs"
+      ],
+      "cwd": "/tmp/fgos-r3-redteam-rkxqjbbb",
+      "exitCode": 0,
+      "timeout": false,
+      "elapsedSeconds": 0.203,
+      "stdout": "{\n  \"root\": \"/tmp/fgos-r3-git-hot-LKV1UM\",\n  \"reports\": [\n    {\n      \"case\": \"real git shell alias -> background shell child inherits lock fd without explicit pass\",\n      \"gitVersion\": \"git version 2.34.1\",\n      \"gitExit\": 0,\n      \"gitStderr\": \"\",\n      \"ownerFdClosed\": true,\n      \"contenderAcquiredAfterGitExit\": false,\n      \"backgroundPid\": 3425399,\n      \"fdinfo\": \"pos:\\t0\\nflags:\\t0100002\\nmnt_id:\\t7649\\nino:\\t643\\nlock:\\t1: FLOCK  ADVISORY  WRITE 3425393 00:5e:643 0 EOF\\n\"\n    },\n    {\n      \"case\": \"after killing leaked child\",\n      \"contenderAcquired\": true\n    },\n    {\n      \"case\": \"Node default spawn fd discipline\",\n      \"contenderAcquiredDespiteLiveUnrelatedChild\": true\n    },\n    {\n      \"case\": \"production assertPlanEvidence called under events.lock (moveWork path)\",\n      \"calls\": [\n        {\n          \"file\": \"git\",\n          \"args\": [\n            \"rev-parse\",\n            \"--verify\",\n            \"--quiet\",\n            \"refs/heads/fgw/fixture\"\n          ],\n          \"underHotLock\": true\n        }\n      ]\n    },\n    {\n      \"case\": \"literal v3 thenable guard with separate process B\",\n      \"rejected\": \"hot-lock-async-body\",\n      \"AContinuedAfterRelease\": true,\n      \"AWriteWhileBHeld\": true\n    }\n  ]\n}\n",
+      "stderr": "",
+      "parsed": {
+        "root": "/tmp/fgos-r3-git-hot-LKV1UM",
+        "reports": [
+          {
+            "case": "real git shell alias -> background shell child inherits lock fd without explicit pass",
+            "gitVersion": "git version 2.34.1",
+            "gitExit": 0,
+            "gitStderr": "",
+            "ownerFdClosed": true,
+            "contenderAcquiredAfterGitExit": false,
+            "backgroundPid": 3425399,
+            "fdinfo": "pos:\t0\nflags:\t0100002\nmnt_id:\t7649\nino:\t643\nlock:\t1: FLOCK  ADVISORY  WRITE 3425393 00:5e:643 0 EOF\n"
+          },
+          {
+            "case": "after killing leaked child",
+            "contenderAcquired": true
+          },
+          {
+            "case": "Node default spawn fd discipline",
+            "contenderAcquiredDespiteLiveUnrelatedChild": true
+          },
+          {
+            "case": "production assertPlanEvidence called under events.lock (moveWork path)",
+            "calls": [
+              {
+                "file": "git",
+                "args": [
+                  "rev-parse",
+                  "--verify",
+                  "--quiet",
+                  "refs/heads/fgw/fixture"
+                ],
+                "underHotLock": true
+              }
+            ]
+          },
+          {
+            "case": "literal v3 thenable guard with separate process B",
+            "rejected": "hot-lock-async-body",
+            "AContinuedAfterRelease": true,
+            "AWriteWhileBHeld": true
+          }
+        ]
+      }
+    },
+    {
+      "argv": [
+        "python3",
+        "r3-admission-terminal.py"
+      ],
+      "cwd": "/tmp/fgos-r3-redteam-rkxqjbbb",
+      "exitCode": 0,
+      "timeout": false,
+      "elapsedSeconds": 0.068,
+      "stdout": "{\n  \"root\": \"/tmp/fgos-r3-admission-en1usf7s\",\n  \"reports\": [\n    {\n      \"case\": \"terminal launch effect happened; launcher killed before launched marker\",\n      \"allocationPresent\": true,\n      \"launchedPresent\": false,\n      \"liveAgent\": true,\n      \"allocationGraceExpired\": true,\n      \"v3SweepWouldClose\": true\n    },\n    {\n      \"case\": \"prepared home before controller first takes attempt lock\",\n      \"reaperExit\": 0,\n      \"controllerCanTakeLockAfterReap\": true,\n      \"homeDeletedBeforeHandoff\": true\n    }\n  ]\n}\n",
+      "stderr": "",
+      "parsed": {
+        "root": "/tmp/fgos-r3-admission-en1usf7s",
+        "reports": [
+          {
+            "case": "terminal launch effect happened; launcher killed before launched marker",
+            "allocationPresent": true,
+            "launchedPresent": false,
+            "liveAgent": true,
+            "allocationGraceExpired": true,
+            "v3SweepWouldClose": true
+          },
+          {
+            "case": "prepared home before controller first takes attempt lock",
+            "reaperExit": 0,
+            "controllerCanTakeLockAfterReap": true,
+            "homeDeletedBeforeHandoff": true
+          }
+        ]
+      }
+    },
+    {
+      "argv": [
+        "node",
+        "r3-settlement.mjs"
+      ],
+      "cwd": "/tmp/fgos-r3-redteam-rkxqjbbb",
+      "exitCode": 0,
+      "timeout": false,
+      "elapsedSeconds": 0.112,
+      "stdout": "{\n  \"case\": \"SIGKILL after real settleRunControl before result publish\",\n  \"root\": \"/tmp/fgos-r3-settlement-RqgCYk\",\n  \"childSignal\": \"SIGKILL\",\n  \"CAS\": {\n    \"status\": \"settled\",\n    \"controlEpoch\": 2\n  },\n  \"adopterExit\": 0,\n  \"adopter\": \"{\\\"adopt\\\":\\\"refused\\\",\\\"control\\\":{\\\"status\\\":\\\"settled\\\",\\\"controlEpoch\\\":2}}\",\n  \"resultStillAbsent\": true\n}\n",
+      "stderr": "",
+      "parsed": {
+        "case": "SIGKILL after real settleRunControl before result publish",
+        "root": "/tmp/fgos-r3-settlement-RqgCYk",
+        "childSignal": "SIGKILL",
+        "CAS": {
+          "status": "settled",
+          "controlEpoch": 2
+        },
+        "adopterExit": 0,
+        "adopter": "{\"adopt\":\"refused\",\"control\":{\"status\":\"settled\",\"controlEpoch\":2}}",
+        "resultStillAbsent": true
+      }
+    },
+    {
+      "argv": [
+        "node",
+        "r3-positive.mjs"
+      ],
+      "cwd": "/tmp/fgos-r3-redteam-rkxqjbbb",
+      "exitCode": 0,
+      "timeout": false,
+      "elapsedSeconds": 0.604,
+      "stdout": "{\n  \"root\": \"/tmp/fgos-r3-positive-O91HT6\",\n  \"reports\": [\n    {\n      \"case\": \"same Node process, two open descriptions\",\n      \"first\": true,\n      \"second\": false,\n      \"afterFirstClose\": true\n    },\n    {\n      \"case\": \"helper acquired then timed out before reporting\",\n      \"signal\": \"SIGKILL\",\n      \"error\": \"ETIMEDOUT\",\n      \"elapsedMs\": 83,\n      \"heldBeforeParentClose\": true,\n      \"freeAfterParentClose\": true\n    },\n    {\n      \"case\": \"4 processes x 50 acquisitions\",\n      \"acquisitions\": 200,\n      \"violations\": 0,\n      \"lockFreeAtEnd\": true\n    }\n  ]\n}\n",
+      "stderr": "",
+      "parsed": {
+        "root": "/tmp/fgos-r3-positive-O91HT6",
+        "reports": [
+          {
+            "case": "same Node process, two open descriptions",
+            "first": true,
+            "second": false,
+            "afterFirstClose": true
+          },
+          {
+            "case": "helper acquired then timed out before reporting",
+            "signal": "SIGKILL",
+            "error": "ETIMEDOUT",
+            "elapsedMs": 83,
+            "heldBeforeParentClose": true,
+            "freeAfterParentClose": true
+          },
+          {
+            "case": "4 processes x 50 acquisitions",
+            "acquisitions": 200,
+            "violations": 0,
+            "lockFreeAtEnd": true
+          }
+        ]
+      }
+    },
+    {
+      "argv": [
+        "python3",
+        "probe_terminal_gate_fd_passing.py"
+      ],
+      "cwd": "/tmp/fgos-r3-redteam-rkxqjbbb",
+      "exitCode": 0,
+      "timeout": false,
+      "elapsedSeconds": 1.592,
+      "stdout": "{\"case\": \"handover-then-supervisor-dies\", \"strangerCanLockAfterSupervisorDeath\": false, \"gateExit\": {\"ran\": true, \"exit\": 0, \"heldLockFd\": 4, \"seconds\": 1.2}, \"workerRan\": true, \"strangerCanLockAfterGateExit\": true}\n{\"case\": \"gate-starts-after-supervisor-died\", \"gateExit\": {\"ran\": false, \"why\": \"connect:111\"}, \"workerRan\": false, \"strangerCanLockAfterGateExit\": true}\n{\"case\": \"supervisor-dies-while-gate-waits-for-go\", \"strangerCanLockAfterSupervisorDeath\": true, \"gateExit\": {\"ran\": false, \"why\": \"eof-before-go\"}, \"workerRan\": false, \"strangerCanLockAfterGateExit\": true}\n",
+      "stderr": "",
+      "parsed": [
+        {
+          "case": "handover-then-supervisor-dies",
+          "strangerCanLockAfterSupervisorDeath": false,
+          "gateExit": {
+            "ran": true,
+            "exit": 0,
+            "heldLockFd": 4,
+            "seconds": 1.2
+          },
+          "workerRan": true,
+          "strangerCanLockAfterGateExit": true
+        },
+        {
+          "case": "gate-starts-after-supervisor-died",
+          "gateExit": {
+            "ran": false,
+            "why": "connect:111"
+          },
+          "workerRan": false,
+          "strangerCanLockAfterGateExit": true
+        },
+        {
+          "case": "supervisor-dies-while-gate-waits-for-go",
+          "strangerCanLockAfterSupervisorDeath": true,
+          "gateExit": {
+            "ran": false,
+            "why": "eof-before-go"
+          },
+          "workerRan": false,
+          "strangerCanLockAfterGateExit": true
+        }
+      ]
+    },
+    {
+      "argv": [
+        "node",
+        "probe-hot-reclaim.mjs"
+      ],
+      "cwd": "/tmp/fgos-r3-redteam-rkxqjbbb",
+      "exitCode": 0,
+      "timeout": false,
+      "elapsedSeconds": 3.452,
+      "stdout": "{\"case\":\"A1 schedule on events.lock, reclaim under kernel lock = false\",\"r2EnteredWhileR1PausedBeforeUnlink\":true,\"R1\":{\"result\":\"acquired\",\"othersInsideOnEntry\":1},\"twoHolders\":true}\n{\"case\":\"A1 schedule on events.lock, reclaim under kernel lock = true\",\"r2EnteredWhileR1PausedBeforeUnlink\":false,\"R1\":{\"result\":\"acquired\",\"othersInsideOnEntry\":0},\"twoHolders\":false}\n{\"case\":\"stress 8 procs, 7 holders SIGKILLed in CS, reclaim under kernel lock = false\",\"acquisitions\":270,\"csViolations\":36,\"finishedWorkers\":4,\"elapsedMs\":403}\n{\"case\":\"stress 8 procs, 14 holders SIGKILLed in CS, reclaim under kernel lock = true\",\"acquisitions\":430,\"csViolations\":0,\"finishedWorkers\":8,\"elapsedMs\":757}\n",
+      "stderr": "node:fs:1940\n  binding.unlink(getValidatedPath(path));\n          ^\n\nError: ENOENT: no such file or directory, unlink '/tmp/fgos-r3-redteam-rkxqjbbb/run-hot-stress-0-PjT1kx/events.lock'\n    at Object.unlinkSync (node:fs:1940:11)\n    at file:///tmp/fgos-r3-redteam-rkxqjbbb/probe-hot-reclaim.mjs:71:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  errno: -2,\n  code: 'ENOENT',\n  syscall: 'unlink',\n  path: '/tmp/fgos-r3-redteam-rkxqjbbb/run-hot-stress-0-PjT1kx/events.lock'\n}\n\nNode.js v24.18.0\nnode:fs:1940\n  binding.unlink(getValidatedPath(path));\n          ^\n\nError: ENOENT: no such file or directory, unlink '/tmp/fgos-r3-redteam-rkxqjbbb/run-hot-stress-0-PjT1kx/events.lock'\n    at Object.unlinkSync (node:fs:1940:11)\n    at file:///tmp/fgos-r3-redteam-rkxqjbbb/probe-hot-reclaim.mjs:71:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  errno: -2,\n  code: 'ENOENT',\n  syscall: 'unlink',\n  path: '/tmp/fgos-r3-redteam-rkxqjbbb/run-hot-stress-0-PjT1kx/events.lock'\n}\n\nNode.js v24.18.0\nnode:fs:1940\n  binding.unlink(getValidatedPath(path));\n          ^\n\nError: ENOENT: no such file or directory, unlink '/tmp/fgos-r3-redteam-rkxqjbbb/run-hot-stress-0-PjT1kx/events.lock'\n    at Object.unlinkSync (node:fs:1940:11)\n    at file:///tmp/fgos-r3-redteam-rkxqjbbb/probe-hot-reclaim.mjs:71:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  errno: -2,\n  code: 'ENOENT',\n  syscall: 'unlink',\n  path: '/tmp/fgos-r3-redteam-rkxqjbbb/run-hot-stress-0-PjT1kx/events.lock'\n}\n\nNode.js v24.18.0\nnode:fs:1940\n  binding.unlink(getValidatedPath(path));\n          ^\n\nError: ENOENT: no such file or directory, unlink '/tmp/fgos-r3-redteam-rkxqjbbb/run-hot-stress-0-PjT1kx/events.lock'\n    at Object.unlinkSync (node:fs:1940:11)\n    at file:///tmp/fgos-r3-redteam-rkxqjbbb/probe-hot-reclaim.mjs:71:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  errno: -2,\n  code: 'ENOENT',\n  syscall: 'unlink',\n  path: '/tmp/fgos-r3-redteam-rkxqjbbb/run-hot-stress-0-PjT1kx/events.lock'\n}\n\nNode.js v24.18.0\n",
+      "parsed": [
+        {
+          "case": "A1 schedule on events.lock, reclaim under kernel lock = false",
+          "r2EnteredWhileR1PausedBeforeUnlink": true,
+          "R1": {
+            "result": "acquired",
+            "othersInsideOnEntry": 1
+          },
+          "twoHolders": true
+        },
+        {
+          "case": "A1 schedule on events.lock, reclaim under kernel lock = true",
+          "r2EnteredWhileR1PausedBeforeUnlink": false,
+          "R1": {
+            "result": "acquired",
+            "othersInsideOnEntry": 0
+          },
+          "twoHolders": false
+        },
+        {
+          "case": "stress 8 procs, 7 holders SIGKILLed in CS, reclaim under kernel lock = false",
+          "acquisitions": 270,
+          "csViolations": 36,
+          "finishedWorkers": 4,
+          "elapsedMs": 403
+        },
+        {
+          "case": "stress 8 procs, 14 holders SIGKILLed in CS, reclaim under kernel lock = true",
+          "acquisitions": 430,
+          "csViolations": 0,
+          "finishedWorkers": 8,
+          "elapsedMs": 757
+        }
+      ]
+    },
+    {
+      "argv": [
+        "python3",
+        "r3-process.py"
+      ],
+      "cwd": "/tmp/fgos-r3-redteam-rkxqjbbb",
+      "exitCode": 0,
+      "elapsedSeconds": 1.828,
+      "stdout": "{\n  \"root\": \"/tmp/fgos-r3-process-j8tdc5tn\",\n  \"reports\": [\n    {\n      \"case\": \"local filesystem exclusion\",\n      \"fs\": \"tmpfs\",\n      \"secondOpenRefused\": true\n    },\n    {\n      \"case\": \"local filesystem exclusion\",\n      \"fs\": \"tmpfs\",\n      \"secondOpenRefused\": true\n    },\n    {\n      \"case\": \"local filesystem probe unavailable\",\n      \"base\": \"/var/tmp\",\n      \"errno\": 30,\n      \"error\": \"[Errno 30] Read-only file system: '/var/tmp/r3-flock-qmnaxybi'\"\n    },\n    {\n      \"case\": \"borrower LOCK_UN while parent still holds fd\",\n      \"childExit\": 0,\n      \"parentFdOpen\": true,\n      \"contenderAcquired\": true\n    },\n    {\n      \"case\": \"gate SIGKILL, PDEATHSIG direct child, subreaper\",\n      \"lockHeldBeforeKill\": true,\n      \"directAgentAlive\": false,\n      \"grandchildAlive\": true,\n      \"grandchildStillWriting\": true,\n      \"contenderAcquiredAfterGateDeath\": true,\n      \"gateExitPresent\": false\n    },\n    {\n      \"case\": \"bundled hard ceiling 150ms versus SIGTERM-ignore agent at >=750ms\",\n      \"gateAlive\": true,\n      \"agentAlive\": true,\n      \"lockHeld\": true,\n      \"gateExitPresent\": false\n    },\n    {\n      \"case\": \"supervisor killed after result before finalize, exact bundled adopter\",\n      \"adopterExit\": 0,\n      \"adopter\": \"{\\\"adopt\\\":\\\"nothing-to-do\\\",\\\"reason\\\":\\\"already-settled\\\"}\",\n      \"homeRemains\": true,\n      \"credentialReturned\": false,\n      \"lockFree\": true\n    },\n    {\n      \"case\": \"only controller observer retains attempt fd\",\n      \"agentAlive\": false,\n      \"supervisorAlive\": false,\n      \"adopter\": \"{\\\"adopt\\\":\\\"kept\\\",\\\"reason\\\":\\\"attempt-lock-held\\\"}\",\n      \"lockFree\": false\n    },\n    {\n      \"case\": \"parent dies before prctl without post-registration parent check\",\n      \"childStillAlive\": true,\n      \"actualParent\": \"3439799\"\n    }\n  ]\n}\n",
+      "stderr": "",
+      "parsed": {
+        "root": "/tmp/fgos-r3-process-j8tdc5tn",
+        "reports": [
+          {
+            "case": "local filesystem exclusion",
+            "fs": "tmpfs",
+            "secondOpenRefused": true
+          },
+          {
+            "case": "local filesystem exclusion",
+            "fs": "tmpfs",
+            "secondOpenRefused": true
+          },
+          {
+            "case": "local filesystem probe unavailable",
+            "base": "/var/tmp",
+            "errno": 30,
+            "error": "[Errno 30] Read-only file system: '/var/tmp/r3-flock-qmnaxybi'"
+          },
+          {
+            "case": "borrower LOCK_UN while parent still holds fd",
+            "childExit": 0,
+            "parentFdOpen": true,
+            "contenderAcquired": true
+          },
+          {
+            "case": "gate SIGKILL, PDEATHSIG direct child, subreaper",
+            "lockHeldBeforeKill": true,
+            "directAgentAlive": false,
+            "grandchildAlive": true,
+            "grandchildStillWriting": true,
+            "contenderAcquiredAfterGateDeath": true,
+            "gateExitPresent": false
+          },
+          {
+            "case": "bundled hard ceiling 150ms versus SIGTERM-ignore agent at >=750ms",
+            "gateAlive": true,
+            "agentAlive": true,
+            "lockHeld": true,
+            "gateExitPresent": false
+          },
+          {
+            "case": "supervisor killed after result before finalize, exact bundled adopter",
+            "adopterExit": 0,
+            "adopter": "{\"adopt\":\"nothing-to-do\",\"reason\":\"already-settled\"}",
+            "homeRemains": true,
+            "credentialReturned": false,
+            "lockFree": true
+          },
+          {
+            "case": "only controller observer retains attempt fd",
+            "agentAlive": false,
+            "supervisorAlive": false,
+            "adopter": "{\"adopt\":\"kept\",\"reason\":\"attempt-lock-held\"}",
+            "lockFree": false
+          },
+          {
+            "case": "parent dies before prctl without post-registration parent check",
+            "childStillAlive": true,
+            "actualParent": "3439799"
+          }
+        ]
+      }
+    },
+    {
+      "argv": [
+        "node",
+        "r3-reaper-migration.mjs"
+      ],
+      "cwd": "/tmp/fgos-r3-redteam-rkxqjbbb",
+      "exitCode": 0,
+      "elapsedSeconds": 0.162,
+      "stdout": "{\n  \"case\": \"6.2 removes binding but 6.3 still owns reaper migration\",\n  \"root\": \"/tmp/fgos-r3-reaper-2PGMNs\",\n  \"oldReaper\": {\n    \"reaped\": [\n      {\n        \"path\": \"/tmp/fgos-r3-reaper-2PGMNs/homes/fixture/home\",\n        \"dispatchId\": \"fixture\",\n        \"reason\": \"process-dead\"\n      }\n    ],\n    \"skipped\": []\n  },\n  \"homeExists\": false,\n  \"workerAlive\": true,\n  \"attemptLockStillHeld\": true\n}\n",
+      "stderr": "",
+      "parsed": {
+        "case": "6.2 removes binding but 6.3 still owns reaper migration",
+        "root": "/tmp/fgos-r3-reaper-2PGMNs",
+        "oldReaper": {
+          "reaped": [
+            {
+              "path": "/tmp/fgos-r3-reaper-2PGMNs/homes/fixture/home",
+              "dispatchId": "fixture",
+              "reason": "process-dead"
+            }
+          ],
+          "skipped": []
+        },
+        "homeExists": false,
+        "workerAlive": true,
+        "attemptLockStillHeld": true
+      }
+    }
+  ],
+  "limitations": [
+    "Rust v3 crates do not exist; native flock and Python model used.",
+    "Terminal allocation/sweep probe models specified policy with real subprocess side effect; no live herdr mutation.",
+    "Git alias fd propagation is not a replay of actual git pre-commit invocation; original design bundle contains that narrower positive proof.",
+    "Initial r3-process.py run failed only at /var/tmp EROFS; final run records this unsupported mount then executes remaining cases.",
+    "probe-hot-reclaim.mjs negative-control stress emits expected ENOENT crashes; zero violations only applies to serialized-reclaim case."
+  ]
+}

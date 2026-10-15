@@ -1,204 +1,184 @@
-// session-identity.mjs -- resolveWriterIdentity(): identifies "the writer"
-// for the STR65 main-checkout lock (D6, str65-worktree-isolation-enforcement)
-// and names how far that identity can be trusted (D9/D15/D16, str46-io-contract).
+// session-identity.mjs -- Node facade over the Session Identity component.
 //
-// Layered signal:
-//   (a) a recognized agent-session env var (FGOS_SESSION_ID, falling back to
-//       the legacy CLAUDE_CODE_SESSION_ID) -> a string session identity.
-//       The registry at <fgosDir>/sessions.json is then consulted ONLY to
-//       CONFIRM that string: the same id is worth more when fgOS itself
-//       issued it than when anyone exported it, so a match reports source
-//       REGISTRY and a miss reports ENV. The VALUE is identical either way.
-//   (b) otherwise (a bare human terminal, no agent session env present) ->
-//       a numeric identity from a persistent ancestor process's pid, found
-//       by walking up the process tree via `ps -o ppid=` a SMALL, FIXED
-//       number of hops (3) from the caller's own pid.
+// The single authority for "who is the writer of this process, and how far
+// can that id be trusted" is the Rust crate fgos-session-identity, reached
+// through the native verb `fgos identity`
+// (docs/platform/session-identity/spec.md). This module decides nothing about
+// the id: it finds the host binary, runs the verb for this process, checks
+// the answer's shape, and remembers it. When no host binary can answer, the
+// caller gets a WriterIdentityError (exit 2) -- never a guessed id and never
+// a second resolver in Node.
 //
-// The registry never SUPPLIES an identity, and no process is matched to a
-// row by directory or by row pid. Such a rule would resolve two agent
-// processes holding different FGOS_SESSION_ID values inside one session
-// worktree to the same id; main-checkout-lock.mjs's self-recognition branch
-// would then admit both as the same writer -- reopening the exact collision
-// STR65 built that lock to close.
-//
-// Why only 3 hops, not an open-ended climb to the outermost ancestor: this
-// is a deliberate, documented narrowing from an earlier draft that walked
-// all the way up. Climbing further is far more likely to land on a process
-// that is genuinely SHARED across multiple distinct terminal sessions (a
-// tmux server, sshd, or the terminal emulator itself) rather than a process
-// unique to one session -- collapsing separate concurrent writers onto the
-// same identity, defeating the point of D6. Stopping a few hops past the
-// hook's own immediate parent (git) lands closer to the invoking shell
-// without eliminating collision risk entirely: two BARE HUMAN TERMINALS
-// that happen to share a parent this shallow (e.g. two panes forked directly
-// from the same shell) can still resolve to the same ancestor pid and
-// collide. This is accepted, not a bug -- D6 scopes the human-terminal
-// fallback as best-effort only. All 3 documented STR65 incidents were agent
-// sessions, which carry a unique env session id and never reach this
-// fallback path at all.
-//
-// Zero-dep aside from `ps` itself (Node builtins only + one shellout). The
-// registry is read with this module's OWN node:fs rather than through
-// session.mjs on purpose: no sessions.lock is taken, and every read failure
-// means "not confirmed" instead of throwing -- the opposite of session.mjs's
-// deliberately fail-closed reader, and the only semantics compatible with
-// D9's "never block a caller".
+// Exec happens at most once per process for a given session env (pid-branch
+// answers) or per session env and fgos dir (env/registry answers), and never
+// while this process holds events.lock or claims.lock: the lock helpers prime
+// the cache before taking the lock and report each lock they hold here, and
+// probeIdentity refuses to exec while any is held.
 
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
+import { resolveActiveHostBin } from './host-bin-path.mjs';
 
 export const REGISTRY = 'registry';
 export const ENV = 'env';
 export const PID = 'pid';
 export const UNRESOLVED = 'unresolved';
 
-const MAX_HOPS = 3;
-const SESSIONS_FILE = 'sessions.json';
+/** The env variables the identity rule reads, in its order
+ * (session-identity.resolve.v1.json x-envOrder). Used here only as the
+ * cache key: a different session env is a different answer. */
+export const IDENTITY_ENV_KEYS = Object.freeze(['FGOS_SESSION_ID', 'CODEX_THREAD_ID', 'CLAUDE_CODE_SESSION_ID']);
 
-// Same charset session.mjs validates minted session ids against, plus a
-// length ceiling. A value outside it is DISCARDED and the next source is
-// tried -- never thrown, never allowed to block a verb (D18).
-const SESSION_ID_RE = /^[A-Za-z0-9._-]+$/;
-const MAX_ID_LENGTH = 200;
+const TIMEOUT_MS = 2000;
+const MAX_OUTPUT_BYTES = 64 * 1024;
+const NO_DIR = '\0no-fgos-dir';
+const SOURCES = new Set([REGISTRY, ENV, PID, UNRESOLVED]);
 
-function envSessionId(env) {
-  for (const key of ['FGOS_SESSION_ID', 'CLAUDE_CODE_SESSION_ID']) {
-    const value = env[key];
-    if (typeof value !== 'string') continue;
-    const trimmed = value.trim();
-    if (!trimmed || trimmed.length > MAX_ID_LENGTH || !SESSION_ID_RE.test(trimmed)) continue;
-    return trimmed;
+export class WriterIdentityError extends Error {
+  constructor(code, message) {
+    super(`writer identity (${code}): ${message}`);
+    this.name = 'WriterIdentityError';
+    this.code = code;
+    this.category = 'precondition';
   }
-  return null;
 }
 
-/** True only when `sessionId` equals the sessionId of some row in
- * <fgosDir>/sessions.json. A missing fgosDir, a missing or unreadable file,
- * unparsable or half-written JSON (writeRegistry is a non-atomic
- * writeFileSync, so a torn read is reachable), a non-array, or rows of the
- * wrong shape all mean the same thing: not confirmed. */
-function registryConfirms(fgosDir, sessionId) {
-  if (typeof fgosDir !== 'string' || !fgosDir) return false;
-  let rows;
+let heldLocks = 0;
+
+/** Called by withEventsLock/withClaimsLock right after taking a lock. */
+export function noteLockHeld() {
+  heldLocks += 1;
+}
+
+/** Called by withEventsLock/withClaimsLock exactly once when that lock is
+ * really released. */
+export function noteLockReleased() {
+  heldLocks = Math.max(0, heldLocks - 1);
+}
+
+function parseIdentity(stdout, bin) {
+  let envelope;
   try {
-    rows = JSON.parse(fs.readFileSync(path.join(fgosDir, SESSIONS_FILE), 'utf8'));
+    envelope = JSON.parse(stdout);
   } catch {
-    return false;
+    throw new WriterIdentityError('bad-output', `${bin} identity printed something that is not JSON`);
   }
-  if (!Array.isArray(rows)) return false;
-  return rows.some((row) => row !== null && typeof row === 'object' && row.sessionId === sessionId);
+  const data = envelope?.data;
+  const shapeOk = envelope?.contract === 'fgos.v1'
+    && typeof envelope.generated_at === 'string'
+    && typeof envelope.data_hash === 'string'
+    && data !== null && typeof data === 'object'
+    && SOURCES.has(data.source)
+    && ((data.source === REGISTRY || data.source === ENV)
+      ? typeof data.id === 'string' && data.id.length > 0
+      : Number.isInteger(data.id) && data.id > 0);
+  if (!shapeOk) {
+    throw new WriterIdentityError('bad-output', `${bin} identity printed an unexpected answer: ${String(stdout).slice(0, 200)}`);
+  }
+  return { id: data.id, source: data.source };
 }
 
-/** Returns the parent pid of `pid` via `ps -o ppid= -p <pid>`, or null if
- * `ps` is unavailable, exits non-zero, prints something unparsable, or
- * exceeds PPID_TIMEOUT_MS (tsk-13m: this call runs inside the held
- * cross-process events.lock via resolveWriterIdentity, so a hung `ps`
- * must not be able to block that lock indefinitely -- the timeout throws,
- * caught below identically to every other failure mode). */
-const PPID_TIMEOUT_MS = 200;
-
-function ppidOf(pid, execFile) {
-  if (execFile === execFileSync && pid === process.pid && typeof process.ppid === 'number' && process.ppid > 0) {
-    return process.ppid;
+function classifyExecError(err, bin) {
+  const stderr = String(err.stderr ?? '').trim();
+  if (err.code === 'ENOENT' || err.code === 'EACCES') {
+    return new WriterIdentityError('host-missing', `cannot run ${bin} (${err.code})`);
   }
-  // On Linux the kernel already answers this from /proc: a plain file read
-  // with no subprocess, so it cannot time out. A `ps` that overran
-  // PPID_TIMEOUT_MS on a loaded host cut the walk short at a different hop
-  // in each process, and a claim taken by one `fgos` process then refused
-  // to settle from another ("writer identity mismatch").
-  if (execFile === execFileSync && process.platform === 'linux') {
-    const procParent = procPpidOf(pid);
-    if (procParent !== undefined) return procParent;
+  if (err.code === 'ETIMEDOUT') {
+    return new WriterIdentityError('timeout', `${bin} identity did not answer within ${TIMEOUT_MS} ms and was killed`);
   }
-  // Git-for-Windows/MSYS ships a `ps` binary, but it is a different dialect
-  // that rejects GNU-style `-o ppid= -p <pid>` outright ("unknown option --
-  // o") -- and that failure's stderr has been observed to leak into and
-  // corrupt the CALLING fgos process's own stderr on Windows CI, breaking
-  // unrelated CLI-output-shape assertions across the suite. There is no
-  // dialect of `ps` on win32 this call can rely on, so skip the shellout
-  // entirely and land directly on the same UNRESOLVED-first-hop outcome the
-  // try/catch below already produces for "no ps binary on this platform"
-  // (D17) -- identical result, no subprocess spawned.
-  if (execFile === execFileSync && process.platform === 'win32') return null;
-  try {
-    const out = execFile('ps', ['-o', 'ppid=', '-p', String(pid)], { encoding: 'utf8', timeout: PPID_TIMEOUT_MS });
-    const parsed = Number.parseInt(String(out).trim(), 10);
-    return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
-  } catch {
-    return null;
+  if (err.status === 4 && stderr.includes('unknown verb "identity"')) {
+    return new WriterIdentityError(
+      'host-version-mismatch',
+      `${bin} has no "identity" verb: the active release is older than this payload; restage/activate it (fgctl), or run a plain \`git commit\` with FGOS_HOST_BIN pointing at a host built from this checkout`,
+    );
   }
-}
-
-/** Parent pid of `pid` from /proc/<pid>/stat: null when the process is gone
- * or the line is unparsable, undefined when /proc is not usable here at all
- * (so the caller falls back to `ps`). The command name (field 2) is wrapped
- * in parentheses and may itself contain spaces or parentheses, so fields are
- * counted from the LAST ")" -- after it come state, then ppid. */
-export function procPpidOf(pid, { readFile = fs.readFileSync } = {}) {
-  let stat;
-  try {
-    stat = readFile(`/proc/${pid}/stat`, 'utf8');
-  } catch (err) {
-    return err.code === 'ENOENT' && fs.existsSync('/proc/self/stat') ? null : undefined;
-  }
-  const afterComm = String(stat).slice(String(stat).lastIndexOf(')') + 1).trim().split(/\s+/);
-  const parsed = Number.parseInt(afterComm[1], 10);
-  return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
+  const how = err.code ? `error ${err.code}` : err.signal ? `signal ${err.signal}` : `exit ${err.status}`;
+  return new WriterIdentityError('host-error', `${bin} identity failed (${how})${stderr ? `: ${stderr.slice(0, 500)}` : ''}`);
 }
 
 /**
- * resolveWriterIdentity(fgosDir, { env, pid, execFile }) -> { id, source }
+ * probeIdentity(bin, fgosDir) -> { id, source }
  *
- * `fgosDir` is the `.fgos` directory whose session registry confirms an
- * env-supplied id; it may be omitted, in which case that confirmation step
- * is simply skipped -- never an error. `env` defaults to process.env, `pid`
- * to process.pid, `execFile` to execFileSync, all overridable for testing
- * (including with fake ancestor chains, no real `ps` involved).
- *
- * Returns { id: <session id string>, source: REGISTRY } when a charset-valid
- * agent-session env var is set and its value matches a row in the registry,
- * and { id: <the same string>, source: ENV } when it does not.
- *
- * Otherwise returns { id: <numeric pid>, source: PID }: the ancestor reached
- * after walking up to MAX_HOPS parent links from `pid`. The walk stops early
- * -- returning the last successfully-resolved pid -- if it hits pid 1 (init)
- * or `ps` fails partway through. If `ps` fails on the very FIRST hop (e.g.
- * no `ps` binary on this platform), no source could confirm anything at all:
- * the id is still the caller's OWN pid, exactly as before, and only `source`
- * becomes UNRESOLVED (D17). That degraded case loses cross-commit
- * persistence (each hook invocation gets its own pid again) but stays safe,
- * and it never throws or hangs.
+ * The one place that runs the verb: no cache, so doctor can ask each
+ * candidate binary directly. Refuses to exec while this process holds an
+ * events/claims lock. The child gets this process's env minus
+ * FGOS_INVOCATION_RECORD_PATH, so the verb writes nothing.
  */
-export function resolveWriterIdentity(fgosDir, { env = process.env, pid = process.pid, execFile = execFileSync } = {}) {
-  const sessionId = envSessionId(env);
-  if (sessionId) {
-    return { id: sessionId, source: registryConfirms(fgosDir, sessionId) ? REGISTRY : ENV };
+export function probeIdentity(bin, fgosDir) {
+  if (heldLocks > 0) {
+    throw new WriterIdentityError(
+      'identity-in-lock',
+      'resolving the writer identity would exec the host while events.lock/claims.lock is held; resolve before taking the lock',
+    );
   }
-
-  // This process's own ancestor chain does not change while it runs, so the
-  // walk is done once and reused. Re-walking on every call let a loaded host
-  // (a `ps` hop over PPID_TIMEOUT_MS) stop the walk at a different hop each
-  // time, giving ONE process two writer ids -- a claim acquired as one id
-  // then refused to settle as another ("writer identity mismatch").
-  const ownProcess = pid === process.pid && execFile === execFileSync;
-  if (ownProcess && ownPidIdentity) return { ...ownPidIdentity };
-  const resolved = walkAncestors(pid, execFile);
-  if (ownProcess) ownPidIdentity = resolved;
-  return { ...resolved };
+  const env = { ...process.env };
+  delete env.FGOS_INVOCATION_RECORD_PATH;
+  const args = ['identity', '--pid', String(process.pid)];
+  if (typeof fgosDir === 'string' && fgosDir) args.push('--fgos-dir', path.resolve(fgosDir));
+  let stdout;
+  try {
+    stdout = execFileSync(bin, args, {
+      env,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+      timeout: TIMEOUT_MS,
+      killSignal: 'SIGKILL',
+      maxBuffer: MAX_OUTPUT_BYTES,
+      windowsHide: true,
+    });
+  } catch (err) {
+    throw classifyExecError(err, bin);
+  }
+  return parseIdentity(stdout, bin);
 }
 
-let ownPidIdentity = null;
-
-function walkAncestors(pid, execFile) {
-  let current = pid;
-  for (let hop = 0; hop < MAX_HOPS; hop++) {
-    const next = ppidOf(current, execFile);
-    if (next === null) {
-      return hop === 0 ? { id: pid, source: UNRESOLVED } : { id: current, source: PID };
-    }
-    current = next;
-    if (current === 1) break;
+/** Cache key for a dir: the realpath of its deepest existing ancestor joined
+ * with the part that does not exist yet, so the key stays the same when a
+ * lock helper creates the directory between priming and use. */
+function dirKey(fgosDir) {
+  if (typeof fgosDir !== 'string' || !fgosDir) return NO_DIR;
+  let existing = path.resolve(fgosDir);
+  const missing = [];
+  while (!fs.existsSync(existing) && path.dirname(existing) !== existing) {
+    missing.unshift(path.basename(existing));
+    existing = path.dirname(existing);
   }
-  return { id: current, source: PID };
+  try {
+    existing = fs.realpathSync(existing);
+  } catch {
+    // keep the lexical path
+  }
+  return path.join(existing, ...missing);
+}
+
+const pidAnswers = new Map();
+const envAnswers = new Map();
+
+/**
+ * resolveWriterIdentity(fgosDir) -> { id, source }
+ *
+ * `fgosDir` is the `.fgos` directory whose sessions.json may confirm an env
+ * id (source registry); omit it to skip that confirmation. Throws
+ * WriterIdentityError when no host binary can answer.
+ */
+export function resolveWriterIdentity(fgosDir) {
+  const envKey = JSON.stringify(IDENTITY_ENV_KEYS.map((key) => process.env[key] ?? null));
+  const pidAnswer = pidAnswers.get(envKey);
+  if (pidAnswer) return { ...pidAnswer };
+  const answerKey = `${envKey}\n${dirKey(fgosDir)}`;
+  const envAnswer = envAnswers.get(answerKey);
+  if (envAnswer) return { ...envAnswer };
+
+  const { bin, tried } = resolveActiveHostBin({ fgosDir });
+  if (!bin) {
+    throw new WriterIdentityError(
+      'host-missing',
+      `no fgos host binary found (tried: ${tried.join('; ')}); run through the \`fgos\` command of an activated workspace, or set FGOS_HOST_BIN to a host binary`,
+    );
+  }
+  const answer = probeIdentity(bin, fgosDir);
+  if (answer.source === PID || answer.source === UNRESOLVED) pidAnswers.set(envKey, answer);
+  else envAnswers.set(answerKey, answer);
+  return { ...answer };
 }

@@ -118,6 +118,8 @@ import { parseFrontmatter } from '../report/frontmatter.mjs';
 import { POLICY_PATCH_FIELDS } from '../runner/dispatch/execution-contract.mjs';
 import { discoverOperationPromptTemplates, TemplateResolutionError } from '../runner/dispatch/operation-prompt-templates.mjs';
 import { resolveHostBin, invokeHost } from '../util/host-bin.mjs';
+import { resolveActiveHostBin } from '../util/host-bin-path.mjs';
+import { probeIdentity } from '../util/session-identity.mjs';
 import { listAssignmentRuns, scanAssignmentLayout, projectRunEligibility } from '../runner/dispatch/assignment-layout.mjs';
 import { conventionCheck } from '../convention/convention-client.mjs';
 export { mainCheckoutHookWired } from './git-hooks.mjs';
@@ -6510,6 +6512,47 @@ registerCheck({
   id: 'observe-host-resolvable',
   description: 'Rust host binary resolves and supports observe commands (friction ping)',
   check: (cwd) => checkObserveHostResolvable(cwd),
+});
+
+/**
+ * The writer identity resolves through the Rust host on both doors a write
+ * can come through: the normal one (FGOS_HOST_BIN when run via the `fgos`
+ * host) and the one a plain `git commit` hook takes (the workspace
+ * activation, ignoring FGOS_HOST_BIN). Each binary is asked directly, never
+ * through the facade's cache, so an old activated release shows up as a
+ * version mismatch even when the host running doctor is newer.
+ */
+export function checkWriterIdentityResolvable(cwd) {
+  const root = resolveMainCheckoutRoot(cwd) ?? cwd;
+  const fgosDir = path.join(root, '.fgos');
+  const hasActivation = fs.existsSync(path.join(fgosDir, 'installation', 'activation.json'));
+  const parts = [];
+  let failure = null;
+  for (const [door, ignoreEnv] of [['current host', false], ['activation (git commit hook)', true]]) {
+    const { bin, tried } = resolveActiveHostBin({ fgosDir, cwd, ignoreEnv });
+    if (!bin) {
+      if (ignoreEnv && !hasActivation) {
+        parts.push(`${door}: no activation in ${root} (a plain git commit at home cannot resolve a writer)`);
+        continue;
+      }
+      failure ??= `${door}: no host binary (tried ${tried.join('; ')}) -- run fgctl init/repair, or set FGOS_HOST_BIN`;
+      continue;
+    }
+    try {
+      const { id, source } = probeIdentity(bin, fgosDir);
+      parts.push(`${door}: ${bin} -> ${JSON.stringify({ id, source })}`);
+    } catch (err) {
+      failure ??= `${door}: ${bin} -> ${err.code ?? 'error'}: ${err.message}`;
+    }
+  }
+  if (failure) return { passed: false, message: [failure, ...parts].join(' | ') };
+  return { passed: true, message: parts.join(' | ') };
+}
+
+registerCheck({
+  id: 'writer-identity-resolvable',
+  description: 'the writer identity resolves through the Rust host, both for the running host and for the activation a plain git commit hook uses',
+  check: (cwd) => checkWriterIdentityResolvable(cwd),
 });
 
 registerCheck({

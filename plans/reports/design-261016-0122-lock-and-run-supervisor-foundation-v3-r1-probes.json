@@ -1,0 +1,392 @@
+{
+ "about": "Round-1 additions for design-261016-0122-lock-and-run-supervisor-foundation-v3-r1.md. probe_herdr_geometry.py creates and closes one real herdr tab; others use temp dirs only.",
+ "files": {
+  "probe_pidns_containment.py": "#!/usr/bin/env python3\n\"\"\"Probe R3-2 (round 1): can the gate prove the whole agent tree is dead when\nthe gate itself is SIGKILLed? The agent forks a grandchild that calls setsid\n(escapes the process group) and keeps writing a heartbeat.\n  A. plain gate (subreaper + PDEATHSIG on the direct child only) -> grandchild survives\n  B. gate runs the agent inside a new PID namespace via bwrap\n     (--unshare-pid --die-with-parent): killing the gate kills the namespace\n     init, and the kernel kills every process in that namespace.\nRun: python3 probe_pidns_containment.py\n\"\"\"\nimport ctypes, json, os, signal, subprocess, sys, tempfile, time\n\nHERE = os.path.dirname(os.path.abspath(__file__))\nAGENT = r'''\nimport os, sys, time\nhb = sys.argv[1]\nif os.fork() == 0:\n    os.setsid()\n    if os.fork() == 0:\n        while True:\n            open(hb, \"a\").write(f\"{time.time()}\\n\"); time.sleep(0.05)\n    os._exit(0)\nwhile True: time.sleep(1)\n'''\n\ndef gate(mode, hb):\n    agent = [sys.executable, \"-c\", AGENT, hb]\n    if mode == \"pidns\":\n        agent = [\"bwrap\", \"--dev-bind\", \"/\", \"/\", \"--unshare-pid\", \"--die-with-parent\", \"--\"] + agent\n    code = f'''\nimport ctypes, os, signal, subprocess, sys, time\nlibc = ctypes.CDLL(None)\nlibc.prctl(36, 1, 0, 0, 0)  # PR_SET_CHILD_SUBREAPER\ndef pre():\n    libc.prctl(1, signal.SIGKILL, 0, 0, 0)  # PR_SET_PDEATHSIG\np = subprocess.Popen({agent!r}, preexec_fn=pre)\ntime.sleep(3600)\n'''\n    return subprocess.Popen([sys.executable, \"-c\", code])\n\ndef grows(hb, wait=0.6):\n    def n():\n        try: return len(open(hb).read().splitlines())\n        except FileNotFoundError: return 0\n    a = n(); time.sleep(wait); return n() > a\n\nout = []\nfor mode in (\"plain\", \"pidns\"):\n    d = tempfile.mkdtemp(prefix=f\"run-pidns-{mode}-\", dir=HERE)\n    hb = os.path.join(d, \"hb\")\n    g = gate(mode, hb)\n    time.sleep(1.0)\n    before = grows(hb)\n    g.send_signal(signal.SIGKILL); g.wait()\n    time.sleep(0.3)\n    after = grows(hb)\n    out.append({\"mode\": mode, \"grandchildWritingBeforeGateKill\": before, \"grandchildStillWritingAfterGateKill\": after})\n    if after:  # clean up the escaped writer\n        subprocess.run([\"pkill\", \"-f\", hb])\njson.dump(out, open(os.path.join(HERE, \"probe-pidns-containment-results.json\"), \"w\"), indent=1)\nfor o in out: print(json.dumps(o))\n",
+  "probe-ledger-fence-generation.mjs": "// Probe (round-1 R3-1a): old account-lock code reads a ledger DIRECTORY, so a\n// tombstone does not fence it. Fence instead with a final generation whose\n// holder is PID 1 (init) with its real start time: production\n// tryAcquireAccountLock must see a live holder forever and refuse.\nimport fs from 'node:fs';\nimport path from 'node:path';\nimport { fileURLToPath } from 'node:url';\nconst HERE = path.dirname(fileURLToPath(import.meta.url));\nconst m = await import('/home/vantt/projects/forgentX/src/runner/dispatch/provider-capacity.mjs');\nconst st = (pid) => { const s = fs.readFileSync(`/proc/${pid}/stat`, 'utf8'); return s.slice(s.lastIndexOf(')') + 2).split(' ')[19]; };\nconst runtimeDir = fs.mkdtempSync(path.join(HERE, 'run-fence-'));\nconst out = {};\nconst h = m.tryAcquireAccountLock({ runtimeDir, provider: 'openai', accountId: 'acc1' });\nout.v1AcquireBeforeFence = h ? 'acquired' : 'held'; h?.release?.();\n// find the ledger dir the production code used\nconst lockDir = (function find(d) { for (const e of fs.readdirSync(d, { withFileTypes: true })) { const p = path.join(d, e.name); if (e.isDirectory()) { if (e.name === 'lock') return p; const r = find(p); if (r) return r; } } return null; })(runtimeDir);\nconst gens = fs.readdirSync(lockDir).filter((n) => /^\\d{10}\\.json$/.test(n)).sort();\nconst next = String(Number(gens.at(-1)?.slice(0, 10) ?? 0) + 1).padStart(10, '0');\nfs.writeFileSync(path.join(lockDir, `${next}.json`), JSON.stringify({ holder: { pid: 1, processStartTime: st(1) }, fence: { movedTo: 'kernel lock', at: new Date().toISOString() } }));\nconst h2 = m.tryAcquireAccountLock({ runtimeDir, provider: 'openai', accountId: 'acc1' });\nout.v1AcquireAfterFence = h2 ? 'acquired' : 'held';\nh2?.release?.();\nout.ledgerFiles = fs.readdirSync(lockDir);\nfs.writeFileSync(path.join(HERE, 'probe-ledger-fence-generation-results.json'), JSON.stringify(out, null, 1));\nconsole.log(JSON.stringify(out));\n",
+  "probe_herdr_geometry.py": "#!/usr/bin/env python3\n\"\"\"Live herdr probe: does the driver report real pane geometry, and does a\nmeasured split rule predict the result? Creates ONE unfocused tab of its own,\nsplits it, reads `herdr pane layout` after every step, closes the tab.\nQuestions: (1) geometry available per pane? (2) does a split consume a\nseparator cell (sum of child sizes vs parent)? (3) does the result of\n`--ratio` match floor/round of the measured parent? (4) what does today's\nfixed rule (split the anchor down at 0.3) produce after N workers?\nRun: python3 probe_herdr_geometry.py\n\"\"\"\nimport json, os, subprocess, sys\n\nHERE = os.path.dirname(os.path.abspath(__file__))\n\ndef herdr(*args):\n    r = subprocess.run([\"herdr\", *args], capture_output=True, text=True, timeout=15)\n    if r.returncode != 0:\n        raise RuntimeError(f\"herdr {' '.join(args)}: {r.stderr.strip() or r.stdout.strip()}\")\n    return json.loads(r.stdout)[\"result\"]\n\ndef layout(pane):\n    return herdr(\"pane\", \"layout\", \"--pane\", pane)[\"layout\"]\n\ndef rect(lay, pane):\n    return next(p[\"rect\"] for p in lay[\"panes\"] if p[\"pane_id\"] == pane)\n\ndef split(pane, direction, ratio):\n    res = herdr(\"pane\", \"split\", pane, \"--direction\", direction, \"--ratio\", str(ratio), \"--no-focus\")\n    return res.get(\"pane\", res).get(\"pane_id\")\n\nout = {\"cases\": []}\ntab = herdr(\"tab\", \"create\", \"--label\", \"fgos-v3-geometry-probe\", \"--no-focus\", \"--cwd\", HERE)\ntab_id = tab.get(\"tab\", tab).get(\"tab_id\")\nroot = tab.get(\"root_pane\", {}).get(\"pane_id\") or tab.get(\"pane\", {}).get(\"pane_id\")\ntry:\n    if not root:\n        root = herdr(\"tab\", \"get\", tab_id)[\"tab\"].get(\"focused_pane_id\")\n    lay0 = layout(root)\n    out[\"tabArea\"] = lay0[\"area\"]\n    # (2)(3) one right split and one down split at 0.5, measured\n    parent = rect(lay0, root)\n    right = split(root, \"right\", 0.5)\n    lay1 = layout(root)\n    a, b = rect(lay1, root), rect(lay1, right)\n    out[\"cases\"].append({\"case\": \"split right 0.5\", \"parentWidth\": parent[\"width\"], \"children\": [a[\"width\"], b[\"width\"]],\n                         \"separatorCells\": parent[\"width\"] - a[\"width\"] - b[\"width\"]})\n    down = split(right, \"down\", 0.5)\n    lay2 = layout(root)\n    c, d = rect(lay2, right), rect(lay2, down)\n    out[\"cases\"].append({\"case\": \"split down 0.5\", \"parentHeight\": b[\"height\"], \"children\": [c[\"height\"], d[\"height\"]],\n                         \"separatorCells\": b[\"height\"] - c[\"height\"] - d[\"height\"]})\n    # (4) today's rule: keep splitting the newest pane down at 0.3\n    anchor, heights = down, []\n    for i in range(6):\n        try:\n            anchor = split(anchor, \"down\", 0.3)\n        except RuntimeError as e:\n            heights.append({\"step\": i + 1, \"error\": str(e)[:160]}); break\n        lay = layout(root)\n        heights.append({\"step\": i + 1, \"panesInColumn\": sorted([p[\"rect\"][\"height\"] for p in lay[\"panes\"] if p[\"rect\"][\"x\"] == d[\"x\"]])})\n    out[\"cases\"].append({\"case\": \"today's rule: newest pane split down 0.3, six times\", \"heights\": heights})\n    out[\"finalLayout\"] = layout(root)\nfinally:\n    herdr(\"tab\", \"close\", tab_id)\n    out[\"tabClosed\"] = tab_id\njson.dump(out, open(os.path.join(HERE, \"probe-herdr-geometry-results.json\"), \"w\"), indent=1)\nprint(json.dumps({k: v for k, v in out.items() if k != \"finalLayout\"}, indent=1))\n",
+  "probe-tombstone.mjs": "// Probe B2 (physical launch floor): a directory \"tombstone\" at a v1 lock path.\n// Runs the REAL v1 lock code (main HEAD, and the W1' branch copy) against it:\n// acquire, inspect, release, releaseIfOwn, forceReclaim. Every call must fail\n// closed (throw or report held/ambiguous) and leave the tombstone in place.\n// Run: node probe-tombstone.mjs\nimport fs from 'node:fs';\nimport path from 'node:path';\nimport { fileURLToPath } from 'node:url';\nconst HERE = path.dirname(fileURLToPath(import.meta.url));\nconst variants = {\n  'main-HEAD': '/home/vantt/projects/forgentX/src/runner/main-checkout-lock.mjs',\n  'W1-branch': path.join(HERE, 'v1-w1/src/runner/main-checkout-lock.mjs'),\n};\nconst out = [];\nfor (const [name, mod] of Object.entries(variants)) {\n  const m = await import(mod);\n  const dir = fs.mkdtempSync(path.join(HERE, `run-tomb-${name}-`));\n  const lockPath = path.join(dir, 'main-checkout.lock');\n  fs.mkdirSync(lockPath); fs.writeFileSync(path.join(lockPath, 'TOMBSTONE'), JSON.stringify({ v: 3, movedTo: 'runtime/locks/main-checkout/' }));\n  const call = (label, fn) => { try { const r = fn(); out.push({ variant: name, call: label, returned: r?.status ?? r }); } catch (e) { out.push({ variant: name, call: label, threw: e.code || e.message }); } };\n  call('acquire(pid)', () => m.acquireMainCheckoutLock(dir, { identity: process.pid, ttlMs: 1000 }));\n  call('acquire(session string)', () => m.acquireMainCheckoutLock(dir, { identity: 'sess-x', ttlMs: 1000 }));\n  if (m.inspectMainCheckoutLock) call('inspect', () => m.inspectMainCheckoutLock(dir));\n  call('release', () => m.releaseMainCheckoutLock(dir));\n  call('releaseIfOwn', () => m.releaseMainCheckoutLockIfOwn(dir, process.pid));\n  call('forceReclaimAmbiguous', () => m.forceReclaimAmbiguousLock(dir));\n  out.push({ variant: name, tombstoneStillThere: fs.statSync(lockPath).isDirectory() && fs.existsSync(path.join(lockPath, 'TOMBSTONE')) });\n}\nfs.writeFileSync(path.join(HERE, 'probe-tombstone-results.json'), JSON.stringify(out, null, 1));\nfor (const o of out) console.log(JSON.stringify(o));\n"
+ },
+ "results": {
+  "probe-pidns-containment-results.json": [
+   {
+    "mode": "plain",
+    "grandchildWritingBeforeGateKill": true,
+    "grandchildStillWritingAfterGateKill": true
+   },
+   {
+    "mode": "pidns",
+    "grandchildWritingBeforeGateKill": true,
+    "grandchildStillWritingAfterGateKill": false
+   }
+  ],
+  "probe-ledger-fence-generation-results.json": {
+   "v1AcquireBeforeFence": "acquired",
+   "v1AcquireAfterFence": "held",
+   "ledgerFiles": [
+    "0000000001.json",
+    "0000000002.json"
+   ]
+  },
+  "probe-herdr-geometry-results.json": {
+   "cases": [
+    {
+     "case": "split right 0.5",
+     "parentWidth": 352,
+     "children": [
+      176,
+      176
+     ],
+     "separatorCells": 0
+    },
+    {
+     "case": "split down 0.5",
+     "parentHeight": 69,
+     "children": [
+      35,
+      34
+     ],
+     "separatorCells": 0
+    },
+    {
+     "case": "today's rule: newest pane split down 0.3, six times",
+     "heights": [
+      {
+       "step": 1,
+       "panesInColumn": [
+        10,
+        24,
+        35
+       ]
+      },
+      {
+       "step": 2,
+       "panesInColumn": [
+        7,
+        10,
+        17,
+        35
+       ]
+      },
+      {
+       "step": 3,
+       "panesInColumn": [
+        5,
+        7,
+        10,
+        12,
+        35
+       ]
+      },
+      {
+       "step": 4,
+       "panesInColumn": [
+        4,
+        5,
+        7,
+        8,
+        10,
+        35
+       ]
+      },
+      {
+       "step": 5,
+       "panesInColumn": [
+        2,
+        4,
+        5,
+        6,
+        7,
+        10,
+        35
+       ]
+      },
+      {
+       "step": 6,
+       "panesInColumn": [
+        2,
+        2,
+        4,
+        4,
+        5,
+        7,
+        10,
+        35
+       ]
+      }
+     ]
+    }
+   ],
+   "tabArea": {
+    "height": 69,
+    "width": 352,
+    "x": 0,
+    "y": 0
+   },
+   "finalLayout": {
+    "area": {
+     "height": 69,
+     "width": 352,
+     "x": 0,
+     "y": 0
+    },
+    "focused_pane_id": "wS:p58V",
+    "panes": [
+     {
+      "focused": true,
+      "pane_id": "wS:p58V",
+      "rect": {
+       "height": 69,
+       "width": 176,
+       "x": 0,
+       "y": 0
+      }
+     },
+     {
+      "focused": false,
+      "pane_id": "wS:p58W",
+      "rect": {
+       "height": 35,
+       "width": 176,
+       "x": 176,
+       "y": 0
+      }
+     },
+     {
+      "focused": false,
+      "pane_id": "wS:p58X",
+      "rect": {
+       "height": 10,
+       "width": 176,
+       "x": 176,
+       "y": 35
+      }
+     },
+     {
+      "focused": false,
+      "pane_id": "wS:p58Y",
+      "rect": {
+       "height": 7,
+       "width": 176,
+       "x": 176,
+       "y": 45
+      }
+     },
+     {
+      "focused": false,
+      "pane_id": "wS:p58Z",
+      "rect": {
+       "height": 5,
+       "width": 176,
+       "x": 176,
+       "y": 52
+      }
+     },
+     {
+      "focused": false,
+      "pane_id": "wS:p580",
+      "rect": {
+       "height": 4,
+       "width": 176,
+       "x": 176,
+       "y": 57
+      }
+     },
+     {
+      "focused": false,
+      "pane_id": "wS:p591",
+      "rect": {
+       "height": 2,
+       "width": 176,
+       "x": 176,
+       "y": 61
+      }
+     },
+     {
+      "focused": false,
+      "pane_id": "wS:p592",
+      "rect": {
+       "height": 2,
+       "width": 176,
+       "x": 176,
+       "y": 63
+      }
+     },
+     {
+      "focused": false,
+      "pane_id": "wS:p593",
+      "rect": {
+       "height": 4,
+       "width": 176,
+       "x": 176,
+       "y": 65
+      }
+     }
+    ],
+    "splits": [
+     {
+      "direction": "right",
+      "id": "split_0_root",
+      "ratio": 0.5,
+      "rect": {
+       "height": 69,
+       "width": 352,
+       "x": 0,
+       "y": 0
+      }
+     },
+     {
+      "direction": "down",
+      "id": "split_1_1",
+      "ratio": 0.5,
+      "rect": {
+       "height": 69,
+       "width": 176,
+       "x": 176,
+       "y": 0
+      }
+     },
+     {
+      "direction": "down",
+      "id": "split_2_11",
+      "ratio": 0.3,
+      "rect": {
+       "height": 34,
+       "width": 176,
+       "x": 176,
+       "y": 35
+      }
+     },
+     {
+      "direction": "down",
+      "id": "split_3_111",
+      "ratio": 0.3,
+      "rect": {
+       "height": 24,
+       "width": 176,
+       "x": 176,
+       "y": 45
+      }
+     },
+     {
+      "direction": "down",
+      "id": "split_4_1111",
+      "ratio": 0.3,
+      "rect": {
+       "height": 17,
+       "width": 176,
+       "x": 176,
+       "y": 52
+      }
+     },
+     {
+      "direction": "down",
+      "id": "split_5_11111",
+      "ratio": 0.3,
+      "rect": {
+       "height": 12,
+       "width": 176,
+       "x": 176,
+       "y": 57
+      }
+     },
+     {
+      "direction": "down",
+      "id": "split_6_111111",
+      "ratio": 0.3,
+      "rect": {
+       "height": 8,
+       "width": 176,
+       "x": 176,
+       "y": 61
+      }
+     },
+     {
+      "direction": "down",
+      "id": "split_7_1111111",
+      "ratio": 0.3,
+      "rect": {
+       "height": 6,
+       "width": 176,
+       "x": 176,
+       "y": 63
+      }
+     }
+    ],
+    "tab_id": "wS:tF8",
+    "workspace_id": "wS",
+    "zoomed": false
+   },
+   "tabClosed": "wS:tF8"
+  },
+  "probe-tombstone-results.json": [
+   {
+    "variant": "main-HEAD",
+    "call": "acquire(pid)",
+    "threw": "EISDIR"
+   },
+   {
+    "variant": "main-HEAD",
+    "call": "acquire(session string)",
+    "threw": "EISDIR"
+   },
+   {
+    "variant": "main-HEAD",
+    "call": "inspect",
+    "threw": "EISDIR"
+   },
+   {
+    "variant": "main-HEAD",
+    "call": "release",
+    "threw": "EISDIR"
+   },
+   {
+    "variant": "main-HEAD",
+    "call": "releaseIfOwn",
+    "threw": "EISDIR"
+   },
+   {
+    "variant": "main-HEAD",
+    "call": "forceReclaimAmbiguous",
+    "threw": "EISDIR"
+   },
+   {
+    "variant": "main-HEAD",
+    "tombstoneStillThere": true
+   },
+   {
+    "variant": "W1-branch",
+    "call": "acquire(pid)",
+    "threw": "EISDIR"
+   },
+   {
+    "variant": "W1-branch",
+    "call": "acquire(session string)",
+    "threw": "EISDIR"
+   },
+   {
+    "variant": "W1-branch",
+    "call": "inspect",
+    "threw": "EISDIR"
+   },
+   {
+    "variant": "W1-branch",
+    "call": "release",
+    "threw": "EISDIR"
+   },
+   {
+    "variant": "W1-branch",
+    "call": "releaseIfOwn",
+    "threw": "EISDIR"
+   },
+   {
+    "variant": "W1-branch",
+    "call": "forceReclaimAmbiguous",
+    "threw": "EISDIR"
+   },
+   {
+    "variant": "W1-branch",
+    "tombstoneStillThere": true
+   }
+  ]
+ }
+}

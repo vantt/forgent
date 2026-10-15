@@ -518,7 +518,14 @@ async function main() {
   // elapsed window or no beacon passes. A corrupt beacon is only a hint and
   // fails open. This file never touches .fgos/main-checkout.lock, so a
   // commit never blocks a claim, land or `fgctl init`.
-  const writer = resolveWriterIdentity(fgosDir);
+  let writer;
+  try {
+    writer = resolveWriterIdentity(fgosDir);
+  } catch (err) {
+    if (err?.name !== 'WriterIdentityError') throw err;
+    refuse(`commit refused: cannot resolve the writer identity (${err.code}): ${err.message}`);
+    return;
+  }
   const now = Date.now();
   const verdict = judgeBeacon(readBeacon(fgosDir), writer.id, now);
   if (verdict.decision === 'refuse') {

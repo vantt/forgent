@@ -1,0 +1,42 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "session-identity.resolve.request",
+  "title": "Session identity resolve request v1",
+  "description": "Who is the writer of the calling process. The env variables are tried in envOrder; a value counts only when trimmed, non-empty, at most maxIdLength characters and matching idPattern. Without a usable env id the rule walks the caller's ancestors: the highest one holding a controlling tty, else the caller's session id, else the caller pid itself (source unresolved).",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "pid": { "type": "integer", "minimum": 1 },
+    "fgosDir": { "type": "string" }
+  },
+  "x-envOrder": ["FGOS_SESSION_ID", "CODEX_THREAD_ID", "CLAUDE_CODE_SESSION_ID"],
+  "x-idPattern": "^[A-Za-z0-9._-]+$",
+  "x-maxIdLength": 200,
+  "x-registryFile": "sessions.json",
+  "definitions": {
+    "outcome": {
+      "$id": "session-identity.resolve.outcome",
+      "title": "Session identity resolve outcome v1",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "source"],
+          "properties": {
+            "id": { "type": "string" },
+            "source": { "enum": ["registry", "env"] }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "source"],
+          "properties": {
+            "id": { "type": "integer", "minimum": 1 },
+            "source": { "enum": ["pid", "unresolved"] }
+          }
+        }
+      ]
+    }
+  }
+}

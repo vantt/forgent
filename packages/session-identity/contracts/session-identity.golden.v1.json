@@ -1,0 +1,699 @@
+{
+  "contract": "session-identity.golden.v1",
+  "notes": "envCases: expected null means no usable env id, so the process-tree rule decides. registry.kind: none (no fgosDir passed), absent (no sessions.json), rows (a JSON array of those rows), raw (the file holds exactly that text). treeCases: a pid missing from processes cannot be read; tty 0 means no controlling tty.",
+  "envCases": [
+    {
+      "name": "FGOS_SESSION_ID alone",
+      "env": {
+        "FGOS_SESSION_ID": "fgos-a"
+      },
+      "registry": {
+        "kind": "none"
+      },
+      "expected": {
+        "id": "fgos-a",
+        "source": "env"
+      }
+    },
+    {
+      "name": "CODEX_THREAD_ID alone",
+      "env": {
+        "CODEX_THREAD_ID": "01a13f6f-thread"
+      },
+      "registry": {
+        "kind": "none"
+      },
+      "expected": {
+        "id": "01a13f6f-thread",
+        "source": "env"
+      }
+    },
+    {
+      "name": "CLAUDE_CODE_SESSION_ID alone",
+      "env": {
+        "CLAUDE_CODE_SESSION_ID": "9493ac81-claude"
+      },
+      "registry": {
+        "kind": "none"
+      },
+      "expected": {
+        "id": "9493ac81-claude",
+        "source": "env"
+      }
+    },
+    {
+      "name": "codex thread wins over claude session",
+      "env": {
+        "CODEX_THREAD_ID": "codex-thread-a",
+        "CLAUDE_CODE_SESSION_ID": "claude-session-b"
+      },
+      "registry": {
+        "kind": "none"
+      },
+      "expected": {
+        "id": "codex-thread-a",
+        "source": "env"
+      }
+    },
+    {
+      "name": "fgos id wins over both agent ids",
+      "env": {
+        "FGOS_SESSION_ID": "child-own",
+        "CODEX_THREAD_ID": "codex-thread-a",
+        "CLAUDE_CODE_SESSION_ID": "claude-session-b"
+      },
+      "registry": {
+        "kind": "none"
+      },
+      "expected": {
+        "id": "child-own",
+        "source": "env"
+      }
+    },
+    {
+      "name": "empty fgos id falls through to the next variable",
+      "env": {
+        "FGOS_SESSION_ID": "",
+        "CLAUDE_CODE_SESSION_ID": "lead-claude"
+      },
+      "registry": {
+        "kind": "none"
+      },
+      "expected": {
+        "id": "lead-claude",
+        "source": "env"
+      }
+    },
+    {
+      "name": "whitespace-only fgos id falls through",
+      "env": {
+        "FGOS_SESSION_ID": "   ",
+        "CODEX_THREAD_ID": "codex-thread-a"
+      },
+      "registry": {
+        "kind": "none"
+      },
+      "expected": {
+        "id": "codex-thread-a",
+        "source": "env"
+      }
+    },
+    {
+      "name": "value is trimmed",
+      "env": {
+        "FGOS_SESSION_ID": "  padded-id\t"
+      },
+      "registry": {
+        "kind": "none"
+      },
+      "expected": {
+        "id": "padded-id",
+        "source": "env"
+      }
+    },
+    {
+      "name": "colon is rejected (herdr pane id shape)",
+      "env": {
+        "FGOS_SESSION_ID": "wS:p57Z"
+      },
+      "registry": {
+        "kind": "none"
+      },
+      "expected": null
+    },
+    {
+      "name": "rejected value falls through to the next variable",
+      "env": {
+        "FGOS_SESSION_ID": "bad value",
+        "CLAUDE_CODE_SESSION_ID": "lead-claude"
+      },
+      "registry": {
+        "kind": "none"
+      },
+      "expected": {
+        "id": "lead-claude",
+        "source": "env"
+      }
+    },
+    {
+      "name": "200 characters accepted",
+      "env": {
+        "FGOS_SESSION_ID": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "registry": {
+        "kind": "none"
+      },
+      "expected": {
+        "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source": "env"
+      }
+    },
+    {
+      "name": "201 characters rejected",
+      "env": {
+        "FGOS_SESSION_ID": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "registry": {
+        "kind": "none"
+      },
+      "expected": null
+    },
+    {
+      "name": "no env id at all",
+      "env": {},
+      "registry": {
+        "kind": "none"
+      },
+      "expected": null
+    },
+    {
+      "name": "registry row confirms the id",
+      "env": {
+        "FGOS_SESSION_ID": "sess-1"
+      },
+      "registry": {
+        "kind": "rows",
+        "rows": [
+          {
+            "sessionId": "other"
+          },
+          {
+            "sessionId": "sess-1"
+          }
+        ]
+      },
+      "expected": {
+        "id": "sess-1",
+        "source": "registry"
+      }
+    },
+    {
+      "name": "registry without a matching row",
+      "env": {
+        "FGOS_SESSION_ID": "sess-1"
+      },
+      "registry": {
+        "kind": "rows",
+        "rows": [
+          {
+            "sessionId": "other"
+          }
+        ]
+      },
+      "expected": {
+        "id": "sess-1",
+        "source": "env"
+      }
+    },
+    {
+      "name": "registry file missing",
+      "env": {
+        "FGOS_SESSION_ID": "sess-1"
+      },
+      "registry": {
+        "kind": "absent"
+      },
+      "expected": {
+        "id": "sess-1",
+        "source": "env"
+      }
+    },
+    {
+      "name": "registry file torn",
+      "env": {
+        "FGOS_SESSION_ID": "sess-1"
+      },
+      "registry": {
+        "kind": "raw",
+        "raw": "[{\"sessionId\":\"sess-1\""
+      },
+      "expected": {
+        "id": "sess-1",
+        "source": "env"
+      }
+    },
+    {
+      "name": "registry not an array",
+      "env": {
+        "FGOS_SESSION_ID": "sess-1"
+      },
+      "registry": {
+        "kind": "raw",
+        "raw": "{\"sessionId\":\"sess-1\"}"
+      },
+      "expected": {
+        "id": "sess-1",
+        "source": "env"
+      }
+    },
+    {
+      "name": "registry rows of the wrong shape",
+      "env": {
+        "FGOS_SESSION_ID": "sess-1"
+      },
+      "registry": {
+        "kind": "raw",
+        "raw": "[null, \"sess-1\", {\"sessionId\": 7}]"
+      },
+      "expected": {
+        "id": "sess-1",
+        "source": "env"
+      }
+    },
+    {
+      "name": "registry confirms a codex thread id too",
+      "env": {
+        "CODEX_THREAD_ID": "codex-thread-a"
+      },
+      "registry": {
+        "kind": "rows",
+        "rows": [
+          {
+            "sessionId": "codex-thread-a"
+          }
+        ]
+      },
+      "expected": {
+        "id": "codex-thread-a",
+        "source": "registry"
+      }
+    }
+  ],
+  "treeCases": [
+    {
+      "name": "bare shell in a herdr pane resolves to the pane root, not the herdr server",
+      "processes": [
+        {
+          "pid": 1,
+          "ppid": 0,
+          "session": 1,
+          "tty": 0
+        },
+        {
+          "pid": 3614,
+          "ppid": 1,
+          "session": 3614,
+          "tty": 0
+        },
+        {
+          "pid": 100,
+          "ppid": 3614,
+          "session": 100,
+          "tty": 34816
+        },
+        {
+          "pid": 101,
+          "ppid": 100,
+          "session": 100,
+          "tty": 34816
+        }
+      ],
+      "callerPid": 101,
+      "expected": {
+        "id": 100,
+        "source": "pid"
+      }
+    },
+    {
+      "name": "one extra wrapper layer (host path) gives the same pane root",
+      "processes": [
+        {
+          "pid": 1,
+          "ppid": 0,
+          "session": 1,
+          "tty": 0
+        },
+        {
+          "pid": 3614,
+          "ppid": 1,
+          "session": 3614,
+          "tty": 0
+        },
+        {
+          "pid": 100,
+          "ppid": 3614,
+          "session": 100,
+          "tty": 34816
+        },
+        {
+          "pid": 202,
+          "ppid": 100,
+          "session": 100,
+          "tty": 34816
+        },
+        {
+          "pid": 203,
+          "ppid": 202,
+          "session": 100,
+          "tty": 34816
+        }
+      ],
+      "callerPid": 203,
+      "expected": {
+        "id": 100,
+        "source": "pid"
+      }
+    },
+    {
+      "name": "omp tool shell in its own pty still resolves to the pane root (highest, not first)",
+      "processes": [
+        {
+          "pid": 1,
+          "ppid": 0,
+          "session": 1,
+          "tty": 0
+        },
+        {
+          "pid": 3614,
+          "ppid": 1,
+          "session": 3614,
+          "tty": 0
+        },
+        {
+          "pid": 300,
+          "ppid": 3614,
+          "session": 300,
+          "tty": 34817
+        },
+        {
+          "pid": 301,
+          "ppid": 300,
+          "session": 300,
+          "tty": 34817
+        },
+        {
+          "pid": 302,
+          "ppid": 301,
+          "session": 302,
+          "tty": 34900
+        },
+        {
+          "pid": 303,
+          "ppid": 302,
+          "session": 302,
+          "tty": 34900
+        }
+      ],
+      "callerPid": 303,
+      "expected": {
+        "id": 300,
+        "source": "pid"
+      }
+    },
+    {
+      "name": "claude tool shell without a tty resolves through claude to the pane root",
+      "processes": [
+        {
+          "pid": 1,
+          "ppid": 0,
+          "session": 1,
+          "tty": 0
+        },
+        {
+          "pid": 3614,
+          "ppid": 1,
+          "session": 3614,
+          "tty": 0
+        },
+        {
+          "pid": 400,
+          "ppid": 3614,
+          "session": 400,
+          "tty": 34818
+        },
+        {
+          "pid": 401,
+          "ppid": 400,
+          "session": 400,
+          "tty": 34818
+        },
+        {
+          "pid": 402,
+          "ppid": 401,
+          "session": 402,
+          "tty": 0
+        },
+        {
+          "pid": 403,
+          "ppid": 402,
+          "session": 402,
+          "tty": 0
+        }
+      ],
+      "callerPid": 403,
+      "expected": {
+        "id": 400,
+        "source": "pid"
+      }
+    },
+    {
+      "name": "sudo use_pty (pty inside pty) resolves to the outer shell",
+      "processes": [
+        {
+          "pid": 1,
+          "ppid": 0,
+          "session": 1,
+          "tty": 0
+        },
+        {
+          "pid": 800,
+          "ppid": 1,
+          "session": 800,
+          "tty": 34819
+        },
+        {
+          "pid": 801,
+          "ppid": 800,
+          "session": 800,
+          "tty": 34819
+        },
+        {
+          "pid": 802,
+          "ppid": 801,
+          "session": 802,
+          "tty": 34950
+        },
+        {
+          "pid": 803,
+          "ppid": 802,
+          "session": 802,
+          "tty": 34950
+        }
+      ],
+      "callerPid": 803,
+      "expected": {
+        "id": 800,
+        "source": "pid"
+      }
+    },
+    {
+      "name": "multiplexer server that kept its launching tty collapses panes onto the launching shell (known limit)",
+      "processes": [
+        {
+          "pid": 1,
+          "ppid": 0,
+          "session": 1,
+          "tty": 0
+        },
+        {
+          "pid": 900,
+          "ppid": 1,
+          "session": 900,
+          "tty": 34820
+        },
+        {
+          "pid": 901,
+          "ppid": 900,
+          "session": 900,
+          "tty": 34820
+        },
+        {
+          "pid": 902,
+          "ppid": 901,
+          "session": 902,
+          "tty": 34960
+        },
+        {
+          "pid": 903,
+          "ppid": 902,
+          "session": 902,
+          "tty": 34960
+        }
+      ],
+      "callerPid": 903,
+      "expected": {
+        "id": 900,
+        "source": "pid"
+      }
+    },
+    {
+      "name": "codex daemon without a tty falls back to the caller's session",
+      "processes": [
+        {
+          "pid": 1,
+          "ppid": 0,
+          "session": 1,
+          "tty": 0
+        },
+        {
+          "pid": 500,
+          "ppid": 1,
+          "session": 500,
+          "tty": 0
+        },
+        {
+          "pid": 501,
+          "ppid": 500,
+          "session": 501,
+          "tty": 0
+        },
+        {
+          "pid": 502,
+          "ppid": 501,
+          "session": 501,
+          "tty": 0
+        }
+      ],
+      "callerPid": 502,
+      "expected": {
+        "id": 501,
+        "source": "pid"
+      }
+    },
+    {
+      "name": "nohup process after its pane closed falls back to its session",
+      "processes": [
+        {
+          "pid": 1,
+          "ppid": 0,
+          "session": 1,
+          "tty": 0
+        },
+        {
+          "pid": 950,
+          "ppid": 1,
+          "session": 940,
+          "tty": 0
+        }
+      ],
+      "callerPid": 950,
+      "expected": {
+        "id": 940,
+        "source": "pid"
+      }
+    },
+    {
+      "name": "container whose pid 1 holds the tty resolves to pid 1",
+      "processes": [
+        {
+          "pid": 1,
+          "ppid": 0,
+          "session": 1,
+          "tty": 34816
+        },
+        {
+          "pid": 7,
+          "ppid": 1,
+          "session": 1,
+          "tty": 34816
+        },
+        {
+          "pid": 8,
+          "ppid": 7,
+          "session": 1,
+          "tty": 34816
+        }
+      ],
+      "callerPid": 8,
+      "expected": {
+        "id": 1,
+        "source": "pid"
+      }
+    },
+    {
+      "name": "parent vanished mid-walk: the highest tty seen so far wins",
+      "processes": [
+        {
+          "pid": 610,
+          "ppid": 611,
+          "session": 605,
+          "tty": 34821
+        }
+      ],
+      "callerPid": 610,
+      "expected": {
+        "id": 610,
+        "source": "pid"
+      }
+    },
+    {
+      "name": "parent vanished and no tty seen: caller session",
+      "processes": [
+        {
+          "pid": 600,
+          "ppid": 601,
+          "session": 600,
+          "tty": 0
+        }
+      ],
+      "callerPid": 600,
+      "expected": {
+        "id": 600,
+        "source": "pid"
+      }
+    },
+    {
+      "name": "a parent cycle stops instead of looping",
+      "processes": [
+        {
+          "pid": 700,
+          "ppid": 701,
+          "session": 700,
+          "tty": 0
+        },
+        {
+          "pid": 701,
+          "ppid": 700,
+          "session": 700,
+          "tty": 0
+        }
+      ],
+      "callerPid": 700,
+      "expected": {
+        "id": 700,
+        "source": "pid"
+      }
+    },
+    {
+      "name": "no tty and no session leaves the caller unresolved",
+      "processes": [
+        {
+          "pid": 1,
+          "ppid": 0,
+          "session": 0,
+          "tty": 0
+        },
+        {
+          "pid": 20,
+          "ppid": 1,
+          "session": 0,
+          "tty": 0
+        }
+      ],
+      "callerPid": 20,
+      "expected": {
+        "id": 20,
+        "source": "unresolved"
+      }
+    },
+    {
+      "name": "unreadable caller is unresolved with the caller pid",
+      "processes": [],
+      "callerPid": 4242,
+      "expected": {
+        "id": 4242,
+        "source": "unresolved"
+      }
+    }
+  ]
+}

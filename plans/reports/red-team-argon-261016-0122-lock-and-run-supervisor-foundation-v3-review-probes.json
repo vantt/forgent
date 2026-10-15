@@ -1,0 +1,251 @@
+{
+  "generatedAt": "2026-10-15T15:29:02.105Z",
+  "targetDesign": "plans/reports/design-261015-2103-lock-and-run-supervisor-foundation-v3.md",
+  "targetCommit": "fb3b6113e",
+  "probeCount": 6,
+  "probes": [
+    {
+      "file": "probe-r3-1-git-fd3-daemon-leak.mjs",
+      "script": "// probe-r3-1-git-fd3-daemon-leak.mjs\n// Tests Question 1 & B3 (§6.1, §6.4): Passing main.lock description at stdio[3]\n// to git commit clears FD_CLOEXEC on fd 3. Any detached daemon spawned by git\n// (e.g. git gc --auto --detach, gpg-agent, fsmonitor--daemon) or by a hook\n// inherits fd 3 and holds the kernel flock indefinitely after git commit and\n// the Node parent close their fds and exit.\nimport fs from \"node:fs\";\nimport path from \"node:path\";\nimport { spawn, spawnSync, execFileSync } from \"node:child_process\";\n\nconst work = fs.mkdtempSync(path.join(\"/tmp/fgos-redteam-v3-suite-ZSpt4u\", \"r3-1-\"));\nconst lockFile = path.join(work, \"main.lock\");\nfs.writeFileSync(lockFile, \"\");\n\nfunction lockFd(fd) {\n  return spawnSync(\"flock\", [\"-n\", \"3\"], { stdio: [\"ignore\", \"ignore\", \"pipe\", fd] }).status === 0;\n}\nfunction strangerCanLock(file) {\n  return spawnSync(\"flock\", [\"-n\", file, \"true\"]).status === 0;\n}\n\nconst repo = path.join(work, \"repo\");\nexecFileSync(\"git\", [\"init\", \"-q\", repo]);\nexecFileSync(\"git\", [\"-C\", repo, \"config\", \"user.email\", \"probe@example.com\"]);\nexecFileSync(\"git\", [\"-C\", repo, \"config\", \"user.name\", \"probe\"]);\nfs.writeFileSync(path.join(repo, \"a.txt\"), \"hello\");\nexecFileSync(\"git\", [\"-C\", repo, \"add\", \"a.txt\"]);\n\n// Real git pre-commit hook (exact borrow check from v3 §6.4) + post-commit / gc daemon simulation\nconst preCommit = path.join(repo, \".git\", \"hooks\", \"pre-commit\");\nfs.writeFileSync(preCommit, `#!/bin/sh\ndevino=\\$(stat -L -c %d:%i /proc/self/fd/3 2>/dev/null)\nif [ \"\\$devino\" = \"\\$EXPECT_DEVINO\" ] && flock -n 3; then\n  echo borrower > \"\\$PROBE_OUT/hook-verdict\"\nelse\n  echo refused > \"\\$PROBE_OUT/hook-verdict\"\n  exit 1\nfi\n`, { mode: 0o755 });\n\n// Simulate a background daemon spawned by git commit (like git gc --auto / gpg-agent / fsmonitor)\n// which git spawns without closing fd 3 because git does not know fd 3 exists.\nconst postCommit = path.join(repo, \".git\", \"hooks\", \"post-commit\");\nfs.writeFileSync(postCommit, `#!/bin/sh\nsetsid sleep 30 >/dev/null 2>&1 &\necho \\$! > \"\\$PROBE_OUT/daemon.pid\"\n`, { mode: 0o755 });\n\nconst fd = fs.openSync(lockFile, \"r+\");\nconst acquired = lockFd(fd);\nconst st = fs.fstatSync(fd);\nconst gitRes = spawnSync(\"git\", [\"-C\", repo, \"commit\", \"-q\", \"-m\", \"test\"], {\n  stdio: [\"ignore\", \"ignore\", \"pipe\", fd],\n  env: { ...process.env, FGOS_LOCK_FD: \"main:3\", EXPECT_DEVINO: `${st.dev}:${st.ino}`, PROBE_OUT: work },\n});\n// Node owner now closes its fd to release main.lock after git commit returned 0:\nfs.closeSync(fd);\n\nconst daemonPid = Number(fs.readFileSync(path.join(work, \"daemon.pid\"), \"utf8\").trim());\nconst fd3TargetInDaemon = fs.readlinkSync(`/proc/${daemonPid}/fd/3`);\nconst fdInfo3InDaemon = fs.readFileSync(`/proc/${daemonPid}/fdinfo/3`, \"utf8\");\nconst canLockWhileDaemonAlive = strangerCanLock(lockFile);\n\nprocess.kill(daemonPid, \"SIGKILL\");\nfor (let i = 0; i < 50; i++) {\n  if (strangerCanLock(lockFile)) break;\n  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 10);\n}\nconst canLockAfterDaemonKilled = strangerCanLock(lockFile);\n\nconst out = {\n  probe: \"R3-1: git commit fd 3 borrow leaks kernel flock to detached child daemon\",\n  ownerAcquired: acquired,\n  gitExitCode: gitRes.status,\n  hookVerdict: fs.readFileSync(path.join(work, \"hook-verdict\"), \"utf8\").trim(),\n  ownerClosedFd: true,\n  daemonPid,\n  daemonInheritedFd3Target: fd3TargetInDaemon,\n  daemonFdInfoHasKernelLock: fdInfo3InDaemon.includes(\"lock:\"),\n  strangerCanLockAfterOwnerClosedFdAndGitExited: canLockWhileDaemonAlive,\n  strangerCanLockAfterDaemonKilled: canLockAfterDaemonKilled,\n};\nconsole.log(JSON.stringify(out));\n",
+      "output": {
+        "probe": "R3-1: git commit fd 3 borrow leaks kernel flock to detached child daemon",
+        "ownerAcquired": true,
+        "gitExitCode": 0,
+        "hookVerdict": "borrower",
+        "ownerClosedFd": true,
+        "daemonPid": 3789390,
+        "daemonInheritedFd3Target": "/tmp/fgos-redteam-v3-suite-ZSpt4u/r3-1-113h2m/main.lock",
+        "daemonFdInfoHasKernelLock": true,
+        "strangerCanLockAfterOwnerClosedFdAndGitExited": false,
+        "strangerCanLockAfterDaemonKilled": true
+      }
+    },
+    {
+      "file": "probe-r3-2-hot-lock-exec-violation.mjs",
+      "script": "import fs from \"node:fs\";\nimport os from \"node:os\";\nimport path from \"node:path\";\nimport child_process from \"node:child_process\";\nimport { syncBuiltinESMExports } from \"node:module\";\n\nconst REPO = \"/home/vantt/projects/forgentX\";\nconst tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), \"r3-2-\"));\nconst repoDir = path.join(tmpRoot, \"repo\");\nfs.mkdirSync(repoDir, { recursive: true });\n\nchild_process.execFileSync(\"git\", [\"init\", \"-q\"], { cwd: repoDir });\nchild_process.execFileSync(\"git\", [\"config\", \"user.email\", \"probe@test.local\"], { cwd: repoDir });\nchild_process.execFileSync(\"git\", [\"config\", \"user.name\", \"Probe\"], { cwd: repoDir });\nfs.mkdirSync(path.join(repoDir, \"docs/history/tsk-r32\"), { recursive: true });\nfs.mkdirSync(path.join(repoDir, \"docs/history/tsk-r32c\"), { recursive: true });\nfs.writeFileSync(path.join(repoDir, \"docs/history/tsk-r32/plan.md\"), \"# Plan\\n\");\nfs.writeFileSync(path.join(repoDir, \"docs/history/tsk-r32c/plan.md\"), \"# Plan C\\n\");\nchild_process.execFileSync(\"git\", [\"add\", \".\"], { cwd: repoDir });\nchild_process.execFileSync(\"git\", [\"commit\", \"-q\", \"-m\", \"init\"], { cwd: repoDir });\nchild_process.execFileSync(\"git\", [\"branch\", \"fgw/tsk-r32\"], { cwd: repoDir });\nchild_process.execFileSync(\"git\", [\"branch\", \"fgw/tsk-r32c\"], { cwd: repoDir });\n// Remove working-tree copy of tsk-r32c/plan.md so it lives ONLY on branch fgw/tsk-r32c (the normal worktree branch case)\nfs.rmSync(path.join(repoDir, \"docs/history/tsk-r32c/plan.md\"));\nchild_process.execFileSync(\"git\", [\"commit\", \"-q\", \"-a\", \"-m\", \"remove wt plan c\"], { cwd: repoDir });\n\nconst fgosDir = path.join(repoDir, \".fgos\");\nfs.mkdirSync(fgosDir, { recursive: true });\n\nconst storeMod = await import(path.join(REPO, \"src/state/store.mjs\"));\nconst claimPortMod = await import(path.join(REPO, \"src/runner/claim-port.mjs\"));\n\nconst execCallsUnderEventsLock = [];\nconst origExecFileSync = child_process.execFileSync;\nlet strictGuardEnabled = false;\n\nchild_process.execFileSync = function patchedExecFileSync(file, args, options) {\n  const lockExists = fs.existsSync(path.join(fgosDir, \"events.lock\"));\n  if (lockExists) {\n    const stack = new Error().stack.split(\"\\n\").slice(1, 7).map((s) => s.trim());\n    execCallsUnderEventsLock.push({\n      cmd: [file, ...(args || [])].join(\" \"),\n      stack,\n    });\n    if (strictGuardEnabled) {\n      throw new Error(\"exec-under-hot-lock: \" + [file, ...(args || [])].join(\" \"));\n    }\n  }\n  return origExecFileSync.call(this, file, args, options);\n};\nsyncBuiltinESMExports();\n\nstoreMod.addWork(fgosDir, {\n  id: \"tsk-r32\",\n  title: \"Probe heavy task\",\n  kind: \"task\",\n  status: \"todo\",\n  workflowStep: \"executing\",\n  risk: \"heavy\",\n  verify: \"true\",\n  deps: [],\n  refs: [\"docs/specs/runner.md\"],\n});\n\n// 1. Observe claimWork + settleClaim without throwing\nconst claimRes = claimPortMod.claimWork(fgosDir, {\n  id: \"tsk-r32\",\n  actor: \"session\",\n  isolate: false,\n  repoRoot: repoDir,\n});\nconst settleRes = storeMod.settleClaim(fgosDir, {\n  id: \"tsk-r32\",\n  claimId: claimRes.claimId,\n  finalStatus: \"todo\",\n});\nconst claimAndSettleExecCount = execCallsUnderEventsLock.length;\n\n// 2. Observe moveWork(delivered) for heavy work with branch fgw/tsk-r32 + plan.md\nstoreMod.moveWork(fgosDir, { id: \"tsk-r32\", to: \"awaiting-approval\" });\nstoreMod.moveWork(fgosDir, { id: \"tsk-r32\", to: \"delivered\" });\nconst totalExecCount = execCallsUnderEventsLock.length;\n\n// 3. Test §6.6 strict guard (\"exec-under-hot-lock\"):\n// (a) claimWork crashes on currentHead(repoRoot)\n// (b) assertPlanEvidence in moveWork(delivered) SWALLOWS the exec-under-hot-lock error inside try/catch\n//     and falsely rejects a valid heavy item whose plan.md is on branch fgw/tsk-r32c!\nstoreMod.addWork(fgosDir, {\n  id: \"tsk-r32b\",\n  title: \"Second task in todo\",\n  kind: \"task\",\n  status: \"todo\",\n  workflowStep: \"executing\",\n  risk: \"light\",\n  verify: \"true\",\n  deps: [],\n  refs: [\"docs/specs/runner.md\"],\n});\nstoreMod.addWork(fgosDir, {\n  id: \"tsk-r32c\",\n  title: \"Third heavy task with plan on branch\",\n  kind: \"task\",\n  status: \"awaiting-approval\",\n  workflowStep: \"executing\",\n  risk: \"heavy\",\n  verify: \"true\",\n  deps: [],\n  refs: [\"docs/specs/runner.md\"],\n});\nstrictGuardEnabled = true;\nlet claimCrashedWithGuard = null;\ntry {\n  claimPortMod.claimWork(fgosDir, {\n    id: \"tsk-r32b\",\n    actor: \"session\",\n    isolate: false,\n    repoRoot: repoDir,\n  });\n} catch (err) {\n  claimCrashedWithGuard = err.message;\n}\n\nlet moveHeavyCrashedWithGuard = null;\ntry {\n  storeMod.moveWork(fgosDir, { id: \"tsk-r32c\", to: \"delivered\" });\n} catch (err) {\n  moveHeavyCrashedWithGuard = err.message;\n}\n\nfs.rmSync(tmpRoot, { recursive: true, force: true });\nconsole.log(JSON.stringify({\n  probe: \"R3-2: production withEventsLock executes 8 git subprocesses inside critical section; §6.6 exec-under-hot-lock guard crashes claimWork and is swallowed by try/catch in getMainFgosDir and assertPlanEvidence\",\n  claimIdBeforeGuard: claimRes.claimId,\n  settleCompletedBeforeGuard: Boolean(settleRes),\n  execSubprocessCountDuringClaimAndSettle: claimAndSettleExecCount,\n  totalExecSubprocessCountUnderEventsLock: totalExecCount,\n  observedExecCallsUnderEventsLock: execCallsUnderEventsLock,\n  claimCrashedWhenGuardEnabled: claimCrashedWithGuard,\n  moveHeavyFalsePreconditionFailureWhenGuardSwallowedByTryCatch: moveHeavyCrashedWithGuard,\n}, null, 2));\n",
+      "output": {
+        "probe": "R3-2: production withEventsLock executes 8 git subprocesses inside critical section; §6.6 exec-under-hot-lock guard crashes claimWork and is swallowed by try/catch in getMainFgosDir and assertPlanEvidence",
+        "claimIdBeforeGuard": "clm-1792078229345-8b52643a",
+        "settleCompletedBeforeGuard": true,
+        "execSubprocessCountDuringClaimAndSettle": 8,
+        "totalExecSubprocessCountUnderEventsLock": 10,
+        "observedExecCallsUnderEventsLock": [
+          {
+            "cmd": "git rev-parse HEAD",
+            "stack": [
+              "at patchedExecFileSync (file:///tmp/probe-r3-2-clean.mjs:40:19)",
+              "at git (file:///home/vantt/projects/forgentX/src/runner/claim-port.mjs:29:10)",
+              "at currentHead (file:///home/vantt/projects/forgentX/src/runner/claim-port.mjs:33:10)",
+              "at file:///home/vantt/projects/forgentX/src/runner/claim-port.mjs:318:51",
+              "at withEventsLock (file:///home/vantt/projects/forgentX/src/state/events.mjs:421:11)",
+              "at Module.claimWork (file:///home/vantt/projects/forgentX/src/runner/claim-port.mjs:301:26)"
+            ]
+          },
+          {
+            "cmd": "git rev-parse --path-format=absolute --git-common-dir",
+            "stack": [
+              "at patchedExecFileSync (file:///tmp/probe-r3-2-clean.mjs:40:19)",
+              "at resolveMainCheckoutRoot (file:///home/vantt/projects/forgentX/src/runner/paths.mjs:77:17)",
+              "at getMainFgosDir (file:///home/vantt/projects/forgentX/src/state/runtime-coordination.mjs:17:22)",
+              "at acquireClaim (file:///home/vantt/projects/forgentX/src/state/runtime-coordination.mjs:198:19)",
+              "at file:///home/vantt/projects/forgentX/src/runner/claim-port.mjs:312:14",
+              "at withEventsLock (file:///home/vantt/projects/forgentX/src/state/events.mjs:421:11)"
+            ]
+          },
+          {
+            "cmd": "git rev-parse --path-format=absolute --git-common-dir",
+            "stack": [
+              "at patchedExecFileSync (file:///tmp/probe-r3-2-clean.mjs:40:19)",
+              "at resolveMainCheckoutRoot (file:///home/vantt/projects/forgentX/src/runner/paths.mjs:77:17)",
+              "at getMainFgosDir (file:///home/vantt/projects/forgentX/src/state/runtime-coordination.mjs:17:22)",
+              "at withClaimsLock (file:///home/vantt/projects/forgentX/src/state/runtime-coordination.mjs:59:19)",
+              "at acquireClaim (file:///home/vantt/projects/forgentX/src/state/runtime-coordination.mjs:199:10)",
+              "at file:///home/vantt/projects/forgentX/src/runner/claim-port.mjs:312:14"
+            ]
+          },
+          {
+            "cmd": "git rev-parse --path-format=absolute --git-common-dir",
+            "stack": [
+              "at patchedExecFileSync (file:///tmp/probe-r3-2-clean.mjs:40:19)",
+              "at resolveMainCheckoutRoot (file:///home/vantt/projects/forgentX/src/runner/paths.mjs:77:17)",
+              "at getMainFgosDir (file:///home/vantt/projects/forgentX/src/state/runtime-coordination.mjs:17:22)",
+              "at readClaim (file:///home/vantt/projects/forgentX/src/state/runtime-coordination.mjs:128:19)",
+              "at file:///home/vantt/projects/forgentX/src/state/runtime-coordination.mjs:205:24",
+              "at withClaimsLock (file:///home/vantt/projects/forgentX/src/state/runtime-coordination.mjs:103:12)"
+            ]
+          },
+          {
+            "cmd": "git rev-parse --path-format=absolute --git-common-dir",
+            "stack": [
+              "at patchedExecFileSync (file:///tmp/probe-r3-2-clean.mjs:40:19)",
+              "at resolveMainCheckoutRoot (file:///home/vantt/projects/forgentX/src/runner/paths.mjs:77:17)",
+              "at getMainFgosDir (file:///home/vantt/projects/forgentX/src/state/runtime-coordination.mjs:17:22)",
+              "at withClaimsLock (file:///home/vantt/projects/forgentX/src/state/runtime-coordination.mjs:59:19)",
+              "at file:///home/vantt/projects/forgentX/src/state/store.mjs:1148:27",
+              "at file:///home/vantt/projects/forgentX/src/state/store.mjs:249:20"
+            ]
+          },
+          {
+            "cmd": "git rev-parse --path-format=absolute --git-common-dir",
+            "stack": [
+              "at patchedExecFileSync (file:///tmp/probe-r3-2-clean.mjs:40:19)",
+              "at resolveMainCheckoutRoot (file:///home/vantt/projects/forgentX/src/runner/paths.mjs:77:17)",
+              "at getMainFgosDir (file:///home/vantt/projects/forgentX/src/state/runtime-coordination.mjs:17:22)",
+              "at readClaim (file:///home/vantt/projects/forgentX/src/state/runtime-coordination.mjs:128:19)",
+              "at file:///home/vantt/projects/forgentX/src/state/store.mjs:1158:26",
+              "at withClaimsLock (file:///home/vantt/projects/forgentX/src/state/runtime-coordination.mjs:103:12)"
+            ]
+          },
+          {
+            "cmd": "git rev-parse --path-format=absolute --git-common-dir",
+            "stack": [
+              "at patchedExecFileSync (file:///tmp/probe-r3-2-clean.mjs:40:19)",
+              "at resolveMainCheckoutRoot (file:///home/vantt/projects/forgentX/src/runner/paths.mjs:77:17)",
+              "at getMainFgosDir (file:///home/vantt/projects/forgentX/src/state/runtime-coordination.mjs:17:22)",
+              "at releaseClaim (file:///home/vantt/projects/forgentX/src/state/runtime-coordination.mjs:276:19)",
+              "at file:///home/vantt/projects/forgentX/src/state/store.mjs:1308:7",
+              "at file:///home/vantt/projects/forgentX/src/state/store.mjs:249:20"
+            ]
+          },
+          {
+            "cmd": "git rev-parse --path-format=absolute --git-common-dir",
+            "stack": [
+              "at patchedExecFileSync (file:///tmp/probe-r3-2-clean.mjs:40:19)",
+              "at resolveMainCheckoutRoot (file:///home/vantt/projects/forgentX/src/runner/paths.mjs:77:17)",
+              "at getMainFgosDir (file:///home/vantt/projects/forgentX/src/state/runtime-coordination.mjs:17:22)",
+              "at withClaimsLock (file:///home/vantt/projects/forgentX/src/state/runtime-coordination.mjs:59:19)",
+              "at releaseClaim (file:///home/vantt/projects/forgentX/src/state/runtime-coordination.mjs:277:10)",
+              "at file:///home/vantt/projects/forgentX/src/state/store.mjs:1308:7"
+            ]
+          },
+          {
+            "cmd": "git rev-parse --verify --quiet refs/heads/fgw/tsk-r32",
+            "stack": [
+              "at patchedExecFileSync (file:///tmp/probe-r3-2-clean.mjs:40:19)",
+              "at file:///home/vantt/projects/forgentX/src/state/store.mjs:612:7",
+              "at assertPlanEvidence (file:///home/vantt/projects/forgentX/src/state/store.mjs:617:5)",
+              "at file:///home/vantt/projects/forgentX/src/state/store.mjs:876:5",
+              "at file:///home/vantt/projects/forgentX/src/state/store.mjs:249:20",
+              "at withEventsLock (file:///home/vantt/projects/forgentX/src/state/events.mjs:421:11)"
+            ]
+          },
+          {
+            "cmd": "git cat-file -e fgw/tsk-r32:docs/history/tsk-r32/plan.md",
+            "stack": [
+              "at patchedExecFileSync (file:///tmp/probe-r3-2-clean.mjs:40:19)",
+              "at file:///home/vantt/projects/forgentX/src/state/store.mjs:622:9",
+              "at Array.some (<anonymous>)",
+              "at assertPlanEvidence (file:///home/vantt/projects/forgentX/src/state/store.mjs:619:30)",
+              "at file:///home/vantt/projects/forgentX/src/state/store.mjs:876:5",
+              "at file:///home/vantt/projects/forgentX/src/state/store.mjs:249:20"
+            ]
+          },
+          {
+            "cmd": "git rev-parse HEAD",
+            "stack": [
+              "at patchedExecFileSync (file:///tmp/probe-r3-2-clean.mjs:40:19)",
+              "at git (file:///home/vantt/projects/forgentX/src/runner/claim-port.mjs:29:10)",
+              "at currentHead (file:///home/vantt/projects/forgentX/src/runner/claim-port.mjs:33:10)",
+              "at file:///home/vantt/projects/forgentX/src/runner/claim-port.mjs:318:51",
+              "at withEventsLock (file:///home/vantt/projects/forgentX/src/state/events.mjs:421:11)",
+              "at Module.claimWork (file:///home/vantt/projects/forgentX/src/runner/claim-port.mjs:301:26)"
+            ]
+          },
+          {
+            "cmd": "git rev-parse --verify --quiet refs/heads/fgw/tsk-r32c",
+            "stack": [
+              "at patchedExecFileSync (file:///tmp/probe-r3-2-clean.mjs:40:19)",
+              "at file:///home/vantt/projects/forgentX/src/state/store.mjs:612:7",
+              "at assertPlanEvidence (file:///home/vantt/projects/forgentX/src/state/store.mjs:617:5)",
+              "at file:///home/vantt/projects/forgentX/src/state/store.mjs:876:5",
+              "at file:///home/vantt/projects/forgentX/src/state/store.mjs:249:20",
+              "at withEventsLock (file:///home/vantt/projects/forgentX/src/state/events.mjs:421:11)"
+            ]
+          }
+        ],
+        "claimCrashedWhenGuardEnabled": "exec-under-hot-lock: git rev-parse HEAD",
+        "moveHeavyFalsePreconditionFailureWhenGuardSwallowedByTryCatch": "work \"tsk-r32c\" cannot move to \"delivered\" — risk:heavy but no plan.md found in current tree (no branch \"fgw/tsk-r32c\") (checked docs/history/tsk-r32c/plan.md); write one before landing."
+      }
+    },
+    {
+      "file": "probe-r3-3-zombie-holder-hot-lock.mjs",
+      "script": "// probe-r3-3-zombie-holder-hot-lock.mjs\nimport fs from \"node:fs\";\nimport path from \"node:path\";\nimport { spawnSync } from \"node:child_process\";\nimport { judgeOwner, startTimeOf, currentBoot } from \"./v3-bundle/era-ledger.mjs\";\nprocess.argv[2] = \"library-import\";\nconst { hotTryAcquire } = await import(\"./v3-bundle/probe-hot-reclaim.mjs\");\nimport { resolveHolderLiveness } from \"/home/vantt/projects/forgentX/src/runner/dispatch/process-identity.mjs\";\n\nconst work = fs.mkdtempSync(path.join(\"/tmp/fgos-redteam-v3-suite-ZSpt4u\", \"r3-3-\"));\nconst lockPath = path.join(work, \"events.lock\");\n\n// Use python to fork a child that writes events.lock, gets SIGKILLed, and stays\n// un-waited (zombie \"Z\") while we test judgeOwner, resolveHolderLiveness, and hotTryAcquire.\nconst py = `\nimport os, signal, time, json, subprocess, sys\nlock_path = sys.argv[1]\nboot_id = open(\"/proc/sys/kernel/random/boot_id\").read().strip().replace(\"-\", \"\")\npid = os.fork()\nif pid == 0:\n    st = open(f\"/proc/{os.getpid()}/stat\").read().rsplit(\")\", 1)[1].split()[19]\n    with open(lock_path, \"w\") as f:\n        json.dump({\"pid\": os.getpid(), \"startTime\": st, \"boot\": boot_id, \"processStartTime\": st, \"bootId\": open(\"/proc/sys/kernel/random/boot_id\").read().strip()}, f)\n    time.sleep(60)\ntime.sleep(0.1)\nos.kill(pid, signal.SIGKILL)\n# Wait until child is in Z (zombie) state, WITHOUT calling waitpid!\nfor _ in range(100):\n    st_line = open(f\"/proc/{pid}/stat\").read()\n    state = st_line.rsplit(\")\", 1)[1].split()[0]\n    if state == \"Z\":\n        break\n    time.sleep(0.01)\nopen(lock_path + \".zombie-ready\", \"w\").write(str(pid))\nwhile not os.path.exists(lock_path + \".done\"):\n    time.sleep(0.02)\nos.waitpid(pid, 0)\n`;\n\nconst holderParent = (await import(\"node:child_process\")).spawn(\"python3\", [\"-c\", py, lockPath]);\nwhile (!fs.existsSync(lockPath + \".zombie-ready\")) {\n  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 10);\n}\nconst zombiePid = Number(fs.readFileSync(lockPath + \".zombie-ready\", \"utf8\"));\nconst procStatState = fs.readFileSync(`/proc/${zombiePid}/stat`, \"utf8\").split(\") \")[1].split(\" \")[0];\nconst rec = JSON.parse(fs.readFileSync(lockPath, \"utf8\"));\nlet kill0Alive = false;\ntry { process.kill(zombiePid, 0); kill0Alive = true; } catch {}\n\nconst v3JudgeVerdict = judgeOwner(rec);\nconst prodResolveVerdict = resolveHolderLiveness(rec, kill0Alive);\nconst hotAcquireResultWhileZombie = hotTryAcquire(lockPath, { reclaimLock: true });\n\nfs.writeFileSync(lockPath + \".done\", \"\");\nawait new Promise((r) => holderParent.on(\"exit\", r));\nconst hotAcquireResultAfterReap = hotTryAcquire(lockPath, { reclaimLock: true });\n\n// Also check corrupt record (missing pid) in production resolveHolderLiveness:\nconst corruptRecordVerdictInProd = resolveHolderLiveness({}, false);\n\nconsole.log(JSON.stringify({\n  probe: \"R3-3: Zombie process (state Z) misjudged as alive/held by §5.1 process-facts and hotTryAcquire\",\n  zombiePid,\n  procStatState,\n  kill0Alive,\n  v3JudgeOwnerVerdict: v3JudgeVerdict,\n  prodResolveHolderLivenessVerdict: prodResolveVerdict,\n  hotTryAcquireWhileHolderIsZombie: hotAcquireResultWhileZombie,\n  hotTryAcquireAfterParentWaitpid: hotAcquireResultAfterReap,\n  prodResolveHolderLivenessOnCorruptRecordWithoutPid: corruptRecordVerdictInProd,\n}));\n",
+      "output": {
+        "probe": "R3-3: Zombie process (state Z) misjudged as alive/held by §5.1 process-facts and hotTryAcquire",
+        "zombiePid": 3789513,
+        "procStatState": "Z",
+        "kill0Alive": true,
+        "v3JudgeOwnerVerdict": "alive",
+        "prodResolveHolderLivenessVerdict": "held",
+        "hotTryAcquireWhileHolderIsZombie": "held",
+        "hotTryAcquireAfterParentWaitpid": "retry",
+        "prodResolveHolderLivenessOnCorruptRecordWithoutPid": "dead"
+      }
+    },
+    {
+      "file": "probe-r3-4-cutover-tombstone-and-quiescence.mjs",
+      "script": "import fs from \"node:fs\";\nimport os from \"node:os\";\nimport path from \"node:path\";\nimport { spawn } from \"node:child_process\";\n\nconst REPO = \"/home/vantt/projects/forgentX\";\nconst tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), \"r3-4-\"));\n\n// Part A: run.mjs:345-351 swallows EISDIR on tombstone directory and fails OPEN on resume\nconst fgosDir = path.join(tmpRoot, \"main-repo\", \".fgos\");\nfs.mkdirSync(fgosDir, { recursive: true });\nconst runMod = await import(path.join(REPO, \"src/runner/main-checkout-lock.mjs\"));\nconst worktreeCwd = path.join(tmpRoot, \"wt-1\");\nfs.mkdirSync(worktreeCwd, { recursive: true });\nconst tombstoneLockPath = path.join(fgosDir, runMod.dispatchLockFile(worktreeCwd));\nfs.mkdirSync(tombstoneLockPath, { recursive: true });\nfs.writeFileSync(path.join(tombstoneLockPath, \"MOVED-TO-V3\"), \"moved\\n\");\n\n// Replicate exact guard from src/runner/execution/run.mjs:345-359\nlet holder;\nlet caughtCode = null;\ntry {\n  holder = JSON.parse(fs.readFileSync(tombstoneLockPath, \"utf8\"))?.pid;\n} catch (err) {\n  caughtCode = err.code;\n  holder = undefined;\n}\nconst runMjsResumeGuardThrows = Boolean(holder && Number.isInteger(holder));\nconst runMjsResumeFailsOpen = !runMjsResumeGuardThrows;\n\n// Part B: Quiescence scan (/proc/*/cmdline and /proc/*/cwd matching main checkout root)\n// misses worker running inside a linked worktree outside main checkout root\nconst mainRoot = path.join(tmpRoot, \"main-checkout\");\nconst externalWorktree = path.join(tmpRoot, \"external-linked-worktree\");\nconst fakeReleaseEntry = path.join(tmpRoot, \"release-store\", \"fgos-worker.mjs\");\nfs.mkdirSync(mainRoot, { recursive: true });\nfs.mkdirSync(externalWorktree, { recursive: true });\nfs.mkdirSync(path.dirname(fakeReleaseEntry), { recursive: true });\nfs.writeFileSync(fakeReleaseEntry, \"setInterval(() => {}, 1000);\\n\");\n\nconst worker = spawn(process.execPath, [fakeReleaseEntry, \"--worktree\", externalWorktree], {\n  cwd: externalWorktree,\n  stdio: \"ignore\",\n});\n\nawait new Promise((r) => setTimeout(r, 80));\n\nconst cmdlineBuf = fs.readFileSync(`/proc/${worker.pid}/cmdline`);\nconst cmdlineStr = cmdlineBuf.toString(\"utf8\").replace(/\\0/g, \" \");\nconst cwdTarget = fs.readlinkSync(`/proc/${worker.pid}/cwd`);\nconst detectedByMainRootQuiescenceScan =\n  cmdlineStr.includes(mainRoot) || cwdTarget === mainRoot || cwdTarget.startsWith(mainRoot + \"/\");\n\nworker.kill(\"SIGKILL\");\n\n// Part C: Per-cwd lazy tombstone + symlink vs realpath key mismatch (§6.8 step 4)\nconst realWt = path.join(tmpRoot, \"real-wt\");\nconst symlinkWt = path.join(tmpRoot, \"symlink-wt\");\nfs.mkdirSync(realWt, { recursive: true });\nfs.symlinkSync(realWt, symlinkWt);\n\nconst v1LockPathViaSymlink = path.join(fgosDir, runMod.dispatchLockFile(symlinkWt));\nconst v1LockPathViaRealpath = path.join(fgosDir, runMod.dispatchLockFile(fs.realpathSync(symlinkWt)));\nconst symlinkVsRealpathDiverges = v1LockPathViaSymlink !== v1LockPathViaRealpath;\n\n// Part D: porting-store.mjs uses .fgos/porting/events.lock (not in §6.8 tombstone list)\nconst portingDir = path.join(fgosDir, \"porting\");\nfs.mkdirSync(portingDir, { recursive: true });\nconst portingLockPath = path.join(portingDir, \"events.lock\");\nconst v3TombstonePaths = [\n  path.join(fgosDir, \"events.lock\"),\n  path.join(fgosDir, \"claims.lock\"),\n  path.join(fgosDir, \"main-checkout.lock\"),\n  path.join(fgosDir, \"runtime/locks/dispatch-cwd.cutover\"),\n];\nconst portingLockCoveredByTombstones = v3TombstonePaths.includes(portingLockPath);\n\nfs.rmSync(tmpRoot, { recursive: true, force: true });\n\nconsole.log(JSON.stringify({\n  probe: \"R3-4: Cutover tombstone & quiescence holes (§6.8)\",\n  hole4a_runMjsResumeReadFileCode: caughtCode,\n  hole4a_runMjsResumeFailsOpenOnTombstoneDir: runMjsResumeFailsOpen,\n  hole4b_linkedWorktreeWorkerPid: worker.pid,\n  hole4b_workerCwd: cwdTarget,\n  hole4b_detectedByMainCheckoutQuiescenceScan: detectedByMainRootQuiescenceScan,\n  hole4c_v1LockPathViaSymlink: path.basename(v1LockPathViaSymlink),\n  hole4c_v1LockPathViaRealpath: path.basename(v1LockPathViaRealpath),\n  hole4c_symlinkVsRealpathTombstoneDiverges: symlinkVsRealpathDiverges,\n  hole4d_portingEventsLockCoveredByTombstones: portingLockCoveredByTombstones,\n}, null, 2));\n",
+      "output": {
+        "probe": "R3-4: Cutover tombstone & quiescence holes (§6.8)",
+        "hole4a_runMjsResumeReadFileCode": "EISDIR",
+        "hole4a_runMjsResumeFailsOpenOnTombstoneDir": true,
+        "hole4b_linkedWorktreeWorkerPid": 3789535,
+        "hole4b_workerCwd": "/tmp/r3-4-sHrQXe/external-linked-worktree",
+        "hole4b_detectedByMainCheckoutQuiescenceScan": false,
+        "hole4c_v1LockPathViaSymlink": "dispatch--%2Ftmp%2Fr3-4-sHrQXe%2Fsymlink-wt.lock",
+        "hole4c_v1LockPathViaRealpath": "dispatch--%2Ftmp%2Fr3-4-sHrQXe%2Freal-wt.lock",
+        "hole4c_symlinkVsRealpathTombstoneDiverges": true,
+        "hole4d_portingEventsLockCoveredByTombstones": false
+      }
+    },
+    {
+      "file": "probe-r3-5-supervisor-adopt-reaper-bugs.mjs",
+      "script": "import fs from \"node:fs\";\nimport os from \"node:os\";\nimport path from \"node:path\";\nimport { spawn, execFileSync } from \"node:child_process\";\nimport { acquireRunControl, buildRunControlHolder } from \"/home/vantt/projects/forgentX/src/runner/dispatch/run-lock.mjs\";\n\nconst suiteDir = \"/tmp/fgos-redteam-v3-suite-ZSpt4u\";\nconst v3BundleDir = path.join(suiteDir, \"v3-bundle\");\nconst tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), \"r3-5-\"));\n\n// Sub-probe 5A: Partial post-receipt crash (supervisor dies after p4-settle.mjs writes result.json,\n// before release / finalize-home runs). Verify p4-adopt.mjs returns \"already-settled\" and NEVER cleans home!\nconst attempt5A = path.join(tmpRoot, \"attempt-5A\");\nfs.mkdirSync(path.join(attempt5A, \"home\"), { recursive: true });\nfs.mkdirSync(path.join(attempt5A, \"outbox\"), { recursive: true });\nfs.writeFileSync(path.join(attempt5A, \"attempt.lock\"), \"\");\nfs.writeFileSync(path.join(attempt5A, \"home\", \"oauth-token.json\"), \"renewed-secret-token\");\nfs.writeFileSync(path.join(attempt5A, \"outbox\", \"result-1.json\"), JSON.stringify({ status: \"done\", summary: \"ok\" }));\nconst ctrl5A = acquireRunControl(attempt5A, { holder: buildRunControlHolder(\"sup:1\"), purpose: \"dispatch\" });\nconst token5APath = path.join(attempt5A, \"sup-token.json\");\nfs.writeFileSync(token5APath, JSON.stringify({ controlEpoch: ctrl5A.controlEpoch, controlToken: ctrl5A.controlToken }));\nfs.writeFileSync(path.join(attempt5A, \"receipt.json\"), JSON.stringify({\n  by: \"supervisor\", kind: \"exited\", workerResultPresent: true\n}));\n\n// Supervisor runs p4-settle.mjs, then crashes before running the release/finalize-home step\nexecFileSync(process.execPath, [path.join(v3BundleDir, \"p4-settle.mjs\"), attempt5A, token5APath]);\nconst resultExistsBeforeAdopt = fs.existsSync(path.join(attempt5A, \"result.json\"));\n\n// Now run p4-adopt.mjs (from v3 probe bundle)\nconst adopt5AOut = JSON.parse(\n  execFileSync(process.execPath, [path.join(v3BundleDir, \"p4-adopt.mjs\"), attempt5A], { encoding: \"utf8\" })\n);\nconst privateHomeStillLeakedOnDisk = fs.existsSync(path.join(attempt5A, \"home\", \"oauth-token.json\"));\n\n// Sub-probe 5B: Reaper (§9.8) holds attempt.lock on a dead attempt while cleaning home ->\n// concurrent p4-adopt.mjs (§9.7) misclassifies the dead attempt as \"attempt-lock-held\" (running)!\nconst attempt5B = path.join(tmpRoot, \"attempt-5B\");\nfs.mkdirSync(path.join(attempt5B, \"home\"), { recursive: true });\nfs.writeFileSync(path.join(attempt5B, \"attempt.lock\"), \"\");\n\nconst reaperProc = spawn(\"python3\", [\"-c\", `\nimport fcntl, os, sys, time\nfd = os.open(sys.argv[1], os.O_RDWR)\nfcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)\nprint(\"locked\", flush=True)\ntime.sleep(5)\n`, path.join(attempt5B, \"attempt.lock\")], { stdio: [\"ignore\", \"pipe\", \"inherit\"] });\n\nawait new Promise((resolve) => {\n  reaperProc.stdout.on(\"data\", (d) => {\n    if (d.toString().includes(\"locked\")) resolve();\n  });\n});\n\nconst adoptDuringReaperOut = JSON.parse(\n  execFileSync(process.execPath, [path.join(v3BundleDir, \"p4-adopt.mjs\"), attempt5B], { encoding: \"utf8\" })\n);\nreaperProc.kill(\"SIGKILL\");\n\n// Sub-probe 5C: \"terminal\" mode (interactive REPL agent that writes outbox/result-1.json and waits for\n// supervisor exit command). Supervisor dies -> agent stays alive in pane until gate hardCeilingMs ->\n// gate kills with stoppedBy=\"hard-ceiling\" -> adopt settles as status=\"timeout\", losing completed result!\nconst attempt5C = path.join(tmpRoot, \"attempt-5C\");\nfs.mkdirSync(path.join(attempt5C, \"outbox\"), { recursive: true });\nfs.writeFileSync(path.join(attempt5C, \"attempt.lock\"), \"\");\nconst replWorkerScript = path.join(attempt5C, \"repl-worker.py\");\nfs.writeFileSync(replWorkerScript, `\nimport json, os, sys, time\noutbox = os.path.join(sys.argv[1], \"outbox\", \"result-1.json\")\nwith open(outbox, \"w\") as f:\n    json.dump({\"contract\": {\"id\": \"agent-result-claim\", \"version\": 2}, \"status\": \"done\", \"summary\": \"completed work\"}, f)\ntime.sleep(10)\n`);\n\nexecFileSync(\"python3\", [\"-c\", `\nimport fcntl, os, subprocess, sys\nd = sys.argv[1]\nlock_fd = os.open(os.path.join(d, \"attempt.lock\"), os.O_RDWR)\nfcntl.flock(lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)\nos.set_inheritable(lock_fd, True)\nsubprocess.run([\n    \"python3\", sys.argv[2],\n    \"--fd\", str(lock_fd),\n    \"--ceiling-ms\", \"200\",\n    \"--report\", os.path.join(d, \"gate-exit.json\"),\n    \"--stdout\", os.path.join(d, \"stdout.log\"),\n    \"--stderr\", os.path.join(d, \"stderr.log\"),\n    \"--\", \"python3\", sys.argv[3], d\n], pass_fds=(lock_fd,))\n`, attempt5C, path.join(v3BundleDir, \"p4_gate.py\"), replWorkerScript]);\n\nconst adopt5COut = JSON.parse(\n  execFileSync(process.execPath, [path.join(v3BundleDir, \"p4-adopt.mjs\"), attempt5C], { encoding: \"utf8\" })\n);\nconst outboxClaim5C = JSON.parse(fs.readFileSync(path.join(attempt5C, \"outbox\", \"result-1.json\"), \"utf8\"));\nconst settledResult5C = JSON.parse(fs.readFileSync(path.join(attempt5C, \"result.json\"), \"utf8\"));\nconst receipt5C = JSON.parse(fs.readFileSync(path.join(attempt5C, \"receipt.json\"), \"utf8\"));\n\n// Sub-probe 5D:\n// (1) 2-level grandchild (gate -> worker -> C1 (ignores SIGTERM) -> C2) escapes p4_gate.py single-pass subreaper loop\n// (2) Worker that ignores SIGTERM hangs p4_gate.py past hardCeilingMs because gate main loop only sends SIGTERM\nconst attempt5D = path.join(tmpRoot, \"attempt-5D\");\nfs.mkdirSync(attempt5D, { recursive: true });\nfs.writeFileSync(path.join(attempt5D, \"attempt.lock\"), \"\");\nconst grandchildPidFile = path.join(attempt5D, \"grandchild.pid\");\nconst c1Script = path.join(attempt5D, \"c1.py\");\nfs.writeFileSync(c1Script, `\nimport os, signal, subprocess, sys, time\nsignal.signal(signal.SIGTERM, signal.SIG_IGN)\nc2 = subprocess.Popen([\"python3\", \"-c\", \"import time; time.sleep(30)\"])\nwith open(sys.argv[1], \"w\") as f:\n    f.write(str(c2.pid))\ntime.sleep(30)\n`);\nconst worker5DScript = path.join(attempt5D, \"worker5d.py\");\nfs.writeFileSync(worker5DScript, `\nimport os, subprocess, sys, time\nsubprocess.Popen([\"python3\", sys.argv[1], sys.argv[2]])\nwhile not os.path.exists(sys.argv[2]):\n    time.sleep(0.02)\n`);\n\nexecFileSync(\"python3\", [\"-c\", `\nimport fcntl, os, subprocess, sys\nd = sys.argv[1]\nlock_fd = os.open(os.path.join(d, \"attempt.lock\"), os.O_RDWR)\nfcntl.flock(lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)\nos.set_inheritable(lock_fd, True)\nsubprocess.run([\n    \"python3\", sys.argv[2],\n    \"--fd\", str(lock_fd),\n    \"--ceiling-ms\", \"5000\",\n    \"--report\", os.path.join(d, \"gate-exit.json\"),\n    \"--stdout\", os.path.join(d, \"stdout.log\"),\n    \"--stderr\", os.path.join(d, \"stderr.log\"),\n    \"--\", \"python3\", sys.argv[3], sys.argv[4], sys.argv[5]\n], pass_fds=(lock_fd,))\n`, attempt5D, path.join(v3BundleDir, \"p4_gate.py\"), worker5DScript, c1Script, grandchildPidFile]);\n\nconst grandchildPid = Number(fs.readFileSync(grandchildPidFile, \"utf8\").trim());\nlet grandchildSurvivedGateExit = false;\ntry {\n  process.kill(grandchildPid, 0);\n  const stat = fs.readFileSync(`/proc/${grandchildPid}/stat`, \"utf8\");\n  const state = stat.slice(stat.lastIndexOf(\")\") + 2).split(\" \")[0];\n  grandchildSurvivedGateExit = state !== \"Z\";\n} catch {\n  grandchildSurvivedGateExit = false;\n}\ntry { process.kill(grandchildPid, \"SIGKILL\"); } catch {}\n\n// Also test SIGTERM-ignoring worker hanging p4_gate.py past ceiling-ms (100ms ceiling, timed out at 450ms)\nconst attempt5E = path.join(tmpRoot, \"attempt-5E\");\nfs.mkdirSync(attempt5E, { recursive: true });\nfs.writeFileSync(path.join(attempt5E, \"attempt.lock\"), \"\");\nlet gateHungPastHardCeiling = false;\ntry {\n  execFileSync(\"python3\", [\"-c\", `\nimport fcntl, os, subprocess, sys\nd = sys.argv[1]\nlock_fd = os.open(os.path.join(d, \"attempt.lock\"), os.O_RDWR)\nfcntl.flock(lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)\nos.set_inheritable(lock_fd, True)\nsubprocess.run([\n    \"python3\", sys.argv[2],\n    \"--fd\", str(lock_fd),\n    \"--ceiling-ms\", \"100\",\n    \"--report\", os.path.join(d, \"gate-exit.json\"),\n    \"--stdout\", os.path.join(d, \"stdout.log\"),\n    \"--stderr\", os.path.join(d, \"stderr.log\"),\n    \"--\", \"python3\", \"-c\", \"import signal, time; signal.signal(signal.SIGTERM, signal.SIG_IGN); time.sleep(10)\"\n], pass_fds=(lock_fd,), timeout=0.45)\n`, attempt5E, path.join(v3BundleDir, \"p4_gate.py\")]);\n} catch {\n  gateHungPastHardCeiling = true;\n}\n\nfs.rmSync(tmpRoot, { recursive: true, force: true });\n\nconsole.log(JSON.stringify({\n  probe: \"R3-5 / R3-6 / R3-7 / R3-8: Supervisor, Adopt, Reaper, and Gate counterexamples\",\n  subprobe5A_partialCrashAfterSettleBeforeFinalizeHome: {\n    resultExistsBeforeAdopt,\n    adoptVerdict: adopt5AOut,\n    privateHomeStillLeakedOnDisk,\n  },\n  subprobe5B_reaperHoldsAttemptLockWhileAdoptRuns: {\n    adoptVerdictWhileReaperCleaningDeadAttempt: adoptDuringReaperOut,\n  },\n  subprobe5C_terminalModeReplOrphanAtSupervisorCrash: {\n    agentWroteOutboxDoneClaim: outboxClaim5C.status === \"done\",\n    gateReceiptStoppedBy: receipt5C.gateExit.stoppedBy,\n    settledResultStatus: settledResult5C.status,\n    completedWorkOverwrittenAsTimeout: settledResult5C.status === \"timeout\",\n  },\n  subprobe5D_gateGrandchildEscapeAndSigtermHang: {\n    grandchildPid,\n    grandchildSurvivedGateSubreaperCleanup: grandchildSurvivedGateExit,\n    sigtermIgnoringWorkerHungGatePastHardCeiling: gateHungPastHardCeiling,\n  }\n}, null, 2));\n",
+      "output": {
+        "probe": "R3-5 / R3-6 / R3-7 / R3-8: Supervisor, Adopt, Reaper, and Gate counterexamples",
+        "subprobe5A_partialCrashAfterSettleBeforeFinalizeHome": {
+          "resultExistsBeforeAdopt": true,
+          "adoptVerdict": {
+            "adopt": "nothing-to-do",
+            "reason": "already-settled"
+          },
+          "privateHomeStillLeakedOnDisk": true
+        },
+        "subprobe5B_reaperHoldsAttemptLockWhileAdoptRuns": {
+          "adoptVerdictWhileReaperCleaningDeadAttempt": {
+            "adopt": "kept",
+            "reason": "attempt-lock-held"
+          }
+        },
+        "subprobe5C_terminalModeReplOrphanAtSupervisorCrash": {
+          "agentWroteOutboxDoneClaim": true,
+          "gateReceiptStoppedBy": "hard-ceiling",
+          "settledResultStatus": "timeout",
+          "completedWorkOverwrittenAsTimeout": true
+        },
+        "subprobe5D_gateGrandchildEscapeAndSigtermHang": {
+          "grandchildPid": 3789874,
+          "grandchildSurvivedGateSubreaperCleanup": true,
+          "sigtermIgnoringWorkerHungGatePastHardCeiling": true
+        }
+      }
+    },
+    {
+      "file": "probe-r3-6-terminal-control-races.mjs",
+      "script": "import fs from \"node:fs\";\nimport os from \"node:os\";\nimport path from \"node:path\";\nimport { spawn } from \"node:child_process\";\n\nconst tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), \"r3-6-\"));\nconst groupsDir = path.join(tmpRoot, \"groups\");\nconst allocationsDir = path.join(tmpRoot, \"allocations\");\nconst tabsLog = path.join(tmpRoot, \"tabs-created.log\");\nfs.mkdirSync(groupsDir, { recursive: true });\nfs.mkdirSync(allocationsDir, { recursive: true });\n\nconst allocateWorker = path.join(tmpRoot, \"tc-allocate.mjs\");\nfs.writeFileSync(allocateWorker, `\nimport fs from \"node:fs\";\nimport path from \"node:path\";\n\nconst [groupsDir, allocationsDir, tabsLog, groupKey, attemptId] = process.argv.slice(2);\nconst groupFile = path.join(groupsDir, groupKey + \".json\");\n\n// §7.6 Option (a): No lock on terminal-control. Read groups/<groupKey>.json if present.\nlet group = null;\ntry {\n  group = JSON.parse(fs.readFileSync(groupFile, \"utf8\"));\n} catch {}\n\n// Simulate herdr tab creation / pane split latency (25ms IPC roundtrip)\nawait new Promise((r) => setTimeout(r, 25));\n\nlet tabId;\nif (!group || !group.tabId) {\n  tabId = \"tab-for-\" + attemptId;\n  fs.appendFileSync(tabsLog, tabId + String.fromCharCode(10));\n  const tmpGroup = groupFile + \".\" + process.pid + \".tmp\";\n  fs.writeFileSync(tmpGroup, JSON.stringify({ groupKey, tabId }));\n  fs.renameSync(tmpGroup, groupFile);\n} else {\n  tabId = group.tabId;\n}\n\nconst paneId = \"pane-\" + attemptId;\nconst allocFile = path.join(allocationsDir, attemptId + \".json\");\nfs.writeFileSync(allocFile, JSON.stringify({\n  attemptId,\n  groupKey,\n  tabId,\n  paneId,\n  allocatedAt: Date.now(),\n  launched: false,\n}));\n`);\n\nconst seats = [\"att-1\", \"att-2\", \"att-3\", \"att-4\"];\nawait Promise.all(seats.map((att) => new Promise((resolve, reject) => {\n  const p = spawn(process.execPath, [allocateWorker, groupsDir, allocationsDir, tabsLog, \"unit-run-1\", att], {\n    stdio: \"ignore\"\n  });\n  p.on(\"exit\", (code) => code === 0 ? resolve() : reject(new Error(\"exit \" + code)));\n})));\n\nconst createdTabs = fs.readFileSync(tabsLog, \"utf8\").trim().split(\"\\n\").filter(Boolean);\nconst allocations = seats.map((att) => JSON.parse(fs.readFileSync(path.join(allocationsDir, att + \".json\"), \"utf8\")));\n\nconst slowLaunchAlloc = path.join(allocationsDir, \"att-slow.json\");\nconst allocationGraceMs = 50;\nfs.writeFileSync(slowLaunchAlloc, JSON.stringify({\n  attemptId: \"att-slow\",\n  groupKey: \"unit-run-2\",\n  tabId: \"tab-slow\",\n  paneId: \"pane-slow\",\n  allocatedAt: Date.now() - 100,\n  launched: false,\n}));\n\nconst rec = JSON.parse(fs.readFileSync(slowLaunchAlloc, \"utf8\"));\nconst sweepClosesPaneWhileAttemptLockHeld = (!rec.launched && (Date.now() - rec.allocatedAt) > allocationGraceMs);\n\nfs.rmSync(tmpRoot, { recursive: true, force: true });\n\nconsole.log(JSON.stringify({\n  probe: \"R3-10: terminal-control lockless Option (a) groupKey tab race and allocationGrace sweep vs slow launch\",\n  concurrentSeatsForSameGroupKey: seats.length,\n  expectedTabsCreatedForGroup: 1,\n  actualTabsCreatedWithoutLock: createdTabs.length,\n  distinctTabsAssignedToSeats: [...new Set(allocations.map((a) => a.tabId))],\n  sweepClosesPaneWhileSlowLaunchHoldsAttemptLock: sweepClosesPaneWhileAttemptLockHeld,\n}, null, 2));\n",
+      "output": {
+        "probe": "R3-10: terminal-control lockless Option (a) groupKey tab race and allocationGrace sweep vs slow launch",
+        "concurrentSeatsForSameGroupKey": 4,
+        "expectedTabsCreatedForGroup": 1,
+        "actualTabsCreatedWithoutLock": 4,
+        "distinctTabsAssignedToSeats": [
+          "tab-for-att-1",
+          "tab-for-att-2",
+          "tab-for-att-3",
+          "tab-for-att-4"
+        ],
+        "sweepClosesPaneWhileSlowLaunchHoldsAttemptLock": true
+      }
+    }
+  ]
+}

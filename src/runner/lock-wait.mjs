@@ -97,7 +97,12 @@ export async function withLockRetry(fn, { waitMs } = {}) {
             ? ' -- likely your own session\'s other in-flight call'
             : ' -- a different pid/session';
         } else if (typeof err.holderPid === 'string') {
-          const selfId = resolveWriterIdentity().id;
+          let selfId = null;
+          try {
+            selfId = resolveWriterIdentity().id;
+          } catch {
+            // Only a progress hint: without an identity, say "different".
+          }
           qualifier = err.holderPid === selfId
             ? ' -- likely your own session\'s other in-flight call'
             : ' -- a different pid/session';

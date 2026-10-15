@@ -241,14 +241,15 @@ const FORBIDDEN_SESSION_FIELDS = new Set(['coordinationId', 'sessionId', 'thread
 
 const EVIDENCE_REQUIRED_VALUES = new Set(['reported', 'verified']);
 
-// Mirrors src/util/session-identity.mjs's own SESSION_ID_RE/MAX_ID_LENGTH
-// (that module does not export them). This is a format-only floor against
-// garbage caller.writerId values -- NOT a real identity check, and this
-// module deliberately never calls resolveWriterIdentity() itself (stays
-// pure, no process shell-out; see the module header and buildInlineAssignment
-// in ./assignment.mjs for why).
-const WRITER_ID_RE = /^[A-Za-z0-9._-]+$/;
-const MAX_WRITER_ID_LENGTH = 200;
+// The id charset and length of the session identity contract
+// (packages/session-identity/contracts/session-identity.resolve.v1.json
+// x-idPattern / x-maxIdLength; a test keeps the two equal). This is a
+// format-only floor against garbage caller.writerId values -- NOT a real
+// identity check, and this module deliberately never calls
+// resolveWriterIdentity() itself (stays pure, no process shell-out; see the
+// module header and buildInlineAssignment in ./assignment.mjs for why).
+export const WRITER_ID_RE = /^[A-Za-z0-9._-]+$/;
+export const MAX_WRITER_ID_LENGTH = 200;
 
 function fail(reason) {
   throw new RunnerConfigError(`execution-contract: ${reason}`);

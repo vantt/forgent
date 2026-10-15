@@ -940,6 +940,26 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
+    name: 'identity',
+    invoke: 'fgos identity',
+    description: 'Read-only: which writer the calling process is, as {id, source}. Tries FGOS_SESSION_ID, CODEX_THREAD_ID, CLAUDE_CODE_SESSION_ID in order (source env, or registry when .fgos/sessions.json lists the id); otherwise the highest ancestor holding a controlling terminal, else the caller\'s session id (source pid); otherwise the caller pid (source unresolved). Single authority: the Rust crate fgos-session-identity (docs/platform/session-identity/spec.md).',
+    parameters: {
+      type: 'object',
+      properties: {
+        pid: { type: 'number', description: 'The process asking. Defaults to the process that started fgos.' },
+        'fgos-dir': { type: 'string', description: 'The .fgos directory whose sessions.json may confirm an env id. Absent skips that confirmation.' },
+      },
+      required: [],
+    },
+    examples: ['fgos identity', 'fgos identity --pid 4242 --fgos-dir .fgos'],
+    touchesState: false,
+    requiresExistingStore: false,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+    nativeOnly: true,
+  },
+  {
     name: 'gate-check',
     invoke: 'fgos gate-check',
     description: 'Read-only: computes whether one of the 2 live skill-embedded Gates (contextApprove/validateApprove) can auto-approve, via canAutoApprove/canAutoApproveMergedGate (src/state/gate-bypass.mjs). Exists so fgos-coding-exploring/fgos-coding-validating resolve this through the CLI\'s own static imports — which already resolve correctly under any install shape (global, dev-checkout, npx), unlike the ad hoc cwd-relative resolver those skills used to embed inline (tsk-65q, docs/history/tsk-65q-gate-bypass-global-install-resolution/).',

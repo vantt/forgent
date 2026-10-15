@@ -20,7 +20,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { SCHEMA_VERSION } from './work.mjs';
-import { resolveWriterIdentity } from '../util/session-identity.mjs';
+import { noteLockHeld, noteLockReleased, resolveWriterIdentity } from '../util/session-identity.mjs';
 import { uniqueTmpTag } from '../util/unique-tmp-tag.mjs';
 
 // Cross-process append lock. `appendEvent` reads the log's last seq then
@@ -406,14 +406,26 @@ function acquireEventsLock(logPath, { pid = process.pid, timeoutMs = EVENTS_LOCK
  * precondition read and the append share the lock's single scope, so a
  * second process can no longer read a precondition that's about to go stale
  * out from under a first process still deciding.
+ *
+ * `fgosDir` is the `.fgos` directory whose writer identity the code inside
+ * resolves; it is resolved (and cached) before the lock is taken, because
+ * the identity bridge never execs while the lock is held. Callers whose
+ * `logPath` does not sit directly under `.fgos/` (per-writer files under
+ * `.fgos/events/`, the porting store) must pass it.
  */
-export function withEventsLock(logPath, fn) {
+export function withEventsLock(logPath, fn, fgosDir = path.dirname(logPath)) {
+  resolveWriterIdentity(fgosDir);
   const lock = acquireEventsLock(logPath);
+  noteLockHeld();
   let released = false;
   const releaseLock = () => {
     if (!released) {
       released = true;
-      lock.release();
+      try {
+        lock.release();
+      } finally {
+        noteLockReleased();
+      }
     }
   };
   let res;
@@ -526,5 +538,5 @@ export { appendEventCore as appendEventLocked };
  * sequence is one critical section.
  */
 export function appendEvent(logPath, opts, fgosDir) {
-  return withEventsLock(logPath, () => appendEventCore(logPath, opts, fgosDir));
+  return withEventsLock(logPath, () => appendEventCore(logPath, opts, fgosDir), fgosDir);
 }

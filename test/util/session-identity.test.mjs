@@ -1,334 +1,317 @@
-// session-identity.test.mjs -- tests for resolveWriterIdentity (D6,
-// str65-worktree-isolation-enforcement; D9/D15/D16/D17/D18/D25/D28,
-// str46-io-contract).
-
+// session-identity.test.mjs -- the Node facade over the Rust session identity
+// crate. Every case runs the real host binary (FGOS_HOST_BIN, built from this
+// checkout by `npm test`) in a fresh Node process, so the per-process cache
+// starts empty and the answer comes from the one authority. Failure modes use
+// small stand-in executables (unix only); the real-binary cases run on
+// Windows too.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { spawn, execFileSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import {
-  resolveWriterIdentity,
-  procPpidOf,
-  REGISTRY,
-  ENV,
-  PID,
-  UNRESOLVED,
-} from '../../src/util/session-identity.mjs';
+import { fileURLToPath } from 'node:url';
 
-/** A disposable `.fgos`-shaped directory holding whatever raw sessions.json
- * body a case needs -- including bodies that are not valid JSON at all. */
-function mkFgosDir(rawRegistryBody) {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-session-identity-'));
-  if (rawRegistryBody !== undefined) {
-    fs.writeFileSync(path.join(dir, 'sessions.json'), rawRegistryBody);
+import { IDENTITY_ENV_KEYS } from '../../src/util/session-identity.mjs';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const REPO_ROOT = path.resolve(__dirname, '../..');
+const FACADE_URL = new URL('../../src/util/session-identity.mjs', import.meta.url).href;
+const CONTRACTS = path.join(REPO_ROOT, 'packages', 'session-identity', 'contracts');
+const HOST = process.env.FGOS_HOST_BIN;
+const UNIX = process.platform !== 'win32';
+
+function requireHost(t) {
+  if (!HOST || !fs.existsSync(HOST)) {
+    assert.fail('set FGOS_HOST_BIN to a host built from this checkout (npm test does this)');
   }
-  return dir;
+  return HOST;
 }
 
-// tsk-13m: a hung `ps` must not be able to block the caller (and, in
-// production, the held cross-process events.lock) forever. Asserts the
-// real fix -- a bounded timeout actually reaches execFileSync's options --
-// rather than just the pre-existing catch-all behavior around it.
-test('ppidOf passes a bounded timeout to execFileSync, so a hung ps command cannot block the caller forever (tsk-13m)', () => {
-  let capturedOptions;
-  const execFile = (_file, _args, options) => {
-    capturedOptions = options;
-    return '90\n';
-  };
-  resolveWriterIdentity(undefined, { env: {}, pid: 100, execFile });
-  assert.equal(typeof capturedOptions.timeout, 'number');
-  assert.ok(capturedOptions.timeout > 0, 'timeout must be a positive bound, not 0/undefined (no bound)');
-  assert.ok(capturedOptions.timeout <= 500, 'timeout must stay a small fraction of events.lock\'s own 2s budget');
-});
-
-test('FGOS_SESSION_ID takes precedence over CLAUDE_CODE_SESSION_ID when both set', () => {
-  const result = resolveWriterIdentity(undefined, {
-    env: { FGOS_SESSION_ID: 'bee-session-1', CLAUDE_CODE_SESSION_ID: 'claude-session-2' },
-  });
-  assert.deepEqual(result, { id: 'bee-session-1', source: ENV });
-});
-
-test('falls back to CLAUDE_CODE_SESSION_ID when FGOS_SESSION_ID is unset', () => {
-  const result = resolveWriterIdentity(undefined, { env: { CLAUDE_CODE_SESSION_ID: 'claude-session-2' } });
-  assert.deepEqual(result, { id: 'claude-session-2', source: ENV });
-});
-
-test('neither env var set falls back to a 3-hop-capped ancestor pid walk', () => {
-  const chain = { 100: '90', 90: '80', 80: '70' };
-  const execFile = (_file, args) => {
-    const pid = Number(args[args.length - 1]);
-    return `${chain[pid]}\n`;
-  };
-  const result = resolveWriterIdentity(undefined, { env: {}, pid: 100, execFile });
-  assert.deepEqual(result, { id: 70, source: PID });
-});
-
-test('empty-string env values are treated as unset, same ancestor walk fallback', () => {
-  const chain = { 100: '90', 90: '80', 80: '70' };
-  const execFile = (_file, args) => {
-    const pid = Number(args[args.length - 1]);
-    return `${chain[pid]}\n`;
-  };
-  const result = resolveWriterIdentity(undefined, {
-    env: { FGOS_SESSION_ID: '   ', CLAUDE_CODE_SESSION_ID: '' },
-    pid: 100,
-    execFile,
-  });
-  assert.deepEqual(result, { id: 70, source: PID });
-});
-
-test('walk stops early at pid 1 before exhausting 3 hops', () => {
-  const chain = { 50: '1' };
-  const execFile = (_file, args) => {
-    const pid = Number(args[args.length - 1]);
-    return `${chain[pid] ?? '1'}\n`;
-  };
-  const result = resolveWriterIdentity(undefined, { env: {}, pid: 50, execFile });
-  assert.deepEqual(result, { id: 1, source: PID });
-});
-
-// D17: the fourth source is a LABEL, never an absent identity. No env value
-// was usable and `ps` was unavailable on the very first hop, so no ancestor
-// could be walked -- the caller's own pid is still handed back, byte-identical
-// to the pre-D9 behaviour, and only `source` records that nothing confirmed it.
-test('unresolved keeps the callers own pid when ps fails on the very first hop', () => {
-  const execFile = () => {
-    throw new Error('ps: command not found');
-  };
-  const result = resolveWriterIdentity(undefined, { env: {}, pid: 4242, execFile });
-  assert.deepEqual(result, { id: 4242, source: UNRESOLVED });
-});
-
-test('ps failure after the first successful hop returns the last resolved pid', () => {
-  let calls = 0;
-  const execFile = () => {
-    calls += 1;
-    if (calls === 1) return '90\n';
-    throw new Error('ps failed mid-walk');
-  };
-  const result = resolveWriterIdentity(undefined, { env: {}, pid: 100, execFile });
-  assert.deepEqual(result, { id: 90, source: PID });
-});
-
-// --- D28: the registry CONFIRMS an env-supplied id, it never supplies one ---
-
-test('identity resolves from the session registry when the env id matches a row', () => {
-  const fgosDir = mkFgosDir(
-    JSON.stringify([
-      { sessionId: 'other-session', worktreePath: '/tmp/other', pid: 111 },
-      { sessionId: 'session-in-registry', worktreePath: '/tmp/mine', pid: 222 },
-    ]),
-  );
-  const result = resolveWriterIdentity(fgosDir, { env: { FGOS_SESSION_ID: 'session-in-registry' } });
-  assert.deepEqual(result, { id: 'session-in-registry', source: REGISTRY });
-});
-
-test('an env id absent from the registry keeps the same value but reports env', () => {
-  const fgosDir = mkFgosDir(JSON.stringify([{ sessionId: 'someone-else', worktreePath: '/tmp/other', pid: 111 }]));
-  const result = resolveWriterIdentity(fgosDir, { env: { FGOS_SESSION_ID: 'not-registered' } });
-  assert.deepEqual(result, { id: 'not-registered', source: ENV });
-});
-
-test('a registry row is never matched by directory or by row pid', () => {
-  const fgosDir = mkFgosDir(
-    JSON.stringify([{ sessionId: 'issued-by-fgos', worktreePath: process.cwd(), pid: process.pid }]),
-  );
-  // Same worktree, same live pid, DIFFERENT session id: two agent processes
-  // sharing one worktree must not collapse onto one identity.
-  const result = resolveWriterIdentity(fgosDir, { env: { FGOS_SESSION_ID: 'a-different-session' } });
-  assert.deepEqual(result, { id: 'a-different-session', source: ENV });
-});
-
-// D25: this module reads sessions.json with its own fs and is TOLERANT of
-// every shape session.mjs's own reader would throw on -- writeRegistry is a
-// non-atomic writeFileSync, so a half-written file is reachable in practice.
-const CORRUPT_REGISTRIES = [
-  ['no sessions.json at all', undefined],
-  ['not valid JSON', 'not-json-at-all{{{'],
-  ['a half-written array', '[{"sessionId": "session-corrupt", "worktree'],
-  ['a JSON object rather than an array', '{"sessionId": "session-corrupt"}'],
-  ['an array of non-objects', '["session-corrupt", null, 7]'],
-];
-
-for (const [label, body] of CORRUPT_REGISTRIES) {
-  test(`a corrupt registry falls through to env without throwing -- ${label}`, () => {
-    const fgosDir = mkFgosDir(body);
-    const result = resolveWriterIdentity(fgosDir, { env: { FGOS_SESSION_ID: 'session-corrupt' } });
-    assert.deepEqual(result, { id: 'session-corrupt', source: ENV });
-  });
+function tmp(prefix) {
+  return fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), prefix)));
 }
 
-test('a corrupt registry falls through to env without throwing -- an unreadable fgosDir path', () => {
-  const result = resolveWriterIdentity('/definitely/not/a/real/fgos/dir', {
-    env: { FGOS_SESSION_ID: 'session-corrupt' },
-  });
-  assert.deepEqual(result, { id: 'session-corrupt', source: ENV });
-});
-
-// D18: an identity outside SESSION_ID_RE (session.mjs:48) plus a length cap
-// is DISCARDED at the resolution layer and the next source is tried. This is
-// the one input class whose resolved VALUE deliberately changes: today such a
-// string is returned verbatim and reaches acquireMainCheckoutLock.
-const MALFORMED_ENV_VALUES = [
-  ['a path traversal segment', '../../etc/passwd'],
-  ['a shell metacharacter', 'session;rm -rf /'],
-  ['whitespace inside the value', 'session id with spaces'],
-  ['a slash', 'sessions/abc'],
-  ['a value past the length ceiling', 'a'.repeat(201)],
-];
-
-for (const [label, value] of MALFORMED_ENV_VALUES) {
-  test(`a malformed env value falls through to the next source -- ${label}`, () => {
-    const chain = { 100: '90', 90: '80', 80: '70' };
-    const execFile = (_file, args) => {
-      const pid = Number(args[args.length - 1]);
-      return `${chain[pid]}\n`;
-    };
-    const result = resolveWriterIdentity(undefined, {
-      env: { FGOS_SESSION_ID: value },
-      pid: 100,
-      execFile,
-    });
-    assert.deepEqual(result, { id: 70, source: PID });
-  });
+/** Env with the session id variables removed, then `extra` applied. */
+function cleanEnv(extra = {}) {
+  const env = { ...process.env };
+  for (const key of IDENTITY_ENV_KEYS) delete env[key];
+  for (const [key, value] of Object.entries(extra)) {
+    if (value === undefined) delete env[key];
+    else env[key] = value;
+  }
+  return env;
 }
 
-test('a malformed env value falls through to the next source -- a valid fallback env var is still used', () => {
-  const result = resolveWriterIdentity(undefined, {
-    env: { FGOS_SESSION_ID: 'bad value/with spaces', CLAUDE_CODE_SESSION_ID: 'claude-session-2' },
-  });
-  assert.deepEqual(result, { id: 'claude-session-2', source: ENV });
-});
+/** Runs `body` (an async function body with `facade` in scope) in a fresh
+ * Node process and returns what it prints as JSON. */
+function inFreshProcess(body, { env = cleanEnv(), cwd = REPO_ROOT, viaShell = 0 } = {}) {
+  const script = `const facade = await import(${JSON.stringify(FACADE_URL)});
+const out = await (async () => { ${body} })();
+process.stdout.write(JSON.stringify(out));`;
+  let command = process.execPath;
+  let args = ['--input-type=module', '-e', script];
+  for (let i = 0; i < viaShell; i++) {
+    args = ['-c', `exec_me() { "$@"; }; exec_me ${[command, ...args].map(shellQuote).join(' ')}; :`];
+    command = '/bin/sh';
+  }
+  const res = spawnSync(command, args, { env, cwd, encoding: 'utf8' });
+  assert.equal(res.status, 0, `fresh process failed: ${res.stderr}`);
+  return JSON.parse(res.stdout);
+}
 
-// Real-process test: proves the 3-hop walk reaches the expected ancestor
-// against an actual OS process tree, not just a faked ppid lookup. Builds a
-// live 3-level chain of spawned node processes (top -> mid -> leaf) below
-// this test process (T), so leaf's 3rd ancestor hop is T itself:
-//   leaf -> (hop1) mid -> (hop2) top -> (hop3) T
-// Each level keeps itself alive (setInterval) until explicitly killed, and
-// relays its own pid, plus every descendant's pid, up to T over IPC so the
-// test can assert against T's own process.pid and clean up afterward.
-//
-// Note: with `node -e <script> <arg1> <arg2>`, process.argv has NO filler
-// slot for the eval'd script itself -- argv[1]/argv[2] ARE the extra args
-// (verified empirically; differs from running a real file, where argv[1]
-// is the file path).
-test('3-hop walk reaches the real ancestor across a spawned process chain', { timeout: 10_000, skip: process.platform === 'win32' }, async () => {
-  const CHILD_SCRIPT = `
-    const { spawn } = require('node:child_process');
-    const depth = Number(process.argv[1]);
-    const src = process.argv[2];
-    if (depth > 0) {
-      const child = spawn(process.execPath, ['-e', src, String(depth - 1), src], {
-        stdio: ['ignore', 'ignore', 'ignore', 'ipc'],
-      });
-      child.on('message', (chain) => {
-        if (process.send) process.send([process.pid, ...chain]);
-      });
-    } else if (process.send) {
-      process.send([process.pid]);
-    }
-    setInterval(() => {}, 3_600_000);
-  `;
+function shellQuote(value) {
+  return `'${String(value).replace(/'/g, `'\\''`)}'`;
+}
 
-  const top = spawn(process.execPath, ['-e', CHILD_SCRIPT, '2', CHILD_SCRIPT], {
-    stdio: ['ignore', 'ignore', 'ignore', 'ipc'],
-  });
+/** A stand-in host: a sh script that logs each call then runs `tail`. */
+function standIn(dir, name, tail) {
+  const file = path.join(dir, name);
+  fs.writeFileSync(file, `#!/bin/sh\necho "$$ $*" >> "${file}.calls"\n${tail}\n`, { mode: 0o755 });
+  return file;
+}
 
-  let chain;
+function calls(file) {
   try {
-    chain = await new Promise((resolve, reject) => {
-      const timer = setTimeout(() => reject(new Error('timed out waiting for process chain')), 8000);
-      top.once('message', (msg) => {
-        clearTimeout(timer);
-        resolve(msg);
-      });
-      top.once('error', (err) => {
-        clearTimeout(timer);
-        reject(err);
-      });
-    });
+    return fs.readFileSync(`${file}.calls`, 'utf8').trim().split('\n').filter(Boolean);
+  } catch {
+    return [];
+  }
+}
 
-    const [topPid, midPid, leafPid] = chain;
-    assert.equal(typeof leafPid, 'number');
+test('the facade cache key names the same env variables, in the same order, as the contract', () => {
+  const contract = JSON.parse(fs.readFileSync(path.join(CONTRACTS, 'session-identity.resolve.v1.json'), 'utf8'));
+  assert.deepEqual([...IDENTITY_ENV_KEYS], contract['x-envOrder']);
+});
 
-    const result = resolveWriterIdentity(undefined, {
-      env: {},
-      pid: leafPid,
-      execFile: (file, args, options) => execFileSync(file, args, { ...options, timeout: 2000 }),
-    });
-    assert.deepEqual(result, { id: process.pid, source: PID });
+test('the dispatch writerId format floor uses the contract id charset and length', async () => {
+  const contract = JSON.parse(fs.readFileSync(path.join(CONTRACTS, 'session-identity.resolve.v1.json'), 'utf8'));
+  const { WRITER_ID_RE, MAX_WRITER_ID_LENGTH } = await import('../../src/runner/dispatch/execution-contract.mjs');
+  assert.equal(WRITER_ID_RE.source, contract['x-idPattern']);
+  assert.equal(MAX_WRITER_ID_LENGTH, contract['x-maxIdLength']);
+});
 
-    for (const pid of [topPid, midPid, leafPid]) {
-      try {
-        process.kill(pid, 'SIGKILL');
-      } catch {
-        // already gone -- fine
-      }
+test('every shared env vector resolves the same through the real binary', (t) => {
+  requireHost(t);
+  const golden = JSON.parse(fs.readFileSync(path.join(CONTRACTS, 'session-identity.golden.v1.json'), 'utf8'));
+  const root = tmp('fgos-identity-env-');
+  const cases = golden.envCases.map((c, i) => {
+    let dir = null;
+    if (c.registry.kind !== 'none') {
+      dir = path.join(root, `case-${i}`);
+      fs.mkdirSync(dir);
+      if (c.registry.kind === 'rows') fs.writeFileSync(path.join(dir, 'sessions.json'), JSON.stringify(c.registry.rows));
+      if (c.registry.kind === 'raw') fs.writeFileSync(path.join(dir, 'sessions.json'), c.registry.raw);
     }
-  } finally {
-    top.kill('SIGKILL');
-  }
+    return { name: c.name, env: c.env, dir, expected: c.expected };
+  });
+  const results = inFreshProcess(`
+    const cases = ${JSON.stringify(cases)};
+    const keys = ${JSON.stringify(IDENTITY_ENV_KEYS)};
+    return cases.map((c) => {
+      for (const key of keys) delete process.env[key];
+      Object.assign(process.env, c.env);
+      return facade.resolveWriterIdentity(c.dir ?? undefined);
+    });`);
+  cases.forEach((c, i) => {
+    if (c.expected === null) {
+      assert.ok([ 'pid', 'unresolved' ].includes(results[i].source), `${c.name}: ${JSON.stringify(results[i])}`);
+    } else {
+      assert.deepEqual(results[i], c.expected, c.name);
+    }
+  });
 });
 
-test('one process keeps one pid-walk writer id even when a later `ps` would time out (loaded host)', { skip: process.platform === 'win32' }, () => {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'writer-id-stable-'));
-  try {
-    // A `ps` that is slower than PPID_TIMEOUT_MS: re-walking with it would
-    // stop at hop 0 and yield a different (UNRESOLVED, own-pid) identity.
-    const slowBin = path.join(tmp, 'bin');
-    fs.mkdirSync(slowBin);
-    fs.writeFileSync(path.join(slowBin, 'ps'), '#!/bin/sh\nsleep 1\n', { mode: 0o755 });
-    const moduleUrl = new URL('../../src/util/session-identity.mjs', import.meta.url).href;
-    const script = `
-import { resolveWriterIdentity } from ${JSON.stringify(moduleUrl)};
-const first = resolveWriterIdentity();
-process.env.PATH = ${JSON.stringify(slowBin)} + ':' + process.env.PATH;
-const second = resolveWriterIdentity();
-process.stdout.write(JSON.stringify({ first, second }));
-`;
-    const env = { PATH: process.env.PATH, HOME: process.env.HOME };
-    const out = JSON.parse(execFileSync(process.execPath, ['--input-type=module', '-e', script], { env, encoding: 'utf8' }));
-    assert.equal(out.first.source, 'pid', 'sanity: no session env, so the identity comes from the ancestor walk');
-    assert.deepEqual(out.second, out.first);
-  } finally {
-    fs.rmSync(tmp, { recursive: true, force: true });
-  }
+test('one exec per session env for the pid branch, whatever fgos dir is passed; a new env asks again', (t) => {
+  if (!UNIX) return t.skip('stand-in hosts are sh scripts');
+  const host = requireHost(t);
+  const dir = tmp('fgos-identity-cache-');
+  const wrapper = standIn(dir, 'host', `exec "${host}" "$@"`);
+  const [a, b, c, d] = inFreshProcess(`
+    const a = facade.resolveWriterIdentity(${JSON.stringify(path.join(dir, 'one'))});
+    const b = facade.resolveWriterIdentity(${JSON.stringify(path.join(dir, 'two'))});
+    const c = facade.resolveWriterIdentity();
+    process.env.FGOS_SESSION_ID = 'later-session';
+    const d = facade.resolveWriterIdentity(${JSON.stringify(path.join(dir, 'one'))});
+    facade.resolveWriterIdentity(${JSON.stringify(path.join(dir, 'one'))});
+    return [a, b, c, d];`, { env: cleanEnv({ FGOS_HOST_BIN: wrapper }) });
+  assert.deepEqual(a, b);
+  assert.deepEqual(a, c);
+  assert.ok(['pid', 'unresolved'].includes(a.source));
+  assert.deepEqual(d, { id: 'later-session', source: 'env' });
+  assert.equal(calls(wrapper).length, 2, calls(wrapper).join('\n'));
 });
 
-// --- /proc parent lookup (Linux): no subprocess, so no timeout under load ---
-
-test('procPpidOf reads the parent pid of a real process from /proc without spawning anything', { skip: process.platform !== 'linux' }, () => {
-  assert.equal(procPpidOf(process.pid), process.ppid);
-});
-
-test('procPpidOf counts fields from the last ")" so a command name with spaces and parentheses cannot shift the ppid', () => {
-  const readFile = () => '4321 (weird ) (name) S 987 4321 4321 0 -1 4194560 100 0 0 0\n';
-  assert.equal(procPpidOf(4321, { readFile }), 987);
-});
-
-test('procPpidOf: null for an unparsable stat line or a vanished process, undefined when /proc itself is not readable', { skip: process.platform !== 'linux' }, () => {
-  assert.equal(procPpidOf(4321, { readFile: () => 'garbage' }), null);
-  assert.equal(procPpidOf(2 ** 31 - 2), null);
-  const denied = () => { throw Object.assign(new Error('denied'), { code: 'EACCES' }); };
-  assert.equal(procPpidOf(4321, { readFile: denied }), undefined);
-});
-
-test('two separate processes resolve the same ancestor identity even when every `ps` call is too slow to finish', { skip: process.platform !== 'linux' }, () => {
-  const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-slow-ps-'));
-  fs.writeFileSync(path.join(binDir, 'ps'), '#!/bin/sh\nsleep 5\n', { mode: 0o755 });
-  const script = `import { resolveWriterIdentity } from ${JSON.stringify(new URL('../../src/util/session-identity.mjs', import.meta.url).href)};
-console.log(JSON.stringify(resolveWriterIdentity(undefined, { env: {} })));`;
-  const env = { ...process.env, PATH: `${binDir}${path.delimiter}${process.env.PATH}` };
-  delete env.FGOS_SESSION_ID;
-  delete env.CLAUDE_CODE_SESSION_ID;
-  const run = () => JSON.parse(execFileSync(process.execPath, ['--input-type=module', '-e', script], { env, encoding: 'utf8' }));
-  const first = run();
-  const second = run();
+test('the env-branch cache key stays the same when the fgos dir is created under a symlink after priming', (t) => {
+  if (!UNIX) return t.skip('symlinks need privileges on Windows');
+  const host = requireHost(t);
+  const dir = tmp('fgos-identity-symlink-');
+  fs.mkdirSync(path.join(dir, 'real'));
+  fs.symlinkSync(path.join(dir, 'real'), path.join(dir, 'alias'));
+  const wrapper = standIn(dir, 'host', `exec "${host}" "$@"`);
+  const fgosDir = path.join(dir, 'alias', 'new', '.fgos');
+  const [first, second] = inFreshProcess(`
+    const fs = await import('node:fs');
+    const first = facade.resolveWriterIdentity(${JSON.stringify(fgosDir)});
+    fs.mkdirSync(${JSON.stringify(fgosDir)}, { recursive: true });
+    facade.noteLockHeld();
+    const second = facade.resolveWriterIdentity(${JSON.stringify(fgosDir)});
+    facade.noteLockReleased();
+    return [first, second];`, { env: cleanEnv({ FGOS_HOST_BIN: wrapper, FGOS_SESSION_ID: 'sess-sym' }) });
+  assert.deepEqual(first, { id: 'sess-sym', source: 'env' });
   assert.deepEqual(second, first);
-  assert.equal(first.source, PID);
-  // Three hops up from the child: this process, its parent, its grandparent.
-  assert.equal(first.id, procPpidOf(process.ppid) ?? process.ppid);
+  assert.equal(calls(wrapper).length, 1);
+});
+
+test('no fgos dir means no registry confirmation, never the cwd', (t) => {
+  requireHost(t);
+  const cwd = tmp('fgos-identity-nodir-');
+  fs.mkdirSync(path.join(cwd, '.fgos'));
+  fs.writeFileSync(path.join(cwd, '.fgos', 'sessions.json'), JSON.stringify([{ sessionId: 'sess-cwd' }]));
+  const answer = inFreshProcess('return facade.resolveWriterIdentity();', {
+    cwd,
+    env: cleanEnv({ FGOS_SESSION_ID: 'sess-cwd' }),
+  });
+  assert.deepEqual(answer, { id: 'sess-cwd', source: 'env' });
+});
+
+test('the depth of wrapper layers between the caller and its terminal does not change the id', (t) => {
+  if (!UNIX) return t.skip('needs /bin/sh');
+  requireHost(t);
+  const direct = inFreshProcess('return facade.resolveWriterIdentity();');
+  const wrapped = inFreshProcess('return facade.resolveWriterIdentity();', { viaShell: 2 });
+  assert.deepEqual(wrapped, direct);
+});
+
+test('a process with no terminal anywhere above it resolves to its session id', (t) => {
+  if (process.platform !== 'linux') return t.skip('reads /proc');
+  requireHost(t);
+  const dir = tmp('fgos-identity-setsid-');
+  const out = path.join(dir, 'out.json');
+  const script = `const facade = await import(${JSON.stringify(FACADE_URL)});
+const fs = await import('node:fs');
+const stat = fs.readFileSync('/proc/self/stat', 'utf8');
+const fields = stat.slice(stat.lastIndexOf(')') + 1).trim().split(/\\s+/);
+fs.writeFileSync(${JSON.stringify(out)}, JSON.stringify({ answer: facade.resolveWriterIdentity(), session: Number(fields[3]), tty: Number(fields[4]) }));`;
+  // setsid without a terminal, then orphan the node child so no ancestor
+  // with a terminal is left above it.
+  const launcher = `( ${shellQuote(process.execPath)} --input-type=module -e ${shellQuote(script)} </dev/null >/dev/null 2>&1 & ) ; exit 0`;
+  const res = spawnSync('/bin/sh', ['-c', launcher], { env: cleanEnv(), detached: true, stdio: 'ignore' });
+  assert.equal(res.status, 0);
+  const deadline = Date.now() + 10_000;
+  while (!fs.existsSync(out) && Date.now() < deadline) spawnSync('sleep', ['0.05']);
+  const { answer, session, tty } = JSON.parse(fs.readFileSync(out, 'utf8'));
+  assert.equal(tty, 0);
+  assert.deepEqual(answer, { id: session, source: 'pid' });
+});
+
+test('activation discovery finds the host without FGOS_HOST_BIN', (t) => {
+  if (!UNIX) return t.skip('stand-in release binary is a sh script');
+  const host = requireHost(t);
+  const root = tmp('fgos-identity-activation-');
+  const release = path.join(root, 'release');
+  fs.mkdirSync(path.join(release, 'bin'), { recursive: true });
+  const releaseBin = standIn(path.join(release, 'bin'), 'fgos', `exec "${host}" "$@"`);
+  fs.mkdirSync(path.join(root, '.fgos', 'installation'), { recursive: true });
+  fs.writeFileSync(path.join(root, '.fgos', 'installation', 'activation.json'), JSON.stringify({ status: 'ready', releasePath: release }));
+  const answer = inFreshProcess(`return facade.resolveWriterIdentity(${JSON.stringify(path.join(root, '.fgos'))});`, {
+    cwd: os.tmpdir(),
+    env: cleanEnv({ FGOS_HOST_BIN: undefined, FGOS_SESSION_ID: 'via-activation' }),
+  });
+  assert.deepEqual(answer, { id: 'via-activation', source: 'env' });
+  assert.equal(calls(releaseBin).length, 1);
+});
+
+function failure(env, body = 'facade.resolveWriterIdentity();') {
+  return inFreshProcess(`
+    const started = Date.now();
+    try { ${body} return { ok: true }; }
+    catch (err) { return { name: err.name, code: err.code, category: err.category, message: err.message, ms: Date.now() - started }; }`, { env });
+}
+
+test('no host binary anywhere is host-missing, naming where it looked', () => {
+  const cwd = tmp('fgos-identity-missing-');
+  const result = inFreshProcess(`
+    try { facade.resolveWriterIdentity(${JSON.stringify(path.join(cwd, '.fgos'))}); return { ok: true }; }
+    catch (err) { return { code: err.code, category: err.category, message: err.message }; }`, {
+    cwd,
+    env: cleanEnv({ FGOS_HOST_BIN: undefined }),
+  });
+  assert.equal(result.code, 'host-missing');
+  assert.equal(result.category, 'precondition');
+  assert.match(result.message, /activation\.json/);
+});
+
+test('host failures are classified, never guessed, and never cached', (t) => {
+  if (!UNIX) return t.skip('stand-in hosts are sh scripts');
+  const host = requireHost(t);
+  const dir = tmp('fgos-identity-failures-');
+  const oldHost = standIn(dir, 'old', 'echo \'fgos: unknown verb "identity". Usage: fgos <command> [args...]\' >&2; exit 4');
+  const slow = standIn(dir, 'slow', `echo $$ > "${dir}/slow.pid"; exec sleep 10`);
+  const junk = standIn(dir, 'junk', 'echo not json');
+  const okShape = standIn(dir, 'shape', 'echo \'{"contract":"fgos.v1","generated_at":"x","data_hash":"y","data":{"id":"7","source":"pid"}}\'');
+  const broken = standIn(dir, 'broken', 'echo boom >&2; exit 3');
+  const real = standIn(dir, 'real', `exec "${host}" "$@"`);
+
+  assert.equal(failure(cleanEnv({ FGOS_HOST_BIN: oldHost })).code, 'host-version-mismatch');
+  assert.equal(failure(cleanEnv({ FGOS_HOST_BIN: junk })).code, 'bad-output');
+  assert.equal(failure(cleanEnv({ FGOS_HOST_BIN: okShape })).code, 'bad-output', 'pid source with a string id');
+  const hostError = failure(cleanEnv({ FGOS_HOST_BIN: broken }));
+  assert.equal(hostError.code, 'host-error');
+  assert.match(hostError.message, /exit 3.*boom/);
+
+  const timeout = failure(cleanEnv({ FGOS_HOST_BIN: slow }));
+  assert.equal(timeout.code, 'timeout');
+  assert.ok(timeout.ms < 6000, `took ${timeout.ms} ms`);
+  const slowPid = Number(fs.readFileSync(path.join(dir, 'slow.pid'), 'utf8'));
+  assert.throws(() => process.kill(slowPid, 0), { code: 'ESRCH' }, 'the timed-out host was killed and reaped');
+
+  // A failure is not remembered: the same process asks again and succeeds.
+  const retried = inFreshProcess(`
+    try { facade.resolveWriterIdentity(); } catch (err) { if (err.code !== 'bad-output') throw err; }
+    process.env.FGOS_HOST_BIN = ${JSON.stringify(real)};
+    return facade.resolveWriterIdentity();`, { env: cleanEnv({ FGOS_HOST_BIN: junk, FGOS_SESSION_ID: 'after-failure' }) });
+  assert.deepEqual(retried, { id: 'after-failure', source: 'env' });
+});
+
+test('no exec while a lock is held: a cache miss and a direct probe both refuse before spawning', (t) => {
+  if (!UNIX) return t.skip('stand-in hosts are sh scripts');
+  const host = requireHost(t);
+  const dir = tmp('fgos-identity-inlock-');
+  const wrapper = standIn(dir, 'host', `exec "${host}" "$@"`);
+  const result = inFreshProcess(`
+    const codes = [];
+    facade.noteLockHeld();
+    try { facade.resolveWriterIdentity(); } catch (err) { codes.push(err.code); }
+    try { facade.probeIdentity(${JSON.stringify(wrapper)}); } catch (err) { codes.push(err.code); }
+    facade.noteLockReleased();
+    const after = facade.resolveWriterIdentity();
+    facade.noteLockHeld();
+    const cached = facade.resolveWriterIdentity();
+    facade.noteLockReleased();
+    return { codes, after, cached };`, { env: cleanEnv({ FGOS_HOST_BIN: wrapper, FGOS_SESSION_ID: 'locked' }) });
+  assert.deepEqual(result.codes, ['identity-in-lock', 'identity-in-lock']);
+  assert.deepEqual(result.after, { id: 'locked', source: 'env' });
+  assert.deepEqual(result.cached, result.after);
+  assert.equal(calls(wrapper).length, 1);
+});
+
+test('the verb runs with the caller pid and without the invocation record path', (t) => {
+  if (!UNIX) return t.skip('stand-in hosts are sh scripts');
+  const host = requireHost(t);
+  const dir = tmp('fgos-identity-env-');
+  const wrapper = standIn(dir, 'host', `echo "record=\${FGOS_INVOCATION_RECORD_PATH:-unset}" >> "${dir}/seen"; exec "${host}" "$@"`);
+  const pid = inFreshProcess('facade.resolveWriterIdentity(); return process.pid;', {
+    env: cleanEnv({ FGOS_HOST_BIN: wrapper, FGOS_INVOCATION_RECORD_PATH: path.join(dir, 'records.jsonl') }),
+  });
+  assert.equal(fs.readFileSync(path.join(dir, 'seen'), 'utf8').trim(), 'record=unset');
+  assert.ok(!fs.existsSync(path.join(dir, 'records.jsonl')));
+  assert.match(calls(wrapper)[0], new RegExp(`identity --pid ${pid}$`));
+});
+
+test('on every platform an unresolved answer names the calling Node process', (t) => {
+  if (process.platform === 'linux') return t.skip('Linux always reads the process tree');
+  requireHost(t);
+  const result = inFreshProcess('return { answer: facade.resolveWriterIdentity(), pid: process.pid };');
+  if (result.answer.source === 'unresolved') assert.equal(result.answer.id, result.pid);
 });

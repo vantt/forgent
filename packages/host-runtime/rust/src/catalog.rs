@@ -49,6 +49,17 @@ pub const CATALOG: &[OperationDescriptor] = &[
         streaming_mode: StreamingMode::None,
     },
     OperationDescriptor {
+        operation_id: OperationId::from_static("session-identity.resolve"),
+        owning_component_id: Cow::Borrowed("session-identity"),
+        request_contract: ContractRef::from_static("session-identity.resolve.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("session-identity.resolve.outcome", "1.0.0"),
+        effect: OperationEffect::Read,
+        idempotency: OperationIdempotency::Safe,
+        authority_policy_id: Cow::Borrowed("session-identity.read"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
+    OperationDescriptor {
         operation_id: OperationId::from_static("test.fixture.echo"),
         owning_component_id: Cow::Borrowed("test"),
         request_contract: ContractRef::from_static("test.fixture.echo.request", "1.0.0"),
@@ -89,7 +100,7 @@ mod tests {
 
     #[test]
     fn catalog_contains_required_operations() {
-        assert_eq!(CATALOG.len(), 6);
+        assert_eq!(CATALOG.len(), 7);
         let ids: Vec<&str> = CATALOG.iter().map(|op| op.operation_id.as_str()).collect();
         assert!(ids.contains(&"distribution.build.show"));
         assert!(ids.contains(&"work.gate-bypass.show"));
@@ -97,6 +108,7 @@ mod tests {
         assert!(ids.contains(&"observe.metrics"));
         assert!(ids.contains(&"observe.friction"));
         assert!(ids.contains(&"convention.query"));
+        assert!(ids.contains(&"session-identity.resolve"));
     }
     /// `OperationId::from_static` (used by every `CATALOG` entry, for
     /// const-context construction with no runtime allocation) skips

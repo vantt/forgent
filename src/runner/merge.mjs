@@ -881,14 +881,11 @@ export async function mergeRunnerItem(repoRoot, item, { timeoutMs, lockRoot = re
   // later, in-process-tree acquisition succeed as a refresh, never a
   // self-deadlock — true whenever an env session id resolves the identity
   // (the primary path; every session actually contending on this checkout
-  // observed during this fix carried one). The bare-terminal ancestor-walk
-  // fallback (session-identity.mjs) resolves relative to each process's OWN
-  // pid, so this call (from the approve process) and the hook's later call
-  // (from its own child pid, several hops deeper) are not guaranteed to
-  // land on the same ancestor and could in principle self-refuse. This is
-  // the same "best-effort only" limitation session-identity.mjs already
-  // documents for that fallback, now newly reachable from here too — not a
-  // regression in kind, just a second call site inheriting a known gap.
+  // observed during this fix carried one). Without an env id the identity
+  // is the highest ancestor holding a terminal, else the session id
+  // (docs/platform/session-identity/spec.md); neither depends on how many
+  // hops deeper the hook's child process sits, so this call and the hook's
+  // later call land on the same id.
   // tsk-2eq: `lockRoot` defaults to `repoRoot` (root->main approve's own
   // call site, unaffected) but a leaf->parent approve passes the real repo
   // root here explicitly while `repoRoot` itself stays the ephemeral

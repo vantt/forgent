@@ -79,6 +79,7 @@ function initSharedAbsoluteHooksPathFixture() {
   fs.copyFileSync(REAL_PROCESS_IDENTITY_MODULE, path.join(dispatchDir, 'process-identity.mjs'));
   fs.copyFileSync(REAL_RUN_TIMEOUT_MODULE, path.join(dispatchDir, 'run-timeout.mjs'));
   fs.copyFileSync(REAL_IDENTITY_MODULE, path.join(utilDir, 'session-identity.mjs'));
+  fs.copyFileSync(path.join(path.dirname(REAL_IDENTITY_MODULE), 'host-bin-path.mjs'), path.join(utilDir, 'host-bin-path.mjs'));
   fs.chmodSync(path.join(hooksDir, 'pre-commit'), 0o755);
   // Absolute, not relative -- this is the load-bearing difference from
   // installGitHooks's own '.githooks' write (see file header).

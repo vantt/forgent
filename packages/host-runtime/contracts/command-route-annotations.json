@@ -16,6 +16,11 @@
     "operation_id": "work.gate-bypass.show",
     "owner_path": "packages/work-state/rust"
   },
+  "identity": {
+    "route_kind": "native",
+    "operation_id": "session-identity.resolve",
+    "owner_path": "packages/session-identity/rust"
+  },
   "metrics": {
     "route_kind": "native",
     "operation_id": "observe.metrics",

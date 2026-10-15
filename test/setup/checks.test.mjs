@@ -84,6 +84,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'enduser-docs-index-stale',
       'invariant-checks-configured',
       'worktree-setup-configured',
+      'writer-identity-resolvable',
       'events-jsonl-not-truncated',
       'cli-version-visible',
       'worker-slots-ceiling-usable',
