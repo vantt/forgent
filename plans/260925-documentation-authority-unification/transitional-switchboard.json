@@ -1053,7 +1053,8 @@
           "authorityStatus": "legacy-current",
           "role": "Entry for docs/ui-spec/** defining visual and UI layout contracts; functional behavior owned by area specs"
         },
-        {"route":"docs/platform/ui-spec/**","authorityStatus":"candidate","scope":"candidate-transformation","role":"Candidate placement only; retained source authority and existing area status are unchanged."}
+        {"route":"docs/platform/ui-spec/**","authorityStatus":"candidate","scope":"candidate-transformation","role":"Candidate placement only; retained source authority and existing area status are unchanged."},
+        {"route":"docs/ui-spec/generated/**","authorityStatus":"non-authority","scope":"ui-spec-build-output","role":"Generated projection written by the ui-spec build tools; regenerate from the ui-spec sources, never edit by hand."}
       ]
     },
     {
