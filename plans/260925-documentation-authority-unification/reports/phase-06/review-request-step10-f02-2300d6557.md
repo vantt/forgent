@@ -1,0 +1,6726 @@
+# Current link pass and helper rules — part 2
+
+One replacement review request; entries 121–240 of section f. **120 entries**. Content and SYNC `2300d65571968bb3bcb80123a273272586e3f1db`; comparison base `980cb29312b8701f5ea639278f44e1a57a6e5c02`. [Single index](review-request-step10-index-2300d6557.md). Old requests packaged at `8d38b18ed` are superseded. No producer seed or verdict.
+
+Current decision and current witness fields take precedence over explicitly preserved historical records. Every rebound row is pending; old reviewed fields occur only inside historical before records. A36 deep lists are in [A36](step10-sync2300-A36.json); all truth corrections, all partial carries and all unequal source/target rows require deep review.
+
+## Entry f-121: link-121
+
+```json
+{
+  "id": "link-121",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+    "inputLine": 40,
+    "inputColumn": 53,
+    "lineBeforeLinkPass": 48,
+    "before": "[source migration §10](../../../architect/host-invocation-routing/node-to-rust-component-migration.md#10-migrate-read-models-before-writers)",
+    "after": "[source migration §10](node-to-rust-migration.md#10-migrate-read-models-before-writers)",
+    "legacyPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "anchor": "10-migrate-read-models-before-writers",
+      "aliasId": "host-invocation-draft-082"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+    "line": 48,
+    "legacy": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "previous": "[source migration §10](node-to-rust-migration.md#10-migrate-read-models-before-writers)",
+    "now": "../../../architect/host-invocation-routing/node-to-rust-component-migration.md#10-migrate-read-models-before-writers",
+    "action": "restored-legacy",
+    "reason": "self-link",
+    "selfBefore": true,
+    "portalBefore": false
+  },
+  "oldDestination": "../../../architect/host-invocation-routing/node-to-rust-component-migration.md#10-migrate-read-models-before-writers",
+  "interimDestination": "node-to-rust-migration.md#10-migrate-read-models-before-writers",
+  "newDestination": "../../../architect/host-invocation-routing/node-to-rust-component-migration.md#10-migrate-read-models-before-writers",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "anchor": "10-migrate-read-models-before-writers",
+    "resolves": true,
+    "fileSHA256": "17103ea9eeaf6ca68869a37e44dca6cb8cc128ae315ef914bde71950f05d20b7"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "action": "restored-legacy",
+    "reason": "self-link",
+    "selfRestored": true,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-122: link-122
+
+```json
+{
+  "id": "link-122",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+    "inputLine": 41,
+    "inputColumn": 79,
+    "lineBeforeLinkPass": 49,
+    "before": "[source migration §11](../../../architect/host-invocation-routing/node-to-rust-component-migration.md#11-migrate-state-writing-components)",
+    "after": "[source migration §11](node-to-rust-migration.md#11-migrate-state-writing-components)",
+    "legacyPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "anchor": "11-migrate-state-writing-components",
+      "aliasId": "host-invocation-draft-083"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+    "line": 49,
+    "legacy": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "previous": "[source migration §11](node-to-rust-migration.md#11-migrate-state-writing-components)",
+    "now": "../../../architect/host-invocation-routing/node-to-rust-component-migration.md#11-migrate-state-writing-components",
+    "action": "restored-legacy",
+    "reason": "self-link",
+    "selfBefore": true,
+    "portalBefore": false
+  },
+  "oldDestination": "../../../architect/host-invocation-routing/node-to-rust-component-migration.md#11-migrate-state-writing-components",
+  "interimDestination": "node-to-rust-migration.md#11-migrate-state-writing-components",
+  "newDestination": "../../../architect/host-invocation-routing/node-to-rust-component-migration.md#11-migrate-state-writing-components",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "anchor": "11-migrate-state-writing-components",
+    "resolves": true,
+    "fileSHA256": "17103ea9eeaf6ca68869a37e44dca6cb8cc128ae315ef914bde71950f05d20b7"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "action": "restored-legacy",
+    "reason": "self-link",
+    "selfRestored": true,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-123: link-123
+
+```json
+{
+  "id": "link-123",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+    "inputLine": 42,
+    "inputColumn": 72,
+    "lineBeforeLinkPass": 50,
+    "before": "[Observe Spec](../../../specs/observe.md)",
+    "after": "[Observe Spec](../../observe/README.md)",
+    "legacyPath": "docs/specs/observe.md",
+    "target": {
+      "path": "docs/platform/observe/README.md",
+      "anchor": null,
+      "aliasId": "step10-specs-0373"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+    "line": 50,
+    "legacy": "docs/specs/observe.md",
+    "previous": "[Observe Spec](../../observe/README.md)",
+    "now": "../../observe/spec.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../../specs/observe.md",
+  "interimDestination": "../../observe/README.md",
+  "newDestination": "../../observe/spec.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/observe/spec.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "7d5af39a688b9d58aa850508da571871f0a2fc1d5be5ccdb74d6466d5d7b5e71"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/specs/observe.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-124: link-124
+
+```json
+{
+  "id": "link-124",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+    "inputLine": 50,
+    "inputColumn": 22,
+    "lineBeforeLinkPass": 58,
+    "before": "[../../../architect/host-invocation-routing/node-to-rust-component-migration.md](../../../architect/host-invocation-routing/node-to-rust-component-migration.md)",
+    "after": "[../../../architect/host-invocation-routing/node-to-rust-component-migration.md](../README.md)",
+    "legacyPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/README.md",
+      "anchor": null,
+      "aliasId": "host-invocation-draft-061"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+    "line": 58,
+    "legacy": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "previous": "[../../../architect/host-invocation-routing/node-to-rust-component-migration.md](../README.md)",
+    "now": "../../../architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "action": "restored-legacy",
+    "reason": "self-link",
+    "selfBefore": false,
+    "portalBefore": true
+  },
+  "oldDestination": "../../../architect/host-invocation-routing/node-to-rust-component-migration.md",
+  "interimDestination": "../README.md",
+  "newDestination": "../../../architect/host-invocation-routing/node-to-rust-component-migration.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "17103ea9eeaf6ca68869a37e44dca6cb8cc128ae315ef914bde71950f05d20b7"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "action": "restored-legacy",
+    "reason": "self-link",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": true,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-125: link-125
+
+```json
+{
+  "id": "link-125",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+    "inputLine": 221,
+    "inputColumn": 4,
+    "lineBeforeLinkPass": 229,
+    "before": "[Runtime Identity And Activation](../../../architect/packaging-distribution/runtime-identity-and-activation.md)",
+    "after": "[Runtime Identity And Activation](../../packaging-distribution/README.md)",
+    "legacyPath": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "target": {
+      "path": "docs/platform/packaging-distribution/README.md",
+      "anchor": null,
+      "aliasId": "step10-packaging-distribution-0173"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+    "line": 229,
+    "legacy": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "previous": "[Runtime Identity And Activation](../../packaging-distribution/README.md)",
+    "now": "../../packaging-distribution/architecture/runtime-identity-and-activation.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfBefore": false,
+    "portalBefore": true
+  },
+  "oldDestination": "../../../architect/packaging-distribution/runtime-identity-and-activation.md",
+  "interimDestination": "../../packaging-distribution/README.md",
+  "newDestination": "../../packaging-distribution/architecture/runtime-identity-and-activation.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "a8246d7c962bff0f4a2cbaa27526a42715fdf20a65504b6b92112e02f1a5056d"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfRestored": false,
+    "portalRetargeted": true,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-126: link-126
+
+```json
+{
+  "id": "link-126",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+    "inputLine": 302,
+    "inputColumn": 2,
+    "lineBeforeLinkPass": 310,
+    "before": "[Future Constraints](../../../architect/packaging-distribution/future-constraints.md)",
+    "after": "[Future Constraints](../../packaging-distribution/architecture/future-constraints.md)",
+    "legacyPath": "docs/architect/packaging-distribution/future-constraints.md",
+    "target": {
+      "path": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+      "anchor": null,
+      "aliasId": "step10-packaging-distribution-0031"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+    "line": 310,
+    "legacy": "docs/architect/packaging-distribution/future-constraints.md",
+    "previous": "[Future Constraints](../../packaging-distribution/architecture/future-constraints.md)",
+    "now": "../../packaging-distribution/architecture/future-constraints.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../../architect/packaging-distribution/future-constraints.md",
+  "interimDestination": "../../packaging-distribution/architecture/future-constraints.md",
+  "newDestination": "../../packaging-distribution/architecture/future-constraints.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "96b84e54fe6e483f474628d348d21a76fbff8e364c9be45b4f2523e8c383e897"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/packaging-distribution/future-constraints.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-127: link-127
+
+```json
+{
+  "id": "link-127",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+    "inputLine": 398,
+    "inputColumn": 1,
+    "lineBeforeLinkPass": 406,
+    "before": "[Runtime Identity And Activation](../../../architect/packaging-distribution/runtime-identity-and-activation.md)",
+    "after": "[Runtime Identity And Activation](../../packaging-distribution/README.md)",
+    "legacyPath": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "target": {
+      "path": "docs/platform/packaging-distribution/README.md",
+      "anchor": null,
+      "aliasId": "step10-packaging-distribution-0173"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+    "line": 406,
+    "legacy": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "previous": "[Runtime Identity And Activation](../../packaging-distribution/README.md)",
+    "now": "../../packaging-distribution/architecture/runtime-identity-and-activation.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfBefore": false,
+    "portalBefore": true
+  },
+  "oldDestination": "../../../architect/packaging-distribution/runtime-identity-and-activation.md",
+  "interimDestination": "../../packaging-distribution/README.md",
+  "newDestination": "../../packaging-distribution/architecture/runtime-identity-and-activation.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "a8246d7c962bff0f4a2cbaa27526a42715fdf20a65504b6b92112e02f1a5056d"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfRestored": false,
+    "portalRetargeted": true,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-128: link-128
+
+```json
+{
+  "id": "link-128",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+    "inputLine": 436,
+    "inputColumn": 1,
+    "lineBeforeLinkPass": 444,
+    "before": "[Runtime Identity And Activation](../../../architect/packaging-distribution/runtime-identity-and-activation.md)",
+    "after": "[Runtime Identity And Activation](../../packaging-distribution/README.md)",
+    "legacyPath": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "target": {
+      "path": "docs/platform/packaging-distribution/README.md",
+      "anchor": null,
+      "aliasId": "step10-packaging-distribution-0173"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+    "line": 444,
+    "legacy": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "previous": "[Runtime Identity And Activation](../../packaging-distribution/README.md)",
+    "now": "../../packaging-distribution/architecture/runtime-identity-and-activation.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfBefore": false,
+    "portalBefore": true
+  },
+  "oldDestination": "../../../architect/packaging-distribution/runtime-identity-and-activation.md",
+  "interimDestination": "../../packaging-distribution/README.md",
+  "newDestination": "../../packaging-distribution/architecture/runtime-identity-and-activation.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "a8246d7c962bff0f4a2cbaa27526a42715fdf20a65504b6b92112e02f1a5056d"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfRestored": false,
+    "portalRetargeted": true,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-129: link-129
+
+```json
+{
+  "id": "link-129",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/architecture/provider-routing.md",
+    "inputLine": 44,
+    "inputColumn": 57,
+    "lineBeforeLinkPass": 52,
+    "before": "[old architecture §6](../../../architect/host-invocation-routing/host-invocation-provider-routing.md#6-router-pure-and-invocationservice-pipeline)",
+    "after": "[old architecture §6](../spec.md#6-router-pure-and-invocationservice-pipeline)",
+    "legacyPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": "6-router-pure-and-invocationservice-pipeline",
+      "aliasId": "host-invocation-draft-045"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/architecture/provider-routing.md",
+    "line": 52,
+    "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "previous": "[old architecture §6](../spec.md#6-router-pure-and-invocationservice-pipeline)",
+    "now": "../spec.md#6-router-pure-and-invocationservice-pipeline",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../../architect/host-invocation-routing/host-invocation-provider-routing.md#6-router-pure-and-invocationservice-pipeline",
+  "interimDestination": "../spec.md#6-router-pure-and-invocationservice-pipeline",
+  "newDestination": "../spec.md#6-router-pure-and-invocationservice-pipeline",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/spec.md",
+    "anchor": "6-router-pure-and-invocationservice-pipeline",
+    "resolves": true,
+    "fileSHA256": "7aaaa030b242b19a0bd4f0f9a8faac74d50b8b6a86c7817a73e7bc2f1848243f"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-130: link-130
+
+```json
+{
+  "id": "link-130",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/architecture/provider-routing.md",
+    "inputLine": 45,
+    "inputColumn": 71,
+    "lineBeforeLinkPass": 53,
+    "before": "[external provider protocol §5](../../../architect/host-invocation-routing/external-provider-protocol.md#5-namespace-rules)",
+    "after": "[external provider protocol §5](external-provider-protocol.md#5-namespace-rules)",
+    "legacyPath": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "anchor": "5-namespace-rules",
+      "aliasId": "host-invocation-draft-035"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/architecture/provider-routing.md",
+    "line": 53,
+    "legacy": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+    "previous": "[external provider protocol §5](external-provider-protocol.md#5-namespace-rules)",
+    "now": "external-provider-protocol.md#5-namespace-rules",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../../architect/host-invocation-routing/external-provider-protocol.md#5-namespace-rules",
+  "interimDestination": "external-provider-protocol.md#5-namespace-rules",
+  "newDestination": "external-provider-protocol.md#5-namespace-rules",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+    "anchor": "5-namespace-rules",
+    "resolves": true,
+    "fileSHA256": "e6f0c282eb6fcafe142d61b199dee5f6f8ad80fb9cd7ed1f317dbf70701a9111"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-131: link-131
+
+```json
+{
+  "id": "link-131",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/architecture/provider-routing.md",
+    "inputLine": 46,
+    "inputColumn": 66,
+    "lineBeforeLinkPass": 54,
+    "before": "[old architecture §7](../../../architect/host-invocation-routing/host-invocation-provider-routing.md#7-authority-two-stage)",
+    "after": "[old architecture §7](../spec.md#7-authority-two-stage)",
+    "legacyPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": "7-authority-two-stage",
+      "aliasId": "host-invocation-draft-046"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/architecture/provider-routing.md",
+    "line": 54,
+    "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "previous": "[old architecture §7](../spec.md#7-authority-two-stage)",
+    "now": "../spec.md#7-authority-two-stage",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../../architect/host-invocation-routing/host-invocation-provider-routing.md#7-authority-two-stage",
+  "interimDestination": "../spec.md#7-authority-two-stage",
+  "newDestination": "../spec.md#7-authority-two-stage",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/spec.md",
+    "anchor": "7-authority-two-stage",
+    "resolves": true,
+    "fileSHA256": "7aaaa030b242b19a0bd4f0f9a8faac74d50b8b6a86c7817a73e7bc2f1848243f"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-132: link-132
+
+```json
+{
+  "id": "link-132",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/architecture/provider-routing.md",
+    "inputLine": 55,
+    "inputColumn": 25,
+    "lineBeforeLinkPass": 63,
+    "before": "[../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../../../architect/host-invocation-routing/host-invocation-provider-routing.md)",
+    "after": "[../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../README.md)",
+    "legacyPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/README.md",
+      "anchor": null,
+      "aliasId": "host-invocation-draft-037"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/architecture/provider-routing.md",
+    "line": 63,
+    "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "previous": "[../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../README.md)",
+    "now": "../spec.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfBefore": false,
+    "portalBefore": true
+  },
+  "oldDestination": "../../../architect/host-invocation-routing/host-invocation-provider-routing.md",
+  "interimDestination": "../README.md",
+  "newDestination": "../spec.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/spec.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "7aaaa030b242b19a0bd4f0f9a8faac74d50b8b6a86c7817a73e7bc2f1848243f"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfRestored": false,
+    "portalRetargeted": true,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-133: link-133
+
+```json
+{
+  "id": "link-133",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+    "inputLine": 42,
+    "inputColumn": 108,
+    "lineBeforeLinkPass": 50,
+    "before": "[source plan §18](../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#18-definition-of-done)",
+    "after": "[source plan §18](../roadmap.md#18-definition-of-done)",
+    "legacyPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/roadmap.md",
+      "anchor": "18-definition-of-done",
+      "aliasId": "host-invocation-draft-135"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+    "line": 50,
+    "legacy": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "previous": "[source plan §18](../roadmap.md#18-definition-of-done)",
+    "now": "../roadmap.md#18-definition-of-done",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#18-definition-of-done",
+  "interimDestination": "../roadmap.md#18-definition-of-done",
+  "newDestination": "../roadmap.md#18-definition-of-done",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/roadmap.md",
+    "anchor": "18-definition-of-done",
+    "resolves": true,
+    "fileSHA256": "f83fb94594f56dbbf481613ea2262e69a7924bef4f45580392a8e9fc9438c12a"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-134: link-134
+
+```json
+{
+  "id": "link-134",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+    "inputLine": 43,
+    "inputColumn": 67,
+    "lineBeforeLinkPass": 51,
+    "before": "[source plan §1](../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#1-outcome)",
+    "after": "[source plan §1](../roadmap.md#1-outcome)",
+    "legacyPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/roadmap.md",
+      "anchor": "1-outcome",
+      "aliasId": "host-invocation-draft-091"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+    "line": 51,
+    "legacy": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "previous": "[source plan §1](../roadmap.md#1-outcome)",
+    "now": "../roadmap.md#1-outcome",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#1-outcome",
+  "interimDestination": "../roadmap.md#1-outcome",
+  "newDestination": "../roadmap.md#1-outcome",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/roadmap.md",
+    "anchor": "1-outcome",
+    "resolves": true,
+    "fileSHA256": "f83fb94594f56dbbf481613ea2262e69a7924bef4f45580392a8e9fc9438c12a"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-135: link-135
+
+```json
+{
+  "id": "link-135",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+    "inputLine": 54,
+    "inputColumn": 17,
+    "lineBeforeLinkPass": 62,
+    "before": "[../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md)",
+    "after": "[../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../README.md)",
+    "legacyPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/README.md",
+      "anchor": null,
+      "aliasId": "host-invocation-draft-088"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+    "line": 62,
+    "legacy": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "previous": "[../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../README.md)",
+    "now": "../roadmap.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfBefore": false,
+    "portalBefore": true
+  },
+  "oldDestination": "../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+  "interimDestination": "../README.md",
+  "newDestination": "../roadmap.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/roadmap.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "f83fb94594f56dbbf481613ea2262e69a7924bef4f45580392a8e9fc9438c12a"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfRestored": false,
+    "portalRetargeted": true,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-136: link-136
+
+```json
+{
+  "id": "link-136",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+    "inputLine": 183,
+    "inputColumn": 346,
+    "lineBeforeLinkPass": 191,
+    "before": "[the retained component-boundary advisory](../../../architect/component-boundary/component-boundary-advisory.md)",
+    "after": "[the retained component-boundary advisory](../../component-boundary.md)",
+    "legacyPath": "docs/architect/component-boundary/component-boundary-advisory.md",
+    "target": {
+      "path": "docs/platform/component-boundary.md",
+      "anchor": null,
+      "aliasId": "step10-whole-system-0212"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+    "line": 191,
+    "legacy": "docs/architect/component-boundary/component-boundary-advisory.md",
+    "previous": "[the retained component-boundary advisory](../../component-boundary.md)",
+    "now": "../../component-boundary.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../../architect/component-boundary/component-boundary-advisory.md",
+  "interimDestination": "../../component-boundary.md",
+  "newDestination": "../../component-boundary.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/component-boundary.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "384cf74c699ef5f6013c9f975dd056844184697bba58784d2ad9b2154ce51d4a"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/component-boundary/component-boundary-advisory.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-137: link-137
+
+```json
+{
+  "id": "link-137",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+    "inputLine": 38,
+    "inputColumn": 88,
+    "lineBeforeLinkPass": 46,
+    "before": "[source protocol §3](../../../architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol)",
+    "after": "[source protocol §3](../architecture/external-provider-protocol.md#3-component-protocol)",
+    "legacyPath": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "anchor": "3-component-protocol",
+      "aliasId": "host-invocation-draft-033"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+    "line": 46,
+    "legacy": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+    "previous": "[source protocol §3](../architecture/external-provider-protocol.md#3-component-protocol)",
+    "now": "../../../architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
+    "action": "restored-legacy",
+    "reason": "provenance/legacy-owner",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../../architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
+  "interimDestination": "../architecture/external-provider-protocol.md#3-component-protocol",
+  "newDestination": "../../../architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+    "anchor": "3-component-protocol",
+    "resolves": true,
+    "fileSHA256": "eb969b8dbb4520b4794887ee98da6c0aa6ab8b799d30647720cfe2ab0b0a260d"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+    "action": "restored-legacy",
+    "reason": "provenance/legacy-owner",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-138: link-138
+
+```json
+{
+  "id": "link-138",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+    "inputLine": 320,
+    "inputColumn": 173,
+    "lineBeforeLinkPass": 328,
+    "before": "[the retained component-boundary advisory](../../../architect/component-boundary/component-boundary-advisory.md)",
+    "after": "[the retained component-boundary advisory](../../component-boundary.md)",
+    "legacyPath": "docs/architect/component-boundary/component-boundary-advisory.md",
+    "target": {
+      "path": "docs/platform/component-boundary.md",
+      "anchor": null,
+      "aliasId": "step10-whole-system-0212"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+    "line": 328,
+    "legacy": "docs/architect/component-boundary/component-boundary-advisory.md",
+    "previous": "[the retained component-boundary advisory](../../component-boundary.md)",
+    "now": "../../component-boundary.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../../architect/component-boundary/component-boundary-advisory.md",
+  "interimDestination": "../../component-boundary.md",
+  "newDestination": "../../component-boundary.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/component-boundary.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "384cf74c699ef5f6013c9f975dd056844184697bba58784d2ad9b2154ce51d4a"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/component-boundary/component-boundary-advisory.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-139: link-139
+
+```json
+{
+  "id": "link-139",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/contracts/external-provider-manifest.md",
+    "inputLine": 36,
+    "inputColumn": 69,
+    "lineBeforeLinkPass": 44,
+    "before": "[source protocol §4](../../../architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker)",
+    "after": "[source protocol §4](../architecture/external-provider-protocol.md#4-plugin-registry-linker)",
+    "legacyPath": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "anchor": "4-plugin-registry-linker",
+      "aliasId": "host-invocation-draft-034"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/contracts/external-provider-manifest.md",
+    "line": 44,
+    "legacy": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+    "previous": "[source protocol §4](../architecture/external-provider-protocol.md#4-plugin-registry-linker)",
+    "now": "../../../architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+    "action": "restored-legacy",
+    "reason": "provenance/legacy-owner",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../../architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+  "interimDestination": "../architecture/external-provider-protocol.md#4-plugin-registry-linker",
+  "newDestination": "../../../architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+    "anchor": "4-plugin-registry-linker",
+    "resolves": true,
+    "fileSHA256": "eb969b8dbb4520b4794887ee98da6c0aa6ab8b799d30647720cfe2ab0b0a260d"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+    "action": "restored-legacy",
+    "reason": "provenance/legacy-owner",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-140: link-140
+
+```json
+{
+  "id": "link-140",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/contracts/external-provider-manifest.md",
+    "inputLine": 37,
+    "inputColumn": 68,
+    "lineBeforeLinkPass": 45,
+    "before": "[source protocol §4](../../../architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker)",
+    "after": "[source protocol §4](../architecture/external-provider-protocol.md#4-plugin-registry-linker)",
+    "legacyPath": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "anchor": "4-plugin-registry-linker",
+      "aliasId": "host-invocation-draft-034"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/contracts/external-provider-manifest.md",
+    "line": 45,
+    "legacy": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+    "previous": "[source protocol §4](../architecture/external-provider-protocol.md#4-plugin-registry-linker)",
+    "now": "../../../architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+    "action": "restored-legacy",
+    "reason": "provenance/legacy-owner",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../../architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+  "interimDestination": "../architecture/external-provider-protocol.md#4-plugin-registry-linker",
+  "newDestination": "../../../architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+    "anchor": "4-plugin-registry-linker",
+    "resolves": true,
+    "fileSHA256": "eb969b8dbb4520b4794887ee98da6c0aa6ab8b799d30647720cfe2ab0b0a260d"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+    "action": "restored-legacy",
+    "reason": "provenance/legacy-owner",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-141: link-141
+
+```json
+{
+  "id": "link-141",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/contracts/legacy-payload.md",
+    "inputLine": 54,
+    "inputColumn": 23,
+    "lineBeforeLinkPass": 62,
+    "before": "[../../../architect/host-invocation-routing/legacy-cli-transition.md](../../../architect/host-invocation-routing/legacy-cli-transition.md)",
+    "after": "[../../../architect/host-invocation-routing/legacy-cli-transition.md](../README.md)",
+    "legacyPath": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/README.md",
+      "anchor": null,
+      "aliasId": "host-invocation-draft-052"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/contracts/legacy-payload.md",
+    "line": 62,
+    "legacy": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+    "previous": "[../../../architect/host-invocation-routing/legacy-cli-transition.md](../README.md)",
+    "now": "../architecture/legacy-cli-transition.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfBefore": false,
+    "portalBefore": true
+  },
+  "oldDestination": "../../../architect/host-invocation-routing/legacy-cli-transition.md",
+  "interimDestination": "../README.md",
+  "newDestination": "../architecture/legacy-cli-transition.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "c1ea1d373905b1b414d4ecafe9e80c0afb89232d956758b8dcde5b451da75d7d"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfRestored": false,
+    "portalRetargeted": true,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-142: link-142
+
+```json
+{
+  "id": "link-142",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/contracts/operation-catalog.md",
+    "inputLine": 39,
+    "inputColumn": 25,
+    "lineBeforeLinkPass": 47,
+    "before": "[../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../../../architect/host-invocation-routing/host-invocation-provider-routing.md)",
+    "after": "[../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../README.md)",
+    "legacyPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/README.md",
+      "anchor": null,
+      "aliasId": "host-invocation-draft-037"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/contracts/operation-catalog.md",
+    "line": 47,
+    "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "previous": "[../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../README.md)",
+    "now": "../spec.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfBefore": false,
+    "portalBefore": true
+  },
+  "oldDestination": "../../../architect/host-invocation-routing/host-invocation-provider-routing.md",
+  "interimDestination": "../README.md",
+  "newDestination": "../spec.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/spec.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "7aaaa030b242b19a0bd4f0f9a8faac74d50b8b6a86c7817a73e7bc2f1848243f"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfRestored": false,
+    "portalRetargeted": true,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-143: link-143
+
+```json
+{
+  "id": "link-143",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/contracts/operation-request-outcome.md",
+    "inputLine": 51,
+    "inputColumn": 25,
+    "lineBeforeLinkPass": 59,
+    "before": "[../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../../../architect/host-invocation-routing/host-invocation-provider-routing.md)",
+    "after": "[../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../README.md)",
+    "legacyPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/README.md",
+      "anchor": null,
+      "aliasId": "host-invocation-draft-037"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/contracts/operation-request-outcome.md",
+    "line": 59,
+    "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "previous": "[../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../README.md)",
+    "now": "../spec.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfBefore": false,
+    "portalBefore": true
+  },
+  "oldDestination": "../../../architect/host-invocation-routing/host-invocation-provider-routing.md",
+  "interimDestination": "../README.md",
+  "newDestination": "../spec.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/spec.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "7aaaa030b242b19a0bd4f0f9a8faac74d50b8b6a86c7817a73e7bc2f1848243f"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfRestored": false,
+    "portalRetargeted": true,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-144: link-144
+
+```json
+{
+  "id": "link-144",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 57,
+    "inputColumn": 160,
+    "lineBeforeLinkPass": 65,
+    "before": "[host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md#1-architecture-name)",
+    "after": "[host-invocation-provider-routing.md](spec.md#1-architecture-name)",
+    "legacyPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": "1-architecture-name",
+      "aliasId": "host-invocation-draft-040"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 65,
+    "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "previous": "[host-invocation-provider-routing.md](spec.md#1-architecture-name)",
+    "now": "spec.md#1-architecture-name",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/host-invocation-provider-routing.md#1-architecture-name",
+  "interimDestination": "spec.md#1-architecture-name",
+  "newDestination": "spec.md#1-architecture-name",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/spec.md",
+    "anchor": "1-architecture-name",
+    "resolves": true,
+    "fileSHA256": "7aaaa030b242b19a0bd4f0f9a8faac74d50b8b6a86c7817a73e7bc2f1848243f"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-145: link-145
+
+```json
+{
+  "id": "link-145",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 58,
+    "inputColumn": 138,
+    "lineBeforeLinkPass": 66,
+    "before": "[host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md#1-architecture-name)",
+    "after": "[host-invocation-provider-routing.md](spec.md#1-architecture-name)",
+    "legacyPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": "1-architecture-name",
+      "aliasId": "host-invocation-draft-040"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 66,
+    "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "previous": "[host-invocation-provider-routing.md](spec.md#1-architecture-name)",
+    "now": "spec.md#1-architecture-name",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/host-invocation-provider-routing.md#1-architecture-name",
+  "interimDestination": "spec.md#1-architecture-name",
+  "newDestination": "spec.md#1-architecture-name",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/spec.md",
+    "anchor": "1-architecture-name",
+    "resolves": true,
+    "fileSHA256": "7aaaa030b242b19a0bd4f0f9a8faac74d50b8b6a86c7817a73e7bc2f1848243f"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-146: link-146
+
+```json
+{
+  "id": "link-146",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 59,
+    "inputColumn": 116,
+    "lineBeforeLinkPass": 67,
+    "before": "[host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md#4-peer-host-use-cases)",
+    "after": "[host-invocation-provider-routing.md](spec.md#4-peer-host-use-cases)",
+    "legacyPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": "4-peer-host-use-cases",
+      "aliasId": "host-invocation-draft-043"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 67,
+    "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "previous": "[host-invocation-provider-routing.md](spec.md#4-peer-host-use-cases)",
+    "now": "spec.md#4-peer-host-use-cases",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/host-invocation-provider-routing.md#4-peer-host-use-cases",
+  "interimDestination": "spec.md#4-peer-host-use-cases",
+  "newDestination": "spec.md#4-peer-host-use-cases",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/spec.md",
+    "anchor": "4-peer-host-use-cases",
+    "resolves": true,
+    "fileSHA256": "7aaaa030b242b19a0bd4f0f9a8faac74d50b8b6a86c7817a73e7bc2f1848243f"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-147: link-147
+
+```json
+{
+  "id": "link-147",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 60,
+    "inputColumn": 141,
+    "lineBeforeLinkPass": 68,
+    "before": "[host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md#4-peer-host-use-cases)",
+    "after": "[host-invocation-provider-routing.md](spec.md#4-peer-host-use-cases)",
+    "legacyPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": "4-peer-host-use-cases",
+      "aliasId": "host-invocation-draft-043"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 68,
+    "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "previous": "[host-invocation-provider-routing.md](spec.md#4-peer-host-use-cases)",
+    "now": "spec.md#4-peer-host-use-cases",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/host-invocation-provider-routing.md#4-peer-host-use-cases",
+  "interimDestination": "spec.md#4-peer-host-use-cases",
+  "newDestination": "spec.md#4-peer-host-use-cases",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/spec.md",
+    "anchor": "4-peer-host-use-cases",
+    "resolves": true,
+    "fileSHA256": "7aaaa030b242b19a0bd4f0f9a8faac74d50b8b6a86c7817a73e7bc2f1848243f"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-148: link-148
+
+```json
+{
+  "id": "link-148",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 60,
+    "inputColumn": 279,
+    "lineBeforeLinkPass": 68,
+    "before": "[legacy-cli-transition.md](../../architect/host-invocation-routing/legacy-cli-transition.md#1-two-distinct-adapters)",
+    "after": "[legacy-cli-transition.md](architecture/legacy-cli-transition.md#1-two-distinct-adapters)",
+    "legacyPath": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "anchor": "1-two-distinct-adapters",
+      "aliasId": "host-invocation-draft-055"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 68,
+    "legacy": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+    "previous": "[legacy-cli-transition.md](architecture/legacy-cli-transition.md#1-two-distinct-adapters)",
+    "now": "architecture/legacy-cli-transition.md#1-two-distinct-adapters",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/legacy-cli-transition.md#1-two-distinct-adapters",
+  "interimDestination": "architecture/legacy-cli-transition.md#1-two-distinct-adapters",
+  "newDestination": "architecture/legacy-cli-transition.md#1-two-distinct-adapters",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+    "anchor": "1-two-distinct-adapters",
+    "resolves": true,
+    "fileSHA256": "c1ea1d373905b1b414d4ecafe9e80c0afb89232d956758b8dcde5b451da75d7d"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-149: link-149
+
+```json
+{
+  "id": "link-149",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 61,
+    "inputColumn": 363,
+    "lineBeforeLinkPass": 69,
+    "before": "[host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md#3-canonical-names)",
+    "after": "[host-invocation-provider-routing.md](spec.md#3-canonical-names)",
+    "legacyPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": "3-canonical-names",
+      "aliasId": "host-invocation-draft-042"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 69,
+    "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "previous": "[host-invocation-provider-routing.md](spec.md#3-canonical-names)",
+    "now": "../../architect/host-invocation-routing/host-invocation-provider-routing.md#3-canonical-names",
+    "action": "restored-legacy",
+    "reason": "provenance/legacy-owner",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/host-invocation-provider-routing.md#3-canonical-names",
+  "interimDestination": "spec.md#3-canonical-names",
+  "newDestination": "../../architect/host-invocation-routing/host-invocation-provider-routing.md#3-canonical-names",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "anchor": "3-canonical-names",
+    "resolves": true,
+    "fileSHA256": "ffa08f6390701e71020110249c3ef7d2888831cee01cfedae28fe4f77ee98cb6"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "action": "restored-legacy",
+    "reason": "provenance/legacy-owner",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-150: link-150
+
+```json
+{
+  "id": "link-150",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 62,
+    "inputColumn": 100,
+    "lineBeforeLinkPass": 70,
+    "before": "[host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts)",
+    "after": "[host-invocation-provider-routing.md](spec.md#5-core-contracts)",
+    "legacyPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": "5-core-contracts",
+      "aliasId": "host-invocation-draft-044"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 70,
+    "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "previous": "[host-invocation-provider-routing.md](spec.md#5-core-contracts)",
+    "now": "spec.md#5-core-contracts",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts",
+  "interimDestination": "spec.md#5-core-contracts",
+  "newDestination": "spec.md#5-core-contracts",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/spec.md",
+    "anchor": "5-core-contracts",
+    "resolves": true,
+    "fileSHA256": "7aaaa030b242b19a0bd4f0f9a8faac74d50b8b6a86c7817a73e7bc2f1848243f"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-151: link-151
+
+```json
+{
+  "id": "link-151",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 63,
+    "inputColumn": 129,
+    "lineBeforeLinkPass": 71,
+    "before": "[host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts)",
+    "after": "[host-invocation-provider-routing.md](spec.md#5-core-contracts)",
+    "legacyPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": "5-core-contracts",
+      "aliasId": "host-invocation-draft-044"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 71,
+    "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "previous": "[host-invocation-provider-routing.md](spec.md#5-core-contracts)",
+    "now": "spec.md#5-core-contracts",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts",
+  "interimDestination": "spec.md#5-core-contracts",
+  "newDestination": "spec.md#5-core-contracts",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/spec.md",
+    "anchor": "5-core-contracts",
+    "resolves": true,
+    "fileSHA256": "7aaaa030b242b19a0bd4f0f9a8faac74d50b8b6a86c7817a73e7bc2f1848243f"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-152: link-152
+
+```json
+{
+  "id": "link-152",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 63,
+    "inputColumn": 262,
+    "lineBeforeLinkPass": 71,
+    "before": "[external-provider-protocol.md](../../architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol)",
+    "after": "[external-provider-protocol.md](architecture/external-provider-protocol.md#3-component-protocol)",
+    "legacyPath": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "anchor": "3-component-protocol",
+      "aliasId": "host-invocation-draft-033"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 71,
+    "legacy": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+    "previous": "[external-provider-protocol.md](architecture/external-provider-protocol.md#3-component-protocol)",
+    "now": "architecture/external-provider-protocol.md#3-component-protocol",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
+  "interimDestination": "architecture/external-provider-protocol.md#3-component-protocol",
+  "newDestination": "architecture/external-provider-protocol.md#3-component-protocol",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+    "anchor": "3-component-protocol",
+    "resolves": true,
+    "fileSHA256": "e6f0c282eb6fcafe142d61b199dee5f6f8ad80fb9cd7ed1f317dbf70701a9111"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-153: link-153
+
+```json
+{
+  "id": "link-153",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 64,
+    "inputColumn": 130,
+    "lineBeforeLinkPass": 72,
+    "before": "[host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts)",
+    "after": "[host-invocation-provider-routing.md](spec.md#5-core-contracts)",
+    "legacyPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": "5-core-contracts",
+      "aliasId": "host-invocation-draft-044"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 72,
+    "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "previous": "[host-invocation-provider-routing.md](spec.md#5-core-contracts)",
+    "now": "spec.md#5-core-contracts",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts",
+  "interimDestination": "spec.md#5-core-contracts",
+  "newDestination": "spec.md#5-core-contracts",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/spec.md",
+    "anchor": "5-core-contracts",
+    "resolves": true,
+    "fileSHA256": "7aaaa030b242b19a0bd4f0f9a8faac74d50b8b6a86c7817a73e7bc2f1848243f"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-154: link-154
+
+```json
+{
+  "id": "link-154",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 65,
+    "inputColumn": 119,
+    "lineBeforeLinkPass": 73,
+    "before": "[host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md#6-router-pure-and-invocationservice-pipeline)",
+    "after": "[host-invocation-provider-routing.md](spec.md#6-router-pure-and-invocationservice-pipeline)",
+    "legacyPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": "6-router-pure-and-invocationservice-pipeline",
+      "aliasId": "host-invocation-draft-045"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 73,
+    "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "previous": "[host-invocation-provider-routing.md](spec.md#6-router-pure-and-invocationservice-pipeline)",
+    "now": "spec.md#6-router-pure-and-invocationservice-pipeline",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/host-invocation-provider-routing.md#6-router-pure-and-invocationservice-pipeline",
+  "interimDestination": "spec.md#6-router-pure-and-invocationservice-pipeline",
+  "newDestination": "spec.md#6-router-pure-and-invocationservice-pipeline",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/spec.md",
+    "anchor": "6-router-pure-and-invocationservice-pipeline",
+    "resolves": true,
+    "fileSHA256": "7aaaa030b242b19a0bd4f0f9a8faac74d50b8b6a86c7817a73e7bc2f1848243f"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-155: link-155
+
+```json
+{
+  "id": "link-155",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 66,
+    "inputColumn": 116,
+    "lineBeforeLinkPass": 74,
+    "before": "[host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md#7-authority-two-stage)",
+    "after": "[host-invocation-provider-routing.md](spec.md#7-authority-two-stage)",
+    "legacyPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": "7-authority-two-stage",
+      "aliasId": "host-invocation-draft-046"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 74,
+    "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "previous": "[host-invocation-provider-routing.md](spec.md#7-authority-two-stage)",
+    "now": "spec.md#7-authority-two-stage",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/host-invocation-provider-routing.md#7-authority-two-stage",
+  "interimDestination": "spec.md#7-authority-two-stage",
+  "newDestination": "spec.md#7-authority-two-stage",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/spec.md",
+    "anchor": "7-authority-two-stage",
+    "resolves": true,
+    "fileSHA256": "7aaaa030b242b19a0bd4f0f9a8faac74d50b8b6a86c7817a73e7bc2f1848243f"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-156: link-156
+
+```json
+{
+  "id": "link-156",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 67,
+    "inputColumn": 139,
+    "lineBeforeLinkPass": 75,
+    "before": "[host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md#7-authority-two-stage)",
+    "after": "[host-invocation-provider-routing.md](spec.md#7-authority-two-stage)",
+    "legacyPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": "7-authority-two-stage",
+      "aliasId": "host-invocation-draft-046"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 75,
+    "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "previous": "[host-invocation-provider-routing.md](spec.md#7-authority-two-stage)",
+    "now": "spec.md#7-authority-two-stage",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/host-invocation-provider-routing.md#7-authority-two-stage",
+  "interimDestination": "spec.md#7-authority-two-stage",
+  "newDestination": "spec.md#7-authority-two-stage",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/spec.md",
+    "anchor": "7-authority-two-stage",
+    "resolves": true,
+    "fileSHA256": "7aaaa030b242b19a0bd4f0f9a8faac74d50b8b6a86c7817a73e7bc2f1848243f"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-157: link-157
+
+```json
+{
+  "id": "link-157",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 67,
+    "inputColumn": 277,
+    "lineBeforeLinkPass": 75,
+    "before": "[node-to-rust-component-migration.md](../../architect/host-invocation-routing/node-to-rust-component-migration.md#13-rollback-rules)",
+    "after": "[node-to-rust-component-migration.md](architecture/node-to-rust-migration.md#13-rollback-rules)",
+    "legacyPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "anchor": "13-rollback-rules",
+      "aliasId": "host-invocation-draft-085"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 75,
+    "legacy": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "previous": "[node-to-rust-component-migration.md](architecture/node-to-rust-migration.md#13-rollback-rules)",
+    "now": "architecture/node-to-rust-migration.md#13-rollback-rules",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/node-to-rust-component-migration.md#13-rollback-rules",
+  "interimDestination": "architecture/node-to-rust-migration.md#13-rollback-rules",
+  "newDestination": "architecture/node-to-rust-migration.md#13-rollback-rules",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+    "anchor": "13-rollback-rules",
+    "resolves": true,
+    "fileSHA256": "91460b8da411b883b18710d3f886eb521945a01af50779d4abd217b8976e63d7"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-158: link-158
+
+```json
+{
+  "id": "link-158",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 68,
+    "inputColumn": 103,
+    "lineBeforeLinkPass": 76,
+    "before": "[host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md#8-failure-cancellation-lifecycle-and-human-input)",
+    "after": "[host-invocation-provider-routing.md](spec.md#8-failure-cancellation-lifecycle-and-human-input)",
+    "legacyPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": "8-failure-cancellation-lifecycle-and-human-input",
+      "aliasId": "host-invocation-draft-047"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 76,
+    "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "previous": "[host-invocation-provider-routing.md](spec.md#8-failure-cancellation-lifecycle-and-human-input)",
+    "now": "spec.md#8-failure-cancellation-lifecycle-and-human-input",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/host-invocation-provider-routing.md#8-failure-cancellation-lifecycle-and-human-input",
+  "interimDestination": "spec.md#8-failure-cancellation-lifecycle-and-human-input",
+  "newDestination": "spec.md#8-failure-cancellation-lifecycle-and-human-input",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/spec.md",
+    "anchor": "8-failure-cancellation-lifecycle-and-human-input",
+    "resolves": true,
+    "fileSHA256": "7aaaa030b242b19a0bd4f0f9a8faac74d50b8b6a86c7817a73e7bc2f1848243f"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-159: link-159
+
+```json
+{
+  "id": "link-159",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 69,
+    "inputColumn": 149,
+    "lineBeforeLinkPass": 77,
+    "before": "[host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md#8-failure-cancellation-lifecycle-and-human-input)",
+    "after": "[host-invocation-provider-routing.md](spec.md#8-failure-cancellation-lifecycle-and-human-input)",
+    "legacyPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": "8-failure-cancellation-lifecycle-and-human-input",
+      "aliasId": "host-invocation-draft-047"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 77,
+    "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "previous": "[host-invocation-provider-routing.md](spec.md#8-failure-cancellation-lifecycle-and-human-input)",
+    "now": "spec.md#8-failure-cancellation-lifecycle-and-human-input",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/host-invocation-provider-routing.md#8-failure-cancellation-lifecycle-and-human-input",
+  "interimDestination": "spec.md#8-failure-cancellation-lifecycle-and-human-input",
+  "newDestination": "spec.md#8-failure-cancellation-lifecycle-and-human-input",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/spec.md",
+    "anchor": "8-failure-cancellation-lifecycle-and-human-input",
+    "resolves": true,
+    "fileSHA256": "7aaaa030b242b19a0bd4f0f9a8faac74d50b8b6a86c7817a73e7bc2f1848243f"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-160: link-160
+
+```json
+{
+  "id": "link-160",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 70,
+    "inputColumn": 84,
+    "lineBeforeLinkPass": 78,
+    "before": "[host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md#8-failure-cancellation-lifecycle-and-human-input)",
+    "after": "[host-invocation-provider-routing.md](spec.md#8-failure-cancellation-lifecycle-and-human-input)",
+    "legacyPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": "8-failure-cancellation-lifecycle-and-human-input",
+      "aliasId": "host-invocation-draft-047"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 78,
+    "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "previous": "[host-invocation-provider-routing.md](spec.md#8-failure-cancellation-lifecycle-and-human-input)",
+    "now": "spec.md#8-failure-cancellation-lifecycle-and-human-input",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/host-invocation-provider-routing.md#8-failure-cancellation-lifecycle-and-human-input",
+  "interimDestination": "spec.md#8-failure-cancellation-lifecycle-and-human-input",
+  "newDestination": "spec.md#8-failure-cancellation-lifecycle-and-human-input",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/spec.md",
+    "anchor": "8-failure-cancellation-lifecycle-and-human-input",
+    "resolves": true,
+    "fileSHA256": "7aaaa030b242b19a0bd4f0f9a8faac74d50b8b6a86c7817a73e7bc2f1848243f"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-161: link-161
+
+```json
+{
+  "id": "link-161",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 70,
+    "inputColumn": 249,
+    "lineBeforeLinkPass": 78,
+    "before": "[node-to-rust-component-migration.md](../../architect/host-invocation-routing/node-to-rust-component-migration.md#9-repeat-by-component-boundary)",
+    "after": "[node-to-rust-component-migration.md](architecture/node-to-rust-migration.md#9-repeat-by-component-boundary)",
+    "legacyPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "anchor": "9-repeat-by-component-boundary",
+      "aliasId": "host-invocation-draft-081"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 78,
+    "legacy": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "previous": "[node-to-rust-component-migration.md](architecture/node-to-rust-migration.md#9-repeat-by-component-boundary)",
+    "now": "architecture/node-to-rust-migration.md#9-repeat-by-component-boundary",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/node-to-rust-component-migration.md#9-repeat-by-component-boundary",
+  "interimDestination": "architecture/node-to-rust-migration.md#9-repeat-by-component-boundary",
+  "newDestination": "architecture/node-to-rust-migration.md#9-repeat-by-component-boundary",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+    "anchor": "9-repeat-by-component-boundary",
+    "resolves": true,
+    "fileSHA256": "91460b8da411b883b18710d3f886eb521945a01af50779d4abd217b8976e63d7"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-162: link-162
+
+```json
+{
+  "id": "link-162",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 71,
+    "inputColumn": 125,
+    "lineBeforeLinkPass": 79,
+    "before": "[host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md#9-physical-placement)",
+    "after": "[host-invocation-provider-routing.md](spec.md#9-physical-placement)",
+    "legacyPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": "9-physical-placement",
+      "aliasId": "host-invocation-draft-048"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 79,
+    "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "previous": "[host-invocation-provider-routing.md](spec.md#9-physical-placement)",
+    "now": "spec.md#9-physical-placement",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/host-invocation-provider-routing.md#9-physical-placement",
+  "interimDestination": "spec.md#9-physical-placement",
+  "newDestination": "spec.md#9-physical-placement",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/spec.md",
+    "anchor": "9-physical-placement",
+    "resolves": true,
+    "fileSHA256": "7aaaa030b242b19a0bd4f0f9a8faac74d50b8b6a86c7817a73e7bc2f1848243f"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-163: link-163
+
+```json
+{
+  "id": "link-163",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 72,
+    "inputColumn": 120,
+    "lineBeforeLinkPass": 80,
+    "before": "[host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md#9-physical-placement)",
+    "after": "[host-invocation-provider-routing.md](spec.md#9-physical-placement)",
+    "legacyPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": "9-physical-placement",
+      "aliasId": "host-invocation-draft-048"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 80,
+    "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "previous": "[host-invocation-provider-routing.md](spec.md#9-physical-placement)",
+    "now": "spec.md#9-physical-placement",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/host-invocation-provider-routing.md#9-physical-placement",
+  "interimDestination": "spec.md#9-physical-placement",
+  "newDestination": "spec.md#9-physical-placement",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/spec.md",
+    "anchor": "9-physical-placement",
+    "resolves": true,
+    "fileSHA256": "7aaaa030b242b19a0bd4f0f9a8faac74d50b8b6a86c7817a73e7bc2f1848243f"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-164: link-164
+
+```json
+{
+  "id": "link-164",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 72,
+    "inputColumn": 257,
+    "lineBeforeLinkPass": 80,
+    "before": "[rust-cli-and-proof-components-plan.md](../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#7-p2-rust-workspace-and-generated-inputs)",
+    "after": "[rust-cli-and-proof-components-plan.md](roadmap.md#7-p2-rust-workspace-and-generated-inputs)",
+    "legacyPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/roadmap.md",
+      "anchor": "7-p2-rust-workspace-and-generated-inputs",
+      "aliasId": "host-invocation-draft-106"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 80,
+    "legacy": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "previous": "[rust-cli-and-proof-components-plan.md](roadmap.md#7-p2-rust-workspace-and-generated-inputs)",
+    "now": "roadmap.md#7-p2-rust-workspace-and-generated-inputs",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#7-p2-rust-workspace-and-generated-inputs",
+  "interimDestination": "roadmap.md#7-p2-rust-workspace-and-generated-inputs",
+  "newDestination": "roadmap.md#7-p2-rust-workspace-and-generated-inputs",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/roadmap.md",
+    "anchor": "7-p2-rust-workspace-and-generated-inputs",
+    "resolves": true,
+    "fileSHA256": "f83fb94594f56dbbf481613ea2262e69a7924bef4f45580392a8e9fc9438c12a"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-165: link-165
+
+```json
+{
+  "id": "link-165",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 73,
+    "inputColumn": 109,
+    "lineBeforeLinkPass": 81,
+    "before": "[host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md#10-release-boundaries)",
+    "after": "[host-invocation-provider-routing.md](spec.md#10-release-boundaries)",
+    "legacyPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": "10-release-boundaries",
+      "aliasId": "host-invocation-draft-049"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 81,
+    "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "previous": "[host-invocation-provider-routing.md](spec.md#10-release-boundaries)",
+    "now": "spec.md#10-release-boundaries",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/host-invocation-provider-routing.md#10-release-boundaries",
+  "interimDestination": "spec.md#10-release-boundaries",
+  "newDestination": "spec.md#10-release-boundaries",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/spec.md",
+    "anchor": "10-release-boundaries",
+    "resolves": true,
+    "fileSHA256": "7aaaa030b242b19a0bd4f0f9a8faac74d50b8b6a86c7817a73e7bc2f1848243f"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-166: link-166
+
+```json
+{
+  "id": "link-166",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 73,
+    "inputColumn": 247,
+    "lineBeforeLinkPass": 81,
+    "before": "[rust-cli-and-proof-components-plan.md](../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#1-outcome)",
+    "after": "[rust-cli-and-proof-components-plan.md](roadmap.md#1-outcome)",
+    "legacyPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/roadmap.md",
+      "anchor": "1-outcome",
+      "aliasId": "host-invocation-draft-091"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 81,
+    "legacy": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "previous": "[rust-cli-and-proof-components-plan.md](roadmap.md#1-outcome)",
+    "now": "roadmap.md#1-outcome",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#1-outcome",
+  "interimDestination": "roadmap.md#1-outcome",
+  "newDestination": "roadmap.md#1-outcome",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/roadmap.md",
+    "anchor": "1-outcome",
+    "resolves": true,
+    "fileSHA256": "f83fb94594f56dbbf481613ea2262e69a7924bef4f45580392a8e9fc9438c12a"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-167: link-167
+
+```json
+{
+  "id": "link-167",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 74,
+    "inputColumn": 101,
+    "lineBeforeLinkPass": 82,
+    "before": "[host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md#10-release-boundaries)",
+    "after": "[host-invocation-provider-routing.md](spec.md#10-release-boundaries)",
+    "legacyPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": "10-release-boundaries",
+      "aliasId": "host-invocation-draft-049"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 82,
+    "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "previous": "[host-invocation-provider-routing.md](spec.md#10-release-boundaries)",
+    "now": "spec.md#10-release-boundaries",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/host-invocation-provider-routing.md#10-release-boundaries",
+  "interimDestination": "spec.md#10-release-boundaries",
+  "newDestination": "spec.md#10-release-boundaries",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/spec.md",
+    "anchor": "10-release-boundaries",
+    "resolves": true,
+    "fileSHA256": "7aaaa030b242b19a0bd4f0f9a8faac74d50b8b6a86c7817a73e7bc2f1848243f"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-168: link-168
+
+```json
+{
+  "id": "link-168",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 74,
+    "inputColumn": 239,
+    "lineBeforeLinkPass": 82,
+    "before": "[rust-cli-and-proof-components-plan.md](../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#12-p7-external-process-provider-preview)",
+    "after": "[rust-cli-and-proof-components-plan.md](roadmap.md#12-p7-external-process-provider-preview)",
+    "legacyPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/roadmap.md",
+      "anchor": "12-p7-external-process-provider-preview",
+      "aliasId": "host-invocation-draft-125"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 82,
+    "legacy": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "previous": "[rust-cli-and-proof-components-plan.md](roadmap.md#12-p7-external-process-provider-preview)",
+    "now": "roadmap.md#12-p7-external-process-provider-preview",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#12-p7-external-process-provider-preview",
+  "interimDestination": "roadmap.md#12-p7-external-process-provider-preview",
+  "newDestination": "roadmap.md#12-p7-external-process-provider-preview",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/roadmap.md",
+    "anchor": "12-p7-external-process-provider-preview",
+    "resolves": true,
+    "fileSHA256": "f83fb94594f56dbbf481613ea2262e69a7924bef4f45580392a8e9fc9438c12a"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-169: link-169
+
+```json
+{
+  "id": "link-169",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 75,
+    "inputColumn": 123,
+    "lineBeforeLinkPass": 83,
+    "before": "[host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md#10-release-boundaries)",
+    "after": "[host-invocation-provider-routing.md](spec.md#10-release-boundaries)",
+    "legacyPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": "10-release-boundaries",
+      "aliasId": "host-invocation-draft-049"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 83,
+    "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "previous": "[host-invocation-provider-routing.md](spec.md#10-release-boundaries)",
+    "now": "spec.md#10-release-boundaries",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/host-invocation-provider-routing.md#10-release-boundaries",
+  "interimDestination": "spec.md#10-release-boundaries",
+  "newDestination": "spec.md#10-release-boundaries",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/spec.md",
+    "anchor": "10-release-boundaries",
+    "resolves": true,
+    "fileSHA256": "7aaaa030b242b19a0bd4f0f9a8faac74d50b8b6a86c7817a73e7bc2f1848243f"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-170: link-170
+
+```json
+{
+  "id": "link-170",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 75,
+    "inputColumn": 261,
+    "lineBeforeLinkPass": 83,
+    "before": "[node-to-rust-component-migration.md](../../architect/host-invocation-routing/node-to-rust-component-migration.md#7-release-r3-production-remote-host)",
+    "after": "[node-to-rust-component-migration.md](architecture/node-to-rust-migration.md#7-release-r3-production-remote-host)",
+    "legacyPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "anchor": "7-release-r3-production-remote-host",
+      "aliasId": "host-invocation-draft-077"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 83,
+    "legacy": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "previous": "[node-to-rust-component-migration.md](architecture/node-to-rust-migration.md#7-release-r3-production-remote-host)",
+    "now": "architecture/node-to-rust-migration.md#7-release-r3-production-remote-host",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/node-to-rust-component-migration.md#7-release-r3-production-remote-host",
+  "interimDestination": "architecture/node-to-rust-migration.md#7-release-r3-production-remote-host",
+  "newDestination": "architecture/node-to-rust-migration.md#7-release-r3-production-remote-host",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+    "anchor": "7-release-r3-production-remote-host",
+    "resolves": true,
+    "fileSHA256": "91460b8da411b883b18710d3f886eb521945a01af50779d4abd217b8976e63d7"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-171: link-171
+
+```json
+{
+  "id": "link-171",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 76,
+    "inputColumn": 75,
+    "lineBeforeLinkPass": 84,
+    "before": "[external-provider-protocol.md](../../architect/host-invocation-routing/external-provider-protocol.md#1-component-classes)",
+    "after": "[external-provider-protocol.md](architecture/external-provider-protocol.md#1-component-classes)",
+    "legacyPath": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "anchor": "1-component-classes",
+      "aliasId": "host-invocation-draft-029"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 84,
+    "legacy": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+    "previous": "[external-provider-protocol.md](architecture/external-provider-protocol.md#1-component-classes)",
+    "now": "architecture/external-provider-protocol.md#1-component-classes",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/external-provider-protocol.md#1-component-classes",
+  "interimDestination": "architecture/external-provider-protocol.md#1-component-classes",
+  "newDestination": "architecture/external-provider-protocol.md#1-component-classes",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+    "anchor": "1-component-classes",
+    "resolves": true,
+    "fileSHA256": "e6f0c282eb6fcafe142d61b199dee5f6f8ad80fb9cd7ed1f317dbf70701a9111"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-172: link-172
+
+```json
+{
+  "id": "link-172",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 77,
+    "inputColumn": 134,
+    "lineBeforeLinkPass": 85,
+    "before": "[external-provider-protocol.md](../../architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol)",
+    "after": "[external-provider-protocol.md](architecture/external-provider-protocol.md#3-component-protocol)",
+    "legacyPath": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "anchor": "3-component-protocol",
+      "aliasId": "host-invocation-draft-033"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 85,
+    "legacy": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+    "previous": "[external-provider-protocol.md](architecture/external-provider-protocol.md#3-component-protocol)",
+    "now": "architecture/external-provider-protocol.md#3-component-protocol",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
+  "interimDestination": "architecture/external-provider-protocol.md#3-component-protocol",
+  "newDestination": "architecture/external-provider-protocol.md#3-component-protocol",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+    "anchor": "3-component-protocol",
+    "resolves": true,
+    "fileSHA256": "e6f0c282eb6fcafe142d61b199dee5f6f8ad80fb9cd7ed1f317dbf70701a9111"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-173: link-173
+
+```json
+{
+  "id": "link-173",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 78,
+    "inputColumn": 124,
+    "lineBeforeLinkPass": 86,
+    "before": "[external-provider-protocol.md](../../architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker)",
+    "after": "[external-provider-protocol.md](architecture/external-provider-protocol.md#4-plugin-registry-linker)",
+    "legacyPath": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "anchor": "4-plugin-registry-linker",
+      "aliasId": "host-invocation-draft-034"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 86,
+    "legacy": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+    "previous": "[external-provider-protocol.md](architecture/external-provider-protocol.md#4-plugin-registry-linker)",
+    "now": "architecture/external-provider-protocol.md#4-plugin-registry-linker",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+  "interimDestination": "architecture/external-provider-protocol.md#4-plugin-registry-linker",
+  "newDestination": "architecture/external-provider-protocol.md#4-plugin-registry-linker",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+    "anchor": "4-plugin-registry-linker",
+    "resolves": true,
+    "fileSHA256": "e6f0c282eb6fcafe142d61b199dee5f6f8ad80fb9cd7ed1f317dbf70701a9111"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-174: link-174
+
+```json
+{
+  "id": "link-174",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 79,
+    "inputColumn": 127,
+    "lineBeforeLinkPass": 87,
+    "before": "[external-provider-protocol.md](../../architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker)",
+    "after": "[external-provider-protocol.md](architecture/external-provider-protocol.md#4-plugin-registry-linker)",
+    "legacyPath": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "anchor": "4-plugin-registry-linker",
+      "aliasId": "host-invocation-draft-034"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 87,
+    "legacy": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+    "previous": "[external-provider-protocol.md](architecture/external-provider-protocol.md#4-plugin-registry-linker)",
+    "now": "architecture/external-provider-protocol.md#4-plugin-registry-linker",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+  "interimDestination": "architecture/external-provider-protocol.md#4-plugin-registry-linker",
+  "newDestination": "architecture/external-provider-protocol.md#4-plugin-registry-linker",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+    "anchor": "4-plugin-registry-linker",
+    "resolves": true,
+    "fileSHA256": "e6f0c282eb6fcafe142d61b199dee5f6f8ad80fb9cd7ed1f317dbf70701a9111"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-175: link-175
+
+```json
+{
+  "id": "link-175",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 80,
+    "inputColumn": 145,
+    "lineBeforeLinkPass": 88,
+    "before": "[external-provider-protocol.md](../../architect/host-invocation-routing/external-provider-protocol.md#5-namespace-rules)",
+    "after": "[external-provider-protocol.md](architecture/external-provider-protocol.md#5-namespace-rules)",
+    "legacyPath": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "anchor": "5-namespace-rules",
+      "aliasId": "host-invocation-draft-035"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 88,
+    "legacy": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+    "previous": "[external-provider-protocol.md](architecture/external-provider-protocol.md#5-namespace-rules)",
+    "now": "architecture/external-provider-protocol.md#5-namespace-rules",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/external-provider-protocol.md#5-namespace-rules",
+  "interimDestination": "architecture/external-provider-protocol.md#5-namespace-rules",
+  "newDestination": "architecture/external-provider-protocol.md#5-namespace-rules",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+    "anchor": "5-namespace-rules",
+    "resolves": true,
+    "fileSHA256": "e6f0c282eb6fcafe142d61b199dee5f6f8ad80fb9cd7ed1f317dbf70701a9111"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-176: link-176
+
+```json
+{
+  "id": "link-176",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 81,
+    "inputColumn": 123,
+    "lineBeforeLinkPass": 89,
+    "before": "[legacy-cli-transition.md](../../architect/host-invocation-routing/legacy-cli-transition.md#1-two-distinct-adapters)",
+    "after": "[legacy-cli-transition.md](architecture/legacy-cli-transition.md#1-two-distinct-adapters)",
+    "legacyPath": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "anchor": "1-two-distinct-adapters",
+      "aliasId": "host-invocation-draft-055"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 89,
+    "legacy": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+    "previous": "[legacy-cli-transition.md](architecture/legacy-cli-transition.md#1-two-distinct-adapters)",
+    "now": "architecture/legacy-cli-transition.md#1-two-distinct-adapters",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/legacy-cli-transition.md#1-two-distinct-adapters",
+  "interimDestination": "architecture/legacy-cli-transition.md#1-two-distinct-adapters",
+  "newDestination": "architecture/legacy-cli-transition.md#1-two-distinct-adapters",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+    "anchor": "1-two-distinct-adapters",
+    "resolves": true,
+    "fileSHA256": "c1ea1d373905b1b414d4ecafe9e80c0afb89232d956758b8dcde5b451da75d7d"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-177: link-177
+
+```json
+{
+  "id": "link-177",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 82,
+    "inputColumn": 111,
+    "lineBeforeLinkPass": 90,
+    "before": "[legacy-cli-transition.md](../../architect/host-invocation-routing/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path)",
+    "after": "[legacy-cli-transition.md](architecture/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path)",
+    "legacyPath": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "anchor": "2-legacy-payload-identity-ownership-and-repair-path",
+      "aliasId": "host-invocation-draft-056"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 90,
+    "legacy": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+    "previous": "[legacy-cli-transition.md](architecture/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path)",
+    "now": "architecture/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path",
+  "interimDestination": "architecture/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path",
+  "newDestination": "architecture/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+    "anchor": "2-legacy-payload-identity-ownership-and-repair-path",
+    "resolves": true,
+    "fileSHA256": "c1ea1d373905b1b414d4ecafe9e80c0afb89232d956758b8dcde5b451da75d7d"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-178: link-178
+
+```json
+{
+  "id": "link-178",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 83,
+    "inputColumn": 222,
+    "lineBeforeLinkPass": 91,
+    "before": "[legacy-cli-transition.md](../../architect/host-invocation-routing/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path)",
+    "after": "[legacy-cli-transition.md](architecture/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path)",
+    "legacyPath": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "anchor": "2-legacy-payload-identity-ownership-and-repair-path",
+      "aliasId": "host-invocation-draft-056"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 91,
+    "legacy": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+    "previous": "[legacy-cli-transition.md](architecture/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path)",
+    "now": "architecture/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path",
+  "interimDestination": "architecture/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path",
+  "newDestination": "architecture/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+    "anchor": "2-legacy-payload-identity-ownership-and-repair-path",
+    "resolves": true,
+    "fileSHA256": "c1ea1d373905b1b414d4ecafe9e80c0afb89232d956758b8dcde5b451da75d7d"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-179: link-179
+
+```json
+{
+  "id": "link-179",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 84,
+    "inputColumn": 123,
+    "lineBeforeLinkPass": 92,
+    "before": "[legacy-cli-transition.md](../../architect/host-invocation-routing/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path)",
+    "after": "[legacy-cli-transition.md](architecture/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path)",
+    "legacyPath": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "anchor": "2-legacy-payload-identity-ownership-and-repair-path",
+      "aliasId": "host-invocation-draft-056"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 92,
+    "legacy": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+    "previous": "[legacy-cli-transition.md](architecture/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path)",
+    "now": "architecture/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path",
+  "interimDestination": "architecture/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path",
+  "newDestination": "architecture/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+    "anchor": "2-legacy-payload-identity-ownership-and-repair-path",
+    "resolves": true,
+    "fileSHA256": "c1ea1d373905b1b414d4ecafe9e80c0afb89232d956758b8dcde5b451da75d7d"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-180: link-180
+
+```json
+{
+  "id": "link-180",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 84,
+    "inputColumn": 269,
+    "lineBeforeLinkPass": 92,
+    "before": "[rust-cli-and-proof-components-plan.md](../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#5-p0-lock-release-inputs-and-baseline-inventory)",
+    "after": "[rust-cli-and-proof-components-plan.md](roadmap.md#5-p0-lock-release-inputs-and-baseline-inventory)",
+    "legacyPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/roadmap.md",
+      "anchor": "5-p0-lock-release-inputs-and-baseline-inventory",
+      "aliasId": "host-invocation-draft-095"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 92,
+    "legacy": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "previous": "[rust-cli-and-proof-components-plan.md](roadmap.md#5-p0-lock-release-inputs-and-baseline-inventory)",
+    "now": "roadmap.md#5-p0-lock-release-inputs-and-baseline-inventory",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#5-p0-lock-release-inputs-and-baseline-inventory",
+  "interimDestination": "roadmap.md#5-p0-lock-release-inputs-and-baseline-inventory",
+  "newDestination": "roadmap.md#5-p0-lock-release-inputs-and-baseline-inventory",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/roadmap.md",
+    "anchor": "5-p0-lock-release-inputs-and-baseline-inventory",
+    "resolves": true,
+    "fileSHA256": "f83fb94594f56dbbf481613ea2262e69a7924bef4f45580392a8e9fc9438c12a"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-181: link-181
+
+```json
+{
+  "id": "link-181",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 85,
+    "inputColumn": 131,
+    "lineBeforeLinkPass": 93,
+    "before": "[legacy-cli-transition.md](../../architect/host-invocation-routing/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path)",
+    "after": "[legacy-cli-transition.md](architecture/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path)",
+    "legacyPath": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "anchor": "2-legacy-payload-identity-ownership-and-repair-path",
+      "aliasId": "host-invocation-draft-056"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 93,
+    "legacy": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+    "previous": "[legacy-cli-transition.md](architecture/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path)",
+    "now": "architecture/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path",
+  "interimDestination": "architecture/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path",
+  "newDestination": "architecture/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+    "anchor": "2-legacy-payload-identity-ownership-and-repair-path",
+    "resolves": true,
+    "fileSHA256": "c1ea1d373905b1b414d4ecafe9e80c0afb89232d956758b8dcde5b451da75d7d"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-182: link-182
+
+```json
+{
+  "id": "link-182",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 85,
+    "inputColumn": 277,
+    "lineBeforeLinkPass": 93,
+    "before": "[rust-cli-and-proof-components-plan.md](../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#6-p1-compatibility-harness)",
+    "after": "[rust-cli-and-proof-components-plan.md](roadmap.md#6-p1-compatibility-harness)",
+    "legacyPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/roadmap.md",
+      "anchor": "6-p1-compatibility-harness",
+      "aliasId": "host-invocation-draft-100"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 93,
+    "legacy": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "previous": "[rust-cli-and-proof-components-plan.md](roadmap.md#6-p1-compatibility-harness)",
+    "now": "roadmap.md#6-p1-compatibility-harness",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#6-p1-compatibility-harness",
+  "interimDestination": "roadmap.md#6-p1-compatibility-harness",
+  "newDestination": "roadmap.md#6-p1-compatibility-harness",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/roadmap.md",
+    "anchor": "6-p1-compatibility-harness",
+    "resolves": true,
+    "fileSHA256": "f83fb94594f56dbbf481613ea2262e69a7924bef4f45580392a8e9fc9438c12a"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-183: link-183
+
+```json
+{
+  "id": "link-183",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 86,
+    "inputColumn": 116,
+    "lineBeforeLinkPass": 94,
+    "before": "[legacy-cli-transition.md](../../architect/host-invocation-routing/legacy-cli-transition.md#4-public-presentation-versus-semantic-outcome)",
+    "after": "[legacy-cli-transition.md](architecture/legacy-cli-transition.md#4-public-presentation-versus-semantic-outcome)",
+    "legacyPath": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "anchor": "4-public-presentation-versus-semantic-outcome",
+      "aliasId": "host-invocation-draft-058"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 94,
+    "legacy": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+    "previous": "[legacy-cli-transition.md](architecture/legacy-cli-transition.md#4-public-presentation-versus-semantic-outcome)",
+    "now": "architecture/legacy-cli-transition.md#4-public-presentation-versus-semantic-outcome",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/legacy-cli-transition.md#4-public-presentation-versus-semantic-outcome",
+  "interimDestination": "architecture/legacy-cli-transition.md#4-public-presentation-versus-semantic-outcome",
+  "newDestination": "architecture/legacy-cli-transition.md#4-public-presentation-versus-semantic-outcome",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+    "anchor": "4-public-presentation-versus-semantic-outcome",
+    "resolves": true,
+    "fileSHA256": "c1ea1d373905b1b414d4ecafe9e80c0afb89232d956758b8dcde5b451da75d7d"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-184: link-184
+
+```json
+{
+  "id": "link-184",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 87,
+    "inputColumn": 109,
+    "lineBeforeLinkPass": 95,
+    "before": "[node-to-rust-component-migration.md](../../architect/host-invocation-routing/node-to-rust-component-migration.md#2-options-considered)",
+    "after": "[node-to-rust-component-migration.md](architecture/node-to-rust-migration.md#2-options-considered)",
+    "legacyPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "anchor": "2-options-considered",
+      "aliasId": "host-invocation-draft-065"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 95,
+    "legacy": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "previous": "[node-to-rust-component-migration.md](architecture/node-to-rust-migration.md#2-options-considered)",
+    "now": "architecture/node-to-rust-migration.md#2-options-considered",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/node-to-rust-component-migration.md#2-options-considered",
+  "interimDestination": "architecture/node-to-rust-migration.md#2-options-considered",
+  "newDestination": "architecture/node-to-rust-migration.md#2-options-considered",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+    "anchor": "2-options-considered",
+    "resolves": true,
+    "fileSHA256": "91460b8da411b883b18710d3f886eb521945a01af50779d4abd217b8976e63d7"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-185: link-185
+
+```json
+{
+  "id": "link-185",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 88,
+    "inputColumn": 108,
+    "lineBeforeLinkPass": 96,
+    "before": "[node-to-rust-component-migration.md](../../architect/host-invocation-routing/node-to-rust-component-migration.md#4-current-migration-readiness)",
+    "after": "[node-to-rust-component-migration.md](architecture/node-to-rust-migration.md#4-current-migration-readiness)",
+    "legacyPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "anchor": "4-current-migration-readiness",
+      "aliasId": "host-invocation-draft-071"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 96,
+    "legacy": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "previous": "[node-to-rust-component-migration.md](architecture/node-to-rust-migration.md#4-current-migration-readiness)",
+    "now": "architecture/node-to-rust-migration.md#4-current-migration-readiness",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/node-to-rust-component-migration.md#4-current-migration-readiness",
+  "interimDestination": "architecture/node-to-rust-migration.md#4-current-migration-readiness",
+  "newDestination": "architecture/node-to-rust-migration.md#4-current-migration-readiness",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+    "anchor": "4-current-migration-readiness",
+    "resolves": true,
+    "fileSHA256": "91460b8da411b883b18710d3f886eb521945a01af50779d4abd217b8976e63d7"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-186: link-186
+
+```json
+{
+  "id": "link-186",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 89,
+    "inputColumn": 208,
+    "lineBeforeLinkPass": 97,
+    "before": "[node-to-rust-component-migration.md](../../architect/host-invocation-routing/node-to-rust-component-migration.md#5-release-r1-distributable-rust-cli-host)",
+    "after": "[node-to-rust-component-migration.md](architecture/node-to-rust-migration.md#5-release-r1-distributable-rust-cli-host)",
+    "legacyPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "anchor": "5-release-r1-distributable-rust-cli-host",
+      "aliasId": "host-invocation-draft-075"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 97,
+    "legacy": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "previous": "[node-to-rust-component-migration.md](architecture/node-to-rust-migration.md#5-release-r1-distributable-rust-cli-host)",
+    "now": "architecture/node-to-rust-migration.md#5-release-r1-distributable-rust-cli-host",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/node-to-rust-component-migration.md#5-release-r1-distributable-rust-cli-host",
+  "interimDestination": "architecture/node-to-rust-migration.md#5-release-r1-distributable-rust-cli-host",
+  "newDestination": "architecture/node-to-rust-migration.md#5-release-r1-distributable-rust-cli-host",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+    "anchor": "5-release-r1-distributable-rust-cli-host",
+    "resolves": true,
+    "fileSHA256": "91460b8da411b883b18710d3f886eb521945a01af50779d4abd217b8976e63d7"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-187: link-187
+
+```json
+{
+  "id": "link-187",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 90,
+    "inputColumn": 110,
+    "lineBeforeLinkPass": 98,
+    "before": "[node-to-rust-component-migration.md](../../architect/host-invocation-routing/node-to-rust-component-migration.md#8-migrate-the-next-small-read-only-proof)",
+    "after": "[node-to-rust-component-migration.md](architecture/node-to-rust-migration.md#8-migrate-the-next-small-read-only-proof)",
+    "legacyPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "anchor": "8-migrate-the-next-small-read-only-proof",
+      "aliasId": "host-invocation-draft-078"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 98,
+    "legacy": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "previous": "[node-to-rust-component-migration.md](architecture/node-to-rust-migration.md#8-migrate-the-next-small-read-only-proof)",
+    "now": "architecture/node-to-rust-migration.md#8-migrate-the-next-small-read-only-proof",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/node-to-rust-component-migration.md#8-migrate-the-next-small-read-only-proof",
+  "interimDestination": "architecture/node-to-rust-migration.md#8-migrate-the-next-small-read-only-proof",
+  "newDestination": "architecture/node-to-rust-migration.md#8-migrate-the-next-small-read-only-proof",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+    "anchor": "8-migrate-the-next-small-read-only-proof",
+    "resolves": true,
+    "fileSHA256": "91460b8da411b883b18710d3f886eb521945a01af50779d4abd217b8976e63d7"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-188: link-188
+
+```json
+{
+  "id": "link-188",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 90,
+    "inputColumn": 267,
+    "lineBeforeLinkPass": 98,
+    "before": "[rust-cli-and-proof-components-plan.md](../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#14-p9-next-native-read)",
+    "after": "[rust-cli-and-proof-components-plan.md](roadmap.md#14-p9-next-native-read)",
+    "legacyPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/roadmap.md",
+      "anchor": "14-p9-next-native-read",
+      "aliasId": "host-invocation-draft-131"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 98,
+    "legacy": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "previous": "[rust-cli-and-proof-components-plan.md](roadmap.md#14-p9-next-native-read)",
+    "now": "roadmap.md#14-p9-next-native-read",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#14-p9-next-native-read",
+  "interimDestination": "roadmap.md#14-p9-next-native-read",
+  "newDestination": "roadmap.md#14-p9-next-native-read",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/roadmap.md",
+    "anchor": "14-p9-next-native-read",
+    "resolves": true,
+    "fileSHA256": "f83fb94594f56dbbf481613ea2262e69a7924bef4f45580392a8e9fc9438c12a"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-189: link-189
+
+```json
+{
+  "id": "link-189",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 91,
+    "inputColumn": 201,
+    "lineBeforeLinkPass": 99,
+    "before": "[node-to-rust-component-migration.md](../../architect/host-invocation-routing/node-to-rust-component-migration.md#10-migrate-read-models-before-writers)",
+    "after": "[node-to-rust-component-migration.md](architecture/node-to-rust-migration.md#10-migrate-read-models-before-writers)",
+    "legacyPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "anchor": "10-migrate-read-models-before-writers",
+      "aliasId": "host-invocation-draft-082"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 99,
+    "legacy": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "previous": "[node-to-rust-component-migration.md](architecture/node-to-rust-migration.md#10-migrate-read-models-before-writers)",
+    "now": "architecture/node-to-rust-migration.md#10-migrate-read-models-before-writers",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/node-to-rust-component-migration.md#10-migrate-read-models-before-writers",
+  "interimDestination": "architecture/node-to-rust-migration.md#10-migrate-read-models-before-writers",
+  "newDestination": "architecture/node-to-rust-migration.md#10-migrate-read-models-before-writers",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+    "anchor": "10-migrate-read-models-before-writers",
+    "resolves": true,
+    "fileSHA256": "91460b8da411b883b18710d3f886eb521945a01af50779d4abd217b8976e63d7"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-190: link-190
+
+```json
+{
+  "id": "link-190",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 91,
+    "inputColumn": 355,
+    "lineBeforeLinkPass": 99,
+    "before": "[node-to-rust-component-migration.md](../../architect/host-invocation-routing/node-to-rust-component-migration.md#11-migrate-state-writing-components)",
+    "after": "[node-to-rust-component-migration.md](architecture/node-to-rust-migration.md#11-migrate-state-writing-components)",
+    "legacyPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "anchor": "11-migrate-state-writing-components",
+      "aliasId": "host-invocation-draft-083"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 99,
+    "legacy": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "previous": "[node-to-rust-component-migration.md](architecture/node-to-rust-migration.md#11-migrate-state-writing-components)",
+    "now": "architecture/node-to-rust-migration.md#11-migrate-state-writing-components",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/node-to-rust-component-migration.md#11-migrate-state-writing-components",
+  "interimDestination": "architecture/node-to-rust-migration.md#11-migrate-state-writing-components",
+  "newDestination": "architecture/node-to-rust-migration.md#11-migrate-state-writing-components",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+    "anchor": "11-migrate-state-writing-components",
+    "resolves": true,
+    "fileSHA256": "91460b8da411b883b18710d3f886eb521945a01af50779d4abd217b8976e63d7"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-191: link-191
+
+```json
+{
+  "id": "link-191",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 92,
+    "inputColumn": 175,
+    "lineBeforeLinkPass": 100,
+    "before": "[node-to-rust-component-migration.md](../../architect/host-invocation-routing/node-to-rust-component-migration.md#12-remove-node)",
+    "after": "[node-to-rust-component-migration.md](architecture/node-to-rust-migration.md#12-remove-node)",
+    "legacyPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "anchor": "12-remove-node",
+      "aliasId": "host-invocation-draft-084"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 100,
+    "legacy": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "previous": "[node-to-rust-component-migration.md](architecture/node-to-rust-migration.md#12-remove-node)",
+    "now": "architecture/node-to-rust-migration.md#12-remove-node",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/node-to-rust-component-migration.md#12-remove-node",
+  "interimDestination": "architecture/node-to-rust-migration.md#12-remove-node",
+  "newDestination": "architecture/node-to-rust-migration.md#12-remove-node",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+    "anchor": "12-remove-node",
+    "resolves": true,
+    "fileSHA256": "91460b8da411b883b18710d3f886eb521945a01af50779d4abd217b8976e63d7"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-192: link-192
+
+```json
+{
+  "id": "link-192",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 93,
+    "inputColumn": 107,
+    "lineBeforeLinkPass": 101,
+    "before": "[rust-cli-and-proof-components-plan.md](../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#4-delivery-graph)",
+    "after": "[rust-cli-and-proof-components-plan.md](roadmap.md#4-delivery-graph)",
+    "legacyPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/roadmap.md",
+      "anchor": "4-delivery-graph",
+      "aliasId": "host-invocation-draft-094"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 101,
+    "legacy": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "previous": "[rust-cli-and-proof-components-plan.md](roadmap.md#4-delivery-graph)",
+    "now": "roadmap.md#4-delivery-graph",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#4-delivery-graph",
+  "interimDestination": "roadmap.md#4-delivery-graph",
+  "newDestination": "roadmap.md#4-delivery-graph",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/roadmap.md",
+    "anchor": "4-delivery-graph",
+    "resolves": true,
+    "fileSHA256": "f83fb94594f56dbbf481613ea2262e69a7924bef4f45580392a8e9fc9438c12a"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-193: link-193
+
+```json
+{
+  "id": "link-193",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "inputLine": 94,
+    "inputColumn": 111,
+    "lineBeforeLinkPass": 102,
+    "before": "[rust-cli-and-proof-components-plan.md](../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#3-decisions-required-before-r1-execution)",
+    "after": "[rust-cli-and-proof-components-plan.md](roadmap.md#3-decisions-required-before-r1-execution)",
+    "legacyPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/roadmap.md",
+      "anchor": "3-decisions-required-before-r1-execution",
+      "aliasId": "host-invocation-draft-093"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+    "line": 102,
+    "legacy": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "previous": "[rust-cli-and-proof-components-plan.md](roadmap.md#3-decisions-required-before-r1-execution)",
+    "now": "roadmap.md#3-decisions-required-before-r1-execution",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#3-decisions-required-before-r1-execution",
+  "interimDestination": "roadmap.md#3-decisions-required-before-r1-execution",
+  "newDestination": "roadmap.md#3-decisions-required-before-r1-execution",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/roadmap.md",
+    "anchor": "3-decisions-required-before-r1-execution",
+    "resolves": true,
+    "fileSHA256": "f83fb94594f56dbbf481613ea2262e69a7924bef4f45580392a8e9fc9438c12a"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-194: link-194
+
+```json
+{
+  "id": "link-194",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/roadmap.md",
+    "inputLine": 332,
+    "inputColumn": 26,
+    "lineBeforeLinkPass": 332,
+    "before": "[fgOS Component Boundary Advisory](../../architect/component-boundary/component-boundary-advisory.md)",
+    "after": "[fgOS Component Boundary Advisory](../component-boundary.md)",
+    "legacyPath": "docs/architect/component-boundary/component-boundary-advisory.md",
+    "target": {
+      "path": "docs/platform/component-boundary.md",
+      "anchor": null,
+      "aliasId": "step10-whole-system-0212"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/roadmap.md",
+    "line": 332,
+    "legacy": "docs/architect/component-boundary/component-boundary-advisory.md",
+    "previous": "[fgOS Component Boundary Advisory](../component-boundary.md)",
+    "now": "../component-boundary.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/component-boundary/component-boundary-advisory.md",
+  "interimDestination": "../component-boundary.md",
+  "newDestination": "../component-boundary.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/component-boundary.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "384cf74c699ef5f6013c9f975dd056844184697bba58784d2ad9b2154ce51d4a"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/component-boundary/component-boundary-advisory.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-195: link-195
+
+```json
+{
+  "id": "link-195",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/roadmap.md",
+    "inputLine": 333,
+    "inputColumn": 40,
+    "lineBeforeLinkPass": 333,
+    "before": "[Runtime Identity And Activation](../../architect/packaging-distribution/runtime-identity-and-activation.md)",
+    "after": "[Runtime Identity And Activation](../packaging-distribution/README.md)",
+    "legacyPath": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "target": {
+      "path": "docs/platform/packaging-distribution/README.md",
+      "anchor": null,
+      "aliasId": "step10-packaging-distribution-0173"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/roadmap.md",
+    "line": 333,
+    "legacy": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "previous": "[Runtime Identity And Activation](../packaging-distribution/README.md)",
+    "now": "../packaging-distribution/architecture/runtime-identity-and-activation.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfBefore": false,
+    "portalBefore": true
+  },
+  "oldDestination": "../../architect/packaging-distribution/runtime-identity-and-activation.md",
+  "interimDestination": "../packaging-distribution/README.md",
+  "newDestination": "../packaging-distribution/architecture/runtime-identity-and-activation.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "a8246d7c962bff0f4a2cbaa27526a42715fdf20a65504b6b92112e02f1a5056d"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfRestored": false,
+    "portalRetargeted": true,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-196: link-196
+
+```json
+{
+  "id": "link-196",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/spec.md",
+    "inputLine": 299,
+    "inputColumn": 430,
+    "lineBeforeLinkPass": 307,
+    "before": "[Runtime Identity And Activation](../../architect/packaging-distribution/runtime-identity-and-activation.md)",
+    "after": "[Runtime Identity And Activation](../packaging-distribution/README.md)",
+    "legacyPath": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "target": {
+      "path": "docs/platform/packaging-distribution/README.md",
+      "anchor": null,
+      "aliasId": "step10-packaging-distribution-0173"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/spec.md",
+    "line": 307,
+    "legacy": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "previous": "[Runtime Identity And Activation](../packaging-distribution/README.md)",
+    "now": "../packaging-distribution/architecture/runtime-identity-and-activation.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfBefore": false,
+    "portalBefore": true
+  },
+  "oldDestination": "../../architect/packaging-distribution/runtime-identity-and-activation.md",
+  "interimDestination": "../packaging-distribution/README.md",
+  "newDestination": "../packaging-distribution/architecture/runtime-identity-and-activation.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "a8246d7c962bff0f4a2cbaa27526a42715fdf20a65504b6b92112e02f1a5056d"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfRestored": false,
+    "portalRetargeted": true,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-197: link-197
+
+```json
+{
+  "id": "link-197",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/spec.md",
+    "inputLine": 307,
+    "inputColumn": 464,
+    "lineBeforeLinkPass": 315,
+    "before": "[Future Constraints](../../architect/packaging-distribution/future-constraints.md)",
+    "after": "[Future Constraints](../packaging-distribution/architecture/future-constraints.md)",
+    "legacyPath": "docs/architect/packaging-distribution/future-constraints.md",
+    "target": {
+      "path": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+      "anchor": null,
+      "aliasId": "step10-packaging-distribution-0031"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/spec.md",
+    "line": 315,
+    "legacy": "docs/architect/packaging-distribution/future-constraints.md",
+    "previous": "[Future Constraints](../packaging-distribution/architecture/future-constraints.md)",
+    "now": "../packaging-distribution/architecture/future-constraints.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/packaging-distribution/future-constraints.md",
+  "interimDestination": "../packaging-distribution/architecture/future-constraints.md",
+  "newDestination": "../packaging-distribution/architecture/future-constraints.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "96b84e54fe6e483f474628d348d21a76fbff8e364c9be45b4f2523e8c383e897"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/packaging-distribution/future-constraints.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-198: link-198
+
+```json
+{
+  "id": "link-198",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/spec.md",
+    "inputLine": 319,
+    "inputColumn": 90,
+    "lineBeforeLinkPass": 327,
+    "before": "[Runtime Identity And Activation](../../architect/packaging-distribution/runtime-identity-and-activation.md)",
+    "after": "[Runtime Identity And Activation](../packaging-distribution/README.md)",
+    "legacyPath": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "target": {
+      "path": "docs/platform/packaging-distribution/README.md",
+      "anchor": null,
+      "aliasId": "step10-packaging-distribution-0173"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/spec.md",
+    "line": 327,
+    "legacy": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "previous": "[Runtime Identity And Activation](../packaging-distribution/README.md)",
+    "now": "../packaging-distribution/architecture/runtime-identity-and-activation.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfBefore": false,
+    "portalBefore": true
+  },
+  "oldDestination": "../../architect/packaging-distribution/runtime-identity-and-activation.md",
+  "interimDestination": "../packaging-distribution/README.md",
+  "newDestination": "../packaging-distribution/architecture/runtime-identity-and-activation.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "a8246d7c962bff0f4a2cbaa27526a42715fdf20a65504b6b92112e02f1a5056d"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfRestored": false,
+    "portalRetargeted": true,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-199: link-199
+
+```json
+{
+  "id": "link-199",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/spec.md",
+    "inputLine": 327,
+    "inputColumn": 3,
+    "lineBeforeLinkPass": 335,
+    "before": "[Component Boundary Advisory](../../architect/component-boundary/component-boundary-advisory.md)",
+    "after": "[Component Boundary Advisory](../component-boundary.md)",
+    "legacyPath": "docs/architect/component-boundary/component-boundary-advisory.md",
+    "target": {
+      "path": "docs/platform/component-boundary.md",
+      "anchor": null,
+      "aliasId": "step10-whole-system-0212"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/spec.md",
+    "line": 335,
+    "legacy": "docs/architect/component-boundary/component-boundary-advisory.md",
+    "previous": "[Component Boundary Advisory](../component-boundary.md)",
+    "now": "../component-boundary.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/component-boundary/component-boundary-advisory.md",
+  "interimDestination": "../component-boundary.md",
+  "newDestination": "../component-boundary.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/component-boundary.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "384cf74c699ef5f6013c9f975dd056844184697bba58784d2ad9b2154ce51d4a"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/component-boundary/component-boundary-advisory.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-200: link-200
+
+```json
+{
+  "id": "link-200",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/spec.md",
+    "inputLine": 328,
+    "inputColumn": 3,
+    "lineBeforeLinkPass": 336,
+    "before": "[Runtime Identity And Activation](../../architect/packaging-distribution/runtime-identity-and-activation.md)",
+    "after": "[Runtime Identity And Activation](../packaging-distribution/README.md)",
+    "legacyPath": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "target": {
+      "path": "docs/platform/packaging-distribution/README.md",
+      "anchor": null,
+      "aliasId": "step10-packaging-distribution-0173"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/spec.md",
+    "line": 336,
+    "legacy": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "previous": "[Runtime Identity And Activation](../packaging-distribution/README.md)",
+    "now": "../packaging-distribution/architecture/runtime-identity-and-activation.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfBefore": false,
+    "portalBefore": true
+  },
+  "oldDestination": "../../architect/packaging-distribution/runtime-identity-and-activation.md",
+  "interimDestination": "../packaging-distribution/README.md",
+  "newDestination": "../packaging-distribution/architecture/runtime-identity-and-activation.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "a8246d7c962bff0f4a2cbaa27526a42715fdf20a65504b6b92112e02f1a5056d"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfRestored": false,
+    "portalRetargeted": true,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-201: link-201
+
+```json
+{
+  "id": "link-201",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
+    "inputLine": 46,
+    "inputColumn": 17,
+    "lineBeforeLinkPass": 54,
+    "before": "[../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md)",
+    "after": "[../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../README.md)",
+    "legacyPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/README.md",
+      "anchor": null,
+      "aliasId": "host-invocation-draft-088"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
+    "line": 54,
+    "legacy": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "previous": "[../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../README.md)",
+    "now": "../roadmap.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfBefore": false,
+    "portalBefore": true
+  },
+  "oldDestination": "../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+  "interimDestination": "../README.md",
+  "newDestination": "../roadmap.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/roadmap.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "f83fb94594f56dbbf481613ea2262e69a7924bef4f45580392a8e9fc9438c12a"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfRestored": false,
+    "portalRetargeted": true,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-202: link-202
+
+```json
+{
+  "id": "link-202",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+    "inputLine": 86,
+    "inputColumn": 17,
+    "lineBeforeLinkPass": 94,
+    "before": "[../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md)",
+    "after": "[../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../README.md)",
+    "legacyPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/README.md",
+      "anchor": null,
+      "aliasId": "host-invocation-draft-088"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+    "line": 94,
+    "legacy": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "previous": "[../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../README.md)",
+    "now": "../roadmap.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfBefore": false,
+    "portalBefore": true
+  },
+  "oldDestination": "../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+  "interimDestination": "../README.md",
+  "newDestination": "../roadmap.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/roadmap.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "f83fb94594f56dbbf481613ea2262e69a7924bef4f45580392a8e9fc9438c12a"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfRestored": false,
+    "portalRetargeted": true,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-203: link-203
+
+```json
+{
+  "id": "link-203",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+    "inputLine": 99,
+    "inputColumn": 17,
+    "lineBeforeLinkPass": 107,
+    "before": "[../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md)",
+    "after": "[../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../README.md)",
+    "legacyPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/README.md",
+      "anchor": null,
+      "aliasId": "host-invocation-draft-088"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+    "line": 107,
+    "legacy": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "previous": "[../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../README.md)",
+    "now": "../roadmap.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfBefore": false,
+    "portalBefore": true
+  },
+  "oldDestination": "../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+  "interimDestination": "../README.md",
+  "newDestination": "../roadmap.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/roadmap.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "f83fb94594f56dbbf481613ea2262e69a7924bef4f45580392a8e9fc9438c12a"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfRestored": false,
+    "portalRetargeted": true,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-204: link-204
+
+```json
+{
+  "id": "link-204",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md",
+    "inputLine": 106,
+    "inputColumn": 22,
+    "lineBeforeLinkPass": 114,
+    "before": "[../../../architect/host-invocation-routing/node-to-rust-component-migration.md](../../../architect/host-invocation-routing/node-to-rust-component-migration.md)",
+    "after": "[../../../architect/host-invocation-routing/node-to-rust-component-migration.md](../README.md)",
+    "legacyPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/README.md",
+      "anchor": null,
+      "aliasId": "host-invocation-draft-061"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md",
+    "line": 114,
+    "legacy": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "previous": "[../../../architect/host-invocation-routing/node-to-rust-component-migration.md](../README.md)",
+    "now": "../architecture/node-to-rust-migration.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfBefore": false,
+    "portalBefore": true
+  },
+  "oldDestination": "../../../architect/host-invocation-routing/node-to-rust-component-migration.md",
+  "interimDestination": "../README.md",
+  "newDestination": "../architecture/node-to-rust-migration.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "91460b8da411b883b18710d3f886eb521945a01af50779d4abd217b8976e63d7"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfRestored": false,
+    "portalRetargeted": true,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-205: link-205
+
+```json
+{
+  "id": "link-205",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+    "inputLine": 33,
+    "inputColumn": 3,
+    "lineBeforeLinkPass": 41,
+    "before": "[documentation-standardization-plan.md](../../../architect/host-invocation-routing/documentation-standardization-plan.md)",
+    "after": "[documentation-standardization-plan.md](../history/documentation-migration/documentation-standardization-plan.md)",
+    "legacyPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+      "anchor": null,
+      "aliasId": "host-invocation-draft-001"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+    "line": 41,
+    "legacy": "docs/architect/host-invocation-routing/documentation-standardization-plan.md",
+    "previous": "[documentation-standardization-plan.md](../history/documentation-migration/documentation-standardization-plan.md)",
+    "now": "../history/documentation-migration/documentation-standardization-plan.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../../architect/host-invocation-routing/documentation-standardization-plan.md",
+  "interimDestination": "../history/documentation-migration/documentation-standardization-plan.md",
+  "newDestination": "../history/documentation-migration/documentation-standardization-plan.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "3739b4d22b221a87b2c8a4c60679dd3de6d524a0931b8fd5bfea4ffe0829b8ca"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/documentation-standardization-plan.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-206: link-206
+
+```json
+{
+  "id": "link-206",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+    "inputLine": 34,
+    "inputColumn": 3,
+    "lineBeforeLinkPass": 42,
+    "before": "[host-invocation-provider-routing.md](../../../architect/host-invocation-routing/host-invocation-provider-routing.md)",
+    "after": "[host-invocation-provider-routing.md](../README.md)",
+    "legacyPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/README.md",
+      "anchor": null,
+      "aliasId": "host-invocation-draft-037"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+    "line": 42,
+    "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "previous": "[host-invocation-provider-routing.md](../README.md)",
+    "now": "../../../architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "action": "restored-legacy",
+    "reason": "provenance/legacy-owner",
+    "selfBefore": false,
+    "portalBefore": true
+  },
+  "oldDestination": "../../../architect/host-invocation-routing/host-invocation-provider-routing.md",
+  "interimDestination": "../README.md",
+  "newDestination": "../../../architect/host-invocation-routing/host-invocation-provider-routing.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "ffa08f6390701e71020110249c3ef7d2888831cee01cfedae28fe4f77ee98cb6"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "action": "restored-legacy",
+    "reason": "provenance/legacy-owner",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": true,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-207: link-207
+
+```json
+{
+  "id": "link-207",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+    "inputLine": 35,
+    "inputColumn": 3,
+    "lineBeforeLinkPass": 43,
+    "before": "[external-provider-protocol.md](../../../architect/host-invocation-routing/external-provider-protocol.md)",
+    "after": "[external-provider-protocol.md](../README.md)",
+    "legacyPath": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/README.md",
+      "anchor": null,
+      "aliasId": "host-invocation-draft-026"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+    "line": 43,
+    "legacy": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+    "previous": "[external-provider-protocol.md](../README.md)",
+    "now": "../architecture/external-provider-protocol.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfBefore": false,
+    "portalBefore": true
+  },
+  "oldDestination": "../../../architect/host-invocation-routing/external-provider-protocol.md",
+  "interimDestination": "../README.md",
+  "newDestination": "../architecture/external-provider-protocol.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "e6f0c282eb6fcafe142d61b199dee5f6f8ad80fb9cd7ed1f317dbf70701a9111"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfRestored": false,
+    "portalRetargeted": true,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-208: link-208
+
+```json
+{
+  "id": "link-208",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+    "inputLine": 36,
+    "inputColumn": 3,
+    "lineBeforeLinkPass": 44,
+    "before": "[legacy-cli-transition.md](../../../architect/host-invocation-routing/legacy-cli-transition.md)",
+    "after": "[legacy-cli-transition.md](../README.md)",
+    "legacyPath": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/README.md",
+      "anchor": null,
+      "aliasId": "host-invocation-draft-052"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+    "line": 44,
+    "legacy": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+    "previous": "[legacy-cli-transition.md](../README.md)",
+    "now": "../architecture/legacy-cli-transition.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfBefore": false,
+    "portalBefore": true
+  },
+  "oldDestination": "../../../architect/host-invocation-routing/legacy-cli-transition.md",
+  "interimDestination": "../README.md",
+  "newDestination": "../architecture/legacy-cli-transition.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "c1ea1d373905b1b414d4ecafe9e80c0afb89232d956758b8dcde5b451da75d7d"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfRestored": false,
+    "portalRetargeted": true,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-209: link-209
+
+```json
+{
+  "id": "link-209",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+    "inputLine": 37,
+    "inputColumn": 3,
+    "lineBeforeLinkPass": 45,
+    "before": "[node-to-rust-component-migration.md](../../../architect/host-invocation-routing/node-to-rust-component-migration.md)",
+    "after": "[node-to-rust-component-migration.md](../README.md)",
+    "legacyPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/README.md",
+      "anchor": null,
+      "aliasId": "host-invocation-draft-061"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+    "line": 45,
+    "legacy": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "previous": "[node-to-rust-component-migration.md](../README.md)",
+    "now": "../architecture/node-to-rust-migration.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfBefore": false,
+    "portalBefore": true
+  },
+  "oldDestination": "../../../architect/host-invocation-routing/node-to-rust-component-migration.md",
+  "interimDestination": "../README.md",
+  "newDestination": "../architecture/node-to-rust-migration.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "91460b8da411b883b18710d3f886eb521945a01af50779d4abd217b8976e63d7"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfRestored": false,
+    "portalRetargeted": true,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-210: link-210
+
+```json
+{
+  "id": "link-210",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+    "inputLine": 38,
+    "inputColumn": 3,
+    "lineBeforeLinkPass": 46,
+    "before": "[rust-cli-and-proof-components-plan.md](../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md)",
+    "after": "[rust-cli-and-proof-components-plan.md](../README.md)",
+    "legacyPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/README.md",
+      "anchor": null,
+      "aliasId": "host-invocation-draft-088"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+    "line": 46,
+    "legacy": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "previous": "[rust-cli-and-proof-components-plan.md](../README.md)",
+    "now": "../roadmap.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfBefore": false,
+    "portalBefore": true
+  },
+  "oldDestination": "../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+  "interimDestination": "../README.md",
+  "newDestination": "../roadmap.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/roadmap.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "f83fb94594f56dbbf481613ea2262e69a7924bef4f45580392a8e9fc9438c12a"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfRestored": false,
+    "portalRetargeted": true,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-211: link-211
+
+```json
+{
+  "id": "link-211",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/vision.md",
+    "inputLine": 57,
+    "inputColumn": 129,
+    "lineBeforeLinkPass": 65,
+    "before": "[host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md)",
+    "after": "[host-invocation-provider-routing.md](README.md)",
+    "legacyPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/README.md",
+      "anchor": null,
+      "aliasId": "host-invocation-draft-037"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/vision.md",
+    "line": 65,
+    "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "previous": "[host-invocation-provider-routing.md](README.md)",
+    "now": "spec.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfBefore": false,
+    "portalBefore": true
+  },
+  "oldDestination": "../../architect/host-invocation-routing/host-invocation-provider-routing.md",
+  "interimDestination": "README.md",
+  "newDestination": "spec.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/spec.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "7aaaa030b242b19a0bd4f0f9a8faac74d50b8b6a86c7817a73e7bc2f1848243f"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfRestored": false,
+    "portalRetargeted": true,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-212: link-212
+
+```json
+{
+  "id": "link-212",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/vision.md",
+    "inputLine": 58,
+    "inputColumn": 186,
+    "lineBeforeLinkPass": 66,
+    "before": "[legacy-cli-transition.md](../../architect/host-invocation-routing/legacy-cli-transition.md)",
+    "after": "[legacy-cli-transition.md](README.md)",
+    "legacyPath": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/README.md",
+      "anchor": null,
+      "aliasId": "host-invocation-draft-052"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/vision.md",
+    "line": 66,
+    "legacy": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+    "previous": "[legacy-cli-transition.md](README.md)",
+    "now": "architecture/legacy-cli-transition.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfBefore": false,
+    "portalBefore": true
+  },
+  "oldDestination": "../../architect/host-invocation-routing/legacy-cli-transition.md",
+  "interimDestination": "README.md",
+  "newDestination": "architecture/legacy-cli-transition.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "c1ea1d373905b1b414d4ecafe9e80c0afb89232d956758b8dcde5b451da75d7d"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfRestored": false,
+    "portalRetargeted": true,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-213: link-213
+
+```json
+{
+  "id": "link-213",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/vision.md",
+    "inputLine": 59,
+    "inputColumn": 145,
+    "lineBeforeLinkPass": 67,
+    "before": "[external-provider-protocol.md](../../architect/host-invocation-routing/external-provider-protocol.md)",
+    "after": "[external-provider-protocol.md](README.md)",
+    "legacyPath": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/README.md",
+      "anchor": null,
+      "aliasId": "host-invocation-draft-026"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/vision.md",
+    "line": 67,
+    "legacy": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+    "previous": "[external-provider-protocol.md](README.md)",
+    "now": "architecture/external-provider-protocol.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfBefore": false,
+    "portalBefore": true
+  },
+  "oldDestination": "../../architect/host-invocation-routing/external-provider-protocol.md",
+  "interimDestination": "README.md",
+  "newDestination": "architecture/external-provider-protocol.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "e6f0c282eb6fcafe142d61b199dee5f6f8ad80fb9cd7ed1f317dbf70701a9111"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfRestored": false,
+    "portalRetargeted": true,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-214: link-214
+
+```json
+{
+  "id": "link-214",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/vision.md",
+    "inputLine": 60,
+    "inputColumn": 149,
+    "lineBeforeLinkPass": 68,
+    "before": "[node-to-rust-component-migration.md](../../architect/host-invocation-routing/node-to-rust-component-migration.md)",
+    "after": "[node-to-rust-component-migration.md](README.md)",
+    "legacyPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/README.md",
+      "anchor": null,
+      "aliasId": "host-invocation-draft-061"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/vision.md",
+    "line": 68,
+    "legacy": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "previous": "[node-to-rust-component-migration.md](README.md)",
+    "now": "architecture/node-to-rust-migration.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfBefore": false,
+    "portalBefore": true
+  },
+  "oldDestination": "../../architect/host-invocation-routing/node-to-rust-component-migration.md",
+  "interimDestination": "README.md",
+  "newDestination": "architecture/node-to-rust-migration.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "91460b8da411b883b18710d3f886eb521945a01af50779d4abd217b8976e63d7"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfRestored": false,
+    "portalRetargeted": true,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-215: link-215
+
+```json
+{
+  "id": "link-215",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/vision.md",
+    "inputLine": 71,
+    "inputColumn": 25,
+    "lineBeforeLinkPass": 79,
+    "before": "[../../architect/host-invocation-routing/host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md)",
+    "after": "[../../architect/host-invocation-routing/host-invocation-provider-routing.md](README.md)",
+    "legacyPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/README.md",
+      "anchor": null,
+      "aliasId": "host-invocation-draft-037"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/vision.md",
+    "line": 79,
+    "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "previous": "[../../architect/host-invocation-routing/host-invocation-provider-routing.md](README.md)",
+    "now": "spec.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfBefore": false,
+    "portalBefore": true
+  },
+  "oldDestination": "../../architect/host-invocation-routing/host-invocation-provider-routing.md",
+  "interimDestination": "README.md",
+  "newDestination": "spec.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/spec.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "7aaaa030b242b19a0bd4f0f9a8faac74d50b8b6a86c7817a73e7bc2f1848243f"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfRestored": false,
+    "portalRetargeted": true,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-216: link-216
+
+```json
+{
+  "id": "link-216",
+  "original": {
+    "path": "docs/platform/host-invocation-routing/vision.md",
+    "inputLine": 72,
+    "inputColumn": 31,
+    "lineBeforeLinkPass": 80,
+    "before": "[../../architect/host-invocation-routing/node-to-rust-component-migration.md](../../architect/host-invocation-routing/node-to-rust-component-migration.md)",
+    "after": "[../../architect/host-invocation-routing/node-to-rust-component-migration.md](README.md)",
+    "legacyPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/README.md",
+      "anchor": null,
+      "aliasId": "host-invocation-draft-061"
+    },
+    "portal": false,
+    "area": "host-invocation-routing",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/host-invocation-routing/vision.md",
+    "line": 80,
+    "legacy": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "previous": "[../../architect/host-invocation-routing/node-to-rust-component-migration.md](README.md)",
+    "now": "architecture/node-to-rust-migration.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfBefore": false,
+    "portalBefore": true
+  },
+  "oldDestination": "../../architect/host-invocation-routing/node-to-rust-component-migration.md",
+  "interimDestination": "README.md",
+  "newDestination": "architecture/node-to-rust-migration.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "91460b8da411b883b18710d3f886eb521945a01af50779d4abd217b8976e63d7"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfRestored": false,
+    "portalRetargeted": true,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-217: link-217
+
+```json
+{
+  "id": "link-217",
+  "original": {
+    "path": "docs/platform/intent-preservation-ledger.md",
+    "inputLine": 105,
+    "inputColumn": 30,
+    "lineBeforeLinkPass": 113,
+    "before": "[../doc-governance.md](../doc-governance.md)",
+    "after": "[../doc-governance.md](governance.md)",
+    "legacyPath": "docs/doc-governance.md",
+    "target": {
+      "path": "docs/platform/governance.md",
+      "anchor": null,
+      "aliasId": "root-authorities-draft-0011"
+    },
+    "portal": false,
+    "area": "platform-root",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/intent-preservation-ledger.md",
+    "line": 113,
+    "legacy": "docs/doc-governance.md",
+    "previous": "[../doc-governance.md](governance.md)",
+    "now": "governance.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../doc-governance.md",
+  "interimDestination": "governance.md",
+  "newDestination": "governance.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/governance.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "e46993268dd1af708a277904df42e1fb5c5fcce8809a56b30e5f958732563a82"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/doc-governance.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-218: link-218
+
+```json
+{
+  "id": "link-218",
+  "original": {
+    "path": "docs/platform/migration-authoring-rules.md",
+    "inputLine": 30,
+    "inputColumn": 4,
+    "lineBeforeLinkPass": 30,
+    "before": "[docs/transitional-switchboard.md](../transitional-switchboard.md)",
+    "after": "[docs/transitional-switchboard.md](documentation/switchboard.md)",
+    "legacyPath": "docs/transitional-switchboard.md",
+    "target": {
+      "path": "docs/platform/documentation/switchboard.md",
+      "anchor": null,
+      "aliasId": "root-authorities-draft-0310"
+    },
+    "portal": false,
+    "area": "platform-root",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/migration-authoring-rules.md",
+    "line": 30,
+    "legacy": "docs/transitional-switchboard.md",
+    "previous": "[docs/transitional-switchboard.md](documentation/switchboard.md)",
+    "now": "documentation/switchboard.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../transitional-switchboard.md",
+  "interimDestination": "documentation/switchboard.md",
+  "newDestination": "documentation/switchboard.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/documentation/switchboard.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "f58542c47377976500986df9364802e7c4d58709467c93775dff1cb8fd2e9886"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/transitional-switchboard.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-219: link-219
+
+```json
+{
+  "id": "link-219",
+  "original": {
+    "path": "docs/platform/migration-authoring-rules.md",
+    "inputLine": 90,
+    "inputColumn": 27,
+    "lineBeforeLinkPass": 90,
+    "before": "[docs/transitional-switchboard.md](../transitional-switchboard.md)",
+    "after": "[docs/transitional-switchboard.md](documentation/switchboard.md)",
+    "legacyPath": "docs/transitional-switchboard.md",
+    "target": {
+      "path": "docs/platform/documentation/switchboard.md",
+      "anchor": null,
+      "aliasId": "root-authorities-draft-0310"
+    },
+    "portal": false,
+    "area": "platform-root",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/migration-authoring-rules.md",
+    "line": 90,
+    "legacy": "docs/transitional-switchboard.md",
+    "previous": "[docs/transitional-switchboard.md](documentation/switchboard.md)",
+    "now": "documentation/switchboard.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../transitional-switchboard.md",
+  "interimDestination": "documentation/switchboard.md",
+  "newDestination": "documentation/switchboard.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/documentation/switchboard.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "f58542c47377976500986df9364802e7c4d58709467c93775dff1cb8fd2e9886"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/transitional-switchboard.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-220: link-220
+
+```json
+{
+  "id": "link-220",
+  "original": {
+    "path": "docs/platform/migration-authoring-rules.md",
+    "inputLine": 91,
+    "inputColumn": 30,
+    "lineBeforeLinkPass": 91,
+    "before": "[docs/doc-governance.md](../doc-governance.md)",
+    "after": "[docs/doc-governance.md](governance.md)",
+    "legacyPath": "docs/doc-governance.md",
+    "target": {
+      "path": "docs/platform/governance.md",
+      "anchor": null,
+      "aliasId": "root-authorities-draft-0011"
+    },
+    "portal": false,
+    "area": "platform-root",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/migration-authoring-rules.md",
+    "line": 91,
+    "legacy": "docs/doc-governance.md",
+    "previous": "[docs/doc-governance.md](governance.md)",
+    "now": "governance.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../doc-governance.md",
+  "interimDestination": "governance.md",
+  "newDestination": "governance.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/governance.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "e46993268dd1af708a277904df42e1fb5c5fcce8809a56b30e5f958732563a82"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/doc-governance.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-221: link-221
+
+```json
+{
+  "id": "link-221",
+  "original": {
+    "path": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+    "inputLine": 181,
+    "inputColumn": 9,
+    "lineBeforeLinkPass": 181,
+    "before": "[Workspace Topology Architecture](../../../architect/workspace-topology.md)",
+    "after": "[Workspace Topology Architecture](../../system-architecture/architecture/workspace-topology.md)",
+    "legacyPath": "docs/architect/workspace-topology.md",
+    "target": {
+      "path": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "anchor": null,
+      "aliasId": "step10-whole-system-1458"
+    },
+    "portal": false,
+    "area": "packaging-distribution",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+    "line": 181,
+    "legacy": "docs/architect/workspace-topology.md",
+    "previous": "[Workspace Topology Architecture](../../system-architecture/architecture/workspace-topology.md)",
+    "now": "../../system-architecture/architecture/workspace-topology.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../../architect/workspace-topology.md",
+  "interimDestination": "../../system-architecture/architecture/workspace-topology.md",
+  "newDestination": "../../system-architecture/architecture/workspace-topology.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/system-architecture/architecture/workspace-topology.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "441108da9c93fa071b4065319c40562ab44d410b714fe0140252a26280a4c15e"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/workspace-topology.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-222: link-222
+
+```json
+{
+  "id": "link-222",
+  "original": {
+    "path": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+    "inputLine": 220,
+    "inputColumn": 153,
+    "lineBeforeLinkPass": 220,
+    "before": "[Legacy CLI Transition](../../../architect/host-invocation-routing/legacy-cli-transition.md)",
+    "after": "[Legacy CLI Transition](../../host-invocation-routing/README.md)",
+    "legacyPath": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/README.md",
+      "anchor": null,
+      "aliasId": "host-invocation-draft-052"
+    },
+    "portal": false,
+    "area": "packaging-distribution",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+    "line": 220,
+    "legacy": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+    "previous": "[Legacy CLI Transition](../../host-invocation-routing/README.md)",
+    "now": "../../host-invocation-routing/architecture/legacy-cli-transition.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfBefore": false,
+    "portalBefore": true
+  },
+  "oldDestination": "../../../architect/host-invocation-routing/legacy-cli-transition.md",
+  "interimDestination": "../../host-invocation-routing/README.md",
+  "newDestination": "../../host-invocation-routing/architecture/legacy-cli-transition.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "c1ea1d373905b1b414d4ecafe9e80c0afb89232d956758b8dcde5b451da75d7d"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfRestored": false,
+    "portalRetargeted": true,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-223: link-223
+
+```json
+{
+  "id": "link-223",
+  "original": {
+    "path": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+    "inputLine": 194,
+    "inputColumn": 1,
+    "lineBeforeLinkPass": 194,
+    "before": "[Workspace Topology Architecture](../../../architect/workspace-topology.md)",
+    "after": "[Workspace Topology Architecture](../../system-architecture/architecture/workspace-topology.md)",
+    "legacyPath": "docs/architect/workspace-topology.md",
+    "target": {
+      "path": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "anchor": null,
+      "aliasId": "step10-whole-system-1458"
+    },
+    "portal": false,
+    "area": "packaging-distribution",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+    "line": 194,
+    "legacy": "docs/architect/workspace-topology.md",
+    "previous": "[Workspace Topology Architecture](../../system-architecture/architecture/workspace-topology.md)",
+    "now": "../../system-architecture/architecture/workspace-topology.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../../architect/workspace-topology.md",
+  "interimDestination": "../../system-architecture/architecture/workspace-topology.md",
+  "newDestination": "../../system-architecture/architecture/workspace-topology.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/system-architecture/architecture/workspace-topology.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "441108da9c93fa071b4065319c40562ab44d410b714fe0140252a26280a4c15e"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/workspace-topology.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-224: link-224
+
+```json
+{
+  "id": "link-224",
+  "original": {
+    "path": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+    "inputLine": 261,
+    "inputColumn": 3,
+    "lineBeforeLinkPass": 261,
+    "before": "[Workspace Topology Architecture](../../../architect/workspace-topology.md)",
+    "after": "[Workspace Topology Architecture](../../system-architecture/architecture/workspace-topology.md)",
+    "legacyPath": "docs/architect/workspace-topology.md",
+    "target": {
+      "path": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "anchor": null,
+      "aliasId": "step10-whole-system-1458"
+    },
+    "portal": false,
+    "area": "packaging-distribution",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+    "line": 261,
+    "legacy": "docs/architect/workspace-topology.md",
+    "previous": "[Workspace Topology Architecture](../../system-architecture/architecture/workspace-topology.md)",
+    "now": "../../system-architecture/architecture/workspace-topology.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../../architect/workspace-topology.md",
+  "interimDestination": "../../system-architecture/architecture/workspace-topology.md",
+  "newDestination": "../../system-architecture/architecture/workspace-topology.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/system-architecture/architecture/workspace-topology.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "441108da9c93fa071b4065319c40562ab44d410b714fe0140252a26280a4c15e"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/workspace-topology.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-225: link-225
+
+```json
+{
+  "id": "link-225",
+  "original": {
+    "path": "docs/platform/packaging-distribution/spec.md",
+    "inputLine": 319,
+    "inputColumn": 1,
+    "lineBeforeLinkPass": 319,
+    "before": "[Workspace Topology Architecture](../../architect/workspace-topology.md)",
+    "after": "[Workspace Topology Architecture](../system-architecture/architecture/workspace-topology.md)",
+    "legacyPath": "docs/architect/workspace-topology.md",
+    "target": {
+      "path": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "anchor": null,
+      "aliasId": "step10-whole-system-1458"
+    },
+    "portal": false,
+    "area": "packaging-distribution",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/packaging-distribution/spec.md",
+    "line": 319,
+    "legacy": "docs/architect/workspace-topology.md",
+    "previous": "[Workspace Topology Architecture](../system-architecture/architecture/workspace-topology.md)",
+    "now": "../system-architecture/architecture/workspace-topology.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/workspace-topology.md",
+  "interimDestination": "../system-architecture/architecture/workspace-topology.md",
+  "newDestination": "../system-architecture/architecture/workspace-topology.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/system-architecture/architecture/workspace-topology.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "441108da9c93fa071b4065319c40562ab44d410b714fe0140252a26280a4c15e"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/workspace-topology.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-226: link-226
+
+```json
+{
+  "id": "link-226",
+  "original": {
+    "path": "docs/platform/packaging-distribution/spec.md",
+    "inputLine": 439,
+    "inputColumn": 3,
+    "lineBeforeLinkPass": 439,
+    "before": "[docs/architect/workspace-topology.md](../../architect/workspace-topology.md)",
+    "after": "[docs/architect/workspace-topology.md](../system-architecture/architecture/workspace-topology.md)",
+    "legacyPath": "docs/architect/workspace-topology.md",
+    "target": {
+      "path": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "anchor": null,
+      "aliasId": "step10-whole-system-1458"
+    },
+    "portal": false,
+    "area": "packaging-distribution",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/packaging-distribution/spec.md",
+    "line": 439,
+    "legacy": "docs/architect/workspace-topology.md",
+    "previous": "[docs/architect/workspace-topology.md](../system-architecture/architecture/workspace-topology.md)",
+    "now": "../system-architecture/architecture/workspace-topology.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/workspace-topology.md",
+  "interimDestination": "../system-architecture/architecture/workspace-topology.md",
+  "newDestination": "../system-architecture/architecture/workspace-topology.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/system-architecture/architecture/workspace-topology.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "441108da9c93fa071b4065319c40562ab44d410b714fe0140252a26280a4c15e"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/workspace-topology.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-227: link-227
+
+```json
+{
+  "id": "link-227",
+  "original": {
+    "path": "docs/platform/packaging-distribution/spec.md",
+    "inputLine": 450,
+    "inputColumn": 1,
+    "lineBeforeLinkPass": 450,
+    "before": "[Workspace Topology Architecture](../../architect/workspace-topology.md)",
+    "after": "[Workspace Topology Architecture](../system-architecture/architecture/workspace-topology.md)",
+    "legacyPath": "docs/architect/workspace-topology.md",
+    "target": {
+      "path": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "anchor": null,
+      "aliasId": "step10-whole-system-1458"
+    },
+    "portal": false,
+    "area": "packaging-distribution",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/packaging-distribution/spec.md",
+    "line": 450,
+    "legacy": "docs/architect/workspace-topology.md",
+    "previous": "[Workspace Topology Architecture](../system-architecture/architecture/workspace-topology.md)",
+    "now": "../system-architecture/architecture/workspace-topology.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/workspace-topology.md",
+  "interimDestination": "../system-architecture/architecture/workspace-topology.md",
+  "newDestination": "../system-architecture/architecture/workspace-topology.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/system-architecture/architecture/workspace-topology.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "441108da9c93fa071b4065319c40562ab44d410b714fe0140252a26280a4c15e"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/workspace-topology.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-228: link-228
+
+```json
+{
+  "id": "link-228",
+  "original": {
+    "path": "docs/platform/proposals/architecture-advisory-panel.md",
+    "inputLine": 24,
+    "inputColumn": 22,
+    "lineBeforeLinkPass": 24,
+    "before": "[original source](../../architect/proposals/architecture-advisory-panel.md)",
+    "after": "[original source](architecture-advisory-panel.md)",
+    "legacyPath": "docs/architect/proposals/architecture-advisory-panel.md",
+    "target": {
+      "path": "docs/platform/proposals/architecture-advisory-panel.md",
+      "anchor": null,
+      "aliasId": "step10-proposals-redesigns-0010"
+    },
+    "portal": false,
+    "area": "proposals",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/proposals/architecture-advisory-panel.md",
+    "line": 24,
+    "legacy": "docs/architect/proposals/architecture-advisory-panel.md",
+    "previous": "[original source](architecture-advisory-panel.md)",
+    "now": "../../architect/proposals/architecture-advisory-panel.md",
+    "action": "restored-legacy",
+    "reason": "provenance/legacy-owner",
+    "selfBefore": true,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/proposals/architecture-advisory-panel.md",
+  "interimDestination": "architecture-advisory-panel.md",
+  "newDestination": "../../architect/proposals/architecture-advisory-panel.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/architect/proposals/architecture-advisory-panel.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "89184422386302e25b111cf6fb84317dc5a7802102654b3f57c0f0db960f4766"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/proposals/architecture-advisory-panel.md",
+    "action": "restored-legacy",
+    "reason": "provenance/legacy-owner",
+    "selfRestored": true,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-229: link-229
+
+```json
+{
+  "id": "link-229",
+  "original": {
+    "path": "docs/platform/proposals/architecture-advisory-panel.md",
+    "inputLine": 59,
+    "inputColumn": 25,
+    "lineBeforeLinkPass": 59,
+    "before": "[Coordination Capability Envelope](../../architect/proposals/coordination-capability-envelope.md)",
+    "after": "[Coordination Capability Envelope](coordination-capability-envelope.md)",
+    "legacyPath": "docs/architect/proposals/coordination-capability-envelope.md",
+    "target": {
+      "path": "docs/platform/proposals/coordination-capability-envelope.md",
+      "anchor": null,
+      "aliasId": "step10-proposals-redesigns-0230"
+    },
+    "portal": false,
+    "area": "proposals",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/proposals/architecture-advisory-panel.md",
+    "line": 59,
+    "legacy": "docs/architect/proposals/coordination-capability-envelope.md",
+    "previous": "[Coordination Capability Envelope](coordination-capability-envelope.md)",
+    "now": "coordination-capability-envelope.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/proposals/coordination-capability-envelope.md",
+  "interimDestination": "coordination-capability-envelope.md",
+  "newDestination": "coordination-capability-envelope.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/proposals/coordination-capability-envelope.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "cb550ddf91b56b91cabac628285a1d8c224a3a93ac91c08dbbbe089bbaf7df13"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/proposals/coordination-capability-envelope.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-230: link-230
+
+```json
+{
+  "id": "link-230",
+  "original": {
+    "path": "docs/platform/proposals/component-authority-boundary-map.md",
+    "inputLine": 24,
+    "inputColumn": 22,
+    "lineBeforeLinkPass": 24,
+    "before": "[original source](../../architect/proposals/component-authority-boundary-map.md)",
+    "after": "[original source](component-authority-boundary-map.md)",
+    "legacyPath": "docs/architect/proposals/component-authority-boundary-map.md",
+    "target": {
+      "path": "docs/platform/proposals/component-authority-boundary-map.md",
+      "anchor": null,
+      "aliasId": "step10-proposals-redesigns-0130"
+    },
+    "portal": false,
+    "area": "proposals",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/proposals/component-authority-boundary-map.md",
+    "line": 24,
+    "legacy": "docs/architect/proposals/component-authority-boundary-map.md",
+    "previous": "[original source](component-authority-boundary-map.md)",
+    "now": "../../architect/proposals/component-authority-boundary-map.md",
+    "action": "restored-legacy",
+    "reason": "provenance/legacy-owner",
+    "selfBefore": true,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/proposals/component-authority-boundary-map.md",
+  "interimDestination": "component-authority-boundary-map.md",
+  "newDestination": "../../architect/proposals/component-authority-boundary-map.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/architect/proposals/component-authority-boundary-map.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "f3d6d5de304a1fb08c1785bd1269d53617bda0cd841876c8c301a04debafeb6f"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/proposals/component-authority-boundary-map.md",
+    "action": "restored-legacy",
+    "reason": "provenance/legacy-owner",
+    "selfRestored": true,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-231: link-231
+
+```json
+{
+  "id": "link-231",
+  "original": {
+    "path": "docs/platform/proposals/component-authority-boundary-map.md",
+    "inputLine": 32,
+    "inputColumn": 10,
+    "lineBeforeLinkPass": 32,
+    "before": "[Step 09 Group Thinking Substrate](../../architect/proposals/step-09-group-thinking-substrate.md)",
+    "after": "[Step 09 Group Thinking Substrate](step-09-group-thinking-substrate.md)",
+    "legacyPath": "docs/architect/proposals/step-09-group-thinking-substrate.md",
+    "target": {
+      "path": "docs/platform/proposals/step-09-group-thinking-substrate.md",
+      "anchor": null,
+      "aliasId": "step10-proposals-redesigns-0509"
+    },
+    "portal": false,
+    "area": "proposals",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/proposals/component-authority-boundary-map.md",
+    "line": 32,
+    "legacy": "docs/architect/proposals/step-09-group-thinking-substrate.md",
+    "previous": "[Step 09 Group Thinking Substrate](step-09-group-thinking-substrate.md)",
+    "now": "step-09-group-thinking-substrate.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/proposals/step-09-group-thinking-substrate.md",
+  "interimDestination": "step-09-group-thinking-substrate.md",
+  "newDestination": "step-09-group-thinking-substrate.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/proposals/step-09-group-thinking-substrate.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "002c0b30a6d7073a8ad136907b5462d1150abbafa841697028bfa1f0e64be41f"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/proposals/step-09-group-thinking-substrate.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-232: link-232
+
+```json
+{
+  "id": "link-232",
+  "original": {
+    "path": "docs/platform/proposals/component-authority-boundary-map.md",
+    "inputLine": 32,
+    "inputColumn": 109,
+    "lineBeforeLinkPass": 32,
+    "before": "[Step 10 Coding Domain Adoption](../../architect/proposals/step-10-coding-domain-adoption.md)",
+    "after": "[Step 10 Coding Domain Adoption](step-10-coding-domain-adoption.md)",
+    "legacyPath": "docs/architect/proposals/step-10-coding-domain-adoption.md",
+    "target": {
+      "path": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+      "anchor": null,
+      "aliasId": "step10-proposals-redesigns-0763"
+    },
+    "portal": false,
+    "area": "proposals",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/proposals/component-authority-boundary-map.md",
+    "line": 32,
+    "legacy": "docs/architect/proposals/step-10-coding-domain-adoption.md",
+    "previous": "[Step 10 Coding Domain Adoption](step-10-coding-domain-adoption.md)",
+    "now": "step-10-coding-domain-adoption.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/proposals/step-10-coding-domain-adoption.md",
+  "interimDestination": "step-10-coding-domain-adoption.md",
+  "newDestination": "step-10-coding-domain-adoption.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "7285d2a7d7ec8da851731f6215760640e31fbb226d869358708b8529a73e67f4"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/proposals/step-10-coding-domain-adoption.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-233: link-233
+
+```json
+{
+  "id": "link-233",
+  "original": {
+    "path": "docs/platform/proposals/component-authority-boundary-map.md",
+    "inputLine": 32,
+    "inputColumn": 204,
+    "lineBeforeLinkPass": 32,
+    "before": "[Agent Coordination Vision](../../architect/agent-coordination/vision.md)",
+    "after": "[Agent Coordination Vision](../agent-coordination/README.md)",
+    "legacyPath": "docs/architect/agent-coordination/vision.md",
+    "target": {
+      "path": "docs/platform/agent-coordination/README.md",
+      "anchor": null,
+      "aliasId": "step10-agent-coordination-4330"
+    },
+    "portal": false,
+    "area": "proposals",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/proposals/component-authority-boundary-map.md",
+    "line": 32,
+    "legacy": "docs/architect/agent-coordination/vision.md",
+    "previous": "[Agent Coordination Vision](../agent-coordination/README.md)",
+    "now": "../agent-coordination/vision.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfBefore": false,
+    "portalBefore": true
+  },
+  "oldDestination": "../../architect/agent-coordination/vision.md",
+  "interimDestination": "../agent-coordination/README.md",
+  "newDestination": "../agent-coordination/vision.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/agent-coordination/vision.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "15424581be04de19fc1a9b5477ddd42d7822ef1a434f1a5a867ffea5d7103bf6"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/agent-coordination/vision.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfRestored": false,
+    "portalRetargeted": true,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-234: link-234
+
+```json
+{
+  "id": "link-234",
+  "original": {
+    "path": "docs/platform/proposals/component-authority-boundary-map.md",
+    "inputLine": 32,
+    "inputColumn": 279,
+    "lineBeforeLinkPass": 32,
+    "before": "[Intent Preservation Ledger](../../architect/agent-coordination/intent-preservation-ledger.md)",
+    "after": "[Intent Preservation Ledger](../agent-coordination/README.md)",
+    "legacyPath": "docs/architect/agent-coordination/intent-preservation-ledger.md",
+    "target": {
+      "path": "docs/platform/agent-coordination/README.md",
+      "anchor": null,
+      "aliasId": "step10-agent-coordination-1148"
+    },
+    "portal": false,
+    "area": "proposals",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/proposals/component-authority-boundary-map.md",
+    "line": 32,
+    "legacy": "docs/architect/agent-coordination/intent-preservation-ledger.md",
+    "previous": "[Intent Preservation Ledger](../agent-coordination/README.md)",
+    "now": "../agent-coordination/history/retired-engine/legacy/intent-preservation-ledger.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfBefore": false,
+    "portalBefore": true
+  },
+  "oldDestination": "../../architect/agent-coordination/intent-preservation-ledger.md",
+  "interimDestination": "../agent-coordination/README.md",
+  "newDestination": "../agent-coordination/history/retired-engine/legacy/intent-preservation-ledger.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/agent-coordination/history/retired-engine/legacy/intent-preservation-ledger.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "60a61d421faa9cd83d7625c3068aedb604a5edd02f78840c82cd445ba64e919e"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/agent-coordination/intent-preservation-ledger.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfRestored": false,
+    "portalRetargeted": true,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-235: link-235
+
+```json
+{
+  "id": "link-235",
+  "original": {
+    "path": "docs/platform/proposals/component-authority-boundary-map.md",
+    "inputLine": 32,
+    "inputColumn": 375,
+    "lineBeforeLinkPass": 32,
+    "before": "[Architecture Intent](../../architect/architecture-intent.md)",
+    "after": "[Architecture Intent](../system-architecture/architecture/architecture-intent.md)",
+    "legacyPath": "docs/architect/architecture-intent.md",
+    "target": {
+      "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
+      "anchor": null,
+      "aliasId": "step10-whole-system-0013"
+    },
+    "portal": false,
+    "area": "proposals",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/proposals/component-authority-boundary-map.md",
+    "line": 32,
+    "legacy": "docs/architect/architecture-intent.md",
+    "previous": "[Architecture Intent](../system-architecture/architecture/architecture-intent.md)",
+    "now": "../system-architecture/architecture/architecture-intent.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/architecture-intent.md",
+  "interimDestination": "../system-architecture/architecture/architecture-intent.md",
+  "newDestination": "../system-architecture/architecture/architecture-intent.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "988b824a980a3c2e57e348ebc3d026f21d6c71c7d83b82eabec0cbaf6f9417fe"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/architecture-intent.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-236: link-236
+
+```json
+{
+  "id": "link-236",
+  "original": {
+    "path": "docs/platform/proposals/component-authority-boundary-map.md",
+    "inputLine": 32,
+    "inputColumn": 438,
+    "lineBeforeLinkPass": 32,
+    "before": "[Component Boundary Advisory](../../architect/component-boundary/component-boundary-advisory.md)",
+    "after": "[Component Boundary Advisory](../component-boundary.md)",
+    "legacyPath": "docs/architect/component-boundary/component-boundary-advisory.md",
+    "target": {
+      "path": "docs/platform/component-boundary.md",
+      "anchor": null,
+      "aliasId": "step10-whole-system-0212"
+    },
+    "portal": false,
+    "area": "proposals",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/proposals/component-authority-boundary-map.md",
+    "line": 32,
+    "legacy": "docs/architect/component-boundary/component-boundary-advisory.md",
+    "previous": "[Component Boundary Advisory](../component-boundary.md)",
+    "now": "../component-boundary.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/component-boundary/component-boundary-advisory.md",
+  "interimDestination": "../component-boundary.md",
+  "newDestination": "../component-boundary.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/component-boundary.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "384cf74c699ef5f6013c9f975dd056844184697bba58784d2ad9b2154ce51d4a"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/component-boundary/component-boundary-advisory.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-237: link-237
+
+```json
+{
+  "id": "link-237",
+  "original": {
+    "path": "docs/platform/proposals/component-authority-boundary-map.md",
+    "inputLine": 32,
+    "inputColumn": 536,
+    "lineBeforeLinkPass": 32,
+    "before": "[Repo Layout Vision](../../architect/component-boundary/repo-layout-vision.md)",
+    "after": "[Repo Layout Vision](../component-boundary.md)",
+    "legacyPath": "docs/architect/component-boundary/repo-layout-vision.md",
+    "target": {
+      "path": "docs/platform/component-boundary.md",
+      "anchor": null,
+      "aliasId": "step10-whole-system-0379"
+    },
+    "portal": false,
+    "area": "proposals",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/proposals/component-authority-boundary-map.md",
+    "line": 32,
+    "legacy": "docs/architect/component-boundary/repo-layout-vision.md",
+    "previous": "[Repo Layout Vision](../component-boundary.md)",
+    "now": "../component-boundary.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfBefore": false,
+    "portalBefore": false
+  },
+  "oldDestination": "../../architect/component-boundary/repo-layout-vision.md",
+  "interimDestination": "../component-boundary.md",
+  "newDestination": "../component-boundary.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/component-boundary.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "384cf74c699ef5f6013c9f975dd056844184697bba58784d2ad9b2154ce51d4a"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/component-boundary/repo-layout-vision.md",
+    "action": "unchanged-candidate",
+    "reason": "explicit-alias",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-238: link-238
+
+```json
+{
+  "id": "link-238",
+  "original": {
+    "path": "docs/platform/proposals/component-authority-boundary-map.md",
+    "inputLine": 32,
+    "inputColumn": 616,
+    "lineBeforeLinkPass": 32,
+    "before": "[Host Invocation And Provider Routing](../../architect/host-invocation-routing/host-invocation-provider-routing.md)",
+    "after": "[Host Invocation And Provider Routing](../host-invocation-routing/README.md)",
+    "legacyPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/README.md",
+      "anchor": null,
+      "aliasId": "host-invocation-draft-037"
+    },
+    "portal": false,
+    "area": "proposals",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/proposals/component-authority-boundary-map.md",
+    "line": 32,
+    "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "previous": "[Host Invocation And Provider Routing](../host-invocation-routing/README.md)",
+    "now": "../host-invocation-routing/spec.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfBefore": false,
+    "portalBefore": true
+  },
+  "oldDestination": "../../architect/host-invocation-routing/host-invocation-provider-routing.md",
+  "interimDestination": "../host-invocation-routing/README.md",
+  "newDestination": "../host-invocation-routing/spec.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/spec.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "7aaaa030b242b19a0bd4f0f9a8faac74d50b8b6a86c7817a73e7bc2f1848243f"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfRestored": false,
+    "portalRetargeted": true,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-239: link-239
+
+```json
+{
+  "id": "link-239",
+  "original": {
+    "path": "docs/platform/proposals/component-authority-boundary-map.md",
+    "inputLine": 32,
+    "inputColumn": 733,
+    "lineBeforeLinkPass": 32,
+    "before": "[Node To Rust Component Migration](../../architect/host-invocation-routing/node-to-rust-component-migration.md)",
+    "after": "[Node To Rust Component Migration](../host-invocation-routing/README.md)",
+    "legacyPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "target": {
+      "path": "docs/platform/host-invocation-routing/README.md",
+      "anchor": null,
+      "aliasId": "host-invocation-draft-061"
+    },
+    "portal": false,
+    "area": "proposals",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/proposals/component-authority-boundary-map.md",
+    "line": 32,
+    "legacy": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "previous": "[Node To Rust Component Migration](../host-invocation-routing/README.md)",
+    "now": "../host-invocation-routing/architecture/node-to-rust-migration.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfBefore": false,
+    "portalBefore": true
+  },
+  "oldDestination": "../../architect/host-invocation-routing/node-to-rust-component-migration.md",
+  "interimDestination": "../host-invocation-routing/README.md",
+  "newDestination": "../host-invocation-routing/architecture/node-to-rust-migration.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "91460b8da411b883b18710d3f886eb521945a01af50779d4abd217b8976e63d7"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+    "action": "retargeted-specific",
+    "reason": "specific-candidate",
+    "selfRestored": false,
+    "portalRetargeted": true,
+    "portalRestored": false,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+
+## Entry f-240: link-240
+
+```json
+{
+  "id": "link-240",
+  "original": {
+    "path": "docs/platform/proposals/component-authority-boundary-map.md",
+    "inputLine": 216,
+    "inputColumn": 445,
+    "lineBeforeLinkPass": 216,
+    "before": "[Dispatch Control Plane](../../architect/agent-coordination/architecture/dispatch-control-plane.md)",
+    "after": "[Dispatch Control Plane](../agent-coordination/README.md)",
+    "legacyPath": "docs/architect/agent-coordination/architecture/dispatch-control-plane.md",
+    "target": {
+      "path": "docs/platform/agent-coordination/README.md",
+      "anchor": null,
+      "aliasId": "step10-agent-coordination-0122"
+    },
+    "portal": false,
+    "area": "proposals",
+    "reviewStatus": "pending"
+  },
+  "correction": {
+    "file": "docs/platform/proposals/component-authority-boundary-map.md",
+    "line": 216,
+    "legacy": "docs/architect/agent-coordination/architecture/dispatch-control-plane.md",
+    "previous": "[Dispatch Control Plane](../agent-coordination/README.md)",
+    "now": "../../architect/agent-coordination/architecture/dispatch-control-plane.md",
+    "action": "restored-legacy",
+    "reason": "provenance/legacy-owner",
+    "selfBefore": false,
+    "portalBefore": true
+  },
+  "oldDestination": "../../architect/agent-coordination/architecture/dispatch-control-plane.md",
+  "interimDestination": "../agent-coordination/README.md",
+  "newDestination": "../../architect/agent-coordination/architecture/dispatch-control-plane.md",
+  "resolution": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "path": "docs/architect/agent-coordination/architecture/dispatch-control-plane.md",
+    "anchor": null,
+    "resolves": true,
+    "fileSHA256": "e45f4c8937f1af62c856999cb8d8bc9c3e52b72d61b0d97e44025d1ab587a63c"
+  },
+  "referentPreservation": {
+    "declaredReferent": "docs/architect/agent-coordination/architecture/dispatch-control-plane.md",
+    "action": "restored-legacy",
+    "reason": "provenance/legacy-owner",
+    "selfRestored": false,
+    "portalRetargeted": false,
+    "portalRestored": true,
+    "independentSemanticReviewRequired": true,
+    "note": "The final rule and explicit action preserve the declared source/self relationship or route its referent to the specific candidate. Resolution does not certify semantics."
+  }
+}
+```
+

@@ -1,0 +1,2299 @@
+{
+  "version": 1,
+  "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+  "SYNC": "2300d65571968bb3bcb80123a273272586e3f1db",
+  "comparisonBase": "980cb29312b8701f5ea639278f44e1a57a6e5c02",
+  "section": "f",
+  "title": "Current link pass and helper rules",
+  "part": 5,
+  "range": [
+    481,
+    600
+  ],
+  "entryCount": 120,
+  "entries": [
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/architecture/provider-routing.md",
+      "line": 54,
+      "label": "old architecture §7",
+      "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "before": "../../../architect/host-invocation-routing/host-invocation-provider-routing.md#7-authority-two-stage",
+      "after": "../spec.md#7-authority-two-stage",
+      "target": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": "7-authority-two-stage",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/spec.md",
+        "anchor": "7-authority-two-stage",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/architecture/provider-routing.md",
+      "line": 63,
+      "label": "../../../architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "before": "../../../architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "after": "../spec.md",
+      "target": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": null,
+      "reason": "specific-candidate",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/spec.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "line": 50,
+      "label": "source plan §18",
+      "legacy": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+      "before": "../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#18-definition-of-done",
+      "after": "../roadmap.md#18-definition-of-done",
+      "target": "docs/platform/host-invocation-routing/roadmap.md",
+      "anchor": "18-definition-of-done",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/roadmap.md",
+        "anchor": "18-definition-of-done",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "line": 51,
+      "label": "source plan §1",
+      "legacy": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+      "before": "../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#1-outcome",
+      "after": "../roadmap.md#1-outcome",
+      "target": "docs/platform/host-invocation-routing/roadmap.md",
+      "anchor": "1-outcome",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/roadmap.md",
+        "anchor": "1-outcome",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "line": 62,
+      "label": "../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+      "legacy": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+      "before": "../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+      "after": "../roadmap.md",
+      "target": "docs/platform/host-invocation-routing/roadmap.md",
+      "anchor": null,
+      "reason": "specific-candidate",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/roadmap.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "line": 191,
+      "label": "the retained component-boundary advisory",
+      "legacy": "docs/architect/component-boundary/component-boundary-advisory.md",
+      "before": "../../../architect/component-boundary/component-boundary-advisory.md",
+      "after": "../../component-boundary.md",
+      "target": "docs/platform/component-boundary.md",
+      "anchor": null,
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/component-boundary.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "line": 328,
+      "label": "the retained component-boundary advisory",
+      "legacy": "docs/architect/component-boundary/component-boundary-advisory.md",
+      "before": "../../../architect/component-boundary/component-boundary-advisory.md",
+      "after": "../../component-boundary.md",
+      "target": "docs/platform/component-boundary.md",
+      "anchor": null,
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/component-boundary.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/contracts/legacy-payload.md",
+      "line": 62,
+      "label": "../../../architect/host-invocation-routing/legacy-cli-transition.md",
+      "legacy": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+      "before": "../../../architect/host-invocation-routing/legacy-cli-transition.md",
+      "after": "../architecture/legacy-cli-transition.md",
+      "target": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "anchor": null,
+      "reason": "specific-candidate",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/contracts/operation-catalog.md",
+      "line": 47,
+      "label": "../../../architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "before": "../../../architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "after": "../spec.md",
+      "target": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": null,
+      "reason": "specific-candidate",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/spec.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/contracts/operation-request-outcome.md",
+      "line": 59,
+      "label": "../../../architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "before": "../../../architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "after": "../spec.md",
+      "target": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": null,
+      "reason": "specific-candidate",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/spec.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 65,
+      "label": "host-invocation-provider-routing.md",
+      "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "before": "../../architect/host-invocation-routing/host-invocation-provider-routing.md#1-architecture-name",
+      "after": "spec.md#1-architecture-name",
+      "target": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": "1-architecture-name",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/spec.md",
+        "anchor": "1-architecture-name",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 66,
+      "label": "host-invocation-provider-routing.md",
+      "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "before": "../../architect/host-invocation-routing/host-invocation-provider-routing.md#1-architecture-name",
+      "after": "spec.md#1-architecture-name",
+      "target": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": "1-architecture-name",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/spec.md",
+        "anchor": "1-architecture-name",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 67,
+      "label": "host-invocation-provider-routing.md",
+      "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "before": "../../architect/host-invocation-routing/host-invocation-provider-routing.md#4-peer-host-use-cases",
+      "after": "spec.md#4-peer-host-use-cases",
+      "target": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": "4-peer-host-use-cases",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/spec.md",
+        "anchor": "4-peer-host-use-cases",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 68,
+      "label": "host-invocation-provider-routing.md",
+      "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "before": "../../architect/host-invocation-routing/host-invocation-provider-routing.md#4-peer-host-use-cases",
+      "after": "spec.md#4-peer-host-use-cases",
+      "target": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": "4-peer-host-use-cases",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/spec.md",
+        "anchor": "4-peer-host-use-cases",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 68,
+      "label": "legacy-cli-transition.md",
+      "legacy": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+      "before": "../../architect/host-invocation-routing/legacy-cli-transition.md#1-two-distinct-adapters",
+      "after": "architecture/legacy-cli-transition.md#1-two-distinct-adapters",
+      "target": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "anchor": "1-two-distinct-adapters",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+        "anchor": "1-two-distinct-adapters",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 70,
+      "label": "host-invocation-provider-routing.md",
+      "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "before": "../../architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts",
+      "after": "spec.md#5-core-contracts",
+      "target": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": "5-core-contracts",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/spec.md",
+        "anchor": "5-core-contracts",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 71,
+      "label": "host-invocation-provider-routing.md",
+      "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "before": "../../architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts",
+      "after": "spec.md#5-core-contracts",
+      "target": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": "5-core-contracts",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/spec.md",
+        "anchor": "5-core-contracts",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 71,
+      "label": "external-provider-protocol.md",
+      "legacy": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+      "before": "../../architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
+      "after": "architecture/external-provider-protocol.md#3-component-protocol",
+      "target": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "anchor": "3-component-protocol",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "anchor": "3-component-protocol",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 72,
+      "label": "host-invocation-provider-routing.md",
+      "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "before": "../../architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts",
+      "after": "spec.md#5-core-contracts",
+      "target": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": "5-core-contracts",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/spec.md",
+        "anchor": "5-core-contracts",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 73,
+      "label": "host-invocation-provider-routing.md",
+      "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "before": "../../architect/host-invocation-routing/host-invocation-provider-routing.md#6-router-pure-and-invocationservice-pipeline",
+      "after": "spec.md#6-router-pure-and-invocationservice-pipeline",
+      "target": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": "6-router-pure-and-invocationservice-pipeline",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/spec.md",
+        "anchor": "6-router-pure-and-invocationservice-pipeline",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 74,
+      "label": "host-invocation-provider-routing.md",
+      "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "before": "../../architect/host-invocation-routing/host-invocation-provider-routing.md#7-authority-two-stage",
+      "after": "spec.md#7-authority-two-stage",
+      "target": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": "7-authority-two-stage",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/spec.md",
+        "anchor": "7-authority-two-stage",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 75,
+      "label": "host-invocation-provider-routing.md",
+      "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "before": "../../architect/host-invocation-routing/host-invocation-provider-routing.md#7-authority-two-stage",
+      "after": "spec.md#7-authority-two-stage",
+      "target": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": "7-authority-two-stage",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/spec.md",
+        "anchor": "7-authority-two-stage",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 75,
+      "label": "node-to-rust-component-migration.md",
+      "legacy": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+      "before": "../../architect/host-invocation-routing/node-to-rust-component-migration.md#13-rollback-rules",
+      "after": "architecture/node-to-rust-migration.md#13-rollback-rules",
+      "target": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "anchor": "13-rollback-rules",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "anchor": "13-rollback-rules",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 76,
+      "label": "host-invocation-provider-routing.md",
+      "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "before": "../../architect/host-invocation-routing/host-invocation-provider-routing.md#8-failure-cancellation-lifecycle-and-human-input",
+      "after": "spec.md#8-failure-cancellation-lifecycle-and-human-input",
+      "target": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": "8-failure-cancellation-lifecycle-and-human-input",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/spec.md",
+        "anchor": "8-failure-cancellation-lifecycle-and-human-input",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 77,
+      "label": "host-invocation-provider-routing.md",
+      "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "before": "../../architect/host-invocation-routing/host-invocation-provider-routing.md#8-failure-cancellation-lifecycle-and-human-input",
+      "after": "spec.md#8-failure-cancellation-lifecycle-and-human-input",
+      "target": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": "8-failure-cancellation-lifecycle-and-human-input",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/spec.md",
+        "anchor": "8-failure-cancellation-lifecycle-and-human-input",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 78,
+      "label": "host-invocation-provider-routing.md",
+      "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "before": "../../architect/host-invocation-routing/host-invocation-provider-routing.md#8-failure-cancellation-lifecycle-and-human-input",
+      "after": "spec.md#8-failure-cancellation-lifecycle-and-human-input",
+      "target": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": "8-failure-cancellation-lifecycle-and-human-input",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/spec.md",
+        "anchor": "8-failure-cancellation-lifecycle-and-human-input",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 78,
+      "label": "node-to-rust-component-migration.md",
+      "legacy": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+      "before": "../../architect/host-invocation-routing/node-to-rust-component-migration.md#9-repeat-by-component-boundary",
+      "after": "architecture/node-to-rust-migration.md#9-repeat-by-component-boundary",
+      "target": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "anchor": "9-repeat-by-component-boundary",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "anchor": "9-repeat-by-component-boundary",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 79,
+      "label": "host-invocation-provider-routing.md",
+      "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "before": "../../architect/host-invocation-routing/host-invocation-provider-routing.md#9-physical-placement",
+      "after": "spec.md#9-physical-placement",
+      "target": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": "9-physical-placement",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/spec.md",
+        "anchor": "9-physical-placement",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 80,
+      "label": "host-invocation-provider-routing.md",
+      "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "before": "../../architect/host-invocation-routing/host-invocation-provider-routing.md#9-physical-placement",
+      "after": "spec.md#9-physical-placement",
+      "target": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": "9-physical-placement",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/spec.md",
+        "anchor": "9-physical-placement",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 80,
+      "label": "rust-cli-and-proof-components-plan.md",
+      "legacy": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+      "before": "../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#7-p2-rust-workspace-and-generated-inputs",
+      "after": "roadmap.md#7-p2-rust-workspace-and-generated-inputs",
+      "target": "docs/platform/host-invocation-routing/roadmap.md",
+      "anchor": "7-p2-rust-workspace-and-generated-inputs",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/roadmap.md",
+        "anchor": "7-p2-rust-workspace-and-generated-inputs",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 81,
+      "label": "host-invocation-provider-routing.md",
+      "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "before": "../../architect/host-invocation-routing/host-invocation-provider-routing.md#10-release-boundaries",
+      "after": "spec.md#10-release-boundaries",
+      "target": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": "10-release-boundaries",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/spec.md",
+        "anchor": "10-release-boundaries",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 81,
+      "label": "rust-cli-and-proof-components-plan.md",
+      "legacy": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+      "before": "../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#1-outcome",
+      "after": "roadmap.md#1-outcome",
+      "target": "docs/platform/host-invocation-routing/roadmap.md",
+      "anchor": "1-outcome",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/roadmap.md",
+        "anchor": "1-outcome",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 82,
+      "label": "host-invocation-provider-routing.md",
+      "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "before": "../../architect/host-invocation-routing/host-invocation-provider-routing.md#10-release-boundaries",
+      "after": "spec.md#10-release-boundaries",
+      "target": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": "10-release-boundaries",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/spec.md",
+        "anchor": "10-release-boundaries",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 82,
+      "label": "rust-cli-and-proof-components-plan.md",
+      "legacy": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+      "before": "../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#12-p7-external-process-provider-preview",
+      "after": "roadmap.md#12-p7-external-process-provider-preview",
+      "target": "docs/platform/host-invocation-routing/roadmap.md",
+      "anchor": "12-p7-external-process-provider-preview",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/roadmap.md",
+        "anchor": "12-p7-external-process-provider-preview",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 83,
+      "label": "host-invocation-provider-routing.md",
+      "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "before": "../../architect/host-invocation-routing/host-invocation-provider-routing.md#10-release-boundaries",
+      "after": "spec.md#10-release-boundaries",
+      "target": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": "10-release-boundaries",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/spec.md",
+        "anchor": "10-release-boundaries",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 83,
+      "label": "node-to-rust-component-migration.md",
+      "legacy": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+      "before": "../../architect/host-invocation-routing/node-to-rust-component-migration.md#7-release-r3-production-remote-host",
+      "after": "architecture/node-to-rust-migration.md#7-release-r3-production-remote-host",
+      "target": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "anchor": "7-release-r3-production-remote-host",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "anchor": "7-release-r3-production-remote-host",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 84,
+      "label": "external-provider-protocol.md",
+      "legacy": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+      "before": "../../architect/host-invocation-routing/external-provider-protocol.md#1-component-classes",
+      "after": "architecture/external-provider-protocol.md#1-component-classes",
+      "target": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "anchor": "1-component-classes",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "anchor": "1-component-classes",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 85,
+      "label": "external-provider-protocol.md",
+      "legacy": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+      "before": "../../architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
+      "after": "architecture/external-provider-protocol.md#3-component-protocol",
+      "target": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "anchor": "3-component-protocol",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "anchor": "3-component-protocol",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 86,
+      "label": "external-provider-protocol.md",
+      "legacy": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+      "before": "../../architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+      "after": "architecture/external-provider-protocol.md#4-plugin-registry-linker",
+      "target": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "anchor": "4-plugin-registry-linker",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "anchor": "4-plugin-registry-linker",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 87,
+      "label": "external-provider-protocol.md",
+      "legacy": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+      "before": "../../architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+      "after": "architecture/external-provider-protocol.md#4-plugin-registry-linker",
+      "target": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "anchor": "4-plugin-registry-linker",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "anchor": "4-plugin-registry-linker",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 88,
+      "label": "external-provider-protocol.md",
+      "legacy": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+      "before": "../../architect/host-invocation-routing/external-provider-protocol.md#5-namespace-rules",
+      "after": "architecture/external-provider-protocol.md#5-namespace-rules",
+      "target": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "anchor": "5-namespace-rules",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "anchor": "5-namespace-rules",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 89,
+      "label": "legacy-cli-transition.md",
+      "legacy": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+      "before": "../../architect/host-invocation-routing/legacy-cli-transition.md#1-two-distinct-adapters",
+      "after": "architecture/legacy-cli-transition.md#1-two-distinct-adapters",
+      "target": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "anchor": "1-two-distinct-adapters",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+        "anchor": "1-two-distinct-adapters",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 90,
+      "label": "legacy-cli-transition.md",
+      "legacy": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+      "before": "../../architect/host-invocation-routing/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path",
+      "after": "architecture/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path",
+      "target": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "anchor": "2-legacy-payload-identity-ownership-and-repair-path",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+        "anchor": "2-legacy-payload-identity-ownership-and-repair-path",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 91,
+      "label": "legacy-cli-transition.md",
+      "legacy": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+      "before": "../../architect/host-invocation-routing/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path",
+      "after": "architecture/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path",
+      "target": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "anchor": "2-legacy-payload-identity-ownership-and-repair-path",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+        "anchor": "2-legacy-payload-identity-ownership-and-repair-path",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 92,
+      "label": "legacy-cli-transition.md",
+      "legacy": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+      "before": "../../architect/host-invocation-routing/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path",
+      "after": "architecture/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path",
+      "target": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "anchor": "2-legacy-payload-identity-ownership-and-repair-path",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+        "anchor": "2-legacy-payload-identity-ownership-and-repair-path",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 92,
+      "label": "rust-cli-and-proof-components-plan.md",
+      "legacy": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+      "before": "../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#5-p0-lock-release-inputs-and-baseline-inventory",
+      "after": "roadmap.md#5-p0-lock-release-inputs-and-baseline-inventory",
+      "target": "docs/platform/host-invocation-routing/roadmap.md",
+      "anchor": "5-p0-lock-release-inputs-and-baseline-inventory",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/roadmap.md",
+        "anchor": "5-p0-lock-release-inputs-and-baseline-inventory",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 93,
+      "label": "legacy-cli-transition.md",
+      "legacy": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+      "before": "../../architect/host-invocation-routing/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path",
+      "after": "architecture/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path",
+      "target": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "anchor": "2-legacy-payload-identity-ownership-and-repair-path",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+        "anchor": "2-legacy-payload-identity-ownership-and-repair-path",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 93,
+      "label": "rust-cli-and-proof-components-plan.md",
+      "legacy": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+      "before": "../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#6-p1-compatibility-harness",
+      "after": "roadmap.md#6-p1-compatibility-harness",
+      "target": "docs/platform/host-invocation-routing/roadmap.md",
+      "anchor": "6-p1-compatibility-harness",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/roadmap.md",
+        "anchor": "6-p1-compatibility-harness",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 94,
+      "label": "legacy-cli-transition.md",
+      "legacy": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+      "before": "../../architect/host-invocation-routing/legacy-cli-transition.md#4-public-presentation-versus-semantic-outcome",
+      "after": "architecture/legacy-cli-transition.md#4-public-presentation-versus-semantic-outcome",
+      "target": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "anchor": "4-public-presentation-versus-semantic-outcome",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+        "anchor": "4-public-presentation-versus-semantic-outcome",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 95,
+      "label": "node-to-rust-component-migration.md",
+      "legacy": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+      "before": "../../architect/host-invocation-routing/node-to-rust-component-migration.md#2-options-considered",
+      "after": "architecture/node-to-rust-migration.md#2-options-considered",
+      "target": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "anchor": "2-options-considered",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "anchor": "2-options-considered",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 96,
+      "label": "node-to-rust-component-migration.md",
+      "legacy": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+      "before": "../../architect/host-invocation-routing/node-to-rust-component-migration.md#4-current-migration-readiness",
+      "after": "architecture/node-to-rust-migration.md#4-current-migration-readiness",
+      "target": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "anchor": "4-current-migration-readiness",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "anchor": "4-current-migration-readiness",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 97,
+      "label": "node-to-rust-component-migration.md",
+      "legacy": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+      "before": "../../architect/host-invocation-routing/node-to-rust-component-migration.md#5-release-r1-distributable-rust-cli-host",
+      "after": "architecture/node-to-rust-migration.md#5-release-r1-distributable-rust-cli-host",
+      "target": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "anchor": "5-release-r1-distributable-rust-cli-host",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "anchor": "5-release-r1-distributable-rust-cli-host",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 98,
+      "label": "node-to-rust-component-migration.md",
+      "legacy": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+      "before": "../../architect/host-invocation-routing/node-to-rust-component-migration.md#8-migrate-the-next-small-read-only-proof",
+      "after": "architecture/node-to-rust-migration.md#8-migrate-the-next-small-read-only-proof",
+      "target": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "anchor": "8-migrate-the-next-small-read-only-proof",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "anchor": "8-migrate-the-next-small-read-only-proof",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 98,
+      "label": "rust-cli-and-proof-components-plan.md",
+      "legacy": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+      "before": "../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#14-p9-next-native-read",
+      "after": "roadmap.md#14-p9-next-native-read",
+      "target": "docs/platform/host-invocation-routing/roadmap.md",
+      "anchor": "14-p9-next-native-read",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/roadmap.md",
+        "anchor": "14-p9-next-native-read",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 99,
+      "label": "node-to-rust-component-migration.md",
+      "legacy": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+      "before": "../../architect/host-invocation-routing/node-to-rust-component-migration.md#10-migrate-read-models-before-writers",
+      "after": "architecture/node-to-rust-migration.md#10-migrate-read-models-before-writers",
+      "target": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "anchor": "10-migrate-read-models-before-writers",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "anchor": "10-migrate-read-models-before-writers",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 99,
+      "label": "node-to-rust-component-migration.md",
+      "legacy": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+      "before": "../../architect/host-invocation-routing/node-to-rust-component-migration.md#11-migrate-state-writing-components",
+      "after": "architecture/node-to-rust-migration.md#11-migrate-state-writing-components",
+      "target": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "anchor": "11-migrate-state-writing-components",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "anchor": "11-migrate-state-writing-components",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 100,
+      "label": "node-to-rust-component-migration.md",
+      "legacy": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+      "before": "../../architect/host-invocation-routing/node-to-rust-component-migration.md#12-remove-node",
+      "after": "architecture/node-to-rust-migration.md#12-remove-node",
+      "target": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "anchor": "12-remove-node",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "anchor": "12-remove-node",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 101,
+      "label": "rust-cli-and-proof-components-plan.md",
+      "legacy": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+      "before": "../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#4-delivery-graph",
+      "after": "roadmap.md#4-delivery-graph",
+      "target": "docs/platform/host-invocation-routing/roadmap.md",
+      "anchor": "4-delivery-graph",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/roadmap.md",
+        "anchor": "4-delivery-graph",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "line": 102,
+      "label": "rust-cli-and-proof-components-plan.md",
+      "legacy": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+      "before": "../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#3-decisions-required-before-r1-execution",
+      "after": "roadmap.md#3-decisions-required-before-r1-execution",
+      "target": "docs/platform/host-invocation-routing/roadmap.md",
+      "anchor": "3-decisions-required-before-r1-execution",
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/roadmap.md",
+        "anchor": "3-decisions-required-before-r1-execution",
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/roadmap.md",
+      "line": 332,
+      "label": "fgOS Component Boundary Advisory",
+      "legacy": "docs/architect/component-boundary/component-boundary-advisory.md",
+      "before": "../../architect/component-boundary/component-boundary-advisory.md",
+      "after": "../component-boundary.md",
+      "target": "docs/platform/component-boundary.md",
+      "anchor": null,
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/component-boundary.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/roadmap.md",
+      "line": 333,
+      "label": "Runtime Identity And Activation",
+      "legacy": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "before": "../../architect/packaging-distribution/runtime-identity-and-activation.md",
+      "after": "../packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "anchor": null,
+      "reason": "specific-candidate",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/spec.md",
+      "line": 307,
+      "label": "Runtime Identity And Activation",
+      "legacy": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "before": "../../architect/packaging-distribution/runtime-identity-and-activation.md",
+      "after": "../packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "anchor": null,
+      "reason": "specific-candidate",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/spec.md",
+      "line": 315,
+      "label": "Future Constraints",
+      "legacy": "docs/architect/packaging-distribution/future-constraints.md",
+      "before": "../../architect/packaging-distribution/future-constraints.md",
+      "after": "../packaging-distribution/architecture/future-constraints.md",
+      "target": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+      "anchor": null,
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/spec.md",
+      "line": 327,
+      "label": "Runtime Identity And Activation",
+      "legacy": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "before": "../../architect/packaging-distribution/runtime-identity-and-activation.md",
+      "after": "../packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "anchor": null,
+      "reason": "specific-candidate",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/spec.md",
+      "line": 335,
+      "label": "Component Boundary Advisory",
+      "legacy": "docs/architect/component-boundary/component-boundary-advisory.md",
+      "before": "../../architect/component-boundary/component-boundary-advisory.md",
+      "after": "../component-boundary.md",
+      "target": "docs/platform/component-boundary.md",
+      "anchor": null,
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/component-boundary.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/spec.md",
+      "line": 336,
+      "label": "Runtime Identity And Activation",
+      "legacy": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "before": "../../architect/packaging-distribution/runtime-identity-and-activation.md",
+      "after": "../packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "anchor": null,
+      "reason": "specific-candidate",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
+      "line": 54,
+      "label": "../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+      "legacy": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+      "before": "../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+      "after": "../roadmap.md",
+      "target": "docs/platform/host-invocation-routing/roadmap.md",
+      "anchor": null,
+      "reason": "specific-candidate",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/roadmap.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+      "line": 94,
+      "label": "../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+      "legacy": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+      "before": "../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+      "after": "../roadmap.md",
+      "target": "docs/platform/host-invocation-routing/roadmap.md",
+      "anchor": null,
+      "reason": "specific-candidate",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/roadmap.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+      "line": 107,
+      "label": "../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+      "legacy": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+      "before": "../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+      "after": "../roadmap.md",
+      "target": "docs/platform/host-invocation-routing/roadmap.md",
+      "anchor": null,
+      "reason": "specific-candidate",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/roadmap.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md",
+      "line": 114,
+      "label": "../../../architect/host-invocation-routing/node-to-rust-component-migration.md",
+      "legacy": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+      "before": "../../../architect/host-invocation-routing/node-to-rust-component-migration.md",
+      "after": "../architecture/node-to-rust-migration.md",
+      "target": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "anchor": null,
+      "reason": "specific-candidate",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+      "line": 41,
+      "label": "documentation-standardization-plan.md",
+      "legacy": "docs/architect/host-invocation-routing/documentation-standardization-plan.md",
+      "before": "../../../architect/host-invocation-routing/documentation-standardization-plan.md",
+      "after": "../history/documentation-migration/documentation-standardization-plan.md",
+      "target": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+      "anchor": null,
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+      "line": 43,
+      "label": "external-provider-protocol.md",
+      "legacy": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+      "before": "../../../architect/host-invocation-routing/external-provider-protocol.md",
+      "after": "../architecture/external-provider-protocol.md",
+      "target": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "anchor": null,
+      "reason": "specific-candidate",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+      "line": 44,
+      "label": "legacy-cli-transition.md",
+      "legacy": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+      "before": "../../../architect/host-invocation-routing/legacy-cli-transition.md",
+      "after": "../architecture/legacy-cli-transition.md",
+      "target": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "anchor": null,
+      "reason": "specific-candidate",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+      "line": 45,
+      "label": "node-to-rust-component-migration.md",
+      "legacy": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+      "before": "../../../architect/host-invocation-routing/node-to-rust-component-migration.md",
+      "after": "../architecture/node-to-rust-migration.md",
+      "target": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "anchor": null,
+      "reason": "specific-candidate",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+      "line": 46,
+      "label": "rust-cli-and-proof-components-plan.md",
+      "legacy": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+      "before": "../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+      "after": "../roadmap.md",
+      "target": "docs/platform/host-invocation-routing/roadmap.md",
+      "anchor": null,
+      "reason": "specific-candidate",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/roadmap.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/vision.md",
+      "line": 65,
+      "label": "host-invocation-provider-routing.md",
+      "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "before": "../../architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "after": "spec.md",
+      "target": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": null,
+      "reason": "specific-candidate",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/spec.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/vision.md",
+      "line": 66,
+      "label": "legacy-cli-transition.md",
+      "legacy": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+      "before": "../../architect/host-invocation-routing/legacy-cli-transition.md",
+      "after": "architecture/legacy-cli-transition.md",
+      "target": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "anchor": null,
+      "reason": "specific-candidate",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/vision.md",
+      "line": 67,
+      "label": "external-provider-protocol.md",
+      "legacy": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+      "before": "../../architect/host-invocation-routing/external-provider-protocol.md",
+      "after": "architecture/external-provider-protocol.md",
+      "target": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "anchor": null,
+      "reason": "specific-candidate",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/vision.md",
+      "line": 68,
+      "label": "node-to-rust-component-migration.md",
+      "legacy": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+      "before": "../../architect/host-invocation-routing/node-to-rust-component-migration.md",
+      "after": "architecture/node-to-rust-migration.md",
+      "target": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "anchor": null,
+      "reason": "specific-candidate",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/vision.md",
+      "line": 79,
+      "label": "../../architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "before": "../../architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "after": "spec.md",
+      "target": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": null,
+      "reason": "specific-candidate",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/spec.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/host-invocation-routing/vision.md",
+      "line": 80,
+      "label": "../../architect/host-invocation-routing/node-to-rust-component-migration.md",
+      "legacy": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+      "before": "../../architect/host-invocation-routing/node-to-rust-component-migration.md",
+      "after": "architecture/node-to-rust-migration.md",
+      "target": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "anchor": null,
+      "reason": "specific-candidate",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/intent-preservation-ledger.md",
+      "line": 113,
+      "label": "../doc-governance.md",
+      "legacy": "docs/doc-governance.md",
+      "before": "../doc-governance.md",
+      "after": "governance.md",
+      "target": "docs/platform/governance.md",
+      "anchor": null,
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/governance.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/migration-authoring-rules.md",
+      "line": 30,
+      "label": "docs/transitional-switchboard.md",
+      "legacy": "docs/transitional-switchboard.md",
+      "before": "../transitional-switchboard.md",
+      "after": "documentation/switchboard.md",
+      "target": "docs/platform/documentation/switchboard.md",
+      "anchor": null,
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/documentation/switchboard.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/migration-authoring-rules.md",
+      "line": 90,
+      "label": "docs/transitional-switchboard.md",
+      "legacy": "docs/transitional-switchboard.md",
+      "before": "../transitional-switchboard.md",
+      "after": "documentation/switchboard.md",
+      "target": "docs/platform/documentation/switchboard.md",
+      "anchor": null,
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/documentation/switchboard.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/migration-authoring-rules.md",
+      "line": 91,
+      "label": "docs/doc-governance.md",
+      "legacy": "docs/doc-governance.md",
+      "before": "../doc-governance.md",
+      "after": "governance.md",
+      "target": "docs/platform/governance.md",
+      "anchor": null,
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/governance.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/packaging-distribution/README.md",
+      "line": 203,
+      "label": "../../architect/component-boundary/README.md",
+      "legacy": "docs/architect/component-boundary/README.md",
+      "before": "../../architect/component-boundary/README.md",
+      "after": "../component-boundary.md",
+      "target": "docs/platform/component-boundary.md",
+      "anchor": null,
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/component-boundary.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/packaging-distribution/README.md",
+      "line": 250,
+      "label": "Workspace Topology Architecture",
+      "legacy": "docs/architect/workspace-topology.md",
+      "before": "../../architect/workspace-topology.md",
+      "after": "../system-architecture/architecture/workspace-topology.md",
+      "target": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "anchor": null,
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/system-architecture/architecture/workspace-topology.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/packaging-distribution/README.md",
+      "line": 258,
+      "label": "Distribution Baseline And Scattered Spec Fragments",
+      "legacy": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+      "before": "../../architect/packaging-distribution/history/distribution-baseline.md",
+      "after": "history/distribution-baseline.md",
+      "target": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+      "anchor": null,
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/packaging-distribution/README.md",
+      "line": 270,
+      "label": "Workspace Topology Architecture",
+      "legacy": "docs/architect/workspace-topology.md",
+      "before": "../../architect/workspace-topology.md",
+      "after": "../system-architecture/architecture/workspace-topology.md",
+      "target": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "anchor": null,
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/system-architecture/architecture/workspace-topology.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/packaging-distribution/README.md",
+      "line": 273,
+      "label": "Distribution Baseline And Scattered Spec Fragments",
+      "legacy": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+      "before": "../../architect/packaging-distribution/history/distribution-baseline.md",
+      "after": "history/distribution-baseline.md",
+      "target": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+      "anchor": null,
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "line": 181,
+      "label": "Workspace Topology Architecture",
+      "legacy": "docs/architect/workspace-topology.md",
+      "before": "../../../architect/workspace-topology.md",
+      "after": "../../system-architecture/architecture/workspace-topology.md",
+      "target": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "anchor": null,
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/system-architecture/architecture/workspace-topology.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "line": 220,
+      "label": "Legacy CLI Transition",
+      "legacy": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+      "before": "../../../architect/host-invocation-routing/legacy-cli-transition.md",
+      "after": "../../host-invocation-routing/architecture/legacy-cli-transition.md",
+      "target": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "anchor": null,
+      "reason": "specific-candidate",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "line": 194,
+      "label": "Workspace Topology Architecture",
+      "legacy": "docs/architect/workspace-topology.md",
+      "before": "../../../architect/workspace-topology.md",
+      "after": "../../system-architecture/architecture/workspace-topology.md",
+      "target": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "anchor": null,
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/system-architecture/architecture/workspace-topology.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "line": 261,
+      "label": "Workspace Topology Architecture",
+      "legacy": "docs/architect/workspace-topology.md",
+      "before": "../../../architect/workspace-topology.md",
+      "after": "../../system-architecture/architecture/workspace-topology.md",
+      "target": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "anchor": null,
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/system-architecture/architecture/workspace-topology.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/packaging-distribution/spec.md",
+      "line": 319,
+      "label": "Workspace Topology Architecture",
+      "legacy": "docs/architect/workspace-topology.md",
+      "before": "../../architect/workspace-topology.md",
+      "after": "../system-architecture/architecture/workspace-topology.md",
+      "target": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "anchor": null,
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/system-architecture/architecture/workspace-topology.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/packaging-distribution/spec.md",
+      "line": 439,
+      "label": "docs/architect/workspace-topology.md",
+      "legacy": "docs/architect/workspace-topology.md",
+      "before": "../../architect/workspace-topology.md",
+      "after": "../system-architecture/architecture/workspace-topology.md",
+      "target": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "anchor": null,
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/system-architecture/architecture/workspace-topology.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/packaging-distribution/spec.md",
+      "line": 450,
+      "label": "Workspace Topology Architecture",
+      "legacy": "docs/architect/workspace-topology.md",
+      "before": "../../architect/workspace-topology.md",
+      "after": "../system-architecture/architecture/workspace-topology.md",
+      "target": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "anchor": null,
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/system-architecture/architecture/workspace-topology.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/proposals/README.md",
+      "line": 42,
+      "label": "Coordination Capability Envelope",
+      "legacy": "docs/architect/proposals/coordination-capability-envelope.md",
+      "before": "../../architect/proposals/coordination-capability-envelope.md",
+      "after": "coordination-capability-envelope.md",
+      "target": "docs/platform/proposals/coordination-capability-envelope.md",
+      "anchor": null,
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/proposals/coordination-capability-envelope.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/proposals/README.md",
+      "line": 46,
+      "label": "Step 09: Group Thinking Substrate",
+      "legacy": "docs/architect/proposals/step-09-group-thinking-substrate.md",
+      "before": "../../architect/proposals/step-09-group-thinking-substrate.md",
+      "after": "step-09-group-thinking-substrate.md",
+      "target": "docs/platform/proposals/step-09-group-thinking-substrate.md",
+      "anchor": null,
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/proposals/step-09-group-thinking-substrate.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/proposals/README.md",
+      "line": 47,
+      "label": "Architecture Advisory Panel",
+      "legacy": "docs/architect/proposals/architecture-advisory-panel.md",
+      "before": "../../architect/proposals/architecture-advisory-panel.md",
+      "after": "architecture-advisory-panel.md",
+      "target": "docs/platform/proposals/architecture-advisory-panel.md",
+      "anchor": null,
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/proposals/architecture-advisory-panel.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/proposals/README.md",
+      "line": 51,
+      "label": "Step 10: Coding Domain Adoption Of The Coordination Foundation",
+      "legacy": "docs/architect/proposals/step-10-coding-domain-adoption.md",
+      "before": "../../architect/proposals/step-10-coding-domain-adoption.md",
+      "after": "step-10-coding-domain-adoption.md",
+      "target": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+      "anchor": null,
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/proposals/README.md",
+      "line": 52,
+      "label": "Component Authority Boundary Map",
+      "legacy": "docs/architect/proposals/component-authority-boundary-map.md",
+      "before": "../../architect/proposals/component-authority-boundary-map.md",
+      "after": "component-authority-boundary-map.md",
+      "target": "docs/platform/proposals/component-authority-boundary-map.md",
+      "anchor": null,
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/proposals/component-authority-boundary-map.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/proposals/README.md",
+      "line": 56,
+      "label": "Step 09 / Step 10 Replan Handoff Prompt",
+      "legacy": "docs/architect/proposals/step-09-step-10-replan-handoff-prompt.md",
+      "before": "../../architect/proposals/step-09-step-10-replan-handoff-prompt.md",
+      "after": "../agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md",
+      "target": "docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md",
+      "anchor": null,
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/proposals/architecture-advisory-panel.md",
+      "line": 59,
+      "label": "Coordination Capability Envelope",
+      "legacy": "docs/architect/proposals/coordination-capability-envelope.md",
+      "before": "../../architect/proposals/coordination-capability-envelope.md",
+      "after": "coordination-capability-envelope.md",
+      "target": "docs/platform/proposals/coordination-capability-envelope.md",
+      "anchor": null,
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/proposals/coordination-capability-envelope.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/proposals/component-authority-boundary-map.md",
+      "line": 32,
+      "label": "Step 09 Group Thinking Substrate",
+      "legacy": "docs/architect/proposals/step-09-group-thinking-substrate.md",
+      "before": "../../architect/proposals/step-09-group-thinking-substrate.md",
+      "after": "step-09-group-thinking-substrate.md",
+      "target": "docs/platform/proposals/step-09-group-thinking-substrate.md",
+      "anchor": null,
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/proposals/step-09-group-thinking-substrate.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/proposals/component-authority-boundary-map.md",
+      "line": 32,
+      "label": "Step 10 Coding Domain Adoption",
+      "legacy": "docs/architect/proposals/step-10-coding-domain-adoption.md",
+      "before": "../../architect/proposals/step-10-coding-domain-adoption.md",
+      "after": "step-10-coding-domain-adoption.md",
+      "target": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+      "anchor": null,
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/proposals/component-authority-boundary-map.md",
+      "line": 32,
+      "label": "Agent Coordination Vision",
+      "legacy": "docs/architect/agent-coordination/vision.md",
+      "before": "../../architect/agent-coordination/vision.md",
+      "after": "../agent-coordination/vision.md",
+      "target": "docs/platform/agent-coordination/vision.md",
+      "anchor": null,
+      "reason": "specific-candidate",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/agent-coordination/vision.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/proposals/component-authority-boundary-map.md",
+      "line": 32,
+      "label": "Intent Preservation Ledger",
+      "legacy": "docs/architect/agent-coordination/intent-preservation-ledger.md",
+      "before": "../../architect/agent-coordination/intent-preservation-ledger.md",
+      "after": "../agent-coordination/history/retired-engine/legacy/intent-preservation-ledger.md",
+      "target": "docs/platform/agent-coordination/history/retired-engine/legacy/intent-preservation-ledger.md",
+      "anchor": null,
+      "reason": "specific-candidate",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/agent-coordination/history/retired-engine/legacy/intent-preservation-ledger.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/proposals/component-authority-boundary-map.md",
+      "line": 32,
+      "label": "Architecture Intent",
+      "legacy": "docs/architect/architecture-intent.md",
+      "before": "../../architect/architecture-intent.md",
+      "after": "../system-architecture/architecture/architecture-intent.md",
+      "target": "docs/platform/system-architecture/architecture/architecture-intent.md",
+      "anchor": null,
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/proposals/component-authority-boundary-map.md",
+      "line": 32,
+      "label": "Component Boundary Advisory",
+      "legacy": "docs/architect/component-boundary/component-boundary-advisory.md",
+      "before": "../../architect/component-boundary/component-boundary-advisory.md",
+      "after": "../component-boundary.md",
+      "target": "docs/platform/component-boundary.md",
+      "anchor": null,
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/component-boundary.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/proposals/component-authority-boundary-map.md",
+      "line": 32,
+      "label": "Repo Layout Vision",
+      "legacy": "docs/architect/component-boundary/repo-layout-vision.md",
+      "before": "../../architect/component-boundary/repo-layout-vision.md",
+      "after": "../component-boundary.md",
+      "target": "docs/platform/component-boundary.md",
+      "anchor": null,
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/component-boundary.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/proposals/component-authority-boundary-map.md",
+      "line": 32,
+      "label": "Host Invocation And Provider Routing",
+      "legacy": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "before": "../../architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "after": "../host-invocation-routing/spec.md",
+      "target": "docs/platform/host-invocation-routing/spec.md",
+      "anchor": null,
+      "reason": "specific-candidate",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/spec.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/proposals/component-authority-boundary-map.md",
+      "line": 32,
+      "label": "Node To Rust Component Migration",
+      "legacy": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+      "before": "../../architect/host-invocation-routing/node-to-rust-component-migration.md",
+      "after": "../host-invocation-routing/architecture/node-to-rust-migration.md",
+      "target": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "anchor": null,
+      "reason": "specific-candidate",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/proposals/coordination-capability-envelope.md",
+      "line": 37,
+      "label": "Chat progress and handoff",
+      "legacy": "docs/architect/proposals/coordination-envelope-progress.md",
+      "before": "../../architect/proposals/coordination-envelope-progress.md",
+      "after": "../agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+      "target": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+      "anchor": null,
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/proposals/coordination-capability-envelope.md",
+      "line": 39,
+      "label": "Runner spec",
+      "legacy": "docs/specs/runner.md",
+      "before": "../../specs/runner.md",
+      "after": "../runner/spec.md",
+      "target": "docs/platform/runner/spec.md",
+      "anchor": null,
+      "reason": "specific-candidate",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/runner/spec.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/proposals/coordination-capability-envelope.md",
+      "line": 40,
+      "label": "Agent Coordination Vision",
+      "legacy": "docs/architect/agent-coordination/vision.md",
+      "before": "../../architect/agent-coordination/vision.md",
+      "after": "../agent-coordination/vision.md",
+      "target": "docs/platform/agent-coordination/vision.md",
+      "anchor": null,
+      "reason": "specific-candidate",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/agent-coordination/vision.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/proposals/coordination-capability-envelope.md",
+      "line": 41,
+      "label": "Intent Preservation Ledger",
+      "legacy": "docs/architect/agent-coordination/intent-preservation-ledger.md",
+      "before": "../../architect/agent-coordination/intent-preservation-ledger.md",
+      "after": "../agent-coordination/history/retired-engine/legacy/intent-preservation-ledger.md",
+      "target": "docs/platform/agent-coordination/history/retired-engine/legacy/intent-preservation-ledger.md",
+      "anchor": null,
+      "reason": "specific-candidate",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/agent-coordination/history/retired-engine/legacy/intent-preservation-ledger.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/proposals/coordination-capability-envelope.md",
+      "line": 42,
+      "label": "System Vision: Trong Mem Ngoai Cung",
+      "legacy": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+      "before": "../../architect/system-vision-trong-mem-ngoai-cung.md",
+      "after": "../system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "target": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "anchor": null,
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/proposals/coordination-capability-envelope.md",
+      "line": 48,
+      "label": "Foundation baseline",
+      "legacy": "docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md",
+      "before": "../../architect/agent-coordination/architecture/coordination-foundation-baseline.md",
+      "after": "../agent-coordination/history/retired-engine/files/architecture/coordination-foundation-baseline.md",
+      "target": "docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-foundation-baseline.md",
+      "anchor": null,
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-foundation-baseline.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    },
+    {
+      "kind": "correction-helper-edit",
+      "file": "docs/platform/proposals/coordination-capability-envelope.md",
+      "line": 49,
+      "label": "FlowDefinition contract",
+      "legacy": "docs/architect/agent-coordination/contracts/flow-definition.md",
+      "before": "../../architect/agent-coordination/contracts/flow-definition.md",
+      "after": "../agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+      "target": "docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+      "anchor": null,
+      "reason": "explicit-alias",
+      "resolution": {
+        "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+        "path": "docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+        "anchor": null,
+        "resolves": true
+      },
+      "independentSemanticReviewRequired": true
+    }
+  ],
+  "independentReviewRequired": true,
+  "seedChosen": false,
+  "verdictChosen": false
+}

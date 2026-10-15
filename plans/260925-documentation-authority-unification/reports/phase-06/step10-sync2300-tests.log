@@ -1,0 +1,56 @@
+✔ deduplicates overlapping candidate lists and accounts native strict red without claiming strict green (1.956197ms)
+✔ rejects same-size candidate substitutions and stale digest/anchor/path/identity (0.329139ms)
+✔ rejects unexpected fatal, unknown open category and summary-count mismatch (0.369467ms)
+✔ pending claims must equal holds by identity; unknown-blocking also counted (0.230654ms)
+✔ partial carries compare full native identity including registry predecessors (0.230054ms)
+✔ identical groups compare digest and exact owner sets rather than group counts (0.31111ms)
+✔ missing explicit rows, malformed data and duplicate native identities fail closed (0.249819ms)
+✔ native registry partial rows use source text digest rather than opaque unit identity digest (0.196912ms)
+✔ never repoints a source relationship or a link to its own file (1.874042ms)
+✔ source column header protects subsequent table rows (0.275209ms)
+✔ chooses a restored same-named candidate before a portal (0.352994ms)
+✔ chooses the unique per-anchor target when no same-named candidate exists (0.188998ms)
+✔ restores and classifies a portal alias with no specific target (0.215507ms)
+✔ wrapped labels are repointed and labels preserved (0.162822ms)
+✔ fences and historical referents are retained (0.142061ms)
+✔ anchored destinations preserve the explicit alias anchor (0.141027ms)
+✔ ambiguous specific targets fail closed (0.142353ms)
+✔ uses the source heading alias for a split document without guessing among sections (0.207949ms)
+✔ a canonical data cell does not protect unrelated following table rows (0.35329ms)
+✔ restored same-named document takes precedence over an archived heading alias (0.189285ms)
+✔ reviewers receive full text and a unified diff in Markdown with safely nested fences (98.394396ms)
+✔ the public seeded Markdown can be scored without exposing the seed or private selection key (242.882824ms)
+✔ script-proven carries supply batch sensitivity controls without reopening accepted decisions (282.978385ms)
+✔ a new shard cannot claim legacy compatibility by deleting author fields (64.809595ms)
+✔ ordinary committed reviews approve seen text without a sensitivity pack and retain their report pin (192.062958ms)
+▶ ordinary reviews cannot approve a changed digest, an unauthored row or their own session
+  ✔ target-digest (88.532156ms)
+  ✔ source-digest (82.709083ms)
+  ✔ authoredBy (81.575726ms)
+  ✔ authorSession (91.07513ms)
+  ✔ same-session (92.032703ms)
+✔ ordinary reviews cannot approve a changed digest, an unauthored row or their own session (436.991625ms)
+▶ checkpoint reports cannot use the ordinary channel to omit sensitivity proof
+  ✔ checkpoint 3 (169.602741ms)
+  ✔ checkpoint 6 (162.901826ms)
+  ✔ checkpoint 10 (168.472476ms)
+✔ checkpoint reports cannot use the ordinary channel to omit sensitivity proof (501.531881ms)
+✔ the review lint accepts a well-formed ordinary report before application and writes nothing (89.338425ms)
+✔ the review lint uses the recorded target digest of an applied shard without an inventory (138.55315ms)
+▶ the review lint names the line and claim of each malformed verdict row
+  ✔ source-digest-not-64-hex (81.957428ms)
+  ✔ wrong-cell-count (84.582405ms)
+  ✔ non-bare-first-cell (83.949357ms)
+  ✔ target-digest-mismatch (81.204255ms)
+  ✔ source-digest-mismatch (85.253297ms)
+  ✔ bad-verdict (83.359525ms)
+✔ the review lint names the line and claim of each malformed verdict row (501.261308ms)
+✔ the review lint allows labelled non-claim rows but reports unknown claims and missing headers (272.152873ms)
+ℹ tests 45
+ℹ suites 0
+ℹ pass 45
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2895.932607

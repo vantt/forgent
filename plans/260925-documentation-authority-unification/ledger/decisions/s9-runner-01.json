@@ -1809,19 +1809,21 @@
     },
     {
       "claimId": "claim_66c5a56d447d241a438d212c7b6222d2",
-      "sourceUnitDigest": "df9402da4e0b1087fb0b38c82b93963f70524eff5988cad5d9e4715eade7953a",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "khóa-hoạt-động-cây-chính-chặn-commit-trần-khi-phiên-khác-đang-hoạt-động-str65",
+      "sourceUnitDigest": "1c46bbd825e116160efeadcef33dab9d2fa69c0ba9985af5de2d4e717cf7b577",
+      "claimKind": "specification",
       "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
       "targetAnchor": "khóa-hoạt-động-cây-chính-chặn-commit-trần-khi-phiên-khác-đang-hoạt-động-str65",
-      "claimKind": "specification",
-      "disposition": "supersede",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792079321432-41fe2051@2026-10-15",
-      "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole heading docs/specs/runner.md#khóa-hoạt-động-cây-chính-chặn-commit-trần-khi-phiên-khác-đang-hoạt-động-str65 (lines 878–878) carried at docs/platform/runner/operations/h-51f5cd7279fd.md#khóa-hoạt-động-cây-chính-chặn-commit-trần-khi-phiên-khác-đang-hoạt-động-str65. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover. L10-14 / A31: predecessor text conserved in source history; upstream replaced this unit at SYNC e7393ea3c. Pending supersession to current verbatim carrier; source digest remains the predecessor digest. Native gap transition and current identity binding owed next package; no approval carry.",
       "targetUnitDigest": "1c46bbd825e116160efeadcef33dab9d2fa69c0ba9985af5de2d4e717cf7b577",
       "targetAncestry": [
         "Added in candidate: Runner Behaviors & Operations",
         "Behaviors & Operations"
-      ]
+      ],
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
+      "rationale": "L10-14 / A31: every changed upstream span carried verbatim into mapped runner/root carrier; prior labelled truth corrections in the enclosing pointer list remain. Source and target unit digests disclose their inequality where applicable. Native identity resolved by the one sync at 2300d65571968bb3bcb80123a273272586e3f1db; pending independent review; no approval carry."
     },
     {
       "claimId": "claim_d883159fc9171a01070453df2af79a8f",
@@ -1845,23 +1847,6 @@
         "Khóa hoạt động cây chính — chặn commit trần khi phiên khác đang hoạt động (STR65)"
       ],
       "reviewReportCommit": "edffd7c6b9cfb0461eec9e0fef65c9b4a2487acc"
-    },
-    {
-      "claimId": "claim_41571c8f42f542be1f44c9371fad823a",
-      "sourceUnitDigest": "1b272bfab383f72def5df026184449f797cb7723c812253713808d6aed302988",
-      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
-      "targetAnchor": "unheaded-block-40",
-      "claimKind": "specification",
-      "disposition": "supersede",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792079321432-41fe2051@2026-10-15",
-      "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-52 (lines 886–906) carried at docs/platform/runner/operations/h-51f5cd7279fd.md#unheaded-block-40. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover. L10-14 / A31: predecessor text conserved in source history; upstream replaced this unit at SYNC e7393ea3c. Pending supersession to current verbatim carrier; source digest remains the predecessor digest. Native gap transition and current identity binding owed next package; no approval carry.",
-      "targetUnitDigest": "325f9c8c7a59c1dfe6ece4b1b20bb12769d8239db1ad80a0e8c3b20d236ea62c",
-      "targetAncestry": [
-        "Added in candidate: Runner Behaviors & Operations",
-        "Behaviors & Operations",
-        "Khóa hoạt động cây chính — chặn commit trần khi phiên khác đang hoạt động (STR65)"
-      ]
     },
     {
       "claimId": "claim_60ee5b173a01a6a4032956ede901812f",
@@ -3099,33 +3084,20 @@
     },
     {
       "claimId": "claim_4efee765e5a47fc42f4d9cccc7a53191",
-      "sourceUnitDigest": "a28a44307d00f10d0da810cccc5a0d5651ce6695e180cdf502baadcf43c6e641",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "pointers-implementation",
+      "sourceUnitDigest": "4bed9c69a1de3312aca4a42931d4d848718ce35f6e8ee2c964b4395748e3cf10",
+      "claimKind": "specification",
       "targetOwner": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
       "targetAnchor": "pointers-implementation",
-      "claimKind": "specification",
-      "disposition": "supersede",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792079321432-41fe2051@2026-10-15",
-      "rationale": "Judgment: A42 evidenced current-state correction or labelled header/navigation hygiene in this bound unit. Judgment: A41/A19 truth correction or explicitly labelled candidate navigation/link/scaffolding repair. Complete original source remains in immutable docs/specs/runner.md; candidate supersedes the identified false current assertion or rebases the same link referent, with unchanged dated decision semantics. A41 F2: replace deleted entropy pointer; A41 F1: replace deleted ranking pointer Full before/after text and evidence in reports/phase-06/step9-rebound-units.json. A22 rebind, pending independent bounded review; no approval carry, retirement or promotion. L10-14 / A31: predecessor text conserved in source history; upstream replaced this unit at SYNC e7393ea3c. Pending supersession to current verbatim carrier; source digest remains the predecessor digest. Native gap transition and current identity binding owed next package; no approval carry.",
       "targetUnitDigest": "077e4456152fabdeec033b95bef9434aacc5236a1b550dd1e752bd1b36f876a9",
       "targetAncestry": [
         "Added in candidate: Runner Pointers (implementation)"
-      ]
-    },
-    {
-      "claimId": "claim_a64fabc06da00bb0eb8dfaba5ea0c1a6",
-      "sourceUnitDigest": "b323720a9d4e93b156af47db347755f342dd8ad9fb9720466bb161732ebef4e3",
-      "targetOwner": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
-      "targetAnchor": "unheaded-block-2",
-      "claimKind": "specification",
+      ],
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792079321432-41fe2051@2026-10-15",
-      "rationale": "Judgment: A42 evidenced current-state correction or labelled header/navigation hygiene in this bound unit. Judgment: A41/A19 truth correction or explicitly labelled candidate navigation/link/scaffolding repair. Complete original source remains in immutable docs/specs/runner.md; candidate supersedes the identified false current assertion or rebases the same link referent, with unchanged dated decision semantics. A41 F2: replace deleted entropy pointer; A41 F1: replace deleted ranking pointer Full before/after text and evidence in reports/phase-06/step9-rebound-units.json. A22 rebind, pending independent bounded review; no approval carry, retirement or promotion. L10-14 / A31: predecessor text conserved in source history; upstream replaced this unit at SYNC e7393ea3c. Pending supersession to current verbatim carrier; source digest remains the predecessor digest. Native gap transition and current identity binding owed next package; no approval carry.",
-      "targetUnitDigest": "ae0e268fad727f5deda17cf43d013aa1710f5cea2506fdd844809c3c8e98511f",
-      "targetAncestry": [
-        "Added in candidate: Runner Pointers (implementation)"
-      ]
+      "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
+      "rationale": "L10-14 / A31: every changed upstream span carried verbatim into mapped runner/root carrier; prior labelled truth corrections in the enclosing pointer list remain. Source and target unit digests disclose their inequality where applicable. Native identity resolved by the one sync at 2300d65571968bb3bcb80123a273272586e3f1db; pending independent review; no approval carry."
     },
     {
       "claimId": "claim_49a878f920dd60fd0449e74d71b5fc1b",
@@ -11393,6 +11365,79 @@
         "0063 — Work chỉ là bên dùng: dispatch nhận input generic (thay phần đầu vào còn lại của RUL73 (dispatch does not know Work).2)"
       ],
       "reviewReportCommit": "edffd7c6b9cfb0461eec9e0fef65c9b4a2487acc"
+    },
+    {
+      "claimId": "claim_5f3ad073a39ac476da56045883f4e852",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-52",
+      "sourceUnitDigest": "325f9c8c7a59c1dfe6ece4b1b20bb12769d8239db1ad80a0e8c3b20d236ea62c",
+      "claimKind": "specification",
+      "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "targetAnchor": "unheaded-block-40",
+      "targetUnitDigest": "325f9c8c7a59c1dfe6ece4b1b20bb12769d8239db1ad80a0e8c3b20d236ea62c",
+      "targetAncestry": [
+        "Added in candidate: Runner Behaviors & Operations",
+        "Behaviors & Operations",
+        "Khóa hoạt động cây chính — chặn commit trần khi phiên khác đang hoạt động (STR65)"
+      ],
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
+      "rationale": "L10-14 / A31: every changed upstream span carried verbatim into mapped runner/root carrier; prior labelled truth corrections in the enclosing pointer list remain. Source and target unit digests disclose their inequality where applicable. Native identity resolved by the one sync at 2300d65571968bb3bcb80123a273272586e3f1db; pending independent review; no approval carry."
+    },
+    {
+      "claimId": "claim_4599d55c9de4262714d378be2b9eaf80",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-102",
+      "sourceUnitDigest": "29fd80cd85f3529f3dcc99950563df4461655efc9d0550abe9dc52b199d07854",
+      "claimKind": "specification",
+      "targetOwner": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+      "targetAnchor": "unheaded-block-2",
+      "targetUnitDigest": "ae0e268fad727f5deda17cf43d013aa1710f5cea2506fdd844809c3c8e98511f",
+      "targetAncestry": [
+        "Added in candidate: Runner Pointers (implementation)"
+      ],
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
+      "rationale": "L10-14 / A31: every changed upstream span carried verbatim into mapped runner/root carrier; prior labelled truth corrections in the enclosing pointer list remain. Source and target unit digests disclose their inequality where applicable. Native identity resolved by the one sync at 2300d65571968bb3bcb80123a273272586e3f1db; pending independent review; no approval carry."
+    },
+    {
+      "claimId": "claim_40c0caf4bd105994712dd37578f27746",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "0064-hook-commit-để-lại-đèn-hoạt-động-riêng-không-ghi-main-checkoutlock-người-tranh-xét-record-theo-ttlms-của-chính-holder-checkpoint-dưới-merge-slot-giữ-main-mutex",
+      "sourceUnitDigest": "dbd2125739c4bcd43eae0e2abb00500fb4b4f309a84d2ba6ef751cc5141b674e",
+      "claimKind": "specification",
+      "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "targetAnchor": "0064-hook-commit-để-lại-đèn-hoạt-động-riêng-không-ghi-main-checkoutlock-người-tranh-xét-record-theo-ttlms-của-chính-holder-checkpoint-dưới-merge-slot-giữ-main-mutex",
+      "targetUnitDigest": "dbd2125739c4bcd43eae0e2abb00500fb4b4f309a84d2ba6ef751cc5141b674e",
+      "targetAncestry": [
+        "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)"
+      ],
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
+      "rationale": "L10-14 / A31: every changed upstream span carried verbatim into mapped runner/root carrier; prior labelled truth corrections in the enclosing pointer list remain. Source and target unit digests disclose their inequality where applicable. Native identity resolved by the one sync at 2300d65571968bb3bcb80123a273272586e3f1db; pending independent review; no approval carry."
+    },
+    {
+      "claimId": "claim_bbfca84de55fe9dfa387cd027bb818f7",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-330",
+      "sourceUnitDigest": "2b6d9c95cda4a9c5c9e36a2acd67da0f030a9cfd01e83e7932e10cdbcd814ce8",
+      "claimKind": "specification",
+      "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "targetAnchor": "unheaded-block-190",
+      "targetUnitDigest": "2b6d9c95cda4a9c5c9e36a2acd67da0f030a9cfd01e83e7932e10cdbcd814ce8",
+      "targetAncestry": [
+        "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "0064 — Hook commit để lại đèn hoạt động riêng, không ghi `main-checkout.lock`; người tranh xét record theo `ttlMs` của chính holder; checkpoint dưới merge slot giữ main mutex"
+      ],
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
+      "rationale": "L10-14 / A31: every changed upstream span carried verbatim into mapped runner/root carrier; prior labelled truth corrections in the enclosing pointer list remain. Source and target unit digests disclose their inequality where applicable. Native identity resolved by the one sync at 2300d65571968bb3bcb80123a273272586e3f1db; pending independent review; no approval carry."
     }
   ],
   "registryGaps": [
@@ -15212,6 +15257,43 @@
       "reviewEntryId": "gap-claim_d5ba1eda7530b865fec747ee0adbc102",
       "evidenceDigest": "a98c12de95095279fbfc6d85b3811beb9857ac21ed752da2f92d77b69c4d3044",
       "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
+    },
+    {
+      "claimId": "claim_41571c8f42f542be1f44c9371fad823a",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceUnitDigest": "1b272bfab383f72def5df026184449f797cb7723c812253713808d6aed302988",
+      "disposition": "partial-carry",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-52",
+      "targetUnitDigest": "325f9c8c7a59c1dfe6ece4b1b20bb12769d8239db1ad80a0e8c3b20d236ea62c",
+      "targetAncestry": [
+        "Spec: Runner (vòng tự hành)",
+        "Behaviors & Operations",
+        "Khóa hoạt động cây chính — chặn commit trần khi phiên khác đang hoạt động (STR65)"
+      ],
+      "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
+      "reviewStatus": "pending",
+      "rationale": "A22/A34 at SYNC 2300d65571968bb3bcb80123a273272586e3f1db: native predecessor gap preserved; upstream rewrote historical lines. Verbatim untransferred residual retained, independent A34 acceptance required; blocks cutover. Full source/successor and residual evidence: step10-sync2300-predecessor-residuals.json. No identity graft or approval carry.",
+      "reviewNote": "Pending independent deep review; source history and current successor are separate native identities.",
+      "remainder": "Verbatim untransferred historical lines in plans/260925-documentation-authority-unification/reports/phase-06/step10-sync2300-predecessor-residuals.json, claim claim_41571c8f42f542be1f44c9371fad823a; row residual SHA256 6bc73a238975f903fb15b4a025ed8df0aa64a628bd8b536e99f6b23e2d3cf64b; source 1b272bfab383f72def5df026184449f797cb7723c812253713808d6aed302988; primary target 325f9c8c7a59c1dfe6ece4b1b20bb12769d8239db1ad80a0e8c3b20d236ea62c. File digest recorded in predecessor reconciliation receipt. Independent A34 acceptance pending; blocks cutover. Residual file SHA256 69c36aaa9da6dba4accb7795c09b45b60456e1d01a25953d18d2483dff848173."
+    },
+    {
+      "claimId": "claim_a64fabc06da00bb0eb8dfaba5ea0c1a6",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceUnitDigest": "b323720a9d4e93b156af47db347755f342dd8ad9fb9720466bb161732ebef4e3",
+      "disposition": "partial-carry",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-102",
+      "targetUnitDigest": "29fd80cd85f3529f3dcc99950563df4461655efc9d0550abe9dc52b199d07854",
+      "targetAncestry": [
+        "Spec: Runner (vòng tự hành)",
+        "Pointers (implementation)"
+      ],
+      "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
+      "reviewStatus": "pending",
+      "rationale": "A22/A34 at SYNC 2300d65571968bb3bcb80123a273272586e3f1db: native predecessor gap preserved; upstream rewrote historical lines. Verbatim untransferred residual retained, independent A34 acceptance required; blocks cutover. Full source/successor and residual evidence: step10-sync2300-predecessor-residuals.json. No identity graft or approval carry.",
+      "reviewNote": "Pending independent deep review; source history and current successor are separate native identities.",
+      "remainder": "Verbatim untransferred historical lines in plans/260925-documentation-authority-unification/reports/phase-06/step10-sync2300-predecessor-residuals.json, claim claim_a64fabc06da00bb0eb8dfaba5ea0c1a6; row residual SHA256 c5271a959105c72b8e294bcc7397b70e7e83edfcedb0b74a750863741a8fabc6; source b323720a9d4e93b156af47db347755f342dd8ad9fb9720466bb161732ebef4e3; primary target 29fd80cd85f3529f3dcc99950563df4461655efc9d0550abe9dc52b199d07854. File digest recorded in predecessor reconciliation receipt. Independent A34 acceptance pending; blocks cutover. Residual file SHA256 69c36aaa9da6dba4accb7795c09b45b60456e1d01a25953d18d2483dff848173."
     }
   ],
   "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-rationale-rereview-b80e8c16c.md"

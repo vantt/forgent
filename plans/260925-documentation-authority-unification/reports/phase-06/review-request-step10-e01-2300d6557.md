@@ -1,0 +1,8550 @@
+# Confinement carry and source re-decisions — part 1
+
+One replacement review request; entries 1–42 of section e. **42 entries**. Content and SYNC `2300d65571968bb3bcb80123a273272586e3f1db`; comparison base `980cb29312b8701f5ea639278f44e1a57a6e5c02`. [Single index](review-request-step10-index-2300d6557.md). Old requests packaged at `8d38b18ed` are superseded. No producer seed or verdict.
+
+Current decision and current witness fields take precedence over explicitly preserved historical records. Every rebound row is pending; old reviewed fields occur only inside historical before records. A36 deep lists are in [A36](step10-sync2300-A36.json); all truth corrections, all partial carries and all unequal source/target rows require deep review.
+
+## Entry e-001: verbatim-carry
+
+```json
+{
+  "kind": "verbatim-carry",
+  "SYNC": "17b751966",
+  "source": "docs/specs/confinement-authority.md",
+  "target": "docs/platform/agent-confinement/spec.md",
+  "map": "plans/260925-documentation-authority-unification/ledger/area-map-specs-ui.md:7",
+  "unit": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-113",
+    "githubAnchor": "unheaded-block-113",
+    "stableAnchor": "unheaded-block-113",
+    "title": "Unheaded block 113",
+    "startLine": 1104,
+    "endLine": 1104,
+    "textDigest": "a7af69f1674754e516550a8802a2acc64dd3a49655a4cdd01fa82d43a540d5ed",
+    "sample": "**Gắn home với tiến trình đang chạy worker (binding, 2026-10-15).** Authority cấp cho mỗi dispatch đã prepare hai hàm `bind`/`markLaunched` (`drivers/bwrap.mjs`, gom qua `bindingFo",
+    "identityFingerprint": "366466fa3653ce725f560e106699a897d40f8681ab982ea93931357b67616fcc",
+    "text": "**Gắn home với tiến trình đang chạy worker (binding, 2026-10-15).** Authority cấp cho mỗi dispatch đã prepare hai hàm `bind`/`markLaunched` (`drivers/bwrap.mjs`, gom qua `bindingForPrepared` ở `authority.mjs`); adapter chỉ gọi hàm, không thấy đường dẫn home, không tự ghi marker. Round herdr confined (mọi round, có assignment hay không) gọi `bind` trước `pane run` với `paneId`, endpoint herdr mà client của round thật sự dùng (`herdrEndpoint` = socket path từ env của client, hoặc socket của session nó đặt tên, hoặc socket mặc định herdr tự rơi về; `herdrSession` chỉ khi env có đặt tên), `binderPid` + `binderStartTime` của controller và `boundAt`; ghi atomic (tmp + rename). Ghi không được thì đóng pane, round fail trước khi có worker. Ngay trước `pane run` (hoặc khi round resume thấy worker đã chạy) ghi `launchedAt`. Round cli-spawn confined gắn home với run supervisor tách rời ngay khi supervisor khởi động (`binderPid` = pid supervisor, không có pane); ghi không được thì báo mã `confinement-bind-failed` và giữ marker như prepare (supervisor đã chạy rồi). Luật reaper cho marker đã bind mà chưa `retainedAt`: binder còn sống (pid + start time) thì giữ tới `boundAt + max(maxAgeMs, 2 phút launch grace + run timeout + 10 phút settle)` bất kể pane trả lời gì; binder chết hoặc quá cửa sổ thì: không có pane → dọn; có pane mà chưa `launchedAt` và binder chết → dọn và đóng pane rỗng; còn lại hỏi pane trên endpoint đã ghi (true giữ, null theo luật hết hạn, false dọn). Marker `retainedAt` giữ luật pane cũ, nhưng giờ hỏi được cả round default-session nhờ endpoint đã ghi. Trước khi xoá, reaper đọc lại marker; khác với bản nó đã dựa vào để quyết thì bỏ qua lượt này. Finalizer chấp nhận đúng các field binding (`paneId`, `herdrEndpoint`, `herdrSession`, `binderPid`, `binderStartTime`, `boundAt`, `launchedAt`) cộng `credentialKept` là thay đổi sau prepare; mọi thay đổi khác vẫn là `ownership-marker-mismatch`. Chưa có (để cho run supervisor + holder-lock): từ chối bind khi home đã quá cửa sổ run tính từ lúc tạo, kiểm trước/sau launch, claim độc quyền khi reap; nên khe \"reaper đã đọc lại xong, controller bind + launch ngay trước lúc xoá\" (RT2-1) vẫn còn."
+  },
+  "priorSource": "`finally`; partial prepare cũng phải cung cấp cleanup handle như quy định ở\n§6.5. Startup reaper nhận diện resource tạm qua dispatch id và dọn phần còn\nlại. Cleanup failure không được biến execution chưa rõ thành thành công, và\nkhông được che mất execution result đã có. Nếu Authority crash sau khi prepare,\nrun record giữ phase cuối cùng và reaper xử lý resource chưa dọn.\n\nReaper và recovery hỏi đúng herdr session mà worker được khởi chạy trong đó: bản ghi launch command và ownership marker của home được giữ lại mang `herdrSession` (socket suy ra từ tên, không lưu), `reconcile` dựng client theo session đó, reaper dùng `FGOS_HERDR_BIN` và cùng session; marker không có session thì trạng thái pane là không rõ và quy tắc hết hạn quyết định.\n\nVới profile remote/container detached, Authority cấp resource identity và ghi allocation intent bền vững trước mỗi\nside effect prepare; driver tạo theo identity đó một cách idempotent. Journal\nghi dispatch id, backend snapshot reference, resource locator, lease/execution\nidentity và trạng thái allocation/collection/cleanup, không chứa credential.\nCallback cleanup chỉ là tối ưu trong process; recovery không phụ thuộc callback.\nReaper phải lấy recovery lease độc quyền, kiểm tra liveness bằng execution\nidentity chống PID reuse, dừng và xác nhận cả execution tree trước khi collect\nvà cleanup idempotent. Timeout/cancel cũng tuân cùng thứ tự. Không liên lạc được\nremote thì giữ unknown và cleanup pending, không suy agent đã dừng; reconnect\nhoặc backend lease-expiry có proof mới cho phép dọn. Resource chưa collect được",
+  "action": "Carry complete new unit verbatim into mapped section in docs turn, label addition, preserve predecessor identities; next package turn native sync/rebind and independent review. Do not inherit approval.",
+  "execution": {
+    "targetSHA256": "36c3552767fdf9acd5748cf5d85861091cdb48688fc9ee8cbe1117a2995b38b9",
+    "verbatim": true,
+    "placement": "After the existing Reaper và recovery paragraph in §8.6; earlier text retained.",
+    "binding": "Pending; all changed target digests and shifted anchors must be rebound by native --rebind in the package turn. No new native identity inferred before sync. Predecessor identities retained.",
+    "nativeSyncCount": 0,
+    "reviewStatus": "pending",
+    "workingTargetBinding": {
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-47",
+      "unitDigest": "a7af69f1674754e516550a8802a2acc64dd3a49655a4cdd01fa82d43a540d5ed",
+      "startLine": 370,
+      "endLine": 370,
+      "nativeClaimId": null,
+      "status": "working text binding only; native sync/rebind next turn; pending independent review"
+    }
+  },
+  "packageNativeBinding": {
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "sourceRows": [
+      {
+        "sourcePath": "docs/specs/confinement-authority.md",
+        "unitDigest": "366466fa3653ce725f560e106699a897d40f8681ab982ea93931357b67616fcc",
+        "identityFingerprint": "366466fa3653ce725f560e106699a897d40f8681ab982ea93931357b67616fcc",
+        "claimId": "claim_d572bb9dc8501362ae23e6d4a71975d2",
+        "sourceAnchor": "unheaded-block-113",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "a7af69f1674754e516550a8802a2acc64dd3a49655a4cdd01fa82d43a540d5ed",
+        "claimKind": "specification",
+        "status": "current",
+        "origin": "added-since-b80e8c16c94cb04c80cc4e858933a9b2a04ddc60"
+      }
+    ],
+    "targetRows": [
+      {
+        "sourcePath": "docs/platform/agent-confinement/spec.md",
+        "unitDigest": "366466fa3653ce725f560e106699a897d40f8681ab982ea93931357b67616fcc",
+        "identityFingerprint": "366466fa3653ce725f560e106699a897d40f8681ab982ea93931357b67616fcc",
+        "claimId": "claim_339635aad9f4cdcf889b1181ea29d9bd",
+        "sourceAnchor": "unheaded-block-47",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "a7af69f1674754e516550a8802a2acc64dd3a49655a4cdd01fa82d43a540d5ed",
+        "claimKind": "specification",
+        "status": "future",
+        "origin": "added-since-b80e8c16c94cb04c80cc4e858933a9b2a04ddc60"
+      }
+    ],
+    "sourceUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-113",
+      "githubAnchor": "unheaded-block-113",
+      "stableAnchor": "unheaded-block-113",
+      "title": "Unheaded block 113",
+      "startLine": 1104,
+      "endLine": 1104,
+      "textDigest": "a7af69f1674754e516550a8802a2acc64dd3a49655a4cdd01fa82d43a540d5ed",
+      "sample": "**Gắn home với tiến trình đang chạy worker (binding, 2026-10-15).** Authority cấp cho mỗi dispatch đã prepare hai hàm `bind`/`markLaunched` (`drivers/bwrap.mjs`, gom qua `bindingFo",
+      "identityFingerprint": "366466fa3653ce725f560e106699a897d40f8681ab982ea93931357b67616fcc",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "8. Policy resolution và edge cases",
+        "8.6 Crash và cleanup"
+      ],
+      "text": "**Gắn home với tiến trình đang chạy worker (binding, 2026-10-15).** Authority cấp cho mỗi dispatch đã prepare hai hàm `bind`/`markLaunched` (`drivers/bwrap.mjs`, gom qua `bindingForPrepared` ở `authority.mjs`); adapter chỉ gọi hàm, không thấy đường dẫn home, không tự ghi marker. Round herdr confined (mọi round, có assignment hay không) gọi `bind` trước `pane run` với `paneId`, endpoint herdr mà client của round thật sự dùng (`herdrEndpoint` = socket path từ env của client, hoặc socket của session nó đặt tên, hoặc socket mặc định herdr tự rơi về; `herdrSession` chỉ khi env có đặt tên), `binderPid` + `binderStartTime` của controller và `boundAt`; ghi atomic (tmp + rename). Ghi không được thì đóng pane, round fail trước khi có worker. Ngay trước `pane run` (hoặc khi round resume thấy worker đã chạy) ghi `launchedAt`. Round cli-spawn confined gắn home với run supervisor tách rời ngay khi supervisor khởi động (`binderPid` = pid supervisor, không có pane); ghi không được thì báo mã `confinement-bind-failed` và giữ marker như prepare (supervisor đã chạy rồi). Luật reaper cho marker đã bind mà chưa `retainedAt`: binder còn sống (pid + start time) thì giữ tới `boundAt + max(maxAgeMs, 2 phút launch grace + run timeout + 10 phút settle)` bất kể pane trả lời gì; binder chết hoặc quá cửa sổ thì: không có pane → dọn; có pane mà chưa `launchedAt` và binder chết → dọn và đóng pane rỗng; còn lại hỏi pane trên endpoint đã ghi (true giữ, null theo luật hết hạn, false dọn). Marker `retainedAt` giữ luật pane cũ, nhưng giờ hỏi được cả round default-session nhờ endpoint đã ghi. Trước khi xoá, reaper đọc lại marker; khác với bản nó đã dựa vào để quyết thì bỏ qua lượt này. Finalizer chấp nhận đúng các field binding (`paneId`, `herdrEndpoint`, `herdrSession`, `binderPid`, `binderStartTime`, `boundAt`, `launchedAt`) cộng `credentialKept` là thay đổi sau prepare; mọi thay đổi khác vẫn là `ownership-marker-mismatch`. Chưa có (để cho run supervisor + holder-lock): từ chối bind khi home đã quá cửa sổ run tính từ lúc tạo, kiểm trước/sau launch, claim độc quyền khi reap; nên khe \"reaper đã đọc lại xong, controller bind + launch ngay trước lúc xoá\" (RT2-1) vẫn còn."
+    },
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-47",
+      "githubAnchor": "unheaded-block-47",
+      "stableAnchor": "unheaded-block-47",
+      "title": "Unheaded block 47",
+      "startLine": 370,
+      "endLine": 370,
+      "textDigest": "a7af69f1674754e516550a8802a2acc64dd3a49655a4cdd01fa82d43a540d5ed",
+      "sample": "**Gắn home với tiến trình đang chạy worker (binding, 2026-10-15).** Authority cấp cho mỗi dispatch đã prepare hai hàm `bind`/`markLaunched` (`drivers/bwrap.mjs`, gom qua `bindingFo",
+      "identityFingerprint": "366466fa3653ce725f560e106699a897d40f8681ab982ea93931357b67616fcc",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "8. Policy resolution và edge cases",
+        "8.6 Crash và cleanup"
+      ],
+      "text": "**Gắn home với tiến trình đang chạy worker (binding, 2026-10-15).** Authority cấp cho mỗi dispatch đã prepare hai hàm `bind`/`markLaunched` (`drivers/bwrap.mjs`, gom qua `bindingForPrepared` ở `authority.mjs`); adapter chỉ gọi hàm, không thấy đường dẫn home, không tự ghi marker. Round herdr confined (mọi round, có assignment hay không) gọi `bind` trước `pane run` với `paneId`, endpoint herdr mà client của round thật sự dùng (`herdrEndpoint` = socket path từ env của client, hoặc socket của session nó đặt tên, hoặc socket mặc định herdr tự rơi về; `herdrSession` chỉ khi env có đặt tên), `binderPid` + `binderStartTime` của controller và `boundAt`; ghi atomic (tmp + rename). Ghi không được thì đóng pane, round fail trước khi có worker. Ngay trước `pane run` (hoặc khi round resume thấy worker đã chạy) ghi `launchedAt`. Round cli-spawn confined gắn home với run supervisor tách rời ngay khi supervisor khởi động (`binderPid` = pid supervisor, không có pane); ghi không được thì báo mã `confinement-bind-failed` và giữ marker như prepare (supervisor đã chạy rồi). Luật reaper cho marker đã bind mà chưa `retainedAt`: binder còn sống (pid + start time) thì giữ tới `boundAt + max(maxAgeMs, 2 phút launch grace + run timeout + 10 phút settle)` bất kể pane trả lời gì; binder chết hoặc quá cửa sổ thì: không có pane → dọn; có pane mà chưa `launchedAt` và binder chết → dọn và đóng pane rỗng; còn lại hỏi pane trên endpoint đã ghi (true giữ, null theo luật hết hạn, false dọn). Marker `retainedAt` giữ luật pane cũ, nhưng giờ hỏi được cả round default-session nhờ endpoint đã ghi. Trước khi xoá, reaper đọc lại marker; khác với bản nó đã dựa vào để quyết thì bỏ qua lượt này. Finalizer chấp nhận đúng các field binding (`paneId`, `herdrEndpoint`, `herdrSession`, `binderPid`, `binderStartTime`, `boundAt`, `launchedAt`) cộng `credentialKept` là thay đổi sau prepare; mọi thay đổi khác vẫn là `ownership-marker-mismatch`. Chưa có (để cho run supervisor + holder-lock): từ chối bind khi home đã quá cửa sổ run tính từ lúc tạo, kiểm trước/sau launch, claim độc quyền khi reap; nên khe \"reaper đã đọc lại xong, controller bind + launch ngay trước lúc xoá\" (RT2-1) vẫn còn."
+    },
+    "uniqueSourceAndTarget": true,
+    "fullDigest": "a7af69f1674754e516550a8802a2acc64dd3a49655a4cdd01fa82d43a540d5ed",
+    "ledgerDecisionAuthored": true,
+    "reviewStatus": "pending independent review",
+    "note": "Native source paragraph has an explicit pending decision in s10-confinement-binding.json. Current package re-decides section claim_46c173; no approval carry."
+  }
+}
+```
+
+## Entry e-002: claim_46c173824da77fbf25f59072ae8e1620
+
+```json
+{
+  "kind": "source-alias-comparison",
+  "claimId": "claim_46c173824da77fbf25f59072ae8e1620",
+  "priorAnchor": "86-crash-và-cleanup",
+  "priorDigest": "a021e5594432d44b1543517b1219a7406a72c4ba9503363e1f8eef3f8085524a",
+  "currentDigest": "018713d3e9d6a59a7fb677b2dfa0225a5461509d1b26c27c0cfde12103d9d67a",
+  "matchingCurrentAnchors": [],
+  "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval.",
+  "draftAliases": [
+    {
+      "aliasId": "step10-specs-0045",
+      "fromPath": "docs/specs/confinement-authority.md#86-crash-và-cleanup",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "86-crash-và-cleanup",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    }
+  ],
+  "currentNative": {
+    "sourcePath": "docs/specs/confinement-authority.md",
+    "unitDigest": "41121712d06197252202bc49af9d142924bce488f7bb894cc29771c49e15d5f4",
+    "identityFingerprint": "441230ba30298939db103b7e3881ba13af5d98c36ffb0a75a891f2b60a81c7e2",
+    "claimId": "claim_46c173824da77fbf25f59072ae8e1620",
+    "sourceAnchor": "86-crash-và-cleanup",
+    "unitKind": "heading",
+    "sourceUnitDigest": "018713d3e9d6a59a7fb677b2dfa0225a5461509d1b26c27c0cfde12103d9d67a",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "currentSourceUnit": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "8.6 Crash và cleanup",
+    "anchor": "86-crash-và-cleanup",
+    "githubAnchor": "86-crash-và-cleanup",
+    "stableAnchor": "h-1205ca9f66bb",
+    "startLine": 1084,
+    "endLine": 1084,
+    "textDigest": "018713d3e9d6a59a7fb677b2dfa0225a5461509d1b26c27c0cfde12103d9d67a",
+    "sample": "8.6 Crash và cleanup",
+    "sectionPayloadDigest": "7b0ab41c70e8c9929e8eabf4ce27fcb6002d42ffb743c088f8b515b41ee7dffb",
+    "followingBlockDigest": "237461836affe4167aaf89d08ee087d9de21a39a3afc2f10e54bfe6bcaeaeb2b",
+    "identityFingerprint": "441230ba30298939db103b7e3881ba13af5d98c36ffb0a75a891f2b60a81c7e2",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "8. Policy resolution và edge cases"
+    ],
+    "text": "### 8.6 Crash và cleanup",
+    "sectionText": "### 8.6 Crash và cleanup\n\nNghĩa vụ chung của Authority là giữ evidence/ownership identity và chỉ cho phép\ndọn sau khi execution đã dừng; recovery mechanics được chọn theo driver profile.\nLocal-bwrap-v1 dùng thư mục tạm theo dispatchId tạo dưới trusted root, ownership\nmarker trước allocation, finally và startup reaper idempotent. Reaper kiểm tra\nprocess identity/liveness (không chỉ PID trần) trước khi dọn; host-disk private\nhome không tự biến mất khi process exit. Không cần remote lease/journal engine\ncho default local. Phần journal/lease dưới đây áp dụng profile có resource sống\nngoài process local (remote/container detached), không phải gate chung của S4.\n\nAttestation `prepared` được ghi trước adapter call. Cleanup chạy trong\n`finally`; partial prepare cũng phải cung cấp cleanup handle như quy định ở\n§6.5. Startup reaper nhận diện resource tạm qua dispatch id và dọn phần còn\nlại. Cleanup failure không được biến execution chưa rõ thành thành công, và\nkhông được che mất execution result đã có. Nếu Authority crash sau khi prepare,\nrun record giữ phase cuối cùng và reaper xử lý resource chưa dọn.\n\nReaper và recovery hỏi đúng herdr session mà worker được khởi chạy trong đó: bản ghi launch command và ownership marker của home được giữ lại mang `herdrSession` (socket suy ra từ tên, không lưu), `reconcile` dựng client theo session đó, reaper dùng `FGOS_HERDR_BIN` và cùng session; marker không có session thì trạng thái pane là không rõ và quy tắc hết hạn quyết định.\n\n**Gắn home với tiến trình đang chạy worker (binding, 2026-10-15).** Authority cấp cho mỗi dispatch đã prepare hai hàm `bind`/`markLaunched` (`drivers/bwrap.mjs`, gom qua `bindingForPrepared` ở `authority.mjs`); adapter chỉ gọi hàm, không thấy đường dẫn home, không tự ghi marker. Round herdr confined (mọi round, có assignment hay không) gọi `bind` trước `pane run` với `paneId`, endpoint herdr mà client của round thật sự dùng (`herdrEndpoint` = socket path từ env của client, hoặc socket của session nó đặt tên, hoặc socket mặc định herdr tự rơi về; `herdrSession` chỉ khi env có đặt tên), `binderPid` + `binderStartTime` của controller và `boundAt`; ghi atomic (tmp + rename). Ghi không được thì đóng pane, round fail trước khi có worker. Ngay trước `pane run` (hoặc khi round resume thấy worker đã chạy) ghi `launchedAt`. Round cli-spawn confined gắn home với run supervisor tách rời ngay khi supervisor khởi động (`binderPid` = pid supervisor, không có pane); ghi không được thì báo mã `confinement-bind-failed` và giữ marker như prepare (supervisor đã chạy rồi). Luật reaper cho marker đã bind mà chưa `retainedAt`: binder còn sống (pid + start time) thì giữ tới `boundAt + max(maxAgeMs, 2 phút launch grace + run timeout + 10 phút settle)` bất kể pane trả lời gì; binder chết hoặc quá cửa sổ thì: không có pane → dọn; có pane mà chưa `launchedAt` và binder chết → dọn và đóng pane rỗng; còn lại hỏi pane trên endpoint đã ghi (true giữ, null theo luật hết hạn, false dọn). Marker `retainedAt` giữ luật pane cũ, nhưng giờ hỏi được cả round default-session nhờ endpoint đã ghi. Trước khi xoá, reaper đọc lại marker; khác với bản nó đã dựa vào để quyết thì bỏ qua lượt này. Finalizer chấp nhận đúng các field binding (`paneId`, `herdrEndpoint`, `herdrSession`, `binderPid`, `binderStartTime`, `boundAt`, `launchedAt`) cộng `credentialKept` là thay đổi sau prepare; mọi thay đổi khác vẫn là `ownership-marker-mismatch`. Chưa có (để cho run supervisor + holder-lock): từ chối bind khi home đã quá cửa sổ run tính từ lúc tạo, kiểm trước/sau launch, claim độc quyền khi reap; nên khe \"reaper đã đọc lại xong, controller bind + launch ngay trước lúc xoá\" (RT2-1) vẫn còn.\n\nVới profile remote/container detached, Authority cấp resource identity và ghi allocation intent bền vững trước mỗi\nside effect prepare; driver tạo theo identity đó một cách idempotent. Journal\nghi dispatch id, backend snapshot reference, resource locator, lease/execution\nidentity và trạng thái allocation/collection/cleanup, không chứa credential.\nCallback cleanup chỉ là tối ưu trong process; recovery không phụ thuộc callback.\nReaper phải lấy recovery lease độc quyền, kiểm tra liveness bằng execution\nidentity chống PID reuse, dừng và xác nhận cả execution tree trước khi collect\nvà cleanup idempotent. Timeout/cancel cũng tuân cùng thứ tự. Không liên lạc được\nremote thì giữ unknown và cleanup pending, không suy agent đã dừng; reconnect\nhoặc backend lease-expiry có proof mới cho phép dọn. Resource chưa collect được\ngiữ cho recovery, không xóa vì agent đã exit. Startup reaper dùng cùng registry\nsetup/doctor; backend không có recovery contract này chưa được nhận required.\n\nLocal profile chỉ phải đáp ứng invariants ownership/liveness/idempotence nêu\ntrên, không phải triển khai journal/lease schema của remote."
+  },
+  "currentTargetComparisons": [
+    {
+      "aliasId": "step10-specs-0045",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "86-crash-và-cleanup",
+      "unit": {
+        "unitKind": "heading",
+        "level": 3,
+        "title": "8.6 Crash và cleanup",
+        "anchor": "86-crash-và-cleanup",
+        "githubAnchor": "86-crash-và-cleanup",
+        "stableAnchor": "h-d76fbbdc6f2f",
+        "startLine": 348,
+        "endLine": 348,
+        "textDigest": "c3306e72572f72945df91c96305a90f6835935407a5d2027b1b60aad89695133",
+        "sample": "8.6 Crash và cleanup",
+        "sectionPayloadDigest": "6ad22d623e5bbbe5815d1aa4bf27adff6fd3ed5f57e234b40c1bc35b86a9aa42",
+        "followingBlockDigest": "237461836affe4167aaf89d08ee087d9de21a39a3afc2f10e54bfe6bcaeaeb2b",
+        "identityFingerprint": "c4e561fb2eb468c282be4fcd119a69b37cb1cc3bf20272269d17feb11ac2ce1a",
+        "ancestry": [
+          "Spec: Agent Confinement Authority",
+          "8. Policy resolution và edge cases"
+        ],
+        "text": "### 8.6 Crash và cleanup",
+        "sectionText": "### 8.6 Crash và cleanup\n\nNghĩa vụ chung của Authority là giữ evidence/ownership identity và chỉ cho phép\ndọn sau khi execution đã dừng; recovery mechanics được chọn theo driver profile.\nLocal-bwrap-v1 dùng thư mục tạm theo dispatchId tạo dưới trusted root, ownership\nmarker trước allocation, finally và startup reaper idempotent. Reaper kiểm tra\nprocess identity/liveness (không chỉ PID trần) trước khi dọn; host-disk private\nhome không tự biến mất khi process exit. Không cần remote lease/journal engine\ncho default local. Phần journal/lease dưới đây áp dụng profile có resource sống\nngoài process local (remote/container detached), không phải gate chung của S4.\n\nAttestation `prepared` được ghi trước adapter call. Cleanup chạy trong\n`finally`; partial prepare cũng phải cung cấp cleanup handle như quy định ở\n§6.5. Startup reaper nhận diện resource tạm qua dispatch id và dọn phần còn\nlại. Cleanup failure không được biến execution chưa rõ thành thành công, và\nkhông được che mất execution result đã có. Nếu Authority crash sau khi prepare,\nrun record giữ phase cuối cùng và reaper xử lý resource chưa dọn.\n\nReaper và recovery hỏi đúng herdr session mà worker được khởi chạy trong đó: bản ghi launch command và ownership marker của home được giữ lại mang `herdrSession` (socket suy ra từ tên, không lưu), `reconcile` dựng client theo session đó, reaper dùng `FGOS_HERDR_BIN` và cùng session; marker không có session thì trạng thái pane là không rõ và quy tắc hết hạn quyết định.\n\nAdded in candidate — verbatim binding addition from the final main sync (2026-10-15); pending independent review:\n\n**Gắn home với tiến trình đang chạy worker (binding, 2026-10-15).** Authority cấp cho mỗi dispatch đã prepare hai hàm `bind`/`markLaunched` (`drivers/bwrap.mjs`, gom qua `bindingForPrepared` ở `authority.mjs`); adapter chỉ gọi hàm, không thấy đường dẫn home, không tự ghi marker. Round herdr confined (mọi round, có assignment hay không) gọi `bind` trước `pane run` với `paneId`, endpoint herdr mà client của round thật sự dùng (`herdrEndpoint` = socket path từ env của client, hoặc socket của session nó đặt tên, hoặc socket mặc định herdr tự rơi về; `herdrSession` chỉ khi env có đặt tên), `binderPid` + `binderStartTime` của controller và `boundAt`; ghi atomic (tmp + rename). Ghi không được thì đóng pane, round fail trước khi có worker. Ngay trước `pane run` (hoặc khi round resume thấy worker đã chạy) ghi `launchedAt`. Round cli-spawn confined gắn home với run supervisor tách rời ngay khi supervisor khởi động (`binderPid` = pid supervisor, không có pane); ghi không được thì báo mã `confinement-bind-failed` và giữ marker như prepare (supervisor đã chạy rồi). Luật reaper cho marker đã bind mà chưa `retainedAt`: binder còn sống (pid + start time) thì giữ tới `boundAt + max(maxAgeMs, 2 phút launch grace + run timeout + 10 phút settle)` bất kể pane trả lời gì; binder chết hoặc quá cửa sổ thì: không có pane → dọn; có pane mà chưa `launchedAt` và binder chết → dọn và đóng pane rỗng; còn lại hỏi pane trên endpoint đã ghi (true giữ, null theo luật hết hạn, false dọn). Marker `retainedAt` giữ luật pane cũ, nhưng giờ hỏi được cả round default-session nhờ endpoint đã ghi. Trước khi xoá, reaper đọc lại marker; khác với bản nó đã dựa vào để quyết thì bỏ qua lượt này. Finalizer chấp nhận đúng các field binding (`paneId`, `herdrEndpoint`, `herdrSession`, `binderPid`, `binderStartTime`, `boundAt`, `launchedAt`) cộng `credentialKept` là thay đổi sau prepare; mọi thay đổi khác vẫn là `ownership-marker-mismatch`. Chưa có (để cho run supervisor + holder-lock): từ chối bind khi home đã quá cửa sổ run tính từ lúc tạo, kiểm trước/sau launch, claim độc quyền khi reap; nên khe \"reaper đã đọc lại xong, controller bind + launch ngay trước lúc xoá\" (RT2-1) vẫn còn.\n\nVới profile remote/container detached, Authority cấp resource identity và ghi allocation intent bền vững trước mỗi\nside effect prepare; driver tạo theo identity đó một cách idempotent. Journal\nghi dispatch id, backend snapshot reference, resource locator, lease/execution\nidentity và trạng thái allocation/collection/cleanup, không chứa credential.\nCallback cleanup chỉ là tối ưu trong process; recovery không phụ thuộc callback.\nReaper phải lấy recovery lease độc quyền, kiểm tra liveness bằng execution\nidentity chống PID reuse, dừng và xác nhận cả execution tree trước khi collect\nvà cleanup idempotent. Timeout/cancel cũng tuân cùng thứ tự. Không liên lạc được\nremote thì giữ unknown và cleanup pending, không suy agent đã dừng; reconnect\nhoặc backend lease-expiry có proof mới cho phép dọn. Resource chưa collect được\ngiữ cho recovery, không xóa vì agent đã exit. Startup reaper dùng cùng registry\nsetup/doctor; backend không có recovery contract này chưa được nhận required.\n\nLocal profile chỉ phải đáp ứng invariants ownership/liveness/idempotence nêu\ntrên, không phải triển khai journal/lease schema của remote."
+      },
+      "uniqueSameDigestUnits": []
+    }
+  ],
+  "historicalPackageComparisons": {
+    "nativeIdentity": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "41121712d06197252202bc49af9d142924bce488f7bb894cc29771c49e15d5f4",
+      "identityFingerprint": "441230ba30298939db103b7e3881ba13af5d98c36ffb0a75a891f2b60a81c7e2",
+      "claimId": "claim_46c173824da77fbf25f59072ae8e1620",
+      "sourceAnchor": "86-crash-và-cleanup",
+      "unitKind": "heading",
+      "sourceUnitDigest": "018713d3e9d6a59a7fb677b2dfa0225a5461509d1b26c27c0cfde12103d9d67a",
+      "claimKind": "specification",
+      "status": "current",
+      "reviewStatus": "needs-review",
+      "lineage": {
+        "fromCommit": "b80e8c16c94cb04c80cc4e858933a9b2a04ddc60",
+        "fromUnitDigest": "9ec2e4cf7d052f2d2431402ad381cbba57372090bdfc3de0e134f85b191c5181",
+        "toUnitDigest": "41121712d06197252202bc49af9d142924bce488f7bb894cc29771c49e15d5f4",
+        "fromSourceUnitDigest": "a021e5594432d44b1543517b1219a7406a72c4ba9503363e1f8eef3f8085524a",
+        "toSourceUnitDigest": "018713d3e9d6a59a7fb677b2dfa0225a5461509d1b26c27c0cfde12103d9d67a"
+      }
+    },
+    "currentIdentityBinding": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "41121712d06197252202bc49af9d142924bce488f7bb894cc29771c49e15d5f4",
+      "identityFingerprint": "441230ba30298939db103b7e3881ba13af5d98c36ffb0a75a891f2b60a81c7e2",
+      "claimId": "claim_46c173824da77fbf25f59072ae8e1620",
+      "sourceAnchor": "86-crash-và-cleanup",
+      "unitKind": "heading",
+      "sourceUnitDigest": "018713d3e9d6a59a7fb677b2dfa0225a5461509d1b26c27c0cfde12103d9d67a",
+      "claimKind": "specification",
+      "status": "current",
+      "reviewStatus": "needs-review",
+      "lineage": {
+        "fromCommit": "b80e8c16c94cb04c80cc4e858933a9b2a04ddc60",
+        "fromUnitDigest": "9ec2e4cf7d052f2d2431402ad381cbba57372090bdfc3de0e134f85b191c5181",
+        "toUnitDigest": "41121712d06197252202bc49af9d142924bce488f7bb894cc29771c49e15d5f4",
+        "fromSourceUnitDigest": "a021e5594432d44b1543517b1219a7406a72c4ba9503363e1f8eef3f8085524a",
+        "toSourceUnitDigest": "018713d3e9d6a59a7fb677b2dfa0225a5461509d1b26c27c0cfde12103d9d67a"
+      }
+    },
+    "uniqueSameDigestBinding": null,
+    "currentUnitAtRetainedIdentity": {
+      "unitKind": "heading",
+      "level": 3,
+      "title": "8.6 Crash và cleanup",
+      "anchor": "86-crash-và-cleanup",
+      "githubAnchor": "86-crash-và-cleanup",
+      "stableAnchor": "h-1205ca9f66bb",
+      "startLine": 1084,
+      "endLine": 1084,
+      "textDigest": "018713d3e9d6a59a7fb677b2dfa0225a5461509d1b26c27c0cfde12103d9d67a",
+      "sample": "8.6 Crash và cleanup",
+      "sectionPayloadDigest": "7b0ab41c70e8c9929e8eabf4ce27fcb6002d42ffb743c088f8b515b41ee7dffb",
+      "followingBlockDigest": "237461836affe4167aaf89d08ee087d9de21a39a3afc2f10e54bfe6bcaeaeb2b",
+      "identityFingerprint": "441230ba30298939db103b7e3881ba13af5d98c36ffb0a75a891f2b60a81c7e2",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "8. Policy resolution và edge cases"
+      ],
+      "text": "### 8.6 Crash và cleanup",
+      "sectionText": "### 8.6 Crash và cleanup\n\nNghĩa vụ chung của Authority là giữ evidence/ownership identity và chỉ cho phép\ndọn sau khi execution đã dừng; recovery mechanics được chọn theo driver profile.\nLocal-bwrap-v1 dùng thư mục tạm theo dispatchId tạo dưới trusted root, ownership\nmarker trước allocation, finally và startup reaper idempotent. Reaper kiểm tra\nprocess identity/liveness (không chỉ PID trần) trước khi dọn; host-disk private\nhome không tự biến mất khi process exit. Không cần remote lease/journal engine\ncho default local. Phần journal/lease dưới đây áp dụng profile có resource sống\nngoài process local (remote/container detached), không phải gate chung của S4.\n\nAttestation `prepared` được ghi trước adapter call. Cleanup chạy trong\n`finally`; partial prepare cũng phải cung cấp cleanup handle như quy định ở\n§6.5. Startup reaper nhận diện resource tạm qua dispatch id và dọn phần còn\nlại. Cleanup failure không được biến execution chưa rõ thành thành công, và\nkhông được che mất execution result đã có. Nếu Authority crash sau khi prepare,\nrun record giữ phase cuối cùng và reaper xử lý resource chưa dọn.\n\nReaper và recovery hỏi đúng herdr session mà worker được khởi chạy trong đó: bản ghi launch command và ownership marker của home được giữ lại mang `herdrSession` (socket suy ra từ tên, không lưu), `reconcile` dựng client theo session đó, reaper dùng `FGOS_HERDR_BIN` và cùng session; marker không có session thì trạng thái pane là không rõ và quy tắc hết hạn quyết định.\n\n**Gắn home với tiến trình đang chạy worker (binding, 2026-10-15).** Authority cấp cho mỗi dispatch đã prepare hai hàm `bind`/`markLaunched` (`drivers/bwrap.mjs`, gom qua `bindingForPrepared` ở `authority.mjs`); adapter chỉ gọi hàm, không thấy đường dẫn home, không tự ghi marker. Round herdr confined (mọi round, có assignment hay không) gọi `bind` trước `pane run` với `paneId`, endpoint herdr mà client của round thật sự dùng (`herdrEndpoint` = socket path từ env của client, hoặc socket của session nó đặt tên, hoặc socket mặc định herdr tự rơi về; `herdrSession` chỉ khi env có đặt tên), `binderPid` + `binderStartTime` của controller và `boundAt`; ghi atomic (tmp + rename). Ghi không được thì đóng pane, round fail trước khi có worker. Ngay trước `pane run` (hoặc khi round resume thấy worker đã chạy) ghi `launchedAt`. Round cli-spawn confined gắn home với run supervisor tách rời ngay khi supervisor khởi động (`binderPid` = pid supervisor, không có pane); ghi không được thì báo mã `confinement-bind-failed` và giữ marker như prepare (supervisor đã chạy rồi). Luật reaper cho marker đã bind mà chưa `retainedAt`: binder còn sống (pid + start time) thì giữ tới `boundAt + max(maxAgeMs, 2 phút launch grace + run timeout + 10 phút settle)` bất kể pane trả lời gì; binder chết hoặc quá cửa sổ thì: không có pane → dọn; có pane mà chưa `launchedAt` và binder chết → dọn và đóng pane rỗng; còn lại hỏi pane trên endpoint đã ghi (true giữ, null theo luật hết hạn, false dọn). Marker `retainedAt` giữ luật pane cũ, nhưng giờ hỏi được cả round default-session nhờ endpoint đã ghi. Trước khi xoá, reaper đọc lại marker; khác với bản nó đã dựa vào để quyết thì bỏ qua lượt này. Finalizer chấp nhận đúng các field binding (`paneId`, `herdrEndpoint`, `herdrSession`, `binderPid`, `binderStartTime`, `boundAt`, `launchedAt`) cộng `credentialKept` là thay đổi sau prepare; mọi thay đổi khác vẫn là `ownership-marker-mismatch`. Chưa có (để cho run supervisor + holder-lock): từ chối bind khi home đã quá cửa sổ run tính từ lúc tạo, kiểm trước/sau launch, claim độc quyền khi reap; nên khe \"reaper đã đọc lại xong, controller bind + launch ngay trước lúc xoá\" (RT2-1) vẫn còn.\n\nVới profile remote/container detached, Authority cấp resource identity và ghi allocation intent bền vững trước mỗi\nside effect prepare; driver tạo theo identity đó một cách idempotent. Journal\nghi dispatch id, backend snapshot reference, resource locator, lease/execution\nidentity và trạng thái allocation/collection/cleanup, không chứa credential.\nCallback cleanup chỉ là tối ưu trong process; recovery không phụ thuộc callback.\nReaper phải lấy recovery lease độc quyền, kiểm tra liveness bằng execution\nidentity chống PID reuse, dừng và xác nhận cả execution tree trước khi collect\nvà cleanup idempotent. Timeout/cancel cũng tuân cùng thứ tự. Không liên lạc được\nremote thì giữ unknown và cleanup pending, không suy agent đã dừng; reconnect\nhoặc backend lease-expiry có proof mới cho phép dọn. Resource chưa collect được\ngiữ cho recovery, không xóa vì agent đã exit. Startup reaper dùng cùng registry\nsetup/doctor; backend không có recovery contract này chưa được nhận required.\n\nLocal profile chỉ phải đáp ứng invariants ownership/liveness/idempotence nêu\ntrên, không phải triển khai journal/lease schema của remote."
+    },
+    "sourceDigestUnchanged": false,
+    "status": "text edited or ambiguous; pending independent source judgment; no approval carry",
+    "aliasTargetComparisons": [
+      {
+        "aliasId": "step10-specs-0045",
+        "fromPath": "docs/specs/confinement-authority.md#86-crash-và-cleanup",
+        "toOwner": "docs/platform/agent-confinement/spec.md",
+        "toAnchor": "86-crash-và-cleanup",
+        "currentTargetAtDraftAnchor": {
+          "unitKind": "heading",
+          "level": 3,
+          "title": "8.6 Crash và cleanup",
+          "anchor": "86-crash-và-cleanup",
+          "githubAnchor": "86-crash-và-cleanup",
+          "stableAnchor": "h-d76fbbdc6f2f",
+          "startLine": 348,
+          "endLine": 348,
+          "textDigest": "c3306e72572f72945df91c96305a90f6835935407a5d2027b1b60aad89695133",
+          "sample": "8.6 Crash và cleanup",
+          "sectionPayloadDigest": "6ad22d623e5bbbe5815d1aa4bf27adff6fd3ed5f57e234b40c1bc35b86a9aa42",
+          "followingBlockDigest": "237461836affe4167aaf89d08ee087d9de21a39a3afc2f10e54bfe6bcaeaeb2b",
+          "identityFingerprint": "c4e561fb2eb468c282be4fcd119a69b37cb1cc3bf20272269d17feb11ac2ce1a",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "8. Policy resolution và edge cases"
+          ],
+          "text": "### 8.6 Crash và cleanup",
+          "sectionText": "### 8.6 Crash và cleanup\n\nNghĩa vụ chung của Authority là giữ evidence/ownership identity và chỉ cho phép\ndọn sau khi execution đã dừng; recovery mechanics được chọn theo driver profile.\nLocal-bwrap-v1 dùng thư mục tạm theo dispatchId tạo dưới trusted root, ownership\nmarker trước allocation, finally và startup reaper idempotent. Reaper kiểm tra\nprocess identity/liveness (không chỉ PID trần) trước khi dọn; host-disk private\nhome không tự biến mất khi process exit. Không cần remote lease/journal engine\ncho default local. Phần journal/lease dưới đây áp dụng profile có resource sống\nngoài process local (remote/container detached), không phải gate chung của S4.\n\nAttestation `prepared` được ghi trước adapter call. Cleanup chạy trong\n`finally`; partial prepare cũng phải cung cấp cleanup handle như quy định ở\n§6.5. Startup reaper nhận diện resource tạm qua dispatch id và dọn phần còn\nlại. Cleanup failure không được biến execution chưa rõ thành thành công, và\nkhông được che mất execution result đã có. Nếu Authority crash sau khi prepare,\nrun record giữ phase cuối cùng và reaper xử lý resource chưa dọn.\n\nReaper và recovery hỏi đúng herdr session mà worker được khởi chạy trong đó: bản ghi launch command và ownership marker của home được giữ lại mang `herdrSession` (socket suy ra từ tên, không lưu), `reconcile` dựng client theo session đó, reaper dùng `FGOS_HERDR_BIN` và cùng session; marker không có session thì trạng thái pane là không rõ và quy tắc hết hạn quyết định.\n\nAdded in candidate — verbatim binding addition from the final main sync (2026-10-15); pending independent review:\n\n**Gắn home với tiến trình đang chạy worker (binding, 2026-10-15).** Authority cấp cho mỗi dispatch đã prepare hai hàm `bind`/`markLaunched` (`drivers/bwrap.mjs`, gom qua `bindingForPrepared` ở `authority.mjs`); adapter chỉ gọi hàm, không thấy đường dẫn home, không tự ghi marker. Round herdr confined (mọi round, có assignment hay không) gọi `bind` trước `pane run` với `paneId`, endpoint herdr mà client của round thật sự dùng (`herdrEndpoint` = socket path từ env của client, hoặc socket của session nó đặt tên, hoặc socket mặc định herdr tự rơi về; `herdrSession` chỉ khi env có đặt tên), `binderPid` + `binderStartTime` của controller và `boundAt`; ghi atomic (tmp + rename). Ghi không được thì đóng pane, round fail trước khi có worker. Ngay trước `pane run` (hoặc khi round resume thấy worker đã chạy) ghi `launchedAt`. Round cli-spawn confined gắn home với run supervisor tách rời ngay khi supervisor khởi động (`binderPid` = pid supervisor, không có pane); ghi không được thì báo mã `confinement-bind-failed` và giữ marker như prepare (supervisor đã chạy rồi). Luật reaper cho marker đã bind mà chưa `retainedAt`: binder còn sống (pid + start time) thì giữ tới `boundAt + max(maxAgeMs, 2 phút launch grace + run timeout + 10 phút settle)` bất kể pane trả lời gì; binder chết hoặc quá cửa sổ thì: không có pane → dọn; có pane mà chưa `launchedAt` và binder chết → dọn và đóng pane rỗng; còn lại hỏi pane trên endpoint đã ghi (true giữ, null theo luật hết hạn, false dọn). Marker `retainedAt` giữ luật pane cũ, nhưng giờ hỏi được cả round default-session nhờ endpoint đã ghi. Trước khi xoá, reaper đọc lại marker; khác với bản nó đã dựa vào để quyết thì bỏ qua lượt này. Finalizer chấp nhận đúng các field binding (`paneId`, `herdrEndpoint`, `herdrSession`, `binderPid`, `binderStartTime`, `boundAt`, `launchedAt`) cộng `credentialKept` là thay đổi sau prepare; mọi thay đổi khác vẫn là `ownership-marker-mismatch`. Chưa có (để cho run supervisor + holder-lock): từ chối bind khi home đã quá cửa sổ run tính từ lúc tạo, kiểm trước/sau launch, claim độc quyền khi reap; nên khe \"reaper đã đọc lại xong, controller bind + launch ngay trước lúc xoá\" (RT2-1) vẫn còn.\n\nVới profile remote/container detached, Authority cấp resource identity và ghi allocation intent bền vững trước mỗi\nside effect prepare; driver tạo theo identity đó một cách idempotent. Journal\nghi dispatch id, backend snapshot reference, resource locator, lease/execution\nidentity và trạng thái allocation/collection/cleanup, không chứa credential.\nCallback cleanup chỉ là tối ưu trong process; recovery không phụ thuộc callback.\nReaper phải lấy recovery lease độc quyền, kiểm tra liveness bằng execution\nidentity chống PID reuse, dừng và xác nhận cả execution tree trước khi collect\nvà cleanup idempotent. Timeout/cancel cũng tuân cùng thứ tự. Không liên lạc được\nremote thì giữ unknown và cleanup pending, không suy agent đã dừng; reconnect\nhoặc backend lease-expiry có proof mới cho phép dọn. Resource chưa collect được\ngiữ cho recovery, không xóa vì agent đã exit. Startup reaper dùng cùng registry\nsetup/doctor; backend không có recovery contract này chưa được nhận required.\n\nLocal profile chỉ phải đáp ứng invariants ownership/liveness/idempotence nêu\ntrên, không phải triển khai journal/lease schema của remote."
+        },
+        "sourceTextDigestAtDraftTarget": false,
+        "uniqueSameTextCurrentTarget": null,
+        "note": "Read-only current source and target comparisons; draft unchanged. Source and target numbered-anchor relocation is not approval. Text corrections or source drift require independent judgment."
+      }
+    ]
+  },
+  "currentSourceDigestUnchanged": false
+}
+```
+
+## Entry e-003: claim_d7fa39da9698c447594edefdc44d7ce5
+
+```json
+{
+  "kind": "source-alias-comparison",
+  "claimId": "claim_d7fa39da9698c447594edefdc44d7ce5",
+  "priorAnchor": "unheaded-block-113",
+  "priorDigest": "a89aecc164ff54f3f6807a0d3231e27b4ca2c77c4e41fd121bbfdb18ea8024f0",
+  "currentDigest": "a7af69f1674754e516550a8802a2acc64dd3a49655a4cdd01fa82d43a540d5ed",
+  "matchingCurrentAnchors": [
+    "unheaded-block-114"
+  ],
+  "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval.",
+  "draftAliases": [
+    {
+      "aliasId": "step10-specs-0068",
+      "fromPath": "docs/specs/confinement-authority.md#unheaded-block-113",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-46",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    }
+  ],
+  "currentNative": {
+    "sourcePath": "docs/specs/confinement-authority.md",
+    "unitDigest": "50915dcd46d43dffa275812e2b7f5d7bb3dc97b5ab41900875cbc632e030bd25",
+    "identityFingerprint": "50915dcd46d43dffa275812e2b7f5d7bb3dc97b5ab41900875cbc632e030bd25",
+    "claimId": "claim_d7fa39da9698c447594edefdc44d7ce5",
+    "sourceAnchor": "unheaded-block-114",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "a89aecc164ff54f3f6807a0d3231e27b4ca2c77c4e41fd121bbfdb18ea8024f0",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "currentSourceUnit": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-114",
+    "githubAnchor": "unheaded-block-114",
+    "stableAnchor": "unheaded-block-114",
+    "title": "Unheaded block 114",
+    "startLine": 1106,
+    "endLine": 1117,
+    "textDigest": "a89aecc164ff54f3f6807a0d3231e27b4ca2c77c4e41fd121bbfdb18ea8024f0",
+    "sample": "Với profile remote/container detached, Authority cấp resource identity và ghi allocation intent bền vững trước mỗi\nside effect prepare; driver tạo theo identity đó một cách idempot",
+    "identityFingerprint": "50915dcd46d43dffa275812e2b7f5d7bb3dc97b5ab41900875cbc632e030bd25",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "8. Policy resolution và edge cases",
+      "8.6 Crash và cleanup"
+    ],
+    "text": "Với profile remote/container detached, Authority cấp resource identity và ghi allocation intent bền vững trước mỗi\nside effect prepare; driver tạo theo identity đó một cách idempotent. Journal\nghi dispatch id, backend snapshot reference, resource locator, lease/execution\nidentity và trạng thái allocation/collection/cleanup, không chứa credential.\nCallback cleanup chỉ là tối ưu trong process; recovery không phụ thuộc callback.\nReaper phải lấy recovery lease độc quyền, kiểm tra liveness bằng execution\nidentity chống PID reuse, dừng và xác nhận cả execution tree trước khi collect\nvà cleanup idempotent. Timeout/cancel cũng tuân cùng thứ tự. Không liên lạc được\nremote thì giữ unknown và cleanup pending, không suy agent đã dừng; reconnect\nhoặc backend lease-expiry có proof mới cho phép dọn. Resource chưa collect được\ngiữ cho recovery, không xóa vì agent đã exit. Startup reaper dùng cùng registry\nsetup/doctor; backend không có recovery contract này chưa được nhận required."
+  },
+  "currentTargetComparisons": [
+    {
+      "aliasId": "step10-specs-0068",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-46",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-46",
+        "githubAnchor": "unheaded-block-46",
+        "stableAnchor": "unheaded-block-46",
+        "title": "Unheaded block 46",
+        "startLine": 368,
+        "endLine": 368,
+        "textDigest": "46a48aa7b43dc72f68eee7332a4dfc62145204e16d4815016396a0bbb0ddb0b6",
+        "sample": "Added in candidate — verbatim binding addition from the final main sync (2026-10-15); pending independent review:",
+        "identityFingerprint": "2c9c66ffb68b052ba02e2c8f655eaa4731e19d4502bf34fafd37af0602bddaa5",
+        "ancestry": [
+          "Spec: Agent Confinement Authority",
+          "8. Policy resolution và edge cases",
+          "8.6 Crash và cleanup"
+        ],
+        "text": "Added in candidate — verbatim binding addition from the final main sync (2026-10-15); pending independent review:"
+      },
+      "uniqueSameDigestUnits": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-48",
+          "githubAnchor": "unheaded-block-48",
+          "stableAnchor": "unheaded-block-48",
+          "title": "Unheaded block 48",
+          "startLine": 372,
+          "endLine": 383,
+          "textDigest": "a89aecc164ff54f3f6807a0d3231e27b4ca2c77c4e41fd121bbfdb18ea8024f0",
+          "sample": "Với profile remote/container detached, Authority cấp resource identity và ghi allocation intent bền vững trước mỗi\nside effect prepare; driver tạo theo identity đó một cách idempot",
+          "identityFingerprint": "50915dcd46d43dffa275812e2b7f5d7bb3dc97b5ab41900875cbc632e030bd25",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "8. Policy resolution và edge cases",
+            "8.6 Crash và cleanup"
+          ],
+          "text": "Với profile remote/container detached, Authority cấp resource identity và ghi allocation intent bền vững trước mỗi\nside effect prepare; driver tạo theo identity đó một cách idempotent. Journal\nghi dispatch id, backend snapshot reference, resource locator, lease/execution\nidentity và trạng thái allocation/collection/cleanup, không chứa credential.\nCallback cleanup chỉ là tối ưu trong process; recovery không phụ thuộc callback.\nReaper phải lấy recovery lease độc quyền, kiểm tra liveness bằng execution\nidentity chống PID reuse, dừng và xác nhận cả execution tree trước khi collect\nvà cleanup idempotent. Timeout/cancel cũng tuân cùng thứ tự. Không liên lạc được\nremote thì giữ unknown và cleanup pending, không suy agent đã dừng; reconnect\nhoặc backend lease-expiry có proof mới cho phép dọn. Resource chưa collect được\ngiữ cho recovery, không xóa vì agent đã exit. Startup reaper dùng cùng registry\nsetup/doctor; backend không có recovery contract này chưa được nhận required."
+        }
+      ]
+    }
+  ],
+  "historicalPackageComparisons": {
+    "nativeIdentity": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "50915dcd46d43dffa275812e2b7f5d7bb3dc97b5ab41900875cbc632e030bd25",
+      "identityFingerprint": "50915dcd46d43dffa275812e2b7f5d7bb3dc97b5ab41900875cbc632e030bd25",
+      "claimId": "claim_d7fa39da9698c447594edefdc44d7ce5",
+      "sourceAnchor": "unheaded-block-114",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "a89aecc164ff54f3f6807a0d3231e27b4ca2c77c4e41fd121bbfdb18ea8024f0",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "currentIdentityBinding": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "50915dcd46d43dffa275812e2b7f5d7bb3dc97b5ab41900875cbc632e030bd25",
+      "identityFingerprint": "50915dcd46d43dffa275812e2b7f5d7bb3dc97b5ab41900875cbc632e030bd25",
+      "claimId": "claim_d7fa39da9698c447594edefdc44d7ce5",
+      "sourceAnchor": "unheaded-block-114",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "a89aecc164ff54f3f6807a0d3231e27b4ca2c77c4e41fd121bbfdb18ea8024f0",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "uniqueSameDigestBinding": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-114",
+      "githubAnchor": "unheaded-block-114",
+      "stableAnchor": "unheaded-block-114",
+      "title": "Unheaded block 114",
+      "startLine": 1106,
+      "endLine": 1117,
+      "textDigest": "a89aecc164ff54f3f6807a0d3231e27b4ca2c77c4e41fd121bbfdb18ea8024f0",
+      "sample": "Với profile remote/container detached, Authority cấp resource identity và ghi allocation intent bền vững trước mỗi\nside effect prepare; driver tạo theo identity đó một cách idempot",
+      "identityFingerprint": "50915dcd46d43dffa275812e2b7f5d7bb3dc97b5ab41900875cbc632e030bd25",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "8. Policy resolution và edge cases",
+        "8.6 Crash và cleanup"
+      ],
+      "text": "Với profile remote/container detached, Authority cấp resource identity và ghi allocation intent bền vững trước mỗi\nside effect prepare; driver tạo theo identity đó một cách idempotent. Journal\nghi dispatch id, backend snapshot reference, resource locator, lease/execution\nidentity và trạng thái allocation/collection/cleanup, không chứa credential.\nCallback cleanup chỉ là tối ưu trong process; recovery không phụ thuộc callback.\nReaper phải lấy recovery lease độc quyền, kiểm tra liveness bằng execution\nidentity chống PID reuse, dừng và xác nhận cả execution tree trước khi collect\nvà cleanup idempotent. Timeout/cancel cũng tuân cùng thứ tự. Không liên lạc được\nremote thì giữ unknown và cleanup pending, không suy agent đã dừng; reconnect\nhoặc backend lease-expiry có proof mới cho phép dọn. Resource chưa collect được\ngiữ cho recovery, không xóa vì agent đã exit. Startup reaper dùng cùng registry\nsetup/doctor; backend không có recovery contract này chưa được nhận required."
+    },
+    "currentUnitAtRetainedIdentity": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-114",
+      "githubAnchor": "unheaded-block-114",
+      "stableAnchor": "unheaded-block-114",
+      "title": "Unheaded block 114",
+      "startLine": 1106,
+      "endLine": 1117,
+      "textDigest": "a89aecc164ff54f3f6807a0d3231e27b4ca2c77c4e41fd121bbfdb18ea8024f0",
+      "sample": "Với profile remote/container detached, Authority cấp resource identity và ghi allocation intent bền vững trước mỗi\nside effect prepare; driver tạo theo identity đó một cách idempot",
+      "identityFingerprint": "50915dcd46d43dffa275812e2b7f5d7bb3dc97b5ab41900875cbc632e030bd25",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "8. Policy resolution và edge cases",
+        "8.6 Crash và cleanup"
+      ],
+      "text": "Với profile remote/container detached, Authority cấp resource identity và ghi allocation intent bền vững trước mỗi\nside effect prepare; driver tạo theo identity đó một cách idempotent. Journal\nghi dispatch id, backend snapshot reference, resource locator, lease/execution\nidentity và trạng thái allocation/collection/cleanup, không chứa credential.\nCallback cleanup chỉ là tối ưu trong process; recovery không phụ thuộc callback.\nReaper phải lấy recovery lease độc quyền, kiểm tra liveness bằng execution\nidentity chống PID reuse, dừng và xác nhận cả execution tree trước khi collect\nvà cleanup idempotent. Timeout/cancel cũng tuân cùng thứ tự. Không liên lạc được\nremote thì giữ unknown và cleanup pending, không suy agent đã dừng; reconnect\nhoặc backend lease-expiry có proof mới cho phép dọn. Resource chưa collect được\ngiữ cho recovery, không xóa vì agent đã exit. Startup reaper dùng cùng registry\nsetup/doctor; backend không có recovery contract này chưa được nhận required."
+    },
+    "sourceDigestUnchanged": true,
+    "status": "same text uniquely found; alias anchor still independently checked",
+    "aliasTargetComparisons": [
+      {
+        "aliasId": "step10-specs-0068",
+        "fromPath": "docs/specs/confinement-authority.md#unheaded-block-113",
+        "toOwner": "docs/platform/agent-confinement/spec.md",
+        "toAnchor": "unheaded-block-46",
+        "currentTargetAtDraftAnchor": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-46",
+          "githubAnchor": "unheaded-block-46",
+          "stableAnchor": "unheaded-block-46",
+          "title": "Unheaded block 46",
+          "startLine": 368,
+          "endLine": 368,
+          "textDigest": "46a48aa7b43dc72f68eee7332a4dfc62145204e16d4815016396a0bbb0ddb0b6",
+          "sample": "Added in candidate — verbatim binding addition from the final main sync (2026-10-15); pending independent review:",
+          "identityFingerprint": "2c9c66ffb68b052ba02e2c8f655eaa4731e19d4502bf34fafd37af0602bddaa5",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "8. Policy resolution và edge cases",
+            "8.6 Crash và cleanup"
+          ],
+          "text": "Added in candidate — verbatim binding addition from the final main sync (2026-10-15); pending independent review:"
+        },
+        "sourceTextDigestAtDraftTarget": false,
+        "uniqueSameTextCurrentTarget": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-48",
+          "githubAnchor": "unheaded-block-48",
+          "stableAnchor": "unheaded-block-48",
+          "title": "Unheaded block 48",
+          "startLine": 372,
+          "endLine": 383,
+          "textDigest": "a89aecc164ff54f3f6807a0d3231e27b4ca2c77c4e41fd121bbfdb18ea8024f0",
+          "sample": "Với profile remote/container detached, Authority cấp resource identity và ghi allocation intent bền vững trước mỗi\nside effect prepare; driver tạo theo identity đó một cách idempot",
+          "identityFingerprint": "50915dcd46d43dffa275812e2b7f5d7bb3dc97b5ab41900875cbc632e030bd25",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "8. Policy resolution và edge cases",
+            "8.6 Crash và cleanup"
+          ],
+          "text": "Với profile remote/container detached, Authority cấp resource identity và ghi allocation intent bền vững trước mỗi\nside effect prepare; driver tạo theo identity đó một cách idempotent. Journal\nghi dispatch id, backend snapshot reference, resource locator, lease/execution\nidentity và trạng thái allocation/collection/cleanup, không chứa credential.\nCallback cleanup chỉ là tối ưu trong process; recovery không phụ thuộc callback.\nReaper phải lấy recovery lease độc quyền, kiểm tra liveness bằng execution\nidentity chống PID reuse, dừng và xác nhận cả execution tree trước khi collect\nvà cleanup idempotent. Timeout/cancel cũng tuân cùng thứ tự. Không liên lạc được\nremote thì giữ unknown và cleanup pending, không suy agent đã dừng; reconnect\nhoặc backend lease-expiry có proof mới cho phép dọn. Resource chưa collect được\ngiữ cho recovery, không xóa vì agent đã exit. Startup reaper dùng cùng registry\nsetup/doctor; backend không có recovery contract này chưa được nhận required."
+        },
+        "note": "Read-only current source and target comparisons; draft unchanged. Source and target numbered-anchor relocation is not approval. Text corrections or source drift require independent judgment."
+      }
+    ]
+  },
+  "currentSourceDigestUnchanged": true
+}
+```
+
+## Entry e-004: claim_daf2ec0996ad074a68903680fce85adb
+
+```json
+{
+  "kind": "source-alias-comparison",
+  "claimId": "claim_daf2ec0996ad074a68903680fce85adb",
+  "priorAnchor": "unheaded-block-114",
+  "priorDigest": "f43f3ff53150980b52653b87618308619ddaae4a8ce19572b2589bb7cf744f7a",
+  "currentDigest": "a89aecc164ff54f3f6807a0d3231e27b4ca2c77c4e41fd121bbfdb18ea8024f0",
+  "matchingCurrentAnchors": [
+    "unheaded-block-115"
+  ],
+  "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval.",
+  "draftAliases": [
+    {
+      "aliasId": "step10-specs-0069",
+      "fromPath": "docs/specs/confinement-authority.md#unheaded-block-114",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-47",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    }
+  ],
+  "currentNative": {
+    "sourcePath": "docs/specs/confinement-authority.md",
+    "unitDigest": "6a1fda5c01985520210ebb5055c2c7e5e1ec433b86f13cc8bd396d3bc4c6cdd0",
+    "identityFingerprint": "6a1fda5c01985520210ebb5055c2c7e5e1ec433b86f13cc8bd396d3bc4c6cdd0",
+    "claimId": "claim_daf2ec0996ad074a68903680fce85adb",
+    "sourceAnchor": "unheaded-block-115",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "f43f3ff53150980b52653b87618308619ddaae4a8ce19572b2589bb7cf744f7a",
+    "claimKind": "contract",
+    "status": "current"
+  },
+  "currentSourceUnit": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-115",
+    "githubAnchor": "unheaded-block-115",
+    "stableAnchor": "unheaded-block-115",
+    "title": "Unheaded block 115",
+    "startLine": 1119,
+    "endLine": 1120,
+    "textDigest": "f43f3ff53150980b52653b87618308619ddaae4a8ce19572b2589bb7cf744f7a",
+    "sample": "Local profile chỉ phải đáp ứng invariants ownership/liveness/idempotence nêu\ntrên, không phải triển khai journal/lease schema của remote.",
+    "identityFingerprint": "6a1fda5c01985520210ebb5055c2c7e5e1ec433b86f13cc8bd396d3bc4c6cdd0",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "8. Policy resolution và edge cases",
+      "8.6 Crash và cleanup"
+    ],
+    "text": "Local profile chỉ phải đáp ứng invariants ownership/liveness/idempotence nêu\ntrên, không phải triển khai journal/lease schema của remote."
+  },
+  "currentTargetComparisons": [
+    {
+      "aliasId": "step10-specs-0069",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-47",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-47",
+        "githubAnchor": "unheaded-block-47",
+        "stableAnchor": "unheaded-block-47",
+        "title": "Unheaded block 47",
+        "startLine": 370,
+        "endLine": 370,
+        "textDigest": "a7af69f1674754e516550a8802a2acc64dd3a49655a4cdd01fa82d43a540d5ed",
+        "sample": "**Gắn home với tiến trình đang chạy worker (binding, 2026-10-15).** Authority cấp cho mỗi dispatch đã prepare hai hàm `bind`/`markLaunched` (`drivers/bwrap.mjs`, gom qua `bindingFo",
+        "identityFingerprint": "366466fa3653ce725f560e106699a897d40f8681ab982ea93931357b67616fcc",
+        "ancestry": [
+          "Spec: Agent Confinement Authority",
+          "8. Policy resolution và edge cases",
+          "8.6 Crash và cleanup"
+        ],
+        "text": "**Gắn home với tiến trình đang chạy worker (binding, 2026-10-15).** Authority cấp cho mỗi dispatch đã prepare hai hàm `bind`/`markLaunched` (`drivers/bwrap.mjs`, gom qua `bindingForPrepared` ở `authority.mjs`); adapter chỉ gọi hàm, không thấy đường dẫn home, không tự ghi marker. Round herdr confined (mọi round, có assignment hay không) gọi `bind` trước `pane run` với `paneId`, endpoint herdr mà client của round thật sự dùng (`herdrEndpoint` = socket path từ env của client, hoặc socket của session nó đặt tên, hoặc socket mặc định herdr tự rơi về; `herdrSession` chỉ khi env có đặt tên), `binderPid` + `binderStartTime` của controller và `boundAt`; ghi atomic (tmp + rename). Ghi không được thì đóng pane, round fail trước khi có worker. Ngay trước `pane run` (hoặc khi round resume thấy worker đã chạy) ghi `launchedAt`. Round cli-spawn confined gắn home với run supervisor tách rời ngay khi supervisor khởi động (`binderPid` = pid supervisor, không có pane); ghi không được thì báo mã `confinement-bind-failed` và giữ marker như prepare (supervisor đã chạy rồi). Luật reaper cho marker đã bind mà chưa `retainedAt`: binder còn sống (pid + start time) thì giữ tới `boundAt + max(maxAgeMs, 2 phút launch grace + run timeout + 10 phút settle)` bất kể pane trả lời gì; binder chết hoặc quá cửa sổ thì: không có pane → dọn; có pane mà chưa `launchedAt` và binder chết → dọn và đóng pane rỗng; còn lại hỏi pane trên endpoint đã ghi (true giữ, null theo luật hết hạn, false dọn). Marker `retainedAt` giữ luật pane cũ, nhưng giờ hỏi được cả round default-session nhờ endpoint đã ghi. Trước khi xoá, reaper đọc lại marker; khác với bản nó đã dựa vào để quyết thì bỏ qua lượt này. Finalizer chấp nhận đúng các field binding (`paneId`, `herdrEndpoint`, `herdrSession`, `binderPid`, `binderStartTime`, `boundAt`, `launchedAt`) cộng `credentialKept` là thay đổi sau prepare; mọi thay đổi khác vẫn là `ownership-marker-mismatch`. Chưa có (để cho run supervisor + holder-lock): từ chối bind khi home đã quá cửa sổ run tính từ lúc tạo, kiểm trước/sau launch, claim độc quyền khi reap; nên khe \"reaper đã đọc lại xong, controller bind + launch ngay trước lúc xoá\" (RT2-1) vẫn còn."
+      },
+      "uniqueSameDigestUnits": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-49",
+          "githubAnchor": "unheaded-block-49",
+          "stableAnchor": "unheaded-block-49",
+          "title": "Unheaded block 49",
+          "startLine": 385,
+          "endLine": 386,
+          "textDigest": "f43f3ff53150980b52653b87618308619ddaae4a8ce19572b2589bb7cf744f7a",
+          "sample": "Local profile chỉ phải đáp ứng invariants ownership/liveness/idempotence nêu\ntrên, không phải triển khai journal/lease schema của remote.",
+          "identityFingerprint": "6a1fda5c01985520210ebb5055c2c7e5e1ec433b86f13cc8bd396d3bc4c6cdd0",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "8. Policy resolution và edge cases",
+            "8.6 Crash và cleanup"
+          ],
+          "text": "Local profile chỉ phải đáp ứng invariants ownership/liveness/idempotence nêu\ntrên, không phải triển khai journal/lease schema của remote."
+        }
+      ]
+    }
+  ],
+  "historicalPackageComparisons": {
+    "nativeIdentity": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "6a1fda5c01985520210ebb5055c2c7e5e1ec433b86f13cc8bd396d3bc4c6cdd0",
+      "identityFingerprint": "6a1fda5c01985520210ebb5055c2c7e5e1ec433b86f13cc8bd396d3bc4c6cdd0",
+      "claimId": "claim_daf2ec0996ad074a68903680fce85adb",
+      "sourceAnchor": "unheaded-block-115",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "f43f3ff53150980b52653b87618308619ddaae4a8ce19572b2589bb7cf744f7a",
+      "claimKind": "contract",
+      "status": "current"
+    },
+    "currentIdentityBinding": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "6a1fda5c01985520210ebb5055c2c7e5e1ec433b86f13cc8bd396d3bc4c6cdd0",
+      "identityFingerprint": "6a1fda5c01985520210ebb5055c2c7e5e1ec433b86f13cc8bd396d3bc4c6cdd0",
+      "claimId": "claim_daf2ec0996ad074a68903680fce85adb",
+      "sourceAnchor": "unheaded-block-115",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "f43f3ff53150980b52653b87618308619ddaae4a8ce19572b2589bb7cf744f7a",
+      "claimKind": "contract",
+      "status": "current"
+    },
+    "uniqueSameDigestBinding": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-115",
+      "githubAnchor": "unheaded-block-115",
+      "stableAnchor": "unheaded-block-115",
+      "title": "Unheaded block 115",
+      "startLine": 1119,
+      "endLine": 1120,
+      "textDigest": "f43f3ff53150980b52653b87618308619ddaae4a8ce19572b2589bb7cf744f7a",
+      "sample": "Local profile chỉ phải đáp ứng invariants ownership/liveness/idempotence nêu\ntrên, không phải triển khai journal/lease schema của remote.",
+      "identityFingerprint": "6a1fda5c01985520210ebb5055c2c7e5e1ec433b86f13cc8bd396d3bc4c6cdd0",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "8. Policy resolution và edge cases",
+        "8.6 Crash và cleanup"
+      ],
+      "text": "Local profile chỉ phải đáp ứng invariants ownership/liveness/idempotence nêu\ntrên, không phải triển khai journal/lease schema của remote."
+    },
+    "currentUnitAtRetainedIdentity": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-115",
+      "githubAnchor": "unheaded-block-115",
+      "stableAnchor": "unheaded-block-115",
+      "title": "Unheaded block 115",
+      "startLine": 1119,
+      "endLine": 1120,
+      "textDigest": "f43f3ff53150980b52653b87618308619ddaae4a8ce19572b2589bb7cf744f7a",
+      "sample": "Local profile chỉ phải đáp ứng invariants ownership/liveness/idempotence nêu\ntrên, không phải triển khai journal/lease schema của remote.",
+      "identityFingerprint": "6a1fda5c01985520210ebb5055c2c7e5e1ec433b86f13cc8bd396d3bc4c6cdd0",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "8. Policy resolution và edge cases",
+        "8.6 Crash và cleanup"
+      ],
+      "text": "Local profile chỉ phải đáp ứng invariants ownership/liveness/idempotence nêu\ntrên, không phải triển khai journal/lease schema của remote."
+    },
+    "sourceDigestUnchanged": true,
+    "status": "same text uniquely found; alias anchor still independently checked",
+    "aliasTargetComparisons": [
+      {
+        "aliasId": "step10-specs-0069",
+        "fromPath": "docs/specs/confinement-authority.md#unheaded-block-114",
+        "toOwner": "docs/platform/agent-confinement/spec.md",
+        "toAnchor": "unheaded-block-47",
+        "currentTargetAtDraftAnchor": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-47",
+          "githubAnchor": "unheaded-block-47",
+          "stableAnchor": "unheaded-block-47",
+          "title": "Unheaded block 47",
+          "startLine": 370,
+          "endLine": 370,
+          "textDigest": "a7af69f1674754e516550a8802a2acc64dd3a49655a4cdd01fa82d43a540d5ed",
+          "sample": "**Gắn home với tiến trình đang chạy worker (binding, 2026-10-15).** Authority cấp cho mỗi dispatch đã prepare hai hàm `bind`/`markLaunched` (`drivers/bwrap.mjs`, gom qua `bindingFo",
+          "identityFingerprint": "366466fa3653ce725f560e106699a897d40f8681ab982ea93931357b67616fcc",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "8. Policy resolution và edge cases",
+            "8.6 Crash và cleanup"
+          ],
+          "text": "**Gắn home với tiến trình đang chạy worker (binding, 2026-10-15).** Authority cấp cho mỗi dispatch đã prepare hai hàm `bind`/`markLaunched` (`drivers/bwrap.mjs`, gom qua `bindingForPrepared` ở `authority.mjs`); adapter chỉ gọi hàm, không thấy đường dẫn home, không tự ghi marker. Round herdr confined (mọi round, có assignment hay không) gọi `bind` trước `pane run` với `paneId`, endpoint herdr mà client của round thật sự dùng (`herdrEndpoint` = socket path từ env của client, hoặc socket của session nó đặt tên, hoặc socket mặc định herdr tự rơi về; `herdrSession` chỉ khi env có đặt tên), `binderPid` + `binderStartTime` của controller và `boundAt`; ghi atomic (tmp + rename). Ghi không được thì đóng pane, round fail trước khi có worker. Ngay trước `pane run` (hoặc khi round resume thấy worker đã chạy) ghi `launchedAt`. Round cli-spawn confined gắn home với run supervisor tách rời ngay khi supervisor khởi động (`binderPid` = pid supervisor, không có pane); ghi không được thì báo mã `confinement-bind-failed` và giữ marker như prepare (supervisor đã chạy rồi). Luật reaper cho marker đã bind mà chưa `retainedAt`: binder còn sống (pid + start time) thì giữ tới `boundAt + max(maxAgeMs, 2 phút launch grace + run timeout + 10 phút settle)` bất kể pane trả lời gì; binder chết hoặc quá cửa sổ thì: không có pane → dọn; có pane mà chưa `launchedAt` và binder chết → dọn và đóng pane rỗng; còn lại hỏi pane trên endpoint đã ghi (true giữ, null theo luật hết hạn, false dọn). Marker `retainedAt` giữ luật pane cũ, nhưng giờ hỏi được cả round default-session nhờ endpoint đã ghi. Trước khi xoá, reaper đọc lại marker; khác với bản nó đã dựa vào để quyết thì bỏ qua lượt này. Finalizer chấp nhận đúng các field binding (`paneId`, `herdrEndpoint`, `herdrSession`, `binderPid`, `binderStartTime`, `boundAt`, `launchedAt`) cộng `credentialKept` là thay đổi sau prepare; mọi thay đổi khác vẫn là `ownership-marker-mismatch`. Chưa có (để cho run supervisor + holder-lock): từ chối bind khi home đã quá cửa sổ run tính từ lúc tạo, kiểm trước/sau launch, claim độc quyền khi reap; nên khe \"reaper đã đọc lại xong, controller bind + launch ngay trước lúc xoá\" (RT2-1) vẫn còn."
+        },
+        "sourceTextDigestAtDraftTarget": false,
+        "uniqueSameTextCurrentTarget": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-49",
+          "githubAnchor": "unheaded-block-49",
+          "stableAnchor": "unheaded-block-49",
+          "title": "Unheaded block 49",
+          "startLine": 385,
+          "endLine": 386,
+          "textDigest": "f43f3ff53150980b52653b87618308619ddaae4a8ce19572b2589bb7cf744f7a",
+          "sample": "Local profile chỉ phải đáp ứng invariants ownership/liveness/idempotence nêu\ntrên, không phải triển khai journal/lease schema của remote.",
+          "identityFingerprint": "6a1fda5c01985520210ebb5055c2c7e5e1ec433b86f13cc8bd396d3bc4c6cdd0",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "8. Policy resolution và edge cases",
+            "8.6 Crash và cleanup"
+          ],
+          "text": "Local profile chỉ phải đáp ứng invariants ownership/liveness/idempotence nêu\ntrên, không phải triển khai journal/lease schema của remote."
+        },
+        "note": "Read-only current source and target comparisons; draft unchanged. Source and target numbered-anchor relocation is not approval. Text corrections or source drift require independent judgment."
+      }
+    ]
+  },
+  "currentSourceDigestUnchanged": true
+}
+```
+
+## Entry e-005: claim_73ae83a090b77eed0e84212e99fa6e7c
+
+```json
+{
+  "kind": "source-alias-comparison",
+  "claimId": "claim_73ae83a090b77eed0e84212e99fa6e7c",
+  "priorAnchor": "unheaded-block-115",
+  "priorDigest": "0ef8d6c210698ac4fae241e133b626be662e36e1023900186b541f3f7d0e27b8",
+  "currentDigest": "f43f3ff53150980b52653b87618308619ddaae4a8ce19572b2589bb7cf744f7a",
+  "matchingCurrentAnchors": [
+    "unheaded-block-116"
+  ],
+  "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval.",
+  "draftAliases": [
+    {
+      "aliasId": "step10-specs-0070",
+      "fromPath": "docs/specs/confinement-authority.md#unheaded-block-115",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-48",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    }
+  ],
+  "currentNative": {
+    "sourcePath": "docs/specs/confinement-authority.md",
+    "unitDigest": "afe1847641e6aab965dbcece2e6e37cdbcd97a1d81833ccc9e239479ab3e67ae",
+    "identityFingerprint": "afe1847641e6aab965dbcece2e6e37cdbcd97a1d81833ccc9e239479ab3e67ae",
+    "claimId": "claim_73ae83a090b77eed0e84212e99fa6e7c",
+    "sourceAnchor": "unheaded-block-116",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "0ef8d6c210698ac4fae241e133b626be662e36e1023900186b541f3f7d0e27b8",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "currentSourceUnit": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-116",
+    "githubAnchor": "unheaded-block-116",
+    "stableAnchor": "unheaded-block-116",
+    "title": "Unheaded block 116",
+    "startLine": 1124,
+    "endLine": 1134,
+    "textDigest": "0ef8d6c210698ac4fae241e133b626be662e36e1023900186b541f3f7d0e27b8",
+    "sample": "| Tình huống | Trước spawn | Kết quả cuối |\n|---|---|---|\n| Required, đủ coverage/readiness/proof | prepare rồi execute | enforced khi receipt/evidence khớp |\n| Required, proof sta",
+    "identityFingerprint": "afe1847641e6aab965dbcece2e6e37cdbcd97a1d81833ccc9e239479ab3e67ae",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "8. Policy resolution và edge cases",
+      "8.7 Bảng tình huống chuẩn"
+    ],
+    "text": "| Tình huống | Trước spawn | Kết quả cuối |\n|---|---|---|\n| Required, đủ coverage/readiness/proof | prepare rồi execute | enforced khi receipt/evidence khớp |\n| Required, proof stale | tự refresh probe trước spawn | pass thì execute; fail/timeout thì refused |\n| Preferred, thiếu network protection nhưng đủ needs | ghi degrade rồi execute phần đã assess | degraded |\n| Preferred không backend, need private home chưa có | refuse, zero spawn | refused |\n| Grant read-write, backend chỉ read, need read | coverage/readiness satisfied | có thể enforced |\n| Grant read-write, backend chỉ read, need write | readiness unsatisfied, zero spawn | refused ở mọi mode |\n| Prepare tạo resource rồi Authority crash | phục hồi theo profile (local marker hoặc journal) | unknown tới khi recovery có bằng chứng |\n| Remote mất kết nối sau started | không suy đã dừng | failed/unknown, cleanup pending |\n| Collect artifact thất bại | agent đã chạy, không refusal hồi tố | failed, giữ resource để thu lại |"
+  },
+  "currentTargetComparisons": [
+    {
+      "aliasId": "step10-specs-0070",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-48",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-48",
+        "githubAnchor": "unheaded-block-48",
+        "stableAnchor": "unheaded-block-48",
+        "title": "Unheaded block 48",
+        "startLine": 372,
+        "endLine": 383,
+        "textDigest": "a89aecc164ff54f3f6807a0d3231e27b4ca2c77c4e41fd121bbfdb18ea8024f0",
+        "sample": "Với profile remote/container detached, Authority cấp resource identity và ghi allocation intent bền vững trước mỗi\nside effect prepare; driver tạo theo identity đó một cách idempot",
+        "identityFingerprint": "50915dcd46d43dffa275812e2b7f5d7bb3dc97b5ab41900875cbc632e030bd25",
+        "ancestry": [
+          "Spec: Agent Confinement Authority",
+          "8. Policy resolution và edge cases",
+          "8.6 Crash và cleanup"
+        ],
+        "text": "Với profile remote/container detached, Authority cấp resource identity và ghi allocation intent bền vững trước mỗi\nside effect prepare; driver tạo theo identity đó một cách idempotent. Journal\nghi dispatch id, backend snapshot reference, resource locator, lease/execution\nidentity và trạng thái allocation/collection/cleanup, không chứa credential.\nCallback cleanup chỉ là tối ưu trong process; recovery không phụ thuộc callback.\nReaper phải lấy recovery lease độc quyền, kiểm tra liveness bằng execution\nidentity chống PID reuse, dừng và xác nhận cả execution tree trước khi collect\nvà cleanup idempotent. Timeout/cancel cũng tuân cùng thứ tự. Không liên lạc được\nremote thì giữ unknown và cleanup pending, không suy agent đã dừng; reconnect\nhoặc backend lease-expiry có proof mới cho phép dọn. Resource chưa collect được\ngiữ cho recovery, không xóa vì agent đã exit. Startup reaper dùng cùng registry\nsetup/doctor; backend không có recovery contract này chưa được nhận required."
+      },
+      "uniqueSameDigestUnits": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-50",
+          "githubAnchor": "unheaded-block-50",
+          "stableAnchor": "unheaded-block-50",
+          "title": "Unheaded block 50",
+          "startLine": 390,
+          "endLine": 400,
+          "textDigest": "0ef8d6c210698ac4fae241e133b626be662e36e1023900186b541f3f7d0e27b8",
+          "sample": "| Tình huống | Trước spawn | Kết quả cuối |\n|---|---|---|\n| Required, đủ coverage/readiness/proof | prepare rồi execute | enforced khi receipt/evidence khớp |\n| Required, proof sta",
+          "identityFingerprint": "afe1847641e6aab965dbcece2e6e37cdbcd97a1d81833ccc9e239479ab3e67ae",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "8. Policy resolution và edge cases",
+            "8.7 Bảng tình huống chuẩn"
+          ],
+          "text": "| Tình huống | Trước spawn | Kết quả cuối |\n|---|---|---|\n| Required, đủ coverage/readiness/proof | prepare rồi execute | enforced khi receipt/evidence khớp |\n| Required, proof stale | tự refresh probe trước spawn | pass thì execute; fail/timeout thì refused |\n| Preferred, thiếu network protection nhưng đủ needs | ghi degrade rồi execute phần đã assess | degraded |\n| Preferred không backend, need private home chưa có | refuse, zero spawn | refused |\n| Grant read-write, backend chỉ read, need read | coverage/readiness satisfied | có thể enforced |\n| Grant read-write, backend chỉ read, need write | readiness unsatisfied, zero spawn | refused ở mọi mode |\n| Prepare tạo resource rồi Authority crash | phục hồi theo profile (local marker hoặc journal) | unknown tới khi recovery có bằng chứng |\n| Remote mất kết nối sau started | không suy đã dừng | failed/unknown, cleanup pending |\n| Collect artifact thất bại | agent đã chạy, không refusal hồi tố | failed, giữ resource để thu lại |"
+        }
+      ]
+    }
+  ],
+  "historicalPackageComparisons": {
+    "nativeIdentity": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "afe1847641e6aab965dbcece2e6e37cdbcd97a1d81833ccc9e239479ab3e67ae",
+      "identityFingerprint": "afe1847641e6aab965dbcece2e6e37cdbcd97a1d81833ccc9e239479ab3e67ae",
+      "claimId": "claim_73ae83a090b77eed0e84212e99fa6e7c",
+      "sourceAnchor": "unheaded-block-116",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "0ef8d6c210698ac4fae241e133b626be662e36e1023900186b541f3f7d0e27b8",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "currentIdentityBinding": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "afe1847641e6aab965dbcece2e6e37cdbcd97a1d81833ccc9e239479ab3e67ae",
+      "identityFingerprint": "afe1847641e6aab965dbcece2e6e37cdbcd97a1d81833ccc9e239479ab3e67ae",
+      "claimId": "claim_73ae83a090b77eed0e84212e99fa6e7c",
+      "sourceAnchor": "unheaded-block-116",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "0ef8d6c210698ac4fae241e133b626be662e36e1023900186b541f3f7d0e27b8",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "uniqueSameDigestBinding": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-116",
+      "githubAnchor": "unheaded-block-116",
+      "stableAnchor": "unheaded-block-116",
+      "title": "Unheaded block 116",
+      "startLine": 1124,
+      "endLine": 1134,
+      "textDigest": "0ef8d6c210698ac4fae241e133b626be662e36e1023900186b541f3f7d0e27b8",
+      "sample": "| Tình huống | Trước spawn | Kết quả cuối |\n|---|---|---|\n| Required, đủ coverage/readiness/proof | prepare rồi execute | enforced khi receipt/evidence khớp |\n| Required, proof sta",
+      "identityFingerprint": "afe1847641e6aab965dbcece2e6e37cdbcd97a1d81833ccc9e239479ab3e67ae",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "8. Policy resolution và edge cases",
+        "8.7 Bảng tình huống chuẩn"
+      ],
+      "text": "| Tình huống | Trước spawn | Kết quả cuối |\n|---|---|---|\n| Required, đủ coverage/readiness/proof | prepare rồi execute | enforced khi receipt/evidence khớp |\n| Required, proof stale | tự refresh probe trước spawn | pass thì execute; fail/timeout thì refused |\n| Preferred, thiếu network protection nhưng đủ needs | ghi degrade rồi execute phần đã assess | degraded |\n| Preferred không backend, need private home chưa có | refuse, zero spawn | refused |\n| Grant read-write, backend chỉ read, need read | coverage/readiness satisfied | có thể enforced |\n| Grant read-write, backend chỉ read, need write | readiness unsatisfied, zero spawn | refused ở mọi mode |\n| Prepare tạo resource rồi Authority crash | phục hồi theo profile (local marker hoặc journal) | unknown tới khi recovery có bằng chứng |\n| Remote mất kết nối sau started | không suy đã dừng | failed/unknown, cleanup pending |\n| Collect artifact thất bại | agent đã chạy, không refusal hồi tố | failed, giữ resource để thu lại |"
+    },
+    "currentUnitAtRetainedIdentity": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-116",
+      "githubAnchor": "unheaded-block-116",
+      "stableAnchor": "unheaded-block-116",
+      "title": "Unheaded block 116",
+      "startLine": 1124,
+      "endLine": 1134,
+      "textDigest": "0ef8d6c210698ac4fae241e133b626be662e36e1023900186b541f3f7d0e27b8",
+      "sample": "| Tình huống | Trước spawn | Kết quả cuối |\n|---|---|---|\n| Required, đủ coverage/readiness/proof | prepare rồi execute | enforced khi receipt/evidence khớp |\n| Required, proof sta",
+      "identityFingerprint": "afe1847641e6aab965dbcece2e6e37cdbcd97a1d81833ccc9e239479ab3e67ae",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "8. Policy resolution và edge cases",
+        "8.7 Bảng tình huống chuẩn"
+      ],
+      "text": "| Tình huống | Trước spawn | Kết quả cuối |\n|---|---|---|\n| Required, đủ coverage/readiness/proof | prepare rồi execute | enforced khi receipt/evidence khớp |\n| Required, proof stale | tự refresh probe trước spawn | pass thì execute; fail/timeout thì refused |\n| Preferred, thiếu network protection nhưng đủ needs | ghi degrade rồi execute phần đã assess | degraded |\n| Preferred không backend, need private home chưa có | refuse, zero spawn | refused |\n| Grant read-write, backend chỉ read, need read | coverage/readiness satisfied | có thể enforced |\n| Grant read-write, backend chỉ read, need write | readiness unsatisfied, zero spawn | refused ở mọi mode |\n| Prepare tạo resource rồi Authority crash | phục hồi theo profile (local marker hoặc journal) | unknown tới khi recovery có bằng chứng |\n| Remote mất kết nối sau started | không suy đã dừng | failed/unknown, cleanup pending |\n| Collect artifact thất bại | agent đã chạy, không refusal hồi tố | failed, giữ resource để thu lại |"
+    },
+    "sourceDigestUnchanged": true,
+    "status": "same text uniquely found; alias anchor still independently checked",
+    "aliasTargetComparisons": [
+      {
+        "aliasId": "step10-specs-0070",
+        "fromPath": "docs/specs/confinement-authority.md#unheaded-block-115",
+        "toOwner": "docs/platform/agent-confinement/spec.md",
+        "toAnchor": "unheaded-block-48",
+        "currentTargetAtDraftAnchor": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-48",
+          "githubAnchor": "unheaded-block-48",
+          "stableAnchor": "unheaded-block-48",
+          "title": "Unheaded block 48",
+          "startLine": 372,
+          "endLine": 383,
+          "textDigest": "a89aecc164ff54f3f6807a0d3231e27b4ca2c77c4e41fd121bbfdb18ea8024f0",
+          "sample": "Với profile remote/container detached, Authority cấp resource identity và ghi allocation intent bền vững trước mỗi\nside effect prepare; driver tạo theo identity đó một cách idempot",
+          "identityFingerprint": "50915dcd46d43dffa275812e2b7f5d7bb3dc97b5ab41900875cbc632e030bd25",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "8. Policy resolution và edge cases",
+            "8.6 Crash và cleanup"
+          ],
+          "text": "Với profile remote/container detached, Authority cấp resource identity và ghi allocation intent bền vững trước mỗi\nside effect prepare; driver tạo theo identity đó một cách idempotent. Journal\nghi dispatch id, backend snapshot reference, resource locator, lease/execution\nidentity và trạng thái allocation/collection/cleanup, không chứa credential.\nCallback cleanup chỉ là tối ưu trong process; recovery không phụ thuộc callback.\nReaper phải lấy recovery lease độc quyền, kiểm tra liveness bằng execution\nidentity chống PID reuse, dừng và xác nhận cả execution tree trước khi collect\nvà cleanup idempotent. Timeout/cancel cũng tuân cùng thứ tự. Không liên lạc được\nremote thì giữ unknown và cleanup pending, không suy agent đã dừng; reconnect\nhoặc backend lease-expiry có proof mới cho phép dọn. Resource chưa collect được\ngiữ cho recovery, không xóa vì agent đã exit. Startup reaper dùng cùng registry\nsetup/doctor; backend không có recovery contract này chưa được nhận required."
+        },
+        "sourceTextDigestAtDraftTarget": false,
+        "uniqueSameTextCurrentTarget": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-50",
+          "githubAnchor": "unheaded-block-50",
+          "stableAnchor": "unheaded-block-50",
+          "title": "Unheaded block 50",
+          "startLine": 390,
+          "endLine": 400,
+          "textDigest": "0ef8d6c210698ac4fae241e133b626be662e36e1023900186b541f3f7d0e27b8",
+          "sample": "| Tình huống | Trước spawn | Kết quả cuối |\n|---|---|---|\n| Required, đủ coverage/readiness/proof | prepare rồi execute | enforced khi receipt/evidence khớp |\n| Required, proof sta",
+          "identityFingerprint": "afe1847641e6aab965dbcece2e6e37cdbcd97a1d81833ccc9e239479ab3e67ae",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "8. Policy resolution và edge cases",
+            "8.7 Bảng tình huống chuẩn"
+          ],
+          "text": "| Tình huống | Trước spawn | Kết quả cuối |\n|---|---|---|\n| Required, đủ coverage/readiness/proof | prepare rồi execute | enforced khi receipt/evidence khớp |\n| Required, proof stale | tự refresh probe trước spawn | pass thì execute; fail/timeout thì refused |\n| Preferred, thiếu network protection nhưng đủ needs | ghi degrade rồi execute phần đã assess | degraded |\n| Preferred không backend, need private home chưa có | refuse, zero spawn | refused |\n| Grant read-write, backend chỉ read, need read | coverage/readiness satisfied | có thể enforced |\n| Grant read-write, backend chỉ read, need write | readiness unsatisfied, zero spawn | refused ở mọi mode |\n| Prepare tạo resource rồi Authority crash | phục hồi theo profile (local marker hoặc journal) | unknown tới khi recovery có bằng chứng |\n| Remote mất kết nối sau started | không suy đã dừng | failed/unknown, cleanup pending |\n| Collect artifact thất bại | agent đã chạy, không refusal hồi tố | failed, giữ resource để thu lại |"
+        },
+        "note": "Read-only current source and target comparisons; draft unchanged. Source and target numbered-anchor relocation is not approval. Text corrections or source drift require independent judgment."
+      }
+    ]
+  },
+  "currentSourceDigestUnchanged": true
+}
+```
+
+## Entry e-006: claim_cc0d485b1b93357edb755f4121a26206
+
+```json
+{
+  "kind": "source-alias-comparison",
+  "claimId": "claim_cc0d485b1b93357edb755f4121a26206",
+  "priorAnchor": "unheaded-block-116",
+  "priorDigest": "f0aa8cea776fc1a9bd023b6e3e1318c7c9c16589a68d5ac16288b63f23634cbb",
+  "currentDigest": "0ef8d6c210698ac4fae241e133b626be662e36e1023900186b541f3f7d0e27b8",
+  "matchingCurrentAnchors": [
+    "unheaded-block-117"
+  ],
+  "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval.",
+  "draftAliases": [
+    {
+      "aliasId": "step10-specs-0071",
+      "fromPath": "docs/specs/confinement-authority.md#unheaded-block-116",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-49",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    }
+  ],
+  "currentNative": {
+    "sourcePath": "docs/specs/confinement-authority.md",
+    "unitDigest": "939f27292f5a04d3a26553f71cb92d8d72ec73eab1559fa5db6e7e9b1630c4e6",
+    "identityFingerprint": "939f27292f5a04d3a26553f71cb92d8d72ec73eab1559fa5db6e7e9b1630c4e6",
+    "claimId": "claim_cc0d485b1b93357edb755f4121a26206",
+    "sourceAnchor": "unheaded-block-117",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "f0aa8cea776fc1a9bd023b6e3e1318c7c9c16589a68d5ac16288b63f23634cbb",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "currentSourceUnit": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-117",
+    "githubAnchor": "unheaded-block-117",
+    "stableAnchor": "unheaded-block-117",
+    "title": "Unheaded block 117",
+    "startLine": 1138,
+    "endLine": 1138,
+    "textDigest": "f0aa8cea776fc1a9bd023b6e3e1318c7c9c16589a68d5ac16288b63f23634cbb",
+    "sample": "Default nhỏ nhất có ích:",
+    "identityFingerprint": "939f27292f5a04d3a26553f71cb92d8d72ec73eab1559fa5db6e7e9b1630c4e6",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "9. Default implementation đầu tiên"
+    ],
+    "text": "Default nhỏ nhất có ích:"
+  },
+  "currentTargetComparisons": [
+    {
+      "aliasId": "step10-specs-0071",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-49",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-49",
+        "githubAnchor": "unheaded-block-49",
+        "stableAnchor": "unheaded-block-49",
+        "title": "Unheaded block 49",
+        "startLine": 385,
+        "endLine": 386,
+        "textDigest": "f43f3ff53150980b52653b87618308619ddaae4a8ce19572b2589bb7cf744f7a",
+        "sample": "Local profile chỉ phải đáp ứng invariants ownership/liveness/idempotence nêu\ntrên, không phải triển khai journal/lease schema của remote.",
+        "identityFingerprint": "6a1fda5c01985520210ebb5055c2c7e5e1ec433b86f13cc8bd396d3bc4c6cdd0",
+        "ancestry": [
+          "Spec: Agent Confinement Authority",
+          "8. Policy resolution và edge cases",
+          "8.6 Crash và cleanup"
+        ],
+        "text": "Local profile chỉ phải đáp ứng invariants ownership/liveness/idempotence nêu\ntrên, không phải triển khai journal/lease schema của remote."
+      },
+      "uniqueSameDigestUnits": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-51",
+          "githubAnchor": "unheaded-block-51",
+          "stableAnchor": "unheaded-block-51",
+          "title": "Unheaded block 51",
+          "startLine": 404,
+          "endLine": 404,
+          "textDigest": "f0aa8cea776fc1a9bd023b6e3e1318c7c9c16589a68d5ac16288b63f23634cbb",
+          "sample": "Default nhỏ nhất có ích:",
+          "identityFingerprint": "939f27292f5a04d3a26553f71cb92d8d72ec73eab1559fa5db6e7e9b1630c4e6",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "9. Default implementation đầu tiên"
+          ],
+          "text": "Default nhỏ nhất có ích:"
+        }
+      ]
+    }
+  ],
+  "historicalPackageComparisons": {
+    "nativeIdentity": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "939f27292f5a04d3a26553f71cb92d8d72ec73eab1559fa5db6e7e9b1630c4e6",
+      "identityFingerprint": "939f27292f5a04d3a26553f71cb92d8d72ec73eab1559fa5db6e7e9b1630c4e6",
+      "claimId": "claim_cc0d485b1b93357edb755f4121a26206",
+      "sourceAnchor": "unheaded-block-117",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "f0aa8cea776fc1a9bd023b6e3e1318c7c9c16589a68d5ac16288b63f23634cbb",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "currentIdentityBinding": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "939f27292f5a04d3a26553f71cb92d8d72ec73eab1559fa5db6e7e9b1630c4e6",
+      "identityFingerprint": "939f27292f5a04d3a26553f71cb92d8d72ec73eab1559fa5db6e7e9b1630c4e6",
+      "claimId": "claim_cc0d485b1b93357edb755f4121a26206",
+      "sourceAnchor": "unheaded-block-117",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "f0aa8cea776fc1a9bd023b6e3e1318c7c9c16589a68d5ac16288b63f23634cbb",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "uniqueSameDigestBinding": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-117",
+      "githubAnchor": "unheaded-block-117",
+      "stableAnchor": "unheaded-block-117",
+      "title": "Unheaded block 117",
+      "startLine": 1138,
+      "endLine": 1138,
+      "textDigest": "f0aa8cea776fc1a9bd023b6e3e1318c7c9c16589a68d5ac16288b63f23634cbb",
+      "sample": "Default nhỏ nhất có ích:",
+      "identityFingerprint": "939f27292f5a04d3a26553f71cb92d8d72ec73eab1559fa5db6e7e9b1630c4e6",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "9. Default implementation đầu tiên"
+      ],
+      "text": "Default nhỏ nhất có ích:"
+    },
+    "currentUnitAtRetainedIdentity": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-117",
+      "githubAnchor": "unheaded-block-117",
+      "stableAnchor": "unheaded-block-117",
+      "title": "Unheaded block 117",
+      "startLine": 1138,
+      "endLine": 1138,
+      "textDigest": "f0aa8cea776fc1a9bd023b6e3e1318c7c9c16589a68d5ac16288b63f23634cbb",
+      "sample": "Default nhỏ nhất có ích:",
+      "identityFingerprint": "939f27292f5a04d3a26553f71cb92d8d72ec73eab1559fa5db6e7e9b1630c4e6",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "9. Default implementation đầu tiên"
+      ],
+      "text": "Default nhỏ nhất có ích:"
+    },
+    "sourceDigestUnchanged": true,
+    "status": "same text uniquely found; alias anchor still independently checked",
+    "aliasTargetComparisons": [
+      {
+        "aliasId": "step10-specs-0071",
+        "fromPath": "docs/specs/confinement-authority.md#unheaded-block-116",
+        "toOwner": "docs/platform/agent-confinement/spec.md",
+        "toAnchor": "unheaded-block-49",
+        "currentTargetAtDraftAnchor": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-49",
+          "githubAnchor": "unheaded-block-49",
+          "stableAnchor": "unheaded-block-49",
+          "title": "Unheaded block 49",
+          "startLine": 385,
+          "endLine": 386,
+          "textDigest": "f43f3ff53150980b52653b87618308619ddaae4a8ce19572b2589bb7cf744f7a",
+          "sample": "Local profile chỉ phải đáp ứng invariants ownership/liveness/idempotence nêu\ntrên, không phải triển khai journal/lease schema của remote.",
+          "identityFingerprint": "6a1fda5c01985520210ebb5055c2c7e5e1ec433b86f13cc8bd396d3bc4c6cdd0",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "8. Policy resolution và edge cases",
+            "8.6 Crash và cleanup"
+          ],
+          "text": "Local profile chỉ phải đáp ứng invariants ownership/liveness/idempotence nêu\ntrên, không phải triển khai journal/lease schema của remote."
+        },
+        "sourceTextDigestAtDraftTarget": false,
+        "uniqueSameTextCurrentTarget": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-51",
+          "githubAnchor": "unheaded-block-51",
+          "stableAnchor": "unheaded-block-51",
+          "title": "Unheaded block 51",
+          "startLine": 404,
+          "endLine": 404,
+          "textDigest": "f0aa8cea776fc1a9bd023b6e3e1318c7c9c16589a68d5ac16288b63f23634cbb",
+          "sample": "Default nhỏ nhất có ích:",
+          "identityFingerprint": "939f27292f5a04d3a26553f71cb92d8d72ec73eab1559fa5db6e7e9b1630c4e6",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "9. Default implementation đầu tiên"
+          ],
+          "text": "Default nhỏ nhất có ích:"
+        },
+        "note": "Read-only current source and target comparisons; draft unchanged. Source and target numbered-anchor relocation is not approval. Text corrections or source drift require independent judgment."
+      }
+    ]
+  },
+  "currentSourceDigestUnchanged": true
+}
+```
+
+## Entry e-007: claim_f1aeeff92e7bbf3f52b1cc88896cc41e
+
+```json
+{
+  "kind": "source-alias-comparison",
+  "claimId": "claim_f1aeeff92e7bbf3f52b1cc88896cc41e",
+  "priorAnchor": "unheaded-block-117",
+  "priorDigest": "2fcf6811e81b5faf421dcc8038872613f72ad4fb0f62a9c552a56c090a6b31c0",
+  "currentDigest": "f0aa8cea776fc1a9bd023b6e3e1318c7c9c16589a68d5ac16288b63f23634cbb",
+  "matchingCurrentAnchors": [
+    "unheaded-block-118"
+  ],
+  "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval.",
+  "draftAliases": [
+    {
+      "aliasId": "step10-specs-0072",
+      "fromPath": "docs/specs/confinement-authority.md#unheaded-block-117",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-50",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    }
+  ],
+  "currentNative": {
+    "sourcePath": "docs/specs/confinement-authority.md",
+    "unitDigest": "c5a27e4d9b3fd598b286624f2fcacdda0a4b496dababc62c22d0ca3ffa7e149c",
+    "identityFingerprint": "c5a27e4d9b3fd598b286624f2fcacdda0a4b496dababc62c22d0ca3ffa7e149c",
+    "claimId": "claim_f1aeeff92e7bbf3f52b1cc88896cc41e",
+    "sourceAnchor": "unheaded-block-118",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "2fcf6811e81b5faf421dcc8038872613f72ad4fb0f62a9c552a56c090a6b31c0",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "currentSourceUnit": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-118",
+    "githubAnchor": "unheaded-block-118",
+    "stableAnchor": "unheaded-block-118",
+    "title": "Unheaded block 118",
+    "startLine": 1140,
+    "endLine": 1159,
+    "textDigest": "2fcf6811e81b5faf421dcc8038872613f72ad4fb0f62a9c552a56c090a6b31c0",
+    "sample": "1. Một backend driver `bwrap` và một backend instance `bwrap` trong machine\n   registry.\n2. Hai built-in policy `host-write-denied` và `workspace-write` (§6.2):\n   `hostWrite: deny",
+    "identityFingerprint": "c5a27e4d9b3fd598b286624f2fcacdda0a4b496dababc62c22d0ca3ffa7e149c",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "9. Default implementation đầu tiên"
+    ],
+    "text": "1. Một backend driver `bwrap` và một backend instance `bwrap` trong machine\n   registry.\n2. Hai built-in policy `host-write-denied` và `workspace-write` (§6.2):\n   `hostWrite: deny`; host-write-denied cấp `run-output` và backend-managed\n   `private-home`; read grant `executor-credentials`;\n   `hostRead/networkEgress/process` lần lượt cho phép `allow/allow/host` và\n   không được trình bày như restriction;\n   workspace-write thêm workspace/git-metadata grant theo ownership/readiness;\n   private home tùy nhu cầu provider, không là control bắt buộc của built-in;\n   private home cho Codex được provider normalizer diễn tả bằng resource binding\n   chuẩn, backend không biết đó là Codex.\n3. Migration ba executor bwrap khỏi argv hardcode; mỗi executor tham chiếu\n   singular backend instance `bwrap`.\n4. Giữ tên `claude-bwrap`, `agy-bwrap`, `codex-bwrap` để không phá evidence\n   trail và capability binding.\n5. Shape cũ của herdr được normalize và đi qua cùng Authority. Việc di dời\n   provisioning khỏi `herdr-round.mjs` có thể ship sau, nhưng chưa di dời xong\n   thì maturity một cửa chỉ được ghi là `partial`.\n6. Mọi capability committed phải khai policy ID hoặc `unconfined` trước khi bật\n   strict mode."
+  },
+  "currentTargetComparisons": [
+    {
+      "aliasId": "step10-specs-0072",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-50",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-50",
+        "githubAnchor": "unheaded-block-50",
+        "stableAnchor": "unheaded-block-50",
+        "title": "Unheaded block 50",
+        "startLine": 390,
+        "endLine": 400,
+        "textDigest": "0ef8d6c210698ac4fae241e133b626be662e36e1023900186b541f3f7d0e27b8",
+        "sample": "| Tình huống | Trước spawn | Kết quả cuối |\n|---|---|---|\n| Required, đủ coverage/readiness/proof | prepare rồi execute | enforced khi receipt/evidence khớp |\n| Required, proof sta",
+        "identityFingerprint": "afe1847641e6aab965dbcece2e6e37cdbcd97a1d81833ccc9e239479ab3e67ae",
+        "ancestry": [
+          "Spec: Agent Confinement Authority",
+          "8. Policy resolution và edge cases",
+          "8.7 Bảng tình huống chuẩn"
+        ],
+        "text": "| Tình huống | Trước spawn | Kết quả cuối |\n|---|---|---|\n| Required, đủ coverage/readiness/proof | prepare rồi execute | enforced khi receipt/evidence khớp |\n| Required, proof stale | tự refresh probe trước spawn | pass thì execute; fail/timeout thì refused |\n| Preferred, thiếu network protection nhưng đủ needs | ghi degrade rồi execute phần đã assess | degraded |\n| Preferred không backend, need private home chưa có | refuse, zero spawn | refused |\n| Grant read-write, backend chỉ read, need read | coverage/readiness satisfied | có thể enforced |\n| Grant read-write, backend chỉ read, need write | readiness unsatisfied, zero spawn | refused ở mọi mode |\n| Prepare tạo resource rồi Authority crash | phục hồi theo profile (local marker hoặc journal) | unknown tới khi recovery có bằng chứng |\n| Remote mất kết nối sau started | không suy đã dừng | failed/unknown, cleanup pending |\n| Collect artifact thất bại | agent đã chạy, không refusal hồi tố | failed, giữ resource để thu lại |"
+      },
+      "uniqueSameDigestUnits": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-52",
+          "githubAnchor": "unheaded-block-52",
+          "stableAnchor": "unheaded-block-52",
+          "title": "Unheaded block 52",
+          "startLine": 406,
+          "endLine": 425,
+          "textDigest": "2fcf6811e81b5faf421dcc8038872613f72ad4fb0f62a9c552a56c090a6b31c0",
+          "sample": "1. Một backend driver `bwrap` và một backend instance `bwrap` trong machine\n   registry.\n2. Hai built-in policy `host-write-denied` và `workspace-write` (§6.2):\n   `hostWrite: deny",
+          "identityFingerprint": "c5a27e4d9b3fd598b286624f2fcacdda0a4b496dababc62c22d0ca3ffa7e149c",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "9. Default implementation đầu tiên"
+          ],
+          "text": "1. Một backend driver `bwrap` và một backend instance `bwrap` trong machine\n   registry.\n2. Hai built-in policy `host-write-denied` và `workspace-write` (§6.2):\n   `hostWrite: deny`; host-write-denied cấp `run-output` và backend-managed\n   `private-home`; read grant `executor-credentials`;\n   `hostRead/networkEgress/process` lần lượt cho phép `allow/allow/host` và\n   không được trình bày như restriction;\n   workspace-write thêm workspace/git-metadata grant theo ownership/readiness;\n   private home tùy nhu cầu provider, không là control bắt buộc của built-in;\n   private home cho Codex được provider normalizer diễn tả bằng resource binding\n   chuẩn, backend không biết đó là Codex.\n3. Migration ba executor bwrap khỏi argv hardcode; mỗi executor tham chiếu\n   singular backend instance `bwrap`.\n4. Giữ tên `claude-bwrap`, `agy-bwrap`, `codex-bwrap` để không phá evidence\n   trail và capability binding.\n5. Shape cũ của herdr được normalize và đi qua cùng Authority. Việc di dời\n   provisioning khỏi `herdr-round.mjs` có thể ship sau, nhưng chưa di dời xong\n   thì maturity một cửa chỉ được ghi là `partial`.\n6. Mọi capability committed phải khai policy ID hoặc `unconfined` trước khi bật\n   strict mode."
+        }
+      ]
+    }
+  ],
+  "historicalPackageComparisons": {
+    "nativeIdentity": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "c5a27e4d9b3fd598b286624f2fcacdda0a4b496dababc62c22d0ca3ffa7e149c",
+      "identityFingerprint": "c5a27e4d9b3fd598b286624f2fcacdda0a4b496dababc62c22d0ca3ffa7e149c",
+      "claimId": "claim_f1aeeff92e7bbf3f52b1cc88896cc41e",
+      "sourceAnchor": "unheaded-block-118",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "2fcf6811e81b5faf421dcc8038872613f72ad4fb0f62a9c552a56c090a6b31c0",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "currentIdentityBinding": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "c5a27e4d9b3fd598b286624f2fcacdda0a4b496dababc62c22d0ca3ffa7e149c",
+      "identityFingerprint": "c5a27e4d9b3fd598b286624f2fcacdda0a4b496dababc62c22d0ca3ffa7e149c",
+      "claimId": "claim_f1aeeff92e7bbf3f52b1cc88896cc41e",
+      "sourceAnchor": "unheaded-block-118",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "2fcf6811e81b5faf421dcc8038872613f72ad4fb0f62a9c552a56c090a6b31c0",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "uniqueSameDigestBinding": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-118",
+      "githubAnchor": "unheaded-block-118",
+      "stableAnchor": "unheaded-block-118",
+      "title": "Unheaded block 118",
+      "startLine": 1140,
+      "endLine": 1159,
+      "textDigest": "2fcf6811e81b5faf421dcc8038872613f72ad4fb0f62a9c552a56c090a6b31c0",
+      "sample": "1. Một backend driver `bwrap` và một backend instance `bwrap` trong machine\n   registry.\n2. Hai built-in policy `host-write-denied` và `workspace-write` (§6.2):\n   `hostWrite: deny",
+      "identityFingerprint": "c5a27e4d9b3fd598b286624f2fcacdda0a4b496dababc62c22d0ca3ffa7e149c",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "9. Default implementation đầu tiên"
+      ],
+      "text": "1. Một backend driver `bwrap` và một backend instance `bwrap` trong machine\n   registry.\n2. Hai built-in policy `host-write-denied` và `workspace-write` (§6.2):\n   `hostWrite: deny`; host-write-denied cấp `run-output` và backend-managed\n   `private-home`; read grant `executor-credentials`;\n   `hostRead/networkEgress/process` lần lượt cho phép `allow/allow/host` và\n   không được trình bày như restriction;\n   workspace-write thêm workspace/git-metadata grant theo ownership/readiness;\n   private home tùy nhu cầu provider, không là control bắt buộc của built-in;\n   private home cho Codex được provider normalizer diễn tả bằng resource binding\n   chuẩn, backend không biết đó là Codex.\n3. Migration ba executor bwrap khỏi argv hardcode; mỗi executor tham chiếu\n   singular backend instance `bwrap`.\n4. Giữ tên `claude-bwrap`, `agy-bwrap`, `codex-bwrap` để không phá evidence\n   trail và capability binding.\n5. Shape cũ của herdr được normalize và đi qua cùng Authority. Việc di dời\n   provisioning khỏi `herdr-round.mjs` có thể ship sau, nhưng chưa di dời xong\n   thì maturity một cửa chỉ được ghi là `partial`.\n6. Mọi capability committed phải khai policy ID hoặc `unconfined` trước khi bật\n   strict mode."
+    },
+    "currentUnitAtRetainedIdentity": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-118",
+      "githubAnchor": "unheaded-block-118",
+      "stableAnchor": "unheaded-block-118",
+      "title": "Unheaded block 118",
+      "startLine": 1140,
+      "endLine": 1159,
+      "textDigest": "2fcf6811e81b5faf421dcc8038872613f72ad4fb0f62a9c552a56c090a6b31c0",
+      "sample": "1. Một backend driver `bwrap` và một backend instance `bwrap` trong machine\n   registry.\n2. Hai built-in policy `host-write-denied` và `workspace-write` (§6.2):\n   `hostWrite: deny",
+      "identityFingerprint": "c5a27e4d9b3fd598b286624f2fcacdda0a4b496dababc62c22d0ca3ffa7e149c",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "9. Default implementation đầu tiên"
+      ],
+      "text": "1. Một backend driver `bwrap` và một backend instance `bwrap` trong machine\n   registry.\n2. Hai built-in policy `host-write-denied` và `workspace-write` (§6.2):\n   `hostWrite: deny`; host-write-denied cấp `run-output` và backend-managed\n   `private-home`; read grant `executor-credentials`;\n   `hostRead/networkEgress/process` lần lượt cho phép `allow/allow/host` và\n   không được trình bày như restriction;\n   workspace-write thêm workspace/git-metadata grant theo ownership/readiness;\n   private home tùy nhu cầu provider, không là control bắt buộc của built-in;\n   private home cho Codex được provider normalizer diễn tả bằng resource binding\n   chuẩn, backend không biết đó là Codex.\n3. Migration ba executor bwrap khỏi argv hardcode; mỗi executor tham chiếu\n   singular backend instance `bwrap`.\n4. Giữ tên `claude-bwrap`, `agy-bwrap`, `codex-bwrap` để không phá evidence\n   trail và capability binding.\n5. Shape cũ của herdr được normalize và đi qua cùng Authority. Việc di dời\n   provisioning khỏi `herdr-round.mjs` có thể ship sau, nhưng chưa di dời xong\n   thì maturity một cửa chỉ được ghi là `partial`.\n6. Mọi capability committed phải khai policy ID hoặc `unconfined` trước khi bật\n   strict mode."
+    },
+    "sourceDigestUnchanged": true,
+    "status": "same text uniquely found; alias anchor still independently checked",
+    "aliasTargetComparisons": [
+      {
+        "aliasId": "step10-specs-0072",
+        "fromPath": "docs/specs/confinement-authority.md#unheaded-block-117",
+        "toOwner": "docs/platform/agent-confinement/spec.md",
+        "toAnchor": "unheaded-block-50",
+        "currentTargetAtDraftAnchor": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-50",
+          "githubAnchor": "unheaded-block-50",
+          "stableAnchor": "unheaded-block-50",
+          "title": "Unheaded block 50",
+          "startLine": 390,
+          "endLine": 400,
+          "textDigest": "0ef8d6c210698ac4fae241e133b626be662e36e1023900186b541f3f7d0e27b8",
+          "sample": "| Tình huống | Trước spawn | Kết quả cuối |\n|---|---|---|\n| Required, đủ coverage/readiness/proof | prepare rồi execute | enforced khi receipt/evidence khớp |\n| Required, proof sta",
+          "identityFingerprint": "afe1847641e6aab965dbcece2e6e37cdbcd97a1d81833ccc9e239479ab3e67ae",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "8. Policy resolution và edge cases",
+            "8.7 Bảng tình huống chuẩn"
+          ],
+          "text": "| Tình huống | Trước spawn | Kết quả cuối |\n|---|---|---|\n| Required, đủ coverage/readiness/proof | prepare rồi execute | enforced khi receipt/evidence khớp |\n| Required, proof stale | tự refresh probe trước spawn | pass thì execute; fail/timeout thì refused |\n| Preferred, thiếu network protection nhưng đủ needs | ghi degrade rồi execute phần đã assess | degraded |\n| Preferred không backend, need private home chưa có | refuse, zero spawn | refused |\n| Grant read-write, backend chỉ read, need read | coverage/readiness satisfied | có thể enforced |\n| Grant read-write, backend chỉ read, need write | readiness unsatisfied, zero spawn | refused ở mọi mode |\n| Prepare tạo resource rồi Authority crash | phục hồi theo profile (local marker hoặc journal) | unknown tới khi recovery có bằng chứng |\n| Remote mất kết nối sau started | không suy đã dừng | failed/unknown, cleanup pending |\n| Collect artifact thất bại | agent đã chạy, không refusal hồi tố | failed, giữ resource để thu lại |"
+        },
+        "sourceTextDigestAtDraftTarget": false,
+        "uniqueSameTextCurrentTarget": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-52",
+          "githubAnchor": "unheaded-block-52",
+          "stableAnchor": "unheaded-block-52",
+          "title": "Unheaded block 52",
+          "startLine": 406,
+          "endLine": 425,
+          "textDigest": "2fcf6811e81b5faf421dcc8038872613f72ad4fb0f62a9c552a56c090a6b31c0",
+          "sample": "1. Một backend driver `bwrap` và một backend instance `bwrap` trong machine\n   registry.\n2. Hai built-in policy `host-write-denied` và `workspace-write` (§6.2):\n   `hostWrite: deny",
+          "identityFingerprint": "c5a27e4d9b3fd598b286624f2fcacdda0a4b496dababc62c22d0ca3ffa7e149c",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "9. Default implementation đầu tiên"
+          ],
+          "text": "1. Một backend driver `bwrap` và một backend instance `bwrap` trong machine\n   registry.\n2. Hai built-in policy `host-write-denied` và `workspace-write` (§6.2):\n   `hostWrite: deny`; host-write-denied cấp `run-output` và backend-managed\n   `private-home`; read grant `executor-credentials`;\n   `hostRead/networkEgress/process` lần lượt cho phép `allow/allow/host` và\n   không được trình bày như restriction;\n   workspace-write thêm workspace/git-metadata grant theo ownership/readiness;\n   private home tùy nhu cầu provider, không là control bắt buộc của built-in;\n   private home cho Codex được provider normalizer diễn tả bằng resource binding\n   chuẩn, backend không biết đó là Codex.\n3. Migration ba executor bwrap khỏi argv hardcode; mỗi executor tham chiếu\n   singular backend instance `bwrap`.\n4. Giữ tên `claude-bwrap`, `agy-bwrap`, `codex-bwrap` để không phá evidence\n   trail và capability binding.\n5. Shape cũ của herdr được normalize và đi qua cùng Authority. Việc di dời\n   provisioning khỏi `herdr-round.mjs` có thể ship sau, nhưng chưa di dời xong\n   thì maturity một cửa chỉ được ghi là `partial`.\n6. Mọi capability committed phải khai policy ID hoặc `unconfined` trước khi bật\n   strict mode."
+        },
+        "note": "Read-only current source and target comparisons; draft unchanged. Source and target numbered-anchor relocation is not approval. Text corrections or source drift require independent judgment."
+      }
+    ]
+  },
+  "currentSourceDigestUnchanged": true
+}
+```
+
+## Entry e-008: claim_1538dad17e4fa44207a7f70dc2ca7b55
+
+```json
+{
+  "kind": "source-alias-comparison",
+  "claimId": "claim_1538dad17e4fa44207a7f70dc2ca7b55",
+  "priorAnchor": "unheaded-block-118",
+  "priorDigest": "9077d21c4c3ff52bd3ddcb04d54a03a978ee83919055752883a6609016055acf",
+  "currentDigest": "2fcf6811e81b5faf421dcc8038872613f72ad4fb0f62a9c552a56c090a6b31c0",
+  "matchingCurrentAnchors": [
+    "unheaded-block-119"
+  ],
+  "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval.",
+  "draftAliases": [
+    {
+      "aliasId": "step10-specs-0073",
+      "fromPath": "docs/specs/confinement-authority.md#unheaded-block-118",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-51",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    }
+  ],
+  "currentNative": {
+    "sourcePath": "docs/specs/confinement-authority.md",
+    "unitDigest": "5f4c45abf90f2a4f9a86048568f1bcc5c85c3256b8ec6beb944a3be317f830b1",
+    "identityFingerprint": "5f4c45abf90f2a4f9a86048568f1bcc5c85c3256b8ec6beb944a3be317f830b1",
+    "claimId": "claim_1538dad17e4fa44207a7f70dc2ca7b55",
+    "sourceAnchor": "unheaded-block-119",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "9077d21c4c3ff52bd3ddcb04d54a03a978ee83919055752883a6609016055acf",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "currentSourceUnit": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-119",
+    "githubAnchor": "unheaded-block-119",
+    "stableAnchor": "unheaded-block-119",
+    "title": "Unheaded block 119",
+    "startLine": 1161,
+    "endLine": 1164,
+    "textDigest": "9077d21c4c3ff52bd3ddcb04d54a03a978ee83919055752883a6609016055acf",
+    "sample": "Trong default, host-write-denied giữ workspace read-only; workspace-write cho\nsửa workspace đã cấp. Capability execute/stage implement phải được migrate sang\nprofile có backend phù",
+    "identityFingerprint": "5f4c45abf90f2a4f9a86048568f1bcc5c85c3256b8ec6beb944a3be317f830b1",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "9. Default implementation đầu tiên"
+    ],
+    "text": "Trong default, host-write-denied giữ workspace read-only; workspace-write cho\nsửa workspace đã cấp. Capability execute/stage implement phải được migrate sang\nprofile có backend phù hợp trước strict flip; không đổi sang unconfined chỉ để\nqua gate. Git commit readiness là kiểm tra riêng như §6.3."
+  },
+  "currentTargetComparisons": [
+    {
+      "aliasId": "step10-specs-0073",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-51",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-51",
+        "githubAnchor": "unheaded-block-51",
+        "stableAnchor": "unheaded-block-51",
+        "title": "Unheaded block 51",
+        "startLine": 404,
+        "endLine": 404,
+        "textDigest": "f0aa8cea776fc1a9bd023b6e3e1318c7c9c16589a68d5ac16288b63f23634cbb",
+        "sample": "Default nhỏ nhất có ích:",
+        "identityFingerprint": "939f27292f5a04d3a26553f71cb92d8d72ec73eab1559fa5db6e7e9b1630c4e6",
+        "ancestry": [
+          "Spec: Agent Confinement Authority",
+          "9. Default implementation đầu tiên"
+        ],
+        "text": "Default nhỏ nhất có ích:"
+      },
+      "uniqueSameDigestUnits": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-53",
+          "githubAnchor": "unheaded-block-53",
+          "stableAnchor": "unheaded-block-53",
+          "title": "Unheaded block 53",
+          "startLine": 427,
+          "endLine": 430,
+          "textDigest": "9077d21c4c3ff52bd3ddcb04d54a03a978ee83919055752883a6609016055acf",
+          "sample": "Trong default, host-write-denied giữ workspace read-only; workspace-write cho\nsửa workspace đã cấp. Capability execute/stage implement phải được migrate sang\nprofile có backend phù",
+          "identityFingerprint": "5f4c45abf90f2a4f9a86048568f1bcc5c85c3256b8ec6beb944a3be317f830b1",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "9. Default implementation đầu tiên"
+          ],
+          "text": "Trong default, host-write-denied giữ workspace read-only; workspace-write cho\nsửa workspace đã cấp. Capability execute/stage implement phải được migrate sang\nprofile có backend phù hợp trước strict flip; không đổi sang unconfined chỉ để\nqua gate. Git commit readiness là kiểm tra riêng như §6.3."
+        }
+      ]
+    }
+  ],
+  "historicalPackageComparisons": {
+    "nativeIdentity": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "5f4c45abf90f2a4f9a86048568f1bcc5c85c3256b8ec6beb944a3be317f830b1",
+      "identityFingerprint": "5f4c45abf90f2a4f9a86048568f1bcc5c85c3256b8ec6beb944a3be317f830b1",
+      "claimId": "claim_1538dad17e4fa44207a7f70dc2ca7b55",
+      "sourceAnchor": "unheaded-block-119",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "9077d21c4c3ff52bd3ddcb04d54a03a978ee83919055752883a6609016055acf",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "currentIdentityBinding": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "5f4c45abf90f2a4f9a86048568f1bcc5c85c3256b8ec6beb944a3be317f830b1",
+      "identityFingerprint": "5f4c45abf90f2a4f9a86048568f1bcc5c85c3256b8ec6beb944a3be317f830b1",
+      "claimId": "claim_1538dad17e4fa44207a7f70dc2ca7b55",
+      "sourceAnchor": "unheaded-block-119",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "9077d21c4c3ff52bd3ddcb04d54a03a978ee83919055752883a6609016055acf",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "uniqueSameDigestBinding": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-119",
+      "githubAnchor": "unheaded-block-119",
+      "stableAnchor": "unheaded-block-119",
+      "title": "Unheaded block 119",
+      "startLine": 1161,
+      "endLine": 1164,
+      "textDigest": "9077d21c4c3ff52bd3ddcb04d54a03a978ee83919055752883a6609016055acf",
+      "sample": "Trong default, host-write-denied giữ workspace read-only; workspace-write cho\nsửa workspace đã cấp. Capability execute/stage implement phải được migrate sang\nprofile có backend phù",
+      "identityFingerprint": "5f4c45abf90f2a4f9a86048568f1bcc5c85c3256b8ec6beb944a3be317f830b1",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "9. Default implementation đầu tiên"
+      ],
+      "text": "Trong default, host-write-denied giữ workspace read-only; workspace-write cho\nsửa workspace đã cấp. Capability execute/stage implement phải được migrate sang\nprofile có backend phù hợp trước strict flip; không đổi sang unconfined chỉ để\nqua gate. Git commit readiness là kiểm tra riêng như §6.3."
+    },
+    "currentUnitAtRetainedIdentity": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-119",
+      "githubAnchor": "unheaded-block-119",
+      "stableAnchor": "unheaded-block-119",
+      "title": "Unheaded block 119",
+      "startLine": 1161,
+      "endLine": 1164,
+      "textDigest": "9077d21c4c3ff52bd3ddcb04d54a03a978ee83919055752883a6609016055acf",
+      "sample": "Trong default, host-write-denied giữ workspace read-only; workspace-write cho\nsửa workspace đã cấp. Capability execute/stage implement phải được migrate sang\nprofile có backend phù",
+      "identityFingerprint": "5f4c45abf90f2a4f9a86048568f1bcc5c85c3256b8ec6beb944a3be317f830b1",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "9. Default implementation đầu tiên"
+      ],
+      "text": "Trong default, host-write-denied giữ workspace read-only; workspace-write cho\nsửa workspace đã cấp. Capability execute/stage implement phải được migrate sang\nprofile có backend phù hợp trước strict flip; không đổi sang unconfined chỉ để\nqua gate. Git commit readiness là kiểm tra riêng như §6.3."
+    },
+    "sourceDigestUnchanged": true,
+    "status": "same text uniquely found; alias anchor still independently checked",
+    "aliasTargetComparisons": [
+      {
+        "aliasId": "step10-specs-0073",
+        "fromPath": "docs/specs/confinement-authority.md#unheaded-block-118",
+        "toOwner": "docs/platform/agent-confinement/spec.md",
+        "toAnchor": "unheaded-block-51",
+        "currentTargetAtDraftAnchor": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-51",
+          "githubAnchor": "unheaded-block-51",
+          "stableAnchor": "unheaded-block-51",
+          "title": "Unheaded block 51",
+          "startLine": 404,
+          "endLine": 404,
+          "textDigest": "f0aa8cea776fc1a9bd023b6e3e1318c7c9c16589a68d5ac16288b63f23634cbb",
+          "sample": "Default nhỏ nhất có ích:",
+          "identityFingerprint": "939f27292f5a04d3a26553f71cb92d8d72ec73eab1559fa5db6e7e9b1630c4e6",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "9. Default implementation đầu tiên"
+          ],
+          "text": "Default nhỏ nhất có ích:"
+        },
+        "sourceTextDigestAtDraftTarget": false,
+        "uniqueSameTextCurrentTarget": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-53",
+          "githubAnchor": "unheaded-block-53",
+          "stableAnchor": "unheaded-block-53",
+          "title": "Unheaded block 53",
+          "startLine": 427,
+          "endLine": 430,
+          "textDigest": "9077d21c4c3ff52bd3ddcb04d54a03a978ee83919055752883a6609016055acf",
+          "sample": "Trong default, host-write-denied giữ workspace read-only; workspace-write cho\nsửa workspace đã cấp. Capability execute/stage implement phải được migrate sang\nprofile có backend phù",
+          "identityFingerprint": "5f4c45abf90f2a4f9a86048568f1bcc5c85c3256b8ec6beb944a3be317f830b1",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "9. Default implementation đầu tiên"
+          ],
+          "text": "Trong default, host-write-denied giữ workspace read-only; workspace-write cho\nsửa workspace đã cấp. Capability execute/stage implement phải được migrate sang\nprofile có backend phù hợp trước strict flip; không đổi sang unconfined chỉ để\nqua gate. Git commit readiness là kiểm tra riêng như §6.3."
+        },
+        "note": "Read-only current source and target comparisons; draft unchanged. Source and target numbered-anchor relocation is not approval. Text corrections or source drift require independent judgment."
+      }
+    ]
+  },
+  "currentSourceDigestUnchanged": true
+}
+```
+
+## Entry e-009: claim_daa730ce31dbd045d14a42c31c57f316
+
+```json
+{
+  "kind": "source-alias-comparison",
+  "claimId": "claim_daa730ce31dbd045d14a42c31c57f316",
+  "priorAnchor": "unheaded-block-119",
+  "priorDigest": "fdcc56c6036171a7393772c55e187bfd7e86e9b00b045bc9d0ae3c81c963fd67",
+  "currentDigest": "9077d21c4c3ff52bd3ddcb04d54a03a978ee83919055752883a6609016055acf",
+  "matchingCurrentAnchors": [
+    "unheaded-block-120"
+  ],
+  "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval.",
+  "draftAliases": [
+    {
+      "aliasId": "step10-specs-0074",
+      "fromPath": "docs/specs/confinement-authority.md#unheaded-block-119",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-52",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    }
+  ],
+  "currentNative": {
+    "sourcePath": "docs/specs/confinement-authority.md",
+    "unitDigest": "6437ebff8e50a0bfa5fa389c6d0eae24e193e7fdcce066395abd75e6d1a1b285",
+    "identityFingerprint": "6437ebff8e50a0bfa5fa389c6d0eae24e193e7fdcce066395abd75e6d1a1b285",
+    "claimId": "claim_daa730ce31dbd045d14a42c31c57f316",
+    "sourceAnchor": "unheaded-block-120",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "fdcc56c6036171a7393772c55e187bfd7e86e9b00b045bc9d0ae3c81c963fd67",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "currentSourceUnit": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-120",
+    "githubAnchor": "unheaded-block-120",
+    "stableAnchor": "unheaded-block-120",
+    "title": "Unheaded block 120",
+    "startLine": 1166,
+    "endLine": 1167,
+    "textDigest": "fdcc56c6036171a7393772c55e187bfd7e86e9b00b045bc9d0ae3c81c963fd67",
+    "sample": "Default chưa cần network firewall, secret filtering, macOS/container/remote\nbackend, generic composition cho mọi tổ hợp control, hoặc đổi tên executor.",
+    "identityFingerprint": "6437ebff8e50a0bfa5fa389c6d0eae24e193e7fdcce066395abd75e6d1a1b285",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "9. Default implementation đầu tiên"
+    ],
+    "text": "Default chưa cần network firewall, secret filtering, macOS/container/remote\nbackend, generic composition cho mọi tổ hợp control, hoặc đổi tên executor."
+  },
+  "currentTargetComparisons": [
+    {
+      "aliasId": "step10-specs-0074",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-52",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-52",
+        "githubAnchor": "unheaded-block-52",
+        "stableAnchor": "unheaded-block-52",
+        "title": "Unheaded block 52",
+        "startLine": 406,
+        "endLine": 425,
+        "textDigest": "2fcf6811e81b5faf421dcc8038872613f72ad4fb0f62a9c552a56c090a6b31c0",
+        "sample": "1. Một backend driver `bwrap` và một backend instance `bwrap` trong machine\n   registry.\n2. Hai built-in policy `host-write-denied` và `workspace-write` (§6.2):\n   `hostWrite: deny",
+        "identityFingerprint": "c5a27e4d9b3fd598b286624f2fcacdda0a4b496dababc62c22d0ca3ffa7e149c",
+        "ancestry": [
+          "Spec: Agent Confinement Authority",
+          "9. Default implementation đầu tiên"
+        ],
+        "text": "1. Một backend driver `bwrap` và một backend instance `bwrap` trong machine\n   registry.\n2. Hai built-in policy `host-write-denied` và `workspace-write` (§6.2):\n   `hostWrite: deny`; host-write-denied cấp `run-output` và backend-managed\n   `private-home`; read grant `executor-credentials`;\n   `hostRead/networkEgress/process` lần lượt cho phép `allow/allow/host` và\n   không được trình bày như restriction;\n   workspace-write thêm workspace/git-metadata grant theo ownership/readiness;\n   private home tùy nhu cầu provider, không là control bắt buộc của built-in;\n   private home cho Codex được provider normalizer diễn tả bằng resource binding\n   chuẩn, backend không biết đó là Codex.\n3. Migration ba executor bwrap khỏi argv hardcode; mỗi executor tham chiếu\n   singular backend instance `bwrap`.\n4. Giữ tên `claude-bwrap`, `agy-bwrap`, `codex-bwrap` để không phá evidence\n   trail và capability binding.\n5. Shape cũ của herdr được normalize và đi qua cùng Authority. Việc di dời\n   provisioning khỏi `herdr-round.mjs` có thể ship sau, nhưng chưa di dời xong\n   thì maturity một cửa chỉ được ghi là `partial`.\n6. Mọi capability committed phải khai policy ID hoặc `unconfined` trước khi bật\n   strict mode."
+      },
+      "uniqueSameDigestUnits": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-54",
+          "githubAnchor": "unheaded-block-54",
+          "stableAnchor": "unheaded-block-54",
+          "title": "Unheaded block 54",
+          "startLine": 432,
+          "endLine": 433,
+          "textDigest": "fdcc56c6036171a7393772c55e187bfd7e86e9b00b045bc9d0ae3c81c963fd67",
+          "sample": "Default chưa cần network firewall, secret filtering, macOS/container/remote\nbackend, generic composition cho mọi tổ hợp control, hoặc đổi tên executor.",
+          "identityFingerprint": "6437ebff8e50a0bfa5fa389c6d0eae24e193e7fdcce066395abd75e6d1a1b285",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "9. Default implementation đầu tiên"
+          ],
+          "text": "Default chưa cần network firewall, secret filtering, macOS/container/remote\nbackend, generic composition cho mọi tổ hợp control, hoặc đổi tên executor."
+        }
+      ]
+    }
+  ],
+  "historicalPackageComparisons": {
+    "nativeIdentity": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "6437ebff8e50a0bfa5fa389c6d0eae24e193e7fdcce066395abd75e6d1a1b285",
+      "identityFingerprint": "6437ebff8e50a0bfa5fa389c6d0eae24e193e7fdcce066395abd75e6d1a1b285",
+      "claimId": "claim_daa730ce31dbd045d14a42c31c57f316",
+      "sourceAnchor": "unheaded-block-120",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "fdcc56c6036171a7393772c55e187bfd7e86e9b00b045bc9d0ae3c81c963fd67",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "currentIdentityBinding": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "6437ebff8e50a0bfa5fa389c6d0eae24e193e7fdcce066395abd75e6d1a1b285",
+      "identityFingerprint": "6437ebff8e50a0bfa5fa389c6d0eae24e193e7fdcce066395abd75e6d1a1b285",
+      "claimId": "claim_daa730ce31dbd045d14a42c31c57f316",
+      "sourceAnchor": "unheaded-block-120",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "fdcc56c6036171a7393772c55e187bfd7e86e9b00b045bc9d0ae3c81c963fd67",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "uniqueSameDigestBinding": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-120",
+      "githubAnchor": "unheaded-block-120",
+      "stableAnchor": "unheaded-block-120",
+      "title": "Unheaded block 120",
+      "startLine": 1166,
+      "endLine": 1167,
+      "textDigest": "fdcc56c6036171a7393772c55e187bfd7e86e9b00b045bc9d0ae3c81c963fd67",
+      "sample": "Default chưa cần network firewall, secret filtering, macOS/container/remote\nbackend, generic composition cho mọi tổ hợp control, hoặc đổi tên executor.",
+      "identityFingerprint": "6437ebff8e50a0bfa5fa389c6d0eae24e193e7fdcce066395abd75e6d1a1b285",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "9. Default implementation đầu tiên"
+      ],
+      "text": "Default chưa cần network firewall, secret filtering, macOS/container/remote\nbackend, generic composition cho mọi tổ hợp control, hoặc đổi tên executor."
+    },
+    "currentUnitAtRetainedIdentity": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-120",
+      "githubAnchor": "unheaded-block-120",
+      "stableAnchor": "unheaded-block-120",
+      "title": "Unheaded block 120",
+      "startLine": 1166,
+      "endLine": 1167,
+      "textDigest": "fdcc56c6036171a7393772c55e187bfd7e86e9b00b045bc9d0ae3c81c963fd67",
+      "sample": "Default chưa cần network firewall, secret filtering, macOS/container/remote\nbackend, generic composition cho mọi tổ hợp control, hoặc đổi tên executor.",
+      "identityFingerprint": "6437ebff8e50a0bfa5fa389c6d0eae24e193e7fdcce066395abd75e6d1a1b285",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "9. Default implementation đầu tiên"
+      ],
+      "text": "Default chưa cần network firewall, secret filtering, macOS/container/remote\nbackend, generic composition cho mọi tổ hợp control, hoặc đổi tên executor."
+    },
+    "sourceDigestUnchanged": true,
+    "status": "same text uniquely found; alias anchor still independently checked",
+    "aliasTargetComparisons": [
+      {
+        "aliasId": "step10-specs-0074",
+        "fromPath": "docs/specs/confinement-authority.md#unheaded-block-119",
+        "toOwner": "docs/platform/agent-confinement/spec.md",
+        "toAnchor": "unheaded-block-52",
+        "currentTargetAtDraftAnchor": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-52",
+          "githubAnchor": "unheaded-block-52",
+          "stableAnchor": "unheaded-block-52",
+          "title": "Unheaded block 52",
+          "startLine": 406,
+          "endLine": 425,
+          "textDigest": "2fcf6811e81b5faf421dcc8038872613f72ad4fb0f62a9c552a56c090a6b31c0",
+          "sample": "1. Một backend driver `bwrap` và một backend instance `bwrap` trong machine\n   registry.\n2. Hai built-in policy `host-write-denied` và `workspace-write` (§6.2):\n   `hostWrite: deny",
+          "identityFingerprint": "c5a27e4d9b3fd598b286624f2fcacdda0a4b496dababc62c22d0ca3ffa7e149c",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "9. Default implementation đầu tiên"
+          ],
+          "text": "1. Một backend driver `bwrap` và một backend instance `bwrap` trong machine\n   registry.\n2. Hai built-in policy `host-write-denied` và `workspace-write` (§6.2):\n   `hostWrite: deny`; host-write-denied cấp `run-output` và backend-managed\n   `private-home`; read grant `executor-credentials`;\n   `hostRead/networkEgress/process` lần lượt cho phép `allow/allow/host` và\n   không được trình bày như restriction;\n   workspace-write thêm workspace/git-metadata grant theo ownership/readiness;\n   private home tùy nhu cầu provider, không là control bắt buộc của built-in;\n   private home cho Codex được provider normalizer diễn tả bằng resource binding\n   chuẩn, backend không biết đó là Codex.\n3. Migration ba executor bwrap khỏi argv hardcode; mỗi executor tham chiếu\n   singular backend instance `bwrap`.\n4. Giữ tên `claude-bwrap`, `agy-bwrap`, `codex-bwrap` để không phá evidence\n   trail và capability binding.\n5. Shape cũ của herdr được normalize và đi qua cùng Authority. Việc di dời\n   provisioning khỏi `herdr-round.mjs` có thể ship sau, nhưng chưa di dời xong\n   thì maturity một cửa chỉ được ghi là `partial`.\n6. Mọi capability committed phải khai policy ID hoặc `unconfined` trước khi bật\n   strict mode."
+        },
+        "sourceTextDigestAtDraftTarget": false,
+        "uniqueSameTextCurrentTarget": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-54",
+          "githubAnchor": "unheaded-block-54",
+          "stableAnchor": "unheaded-block-54",
+          "title": "Unheaded block 54",
+          "startLine": 432,
+          "endLine": 433,
+          "textDigest": "fdcc56c6036171a7393772c55e187bfd7e86e9b00b045bc9d0ae3c81c963fd67",
+          "sample": "Default chưa cần network firewall, secret filtering, macOS/container/remote\nbackend, generic composition cho mọi tổ hợp control, hoặc đổi tên executor.",
+          "identityFingerprint": "6437ebff8e50a0bfa5fa389c6d0eae24e193e7fdcce066395abd75e6d1a1b285",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "9. Default implementation đầu tiên"
+          ],
+          "text": "Default chưa cần network firewall, secret filtering, macOS/container/remote\nbackend, generic composition cho mọi tổ hợp control, hoặc đổi tên executor."
+        },
+        "note": "Read-only current source and target comparisons; draft unchanged. Source and target numbered-anchor relocation is not approval. Text corrections or source drift require independent judgment."
+      }
+    ]
+  },
+  "currentSourceDigestUnchanged": true
+}
+```
+
+## Entry e-010: claim_1a847c3e3266a47169a83f7ac836ef7b
+
+```json
+{
+  "kind": "source-alias-comparison",
+  "claimId": "claim_1a847c3e3266a47169a83f7ac836ef7b",
+  "priorAnchor": "unheaded-block-120",
+  "priorDigest": "14f3ee1a5085e8338b27e811d4a6fdddb36726d4f98c9df86111a65f594d85fa",
+  "currentDigest": "fdcc56c6036171a7393772c55e187bfd7e86e9b00b045bc9d0ae3c81c963fd67",
+  "matchingCurrentAnchors": [
+    "unheaded-block-121"
+  ],
+  "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval.",
+  "draftAliases": [
+    {
+      "aliasId": "step10-specs-0076",
+      "fromPath": "docs/specs/confinement-authority.md#unheaded-block-120",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-53",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    }
+  ],
+  "currentNative": {
+    "sourcePath": "docs/specs/confinement-authority.md",
+    "unitDigest": "af529bc80b1dc6dd2725ebf4012fcb269af668ad35efa8cd0abe96ede6c9f503",
+    "identityFingerprint": "af529bc80b1dc6dd2725ebf4012fcb269af668ad35efa8cd0abe96ede6c9f503",
+    "claimId": "claim_1a847c3e3266a47169a83f7ac836ef7b",
+    "sourceAnchor": "unheaded-block-121",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "14f3ee1a5085e8338b27e811d4a6fdddb36726d4f98c9df86111a65f594d85fa",
+    "claimKind": "contract",
+    "status": "current"
+  },
+  "currentSourceUnit": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-121",
+    "githubAnchor": "unheaded-block-121",
+    "stableAnchor": "unheaded-block-121",
+    "title": "Unheaded block 121",
+    "startLine": 1171,
+    "endLine": 1183,
+    "textDigest": "14f3ee1a5085e8338b27e811d4a6fdddb36726d4f98c9df86111a65f594d85fa",
+    "sample": "| Contract surface | Default v1 |\n|---|---|\n| Mode | `required`, `unconfined`; `preferred` có trong contract nhưng default chưa nhận config này |\n| Invocation override | Contract đ",
+    "identityFingerprint": "af529bc80b1dc6dd2725ebf4012fcb269af668ad35efa8cd0abe96ede6c9f503",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "9. Default implementation đầu tiên",
+      "9.1 Support matrix của default"
+    ],
+    "text": "| Contract surface | Default v1 |\n|---|---|\n| Mode | `required`, `unconfined`; `preferred` có trong contract nhưng default chưa nhận config này |\n| Invocation override | Contract đích giữ shape/partial-order; default v1 từ chối config override, dùng policy ID/capability khác — trừ một override duy nhất, `{ controls: { hostRead: 'blind' } }` (§9.2) |\n| `hostWrite` | `deny` qua bwrap, hoặc `allow` khi explicit `unconfined` |\n| Write grant | run-output, private-home khi cần; workspace/git-metadata cho workspace-write theo readiness |\n| Read grant | `executor-credentials` khi policy của dispatch yêu cầu |\n| `home` | host mặc định; private resource khi provider cần; home private nếu policy thực sự yêu cầu và đã prove |\n| `session`, `workspace` | effective value là `shared`; legacy `isolated/own` được normalize nhưng chưa di dời enforcement ở slice đầu |\n| `hostRead` | `allow`, hoặc `blind` (§9.2); request `deny` bị `unsupported` |\n| `networkEgress`, `process` | effective value là `allow`, `host`; request `deny/filtered/isolated` bị `unsupported` |\n| Resource delivery/collect | host direct/mount; copy/remote/workspace-change chưa hỗ trợ |\n| Backend | Linux bwrap; backend khác trả `unsupported` có lý do |"
+  },
+  "currentTargetComparisons": [
+    {
+      "aliasId": "step10-specs-0076",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-53",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-53",
+        "githubAnchor": "unheaded-block-53",
+        "stableAnchor": "unheaded-block-53",
+        "title": "Unheaded block 53",
+        "startLine": 427,
+        "endLine": 430,
+        "textDigest": "9077d21c4c3ff52bd3ddcb04d54a03a978ee83919055752883a6609016055acf",
+        "sample": "Trong default, host-write-denied giữ workspace read-only; workspace-write cho\nsửa workspace đã cấp. Capability execute/stage implement phải được migrate sang\nprofile có backend phù",
+        "identityFingerprint": "5f4c45abf90f2a4f9a86048568f1bcc5c85c3256b8ec6beb944a3be317f830b1",
+        "ancestry": [
+          "Spec: Agent Confinement Authority",
+          "9. Default implementation đầu tiên"
+        ],
+        "text": "Trong default, host-write-denied giữ workspace read-only; workspace-write cho\nsửa workspace đã cấp. Capability execute/stage implement phải được migrate sang\nprofile có backend phù hợp trước strict flip; không đổi sang unconfined chỉ để\nqua gate. Git commit readiness là kiểm tra riêng như §6.3."
+      },
+      "uniqueSameDigestUnits": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-55",
+          "githubAnchor": "unheaded-block-55",
+          "stableAnchor": "unheaded-block-55",
+          "title": "Unheaded block 55",
+          "startLine": 437,
+          "endLine": 449,
+          "textDigest": "14f3ee1a5085e8338b27e811d4a6fdddb36726d4f98c9df86111a65f594d85fa",
+          "sample": "| Contract surface | Default v1 |\n|---|---|\n| Mode | `required`, `unconfined`; `preferred` có trong contract nhưng default chưa nhận config này |\n| Invocation override | Contract đ",
+          "identityFingerprint": "af529bc80b1dc6dd2725ebf4012fcb269af668ad35efa8cd0abe96ede6c9f503",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "9. Default implementation đầu tiên",
+            "9.1 Support matrix của default"
+          ],
+          "text": "| Contract surface | Default v1 |\n|---|---|\n| Mode | `required`, `unconfined`; `preferred` có trong contract nhưng default chưa nhận config này |\n| Invocation override | Contract đích giữ shape/partial-order; default v1 từ chối config override, dùng policy ID/capability khác — trừ một override duy nhất, `{ controls: { hostRead: 'blind' } }` (§9.2) |\n| `hostWrite` | `deny` qua bwrap, hoặc `allow` khi explicit `unconfined` |\n| Write grant | run-output, private-home khi cần; workspace/git-metadata cho workspace-write theo readiness |\n| Read grant | `executor-credentials` khi policy của dispatch yêu cầu |\n| `home` | host mặc định; private resource khi provider cần; home private nếu policy thực sự yêu cầu và đã prove |\n| `session`, `workspace` | effective value là `shared`; legacy `isolated/own` được normalize nhưng chưa di dời enforcement ở slice đầu |\n| `hostRead` | `allow`, hoặc `blind` (§9.2); request `deny` bị `unsupported` |\n| `networkEgress`, `process` | effective value là `allow`, `host`; request `deny/filtered/isolated` bị `unsupported` |\n| Resource delivery/collect | host direct/mount; copy/remote/workspace-change chưa hỗ trợ |\n| Backend | Linux bwrap; backend khác trả `unsupported` có lý do |"
+        }
+      ]
+    }
+  ],
+  "historicalPackageComparisons": {
+    "nativeIdentity": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "af529bc80b1dc6dd2725ebf4012fcb269af668ad35efa8cd0abe96ede6c9f503",
+      "identityFingerprint": "af529bc80b1dc6dd2725ebf4012fcb269af668ad35efa8cd0abe96ede6c9f503",
+      "claimId": "claim_1a847c3e3266a47169a83f7ac836ef7b",
+      "sourceAnchor": "unheaded-block-121",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "14f3ee1a5085e8338b27e811d4a6fdddb36726d4f98c9df86111a65f594d85fa",
+      "claimKind": "contract",
+      "status": "current"
+    },
+    "currentIdentityBinding": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "af529bc80b1dc6dd2725ebf4012fcb269af668ad35efa8cd0abe96ede6c9f503",
+      "identityFingerprint": "af529bc80b1dc6dd2725ebf4012fcb269af668ad35efa8cd0abe96ede6c9f503",
+      "claimId": "claim_1a847c3e3266a47169a83f7ac836ef7b",
+      "sourceAnchor": "unheaded-block-121",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "14f3ee1a5085e8338b27e811d4a6fdddb36726d4f98c9df86111a65f594d85fa",
+      "claimKind": "contract",
+      "status": "current"
+    },
+    "uniqueSameDigestBinding": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-121",
+      "githubAnchor": "unheaded-block-121",
+      "stableAnchor": "unheaded-block-121",
+      "title": "Unheaded block 121",
+      "startLine": 1171,
+      "endLine": 1183,
+      "textDigest": "14f3ee1a5085e8338b27e811d4a6fdddb36726d4f98c9df86111a65f594d85fa",
+      "sample": "| Contract surface | Default v1 |\n|---|---|\n| Mode | `required`, `unconfined`; `preferred` có trong contract nhưng default chưa nhận config này |\n| Invocation override | Contract đ",
+      "identityFingerprint": "af529bc80b1dc6dd2725ebf4012fcb269af668ad35efa8cd0abe96ede6c9f503",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "9. Default implementation đầu tiên",
+        "9.1 Support matrix của default"
+      ],
+      "text": "| Contract surface | Default v1 |\n|---|---|\n| Mode | `required`, `unconfined`; `preferred` có trong contract nhưng default chưa nhận config này |\n| Invocation override | Contract đích giữ shape/partial-order; default v1 từ chối config override, dùng policy ID/capability khác — trừ một override duy nhất, `{ controls: { hostRead: 'blind' } }` (§9.2) |\n| `hostWrite` | `deny` qua bwrap, hoặc `allow` khi explicit `unconfined` |\n| Write grant | run-output, private-home khi cần; workspace/git-metadata cho workspace-write theo readiness |\n| Read grant | `executor-credentials` khi policy của dispatch yêu cầu |\n| `home` | host mặc định; private resource khi provider cần; home private nếu policy thực sự yêu cầu và đã prove |\n| `session`, `workspace` | effective value là `shared`; legacy `isolated/own` được normalize nhưng chưa di dời enforcement ở slice đầu |\n| `hostRead` | `allow`, hoặc `blind` (§9.2); request `deny` bị `unsupported` |\n| `networkEgress`, `process` | effective value là `allow`, `host`; request `deny/filtered/isolated` bị `unsupported` |\n| Resource delivery/collect | host direct/mount; copy/remote/workspace-change chưa hỗ trợ |\n| Backend | Linux bwrap; backend khác trả `unsupported` có lý do |"
+    },
+    "currentUnitAtRetainedIdentity": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-121",
+      "githubAnchor": "unheaded-block-121",
+      "stableAnchor": "unheaded-block-121",
+      "title": "Unheaded block 121",
+      "startLine": 1171,
+      "endLine": 1183,
+      "textDigest": "14f3ee1a5085e8338b27e811d4a6fdddb36726d4f98c9df86111a65f594d85fa",
+      "sample": "| Contract surface | Default v1 |\n|---|---|\n| Mode | `required`, `unconfined`; `preferred` có trong contract nhưng default chưa nhận config này |\n| Invocation override | Contract đ",
+      "identityFingerprint": "af529bc80b1dc6dd2725ebf4012fcb269af668ad35efa8cd0abe96ede6c9f503",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "9. Default implementation đầu tiên",
+        "9.1 Support matrix của default"
+      ],
+      "text": "| Contract surface | Default v1 |\n|---|---|\n| Mode | `required`, `unconfined`; `preferred` có trong contract nhưng default chưa nhận config này |\n| Invocation override | Contract đích giữ shape/partial-order; default v1 từ chối config override, dùng policy ID/capability khác — trừ một override duy nhất, `{ controls: { hostRead: 'blind' } }` (§9.2) |\n| `hostWrite` | `deny` qua bwrap, hoặc `allow` khi explicit `unconfined` |\n| Write grant | run-output, private-home khi cần; workspace/git-metadata cho workspace-write theo readiness |\n| Read grant | `executor-credentials` khi policy của dispatch yêu cầu |\n| `home` | host mặc định; private resource khi provider cần; home private nếu policy thực sự yêu cầu và đã prove |\n| `session`, `workspace` | effective value là `shared`; legacy `isolated/own` được normalize nhưng chưa di dời enforcement ở slice đầu |\n| `hostRead` | `allow`, hoặc `blind` (§9.2); request `deny` bị `unsupported` |\n| `networkEgress`, `process` | effective value là `allow`, `host`; request `deny/filtered/isolated` bị `unsupported` |\n| Resource delivery/collect | host direct/mount; copy/remote/workspace-change chưa hỗ trợ |\n| Backend | Linux bwrap; backend khác trả `unsupported` có lý do |"
+    },
+    "sourceDigestUnchanged": true,
+    "status": "same text uniquely found; alias anchor still independently checked",
+    "aliasTargetComparisons": [
+      {
+        "aliasId": "step10-specs-0076",
+        "fromPath": "docs/specs/confinement-authority.md#unheaded-block-120",
+        "toOwner": "docs/platform/agent-confinement/spec.md",
+        "toAnchor": "unheaded-block-53",
+        "currentTargetAtDraftAnchor": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-53",
+          "githubAnchor": "unheaded-block-53",
+          "stableAnchor": "unheaded-block-53",
+          "title": "Unheaded block 53",
+          "startLine": 427,
+          "endLine": 430,
+          "textDigest": "9077d21c4c3ff52bd3ddcb04d54a03a978ee83919055752883a6609016055acf",
+          "sample": "Trong default, host-write-denied giữ workspace read-only; workspace-write cho\nsửa workspace đã cấp. Capability execute/stage implement phải được migrate sang\nprofile có backend phù",
+          "identityFingerprint": "5f4c45abf90f2a4f9a86048568f1bcc5c85c3256b8ec6beb944a3be317f830b1",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "9. Default implementation đầu tiên"
+          ],
+          "text": "Trong default, host-write-denied giữ workspace read-only; workspace-write cho\nsửa workspace đã cấp. Capability execute/stage implement phải được migrate sang\nprofile có backend phù hợp trước strict flip; không đổi sang unconfined chỉ để\nqua gate. Git commit readiness là kiểm tra riêng như §6.3."
+        },
+        "sourceTextDigestAtDraftTarget": false,
+        "uniqueSameTextCurrentTarget": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-55",
+          "githubAnchor": "unheaded-block-55",
+          "stableAnchor": "unheaded-block-55",
+          "title": "Unheaded block 55",
+          "startLine": 437,
+          "endLine": 449,
+          "textDigest": "14f3ee1a5085e8338b27e811d4a6fdddb36726d4f98c9df86111a65f594d85fa",
+          "sample": "| Contract surface | Default v1 |\n|---|---|\n| Mode | `required`, `unconfined`; `preferred` có trong contract nhưng default chưa nhận config này |\n| Invocation override | Contract đ",
+          "identityFingerprint": "af529bc80b1dc6dd2725ebf4012fcb269af668ad35efa8cd0abe96ede6c9f503",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "9. Default implementation đầu tiên",
+            "9.1 Support matrix của default"
+          ],
+          "text": "| Contract surface | Default v1 |\n|---|---|\n| Mode | `required`, `unconfined`; `preferred` có trong contract nhưng default chưa nhận config này |\n| Invocation override | Contract đích giữ shape/partial-order; default v1 từ chối config override, dùng policy ID/capability khác — trừ một override duy nhất, `{ controls: { hostRead: 'blind' } }` (§9.2) |\n| `hostWrite` | `deny` qua bwrap, hoặc `allow` khi explicit `unconfined` |\n| Write grant | run-output, private-home khi cần; workspace/git-metadata cho workspace-write theo readiness |\n| Read grant | `executor-credentials` khi policy của dispatch yêu cầu |\n| `home` | host mặc định; private resource khi provider cần; home private nếu policy thực sự yêu cầu và đã prove |\n| `session`, `workspace` | effective value là `shared`; legacy `isolated/own` được normalize nhưng chưa di dời enforcement ở slice đầu |\n| `hostRead` | `allow`, hoặc `blind` (§9.2); request `deny` bị `unsupported` |\n| `networkEgress`, `process` | effective value là `allow`, `host`; request `deny/filtered/isolated` bị `unsupported` |\n| Resource delivery/collect | host direct/mount; copy/remote/workspace-change chưa hỗ trợ |\n| Backend | Linux bwrap; backend khác trả `unsupported` có lý do |"
+        },
+        "note": "Read-only current source and target comparisons; draft unchanged. Source and target numbered-anchor relocation is not approval. Text corrections or source drift require independent judgment."
+      }
+    ]
+  },
+  "currentSourceDigestUnchanged": true
+}
+```
+
+## Entry e-011: claim_d4bc3fb932ca2d29e917119191f45f1c
+
+```json
+{
+  "kind": "source-alias-comparison",
+  "claimId": "claim_d4bc3fb932ca2d29e917119191f45f1c",
+  "priorAnchor": "unheaded-block-121",
+  "priorDigest": "62da6aab49287cf95b091c9f3b8d55e5eed5b510a040c7663c8d3616cef1a994",
+  "currentDigest": "14f3ee1a5085e8338b27e811d4a6fdddb36726d4f98c9df86111a65f594d85fa",
+  "matchingCurrentAnchors": [
+    "unheaded-block-122"
+  ],
+  "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval.",
+  "draftAliases": [
+    {
+      "aliasId": "step10-specs-0077",
+      "fromPath": "docs/specs/confinement-authority.md#unheaded-block-121",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-54",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    }
+  ],
+  "currentNative": {
+    "sourcePath": "docs/specs/confinement-authority.md",
+    "unitDigest": "a47f66258b78b44aa166b2faf755f7afe52a56fbbc6d8b443faf60e128c0fd62",
+    "identityFingerprint": "a47f66258b78b44aa166b2faf755f7afe52a56fbbc6d8b443faf60e128c0fd62",
+    "claimId": "claim_d4bc3fb932ca2d29e917119191f45f1c",
+    "sourceAnchor": "unheaded-block-122",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "62da6aab49287cf95b091c9f3b8d55e5eed5b510a040c7663c8d3616cef1a994",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "currentSourceUnit": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-122",
+    "githubAnchor": "unheaded-block-122",
+    "stableAnchor": "unheaded-block-122",
+    "title": "Unheaded block 122",
+    "startLine": 1185,
+    "endLine": 1186,
+    "textDigest": "62da6aab49287cf95b091c9f3b8d55e5eed5b510a040c7663c8d3616cef1a994",
+    "sample": "Việc parser hiểu một field không có nghĩa backend đã support field đó. Default\nphải từ chối requirement ngoài matrix thay vì nhận rồi bỏ qua.",
+    "identityFingerprint": "a47f66258b78b44aa166b2faf755f7afe52a56fbbc6d8b443faf60e128c0fd62",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "9. Default implementation đầu tiên",
+      "9.1 Support matrix của default"
+    ],
+    "text": "Việc parser hiểu một field không có nghĩa backend đã support field đó. Default\nphải từ chối requirement ngoài matrix thay vì nhận rồi bỏ qua."
+  },
+  "currentTargetComparisons": [
+    {
+      "aliasId": "step10-specs-0077",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-54",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-54",
+        "githubAnchor": "unheaded-block-54",
+        "stableAnchor": "unheaded-block-54",
+        "title": "Unheaded block 54",
+        "startLine": 432,
+        "endLine": 433,
+        "textDigest": "fdcc56c6036171a7393772c55e187bfd7e86e9b00b045bc9d0ae3c81c963fd67",
+        "sample": "Default chưa cần network firewall, secret filtering, macOS/container/remote\nbackend, generic composition cho mọi tổ hợp control, hoặc đổi tên executor.",
+        "identityFingerprint": "6437ebff8e50a0bfa5fa389c6d0eae24e193e7fdcce066395abd75e6d1a1b285",
+        "ancestry": [
+          "Spec: Agent Confinement Authority",
+          "9. Default implementation đầu tiên"
+        ],
+        "text": "Default chưa cần network firewall, secret filtering, macOS/container/remote\nbackend, generic composition cho mọi tổ hợp control, hoặc đổi tên executor."
+      },
+      "uniqueSameDigestUnits": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-56",
+          "githubAnchor": "unheaded-block-56",
+          "stableAnchor": "unheaded-block-56",
+          "title": "Unheaded block 56",
+          "startLine": 451,
+          "endLine": 452,
+          "textDigest": "62da6aab49287cf95b091c9f3b8d55e5eed5b510a040c7663c8d3616cef1a994",
+          "sample": "Việc parser hiểu một field không có nghĩa backend đã support field đó. Default\nphải từ chối requirement ngoài matrix thay vì nhận rồi bỏ qua.",
+          "identityFingerprint": "a47f66258b78b44aa166b2faf755f7afe52a56fbbc6d8b443faf60e128c0fd62",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "9. Default implementation đầu tiên",
+            "9.1 Support matrix của default"
+          ],
+          "text": "Việc parser hiểu một field không có nghĩa backend đã support field đó. Default\nphải từ chối requirement ngoài matrix thay vì nhận rồi bỏ qua."
+        }
+      ]
+    }
+  ],
+  "historicalPackageComparisons": {
+    "nativeIdentity": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "a47f66258b78b44aa166b2faf755f7afe52a56fbbc6d8b443faf60e128c0fd62",
+      "identityFingerprint": "a47f66258b78b44aa166b2faf755f7afe52a56fbbc6d8b443faf60e128c0fd62",
+      "claimId": "claim_d4bc3fb932ca2d29e917119191f45f1c",
+      "sourceAnchor": "unheaded-block-122",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "62da6aab49287cf95b091c9f3b8d55e5eed5b510a040c7663c8d3616cef1a994",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "currentIdentityBinding": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "a47f66258b78b44aa166b2faf755f7afe52a56fbbc6d8b443faf60e128c0fd62",
+      "identityFingerprint": "a47f66258b78b44aa166b2faf755f7afe52a56fbbc6d8b443faf60e128c0fd62",
+      "claimId": "claim_d4bc3fb932ca2d29e917119191f45f1c",
+      "sourceAnchor": "unheaded-block-122",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "62da6aab49287cf95b091c9f3b8d55e5eed5b510a040c7663c8d3616cef1a994",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "uniqueSameDigestBinding": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-122",
+      "githubAnchor": "unheaded-block-122",
+      "stableAnchor": "unheaded-block-122",
+      "title": "Unheaded block 122",
+      "startLine": 1185,
+      "endLine": 1186,
+      "textDigest": "62da6aab49287cf95b091c9f3b8d55e5eed5b510a040c7663c8d3616cef1a994",
+      "sample": "Việc parser hiểu một field không có nghĩa backend đã support field đó. Default\nphải từ chối requirement ngoài matrix thay vì nhận rồi bỏ qua.",
+      "identityFingerprint": "a47f66258b78b44aa166b2faf755f7afe52a56fbbc6d8b443faf60e128c0fd62",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "9. Default implementation đầu tiên",
+        "9.1 Support matrix của default"
+      ],
+      "text": "Việc parser hiểu một field không có nghĩa backend đã support field đó. Default\nphải từ chối requirement ngoài matrix thay vì nhận rồi bỏ qua."
+    },
+    "currentUnitAtRetainedIdentity": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-122",
+      "githubAnchor": "unheaded-block-122",
+      "stableAnchor": "unheaded-block-122",
+      "title": "Unheaded block 122",
+      "startLine": 1185,
+      "endLine": 1186,
+      "textDigest": "62da6aab49287cf95b091c9f3b8d55e5eed5b510a040c7663c8d3616cef1a994",
+      "sample": "Việc parser hiểu một field không có nghĩa backend đã support field đó. Default\nphải từ chối requirement ngoài matrix thay vì nhận rồi bỏ qua.",
+      "identityFingerprint": "a47f66258b78b44aa166b2faf755f7afe52a56fbbc6d8b443faf60e128c0fd62",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "9. Default implementation đầu tiên",
+        "9.1 Support matrix của default"
+      ],
+      "text": "Việc parser hiểu một field không có nghĩa backend đã support field đó. Default\nphải từ chối requirement ngoài matrix thay vì nhận rồi bỏ qua."
+    },
+    "sourceDigestUnchanged": true,
+    "status": "same text uniquely found; alias anchor still independently checked",
+    "aliasTargetComparisons": [
+      {
+        "aliasId": "step10-specs-0077",
+        "fromPath": "docs/specs/confinement-authority.md#unheaded-block-121",
+        "toOwner": "docs/platform/agent-confinement/spec.md",
+        "toAnchor": "unheaded-block-54",
+        "currentTargetAtDraftAnchor": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-54",
+          "githubAnchor": "unheaded-block-54",
+          "stableAnchor": "unheaded-block-54",
+          "title": "Unheaded block 54",
+          "startLine": 432,
+          "endLine": 433,
+          "textDigest": "fdcc56c6036171a7393772c55e187bfd7e86e9b00b045bc9d0ae3c81c963fd67",
+          "sample": "Default chưa cần network firewall, secret filtering, macOS/container/remote\nbackend, generic composition cho mọi tổ hợp control, hoặc đổi tên executor.",
+          "identityFingerprint": "6437ebff8e50a0bfa5fa389c6d0eae24e193e7fdcce066395abd75e6d1a1b285",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "9. Default implementation đầu tiên"
+          ],
+          "text": "Default chưa cần network firewall, secret filtering, macOS/container/remote\nbackend, generic composition cho mọi tổ hợp control, hoặc đổi tên executor."
+        },
+        "sourceTextDigestAtDraftTarget": false,
+        "uniqueSameTextCurrentTarget": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-56",
+          "githubAnchor": "unheaded-block-56",
+          "stableAnchor": "unheaded-block-56",
+          "title": "Unheaded block 56",
+          "startLine": 451,
+          "endLine": 452,
+          "textDigest": "62da6aab49287cf95b091c9f3b8d55e5eed5b510a040c7663c8d3616cef1a994",
+          "sample": "Việc parser hiểu một field không có nghĩa backend đã support field đó. Default\nphải từ chối requirement ngoài matrix thay vì nhận rồi bỏ qua.",
+          "identityFingerprint": "a47f66258b78b44aa166b2faf755f7afe52a56fbbc6d8b443faf60e128c0fd62",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "9. Default implementation đầu tiên",
+            "9.1 Support matrix của default"
+          ],
+          "text": "Việc parser hiểu một field không có nghĩa backend đã support field đó. Default\nphải từ chối requirement ngoài matrix thay vì nhận rồi bỏ qua."
+        },
+        "note": "Read-only current source and target comparisons; draft unchanged. Source and target numbered-anchor relocation is not approval. Text corrections or source drift require independent judgment."
+      }
+    ]
+  },
+  "currentSourceDigestUnchanged": true
+}
+```
+
+## Entry e-012: claim_68dd1d19379c9a16393429b5e2aac34a
+
+```json
+{
+  "kind": "source-alias-comparison",
+  "claimId": "claim_68dd1d19379c9a16393429b5e2aac34a",
+  "priorAnchor": "unheaded-block-122",
+  "priorDigest": "cd86d66ba41c3e216cfd4d8bd8d3d67ba807275450780add3123faf7d91d35bb",
+  "currentDigest": "62da6aab49287cf95b091c9f3b8d55e5eed5b510a040c7663c8d3616cef1a994",
+  "matchingCurrentAnchors": [
+    "unheaded-block-123"
+  ],
+  "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval.",
+  "draftAliases": [
+    {
+      "aliasId": "step10-specs-0078",
+      "fromPath": "docs/specs/confinement-authority.md#unheaded-block-122",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-55",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    }
+  ],
+  "currentNative": {
+    "sourcePath": "docs/specs/confinement-authority.md",
+    "unitDigest": "4938e6c7567c76d0df9a989ca7117af8fb8e81a2825f6e1caff9b18b4aa98acc",
+    "identityFingerprint": "4938e6c7567c76d0df9a989ca7117af8fb8e81a2825f6e1caff9b18b4aa98acc",
+    "claimId": "claim_68dd1d19379c9a16393429b5e2aac34a",
+    "sourceAnchor": "unheaded-block-123",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "cd86d66ba41c3e216cfd4d8bd8d3d67ba807275450780add3123faf7d91d35bb",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "currentSourceUnit": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-123",
+    "githubAnchor": "unheaded-block-123",
+    "stableAnchor": "unheaded-block-123",
+    "title": "Unheaded block 123",
+    "startLine": 1190,
+    "endLine": 1194,
+    "textDigest": "cd86d66ba41c3e216cfd4d8bd8d3d67ba807275450780add3123faf7d91d35bb",
+    "sample": "`blind` là giá trị thứ ba của trục `hostRead` (`deny > blind > allow`): host vẫn đọc được,\ntrừ run state của các dispatch khác và phiên agent đang sống. Runner gửi nó như một overr",
+    "identityFingerprint": "4938e6c7567c76d0df9a989ca7117af8fb8e81a2825f6e1caff9b18b4aa98acc",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "9. Default implementation đầu tiên",
+      "9.2 `hostRead: blind` — worker mù trước run state của peer"
+    ],
+    "text": "`blind` là giá trị thứ ba của trục `hostRead` (`deny > blind > allow`): host vẫn đọc được,\ntrừ run state của các dispatch khác và phiên agent đang sống. Runner gửi nó như một override\nchỉ-thu-hẹp qua slot `override` của request (Unit mang `blind: true`, mọi vai của Unit đó đều\nmù); built-in policy không đổi, không có policy ID mới. Mặc định tắt: argv của dispatch không\n`blind` giữ nguyên từng byte."
+  },
+  "currentTargetComparisons": [
+    {
+      "aliasId": "step10-specs-0078",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-55",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-55",
+        "githubAnchor": "unheaded-block-55",
+        "stableAnchor": "unheaded-block-55",
+        "title": "Unheaded block 55",
+        "startLine": 437,
+        "endLine": 449,
+        "textDigest": "14f3ee1a5085e8338b27e811d4a6fdddb36726d4f98c9df86111a65f594d85fa",
+        "sample": "| Contract surface | Default v1 |\n|---|---|\n| Mode | `required`, `unconfined`; `preferred` có trong contract nhưng default chưa nhận config này |\n| Invocation override | Contract đ",
+        "identityFingerprint": "af529bc80b1dc6dd2725ebf4012fcb269af668ad35efa8cd0abe96ede6c9f503",
+        "ancestry": [
+          "Spec: Agent Confinement Authority",
+          "9. Default implementation đầu tiên",
+          "9.1 Support matrix của default"
+        ],
+        "text": "| Contract surface | Default v1 |\n|---|---|\n| Mode | `required`, `unconfined`; `preferred` có trong contract nhưng default chưa nhận config này |\n| Invocation override | Contract đích giữ shape/partial-order; default v1 từ chối config override, dùng policy ID/capability khác — trừ một override duy nhất, `{ controls: { hostRead: 'blind' } }` (§9.2) |\n| `hostWrite` | `deny` qua bwrap, hoặc `allow` khi explicit `unconfined` |\n| Write grant | run-output, private-home khi cần; workspace/git-metadata cho workspace-write theo readiness |\n| Read grant | `executor-credentials` khi policy của dispatch yêu cầu |\n| `home` | host mặc định; private resource khi provider cần; home private nếu policy thực sự yêu cầu và đã prove |\n| `session`, `workspace` | effective value là `shared`; legacy `isolated/own` được normalize nhưng chưa di dời enforcement ở slice đầu |\n| `hostRead` | `allow`, hoặc `blind` (§9.2); request `deny` bị `unsupported` |\n| `networkEgress`, `process` | effective value là `allow`, `host`; request `deny/filtered/isolated` bị `unsupported` |\n| Resource delivery/collect | host direct/mount; copy/remote/workspace-change chưa hỗ trợ |\n| Backend | Linux bwrap; backend khác trả `unsupported` có lý do |"
+      },
+      "uniqueSameDigestUnits": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-57",
+          "githubAnchor": "unheaded-block-57",
+          "stableAnchor": "unheaded-block-57",
+          "title": "Unheaded block 57",
+          "startLine": 456,
+          "endLine": 460,
+          "textDigest": "cd86d66ba41c3e216cfd4d8bd8d3d67ba807275450780add3123faf7d91d35bb",
+          "sample": "`blind` là giá trị thứ ba của trục `hostRead` (`deny > blind > allow`): host vẫn đọc được,\ntrừ run state của các dispatch khác và phiên agent đang sống. Runner gửi nó như một overr",
+          "identityFingerprint": "4938e6c7567c76d0df9a989ca7117af8fb8e81a2825f6e1caff9b18b4aa98acc",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "9. Default implementation đầu tiên",
+            "9.2 `hostRead: blind` — worker mù trước run state của peer"
+          ],
+          "text": "`blind` là giá trị thứ ba của trục `hostRead` (`deny > blind > allow`): host vẫn đọc được,\ntrừ run state của các dispatch khác và phiên agent đang sống. Runner gửi nó như một override\nchỉ-thu-hẹp qua slot `override` của request (Unit mang `blind: true`, mọi vai của Unit đó đều\nmù); built-in policy không đổi, không có policy ID mới. Mặc định tắt: argv của dispatch không\n`blind` giữ nguyên từng byte."
+        }
+      ]
+    }
+  ],
+  "historicalPackageComparisons": {
+    "nativeIdentity": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "4938e6c7567c76d0df9a989ca7117af8fb8e81a2825f6e1caff9b18b4aa98acc",
+      "identityFingerprint": "4938e6c7567c76d0df9a989ca7117af8fb8e81a2825f6e1caff9b18b4aa98acc",
+      "claimId": "claim_68dd1d19379c9a16393429b5e2aac34a",
+      "sourceAnchor": "unheaded-block-123",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "cd86d66ba41c3e216cfd4d8bd8d3d67ba807275450780add3123faf7d91d35bb",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "currentIdentityBinding": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "4938e6c7567c76d0df9a989ca7117af8fb8e81a2825f6e1caff9b18b4aa98acc",
+      "identityFingerprint": "4938e6c7567c76d0df9a989ca7117af8fb8e81a2825f6e1caff9b18b4aa98acc",
+      "claimId": "claim_68dd1d19379c9a16393429b5e2aac34a",
+      "sourceAnchor": "unheaded-block-123",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "cd86d66ba41c3e216cfd4d8bd8d3d67ba807275450780add3123faf7d91d35bb",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "uniqueSameDigestBinding": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-123",
+      "githubAnchor": "unheaded-block-123",
+      "stableAnchor": "unheaded-block-123",
+      "title": "Unheaded block 123",
+      "startLine": 1190,
+      "endLine": 1194,
+      "textDigest": "cd86d66ba41c3e216cfd4d8bd8d3d67ba807275450780add3123faf7d91d35bb",
+      "sample": "`blind` là giá trị thứ ba của trục `hostRead` (`deny > blind > allow`): host vẫn đọc được,\ntrừ run state của các dispatch khác và phiên agent đang sống. Runner gửi nó như một overr",
+      "identityFingerprint": "4938e6c7567c76d0df9a989ca7117af8fb8e81a2825f6e1caff9b18b4aa98acc",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "9. Default implementation đầu tiên",
+        "9.2 `hostRead: blind` — worker mù trước run state của peer"
+      ],
+      "text": "`blind` là giá trị thứ ba của trục `hostRead` (`deny > blind > allow`): host vẫn đọc được,\ntrừ run state của các dispatch khác và phiên agent đang sống. Runner gửi nó như một override\nchỉ-thu-hẹp qua slot `override` của request (Unit mang `blind: true`, mọi vai của Unit đó đều\nmù); built-in policy không đổi, không có policy ID mới. Mặc định tắt: argv của dispatch không\n`blind` giữ nguyên từng byte."
+    },
+    "currentUnitAtRetainedIdentity": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-123",
+      "githubAnchor": "unheaded-block-123",
+      "stableAnchor": "unheaded-block-123",
+      "title": "Unheaded block 123",
+      "startLine": 1190,
+      "endLine": 1194,
+      "textDigest": "cd86d66ba41c3e216cfd4d8bd8d3d67ba807275450780add3123faf7d91d35bb",
+      "sample": "`blind` là giá trị thứ ba của trục `hostRead` (`deny > blind > allow`): host vẫn đọc được,\ntrừ run state của các dispatch khác và phiên agent đang sống. Runner gửi nó như một overr",
+      "identityFingerprint": "4938e6c7567c76d0df9a989ca7117af8fb8e81a2825f6e1caff9b18b4aa98acc",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "9. Default implementation đầu tiên",
+        "9.2 `hostRead: blind` — worker mù trước run state của peer"
+      ],
+      "text": "`blind` là giá trị thứ ba của trục `hostRead` (`deny > blind > allow`): host vẫn đọc được,\ntrừ run state của các dispatch khác và phiên agent đang sống. Runner gửi nó như một override\nchỉ-thu-hẹp qua slot `override` của request (Unit mang `blind: true`, mọi vai của Unit đó đều\nmù); built-in policy không đổi, không có policy ID mới. Mặc định tắt: argv của dispatch không\n`blind` giữ nguyên từng byte."
+    },
+    "sourceDigestUnchanged": true,
+    "status": "same text uniquely found; alias anchor still independently checked",
+    "aliasTargetComparisons": [
+      {
+        "aliasId": "step10-specs-0078",
+        "fromPath": "docs/specs/confinement-authority.md#unheaded-block-122",
+        "toOwner": "docs/platform/agent-confinement/spec.md",
+        "toAnchor": "unheaded-block-55",
+        "currentTargetAtDraftAnchor": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-55",
+          "githubAnchor": "unheaded-block-55",
+          "stableAnchor": "unheaded-block-55",
+          "title": "Unheaded block 55",
+          "startLine": 437,
+          "endLine": 449,
+          "textDigest": "14f3ee1a5085e8338b27e811d4a6fdddb36726d4f98c9df86111a65f594d85fa",
+          "sample": "| Contract surface | Default v1 |\n|---|---|\n| Mode | `required`, `unconfined`; `preferred` có trong contract nhưng default chưa nhận config này |\n| Invocation override | Contract đ",
+          "identityFingerprint": "af529bc80b1dc6dd2725ebf4012fcb269af668ad35efa8cd0abe96ede6c9f503",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "9. Default implementation đầu tiên",
+            "9.1 Support matrix của default"
+          ],
+          "text": "| Contract surface | Default v1 |\n|---|---|\n| Mode | `required`, `unconfined`; `preferred` có trong contract nhưng default chưa nhận config này |\n| Invocation override | Contract đích giữ shape/partial-order; default v1 từ chối config override, dùng policy ID/capability khác — trừ một override duy nhất, `{ controls: { hostRead: 'blind' } }` (§9.2) |\n| `hostWrite` | `deny` qua bwrap, hoặc `allow` khi explicit `unconfined` |\n| Write grant | run-output, private-home khi cần; workspace/git-metadata cho workspace-write theo readiness |\n| Read grant | `executor-credentials` khi policy của dispatch yêu cầu |\n| `home` | host mặc định; private resource khi provider cần; home private nếu policy thực sự yêu cầu và đã prove |\n| `session`, `workspace` | effective value là `shared`; legacy `isolated/own` được normalize nhưng chưa di dời enforcement ở slice đầu |\n| `hostRead` | `allow`, hoặc `blind` (§9.2); request `deny` bị `unsupported` |\n| `networkEgress`, `process` | effective value là `allow`, `host`; request `deny/filtered/isolated` bị `unsupported` |\n| Resource delivery/collect | host direct/mount; copy/remote/workspace-change chưa hỗ trợ |\n| Backend | Linux bwrap; backend khác trả `unsupported` có lý do |"
+        },
+        "sourceTextDigestAtDraftTarget": false,
+        "uniqueSameTextCurrentTarget": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-57",
+          "githubAnchor": "unheaded-block-57",
+          "stableAnchor": "unheaded-block-57",
+          "title": "Unheaded block 57",
+          "startLine": 456,
+          "endLine": 460,
+          "textDigest": "cd86d66ba41c3e216cfd4d8bd8d3d67ba807275450780add3123faf7d91d35bb",
+          "sample": "`blind` là giá trị thứ ba của trục `hostRead` (`deny > blind > allow`): host vẫn đọc được,\ntrừ run state của các dispatch khác và phiên agent đang sống. Runner gửi nó như một overr",
+          "identityFingerprint": "4938e6c7567c76d0df9a989ca7117af8fb8e81a2825f6e1caff9b18b4aa98acc",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "9. Default implementation đầu tiên",
+            "9.2 `hostRead: blind` — worker mù trước run state của peer"
+          ],
+          "text": "`blind` là giá trị thứ ba của trục `hostRead` (`deny > blind > allow`): host vẫn đọc được,\ntrừ run state của các dispatch khác và phiên agent đang sống. Runner gửi nó như một override\nchỉ-thu-hẹp qua slot `override` của request (Unit mang `blind: true`, mọi vai của Unit đó đều\nmù); built-in policy không đổi, không có policy ID mới. Mặc định tắt: argv của dispatch không\n`blind` giữ nguyên từng byte."
+        },
+        "note": "Read-only current source and target comparisons; draft unchanged. Source and target numbered-anchor relocation is not approval. Text corrections or source drift require independent judgment."
+      }
+    ]
+  },
+  "currentSourceDigestUnchanged": true
+}
+```
+
+## Entry e-013: claim_b1731956c352b9977eef7ffa07f88991
+
+```json
+{
+  "kind": "source-alias-comparison",
+  "claimId": "claim_b1731956c352b9977eef7ffa07f88991",
+  "priorAnchor": "unheaded-block-123",
+  "priorDigest": "7cf71cce1a2badb415557e66813aa0937d285bc90ad11c6264e1e54083199ff6",
+  "currentDigest": "cd86d66ba41c3e216cfd4d8bd8d3d67ba807275450780add3123faf7d91d35bb",
+  "matchingCurrentAnchors": [
+    "unheaded-block-124"
+  ],
+  "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval.",
+  "draftAliases": [
+    {
+      "aliasId": "step10-specs-0079",
+      "fromPath": "docs/specs/confinement-authority.md#unheaded-block-123",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-56",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    }
+  ],
+  "currentNative": {
+    "sourcePath": "docs/specs/confinement-authority.md",
+    "unitDigest": "4a38ae1622ec5454712f92237ad8feed19e54b64a51650533fee85d0b674ada7",
+    "identityFingerprint": "4a38ae1622ec5454712f92237ad8feed19e54b64a51650533fee85d0b674ada7",
+    "claimId": "claim_b1731956c352b9977eef7ffa07f88991",
+    "sourceAnchor": "unheaded-block-124",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "7cf71cce1a2badb415557e66813aa0937d285bc90ad11c6264e1e54083199ff6",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "currentSourceUnit": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-124",
+    "githubAnchor": "unheaded-block-124",
+    "stableAnchor": "unheaded-block-124",
+    "title": "Unheaded block 124",
+    "startLine": 1196,
+    "endLine": 1205,
+    "textDigest": "7cf71cce1a2badb415557e66813aa0937d285bc90ad11c6264e1e54083199ff6",
+    "sample": "Với `blind`, driver bwrap giữ `--ro-bind / /` và thêm, theo đúng thứ tự: `--unshare-pid` (ẩn\n`/proc/<pid>/cmdline` của tiến trình khác); `--tmpfs` che từng *hidden root* đang tồn t",
+    "identityFingerprint": "4a38ae1622ec5454712f92237ad8feed19e54b64a51650533fee85d0b674ada7",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "9. Default implementation đầu tiên",
+      "9.2 `hostRead: blind` — worker mù trước run state của peer"
+    ],
+    "text": "Với `blind`, driver bwrap giữ `--ro-bind / /` và thêm, theo đúng thứ tự: `--unshare-pid` (ẩn\n`/proc/<pid>/cmdline` của tiến trình khác); `--tmpfs` che từng *hidden root* đang tồn tại;\n`--ro-bind` thư mục của chính dispatch (round dir `<assignments>/<unit run>/<role>/<round>`,\nhoặc run dir nếu không có assignment) chỉ-đọc; các mount nằm dưới mask (outbox ghi được, private\nhome); cuối cùng `--remount-ro` trên các mask. Hidden root là dữ liệu của contract\n(`BLIND_HIDDEN_ROOTS`), không phải code của driver: `{fgosDir}/assignments`,\n`{fgosDir}/workflow-runs`, `{fgosDir}/dispatch-runs` của project dispatch đang chạy, thư mục\nsocket của herdr, và confinement temp root (private home của dispatch khác, chứa transcript agent).\nResource `hidden-root` và `own-assignment` đi vào plan/attestation; attestation ghi thêm\n`requested.override`, `effectiveControls.hostRead: blind` và `hiddenRoots`."
+  },
+  "currentTargetComparisons": [
+    {
+      "aliasId": "step10-specs-0079",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-56",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-56",
+        "githubAnchor": "unheaded-block-56",
+        "stableAnchor": "unheaded-block-56",
+        "title": "Unheaded block 56",
+        "startLine": 451,
+        "endLine": 452,
+        "textDigest": "62da6aab49287cf95b091c9f3b8d55e5eed5b510a040c7663c8d3616cef1a994",
+        "sample": "Việc parser hiểu một field không có nghĩa backend đã support field đó. Default\nphải từ chối requirement ngoài matrix thay vì nhận rồi bỏ qua.",
+        "identityFingerprint": "a47f66258b78b44aa166b2faf755f7afe52a56fbbc6d8b443faf60e128c0fd62",
+        "ancestry": [
+          "Spec: Agent Confinement Authority",
+          "9. Default implementation đầu tiên",
+          "9.1 Support matrix của default"
+        ],
+        "text": "Việc parser hiểu một field không có nghĩa backend đã support field đó. Default\nphải từ chối requirement ngoài matrix thay vì nhận rồi bỏ qua."
+      },
+      "uniqueSameDigestUnits": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-58",
+          "githubAnchor": "unheaded-block-58",
+          "stableAnchor": "unheaded-block-58",
+          "title": "Unheaded block 58",
+          "startLine": 462,
+          "endLine": 471,
+          "textDigest": "7cf71cce1a2badb415557e66813aa0937d285bc90ad11c6264e1e54083199ff6",
+          "sample": "Với `blind`, driver bwrap giữ `--ro-bind / /` và thêm, theo đúng thứ tự: `--unshare-pid` (ẩn\n`/proc/<pid>/cmdline` của tiến trình khác); `--tmpfs` che từng *hidden root* đang tồn t",
+          "identityFingerprint": "4a38ae1622ec5454712f92237ad8feed19e54b64a51650533fee85d0b674ada7",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "9. Default implementation đầu tiên",
+            "9.2 `hostRead: blind` — worker mù trước run state của peer"
+          ],
+          "text": "Với `blind`, driver bwrap giữ `--ro-bind / /` và thêm, theo đúng thứ tự: `--unshare-pid` (ẩn\n`/proc/<pid>/cmdline` của tiến trình khác); `--tmpfs` che từng *hidden root* đang tồn tại;\n`--ro-bind` thư mục của chính dispatch (round dir `<assignments>/<unit run>/<role>/<round>`,\nhoặc run dir nếu không có assignment) chỉ-đọc; các mount nằm dưới mask (outbox ghi được, private\nhome); cuối cùng `--remount-ro` trên các mask. Hidden root là dữ liệu của contract\n(`BLIND_HIDDEN_ROOTS`), không phải code của driver: `{fgosDir}/assignments`,\n`{fgosDir}/workflow-runs`, `{fgosDir}/dispatch-runs` của project dispatch đang chạy, thư mục\nsocket của herdr, và confinement temp root (private home của dispatch khác, chứa transcript agent).\nResource `hidden-root` và `own-assignment` đi vào plan/attestation; attestation ghi thêm\n`requested.override`, `effectiveControls.hostRead: blind` và `hiddenRoots`."
+        }
+      ]
+    }
+  ],
+  "historicalPackageComparisons": {
+    "nativeIdentity": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "4a38ae1622ec5454712f92237ad8feed19e54b64a51650533fee85d0b674ada7",
+      "identityFingerprint": "4a38ae1622ec5454712f92237ad8feed19e54b64a51650533fee85d0b674ada7",
+      "claimId": "claim_b1731956c352b9977eef7ffa07f88991",
+      "sourceAnchor": "unheaded-block-124",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "7cf71cce1a2badb415557e66813aa0937d285bc90ad11c6264e1e54083199ff6",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "currentIdentityBinding": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "4a38ae1622ec5454712f92237ad8feed19e54b64a51650533fee85d0b674ada7",
+      "identityFingerprint": "4a38ae1622ec5454712f92237ad8feed19e54b64a51650533fee85d0b674ada7",
+      "claimId": "claim_b1731956c352b9977eef7ffa07f88991",
+      "sourceAnchor": "unheaded-block-124",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "7cf71cce1a2badb415557e66813aa0937d285bc90ad11c6264e1e54083199ff6",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "uniqueSameDigestBinding": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-124",
+      "githubAnchor": "unheaded-block-124",
+      "stableAnchor": "unheaded-block-124",
+      "title": "Unheaded block 124",
+      "startLine": 1196,
+      "endLine": 1205,
+      "textDigest": "7cf71cce1a2badb415557e66813aa0937d285bc90ad11c6264e1e54083199ff6",
+      "sample": "Với `blind`, driver bwrap giữ `--ro-bind / /` và thêm, theo đúng thứ tự: `--unshare-pid` (ẩn\n`/proc/<pid>/cmdline` của tiến trình khác); `--tmpfs` che từng *hidden root* đang tồn t",
+      "identityFingerprint": "4a38ae1622ec5454712f92237ad8feed19e54b64a51650533fee85d0b674ada7",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "9. Default implementation đầu tiên",
+        "9.2 `hostRead: blind` — worker mù trước run state của peer"
+      ],
+      "text": "Với `blind`, driver bwrap giữ `--ro-bind / /` và thêm, theo đúng thứ tự: `--unshare-pid` (ẩn\n`/proc/<pid>/cmdline` của tiến trình khác); `--tmpfs` che từng *hidden root* đang tồn tại;\n`--ro-bind` thư mục của chính dispatch (round dir `<assignments>/<unit run>/<role>/<round>`,\nhoặc run dir nếu không có assignment) chỉ-đọc; các mount nằm dưới mask (outbox ghi được, private\nhome); cuối cùng `--remount-ro` trên các mask. Hidden root là dữ liệu của contract\n(`BLIND_HIDDEN_ROOTS`), không phải code của driver: `{fgosDir}/assignments`,\n`{fgosDir}/workflow-runs`, `{fgosDir}/dispatch-runs` của project dispatch đang chạy, thư mục\nsocket của herdr, và confinement temp root (private home của dispatch khác, chứa transcript agent).\nResource `hidden-root` và `own-assignment` đi vào plan/attestation; attestation ghi thêm\n`requested.override`, `effectiveControls.hostRead: blind` và `hiddenRoots`."
+    },
+    "currentUnitAtRetainedIdentity": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-124",
+      "githubAnchor": "unheaded-block-124",
+      "stableAnchor": "unheaded-block-124",
+      "title": "Unheaded block 124",
+      "startLine": 1196,
+      "endLine": 1205,
+      "textDigest": "7cf71cce1a2badb415557e66813aa0937d285bc90ad11c6264e1e54083199ff6",
+      "sample": "Với `blind`, driver bwrap giữ `--ro-bind / /` và thêm, theo đúng thứ tự: `--unshare-pid` (ẩn\n`/proc/<pid>/cmdline` của tiến trình khác); `--tmpfs` che từng *hidden root* đang tồn t",
+      "identityFingerprint": "4a38ae1622ec5454712f92237ad8feed19e54b64a51650533fee85d0b674ada7",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "9. Default implementation đầu tiên",
+        "9.2 `hostRead: blind` — worker mù trước run state của peer"
+      ],
+      "text": "Với `blind`, driver bwrap giữ `--ro-bind / /` và thêm, theo đúng thứ tự: `--unshare-pid` (ẩn\n`/proc/<pid>/cmdline` của tiến trình khác); `--tmpfs` che từng *hidden root* đang tồn tại;\n`--ro-bind` thư mục của chính dispatch (round dir `<assignments>/<unit run>/<role>/<round>`,\nhoặc run dir nếu không có assignment) chỉ-đọc; các mount nằm dưới mask (outbox ghi được, private\nhome); cuối cùng `--remount-ro` trên các mask. Hidden root là dữ liệu của contract\n(`BLIND_HIDDEN_ROOTS`), không phải code của driver: `{fgosDir}/assignments`,\n`{fgosDir}/workflow-runs`, `{fgosDir}/dispatch-runs` của project dispatch đang chạy, thư mục\nsocket của herdr, và confinement temp root (private home của dispatch khác, chứa transcript agent).\nResource `hidden-root` và `own-assignment` đi vào plan/attestation; attestation ghi thêm\n`requested.override`, `effectiveControls.hostRead: blind` và `hiddenRoots`."
+    },
+    "sourceDigestUnchanged": true,
+    "status": "same text uniquely found; alias anchor still independently checked",
+    "aliasTargetComparisons": [
+      {
+        "aliasId": "step10-specs-0079",
+        "fromPath": "docs/specs/confinement-authority.md#unheaded-block-123",
+        "toOwner": "docs/platform/agent-confinement/spec.md",
+        "toAnchor": "unheaded-block-56",
+        "currentTargetAtDraftAnchor": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-56",
+          "githubAnchor": "unheaded-block-56",
+          "stableAnchor": "unheaded-block-56",
+          "title": "Unheaded block 56",
+          "startLine": 451,
+          "endLine": 452,
+          "textDigest": "62da6aab49287cf95b091c9f3b8d55e5eed5b510a040c7663c8d3616cef1a994",
+          "sample": "Việc parser hiểu một field không có nghĩa backend đã support field đó. Default\nphải từ chối requirement ngoài matrix thay vì nhận rồi bỏ qua.",
+          "identityFingerprint": "a47f66258b78b44aa166b2faf755f7afe52a56fbbc6d8b443faf60e128c0fd62",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "9. Default implementation đầu tiên",
+            "9.1 Support matrix của default"
+          ],
+          "text": "Việc parser hiểu một field không có nghĩa backend đã support field đó. Default\nphải từ chối requirement ngoài matrix thay vì nhận rồi bỏ qua."
+        },
+        "sourceTextDigestAtDraftTarget": false,
+        "uniqueSameTextCurrentTarget": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-58",
+          "githubAnchor": "unheaded-block-58",
+          "stableAnchor": "unheaded-block-58",
+          "title": "Unheaded block 58",
+          "startLine": 462,
+          "endLine": 471,
+          "textDigest": "7cf71cce1a2badb415557e66813aa0937d285bc90ad11c6264e1e54083199ff6",
+          "sample": "Với `blind`, driver bwrap giữ `--ro-bind / /` và thêm, theo đúng thứ tự: `--unshare-pid` (ẩn\n`/proc/<pid>/cmdline` của tiến trình khác); `--tmpfs` che từng *hidden root* đang tồn t",
+          "identityFingerprint": "4a38ae1622ec5454712f92237ad8feed19e54b64a51650533fee85d0b674ada7",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "9. Default implementation đầu tiên",
+            "9.2 `hostRead: blind` — worker mù trước run state của peer"
+          ],
+          "text": "Với `blind`, driver bwrap giữ `--ro-bind / /` và thêm, theo đúng thứ tự: `--unshare-pid` (ẩn\n`/proc/<pid>/cmdline` của tiến trình khác); `--tmpfs` che từng *hidden root* đang tồn tại;\n`--ro-bind` thư mục của chính dispatch (round dir `<assignments>/<unit run>/<role>/<round>`,\nhoặc run dir nếu không có assignment) chỉ-đọc; các mount nằm dưới mask (outbox ghi được, private\nhome); cuối cùng `--remount-ro` trên các mask. Hidden root là dữ liệu của contract\n(`BLIND_HIDDEN_ROOTS`), không phải code của driver: `{fgosDir}/assignments`,\n`{fgosDir}/workflow-runs`, `{fgosDir}/dispatch-runs` của project dispatch đang chạy, thư mục\nsocket của herdr, và confinement temp root (private home của dispatch khác, chứa transcript agent).\nResource `hidden-root` và `own-assignment` đi vào plan/attestation; attestation ghi thêm\n`requested.override`, `effectiveControls.hostRead: blind` và `hiddenRoots`."
+        },
+        "note": "Read-only current source and target comparisons; draft unchanged. Source and target numbered-anchor relocation is not approval. Text corrections or source drift require independent judgment."
+      }
+    ]
+  },
+  "currentSourceDigestUnchanged": true
+}
+```
+
+## Entry e-014: claim_54f630d44a33c5624ebeca834cf25ceb
+
+```json
+{
+  "kind": "source-alias-comparison",
+  "claimId": "claim_54f630d44a33c5624ebeca834cf25ceb",
+  "priorAnchor": "unheaded-block-124",
+  "priorDigest": "8caafcb371d02a300d8aa42288fc25e25354ddd2301e48508ee4810c99340902",
+  "currentDigest": "7cf71cce1a2badb415557e66813aa0937d285bc90ad11c6264e1e54083199ff6",
+  "matchingCurrentAnchors": [
+    "unheaded-block-125"
+  ],
+  "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval.",
+  "draftAliases": [
+    {
+      "aliasId": "step10-specs-0080",
+      "fromPath": "docs/specs/confinement-authority.md#unheaded-block-124",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-57",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    }
+  ],
+  "currentNative": {
+    "sourcePath": "docs/specs/confinement-authority.md",
+    "unitDigest": "3548ae4ac9be2f8c7d818cc88b96df1b59f595c7597bf8ce31b098fb1d4f23ec",
+    "identityFingerprint": "3548ae4ac9be2f8c7d818cc88b96df1b59f595c7597bf8ce31b098fb1d4f23ec",
+    "claimId": "claim_54f630d44a33c5624ebeca834cf25ceb",
+    "sourceAnchor": "unheaded-block-125",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "8caafcb371d02a300d8aa42288fc25e25354ddd2301e48508ee4810c99340902",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "currentSourceUnit": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-125",
+    "githubAnchor": "unheaded-block-125",
+    "stableAnchor": "unheaded-block-125",
+    "title": "Unheaded block 125",
+    "startLine": 1207,
+    "endLine": 1222,
+    "textDigest": "8caafcb371d02a300d8aa42288fc25e25354ddd2301e48508ee4810c99340902",
+    "sample": "Vì sao như vậy: (1) chỉ che ba thư mục run state chứ không che cả `.fgos`, vì `.fgos` có file\ntracked (config, events) — che cả thư mục làm chúng hiện thành \"đã xoá\" trong trạng th",
+    "identityFingerprint": "3548ae4ac9be2f8c7d818cc88b96df1b59f595c7597bf8ce31b098fb1d4f23ec",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "9. Default implementation đầu tiên",
+      "9.2 `hostRead: blind` — worker mù trước run state của peer"
+    ],
+    "text": "Vì sao như vậy: (1) chỉ che ba thư mục run state chứ không che cả `.fgos`, vì `.fgos` có file\ntracked (config, events) — che cả thư mục làm chúng hiện thành \"đã xoá\" trong trạng thái checkout,\nvà worker ghi được workspace có thể commit việc xoá đó; (2) `--unshare-pid` vì không có nó worker\nđọc được cmdline của tiến trình anh em; (3) socket herdr nằm trong danh sách vì `--ro-bind / /`\nvẫn cho `connect()`, tức worker có thể `pane read` pane của anh em. Blind chỉ dùng được khi cái\nworker *được trao* nằm sẵn trong thư mục của chính nó, nên với Unit `blind` resolver hand-off\n(`resolveUnitInputs`, `src/runner/execution/handoff-refs.mjs`) không giao đường dẫn gốc: mọi input\n`unit-run:`, `gate-answer:` và mọi ref nằm trong hidden root được chép nguyên byte (kiểm lại sha256\nlúc chép; nguồn đã đổi sau settle thì từ chối `report-changed-after-settle`) vào `inputs/` của\n*round dir của chính vai đó* (`<round>/inputs/<tên>`), vô điều kiện, không cần `anonymizeInputs`; tên\ntrung tính `seat-A...` cho input `unit-run:` khi `anonymizeInputs` bật, tên cố định `<n>-<vai>-r<vòng>`\nhoặc `<n>-gate-<bước>` nếu không. Mỗi vai một bản riêng (không chia sẻ giữa các vai của Unit), nên\nchỉ vai đó đọc được; danh sách ref của vai là các bản chép. `unit.json` giữ `resolvedInputs` (ref\nđọc được tại chỗ) và `inputMap` (nguồn, tên, sha256); resume dùng lại bản chép đã có, fallback chép\nlại vào round dir của lần thử mới. Synthesizer của pattern `panel` nhận report của panelist theo\nđúng cách đó. `blind-ref-hidden` chỉ còn cho ref không chép được."
+  },
+  "currentTargetComparisons": [
+    {
+      "aliasId": "step10-specs-0080",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-57",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-57",
+        "githubAnchor": "unheaded-block-57",
+        "stableAnchor": "unheaded-block-57",
+        "title": "Unheaded block 57",
+        "startLine": 456,
+        "endLine": 460,
+        "textDigest": "cd86d66ba41c3e216cfd4d8bd8d3d67ba807275450780add3123faf7d91d35bb",
+        "sample": "`blind` là giá trị thứ ba của trục `hostRead` (`deny > blind > allow`): host vẫn đọc được,\ntrừ run state của các dispatch khác và phiên agent đang sống. Runner gửi nó như một overr",
+        "identityFingerprint": "4938e6c7567c76d0df9a989ca7117af8fb8e81a2825f6e1caff9b18b4aa98acc",
+        "ancestry": [
+          "Spec: Agent Confinement Authority",
+          "9. Default implementation đầu tiên",
+          "9.2 `hostRead: blind` — worker mù trước run state của peer"
+        ],
+        "text": "`blind` là giá trị thứ ba của trục `hostRead` (`deny > blind > allow`): host vẫn đọc được,\ntrừ run state của các dispatch khác và phiên agent đang sống. Runner gửi nó như một override\nchỉ-thu-hẹp qua slot `override` của request (Unit mang `blind: true`, mọi vai của Unit đó đều\nmù); built-in policy không đổi, không có policy ID mới. Mặc định tắt: argv của dispatch không\n`blind` giữ nguyên từng byte."
+      },
+      "uniqueSameDigestUnits": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-59",
+          "githubAnchor": "unheaded-block-59",
+          "stableAnchor": "unheaded-block-59",
+          "title": "Unheaded block 59",
+          "startLine": 473,
+          "endLine": 488,
+          "textDigest": "8caafcb371d02a300d8aa42288fc25e25354ddd2301e48508ee4810c99340902",
+          "sample": "Vì sao như vậy: (1) chỉ che ba thư mục run state chứ không che cả `.fgos`, vì `.fgos` có file\ntracked (config, events) — che cả thư mục làm chúng hiện thành \"đã xoá\" trong trạng th",
+          "identityFingerprint": "3548ae4ac9be2f8c7d818cc88b96df1b59f595c7597bf8ce31b098fb1d4f23ec",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "9. Default implementation đầu tiên",
+            "9.2 `hostRead: blind` — worker mù trước run state của peer"
+          ],
+          "text": "Vì sao như vậy: (1) chỉ che ba thư mục run state chứ không che cả `.fgos`, vì `.fgos` có file\ntracked (config, events) — che cả thư mục làm chúng hiện thành \"đã xoá\" trong trạng thái checkout,\nvà worker ghi được workspace có thể commit việc xoá đó; (2) `--unshare-pid` vì không có nó worker\nđọc được cmdline của tiến trình anh em; (3) socket herdr nằm trong danh sách vì `--ro-bind / /`\nvẫn cho `connect()`, tức worker có thể `pane read` pane của anh em. Blind chỉ dùng được khi cái\nworker *được trao* nằm sẵn trong thư mục của chính nó, nên với Unit `blind` resolver hand-off\n(`resolveUnitInputs`, `src/runner/execution/handoff-refs.mjs`) không giao đường dẫn gốc: mọi input\n`unit-run:`, `gate-answer:` và mọi ref nằm trong hidden root được chép nguyên byte (kiểm lại sha256\nlúc chép; nguồn đã đổi sau settle thì từ chối `report-changed-after-settle`) vào `inputs/` của\n*round dir của chính vai đó* (`<round>/inputs/<tên>`), vô điều kiện, không cần `anonymizeInputs`; tên\ntrung tính `seat-A...` cho input `unit-run:` khi `anonymizeInputs` bật, tên cố định `<n>-<vai>-r<vòng>`\nhoặc `<n>-gate-<bước>` nếu không. Mỗi vai một bản riêng (không chia sẻ giữa các vai của Unit), nên\nchỉ vai đó đọc được; danh sách ref của vai là các bản chép. `unit.json` giữ `resolvedInputs` (ref\nđọc được tại chỗ) và `inputMap` (nguồn, tên, sha256); resume dùng lại bản chép đã có, fallback chép\nlại vào round dir của lần thử mới. Synthesizer của pattern `panel` nhận report của panelist theo\nđúng cách đó. `blind-ref-hidden` chỉ còn cho ref không chép được."
+        }
+      ]
+    }
+  ],
+  "historicalPackageComparisons": {
+    "nativeIdentity": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "3548ae4ac9be2f8c7d818cc88b96df1b59f595c7597bf8ce31b098fb1d4f23ec",
+      "identityFingerprint": "3548ae4ac9be2f8c7d818cc88b96df1b59f595c7597bf8ce31b098fb1d4f23ec",
+      "claimId": "claim_54f630d44a33c5624ebeca834cf25ceb",
+      "sourceAnchor": "unheaded-block-125",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "8caafcb371d02a300d8aa42288fc25e25354ddd2301e48508ee4810c99340902",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "currentIdentityBinding": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "3548ae4ac9be2f8c7d818cc88b96df1b59f595c7597bf8ce31b098fb1d4f23ec",
+      "identityFingerprint": "3548ae4ac9be2f8c7d818cc88b96df1b59f595c7597bf8ce31b098fb1d4f23ec",
+      "claimId": "claim_54f630d44a33c5624ebeca834cf25ceb",
+      "sourceAnchor": "unheaded-block-125",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "8caafcb371d02a300d8aa42288fc25e25354ddd2301e48508ee4810c99340902",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "uniqueSameDigestBinding": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-125",
+      "githubAnchor": "unheaded-block-125",
+      "stableAnchor": "unheaded-block-125",
+      "title": "Unheaded block 125",
+      "startLine": 1207,
+      "endLine": 1222,
+      "textDigest": "8caafcb371d02a300d8aa42288fc25e25354ddd2301e48508ee4810c99340902",
+      "sample": "Vì sao như vậy: (1) chỉ che ba thư mục run state chứ không che cả `.fgos`, vì `.fgos` có file\ntracked (config, events) — che cả thư mục làm chúng hiện thành \"đã xoá\" trong trạng th",
+      "identityFingerprint": "3548ae4ac9be2f8c7d818cc88b96df1b59f595c7597bf8ce31b098fb1d4f23ec",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "9. Default implementation đầu tiên",
+        "9.2 `hostRead: blind` — worker mù trước run state của peer"
+      ],
+      "text": "Vì sao như vậy: (1) chỉ che ba thư mục run state chứ không che cả `.fgos`, vì `.fgos` có file\ntracked (config, events) — che cả thư mục làm chúng hiện thành \"đã xoá\" trong trạng thái checkout,\nvà worker ghi được workspace có thể commit việc xoá đó; (2) `--unshare-pid` vì không có nó worker\nđọc được cmdline của tiến trình anh em; (3) socket herdr nằm trong danh sách vì `--ro-bind / /`\nvẫn cho `connect()`, tức worker có thể `pane read` pane của anh em. Blind chỉ dùng được khi cái\nworker *được trao* nằm sẵn trong thư mục của chính nó, nên với Unit `blind` resolver hand-off\n(`resolveUnitInputs`, `src/runner/execution/handoff-refs.mjs`) không giao đường dẫn gốc: mọi input\n`unit-run:`, `gate-answer:` và mọi ref nằm trong hidden root được chép nguyên byte (kiểm lại sha256\nlúc chép; nguồn đã đổi sau settle thì từ chối `report-changed-after-settle`) vào `inputs/` của\n*round dir của chính vai đó* (`<round>/inputs/<tên>`), vô điều kiện, không cần `anonymizeInputs`; tên\ntrung tính `seat-A...` cho input `unit-run:` khi `anonymizeInputs` bật, tên cố định `<n>-<vai>-r<vòng>`\nhoặc `<n>-gate-<bước>` nếu không. Mỗi vai một bản riêng (không chia sẻ giữa các vai của Unit), nên\nchỉ vai đó đọc được; danh sách ref của vai là các bản chép. `unit.json` giữ `resolvedInputs` (ref\nđọc được tại chỗ) và `inputMap` (nguồn, tên, sha256); resume dùng lại bản chép đã có, fallback chép\nlại vào round dir của lần thử mới. Synthesizer của pattern `panel` nhận report của panelist theo\nđúng cách đó. `blind-ref-hidden` chỉ còn cho ref không chép được."
+    },
+    "currentUnitAtRetainedIdentity": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-125",
+      "githubAnchor": "unheaded-block-125",
+      "stableAnchor": "unheaded-block-125",
+      "title": "Unheaded block 125",
+      "startLine": 1207,
+      "endLine": 1222,
+      "textDigest": "8caafcb371d02a300d8aa42288fc25e25354ddd2301e48508ee4810c99340902",
+      "sample": "Vì sao như vậy: (1) chỉ che ba thư mục run state chứ không che cả `.fgos`, vì `.fgos` có file\ntracked (config, events) — che cả thư mục làm chúng hiện thành \"đã xoá\" trong trạng th",
+      "identityFingerprint": "3548ae4ac9be2f8c7d818cc88b96df1b59f595c7597bf8ce31b098fb1d4f23ec",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "9. Default implementation đầu tiên",
+        "9.2 `hostRead: blind` — worker mù trước run state của peer"
+      ],
+      "text": "Vì sao như vậy: (1) chỉ che ba thư mục run state chứ không che cả `.fgos`, vì `.fgos` có file\ntracked (config, events) — che cả thư mục làm chúng hiện thành \"đã xoá\" trong trạng thái checkout,\nvà worker ghi được workspace có thể commit việc xoá đó; (2) `--unshare-pid` vì không có nó worker\nđọc được cmdline của tiến trình anh em; (3) socket herdr nằm trong danh sách vì `--ro-bind / /`\nvẫn cho `connect()`, tức worker có thể `pane read` pane của anh em. Blind chỉ dùng được khi cái\nworker *được trao* nằm sẵn trong thư mục của chính nó, nên với Unit `blind` resolver hand-off\n(`resolveUnitInputs`, `src/runner/execution/handoff-refs.mjs`) không giao đường dẫn gốc: mọi input\n`unit-run:`, `gate-answer:` và mọi ref nằm trong hidden root được chép nguyên byte (kiểm lại sha256\nlúc chép; nguồn đã đổi sau settle thì từ chối `report-changed-after-settle`) vào `inputs/` của\n*round dir của chính vai đó* (`<round>/inputs/<tên>`), vô điều kiện, không cần `anonymizeInputs`; tên\ntrung tính `seat-A...` cho input `unit-run:` khi `anonymizeInputs` bật, tên cố định `<n>-<vai>-r<vòng>`\nhoặc `<n>-gate-<bước>` nếu không. Mỗi vai một bản riêng (không chia sẻ giữa các vai của Unit), nên\nchỉ vai đó đọc được; danh sách ref của vai là các bản chép. `unit.json` giữ `resolvedInputs` (ref\nđọc được tại chỗ) và `inputMap` (nguồn, tên, sha256); resume dùng lại bản chép đã có, fallback chép\nlại vào round dir của lần thử mới. Synthesizer của pattern `panel` nhận report của panelist theo\nđúng cách đó. `blind-ref-hidden` chỉ còn cho ref không chép được."
+    },
+    "sourceDigestUnchanged": true,
+    "status": "same text uniquely found; alias anchor still independently checked",
+    "aliasTargetComparisons": [
+      {
+        "aliasId": "step10-specs-0080",
+        "fromPath": "docs/specs/confinement-authority.md#unheaded-block-124",
+        "toOwner": "docs/platform/agent-confinement/spec.md",
+        "toAnchor": "unheaded-block-57",
+        "currentTargetAtDraftAnchor": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-57",
+          "githubAnchor": "unheaded-block-57",
+          "stableAnchor": "unheaded-block-57",
+          "title": "Unheaded block 57",
+          "startLine": 456,
+          "endLine": 460,
+          "textDigest": "cd86d66ba41c3e216cfd4d8bd8d3d67ba807275450780add3123faf7d91d35bb",
+          "sample": "`blind` là giá trị thứ ba của trục `hostRead` (`deny > blind > allow`): host vẫn đọc được,\ntrừ run state của các dispatch khác và phiên agent đang sống. Runner gửi nó như một overr",
+          "identityFingerprint": "4938e6c7567c76d0df9a989ca7117af8fb8e81a2825f6e1caff9b18b4aa98acc",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "9. Default implementation đầu tiên",
+            "9.2 `hostRead: blind` — worker mù trước run state của peer"
+          ],
+          "text": "`blind` là giá trị thứ ba của trục `hostRead` (`deny > blind > allow`): host vẫn đọc được,\ntrừ run state của các dispatch khác và phiên agent đang sống. Runner gửi nó như một override\nchỉ-thu-hẹp qua slot `override` của request (Unit mang `blind: true`, mọi vai của Unit đó đều\nmù); built-in policy không đổi, không có policy ID mới. Mặc định tắt: argv của dispatch không\n`blind` giữ nguyên từng byte."
+        },
+        "sourceTextDigestAtDraftTarget": false,
+        "uniqueSameTextCurrentTarget": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-59",
+          "githubAnchor": "unheaded-block-59",
+          "stableAnchor": "unheaded-block-59",
+          "title": "Unheaded block 59",
+          "startLine": 473,
+          "endLine": 488,
+          "textDigest": "8caafcb371d02a300d8aa42288fc25e25354ddd2301e48508ee4810c99340902",
+          "sample": "Vì sao như vậy: (1) chỉ che ba thư mục run state chứ không che cả `.fgos`, vì `.fgos` có file\ntracked (config, events) — che cả thư mục làm chúng hiện thành \"đã xoá\" trong trạng th",
+          "identityFingerprint": "3548ae4ac9be2f8c7d818cc88b96df1b59f595c7597bf8ce31b098fb1d4f23ec",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "9. Default implementation đầu tiên",
+            "9.2 `hostRead: blind` — worker mù trước run state của peer"
+          ],
+          "text": "Vì sao như vậy: (1) chỉ che ba thư mục run state chứ không che cả `.fgos`, vì `.fgos` có file\ntracked (config, events) — che cả thư mục làm chúng hiện thành \"đã xoá\" trong trạng thái checkout,\nvà worker ghi được workspace có thể commit việc xoá đó; (2) `--unshare-pid` vì không có nó worker\nđọc được cmdline của tiến trình anh em; (3) socket herdr nằm trong danh sách vì `--ro-bind / /`\nvẫn cho `connect()`, tức worker có thể `pane read` pane của anh em. Blind chỉ dùng được khi cái\nworker *được trao* nằm sẵn trong thư mục của chính nó, nên với Unit `blind` resolver hand-off\n(`resolveUnitInputs`, `src/runner/execution/handoff-refs.mjs`) không giao đường dẫn gốc: mọi input\n`unit-run:`, `gate-answer:` và mọi ref nằm trong hidden root được chép nguyên byte (kiểm lại sha256\nlúc chép; nguồn đã đổi sau settle thì từ chối `report-changed-after-settle`) vào `inputs/` của\n*round dir của chính vai đó* (`<round>/inputs/<tên>`), vô điều kiện, không cần `anonymizeInputs`; tên\ntrung tính `seat-A...` cho input `unit-run:` khi `anonymizeInputs` bật, tên cố định `<n>-<vai>-r<vòng>`\nhoặc `<n>-gate-<bước>` nếu không. Mỗi vai một bản riêng (không chia sẻ giữa các vai của Unit), nên\nchỉ vai đó đọc được; danh sách ref của vai là các bản chép. `unit.json` giữ `resolvedInputs` (ref\nđọc được tại chỗ) và `inputMap` (nguồn, tên, sha256); resume dùng lại bản chép đã có, fallback chép\nlại vào round dir của lần thử mới. Synthesizer của pattern `panel` nhận report của panelist theo\nđúng cách đó. `blind-ref-hidden` chỉ còn cho ref không chép được."
+        },
+        "note": "Read-only current source and target comparisons; draft unchanged. Source and target numbered-anchor relocation is not approval. Text corrections or source drift require independent judgment."
+      }
+    ]
+  },
+  "currentSourceDigestUnchanged": true
+}
+```
+
+## Entry e-015: claim_220b8163566ad8b38cbf1d534c871e42
+
+```json
+{
+  "kind": "source-alias-comparison",
+  "claimId": "claim_220b8163566ad8b38cbf1d534c871e42",
+  "priorAnchor": "unheaded-block-125",
+  "priorDigest": "d0eb5b8c250cd17479ceba5b41a114e24933e13bfe9ca355ed5871091093e30f",
+  "currentDigest": "8caafcb371d02a300d8aa42288fc25e25354ddd2301e48508ee4810c99340902",
+  "matchingCurrentAnchors": [
+    "unheaded-block-126"
+  ],
+  "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval.",
+  "draftAliases": [
+    {
+      "aliasId": "step10-specs-0081",
+      "fromPath": "docs/specs/confinement-authority.md#unheaded-block-125",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-58",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    }
+  ],
+  "currentNative": {
+    "sourcePath": "docs/specs/confinement-authority.md",
+    "unitDigest": "a3210dd0ebe893f20977d38eaad3c9a57ceb312096f517c8d17d704f8881f61b",
+    "identityFingerprint": "a3210dd0ebe893f20977d38eaad3c9a57ceb312096f517c8d17d704f8881f61b",
+    "claimId": "claim_220b8163566ad8b38cbf1d534c871e42",
+    "sourceAnchor": "unheaded-block-126",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "d0eb5b8c250cd17479ceba5b41a114e24933e13bfe9ca355ed5871091093e30f",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "currentSourceUnit": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-126",
+    "githubAnchor": "unheaded-block-126",
+    "stableAnchor": "unheaded-block-126",
+    "title": "Unheaded block 126",
+    "startLine": 1224,
+    "endLine": 1231,
+    "textDigest": "d0eb5b8c250cd17479ceba5b41a114e24933e13bfe9ca355ed5871091093e30f",
+    "sample": "Canary sống (2026-10-05, mỗi họ executor một Unit blind chỉ-đọc, input `unit-run:`, và đường dẫn\ntuyệt đối tới report nguồn): claude (herdr), codex (herdr và cli bwrap), xai (pi he",
+    "identityFingerprint": "a3210dd0ebe893f20977d38eaad3c9a57ceb312096f517c8d17d704f8881f61b",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "9. Default implementation đầu tiên",
+      "9.2 `hostRead: blind` — worker mù trước run state của peer"
+    ],
+    "text": "Canary sống (2026-10-05, mỗi họ executor một Unit blind chỉ-đọc, input `unit-run:`, và đường dẫn\ntuyệt đối tới report nguồn): claude (herdr), codex (herdr và cli bwrap), xai (pi herdr), glm và\ndeepseek (pi cli bwrap) đều đọc bản chép, gặp `ENOENT` ở nguồn và chỉ thấy chuỗi của chính mình\ntrong `.fgos/assignments`. Dưới `--unshare-pid` và mask thư mục socket herdr, herdr vẫn nhận ra agent\ntrong pane (`agentKnownToHerdr: detected`, trạng thái `unknown` → `working` → `idle`/kết thúc), nên\nmask và `--unshare-pid` giữ nguyên. agy chưa chứng minh được: `agy-herdr` hỏng cả khi không blind\n(`foreground process ... does not match prepared command argv`), `agy-cli-bwrap` dừng vì hết quota\ncủa tài khoản."
+  },
+  "currentTargetComparisons": [
+    {
+      "aliasId": "step10-specs-0081",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-58",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-58",
+        "githubAnchor": "unheaded-block-58",
+        "stableAnchor": "unheaded-block-58",
+        "title": "Unheaded block 58",
+        "startLine": 462,
+        "endLine": 471,
+        "textDigest": "7cf71cce1a2badb415557e66813aa0937d285bc90ad11c6264e1e54083199ff6",
+        "sample": "Với `blind`, driver bwrap giữ `--ro-bind / /` và thêm, theo đúng thứ tự: `--unshare-pid` (ẩn\n`/proc/<pid>/cmdline` của tiến trình khác); `--tmpfs` che từng *hidden root* đang tồn t",
+        "identityFingerprint": "4a38ae1622ec5454712f92237ad8feed19e54b64a51650533fee85d0b674ada7",
+        "ancestry": [
+          "Spec: Agent Confinement Authority",
+          "9. Default implementation đầu tiên",
+          "9.2 `hostRead: blind` — worker mù trước run state của peer"
+        ],
+        "text": "Với `blind`, driver bwrap giữ `--ro-bind / /` và thêm, theo đúng thứ tự: `--unshare-pid` (ẩn\n`/proc/<pid>/cmdline` của tiến trình khác); `--tmpfs` che từng *hidden root* đang tồn tại;\n`--ro-bind` thư mục của chính dispatch (round dir `<assignments>/<unit run>/<role>/<round>`,\nhoặc run dir nếu không có assignment) chỉ-đọc; các mount nằm dưới mask (outbox ghi được, private\nhome); cuối cùng `--remount-ro` trên các mask. Hidden root là dữ liệu của contract\n(`BLIND_HIDDEN_ROOTS`), không phải code của driver: `{fgosDir}/assignments`,\n`{fgosDir}/workflow-runs`, `{fgosDir}/dispatch-runs` của project dispatch đang chạy, thư mục\nsocket của herdr, và confinement temp root (private home của dispatch khác, chứa transcript agent).\nResource `hidden-root` và `own-assignment` đi vào plan/attestation; attestation ghi thêm\n`requested.override`, `effectiveControls.hostRead: blind` và `hiddenRoots`."
+      },
+      "uniqueSameDigestUnits": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-60",
+          "githubAnchor": "unheaded-block-60",
+          "stableAnchor": "unheaded-block-60",
+          "title": "Unheaded block 60",
+          "startLine": 490,
+          "endLine": 497,
+          "textDigest": "d0eb5b8c250cd17479ceba5b41a114e24933e13bfe9ca355ed5871091093e30f",
+          "sample": "Canary sống (2026-10-05, mỗi họ executor một Unit blind chỉ-đọc, input `unit-run:`, và đường dẫn\ntuyệt đối tới report nguồn): claude (herdr), codex (herdr và cli bwrap), xai (pi he",
+          "identityFingerprint": "a3210dd0ebe893f20977d38eaad3c9a57ceb312096f517c8d17d704f8881f61b",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "9. Default implementation đầu tiên",
+            "9.2 `hostRead: blind` — worker mù trước run state của peer"
+          ],
+          "text": "Canary sống (2026-10-05, mỗi họ executor một Unit blind chỉ-đọc, input `unit-run:`, và đường dẫn\ntuyệt đối tới report nguồn): claude (herdr), codex (herdr và cli bwrap), xai (pi herdr), glm và\ndeepseek (pi cli bwrap) đều đọc bản chép, gặp `ENOENT` ở nguồn và chỉ thấy chuỗi của chính mình\ntrong `.fgos/assignments`. Dưới `--unshare-pid` và mask thư mục socket herdr, herdr vẫn nhận ra agent\ntrong pane (`agentKnownToHerdr: detected`, trạng thái `unknown` → `working` → `idle`/kết thúc), nên\nmask và `--unshare-pid` giữ nguyên. agy chưa chứng minh được: `agy-herdr` hỏng cả khi không blind\n(`foreground process ... does not match prepared command argv`), `agy-cli-bwrap` dừng vì hết quota\ncủa tài khoản."
+        }
+      ]
+    }
+  ],
+  "historicalPackageComparisons": {
+    "nativeIdentity": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "a3210dd0ebe893f20977d38eaad3c9a57ceb312096f517c8d17d704f8881f61b",
+      "identityFingerprint": "a3210dd0ebe893f20977d38eaad3c9a57ceb312096f517c8d17d704f8881f61b",
+      "claimId": "claim_220b8163566ad8b38cbf1d534c871e42",
+      "sourceAnchor": "unheaded-block-126",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "d0eb5b8c250cd17479ceba5b41a114e24933e13bfe9ca355ed5871091093e30f",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "currentIdentityBinding": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "a3210dd0ebe893f20977d38eaad3c9a57ceb312096f517c8d17d704f8881f61b",
+      "identityFingerprint": "a3210dd0ebe893f20977d38eaad3c9a57ceb312096f517c8d17d704f8881f61b",
+      "claimId": "claim_220b8163566ad8b38cbf1d534c871e42",
+      "sourceAnchor": "unheaded-block-126",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "d0eb5b8c250cd17479ceba5b41a114e24933e13bfe9ca355ed5871091093e30f",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "uniqueSameDigestBinding": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-126",
+      "githubAnchor": "unheaded-block-126",
+      "stableAnchor": "unheaded-block-126",
+      "title": "Unheaded block 126",
+      "startLine": 1224,
+      "endLine": 1231,
+      "textDigest": "d0eb5b8c250cd17479ceba5b41a114e24933e13bfe9ca355ed5871091093e30f",
+      "sample": "Canary sống (2026-10-05, mỗi họ executor một Unit blind chỉ-đọc, input `unit-run:`, và đường dẫn\ntuyệt đối tới report nguồn): claude (herdr), codex (herdr và cli bwrap), xai (pi he",
+      "identityFingerprint": "a3210dd0ebe893f20977d38eaad3c9a57ceb312096f517c8d17d704f8881f61b",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "9. Default implementation đầu tiên",
+        "9.2 `hostRead: blind` — worker mù trước run state của peer"
+      ],
+      "text": "Canary sống (2026-10-05, mỗi họ executor một Unit blind chỉ-đọc, input `unit-run:`, và đường dẫn\ntuyệt đối tới report nguồn): claude (herdr), codex (herdr và cli bwrap), xai (pi herdr), glm và\ndeepseek (pi cli bwrap) đều đọc bản chép, gặp `ENOENT` ở nguồn và chỉ thấy chuỗi của chính mình\ntrong `.fgos/assignments`. Dưới `--unshare-pid` và mask thư mục socket herdr, herdr vẫn nhận ra agent\ntrong pane (`agentKnownToHerdr: detected`, trạng thái `unknown` → `working` → `idle`/kết thúc), nên\nmask và `--unshare-pid` giữ nguyên. agy chưa chứng minh được: `agy-herdr` hỏng cả khi không blind\n(`foreground process ... does not match prepared command argv`), `agy-cli-bwrap` dừng vì hết quota\ncủa tài khoản."
+    },
+    "currentUnitAtRetainedIdentity": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-126",
+      "githubAnchor": "unheaded-block-126",
+      "stableAnchor": "unheaded-block-126",
+      "title": "Unheaded block 126",
+      "startLine": 1224,
+      "endLine": 1231,
+      "textDigest": "d0eb5b8c250cd17479ceba5b41a114e24933e13bfe9ca355ed5871091093e30f",
+      "sample": "Canary sống (2026-10-05, mỗi họ executor một Unit blind chỉ-đọc, input `unit-run:`, và đường dẫn\ntuyệt đối tới report nguồn): claude (herdr), codex (herdr và cli bwrap), xai (pi he",
+      "identityFingerprint": "a3210dd0ebe893f20977d38eaad3c9a57ceb312096f517c8d17d704f8881f61b",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "9. Default implementation đầu tiên",
+        "9.2 `hostRead: blind` — worker mù trước run state của peer"
+      ],
+      "text": "Canary sống (2026-10-05, mỗi họ executor một Unit blind chỉ-đọc, input `unit-run:`, và đường dẫn\ntuyệt đối tới report nguồn): claude (herdr), codex (herdr và cli bwrap), xai (pi herdr), glm và\ndeepseek (pi cli bwrap) đều đọc bản chép, gặp `ENOENT` ở nguồn và chỉ thấy chuỗi của chính mình\ntrong `.fgos/assignments`. Dưới `--unshare-pid` và mask thư mục socket herdr, herdr vẫn nhận ra agent\ntrong pane (`agentKnownToHerdr: detected`, trạng thái `unknown` → `working` → `idle`/kết thúc), nên\nmask và `--unshare-pid` giữ nguyên. agy chưa chứng minh được: `agy-herdr` hỏng cả khi không blind\n(`foreground process ... does not match prepared command argv`), `agy-cli-bwrap` dừng vì hết quota\ncủa tài khoản."
+    },
+    "sourceDigestUnchanged": true,
+    "status": "same text uniquely found; alias anchor still independently checked",
+    "aliasTargetComparisons": [
+      {
+        "aliasId": "step10-specs-0081",
+        "fromPath": "docs/specs/confinement-authority.md#unheaded-block-125",
+        "toOwner": "docs/platform/agent-confinement/spec.md",
+        "toAnchor": "unheaded-block-58",
+        "currentTargetAtDraftAnchor": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-58",
+          "githubAnchor": "unheaded-block-58",
+          "stableAnchor": "unheaded-block-58",
+          "title": "Unheaded block 58",
+          "startLine": 462,
+          "endLine": 471,
+          "textDigest": "7cf71cce1a2badb415557e66813aa0937d285bc90ad11c6264e1e54083199ff6",
+          "sample": "Với `blind`, driver bwrap giữ `--ro-bind / /` và thêm, theo đúng thứ tự: `--unshare-pid` (ẩn\n`/proc/<pid>/cmdline` của tiến trình khác); `--tmpfs` che từng *hidden root* đang tồn t",
+          "identityFingerprint": "4a38ae1622ec5454712f92237ad8feed19e54b64a51650533fee85d0b674ada7",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "9. Default implementation đầu tiên",
+            "9.2 `hostRead: blind` — worker mù trước run state của peer"
+          ],
+          "text": "Với `blind`, driver bwrap giữ `--ro-bind / /` và thêm, theo đúng thứ tự: `--unshare-pid` (ẩn\n`/proc/<pid>/cmdline` của tiến trình khác); `--tmpfs` che từng *hidden root* đang tồn tại;\n`--ro-bind` thư mục của chính dispatch (round dir `<assignments>/<unit run>/<role>/<round>`,\nhoặc run dir nếu không có assignment) chỉ-đọc; các mount nằm dưới mask (outbox ghi được, private\nhome); cuối cùng `--remount-ro` trên các mask. Hidden root là dữ liệu của contract\n(`BLIND_HIDDEN_ROOTS`), không phải code của driver: `{fgosDir}/assignments`,\n`{fgosDir}/workflow-runs`, `{fgosDir}/dispatch-runs` của project dispatch đang chạy, thư mục\nsocket của herdr, và confinement temp root (private home của dispatch khác, chứa transcript agent).\nResource `hidden-root` và `own-assignment` đi vào plan/attestation; attestation ghi thêm\n`requested.override`, `effectiveControls.hostRead: blind` và `hiddenRoots`."
+        },
+        "sourceTextDigestAtDraftTarget": false,
+        "uniqueSameTextCurrentTarget": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-60",
+          "githubAnchor": "unheaded-block-60",
+          "stableAnchor": "unheaded-block-60",
+          "title": "Unheaded block 60",
+          "startLine": 490,
+          "endLine": 497,
+          "textDigest": "d0eb5b8c250cd17479ceba5b41a114e24933e13bfe9ca355ed5871091093e30f",
+          "sample": "Canary sống (2026-10-05, mỗi họ executor một Unit blind chỉ-đọc, input `unit-run:`, và đường dẫn\ntuyệt đối tới report nguồn): claude (herdr), codex (herdr và cli bwrap), xai (pi he",
+          "identityFingerprint": "a3210dd0ebe893f20977d38eaad3c9a57ceb312096f517c8d17d704f8881f61b",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "9. Default implementation đầu tiên",
+            "9.2 `hostRead: blind` — worker mù trước run state của peer"
+          ],
+          "text": "Canary sống (2026-10-05, mỗi họ executor một Unit blind chỉ-đọc, input `unit-run:`, và đường dẫn\ntuyệt đối tới report nguồn): claude (herdr), codex (herdr và cli bwrap), xai (pi herdr), glm và\ndeepseek (pi cli bwrap) đều đọc bản chép, gặp `ENOENT` ở nguồn và chỉ thấy chuỗi của chính mình\ntrong `.fgos/assignments`. Dưới `--unshare-pid` và mask thư mục socket herdr, herdr vẫn nhận ra agent\ntrong pane (`agentKnownToHerdr: detected`, trạng thái `unknown` → `working` → `idle`/kết thúc), nên\nmask và `--unshare-pid` giữ nguyên. agy chưa chứng minh được: `agy-herdr` hỏng cả khi không blind\n(`foreground process ... does not match prepared command argv`), `agy-cli-bwrap` dừng vì hết quota\ncủa tài khoản."
+        },
+        "note": "Read-only current source and target comparisons; draft unchanged. Source and target numbered-anchor relocation is not approval. Text corrections or source drift require independent judgment."
+      }
+    ]
+  },
+  "currentSourceDigestUnchanged": true
+}
+```
+
+## Entry e-016: claim_9d863e7c1e4c3983292845628b60e041
+
+```json
+{
+  "kind": "source-alias-comparison",
+  "claimId": "claim_9d863e7c1e4c3983292845628b60e041",
+  "priorAnchor": "unheaded-block-126",
+  "priorDigest": "a42feb4ea36f23dcda856872a41811401e058cee1f3bfd71af95069725466bc8",
+  "currentDigest": "d0eb5b8c250cd17479ceba5b41a114e24933e13bfe9ca355ed5871091093e30f",
+  "matchingCurrentAnchors": [
+    "unheaded-block-127"
+  ],
+  "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval.",
+  "draftAliases": [
+    {
+      "aliasId": "step10-specs-0082",
+      "fromPath": "docs/specs/confinement-authority.md#unheaded-block-126",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-59",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    }
+  ],
+  "currentNative": {
+    "sourcePath": "docs/specs/confinement-authority.md",
+    "unitDigest": "f70870c5e32af26c81575c163e34438c8e9fbe0acdec1c7b6da7681c0f3abfc3",
+    "identityFingerprint": "f70870c5e32af26c81575c163e34438c8e9fbe0acdec1c7b6da7681c0f3abfc3",
+    "claimId": "claim_9d863e7c1e4c3983292845628b60e041",
+    "sourceAnchor": "unheaded-block-127",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "a42feb4ea36f23dcda856872a41811401e058cee1f3bfd71af95069725466bc8",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "currentSourceUnit": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-127",
+    "githubAnchor": "unheaded-block-127",
+    "stableAnchor": "unheaded-block-127",
+    "title": "Unheaded block 127",
+    "startLine": 1233,
+    "endLine": 1245,
+    "textDigest": "a42feb4ea36f23dcda856872a41811401e058cee1f3bfd71af95069725466bc8",
+    "sample": "Dispatch `blind` bị **từ chối, không bao giờ chạy không-blind**, với lý do có tên, trước khi\nspawn: `blind-requires-confinement` (mode không phải `required`/không có policy),\n`blin",
+    "identityFingerprint": "f70870c5e32af26c81575c163e34438c8e9fbe0acdec1c7b6da7681c0f3abfc3",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "9. Default implementation đầu tiên",
+      "9.2 `hostRead: blind` — worker mù trước run state của peer"
+    ],
+    "text": "Dispatch `blind` bị **từ chối, không bao giờ chạy không-blind**, với lý do có tên, trước khi\nspawn: `blind-requires-confinement` (mode không phải `required`/không có policy),\n`blind-in-process` (Agent tool/inline không có sandbox quanh worker; `bind()` cũng không chọn nó),\n`blind-hides-workspace` (cwd hoặc repo root nằm trong hidden root), `blind-ref-hidden` (context\nref nằm trong hidden root ngoài thư mục của chính dispatch), `confinement-backend-missing` /\n`confinement-backend-disabled` (không có bwrap), `confinement-probe-failed` (probe chưa tươi hoặc\nkhông qua). Probe `peer-run-hidden` (thứ chín, chỉ cho dispatch blind; fingerprint và cache riêng)\ndựng argv từ chính `prepareBwrap`: worker không đọc được report của peer, home của peer, cmdline\ncủa tiến trình anh em, nhưng đọc được thư mục của mình (chỉ-đọc) và ghi được outbox; falsifier bỏ\nmask thì phải đọc được file peer. `fgos doctor` báo `blind-read: pass | fail |\nbackend-unsupported` (check `confinement-blind-read`). Giới hạn còn mở: transcript agent của Lead\ntrong host home, `.fgos/secrets.local.env` và project khác (bí mật, không phải mù), và mạng\nlocalhost."
+  },
+  "currentTargetComparisons": [
+    {
+      "aliasId": "step10-specs-0082",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-59",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-59",
+        "githubAnchor": "unheaded-block-59",
+        "stableAnchor": "unheaded-block-59",
+        "title": "Unheaded block 59",
+        "startLine": 473,
+        "endLine": 488,
+        "textDigest": "8caafcb371d02a300d8aa42288fc25e25354ddd2301e48508ee4810c99340902",
+        "sample": "Vì sao như vậy: (1) chỉ che ba thư mục run state chứ không che cả `.fgos`, vì `.fgos` có file\ntracked (config, events) — che cả thư mục làm chúng hiện thành \"đã xoá\" trong trạng th",
+        "identityFingerprint": "3548ae4ac9be2f8c7d818cc88b96df1b59f595c7597bf8ce31b098fb1d4f23ec",
+        "ancestry": [
+          "Spec: Agent Confinement Authority",
+          "9. Default implementation đầu tiên",
+          "9.2 `hostRead: blind` — worker mù trước run state của peer"
+        ],
+        "text": "Vì sao như vậy: (1) chỉ che ba thư mục run state chứ không che cả `.fgos`, vì `.fgos` có file\ntracked (config, events) — che cả thư mục làm chúng hiện thành \"đã xoá\" trong trạng thái checkout,\nvà worker ghi được workspace có thể commit việc xoá đó; (2) `--unshare-pid` vì không có nó worker\nđọc được cmdline của tiến trình anh em; (3) socket herdr nằm trong danh sách vì `--ro-bind / /`\nvẫn cho `connect()`, tức worker có thể `pane read` pane của anh em. Blind chỉ dùng được khi cái\nworker *được trao* nằm sẵn trong thư mục của chính nó, nên với Unit `blind` resolver hand-off\n(`resolveUnitInputs`, `src/runner/execution/handoff-refs.mjs`) không giao đường dẫn gốc: mọi input\n`unit-run:`, `gate-answer:` và mọi ref nằm trong hidden root được chép nguyên byte (kiểm lại sha256\nlúc chép; nguồn đã đổi sau settle thì từ chối `report-changed-after-settle`) vào `inputs/` của\n*round dir của chính vai đó* (`<round>/inputs/<tên>`), vô điều kiện, không cần `anonymizeInputs`; tên\ntrung tính `seat-A...` cho input `unit-run:` khi `anonymizeInputs` bật, tên cố định `<n>-<vai>-r<vòng>`\nhoặc `<n>-gate-<bước>` nếu không. Mỗi vai một bản riêng (không chia sẻ giữa các vai của Unit), nên\nchỉ vai đó đọc được; danh sách ref của vai là các bản chép. `unit.json` giữ `resolvedInputs` (ref\nđọc được tại chỗ) và `inputMap` (nguồn, tên, sha256); resume dùng lại bản chép đã có, fallback chép\nlại vào round dir của lần thử mới. Synthesizer của pattern `panel` nhận report của panelist theo\nđúng cách đó. `blind-ref-hidden` chỉ còn cho ref không chép được."
+      },
+      "uniqueSameDigestUnits": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-61",
+          "githubAnchor": "unheaded-block-61",
+          "stableAnchor": "unheaded-block-61",
+          "title": "Unheaded block 61",
+          "startLine": 499,
+          "endLine": 511,
+          "textDigest": "a42feb4ea36f23dcda856872a41811401e058cee1f3bfd71af95069725466bc8",
+          "sample": "Dispatch `blind` bị **từ chối, không bao giờ chạy không-blind**, với lý do có tên, trước khi\nspawn: `blind-requires-confinement` (mode không phải `required`/không có policy),\n`blin",
+          "identityFingerprint": "f70870c5e32af26c81575c163e34438c8e9fbe0acdec1c7b6da7681c0f3abfc3",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "9. Default implementation đầu tiên",
+            "9.2 `hostRead: blind` — worker mù trước run state của peer"
+          ],
+          "text": "Dispatch `blind` bị **từ chối, không bao giờ chạy không-blind**, với lý do có tên, trước khi\nspawn: `blind-requires-confinement` (mode không phải `required`/không có policy),\n`blind-in-process` (Agent tool/inline không có sandbox quanh worker; `bind()` cũng không chọn nó),\n`blind-hides-workspace` (cwd hoặc repo root nằm trong hidden root), `blind-ref-hidden` (context\nref nằm trong hidden root ngoài thư mục của chính dispatch), `confinement-backend-missing` /\n`confinement-backend-disabled` (không có bwrap), `confinement-probe-failed` (probe chưa tươi hoặc\nkhông qua). Probe `peer-run-hidden` (thứ chín, chỉ cho dispatch blind; fingerprint và cache riêng)\ndựng argv từ chính `prepareBwrap`: worker không đọc được report của peer, home của peer, cmdline\ncủa tiến trình anh em, nhưng đọc được thư mục của mình (chỉ-đọc) và ghi được outbox; falsifier bỏ\nmask thì phải đọc được file peer. `fgos doctor` báo `blind-read: pass | fail |\nbackend-unsupported` (check `confinement-blind-read`). Giới hạn còn mở: transcript agent của Lead\ntrong host home, `.fgos/secrets.local.env` và project khác (bí mật, không phải mù), và mạng\nlocalhost."
+        }
+      ]
+    }
+  ],
+  "historicalPackageComparisons": {
+    "nativeIdentity": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "f70870c5e32af26c81575c163e34438c8e9fbe0acdec1c7b6da7681c0f3abfc3",
+      "identityFingerprint": "f70870c5e32af26c81575c163e34438c8e9fbe0acdec1c7b6da7681c0f3abfc3",
+      "claimId": "claim_9d863e7c1e4c3983292845628b60e041",
+      "sourceAnchor": "unheaded-block-127",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "a42feb4ea36f23dcda856872a41811401e058cee1f3bfd71af95069725466bc8",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "currentIdentityBinding": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "f70870c5e32af26c81575c163e34438c8e9fbe0acdec1c7b6da7681c0f3abfc3",
+      "identityFingerprint": "f70870c5e32af26c81575c163e34438c8e9fbe0acdec1c7b6da7681c0f3abfc3",
+      "claimId": "claim_9d863e7c1e4c3983292845628b60e041",
+      "sourceAnchor": "unheaded-block-127",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "a42feb4ea36f23dcda856872a41811401e058cee1f3bfd71af95069725466bc8",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "uniqueSameDigestBinding": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-127",
+      "githubAnchor": "unheaded-block-127",
+      "stableAnchor": "unheaded-block-127",
+      "title": "Unheaded block 127",
+      "startLine": 1233,
+      "endLine": 1245,
+      "textDigest": "a42feb4ea36f23dcda856872a41811401e058cee1f3bfd71af95069725466bc8",
+      "sample": "Dispatch `blind` bị **từ chối, không bao giờ chạy không-blind**, với lý do có tên, trước khi\nspawn: `blind-requires-confinement` (mode không phải `required`/không có policy),\n`blin",
+      "identityFingerprint": "f70870c5e32af26c81575c163e34438c8e9fbe0acdec1c7b6da7681c0f3abfc3",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "9. Default implementation đầu tiên",
+        "9.2 `hostRead: blind` — worker mù trước run state của peer"
+      ],
+      "text": "Dispatch `blind` bị **từ chối, không bao giờ chạy không-blind**, với lý do có tên, trước khi\nspawn: `blind-requires-confinement` (mode không phải `required`/không có policy),\n`blind-in-process` (Agent tool/inline không có sandbox quanh worker; `bind()` cũng không chọn nó),\n`blind-hides-workspace` (cwd hoặc repo root nằm trong hidden root), `blind-ref-hidden` (context\nref nằm trong hidden root ngoài thư mục của chính dispatch), `confinement-backend-missing` /\n`confinement-backend-disabled` (không có bwrap), `confinement-probe-failed` (probe chưa tươi hoặc\nkhông qua). Probe `peer-run-hidden` (thứ chín, chỉ cho dispatch blind; fingerprint và cache riêng)\ndựng argv từ chính `prepareBwrap`: worker không đọc được report của peer, home của peer, cmdline\ncủa tiến trình anh em, nhưng đọc được thư mục của mình (chỉ-đọc) và ghi được outbox; falsifier bỏ\nmask thì phải đọc được file peer. `fgos doctor` báo `blind-read: pass | fail |\nbackend-unsupported` (check `confinement-blind-read`). Giới hạn còn mở: transcript agent của Lead\ntrong host home, `.fgos/secrets.local.env` và project khác (bí mật, không phải mù), và mạng\nlocalhost."
+    },
+    "currentUnitAtRetainedIdentity": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-127",
+      "githubAnchor": "unheaded-block-127",
+      "stableAnchor": "unheaded-block-127",
+      "title": "Unheaded block 127",
+      "startLine": 1233,
+      "endLine": 1245,
+      "textDigest": "a42feb4ea36f23dcda856872a41811401e058cee1f3bfd71af95069725466bc8",
+      "sample": "Dispatch `blind` bị **từ chối, không bao giờ chạy không-blind**, với lý do có tên, trước khi\nspawn: `blind-requires-confinement` (mode không phải `required`/không có policy),\n`blin",
+      "identityFingerprint": "f70870c5e32af26c81575c163e34438c8e9fbe0acdec1c7b6da7681c0f3abfc3",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "9. Default implementation đầu tiên",
+        "9.2 `hostRead: blind` — worker mù trước run state của peer"
+      ],
+      "text": "Dispatch `blind` bị **từ chối, không bao giờ chạy không-blind**, với lý do có tên, trước khi\nspawn: `blind-requires-confinement` (mode không phải `required`/không có policy),\n`blind-in-process` (Agent tool/inline không có sandbox quanh worker; `bind()` cũng không chọn nó),\n`blind-hides-workspace` (cwd hoặc repo root nằm trong hidden root), `blind-ref-hidden` (context\nref nằm trong hidden root ngoài thư mục của chính dispatch), `confinement-backend-missing` /\n`confinement-backend-disabled` (không có bwrap), `confinement-probe-failed` (probe chưa tươi hoặc\nkhông qua). Probe `peer-run-hidden` (thứ chín, chỉ cho dispatch blind; fingerprint và cache riêng)\ndựng argv từ chính `prepareBwrap`: worker không đọc được report của peer, home của peer, cmdline\ncủa tiến trình anh em, nhưng đọc được thư mục của mình (chỉ-đọc) và ghi được outbox; falsifier bỏ\nmask thì phải đọc được file peer. `fgos doctor` báo `blind-read: pass | fail |\nbackend-unsupported` (check `confinement-blind-read`). Giới hạn còn mở: transcript agent của Lead\ntrong host home, `.fgos/secrets.local.env` và project khác (bí mật, không phải mù), và mạng\nlocalhost."
+    },
+    "sourceDigestUnchanged": true,
+    "status": "same text uniquely found; alias anchor still independently checked",
+    "aliasTargetComparisons": [
+      {
+        "aliasId": "step10-specs-0082",
+        "fromPath": "docs/specs/confinement-authority.md#unheaded-block-126",
+        "toOwner": "docs/platform/agent-confinement/spec.md",
+        "toAnchor": "unheaded-block-59",
+        "currentTargetAtDraftAnchor": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-59",
+          "githubAnchor": "unheaded-block-59",
+          "stableAnchor": "unheaded-block-59",
+          "title": "Unheaded block 59",
+          "startLine": 473,
+          "endLine": 488,
+          "textDigest": "8caafcb371d02a300d8aa42288fc25e25354ddd2301e48508ee4810c99340902",
+          "sample": "Vì sao như vậy: (1) chỉ che ba thư mục run state chứ không che cả `.fgos`, vì `.fgos` có file\ntracked (config, events) — che cả thư mục làm chúng hiện thành \"đã xoá\" trong trạng th",
+          "identityFingerprint": "3548ae4ac9be2f8c7d818cc88b96df1b59f595c7597bf8ce31b098fb1d4f23ec",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "9. Default implementation đầu tiên",
+            "9.2 `hostRead: blind` — worker mù trước run state của peer"
+          ],
+          "text": "Vì sao như vậy: (1) chỉ che ba thư mục run state chứ không che cả `.fgos`, vì `.fgos` có file\ntracked (config, events) — che cả thư mục làm chúng hiện thành \"đã xoá\" trong trạng thái checkout,\nvà worker ghi được workspace có thể commit việc xoá đó; (2) `--unshare-pid` vì không có nó worker\nđọc được cmdline của tiến trình anh em; (3) socket herdr nằm trong danh sách vì `--ro-bind / /`\nvẫn cho `connect()`, tức worker có thể `pane read` pane của anh em. Blind chỉ dùng được khi cái\nworker *được trao* nằm sẵn trong thư mục của chính nó, nên với Unit `blind` resolver hand-off\n(`resolveUnitInputs`, `src/runner/execution/handoff-refs.mjs`) không giao đường dẫn gốc: mọi input\n`unit-run:`, `gate-answer:` và mọi ref nằm trong hidden root được chép nguyên byte (kiểm lại sha256\nlúc chép; nguồn đã đổi sau settle thì từ chối `report-changed-after-settle`) vào `inputs/` của\n*round dir của chính vai đó* (`<round>/inputs/<tên>`), vô điều kiện, không cần `anonymizeInputs`; tên\ntrung tính `seat-A...` cho input `unit-run:` khi `anonymizeInputs` bật, tên cố định `<n>-<vai>-r<vòng>`\nhoặc `<n>-gate-<bước>` nếu không. Mỗi vai một bản riêng (không chia sẻ giữa các vai của Unit), nên\nchỉ vai đó đọc được; danh sách ref của vai là các bản chép. `unit.json` giữ `resolvedInputs` (ref\nđọc được tại chỗ) và `inputMap` (nguồn, tên, sha256); resume dùng lại bản chép đã có, fallback chép\nlại vào round dir của lần thử mới. Synthesizer của pattern `panel` nhận report của panelist theo\nđúng cách đó. `blind-ref-hidden` chỉ còn cho ref không chép được."
+        },
+        "sourceTextDigestAtDraftTarget": false,
+        "uniqueSameTextCurrentTarget": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-61",
+          "githubAnchor": "unheaded-block-61",
+          "stableAnchor": "unheaded-block-61",
+          "title": "Unheaded block 61",
+          "startLine": 499,
+          "endLine": 511,
+          "textDigest": "a42feb4ea36f23dcda856872a41811401e058cee1f3bfd71af95069725466bc8",
+          "sample": "Dispatch `blind` bị **từ chối, không bao giờ chạy không-blind**, với lý do có tên, trước khi\nspawn: `blind-requires-confinement` (mode không phải `required`/không có policy),\n`blin",
+          "identityFingerprint": "f70870c5e32af26c81575c163e34438c8e9fbe0acdec1c7b6da7681c0f3abfc3",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "9. Default implementation đầu tiên",
+            "9.2 `hostRead: blind` — worker mù trước run state của peer"
+          ],
+          "text": "Dispatch `blind` bị **từ chối, không bao giờ chạy không-blind**, với lý do có tên, trước khi\nspawn: `blind-requires-confinement` (mode không phải `required`/không có policy),\n`blind-in-process` (Agent tool/inline không có sandbox quanh worker; `bind()` cũng không chọn nó),\n`blind-hides-workspace` (cwd hoặc repo root nằm trong hidden root), `blind-ref-hidden` (context\nref nằm trong hidden root ngoài thư mục của chính dispatch), `confinement-backend-missing` /\n`confinement-backend-disabled` (không có bwrap), `confinement-probe-failed` (probe chưa tươi hoặc\nkhông qua). Probe `peer-run-hidden` (thứ chín, chỉ cho dispatch blind; fingerprint và cache riêng)\ndựng argv từ chính `prepareBwrap`: worker không đọc được report của peer, home của peer, cmdline\ncủa tiến trình anh em, nhưng đọc được thư mục của mình (chỉ-đọc) và ghi được outbox; falsifier bỏ\nmask thì phải đọc được file peer. `fgos doctor` báo `blind-read: pass | fail |\nbackend-unsupported` (check `confinement-blind-read`). Giới hạn còn mở: transcript agent của Lead\ntrong host home, `.fgos/secrets.local.env` và project khác (bí mật, không phải mù), và mạng\nlocalhost."
+        },
+        "note": "Read-only current source and target comparisons; draft unchanged. Source and target numbered-anchor relocation is not approval. Text corrections or source drift require independent judgment."
+      }
+    ]
+  },
+  "currentSourceDigestUnchanged": true
+}
+```
+
+## Entry e-017: claim_029dd2509143e3a718a8fc0b7f7be03e
+
+```json
+{
+  "kind": "source-alias-comparison",
+  "claimId": "claim_029dd2509143e3a718a8fc0b7f7be03e",
+  "priorAnchor": "unheaded-block-127",
+  "priorDigest": "5036517c45b86b22554b3c8c1b11e63cc453d4a66722bbd0c820af5ec68cc56f",
+  "currentDigest": "a42feb4ea36f23dcda856872a41811401e058cee1f3bfd71af95069725466bc8",
+  "matchingCurrentAnchors": [
+    "unheaded-block-128"
+  ],
+  "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval.",
+  "draftAliases": [
+    {
+      "aliasId": "step10-specs-0083",
+      "fromPath": "docs/specs/confinement-authority.md#unheaded-block-127",
+      "toOwner": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+      "toAnchor": "unheaded-block-3",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    }
+  ],
+  "currentNative": {
+    "sourcePath": "docs/specs/confinement-authority.md",
+    "unitDigest": "2bb8eb696342baad57eed99651a6a5f651d0173d0e69f1015f333df5157260d8",
+    "identityFingerprint": "2bb8eb696342baad57eed99651a6a5f651d0173d0e69f1015f333df5157260d8",
+    "claimId": "claim_029dd2509143e3a718a8fc0b7f7be03e",
+    "sourceAnchor": "unheaded-block-128",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "5036517c45b86b22554b3c8c1b11e63cc453d4a66722bbd0c820af5ec68cc56f",
+    "claimKind": "contract",
+    "status": "current"
+  },
+  "currentSourceUnit": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-128",
+    "githubAnchor": "unheaded-block-128",
+    "stableAnchor": "unheaded-block-128",
+    "title": "Unheaded block 128",
+    "startLine": 1249,
+    "endLine": 1258,
+    "textDigest": "5036517c45b86b22554b3c8c1b11e63cc453d4a66722bbd0c820af5ec68cc56f",
+    "sample": "| Phase | Kết quả | Trạng thái (Track `confinement-authority-implementation`) |\n|---|---|---|\n| S0 - Contract | Spec, schema names, error taxonomy, one-door invariant | **Đã hoàn t",
+    "identityFingerprint": "2bb8eb696342baad57eed99651a6a5f651d0173d0e69f1015f333df5157260d8",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "10. Lộ trình rollout và trạng thái hoàn thành"
+    ],
+    "text": "| Phase | Kết quả | Trạng thái (Track `confinement-authority-implementation`) |\n|---|---|---|\n| S0 - Contract | Spec, schema names, error taxonomy, one-door invariant | **Đã hoàn thành (P00)**: Contract đóng băng, repo map, inventory |\n| S1 - One-door observe | Hai call site chỉ gọi Authority; adapter execute handle bị ẩn; attestation đính kèm kết quả | **Đã hoàn thành (P02)**: `executeThroughConfinement` gắn tại `spawnWorker` và `executeExecutorCli` |\n| S2 - Declare | Capabilities explicit policy / `unconfined`; backend registry machine-local; schema validation | **Đã hoàn thành (P01/P04)**: Closed schema, `~/.fgos/confinement-backends.json`, setup/doctor |\n| S3 - Prove | Probe harness committed (8 falsification probes) + doctor checks probe freshness | **Đã hoàn thành (P03)**: `runAllConfinementProbes` + doctor checks |\n| S4 - Enforce | `required` fail closed trước spawn; di trú 3 bwrap executor | **Đã hoàn thành một phần (P04)**: 7 refusal gates, F-a đến F-d đóng; di trú 3 bwrap executor sang backend reference CHỈ ở fixture (P04.md R4) — live `.fgos/config.json` migration deferred, chưa hoàn thành |\n| S5 - Complete migration | Herdr và legacy confinement hội tụ dưới Authority; evaluateBypassPairing | **Đã hoàn thành (P05)**: Chuẩn hoá v1 controls, bypass pairing bảo đảm |\n| Dogfood Proof | Multi-agent coordination với cross-provider execution và bwrap enforcement thật | **Đã hoàn thành (P06)**: Doer/Reviewer/Red-Team live proof xanh, attestation artifacts |\n| S6 - Extend | macOS/container/remote/network/secret backend khi có nhu cầu | Tương lai / mở rộng ngoài v1 |"
+  },
+  "currentTargetComparisons": [
+    {
+      "aliasId": "step10-specs-0083",
+      "toOwner": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+      "toAnchor": "unheaded-block-3",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 26,
+        "endLine": 35,
+        "textDigest": "5036517c45b86b22554b3c8c1b11e63cc453d4a66722bbd0c820af5ec68cc56f",
+        "sample": "| Phase | Kết quả | Trạng thái (Track `confinement-authority-implementation`) |\n|---|---|---|\n| S0 - Contract | Spec, schema names, error taxonomy, one-door invariant | **Đã hoàn t",
+        "identityFingerprint": "2bb8eb696342baad57eed99651a6a5f651d0173d0e69f1015f333df5157260d8",
+        "ancestry": [
+          "Added in candidate: rollout and settled facts",
+          "10. Lộ trình rollout và trạng thái hoàn thành"
+        ],
+        "text": "| Phase | Kết quả | Trạng thái (Track `confinement-authority-implementation`) |\n|---|---|---|\n| S0 - Contract | Spec, schema names, error taxonomy, one-door invariant | **Đã hoàn thành (P00)**: Contract đóng băng, repo map, inventory |\n| S1 - One-door observe | Hai call site chỉ gọi Authority; adapter execute handle bị ẩn; attestation đính kèm kết quả | **Đã hoàn thành (P02)**: `executeThroughConfinement` gắn tại `spawnWorker` và `executeExecutorCli` |\n| S2 - Declare | Capabilities explicit policy / `unconfined`; backend registry machine-local; schema validation | **Đã hoàn thành (P01/P04)**: Closed schema, `~/.fgos/confinement-backends.json`, setup/doctor |\n| S3 - Prove | Probe harness committed (8 falsification probes) + doctor checks probe freshness | **Đã hoàn thành (P03)**: `runAllConfinementProbes` + doctor checks |\n| S4 - Enforce | `required` fail closed trước spawn; di trú 3 bwrap executor | **Đã hoàn thành một phần (P04)**: 7 refusal gates, F-a đến F-d đóng; di trú 3 bwrap executor sang backend reference CHỈ ở fixture (P04.md R4) — live `.fgos/config.json` migration deferred, chưa hoàn thành |\n| S5 - Complete migration | Herdr và legacy confinement hội tụ dưới Authority; evaluateBypassPairing | **Đã hoàn thành (P05)**: Chuẩn hoá v1 controls, bypass pairing bảo đảm |\n| Dogfood Proof | Multi-agent coordination với cross-provider execution và bwrap enforcement thật | **Đã hoàn thành (P06)**: Doer/Reviewer/Red-Team live proof xanh, attestation artifacts |\n| S6 - Extend | macOS/container/remote/network/secret backend khi có nhu cầu | Tương lai / mở rộng ngoài v1 |"
+      },
+      "uniqueSameDigestUnits": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-3",
+          "githubAnchor": "unheaded-block-3",
+          "stableAnchor": "unheaded-block-3",
+          "title": "Unheaded block 3",
+          "startLine": 26,
+          "endLine": 35,
+          "textDigest": "5036517c45b86b22554b3c8c1b11e63cc453d4a66722bbd0c820af5ec68cc56f",
+          "sample": "| Phase | Kết quả | Trạng thái (Track `confinement-authority-implementation`) |\n|---|---|---|\n| S0 - Contract | Spec, schema names, error taxonomy, one-door invariant | **Đã hoàn t",
+          "identityFingerprint": "2bb8eb696342baad57eed99651a6a5f651d0173d0e69f1015f333df5157260d8",
+          "ancestry": [
+            "Added in candidate: rollout and settled facts",
+            "10. Lộ trình rollout và trạng thái hoàn thành"
+          ],
+          "text": "| Phase | Kết quả | Trạng thái (Track `confinement-authority-implementation`) |\n|---|---|---|\n| S0 - Contract | Spec, schema names, error taxonomy, one-door invariant | **Đã hoàn thành (P00)**: Contract đóng băng, repo map, inventory |\n| S1 - One-door observe | Hai call site chỉ gọi Authority; adapter execute handle bị ẩn; attestation đính kèm kết quả | **Đã hoàn thành (P02)**: `executeThroughConfinement` gắn tại `spawnWorker` và `executeExecutorCli` |\n| S2 - Declare | Capabilities explicit policy / `unconfined`; backend registry machine-local; schema validation | **Đã hoàn thành (P01/P04)**: Closed schema, `~/.fgos/confinement-backends.json`, setup/doctor |\n| S3 - Prove | Probe harness committed (8 falsification probes) + doctor checks probe freshness | **Đã hoàn thành (P03)**: `runAllConfinementProbes` + doctor checks |\n| S4 - Enforce | `required` fail closed trước spawn; di trú 3 bwrap executor | **Đã hoàn thành một phần (P04)**: 7 refusal gates, F-a đến F-d đóng; di trú 3 bwrap executor sang backend reference CHỈ ở fixture (P04.md R4) — live `.fgos/config.json` migration deferred, chưa hoàn thành |\n| S5 - Complete migration | Herdr và legacy confinement hội tụ dưới Authority; evaluateBypassPairing | **Đã hoàn thành (P05)**: Chuẩn hoá v1 controls, bypass pairing bảo đảm |\n| Dogfood Proof | Multi-agent coordination với cross-provider execution và bwrap enforcement thật | **Đã hoàn thành (P06)**: Doer/Reviewer/Red-Team live proof xanh, attestation artifacts |\n| S6 - Extend | macOS/container/remote/network/secret backend khi có nhu cầu | Tương lai / mở rộng ngoài v1 |"
+        }
+      ]
+    }
+  ],
+  "historicalPackageComparisons": {
+    "nativeIdentity": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "2bb8eb696342baad57eed99651a6a5f651d0173d0e69f1015f333df5157260d8",
+      "identityFingerprint": "2bb8eb696342baad57eed99651a6a5f651d0173d0e69f1015f333df5157260d8",
+      "claimId": "claim_029dd2509143e3a718a8fc0b7f7be03e",
+      "sourceAnchor": "unheaded-block-128",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "5036517c45b86b22554b3c8c1b11e63cc453d4a66722bbd0c820af5ec68cc56f",
+      "claimKind": "contract",
+      "status": "current"
+    },
+    "currentIdentityBinding": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "2bb8eb696342baad57eed99651a6a5f651d0173d0e69f1015f333df5157260d8",
+      "identityFingerprint": "2bb8eb696342baad57eed99651a6a5f651d0173d0e69f1015f333df5157260d8",
+      "claimId": "claim_029dd2509143e3a718a8fc0b7f7be03e",
+      "sourceAnchor": "unheaded-block-128",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "5036517c45b86b22554b3c8c1b11e63cc453d4a66722bbd0c820af5ec68cc56f",
+      "claimKind": "contract",
+      "status": "current"
+    },
+    "uniqueSameDigestBinding": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-128",
+      "githubAnchor": "unheaded-block-128",
+      "stableAnchor": "unheaded-block-128",
+      "title": "Unheaded block 128",
+      "startLine": 1249,
+      "endLine": 1258,
+      "textDigest": "5036517c45b86b22554b3c8c1b11e63cc453d4a66722bbd0c820af5ec68cc56f",
+      "sample": "| Phase | Kết quả | Trạng thái (Track `confinement-authority-implementation`) |\n|---|---|---|\n| S0 - Contract | Spec, schema names, error taxonomy, one-door invariant | **Đã hoàn t",
+      "identityFingerprint": "2bb8eb696342baad57eed99651a6a5f651d0173d0e69f1015f333df5157260d8",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "10. Lộ trình rollout và trạng thái hoàn thành"
+      ],
+      "text": "| Phase | Kết quả | Trạng thái (Track `confinement-authority-implementation`) |\n|---|---|---|\n| S0 - Contract | Spec, schema names, error taxonomy, one-door invariant | **Đã hoàn thành (P00)**: Contract đóng băng, repo map, inventory |\n| S1 - One-door observe | Hai call site chỉ gọi Authority; adapter execute handle bị ẩn; attestation đính kèm kết quả | **Đã hoàn thành (P02)**: `executeThroughConfinement` gắn tại `spawnWorker` và `executeExecutorCli` |\n| S2 - Declare | Capabilities explicit policy / `unconfined`; backend registry machine-local; schema validation | **Đã hoàn thành (P01/P04)**: Closed schema, `~/.fgos/confinement-backends.json`, setup/doctor |\n| S3 - Prove | Probe harness committed (8 falsification probes) + doctor checks probe freshness | **Đã hoàn thành (P03)**: `runAllConfinementProbes` + doctor checks |\n| S4 - Enforce | `required` fail closed trước spawn; di trú 3 bwrap executor | **Đã hoàn thành một phần (P04)**: 7 refusal gates, F-a đến F-d đóng; di trú 3 bwrap executor sang backend reference CHỈ ở fixture (P04.md R4) — live `.fgos/config.json` migration deferred, chưa hoàn thành |\n| S5 - Complete migration | Herdr và legacy confinement hội tụ dưới Authority; evaluateBypassPairing | **Đã hoàn thành (P05)**: Chuẩn hoá v1 controls, bypass pairing bảo đảm |\n| Dogfood Proof | Multi-agent coordination với cross-provider execution và bwrap enforcement thật | **Đã hoàn thành (P06)**: Doer/Reviewer/Red-Team live proof xanh, attestation artifacts |\n| S6 - Extend | macOS/container/remote/network/secret backend khi có nhu cầu | Tương lai / mở rộng ngoài v1 |"
+    },
+    "currentUnitAtRetainedIdentity": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-128",
+      "githubAnchor": "unheaded-block-128",
+      "stableAnchor": "unheaded-block-128",
+      "title": "Unheaded block 128",
+      "startLine": 1249,
+      "endLine": 1258,
+      "textDigest": "5036517c45b86b22554b3c8c1b11e63cc453d4a66722bbd0c820af5ec68cc56f",
+      "sample": "| Phase | Kết quả | Trạng thái (Track `confinement-authority-implementation`) |\n|---|---|---|\n| S0 - Contract | Spec, schema names, error taxonomy, one-door invariant | **Đã hoàn t",
+      "identityFingerprint": "2bb8eb696342baad57eed99651a6a5f651d0173d0e69f1015f333df5157260d8",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "10. Lộ trình rollout và trạng thái hoàn thành"
+      ],
+      "text": "| Phase | Kết quả | Trạng thái (Track `confinement-authority-implementation`) |\n|---|---|---|\n| S0 - Contract | Spec, schema names, error taxonomy, one-door invariant | **Đã hoàn thành (P00)**: Contract đóng băng, repo map, inventory |\n| S1 - One-door observe | Hai call site chỉ gọi Authority; adapter execute handle bị ẩn; attestation đính kèm kết quả | **Đã hoàn thành (P02)**: `executeThroughConfinement` gắn tại `spawnWorker` và `executeExecutorCli` |\n| S2 - Declare | Capabilities explicit policy / `unconfined`; backend registry machine-local; schema validation | **Đã hoàn thành (P01/P04)**: Closed schema, `~/.fgos/confinement-backends.json`, setup/doctor |\n| S3 - Prove | Probe harness committed (8 falsification probes) + doctor checks probe freshness | **Đã hoàn thành (P03)**: `runAllConfinementProbes` + doctor checks |\n| S4 - Enforce | `required` fail closed trước spawn; di trú 3 bwrap executor | **Đã hoàn thành một phần (P04)**: 7 refusal gates, F-a đến F-d đóng; di trú 3 bwrap executor sang backend reference CHỈ ở fixture (P04.md R4) — live `.fgos/config.json` migration deferred, chưa hoàn thành |\n| S5 - Complete migration | Herdr và legacy confinement hội tụ dưới Authority; evaluateBypassPairing | **Đã hoàn thành (P05)**: Chuẩn hoá v1 controls, bypass pairing bảo đảm |\n| Dogfood Proof | Multi-agent coordination với cross-provider execution và bwrap enforcement thật | **Đã hoàn thành (P06)**: Doer/Reviewer/Red-Team live proof xanh, attestation artifacts |\n| S6 - Extend | macOS/container/remote/network/secret backend khi có nhu cầu | Tương lai / mở rộng ngoài v1 |"
+    },
+    "sourceDigestUnchanged": true,
+    "status": "same text uniquely found; alias anchor still independently checked",
+    "aliasTargetComparisons": [
+      {
+        "aliasId": "step10-specs-0083",
+        "fromPath": "docs/specs/confinement-authority.md#unheaded-block-127",
+        "toOwner": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "toAnchor": "unheaded-block-3",
+        "currentTargetAtDraftAnchor": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-3",
+          "githubAnchor": "unheaded-block-3",
+          "stableAnchor": "unheaded-block-3",
+          "title": "Unheaded block 3",
+          "startLine": 26,
+          "endLine": 35,
+          "textDigest": "5036517c45b86b22554b3c8c1b11e63cc453d4a66722bbd0c820af5ec68cc56f",
+          "sample": "| Phase | Kết quả | Trạng thái (Track `confinement-authority-implementation`) |\n|---|---|---|\n| S0 - Contract | Spec, schema names, error taxonomy, one-door invariant | **Đã hoàn t",
+          "identityFingerprint": "2bb8eb696342baad57eed99651a6a5f651d0173d0e69f1015f333df5157260d8",
+          "ancestry": [
+            "Added in candidate: rollout and settled facts",
+            "10. Lộ trình rollout và trạng thái hoàn thành"
+          ],
+          "text": "| Phase | Kết quả | Trạng thái (Track `confinement-authority-implementation`) |\n|---|---|---|\n| S0 - Contract | Spec, schema names, error taxonomy, one-door invariant | **Đã hoàn thành (P00)**: Contract đóng băng, repo map, inventory |\n| S1 - One-door observe | Hai call site chỉ gọi Authority; adapter execute handle bị ẩn; attestation đính kèm kết quả | **Đã hoàn thành (P02)**: `executeThroughConfinement` gắn tại `spawnWorker` và `executeExecutorCli` |\n| S2 - Declare | Capabilities explicit policy / `unconfined`; backend registry machine-local; schema validation | **Đã hoàn thành (P01/P04)**: Closed schema, `~/.fgos/confinement-backends.json`, setup/doctor |\n| S3 - Prove | Probe harness committed (8 falsification probes) + doctor checks probe freshness | **Đã hoàn thành (P03)**: `runAllConfinementProbes` + doctor checks |\n| S4 - Enforce | `required` fail closed trước spawn; di trú 3 bwrap executor | **Đã hoàn thành một phần (P04)**: 7 refusal gates, F-a đến F-d đóng; di trú 3 bwrap executor sang backend reference CHỈ ở fixture (P04.md R4) — live `.fgos/config.json` migration deferred, chưa hoàn thành |\n| S5 - Complete migration | Herdr và legacy confinement hội tụ dưới Authority; evaluateBypassPairing | **Đã hoàn thành (P05)**: Chuẩn hoá v1 controls, bypass pairing bảo đảm |\n| Dogfood Proof | Multi-agent coordination với cross-provider execution và bwrap enforcement thật | **Đã hoàn thành (P06)**: Doer/Reviewer/Red-Team live proof xanh, attestation artifacts |\n| S6 - Extend | macOS/container/remote/network/secret backend khi có nhu cầu | Tương lai / mở rộng ngoài v1 |"
+        },
+        "sourceTextDigestAtDraftTarget": true,
+        "uniqueSameTextCurrentTarget": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-3",
+          "githubAnchor": "unheaded-block-3",
+          "stableAnchor": "unheaded-block-3",
+          "title": "Unheaded block 3",
+          "startLine": 26,
+          "endLine": 35,
+          "textDigest": "5036517c45b86b22554b3c8c1b11e63cc453d4a66722bbd0c820af5ec68cc56f",
+          "sample": "| Phase | Kết quả | Trạng thái (Track `confinement-authority-implementation`) |\n|---|---|---|\n| S0 - Contract | Spec, schema names, error taxonomy, one-door invariant | **Đã hoàn t",
+          "identityFingerprint": "2bb8eb696342baad57eed99651a6a5f651d0173d0e69f1015f333df5157260d8",
+          "ancestry": [
+            "Added in candidate: rollout and settled facts",
+            "10. Lộ trình rollout và trạng thái hoàn thành"
+          ],
+          "text": "| Phase | Kết quả | Trạng thái (Track `confinement-authority-implementation`) |\n|---|---|---|\n| S0 - Contract | Spec, schema names, error taxonomy, one-door invariant | **Đã hoàn thành (P00)**: Contract đóng băng, repo map, inventory |\n| S1 - One-door observe | Hai call site chỉ gọi Authority; adapter execute handle bị ẩn; attestation đính kèm kết quả | **Đã hoàn thành (P02)**: `executeThroughConfinement` gắn tại `spawnWorker` và `executeExecutorCli` |\n| S2 - Declare | Capabilities explicit policy / `unconfined`; backend registry machine-local; schema validation | **Đã hoàn thành (P01/P04)**: Closed schema, `~/.fgos/confinement-backends.json`, setup/doctor |\n| S3 - Prove | Probe harness committed (8 falsification probes) + doctor checks probe freshness | **Đã hoàn thành (P03)**: `runAllConfinementProbes` + doctor checks |\n| S4 - Enforce | `required` fail closed trước spawn; di trú 3 bwrap executor | **Đã hoàn thành một phần (P04)**: 7 refusal gates, F-a đến F-d đóng; di trú 3 bwrap executor sang backend reference CHỈ ở fixture (P04.md R4) — live `.fgos/config.json` migration deferred, chưa hoàn thành |\n| S5 - Complete migration | Herdr và legacy confinement hội tụ dưới Authority; evaluateBypassPairing | **Đã hoàn thành (P05)**: Chuẩn hoá v1 controls, bypass pairing bảo đảm |\n| Dogfood Proof | Multi-agent coordination với cross-provider execution và bwrap enforcement thật | **Đã hoàn thành (P06)**: Doer/Reviewer/Red-Team live proof xanh, attestation artifacts |\n| S6 - Extend | macOS/container/remote/network/secret backend khi có nhu cầu | Tương lai / mở rộng ngoài v1 |"
+        },
+        "note": "Read-only current source and target comparisons; draft unchanged. Source and target numbered-anchor relocation is not approval. Text corrections or source drift require independent judgment."
+      }
+    ]
+  },
+  "currentSourceDigestUnchanged": true
+}
+```
+
+## Entry e-018: claim_0a81cfc730773e8a468f69c67e1a7948
+
+```json
+{
+  "kind": "source-alias-comparison",
+  "claimId": "claim_0a81cfc730773e8a468f69c67e1a7948",
+  "priorAnchor": "unheaded-block-128",
+  "priorDigest": "685026d049d214e631c09ff55243094abcf13ea2acb41222f115d94bcc335107",
+  "currentDigest": "5036517c45b86b22554b3c8c1b11e63cc453d4a66722bbd0c820af5ec68cc56f",
+  "matchingCurrentAnchors": [
+    "unheaded-block-129"
+  ],
+  "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval.",
+  "draftAliases": [
+    {
+      "aliasId": "step10-specs-0084",
+      "fromPath": "docs/specs/confinement-authority.md#unheaded-block-128",
+      "toOwner": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+      "toAnchor": "unheaded-block-4",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    }
+  ],
+  "currentNative": {
+    "sourcePath": "docs/specs/confinement-authority.md",
+    "unitDigest": "e2c100056141c4a8d1703bbb66d0fc016bbe2bdbd20a052f831c9b3af630a70b",
+    "identityFingerprint": "e2c100056141c4a8d1703bbb66d0fc016bbe2bdbd20a052f831c9b3af630a70b",
+    "claimId": "claim_0a81cfc730773e8a468f69c67e1a7948",
+    "sourceAnchor": "unheaded-block-129",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "685026d049d214e631c09ff55243094abcf13ea2acb41222f115d94bcc335107",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "currentSourceUnit": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-129",
+    "githubAnchor": "unheaded-block-129",
+    "stableAnchor": "unheaded-block-129",
+    "title": "Unheaded block 129",
+    "startLine": 1260,
+    "endLine": 1260,
+    "textDigest": "685026d049d214e631c09ff55243094abcf13ea2acb41222f115d94bcc335107",
+    "sample": "Observe-first là thứ tự rollout, không phải kiến trúc đích. `required` luôn fail-closed. Mọi capability chưa có backend binding hỗ trợ được giữ ở `unconfined` (cho 3 capability tư ",
+    "identityFingerprint": "e2c100056141c4a8d1703bbb66d0fc016bbe2bdbd20a052f831c9b3af630a70b",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "10. Lộ trình rollout và trạng thái hoàn thành"
+    ],
+    "text": "Observe-first là thứ tự rollout, không phải kiến trúc đích. `required` luôn fail-closed. Mọi capability chưa có backend binding hỗ trợ được giữ ở `unconfined` (cho 3 capability tư vấn) hoặc omitted (chờ backend binding). Chế độ strict mode (`runner.confinement.strict`) mặc định giữ `false` với chẩn đoán sẵn sàng từ `fgos doctor`."
+  },
+  "currentTargetComparisons": [
+    {
+      "aliasId": "step10-specs-0084",
+      "toOwner": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+      "toAnchor": "unheaded-block-4",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 37,
+        "endLine": 37,
+        "textDigest": "685026d049d214e631c09ff55243094abcf13ea2acb41222f115d94bcc335107",
+        "sample": "Observe-first là thứ tự rollout, không phải kiến trúc đích. `required` luôn fail-closed. Mọi capability chưa có backend binding hỗ trợ được giữ ở `unconfined` (cho 3 capability tư ",
+        "identityFingerprint": "e2c100056141c4a8d1703bbb66d0fc016bbe2bdbd20a052f831c9b3af630a70b",
+        "ancestry": [
+          "Added in candidate: rollout and settled facts",
+          "10. Lộ trình rollout và trạng thái hoàn thành"
+        ],
+        "text": "Observe-first là thứ tự rollout, không phải kiến trúc đích. `required` luôn fail-closed. Mọi capability chưa có backend binding hỗ trợ được giữ ở `unconfined` (cho 3 capability tư vấn) hoặc omitted (chờ backend binding). Chế độ strict mode (`runner.confinement.strict`) mặc định giữ `false` với chẩn đoán sẵn sàng từ `fgos doctor`."
+      },
+      "uniqueSameDigestUnits": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-4",
+          "githubAnchor": "unheaded-block-4",
+          "stableAnchor": "unheaded-block-4",
+          "title": "Unheaded block 4",
+          "startLine": 37,
+          "endLine": 37,
+          "textDigest": "685026d049d214e631c09ff55243094abcf13ea2acb41222f115d94bcc335107",
+          "sample": "Observe-first là thứ tự rollout, không phải kiến trúc đích. `required` luôn fail-closed. Mọi capability chưa có backend binding hỗ trợ được giữ ở `unconfined` (cho 3 capability tư ",
+          "identityFingerprint": "e2c100056141c4a8d1703bbb66d0fc016bbe2bdbd20a052f831c9b3af630a70b",
+          "ancestry": [
+            "Added in candidate: rollout and settled facts",
+            "10. Lộ trình rollout và trạng thái hoàn thành"
+          ],
+          "text": "Observe-first là thứ tự rollout, không phải kiến trúc đích. `required` luôn fail-closed. Mọi capability chưa có backend binding hỗ trợ được giữ ở `unconfined` (cho 3 capability tư vấn) hoặc omitted (chờ backend binding). Chế độ strict mode (`runner.confinement.strict`) mặc định giữ `false` với chẩn đoán sẵn sàng từ `fgos doctor`."
+        }
+      ]
+    }
+  ],
+  "historicalPackageComparisons": {
+    "nativeIdentity": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "e2c100056141c4a8d1703bbb66d0fc016bbe2bdbd20a052f831c9b3af630a70b",
+      "identityFingerprint": "e2c100056141c4a8d1703bbb66d0fc016bbe2bdbd20a052f831c9b3af630a70b",
+      "claimId": "claim_0a81cfc730773e8a468f69c67e1a7948",
+      "sourceAnchor": "unheaded-block-129",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "685026d049d214e631c09ff55243094abcf13ea2acb41222f115d94bcc335107",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "currentIdentityBinding": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "e2c100056141c4a8d1703bbb66d0fc016bbe2bdbd20a052f831c9b3af630a70b",
+      "identityFingerprint": "e2c100056141c4a8d1703bbb66d0fc016bbe2bdbd20a052f831c9b3af630a70b",
+      "claimId": "claim_0a81cfc730773e8a468f69c67e1a7948",
+      "sourceAnchor": "unheaded-block-129",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "685026d049d214e631c09ff55243094abcf13ea2acb41222f115d94bcc335107",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "uniqueSameDigestBinding": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-129",
+      "githubAnchor": "unheaded-block-129",
+      "stableAnchor": "unheaded-block-129",
+      "title": "Unheaded block 129",
+      "startLine": 1260,
+      "endLine": 1260,
+      "textDigest": "685026d049d214e631c09ff55243094abcf13ea2acb41222f115d94bcc335107",
+      "sample": "Observe-first là thứ tự rollout, không phải kiến trúc đích. `required` luôn fail-closed. Mọi capability chưa có backend binding hỗ trợ được giữ ở `unconfined` (cho 3 capability tư ",
+      "identityFingerprint": "e2c100056141c4a8d1703bbb66d0fc016bbe2bdbd20a052f831c9b3af630a70b",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "10. Lộ trình rollout và trạng thái hoàn thành"
+      ],
+      "text": "Observe-first là thứ tự rollout, không phải kiến trúc đích. `required` luôn fail-closed. Mọi capability chưa có backend binding hỗ trợ được giữ ở `unconfined` (cho 3 capability tư vấn) hoặc omitted (chờ backend binding). Chế độ strict mode (`runner.confinement.strict`) mặc định giữ `false` với chẩn đoán sẵn sàng từ `fgos doctor`."
+    },
+    "currentUnitAtRetainedIdentity": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-129",
+      "githubAnchor": "unheaded-block-129",
+      "stableAnchor": "unheaded-block-129",
+      "title": "Unheaded block 129",
+      "startLine": 1260,
+      "endLine": 1260,
+      "textDigest": "685026d049d214e631c09ff55243094abcf13ea2acb41222f115d94bcc335107",
+      "sample": "Observe-first là thứ tự rollout, không phải kiến trúc đích. `required` luôn fail-closed. Mọi capability chưa có backend binding hỗ trợ được giữ ở `unconfined` (cho 3 capability tư ",
+      "identityFingerprint": "e2c100056141c4a8d1703bbb66d0fc016bbe2bdbd20a052f831c9b3af630a70b",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "10. Lộ trình rollout và trạng thái hoàn thành"
+      ],
+      "text": "Observe-first là thứ tự rollout, không phải kiến trúc đích. `required` luôn fail-closed. Mọi capability chưa có backend binding hỗ trợ được giữ ở `unconfined` (cho 3 capability tư vấn) hoặc omitted (chờ backend binding). Chế độ strict mode (`runner.confinement.strict`) mặc định giữ `false` với chẩn đoán sẵn sàng từ `fgos doctor`."
+    },
+    "sourceDigestUnchanged": true,
+    "status": "same text uniquely found; alias anchor still independently checked",
+    "aliasTargetComparisons": [
+      {
+        "aliasId": "step10-specs-0084",
+        "fromPath": "docs/specs/confinement-authority.md#unheaded-block-128",
+        "toOwner": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "toAnchor": "unheaded-block-4",
+        "currentTargetAtDraftAnchor": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-4",
+          "githubAnchor": "unheaded-block-4",
+          "stableAnchor": "unheaded-block-4",
+          "title": "Unheaded block 4",
+          "startLine": 37,
+          "endLine": 37,
+          "textDigest": "685026d049d214e631c09ff55243094abcf13ea2acb41222f115d94bcc335107",
+          "sample": "Observe-first là thứ tự rollout, không phải kiến trúc đích. `required` luôn fail-closed. Mọi capability chưa có backend binding hỗ trợ được giữ ở `unconfined` (cho 3 capability tư ",
+          "identityFingerprint": "e2c100056141c4a8d1703bbb66d0fc016bbe2bdbd20a052f831c9b3af630a70b",
+          "ancestry": [
+            "Added in candidate: rollout and settled facts",
+            "10. Lộ trình rollout và trạng thái hoàn thành"
+          ],
+          "text": "Observe-first là thứ tự rollout, không phải kiến trúc đích. `required` luôn fail-closed. Mọi capability chưa có backend binding hỗ trợ được giữ ở `unconfined` (cho 3 capability tư vấn) hoặc omitted (chờ backend binding). Chế độ strict mode (`runner.confinement.strict`) mặc định giữ `false` với chẩn đoán sẵn sàng từ `fgos doctor`."
+        },
+        "sourceTextDigestAtDraftTarget": true,
+        "uniqueSameTextCurrentTarget": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-4",
+          "githubAnchor": "unheaded-block-4",
+          "stableAnchor": "unheaded-block-4",
+          "title": "Unheaded block 4",
+          "startLine": 37,
+          "endLine": 37,
+          "textDigest": "685026d049d214e631c09ff55243094abcf13ea2acb41222f115d94bcc335107",
+          "sample": "Observe-first là thứ tự rollout, không phải kiến trúc đích. `required` luôn fail-closed. Mọi capability chưa có backend binding hỗ trợ được giữ ở `unconfined` (cho 3 capability tư ",
+          "identityFingerprint": "e2c100056141c4a8d1703bbb66d0fc016bbe2bdbd20a052f831c9b3af630a70b",
+          "ancestry": [
+            "Added in candidate: rollout and settled facts",
+            "10. Lộ trình rollout và trạng thái hoàn thành"
+          ],
+          "text": "Observe-first là thứ tự rollout, không phải kiến trúc đích. `required` luôn fail-closed. Mọi capability chưa có backend binding hỗ trợ được giữ ở `unconfined` (cho 3 capability tư vấn) hoặc omitted (chờ backend binding). Chế độ strict mode (`runner.confinement.strict`) mặc định giữ `false` với chẩn đoán sẵn sàng từ `fgos doctor`."
+        },
+        "note": "Read-only current source and target comparisons; draft unchanged. Source and target numbered-anchor relocation is not approval. Text corrections or source drift require independent judgment."
+      }
+    ]
+  },
+  "currentSourceDigestUnchanged": true
+}
+```
+
+## Entry e-019: claim_bb5abf5828264d19c061b9b0920618a3
+
+```json
+{
+  "kind": "source-alias-comparison",
+  "claimId": "claim_bb5abf5828264d19c061b9b0920618a3",
+  "priorAnchor": "unheaded-block-129",
+  "priorDigest": "7653e11267b25193a2a1f9c9969fffcc140830bfec41bb55bd80af4a541dc396",
+  "currentDigest": "685026d049d214e631c09ff55243094abcf13ea2acb41222f115d94bcc335107",
+  "matchingCurrentAnchors": [
+    "unheaded-block-130"
+  ],
+  "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval.",
+  "draftAliases": [
+    {
+      "aliasId": "step10-specs-0085",
+      "fromPath": "docs/specs/confinement-authority.md#unheaded-block-129",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-60",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    }
+  ],
+  "currentNative": {
+    "sourcePath": "docs/specs/confinement-authority.md",
+    "unitDigest": "b23f66e12db59d98e2df27a14c7953e28d9d2a82b8d761c306b4e401a7c38cab",
+    "identityFingerprint": "b23f66e12db59d98e2df27a14c7953e28d9d2a82b8d761c306b4e401a7c38cab",
+    "claimId": "claim_bb5abf5828264d19c061b9b0920618a3",
+    "sourceAnchor": "unheaded-block-130",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "7653e11267b25193a2a1f9c9969fffcc140830bfec41bb55bd80af4a541dc396",
+    "claimKind": "contract",
+    "status": "current"
+  },
+  "currentSourceUnit": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-130",
+    "githubAnchor": "unheaded-block-130",
+    "stableAnchor": "unheaded-block-130",
+    "title": "Unheaded block 130",
+    "startLine": 1266,
+    "endLine": 1274,
+    "textDigest": "7653e11267b25193a2a1f9c9969fffcc140830bfec41bb55bd80af4a541dc396",
+    "sample": "- Schema từ chối key lạ, backend instance/driver type lạ, driver config sai,\n  policy thiếu và override hạ policy.\n- Project-over-global merge được validate lại.\n- Project config k",
+    "identityFingerprint": "b23f66e12db59d98e2df27a14c7953e28d9d2a82b8d761c306b4e401a7c38cab",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "11. Proof và Definition of Done",
+      "11.1 Contract tests"
+    ],
+    "text": "- Schema từ chối key lạ, backend instance/driver type lạ, driver config sai,\n  policy thiếu và override hạ policy.\n- Project-over-global merge được validate lại.\n- Project config không thể định nghĩa hoặc override machine backend instance.\n- Mọi capability resolve thành policy ID hoặc explicit `unconfined`.\n- Backend không cover required control/grant phải refuse.\n- Network filter/override, grant coverage và resource readiness tuân bảng §8.7.\n- Fingerprint/receipt/channels đúng closed schema; stale proof phải refresh pass\n  trước required spawn, refresh fail/timeout thì refuse."
+  },
+  "currentTargetComparisons": [
+    {
+      "aliasId": "step10-specs-0085",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-60",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-60",
+        "githubAnchor": "unheaded-block-60",
+        "stableAnchor": "unheaded-block-60",
+        "title": "Unheaded block 60",
+        "startLine": 490,
+        "endLine": 497,
+        "textDigest": "d0eb5b8c250cd17479ceba5b41a114e24933e13bfe9ca355ed5871091093e30f",
+        "sample": "Canary sống (2026-10-05, mỗi họ executor một Unit blind chỉ-đọc, input `unit-run:`, và đường dẫn\ntuyệt đối tới report nguồn): claude (herdr), codex (herdr và cli bwrap), xai (pi he",
+        "identityFingerprint": "a3210dd0ebe893f20977d38eaad3c9a57ceb312096f517c8d17d704f8881f61b",
+        "ancestry": [
+          "Spec: Agent Confinement Authority",
+          "9. Default implementation đầu tiên",
+          "9.2 `hostRead: blind` — worker mù trước run state của peer"
+        ],
+        "text": "Canary sống (2026-10-05, mỗi họ executor một Unit blind chỉ-đọc, input `unit-run:`, và đường dẫn\ntuyệt đối tới report nguồn): claude (herdr), codex (herdr và cli bwrap), xai (pi herdr), glm và\ndeepseek (pi cli bwrap) đều đọc bản chép, gặp `ENOENT` ở nguồn và chỉ thấy chuỗi của chính mình\ntrong `.fgos/assignments`. Dưới `--unshare-pid` và mask thư mục socket herdr, herdr vẫn nhận ra agent\ntrong pane (`agentKnownToHerdr: detected`, trạng thái `unknown` → `working` → `idle`/kết thúc), nên\nmask và `--unshare-pid` giữ nguyên. agy chưa chứng minh được: `agy-herdr` hỏng cả khi không blind\n(`foreground process ... does not match prepared command argv`), `agy-cli-bwrap` dừng vì hết quota\ncủa tài khoản."
+      },
+      "uniqueSameDigestUnits": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-62",
+          "githubAnchor": "unheaded-block-62",
+          "stableAnchor": "unheaded-block-62",
+          "title": "Unheaded block 62",
+          "startLine": 517,
+          "endLine": 525,
+          "textDigest": "7653e11267b25193a2a1f9c9969fffcc140830bfec41bb55bd80af4a541dc396",
+          "sample": "- Schema từ chối key lạ, backend instance/driver type lạ, driver config sai,\n  policy thiếu và override hạ policy.\n- Project-over-global merge được validate lại.\n- Project config k",
+          "identityFingerprint": "b23f66e12db59d98e2df27a14c7953e28d9d2a82b8d761c306b4e401a7c38cab",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "11. Proof và Definition of Done",
+            "11.1 Contract tests"
+          ],
+          "text": "- Schema từ chối key lạ, backend instance/driver type lạ, driver config sai,\n  policy thiếu và override hạ policy.\n- Project-over-global merge được validate lại.\n- Project config không thể định nghĩa hoặc override machine backend instance.\n- Mọi capability resolve thành policy ID hoặc explicit `unconfined`.\n- Backend không cover required control/grant phải refuse.\n- Network filter/override, grant coverage và resource readiness tuân bảng §8.7.\n- Fingerprint/receipt/channels đúng closed schema; stale proof phải refresh pass\n  trước required spawn, refresh fail/timeout thì refuse."
+        }
+      ]
+    }
+  ],
+  "historicalPackageComparisons": {
+    "nativeIdentity": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "b23f66e12db59d98e2df27a14c7953e28d9d2a82b8d761c306b4e401a7c38cab",
+      "identityFingerprint": "b23f66e12db59d98e2df27a14c7953e28d9d2a82b8d761c306b4e401a7c38cab",
+      "claimId": "claim_bb5abf5828264d19c061b9b0920618a3",
+      "sourceAnchor": "unheaded-block-130",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "7653e11267b25193a2a1f9c9969fffcc140830bfec41bb55bd80af4a541dc396",
+      "claimKind": "contract",
+      "status": "current"
+    },
+    "currentIdentityBinding": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "b23f66e12db59d98e2df27a14c7953e28d9d2a82b8d761c306b4e401a7c38cab",
+      "identityFingerprint": "b23f66e12db59d98e2df27a14c7953e28d9d2a82b8d761c306b4e401a7c38cab",
+      "claimId": "claim_bb5abf5828264d19c061b9b0920618a3",
+      "sourceAnchor": "unheaded-block-130",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "7653e11267b25193a2a1f9c9969fffcc140830bfec41bb55bd80af4a541dc396",
+      "claimKind": "contract",
+      "status": "current"
+    },
+    "uniqueSameDigestBinding": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-130",
+      "githubAnchor": "unheaded-block-130",
+      "stableAnchor": "unheaded-block-130",
+      "title": "Unheaded block 130",
+      "startLine": 1266,
+      "endLine": 1274,
+      "textDigest": "7653e11267b25193a2a1f9c9969fffcc140830bfec41bb55bd80af4a541dc396",
+      "sample": "- Schema từ chối key lạ, backend instance/driver type lạ, driver config sai,\n  policy thiếu và override hạ policy.\n- Project-over-global merge được validate lại.\n- Project config k",
+      "identityFingerprint": "b23f66e12db59d98e2df27a14c7953e28d9d2a82b8d761c306b4e401a7c38cab",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "11. Proof và Definition of Done",
+        "11.1 Contract tests"
+      ],
+      "text": "- Schema từ chối key lạ, backend instance/driver type lạ, driver config sai,\n  policy thiếu và override hạ policy.\n- Project-over-global merge được validate lại.\n- Project config không thể định nghĩa hoặc override machine backend instance.\n- Mọi capability resolve thành policy ID hoặc explicit `unconfined`.\n- Backend không cover required control/grant phải refuse.\n- Network filter/override, grant coverage và resource readiness tuân bảng §8.7.\n- Fingerprint/receipt/channels đúng closed schema; stale proof phải refresh pass\n  trước required spawn, refresh fail/timeout thì refuse."
+    },
+    "currentUnitAtRetainedIdentity": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-130",
+      "githubAnchor": "unheaded-block-130",
+      "stableAnchor": "unheaded-block-130",
+      "title": "Unheaded block 130",
+      "startLine": 1266,
+      "endLine": 1274,
+      "textDigest": "7653e11267b25193a2a1f9c9969fffcc140830bfec41bb55bd80af4a541dc396",
+      "sample": "- Schema từ chối key lạ, backend instance/driver type lạ, driver config sai,\n  policy thiếu và override hạ policy.\n- Project-over-global merge được validate lại.\n- Project config k",
+      "identityFingerprint": "b23f66e12db59d98e2df27a14c7953e28d9d2a82b8d761c306b4e401a7c38cab",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "11. Proof và Definition of Done",
+        "11.1 Contract tests"
+      ],
+      "text": "- Schema từ chối key lạ, backend instance/driver type lạ, driver config sai,\n  policy thiếu và override hạ policy.\n- Project-over-global merge được validate lại.\n- Project config không thể định nghĩa hoặc override machine backend instance.\n- Mọi capability resolve thành policy ID hoặc explicit `unconfined`.\n- Backend không cover required control/grant phải refuse.\n- Network filter/override, grant coverage và resource readiness tuân bảng §8.7.\n- Fingerprint/receipt/channels đúng closed schema; stale proof phải refresh pass\n  trước required spawn, refresh fail/timeout thì refuse."
+    },
+    "sourceDigestUnchanged": true,
+    "status": "same text uniquely found; alias anchor still independently checked",
+    "aliasTargetComparisons": [
+      {
+        "aliasId": "step10-specs-0085",
+        "fromPath": "docs/specs/confinement-authority.md#unheaded-block-129",
+        "toOwner": "docs/platform/agent-confinement/spec.md",
+        "toAnchor": "unheaded-block-60",
+        "currentTargetAtDraftAnchor": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-60",
+          "githubAnchor": "unheaded-block-60",
+          "stableAnchor": "unheaded-block-60",
+          "title": "Unheaded block 60",
+          "startLine": 490,
+          "endLine": 497,
+          "textDigest": "d0eb5b8c250cd17479ceba5b41a114e24933e13bfe9ca355ed5871091093e30f",
+          "sample": "Canary sống (2026-10-05, mỗi họ executor một Unit blind chỉ-đọc, input `unit-run:`, và đường dẫn\ntuyệt đối tới report nguồn): claude (herdr), codex (herdr và cli bwrap), xai (pi he",
+          "identityFingerprint": "a3210dd0ebe893f20977d38eaad3c9a57ceb312096f517c8d17d704f8881f61b",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "9. Default implementation đầu tiên",
+            "9.2 `hostRead: blind` — worker mù trước run state của peer"
+          ],
+          "text": "Canary sống (2026-10-05, mỗi họ executor một Unit blind chỉ-đọc, input `unit-run:`, và đường dẫn\ntuyệt đối tới report nguồn): claude (herdr), codex (herdr và cli bwrap), xai (pi herdr), glm và\ndeepseek (pi cli bwrap) đều đọc bản chép, gặp `ENOENT` ở nguồn và chỉ thấy chuỗi của chính mình\ntrong `.fgos/assignments`. Dưới `--unshare-pid` và mask thư mục socket herdr, herdr vẫn nhận ra agent\ntrong pane (`agentKnownToHerdr: detected`, trạng thái `unknown` → `working` → `idle`/kết thúc), nên\nmask và `--unshare-pid` giữ nguyên. agy chưa chứng minh được: `agy-herdr` hỏng cả khi không blind\n(`foreground process ... does not match prepared command argv`), `agy-cli-bwrap` dừng vì hết quota\ncủa tài khoản."
+        },
+        "sourceTextDigestAtDraftTarget": false,
+        "uniqueSameTextCurrentTarget": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-62",
+          "githubAnchor": "unheaded-block-62",
+          "stableAnchor": "unheaded-block-62",
+          "title": "Unheaded block 62",
+          "startLine": 517,
+          "endLine": 525,
+          "textDigest": "7653e11267b25193a2a1f9c9969fffcc140830bfec41bb55bd80af4a541dc396",
+          "sample": "- Schema từ chối key lạ, backend instance/driver type lạ, driver config sai,\n  policy thiếu và override hạ policy.\n- Project-over-global merge được validate lại.\n- Project config k",
+          "identityFingerprint": "b23f66e12db59d98e2df27a14c7953e28d9d2a82b8d761c306b4e401a7c38cab",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "11. Proof và Definition of Done",
+            "11.1 Contract tests"
+          ],
+          "text": "- Schema từ chối key lạ, backend instance/driver type lạ, driver config sai,\n  policy thiếu và override hạ policy.\n- Project-over-global merge được validate lại.\n- Project config không thể định nghĩa hoặc override machine backend instance.\n- Mọi capability resolve thành policy ID hoặc explicit `unconfined`.\n- Backend không cover required control/grant phải refuse.\n- Network filter/override, grant coverage và resource readiness tuân bảng §8.7.\n- Fingerprint/receipt/channels đúng closed schema; stale proof phải refresh pass\n  trước required spawn, refresh fail/timeout thì refuse."
+        },
+        "note": "Read-only current source and target comparisons; draft unchanged. Source and target numbered-anchor relocation is not approval. Text corrections or source drift require independent judgment."
+      }
+    ]
+  },
+  "currentSourceDigestUnchanged": true
+}
+```
+
+## Entry e-020: claim_bd94f9efb9ccdbbc8ca5b90916290c6f
+
+```json
+{
+  "kind": "source-alias-comparison",
+  "claimId": "claim_bd94f9efb9ccdbbc8ca5b90916290c6f",
+  "priorAnchor": "unheaded-block-130",
+  "priorDigest": "ef13d34054bfb70d28e34612c2fa9c8baf76e7a153c8f38c1673b92b9936f2bd",
+  "currentDigest": "7653e11267b25193a2a1f9c9969fffcc140830bfec41bb55bd80af4a541dc396",
+  "matchingCurrentAnchors": [
+    "unheaded-block-131"
+  ],
+  "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval.",
+  "draftAliases": [
+    {
+      "aliasId": "step10-specs-0087",
+      "fromPath": "docs/specs/confinement-authority.md#unheaded-block-130",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-61",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    }
+  ],
+  "currentNative": {
+    "sourcePath": "docs/specs/confinement-authority.md",
+    "unitDigest": "0d5707db18e5247b707f6978f604db5fdd4b99ae054155e51d0314fdf2c597d3",
+    "identityFingerprint": "0d5707db18e5247b707f6978f604db5fdd4b99ae054155e51d0314fdf2c597d3",
+    "claimId": "claim_bd94f9efb9ccdbbc8ca5b90916290c6f",
+    "sourceAnchor": "unheaded-block-131",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "ef13d34054bfb70d28e34612c2fa9c8baf76e7a153c8f38c1673b92b9936f2bd",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "currentSourceUnit": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-131",
+    "githubAnchor": "unheaded-block-131",
+    "stableAnchor": "unheaded-block-131",
+    "title": "Unheaded block 131",
+    "startLine": 1278,
+    "endLine": 1287,
+    "textDigest": "ef13d34054bfb70d28e34612c2fa9c8baf76e7a153c8f38c1673b92b9936f2bd",
+    "sample": "- Import/static test chứng minh production caller không gọi executor adapter\n  execute function trực tiếp.\n- Cả `spawnWorker` và `executeExecutorCli` đi qua cùng facade.\n- Adapter ",
+    "identityFingerprint": "0d5707db18e5247b707f6978f604db5fdd4b99ae054155e51d0314fdf2c597d3",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "11. Proof và Definition of Done",
+      "11.2 One-door tests"
+    ],
+    "text": "- Import/static test chứng minh production caller không gọi executor adapter\n  execute function trực tiếp.\n- Cả `spawnWorker` và `executeExecutorCli` đi qua cùng facade.\n- Adapter fake chỉ nhận prepared invocation.\n- Throw trong resolve/assess/compile/prepare tạo zero spawn.\n- Preferred thiếu backend/needs và partial coverage tuân §8.2, không fallback\n  invocation gốc sau prepare failure.\n- Crash giữa allocation intent và prepare completion được replay/reap\n  idempotent; không cleanup execution còn sống hoặc remote chưa rõ liveness.\n- Collect failure giữ artifact/resource; cleanup failure không xóa agent result."
+  },
+  "currentTargetComparisons": [
+    {
+      "aliasId": "step10-specs-0087",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-61",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-61",
+        "githubAnchor": "unheaded-block-61",
+        "stableAnchor": "unheaded-block-61",
+        "title": "Unheaded block 61",
+        "startLine": 499,
+        "endLine": 511,
+        "textDigest": "a42feb4ea36f23dcda856872a41811401e058cee1f3bfd71af95069725466bc8",
+        "sample": "Dispatch `blind` bị **từ chối, không bao giờ chạy không-blind**, với lý do có tên, trước khi\nspawn: `blind-requires-confinement` (mode không phải `required`/không có policy),\n`blin",
+        "identityFingerprint": "f70870c5e32af26c81575c163e34438c8e9fbe0acdec1c7b6da7681c0f3abfc3",
+        "ancestry": [
+          "Spec: Agent Confinement Authority",
+          "9. Default implementation đầu tiên",
+          "9.2 `hostRead: blind` — worker mù trước run state của peer"
+        ],
+        "text": "Dispatch `blind` bị **từ chối, không bao giờ chạy không-blind**, với lý do có tên, trước khi\nspawn: `blind-requires-confinement` (mode không phải `required`/không có policy),\n`blind-in-process` (Agent tool/inline không có sandbox quanh worker; `bind()` cũng không chọn nó),\n`blind-hides-workspace` (cwd hoặc repo root nằm trong hidden root), `blind-ref-hidden` (context\nref nằm trong hidden root ngoài thư mục của chính dispatch), `confinement-backend-missing` /\n`confinement-backend-disabled` (không có bwrap), `confinement-probe-failed` (probe chưa tươi hoặc\nkhông qua). Probe `peer-run-hidden` (thứ chín, chỉ cho dispatch blind; fingerprint và cache riêng)\ndựng argv từ chính `prepareBwrap`: worker không đọc được report của peer, home của peer, cmdline\ncủa tiến trình anh em, nhưng đọc được thư mục của mình (chỉ-đọc) và ghi được outbox; falsifier bỏ\nmask thì phải đọc được file peer. `fgos doctor` báo `blind-read: pass | fail |\nbackend-unsupported` (check `confinement-blind-read`). Giới hạn còn mở: transcript agent của Lead\ntrong host home, `.fgos/secrets.local.env` và project khác (bí mật, không phải mù), và mạng\nlocalhost."
+      },
+      "uniqueSameDigestUnits": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-63",
+          "githubAnchor": "unheaded-block-63",
+          "stableAnchor": "unheaded-block-63",
+          "title": "Unheaded block 63",
+          "startLine": 529,
+          "endLine": 538,
+          "textDigest": "ef13d34054bfb70d28e34612c2fa9c8baf76e7a153c8f38c1673b92b9936f2bd",
+          "sample": "- Import/static test chứng minh production caller không gọi executor adapter\n  execute function trực tiếp.\n- Cả `spawnWorker` và `executeExecutorCli` đi qua cùng facade.\n- Adapter ",
+          "identityFingerprint": "0d5707db18e5247b707f6978f604db5fdd4b99ae054155e51d0314fdf2c597d3",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "11. Proof và Definition of Done",
+            "11.2 One-door tests"
+          ],
+          "text": "- Import/static test chứng minh production caller không gọi executor adapter\n  execute function trực tiếp.\n- Cả `spawnWorker` và `executeExecutorCli` đi qua cùng facade.\n- Adapter fake chỉ nhận prepared invocation.\n- Throw trong resolve/assess/compile/prepare tạo zero spawn.\n- Preferred thiếu backend/needs và partial coverage tuân §8.2, không fallback\n  invocation gốc sau prepare failure.\n- Crash giữa allocation intent và prepare completion được replay/reap\n  idempotent; không cleanup execution còn sống hoặc remote chưa rõ liveness.\n- Collect failure giữ artifact/resource; cleanup failure không xóa agent result."
+        }
+      ]
+    }
+  ],
+  "historicalPackageComparisons": {
+    "nativeIdentity": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "0d5707db18e5247b707f6978f604db5fdd4b99ae054155e51d0314fdf2c597d3",
+      "identityFingerprint": "0d5707db18e5247b707f6978f604db5fdd4b99ae054155e51d0314fdf2c597d3",
+      "claimId": "claim_bd94f9efb9ccdbbc8ca5b90916290c6f",
+      "sourceAnchor": "unheaded-block-131",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "ef13d34054bfb70d28e34612c2fa9c8baf76e7a153c8f38c1673b92b9936f2bd",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "currentIdentityBinding": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "0d5707db18e5247b707f6978f604db5fdd4b99ae054155e51d0314fdf2c597d3",
+      "identityFingerprint": "0d5707db18e5247b707f6978f604db5fdd4b99ae054155e51d0314fdf2c597d3",
+      "claimId": "claim_bd94f9efb9ccdbbc8ca5b90916290c6f",
+      "sourceAnchor": "unheaded-block-131",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "ef13d34054bfb70d28e34612c2fa9c8baf76e7a153c8f38c1673b92b9936f2bd",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "uniqueSameDigestBinding": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-131",
+      "githubAnchor": "unheaded-block-131",
+      "stableAnchor": "unheaded-block-131",
+      "title": "Unheaded block 131",
+      "startLine": 1278,
+      "endLine": 1287,
+      "textDigest": "ef13d34054bfb70d28e34612c2fa9c8baf76e7a153c8f38c1673b92b9936f2bd",
+      "sample": "- Import/static test chứng minh production caller không gọi executor adapter\n  execute function trực tiếp.\n- Cả `spawnWorker` và `executeExecutorCli` đi qua cùng facade.\n- Adapter ",
+      "identityFingerprint": "0d5707db18e5247b707f6978f604db5fdd4b99ae054155e51d0314fdf2c597d3",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "11. Proof và Definition of Done",
+        "11.2 One-door tests"
+      ],
+      "text": "- Import/static test chứng minh production caller không gọi executor adapter\n  execute function trực tiếp.\n- Cả `spawnWorker` và `executeExecutorCli` đi qua cùng facade.\n- Adapter fake chỉ nhận prepared invocation.\n- Throw trong resolve/assess/compile/prepare tạo zero spawn.\n- Preferred thiếu backend/needs và partial coverage tuân §8.2, không fallback\n  invocation gốc sau prepare failure.\n- Crash giữa allocation intent và prepare completion được replay/reap\n  idempotent; không cleanup execution còn sống hoặc remote chưa rõ liveness.\n- Collect failure giữ artifact/resource; cleanup failure không xóa agent result."
+    },
+    "currentUnitAtRetainedIdentity": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-131",
+      "githubAnchor": "unheaded-block-131",
+      "stableAnchor": "unheaded-block-131",
+      "title": "Unheaded block 131",
+      "startLine": 1278,
+      "endLine": 1287,
+      "textDigest": "ef13d34054bfb70d28e34612c2fa9c8baf76e7a153c8f38c1673b92b9936f2bd",
+      "sample": "- Import/static test chứng minh production caller không gọi executor adapter\n  execute function trực tiếp.\n- Cả `spawnWorker` và `executeExecutorCli` đi qua cùng facade.\n- Adapter ",
+      "identityFingerprint": "0d5707db18e5247b707f6978f604db5fdd4b99ae054155e51d0314fdf2c597d3",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "11. Proof và Definition of Done",
+        "11.2 One-door tests"
+      ],
+      "text": "- Import/static test chứng minh production caller không gọi executor adapter\n  execute function trực tiếp.\n- Cả `spawnWorker` và `executeExecutorCli` đi qua cùng facade.\n- Adapter fake chỉ nhận prepared invocation.\n- Throw trong resolve/assess/compile/prepare tạo zero spawn.\n- Preferred thiếu backend/needs và partial coverage tuân §8.2, không fallback\n  invocation gốc sau prepare failure.\n- Crash giữa allocation intent và prepare completion được replay/reap\n  idempotent; không cleanup execution còn sống hoặc remote chưa rõ liveness.\n- Collect failure giữ artifact/resource; cleanup failure không xóa agent result."
+    },
+    "sourceDigestUnchanged": true,
+    "status": "same text uniquely found; alias anchor still independently checked",
+    "aliasTargetComparisons": [
+      {
+        "aliasId": "step10-specs-0087",
+        "fromPath": "docs/specs/confinement-authority.md#unheaded-block-130",
+        "toOwner": "docs/platform/agent-confinement/spec.md",
+        "toAnchor": "unheaded-block-61",
+        "currentTargetAtDraftAnchor": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-61",
+          "githubAnchor": "unheaded-block-61",
+          "stableAnchor": "unheaded-block-61",
+          "title": "Unheaded block 61",
+          "startLine": 499,
+          "endLine": 511,
+          "textDigest": "a42feb4ea36f23dcda856872a41811401e058cee1f3bfd71af95069725466bc8",
+          "sample": "Dispatch `blind` bị **từ chối, không bao giờ chạy không-blind**, với lý do có tên, trước khi\nspawn: `blind-requires-confinement` (mode không phải `required`/không có policy),\n`blin",
+          "identityFingerprint": "f70870c5e32af26c81575c163e34438c8e9fbe0acdec1c7b6da7681c0f3abfc3",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "9. Default implementation đầu tiên",
+            "9.2 `hostRead: blind` — worker mù trước run state của peer"
+          ],
+          "text": "Dispatch `blind` bị **từ chối, không bao giờ chạy không-blind**, với lý do có tên, trước khi\nspawn: `blind-requires-confinement` (mode không phải `required`/không có policy),\n`blind-in-process` (Agent tool/inline không có sandbox quanh worker; `bind()` cũng không chọn nó),\n`blind-hides-workspace` (cwd hoặc repo root nằm trong hidden root), `blind-ref-hidden` (context\nref nằm trong hidden root ngoài thư mục của chính dispatch), `confinement-backend-missing` /\n`confinement-backend-disabled` (không có bwrap), `confinement-probe-failed` (probe chưa tươi hoặc\nkhông qua). Probe `peer-run-hidden` (thứ chín, chỉ cho dispatch blind; fingerprint và cache riêng)\ndựng argv từ chính `prepareBwrap`: worker không đọc được report của peer, home của peer, cmdline\ncủa tiến trình anh em, nhưng đọc được thư mục của mình (chỉ-đọc) và ghi được outbox; falsifier bỏ\nmask thì phải đọc được file peer. `fgos doctor` báo `blind-read: pass | fail |\nbackend-unsupported` (check `confinement-blind-read`). Giới hạn còn mở: transcript agent của Lead\ntrong host home, `.fgos/secrets.local.env` và project khác (bí mật, không phải mù), và mạng\nlocalhost."
+        },
+        "sourceTextDigestAtDraftTarget": false,
+        "uniqueSameTextCurrentTarget": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-63",
+          "githubAnchor": "unheaded-block-63",
+          "stableAnchor": "unheaded-block-63",
+          "title": "Unheaded block 63",
+          "startLine": 529,
+          "endLine": 538,
+          "textDigest": "ef13d34054bfb70d28e34612c2fa9c8baf76e7a153c8f38c1673b92b9936f2bd",
+          "sample": "- Import/static test chứng minh production caller không gọi executor adapter\n  execute function trực tiếp.\n- Cả `spawnWorker` và `executeExecutorCli` đi qua cùng facade.\n- Adapter ",
+          "identityFingerprint": "0d5707db18e5247b707f6978f604db5fdd4b99ae054155e51d0314fdf2c597d3",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "11. Proof và Definition of Done",
+            "11.2 One-door tests"
+          ],
+          "text": "- Import/static test chứng minh production caller không gọi executor adapter\n  execute function trực tiếp.\n- Cả `spawnWorker` và `executeExecutorCli` đi qua cùng facade.\n- Adapter fake chỉ nhận prepared invocation.\n- Throw trong resolve/assess/compile/prepare tạo zero spawn.\n- Preferred thiếu backend/needs và partial coverage tuân §8.2, không fallback\n  invocation gốc sau prepare failure.\n- Crash giữa allocation intent và prepare completion được replay/reap\n  idempotent; không cleanup execution còn sống hoặc remote chưa rõ liveness.\n- Collect failure giữ artifact/resource; cleanup failure không xóa agent result."
+        },
+        "note": "Read-only current source and target comparisons; draft unchanged. Source and target numbered-anchor relocation is not approval. Text corrections or source drift require independent judgment."
+      }
+    ]
+  },
+  "currentSourceDigestUnchanged": true
+}
+```
+
+## Entry e-021: claim_2977601fcac216f335c121ce5a58ec9e
+
+```json
+{
+  "kind": "source-alias-comparison",
+  "claimId": "claim_2977601fcac216f335c121ce5a58ec9e",
+  "priorAnchor": "unheaded-block-131",
+  "priorDigest": "6dc2d3110bcb9737263766d842a280447bb840efd94b14cc54cbc739d7c3c0a8",
+  "currentDigest": "ef13d34054bfb70d28e34612c2fa9c8baf76e7a153c8f38c1673b92b9936f2bd",
+  "matchingCurrentAnchors": [
+    "unheaded-block-132"
+  ],
+  "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval.",
+  "draftAliases": [
+    {
+      "aliasId": "step10-specs-0088",
+      "fromPath": "docs/specs/confinement-authority.md#unheaded-block-131",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-62",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    }
+  ],
+  "currentNative": {
+    "sourcePath": "docs/specs/confinement-authority.md",
+    "unitDigest": "5e8485d8b6ee7f96373fb2f5326e33ebc44372cdf267980113554bd6a6b201c3",
+    "identityFingerprint": "5e8485d8b6ee7f96373fb2f5326e33ebc44372cdf267980113554bd6a6b201c3",
+    "claimId": "claim_2977601fcac216f335c121ce5a58ec9e",
+    "sourceAnchor": "unheaded-block-132",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "6dc2d3110bcb9737263766d842a280447bb840efd94b14cc54cbc739d7c3c0a8",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "currentSourceUnit": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-132",
+    "githubAnchor": "unheaded-block-132",
+    "stableAnchor": "unheaded-block-132",
+    "title": "Unheaded block 132",
+    "startLine": 1291,
+    "endLine": 1291,
+    "textDigest": "6dc2d3110bcb9737263766d842a280447bb840efd94b14cc54cbc739d7c3c0a8",
+    "sample": "Probe phải nằm trong repo và chạy lại được. Với default bwrap, probe chứng minh:",
+    "identityFingerprint": "5e8485d8b6ee7f96373fb2f5326e33ebc44372cdf267980113554bd6a6b201c3",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "11. Proof và Definition of Done",
+      "11.3 Behavior probes"
+    ],
+    "text": "Probe phải nằm trong repo và chạy lại được. Với default bwrap, probe chứng minh:"
+  },
+  "currentTargetComparisons": [
+    {
+      "aliasId": "step10-specs-0088",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-62",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-62",
+        "githubAnchor": "unheaded-block-62",
+        "stableAnchor": "unheaded-block-62",
+        "title": "Unheaded block 62",
+        "startLine": 517,
+        "endLine": 525,
+        "textDigest": "7653e11267b25193a2a1f9c9969fffcc140830bfec41bb55bd80af4a541dc396",
+        "sample": "- Schema từ chối key lạ, backend instance/driver type lạ, driver config sai,\n  policy thiếu và override hạ policy.\n- Project-over-global merge được validate lại.\n- Project config k",
+        "identityFingerprint": "b23f66e12db59d98e2df27a14c7953e28d9d2a82b8d761c306b4e401a7c38cab",
+        "ancestry": [
+          "Spec: Agent Confinement Authority",
+          "11. Proof và Definition of Done",
+          "11.1 Contract tests"
+        ],
+        "text": "- Schema từ chối key lạ, backend instance/driver type lạ, driver config sai,\n  policy thiếu và override hạ policy.\n- Project-over-global merge được validate lại.\n- Project config không thể định nghĩa hoặc override machine backend instance.\n- Mọi capability resolve thành policy ID hoặc explicit `unconfined`.\n- Backend không cover required control/grant phải refuse.\n- Network filter/override, grant coverage và resource readiness tuân bảng §8.7.\n- Fingerprint/receipt/channels đúng closed schema; stale proof phải refresh pass\n  trước required spawn, refresh fail/timeout thì refuse."
+      },
+      "uniqueSameDigestUnits": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-64",
+          "githubAnchor": "unheaded-block-64",
+          "stableAnchor": "unheaded-block-64",
+          "title": "Unheaded block 64",
+          "startLine": 542,
+          "endLine": 542,
+          "textDigest": "6dc2d3110bcb9737263766d842a280447bb840efd94b14cc54cbc739d7c3c0a8",
+          "sample": "Probe phải nằm trong repo và chạy lại được. Với default bwrap, probe chứng minh:",
+          "identityFingerprint": "5e8485d8b6ee7f96373fb2f5326e33ebc44372cdf267980113554bd6a6b201c3",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "11. Proof và Definition of Done",
+            "11.3 Behavior probes"
+          ],
+          "text": "Probe phải nằm trong repo và chạy lại được. Với default bwrap, probe chứng minh:"
+        }
+      ]
+    }
+  ],
+  "historicalPackageComparisons": {
+    "nativeIdentity": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "5e8485d8b6ee7f96373fb2f5326e33ebc44372cdf267980113554bd6a6b201c3",
+      "identityFingerprint": "5e8485d8b6ee7f96373fb2f5326e33ebc44372cdf267980113554bd6a6b201c3",
+      "claimId": "claim_2977601fcac216f335c121ce5a58ec9e",
+      "sourceAnchor": "unheaded-block-132",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "6dc2d3110bcb9737263766d842a280447bb840efd94b14cc54cbc739d7c3c0a8",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "currentIdentityBinding": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "5e8485d8b6ee7f96373fb2f5326e33ebc44372cdf267980113554bd6a6b201c3",
+      "identityFingerprint": "5e8485d8b6ee7f96373fb2f5326e33ebc44372cdf267980113554bd6a6b201c3",
+      "claimId": "claim_2977601fcac216f335c121ce5a58ec9e",
+      "sourceAnchor": "unheaded-block-132",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "6dc2d3110bcb9737263766d842a280447bb840efd94b14cc54cbc739d7c3c0a8",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "uniqueSameDigestBinding": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-132",
+      "githubAnchor": "unheaded-block-132",
+      "stableAnchor": "unheaded-block-132",
+      "title": "Unheaded block 132",
+      "startLine": 1291,
+      "endLine": 1291,
+      "textDigest": "6dc2d3110bcb9737263766d842a280447bb840efd94b14cc54cbc739d7c3c0a8",
+      "sample": "Probe phải nằm trong repo và chạy lại được. Với default bwrap, probe chứng minh:",
+      "identityFingerprint": "5e8485d8b6ee7f96373fb2f5326e33ebc44372cdf267980113554bd6a6b201c3",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "11. Proof và Definition of Done",
+        "11.3 Behavior probes"
+      ],
+      "text": "Probe phải nằm trong repo và chạy lại được. Với default bwrap, probe chứng minh:"
+    },
+    "currentUnitAtRetainedIdentity": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-132",
+      "githubAnchor": "unheaded-block-132",
+      "stableAnchor": "unheaded-block-132",
+      "title": "Unheaded block 132",
+      "startLine": 1291,
+      "endLine": 1291,
+      "textDigest": "6dc2d3110bcb9737263766d842a280447bb840efd94b14cc54cbc739d7c3c0a8",
+      "sample": "Probe phải nằm trong repo và chạy lại được. Với default bwrap, probe chứng minh:",
+      "identityFingerprint": "5e8485d8b6ee7f96373fb2f5326e33ebc44372cdf267980113554bd6a6b201c3",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "11. Proof và Definition of Done",
+        "11.3 Behavior probes"
+      ],
+      "text": "Probe phải nằm trong repo và chạy lại được. Với default bwrap, probe chứng minh:"
+    },
+    "sourceDigestUnchanged": true,
+    "status": "same text uniquely found; alias anchor still independently checked",
+    "aliasTargetComparisons": [
+      {
+        "aliasId": "step10-specs-0088",
+        "fromPath": "docs/specs/confinement-authority.md#unheaded-block-131",
+        "toOwner": "docs/platform/agent-confinement/spec.md",
+        "toAnchor": "unheaded-block-62",
+        "currentTargetAtDraftAnchor": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-62",
+          "githubAnchor": "unheaded-block-62",
+          "stableAnchor": "unheaded-block-62",
+          "title": "Unheaded block 62",
+          "startLine": 517,
+          "endLine": 525,
+          "textDigest": "7653e11267b25193a2a1f9c9969fffcc140830bfec41bb55bd80af4a541dc396",
+          "sample": "- Schema từ chối key lạ, backend instance/driver type lạ, driver config sai,\n  policy thiếu và override hạ policy.\n- Project-over-global merge được validate lại.\n- Project config k",
+          "identityFingerprint": "b23f66e12db59d98e2df27a14c7953e28d9d2a82b8d761c306b4e401a7c38cab",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "11. Proof và Definition of Done",
+            "11.1 Contract tests"
+          ],
+          "text": "- Schema từ chối key lạ, backend instance/driver type lạ, driver config sai,\n  policy thiếu và override hạ policy.\n- Project-over-global merge được validate lại.\n- Project config không thể định nghĩa hoặc override machine backend instance.\n- Mọi capability resolve thành policy ID hoặc explicit `unconfined`.\n- Backend không cover required control/grant phải refuse.\n- Network filter/override, grant coverage và resource readiness tuân bảng §8.7.\n- Fingerprint/receipt/channels đúng closed schema; stale proof phải refresh pass\n  trước required spawn, refresh fail/timeout thì refuse."
+        },
+        "sourceTextDigestAtDraftTarget": false,
+        "uniqueSameTextCurrentTarget": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-64",
+          "githubAnchor": "unheaded-block-64",
+          "stableAnchor": "unheaded-block-64",
+          "title": "Unheaded block 64",
+          "startLine": 542,
+          "endLine": 542,
+          "textDigest": "6dc2d3110bcb9737263766d842a280447bb840efd94b14cc54cbc739d7c3c0a8",
+          "sample": "Probe phải nằm trong repo và chạy lại được. Với default bwrap, probe chứng minh:",
+          "identityFingerprint": "5e8485d8b6ee7f96373fb2f5326e33ebc44372cdf267980113554bd6a6b201c3",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "11. Proof và Definition of Done",
+            "11.3 Behavior probes"
+          ],
+          "text": "Probe phải nằm trong repo và chạy lại được. Với default bwrap, probe chứng minh:"
+        },
+        "note": "Read-only current source and target comparisons; draft unchanged. Source and target numbered-anchor relocation is not approval. Text corrections or source drift require independent judgment."
+      }
+    ]
+  },
+  "currentSourceDigestUnchanged": true
+}
+```
+
+## Entry e-022: claim_d81f120837aab96ba270276e5090e2e0
+
+```json
+{
+  "kind": "source-alias-comparison",
+  "claimId": "claim_d81f120837aab96ba270276e5090e2e0",
+  "priorAnchor": "unheaded-block-132",
+  "priorDigest": "e3281f44b9de246979eb391c466d2aec235d67fd39c35775a42a31261ae2a129",
+  "currentDigest": "6dc2d3110bcb9737263766d842a280447bb840efd94b14cc54cbc739d7c3c0a8",
+  "matchingCurrentAnchors": [
+    "unheaded-block-133"
+  ],
+  "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval.",
+  "draftAliases": [
+    {
+      "aliasId": "step10-specs-0089",
+      "fromPath": "docs/specs/confinement-authority.md#unheaded-block-132",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-63",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    }
+  ],
+  "currentNative": {
+    "sourcePath": "docs/specs/confinement-authority.md",
+    "unitDigest": "e8be6872ff628bf10e5664086b531568d2b80260e5c458298c0ee5ccd3372887",
+    "identityFingerprint": "e8be6872ff628bf10e5664086b531568d2b80260e5c458298c0ee5ccd3372887",
+    "claimId": "claim_d81f120837aab96ba270276e5090e2e0",
+    "sourceAnchor": "unheaded-block-133",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "e3281f44b9de246979eb391c466d2aec235d67fd39c35775a42a31261ae2a129",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "currentSourceUnit": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-133",
+    "githubAnchor": "unheaded-block-133",
+    "stableAnchor": "unheaded-block-133",
+    "title": "Unheaded block 133",
+    "startLine": 1293,
+    "endLine": 1302,
+    "textDigest": "e3281f44b9de246979eb391c466d2aec235d67fd39c35775a42a31261ae2a129",
+    "sample": "- ghi vào `run-output` của chính dispatch thành công;\n- host-write-denied: ghi vào cwd/repo root bị chặn;\n- workspace-write: workspace được cấp ghi được, ngoài grant vẫn bị chặn;\n ",
+    "identityFingerprint": "e8be6872ff628bf10e5664086b531568d2b80260e5c458298c0ee5ccd3372887",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "11. Proof và Definition of Done",
+      "11.3 Behavior probes"
+    ],
+    "text": "- ghi vào `run-output` của chính dispatch thành công;\n- host-write-denied: ghi vào cwd/repo root bị chặn;\n- workspace-write: workspace được cấp ghi được, ngoài grant vẫn bị chặn;\n  probe riêng Git metadata ownership và commit readiness;\n- ghi vào run directory của dispatch khác bị chặn;\n- private home ghi được nhưng real host home bị chặn;\n- descriptor ghi ngoài grant không được kế thừa; stdio chỉ qua output channel\n  được quản lý; attestation công bố host IPC/network ngoài phạm vi đúng §4;\n- `executor-credentials` grant đọc được nhưng không ghi được;\n- host read và network vẫn khả dụng, để chứng minh attestation không overclaim."
+  },
+  "currentTargetComparisons": [
+    {
+      "aliasId": "step10-specs-0089",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-63",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-63",
+        "githubAnchor": "unheaded-block-63",
+        "stableAnchor": "unheaded-block-63",
+        "title": "Unheaded block 63",
+        "startLine": 529,
+        "endLine": 538,
+        "textDigest": "ef13d34054bfb70d28e34612c2fa9c8baf76e7a153c8f38c1673b92b9936f2bd",
+        "sample": "- Import/static test chứng minh production caller không gọi executor adapter\n  execute function trực tiếp.\n- Cả `spawnWorker` và `executeExecutorCli` đi qua cùng facade.\n- Adapter ",
+        "identityFingerprint": "0d5707db18e5247b707f6978f604db5fdd4b99ae054155e51d0314fdf2c597d3",
+        "ancestry": [
+          "Spec: Agent Confinement Authority",
+          "11. Proof và Definition of Done",
+          "11.2 One-door tests"
+        ],
+        "text": "- Import/static test chứng minh production caller không gọi executor adapter\n  execute function trực tiếp.\n- Cả `spawnWorker` và `executeExecutorCli` đi qua cùng facade.\n- Adapter fake chỉ nhận prepared invocation.\n- Throw trong resolve/assess/compile/prepare tạo zero spawn.\n- Preferred thiếu backend/needs và partial coverage tuân §8.2, không fallback\n  invocation gốc sau prepare failure.\n- Crash giữa allocation intent và prepare completion được replay/reap\n  idempotent; không cleanup execution còn sống hoặc remote chưa rõ liveness.\n- Collect failure giữ artifact/resource; cleanup failure không xóa agent result."
+      },
+      "uniqueSameDigestUnits": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-65",
+          "githubAnchor": "unheaded-block-65",
+          "stableAnchor": "unheaded-block-65",
+          "title": "Unheaded block 65",
+          "startLine": 544,
+          "endLine": 553,
+          "textDigest": "e3281f44b9de246979eb391c466d2aec235d67fd39c35775a42a31261ae2a129",
+          "sample": "- ghi vào `run-output` của chính dispatch thành công;\n- host-write-denied: ghi vào cwd/repo root bị chặn;\n- workspace-write: workspace được cấp ghi được, ngoài grant vẫn bị chặn;\n ",
+          "identityFingerprint": "e8be6872ff628bf10e5664086b531568d2b80260e5c458298c0ee5ccd3372887",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "11. Proof và Definition of Done",
+            "11.3 Behavior probes"
+          ],
+          "text": "- ghi vào `run-output` của chính dispatch thành công;\n- host-write-denied: ghi vào cwd/repo root bị chặn;\n- workspace-write: workspace được cấp ghi được, ngoài grant vẫn bị chặn;\n  probe riêng Git metadata ownership và commit readiness;\n- ghi vào run directory của dispatch khác bị chặn;\n- private home ghi được nhưng real host home bị chặn;\n- descriptor ghi ngoài grant không được kế thừa; stdio chỉ qua output channel\n  được quản lý; attestation công bố host IPC/network ngoài phạm vi đúng §4;\n- `executor-credentials` grant đọc được nhưng không ghi được;\n- host read và network vẫn khả dụng, để chứng minh attestation không overclaim."
+        }
+      ]
+    }
+  ],
+  "historicalPackageComparisons": {
+    "nativeIdentity": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "e8be6872ff628bf10e5664086b531568d2b80260e5c458298c0ee5ccd3372887",
+      "identityFingerprint": "e8be6872ff628bf10e5664086b531568d2b80260e5c458298c0ee5ccd3372887",
+      "claimId": "claim_d81f120837aab96ba270276e5090e2e0",
+      "sourceAnchor": "unheaded-block-133",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "e3281f44b9de246979eb391c466d2aec235d67fd39c35775a42a31261ae2a129",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "currentIdentityBinding": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "e8be6872ff628bf10e5664086b531568d2b80260e5c458298c0ee5ccd3372887",
+      "identityFingerprint": "e8be6872ff628bf10e5664086b531568d2b80260e5c458298c0ee5ccd3372887",
+      "claimId": "claim_d81f120837aab96ba270276e5090e2e0",
+      "sourceAnchor": "unheaded-block-133",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "e3281f44b9de246979eb391c466d2aec235d67fd39c35775a42a31261ae2a129",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "uniqueSameDigestBinding": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-133",
+      "githubAnchor": "unheaded-block-133",
+      "stableAnchor": "unheaded-block-133",
+      "title": "Unheaded block 133",
+      "startLine": 1293,
+      "endLine": 1302,
+      "textDigest": "e3281f44b9de246979eb391c466d2aec235d67fd39c35775a42a31261ae2a129",
+      "sample": "- ghi vào `run-output` của chính dispatch thành công;\n- host-write-denied: ghi vào cwd/repo root bị chặn;\n- workspace-write: workspace được cấp ghi được, ngoài grant vẫn bị chặn;\n ",
+      "identityFingerprint": "e8be6872ff628bf10e5664086b531568d2b80260e5c458298c0ee5ccd3372887",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "11. Proof và Definition of Done",
+        "11.3 Behavior probes"
+      ],
+      "text": "- ghi vào `run-output` của chính dispatch thành công;\n- host-write-denied: ghi vào cwd/repo root bị chặn;\n- workspace-write: workspace được cấp ghi được, ngoài grant vẫn bị chặn;\n  probe riêng Git metadata ownership và commit readiness;\n- ghi vào run directory của dispatch khác bị chặn;\n- private home ghi được nhưng real host home bị chặn;\n- descriptor ghi ngoài grant không được kế thừa; stdio chỉ qua output channel\n  được quản lý; attestation công bố host IPC/network ngoài phạm vi đúng §4;\n- `executor-credentials` grant đọc được nhưng không ghi được;\n- host read và network vẫn khả dụng, để chứng minh attestation không overclaim."
+    },
+    "currentUnitAtRetainedIdentity": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-133",
+      "githubAnchor": "unheaded-block-133",
+      "stableAnchor": "unheaded-block-133",
+      "title": "Unheaded block 133",
+      "startLine": 1293,
+      "endLine": 1302,
+      "textDigest": "e3281f44b9de246979eb391c466d2aec235d67fd39c35775a42a31261ae2a129",
+      "sample": "- ghi vào `run-output` của chính dispatch thành công;\n- host-write-denied: ghi vào cwd/repo root bị chặn;\n- workspace-write: workspace được cấp ghi được, ngoài grant vẫn bị chặn;\n ",
+      "identityFingerprint": "e8be6872ff628bf10e5664086b531568d2b80260e5c458298c0ee5ccd3372887",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "11. Proof và Definition of Done",
+        "11.3 Behavior probes"
+      ],
+      "text": "- ghi vào `run-output` của chính dispatch thành công;\n- host-write-denied: ghi vào cwd/repo root bị chặn;\n- workspace-write: workspace được cấp ghi được, ngoài grant vẫn bị chặn;\n  probe riêng Git metadata ownership và commit readiness;\n- ghi vào run directory của dispatch khác bị chặn;\n- private home ghi được nhưng real host home bị chặn;\n- descriptor ghi ngoài grant không được kế thừa; stdio chỉ qua output channel\n  được quản lý; attestation công bố host IPC/network ngoài phạm vi đúng §4;\n- `executor-credentials` grant đọc được nhưng không ghi được;\n- host read và network vẫn khả dụng, để chứng minh attestation không overclaim."
+    },
+    "sourceDigestUnchanged": true,
+    "status": "same text uniquely found; alias anchor still independently checked",
+    "aliasTargetComparisons": [
+      {
+        "aliasId": "step10-specs-0089",
+        "fromPath": "docs/specs/confinement-authority.md#unheaded-block-132",
+        "toOwner": "docs/platform/agent-confinement/spec.md",
+        "toAnchor": "unheaded-block-63",
+        "currentTargetAtDraftAnchor": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-63",
+          "githubAnchor": "unheaded-block-63",
+          "stableAnchor": "unheaded-block-63",
+          "title": "Unheaded block 63",
+          "startLine": 529,
+          "endLine": 538,
+          "textDigest": "ef13d34054bfb70d28e34612c2fa9c8baf76e7a153c8f38c1673b92b9936f2bd",
+          "sample": "- Import/static test chứng minh production caller không gọi executor adapter\n  execute function trực tiếp.\n- Cả `spawnWorker` và `executeExecutorCli` đi qua cùng facade.\n- Adapter ",
+          "identityFingerprint": "0d5707db18e5247b707f6978f604db5fdd4b99ae054155e51d0314fdf2c597d3",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "11. Proof và Definition of Done",
+            "11.2 One-door tests"
+          ],
+          "text": "- Import/static test chứng minh production caller không gọi executor adapter\n  execute function trực tiếp.\n- Cả `spawnWorker` và `executeExecutorCli` đi qua cùng facade.\n- Adapter fake chỉ nhận prepared invocation.\n- Throw trong resolve/assess/compile/prepare tạo zero spawn.\n- Preferred thiếu backend/needs và partial coverage tuân §8.2, không fallback\n  invocation gốc sau prepare failure.\n- Crash giữa allocation intent và prepare completion được replay/reap\n  idempotent; không cleanup execution còn sống hoặc remote chưa rõ liveness.\n- Collect failure giữ artifact/resource; cleanup failure không xóa agent result."
+        },
+        "sourceTextDigestAtDraftTarget": false,
+        "uniqueSameTextCurrentTarget": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-65",
+          "githubAnchor": "unheaded-block-65",
+          "stableAnchor": "unheaded-block-65",
+          "title": "Unheaded block 65",
+          "startLine": 544,
+          "endLine": 553,
+          "textDigest": "e3281f44b9de246979eb391c466d2aec235d67fd39c35775a42a31261ae2a129",
+          "sample": "- ghi vào `run-output` của chính dispatch thành công;\n- host-write-denied: ghi vào cwd/repo root bị chặn;\n- workspace-write: workspace được cấp ghi được, ngoài grant vẫn bị chặn;\n ",
+          "identityFingerprint": "e8be6872ff628bf10e5664086b531568d2b80260e5c458298c0ee5ccd3372887",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "11. Proof và Definition of Done",
+            "11.3 Behavior probes"
+          ],
+          "text": "- ghi vào `run-output` của chính dispatch thành công;\n- host-write-denied: ghi vào cwd/repo root bị chặn;\n- workspace-write: workspace được cấp ghi được, ngoài grant vẫn bị chặn;\n  probe riêng Git metadata ownership và commit readiness;\n- ghi vào run directory của dispatch khác bị chặn;\n- private home ghi được nhưng real host home bị chặn;\n- descriptor ghi ngoài grant không được kế thừa; stdio chỉ qua output channel\n  được quản lý; attestation công bố host IPC/network ngoài phạm vi đúng §4;\n- `executor-credentials` grant đọc được nhưng không ghi được;\n- host read và network vẫn khả dụng, để chứng minh attestation không overclaim."
+        },
+        "note": "Read-only current source and target comparisons; draft unchanged. Source and target numbered-anchor relocation is not approval. Text corrections or source drift require independent judgment."
+      }
+    ]
+  },
+  "currentSourceDigestUnchanged": true
+}
+```
+
+## Entry e-023: claim_34983077687032d7a49ecc61907a6806
+
+```json
+{
+  "kind": "source-alias-comparison",
+  "claimId": "claim_34983077687032d7a49ecc61907a6806",
+  "priorAnchor": "unheaded-block-133",
+  "priorDigest": "81541208991d526412de79630015558afcc29113e90b9e33d5818071621c09f7",
+  "currentDigest": "e3281f44b9de246979eb391c466d2aec235d67fd39c35775a42a31261ae2a129",
+  "matchingCurrentAnchors": [
+    "unheaded-block-134"
+  ],
+  "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval.",
+  "draftAliases": [
+    {
+      "aliasId": "step10-specs-0090",
+      "fromPath": "docs/specs/confinement-authority.md#unheaded-block-133",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-64",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    }
+  ],
+  "currentNative": {
+    "sourcePath": "docs/specs/confinement-authority.md",
+    "unitDigest": "a26346b5f9511a5db4f295da1d665e5c8cfd8de8ccb95a3397f8f6d871a23c6c",
+    "identityFingerprint": "a26346b5f9511a5db4f295da1d665e5c8cfd8de8ccb95a3397f8f6d871a23c6c",
+    "claimId": "claim_34983077687032d7a49ecc61907a6806",
+    "sourceAnchor": "unheaded-block-134",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "81541208991d526412de79630015558afcc29113e90b9e33d5818071621c09f7",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "currentSourceUnit": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-134",
+    "githubAnchor": "unheaded-block-134",
+    "stableAnchor": "unheaded-block-134",
+    "title": "Unheaded block 134",
+    "startLine": 1304,
+    "endLine": 1306,
+    "textDigest": "81541208991d526412de79630015558afcc29113e90b9e33d5818071621c09f7",
+    "sample": "Probe input/assertion độc lập với declarative claims. Thay đổi dependency trong\nproof profile bắt buộc refresh probe tương ứng theo §6.6; readiness recipe\nprovider thay đổi không i",
+    "identityFingerprint": "a26346b5f9511a5db4f295da1d665e5c8cfd8de8ccb95a3397f8f6d871a23c6c",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "11. Proof và Definition of Done",
+      "11.3 Behavior probes"
+    ],
+    "text": "Probe input/assertion độc lập với declarative claims. Thay đổi dependency trong\nproof profile bắt buộc refresh probe tương ứng theo §6.6; readiness recipe\nprovider thay đổi không invalidate backend proof không liên quan."
+  },
+  "currentTargetComparisons": [
+    {
+      "aliasId": "step10-specs-0090",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-64",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-64",
+        "githubAnchor": "unheaded-block-64",
+        "stableAnchor": "unheaded-block-64",
+        "title": "Unheaded block 64",
+        "startLine": 542,
+        "endLine": 542,
+        "textDigest": "6dc2d3110bcb9737263766d842a280447bb840efd94b14cc54cbc739d7c3c0a8",
+        "sample": "Probe phải nằm trong repo và chạy lại được. Với default bwrap, probe chứng minh:",
+        "identityFingerprint": "5e8485d8b6ee7f96373fb2f5326e33ebc44372cdf267980113554bd6a6b201c3",
+        "ancestry": [
+          "Spec: Agent Confinement Authority",
+          "11. Proof và Definition of Done",
+          "11.3 Behavior probes"
+        ],
+        "text": "Probe phải nằm trong repo và chạy lại được. Với default bwrap, probe chứng minh:"
+      },
+      "uniqueSameDigestUnits": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-66",
+          "githubAnchor": "unheaded-block-66",
+          "stableAnchor": "unheaded-block-66",
+          "title": "Unheaded block 66",
+          "startLine": 555,
+          "endLine": 557,
+          "textDigest": "81541208991d526412de79630015558afcc29113e90b9e33d5818071621c09f7",
+          "sample": "Probe input/assertion độc lập với declarative claims. Thay đổi dependency trong\nproof profile bắt buộc refresh probe tương ứng theo §6.6; readiness recipe\nprovider thay đổi không i",
+          "identityFingerprint": "a26346b5f9511a5db4f295da1d665e5c8cfd8de8ccb95a3397f8f6d871a23c6c",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "11. Proof và Definition of Done",
+            "11.3 Behavior probes"
+          ],
+          "text": "Probe input/assertion độc lập với declarative claims. Thay đổi dependency trong\nproof profile bắt buộc refresh probe tương ứng theo §6.6; readiness recipe\nprovider thay đổi không invalidate backend proof không liên quan."
+        }
+      ]
+    }
+  ],
+  "historicalPackageComparisons": {
+    "nativeIdentity": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "a26346b5f9511a5db4f295da1d665e5c8cfd8de8ccb95a3397f8f6d871a23c6c",
+      "identityFingerprint": "a26346b5f9511a5db4f295da1d665e5c8cfd8de8ccb95a3397f8f6d871a23c6c",
+      "claimId": "claim_34983077687032d7a49ecc61907a6806",
+      "sourceAnchor": "unheaded-block-134",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "81541208991d526412de79630015558afcc29113e90b9e33d5818071621c09f7",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "currentIdentityBinding": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "a26346b5f9511a5db4f295da1d665e5c8cfd8de8ccb95a3397f8f6d871a23c6c",
+      "identityFingerprint": "a26346b5f9511a5db4f295da1d665e5c8cfd8de8ccb95a3397f8f6d871a23c6c",
+      "claimId": "claim_34983077687032d7a49ecc61907a6806",
+      "sourceAnchor": "unheaded-block-134",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "81541208991d526412de79630015558afcc29113e90b9e33d5818071621c09f7",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "uniqueSameDigestBinding": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-134",
+      "githubAnchor": "unheaded-block-134",
+      "stableAnchor": "unheaded-block-134",
+      "title": "Unheaded block 134",
+      "startLine": 1304,
+      "endLine": 1306,
+      "textDigest": "81541208991d526412de79630015558afcc29113e90b9e33d5818071621c09f7",
+      "sample": "Probe input/assertion độc lập với declarative claims. Thay đổi dependency trong\nproof profile bắt buộc refresh probe tương ứng theo §6.6; readiness recipe\nprovider thay đổi không i",
+      "identityFingerprint": "a26346b5f9511a5db4f295da1d665e5c8cfd8de8ccb95a3397f8f6d871a23c6c",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "11. Proof và Definition of Done",
+        "11.3 Behavior probes"
+      ],
+      "text": "Probe input/assertion độc lập với declarative claims. Thay đổi dependency trong\nproof profile bắt buộc refresh probe tương ứng theo §6.6; readiness recipe\nprovider thay đổi không invalidate backend proof không liên quan."
+    },
+    "currentUnitAtRetainedIdentity": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-134",
+      "githubAnchor": "unheaded-block-134",
+      "stableAnchor": "unheaded-block-134",
+      "title": "Unheaded block 134",
+      "startLine": 1304,
+      "endLine": 1306,
+      "textDigest": "81541208991d526412de79630015558afcc29113e90b9e33d5818071621c09f7",
+      "sample": "Probe input/assertion độc lập với declarative claims. Thay đổi dependency trong\nproof profile bắt buộc refresh probe tương ứng theo §6.6; readiness recipe\nprovider thay đổi không i",
+      "identityFingerprint": "a26346b5f9511a5db4f295da1d665e5c8cfd8de8ccb95a3397f8f6d871a23c6c",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "11. Proof và Definition of Done",
+        "11.3 Behavior probes"
+      ],
+      "text": "Probe input/assertion độc lập với declarative claims. Thay đổi dependency trong\nproof profile bắt buộc refresh probe tương ứng theo §6.6; readiness recipe\nprovider thay đổi không invalidate backend proof không liên quan."
+    },
+    "sourceDigestUnchanged": true,
+    "status": "same text uniquely found; alias anchor still independently checked",
+    "aliasTargetComparisons": [
+      {
+        "aliasId": "step10-specs-0090",
+        "fromPath": "docs/specs/confinement-authority.md#unheaded-block-133",
+        "toOwner": "docs/platform/agent-confinement/spec.md",
+        "toAnchor": "unheaded-block-64",
+        "currentTargetAtDraftAnchor": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-64",
+          "githubAnchor": "unheaded-block-64",
+          "stableAnchor": "unheaded-block-64",
+          "title": "Unheaded block 64",
+          "startLine": 542,
+          "endLine": 542,
+          "textDigest": "6dc2d3110bcb9737263766d842a280447bb840efd94b14cc54cbc739d7c3c0a8",
+          "sample": "Probe phải nằm trong repo và chạy lại được. Với default bwrap, probe chứng minh:",
+          "identityFingerprint": "5e8485d8b6ee7f96373fb2f5326e33ebc44372cdf267980113554bd6a6b201c3",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "11. Proof và Definition of Done",
+            "11.3 Behavior probes"
+          ],
+          "text": "Probe phải nằm trong repo và chạy lại được. Với default bwrap, probe chứng minh:"
+        },
+        "sourceTextDigestAtDraftTarget": false,
+        "uniqueSameTextCurrentTarget": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-66",
+          "githubAnchor": "unheaded-block-66",
+          "stableAnchor": "unheaded-block-66",
+          "title": "Unheaded block 66",
+          "startLine": 555,
+          "endLine": 557,
+          "textDigest": "81541208991d526412de79630015558afcc29113e90b9e33d5818071621c09f7",
+          "sample": "Probe input/assertion độc lập với declarative claims. Thay đổi dependency trong\nproof profile bắt buộc refresh probe tương ứng theo §6.6; readiness recipe\nprovider thay đổi không i",
+          "identityFingerprint": "a26346b5f9511a5db4f295da1d665e5c8cfd8de8ccb95a3397f8f6d871a23c6c",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "11. Proof và Definition of Done",
+            "11.3 Behavior probes"
+          ],
+          "text": "Probe input/assertion độc lập với declarative claims. Thay đổi dependency trong\nproof profile bắt buộc refresh probe tương ứng theo §6.6; readiness recipe\nprovider thay đổi không invalidate backend proof không liên quan."
+        },
+        "note": "Read-only current source and target comparisons; draft unchanged. Source and target numbered-anchor relocation is not approval. Text corrections or source drift require independent judgment."
+      }
+    ]
+  },
+  "currentSourceDigestUnchanged": true
+}
+```
+
+## Entry e-024: claim_d9f0a2209948f0357cac70dc0778b0bb
+
+```json
+{
+  "kind": "source-alias-comparison",
+  "claimId": "claim_d9f0a2209948f0357cac70dc0778b0bb",
+  "priorAnchor": "unheaded-block-134",
+  "priorDigest": "0863b0b9257af2b10d97f01c65e9433aa9e18f3bca620427ae014d6c874bd9dc",
+  "currentDigest": "81541208991d526412de79630015558afcc29113e90b9e33d5818071621c09f7",
+  "matchingCurrentAnchors": [
+    "unheaded-block-135"
+  ],
+  "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval.",
+  "draftAliases": [
+    {
+      "aliasId": "step10-specs-0091",
+      "fromPath": "docs/specs/confinement-authority.md#unheaded-block-134",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-65",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    }
+  ],
+  "currentNative": {
+    "sourcePath": "docs/specs/confinement-authority.md",
+    "unitDigest": "1be45e1f3ed18b93004476a6a5919346fc763d0492c3a02bb10b2f683cdcb504",
+    "identityFingerprint": "1be45e1f3ed18b93004476a6a5919346fc763d0492c3a02bb10b2f683cdcb504",
+    "claimId": "claim_d9f0a2209948f0357cac70dc0778b0bb",
+    "sourceAnchor": "unheaded-block-135",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "0863b0b9257af2b10d97f01c65e9433aa9e18f3bca620427ae014d6c874bd9dc",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "currentSourceUnit": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-135",
+    "githubAnchor": "unheaded-block-135",
+    "stableAnchor": "unheaded-block-135",
+    "title": "Unheaded block 135",
+    "startLine": 1310,
+    "endLine": 1314,
+    "textDigest": "0863b0b9257af2b10d97f01c65e9433aa9e18f3bca620427ae014d6c874bd9dc",
+    "sample": "- Pin posture của cả 17 executor hiện tại.\n- Pin exact write grant của ba executor bwrap.\n- Có falsifier đỏ khi thêm executor bwrap thứ tư mà không khai báo.\n- Event/run record lưu",
+    "identityFingerprint": "1be45e1f3ed18b93004476a6a5919346fc763d0492c3a02bb10b2f683cdcb504",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "11. Proof và Definition of Done",
+      "11.4 Observability"
+    ],
+    "text": "- Pin posture của cả 17 executor hiện tại.\n- Pin exact write grant của ba executor bwrap.\n- Có falsifier đỏ khi thêm executor bwrap thứ tư mà không khai báo.\n- Event/run record lưu `confinement-attestation.v1` và mismatch.\n- Log stdout/stderr không chứa credential value."
+  },
+  "currentTargetComparisons": [
+    {
+      "aliasId": "step10-specs-0091",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-65",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-65",
+        "githubAnchor": "unheaded-block-65",
+        "stableAnchor": "unheaded-block-65",
+        "title": "Unheaded block 65",
+        "startLine": 544,
+        "endLine": 553,
+        "textDigest": "e3281f44b9de246979eb391c466d2aec235d67fd39c35775a42a31261ae2a129",
+        "sample": "- ghi vào `run-output` của chính dispatch thành công;\n- host-write-denied: ghi vào cwd/repo root bị chặn;\n- workspace-write: workspace được cấp ghi được, ngoài grant vẫn bị chặn;\n ",
+        "identityFingerprint": "e8be6872ff628bf10e5664086b531568d2b80260e5c458298c0ee5ccd3372887",
+        "ancestry": [
+          "Spec: Agent Confinement Authority",
+          "11. Proof và Definition of Done",
+          "11.3 Behavior probes"
+        ],
+        "text": "- ghi vào `run-output` của chính dispatch thành công;\n- host-write-denied: ghi vào cwd/repo root bị chặn;\n- workspace-write: workspace được cấp ghi được, ngoài grant vẫn bị chặn;\n  probe riêng Git metadata ownership và commit readiness;\n- ghi vào run directory của dispatch khác bị chặn;\n- private home ghi được nhưng real host home bị chặn;\n- descriptor ghi ngoài grant không được kế thừa; stdio chỉ qua output channel\n  được quản lý; attestation công bố host IPC/network ngoài phạm vi đúng §4;\n- `executor-credentials` grant đọc được nhưng không ghi được;\n- host read và network vẫn khả dụng, để chứng minh attestation không overclaim."
+      },
+      "uniqueSameDigestUnits": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-67",
+          "githubAnchor": "unheaded-block-67",
+          "stableAnchor": "unheaded-block-67",
+          "title": "Unheaded block 67",
+          "startLine": 561,
+          "endLine": 565,
+          "textDigest": "0863b0b9257af2b10d97f01c65e9433aa9e18f3bca620427ae014d6c874bd9dc",
+          "sample": "- Pin posture của cả 17 executor hiện tại.\n- Pin exact write grant của ba executor bwrap.\n- Có falsifier đỏ khi thêm executor bwrap thứ tư mà không khai báo.\n- Event/run record lưu",
+          "identityFingerprint": "1be45e1f3ed18b93004476a6a5919346fc763d0492c3a02bb10b2f683cdcb504",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "11. Proof và Definition of Done",
+            "11.4 Observability"
+          ],
+          "text": "- Pin posture của cả 17 executor hiện tại.\n- Pin exact write grant của ba executor bwrap.\n- Có falsifier đỏ khi thêm executor bwrap thứ tư mà không khai báo.\n- Event/run record lưu `confinement-attestation.v1` và mismatch.\n- Log stdout/stderr không chứa credential value."
+        }
+      ]
+    }
+  ],
+  "historicalPackageComparisons": {
+    "nativeIdentity": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "1be45e1f3ed18b93004476a6a5919346fc763d0492c3a02bb10b2f683cdcb504",
+      "identityFingerprint": "1be45e1f3ed18b93004476a6a5919346fc763d0492c3a02bb10b2f683cdcb504",
+      "claimId": "claim_d9f0a2209948f0357cac70dc0778b0bb",
+      "sourceAnchor": "unheaded-block-135",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "0863b0b9257af2b10d97f01c65e9433aa9e18f3bca620427ae014d6c874bd9dc",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "currentIdentityBinding": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "1be45e1f3ed18b93004476a6a5919346fc763d0492c3a02bb10b2f683cdcb504",
+      "identityFingerprint": "1be45e1f3ed18b93004476a6a5919346fc763d0492c3a02bb10b2f683cdcb504",
+      "claimId": "claim_d9f0a2209948f0357cac70dc0778b0bb",
+      "sourceAnchor": "unheaded-block-135",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "0863b0b9257af2b10d97f01c65e9433aa9e18f3bca620427ae014d6c874bd9dc",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "uniqueSameDigestBinding": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-135",
+      "githubAnchor": "unheaded-block-135",
+      "stableAnchor": "unheaded-block-135",
+      "title": "Unheaded block 135",
+      "startLine": 1310,
+      "endLine": 1314,
+      "textDigest": "0863b0b9257af2b10d97f01c65e9433aa9e18f3bca620427ae014d6c874bd9dc",
+      "sample": "- Pin posture của cả 17 executor hiện tại.\n- Pin exact write grant của ba executor bwrap.\n- Có falsifier đỏ khi thêm executor bwrap thứ tư mà không khai báo.\n- Event/run record lưu",
+      "identityFingerprint": "1be45e1f3ed18b93004476a6a5919346fc763d0492c3a02bb10b2f683cdcb504",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "11. Proof và Definition of Done",
+        "11.4 Observability"
+      ],
+      "text": "- Pin posture của cả 17 executor hiện tại.\n- Pin exact write grant của ba executor bwrap.\n- Có falsifier đỏ khi thêm executor bwrap thứ tư mà không khai báo.\n- Event/run record lưu `confinement-attestation.v1` và mismatch.\n- Log stdout/stderr không chứa credential value."
+    },
+    "currentUnitAtRetainedIdentity": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-135",
+      "githubAnchor": "unheaded-block-135",
+      "stableAnchor": "unheaded-block-135",
+      "title": "Unheaded block 135",
+      "startLine": 1310,
+      "endLine": 1314,
+      "textDigest": "0863b0b9257af2b10d97f01c65e9433aa9e18f3bca620427ae014d6c874bd9dc",
+      "sample": "- Pin posture của cả 17 executor hiện tại.\n- Pin exact write grant của ba executor bwrap.\n- Có falsifier đỏ khi thêm executor bwrap thứ tư mà không khai báo.\n- Event/run record lưu",
+      "identityFingerprint": "1be45e1f3ed18b93004476a6a5919346fc763d0492c3a02bb10b2f683cdcb504",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "11. Proof và Definition of Done",
+        "11.4 Observability"
+      ],
+      "text": "- Pin posture của cả 17 executor hiện tại.\n- Pin exact write grant của ba executor bwrap.\n- Có falsifier đỏ khi thêm executor bwrap thứ tư mà không khai báo.\n- Event/run record lưu `confinement-attestation.v1` và mismatch.\n- Log stdout/stderr không chứa credential value."
+    },
+    "sourceDigestUnchanged": true,
+    "status": "same text uniquely found; alias anchor still independently checked",
+    "aliasTargetComparisons": [
+      {
+        "aliasId": "step10-specs-0091",
+        "fromPath": "docs/specs/confinement-authority.md#unheaded-block-134",
+        "toOwner": "docs/platform/agent-confinement/spec.md",
+        "toAnchor": "unheaded-block-65",
+        "currentTargetAtDraftAnchor": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-65",
+          "githubAnchor": "unheaded-block-65",
+          "stableAnchor": "unheaded-block-65",
+          "title": "Unheaded block 65",
+          "startLine": 544,
+          "endLine": 553,
+          "textDigest": "e3281f44b9de246979eb391c466d2aec235d67fd39c35775a42a31261ae2a129",
+          "sample": "- ghi vào `run-output` của chính dispatch thành công;\n- host-write-denied: ghi vào cwd/repo root bị chặn;\n- workspace-write: workspace được cấp ghi được, ngoài grant vẫn bị chặn;\n ",
+          "identityFingerprint": "e8be6872ff628bf10e5664086b531568d2b80260e5c458298c0ee5ccd3372887",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "11. Proof và Definition of Done",
+            "11.3 Behavior probes"
+          ],
+          "text": "- ghi vào `run-output` của chính dispatch thành công;\n- host-write-denied: ghi vào cwd/repo root bị chặn;\n- workspace-write: workspace được cấp ghi được, ngoài grant vẫn bị chặn;\n  probe riêng Git metadata ownership và commit readiness;\n- ghi vào run directory của dispatch khác bị chặn;\n- private home ghi được nhưng real host home bị chặn;\n- descriptor ghi ngoài grant không được kế thừa; stdio chỉ qua output channel\n  được quản lý; attestation công bố host IPC/network ngoài phạm vi đúng §4;\n- `executor-credentials` grant đọc được nhưng không ghi được;\n- host read và network vẫn khả dụng, để chứng minh attestation không overclaim."
+        },
+        "sourceTextDigestAtDraftTarget": false,
+        "uniqueSameTextCurrentTarget": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-67",
+          "githubAnchor": "unheaded-block-67",
+          "stableAnchor": "unheaded-block-67",
+          "title": "Unheaded block 67",
+          "startLine": 561,
+          "endLine": 565,
+          "textDigest": "0863b0b9257af2b10d97f01c65e9433aa9e18f3bca620427ae014d6c874bd9dc",
+          "sample": "- Pin posture của cả 17 executor hiện tại.\n- Pin exact write grant của ba executor bwrap.\n- Có falsifier đỏ khi thêm executor bwrap thứ tư mà không khai báo.\n- Event/run record lưu",
+          "identityFingerprint": "1be45e1f3ed18b93004476a6a5919346fc763d0492c3a02bb10b2f683cdcb504",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "11. Proof và Definition of Done",
+            "11.4 Observability"
+          ],
+          "text": "- Pin posture của cả 17 executor hiện tại.\n- Pin exact write grant của ba executor bwrap.\n- Có falsifier đỏ khi thêm executor bwrap thứ tư mà không khai báo.\n- Event/run record lưu `confinement-attestation.v1` và mismatch.\n- Log stdout/stderr không chứa credential value."
+        },
+        "note": "Read-only current source and target comparisons; draft unchanged. Source and target numbered-anchor relocation is not approval. Text corrections or source drift require independent judgment."
+      }
+    ]
+  },
+  "currentSourceDigestUnchanged": true
+}
+```
+
+## Entry e-025: claim_f82a2cff173a458bb2231203222c10e0
+
+```json
+{
+  "kind": "source-alias-comparison",
+  "claimId": "claim_f82a2cff173a458bb2231203222c10e0",
+  "priorAnchor": "unheaded-block-135",
+  "priorDigest": "03aadf655bc30ec74e7e34d25a18d3b8f3f866fc2120a48550822fada8afa1d5",
+  "currentDigest": "0863b0b9257af2b10d97f01c65e9433aa9e18f3bca620427ae014d6c874bd9dc",
+  "matchingCurrentAnchors": [
+    "unheaded-block-136"
+  ],
+  "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval.",
+  "draftAliases": [
+    {
+      "aliasId": "step10-specs-0092",
+      "fromPath": "docs/specs/confinement-authority.md#unheaded-block-135",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-66",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    }
+  ],
+  "currentNative": {
+    "sourcePath": "docs/specs/confinement-authority.md",
+    "unitDigest": "ee8afd3b8ef3e08df9a1513448b6e6fcdb54709a5bffecef202bb567406cca25",
+    "identityFingerprint": "ee8afd3b8ef3e08df9a1513448b6e6fcdb54709a5bffecef202bb567406cca25",
+    "claimId": "claim_f82a2cff173a458bb2231203222c10e0",
+    "sourceAnchor": "unheaded-block-136",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "03aadf655bc30ec74e7e34d25a18d3b8f3f866fc2120a48550822fada8afa1d5",
+    "claimKind": "contract",
+    "status": "current"
+  },
+  "currentSourceUnit": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-136",
+    "githubAnchor": "unheaded-block-136",
+    "stableAnchor": "unheaded-block-136",
+    "title": "Unheaded block 136",
+    "startLine": 1318,
+    "endLine": 1324,
+    "textDigest": "03aadf655bc30ec74e7e34d25a18d3b8f3f866fc2120a48550822fada8afa1d5",
+    "sample": "Mỗi backend driver đăng ký check schema/capability và mỗi machine-registry\ninstance được `fgos doctor` kiểm tra: binary hoặc runtime khả dụng, platform\nsupport, namespace/mount pre",
+    "identityFingerprint": "ee8afd3b8ef3e08df9a1513448b6e6fcdb54709a5bffecef202bb567406cca25",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "11. Proof và Definition of Done",
+      "11.5 Doctor/setup"
+    ],
+    "text": "Mỗi backend driver đăng ký check schema/capability và mỗi machine-registry\ninstance được `fgos doctor` kiểm tra: binary hoặc runtime khả dụng, platform\nsupport, namespace/mount prerequisite, runDir writable, credential source\nreadable và probe freshness. `fgos setup` tạo/fill missing backend instance\ntrong machine registry mà không ghi đè custom value; shared project/global\nconfig vẫn giữ precedence hiện hành. Doctor report phân biệt rõ `configured`,\n`disabled`, `unavailable` và `ready`."
+  },
+  "currentTargetComparisons": [
+    {
+      "aliasId": "step10-specs-0092",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-66",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-66",
+        "githubAnchor": "unheaded-block-66",
+        "stableAnchor": "unheaded-block-66",
+        "title": "Unheaded block 66",
+        "startLine": 555,
+        "endLine": 557,
+        "textDigest": "81541208991d526412de79630015558afcc29113e90b9e33d5818071621c09f7",
+        "sample": "Probe input/assertion độc lập với declarative claims. Thay đổi dependency trong\nproof profile bắt buộc refresh probe tương ứng theo §6.6; readiness recipe\nprovider thay đổi không i",
+        "identityFingerprint": "a26346b5f9511a5db4f295da1d665e5c8cfd8de8ccb95a3397f8f6d871a23c6c",
+        "ancestry": [
+          "Spec: Agent Confinement Authority",
+          "11. Proof và Definition of Done",
+          "11.3 Behavior probes"
+        ],
+        "text": "Probe input/assertion độc lập với declarative claims. Thay đổi dependency trong\nproof profile bắt buộc refresh probe tương ứng theo §6.6; readiness recipe\nprovider thay đổi không invalidate backend proof không liên quan."
+      },
+      "uniqueSameDigestUnits": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-68",
+          "githubAnchor": "unheaded-block-68",
+          "stableAnchor": "unheaded-block-68",
+          "title": "Unheaded block 68",
+          "startLine": 569,
+          "endLine": 575,
+          "textDigest": "03aadf655bc30ec74e7e34d25a18d3b8f3f866fc2120a48550822fada8afa1d5",
+          "sample": "Mỗi backend driver đăng ký check schema/capability và mỗi machine-registry\ninstance được `fgos doctor` kiểm tra: binary hoặc runtime khả dụng, platform\nsupport, namespace/mount pre",
+          "identityFingerprint": "ee8afd3b8ef3e08df9a1513448b6e6fcdb54709a5bffecef202bb567406cca25",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "11. Proof và Definition of Done",
+            "11.5 Doctor/setup"
+          ],
+          "text": "Mỗi backend driver đăng ký check schema/capability và mỗi machine-registry\ninstance được `fgos doctor` kiểm tra: binary hoặc runtime khả dụng, platform\nsupport, namespace/mount prerequisite, runDir writable, credential source\nreadable và probe freshness. `fgos setup` tạo/fill missing backend instance\ntrong machine registry mà không ghi đè custom value; shared project/global\nconfig vẫn giữ precedence hiện hành. Doctor report phân biệt rõ `configured`,\n`disabled`, `unavailable` và `ready`."
+        }
+      ]
+    }
+  ],
+  "historicalPackageComparisons": {
+    "nativeIdentity": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "ee8afd3b8ef3e08df9a1513448b6e6fcdb54709a5bffecef202bb567406cca25",
+      "identityFingerprint": "ee8afd3b8ef3e08df9a1513448b6e6fcdb54709a5bffecef202bb567406cca25",
+      "claimId": "claim_f82a2cff173a458bb2231203222c10e0",
+      "sourceAnchor": "unheaded-block-136",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "03aadf655bc30ec74e7e34d25a18d3b8f3f866fc2120a48550822fada8afa1d5",
+      "claimKind": "contract",
+      "status": "current"
+    },
+    "currentIdentityBinding": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "ee8afd3b8ef3e08df9a1513448b6e6fcdb54709a5bffecef202bb567406cca25",
+      "identityFingerprint": "ee8afd3b8ef3e08df9a1513448b6e6fcdb54709a5bffecef202bb567406cca25",
+      "claimId": "claim_f82a2cff173a458bb2231203222c10e0",
+      "sourceAnchor": "unheaded-block-136",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "03aadf655bc30ec74e7e34d25a18d3b8f3f866fc2120a48550822fada8afa1d5",
+      "claimKind": "contract",
+      "status": "current"
+    },
+    "uniqueSameDigestBinding": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-136",
+      "githubAnchor": "unheaded-block-136",
+      "stableAnchor": "unheaded-block-136",
+      "title": "Unheaded block 136",
+      "startLine": 1318,
+      "endLine": 1324,
+      "textDigest": "03aadf655bc30ec74e7e34d25a18d3b8f3f866fc2120a48550822fada8afa1d5",
+      "sample": "Mỗi backend driver đăng ký check schema/capability và mỗi machine-registry\ninstance được `fgos doctor` kiểm tra: binary hoặc runtime khả dụng, platform\nsupport, namespace/mount pre",
+      "identityFingerprint": "ee8afd3b8ef3e08df9a1513448b6e6fcdb54709a5bffecef202bb567406cca25",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "11. Proof và Definition of Done",
+        "11.5 Doctor/setup"
+      ],
+      "text": "Mỗi backend driver đăng ký check schema/capability và mỗi machine-registry\ninstance được `fgos doctor` kiểm tra: binary hoặc runtime khả dụng, platform\nsupport, namespace/mount prerequisite, runDir writable, credential source\nreadable và probe freshness. `fgos setup` tạo/fill missing backend instance\ntrong machine registry mà không ghi đè custom value; shared project/global\nconfig vẫn giữ precedence hiện hành. Doctor report phân biệt rõ `configured`,\n`disabled`, `unavailable` và `ready`."
+    },
+    "currentUnitAtRetainedIdentity": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-136",
+      "githubAnchor": "unheaded-block-136",
+      "stableAnchor": "unheaded-block-136",
+      "title": "Unheaded block 136",
+      "startLine": 1318,
+      "endLine": 1324,
+      "textDigest": "03aadf655bc30ec74e7e34d25a18d3b8f3f866fc2120a48550822fada8afa1d5",
+      "sample": "Mỗi backend driver đăng ký check schema/capability và mỗi machine-registry\ninstance được `fgos doctor` kiểm tra: binary hoặc runtime khả dụng, platform\nsupport, namespace/mount pre",
+      "identityFingerprint": "ee8afd3b8ef3e08df9a1513448b6e6fcdb54709a5bffecef202bb567406cca25",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "11. Proof và Definition of Done",
+        "11.5 Doctor/setup"
+      ],
+      "text": "Mỗi backend driver đăng ký check schema/capability và mỗi machine-registry\ninstance được `fgos doctor` kiểm tra: binary hoặc runtime khả dụng, platform\nsupport, namespace/mount prerequisite, runDir writable, credential source\nreadable và probe freshness. `fgos setup` tạo/fill missing backend instance\ntrong machine registry mà không ghi đè custom value; shared project/global\nconfig vẫn giữ precedence hiện hành. Doctor report phân biệt rõ `configured`,\n`disabled`, `unavailable` và `ready`."
+    },
+    "sourceDigestUnchanged": true,
+    "status": "same text uniquely found; alias anchor still independently checked",
+    "aliasTargetComparisons": [
+      {
+        "aliasId": "step10-specs-0092",
+        "fromPath": "docs/specs/confinement-authority.md#unheaded-block-135",
+        "toOwner": "docs/platform/agent-confinement/spec.md",
+        "toAnchor": "unheaded-block-66",
+        "currentTargetAtDraftAnchor": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-66",
+          "githubAnchor": "unheaded-block-66",
+          "stableAnchor": "unheaded-block-66",
+          "title": "Unheaded block 66",
+          "startLine": 555,
+          "endLine": 557,
+          "textDigest": "81541208991d526412de79630015558afcc29113e90b9e33d5818071621c09f7",
+          "sample": "Probe input/assertion độc lập với declarative claims. Thay đổi dependency trong\nproof profile bắt buộc refresh probe tương ứng theo §6.6; readiness recipe\nprovider thay đổi không i",
+          "identityFingerprint": "a26346b5f9511a5db4f295da1d665e5c8cfd8de8ccb95a3397f8f6d871a23c6c",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "11. Proof và Definition of Done",
+            "11.3 Behavior probes"
+          ],
+          "text": "Probe input/assertion độc lập với declarative claims. Thay đổi dependency trong\nproof profile bắt buộc refresh probe tương ứng theo §6.6; readiness recipe\nprovider thay đổi không invalidate backend proof không liên quan."
+        },
+        "sourceTextDigestAtDraftTarget": false,
+        "uniqueSameTextCurrentTarget": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-68",
+          "githubAnchor": "unheaded-block-68",
+          "stableAnchor": "unheaded-block-68",
+          "title": "Unheaded block 68",
+          "startLine": 569,
+          "endLine": 575,
+          "textDigest": "03aadf655bc30ec74e7e34d25a18d3b8f3f866fc2120a48550822fada8afa1d5",
+          "sample": "Mỗi backend driver đăng ký check schema/capability và mỗi machine-registry\ninstance được `fgos doctor` kiểm tra: binary hoặc runtime khả dụng, platform\nsupport, namespace/mount pre",
+          "identityFingerprint": "ee8afd3b8ef3e08df9a1513448b6e6fcdb54709a5bffecef202bb567406cca25",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "11. Proof và Definition of Done",
+            "11.5 Doctor/setup"
+          ],
+          "text": "Mỗi backend driver đăng ký check schema/capability và mỗi machine-registry\ninstance được `fgos doctor` kiểm tra: binary hoặc runtime khả dụng, platform\nsupport, namespace/mount prerequisite, runDir writable, credential source\nreadable và probe freshness. `fgos setup` tạo/fill missing backend instance\ntrong machine registry mà không ghi đè custom value; shared project/global\nconfig vẫn giữ precedence hiện hành. Doctor report phân biệt rõ `configured`,\n`disabled`, `unavailable` và `ready`."
+        },
+        "note": "Read-only current source and target comparisons; draft unchanged. Source and target numbered-anchor relocation is not approval. Text corrections or source drift require independent judgment."
+      }
+    ]
+  },
+  "currentSourceDigestUnchanged": true
+}
+```
+
+## Entry e-026: claim_c030fece276e5228ec08051c9b243dd4
+
+```json
+{
+  "kind": "source-alias-comparison",
+  "claimId": "claim_c030fece276e5228ec08051c9b243dd4",
+  "priorAnchor": "unheaded-block-136",
+  "priorDigest": "92b2a00d3ef31661c9945793933c8796b9d85c5d1ff72795cb0f4cb1882526d1",
+  "currentDigest": "03aadf655bc30ec74e7e34d25a18d3b8f3f866fc2120a48550822fada8afa1d5",
+  "matchingCurrentAnchors": [
+    "unheaded-block-137"
+  ],
+  "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval.",
+  "draftAliases": [
+    {
+      "aliasId": "step10-specs-0093",
+      "fromPath": "docs/specs/confinement-authority.md#unheaded-block-136",
+      "toOwner": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+      "toAnchor": "unheaded-block-3",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    }
+  ],
+  "currentNative": {
+    "sourcePath": "docs/specs/confinement-authority.md",
+    "unitDigest": "94b495f85cecf6c3cad406f0e7dc88efb44b46b01bfa576aef9400e988bbd45e",
+    "identityFingerprint": "94b495f85cecf6c3cad406f0e7dc88efb44b46b01bfa576aef9400e988bbd45e",
+    "claimId": "claim_c030fece276e5228ec08051c9b243dd4",
+    "sourceAnchor": "unheaded-block-137",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "92b2a00d3ef31661c9945793933c8796b9d85c5d1ff72795cb0f4cb1882526d1",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "currentSourceUnit": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-137",
+    "githubAnchor": "unheaded-block-137",
+    "stableAnchor": "unheaded-block-137",
+    "title": "Unheaded block 137",
+    "startLine": 1328,
+    "endLine": 1341,
+    "textDigest": "92b2a00d3ef31661c9945793933c8796b9d85c5d1ff72795cb0f4cb1882526d1",
+    "sample": "| Quyết định | Lý do |\n|---|---|\n| Một runtime authority door, sau khi có `runDir`, trước adapter | Đủ runtime data và adapter không bypass |\n| Nhiều phase nội bộ không phải nhiều ",
+    "identityFingerprint": "94b495f85cecf6c3cad406f0e7dc88efb44b46b01bfa576aef9400e988bbd45e",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "12. Quyết định của proposal"
+    ],
+    "text": "| Quyết định | Lý do |\n|---|---|\n| Một runtime authority door, sau khi có `runDir`, trước adapter | Đủ runtime data và adapter không bypass |\n| Nhiều phase nội bộ không phải nhiều cửa | Tách pure logic/side effect nhưng chỉ một quyền execute |\n| Policy diễn tả từng threat axis, không có boolean tổng quát | Chống overclaim và mở rộng không phá nghĩa cũ |\n| Write exception là resource `run-output`, resolve runtime | Portable và hẹp đúng dispatch |\n| `required` refuse; `preferred` mới degrade; `unconfined` explicit | Một contract đủ cho secure và portable workflow |\n| Capability đặt minimum; executor tham chiếu một backend instance | Trách nhiệm rõ, không có thuật toán chọn backend ẩn |\n| Machine registry khai instance + driver-specific deployment config, không chọn default | Customizable nhưng không tạo nguồn routing thứ hai |\n| Backend không cover thì refuse/degrade theo mode, không auto-fallback | Không âm thầm đổi filesystem, credential hay network semantics |\n| Driver assess; Authority decide/compile; driver prepare; Authority execute | Mỗi quyết định chỉ có một owner |\n| Provider normalizer phát resource binding chuẩn; backend provider-agnostic | Không giấu recipe thành nhánh provider trong driver |\n| Observe-first khi rollout, enforcement là đích | Có evidence trước breaking change, không hạ mục tiêu |\n| Detector độc lập và không tự nâng assurance | Tránh tự xác nhận vòng tròn |"
+  },
+  "currentTargetComparisons": [
+    {
+      "aliasId": "step10-specs-0093",
+      "toOwner": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+      "toAnchor": "unheaded-block-3",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 26,
+        "endLine": 39,
+        "textDigest": "92b2a00d3ef31661c9945793933c8796b9d85c5d1ff72795cb0f4cb1882526d1",
+        "sample": "| Quyết định | Lý do |\n|---|---|\n| Một runtime authority door, sau khi có `runDir`, trước adapter | Đủ runtime data và adapter không bypass |\n| Nhiều phase nội bộ không phải nhiều ",
+        "identityFingerprint": "94b495f85cecf6c3cad406f0e7dc88efb44b46b01bfa576aef9400e988bbd45e",
+        "ancestry": [
+          "Added in candidate: confinement authority decisions",
+          "12. Quyết định của proposal"
+        ],
+        "text": "| Quyết định | Lý do |\n|---|---|\n| Một runtime authority door, sau khi có `runDir`, trước adapter | Đủ runtime data và adapter không bypass |\n| Nhiều phase nội bộ không phải nhiều cửa | Tách pure logic/side effect nhưng chỉ một quyền execute |\n| Policy diễn tả từng threat axis, không có boolean tổng quát | Chống overclaim và mở rộng không phá nghĩa cũ |\n| Write exception là resource `run-output`, resolve runtime | Portable và hẹp đúng dispatch |\n| `required` refuse; `preferred` mới degrade; `unconfined` explicit | Một contract đủ cho secure và portable workflow |\n| Capability đặt minimum; executor tham chiếu một backend instance | Trách nhiệm rõ, không có thuật toán chọn backend ẩn |\n| Machine registry khai instance + driver-specific deployment config, không chọn default | Customizable nhưng không tạo nguồn routing thứ hai |\n| Backend không cover thì refuse/degrade theo mode, không auto-fallback | Không âm thầm đổi filesystem, credential hay network semantics |\n| Driver assess; Authority decide/compile; driver prepare; Authority execute | Mỗi quyết định chỉ có một owner |\n| Provider normalizer phát resource binding chuẩn; backend provider-agnostic | Không giấu recipe thành nhánh provider trong driver |\n| Observe-first khi rollout, enforcement là đích | Có evidence trước breaking change, không hạ mục tiêu |\n| Detector độc lập và không tự nâng assurance | Tránh tự xác nhận vòng tròn |"
+      },
+      "uniqueSameDigestUnits": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-3",
+          "githubAnchor": "unheaded-block-3",
+          "stableAnchor": "unheaded-block-3",
+          "title": "Unheaded block 3",
+          "startLine": 26,
+          "endLine": 39,
+          "textDigest": "92b2a00d3ef31661c9945793933c8796b9d85c5d1ff72795cb0f4cb1882526d1",
+          "sample": "| Quyết định | Lý do |\n|---|---|\n| Một runtime authority door, sau khi có `runDir`, trước adapter | Đủ runtime data và adapter không bypass |\n| Nhiều phase nội bộ không phải nhiều ",
+          "identityFingerprint": "94b495f85cecf6c3cad406f0e7dc88efb44b46b01bfa576aef9400e988bbd45e",
+          "ancestry": [
+            "Added in candidate: confinement authority decisions",
+            "12. Quyết định của proposal"
+          ],
+          "text": "| Quyết định | Lý do |\n|---|---|\n| Một runtime authority door, sau khi có `runDir`, trước adapter | Đủ runtime data và adapter không bypass |\n| Nhiều phase nội bộ không phải nhiều cửa | Tách pure logic/side effect nhưng chỉ một quyền execute |\n| Policy diễn tả từng threat axis, không có boolean tổng quát | Chống overclaim và mở rộng không phá nghĩa cũ |\n| Write exception là resource `run-output`, resolve runtime | Portable và hẹp đúng dispatch |\n| `required` refuse; `preferred` mới degrade; `unconfined` explicit | Một contract đủ cho secure và portable workflow |\n| Capability đặt minimum; executor tham chiếu một backend instance | Trách nhiệm rõ, không có thuật toán chọn backend ẩn |\n| Machine registry khai instance + driver-specific deployment config, không chọn default | Customizable nhưng không tạo nguồn routing thứ hai |\n| Backend không cover thì refuse/degrade theo mode, không auto-fallback | Không âm thầm đổi filesystem, credential hay network semantics |\n| Driver assess; Authority decide/compile; driver prepare; Authority execute | Mỗi quyết định chỉ có một owner |\n| Provider normalizer phát resource binding chuẩn; backend provider-agnostic | Không giấu recipe thành nhánh provider trong driver |\n| Observe-first khi rollout, enforcement là đích | Có evidence trước breaking change, không hạ mục tiêu |\n| Detector độc lập và không tự nâng assurance | Tránh tự xác nhận vòng tròn |"
+        }
+      ]
+    }
+  ],
+  "historicalPackageComparisons": {
+    "nativeIdentity": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "94b495f85cecf6c3cad406f0e7dc88efb44b46b01bfa576aef9400e988bbd45e",
+      "identityFingerprint": "94b495f85cecf6c3cad406f0e7dc88efb44b46b01bfa576aef9400e988bbd45e",
+      "claimId": "claim_c030fece276e5228ec08051c9b243dd4",
+      "sourceAnchor": "unheaded-block-137",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "92b2a00d3ef31661c9945793933c8796b9d85c5d1ff72795cb0f4cb1882526d1",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "currentIdentityBinding": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "94b495f85cecf6c3cad406f0e7dc88efb44b46b01bfa576aef9400e988bbd45e",
+      "identityFingerprint": "94b495f85cecf6c3cad406f0e7dc88efb44b46b01bfa576aef9400e988bbd45e",
+      "claimId": "claim_c030fece276e5228ec08051c9b243dd4",
+      "sourceAnchor": "unheaded-block-137",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "92b2a00d3ef31661c9945793933c8796b9d85c5d1ff72795cb0f4cb1882526d1",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "uniqueSameDigestBinding": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-137",
+      "githubAnchor": "unheaded-block-137",
+      "stableAnchor": "unheaded-block-137",
+      "title": "Unheaded block 137",
+      "startLine": 1328,
+      "endLine": 1341,
+      "textDigest": "92b2a00d3ef31661c9945793933c8796b9d85c5d1ff72795cb0f4cb1882526d1",
+      "sample": "| Quyết định | Lý do |\n|---|---|\n| Một runtime authority door, sau khi có `runDir`, trước adapter | Đủ runtime data và adapter không bypass |\n| Nhiều phase nội bộ không phải nhiều ",
+      "identityFingerprint": "94b495f85cecf6c3cad406f0e7dc88efb44b46b01bfa576aef9400e988bbd45e",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "12. Quyết định của proposal"
+      ],
+      "text": "| Quyết định | Lý do |\n|---|---|\n| Một runtime authority door, sau khi có `runDir`, trước adapter | Đủ runtime data và adapter không bypass |\n| Nhiều phase nội bộ không phải nhiều cửa | Tách pure logic/side effect nhưng chỉ một quyền execute |\n| Policy diễn tả từng threat axis, không có boolean tổng quát | Chống overclaim và mở rộng không phá nghĩa cũ |\n| Write exception là resource `run-output`, resolve runtime | Portable và hẹp đúng dispatch |\n| `required` refuse; `preferred` mới degrade; `unconfined` explicit | Một contract đủ cho secure và portable workflow |\n| Capability đặt minimum; executor tham chiếu một backend instance | Trách nhiệm rõ, không có thuật toán chọn backend ẩn |\n| Machine registry khai instance + driver-specific deployment config, không chọn default | Customizable nhưng không tạo nguồn routing thứ hai |\n| Backend không cover thì refuse/degrade theo mode, không auto-fallback | Không âm thầm đổi filesystem, credential hay network semantics |\n| Driver assess; Authority decide/compile; driver prepare; Authority execute | Mỗi quyết định chỉ có một owner |\n| Provider normalizer phát resource binding chuẩn; backend provider-agnostic | Không giấu recipe thành nhánh provider trong driver |\n| Observe-first khi rollout, enforcement là đích | Có evidence trước breaking change, không hạ mục tiêu |\n| Detector độc lập và không tự nâng assurance | Tránh tự xác nhận vòng tròn |"
+    },
+    "currentUnitAtRetainedIdentity": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-137",
+      "githubAnchor": "unheaded-block-137",
+      "stableAnchor": "unheaded-block-137",
+      "title": "Unheaded block 137",
+      "startLine": 1328,
+      "endLine": 1341,
+      "textDigest": "92b2a00d3ef31661c9945793933c8796b9d85c5d1ff72795cb0f4cb1882526d1",
+      "sample": "| Quyết định | Lý do |\n|---|---|\n| Một runtime authority door, sau khi có `runDir`, trước adapter | Đủ runtime data và adapter không bypass |\n| Nhiều phase nội bộ không phải nhiều ",
+      "identityFingerprint": "94b495f85cecf6c3cad406f0e7dc88efb44b46b01bfa576aef9400e988bbd45e",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "12. Quyết định của proposal"
+      ],
+      "text": "| Quyết định | Lý do |\n|---|---|\n| Một runtime authority door, sau khi có `runDir`, trước adapter | Đủ runtime data và adapter không bypass |\n| Nhiều phase nội bộ không phải nhiều cửa | Tách pure logic/side effect nhưng chỉ một quyền execute |\n| Policy diễn tả từng threat axis, không có boolean tổng quát | Chống overclaim và mở rộng không phá nghĩa cũ |\n| Write exception là resource `run-output`, resolve runtime | Portable và hẹp đúng dispatch |\n| `required` refuse; `preferred` mới degrade; `unconfined` explicit | Một contract đủ cho secure và portable workflow |\n| Capability đặt minimum; executor tham chiếu một backend instance | Trách nhiệm rõ, không có thuật toán chọn backend ẩn |\n| Machine registry khai instance + driver-specific deployment config, không chọn default | Customizable nhưng không tạo nguồn routing thứ hai |\n| Backend không cover thì refuse/degrade theo mode, không auto-fallback | Không âm thầm đổi filesystem, credential hay network semantics |\n| Driver assess; Authority decide/compile; driver prepare; Authority execute | Mỗi quyết định chỉ có một owner |\n| Provider normalizer phát resource binding chuẩn; backend provider-agnostic | Không giấu recipe thành nhánh provider trong driver |\n| Observe-first khi rollout, enforcement là đích | Có evidence trước breaking change, không hạ mục tiêu |\n| Detector độc lập và không tự nâng assurance | Tránh tự xác nhận vòng tròn |"
+    },
+    "sourceDigestUnchanged": true,
+    "status": "same text uniquely found; alias anchor still independently checked",
+    "aliasTargetComparisons": [
+      {
+        "aliasId": "step10-specs-0093",
+        "fromPath": "docs/specs/confinement-authority.md#unheaded-block-136",
+        "toOwner": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+        "toAnchor": "unheaded-block-3",
+        "currentTargetAtDraftAnchor": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-3",
+          "githubAnchor": "unheaded-block-3",
+          "stableAnchor": "unheaded-block-3",
+          "title": "Unheaded block 3",
+          "startLine": 26,
+          "endLine": 39,
+          "textDigest": "92b2a00d3ef31661c9945793933c8796b9d85c5d1ff72795cb0f4cb1882526d1",
+          "sample": "| Quyết định | Lý do |\n|---|---|\n| Một runtime authority door, sau khi có `runDir`, trước adapter | Đủ runtime data và adapter không bypass |\n| Nhiều phase nội bộ không phải nhiều ",
+          "identityFingerprint": "94b495f85cecf6c3cad406f0e7dc88efb44b46b01bfa576aef9400e988bbd45e",
+          "ancestry": [
+            "Added in candidate: confinement authority decisions",
+            "12. Quyết định của proposal"
+          ],
+          "text": "| Quyết định | Lý do |\n|---|---|\n| Một runtime authority door, sau khi có `runDir`, trước adapter | Đủ runtime data và adapter không bypass |\n| Nhiều phase nội bộ không phải nhiều cửa | Tách pure logic/side effect nhưng chỉ một quyền execute |\n| Policy diễn tả từng threat axis, không có boolean tổng quát | Chống overclaim và mở rộng không phá nghĩa cũ |\n| Write exception là resource `run-output`, resolve runtime | Portable và hẹp đúng dispatch |\n| `required` refuse; `preferred` mới degrade; `unconfined` explicit | Một contract đủ cho secure và portable workflow |\n| Capability đặt minimum; executor tham chiếu một backend instance | Trách nhiệm rõ, không có thuật toán chọn backend ẩn |\n| Machine registry khai instance + driver-specific deployment config, không chọn default | Customizable nhưng không tạo nguồn routing thứ hai |\n| Backend không cover thì refuse/degrade theo mode, không auto-fallback | Không âm thầm đổi filesystem, credential hay network semantics |\n| Driver assess; Authority decide/compile; driver prepare; Authority execute | Mỗi quyết định chỉ có một owner |\n| Provider normalizer phát resource binding chuẩn; backend provider-agnostic | Không giấu recipe thành nhánh provider trong driver |\n| Observe-first khi rollout, enforcement là đích | Có evidence trước breaking change, không hạ mục tiêu |\n| Detector độc lập và không tự nâng assurance | Tránh tự xác nhận vòng tròn |"
+        },
+        "sourceTextDigestAtDraftTarget": true,
+        "uniqueSameTextCurrentTarget": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-3",
+          "githubAnchor": "unheaded-block-3",
+          "stableAnchor": "unheaded-block-3",
+          "title": "Unheaded block 3",
+          "startLine": 26,
+          "endLine": 39,
+          "textDigest": "92b2a00d3ef31661c9945793933c8796b9d85c5d1ff72795cb0f4cb1882526d1",
+          "sample": "| Quyết định | Lý do |\n|---|---|\n| Một runtime authority door, sau khi có `runDir`, trước adapter | Đủ runtime data và adapter không bypass |\n| Nhiều phase nội bộ không phải nhiều ",
+          "identityFingerprint": "94b495f85cecf6c3cad406f0e7dc88efb44b46b01bfa576aef9400e988bbd45e",
+          "ancestry": [
+            "Added in candidate: confinement authority decisions",
+            "12. Quyết định của proposal"
+          ],
+          "text": "| Quyết định | Lý do |\n|---|---|\n| Một runtime authority door, sau khi có `runDir`, trước adapter | Đủ runtime data và adapter không bypass |\n| Nhiều phase nội bộ không phải nhiều cửa | Tách pure logic/side effect nhưng chỉ một quyền execute |\n| Policy diễn tả từng threat axis, không có boolean tổng quát | Chống overclaim và mở rộng không phá nghĩa cũ |\n| Write exception là resource `run-output`, resolve runtime | Portable và hẹp đúng dispatch |\n| `required` refuse; `preferred` mới degrade; `unconfined` explicit | Một contract đủ cho secure và portable workflow |\n| Capability đặt minimum; executor tham chiếu một backend instance | Trách nhiệm rõ, không có thuật toán chọn backend ẩn |\n| Machine registry khai instance + driver-specific deployment config, không chọn default | Customizable nhưng không tạo nguồn routing thứ hai |\n| Backend không cover thì refuse/degrade theo mode, không auto-fallback | Không âm thầm đổi filesystem, credential hay network semantics |\n| Driver assess; Authority decide/compile; driver prepare; Authority execute | Mỗi quyết định chỉ có một owner |\n| Provider normalizer phát resource binding chuẩn; backend provider-agnostic | Không giấu recipe thành nhánh provider trong driver |\n| Observe-first khi rollout, enforcement là đích | Có evidence trước breaking change, không hạ mục tiêu |\n| Detector độc lập và không tự nâng assurance | Tránh tự xác nhận vòng tròn |"
+        },
+        "note": "Read-only current source and target comparisons; draft unchanged. Source and target numbered-anchor relocation is not approval. Text corrections or source drift require independent judgment."
+      }
+    ]
+  },
+  "currentSourceDigestUnchanged": true
+}
+```
+
+## Entry e-027: claim_84e60054f3f70565af1fcf9c09352d83
+
+```json
+{
+  "kind": "source-alias-comparison",
+  "claimId": "claim_84e60054f3f70565af1fcf9c09352d83",
+  "priorAnchor": "unheaded-block-137",
+  "priorDigest": "a7fc9ce0823faab5b809042244aae5280d335cab7d03343c7e3ba2fe7e1e20ea",
+  "currentDigest": "92b2a00d3ef31661c9945793933c8796b9d85c5d1ff72795cb0f4cb1882526d1",
+  "matchingCurrentAnchors": [
+    "unheaded-block-138"
+  ],
+  "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval.",
+  "draftAliases": [
+    {
+      "aliasId": "step10-specs-0094",
+      "fromPath": "docs/specs/confinement-authority.md#unheaded-block-137",
+      "toOwner": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+      "toAnchor": "unheaded-block-5",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    }
+  ],
+  "currentNative": {
+    "sourcePath": "docs/specs/confinement-authority.md",
+    "unitDigest": "b1c786cc1b5446ca0588e253b69428a929822a0c3f7007a24dd17cf671eb9c00",
+    "identityFingerprint": "b1c786cc1b5446ca0588e253b69428a929822a0c3f7007a24dd17cf671eb9c00",
+    "claimId": "claim_84e60054f3f70565af1fcf9c09352d83",
+    "sourceAnchor": "unheaded-block-138",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "a7fc9ce0823faab5b809042244aae5280d335cab7d03343c7e3ba2fe7e1e20ea",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "currentSourceUnit": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-138",
+    "githubAnchor": "unheaded-block-138",
+    "stableAnchor": "unheaded-block-138",
+    "title": "Unheaded block 138",
+    "startLine": 1345,
+    "endLine": 1345,
+    "textDigest": "a7fc9ce0823faab5b809042244aae5280d335cab7d03343c7e3ba2fe7e1e20ea",
+    "sample": "Bảy rủi ro ban đầu đã được giải quyết qua các cell thi công P00-P06:",
+    "identityFingerprint": "b1c786cc1b5446ca0588e253b69428a929822a0c3f7007a24dd17cf671eb9c00",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)"
+    ],
+    "text": "Bảy rủi ro ban đầu đã được giải quyết qua các cell thi công P00-P06:"
+  },
+  "currentTargetComparisons": [
+    {
+      "aliasId": "step10-specs-0094",
+      "toOwner": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+      "toAnchor": "unheaded-block-5",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 41,
+        "endLine": 41,
+        "textDigest": "a7fc9ce0823faab5b809042244aae5280d335cab7d03343c7e3ba2fe7e1e20ea",
+        "sample": "Bảy rủi ro ban đầu đã được giải quyết qua các cell thi công P00-P06:",
+        "identityFingerprint": "b1c786cc1b5446ca0588e253b69428a929822a0c3f7007a24dd17cf671eb9c00",
+        "ancestry": [
+          "Added in candidate: rollout and settled facts",
+          "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)"
+        ],
+        "text": "Bảy rủi ro ban đầu đã được giải quyết qua các cell thi công P00-P06:"
+      },
+      "uniqueSameDigestUnits": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-5",
+          "githubAnchor": "unheaded-block-5",
+          "stableAnchor": "unheaded-block-5",
+          "title": "Unheaded block 5",
+          "startLine": 41,
+          "endLine": 41,
+          "textDigest": "a7fc9ce0823faab5b809042244aae5280d335cab7d03343c7e3ba2fe7e1e20ea",
+          "sample": "Bảy rủi ro ban đầu đã được giải quyết qua các cell thi công P00-P06:",
+          "identityFingerprint": "b1c786cc1b5446ca0588e253b69428a929822a0c3f7007a24dd17cf671eb9c00",
+          "ancestry": [
+            "Added in candidate: rollout and settled facts",
+            "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)"
+          ],
+          "text": "Bảy rủi ro ban đầu đã được giải quyết qua các cell thi công P00-P06:"
+        }
+      ]
+    }
+  ],
+  "historicalPackageComparisons": {
+    "nativeIdentity": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "b1c786cc1b5446ca0588e253b69428a929822a0c3f7007a24dd17cf671eb9c00",
+      "identityFingerprint": "b1c786cc1b5446ca0588e253b69428a929822a0c3f7007a24dd17cf671eb9c00",
+      "claimId": "claim_84e60054f3f70565af1fcf9c09352d83",
+      "sourceAnchor": "unheaded-block-138",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "a7fc9ce0823faab5b809042244aae5280d335cab7d03343c7e3ba2fe7e1e20ea",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "currentIdentityBinding": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "b1c786cc1b5446ca0588e253b69428a929822a0c3f7007a24dd17cf671eb9c00",
+      "identityFingerprint": "b1c786cc1b5446ca0588e253b69428a929822a0c3f7007a24dd17cf671eb9c00",
+      "claimId": "claim_84e60054f3f70565af1fcf9c09352d83",
+      "sourceAnchor": "unheaded-block-138",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "a7fc9ce0823faab5b809042244aae5280d335cab7d03343c7e3ba2fe7e1e20ea",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "uniqueSameDigestBinding": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-138",
+      "githubAnchor": "unheaded-block-138",
+      "stableAnchor": "unheaded-block-138",
+      "title": "Unheaded block 138",
+      "startLine": 1345,
+      "endLine": 1345,
+      "textDigest": "a7fc9ce0823faab5b809042244aae5280d335cab7d03343c7e3ba2fe7e1e20ea",
+      "sample": "Bảy rủi ro ban đầu đã được giải quyết qua các cell thi công P00-P06:",
+      "identityFingerprint": "b1c786cc1b5446ca0588e253b69428a929822a0c3f7007a24dd17cf671eb9c00",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)"
+      ],
+      "text": "Bảy rủi ro ban đầu đã được giải quyết qua các cell thi công P00-P06:"
+    },
+    "currentUnitAtRetainedIdentity": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-138",
+      "githubAnchor": "unheaded-block-138",
+      "stableAnchor": "unheaded-block-138",
+      "title": "Unheaded block 138",
+      "startLine": 1345,
+      "endLine": 1345,
+      "textDigest": "a7fc9ce0823faab5b809042244aae5280d335cab7d03343c7e3ba2fe7e1e20ea",
+      "sample": "Bảy rủi ro ban đầu đã được giải quyết qua các cell thi công P00-P06:",
+      "identityFingerprint": "b1c786cc1b5446ca0588e253b69428a929822a0c3f7007a24dd17cf671eb9c00",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)"
+      ],
+      "text": "Bảy rủi ro ban đầu đã được giải quyết qua các cell thi công P00-P06:"
+    },
+    "sourceDigestUnchanged": true,
+    "status": "same text uniquely found; alias anchor still independently checked",
+    "aliasTargetComparisons": [
+      {
+        "aliasId": "step10-specs-0094",
+        "fromPath": "docs/specs/confinement-authority.md#unheaded-block-137",
+        "toOwner": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "toAnchor": "unheaded-block-5",
+        "currentTargetAtDraftAnchor": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-5",
+          "githubAnchor": "unheaded-block-5",
+          "stableAnchor": "unheaded-block-5",
+          "title": "Unheaded block 5",
+          "startLine": 41,
+          "endLine": 41,
+          "textDigest": "a7fc9ce0823faab5b809042244aae5280d335cab7d03343c7e3ba2fe7e1e20ea",
+          "sample": "Bảy rủi ro ban đầu đã được giải quyết qua các cell thi công P00-P06:",
+          "identityFingerprint": "b1c786cc1b5446ca0588e253b69428a929822a0c3f7007a24dd17cf671eb9c00",
+          "ancestry": [
+            "Added in candidate: rollout and settled facts",
+            "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)"
+          ],
+          "text": "Bảy rủi ro ban đầu đã được giải quyết qua các cell thi công P00-P06:"
+        },
+        "sourceTextDigestAtDraftTarget": true,
+        "uniqueSameTextCurrentTarget": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-5",
+          "githubAnchor": "unheaded-block-5",
+          "stableAnchor": "unheaded-block-5",
+          "title": "Unheaded block 5",
+          "startLine": 41,
+          "endLine": 41,
+          "textDigest": "a7fc9ce0823faab5b809042244aae5280d335cab7d03343c7e3ba2fe7e1e20ea",
+          "sample": "Bảy rủi ro ban đầu đã được giải quyết qua các cell thi công P00-P06:",
+          "identityFingerprint": "b1c786cc1b5446ca0588e253b69428a929822a0c3f7007a24dd17cf671eb9c00",
+          "ancestry": [
+            "Added in candidate: rollout and settled facts",
+            "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)"
+          ],
+          "text": "Bảy rủi ro ban đầu đã được giải quyết qua các cell thi công P00-P06:"
+        },
+        "note": "Read-only current source and target comparisons; draft unchanged. Source and target numbered-anchor relocation is not approval. Text corrections or source drift require independent judgment."
+      }
+    ]
+  },
+  "currentSourceDigestUnchanged": true
+}
+```
+
+## Entry e-028: claim_53e0df53a67f6897195cbf23839c6c9b
+
+```json
+{
+  "kind": "source-alias-comparison",
+  "claimId": "claim_53e0df53a67f6897195cbf23839c6c9b",
+  "priorAnchor": "unheaded-block-138",
+  "priorDigest": "d06ca4feb3fc1e931aa43134c6d30fe620ab3850b195c9d1dd417a68464059f4",
+  "currentDigest": "a7fc9ce0823faab5b809042244aae5280d335cab7d03343c7e3ba2fe7e1e20ea",
+  "matchingCurrentAnchors": [
+    "unheaded-block-139"
+  ],
+  "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval.",
+  "draftAliases": [
+    {
+      "aliasId": "step10-specs-0095",
+      "fromPath": "docs/specs/confinement-authority.md#unheaded-block-138",
+      "toOwner": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+      "toAnchor": "unheaded-block-6",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    }
+  ],
+  "currentNative": {
+    "sourcePath": "docs/specs/confinement-authority.md",
+    "unitDigest": "e8c89f32fb70b91a2e3d1cb800ab827c36e3cbaa0ed9b9b55fe6edd3e63d29d8",
+    "identityFingerprint": "e8c89f32fb70b91a2e3d1cb800ab827c36e3cbaa0ed9b9b55fe6edd3e63d29d8",
+    "claimId": "claim_53e0df53a67f6897195cbf23839c6c9b",
+    "sourceAnchor": "unheaded-block-139",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "d06ca4feb3fc1e931aa43134c6d30fe620ab3850b195c9d1dd417a68464059f4",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "currentSourceUnit": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-139",
+    "githubAnchor": "unheaded-block-139",
+    "stableAnchor": "unheaded-block-139",
+    "title": "Unheaded block 139",
+    "startLine": 1347,
+    "endLine": 1353,
+    "textDigest": "d06ca4feb3fc1e931aa43134c6d30fe620ab3850b195c9d1dd417a68464059f4",
+    "sample": "1. **`herdr-spawn` convergence:** Pre-adapter checks (`workspace: own` worktree cwd và bypass pairing) đã đưa ra Authority prepare. Bypass pairing được bảo vệ bởi hàm dùng chung `e",
+    "identityFingerprint": "e8c89f32fb70b91a2e3d1cb800ab827c36e3cbaa0ed9b9b55fe6edd3e63d29d8",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)"
+    ],
+    "text": "1. **`herdr-spawn` convergence:** Pre-adapter checks (`workspace: own` worktree cwd và bypass pairing) đã đưa ra Authority prepare. Bypass pairing được bảo vệ bởi hàm dùng chung `evaluateBypassPairing` cho cả Authority và `herdr-round.mjs`. Quản lý session/home lifecycle được khoanh vùng trong adapter; `fgos doctor` phản ánh trạng thái này là `partial` (P05).\n2. **One-door call graph:** AST và import tests (`test/architecture.test.mjs`) bảo đảm không còn production call site nào ngoài `authority.mjs` được phép truy cập adapter execute handle (P02).\n3. **`runDir` và grant scoping:** `run-output` được cấp riêng theo từng dispatch; agent không thể ghi đè sang runDir của dispatch khác (P03, probe 4).\n4. **Attestation persistence:** Bản ghi `confinement-attestation.v1` được lưu trữ an toàn, gắn liền với kết quả execution, ngăn chặn agent trong sandbox giả mạo bằng chứng (P03).\n5. **Probe harness:** 8 bài probe falsification độc lập đã được cam kết tại `src/runner/dispatch/confinement/probes/` và kiểm tra độ tươi qua `fgos doctor` (P03).\n6. **Machine backend registry:** `~/.fgos/confinement-backends.json` được định nghĩa theo schema đóng `confinement-backend-registry.v1`, không cho phép project config ghi đè, và tự động bootstrap qua `fgos doctor --fix` (P01).\n7. **Bản đồ kiến trúc:** Component `src/runner/dispatch/confinement/`, slice `confinement-enforcement`, và contract CTR010 (`confinement-authority.v1`) đã được đăng ký chính thức tại `docs/architecture-map.md` (P07)."
+  },
+  "currentTargetComparisons": [
+    {
+      "aliasId": "step10-specs-0095",
+      "toOwner": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+      "toAnchor": "unheaded-block-6",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 43,
+        "endLine": 49,
+        "textDigest": "d06ca4feb3fc1e931aa43134c6d30fe620ab3850b195c9d1dd417a68464059f4",
+        "sample": "1. **`herdr-spawn` convergence:** Pre-adapter checks (`workspace: own` worktree cwd và bypass pairing) đã đưa ra Authority prepare. Bypass pairing được bảo vệ bởi hàm dùng chung `e",
+        "identityFingerprint": "e8c89f32fb70b91a2e3d1cb800ab827c36e3cbaa0ed9b9b55fe6edd3e63d29d8",
+        "ancestry": [
+          "Added in candidate: rollout and settled facts",
+          "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)"
+        ],
+        "text": "1. **`herdr-spawn` convergence:** Pre-adapter checks (`workspace: own` worktree cwd và bypass pairing) đã đưa ra Authority prepare. Bypass pairing được bảo vệ bởi hàm dùng chung `evaluateBypassPairing` cho cả Authority và `herdr-round.mjs`. Quản lý session/home lifecycle được khoanh vùng trong adapter; `fgos doctor` phản ánh trạng thái này là `partial` (P05).\n2. **One-door call graph:** AST và import tests (`test/architecture.test.mjs`) bảo đảm không còn production call site nào ngoài `authority.mjs` được phép truy cập adapter execute handle (P02).\n3. **`runDir` và grant scoping:** `run-output` được cấp riêng theo từng dispatch; agent không thể ghi đè sang runDir của dispatch khác (P03, probe 4).\n4. **Attestation persistence:** Bản ghi `confinement-attestation.v1` được lưu trữ an toàn, gắn liền với kết quả execution, ngăn chặn agent trong sandbox giả mạo bằng chứng (P03).\n5. **Probe harness:** 8 bài probe falsification độc lập đã được cam kết tại `src/runner/dispatch/confinement/probes/` và kiểm tra độ tươi qua `fgos doctor` (P03).\n6. **Machine backend registry:** `~/.fgos/confinement-backends.json` được định nghĩa theo schema đóng `confinement-backend-registry.v1`, không cho phép project config ghi đè, và tự động bootstrap qua `fgos doctor --fix` (P01).\n7. **Bản đồ kiến trúc:** Component `src/runner/dispatch/confinement/`, slice `confinement-enforcement`, và contract CTR010 (`confinement-authority.v1`) đã được đăng ký chính thức tại `docs/architecture-map.md` (P07)."
+      },
+      "uniqueSameDigestUnits": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-6",
+          "githubAnchor": "unheaded-block-6",
+          "stableAnchor": "unheaded-block-6",
+          "title": "Unheaded block 6",
+          "startLine": 43,
+          "endLine": 49,
+          "textDigest": "d06ca4feb3fc1e931aa43134c6d30fe620ab3850b195c9d1dd417a68464059f4",
+          "sample": "1. **`herdr-spawn` convergence:** Pre-adapter checks (`workspace: own` worktree cwd và bypass pairing) đã đưa ra Authority prepare. Bypass pairing được bảo vệ bởi hàm dùng chung `e",
+          "identityFingerprint": "e8c89f32fb70b91a2e3d1cb800ab827c36e3cbaa0ed9b9b55fe6edd3e63d29d8",
+          "ancestry": [
+            "Added in candidate: rollout and settled facts",
+            "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)"
+          ],
+          "text": "1. **`herdr-spawn` convergence:** Pre-adapter checks (`workspace: own` worktree cwd và bypass pairing) đã đưa ra Authority prepare. Bypass pairing được bảo vệ bởi hàm dùng chung `evaluateBypassPairing` cho cả Authority và `herdr-round.mjs`. Quản lý session/home lifecycle được khoanh vùng trong adapter; `fgos doctor` phản ánh trạng thái này là `partial` (P05).\n2. **One-door call graph:** AST và import tests (`test/architecture.test.mjs`) bảo đảm không còn production call site nào ngoài `authority.mjs` được phép truy cập adapter execute handle (P02).\n3. **`runDir` và grant scoping:** `run-output` được cấp riêng theo từng dispatch; agent không thể ghi đè sang runDir của dispatch khác (P03, probe 4).\n4. **Attestation persistence:** Bản ghi `confinement-attestation.v1` được lưu trữ an toàn, gắn liền với kết quả execution, ngăn chặn agent trong sandbox giả mạo bằng chứng (P03).\n5. **Probe harness:** 8 bài probe falsification độc lập đã được cam kết tại `src/runner/dispatch/confinement/probes/` và kiểm tra độ tươi qua `fgos doctor` (P03).\n6. **Machine backend registry:** `~/.fgos/confinement-backends.json` được định nghĩa theo schema đóng `confinement-backend-registry.v1`, không cho phép project config ghi đè, và tự động bootstrap qua `fgos doctor --fix` (P01).\n7. **Bản đồ kiến trúc:** Component `src/runner/dispatch/confinement/`, slice `confinement-enforcement`, và contract CTR010 (`confinement-authority.v1`) đã được đăng ký chính thức tại `docs/architecture-map.md` (P07)."
+        }
+      ]
+    }
+  ],
+  "historicalPackageComparisons": {
+    "nativeIdentity": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "e8c89f32fb70b91a2e3d1cb800ab827c36e3cbaa0ed9b9b55fe6edd3e63d29d8",
+      "identityFingerprint": "e8c89f32fb70b91a2e3d1cb800ab827c36e3cbaa0ed9b9b55fe6edd3e63d29d8",
+      "claimId": "claim_53e0df53a67f6897195cbf23839c6c9b",
+      "sourceAnchor": "unheaded-block-139",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "d06ca4feb3fc1e931aa43134c6d30fe620ab3850b195c9d1dd417a68464059f4",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "currentIdentityBinding": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "e8c89f32fb70b91a2e3d1cb800ab827c36e3cbaa0ed9b9b55fe6edd3e63d29d8",
+      "identityFingerprint": "e8c89f32fb70b91a2e3d1cb800ab827c36e3cbaa0ed9b9b55fe6edd3e63d29d8",
+      "claimId": "claim_53e0df53a67f6897195cbf23839c6c9b",
+      "sourceAnchor": "unheaded-block-139",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "d06ca4feb3fc1e931aa43134c6d30fe620ab3850b195c9d1dd417a68464059f4",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "uniqueSameDigestBinding": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-139",
+      "githubAnchor": "unheaded-block-139",
+      "stableAnchor": "unheaded-block-139",
+      "title": "Unheaded block 139",
+      "startLine": 1347,
+      "endLine": 1353,
+      "textDigest": "d06ca4feb3fc1e931aa43134c6d30fe620ab3850b195c9d1dd417a68464059f4",
+      "sample": "1. **`herdr-spawn` convergence:** Pre-adapter checks (`workspace: own` worktree cwd và bypass pairing) đã đưa ra Authority prepare. Bypass pairing được bảo vệ bởi hàm dùng chung `e",
+      "identityFingerprint": "e8c89f32fb70b91a2e3d1cb800ab827c36e3cbaa0ed9b9b55fe6edd3e63d29d8",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)"
+      ],
+      "text": "1. **`herdr-spawn` convergence:** Pre-adapter checks (`workspace: own` worktree cwd và bypass pairing) đã đưa ra Authority prepare. Bypass pairing được bảo vệ bởi hàm dùng chung `evaluateBypassPairing` cho cả Authority và `herdr-round.mjs`. Quản lý session/home lifecycle được khoanh vùng trong adapter; `fgos doctor` phản ánh trạng thái này là `partial` (P05).\n2. **One-door call graph:** AST và import tests (`test/architecture.test.mjs`) bảo đảm không còn production call site nào ngoài `authority.mjs` được phép truy cập adapter execute handle (P02).\n3. **`runDir` và grant scoping:** `run-output` được cấp riêng theo từng dispatch; agent không thể ghi đè sang runDir của dispatch khác (P03, probe 4).\n4. **Attestation persistence:** Bản ghi `confinement-attestation.v1` được lưu trữ an toàn, gắn liền với kết quả execution, ngăn chặn agent trong sandbox giả mạo bằng chứng (P03).\n5. **Probe harness:** 8 bài probe falsification độc lập đã được cam kết tại `src/runner/dispatch/confinement/probes/` và kiểm tra độ tươi qua `fgos doctor` (P03).\n6. **Machine backend registry:** `~/.fgos/confinement-backends.json` được định nghĩa theo schema đóng `confinement-backend-registry.v1`, không cho phép project config ghi đè, và tự động bootstrap qua `fgos doctor --fix` (P01).\n7. **Bản đồ kiến trúc:** Component `src/runner/dispatch/confinement/`, slice `confinement-enforcement`, và contract CTR010 (`confinement-authority.v1`) đã được đăng ký chính thức tại `docs/architecture-map.md` (P07)."
+    },
+    "currentUnitAtRetainedIdentity": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-139",
+      "githubAnchor": "unheaded-block-139",
+      "stableAnchor": "unheaded-block-139",
+      "title": "Unheaded block 139",
+      "startLine": 1347,
+      "endLine": 1353,
+      "textDigest": "d06ca4feb3fc1e931aa43134c6d30fe620ab3850b195c9d1dd417a68464059f4",
+      "sample": "1. **`herdr-spawn` convergence:** Pre-adapter checks (`workspace: own` worktree cwd và bypass pairing) đã đưa ra Authority prepare. Bypass pairing được bảo vệ bởi hàm dùng chung `e",
+      "identityFingerprint": "e8c89f32fb70b91a2e3d1cb800ab827c36e3cbaa0ed9b9b55fe6edd3e63d29d8",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)"
+      ],
+      "text": "1. **`herdr-spawn` convergence:** Pre-adapter checks (`workspace: own` worktree cwd và bypass pairing) đã đưa ra Authority prepare. Bypass pairing được bảo vệ bởi hàm dùng chung `evaluateBypassPairing` cho cả Authority và `herdr-round.mjs`. Quản lý session/home lifecycle được khoanh vùng trong adapter; `fgos doctor` phản ánh trạng thái này là `partial` (P05).\n2. **One-door call graph:** AST và import tests (`test/architecture.test.mjs`) bảo đảm không còn production call site nào ngoài `authority.mjs` được phép truy cập adapter execute handle (P02).\n3. **`runDir` và grant scoping:** `run-output` được cấp riêng theo từng dispatch; agent không thể ghi đè sang runDir của dispatch khác (P03, probe 4).\n4. **Attestation persistence:** Bản ghi `confinement-attestation.v1` được lưu trữ an toàn, gắn liền với kết quả execution, ngăn chặn agent trong sandbox giả mạo bằng chứng (P03).\n5. **Probe harness:** 8 bài probe falsification độc lập đã được cam kết tại `src/runner/dispatch/confinement/probes/` và kiểm tra độ tươi qua `fgos doctor` (P03).\n6. **Machine backend registry:** `~/.fgos/confinement-backends.json` được định nghĩa theo schema đóng `confinement-backend-registry.v1`, không cho phép project config ghi đè, và tự động bootstrap qua `fgos doctor --fix` (P01).\n7. **Bản đồ kiến trúc:** Component `src/runner/dispatch/confinement/`, slice `confinement-enforcement`, và contract CTR010 (`confinement-authority.v1`) đã được đăng ký chính thức tại `docs/architecture-map.md` (P07)."
+    },
+    "sourceDigestUnchanged": true,
+    "status": "same text uniquely found; alias anchor still independently checked",
+    "aliasTargetComparisons": [
+      {
+        "aliasId": "step10-specs-0095",
+        "fromPath": "docs/specs/confinement-authority.md#unheaded-block-138",
+        "toOwner": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "toAnchor": "unheaded-block-6",
+        "currentTargetAtDraftAnchor": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-6",
+          "githubAnchor": "unheaded-block-6",
+          "stableAnchor": "unheaded-block-6",
+          "title": "Unheaded block 6",
+          "startLine": 43,
+          "endLine": 49,
+          "textDigest": "d06ca4feb3fc1e931aa43134c6d30fe620ab3850b195c9d1dd417a68464059f4",
+          "sample": "1. **`herdr-spawn` convergence:** Pre-adapter checks (`workspace: own` worktree cwd và bypass pairing) đã đưa ra Authority prepare. Bypass pairing được bảo vệ bởi hàm dùng chung `e",
+          "identityFingerprint": "e8c89f32fb70b91a2e3d1cb800ab827c36e3cbaa0ed9b9b55fe6edd3e63d29d8",
+          "ancestry": [
+            "Added in candidate: rollout and settled facts",
+            "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)"
+          ],
+          "text": "1. **`herdr-spawn` convergence:** Pre-adapter checks (`workspace: own` worktree cwd và bypass pairing) đã đưa ra Authority prepare. Bypass pairing được bảo vệ bởi hàm dùng chung `evaluateBypassPairing` cho cả Authority và `herdr-round.mjs`. Quản lý session/home lifecycle được khoanh vùng trong adapter; `fgos doctor` phản ánh trạng thái này là `partial` (P05).\n2. **One-door call graph:** AST và import tests (`test/architecture.test.mjs`) bảo đảm không còn production call site nào ngoài `authority.mjs` được phép truy cập adapter execute handle (P02).\n3. **`runDir` và grant scoping:** `run-output` được cấp riêng theo từng dispatch; agent không thể ghi đè sang runDir của dispatch khác (P03, probe 4).\n4. **Attestation persistence:** Bản ghi `confinement-attestation.v1` được lưu trữ an toàn, gắn liền với kết quả execution, ngăn chặn agent trong sandbox giả mạo bằng chứng (P03).\n5. **Probe harness:** 8 bài probe falsification độc lập đã được cam kết tại `src/runner/dispatch/confinement/probes/` và kiểm tra độ tươi qua `fgos doctor` (P03).\n6. **Machine backend registry:** `~/.fgos/confinement-backends.json` được định nghĩa theo schema đóng `confinement-backend-registry.v1`, không cho phép project config ghi đè, và tự động bootstrap qua `fgos doctor --fix` (P01).\n7. **Bản đồ kiến trúc:** Component `src/runner/dispatch/confinement/`, slice `confinement-enforcement`, và contract CTR010 (`confinement-authority.v1`) đã được đăng ký chính thức tại `docs/architecture-map.md` (P07)."
+        },
+        "sourceTextDigestAtDraftTarget": true,
+        "uniqueSameTextCurrentTarget": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-6",
+          "githubAnchor": "unheaded-block-6",
+          "stableAnchor": "unheaded-block-6",
+          "title": "Unheaded block 6",
+          "startLine": 43,
+          "endLine": 49,
+          "textDigest": "d06ca4feb3fc1e931aa43134c6d30fe620ab3850b195c9d1dd417a68464059f4",
+          "sample": "1. **`herdr-spawn` convergence:** Pre-adapter checks (`workspace: own` worktree cwd và bypass pairing) đã đưa ra Authority prepare. Bypass pairing được bảo vệ bởi hàm dùng chung `e",
+          "identityFingerprint": "e8c89f32fb70b91a2e3d1cb800ab827c36e3cbaa0ed9b9b55fe6edd3e63d29d8",
+          "ancestry": [
+            "Added in candidate: rollout and settled facts",
+            "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)"
+          ],
+          "text": "1. **`herdr-spawn` convergence:** Pre-adapter checks (`workspace: own` worktree cwd và bypass pairing) đã đưa ra Authority prepare. Bypass pairing được bảo vệ bởi hàm dùng chung `evaluateBypassPairing` cho cả Authority và `herdr-round.mjs`. Quản lý session/home lifecycle được khoanh vùng trong adapter; `fgos doctor` phản ánh trạng thái này là `partial` (P05).\n2. **One-door call graph:** AST và import tests (`test/architecture.test.mjs`) bảo đảm không còn production call site nào ngoài `authority.mjs` được phép truy cập adapter execute handle (P02).\n3. **`runDir` và grant scoping:** `run-output` được cấp riêng theo từng dispatch; agent không thể ghi đè sang runDir của dispatch khác (P03, probe 4).\n4. **Attestation persistence:** Bản ghi `confinement-attestation.v1` được lưu trữ an toàn, gắn liền với kết quả execution, ngăn chặn agent trong sandbox giả mạo bằng chứng (P03).\n5. **Probe harness:** 8 bài probe falsification độc lập đã được cam kết tại `src/runner/dispatch/confinement/probes/` và kiểm tra độ tươi qua `fgos doctor` (P03).\n6. **Machine backend registry:** `~/.fgos/confinement-backends.json` được định nghĩa theo schema đóng `confinement-backend-registry.v1`, không cho phép project config ghi đè, và tự động bootstrap qua `fgos doctor --fix` (P01).\n7. **Bản đồ kiến trúc:** Component `src/runner/dispatch/confinement/`, slice `confinement-enforcement`, và contract CTR010 (`confinement-authority.v1`) đã được đăng ký chính thức tại `docs/architecture-map.md` (P07)."
+        },
+        "note": "Read-only current source and target comparisons; draft unchanged. Source and target numbered-anchor relocation is not approval. Text corrections or source drift require independent judgment."
+      }
+    ]
+  },
+  "currentSourceDigestUnchanged": true
+}
+```
+
+## Entry e-029: claim_eaadf6a68a7c7f9ed4005478db93c95b
+
+```json
+{
+  "kind": "source-alias-comparison",
+  "claimId": "claim_eaadf6a68a7c7f9ed4005478db93c95b",
+  "priorAnchor": "unheaded-block-139",
+  "priorDigest": "09081a2c1a3eb4536192eed72162efca188fdf9b084170519b57415f216c32c3",
+  "currentDigest": "d06ca4feb3fc1e931aa43134c6d30fe620ab3850b195c9d1dd417a68464059f4",
+  "matchingCurrentAnchors": [
+    "unheaded-block-140"
+  ],
+  "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval.",
+  "draftAliases": [
+    {
+      "aliasId": "step10-specs-0096",
+      "fromPath": "docs/specs/confinement-authority.md#unheaded-block-139",
+      "toOwner": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+      "toAnchor": "unheaded-block-7",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    }
+  ],
+  "currentNative": {
+    "sourcePath": "docs/specs/confinement-authority.md",
+    "unitDigest": "0b0dcad147ec9e0359c2014f8c8b18b7dace09a97d8a742641c130fef35ffae3",
+    "identityFingerprint": "0b0dcad147ec9e0359c2014f8c8b18b7dace09a97d8a742641c130fef35ffae3",
+    "claimId": "claim_eaadf6a68a7c7f9ed4005478db93c95b",
+    "sourceAnchor": "unheaded-block-140",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "09081a2c1a3eb4536192eed72162efca188fdf9b084170519b57415f216c32c3",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "currentSourceUnit": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-140",
+    "githubAnchor": "unheaded-block-140",
+    "stableAnchor": "unheaded-block-140",
+    "title": "Unheaded block 140",
+    "startLine": 1357,
+    "endLine": 1357,
+    "textDigest": "09081a2c1a3eb4536192eed72162efca188fdf9b084170519b57415f216c32c3",
+    "sample": "**Công thức (đã chạy thật, Request-to-Run P6):** một invocation `herdr-spawn` có `confinement.backend: bwrap` giữ trạng thái của agent trong một private home thay vì thư mục accoun",
+    "identityFingerprint": "0b0dcad147ec9e0359c2014f8c8b18b7dace09a97d8a742641c130fef35ffae3",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+      "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
+    ],
+    "text": "**Công thức (đã chạy thật, Request-to-Run P6):** một invocation `herdr-spawn` có `confinement.backend: bwrap` giữ trạng thái của agent trong một private home thay vì thư mục account thật (đang read-only dưới posture):"
+  },
+  "currentTargetComparisons": [
+    {
+      "aliasId": "step10-specs-0096",
+      "toOwner": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+      "toAnchor": "unheaded-block-7",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 53,
+        "endLine": 53,
+        "textDigest": "09081a2c1a3eb4536192eed72162efca188fdf9b084170519b57415f216c32c3",
+        "sample": "**Công thức (đã chạy thật, Request-to-Run P6):** một invocation `herdr-spawn` có `confinement.backend: bwrap` giữ trạng thái của agent trong một private home thay vì thư mục accoun",
+        "identityFingerprint": "0b0dcad147ec9e0359c2014f8c8b18b7dace09a97d8a742641c130fef35ffae3",
+        "ancestry": [
+          "Added in candidate: rollout and settled facts",
+          "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+          "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
+        ],
+        "text": "**Công thức (đã chạy thật, Request-to-Run P6):** một invocation `herdr-spawn` có `confinement.backend: bwrap` giữ trạng thái của agent trong một private home thay vì thư mục account thật (đang read-only dưới posture):"
+      },
+      "uniqueSameDigestUnits": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-7",
+          "githubAnchor": "unheaded-block-7",
+          "stableAnchor": "unheaded-block-7",
+          "title": "Unheaded block 7",
+          "startLine": 53,
+          "endLine": 53,
+          "textDigest": "09081a2c1a3eb4536192eed72162efca188fdf9b084170519b57415f216c32c3",
+          "sample": "**Công thức (đã chạy thật, Request-to-Run P6):** một invocation `herdr-spawn` có `confinement.backend: bwrap` giữ trạng thái của agent trong một private home thay vì thư mục accoun",
+          "identityFingerprint": "0b0dcad147ec9e0359c2014f8c8b18b7dace09a97d8a742641c130fef35ffae3",
+          "ancestry": [
+            "Added in candidate: rollout and settled facts",
+            "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+            "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
+          ],
+          "text": "**Công thức (đã chạy thật, Request-to-Run P6):** một invocation `herdr-spawn` có `confinement.backend: bwrap` giữ trạng thái của agent trong một private home thay vì thư mục account thật (đang read-only dưới posture):"
+        }
+      ]
+    }
+  ],
+  "historicalPackageComparisons": {
+    "nativeIdentity": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "0b0dcad147ec9e0359c2014f8c8b18b7dace09a97d8a742641c130fef35ffae3",
+      "identityFingerprint": "0b0dcad147ec9e0359c2014f8c8b18b7dace09a97d8a742641c130fef35ffae3",
+      "claimId": "claim_eaadf6a68a7c7f9ed4005478db93c95b",
+      "sourceAnchor": "unheaded-block-140",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "09081a2c1a3eb4536192eed72162efca188fdf9b084170519b57415f216c32c3",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "currentIdentityBinding": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "0b0dcad147ec9e0359c2014f8c8b18b7dace09a97d8a742641c130fef35ffae3",
+      "identityFingerprint": "0b0dcad147ec9e0359c2014f8c8b18b7dace09a97d8a742641c130fef35ffae3",
+      "claimId": "claim_eaadf6a68a7c7f9ed4005478db93c95b",
+      "sourceAnchor": "unheaded-block-140",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "09081a2c1a3eb4536192eed72162efca188fdf9b084170519b57415f216c32c3",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "uniqueSameDigestBinding": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-140",
+      "githubAnchor": "unheaded-block-140",
+      "stableAnchor": "unheaded-block-140",
+      "title": "Unheaded block 140",
+      "startLine": 1357,
+      "endLine": 1357,
+      "textDigest": "09081a2c1a3eb4536192eed72162efca188fdf9b084170519b57415f216c32c3",
+      "sample": "**Công thức (đã chạy thật, Request-to-Run P6):** một invocation `herdr-spawn` có `confinement.backend: bwrap` giữ trạng thái của agent trong một private home thay vì thư mục accoun",
+      "identityFingerprint": "0b0dcad147ec9e0359c2014f8c8b18b7dace09a97d8a742641c130fef35ffae3",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+        "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
+      ],
+      "text": "**Công thức (đã chạy thật, Request-to-Run P6):** một invocation `herdr-spawn` có `confinement.backend: bwrap` giữ trạng thái của agent trong một private home thay vì thư mục account thật (đang read-only dưới posture):"
+    },
+    "currentUnitAtRetainedIdentity": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-140",
+      "githubAnchor": "unheaded-block-140",
+      "stableAnchor": "unheaded-block-140",
+      "title": "Unheaded block 140",
+      "startLine": 1357,
+      "endLine": 1357,
+      "textDigest": "09081a2c1a3eb4536192eed72162efca188fdf9b084170519b57415f216c32c3",
+      "sample": "**Công thức (đã chạy thật, Request-to-Run P6):** một invocation `herdr-spawn` có `confinement.backend: bwrap` giữ trạng thái của agent trong một private home thay vì thư mục accoun",
+      "identityFingerprint": "0b0dcad147ec9e0359c2014f8c8b18b7dace09a97d8a742641c130fef35ffae3",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+        "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
+      ],
+      "text": "**Công thức (đã chạy thật, Request-to-Run P6):** một invocation `herdr-spawn` có `confinement.backend: bwrap` giữ trạng thái của agent trong một private home thay vì thư mục account thật (đang read-only dưới posture):"
+    },
+    "sourceDigestUnchanged": true,
+    "status": "same text uniquely found; alias anchor still independently checked",
+    "aliasTargetComparisons": [
+      {
+        "aliasId": "step10-specs-0096",
+        "fromPath": "docs/specs/confinement-authority.md#unheaded-block-139",
+        "toOwner": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "toAnchor": "unheaded-block-7",
+        "currentTargetAtDraftAnchor": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-7",
+          "githubAnchor": "unheaded-block-7",
+          "stableAnchor": "unheaded-block-7",
+          "title": "Unheaded block 7",
+          "startLine": 53,
+          "endLine": 53,
+          "textDigest": "09081a2c1a3eb4536192eed72162efca188fdf9b084170519b57415f216c32c3",
+          "sample": "**Công thức (đã chạy thật, Request-to-Run P6):** một invocation `herdr-spawn` có `confinement.backend: bwrap` giữ trạng thái của agent trong một private home thay vì thư mục accoun",
+          "identityFingerprint": "0b0dcad147ec9e0359c2014f8c8b18b7dace09a97d8a742641c130fef35ffae3",
+          "ancestry": [
+            "Added in candidate: rollout and settled facts",
+            "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+            "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
+          ],
+          "text": "**Công thức (đã chạy thật, Request-to-Run P6):** một invocation `herdr-spawn` có `confinement.backend: bwrap` giữ trạng thái của agent trong một private home thay vì thư mục account thật (đang read-only dưới posture):"
+        },
+        "sourceTextDigestAtDraftTarget": true,
+        "uniqueSameTextCurrentTarget": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-7",
+          "githubAnchor": "unheaded-block-7",
+          "stableAnchor": "unheaded-block-7",
+          "title": "Unheaded block 7",
+          "startLine": 53,
+          "endLine": 53,
+          "textDigest": "09081a2c1a3eb4536192eed72162efca188fdf9b084170519b57415f216c32c3",
+          "sample": "**Công thức (đã chạy thật, Request-to-Run P6):** một invocation `herdr-spawn` có `confinement.backend: bwrap` giữ trạng thái của agent trong một private home thay vì thư mục accoun",
+          "identityFingerprint": "0b0dcad147ec9e0359c2014f8c8b18b7dace09a97d8a742641c130fef35ffae3",
+          "ancestry": [
+            "Added in candidate: rollout and settled facts",
+            "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+            "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
+          ],
+          "text": "**Công thức (đã chạy thật, Request-to-Run P6):** một invocation `herdr-spawn` có `confinement.backend: bwrap` giữ trạng thái của agent trong một private home thay vì thư mục account thật (đang read-only dưới posture):"
+        },
+        "note": "Read-only current source and target comparisons; draft unchanged. Source and target numbered-anchor relocation is not approval. Text corrections or source drift require independent judgment."
+      }
+    ]
+  },
+  "currentSourceDigestUnchanged": true
+}
+```
+
+## Entry e-030: claim_e017f3c0a36bb052472cf9ad2bd616b4
+
+```json
+{
+  "kind": "source-alias-comparison",
+  "claimId": "claim_e017f3c0a36bb052472cf9ad2bd616b4",
+  "priorAnchor": "unheaded-block-140",
+  "priorDigest": "0291bfb160d8cd95cf9b5d305ba952d9f824993e04ebbfdde79b629f8b1a92dc",
+  "currentDigest": "09081a2c1a3eb4536192eed72162efca188fdf9b084170519b57415f216c32c3",
+  "matchingCurrentAnchors": [
+    "unheaded-block-141"
+  ],
+  "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval.",
+  "draftAliases": [
+    {
+      "aliasId": "step10-specs-0098",
+      "fromPath": "docs/specs/confinement-authority.md#unheaded-block-140",
+      "toOwner": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+      "toAnchor": "unheaded-block-8",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    }
+  ],
+  "currentNative": {
+    "sourcePath": "docs/specs/confinement-authority.md",
+    "unitDigest": "51e99bed879457f9235eb52b9428a7aab1c3f092b615b88a81f7b5c1476486ed",
+    "identityFingerprint": "51e99bed879457f9235eb52b9428a7aab1c3f092b615b88a81f7b5c1476486ed",
+    "claimId": "claim_e017f3c0a36bb052472cf9ad2bd616b4",
+    "sourceAnchor": "unheaded-block-141",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "0291bfb160d8cd95cf9b5d305ba952d9f824993e04ebbfdde79b629f8b1a92dc",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "currentSourceUnit": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-141",
+    "githubAnchor": "unheaded-block-141",
+    "stableAnchor": "unheaded-block-141",
+    "title": "Unheaded block 141",
+    "startLine": 1359,
+    "endLine": 1361,
+    "textDigest": "0291bfb160d8cd95cf9b5d305ba952d9f824993e04ebbfdde79b629f8b1a92dc",
+    "sample": "1. `resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: <CODEX_HOME | HOME | PI_CODING_AGENT_DIR> } }]` trên invocation (cùng dạng `codex-cli-bwrap`).\n2. Lo",
+    "identityFingerprint": "51e99bed879457f9235eb52b9428a7aab1c3f092b615b88a81f7b5c1476486ed",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+      "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
+    ],
+    "text": "1. `resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: <CODEX_HOME | HOME | PI_CODING_AGENT_DIR> } }]` trên invocation (cùng dạng `codex-cli-bwrap`).\n2. Login của account đến từ inventory toàn máy `runner.providers.<provider>.accounts.<id>.credentialSource` trong `~/.fgos/config.json` (RUL65b của `docs/specs/runner.md`): kind `codex-home` (`auth.json`) hoặc `home-files` (danh sách file tường minh, copy owner-only, fail closed) — driver `drivers/bwrap.mjs` copy vào private home trước khi spawn. Account có thể khai `credentialSources` (một store cho mỗi CLI, key là tên lệnh); request của Authority (`buildConfinementRequest`) chọn store của CLI mà invocation chạy, và CLI không có store thì bị từ chối trước khi worker chạy (runner.md RUL80 (account trước, CLI sau: một login store cho mỗi CLI)). Không mount thư mục account thật, không bypass flag thay sandbox.\n3. Trust của workspace ghi vào store trong private home (`herdr-round.mjs` `trustStorePaths`), dẫn xuất từ store account thật — store của chính account được lease (credential source mà Authority chuyển cho adapter qua `trustAccountSource`), không phải account mà env tĩnh của invocation chỉ tới (runner.md RUL78 (a confined pane reads its folder trust from the leased account's own store)); với codex, trust từng hook của `<cwd>/.codex/hooks.json` (`[hooks.state.\"<đường dẫn tuyệt đối>:<event>:<nhóm>:<handler>\"] trusted_hash`, băm theo luật của codex, ghim bằng test) được gieo cùng lúc, chỉ vào config của private home (không bao giờ vào config thật của account; private home bị xoá sau dispatch nên không có bước gỡ) và chỉ khi gốc repo đã được người dùng tin; với claude, các MCP server do `<cwd>/.mcp.json` khai báo được duyệt riêng cho tiến trình worker bằng `--settings` (`enabledMcpjsonServers`, thêm vào args khi chuẩn bị worker invocation; không ghi file dùng chung), cũng chỉ khi gốc repo đã được tin; `fgos doctor` check `confined-pane-accounts` báo pane nào sẽ khởi động chưa đăng nhập."
+  },
+  "currentTargetComparisons": [
+    {
+      "aliasId": "step10-specs-0098",
+      "toOwner": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+      "toAnchor": "unheaded-block-8",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-8",
+        "githubAnchor": "unheaded-block-8",
+        "stableAnchor": "unheaded-block-8",
+        "title": "Unheaded block 8",
+        "startLine": 55,
+        "endLine": 57,
+        "textDigest": "0291bfb160d8cd95cf9b5d305ba952d9f824993e04ebbfdde79b629f8b1a92dc",
+        "sample": "1. `resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: <CODEX_HOME | HOME | PI_CODING_AGENT_DIR> } }]` trên invocation (cùng dạng `codex-cli-bwrap`).\n2. Lo",
+        "identityFingerprint": "51e99bed879457f9235eb52b9428a7aab1c3f092b615b88a81f7b5c1476486ed",
+        "ancestry": [
+          "Added in candidate: rollout and settled facts",
+          "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+          "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
+        ],
+        "text": "1. `resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: <CODEX_HOME | HOME | PI_CODING_AGENT_DIR> } }]` trên invocation (cùng dạng `codex-cli-bwrap`).\n2. Login của account đến từ inventory toàn máy `runner.providers.<provider>.accounts.<id>.credentialSource` trong `~/.fgos/config.json` (RUL65b của `docs/specs/runner.md`): kind `codex-home` (`auth.json`) hoặc `home-files` (danh sách file tường minh, copy owner-only, fail closed) — driver `drivers/bwrap.mjs` copy vào private home trước khi spawn. Account có thể khai `credentialSources` (một store cho mỗi CLI, key là tên lệnh); request của Authority (`buildConfinementRequest`) chọn store của CLI mà invocation chạy, và CLI không có store thì bị từ chối trước khi worker chạy (runner.md RUL80 (account trước, CLI sau: một login store cho mỗi CLI)). Không mount thư mục account thật, không bypass flag thay sandbox.\n3. Trust của workspace ghi vào store trong private home (`herdr-round.mjs` `trustStorePaths`), dẫn xuất từ store account thật — store của chính account được lease (credential source mà Authority chuyển cho adapter qua `trustAccountSource`), không phải account mà env tĩnh của invocation chỉ tới (runner.md RUL78 (a confined pane reads its folder trust from the leased account's own store)); với codex, trust từng hook của `<cwd>/.codex/hooks.json` (`[hooks.state.\"<đường dẫn tuyệt đối>:<event>:<nhóm>:<handler>\"] trusted_hash`, băm theo luật của codex, ghim bằng test) được gieo cùng lúc, chỉ vào config của private home (không bao giờ vào config thật của account; private home bị xoá sau dispatch nên không có bước gỡ) và chỉ khi gốc repo đã được người dùng tin; với claude, các MCP server do `<cwd>/.mcp.json` khai báo được duyệt riêng cho tiến trình worker bằng `--settings` (`enabledMcpjsonServers`, thêm vào args khi chuẩn bị worker invocation; không ghi file dùng chung), cũng chỉ khi gốc repo đã được tin; `fgos doctor` check `confined-pane-accounts` báo pane nào sẽ khởi động chưa đăng nhập."
+      },
+      "uniqueSameDigestUnits": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-8",
+          "githubAnchor": "unheaded-block-8",
+          "stableAnchor": "unheaded-block-8",
+          "title": "Unheaded block 8",
+          "startLine": 55,
+          "endLine": 57,
+          "textDigest": "0291bfb160d8cd95cf9b5d305ba952d9f824993e04ebbfdde79b629f8b1a92dc",
+          "sample": "1. `resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: <CODEX_HOME | HOME | PI_CODING_AGENT_DIR> } }]` trên invocation (cùng dạng `codex-cli-bwrap`).\n2. Lo",
+          "identityFingerprint": "51e99bed879457f9235eb52b9428a7aab1c3f092b615b88a81f7b5c1476486ed",
+          "ancestry": [
+            "Added in candidate: rollout and settled facts",
+            "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+            "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
+          ],
+          "text": "1. `resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: <CODEX_HOME | HOME | PI_CODING_AGENT_DIR> } }]` trên invocation (cùng dạng `codex-cli-bwrap`).\n2. Login của account đến từ inventory toàn máy `runner.providers.<provider>.accounts.<id>.credentialSource` trong `~/.fgos/config.json` (RUL65b của `docs/specs/runner.md`): kind `codex-home` (`auth.json`) hoặc `home-files` (danh sách file tường minh, copy owner-only, fail closed) — driver `drivers/bwrap.mjs` copy vào private home trước khi spawn. Account có thể khai `credentialSources` (một store cho mỗi CLI, key là tên lệnh); request của Authority (`buildConfinementRequest`) chọn store của CLI mà invocation chạy, và CLI không có store thì bị từ chối trước khi worker chạy (runner.md RUL80 (account trước, CLI sau: một login store cho mỗi CLI)). Không mount thư mục account thật, không bypass flag thay sandbox.\n3. Trust của workspace ghi vào store trong private home (`herdr-round.mjs` `trustStorePaths`), dẫn xuất từ store account thật — store của chính account được lease (credential source mà Authority chuyển cho adapter qua `trustAccountSource`), không phải account mà env tĩnh của invocation chỉ tới (runner.md RUL78 (a confined pane reads its folder trust from the leased account's own store)); với codex, trust từng hook của `<cwd>/.codex/hooks.json` (`[hooks.state.\"<đường dẫn tuyệt đối>:<event>:<nhóm>:<handler>\"] trusted_hash`, băm theo luật của codex, ghim bằng test) được gieo cùng lúc, chỉ vào config của private home (không bao giờ vào config thật của account; private home bị xoá sau dispatch nên không có bước gỡ) và chỉ khi gốc repo đã được người dùng tin; với claude, các MCP server do `<cwd>/.mcp.json` khai báo được duyệt riêng cho tiến trình worker bằng `--settings` (`enabledMcpjsonServers`, thêm vào args khi chuẩn bị worker invocation; không ghi file dùng chung), cũng chỉ khi gốc repo đã được tin; `fgos doctor` check `confined-pane-accounts` báo pane nào sẽ khởi động chưa đăng nhập."
+        }
+      ]
+    }
+  ],
+  "historicalPackageComparisons": {
+    "nativeIdentity": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "51e99bed879457f9235eb52b9428a7aab1c3f092b615b88a81f7b5c1476486ed",
+      "identityFingerprint": "51e99bed879457f9235eb52b9428a7aab1c3f092b615b88a81f7b5c1476486ed",
+      "claimId": "claim_e017f3c0a36bb052472cf9ad2bd616b4",
+      "sourceAnchor": "unheaded-block-141",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "0291bfb160d8cd95cf9b5d305ba952d9f824993e04ebbfdde79b629f8b1a92dc",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "currentIdentityBinding": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "51e99bed879457f9235eb52b9428a7aab1c3f092b615b88a81f7b5c1476486ed",
+      "identityFingerprint": "51e99bed879457f9235eb52b9428a7aab1c3f092b615b88a81f7b5c1476486ed",
+      "claimId": "claim_e017f3c0a36bb052472cf9ad2bd616b4",
+      "sourceAnchor": "unheaded-block-141",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "0291bfb160d8cd95cf9b5d305ba952d9f824993e04ebbfdde79b629f8b1a92dc",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "uniqueSameDigestBinding": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-141",
+      "githubAnchor": "unheaded-block-141",
+      "stableAnchor": "unheaded-block-141",
+      "title": "Unheaded block 141",
+      "startLine": 1359,
+      "endLine": 1361,
+      "textDigest": "0291bfb160d8cd95cf9b5d305ba952d9f824993e04ebbfdde79b629f8b1a92dc",
+      "sample": "1. `resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: <CODEX_HOME | HOME | PI_CODING_AGENT_DIR> } }]` trên invocation (cùng dạng `codex-cli-bwrap`).\n2. Lo",
+      "identityFingerprint": "51e99bed879457f9235eb52b9428a7aab1c3f092b615b88a81f7b5c1476486ed",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+        "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
+      ],
+      "text": "1. `resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: <CODEX_HOME | HOME | PI_CODING_AGENT_DIR> } }]` trên invocation (cùng dạng `codex-cli-bwrap`).\n2. Login của account đến từ inventory toàn máy `runner.providers.<provider>.accounts.<id>.credentialSource` trong `~/.fgos/config.json` (RUL65b của `docs/specs/runner.md`): kind `codex-home` (`auth.json`) hoặc `home-files` (danh sách file tường minh, copy owner-only, fail closed) — driver `drivers/bwrap.mjs` copy vào private home trước khi spawn. Account có thể khai `credentialSources` (một store cho mỗi CLI, key là tên lệnh); request của Authority (`buildConfinementRequest`) chọn store của CLI mà invocation chạy, và CLI không có store thì bị từ chối trước khi worker chạy (runner.md RUL80 (account trước, CLI sau: một login store cho mỗi CLI)). Không mount thư mục account thật, không bypass flag thay sandbox.\n3. Trust của workspace ghi vào store trong private home (`herdr-round.mjs` `trustStorePaths`), dẫn xuất từ store account thật — store của chính account được lease (credential source mà Authority chuyển cho adapter qua `trustAccountSource`), không phải account mà env tĩnh của invocation chỉ tới (runner.md RUL78 (a confined pane reads its folder trust from the leased account's own store)); với codex, trust từng hook của `<cwd>/.codex/hooks.json` (`[hooks.state.\"<đường dẫn tuyệt đối>:<event>:<nhóm>:<handler>\"] trusted_hash`, băm theo luật của codex, ghim bằng test) được gieo cùng lúc, chỉ vào config của private home (không bao giờ vào config thật của account; private home bị xoá sau dispatch nên không có bước gỡ) và chỉ khi gốc repo đã được người dùng tin; với claude, các MCP server do `<cwd>/.mcp.json` khai báo được duyệt riêng cho tiến trình worker bằng `--settings` (`enabledMcpjsonServers`, thêm vào args khi chuẩn bị worker invocation; không ghi file dùng chung), cũng chỉ khi gốc repo đã được tin; `fgos doctor` check `confined-pane-accounts` báo pane nào sẽ khởi động chưa đăng nhập."
+    },
+    "currentUnitAtRetainedIdentity": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-141",
+      "githubAnchor": "unheaded-block-141",
+      "stableAnchor": "unheaded-block-141",
+      "title": "Unheaded block 141",
+      "startLine": 1359,
+      "endLine": 1361,
+      "textDigest": "0291bfb160d8cd95cf9b5d305ba952d9f824993e04ebbfdde79b629f8b1a92dc",
+      "sample": "1. `resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: <CODEX_HOME | HOME | PI_CODING_AGENT_DIR> } }]` trên invocation (cùng dạng `codex-cli-bwrap`).\n2. Lo",
+      "identityFingerprint": "51e99bed879457f9235eb52b9428a7aab1c3f092b615b88a81f7b5c1476486ed",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+        "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
+      ],
+      "text": "1. `resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: <CODEX_HOME | HOME | PI_CODING_AGENT_DIR> } }]` trên invocation (cùng dạng `codex-cli-bwrap`).\n2. Login của account đến từ inventory toàn máy `runner.providers.<provider>.accounts.<id>.credentialSource` trong `~/.fgos/config.json` (RUL65b của `docs/specs/runner.md`): kind `codex-home` (`auth.json`) hoặc `home-files` (danh sách file tường minh, copy owner-only, fail closed) — driver `drivers/bwrap.mjs` copy vào private home trước khi spawn. Account có thể khai `credentialSources` (một store cho mỗi CLI, key là tên lệnh); request của Authority (`buildConfinementRequest`) chọn store của CLI mà invocation chạy, và CLI không có store thì bị từ chối trước khi worker chạy (runner.md RUL80 (account trước, CLI sau: một login store cho mỗi CLI)). Không mount thư mục account thật, không bypass flag thay sandbox.\n3. Trust của workspace ghi vào store trong private home (`herdr-round.mjs` `trustStorePaths`), dẫn xuất từ store account thật — store của chính account được lease (credential source mà Authority chuyển cho adapter qua `trustAccountSource`), không phải account mà env tĩnh của invocation chỉ tới (runner.md RUL78 (a confined pane reads its folder trust from the leased account's own store)); với codex, trust từng hook của `<cwd>/.codex/hooks.json` (`[hooks.state.\"<đường dẫn tuyệt đối>:<event>:<nhóm>:<handler>\"] trusted_hash`, băm theo luật của codex, ghim bằng test) được gieo cùng lúc, chỉ vào config của private home (không bao giờ vào config thật của account; private home bị xoá sau dispatch nên không có bước gỡ) và chỉ khi gốc repo đã được người dùng tin; với claude, các MCP server do `<cwd>/.mcp.json` khai báo được duyệt riêng cho tiến trình worker bằng `--settings` (`enabledMcpjsonServers`, thêm vào args khi chuẩn bị worker invocation; không ghi file dùng chung), cũng chỉ khi gốc repo đã được tin; `fgos doctor` check `confined-pane-accounts` báo pane nào sẽ khởi động chưa đăng nhập."
+    },
+    "sourceDigestUnchanged": true,
+    "status": "same text uniquely found; alias anchor still independently checked",
+    "aliasTargetComparisons": [
+      {
+        "aliasId": "step10-specs-0098",
+        "fromPath": "docs/specs/confinement-authority.md#unheaded-block-140",
+        "toOwner": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "toAnchor": "unheaded-block-8",
+        "currentTargetAtDraftAnchor": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-8",
+          "githubAnchor": "unheaded-block-8",
+          "stableAnchor": "unheaded-block-8",
+          "title": "Unheaded block 8",
+          "startLine": 55,
+          "endLine": 57,
+          "textDigest": "0291bfb160d8cd95cf9b5d305ba952d9f824993e04ebbfdde79b629f8b1a92dc",
+          "sample": "1. `resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: <CODEX_HOME | HOME | PI_CODING_AGENT_DIR> } }]` trên invocation (cùng dạng `codex-cli-bwrap`).\n2. Lo",
+          "identityFingerprint": "51e99bed879457f9235eb52b9428a7aab1c3f092b615b88a81f7b5c1476486ed",
+          "ancestry": [
+            "Added in candidate: rollout and settled facts",
+            "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+            "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
+          ],
+          "text": "1. `resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: <CODEX_HOME | HOME | PI_CODING_AGENT_DIR> } }]` trên invocation (cùng dạng `codex-cli-bwrap`).\n2. Login của account đến từ inventory toàn máy `runner.providers.<provider>.accounts.<id>.credentialSource` trong `~/.fgos/config.json` (RUL65b của `docs/specs/runner.md`): kind `codex-home` (`auth.json`) hoặc `home-files` (danh sách file tường minh, copy owner-only, fail closed) — driver `drivers/bwrap.mjs` copy vào private home trước khi spawn. Account có thể khai `credentialSources` (một store cho mỗi CLI, key là tên lệnh); request của Authority (`buildConfinementRequest`) chọn store của CLI mà invocation chạy, và CLI không có store thì bị từ chối trước khi worker chạy (runner.md RUL80 (account trước, CLI sau: một login store cho mỗi CLI)). Không mount thư mục account thật, không bypass flag thay sandbox.\n3. Trust của workspace ghi vào store trong private home (`herdr-round.mjs` `trustStorePaths`), dẫn xuất từ store account thật — store của chính account được lease (credential source mà Authority chuyển cho adapter qua `trustAccountSource`), không phải account mà env tĩnh của invocation chỉ tới (runner.md RUL78 (a confined pane reads its folder trust from the leased account's own store)); với codex, trust từng hook của `<cwd>/.codex/hooks.json` (`[hooks.state.\"<đường dẫn tuyệt đối>:<event>:<nhóm>:<handler>\"] trusted_hash`, băm theo luật của codex, ghim bằng test) được gieo cùng lúc, chỉ vào config của private home (không bao giờ vào config thật của account; private home bị xoá sau dispatch nên không có bước gỡ) và chỉ khi gốc repo đã được người dùng tin; với claude, các MCP server do `<cwd>/.mcp.json` khai báo được duyệt riêng cho tiến trình worker bằng `--settings` (`enabledMcpjsonServers`, thêm vào args khi chuẩn bị worker invocation; không ghi file dùng chung), cũng chỉ khi gốc repo đã được tin; `fgos doctor` check `confined-pane-accounts` báo pane nào sẽ khởi động chưa đăng nhập."
+        },
+        "sourceTextDigestAtDraftTarget": true,
+        "uniqueSameTextCurrentTarget": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-8",
+          "githubAnchor": "unheaded-block-8",
+          "stableAnchor": "unheaded-block-8",
+          "title": "Unheaded block 8",
+          "startLine": 55,
+          "endLine": 57,
+          "textDigest": "0291bfb160d8cd95cf9b5d305ba952d9f824993e04ebbfdde79b629f8b1a92dc",
+          "sample": "1. `resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: <CODEX_HOME | HOME | PI_CODING_AGENT_DIR> } }]` trên invocation (cùng dạng `codex-cli-bwrap`).\n2. Lo",
+          "identityFingerprint": "51e99bed879457f9235eb52b9428a7aab1c3f092b615b88a81f7b5c1476486ed",
+          "ancestry": [
+            "Added in candidate: rollout and settled facts",
+            "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+            "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
+          ],
+          "text": "1. `resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: <CODEX_HOME | HOME | PI_CODING_AGENT_DIR> } }]` trên invocation (cùng dạng `codex-cli-bwrap`).\n2. Login của account đến từ inventory toàn máy `runner.providers.<provider>.accounts.<id>.credentialSource` trong `~/.fgos/config.json` (RUL65b của `docs/specs/runner.md`): kind `codex-home` (`auth.json`) hoặc `home-files` (danh sách file tường minh, copy owner-only, fail closed) — driver `drivers/bwrap.mjs` copy vào private home trước khi spawn. Account có thể khai `credentialSources` (một store cho mỗi CLI, key là tên lệnh); request của Authority (`buildConfinementRequest`) chọn store của CLI mà invocation chạy, và CLI không có store thì bị từ chối trước khi worker chạy (runner.md RUL80 (account trước, CLI sau: một login store cho mỗi CLI)). Không mount thư mục account thật, không bypass flag thay sandbox.\n3. Trust của workspace ghi vào store trong private home (`herdr-round.mjs` `trustStorePaths`), dẫn xuất từ store account thật — store của chính account được lease (credential source mà Authority chuyển cho adapter qua `trustAccountSource`), không phải account mà env tĩnh của invocation chỉ tới (runner.md RUL78 (a confined pane reads its folder trust from the leased account's own store)); với codex, trust từng hook của `<cwd>/.codex/hooks.json` (`[hooks.state.\"<đường dẫn tuyệt đối>:<event>:<nhóm>:<handler>\"] trusted_hash`, băm theo luật của codex, ghim bằng test) được gieo cùng lúc, chỉ vào config của private home (không bao giờ vào config thật của account; private home bị xoá sau dispatch nên không có bước gỡ) và chỉ khi gốc repo đã được người dùng tin; với claude, các MCP server do `<cwd>/.mcp.json` khai báo được duyệt riêng cho tiến trình worker bằng `--settings` (`enabledMcpjsonServers`, thêm vào args khi chuẩn bị worker invocation; không ghi file dùng chung), cũng chỉ khi gốc repo đã được tin; `fgos doctor` check `confined-pane-accounts` báo pane nào sẽ khởi động chưa đăng nhập."
+        },
+        "note": "Read-only current source and target comparisons; draft unchanged. Source and target numbered-anchor relocation is not approval. Text corrections or source drift require independent judgment."
+      }
+    ]
+  },
+  "currentSourceDigestUnchanged": true
+}
+```
+
+## Entry e-031: claim_81ec7e246f5d04771ed8242d9f45a51c
+
+```json
+{
+  "kind": "source-alias-comparison",
+  "claimId": "claim_81ec7e246f5d04771ed8242d9f45a51c",
+  "priorAnchor": "unheaded-block-141",
+  "priorDigest": "3adecc728b89a0251ef17f37a38077c58eb02791d61ae5358fbf4e73445230b5",
+  "currentDigest": "0291bfb160d8cd95cf9b5d305ba952d9f824993e04ebbfdde79b629f8b1a92dc",
+  "matchingCurrentAnchors": [
+    "unheaded-block-142"
+  ],
+  "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval.",
+  "draftAliases": [
+    {
+      "aliasId": "step10-specs-0099",
+      "fromPath": "docs/specs/confinement-authority.md#unheaded-block-141",
+      "toOwner": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+      "toAnchor": "unheaded-block-9",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    }
+  ],
+  "currentNative": {
+    "sourcePath": "docs/specs/confinement-authority.md",
+    "unitDigest": "9964737711a906a4d5d7c22c44b62c15d4143f3c574cb67c014e25005157cbee",
+    "identityFingerprint": "9964737711a906a4d5d7c22c44b62c15d4143f3c574cb67c014e25005157cbee",
+    "claimId": "claim_81ec7e246f5d04771ed8242d9f45a51c",
+    "sourceAnchor": "unheaded-block-142",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "3adecc728b89a0251ef17f37a38077c58eb02791d61ae5358fbf4e73445230b5",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "currentSourceUnit": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-142",
+    "githubAnchor": "unheaded-block-142",
+    "stableAnchor": "unheaded-block-142",
+    "title": "Unheaded block 142",
+    "startLine": 1363,
+    "endLine": 1363,
+    "textDigest": "3adecc728b89a0251ef17f37a38077c58eb02791d61ae5358fbf4e73445230b5",
+    "sample": "**Lịch sử (để khỏi suy ra lại):** `5a42bc376` (2026-09-11) `codex-bwrap` cli-spawn có private-home→`CODEX_HOME`; `569f72d3b`, `a1a966ff2`, `ec6a0745d` (09-16, rotator slice 1 thay ",
+    "identityFingerprint": "9964737711a906a4d5d7c22c44b62c15d4143f3c574cb67c014e25005157cbee",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+      "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
+    ],
+    "text": "**Lịch sử (để khỏi suy ra lại):** `5a42bc376` (2026-09-11) `codex-bwrap` cli-spawn có private-home→`CODEX_HOME`; `569f72d3b`, `a1a966ff2`, `ec6a0745d` (09-16, rotator slice 1 thay `FGOS_CODEX_CREDENTIAL_HOMES`) chuyển credential sang inventory (khi đó chỉ `codex-home`). `c54c1888b`, `8c4b4aeeb`, `2cff7102a` (09-11..18) đưa launch confine của herdr-spawn qua Authority — chứng minh bằng worker giả và claude. `e37f8225d` (09-21, H8) từ chối `credential-provisioning-unsupported` cho adapter khác cli-spawn; lý do chỉ nằm trong comment code và `plans/reports/dispatch-execution-engine-architecture-review-260920.md`. `e7bd9b418`, `a9fc61324` (09-17) gộp/đổi tên executor id (`codex-bwrap` thành `openai`/`codex-cli-bwrap`), `5bbd066cd` xoá `claude-herdr`/`pi-herdr` \"dormant\" nên grep theo tên cũ không còn ra. `cfd670c43` (2026-10-01) áp posture lên mọi invocation herdr nhưng không kèm binding: codex/pi/agy chết ngay lúc khởi động (state dir read-only)."
+  },
+  "currentTargetComparisons": [
+    {
+      "aliasId": "step10-specs-0099",
+      "toOwner": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+      "toAnchor": "unheaded-block-9",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-9",
+        "githubAnchor": "unheaded-block-9",
+        "stableAnchor": "unheaded-block-9",
+        "title": "Unheaded block 9",
+        "startLine": 59,
+        "endLine": 59,
+        "textDigest": "3adecc728b89a0251ef17f37a38077c58eb02791d61ae5358fbf4e73445230b5",
+        "sample": "**Lịch sử (để khỏi suy ra lại):** `5a42bc376` (2026-09-11) `codex-bwrap` cli-spawn có private-home→`CODEX_HOME`; `569f72d3b`, `a1a966ff2`, `ec6a0745d` (09-16, rotator slice 1 thay ",
+        "identityFingerprint": "9964737711a906a4d5d7c22c44b62c15d4143f3c574cb67c014e25005157cbee",
+        "ancestry": [
+          "Added in candidate: rollout and settled facts",
+          "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+          "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
+        ],
+        "text": "**Lịch sử (để khỏi suy ra lại):** `5a42bc376` (2026-09-11) `codex-bwrap` cli-spawn có private-home→`CODEX_HOME`; `569f72d3b`, `a1a966ff2`, `ec6a0745d` (09-16, rotator slice 1 thay `FGOS_CODEX_CREDENTIAL_HOMES`) chuyển credential sang inventory (khi đó chỉ `codex-home`). `c54c1888b`, `8c4b4aeeb`, `2cff7102a` (09-11..18) đưa launch confine của herdr-spawn qua Authority — chứng minh bằng worker giả và claude. `e37f8225d` (09-21, H8) từ chối `credential-provisioning-unsupported` cho adapter khác cli-spawn; lý do chỉ nằm trong comment code và `plans/reports/dispatch-execution-engine-architecture-review-260920.md`. `e7bd9b418`, `a9fc61324` (09-17) gộp/đổi tên executor id (`codex-bwrap` thành `openai`/`codex-cli-bwrap`), `5bbd066cd` xoá `claude-herdr`/`pi-herdr` \"dormant\" nên grep theo tên cũ không còn ra. `cfd670c43` (2026-10-01) áp posture lên mọi invocation herdr nhưng không kèm binding: codex/pi/agy chết ngay lúc khởi động (state dir read-only)."
+      },
+      "uniqueSameDigestUnits": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-9",
+          "githubAnchor": "unheaded-block-9",
+          "stableAnchor": "unheaded-block-9",
+          "title": "Unheaded block 9",
+          "startLine": 59,
+          "endLine": 59,
+          "textDigest": "3adecc728b89a0251ef17f37a38077c58eb02791d61ae5358fbf4e73445230b5",
+          "sample": "**Lịch sử (để khỏi suy ra lại):** `5a42bc376` (2026-09-11) `codex-bwrap` cli-spawn có private-home→`CODEX_HOME`; `569f72d3b`, `a1a966ff2`, `ec6a0745d` (09-16, rotator slice 1 thay ",
+          "identityFingerprint": "9964737711a906a4d5d7c22c44b62c15d4143f3c574cb67c014e25005157cbee",
+          "ancestry": [
+            "Added in candidate: rollout and settled facts",
+            "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+            "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
+          ],
+          "text": "**Lịch sử (để khỏi suy ra lại):** `5a42bc376` (2026-09-11) `codex-bwrap` cli-spawn có private-home→`CODEX_HOME`; `569f72d3b`, `a1a966ff2`, `ec6a0745d` (09-16, rotator slice 1 thay `FGOS_CODEX_CREDENTIAL_HOMES`) chuyển credential sang inventory (khi đó chỉ `codex-home`). `c54c1888b`, `8c4b4aeeb`, `2cff7102a` (09-11..18) đưa launch confine của herdr-spawn qua Authority — chứng minh bằng worker giả và claude. `e37f8225d` (09-21, H8) từ chối `credential-provisioning-unsupported` cho adapter khác cli-spawn; lý do chỉ nằm trong comment code và `plans/reports/dispatch-execution-engine-architecture-review-260920.md`. `e7bd9b418`, `a9fc61324` (09-17) gộp/đổi tên executor id (`codex-bwrap` thành `openai`/`codex-cli-bwrap`), `5bbd066cd` xoá `claude-herdr`/`pi-herdr` \"dormant\" nên grep theo tên cũ không còn ra. `cfd670c43` (2026-10-01) áp posture lên mọi invocation herdr nhưng không kèm binding: codex/pi/agy chết ngay lúc khởi động (state dir read-only)."
+        }
+      ]
+    }
+  ],
+  "historicalPackageComparisons": {
+    "nativeIdentity": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "9964737711a906a4d5d7c22c44b62c15d4143f3c574cb67c014e25005157cbee",
+      "identityFingerprint": "9964737711a906a4d5d7c22c44b62c15d4143f3c574cb67c014e25005157cbee",
+      "claimId": "claim_81ec7e246f5d04771ed8242d9f45a51c",
+      "sourceAnchor": "unheaded-block-142",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "3adecc728b89a0251ef17f37a38077c58eb02791d61ae5358fbf4e73445230b5",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "currentIdentityBinding": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "9964737711a906a4d5d7c22c44b62c15d4143f3c574cb67c014e25005157cbee",
+      "identityFingerprint": "9964737711a906a4d5d7c22c44b62c15d4143f3c574cb67c014e25005157cbee",
+      "claimId": "claim_81ec7e246f5d04771ed8242d9f45a51c",
+      "sourceAnchor": "unheaded-block-142",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "3adecc728b89a0251ef17f37a38077c58eb02791d61ae5358fbf4e73445230b5",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "uniqueSameDigestBinding": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-142",
+      "githubAnchor": "unheaded-block-142",
+      "stableAnchor": "unheaded-block-142",
+      "title": "Unheaded block 142",
+      "startLine": 1363,
+      "endLine": 1363,
+      "textDigest": "3adecc728b89a0251ef17f37a38077c58eb02791d61ae5358fbf4e73445230b5",
+      "sample": "**Lịch sử (để khỏi suy ra lại):** `5a42bc376` (2026-09-11) `codex-bwrap` cli-spawn có private-home→`CODEX_HOME`; `569f72d3b`, `a1a966ff2`, `ec6a0745d` (09-16, rotator slice 1 thay ",
+      "identityFingerprint": "9964737711a906a4d5d7c22c44b62c15d4143f3c574cb67c014e25005157cbee",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+        "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
+      ],
+      "text": "**Lịch sử (để khỏi suy ra lại):** `5a42bc376` (2026-09-11) `codex-bwrap` cli-spawn có private-home→`CODEX_HOME`; `569f72d3b`, `a1a966ff2`, `ec6a0745d` (09-16, rotator slice 1 thay `FGOS_CODEX_CREDENTIAL_HOMES`) chuyển credential sang inventory (khi đó chỉ `codex-home`). `c54c1888b`, `8c4b4aeeb`, `2cff7102a` (09-11..18) đưa launch confine của herdr-spawn qua Authority — chứng minh bằng worker giả và claude. `e37f8225d` (09-21, H8) từ chối `credential-provisioning-unsupported` cho adapter khác cli-spawn; lý do chỉ nằm trong comment code và `plans/reports/dispatch-execution-engine-architecture-review-260920.md`. `e7bd9b418`, `a9fc61324` (09-17) gộp/đổi tên executor id (`codex-bwrap` thành `openai`/`codex-cli-bwrap`), `5bbd066cd` xoá `claude-herdr`/`pi-herdr` \"dormant\" nên grep theo tên cũ không còn ra. `cfd670c43` (2026-10-01) áp posture lên mọi invocation herdr nhưng không kèm binding: codex/pi/agy chết ngay lúc khởi động (state dir read-only)."
+    },
+    "currentUnitAtRetainedIdentity": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-142",
+      "githubAnchor": "unheaded-block-142",
+      "stableAnchor": "unheaded-block-142",
+      "title": "Unheaded block 142",
+      "startLine": 1363,
+      "endLine": 1363,
+      "textDigest": "3adecc728b89a0251ef17f37a38077c58eb02791d61ae5358fbf4e73445230b5",
+      "sample": "**Lịch sử (để khỏi suy ra lại):** `5a42bc376` (2026-09-11) `codex-bwrap` cli-spawn có private-home→`CODEX_HOME`; `569f72d3b`, `a1a966ff2`, `ec6a0745d` (09-16, rotator slice 1 thay ",
+      "identityFingerprint": "9964737711a906a4d5d7c22c44b62c15d4143f3c574cb67c014e25005157cbee",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+        "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
+      ],
+      "text": "**Lịch sử (để khỏi suy ra lại):** `5a42bc376` (2026-09-11) `codex-bwrap` cli-spawn có private-home→`CODEX_HOME`; `569f72d3b`, `a1a966ff2`, `ec6a0745d` (09-16, rotator slice 1 thay `FGOS_CODEX_CREDENTIAL_HOMES`) chuyển credential sang inventory (khi đó chỉ `codex-home`). `c54c1888b`, `8c4b4aeeb`, `2cff7102a` (09-11..18) đưa launch confine của herdr-spawn qua Authority — chứng minh bằng worker giả và claude. `e37f8225d` (09-21, H8) từ chối `credential-provisioning-unsupported` cho adapter khác cli-spawn; lý do chỉ nằm trong comment code và `plans/reports/dispatch-execution-engine-architecture-review-260920.md`. `e7bd9b418`, `a9fc61324` (09-17) gộp/đổi tên executor id (`codex-bwrap` thành `openai`/`codex-cli-bwrap`), `5bbd066cd` xoá `claude-herdr`/`pi-herdr` \"dormant\" nên grep theo tên cũ không còn ra. `cfd670c43` (2026-10-01) áp posture lên mọi invocation herdr nhưng không kèm binding: codex/pi/agy chết ngay lúc khởi động (state dir read-only)."
+    },
+    "sourceDigestUnchanged": true,
+    "status": "same text uniquely found; alias anchor still independently checked",
+    "aliasTargetComparisons": [
+      {
+        "aliasId": "step10-specs-0099",
+        "fromPath": "docs/specs/confinement-authority.md#unheaded-block-141",
+        "toOwner": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "toAnchor": "unheaded-block-9",
+        "currentTargetAtDraftAnchor": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-9",
+          "githubAnchor": "unheaded-block-9",
+          "stableAnchor": "unheaded-block-9",
+          "title": "Unheaded block 9",
+          "startLine": 59,
+          "endLine": 59,
+          "textDigest": "3adecc728b89a0251ef17f37a38077c58eb02791d61ae5358fbf4e73445230b5",
+          "sample": "**Lịch sử (để khỏi suy ra lại):** `5a42bc376` (2026-09-11) `codex-bwrap` cli-spawn có private-home→`CODEX_HOME`; `569f72d3b`, `a1a966ff2`, `ec6a0745d` (09-16, rotator slice 1 thay ",
+          "identityFingerprint": "9964737711a906a4d5d7c22c44b62c15d4143f3c574cb67c014e25005157cbee",
+          "ancestry": [
+            "Added in candidate: rollout and settled facts",
+            "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+            "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
+          ],
+          "text": "**Lịch sử (để khỏi suy ra lại):** `5a42bc376` (2026-09-11) `codex-bwrap` cli-spawn có private-home→`CODEX_HOME`; `569f72d3b`, `a1a966ff2`, `ec6a0745d` (09-16, rotator slice 1 thay `FGOS_CODEX_CREDENTIAL_HOMES`) chuyển credential sang inventory (khi đó chỉ `codex-home`). `c54c1888b`, `8c4b4aeeb`, `2cff7102a` (09-11..18) đưa launch confine của herdr-spawn qua Authority — chứng minh bằng worker giả và claude. `e37f8225d` (09-21, H8) từ chối `credential-provisioning-unsupported` cho adapter khác cli-spawn; lý do chỉ nằm trong comment code và `plans/reports/dispatch-execution-engine-architecture-review-260920.md`. `e7bd9b418`, `a9fc61324` (09-17) gộp/đổi tên executor id (`codex-bwrap` thành `openai`/`codex-cli-bwrap`), `5bbd066cd` xoá `claude-herdr`/`pi-herdr` \"dormant\" nên grep theo tên cũ không còn ra. `cfd670c43` (2026-10-01) áp posture lên mọi invocation herdr nhưng không kèm binding: codex/pi/agy chết ngay lúc khởi động (state dir read-only)."
+        },
+        "sourceTextDigestAtDraftTarget": true,
+        "uniqueSameTextCurrentTarget": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-9",
+          "githubAnchor": "unheaded-block-9",
+          "stableAnchor": "unheaded-block-9",
+          "title": "Unheaded block 9",
+          "startLine": 59,
+          "endLine": 59,
+          "textDigest": "3adecc728b89a0251ef17f37a38077c58eb02791d61ae5358fbf4e73445230b5",
+          "sample": "**Lịch sử (để khỏi suy ra lại):** `5a42bc376` (2026-09-11) `codex-bwrap` cli-spawn có private-home→`CODEX_HOME`; `569f72d3b`, `a1a966ff2`, `ec6a0745d` (09-16, rotator slice 1 thay ",
+          "identityFingerprint": "9964737711a906a4d5d7c22c44b62c15d4143f3c574cb67c014e25005157cbee",
+          "ancestry": [
+            "Added in candidate: rollout and settled facts",
+            "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+            "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
+          ],
+          "text": "**Lịch sử (để khỏi suy ra lại):** `5a42bc376` (2026-09-11) `codex-bwrap` cli-spawn có private-home→`CODEX_HOME`; `569f72d3b`, `a1a966ff2`, `ec6a0745d` (09-16, rotator slice 1 thay `FGOS_CODEX_CREDENTIAL_HOMES`) chuyển credential sang inventory (khi đó chỉ `codex-home`). `c54c1888b`, `8c4b4aeeb`, `2cff7102a` (09-11..18) đưa launch confine của herdr-spawn qua Authority — chứng minh bằng worker giả và claude. `e37f8225d` (09-21, H8) từ chối `credential-provisioning-unsupported` cho adapter khác cli-spawn; lý do chỉ nằm trong comment code và `plans/reports/dispatch-execution-engine-architecture-review-260920.md`. `e7bd9b418`, `a9fc61324` (09-17) gộp/đổi tên executor id (`codex-bwrap` thành `openai`/`codex-cli-bwrap`), `5bbd066cd` xoá `claude-herdr`/`pi-herdr` \"dormant\" nên grep theo tên cũ không còn ra. `cfd670c43` (2026-10-01) áp posture lên mọi invocation herdr nhưng không kèm binding: codex/pi/agy chết ngay lúc khởi động (state dir read-only)."
+        },
+        "note": "Read-only current source and target comparisons; draft unchanged. Source and target numbered-anchor relocation is not approval. Text corrections or source drift require independent judgment."
+      }
+    ]
+  },
+  "currentSourceDigestUnchanged": true
+}
+```
+
+## Entry e-032: claim_0da9c2a174db070122d3b5c6af25e677
+
+```json
+{
+  "kind": "source-alias-comparison",
+  "claimId": "claim_0da9c2a174db070122d3b5c6af25e677",
+  "priorAnchor": "unheaded-block-142",
+  "priorDigest": "ae79ac51f3a5a094bad8bc45affea34150699320dc4e427a6a8b8653b5ea8c6d",
+  "currentDigest": "3adecc728b89a0251ef17f37a38077c58eb02791d61ae5358fbf4e73445230b5",
+  "matchingCurrentAnchors": [
+    "unheaded-block-143"
+  ],
+  "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval.",
+  "draftAliases": [
+    {
+      "aliasId": "step10-specs-0100",
+      "fromPath": "docs/specs/confinement-authority.md#unheaded-block-142",
+      "toOwner": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+      "toAnchor": "unheaded-block-10",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    }
+  ],
+  "currentNative": {
+    "sourcePath": "docs/specs/confinement-authority.md",
+    "unitDigest": "dc9c8753fdc7163493c9bdb5e3826b736ba48133d6ff33ec1c21f86e2bd3798e",
+    "identityFingerprint": "dc9c8753fdc7163493c9bdb5e3826b736ba48133d6ff33ec1c21f86e2bd3798e",
+    "claimId": "claim_0da9c2a174db070122d3b5c6af25e677",
+    "sourceAnchor": "unheaded-block-143",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "ae79ac51f3a5a094bad8bc45affea34150699320dc4e427a6a8b8653b5ea8c6d",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "currentSourceUnit": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-143",
+    "githubAnchor": "unheaded-block-143",
+    "stableAnchor": "unheaded-block-143",
+    "title": "Unheaded block 143",
+    "startLine": 1365,
+    "endLine": 1365,
+    "textDigest": "ae79ac51f3a5a094bad8bc45affea34150699320dc4e427a6a8b8653b5ea8c6d",
+    "sample": "**Vì sao từng bị quên:** (a) cách làm nằm trong commit và trong spec dưới nhãn \"Codex bwrap\" nên đọc như chuyện riêng của cli-spawn; (b) ngoại lệ H8 loại herdr-spawn không có trong",
+    "identityFingerprint": "dc9c8753fdc7163493c9bdb5e3826b736ba48133d6ff33ec1c21f86e2bd3798e",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+      "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
+    ],
+    "text": "**Vì sao từng bị quên:** (a) cách làm nằm trong commit và trong spec dưới nhãn \"Codex bwrap\" nên đọc như chuyện riêng của cli-spawn; (b) ngoại lệ H8 loại herdr-spawn không có trong spec; (c) id executor bị đổi tên, tìm theo tên cũ không thấy; (d) phase \"facts\" của kế hoạch chỉ hỏi về code hiện tại, không hỏi \"trước đây đã có gì và vì sao bị bỏ\". Bước kiểm tiền lệ nay nằm ở `AGENTS.md` (\"Before touching code\")."
+  },
+  "currentTargetComparisons": [
+    {
+      "aliasId": "step10-specs-0100",
+      "toOwner": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+      "toAnchor": "unheaded-block-10",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-10",
+        "githubAnchor": "unheaded-block-10",
+        "stableAnchor": "unheaded-block-10",
+        "title": "Unheaded block 10",
+        "startLine": 61,
+        "endLine": 61,
+        "textDigest": "ae79ac51f3a5a094bad8bc45affea34150699320dc4e427a6a8b8653b5ea8c6d",
+        "sample": "**Vì sao từng bị quên:** (a) cách làm nằm trong commit và trong spec dưới nhãn \"Codex bwrap\" nên đọc như chuyện riêng của cli-spawn; (b) ngoại lệ H8 loại herdr-spawn không có trong",
+        "identityFingerprint": "dc9c8753fdc7163493c9bdb5e3826b736ba48133d6ff33ec1c21f86e2bd3798e",
+        "ancestry": [
+          "Added in candidate: rollout and settled facts",
+          "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+          "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
+        ],
+        "text": "**Vì sao từng bị quên:** (a) cách làm nằm trong commit và trong spec dưới nhãn \"Codex bwrap\" nên đọc như chuyện riêng của cli-spawn; (b) ngoại lệ H8 loại herdr-spawn không có trong spec; (c) id executor bị đổi tên, tìm theo tên cũ không thấy; (d) phase \"facts\" của kế hoạch chỉ hỏi về code hiện tại, không hỏi \"trước đây đã có gì và vì sao bị bỏ\". Bước kiểm tiền lệ nay nằm ở `AGENTS.md` (\"Before touching code\")."
+      },
+      "uniqueSameDigestUnits": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-10",
+          "githubAnchor": "unheaded-block-10",
+          "stableAnchor": "unheaded-block-10",
+          "title": "Unheaded block 10",
+          "startLine": 61,
+          "endLine": 61,
+          "textDigest": "ae79ac51f3a5a094bad8bc45affea34150699320dc4e427a6a8b8653b5ea8c6d",
+          "sample": "**Vì sao từng bị quên:** (a) cách làm nằm trong commit và trong spec dưới nhãn \"Codex bwrap\" nên đọc như chuyện riêng của cli-spawn; (b) ngoại lệ H8 loại herdr-spawn không có trong",
+          "identityFingerprint": "dc9c8753fdc7163493c9bdb5e3826b736ba48133d6ff33ec1c21f86e2bd3798e",
+          "ancestry": [
+            "Added in candidate: rollout and settled facts",
+            "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+            "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
+          ],
+          "text": "**Vì sao từng bị quên:** (a) cách làm nằm trong commit và trong spec dưới nhãn \"Codex bwrap\" nên đọc như chuyện riêng của cli-spawn; (b) ngoại lệ H8 loại herdr-spawn không có trong spec; (c) id executor bị đổi tên, tìm theo tên cũ không thấy; (d) phase \"facts\" của kế hoạch chỉ hỏi về code hiện tại, không hỏi \"trước đây đã có gì và vì sao bị bỏ\". Bước kiểm tiền lệ nay nằm ở `AGENTS.md` (\"Before touching code\")."
+        }
+      ]
+    }
+  ],
+  "historicalPackageComparisons": {
+    "nativeIdentity": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "dc9c8753fdc7163493c9bdb5e3826b736ba48133d6ff33ec1c21f86e2bd3798e",
+      "identityFingerprint": "dc9c8753fdc7163493c9bdb5e3826b736ba48133d6ff33ec1c21f86e2bd3798e",
+      "claimId": "claim_0da9c2a174db070122d3b5c6af25e677",
+      "sourceAnchor": "unheaded-block-143",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "ae79ac51f3a5a094bad8bc45affea34150699320dc4e427a6a8b8653b5ea8c6d",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "currentIdentityBinding": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "dc9c8753fdc7163493c9bdb5e3826b736ba48133d6ff33ec1c21f86e2bd3798e",
+      "identityFingerprint": "dc9c8753fdc7163493c9bdb5e3826b736ba48133d6ff33ec1c21f86e2bd3798e",
+      "claimId": "claim_0da9c2a174db070122d3b5c6af25e677",
+      "sourceAnchor": "unheaded-block-143",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "ae79ac51f3a5a094bad8bc45affea34150699320dc4e427a6a8b8653b5ea8c6d",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "uniqueSameDigestBinding": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-143",
+      "githubAnchor": "unheaded-block-143",
+      "stableAnchor": "unheaded-block-143",
+      "title": "Unheaded block 143",
+      "startLine": 1365,
+      "endLine": 1365,
+      "textDigest": "ae79ac51f3a5a094bad8bc45affea34150699320dc4e427a6a8b8653b5ea8c6d",
+      "sample": "**Vì sao từng bị quên:** (a) cách làm nằm trong commit và trong spec dưới nhãn \"Codex bwrap\" nên đọc như chuyện riêng của cli-spawn; (b) ngoại lệ H8 loại herdr-spawn không có trong",
+      "identityFingerprint": "dc9c8753fdc7163493c9bdb5e3826b736ba48133d6ff33ec1c21f86e2bd3798e",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+        "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
+      ],
+      "text": "**Vì sao từng bị quên:** (a) cách làm nằm trong commit và trong spec dưới nhãn \"Codex bwrap\" nên đọc như chuyện riêng của cli-spawn; (b) ngoại lệ H8 loại herdr-spawn không có trong spec; (c) id executor bị đổi tên, tìm theo tên cũ không thấy; (d) phase \"facts\" của kế hoạch chỉ hỏi về code hiện tại, không hỏi \"trước đây đã có gì và vì sao bị bỏ\". Bước kiểm tiền lệ nay nằm ở `AGENTS.md` (\"Before touching code\")."
+    },
+    "currentUnitAtRetainedIdentity": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-143",
+      "githubAnchor": "unheaded-block-143",
+      "stableAnchor": "unheaded-block-143",
+      "title": "Unheaded block 143",
+      "startLine": 1365,
+      "endLine": 1365,
+      "textDigest": "ae79ac51f3a5a094bad8bc45affea34150699320dc4e427a6a8b8653b5ea8c6d",
+      "sample": "**Vì sao từng bị quên:** (a) cách làm nằm trong commit và trong spec dưới nhãn \"Codex bwrap\" nên đọc như chuyện riêng của cli-spawn; (b) ngoại lệ H8 loại herdr-spawn không có trong",
+      "identityFingerprint": "dc9c8753fdc7163493c9bdb5e3826b736ba48133d6ff33ec1c21f86e2bd3798e",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+        "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
+      ],
+      "text": "**Vì sao từng bị quên:** (a) cách làm nằm trong commit và trong spec dưới nhãn \"Codex bwrap\" nên đọc như chuyện riêng của cli-spawn; (b) ngoại lệ H8 loại herdr-spawn không có trong spec; (c) id executor bị đổi tên, tìm theo tên cũ không thấy; (d) phase \"facts\" của kế hoạch chỉ hỏi về code hiện tại, không hỏi \"trước đây đã có gì và vì sao bị bỏ\". Bước kiểm tiền lệ nay nằm ở `AGENTS.md` (\"Before touching code\")."
+    },
+    "sourceDigestUnchanged": true,
+    "status": "same text uniquely found; alias anchor still independently checked",
+    "aliasTargetComparisons": [
+      {
+        "aliasId": "step10-specs-0100",
+        "fromPath": "docs/specs/confinement-authority.md#unheaded-block-142",
+        "toOwner": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "toAnchor": "unheaded-block-10",
+        "currentTargetAtDraftAnchor": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-10",
+          "githubAnchor": "unheaded-block-10",
+          "stableAnchor": "unheaded-block-10",
+          "title": "Unheaded block 10",
+          "startLine": 61,
+          "endLine": 61,
+          "textDigest": "ae79ac51f3a5a094bad8bc45affea34150699320dc4e427a6a8b8653b5ea8c6d",
+          "sample": "**Vì sao từng bị quên:** (a) cách làm nằm trong commit và trong spec dưới nhãn \"Codex bwrap\" nên đọc như chuyện riêng của cli-spawn; (b) ngoại lệ H8 loại herdr-spawn không có trong",
+          "identityFingerprint": "dc9c8753fdc7163493c9bdb5e3826b736ba48133d6ff33ec1c21f86e2bd3798e",
+          "ancestry": [
+            "Added in candidate: rollout and settled facts",
+            "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+            "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
+          ],
+          "text": "**Vì sao từng bị quên:** (a) cách làm nằm trong commit và trong spec dưới nhãn \"Codex bwrap\" nên đọc như chuyện riêng của cli-spawn; (b) ngoại lệ H8 loại herdr-spawn không có trong spec; (c) id executor bị đổi tên, tìm theo tên cũ không thấy; (d) phase \"facts\" của kế hoạch chỉ hỏi về code hiện tại, không hỏi \"trước đây đã có gì và vì sao bị bỏ\". Bước kiểm tiền lệ nay nằm ở `AGENTS.md` (\"Before touching code\")."
+        },
+        "sourceTextDigestAtDraftTarget": true,
+        "uniqueSameTextCurrentTarget": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-10",
+          "githubAnchor": "unheaded-block-10",
+          "stableAnchor": "unheaded-block-10",
+          "title": "Unheaded block 10",
+          "startLine": 61,
+          "endLine": 61,
+          "textDigest": "ae79ac51f3a5a094bad8bc45affea34150699320dc4e427a6a8b8653b5ea8c6d",
+          "sample": "**Vì sao từng bị quên:** (a) cách làm nằm trong commit và trong spec dưới nhãn \"Codex bwrap\" nên đọc như chuyện riêng của cli-spawn; (b) ngoại lệ H8 loại herdr-spawn không có trong",
+          "identityFingerprint": "dc9c8753fdc7163493c9bdb5e3826b736ba48133d6ff33ec1c21f86e2bd3798e",
+          "ancestry": [
+            "Added in candidate: rollout and settled facts",
+            "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+            "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
+          ],
+          "text": "**Vì sao từng bị quên:** (a) cách làm nằm trong commit và trong spec dưới nhãn \"Codex bwrap\" nên đọc như chuyện riêng của cli-spawn; (b) ngoại lệ H8 loại herdr-spawn không có trong spec; (c) id executor bị đổi tên, tìm theo tên cũ không thấy; (d) phase \"facts\" của kế hoạch chỉ hỏi về code hiện tại, không hỏi \"trước đây đã có gì và vì sao bị bỏ\". Bước kiểm tiền lệ nay nằm ở `AGENTS.md` (\"Before touching code\")."
+        },
+        "note": "Read-only current source and target comparisons; draft unchanged. Source and target numbered-anchor relocation is not approval. Text corrections or source drift require independent judgment."
+      }
+    ]
+  },
+  "currentSourceDigestUnchanged": true
+}
+```
+
+## Entry e-033: claim_022af2ccb616ad85400526fd94408258
+
+```json
+{
+  "kind": "source-alias-comparison",
+  "claimId": "claim_022af2ccb616ad85400526fd94408258",
+  "priorAnchor": "unheaded-block-143",
+  "priorDigest": "9c24e69b1b4a4ede9fce9ed6d771f342920397506c61c2a546df8163a810c5ae",
+  "currentDigest": "ae79ac51f3a5a094bad8bc45affea34150699320dc4e427a6a8b8653b5ea8c6d",
+  "matchingCurrentAnchors": [
+    "unheaded-block-144"
+  ],
+  "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval.",
+  "draftAliases": [
+    {
+      "aliasId": "step10-specs-0101",
+      "fromPath": "docs/specs/confinement-authority.md#unheaded-block-143",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-67",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    }
+  ],
+  "currentNative": {
+    "sourcePath": "docs/specs/confinement-authority.md",
+    "unitDigest": "be86a74cad90f4d984b92e5c5e25041ffb38373d43fea3a5b1f491c2fc2b42b0",
+    "identityFingerprint": "be86a74cad90f4d984b92e5c5e25041ffb38373d43fea3a5b1f491c2fc2b42b0",
+    "claimId": "claim_022af2ccb616ad85400526fd94408258",
+    "sourceAnchor": "unheaded-block-144",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "9c24e69b1b4a4ede9fce9ed6d771f342920397506c61c2a546df8163a810c5ae",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "currentSourceUnit": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-144",
+    "githubAnchor": "unheaded-block-144",
+    "stableAnchor": "unheaded-block-144",
+    "title": "Unheaded block 144",
+    "startLine": 1369,
+    "endLine": 1369,
+    "textDigest": "9c24e69b1b4a4ede9fce9ed6d771f342920397506c61c2a546df8163a810c5ae",
+    "sample": "Private home nhận một **bản chép** của login, bị xoá sau dispatch. Hai điều đi kèm (chi tiết và luật ở `docs/specs/runner.md`, RUL75 (login xoay vòng được gia hạn một lần tại nguồn",
+    "identityFingerprint": "be86a74cad90f4d984b92e5c5e25041ffb38373d43fea3a5b1f491c2fc2b42b0",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+      "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
+    ],
+    "text": "Private home nhận một **bản chép** của login, bị xoá sau dispatch. Hai điều đi kèm (chi tiết và luật ở `docs/specs/runner.md`, RUL75 (login xoay vòng được gia hạn một lần tại nguồn, trong bản chép fgOS giữ, và login được gia hạn trong private home được ghi ngược)):"
+  },
+  "currentTargetComparisons": [
+    {
+      "aliasId": "step10-specs-0101",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-67",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-67",
+        "githubAnchor": "unheaded-block-67",
+        "stableAnchor": "unheaded-block-67",
+        "title": "Unheaded block 67",
+        "startLine": 561,
+        "endLine": 565,
+        "textDigest": "0863b0b9257af2b10d97f01c65e9433aa9e18f3bca620427ae014d6c874bd9dc",
+        "sample": "- Pin posture của cả 17 executor hiện tại.\n- Pin exact write grant của ba executor bwrap.\n- Có falsifier đỏ khi thêm executor bwrap thứ tư mà không khai báo.\n- Event/run record lưu",
+        "identityFingerprint": "1be45e1f3ed18b93004476a6a5919346fc763d0492c3a02bb10b2f683cdcb504",
+        "ancestry": [
+          "Spec: Agent Confinement Authority",
+          "11. Proof và Definition of Done",
+          "11.4 Observability"
+        ],
+        "text": "- Pin posture của cả 17 executor hiện tại.\n- Pin exact write grant của ba executor bwrap.\n- Có falsifier đỏ khi thêm executor bwrap thứ tư mà không khai báo.\n- Event/run record lưu `confinement-attestation.v1` và mismatch.\n- Log stdout/stderr không chứa credential value."
+      },
+      "uniqueSameDigestUnits": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-69",
+          "githubAnchor": "unheaded-block-69",
+          "stableAnchor": "unheaded-block-69",
+          "title": "Unheaded block 69",
+          "startLine": 581,
+          "endLine": 581,
+          "textDigest": "9c24e69b1b4a4ede9fce9ed6d771f342920397506c61c2a546df8163a810c5ae",
+          "sample": "Private home nhận một **bản chép** của login, bị xoá sau dispatch. Hai điều đi kèm (chi tiết và luật ở `docs/specs/runner.md`, RUL75 (login xoay vòng được gia hạn một lần tại nguồn",
+          "identityFingerprint": "be86a74cad90f4d984b92e5c5e25041ffb38373d43fea3a5b1f491c2fc2b42b0",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "Added in candidate: Current settled facts and deferred items",
+            "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
+          ],
+          "text": "Private home nhận một **bản chép** của login, bị xoá sau dispatch. Hai điều đi kèm (chi tiết và luật ở `docs/specs/runner.md`, RUL75 (login xoay vòng được gia hạn một lần tại nguồn, trong bản chép fgOS giữ, và login được gia hạn trong private home được ghi ngược)):"
+        }
+      ]
+    }
+  ],
+  "historicalPackageComparisons": {
+    "nativeIdentity": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "be86a74cad90f4d984b92e5c5e25041ffb38373d43fea3a5b1f491c2fc2b42b0",
+      "identityFingerprint": "be86a74cad90f4d984b92e5c5e25041ffb38373d43fea3a5b1f491c2fc2b42b0",
+      "claimId": "claim_022af2ccb616ad85400526fd94408258",
+      "sourceAnchor": "unheaded-block-144",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "9c24e69b1b4a4ede9fce9ed6d771f342920397506c61c2a546df8163a810c5ae",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "currentIdentityBinding": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "be86a74cad90f4d984b92e5c5e25041ffb38373d43fea3a5b1f491c2fc2b42b0",
+      "identityFingerprint": "be86a74cad90f4d984b92e5c5e25041ffb38373d43fea3a5b1f491c2fc2b42b0",
+      "claimId": "claim_022af2ccb616ad85400526fd94408258",
+      "sourceAnchor": "unheaded-block-144",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "9c24e69b1b4a4ede9fce9ed6d771f342920397506c61c2a546df8163a810c5ae",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "uniqueSameDigestBinding": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-144",
+      "githubAnchor": "unheaded-block-144",
+      "stableAnchor": "unheaded-block-144",
+      "title": "Unheaded block 144",
+      "startLine": 1369,
+      "endLine": 1369,
+      "textDigest": "9c24e69b1b4a4ede9fce9ed6d771f342920397506c61c2a546df8163a810c5ae",
+      "sample": "Private home nhận một **bản chép** của login, bị xoá sau dispatch. Hai điều đi kèm (chi tiết và luật ở `docs/specs/runner.md`, RUL75 (login xoay vòng được gia hạn một lần tại nguồn",
+      "identityFingerprint": "be86a74cad90f4d984b92e5c5e25041ffb38373d43fea3a5b1f491c2fc2b42b0",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+        "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
+      ],
+      "text": "Private home nhận một **bản chép** của login, bị xoá sau dispatch. Hai điều đi kèm (chi tiết và luật ở `docs/specs/runner.md`, RUL75 (login xoay vòng được gia hạn một lần tại nguồn, trong bản chép fgOS giữ, và login được gia hạn trong private home được ghi ngược)):"
+    },
+    "currentUnitAtRetainedIdentity": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-144",
+      "githubAnchor": "unheaded-block-144",
+      "stableAnchor": "unheaded-block-144",
+      "title": "Unheaded block 144",
+      "startLine": 1369,
+      "endLine": 1369,
+      "textDigest": "9c24e69b1b4a4ede9fce9ed6d771f342920397506c61c2a546df8163a810c5ae",
+      "sample": "Private home nhận một **bản chép** của login, bị xoá sau dispatch. Hai điều đi kèm (chi tiết và luật ở `docs/specs/runner.md`, RUL75 (login xoay vòng được gia hạn một lần tại nguồn",
+      "identityFingerprint": "be86a74cad90f4d984b92e5c5e25041ffb38373d43fea3a5b1f491c2fc2b42b0",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+        "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
+      ],
+      "text": "Private home nhận một **bản chép** của login, bị xoá sau dispatch. Hai điều đi kèm (chi tiết và luật ở `docs/specs/runner.md`, RUL75 (login xoay vòng được gia hạn một lần tại nguồn, trong bản chép fgOS giữ, và login được gia hạn trong private home được ghi ngược)):"
+    },
+    "sourceDigestUnchanged": true,
+    "status": "same text uniquely found; alias anchor still independently checked",
+    "aliasTargetComparisons": [
+      {
+        "aliasId": "step10-specs-0101",
+        "fromPath": "docs/specs/confinement-authority.md#unheaded-block-143",
+        "toOwner": "docs/platform/agent-confinement/spec.md",
+        "toAnchor": "unheaded-block-67",
+        "currentTargetAtDraftAnchor": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-67",
+          "githubAnchor": "unheaded-block-67",
+          "stableAnchor": "unheaded-block-67",
+          "title": "Unheaded block 67",
+          "startLine": 561,
+          "endLine": 565,
+          "textDigest": "0863b0b9257af2b10d97f01c65e9433aa9e18f3bca620427ae014d6c874bd9dc",
+          "sample": "- Pin posture của cả 17 executor hiện tại.\n- Pin exact write grant của ba executor bwrap.\n- Có falsifier đỏ khi thêm executor bwrap thứ tư mà không khai báo.\n- Event/run record lưu",
+          "identityFingerprint": "1be45e1f3ed18b93004476a6a5919346fc763d0492c3a02bb10b2f683cdcb504",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "11. Proof và Definition of Done",
+            "11.4 Observability"
+          ],
+          "text": "- Pin posture của cả 17 executor hiện tại.\n- Pin exact write grant của ba executor bwrap.\n- Có falsifier đỏ khi thêm executor bwrap thứ tư mà không khai báo.\n- Event/run record lưu `confinement-attestation.v1` và mismatch.\n- Log stdout/stderr không chứa credential value."
+        },
+        "sourceTextDigestAtDraftTarget": false,
+        "uniqueSameTextCurrentTarget": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-69",
+          "githubAnchor": "unheaded-block-69",
+          "stableAnchor": "unheaded-block-69",
+          "title": "Unheaded block 69",
+          "startLine": 581,
+          "endLine": 581,
+          "textDigest": "9c24e69b1b4a4ede9fce9ed6d771f342920397506c61c2a546df8163a810c5ae",
+          "sample": "Private home nhận một **bản chép** của login, bị xoá sau dispatch. Hai điều đi kèm (chi tiết và luật ở `docs/specs/runner.md`, RUL75 (login xoay vòng được gia hạn một lần tại nguồn",
+          "identityFingerprint": "be86a74cad90f4d984b92e5c5e25041ffb38373d43fea3a5b1f491c2fc2b42b0",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "Added in candidate: Current settled facts and deferred items",
+            "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
+          ],
+          "text": "Private home nhận một **bản chép** của login, bị xoá sau dispatch. Hai điều đi kèm (chi tiết và luật ở `docs/specs/runner.md`, RUL75 (login xoay vòng được gia hạn một lần tại nguồn, trong bản chép fgOS giữ, và login được gia hạn trong private home được ghi ngược)):"
+        },
+        "note": "Read-only current source and target comparisons; draft unchanged. Source and target numbered-anchor relocation is not approval. Text corrections or source drift require independent judgment."
+      }
+    ]
+  },
+  "currentSourceDigestUnchanged": true
+}
+```
+
+## Entry e-034: claim_19c1aba20ad51fafc86dc889996c2063
+
+```json
+{
+  "kind": "source-alias-comparison",
+  "claimId": "claim_19c1aba20ad51fafc86dc889996c2063",
+  "priorAnchor": "unheaded-block-144",
+  "priorDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
+  "currentDigest": "9c24e69b1b4a4ede9fce9ed6d771f342920397506c61c2a546df8163a810c5ae",
+  "matchingCurrentAnchors": [
+    "unheaded-block-145"
+  ],
+  "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval.",
+  "draftAliases": [
+    {
+      "aliasId": "step10-specs-0102",
+      "fromPath": "docs/specs/confinement-authority.md#unheaded-block-144",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-68",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    }
+  ],
+  "currentNative": {
+    "sourcePath": "docs/specs/confinement-authority.md",
+    "unitDigest": "3b2449b1edc267a1157f77e25028c3045a65714309624b194d36cb5f286383bd",
+    "identityFingerprint": "3b2449b1edc267a1157f77e25028c3045a65714309624b194d36cb5f286383bd",
+    "claimId": "claim_19c1aba20ad51fafc86dc889996c2063",
+    "sourceAnchor": "unheaded-block-145",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "currentSourceUnit": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-145",
+    "githubAnchor": "unheaded-block-145",
+    "stableAnchor": "unheaded-block-145",
+    "title": "Unheaded block 145",
+    "startLine": 1371,
+    "endLine": 1372,
+    "textDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
+    "sample": "- **Kho SQLite chép dạng snapshot.** File `agent.db` (omp) trong danh sách `files` được chép bằng `VACUUM INTO` qua `node:sqlite` — snapshot nhất quán, gồm cả phần còn nằm trong wr",
+    "identityFingerprint": "3b2449b1edc267a1157f77e25028c3045a65714309624b194d36cb5f286383bd",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+      "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
+    ],
+    "text": "- **Kho SQLite chép dạng snapshot.** File `agent.db` (omp) trong danh sách `files` được chép bằng `VACUUM INTO` qua `node:sqlite` — snapshot nhất quán, gồm cả phần còn nằm trong write-ahead log — thay vì chép file thô thiếu WAL; không có `node:sqlite` thì chép file như trước. Danh sách file được phép chép không đổi, thư mục account thật vẫn không bao giờ được mount.\n- **Bản mới hơn được ghi ngược lúc xoá home.** Khi dispatch được opt-in (caller truyền hàm gia hạn), ownership marker của private home ghi thêm `credentialWriteBack` (provider, account, home nguồn, layout, runtime dir; chỉ tên và đường dẫn, không giá trị credential) sau khi chép xong. Mọi đường xoá home — cleanup của driver, `finalizeConfinementResources` và orphan reaper — đi qua một hàm xoá duy nhất (`removeConfinementDir`, `confinement/cleanup.mjs`): trước khi xoá, login trong home mới hơn login nguồn thì được dàn (staging) rồi áp lên nguồn dưới lock của account, một lần thử không chờ; lock bận thì để `pending/` cho lần refresh-ahead kế tiếp. Lỗi ghi ngược chỉ báo bằng mã cố định trên stderr và chỉ chặn việc xoá trong đúng một trường hợp: việc dàn thất bại (xem dưới). Bản dàn không bao giờ bị xoá khi nguồn không đọc được (đang ghi dở, `agent.db` không mở được, hoặc không xác định được entry) hay khi bản chép không đọc được vì lý do có thể qua (thiếu `node:sqlite`, `agent.db` không mở được): bản chép được giữ ở `pending/` (giới hạn 5 bản mỗi kho login (mỗi account với một kho, mỗi `stores/<cli>` với kho theo CLI), nhưng chỉ bản dư thừa mới bị bỏ: sau khi áp các bản pending dưới account lock, bản có login trùng hệt một bản pending khác thì bị bỏ khi account vượt giới hạn, bản mới nhất của mỗi nhóm trùng được giữ; bản không chứng minh được là dư thừa hay lỗi thời thì không bao giờ bị bỏ để nhường chỗ, nên account có thể vượt giới hạn và check doctor báo; bản do probe ghi dở được giữ ở `torn/` cho việc khôi phục thủ công, không bao giờ tự áp hay tự bỏ, và doctor báo ở mọi tuổi; `torn/` chỉ áp cho bản scratch của probe, còn scratch do runner đã chết để lại và pane home có store bị cắt vẫn bị xoá khi JSON không đọc được; bản không parse được thì so theo byte của file store và của write-ahead log hoặc rollback journal không rỗng (file không đọc được, trừ khi không tồn tại, không bao giờ bị coi là không có; index `-shm` không tính); home có file store trùng từng byte với nguồn và không bên nào có write-ahead log hay journal không rỗng thì không renew gì nên không được dàn) và báo `staged`/`apply-deferred`; chỉ xoá khi nguồn đọc được và chứng minh bản chép không mới hơn, hoặc bản chép được chứng minh hỏng (JSON hỏng, hay không có entry dùng được). Lỗi đọc file của hệ điều hành (quyền, I/O; mã `unreadable-file`) có thể qua nên bản chép được giữ; chỉ file kho không tồn tại (`missing-file`) mới được coi là rỗng và bị xoá. Nếu việc dàn thất bại, private home và marker được giữ lại (việc xoá báo lỗi, một dòng stderr mã cố định) để lần xoá sau, kể cả của reaper, thử lại; mỗi lần thất bại được đếm trong marker (`credentialKept`; hai lần cách nhau dưới 15 phút chỉ tính một, để lỗi tạm thời không dùng hết hạn mức), marker được ghi qua file tạm rồi rename và marker có mặt nhưng đọc không được thì việc xoá dừng lại. Sau 5 lần home bị giữ hẳn: không thử xoá nữa, không bao giờ bị xoá vì quá tuổi. Home bị giữ được kiểm lại dưới account lock khi account đó được gia hạn lần kế tiếp và bởi `fgos doctor --fix` (tập temp root tìm kiếm giống của doctor: root mặc định cộng `tempRoot` của từng backend đã đăng ký, lấy qua hook do phía dispatch truyền xuống; home nằm dưới `privateHomeRoot` riêng của backend không thuộc tập này nên không check, repair, reaper hay lần gia hạn nào thấy, và cũng không bao giờ bị xoá), và chỉ với home thuộc đúng runtime dir của lock đang giữ: chỉ xoá khi nguồn đọc được và chứng minh login trong home không mới hơn, hoặc login đó đã dàn được cạnh nguồn (và được áp); không thì vẫn giữ. Bản đã dàn và thư mục `pending/` được đồng bộ xuống đĩa trước khi home bị xoá. File marker không nhận ra được là marker nào cả (không phải JSON, không phải object, hay không có tên contract) thì mọi việc xoá home đó dừng lại. Finalizer so digest của marker không tính `credentialKept` (cleanup của driver thêm trường này sau khi digest được lấy) và không dừng ở home đó mà vẫn xoá các resource còn lại của dispatch (dispatch ghi là `retained`, kèm lý do của home). Check `credential-copies-retained` của `fgos doctor` báo theo provider/account: home bị giữ hẳn (fail, nêu thư mục home), home đang thử lại và các bản `pending/`/scratch quá một ngày (cảnh báo); chỉ có số đếm và tuổi, không bao giờ in giá trị, và check không xoá gì. Provisioning Codex đóng kín (fail closed): `auth.json` là symlink trỏ ra ngoài home, hoặc `home` tương đối, làm dispatch thất bại trước khi worker chạy (trước đây symlink được theo, home tương đối được hiểu theo cwd). Đường xoá home gọi module gia hạn credential (`provider-credential-renewal.mjs`) và qua đó phụ thuộc vào provider capacity, chỉ để lấy account lock. Home không có field này được xoá y như trước."
+  },
+  "currentTargetComparisons": [
+    {
+      "aliasId": "step10-specs-0102",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-68",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-68",
+        "githubAnchor": "unheaded-block-68",
+        "stableAnchor": "unheaded-block-68",
+        "title": "Unheaded block 68",
+        "startLine": 569,
+        "endLine": 575,
+        "textDigest": "03aadf655bc30ec74e7e34d25a18d3b8f3f866fc2120a48550822fada8afa1d5",
+        "sample": "Mỗi backend driver đăng ký check schema/capability và mỗi machine-registry\ninstance được `fgos doctor` kiểm tra: binary hoặc runtime khả dụng, platform\nsupport, namespace/mount pre",
+        "identityFingerprint": "ee8afd3b8ef3e08df9a1513448b6e6fcdb54709a5bffecef202bb567406cca25",
+        "ancestry": [
+          "Spec: Agent Confinement Authority",
+          "11. Proof và Definition of Done",
+          "11.5 Doctor/setup"
+        ],
+        "text": "Mỗi backend driver đăng ký check schema/capability và mỗi machine-registry\ninstance được `fgos doctor` kiểm tra: binary hoặc runtime khả dụng, platform\nsupport, namespace/mount prerequisite, runDir writable, credential source\nreadable và probe freshness. `fgos setup` tạo/fill missing backend instance\ntrong machine registry mà không ghi đè custom value; shared project/global\nconfig vẫn giữ precedence hiện hành. Doctor report phân biệt rõ `configured`,\n`disabled`, `unavailable` và `ready`."
+      },
+      "uniqueSameDigestUnits": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-70",
+          "githubAnchor": "unheaded-block-70",
+          "stableAnchor": "unheaded-block-70",
+          "title": "Unheaded block 70",
+          "startLine": 583,
+          "endLine": 584,
+          "textDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
+          "sample": "- **Kho SQLite chép dạng snapshot.** File `agent.db` (omp) trong danh sách `files` được chép bằng `VACUUM INTO` qua `node:sqlite` — snapshot nhất quán, gồm cả phần còn nằm trong wr",
+          "identityFingerprint": "3b2449b1edc267a1157f77e25028c3045a65714309624b194d36cb5f286383bd",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "Added in candidate: Current settled facts and deferred items",
+            "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
+          ],
+          "text": "- **Kho SQLite chép dạng snapshot.** File `agent.db` (omp) trong danh sách `files` được chép bằng `VACUUM INTO` qua `node:sqlite` — snapshot nhất quán, gồm cả phần còn nằm trong write-ahead log — thay vì chép file thô thiếu WAL; không có `node:sqlite` thì chép file như trước. Danh sách file được phép chép không đổi, thư mục account thật vẫn không bao giờ được mount.\n- **Bản mới hơn được ghi ngược lúc xoá home.** Khi dispatch được opt-in (caller truyền hàm gia hạn), ownership marker của private home ghi thêm `credentialWriteBack` (provider, account, home nguồn, layout, runtime dir; chỉ tên và đường dẫn, không giá trị credential) sau khi chép xong. Mọi đường xoá home — cleanup của driver, `finalizeConfinementResources` và orphan reaper — đi qua một hàm xoá duy nhất (`removeConfinementDir`, `confinement/cleanup.mjs`): trước khi xoá, login trong home mới hơn login nguồn thì được dàn (staging) rồi áp lên nguồn dưới lock của account, một lần thử không chờ; lock bận thì để `pending/` cho lần refresh-ahead kế tiếp. Lỗi ghi ngược chỉ báo bằng mã cố định trên stderr và chỉ chặn việc xoá trong đúng một trường hợp: việc dàn thất bại (xem dưới). Bản dàn không bao giờ bị xoá khi nguồn không đọc được (đang ghi dở, `agent.db` không mở được, hoặc không xác định được entry) hay khi bản chép không đọc được vì lý do có thể qua (thiếu `node:sqlite`, `agent.db` không mở được): bản chép được giữ ở `pending/` (giới hạn 5 bản mỗi kho login (mỗi account với một kho, mỗi `stores/<cli>` với kho theo CLI), nhưng chỉ bản dư thừa mới bị bỏ: sau khi áp các bản pending dưới account lock, bản có login trùng hệt một bản pending khác thì bị bỏ khi account vượt giới hạn, bản mới nhất của mỗi nhóm trùng được giữ; bản không chứng minh được là dư thừa hay lỗi thời thì không bao giờ bị bỏ để nhường chỗ, nên account có thể vượt giới hạn và check doctor báo; bản do probe ghi dở được giữ ở `torn/` cho việc khôi phục thủ công, không bao giờ tự áp hay tự bỏ, và doctor báo ở mọi tuổi; `torn/` chỉ áp cho bản scratch của probe, còn scratch do runner đã chết để lại và pane home có store bị cắt vẫn bị xoá khi JSON không đọc được; bản không parse được thì so theo byte của file store và của write-ahead log hoặc rollback journal không rỗng (file không đọc được, trừ khi không tồn tại, không bao giờ bị coi là không có; index `-shm` không tính); home có file store trùng từng byte với nguồn và không bên nào có write-ahead log hay journal không rỗng thì không renew gì nên không được dàn) và báo `staged`/`apply-deferred`; chỉ xoá khi nguồn đọc được và chứng minh bản chép không mới hơn, hoặc bản chép được chứng minh hỏng (JSON hỏng, hay không có entry dùng được). Lỗi đọc file của hệ điều hành (quyền, I/O; mã `unreadable-file`) có thể qua nên bản chép được giữ; chỉ file kho không tồn tại (`missing-file`) mới được coi là rỗng và bị xoá. Nếu việc dàn thất bại, private home và marker được giữ lại (việc xoá báo lỗi, một dòng stderr mã cố định) để lần xoá sau, kể cả của reaper, thử lại; mỗi lần thất bại được đếm trong marker (`credentialKept`; hai lần cách nhau dưới 15 phút chỉ tính một, để lỗi tạm thời không dùng hết hạn mức), marker được ghi qua file tạm rồi rename và marker có mặt nhưng đọc không được thì việc xoá dừng lại. Sau 5 lần home bị giữ hẳn: không thử xoá nữa, không bao giờ bị xoá vì quá tuổi. Home bị giữ được kiểm lại dưới account lock khi account đó được gia hạn lần kế tiếp và bởi `fgos doctor --fix` (tập temp root tìm kiếm giống của doctor: root mặc định cộng `tempRoot` của từng backend đã đăng ký, lấy qua hook do phía dispatch truyền xuống; home nằm dưới `privateHomeRoot` riêng của backend không thuộc tập này nên không check, repair, reaper hay lần gia hạn nào thấy, và cũng không bao giờ bị xoá), và chỉ với home thuộc đúng runtime dir của lock đang giữ: chỉ xoá khi nguồn đọc được và chứng minh login trong home không mới hơn, hoặc login đó đã dàn được cạnh nguồn (và được áp); không thì vẫn giữ. Bản đã dàn và thư mục `pending/` được đồng bộ xuống đĩa trước khi home bị xoá. File marker không nhận ra được là marker nào cả (không phải JSON, không phải object, hay không có tên contract) thì mọi việc xoá home đó dừng lại. Finalizer so digest của marker không tính `credentialKept` (cleanup của driver thêm trường này sau khi digest được lấy) và không dừng ở home đó mà vẫn xoá các resource còn lại của dispatch (dispatch ghi là `retained`, kèm lý do của home). Check `credential-copies-retained` của `fgos doctor` báo theo provider/account: home bị giữ hẳn (fail, nêu thư mục home), home đang thử lại và các bản `pending/`/scratch quá một ngày (cảnh báo); chỉ có số đếm và tuổi, không bao giờ in giá trị, và check không xoá gì. Provisioning Codex đóng kín (fail closed): `auth.json` là symlink trỏ ra ngoài home, hoặc `home` tương đối, làm dispatch thất bại trước khi worker chạy (trước đây symlink được theo, home tương đối được hiểu theo cwd). Đường xoá home gọi module gia hạn credential (`provider-credential-renewal.mjs`) và qua đó phụ thuộc vào provider capacity, chỉ để lấy account lock. Home không có field này được xoá y như trước."
+        }
+      ]
+    }
+  ],
+  "historicalPackageComparisons": {
+    "nativeIdentity": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "3b2449b1edc267a1157f77e25028c3045a65714309624b194d36cb5f286383bd",
+      "identityFingerprint": "3b2449b1edc267a1157f77e25028c3045a65714309624b194d36cb5f286383bd",
+      "claimId": "claim_19c1aba20ad51fafc86dc889996c2063",
+      "sourceAnchor": "unheaded-block-145",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "currentIdentityBinding": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "3b2449b1edc267a1157f77e25028c3045a65714309624b194d36cb5f286383bd",
+      "identityFingerprint": "3b2449b1edc267a1157f77e25028c3045a65714309624b194d36cb5f286383bd",
+      "claimId": "claim_19c1aba20ad51fafc86dc889996c2063",
+      "sourceAnchor": "unheaded-block-145",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "uniqueSameDigestBinding": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-145",
+      "githubAnchor": "unheaded-block-145",
+      "stableAnchor": "unheaded-block-145",
+      "title": "Unheaded block 145",
+      "startLine": 1371,
+      "endLine": 1372,
+      "textDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
+      "sample": "- **Kho SQLite chép dạng snapshot.** File `agent.db` (omp) trong danh sách `files` được chép bằng `VACUUM INTO` qua `node:sqlite` — snapshot nhất quán, gồm cả phần còn nằm trong wr",
+      "identityFingerprint": "3b2449b1edc267a1157f77e25028c3045a65714309624b194d36cb5f286383bd",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+        "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
+      ],
+      "text": "- **Kho SQLite chép dạng snapshot.** File `agent.db` (omp) trong danh sách `files` được chép bằng `VACUUM INTO` qua `node:sqlite` — snapshot nhất quán, gồm cả phần còn nằm trong write-ahead log — thay vì chép file thô thiếu WAL; không có `node:sqlite` thì chép file như trước. Danh sách file được phép chép không đổi, thư mục account thật vẫn không bao giờ được mount.\n- **Bản mới hơn được ghi ngược lúc xoá home.** Khi dispatch được opt-in (caller truyền hàm gia hạn), ownership marker của private home ghi thêm `credentialWriteBack` (provider, account, home nguồn, layout, runtime dir; chỉ tên và đường dẫn, không giá trị credential) sau khi chép xong. Mọi đường xoá home — cleanup của driver, `finalizeConfinementResources` và orphan reaper — đi qua một hàm xoá duy nhất (`removeConfinementDir`, `confinement/cleanup.mjs`): trước khi xoá, login trong home mới hơn login nguồn thì được dàn (staging) rồi áp lên nguồn dưới lock của account, một lần thử không chờ; lock bận thì để `pending/` cho lần refresh-ahead kế tiếp. Lỗi ghi ngược chỉ báo bằng mã cố định trên stderr và chỉ chặn việc xoá trong đúng một trường hợp: việc dàn thất bại (xem dưới). Bản dàn không bao giờ bị xoá khi nguồn không đọc được (đang ghi dở, `agent.db` không mở được, hoặc không xác định được entry) hay khi bản chép không đọc được vì lý do có thể qua (thiếu `node:sqlite`, `agent.db` không mở được): bản chép được giữ ở `pending/` (giới hạn 5 bản mỗi kho login (mỗi account với một kho, mỗi `stores/<cli>` với kho theo CLI), nhưng chỉ bản dư thừa mới bị bỏ: sau khi áp các bản pending dưới account lock, bản có login trùng hệt một bản pending khác thì bị bỏ khi account vượt giới hạn, bản mới nhất của mỗi nhóm trùng được giữ; bản không chứng minh được là dư thừa hay lỗi thời thì không bao giờ bị bỏ để nhường chỗ, nên account có thể vượt giới hạn và check doctor báo; bản do probe ghi dở được giữ ở `torn/` cho việc khôi phục thủ công, không bao giờ tự áp hay tự bỏ, và doctor báo ở mọi tuổi; `torn/` chỉ áp cho bản scratch của probe, còn scratch do runner đã chết để lại và pane home có store bị cắt vẫn bị xoá khi JSON không đọc được; bản không parse được thì so theo byte của file store và của write-ahead log hoặc rollback journal không rỗng (file không đọc được, trừ khi không tồn tại, không bao giờ bị coi là không có; index `-shm` không tính); home có file store trùng từng byte với nguồn và không bên nào có write-ahead log hay journal không rỗng thì không renew gì nên không được dàn) và báo `staged`/`apply-deferred`; chỉ xoá khi nguồn đọc được và chứng minh bản chép không mới hơn, hoặc bản chép được chứng minh hỏng (JSON hỏng, hay không có entry dùng được). Lỗi đọc file của hệ điều hành (quyền, I/O; mã `unreadable-file`) có thể qua nên bản chép được giữ; chỉ file kho không tồn tại (`missing-file`) mới được coi là rỗng và bị xoá. Nếu việc dàn thất bại, private home và marker được giữ lại (việc xoá báo lỗi, một dòng stderr mã cố định) để lần xoá sau, kể cả của reaper, thử lại; mỗi lần thất bại được đếm trong marker (`credentialKept`; hai lần cách nhau dưới 15 phút chỉ tính một, để lỗi tạm thời không dùng hết hạn mức), marker được ghi qua file tạm rồi rename và marker có mặt nhưng đọc không được thì việc xoá dừng lại. Sau 5 lần home bị giữ hẳn: không thử xoá nữa, không bao giờ bị xoá vì quá tuổi. Home bị giữ được kiểm lại dưới account lock khi account đó được gia hạn lần kế tiếp và bởi `fgos doctor --fix` (tập temp root tìm kiếm giống của doctor: root mặc định cộng `tempRoot` của từng backend đã đăng ký, lấy qua hook do phía dispatch truyền xuống; home nằm dưới `privateHomeRoot` riêng của backend không thuộc tập này nên không check, repair, reaper hay lần gia hạn nào thấy, và cũng không bao giờ bị xoá), và chỉ với home thuộc đúng runtime dir của lock đang giữ: chỉ xoá khi nguồn đọc được và chứng minh login trong home không mới hơn, hoặc login đó đã dàn được cạnh nguồn (và được áp); không thì vẫn giữ. Bản đã dàn và thư mục `pending/` được đồng bộ xuống đĩa trước khi home bị xoá. File marker không nhận ra được là marker nào cả (không phải JSON, không phải object, hay không có tên contract) thì mọi việc xoá home đó dừng lại. Finalizer so digest của marker không tính `credentialKept` (cleanup của driver thêm trường này sau khi digest được lấy) và không dừng ở home đó mà vẫn xoá các resource còn lại của dispatch (dispatch ghi là `retained`, kèm lý do của home). Check `credential-copies-retained` của `fgos doctor` báo theo provider/account: home bị giữ hẳn (fail, nêu thư mục home), home đang thử lại và các bản `pending/`/scratch quá một ngày (cảnh báo); chỉ có số đếm và tuổi, không bao giờ in giá trị, và check không xoá gì. Provisioning Codex đóng kín (fail closed): `auth.json` là symlink trỏ ra ngoài home, hoặc `home` tương đối, làm dispatch thất bại trước khi worker chạy (trước đây symlink được theo, home tương đối được hiểu theo cwd). Đường xoá home gọi module gia hạn credential (`provider-credential-renewal.mjs`) và qua đó phụ thuộc vào provider capacity, chỉ để lấy account lock. Home không có field này được xoá y như trước."
+    },
+    "currentUnitAtRetainedIdentity": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-145",
+      "githubAnchor": "unheaded-block-145",
+      "stableAnchor": "unheaded-block-145",
+      "title": "Unheaded block 145",
+      "startLine": 1371,
+      "endLine": 1372,
+      "textDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
+      "sample": "- **Kho SQLite chép dạng snapshot.** File `agent.db` (omp) trong danh sách `files` được chép bằng `VACUUM INTO` qua `node:sqlite` — snapshot nhất quán, gồm cả phần còn nằm trong wr",
+      "identityFingerprint": "3b2449b1edc267a1157f77e25028c3045a65714309624b194d36cb5f286383bd",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+        "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
+      ],
+      "text": "- **Kho SQLite chép dạng snapshot.** File `agent.db` (omp) trong danh sách `files` được chép bằng `VACUUM INTO` qua `node:sqlite` — snapshot nhất quán, gồm cả phần còn nằm trong write-ahead log — thay vì chép file thô thiếu WAL; không có `node:sqlite` thì chép file như trước. Danh sách file được phép chép không đổi, thư mục account thật vẫn không bao giờ được mount.\n- **Bản mới hơn được ghi ngược lúc xoá home.** Khi dispatch được opt-in (caller truyền hàm gia hạn), ownership marker của private home ghi thêm `credentialWriteBack` (provider, account, home nguồn, layout, runtime dir; chỉ tên và đường dẫn, không giá trị credential) sau khi chép xong. Mọi đường xoá home — cleanup của driver, `finalizeConfinementResources` và orphan reaper — đi qua một hàm xoá duy nhất (`removeConfinementDir`, `confinement/cleanup.mjs`): trước khi xoá, login trong home mới hơn login nguồn thì được dàn (staging) rồi áp lên nguồn dưới lock của account, một lần thử không chờ; lock bận thì để `pending/` cho lần refresh-ahead kế tiếp. Lỗi ghi ngược chỉ báo bằng mã cố định trên stderr và chỉ chặn việc xoá trong đúng một trường hợp: việc dàn thất bại (xem dưới). Bản dàn không bao giờ bị xoá khi nguồn không đọc được (đang ghi dở, `agent.db` không mở được, hoặc không xác định được entry) hay khi bản chép không đọc được vì lý do có thể qua (thiếu `node:sqlite`, `agent.db` không mở được): bản chép được giữ ở `pending/` (giới hạn 5 bản mỗi kho login (mỗi account với một kho, mỗi `stores/<cli>` với kho theo CLI), nhưng chỉ bản dư thừa mới bị bỏ: sau khi áp các bản pending dưới account lock, bản có login trùng hệt một bản pending khác thì bị bỏ khi account vượt giới hạn, bản mới nhất của mỗi nhóm trùng được giữ; bản không chứng minh được là dư thừa hay lỗi thời thì không bao giờ bị bỏ để nhường chỗ, nên account có thể vượt giới hạn và check doctor báo; bản do probe ghi dở được giữ ở `torn/` cho việc khôi phục thủ công, không bao giờ tự áp hay tự bỏ, và doctor báo ở mọi tuổi; `torn/` chỉ áp cho bản scratch của probe, còn scratch do runner đã chết để lại và pane home có store bị cắt vẫn bị xoá khi JSON không đọc được; bản không parse được thì so theo byte của file store và của write-ahead log hoặc rollback journal không rỗng (file không đọc được, trừ khi không tồn tại, không bao giờ bị coi là không có; index `-shm` không tính); home có file store trùng từng byte với nguồn và không bên nào có write-ahead log hay journal không rỗng thì không renew gì nên không được dàn) và báo `staged`/`apply-deferred`; chỉ xoá khi nguồn đọc được và chứng minh bản chép không mới hơn, hoặc bản chép được chứng minh hỏng (JSON hỏng, hay không có entry dùng được). Lỗi đọc file của hệ điều hành (quyền, I/O; mã `unreadable-file`) có thể qua nên bản chép được giữ; chỉ file kho không tồn tại (`missing-file`) mới được coi là rỗng và bị xoá. Nếu việc dàn thất bại, private home và marker được giữ lại (việc xoá báo lỗi, một dòng stderr mã cố định) để lần xoá sau, kể cả của reaper, thử lại; mỗi lần thất bại được đếm trong marker (`credentialKept`; hai lần cách nhau dưới 15 phút chỉ tính một, để lỗi tạm thời không dùng hết hạn mức), marker được ghi qua file tạm rồi rename và marker có mặt nhưng đọc không được thì việc xoá dừng lại. Sau 5 lần home bị giữ hẳn: không thử xoá nữa, không bao giờ bị xoá vì quá tuổi. Home bị giữ được kiểm lại dưới account lock khi account đó được gia hạn lần kế tiếp và bởi `fgos doctor --fix` (tập temp root tìm kiếm giống của doctor: root mặc định cộng `tempRoot` của từng backend đã đăng ký, lấy qua hook do phía dispatch truyền xuống; home nằm dưới `privateHomeRoot` riêng của backend không thuộc tập này nên không check, repair, reaper hay lần gia hạn nào thấy, và cũng không bao giờ bị xoá), và chỉ với home thuộc đúng runtime dir của lock đang giữ: chỉ xoá khi nguồn đọc được và chứng minh login trong home không mới hơn, hoặc login đó đã dàn được cạnh nguồn (và được áp); không thì vẫn giữ. Bản đã dàn và thư mục `pending/` được đồng bộ xuống đĩa trước khi home bị xoá. File marker không nhận ra được là marker nào cả (không phải JSON, không phải object, hay không có tên contract) thì mọi việc xoá home đó dừng lại. Finalizer so digest của marker không tính `credentialKept` (cleanup của driver thêm trường này sau khi digest được lấy) và không dừng ở home đó mà vẫn xoá các resource còn lại của dispatch (dispatch ghi là `retained`, kèm lý do của home). Check `credential-copies-retained` của `fgos doctor` báo theo provider/account: home bị giữ hẳn (fail, nêu thư mục home), home đang thử lại và các bản `pending/`/scratch quá một ngày (cảnh báo); chỉ có số đếm và tuổi, không bao giờ in giá trị, và check không xoá gì. Provisioning Codex đóng kín (fail closed): `auth.json` là symlink trỏ ra ngoài home, hoặc `home` tương đối, làm dispatch thất bại trước khi worker chạy (trước đây symlink được theo, home tương đối được hiểu theo cwd). Đường xoá home gọi module gia hạn credential (`provider-credential-renewal.mjs`) và qua đó phụ thuộc vào provider capacity, chỉ để lấy account lock. Home không có field này được xoá y như trước."
+    },
+    "sourceDigestUnchanged": true,
+    "status": "same text uniquely found; alias anchor still independently checked",
+    "aliasTargetComparisons": [
+      {
+        "aliasId": "step10-specs-0102",
+        "fromPath": "docs/specs/confinement-authority.md#unheaded-block-144",
+        "toOwner": "docs/platform/agent-confinement/spec.md",
+        "toAnchor": "unheaded-block-68",
+        "currentTargetAtDraftAnchor": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-68",
+          "githubAnchor": "unheaded-block-68",
+          "stableAnchor": "unheaded-block-68",
+          "title": "Unheaded block 68",
+          "startLine": 569,
+          "endLine": 575,
+          "textDigest": "03aadf655bc30ec74e7e34d25a18d3b8f3f866fc2120a48550822fada8afa1d5",
+          "sample": "Mỗi backend driver đăng ký check schema/capability và mỗi machine-registry\ninstance được `fgos doctor` kiểm tra: binary hoặc runtime khả dụng, platform\nsupport, namespace/mount pre",
+          "identityFingerprint": "ee8afd3b8ef3e08df9a1513448b6e6fcdb54709a5bffecef202bb567406cca25",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "11. Proof và Definition of Done",
+            "11.5 Doctor/setup"
+          ],
+          "text": "Mỗi backend driver đăng ký check schema/capability và mỗi machine-registry\ninstance được `fgos doctor` kiểm tra: binary hoặc runtime khả dụng, platform\nsupport, namespace/mount prerequisite, runDir writable, credential source\nreadable và probe freshness. `fgos setup` tạo/fill missing backend instance\ntrong machine registry mà không ghi đè custom value; shared project/global\nconfig vẫn giữ precedence hiện hành. Doctor report phân biệt rõ `configured`,\n`disabled`, `unavailable` và `ready`."
+        },
+        "sourceTextDigestAtDraftTarget": false,
+        "uniqueSameTextCurrentTarget": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-70",
+          "githubAnchor": "unheaded-block-70",
+          "stableAnchor": "unheaded-block-70",
+          "title": "Unheaded block 70",
+          "startLine": 583,
+          "endLine": 584,
+          "textDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
+          "sample": "- **Kho SQLite chép dạng snapshot.** File `agent.db` (omp) trong danh sách `files` được chép bằng `VACUUM INTO` qua `node:sqlite` — snapshot nhất quán, gồm cả phần còn nằm trong wr",
+          "identityFingerprint": "3b2449b1edc267a1157f77e25028c3045a65714309624b194d36cb5f286383bd",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "Added in candidate: Current settled facts and deferred items",
+            "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
+          ],
+          "text": "- **Kho SQLite chép dạng snapshot.** File `agent.db` (omp) trong danh sách `files` được chép bằng `VACUUM INTO` qua `node:sqlite` — snapshot nhất quán, gồm cả phần còn nằm trong write-ahead log — thay vì chép file thô thiếu WAL; không có `node:sqlite` thì chép file như trước. Danh sách file được phép chép không đổi, thư mục account thật vẫn không bao giờ được mount.\n- **Bản mới hơn được ghi ngược lúc xoá home.** Khi dispatch được opt-in (caller truyền hàm gia hạn), ownership marker của private home ghi thêm `credentialWriteBack` (provider, account, home nguồn, layout, runtime dir; chỉ tên và đường dẫn, không giá trị credential) sau khi chép xong. Mọi đường xoá home — cleanup của driver, `finalizeConfinementResources` và orphan reaper — đi qua một hàm xoá duy nhất (`removeConfinementDir`, `confinement/cleanup.mjs`): trước khi xoá, login trong home mới hơn login nguồn thì được dàn (staging) rồi áp lên nguồn dưới lock của account, một lần thử không chờ; lock bận thì để `pending/` cho lần refresh-ahead kế tiếp. Lỗi ghi ngược chỉ báo bằng mã cố định trên stderr và chỉ chặn việc xoá trong đúng một trường hợp: việc dàn thất bại (xem dưới). Bản dàn không bao giờ bị xoá khi nguồn không đọc được (đang ghi dở, `agent.db` không mở được, hoặc không xác định được entry) hay khi bản chép không đọc được vì lý do có thể qua (thiếu `node:sqlite`, `agent.db` không mở được): bản chép được giữ ở `pending/` (giới hạn 5 bản mỗi kho login (mỗi account với một kho, mỗi `stores/<cli>` với kho theo CLI), nhưng chỉ bản dư thừa mới bị bỏ: sau khi áp các bản pending dưới account lock, bản có login trùng hệt một bản pending khác thì bị bỏ khi account vượt giới hạn, bản mới nhất của mỗi nhóm trùng được giữ; bản không chứng minh được là dư thừa hay lỗi thời thì không bao giờ bị bỏ để nhường chỗ, nên account có thể vượt giới hạn và check doctor báo; bản do probe ghi dở được giữ ở `torn/` cho việc khôi phục thủ công, không bao giờ tự áp hay tự bỏ, và doctor báo ở mọi tuổi; `torn/` chỉ áp cho bản scratch của probe, còn scratch do runner đã chết để lại và pane home có store bị cắt vẫn bị xoá khi JSON không đọc được; bản không parse được thì so theo byte của file store và của write-ahead log hoặc rollback journal không rỗng (file không đọc được, trừ khi không tồn tại, không bao giờ bị coi là không có; index `-shm` không tính); home có file store trùng từng byte với nguồn và không bên nào có write-ahead log hay journal không rỗng thì không renew gì nên không được dàn) và báo `staged`/`apply-deferred`; chỉ xoá khi nguồn đọc được và chứng minh bản chép không mới hơn, hoặc bản chép được chứng minh hỏng (JSON hỏng, hay không có entry dùng được). Lỗi đọc file của hệ điều hành (quyền, I/O; mã `unreadable-file`) có thể qua nên bản chép được giữ; chỉ file kho không tồn tại (`missing-file`) mới được coi là rỗng và bị xoá. Nếu việc dàn thất bại, private home và marker được giữ lại (việc xoá báo lỗi, một dòng stderr mã cố định) để lần xoá sau, kể cả của reaper, thử lại; mỗi lần thất bại được đếm trong marker (`credentialKept`; hai lần cách nhau dưới 15 phút chỉ tính một, để lỗi tạm thời không dùng hết hạn mức), marker được ghi qua file tạm rồi rename và marker có mặt nhưng đọc không được thì việc xoá dừng lại. Sau 5 lần home bị giữ hẳn: không thử xoá nữa, không bao giờ bị xoá vì quá tuổi. Home bị giữ được kiểm lại dưới account lock khi account đó được gia hạn lần kế tiếp và bởi `fgos doctor --fix` (tập temp root tìm kiếm giống của doctor: root mặc định cộng `tempRoot` của từng backend đã đăng ký, lấy qua hook do phía dispatch truyền xuống; home nằm dưới `privateHomeRoot` riêng của backend không thuộc tập này nên không check, repair, reaper hay lần gia hạn nào thấy, và cũng không bao giờ bị xoá), và chỉ với home thuộc đúng runtime dir của lock đang giữ: chỉ xoá khi nguồn đọc được và chứng minh login trong home không mới hơn, hoặc login đó đã dàn được cạnh nguồn (và được áp); không thì vẫn giữ. Bản đã dàn và thư mục `pending/` được đồng bộ xuống đĩa trước khi home bị xoá. File marker không nhận ra được là marker nào cả (không phải JSON, không phải object, hay không có tên contract) thì mọi việc xoá home đó dừng lại. Finalizer so digest của marker không tính `credentialKept` (cleanup của driver thêm trường này sau khi digest được lấy) và không dừng ở home đó mà vẫn xoá các resource còn lại của dispatch (dispatch ghi là `retained`, kèm lý do của home). Check `credential-copies-retained` của `fgos doctor` báo theo provider/account: home bị giữ hẳn (fail, nêu thư mục home), home đang thử lại và các bản `pending/`/scratch quá một ngày (cảnh báo); chỉ có số đếm và tuổi, không bao giờ in giá trị, và check không xoá gì. Provisioning Codex đóng kín (fail closed): `auth.json` là symlink trỏ ra ngoài home, hoặc `home` tương đối, làm dispatch thất bại trước khi worker chạy (trước đây symlink được theo, home tương đối được hiểu theo cwd). Đường xoá home gọi module gia hạn credential (`provider-credential-renewal.mjs`) và qua đó phụ thuộc vào provider capacity, chỉ để lấy account lock. Home không có field này được xoá y như trước."
+        },
+        "note": "Read-only current source and target comparisons; draft unchanged. Source and target numbered-anchor relocation is not approval. Text corrections or source drift require independent judgment."
+      }
+    ]
+  },
+  "currentSourceDigestUnchanged": true
+}
+```
+
+## Entry e-035: claim_3751f92605ff426f0c91aea00cf436f9
+
+```json
+{
+  "kind": "source-alias-comparison",
+  "claimId": "claim_3751f92605ff426f0c91aea00cf436f9",
+  "priorAnchor": "unheaded-block-145",
+  "priorDigest": "af28f424e64708cf882cb1c0f7919d22ea461c5a71cf3c39ba0654b90de583b4",
+  "currentDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
+  "matchingCurrentAnchors": [
+    "unheaded-block-146"
+  ],
+  "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval.",
+  "draftAliases": [
+    {
+      "aliasId": "step10-specs-0103",
+      "fromPath": "docs/specs/confinement-authority.md#unheaded-block-145",
+      "toOwner": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+      "toAnchor": "unheaded-block-4",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    }
+  ],
+  "currentNative": {
+    "sourcePath": "docs/specs/confinement-authority.md",
+    "unitDigest": "65f0254456a7920b30d55cd7e461f9f85ff6a305ed50c8c52c848ec7a4ba7182",
+    "identityFingerprint": "65f0254456a7920b30d55cd7e461f9f85ff6a305ed50c8c52c848ec7a4ba7182",
+    "claimId": "claim_3751f92605ff426f0c91aea00cf436f9",
+    "sourceAnchor": "unheaded-block-146",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "af28f424e64708cf882cb1c0f7919d22ea461c5a71cf3c39ba0654b90de583b4",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "currentSourceUnit": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-146",
+    "githubAnchor": "unheaded-block-146",
+    "stableAnchor": "unheaded-block-146",
+    "title": "Unheaded block 146",
+    "startLine": 1376,
+    "endLine": 1376,
+    "textDigest": "af28f424e64708cf882cb1c0f7919d22ea461c5a71cf3c39ba0654b90de583b4",
+    "sample": "**Quyết định (2026-10-13):** invocation `codex-herdr-fgovn` truyền thêm `--no-daemon` cạnh `-s danger-full-access -a never`. bwrap là confinement; sandbox riêng của Codex phải tắt ",
+    "identityFingerprint": "65f0254456a7920b30d55cd7e461f9f85ff6a305ed50c8c52c848ec7a4ba7182",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+      "13.3 Pane Codex chạy `--no-daemon`: sandbox riêng của Codex phải tắt suốt phiên"
+    ],
+    "text": "**Quyết định (2026-10-13):** invocation `codex-herdr-fgovn` truyền thêm `--no-daemon` cạnh `-s danger-full-access -a never`. bwrap là confinement; sandbox riêng của Codex phải tắt trong suốt phiên, không chỉ ở lượt đầu."
+  },
+  "currentTargetComparisons": [
+    {
+      "aliasId": "step10-specs-0103",
+      "toOwner": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+      "toAnchor": "unheaded-block-4",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 43,
+        "endLine": 43,
+        "textDigest": "af28f424e64708cf882cb1c0f7919d22ea461c5a71cf3c39ba0654b90de583b4",
+        "sample": "**Quyết định (2026-10-13):** invocation `codex-herdr-fgovn` truyền thêm `--no-daemon` cạnh `-s danger-full-access -a never`. bwrap là confinement; sandbox riêng của Codex phải tắt ",
+        "identityFingerprint": "65f0254456a7920b30d55cd7e461f9f85ff6a305ed50c8c52c848ec7a4ba7182",
+        "ancestry": [
+          "Added in candidate: confinement authority decisions",
+          "12. Quyết định của proposal",
+          "13.3 Pane Codex chạy `--no-daemon`: sandbox riêng của Codex phải tắt suốt phiên"
+        ],
+        "text": "**Quyết định (2026-10-13):** invocation `codex-herdr-fgovn` truyền thêm `--no-daemon` cạnh `-s danger-full-access -a never`. bwrap là confinement; sandbox riêng của Codex phải tắt trong suốt phiên, không chỉ ở lượt đầu."
+      },
+      "uniqueSameDigestUnits": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-4",
+          "githubAnchor": "unheaded-block-4",
+          "stableAnchor": "unheaded-block-4",
+          "title": "Unheaded block 4",
+          "startLine": 43,
+          "endLine": 43,
+          "textDigest": "af28f424e64708cf882cb1c0f7919d22ea461c5a71cf3c39ba0654b90de583b4",
+          "sample": "**Quyết định (2026-10-13):** invocation `codex-herdr-fgovn` truyền thêm `--no-daemon` cạnh `-s danger-full-access -a never`. bwrap là confinement; sandbox riêng của Codex phải tắt ",
+          "identityFingerprint": "65f0254456a7920b30d55cd7e461f9f85ff6a305ed50c8c52c848ec7a4ba7182",
+          "ancestry": [
+            "Added in candidate: confinement authority decisions",
+            "12. Quyết định của proposal",
+            "13.3 Pane Codex chạy `--no-daemon`: sandbox riêng của Codex phải tắt suốt phiên"
+          ],
+          "text": "**Quyết định (2026-10-13):** invocation `codex-herdr-fgovn` truyền thêm `--no-daemon` cạnh `-s danger-full-access -a never`. bwrap là confinement; sandbox riêng của Codex phải tắt trong suốt phiên, không chỉ ở lượt đầu."
+        }
+      ]
+    }
+  ],
+  "historicalPackageComparisons": {
+    "nativeIdentity": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "65f0254456a7920b30d55cd7e461f9f85ff6a305ed50c8c52c848ec7a4ba7182",
+      "identityFingerprint": "65f0254456a7920b30d55cd7e461f9f85ff6a305ed50c8c52c848ec7a4ba7182",
+      "claimId": "claim_3751f92605ff426f0c91aea00cf436f9",
+      "sourceAnchor": "unheaded-block-146",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "af28f424e64708cf882cb1c0f7919d22ea461c5a71cf3c39ba0654b90de583b4",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "currentIdentityBinding": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "65f0254456a7920b30d55cd7e461f9f85ff6a305ed50c8c52c848ec7a4ba7182",
+      "identityFingerprint": "65f0254456a7920b30d55cd7e461f9f85ff6a305ed50c8c52c848ec7a4ba7182",
+      "claimId": "claim_3751f92605ff426f0c91aea00cf436f9",
+      "sourceAnchor": "unheaded-block-146",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "af28f424e64708cf882cb1c0f7919d22ea461c5a71cf3c39ba0654b90de583b4",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "uniqueSameDigestBinding": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-146",
+      "githubAnchor": "unheaded-block-146",
+      "stableAnchor": "unheaded-block-146",
+      "title": "Unheaded block 146",
+      "startLine": 1376,
+      "endLine": 1376,
+      "textDigest": "af28f424e64708cf882cb1c0f7919d22ea461c5a71cf3c39ba0654b90de583b4",
+      "sample": "**Quyết định (2026-10-13):** invocation `codex-herdr-fgovn` truyền thêm `--no-daemon` cạnh `-s danger-full-access -a never`. bwrap là confinement; sandbox riêng của Codex phải tắt ",
+      "identityFingerprint": "65f0254456a7920b30d55cd7e461f9f85ff6a305ed50c8c52c848ec7a4ba7182",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+        "13.3 Pane Codex chạy `--no-daemon`: sandbox riêng của Codex phải tắt suốt phiên"
+      ],
+      "text": "**Quyết định (2026-10-13):** invocation `codex-herdr-fgovn` truyền thêm `--no-daemon` cạnh `-s danger-full-access -a never`. bwrap là confinement; sandbox riêng của Codex phải tắt trong suốt phiên, không chỉ ở lượt đầu."
+    },
+    "currentUnitAtRetainedIdentity": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-146",
+      "githubAnchor": "unheaded-block-146",
+      "stableAnchor": "unheaded-block-146",
+      "title": "Unheaded block 146",
+      "startLine": 1376,
+      "endLine": 1376,
+      "textDigest": "af28f424e64708cf882cb1c0f7919d22ea461c5a71cf3c39ba0654b90de583b4",
+      "sample": "**Quyết định (2026-10-13):** invocation `codex-herdr-fgovn` truyền thêm `--no-daemon` cạnh `-s danger-full-access -a never`. bwrap là confinement; sandbox riêng của Codex phải tắt ",
+      "identityFingerprint": "65f0254456a7920b30d55cd7e461f9f85ff6a305ed50c8c52c848ec7a4ba7182",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+        "13.3 Pane Codex chạy `--no-daemon`: sandbox riêng của Codex phải tắt suốt phiên"
+      ],
+      "text": "**Quyết định (2026-10-13):** invocation `codex-herdr-fgovn` truyền thêm `--no-daemon` cạnh `-s danger-full-access -a never`. bwrap là confinement; sandbox riêng của Codex phải tắt trong suốt phiên, không chỉ ở lượt đầu."
+    },
+    "sourceDigestUnchanged": true,
+    "status": "same text uniquely found; alias anchor still independently checked",
+    "aliasTargetComparisons": [
+      {
+        "aliasId": "step10-specs-0103",
+        "fromPath": "docs/specs/confinement-authority.md#unheaded-block-145",
+        "toOwner": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+        "toAnchor": "unheaded-block-4",
+        "currentTargetAtDraftAnchor": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-4",
+          "githubAnchor": "unheaded-block-4",
+          "stableAnchor": "unheaded-block-4",
+          "title": "Unheaded block 4",
+          "startLine": 43,
+          "endLine": 43,
+          "textDigest": "af28f424e64708cf882cb1c0f7919d22ea461c5a71cf3c39ba0654b90de583b4",
+          "sample": "**Quyết định (2026-10-13):** invocation `codex-herdr-fgovn` truyền thêm `--no-daemon` cạnh `-s danger-full-access -a never`. bwrap là confinement; sandbox riêng của Codex phải tắt ",
+          "identityFingerprint": "65f0254456a7920b30d55cd7e461f9f85ff6a305ed50c8c52c848ec7a4ba7182",
+          "ancestry": [
+            "Added in candidate: confinement authority decisions",
+            "12. Quyết định của proposal",
+            "13.3 Pane Codex chạy `--no-daemon`: sandbox riêng của Codex phải tắt suốt phiên"
+          ],
+          "text": "**Quyết định (2026-10-13):** invocation `codex-herdr-fgovn` truyền thêm `--no-daemon` cạnh `-s danger-full-access -a never`. bwrap là confinement; sandbox riêng của Codex phải tắt trong suốt phiên, không chỉ ở lượt đầu."
+        },
+        "sourceTextDigestAtDraftTarget": true,
+        "uniqueSameTextCurrentTarget": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-4",
+          "githubAnchor": "unheaded-block-4",
+          "stableAnchor": "unheaded-block-4",
+          "title": "Unheaded block 4",
+          "startLine": 43,
+          "endLine": 43,
+          "textDigest": "af28f424e64708cf882cb1c0f7919d22ea461c5a71cf3c39ba0654b90de583b4",
+          "sample": "**Quyết định (2026-10-13):** invocation `codex-herdr-fgovn` truyền thêm `--no-daemon` cạnh `-s danger-full-access -a never`. bwrap là confinement; sandbox riêng của Codex phải tắt ",
+          "identityFingerprint": "65f0254456a7920b30d55cd7e461f9f85ff6a305ed50c8c52c848ec7a4ba7182",
+          "ancestry": [
+            "Added in candidate: confinement authority decisions",
+            "12. Quyết định của proposal",
+            "13.3 Pane Codex chạy `--no-daemon`: sandbox riêng của Codex phải tắt suốt phiên"
+          ],
+          "text": "**Quyết định (2026-10-13):** invocation `codex-herdr-fgovn` truyền thêm `--no-daemon` cạnh `-s danger-full-access -a never`. bwrap là confinement; sandbox riêng của Codex phải tắt trong suốt phiên, không chỉ ở lượt đầu."
+        },
+        "note": "Read-only current source and target comparisons; draft unchanged. Source and target numbered-anchor relocation is not approval. Text corrections or source drift require independent judgment."
+      }
+    ]
+  },
+  "currentSourceDigestUnchanged": true
+}
+```
+
+## Entry e-036: claim_3a59166febcee14eae6a7815533da0b8
+
+```json
+{
+  "kind": "source-alias-comparison",
+  "claimId": "claim_3a59166febcee14eae6a7815533da0b8",
+  "priorAnchor": "unheaded-block-146",
+  "priorDigest": "6b135234f1db94662f8db717b7ce7f1b4911e2415c195e4715e7c2ae0987acd9",
+  "currentDigest": "af28f424e64708cf882cb1c0f7919d22ea461c5a71cf3c39ba0654b90de583b4",
+  "matchingCurrentAnchors": [
+    "unheaded-block-147"
+  ],
+  "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval.",
+  "draftAliases": [
+    {
+      "aliasId": "step10-specs-0104",
+      "fromPath": "docs/specs/confinement-authority.md#unheaded-block-146",
+      "toOwner": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+      "toAnchor": "unheaded-block-5",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    }
+  ],
+  "currentNative": {
+    "sourcePath": "docs/specs/confinement-authority.md",
+    "unitDigest": "5c411ab8ecee2cebabdb9eebbd06238cd3006b21473d56b62a2c4852715257d7",
+    "identityFingerprint": "5c411ab8ecee2cebabdb9eebbd06238cd3006b21473d56b62a2c4852715257d7",
+    "claimId": "claim_3a59166febcee14eae6a7815533da0b8",
+    "sourceAnchor": "unheaded-block-147",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "6b135234f1db94662f8db717b7ce7f1b4911e2415c195e4715e7c2ae0987acd9",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "currentSourceUnit": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-147",
+    "githubAnchor": "unheaded-block-147",
+    "stableAnchor": "unheaded-block-147",
+    "title": "Unheaded block 147",
+    "startLine": 1378,
+    "endLine": 1378,
+    "textDigest": "6b135234f1db94662f8db717b7ce7f1b4911e2415c195e4715e7c2ae0987acd9",
+    "sample": "**Vì sao:** mặc định TUI của Codex (từ 0.160) không tự chạy phiên mà giao cho một app-server daemon dùng chung (`codex app-server --listen unix:// --managed-daemon`), cài vào `<COD",
+    "identityFingerprint": "5c411ab8ecee2cebabdb9eebbd06238cd3006b21473d56b62a2c4852715257d7",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+      "13.3 Pane Codex chạy `--no-daemon`: sandbox riêng của Codex phải tắt suốt phiên"
+    ],
+    "text": "**Vì sao:** mặc định TUI của Codex (từ 0.160) không tự chạy phiên mà giao cho một app-server daemon dùng chung (`codex app-server --listen unix:// --managed-daemon`), cài vào `<CODEX_HOME>/packages/app-server-daemon/releases/<version>/` lúc khởi động, kèm một daemon-updater tự thay bản mới hơn. Cờ `-s` của TUI chỉ áp cho thread nó mở; một thread mà daemon mở lại sau khi bị thay thì chạy theo mặc định của config, mà với workspace đã được gieo trust thì đó là sandbox `workspace-write` của chính Codex. Sandbox đó dựng bwrap riêng, coi cwd là writable root và mkdir các mount che (`.codex`, `.aws`, ...) bên trong cwd; dưới `--ro-bind / /` của fgOS lệnh mkdir thất bại nên mọi lệnh hỏng trước khi chạy: `bwrap: Can't mkdir <cwd>/.aws: Read-only file system`. Với `--no-daemon` phiên chạy trong chính tiến trình TUI, mang `-s danger-full-access` đến hết, không có daemon/updater nào chạy ra từ private home."
+  },
+  "currentTargetComparisons": [
+    {
+      "aliasId": "step10-specs-0104",
+      "toOwner": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+      "toAnchor": "unheaded-block-5",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 45,
+        "endLine": 45,
+        "textDigest": "6b135234f1db94662f8db717b7ce7f1b4911e2415c195e4715e7c2ae0987acd9",
+        "sample": "**Vì sao:** mặc định TUI của Codex (từ 0.160) không tự chạy phiên mà giao cho một app-server daemon dùng chung (`codex app-server --listen unix:// --managed-daemon`), cài vào `<COD",
+        "identityFingerprint": "5c411ab8ecee2cebabdb9eebbd06238cd3006b21473d56b62a2c4852715257d7",
+        "ancestry": [
+          "Added in candidate: confinement authority decisions",
+          "12. Quyết định của proposal",
+          "13.3 Pane Codex chạy `--no-daemon`: sandbox riêng của Codex phải tắt suốt phiên"
+        ],
+        "text": "**Vì sao:** mặc định TUI của Codex (từ 0.160) không tự chạy phiên mà giao cho một app-server daemon dùng chung (`codex app-server --listen unix:// --managed-daemon`), cài vào `<CODEX_HOME>/packages/app-server-daemon/releases/<version>/` lúc khởi động, kèm một daemon-updater tự thay bản mới hơn. Cờ `-s` của TUI chỉ áp cho thread nó mở; một thread mà daemon mở lại sau khi bị thay thì chạy theo mặc định của config, mà với workspace đã được gieo trust thì đó là sandbox `workspace-write` của chính Codex. Sandbox đó dựng bwrap riêng, coi cwd là writable root và mkdir các mount che (`.codex`, `.aws`, ...) bên trong cwd; dưới `--ro-bind / /` của fgOS lệnh mkdir thất bại nên mọi lệnh hỏng trước khi chạy: `bwrap: Can't mkdir <cwd>/.aws: Read-only file system`. Với `--no-daemon` phiên chạy trong chính tiến trình TUI, mang `-s danger-full-access` đến hết, không có daemon/updater nào chạy ra từ private home."
+      },
+      "uniqueSameDigestUnits": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-5",
+          "githubAnchor": "unheaded-block-5",
+          "stableAnchor": "unheaded-block-5",
+          "title": "Unheaded block 5",
+          "startLine": 45,
+          "endLine": 45,
+          "textDigest": "6b135234f1db94662f8db717b7ce7f1b4911e2415c195e4715e7c2ae0987acd9",
+          "sample": "**Vì sao:** mặc định TUI của Codex (từ 0.160) không tự chạy phiên mà giao cho một app-server daemon dùng chung (`codex app-server --listen unix:// --managed-daemon`), cài vào `<COD",
+          "identityFingerprint": "5c411ab8ecee2cebabdb9eebbd06238cd3006b21473d56b62a2c4852715257d7",
+          "ancestry": [
+            "Added in candidate: confinement authority decisions",
+            "12. Quyết định của proposal",
+            "13.3 Pane Codex chạy `--no-daemon`: sandbox riêng của Codex phải tắt suốt phiên"
+          ],
+          "text": "**Vì sao:** mặc định TUI của Codex (từ 0.160) không tự chạy phiên mà giao cho một app-server daemon dùng chung (`codex app-server --listen unix:// --managed-daemon`), cài vào `<CODEX_HOME>/packages/app-server-daemon/releases/<version>/` lúc khởi động, kèm một daemon-updater tự thay bản mới hơn. Cờ `-s` của TUI chỉ áp cho thread nó mở; một thread mà daemon mở lại sau khi bị thay thì chạy theo mặc định của config, mà với workspace đã được gieo trust thì đó là sandbox `workspace-write` của chính Codex. Sandbox đó dựng bwrap riêng, coi cwd là writable root và mkdir các mount che (`.codex`, `.aws`, ...) bên trong cwd; dưới `--ro-bind / /` của fgOS lệnh mkdir thất bại nên mọi lệnh hỏng trước khi chạy: `bwrap: Can't mkdir <cwd>/.aws: Read-only file system`. Với `--no-daemon` phiên chạy trong chính tiến trình TUI, mang `-s danger-full-access` đến hết, không có daemon/updater nào chạy ra từ private home."
+        }
+      ]
+    }
+  ],
+  "historicalPackageComparisons": {
+    "nativeIdentity": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "5c411ab8ecee2cebabdb9eebbd06238cd3006b21473d56b62a2c4852715257d7",
+      "identityFingerprint": "5c411ab8ecee2cebabdb9eebbd06238cd3006b21473d56b62a2c4852715257d7",
+      "claimId": "claim_3a59166febcee14eae6a7815533da0b8",
+      "sourceAnchor": "unheaded-block-147",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "6b135234f1db94662f8db717b7ce7f1b4911e2415c195e4715e7c2ae0987acd9",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "currentIdentityBinding": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "5c411ab8ecee2cebabdb9eebbd06238cd3006b21473d56b62a2c4852715257d7",
+      "identityFingerprint": "5c411ab8ecee2cebabdb9eebbd06238cd3006b21473d56b62a2c4852715257d7",
+      "claimId": "claim_3a59166febcee14eae6a7815533da0b8",
+      "sourceAnchor": "unheaded-block-147",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "6b135234f1db94662f8db717b7ce7f1b4911e2415c195e4715e7c2ae0987acd9",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "uniqueSameDigestBinding": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-147",
+      "githubAnchor": "unheaded-block-147",
+      "stableAnchor": "unheaded-block-147",
+      "title": "Unheaded block 147",
+      "startLine": 1378,
+      "endLine": 1378,
+      "textDigest": "6b135234f1db94662f8db717b7ce7f1b4911e2415c195e4715e7c2ae0987acd9",
+      "sample": "**Vì sao:** mặc định TUI của Codex (từ 0.160) không tự chạy phiên mà giao cho một app-server daemon dùng chung (`codex app-server --listen unix:// --managed-daemon`), cài vào `<COD",
+      "identityFingerprint": "5c411ab8ecee2cebabdb9eebbd06238cd3006b21473d56b62a2c4852715257d7",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+        "13.3 Pane Codex chạy `--no-daemon`: sandbox riêng của Codex phải tắt suốt phiên"
+      ],
+      "text": "**Vì sao:** mặc định TUI của Codex (từ 0.160) không tự chạy phiên mà giao cho một app-server daemon dùng chung (`codex app-server --listen unix:// --managed-daemon`), cài vào `<CODEX_HOME>/packages/app-server-daemon/releases/<version>/` lúc khởi động, kèm một daemon-updater tự thay bản mới hơn. Cờ `-s` của TUI chỉ áp cho thread nó mở; một thread mà daemon mở lại sau khi bị thay thì chạy theo mặc định của config, mà với workspace đã được gieo trust thì đó là sandbox `workspace-write` của chính Codex. Sandbox đó dựng bwrap riêng, coi cwd là writable root và mkdir các mount che (`.codex`, `.aws`, ...) bên trong cwd; dưới `--ro-bind / /` của fgOS lệnh mkdir thất bại nên mọi lệnh hỏng trước khi chạy: `bwrap: Can't mkdir <cwd>/.aws: Read-only file system`. Với `--no-daemon` phiên chạy trong chính tiến trình TUI, mang `-s danger-full-access` đến hết, không có daemon/updater nào chạy ra từ private home."
+    },
+    "currentUnitAtRetainedIdentity": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-147",
+      "githubAnchor": "unheaded-block-147",
+      "stableAnchor": "unheaded-block-147",
+      "title": "Unheaded block 147",
+      "startLine": 1378,
+      "endLine": 1378,
+      "textDigest": "6b135234f1db94662f8db717b7ce7f1b4911e2415c195e4715e7c2ae0987acd9",
+      "sample": "**Vì sao:** mặc định TUI của Codex (từ 0.160) không tự chạy phiên mà giao cho một app-server daemon dùng chung (`codex app-server --listen unix:// --managed-daemon`), cài vào `<COD",
+      "identityFingerprint": "5c411ab8ecee2cebabdb9eebbd06238cd3006b21473d56b62a2c4852715257d7",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+        "13.3 Pane Codex chạy `--no-daemon`: sandbox riêng của Codex phải tắt suốt phiên"
+      ],
+      "text": "**Vì sao:** mặc định TUI của Codex (từ 0.160) không tự chạy phiên mà giao cho một app-server daemon dùng chung (`codex app-server --listen unix:// --managed-daemon`), cài vào `<CODEX_HOME>/packages/app-server-daemon/releases/<version>/` lúc khởi động, kèm một daemon-updater tự thay bản mới hơn. Cờ `-s` của TUI chỉ áp cho thread nó mở; một thread mà daemon mở lại sau khi bị thay thì chạy theo mặc định của config, mà với workspace đã được gieo trust thì đó là sandbox `workspace-write` của chính Codex. Sandbox đó dựng bwrap riêng, coi cwd là writable root và mkdir các mount che (`.codex`, `.aws`, ...) bên trong cwd; dưới `--ro-bind / /` của fgOS lệnh mkdir thất bại nên mọi lệnh hỏng trước khi chạy: `bwrap: Can't mkdir <cwd>/.aws: Read-only file system`. Với `--no-daemon` phiên chạy trong chính tiến trình TUI, mang `-s danger-full-access` đến hết, không có daemon/updater nào chạy ra từ private home."
+    },
+    "sourceDigestUnchanged": true,
+    "status": "same text uniquely found; alias anchor still independently checked",
+    "aliasTargetComparisons": [
+      {
+        "aliasId": "step10-specs-0104",
+        "fromPath": "docs/specs/confinement-authority.md#unheaded-block-146",
+        "toOwner": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+        "toAnchor": "unheaded-block-5",
+        "currentTargetAtDraftAnchor": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-5",
+          "githubAnchor": "unheaded-block-5",
+          "stableAnchor": "unheaded-block-5",
+          "title": "Unheaded block 5",
+          "startLine": 45,
+          "endLine": 45,
+          "textDigest": "6b135234f1db94662f8db717b7ce7f1b4911e2415c195e4715e7c2ae0987acd9",
+          "sample": "**Vì sao:** mặc định TUI của Codex (từ 0.160) không tự chạy phiên mà giao cho một app-server daemon dùng chung (`codex app-server --listen unix:// --managed-daemon`), cài vào `<COD",
+          "identityFingerprint": "5c411ab8ecee2cebabdb9eebbd06238cd3006b21473d56b62a2c4852715257d7",
+          "ancestry": [
+            "Added in candidate: confinement authority decisions",
+            "12. Quyết định của proposal",
+            "13.3 Pane Codex chạy `--no-daemon`: sandbox riêng của Codex phải tắt suốt phiên"
+          ],
+          "text": "**Vì sao:** mặc định TUI của Codex (từ 0.160) không tự chạy phiên mà giao cho một app-server daemon dùng chung (`codex app-server --listen unix:// --managed-daemon`), cài vào `<CODEX_HOME>/packages/app-server-daemon/releases/<version>/` lúc khởi động, kèm một daemon-updater tự thay bản mới hơn. Cờ `-s` của TUI chỉ áp cho thread nó mở; một thread mà daemon mở lại sau khi bị thay thì chạy theo mặc định của config, mà với workspace đã được gieo trust thì đó là sandbox `workspace-write` của chính Codex. Sandbox đó dựng bwrap riêng, coi cwd là writable root và mkdir các mount che (`.codex`, `.aws`, ...) bên trong cwd; dưới `--ro-bind / /` của fgOS lệnh mkdir thất bại nên mọi lệnh hỏng trước khi chạy: `bwrap: Can't mkdir <cwd>/.aws: Read-only file system`. Với `--no-daemon` phiên chạy trong chính tiến trình TUI, mang `-s danger-full-access` đến hết, không có daemon/updater nào chạy ra từ private home."
+        },
+        "sourceTextDigestAtDraftTarget": true,
+        "uniqueSameTextCurrentTarget": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-5",
+          "githubAnchor": "unheaded-block-5",
+          "stableAnchor": "unheaded-block-5",
+          "title": "Unheaded block 5",
+          "startLine": 45,
+          "endLine": 45,
+          "textDigest": "6b135234f1db94662f8db717b7ce7f1b4911e2415c195e4715e7c2ae0987acd9",
+          "sample": "**Vì sao:** mặc định TUI của Codex (từ 0.160) không tự chạy phiên mà giao cho một app-server daemon dùng chung (`codex app-server --listen unix:// --managed-daemon`), cài vào `<COD",
+          "identityFingerprint": "5c411ab8ecee2cebabdb9eebbd06238cd3006b21473d56b62a2c4852715257d7",
+          "ancestry": [
+            "Added in candidate: confinement authority decisions",
+            "12. Quyết định của proposal",
+            "13.3 Pane Codex chạy `--no-daemon`: sandbox riêng của Codex phải tắt suốt phiên"
+          ],
+          "text": "**Vì sao:** mặc định TUI của Codex (từ 0.160) không tự chạy phiên mà giao cho một app-server daemon dùng chung (`codex app-server --listen unix:// --managed-daemon`), cài vào `<CODEX_HOME>/packages/app-server-daemon/releases/<version>/` lúc khởi động, kèm một daemon-updater tự thay bản mới hơn. Cờ `-s` của TUI chỉ áp cho thread nó mở; một thread mà daemon mở lại sau khi bị thay thì chạy theo mặc định của config, mà với workspace đã được gieo trust thì đó là sandbox `workspace-write` của chính Codex. Sandbox đó dựng bwrap riêng, coi cwd là writable root và mkdir các mount che (`.codex`, `.aws`, ...) bên trong cwd; dưới `--ro-bind / /` của fgOS lệnh mkdir thất bại nên mọi lệnh hỏng trước khi chạy: `bwrap: Can't mkdir <cwd>/.aws: Read-only file system`. Với `--no-daemon` phiên chạy trong chính tiến trình TUI, mang `-s danger-full-access` đến hết, không có daemon/updater nào chạy ra từ private home."
+        },
+        "note": "Read-only current source and target comparisons; draft unchanged. Source and target numbered-anchor relocation is not approval. Text corrections or source drift require independent judgment."
+      }
+    ]
+  },
+  "currentSourceDigestUnchanged": true
+}
+```
+
+## Entry e-037: claim_9926460074ef65ebbb208553bc11562e
+
+```json
+{
+  "kind": "source-alias-comparison",
+  "claimId": "claim_9926460074ef65ebbb208553bc11562e",
+  "priorAnchor": "unheaded-block-147",
+  "priorDigest": "7a4a02217b1fb56fa31b960e54231e46290d1c09d415ef8bbaf5dc32683f940b",
+  "currentDigest": "6b135234f1db94662f8db717b7ce7f1b4911e2415c195e4715e7c2ae0987acd9",
+  "matchingCurrentAnchors": [
+    "unheaded-block-148"
+  ],
+  "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval.",
+  "draftAliases": [
+    {
+      "aliasId": "step10-specs-0105",
+      "fromPath": "docs/specs/confinement-authority.md#unheaded-block-147",
+      "toOwner": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+      "toAnchor": "unheaded-block-6",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    }
+  ],
+  "currentNative": {
+    "sourcePath": "docs/specs/confinement-authority.md",
+    "unitDigest": "aaa39370c64bdc5175d72549977ee2e7c6ba288c66a77b43b67db7c867d93982",
+    "identityFingerprint": "aaa39370c64bdc5175d72549977ee2e7c6ba288c66a77b43b67db7c867d93982",
+    "claimId": "claim_9926460074ef65ebbb208553bc11562e",
+    "sourceAnchor": "unheaded-block-148",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "7a4a02217b1fb56fa31b960e54231e46290d1c09d415ef8bbaf5dc32683f940b",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "currentSourceUnit": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-148",
+    "githubAnchor": "unheaded-block-148",
+    "stableAnchor": "unheaded-block-148",
+    "title": "Unheaded block 148",
+    "startLine": 1380,
+    "endLine": 1380,
+    "textDigest": "7a4a02217b1fb56fa31b960e54231e46290d1c09d415ef8bbaf5dc32683f940b",
+    "sample": "**Bằng chứng:** sự cố thật ở run `unit-run-1791874482416-acccbfe0/panelist-2/1` (pane chạy codex 0.160.1, lệnh đầu chạy được, sau một lần turn bị ngắt thì daemon 0.162.1 xuất hiện ",
+    "identityFingerprint": "aaa39370c64bdc5175d72549977ee2e7c6ba288c66a77b43b67db7c867d93982",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+      "13.3 Pane Codex chạy `--no-daemon`: sandbox riêng của Codex phải tắt suốt phiên"
+    ],
+    "text": "**Bằng chứng:** sự cố thật ở run `unit-run-1791874482416-acccbfe0/panelist-2/1` (pane chạy codex 0.160.1, lệnh đầu chạy được, sau một lần turn bị ngắt thì daemon 0.162.1 xuất hiện trong private home và mọi lệnh hỏng với lỗi trên). Tái hiện cơ chế: dưới đúng mount fgOS dựng (`--ro-bind / /`, `--tmpfs /tmp`, private home và outbox writable), `codex sandbox -c sandbox_mode=\"workspace-write\" -- <ghi outbox>` với cwd là checkout chính báo đúng `bwrap: Can't mkdir /home/vantt/projects/forgentX/.aws: Read-only file system` (worktree không có `.codex` thì báo `.codex`), còn `danger-full-access` ghi được outbox; `read-only` hỏng vì cách khác (`execvp codex-linux-sandbox`). Dispatch pane thật có `--no-daemon`: private home không có `app-server-daemon/` hay `packages/`, run settle, outbox có `report-1.md` và `result-1.json`."
+  },
+  "currentTargetComparisons": [
+    {
+      "aliasId": "step10-specs-0105",
+      "toOwner": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+      "toAnchor": "unheaded-block-6",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 47,
+        "endLine": 47,
+        "textDigest": "7a4a02217b1fb56fa31b960e54231e46290d1c09d415ef8bbaf5dc32683f940b",
+        "sample": "**Bằng chứng:** sự cố thật ở run `unit-run-1791874482416-acccbfe0/panelist-2/1` (pane chạy codex 0.160.1, lệnh đầu chạy được, sau một lần turn bị ngắt thì daemon 0.162.1 xuất hiện ",
+        "identityFingerprint": "aaa39370c64bdc5175d72549977ee2e7c6ba288c66a77b43b67db7c867d93982",
+        "ancestry": [
+          "Added in candidate: confinement authority decisions",
+          "12. Quyết định của proposal",
+          "13.3 Pane Codex chạy `--no-daemon`: sandbox riêng của Codex phải tắt suốt phiên"
+        ],
+        "text": "**Bằng chứng:** sự cố thật ở run `unit-run-1791874482416-acccbfe0/panelist-2/1` (pane chạy codex 0.160.1, lệnh đầu chạy được, sau một lần turn bị ngắt thì daemon 0.162.1 xuất hiện trong private home và mọi lệnh hỏng với lỗi trên). Tái hiện cơ chế: dưới đúng mount fgOS dựng (`--ro-bind / /`, `--tmpfs /tmp`, private home và outbox writable), `codex sandbox -c sandbox_mode=\"workspace-write\" -- <ghi outbox>` với cwd là checkout chính báo đúng `bwrap: Can't mkdir /home/vantt/projects/forgentX/.aws: Read-only file system` (worktree không có `.codex` thì báo `.codex`), còn `danger-full-access` ghi được outbox; `read-only` hỏng vì cách khác (`execvp codex-linux-sandbox`). Dispatch pane thật có `--no-daemon`: private home không có `app-server-daemon/` hay `packages/`, run settle, outbox có `report-1.md` và `result-1.json`."
+      },
+      "uniqueSameDigestUnits": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-6",
+          "githubAnchor": "unheaded-block-6",
+          "stableAnchor": "unheaded-block-6",
+          "title": "Unheaded block 6",
+          "startLine": 47,
+          "endLine": 47,
+          "textDigest": "7a4a02217b1fb56fa31b960e54231e46290d1c09d415ef8bbaf5dc32683f940b",
+          "sample": "**Bằng chứng:** sự cố thật ở run `unit-run-1791874482416-acccbfe0/panelist-2/1` (pane chạy codex 0.160.1, lệnh đầu chạy được, sau một lần turn bị ngắt thì daemon 0.162.1 xuất hiện ",
+          "identityFingerprint": "aaa39370c64bdc5175d72549977ee2e7c6ba288c66a77b43b67db7c867d93982",
+          "ancestry": [
+            "Added in candidate: confinement authority decisions",
+            "12. Quyết định của proposal",
+            "13.3 Pane Codex chạy `--no-daemon`: sandbox riêng của Codex phải tắt suốt phiên"
+          ],
+          "text": "**Bằng chứng:** sự cố thật ở run `unit-run-1791874482416-acccbfe0/panelist-2/1` (pane chạy codex 0.160.1, lệnh đầu chạy được, sau một lần turn bị ngắt thì daemon 0.162.1 xuất hiện trong private home và mọi lệnh hỏng với lỗi trên). Tái hiện cơ chế: dưới đúng mount fgOS dựng (`--ro-bind / /`, `--tmpfs /tmp`, private home và outbox writable), `codex sandbox -c sandbox_mode=\"workspace-write\" -- <ghi outbox>` với cwd là checkout chính báo đúng `bwrap: Can't mkdir /home/vantt/projects/forgentX/.aws: Read-only file system` (worktree không có `.codex` thì báo `.codex`), còn `danger-full-access` ghi được outbox; `read-only` hỏng vì cách khác (`execvp codex-linux-sandbox`). Dispatch pane thật có `--no-daemon`: private home không có `app-server-daemon/` hay `packages/`, run settle, outbox có `report-1.md` và `result-1.json`."
+        }
+      ]
+    }
+  ],
+  "historicalPackageComparisons": {
+    "nativeIdentity": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "aaa39370c64bdc5175d72549977ee2e7c6ba288c66a77b43b67db7c867d93982",
+      "identityFingerprint": "aaa39370c64bdc5175d72549977ee2e7c6ba288c66a77b43b67db7c867d93982",
+      "claimId": "claim_9926460074ef65ebbb208553bc11562e",
+      "sourceAnchor": "unheaded-block-148",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "7a4a02217b1fb56fa31b960e54231e46290d1c09d415ef8bbaf5dc32683f940b",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "currentIdentityBinding": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "aaa39370c64bdc5175d72549977ee2e7c6ba288c66a77b43b67db7c867d93982",
+      "identityFingerprint": "aaa39370c64bdc5175d72549977ee2e7c6ba288c66a77b43b67db7c867d93982",
+      "claimId": "claim_9926460074ef65ebbb208553bc11562e",
+      "sourceAnchor": "unheaded-block-148",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "7a4a02217b1fb56fa31b960e54231e46290d1c09d415ef8bbaf5dc32683f940b",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "uniqueSameDigestBinding": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-148",
+      "githubAnchor": "unheaded-block-148",
+      "stableAnchor": "unheaded-block-148",
+      "title": "Unheaded block 148",
+      "startLine": 1380,
+      "endLine": 1380,
+      "textDigest": "7a4a02217b1fb56fa31b960e54231e46290d1c09d415ef8bbaf5dc32683f940b",
+      "sample": "**Bằng chứng:** sự cố thật ở run `unit-run-1791874482416-acccbfe0/panelist-2/1` (pane chạy codex 0.160.1, lệnh đầu chạy được, sau một lần turn bị ngắt thì daemon 0.162.1 xuất hiện ",
+      "identityFingerprint": "aaa39370c64bdc5175d72549977ee2e7c6ba288c66a77b43b67db7c867d93982",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+        "13.3 Pane Codex chạy `--no-daemon`: sandbox riêng của Codex phải tắt suốt phiên"
+      ],
+      "text": "**Bằng chứng:** sự cố thật ở run `unit-run-1791874482416-acccbfe0/panelist-2/1` (pane chạy codex 0.160.1, lệnh đầu chạy được, sau một lần turn bị ngắt thì daemon 0.162.1 xuất hiện trong private home và mọi lệnh hỏng với lỗi trên). Tái hiện cơ chế: dưới đúng mount fgOS dựng (`--ro-bind / /`, `--tmpfs /tmp`, private home và outbox writable), `codex sandbox -c sandbox_mode=\"workspace-write\" -- <ghi outbox>` với cwd là checkout chính báo đúng `bwrap: Can't mkdir /home/vantt/projects/forgentX/.aws: Read-only file system` (worktree không có `.codex` thì báo `.codex`), còn `danger-full-access` ghi được outbox; `read-only` hỏng vì cách khác (`execvp codex-linux-sandbox`). Dispatch pane thật có `--no-daemon`: private home không có `app-server-daemon/` hay `packages/`, run settle, outbox có `report-1.md` và `result-1.json`."
+    },
+    "currentUnitAtRetainedIdentity": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-148",
+      "githubAnchor": "unheaded-block-148",
+      "stableAnchor": "unheaded-block-148",
+      "title": "Unheaded block 148",
+      "startLine": 1380,
+      "endLine": 1380,
+      "textDigest": "7a4a02217b1fb56fa31b960e54231e46290d1c09d415ef8bbaf5dc32683f940b",
+      "sample": "**Bằng chứng:** sự cố thật ở run `unit-run-1791874482416-acccbfe0/panelist-2/1` (pane chạy codex 0.160.1, lệnh đầu chạy được, sau một lần turn bị ngắt thì daemon 0.162.1 xuất hiện ",
+      "identityFingerprint": "aaa39370c64bdc5175d72549977ee2e7c6ba288c66a77b43b67db7c867d93982",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+        "13.3 Pane Codex chạy `--no-daemon`: sandbox riêng của Codex phải tắt suốt phiên"
+      ],
+      "text": "**Bằng chứng:** sự cố thật ở run `unit-run-1791874482416-acccbfe0/panelist-2/1` (pane chạy codex 0.160.1, lệnh đầu chạy được, sau một lần turn bị ngắt thì daemon 0.162.1 xuất hiện trong private home và mọi lệnh hỏng với lỗi trên). Tái hiện cơ chế: dưới đúng mount fgOS dựng (`--ro-bind / /`, `--tmpfs /tmp`, private home và outbox writable), `codex sandbox -c sandbox_mode=\"workspace-write\" -- <ghi outbox>` với cwd là checkout chính báo đúng `bwrap: Can't mkdir /home/vantt/projects/forgentX/.aws: Read-only file system` (worktree không có `.codex` thì báo `.codex`), còn `danger-full-access` ghi được outbox; `read-only` hỏng vì cách khác (`execvp codex-linux-sandbox`). Dispatch pane thật có `--no-daemon`: private home không có `app-server-daemon/` hay `packages/`, run settle, outbox có `report-1.md` và `result-1.json`."
+    },
+    "sourceDigestUnchanged": true,
+    "status": "same text uniquely found; alias anchor still independently checked",
+    "aliasTargetComparisons": [
+      {
+        "aliasId": "step10-specs-0105",
+        "fromPath": "docs/specs/confinement-authority.md#unheaded-block-147",
+        "toOwner": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+        "toAnchor": "unheaded-block-6",
+        "currentTargetAtDraftAnchor": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-6",
+          "githubAnchor": "unheaded-block-6",
+          "stableAnchor": "unheaded-block-6",
+          "title": "Unheaded block 6",
+          "startLine": 47,
+          "endLine": 47,
+          "textDigest": "7a4a02217b1fb56fa31b960e54231e46290d1c09d415ef8bbaf5dc32683f940b",
+          "sample": "**Bằng chứng:** sự cố thật ở run `unit-run-1791874482416-acccbfe0/panelist-2/1` (pane chạy codex 0.160.1, lệnh đầu chạy được, sau một lần turn bị ngắt thì daemon 0.162.1 xuất hiện ",
+          "identityFingerprint": "aaa39370c64bdc5175d72549977ee2e7c6ba288c66a77b43b67db7c867d93982",
+          "ancestry": [
+            "Added in candidate: confinement authority decisions",
+            "12. Quyết định của proposal",
+            "13.3 Pane Codex chạy `--no-daemon`: sandbox riêng của Codex phải tắt suốt phiên"
+          ],
+          "text": "**Bằng chứng:** sự cố thật ở run `unit-run-1791874482416-acccbfe0/panelist-2/1` (pane chạy codex 0.160.1, lệnh đầu chạy được, sau một lần turn bị ngắt thì daemon 0.162.1 xuất hiện trong private home và mọi lệnh hỏng với lỗi trên). Tái hiện cơ chế: dưới đúng mount fgOS dựng (`--ro-bind / /`, `--tmpfs /tmp`, private home và outbox writable), `codex sandbox -c sandbox_mode=\"workspace-write\" -- <ghi outbox>` với cwd là checkout chính báo đúng `bwrap: Can't mkdir /home/vantt/projects/forgentX/.aws: Read-only file system` (worktree không có `.codex` thì báo `.codex`), còn `danger-full-access` ghi được outbox; `read-only` hỏng vì cách khác (`execvp codex-linux-sandbox`). Dispatch pane thật có `--no-daemon`: private home không có `app-server-daemon/` hay `packages/`, run settle, outbox có `report-1.md` và `result-1.json`."
+        },
+        "sourceTextDigestAtDraftTarget": true,
+        "uniqueSameTextCurrentTarget": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-6",
+          "githubAnchor": "unheaded-block-6",
+          "stableAnchor": "unheaded-block-6",
+          "title": "Unheaded block 6",
+          "startLine": 47,
+          "endLine": 47,
+          "textDigest": "7a4a02217b1fb56fa31b960e54231e46290d1c09d415ef8bbaf5dc32683f940b",
+          "sample": "**Bằng chứng:** sự cố thật ở run `unit-run-1791874482416-acccbfe0/panelist-2/1` (pane chạy codex 0.160.1, lệnh đầu chạy được, sau một lần turn bị ngắt thì daemon 0.162.1 xuất hiện ",
+          "identityFingerprint": "aaa39370c64bdc5175d72549977ee2e7c6ba288c66a77b43b67db7c867d93982",
+          "ancestry": [
+            "Added in candidate: confinement authority decisions",
+            "12. Quyết định của proposal",
+            "13.3 Pane Codex chạy `--no-daemon`: sandbox riêng của Codex phải tắt suốt phiên"
+          ],
+          "text": "**Bằng chứng:** sự cố thật ở run `unit-run-1791874482416-acccbfe0/panelist-2/1` (pane chạy codex 0.160.1, lệnh đầu chạy được, sau một lần turn bị ngắt thì daemon 0.162.1 xuất hiện trong private home và mọi lệnh hỏng với lỗi trên). Tái hiện cơ chế: dưới đúng mount fgOS dựng (`--ro-bind / /`, `--tmpfs /tmp`, private home và outbox writable), `codex sandbox -c sandbox_mode=\"workspace-write\" -- <ghi outbox>` với cwd là checkout chính báo đúng `bwrap: Can't mkdir /home/vantt/projects/forgentX/.aws: Read-only file system` (worktree không có `.codex` thì báo `.codex`), còn `danger-full-access` ghi được outbox; `read-only` hỏng vì cách khác (`execvp codex-linux-sandbox`). Dispatch pane thật có `--no-daemon`: private home không có `app-server-daemon/` hay `packages/`, run settle, outbox có `report-1.md` và `result-1.json`."
+        },
+        "note": "Read-only current source and target comparisons; draft unchanged. Source and target numbered-anchor relocation is not approval. Text corrections or source drift require independent judgment."
+      }
+    ]
+  },
+  "currentSourceDigestUnchanged": true
+}
+```
+
+## Entry e-038: claim_3be68f87d3d60c946927441f13933a84
+
+```json
+{
+  "kind": "source-alias-comparison",
+  "claimId": "claim_3be68f87d3d60c946927441f13933a84",
+  "priorAnchor": "unheaded-block-148",
+  "priorDigest": "05a668d4bfd01094c18b54e82e2ea42408957cb1725c27a31b8173c35b8a0b33",
+  "currentDigest": "7a4a02217b1fb56fa31b960e54231e46290d1c09d415ef8bbaf5dc32683f940b",
+  "matchingCurrentAnchors": [
+    "unheaded-block-149"
+  ],
+  "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval.",
+  "draftAliases": [
+    {
+      "aliasId": "step10-specs-0106",
+      "fromPath": "docs/specs/confinement-authority.md#unheaded-block-148",
+      "toOwner": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+      "toAnchor": "unheaded-block-7",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    }
+  ],
+  "currentNative": {
+    "sourcePath": "docs/specs/confinement-authority.md",
+    "unitDigest": "421db2881327eaebe74d9951d45bbc3c0f745d975fdfd0cc85f4306c25fcdf86",
+    "identityFingerprint": "421db2881327eaebe74d9951d45bbc3c0f745d975fdfd0cc85f4306c25fcdf86",
+    "claimId": "claim_3be68f87d3d60c946927441f13933a84",
+    "sourceAnchor": "unheaded-block-149",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "05a668d4bfd01094c18b54e82e2ea42408957cb1725c27a31b8173c35b8a0b33",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "currentSourceUnit": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-149",
+    "githubAnchor": "unheaded-block-149",
+    "stableAnchor": "unheaded-block-149",
+    "title": "Unheaded block 149",
+    "startLine": 1382,
+    "endLine": 1382,
+    "textDigest": "05a668d4bfd01094c18b54e82e2ea42408957cb1725c27a31b8173c35b8a0b33",
+    "sample": "**Chưa chứng minh:** sự kiện nào khiến thread trong sự cố chạy lại dưới `workspace-write` (giả thuyết mạnh nhất: daemon-updater thay 0.160.1 bằng 0.162.1 giữa run, chính việc thay ",
+    "identityFingerprint": "421db2881327eaebe74d9951d45bbc3c0f745d975fdfd0cc85f4306c25fcdf86",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+      "13.3 Pane Codex chạy `--no-daemon`: sandbox riêng của Codex phải tắt suốt phiên"
+    ],
+    "text": "**Chưa chứng minh:** sự kiện nào khiến thread trong sự cố chạy lại dưới `workspace-write` (giả thuyết mạnh nhất: daemon-updater thay 0.160.1 bằng 0.162.1 giữa run, chính việc thay thế làm ngắt turn, và thread được mở lại không mang `-s`). Tắt daemon loại bỏ cả nhánh này; ghi `sandbox_mode = \"danger-full-access\"` vào `config.toml` của private home là lớp phòng thủ thứ hai chưa làm (file đó do bước gieo trust ghi, và driver bwrap không được rẽ nhánh theo provider). Đường `codex exec` (`codex-cli-bwrap`) không dùng daemon nên không đổi."
+  },
+  "currentTargetComparisons": [
+    {
+      "aliasId": "step10-specs-0106",
+      "toOwner": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+      "toAnchor": "unheaded-block-7",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 49,
+        "endLine": 49,
+        "textDigest": "05a668d4bfd01094c18b54e82e2ea42408957cb1725c27a31b8173c35b8a0b33",
+        "sample": "**Chưa chứng minh:** sự kiện nào khiến thread trong sự cố chạy lại dưới `workspace-write` (giả thuyết mạnh nhất: daemon-updater thay 0.160.1 bằng 0.162.1 giữa run, chính việc thay ",
+        "identityFingerprint": "421db2881327eaebe74d9951d45bbc3c0f745d975fdfd0cc85f4306c25fcdf86",
+        "ancestry": [
+          "Added in candidate: confinement authority decisions",
+          "12. Quyết định của proposal",
+          "13.3 Pane Codex chạy `--no-daemon`: sandbox riêng của Codex phải tắt suốt phiên"
+        ],
+        "text": "**Chưa chứng minh:** sự kiện nào khiến thread trong sự cố chạy lại dưới `workspace-write` (giả thuyết mạnh nhất: daemon-updater thay 0.160.1 bằng 0.162.1 giữa run, chính việc thay thế làm ngắt turn, và thread được mở lại không mang `-s`). Tắt daemon loại bỏ cả nhánh này; ghi `sandbox_mode = \"danger-full-access\"` vào `config.toml` của private home là lớp phòng thủ thứ hai chưa làm (file đó do bước gieo trust ghi, và driver bwrap không được rẽ nhánh theo provider). Đường `codex exec` (`codex-cli-bwrap`) không dùng daemon nên không đổi."
+      },
+      "uniqueSameDigestUnits": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-7",
+          "githubAnchor": "unheaded-block-7",
+          "stableAnchor": "unheaded-block-7",
+          "title": "Unheaded block 7",
+          "startLine": 49,
+          "endLine": 49,
+          "textDigest": "05a668d4bfd01094c18b54e82e2ea42408957cb1725c27a31b8173c35b8a0b33",
+          "sample": "**Chưa chứng minh:** sự kiện nào khiến thread trong sự cố chạy lại dưới `workspace-write` (giả thuyết mạnh nhất: daemon-updater thay 0.160.1 bằng 0.162.1 giữa run, chính việc thay ",
+          "identityFingerprint": "421db2881327eaebe74d9951d45bbc3c0f745d975fdfd0cc85f4306c25fcdf86",
+          "ancestry": [
+            "Added in candidate: confinement authority decisions",
+            "12. Quyết định của proposal",
+            "13.3 Pane Codex chạy `--no-daemon`: sandbox riêng của Codex phải tắt suốt phiên"
+          ],
+          "text": "**Chưa chứng minh:** sự kiện nào khiến thread trong sự cố chạy lại dưới `workspace-write` (giả thuyết mạnh nhất: daemon-updater thay 0.160.1 bằng 0.162.1 giữa run, chính việc thay thế làm ngắt turn, và thread được mở lại không mang `-s`). Tắt daemon loại bỏ cả nhánh này; ghi `sandbox_mode = \"danger-full-access\"` vào `config.toml` của private home là lớp phòng thủ thứ hai chưa làm (file đó do bước gieo trust ghi, và driver bwrap không được rẽ nhánh theo provider). Đường `codex exec` (`codex-cli-bwrap`) không dùng daemon nên không đổi."
+        }
+      ]
+    }
+  ],
+  "historicalPackageComparisons": {
+    "nativeIdentity": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "421db2881327eaebe74d9951d45bbc3c0f745d975fdfd0cc85f4306c25fcdf86",
+      "identityFingerprint": "421db2881327eaebe74d9951d45bbc3c0f745d975fdfd0cc85f4306c25fcdf86",
+      "claimId": "claim_3be68f87d3d60c946927441f13933a84",
+      "sourceAnchor": "unheaded-block-149",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "05a668d4bfd01094c18b54e82e2ea42408957cb1725c27a31b8173c35b8a0b33",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "currentIdentityBinding": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "421db2881327eaebe74d9951d45bbc3c0f745d975fdfd0cc85f4306c25fcdf86",
+      "identityFingerprint": "421db2881327eaebe74d9951d45bbc3c0f745d975fdfd0cc85f4306c25fcdf86",
+      "claimId": "claim_3be68f87d3d60c946927441f13933a84",
+      "sourceAnchor": "unheaded-block-149",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "05a668d4bfd01094c18b54e82e2ea42408957cb1725c27a31b8173c35b8a0b33",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "uniqueSameDigestBinding": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-149",
+      "githubAnchor": "unheaded-block-149",
+      "stableAnchor": "unheaded-block-149",
+      "title": "Unheaded block 149",
+      "startLine": 1382,
+      "endLine": 1382,
+      "textDigest": "05a668d4bfd01094c18b54e82e2ea42408957cb1725c27a31b8173c35b8a0b33",
+      "sample": "**Chưa chứng minh:** sự kiện nào khiến thread trong sự cố chạy lại dưới `workspace-write` (giả thuyết mạnh nhất: daemon-updater thay 0.160.1 bằng 0.162.1 giữa run, chính việc thay ",
+      "identityFingerprint": "421db2881327eaebe74d9951d45bbc3c0f745d975fdfd0cc85f4306c25fcdf86",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+        "13.3 Pane Codex chạy `--no-daemon`: sandbox riêng của Codex phải tắt suốt phiên"
+      ],
+      "text": "**Chưa chứng minh:** sự kiện nào khiến thread trong sự cố chạy lại dưới `workspace-write` (giả thuyết mạnh nhất: daemon-updater thay 0.160.1 bằng 0.162.1 giữa run, chính việc thay thế làm ngắt turn, và thread được mở lại không mang `-s`). Tắt daemon loại bỏ cả nhánh này; ghi `sandbox_mode = \"danger-full-access\"` vào `config.toml` của private home là lớp phòng thủ thứ hai chưa làm (file đó do bước gieo trust ghi, và driver bwrap không được rẽ nhánh theo provider). Đường `codex exec` (`codex-cli-bwrap`) không dùng daemon nên không đổi."
+    },
+    "currentUnitAtRetainedIdentity": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-149",
+      "githubAnchor": "unheaded-block-149",
+      "stableAnchor": "unheaded-block-149",
+      "title": "Unheaded block 149",
+      "startLine": 1382,
+      "endLine": 1382,
+      "textDigest": "05a668d4bfd01094c18b54e82e2ea42408957cb1725c27a31b8173c35b8a0b33",
+      "sample": "**Chưa chứng minh:** sự kiện nào khiến thread trong sự cố chạy lại dưới `workspace-write` (giả thuyết mạnh nhất: daemon-updater thay 0.160.1 bằng 0.162.1 giữa run, chính việc thay ",
+      "identityFingerprint": "421db2881327eaebe74d9951d45bbc3c0f745d975fdfd0cc85f4306c25fcdf86",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+        "13.3 Pane Codex chạy `--no-daemon`: sandbox riêng của Codex phải tắt suốt phiên"
+      ],
+      "text": "**Chưa chứng minh:** sự kiện nào khiến thread trong sự cố chạy lại dưới `workspace-write` (giả thuyết mạnh nhất: daemon-updater thay 0.160.1 bằng 0.162.1 giữa run, chính việc thay thế làm ngắt turn, và thread được mở lại không mang `-s`). Tắt daemon loại bỏ cả nhánh này; ghi `sandbox_mode = \"danger-full-access\"` vào `config.toml` của private home là lớp phòng thủ thứ hai chưa làm (file đó do bước gieo trust ghi, và driver bwrap không được rẽ nhánh theo provider). Đường `codex exec` (`codex-cli-bwrap`) không dùng daemon nên không đổi."
+    },
+    "sourceDigestUnchanged": true,
+    "status": "same text uniquely found; alias anchor still independently checked",
+    "aliasTargetComparisons": [
+      {
+        "aliasId": "step10-specs-0106",
+        "fromPath": "docs/specs/confinement-authority.md#unheaded-block-148",
+        "toOwner": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+        "toAnchor": "unheaded-block-7",
+        "currentTargetAtDraftAnchor": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-7",
+          "githubAnchor": "unheaded-block-7",
+          "stableAnchor": "unheaded-block-7",
+          "title": "Unheaded block 7",
+          "startLine": 49,
+          "endLine": 49,
+          "textDigest": "05a668d4bfd01094c18b54e82e2ea42408957cb1725c27a31b8173c35b8a0b33",
+          "sample": "**Chưa chứng minh:** sự kiện nào khiến thread trong sự cố chạy lại dưới `workspace-write` (giả thuyết mạnh nhất: daemon-updater thay 0.160.1 bằng 0.162.1 giữa run, chính việc thay ",
+          "identityFingerprint": "421db2881327eaebe74d9951d45bbc3c0f745d975fdfd0cc85f4306c25fcdf86",
+          "ancestry": [
+            "Added in candidate: confinement authority decisions",
+            "12. Quyết định của proposal",
+            "13.3 Pane Codex chạy `--no-daemon`: sandbox riêng của Codex phải tắt suốt phiên"
+          ],
+          "text": "**Chưa chứng minh:** sự kiện nào khiến thread trong sự cố chạy lại dưới `workspace-write` (giả thuyết mạnh nhất: daemon-updater thay 0.160.1 bằng 0.162.1 giữa run, chính việc thay thế làm ngắt turn, và thread được mở lại không mang `-s`). Tắt daemon loại bỏ cả nhánh này; ghi `sandbox_mode = \"danger-full-access\"` vào `config.toml` của private home là lớp phòng thủ thứ hai chưa làm (file đó do bước gieo trust ghi, và driver bwrap không được rẽ nhánh theo provider). Đường `codex exec` (`codex-cli-bwrap`) không dùng daemon nên không đổi."
+        },
+        "sourceTextDigestAtDraftTarget": true,
+        "uniqueSameTextCurrentTarget": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-7",
+          "githubAnchor": "unheaded-block-7",
+          "stableAnchor": "unheaded-block-7",
+          "title": "Unheaded block 7",
+          "startLine": 49,
+          "endLine": 49,
+          "textDigest": "05a668d4bfd01094c18b54e82e2ea42408957cb1725c27a31b8173c35b8a0b33",
+          "sample": "**Chưa chứng minh:** sự kiện nào khiến thread trong sự cố chạy lại dưới `workspace-write` (giả thuyết mạnh nhất: daemon-updater thay 0.160.1 bằng 0.162.1 giữa run, chính việc thay ",
+          "identityFingerprint": "421db2881327eaebe74d9951d45bbc3c0f745d975fdfd0cc85f4306c25fcdf86",
+          "ancestry": [
+            "Added in candidate: confinement authority decisions",
+            "12. Quyết định của proposal",
+            "13.3 Pane Codex chạy `--no-daemon`: sandbox riêng của Codex phải tắt suốt phiên"
+          ],
+          "text": "**Chưa chứng minh:** sự kiện nào khiến thread trong sự cố chạy lại dưới `workspace-write` (giả thuyết mạnh nhất: daemon-updater thay 0.160.1 bằng 0.162.1 giữa run, chính việc thay thế làm ngắt turn, và thread được mở lại không mang `-s`). Tắt daemon loại bỏ cả nhánh này; ghi `sandbox_mode = \"danger-full-access\"` vào `config.toml` của private home là lớp phòng thủ thứ hai chưa làm (file đó do bước gieo trust ghi, và driver bwrap không được rẽ nhánh theo provider). Đường `codex exec` (`codex-cli-bwrap`) không dùng daemon nên không đổi."
+        },
+        "note": "Read-only current source and target comparisons; draft unchanged. Source and target numbered-anchor relocation is not approval. Text corrections or source drift require independent judgment."
+      }
+    ]
+  },
+  "currentSourceDigestUnchanged": true
+}
+```
+
+## Entry e-039: claim_dbbee9d940a2d595936e12ba6781f684
+
+```json
+{
+  "kind": "source-alias-comparison",
+  "claimId": "claim_dbbee9d940a2d595936e12ba6781f684",
+  "priorAnchor": "unheaded-block-149",
+  "priorDigest": "63bf6e3f79aef39f4af16bbcdeb237dff250a8f2aefbe0e5b18249eab50649e1",
+  "currentDigest": "05a668d4bfd01094c18b54e82e2ea42408957cb1725c27a31b8173c35b8a0b33",
+  "matchingCurrentAnchors": [
+    "unheaded-block-150"
+  ],
+  "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval.",
+  "draftAliases": [
+    {
+      "aliasId": "step10-specs-0107",
+      "fromPath": "docs/specs/confinement-authority.md#unheaded-block-149",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-69",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    }
+  ],
+  "currentNative": {
+    "sourcePath": "docs/specs/confinement-authority.md",
+    "unitDigest": "59b9c06c5006eebd43e4ccf13af1149a769149495a1e388ff746696660d02a4f",
+    "identityFingerprint": "59b9c06c5006eebd43e4ccf13af1149a769149495a1e388ff746696660d02a4f",
+    "claimId": "claim_dbbee9d940a2d595936e12ba6781f684",
+    "sourceAnchor": "unheaded-block-150",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "63bf6e3f79aef39f4af16bbcdeb237dff250a8f2aefbe0e5b18249eab50649e1",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "currentSourceUnit": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-150",
+    "githubAnchor": "unheaded-block-150",
+    "stableAnchor": "unheaded-block-150",
+    "title": "Unheaded block 150",
+    "startLine": 1386,
+    "endLine": 1389,
+    "textDigest": "63bf6e3f79aef39f4af16bbcdeb237dff250a8f2aefbe0e5b18249eab50649e1",
+    "sample": "- **P04 M-3 (Inherited unconfined anchor overclaim):** Khi kế thừa anchor từ capability cha, một capability không khai báo confinement nhận attestation `unconfined` (explicit opt-o",
+    "identityFingerprint": "59b9c06c5006eebd43e4ccf13af1149a769149495a1e388ff746696660d02a4f",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+      "Tồn đọng mở (Open Deferred Items):"
+    ],
+    "text": "- **P04 M-3 (Inherited unconfined anchor overclaim):** Khi kế thừa anchor từ capability cha, một capability không khai báo confinement nhận attestation `unconfined` (explicit opt-out) thay vì `unknown`/`omitted`. Cần phân biệt rõ cờ thừa kế trong phase tiếp theo.\n- **P03 NEW-1b/NEW-1c & P06 M2 (Thin attestation body):** Thân attestation của `enforced` chưa so sánh toàn diện invocation chạy thực tế với plan đã prepare; mảng `channels[]` vẫn mang chi tiết observe-mode.\n- **P03 R4 (Reaper caller):** Hàm dọn dẹp thư mục tạm thành công chưa có caller định kỳ trong production.\n- **Strict Mode Default:** `runner.confinement.strict` tiếp tục mặc định là `false`, giữ an toàn tương thích cho môi trường phát triển và chờ hoàn thiện các tồn đọng trên trước khi kích hoạt mặc định. Operator có thể bật `strict: true` khi đã thoả mãn `fgos doctor`."
+  },
+  "currentTargetComparisons": [
+    {
+      "aliasId": "step10-specs-0107",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-69",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-69",
+        "githubAnchor": "unheaded-block-69",
+        "stableAnchor": "unheaded-block-69",
+        "title": "Unheaded block 69",
+        "startLine": 581,
+        "endLine": 581,
+        "textDigest": "9c24e69b1b4a4ede9fce9ed6d771f342920397506c61c2a546df8163a810c5ae",
+        "sample": "Private home nhận một **bản chép** của login, bị xoá sau dispatch. Hai điều đi kèm (chi tiết và luật ở `docs/specs/runner.md`, RUL75 (login xoay vòng được gia hạn một lần tại nguồn",
+        "identityFingerprint": "be86a74cad90f4d984b92e5c5e25041ffb38373d43fea3a5b1f491c2fc2b42b0",
+        "ancestry": [
+          "Spec: Agent Confinement Authority",
+          "Added in candidate: Current settled facts and deferred items",
+          "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
+        ],
+        "text": "Private home nhận một **bản chép** của login, bị xoá sau dispatch. Hai điều đi kèm (chi tiết và luật ở `docs/specs/runner.md`, RUL75 (login xoay vòng được gia hạn một lần tại nguồn, trong bản chép fgOS giữ, và login được gia hạn trong private home được ghi ngược)):"
+      },
+      "uniqueSameDigestUnits": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-71",
+          "githubAnchor": "unheaded-block-71",
+          "stableAnchor": "unheaded-block-71",
+          "title": "Unheaded block 71",
+          "startLine": 588,
+          "endLine": 591,
+          "textDigest": "63bf6e3f79aef39f4af16bbcdeb237dff250a8f2aefbe0e5b18249eab50649e1",
+          "sample": "- **P04 M-3 (Inherited unconfined anchor overclaim):** Khi kế thừa anchor từ capability cha, một capability không khai báo confinement nhận attestation `unconfined` (explicit opt-o",
+          "identityFingerprint": "59b9c06c5006eebd43e4ccf13af1149a769149495a1e388ff746696660d02a4f",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "Added in candidate: Current settled facts and deferred items",
+            "Tồn đọng mở (Open Deferred Items):"
+          ],
+          "text": "- **P04 M-3 (Inherited unconfined anchor overclaim):** Khi kế thừa anchor từ capability cha, một capability không khai báo confinement nhận attestation `unconfined` (explicit opt-out) thay vì `unknown`/`omitted`. Cần phân biệt rõ cờ thừa kế trong phase tiếp theo.\n- **P03 NEW-1b/NEW-1c & P06 M2 (Thin attestation body):** Thân attestation của `enforced` chưa so sánh toàn diện invocation chạy thực tế với plan đã prepare; mảng `channels[]` vẫn mang chi tiết observe-mode.\n- **P03 R4 (Reaper caller):** Hàm dọn dẹp thư mục tạm thành công chưa có caller định kỳ trong production.\n- **Strict Mode Default:** `runner.confinement.strict` tiếp tục mặc định là `false`, giữ an toàn tương thích cho môi trường phát triển và chờ hoàn thiện các tồn đọng trên trước khi kích hoạt mặc định. Operator có thể bật `strict: true` khi đã thoả mãn `fgos doctor`."
+        }
+      ]
+    }
+  ],
+  "historicalPackageComparisons": {
+    "nativeIdentity": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "59b9c06c5006eebd43e4ccf13af1149a769149495a1e388ff746696660d02a4f",
+      "identityFingerprint": "59b9c06c5006eebd43e4ccf13af1149a769149495a1e388ff746696660d02a4f",
+      "claimId": "claim_dbbee9d940a2d595936e12ba6781f684",
+      "sourceAnchor": "unheaded-block-150",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "63bf6e3f79aef39f4af16bbcdeb237dff250a8f2aefbe0e5b18249eab50649e1",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "currentIdentityBinding": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "59b9c06c5006eebd43e4ccf13af1149a769149495a1e388ff746696660d02a4f",
+      "identityFingerprint": "59b9c06c5006eebd43e4ccf13af1149a769149495a1e388ff746696660d02a4f",
+      "claimId": "claim_dbbee9d940a2d595936e12ba6781f684",
+      "sourceAnchor": "unheaded-block-150",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "63bf6e3f79aef39f4af16bbcdeb237dff250a8f2aefbe0e5b18249eab50649e1",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "uniqueSameDigestBinding": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-150",
+      "githubAnchor": "unheaded-block-150",
+      "stableAnchor": "unheaded-block-150",
+      "title": "Unheaded block 150",
+      "startLine": 1386,
+      "endLine": 1389,
+      "textDigest": "63bf6e3f79aef39f4af16bbcdeb237dff250a8f2aefbe0e5b18249eab50649e1",
+      "sample": "- **P04 M-3 (Inherited unconfined anchor overclaim):** Khi kế thừa anchor từ capability cha, một capability không khai báo confinement nhận attestation `unconfined` (explicit opt-o",
+      "identityFingerprint": "59b9c06c5006eebd43e4ccf13af1149a769149495a1e388ff746696660d02a4f",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+        "Tồn đọng mở (Open Deferred Items):"
+      ],
+      "text": "- **P04 M-3 (Inherited unconfined anchor overclaim):** Khi kế thừa anchor từ capability cha, một capability không khai báo confinement nhận attestation `unconfined` (explicit opt-out) thay vì `unknown`/`omitted`. Cần phân biệt rõ cờ thừa kế trong phase tiếp theo.\n- **P03 NEW-1b/NEW-1c & P06 M2 (Thin attestation body):** Thân attestation của `enforced` chưa so sánh toàn diện invocation chạy thực tế với plan đã prepare; mảng `channels[]` vẫn mang chi tiết observe-mode.\n- **P03 R4 (Reaper caller):** Hàm dọn dẹp thư mục tạm thành công chưa có caller định kỳ trong production.\n- **Strict Mode Default:** `runner.confinement.strict` tiếp tục mặc định là `false`, giữ an toàn tương thích cho môi trường phát triển và chờ hoàn thiện các tồn đọng trên trước khi kích hoạt mặc định. Operator có thể bật `strict: true` khi đã thoả mãn `fgos doctor`."
+    },
+    "currentUnitAtRetainedIdentity": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-150",
+      "githubAnchor": "unheaded-block-150",
+      "stableAnchor": "unheaded-block-150",
+      "title": "Unheaded block 150",
+      "startLine": 1386,
+      "endLine": 1389,
+      "textDigest": "63bf6e3f79aef39f4af16bbcdeb237dff250a8f2aefbe0e5b18249eab50649e1",
+      "sample": "- **P04 M-3 (Inherited unconfined anchor overclaim):** Khi kế thừa anchor từ capability cha, một capability không khai báo confinement nhận attestation `unconfined` (explicit opt-o",
+      "identityFingerprint": "59b9c06c5006eebd43e4ccf13af1149a769149495a1e388ff746696660d02a4f",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+        "Tồn đọng mở (Open Deferred Items):"
+      ],
+      "text": "- **P04 M-3 (Inherited unconfined anchor overclaim):** Khi kế thừa anchor từ capability cha, một capability không khai báo confinement nhận attestation `unconfined` (explicit opt-out) thay vì `unknown`/`omitted`. Cần phân biệt rõ cờ thừa kế trong phase tiếp theo.\n- **P03 NEW-1b/NEW-1c & P06 M2 (Thin attestation body):** Thân attestation của `enforced` chưa so sánh toàn diện invocation chạy thực tế với plan đã prepare; mảng `channels[]` vẫn mang chi tiết observe-mode.\n- **P03 R4 (Reaper caller):** Hàm dọn dẹp thư mục tạm thành công chưa có caller định kỳ trong production.\n- **Strict Mode Default:** `runner.confinement.strict` tiếp tục mặc định là `false`, giữ an toàn tương thích cho môi trường phát triển và chờ hoàn thiện các tồn đọng trên trước khi kích hoạt mặc định. Operator có thể bật `strict: true` khi đã thoả mãn `fgos doctor`."
+    },
+    "sourceDigestUnchanged": true,
+    "status": "same text uniquely found; alias anchor still independently checked",
+    "aliasTargetComparisons": [
+      {
+        "aliasId": "step10-specs-0107",
+        "fromPath": "docs/specs/confinement-authority.md#unheaded-block-149",
+        "toOwner": "docs/platform/agent-confinement/spec.md",
+        "toAnchor": "unheaded-block-69",
+        "currentTargetAtDraftAnchor": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-69",
+          "githubAnchor": "unheaded-block-69",
+          "stableAnchor": "unheaded-block-69",
+          "title": "Unheaded block 69",
+          "startLine": 581,
+          "endLine": 581,
+          "textDigest": "9c24e69b1b4a4ede9fce9ed6d771f342920397506c61c2a546df8163a810c5ae",
+          "sample": "Private home nhận một **bản chép** của login, bị xoá sau dispatch. Hai điều đi kèm (chi tiết và luật ở `docs/specs/runner.md`, RUL75 (login xoay vòng được gia hạn một lần tại nguồn",
+          "identityFingerprint": "be86a74cad90f4d984b92e5c5e25041ffb38373d43fea3a5b1f491c2fc2b42b0",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "Added in candidate: Current settled facts and deferred items",
+            "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
+          ],
+          "text": "Private home nhận một **bản chép** của login, bị xoá sau dispatch. Hai điều đi kèm (chi tiết và luật ở `docs/specs/runner.md`, RUL75 (login xoay vòng được gia hạn một lần tại nguồn, trong bản chép fgOS giữ, và login được gia hạn trong private home được ghi ngược)):"
+        },
+        "sourceTextDigestAtDraftTarget": false,
+        "uniqueSameTextCurrentTarget": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-71",
+          "githubAnchor": "unheaded-block-71",
+          "stableAnchor": "unheaded-block-71",
+          "title": "Unheaded block 71",
+          "startLine": 588,
+          "endLine": 591,
+          "textDigest": "63bf6e3f79aef39f4af16bbcdeb237dff250a8f2aefbe0e5b18249eab50649e1",
+          "sample": "- **P04 M-3 (Inherited unconfined anchor overclaim):** Khi kế thừa anchor từ capability cha, một capability không khai báo confinement nhận attestation `unconfined` (explicit opt-o",
+          "identityFingerprint": "59b9c06c5006eebd43e4ccf13af1149a769149495a1e388ff746696660d02a4f",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "Added in candidate: Current settled facts and deferred items",
+            "Tồn đọng mở (Open Deferred Items):"
+          ],
+          "text": "- **P04 M-3 (Inherited unconfined anchor overclaim):** Khi kế thừa anchor từ capability cha, một capability không khai báo confinement nhận attestation `unconfined` (explicit opt-out) thay vì `unknown`/`omitted`. Cần phân biệt rõ cờ thừa kế trong phase tiếp theo.\n- **P03 NEW-1b/NEW-1c & P06 M2 (Thin attestation body):** Thân attestation của `enforced` chưa so sánh toàn diện invocation chạy thực tế với plan đã prepare; mảng `channels[]` vẫn mang chi tiết observe-mode.\n- **P03 R4 (Reaper caller):** Hàm dọn dẹp thư mục tạm thành công chưa có caller định kỳ trong production.\n- **Strict Mode Default:** `runner.confinement.strict` tiếp tục mặc định là `false`, giữ an toàn tương thích cho môi trường phát triển và chờ hoàn thiện các tồn đọng trên trước khi kích hoạt mặc định. Operator có thể bật `strict: true` khi đã thoả mãn `fgos doctor`."
+        },
+        "note": "Read-only current source and target comparisons; draft unchanged. Source and target numbered-anchor relocation is not approval. Text corrections or source drift require independent judgment."
+      }
+    ]
+  },
+  "currentSourceDigestUnchanged": true
+}
+```
+
+## Entry e-040: claim_c491a724bb730522215633d79a66e5b3
+
+```json
+{
+  "kind": "source-alias-comparison",
+  "claimId": "claim_c491a724bb730522215633d79a66e5b3",
+  "priorAnchor": "unheaded-block-150",
+  "priorDigest": "b412674cbe8f64e89a752ba65cf9752f00b362a19455bcded73bd2a283d4ab16",
+  "currentDigest": "63bf6e3f79aef39f4af16bbcdeb237dff250a8f2aefbe0e5b18249eab50649e1",
+  "matchingCurrentAnchors": [
+    "unheaded-block-151"
+  ],
+  "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval.",
+  "draftAliases": [
+    {
+      "aliasId": "step10-specs-0109",
+      "fromPath": "docs/specs/confinement-authority.md#unheaded-block-150",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-70",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    }
+  ],
+  "currentNative": {
+    "sourcePath": "docs/specs/confinement-authority.md",
+    "unitDigest": "20fbf3eb59c4ad33d13642444e0c6b2ca4812520f36b798bb5a7799f24bdae25",
+    "identityFingerprint": "20fbf3eb59c4ad33d13642444e0c6b2ca4812520f36b798bb5a7799f24bdae25",
+    "claimId": "claim_c491a724bb730522215633d79a66e5b3",
+    "sourceAnchor": "unheaded-block-151",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "b412674cbe8f64e89a752ba65cf9752f00b362a19455bcded73bd2a283d4ab16",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "currentSourceUnit": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-151",
+    "githubAnchor": "unheaded-block-151",
+    "stableAnchor": "unheaded-block-151",
+    "title": "Unheaded block 151",
+    "startLine": 1393,
+    "endLine": 1401,
+    "textDigest": "b412674cbe8f64e89a752ba65cf9752f00b362a19455bcded73bd2a283d4ab16",
+    "sample": "- `src/runner/dispatch/cli.mjs`: hai seam trước adapter; `runDir` có tại đây.\n- `src/runner/dispatch/transport.mjs`: `resolveExecutorCommand`, adapter registry\n  và `cliSpawnAdapte",
+    "identityFingerprint": "20fbf3eb59c4ad33d13642444e0c6b2ca4812520f36b798bb5a7799f24bdae25",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "14. Pointers hiện tại"
+    ],
+    "text": "- `src/runner/dispatch/cli.mjs`: hai seam trước adapter; `runDir` có tại đây.\n- `src/runner/dispatch/transport.mjs`: `resolveExecutorCommand`, adapter registry\n  và `cliSpawnAdapter` hiện bỏ `confinement`.\n- `src/runner/dispatch/resolve.mjs`: resolve executor và fallback path.\n- `src/runner/dispatch/config.mjs`: validation của shape confinement cũ.\n- `src/runner/dispatch/herdr-round.mjs`: enforcement session/home hiện tại.\n- `src/setup/registrations.mjs`: doctor checks liên quan.\n- `.fgos/config.json`: các invocation bwrap (cli-spawn và herdr-spawn) khai `confinement.backend`; invocation herdr của codex/agy/pi khai thêm `resourceBindings` private-home (§13.1).\n- `docs/routing-handoff-contract.md`: worktree containment không phải sandbox."
+  },
+  "currentTargetComparisons": [
+    {
+      "aliasId": "step10-specs-0109",
+      "toOwner": "docs/platform/agent-confinement/spec.md",
+      "toAnchor": "unheaded-block-70",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-70",
+        "githubAnchor": "unheaded-block-70",
+        "stableAnchor": "unheaded-block-70",
+        "title": "Unheaded block 70",
+        "startLine": 583,
+        "endLine": 584,
+        "textDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
+        "sample": "- **Kho SQLite chép dạng snapshot.** File `agent.db` (omp) trong danh sách `files` được chép bằng `VACUUM INTO` qua `node:sqlite` — snapshot nhất quán, gồm cả phần còn nằm trong wr",
+        "identityFingerprint": "3b2449b1edc267a1157f77e25028c3045a65714309624b194d36cb5f286383bd",
+        "ancestry": [
+          "Spec: Agent Confinement Authority",
+          "Added in candidate: Current settled facts and deferred items",
+          "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
+        ],
+        "text": "- **Kho SQLite chép dạng snapshot.** File `agent.db` (omp) trong danh sách `files` được chép bằng `VACUUM INTO` qua `node:sqlite` — snapshot nhất quán, gồm cả phần còn nằm trong write-ahead log — thay vì chép file thô thiếu WAL; không có `node:sqlite` thì chép file như trước. Danh sách file được phép chép không đổi, thư mục account thật vẫn không bao giờ được mount.\n- **Bản mới hơn được ghi ngược lúc xoá home.** Khi dispatch được opt-in (caller truyền hàm gia hạn), ownership marker của private home ghi thêm `credentialWriteBack` (provider, account, home nguồn, layout, runtime dir; chỉ tên và đường dẫn, không giá trị credential) sau khi chép xong. Mọi đường xoá home — cleanup của driver, `finalizeConfinementResources` và orphan reaper — đi qua một hàm xoá duy nhất (`removeConfinementDir`, `confinement/cleanup.mjs`): trước khi xoá, login trong home mới hơn login nguồn thì được dàn (staging) rồi áp lên nguồn dưới lock của account, một lần thử không chờ; lock bận thì để `pending/` cho lần refresh-ahead kế tiếp. Lỗi ghi ngược chỉ báo bằng mã cố định trên stderr và chỉ chặn việc xoá trong đúng một trường hợp: việc dàn thất bại (xem dưới). Bản dàn không bao giờ bị xoá khi nguồn không đọc được (đang ghi dở, `agent.db` không mở được, hoặc không xác định được entry) hay khi bản chép không đọc được vì lý do có thể qua (thiếu `node:sqlite`, `agent.db` không mở được): bản chép được giữ ở `pending/` (giới hạn 5 bản mỗi kho login (mỗi account với một kho, mỗi `stores/<cli>` với kho theo CLI), nhưng chỉ bản dư thừa mới bị bỏ: sau khi áp các bản pending dưới account lock, bản có login trùng hệt một bản pending khác thì bị bỏ khi account vượt giới hạn, bản mới nhất của mỗi nhóm trùng được giữ; bản không chứng minh được là dư thừa hay lỗi thời thì không bao giờ bị bỏ để nhường chỗ, nên account có thể vượt giới hạn và check doctor báo; bản do probe ghi dở được giữ ở `torn/` cho việc khôi phục thủ công, không bao giờ tự áp hay tự bỏ, và doctor báo ở mọi tuổi; `torn/` chỉ áp cho bản scratch của probe, còn scratch do runner đã chết để lại và pane home có store bị cắt vẫn bị xoá khi JSON không đọc được; bản không parse được thì so theo byte của file store và của write-ahead log hoặc rollback journal không rỗng (file không đọc được, trừ khi không tồn tại, không bao giờ bị coi là không có; index `-shm` không tính); home có file store trùng từng byte với nguồn và không bên nào có write-ahead log hay journal không rỗng thì không renew gì nên không được dàn) và báo `staged`/`apply-deferred`; chỉ xoá khi nguồn đọc được và chứng minh bản chép không mới hơn, hoặc bản chép được chứng minh hỏng (JSON hỏng, hay không có entry dùng được). Lỗi đọc file của hệ điều hành (quyền, I/O; mã `unreadable-file`) có thể qua nên bản chép được giữ; chỉ file kho không tồn tại (`missing-file`) mới được coi là rỗng và bị xoá. Nếu việc dàn thất bại, private home và marker được giữ lại (việc xoá báo lỗi, một dòng stderr mã cố định) để lần xoá sau, kể cả của reaper, thử lại; mỗi lần thất bại được đếm trong marker (`credentialKept`; hai lần cách nhau dưới 15 phút chỉ tính một, để lỗi tạm thời không dùng hết hạn mức), marker được ghi qua file tạm rồi rename và marker có mặt nhưng đọc không được thì việc xoá dừng lại. Sau 5 lần home bị giữ hẳn: không thử xoá nữa, không bao giờ bị xoá vì quá tuổi. Home bị giữ được kiểm lại dưới account lock khi account đó được gia hạn lần kế tiếp và bởi `fgos doctor --fix` (tập temp root tìm kiếm giống của doctor: root mặc định cộng `tempRoot` của từng backend đã đăng ký, lấy qua hook do phía dispatch truyền xuống; home nằm dưới `privateHomeRoot` riêng của backend không thuộc tập này nên không check, repair, reaper hay lần gia hạn nào thấy, và cũng không bao giờ bị xoá), và chỉ với home thuộc đúng runtime dir của lock đang giữ: chỉ xoá khi nguồn đọc được và chứng minh login trong home không mới hơn, hoặc login đó đã dàn được cạnh nguồn (và được áp); không thì vẫn giữ. Bản đã dàn và thư mục `pending/` được đồng bộ xuống đĩa trước khi home bị xoá. File marker không nhận ra được là marker nào cả (không phải JSON, không phải object, hay không có tên contract) thì mọi việc xoá home đó dừng lại. Finalizer so digest của marker không tính `credentialKept` (cleanup của driver thêm trường này sau khi digest được lấy) và không dừng ở home đó mà vẫn xoá các resource còn lại của dispatch (dispatch ghi là `retained`, kèm lý do của home). Check `credential-copies-retained` của `fgos doctor` báo theo provider/account: home bị giữ hẳn (fail, nêu thư mục home), home đang thử lại và các bản `pending/`/scratch quá một ngày (cảnh báo); chỉ có số đếm và tuổi, không bao giờ in giá trị, và check không xoá gì. Provisioning Codex đóng kín (fail closed): `auth.json` là symlink trỏ ra ngoài home, hoặc `home` tương đối, làm dispatch thất bại trước khi worker chạy (trước đây symlink được theo, home tương đối được hiểu theo cwd). Đường xoá home gọi module gia hạn credential (`provider-credential-renewal.mjs`) và qua đó phụ thuộc vào provider capacity, chỉ để lấy account lock. Home không có field này được xoá y như trước."
+      },
+      "uniqueSameDigestUnits": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-72",
+          "githubAnchor": "unheaded-block-72",
+          "stableAnchor": "unheaded-block-72",
+          "title": "Unheaded block 72",
+          "startLine": 595,
+          "endLine": 603,
+          "textDigest": "b412674cbe8f64e89a752ba65cf9752f00b362a19455bcded73bd2a283d4ab16",
+          "sample": "- `src/runner/dispatch/cli.mjs`: hai seam trước adapter; `runDir` có tại đây.\n- `src/runner/dispatch/transport.mjs`: `resolveExecutorCommand`, adapter registry\n  và `cliSpawnAdapte",
+          "identityFingerprint": "20fbf3eb59c4ad33d13642444e0c6b2ca4812520f36b798bb5a7799f24bdae25",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "14. Pointers hiện tại"
+          ],
+          "text": "- `src/runner/dispatch/cli.mjs`: hai seam trước adapter; `runDir` có tại đây.\n- `src/runner/dispatch/transport.mjs`: `resolveExecutorCommand`, adapter registry\n  và `cliSpawnAdapter` hiện bỏ `confinement`.\n- `src/runner/dispatch/resolve.mjs`: resolve executor và fallback path.\n- `src/runner/dispatch/config.mjs`: validation của shape confinement cũ.\n- `src/runner/dispatch/herdr-round.mjs`: enforcement session/home hiện tại.\n- `src/setup/registrations.mjs`: doctor checks liên quan.\n- `.fgos/config.json`: các invocation bwrap (cli-spawn và herdr-spawn) khai `confinement.backend`; invocation herdr của codex/agy/pi khai thêm `resourceBindings` private-home (§13.1).\n- `docs/routing-handoff-contract.md`: worktree containment không phải sandbox."
+        }
+      ]
+    }
+  ],
+  "historicalPackageComparisons": {
+    "nativeIdentity": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "20fbf3eb59c4ad33d13642444e0c6b2ca4812520f36b798bb5a7799f24bdae25",
+      "identityFingerprint": "20fbf3eb59c4ad33d13642444e0c6b2ca4812520f36b798bb5a7799f24bdae25",
+      "claimId": "claim_c491a724bb730522215633d79a66e5b3",
+      "sourceAnchor": "unheaded-block-151",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "b412674cbe8f64e89a752ba65cf9752f00b362a19455bcded73bd2a283d4ab16",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "currentIdentityBinding": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "20fbf3eb59c4ad33d13642444e0c6b2ca4812520f36b798bb5a7799f24bdae25",
+      "identityFingerprint": "20fbf3eb59c4ad33d13642444e0c6b2ca4812520f36b798bb5a7799f24bdae25",
+      "claimId": "claim_c491a724bb730522215633d79a66e5b3",
+      "sourceAnchor": "unheaded-block-151",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "b412674cbe8f64e89a752ba65cf9752f00b362a19455bcded73bd2a283d4ab16",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "uniqueSameDigestBinding": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-151",
+      "githubAnchor": "unheaded-block-151",
+      "stableAnchor": "unheaded-block-151",
+      "title": "Unheaded block 151",
+      "startLine": 1393,
+      "endLine": 1401,
+      "textDigest": "b412674cbe8f64e89a752ba65cf9752f00b362a19455bcded73bd2a283d4ab16",
+      "sample": "- `src/runner/dispatch/cli.mjs`: hai seam trước adapter; `runDir` có tại đây.\n- `src/runner/dispatch/transport.mjs`: `resolveExecutorCommand`, adapter registry\n  và `cliSpawnAdapte",
+      "identityFingerprint": "20fbf3eb59c4ad33d13642444e0c6b2ca4812520f36b798bb5a7799f24bdae25",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "14. Pointers hiện tại"
+      ],
+      "text": "- `src/runner/dispatch/cli.mjs`: hai seam trước adapter; `runDir` có tại đây.\n- `src/runner/dispatch/transport.mjs`: `resolveExecutorCommand`, adapter registry\n  và `cliSpawnAdapter` hiện bỏ `confinement`.\n- `src/runner/dispatch/resolve.mjs`: resolve executor và fallback path.\n- `src/runner/dispatch/config.mjs`: validation của shape confinement cũ.\n- `src/runner/dispatch/herdr-round.mjs`: enforcement session/home hiện tại.\n- `src/setup/registrations.mjs`: doctor checks liên quan.\n- `.fgos/config.json`: các invocation bwrap (cli-spawn và herdr-spawn) khai `confinement.backend`; invocation herdr của codex/agy/pi khai thêm `resourceBindings` private-home (§13.1).\n- `docs/routing-handoff-contract.md`: worktree containment không phải sandbox."
+    },
+    "currentUnitAtRetainedIdentity": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-151",
+      "githubAnchor": "unheaded-block-151",
+      "stableAnchor": "unheaded-block-151",
+      "title": "Unheaded block 151",
+      "startLine": 1393,
+      "endLine": 1401,
+      "textDigest": "b412674cbe8f64e89a752ba65cf9752f00b362a19455bcded73bd2a283d4ab16",
+      "sample": "- `src/runner/dispatch/cli.mjs`: hai seam trước adapter; `runDir` có tại đây.\n- `src/runner/dispatch/transport.mjs`: `resolveExecutorCommand`, adapter registry\n  và `cliSpawnAdapte",
+      "identityFingerprint": "20fbf3eb59c4ad33d13642444e0c6b2ca4812520f36b798bb5a7799f24bdae25",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "14. Pointers hiện tại"
+      ],
+      "text": "- `src/runner/dispatch/cli.mjs`: hai seam trước adapter; `runDir` có tại đây.\n- `src/runner/dispatch/transport.mjs`: `resolveExecutorCommand`, adapter registry\n  và `cliSpawnAdapter` hiện bỏ `confinement`.\n- `src/runner/dispatch/resolve.mjs`: resolve executor và fallback path.\n- `src/runner/dispatch/config.mjs`: validation của shape confinement cũ.\n- `src/runner/dispatch/herdr-round.mjs`: enforcement session/home hiện tại.\n- `src/setup/registrations.mjs`: doctor checks liên quan.\n- `.fgos/config.json`: các invocation bwrap (cli-spawn và herdr-spawn) khai `confinement.backend`; invocation herdr của codex/agy/pi khai thêm `resourceBindings` private-home (§13.1).\n- `docs/routing-handoff-contract.md`: worktree containment không phải sandbox."
+    },
+    "sourceDigestUnchanged": true,
+    "status": "same text uniquely found; alias anchor still independently checked",
+    "aliasTargetComparisons": [
+      {
+        "aliasId": "step10-specs-0109",
+        "fromPath": "docs/specs/confinement-authority.md#unheaded-block-150",
+        "toOwner": "docs/platform/agent-confinement/spec.md",
+        "toAnchor": "unheaded-block-70",
+        "currentTargetAtDraftAnchor": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-70",
+          "githubAnchor": "unheaded-block-70",
+          "stableAnchor": "unheaded-block-70",
+          "title": "Unheaded block 70",
+          "startLine": 583,
+          "endLine": 584,
+          "textDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
+          "sample": "- **Kho SQLite chép dạng snapshot.** File `agent.db` (omp) trong danh sách `files` được chép bằng `VACUUM INTO` qua `node:sqlite` — snapshot nhất quán, gồm cả phần còn nằm trong wr",
+          "identityFingerprint": "3b2449b1edc267a1157f77e25028c3045a65714309624b194d36cb5f286383bd",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "Added in candidate: Current settled facts and deferred items",
+            "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
+          ],
+          "text": "- **Kho SQLite chép dạng snapshot.** File `agent.db` (omp) trong danh sách `files` được chép bằng `VACUUM INTO` qua `node:sqlite` — snapshot nhất quán, gồm cả phần còn nằm trong write-ahead log — thay vì chép file thô thiếu WAL; không có `node:sqlite` thì chép file như trước. Danh sách file được phép chép không đổi, thư mục account thật vẫn không bao giờ được mount.\n- **Bản mới hơn được ghi ngược lúc xoá home.** Khi dispatch được opt-in (caller truyền hàm gia hạn), ownership marker của private home ghi thêm `credentialWriteBack` (provider, account, home nguồn, layout, runtime dir; chỉ tên và đường dẫn, không giá trị credential) sau khi chép xong. Mọi đường xoá home — cleanup của driver, `finalizeConfinementResources` và orphan reaper — đi qua một hàm xoá duy nhất (`removeConfinementDir`, `confinement/cleanup.mjs`): trước khi xoá, login trong home mới hơn login nguồn thì được dàn (staging) rồi áp lên nguồn dưới lock của account, một lần thử không chờ; lock bận thì để `pending/` cho lần refresh-ahead kế tiếp. Lỗi ghi ngược chỉ báo bằng mã cố định trên stderr và chỉ chặn việc xoá trong đúng một trường hợp: việc dàn thất bại (xem dưới). Bản dàn không bao giờ bị xoá khi nguồn không đọc được (đang ghi dở, `agent.db` không mở được, hoặc không xác định được entry) hay khi bản chép không đọc được vì lý do có thể qua (thiếu `node:sqlite`, `agent.db` không mở được): bản chép được giữ ở `pending/` (giới hạn 5 bản mỗi kho login (mỗi account với một kho, mỗi `stores/<cli>` với kho theo CLI), nhưng chỉ bản dư thừa mới bị bỏ: sau khi áp các bản pending dưới account lock, bản có login trùng hệt một bản pending khác thì bị bỏ khi account vượt giới hạn, bản mới nhất của mỗi nhóm trùng được giữ; bản không chứng minh được là dư thừa hay lỗi thời thì không bao giờ bị bỏ để nhường chỗ, nên account có thể vượt giới hạn và check doctor báo; bản do probe ghi dở được giữ ở `torn/` cho việc khôi phục thủ công, không bao giờ tự áp hay tự bỏ, và doctor báo ở mọi tuổi; `torn/` chỉ áp cho bản scratch của probe, còn scratch do runner đã chết để lại và pane home có store bị cắt vẫn bị xoá khi JSON không đọc được; bản không parse được thì so theo byte của file store và của write-ahead log hoặc rollback journal không rỗng (file không đọc được, trừ khi không tồn tại, không bao giờ bị coi là không có; index `-shm` không tính); home có file store trùng từng byte với nguồn và không bên nào có write-ahead log hay journal không rỗng thì không renew gì nên không được dàn) và báo `staged`/`apply-deferred`; chỉ xoá khi nguồn đọc được và chứng minh bản chép không mới hơn, hoặc bản chép được chứng minh hỏng (JSON hỏng, hay không có entry dùng được). Lỗi đọc file của hệ điều hành (quyền, I/O; mã `unreadable-file`) có thể qua nên bản chép được giữ; chỉ file kho không tồn tại (`missing-file`) mới được coi là rỗng và bị xoá. Nếu việc dàn thất bại, private home và marker được giữ lại (việc xoá báo lỗi, một dòng stderr mã cố định) để lần xoá sau, kể cả của reaper, thử lại; mỗi lần thất bại được đếm trong marker (`credentialKept`; hai lần cách nhau dưới 15 phút chỉ tính một, để lỗi tạm thời không dùng hết hạn mức), marker được ghi qua file tạm rồi rename và marker có mặt nhưng đọc không được thì việc xoá dừng lại. Sau 5 lần home bị giữ hẳn: không thử xoá nữa, không bao giờ bị xoá vì quá tuổi. Home bị giữ được kiểm lại dưới account lock khi account đó được gia hạn lần kế tiếp và bởi `fgos doctor --fix` (tập temp root tìm kiếm giống của doctor: root mặc định cộng `tempRoot` của từng backend đã đăng ký, lấy qua hook do phía dispatch truyền xuống; home nằm dưới `privateHomeRoot` riêng của backend không thuộc tập này nên không check, repair, reaper hay lần gia hạn nào thấy, và cũng không bao giờ bị xoá), và chỉ với home thuộc đúng runtime dir của lock đang giữ: chỉ xoá khi nguồn đọc được và chứng minh login trong home không mới hơn, hoặc login đó đã dàn được cạnh nguồn (và được áp); không thì vẫn giữ. Bản đã dàn và thư mục `pending/` được đồng bộ xuống đĩa trước khi home bị xoá. File marker không nhận ra được là marker nào cả (không phải JSON, không phải object, hay không có tên contract) thì mọi việc xoá home đó dừng lại. Finalizer so digest của marker không tính `credentialKept` (cleanup của driver thêm trường này sau khi digest được lấy) và không dừng ở home đó mà vẫn xoá các resource còn lại của dispatch (dispatch ghi là `retained`, kèm lý do của home). Check `credential-copies-retained` của `fgos doctor` báo theo provider/account: home bị giữ hẳn (fail, nêu thư mục home), home đang thử lại và các bản `pending/`/scratch quá một ngày (cảnh báo); chỉ có số đếm và tuổi, không bao giờ in giá trị, và check không xoá gì. Provisioning Codex đóng kín (fail closed): `auth.json` là symlink trỏ ra ngoài home, hoặc `home` tương đối, làm dispatch thất bại trước khi worker chạy (trước đây symlink được theo, home tương đối được hiểu theo cwd). Đường xoá home gọi module gia hạn credential (`provider-credential-renewal.mjs`) và qua đó phụ thuộc vào provider capacity, chỉ để lấy account lock. Home không có field này được xoá y như trước."
+        },
+        "sourceTextDigestAtDraftTarget": false,
+        "uniqueSameTextCurrentTarget": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-72",
+          "githubAnchor": "unheaded-block-72",
+          "stableAnchor": "unheaded-block-72",
+          "title": "Unheaded block 72",
+          "startLine": 595,
+          "endLine": 603,
+          "textDigest": "b412674cbe8f64e89a752ba65cf9752f00b362a19455bcded73bd2a283d4ab16",
+          "sample": "- `src/runner/dispatch/cli.mjs`: hai seam trước adapter; `runDir` có tại đây.\n- `src/runner/dispatch/transport.mjs`: `resolveExecutorCommand`, adapter registry\n  và `cliSpawnAdapte",
+          "identityFingerprint": "20fbf3eb59c4ad33d13642444e0c6b2ca4812520f36b798bb5a7799f24bdae25",
+          "ancestry": [
+            "Spec: Agent Confinement Authority",
+            "14. Pointers hiện tại"
+          ],
+          "text": "- `src/runner/dispatch/cli.mjs`: hai seam trước adapter; `runDir` có tại đây.\n- `src/runner/dispatch/transport.mjs`: `resolveExecutorCommand`, adapter registry\n  và `cliSpawnAdapter` hiện bỏ `confinement`.\n- `src/runner/dispatch/resolve.mjs`: resolve executor và fallback path.\n- `src/runner/dispatch/config.mjs`: validation của shape confinement cũ.\n- `src/runner/dispatch/herdr-round.mjs`: enforcement session/home hiện tại.\n- `src/setup/registrations.mjs`: doctor checks liên quan.\n- `.fgos/config.json`: các invocation bwrap (cli-spawn và herdr-spawn) khai `confinement.backend`; invocation herdr của codex/agy/pi khai thêm `resourceBindings` private-home (§13.1).\n- `docs/routing-handoff-contract.md`: worktree containment không phải sandbox."
+        },
+        "note": "Read-only current source and target comparisons; draft unchanged. Source and target numbered-anchor relocation is not approval. Text corrections or source drift require independent judgment."
+      }
+    ]
+  },
+  "currentSourceDigestUnchanged": true
+}
+```
+
+## Entry e-041: source-or-truth-redecision
+
+```json
+{
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+  "kind": "source-or-truth-redecision",
+  "before": {
+    "claimId": "claim_46c173824da77fbf25f59072ae8e1620",
+    "sourceUnitDigest": "a021e5594432d44b1543517b1219a7406a72c4ba9503363e1f8eef3f8085524a",
+    "targetOwner": "docs/platform/agent-confinement/spec.md",
+    "targetAnchor": "86-crash-và-cleanup",
+    "claimKind": "specification",
+    "disposition": "move",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+    "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/confinement-authority.md#86-crash-và-cleanup (source lines 1084-1084) is carried at docs/platform/agent-confinement/spec.md#86-crash-và-cleanup (candidate lines 348-348). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/confinement-authority.md verbatim in docs/platform/agent-confinement/spec.md, docs/platform/agent-confinement/contracts/confinement-authority-v1.md, docs/platform/agent-confinement/history/rollout-and-settled-facts.md, docs/platform/agent-confinement/decisions/confinement-authority-decisions.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+    "reviewNote": "Independent review required for this package binding; no approval carried.",
+    "targetUnitDigest": "c3306e72572f72945df91c96305a90f6835935407a5d2027b1b60aad89695133",
+    "targetAncestry": [
+      "Spec: Agent Confinement Authority",
+      "8. Policy resolution và edge cases"
+    ]
+  },
+  "after": {
+    "claimId": "claim_46c173824da77fbf25f59072ae8e1620",
+    "sourceUnitDigest": "018713d3e9d6a59a7fb677b2dfa0225a5461509d1b26c27c0cfde12103d9d67a",
+    "targetOwner": "docs/platform/agent-confinement/spec.md",
+    "targetAnchor": "86-crash-và-cleanup",
+    "claimKind": "specification",
+    "disposition": "supersede",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792079321432-41fe2051@2026-10-15",
+    "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/confinement-authority.md#86-crash-và-cleanup (source lines 1084-1084) is carried at docs/platform/agent-confinement/spec.md#86-crash-và-cleanup (candidate lines 348-348). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/confinement-authority.md verbatim in docs/platform/agent-confinement/spec.md, docs/platform/agent-confinement/contracts/confinement-authority-v1.md, docs/platform/agent-confinement/history/rollout-and-settled-facts.md, docs/platform/agent-confinement/decisions/confinement-authority-decisions.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. L10-14: re-decided against current confinement §8.6 full direct-section source digest after binding paragraph addition; complete paragraph already carried verbatim. Current source/target binding is pending independent review.",
+    "targetUnitDigest": "c3306e72572f72945df91c96305a90f6835935407a5d2027b1b60aad89695133",
+    "targetAncestry": [
+      "Spec: Agent Confinement Authority",
+      "8. Policy resolution và edge cases"
+    ]
+  },
+  "sourceWitness": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "8.6 Crash và cleanup",
+    "anchor": "86-crash-và-cleanup",
+    "githubAnchor": "86-crash-và-cleanup",
+    "stableAnchor": "h-1205ca9f66bb",
+    "startLine": 1084,
+    "endLine": 1084,
+    "textDigest": "018713d3e9d6a59a7fb677b2dfa0225a5461509d1b26c27c0cfde12103d9d67a",
+    "sample": "8.6 Crash và cleanup",
+    "sectionPayloadDigest": "7b0ab41c70e8c9929e8eabf4ce27fcb6002d42ffb743c088f8b515b41ee7dffb",
+    "followingBlockDigest": "237461836affe4167aaf89d08ee087d9de21a39a3afc2f10e54bfe6bcaeaeb2b",
+    "identityFingerprint": "441230ba30298939db103b7e3881ba13af5d98c36ffb0a75a891f2b60a81c7e2",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "8. Policy resolution và edge cases"
+    ],
+    "text": "### 8.6 Crash và cleanup"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "8.6 Crash và cleanup",
+    "anchor": "86-crash-và-cleanup",
+    "githubAnchor": "86-crash-và-cleanup",
+    "stableAnchor": "h-d76fbbdc6f2f",
+    "startLine": 348,
+    "endLine": 348,
+    "textDigest": "c3306e72572f72945df91c96305a90f6835935407a5d2027b1b60aad89695133",
+    "sample": "8.6 Crash và cleanup",
+    "sectionPayloadDigest": "6ad22d623e5bbbe5815d1aa4bf27adff6fd3ed5f57e234b40c1bc35b86a9aa42",
+    "followingBlockDigest": "237461836affe4167aaf89d08ee087d9de21a39a3afc2f10e54bfe6bcaeaeb2b",
+    "identityFingerprint": "c4e561fb2eb468c282be4fcd119a69b37cb1cc3bf20272269d17feb11ac2ce1a",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "8. Policy resolution và edge cases"
+    ],
+    "text": "### 8.6 Crash và cleanup"
+  },
+  "currentDecision": {
+    "claimId": "claim_46c173824da77fbf25f59072ae8e1620",
+    "sourceUnitDigest": "018713d3e9d6a59a7fb677b2dfa0225a5461509d1b26c27c0cfde12103d9d67a",
+    "targetOwner": "docs/platform/agent-confinement/spec.md",
+    "targetAnchor": "86-crash-và-cleanup",
+    "claimKind": "specification",
+    "disposition": "supersede",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792079321432-41fe2051@2026-10-15",
+    "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/confinement-authority.md#86-crash-và-cleanup (source lines 1084-1084) is carried at docs/platform/agent-confinement/spec.md#86-crash-và-cleanup (candidate lines 348-348). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/confinement-authority.md verbatim in docs/platform/agent-confinement/spec.md, docs/platform/agent-confinement/contracts/confinement-authority-v1.md, docs/platform/agent-confinement/history/rollout-and-settled-facts.md, docs/platform/agent-confinement/decisions/confinement-authority-decisions.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. L10-14: re-decided against current confinement §8.6 full direct-section source digest after binding paragraph addition; complete paragraph already carried verbatim. Current source/target binding is pending independent review.",
+    "targetUnitDigest": "c3306e72572f72945df91c96305a90f6835935407a5d2027b1b60aad89695133",
+    "targetAncestry": [
+      "Spec: Agent Confinement Authority",
+      "8. Policy resolution và edge cases"
+    ]
+  },
+  "deepRequired": true,
+  "currentSourceWitness": {
+    "native": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "41121712d06197252202bc49af9d142924bce488f7bb894cc29771c49e15d5f4",
+      "identityFingerprint": "441230ba30298939db103b7e3881ba13af5d98c36ffb0a75a891f2b60a81c7e2",
+      "claimId": "claim_46c173824da77fbf25f59072ae8e1620",
+      "sourceAnchor": "86-crash-và-cleanup",
+      "unitKind": "heading",
+      "sourceUnitDigest": "018713d3e9d6a59a7fb677b2dfa0225a5461509d1b26c27c0cfde12103d9d67a",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "unit": {
+      "unitKind": "heading",
+      "level": 3,
+      "title": "8.6 Crash và cleanup",
+      "anchor": "86-crash-và-cleanup",
+      "githubAnchor": "86-crash-và-cleanup",
+      "stableAnchor": "h-1205ca9f66bb",
+      "startLine": 1084,
+      "endLine": 1084,
+      "textDigest": "018713d3e9d6a59a7fb677b2dfa0225a5461509d1b26c27c0cfde12103d9d67a",
+      "sample": "8.6 Crash và cleanup",
+      "sectionPayloadDigest": "7b0ab41c70e8c9929e8eabf4ce27fcb6002d42ffb743c088f8b515b41ee7dffb",
+      "followingBlockDigest": "237461836affe4167aaf89d08ee087d9de21a39a3afc2f10e54bfe6bcaeaeb2b",
+      "identityFingerprint": "441230ba30298939db103b7e3881ba13af5d98c36ffb0a75a891f2b60a81c7e2",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "8. Policy resolution và edge cases"
+      ],
+      "text": "### 8.6 Crash và cleanup",
+      "sectionText": "### 8.6 Crash và cleanup\n\nNghĩa vụ chung của Authority là giữ evidence/ownership identity và chỉ cho phép\ndọn sau khi execution đã dừng; recovery mechanics được chọn theo driver profile.\nLocal-bwrap-v1 dùng thư mục tạm theo dispatchId tạo dưới trusted root, ownership\nmarker trước allocation, finally và startup reaper idempotent. Reaper kiểm tra\nprocess identity/liveness (không chỉ PID trần) trước khi dọn; host-disk private\nhome không tự biến mất khi process exit. Không cần remote lease/journal engine\ncho default local. Phần journal/lease dưới đây áp dụng profile có resource sống\nngoài process local (remote/container detached), không phải gate chung của S4.\n\nAttestation `prepared` được ghi trước adapter call. Cleanup chạy trong\n`finally`; partial prepare cũng phải cung cấp cleanup handle như quy định ở\n§6.5. Startup reaper nhận diện resource tạm qua dispatch id và dọn phần còn\nlại. Cleanup failure không được biến execution chưa rõ thành thành công, và\nkhông được che mất execution result đã có. Nếu Authority crash sau khi prepare,\nrun record giữ phase cuối cùng và reaper xử lý resource chưa dọn.\n\nReaper và recovery hỏi đúng herdr session mà worker được khởi chạy trong đó: bản ghi launch command và ownership marker của home được giữ lại mang `herdrSession` (socket suy ra từ tên, không lưu), `reconcile` dựng client theo session đó, reaper dùng `FGOS_HERDR_BIN` và cùng session; marker không có session thì trạng thái pane là không rõ và quy tắc hết hạn quyết định.\n\n**Gắn home với tiến trình đang chạy worker (binding, 2026-10-15).** Authority cấp cho mỗi dispatch đã prepare hai hàm `bind`/`markLaunched` (`drivers/bwrap.mjs`, gom qua `bindingForPrepared` ở `authority.mjs`); adapter chỉ gọi hàm, không thấy đường dẫn home, không tự ghi marker. Round herdr confined (mọi round, có assignment hay không) gọi `bind` trước `pane run` với `paneId`, endpoint herdr mà client của round thật sự dùng (`herdrEndpoint` = socket path từ env của client, hoặc socket của session nó đặt tên, hoặc socket mặc định herdr tự rơi về; `herdrSession` chỉ khi env có đặt tên), `binderPid` + `binderStartTime` của controller và `boundAt`; ghi atomic (tmp + rename). Ghi không được thì đóng pane, round fail trước khi có worker. Ngay trước `pane run` (hoặc khi round resume thấy worker đã chạy) ghi `launchedAt`. Round cli-spawn confined gắn home với run supervisor tách rời ngay khi supervisor khởi động (`binderPid` = pid supervisor, không có pane); ghi không được thì báo mã `confinement-bind-failed` và giữ marker như prepare (supervisor đã chạy rồi). Luật reaper cho marker đã bind mà chưa `retainedAt`: binder còn sống (pid + start time) thì giữ tới `boundAt + max(maxAgeMs, 2 phút launch grace + run timeout + 10 phút settle)` bất kể pane trả lời gì; binder chết hoặc quá cửa sổ thì: không có pane → dọn; có pane mà chưa `launchedAt` và binder chết → dọn và đóng pane rỗng; còn lại hỏi pane trên endpoint đã ghi (true giữ, null theo luật hết hạn, false dọn). Marker `retainedAt` giữ luật pane cũ, nhưng giờ hỏi được cả round default-session nhờ endpoint đã ghi. Trước khi xoá, reaper đọc lại marker; khác với bản nó đã dựa vào để quyết thì bỏ qua lượt này. Finalizer chấp nhận đúng các field binding (`paneId`, `herdrEndpoint`, `herdrSession`, `binderPid`, `binderStartTime`, `boundAt`, `launchedAt`) cộng `credentialKept` là thay đổi sau prepare; mọi thay đổi khác vẫn là `ownership-marker-mismatch`. Chưa có (để cho run supervisor + holder-lock): từ chối bind khi home đã quá cửa sổ run tính từ lúc tạo, kiểm trước/sau launch, claim độc quyền khi reap; nên khe \"reaper đã đọc lại xong, controller bind + launch ngay trước lúc xoá\" (RT2-1) vẫn còn.\n\nVới profile remote/container detached, Authority cấp resource identity và ghi allocation intent bền vững trước mỗi\nside effect prepare; driver tạo theo identity đó một cách idempotent. Journal\nghi dispatch id, backend snapshot reference, resource locator, lease/execution\nidentity và trạng thái allocation/collection/cleanup, không chứa credential.\nCallback cleanup chỉ là tối ưu trong process; recovery không phụ thuộc callback.\nReaper phải lấy recovery lease độc quyền, kiểm tra liveness bằng execution\nidentity chống PID reuse, dừng và xác nhận cả execution tree trước khi collect\nvà cleanup idempotent. Timeout/cancel cũng tuân cùng thứ tự. Không liên lạc được\nremote thì giữ unknown và cleanup pending, không suy agent đã dừng; reconnect\nhoặc backend lease-expiry có proof mới cho phép dọn. Resource chưa collect được\ngiữ cho recovery, không xóa vì agent đã exit. Startup reaper dùng cùng registry\nsetup/doctor; backend không có recovery contract này chưa được nhận required.\n\nLocal profile chỉ phải đáp ứng invariants ownership/liveness/idempotence nêu\ntrên, không phải triển khai journal/lease schema của remote."
+    }
+  },
+  "currentTargetWitness": {
+    "path": "docs/platform/agent-confinement/spec.md",
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "unit": {
+      "unitKind": "heading",
+      "level": 3,
+      "title": "8.6 Crash và cleanup",
+      "anchor": "86-crash-và-cleanup",
+      "githubAnchor": "86-crash-và-cleanup",
+      "stableAnchor": "h-d76fbbdc6f2f",
+      "startLine": 348,
+      "endLine": 348,
+      "textDigest": "c3306e72572f72945df91c96305a90f6835935407a5d2027b1b60aad89695133",
+      "sample": "8.6 Crash và cleanup",
+      "sectionPayloadDigest": "6ad22d623e5bbbe5815d1aa4bf27adff6fd3ed5f57e234b40c1bc35b86a9aa42",
+      "followingBlockDigest": "237461836affe4167aaf89d08ee087d9de21a39a3afc2f10e54bfe6bcaeaeb2b",
+      "identityFingerprint": "c4e561fb2eb468c282be4fcd119a69b37cb1cc3bf20272269d17feb11ac2ce1a",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "8. Policy resolution và edge cases"
+      ],
+      "text": "### 8.6 Crash và cleanup",
+      "sectionText": "### 8.6 Crash và cleanup\n\nNghĩa vụ chung của Authority là giữ evidence/ownership identity và chỉ cho phép\ndọn sau khi execution đã dừng; recovery mechanics được chọn theo driver profile.\nLocal-bwrap-v1 dùng thư mục tạm theo dispatchId tạo dưới trusted root, ownership\nmarker trước allocation, finally và startup reaper idempotent. Reaper kiểm tra\nprocess identity/liveness (không chỉ PID trần) trước khi dọn; host-disk private\nhome không tự biến mất khi process exit. Không cần remote lease/journal engine\ncho default local. Phần journal/lease dưới đây áp dụng profile có resource sống\nngoài process local (remote/container detached), không phải gate chung của S4.\n\nAttestation `prepared` được ghi trước adapter call. Cleanup chạy trong\n`finally`; partial prepare cũng phải cung cấp cleanup handle như quy định ở\n§6.5. Startup reaper nhận diện resource tạm qua dispatch id và dọn phần còn\nlại. Cleanup failure không được biến execution chưa rõ thành thành công, và\nkhông được che mất execution result đã có. Nếu Authority crash sau khi prepare,\nrun record giữ phase cuối cùng và reaper xử lý resource chưa dọn.\n\nReaper và recovery hỏi đúng herdr session mà worker được khởi chạy trong đó: bản ghi launch command và ownership marker của home được giữ lại mang `herdrSession` (socket suy ra từ tên, không lưu), `reconcile` dựng client theo session đó, reaper dùng `FGOS_HERDR_BIN` và cùng session; marker không có session thì trạng thái pane là không rõ và quy tắc hết hạn quyết định.\n\nAdded in candidate — verbatim binding addition from the final main sync (2026-10-15); pending independent review:\n\n**Gắn home với tiến trình đang chạy worker (binding, 2026-10-15).** Authority cấp cho mỗi dispatch đã prepare hai hàm `bind`/`markLaunched` (`drivers/bwrap.mjs`, gom qua `bindingForPrepared` ở `authority.mjs`); adapter chỉ gọi hàm, không thấy đường dẫn home, không tự ghi marker. Round herdr confined (mọi round, có assignment hay không) gọi `bind` trước `pane run` với `paneId`, endpoint herdr mà client của round thật sự dùng (`herdrEndpoint` = socket path từ env của client, hoặc socket của session nó đặt tên, hoặc socket mặc định herdr tự rơi về; `herdrSession` chỉ khi env có đặt tên), `binderPid` + `binderStartTime` của controller và `boundAt`; ghi atomic (tmp + rename). Ghi không được thì đóng pane, round fail trước khi có worker. Ngay trước `pane run` (hoặc khi round resume thấy worker đã chạy) ghi `launchedAt`. Round cli-spawn confined gắn home với run supervisor tách rời ngay khi supervisor khởi động (`binderPid` = pid supervisor, không có pane); ghi không được thì báo mã `confinement-bind-failed` và giữ marker như prepare (supervisor đã chạy rồi). Luật reaper cho marker đã bind mà chưa `retainedAt`: binder còn sống (pid + start time) thì giữ tới `boundAt + max(maxAgeMs, 2 phút launch grace + run timeout + 10 phút settle)` bất kể pane trả lời gì; binder chết hoặc quá cửa sổ thì: không có pane → dọn; có pane mà chưa `launchedAt` và binder chết → dọn và đóng pane rỗng; còn lại hỏi pane trên endpoint đã ghi (true giữ, null theo luật hết hạn, false dọn). Marker `retainedAt` giữ luật pane cũ, nhưng giờ hỏi được cả round default-session nhờ endpoint đã ghi. Trước khi xoá, reaper đọc lại marker; khác với bản nó đã dựa vào để quyết thì bỏ qua lượt này. Finalizer chấp nhận đúng các field binding (`paneId`, `herdrEndpoint`, `herdrSession`, `binderPid`, `binderStartTime`, `boundAt`, `launchedAt`) cộng `credentialKept` là thay đổi sau prepare; mọi thay đổi khác vẫn là `ownership-marker-mismatch`. Chưa có (để cho run supervisor + holder-lock): từ chối bind khi home đã quá cửa sổ run tính từ lúc tạo, kiểm trước/sau launch, claim độc quyền khi reap; nên khe \"reaper đã đọc lại xong, controller bind + launch ngay trước lúc xoá\" (RT2-1) vẫn còn.\n\nVới profile remote/container detached, Authority cấp resource identity và ghi allocation intent bền vững trước mỗi\nside effect prepare; driver tạo theo identity đó một cách idempotent. Journal\nghi dispatch id, backend snapshot reference, resource locator, lease/execution\nidentity và trạng thái allocation/collection/cleanup, không chứa credential.\nCallback cleanup chỉ là tối ưu trong process; recovery không phụ thuộc callback.\nReaper phải lấy recovery lease độc quyền, kiểm tra liveness bằng execution\nidentity chống PID reuse, dừng và xác nhận cả execution tree trước khi collect\nvà cleanup idempotent. Timeout/cancel cũng tuân cùng thứ tự. Không liên lạc được\nremote thì giữ unknown và cleanup pending, không suy agent đã dừng; reconnect\nhoặc backend lease-expiry có proof mới cho phép dọn. Resource chưa collect được\ngiữ cho recovery, không xóa vì agent đã exit. Startup reaper dùng cùng registry\nsetup/doctor; backend không có recovery contract này chưa được nhận required.\n\nLocal profile chỉ phải đáp ứng invariants ownership/liveness/idempotence nêu\ntrên, không phải triển khai journal/lease schema của remote."
+    }
+  }
+}
+```
+
+## Entry e-042: current-native-binding-paragraph-decision
+
+```json
+{
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-confinement-binding.json",
+  "kind": "current-native-binding-paragraph-decision",
+  "before": null,
+  "after": {
+    "claimId": "claim_d572bb9dc8501362ae23e6d4a71975d2",
+    "sourceUnitDigest": "a7af69f1674754e516550a8802a2acc64dd3a49655a4cdd01fa82d43a540d5ed",
+    "targetOwner": "docs/platform/agent-confinement/spec.md",
+    "targetAnchor": "unheaded-block-47",
+    "targetUnitDigest": "a7af69f1674754e516550a8802a2acc64dd3a49655a4cdd01fa82d43a540d5ed",
+    "targetAncestry": [
+      "Spec: Agent Confinement Authority",
+      "8. Policy resolution và edge cases",
+      "8.6 Crash và cleanup"
+    ],
+    "claimKind": "specification",
+    "disposition": "move",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792079321432-41fe2051@2026-10-15",
+    "rationale": "L10-14 current-source re-decision completes the binding addition carried in the prior docs turn. Complete source paragraph equals target text byte for byte, with limitations retained; identity already native in the prior package registry. Independent review required; no current-truth, promotion or cutover approval."
+  },
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-113",
+    "githubAnchor": "unheaded-block-113",
+    "stableAnchor": "unheaded-block-113",
+    "title": "Unheaded block 113",
+    "startLine": 1104,
+    "endLine": 1104,
+    "textDigest": "a7af69f1674754e516550a8802a2acc64dd3a49655a4cdd01fa82d43a540d5ed",
+    "sample": "**Gắn home với tiến trình đang chạy worker (binding, 2026-10-15).** Authority cấp cho mỗi dispatch đã prepare hai hàm `bind`/`markLaunched` (`drivers/bwrap.mjs`, gom qua `bindingFo",
+    "identityFingerprint": "366466fa3653ce725f560e106699a897d40f8681ab982ea93931357b67616fcc",
+    "text": "**Gắn home với tiến trình đang chạy worker (binding, 2026-10-15).** Authority cấp cho mỗi dispatch đã prepare hai hàm `bind`/`markLaunched` (`drivers/bwrap.mjs`, gom qua `bindingForPrepared` ở `authority.mjs`); adapter chỉ gọi hàm, không thấy đường dẫn home, không tự ghi marker. Round herdr confined (mọi round, có assignment hay không) gọi `bind` trước `pane run` với `paneId`, endpoint herdr mà client của round thật sự dùng (`herdrEndpoint` = socket path từ env của client, hoặc socket của session nó đặt tên, hoặc socket mặc định herdr tự rơi về; `herdrSession` chỉ khi env có đặt tên), `binderPid` + `binderStartTime` của controller và `boundAt`; ghi atomic (tmp + rename). Ghi không được thì đóng pane, round fail trước khi có worker. Ngay trước `pane run` (hoặc khi round resume thấy worker đã chạy) ghi `launchedAt`. Round cli-spawn confined gắn home với run supervisor tách rời ngay khi supervisor khởi động (`binderPid` = pid supervisor, không có pane); ghi không được thì báo mã `confinement-bind-failed` và giữ marker như prepare (supervisor đã chạy rồi). Luật reaper cho marker đã bind mà chưa `retainedAt`: binder còn sống (pid + start time) thì giữ tới `boundAt + max(maxAgeMs, 2 phút launch grace + run timeout + 10 phút settle)` bất kể pane trả lời gì; binder chết hoặc quá cửa sổ thì: không có pane → dọn; có pane mà chưa `launchedAt` và binder chết → dọn và đóng pane rỗng; còn lại hỏi pane trên endpoint đã ghi (true giữ, null theo luật hết hạn, false dọn). Marker `retainedAt` giữ luật pane cũ, nhưng giờ hỏi được cả round default-session nhờ endpoint đã ghi. Trước khi xoá, reaper đọc lại marker; khác với bản nó đã dựa vào để quyết thì bỏ qua lượt này. Finalizer chấp nhận đúng các field binding (`paneId`, `herdrEndpoint`, `herdrSession`, `binderPid`, `binderStartTime`, `boundAt`, `launchedAt`) cộng `credentialKept` là thay đổi sau prepare; mọi thay đổi khác vẫn là `ownership-marker-mismatch`. Chưa có (để cho run supervisor + holder-lock): từ chối bind khi home đã quá cửa sổ run tính từ lúc tạo, kiểm trước/sau launch, claim độc quyền khi reap; nên khe \"reaper đã đọc lại xong, controller bind + launch ngay trước lúc xoá\" (RT2-1) vẫn còn.",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "8. Policy resolution và edge cases",
+      "8.6 Crash và cleanup"
+    ]
+  },
+  "targetWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-47",
+    "githubAnchor": "unheaded-block-47",
+    "stableAnchor": "unheaded-block-47",
+    "title": "Unheaded block 47",
+    "startLine": 370,
+    "endLine": 370,
+    "textDigest": "a7af69f1674754e516550a8802a2acc64dd3a49655a4cdd01fa82d43a540d5ed",
+    "sample": "**Gắn home với tiến trình đang chạy worker (binding, 2026-10-15).** Authority cấp cho mỗi dispatch đã prepare hai hàm `bind`/`markLaunched` (`drivers/bwrap.mjs`, gom qua `bindingFo",
+    "identityFingerprint": "366466fa3653ce725f560e106699a897d40f8681ab982ea93931357b67616fcc",
+    "text": "**Gắn home với tiến trình đang chạy worker (binding, 2026-10-15).** Authority cấp cho mỗi dispatch đã prepare hai hàm `bind`/`markLaunched` (`drivers/bwrap.mjs`, gom qua `bindingForPrepared` ở `authority.mjs`); adapter chỉ gọi hàm, không thấy đường dẫn home, không tự ghi marker. Round herdr confined (mọi round, có assignment hay không) gọi `bind` trước `pane run` với `paneId`, endpoint herdr mà client của round thật sự dùng (`herdrEndpoint` = socket path từ env của client, hoặc socket của session nó đặt tên, hoặc socket mặc định herdr tự rơi về; `herdrSession` chỉ khi env có đặt tên), `binderPid` + `binderStartTime` của controller và `boundAt`; ghi atomic (tmp + rename). Ghi không được thì đóng pane, round fail trước khi có worker. Ngay trước `pane run` (hoặc khi round resume thấy worker đã chạy) ghi `launchedAt`. Round cli-spawn confined gắn home với run supervisor tách rời ngay khi supervisor khởi động (`binderPid` = pid supervisor, không có pane); ghi không được thì báo mã `confinement-bind-failed` và giữ marker như prepare (supervisor đã chạy rồi). Luật reaper cho marker đã bind mà chưa `retainedAt`: binder còn sống (pid + start time) thì giữ tới `boundAt + max(maxAgeMs, 2 phút launch grace + run timeout + 10 phút settle)` bất kể pane trả lời gì; binder chết hoặc quá cửa sổ thì: không có pane → dọn; có pane mà chưa `launchedAt` và binder chết → dọn và đóng pane rỗng; còn lại hỏi pane trên endpoint đã ghi (true giữ, null theo luật hết hạn, false dọn). Marker `retainedAt` giữ luật pane cũ, nhưng giờ hỏi được cả round default-session nhờ endpoint đã ghi. Trước khi xoá, reaper đọc lại marker; khác với bản nó đã dựa vào để quyết thì bỏ qua lượt này. Finalizer chấp nhận đúng các field binding (`paneId`, `herdrEndpoint`, `herdrSession`, `binderPid`, `binderStartTime`, `boundAt`, `launchedAt`) cộng `credentialKept` là thay đổi sau prepare; mọi thay đổi khác vẫn là `ownership-marker-mismatch`. Chưa có (để cho run supervisor + holder-lock): từ chối bind khi home đã quá cửa sổ run tính từ lúc tạo, kiểm trước/sau launch, claim độc quyền khi reap; nên khe \"reaper đã đọc lại xong, controller bind + launch ngay trước lúc xoá\" (RT2-1) vẫn còn.",
+    "ancestry": [
+      "Spec: Agent Confinement Authority",
+      "8. Policy resolution và edge cases",
+      "8.6 Crash và cleanup"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_d572bb9dc8501362ae23e6d4a71975d2",
+    "sourceUnitDigest": "a7af69f1674754e516550a8802a2acc64dd3a49655a4cdd01fa82d43a540d5ed",
+    "targetOwner": "docs/platform/agent-confinement/spec.md",
+    "targetAnchor": "unheaded-block-47",
+    "targetUnitDigest": "a7af69f1674754e516550a8802a2acc64dd3a49655a4cdd01fa82d43a540d5ed",
+    "targetAncestry": [
+      "Spec: Agent Confinement Authority",
+      "8. Policy resolution và edge cases",
+      "8.6 Crash và cleanup"
+    ],
+    "claimKind": "specification",
+    "disposition": "move",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792079321432-41fe2051@2026-10-15",
+    "rationale": "L10-14 current-source re-decision completes the binding addition carried in the prior docs turn. Complete source paragraph equals target text byte for byte, with limitations retained; identity already native in the prior package registry. Independent review required; no current-truth, promotion or cutover approval."
+  },
+  "deepRequired": true,
+  "currentSourceWitness": {
+    "native": {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "366466fa3653ce725f560e106699a897d40f8681ab982ea93931357b67616fcc",
+      "identityFingerprint": "366466fa3653ce725f560e106699a897d40f8681ab982ea93931357b67616fcc",
+      "claimId": "claim_d572bb9dc8501362ae23e6d4a71975d2",
+      "sourceAnchor": "unheaded-block-113",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "a7af69f1674754e516550a8802a2acc64dd3a49655a4cdd01fa82d43a540d5ed",
+      "claimKind": "specification",
+      "status": "current"
+    },
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-113",
+      "githubAnchor": "unheaded-block-113",
+      "stableAnchor": "unheaded-block-113",
+      "title": "Unheaded block 113",
+      "startLine": 1104,
+      "endLine": 1104,
+      "textDigest": "a7af69f1674754e516550a8802a2acc64dd3a49655a4cdd01fa82d43a540d5ed",
+      "sample": "**Gắn home với tiến trình đang chạy worker (binding, 2026-10-15).** Authority cấp cho mỗi dispatch đã prepare hai hàm `bind`/`markLaunched` (`drivers/bwrap.mjs`, gom qua `bindingFo",
+      "identityFingerprint": "366466fa3653ce725f560e106699a897d40f8681ab982ea93931357b67616fcc",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "8. Policy resolution và edge cases",
+        "8.6 Crash và cleanup"
+      ],
+      "text": "**Gắn home với tiến trình đang chạy worker (binding, 2026-10-15).** Authority cấp cho mỗi dispatch đã prepare hai hàm `bind`/`markLaunched` (`drivers/bwrap.mjs`, gom qua `bindingForPrepared` ở `authority.mjs`); adapter chỉ gọi hàm, không thấy đường dẫn home, không tự ghi marker. Round herdr confined (mọi round, có assignment hay không) gọi `bind` trước `pane run` với `paneId`, endpoint herdr mà client của round thật sự dùng (`herdrEndpoint` = socket path từ env của client, hoặc socket của session nó đặt tên, hoặc socket mặc định herdr tự rơi về; `herdrSession` chỉ khi env có đặt tên), `binderPid` + `binderStartTime` của controller và `boundAt`; ghi atomic (tmp + rename). Ghi không được thì đóng pane, round fail trước khi có worker. Ngay trước `pane run` (hoặc khi round resume thấy worker đã chạy) ghi `launchedAt`. Round cli-spawn confined gắn home với run supervisor tách rời ngay khi supervisor khởi động (`binderPid` = pid supervisor, không có pane); ghi không được thì báo mã `confinement-bind-failed` và giữ marker như prepare (supervisor đã chạy rồi). Luật reaper cho marker đã bind mà chưa `retainedAt`: binder còn sống (pid + start time) thì giữ tới `boundAt + max(maxAgeMs, 2 phút launch grace + run timeout + 10 phút settle)` bất kể pane trả lời gì; binder chết hoặc quá cửa sổ thì: không có pane → dọn; có pane mà chưa `launchedAt` và binder chết → dọn và đóng pane rỗng; còn lại hỏi pane trên endpoint đã ghi (true giữ, null theo luật hết hạn, false dọn). Marker `retainedAt` giữ luật pane cũ, nhưng giờ hỏi được cả round default-session nhờ endpoint đã ghi. Trước khi xoá, reaper đọc lại marker; khác với bản nó đã dựa vào để quyết thì bỏ qua lượt này. Finalizer chấp nhận đúng các field binding (`paneId`, `herdrEndpoint`, `herdrSession`, `binderPid`, `binderStartTime`, `boundAt`, `launchedAt`) cộng `credentialKept` là thay đổi sau prepare; mọi thay đổi khác vẫn là `ownership-marker-mismatch`. Chưa có (để cho run supervisor + holder-lock): từ chối bind khi home đã quá cửa sổ run tính từ lúc tạo, kiểm trước/sau launch, claim độc quyền khi reap; nên khe \"reaper đã đọc lại xong, controller bind + launch ngay trước lúc xoá\" (RT2-1) vẫn còn."
+    }
+  },
+  "currentTargetWitness": {
+    "path": "docs/platform/agent-confinement/spec.md",
+    "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-47",
+      "githubAnchor": "unheaded-block-47",
+      "stableAnchor": "unheaded-block-47",
+      "title": "Unheaded block 47",
+      "startLine": 370,
+      "endLine": 370,
+      "textDigest": "a7af69f1674754e516550a8802a2acc64dd3a49655a4cdd01fa82d43a540d5ed",
+      "sample": "**Gắn home với tiến trình đang chạy worker (binding, 2026-10-15).** Authority cấp cho mỗi dispatch đã prepare hai hàm `bind`/`markLaunched` (`drivers/bwrap.mjs`, gom qua `bindingFo",
+      "identityFingerprint": "366466fa3653ce725f560e106699a897d40f8681ab982ea93931357b67616fcc",
+      "ancestry": [
+        "Spec: Agent Confinement Authority",
+        "8. Policy resolution và edge cases",
+        "8.6 Crash và cleanup"
+      ],
+      "text": "**Gắn home với tiến trình đang chạy worker (binding, 2026-10-15).** Authority cấp cho mỗi dispatch đã prepare hai hàm `bind`/`markLaunched` (`drivers/bwrap.mjs`, gom qua `bindingForPrepared` ở `authority.mjs`); adapter chỉ gọi hàm, không thấy đường dẫn home, không tự ghi marker. Round herdr confined (mọi round, có assignment hay không) gọi `bind` trước `pane run` với `paneId`, endpoint herdr mà client của round thật sự dùng (`herdrEndpoint` = socket path từ env của client, hoặc socket của session nó đặt tên, hoặc socket mặc định herdr tự rơi về; `herdrSession` chỉ khi env có đặt tên), `binderPid` + `binderStartTime` của controller và `boundAt`; ghi atomic (tmp + rename). Ghi không được thì đóng pane, round fail trước khi có worker. Ngay trước `pane run` (hoặc khi round resume thấy worker đã chạy) ghi `launchedAt`. Round cli-spawn confined gắn home với run supervisor tách rời ngay khi supervisor khởi động (`binderPid` = pid supervisor, không có pane); ghi không được thì báo mã `confinement-bind-failed` và giữ marker như prepare (supervisor đã chạy rồi). Luật reaper cho marker đã bind mà chưa `retainedAt`: binder còn sống (pid + start time) thì giữ tới `boundAt + max(maxAgeMs, 2 phút launch grace + run timeout + 10 phút settle)` bất kể pane trả lời gì; binder chết hoặc quá cửa sổ thì: không có pane → dọn; có pane mà chưa `launchedAt` và binder chết → dọn và đóng pane rỗng; còn lại hỏi pane trên endpoint đã ghi (true giữ, null theo luật hết hạn, false dọn). Marker `retainedAt` giữ luật pane cũ, nhưng giờ hỏi được cả round default-session nhờ endpoint đã ghi. Trước khi xoá, reaper đọc lại marker; khác với bản nó đã dựa vào để quyết thì bỏ qua lượt này. Finalizer chấp nhận đúng các field binding (`paneId`, `herdrEndpoint`, `herdrSession`, `binderPid`, `binderStartTime`, `boundAt`, `launchedAt`) cộng `credentialKept` là thay đổi sau prepare; mọi thay đổi khác vẫn là `ownership-marker-mismatch`. Chưa có (để cho run supervisor + holder-lock): từ chối bind khi home đã quá cửa sổ run tính từ lúc tạo, kiểm trước/sau launch, claim độc quyền khi reap; nên khe \"reaper đã đọc lại xong, controller bind + launch ngay trước lúc xoá\" (RT2-1) vẫn còn."
+    }
+  }
+}
+```
+

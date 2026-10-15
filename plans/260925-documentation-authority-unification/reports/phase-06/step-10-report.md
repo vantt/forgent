@@ -1,3 +1,63 @@
+# Step 10 replacement package complete — independent review next
+
+Assignment `unit-run-1792080300559-b4112a2f/producer/1`; **SYNC `2300d65571968bb3bcb80123a273272586e3f1db`**, designated content/combined-main pin; comparison base `980cb29312b8701f5ea639278f44e1a57a6e5c02`. All requests packaged at **`8d38b18ed` are superseded and will not be reviewed**; aecdc30aa request parts remain historical only. Runner owns commits. This package changes only plan files; no docs bytes changed.
+
+## Native synchronization and predecessor accounting
+
+**One background native sync, 640.480s (10m40.5s)**, own [log](step10-sync2300-native.log); **one compact registry persistence**. **4,485 files / 91,348 active native units**; known IDs **99,300 → 99,462, zero loss**; native inventory/registry active tuples equal. **162 new active IDs / 157 preserved new gaps**, 145 retained IDs have changed path/anchor/digest tuples. [Proof](step10-sync2300-native-proof.json), [complete transition accounting](step10-sync2300-accounting.json). Native inventory is transported once via a complete enumerable v8 cache, with no second sync/generation. Current registry SHA256 `7c428a66423b9874ad184212883c037f554b369d6a250f12213dd3fd0280d811`.
+
+All **five pending source predecessors reconciled** under A22/A34: **two heading IDs retained by native sync** are updated from the matching native drafts; **three actual gaps** are separately pending **one supersede / two partial-carries**. No false gap or identity graft. The supersede preserves all historical lines verbatim in order; both partial-carries keep the exact untransferred lines with full source/primary-target/residual/file SHA256 bindings. All require independent deep review; partial-carries block cutover until lawful A34 acceptance. **Seven source drafts resolved to native IDs**, including the two retained IDs and five newly assigned source IDs. [Reconciliation and receipts](step10-sync2300-predecessor-reconciliation.json), [verbatim residuals](step10-sync2300-predecessor-residuals.json).
+
+**88 target-drift rows / 22 shards** processed through bounded native `--rebind` inputs, then explicitly bound to their evidenced current target; all are **pending**, review fields removed, **no approval carry**. The native helper leaves already-pending rows pending; it does not automatically approve edited targets. Current binding correspondence uses the uniquely retained native identity or committed text/line ancestry evidence. [Before/after, full digests, native receipts](step10-sync2300-rebindings.json). The combined review set covers **198 unique rebound rows**: the union of 196 earlier package rows and these 88, with history retained and final canonical after rows shown.
+
+Initial full D exposed **six additional retained-map source bindings** (three stale heading digests, three predecessor gaps). These are reconciled pending under the existing outside-platform repository-navigation decision; all six new current navigation units are explicitly pending too. Full original/current witnesses: [reading-map reconciliation](step10-sync2300-reading-map-reconciliation.json). Initial six-fatal D results are preserved as `step10-sync2300-initial-*` and [initial log](step10-sync2300-verification.log). That cycle held the pre-correction decisions in memory for D; its later CLI snapshot/verify reloaded the corrected ledger and already passed. The final cycle below aligns all three D configurations and both dry runs with the same corrected ledger; final D below reuses the same complete native inventory after these necessary ledger corrections, without another sync or registry write.
+
+## D and snapshot / verify dry runs
+
+**D: zero fatal in all three runs**, against both prior registries together and each separately. [Summary](step10-sync2300-D-summary.json), [both](step10-sync2300-D-both.json), [identity](step10-sync2300-D-identity.json), [phase02](step10-sync2300-D-phase02.json). This is non-strict native D using the complete inventory, not global strict E or closure. All non-strict conservation-open data remains in the run artifacts.
+
+**Native dry-run `--snapshot` exit 0; `--verify` exit 0.** Both agree on **68,462 rows**, SHA256 `3849730f8c72a963c99b83d0ed21221333e5d1982e81638e8854c90f0c3f23a1`. [Commands and results](step10-sync2300-dry-run.json), [final verification log](step10-sync2300-final-verification.log). Dry snapshot and recomputed verification agree; this is a rehearsal with pending decisions, not sealed history, truth approval or cutover. No docs/history bytes written.
+
+## One complete replacement request
+
+[Single index](review-request-step10-index-2300d6557.md), [machine index](review-request-step10-index-2300d6557.json): **1,291 entries / 17 request files**, at most 120 entries each. Counts by part: **120, 17, 77, 120, 78, 38, 42, 120, 120, 120, 120, 120, 120, 26, 1, 23, 29**. Section counts:
+
+| Section | Contents | Entries |
+|---|---|---:|
+| a | Closing AGENTS/CLAUDE shard, complete claim_5c520fcb rationale/residual/IDs, unchanged reviewed split-line and retired accounting | 137 |
+| b | 53-entry merge table, three source-map redecisions, seven L10-12 truth corrections with code evidence, R10-4 wording diff and current merged map | 77 |
+| c | Every rebound row, original before/current after, full digests, native receipts and full source/target witnesses | 198 |
+| d | All 37 header fills plus one synonym-deduplication record | 38 |
+| e | Confinement re-carry, 39 alias comparisons at current pin, claim_46c173 and carried-paragraph redecisions | 42 |
+| f | All 366 original link decisions in current form, later helper edits/classifications, path-label changes, complete helper rules/tests | 746 |
+| g | Current history README, no sealed-history claim | 1 |
+| h | Group records, holds, comparison helper/tests, all partial-carry rows and complete native transitions | 23 |
+| i | Five main runner hunks, manifest byte-equality/sidecar, runner redecisions, five predecessor reconciliations, seven native bindings and residuals | 29 |
+
+Every original link row shows old/interim/final destination and final resolution; **all 36 self-links restored**, former **86 architect portal links = 76 specific targets + ten restored legacy-source referents**. All final edited destinations/anchors resolve. Source/self/canonical/original relationship rules are preserved; destination semantics are expressly owed independent review, not certified by existence. Later explicit edits/classifications include wrapped/vision links. The 41 history referents, nine queued original entries, fences, inline code and other non-doc consumer queues remain classified.
+
+[A36 exact lists](step10-sync2300-A36.json): mechanical all **198** rebound rows; deep **all 138 current source/target-unequal rebound rows**, **all 26 partial-carries**, **all seven truth corrections**, and all other explicitly flagged residual/new-unit/redecision evidence. Reviewer-seeded draw **at least 26 of 173 Weak-exact/Judgment rows** (class observations: 138 Judgment, 35 Weak-exact, 25 Unit-exact), with own deep/mechanical notes; >3% deep rework escalates to whole-pack deep review. The producer selected **no seed, sample or verdict**. Overlapping evidence appearances refer to the same canonical decision; return one consistent verdict per current canonical claim, referencing entry IDs.
+
+## Validation and remaining obligations
+
+**A/B/H/I pass**: eight historical A observations plus explicit L10-13/A9 helper authorization, no baseline modification; no current scope violations. H **608 files / 216 checked / zero findings**, I unchanged; extractor closure blobs equal. **59/59 targeted tests pass** (45 link/global/review-format + 14 decision-review), `env -u CLAUDE_CODE_SESSION_ID`; [tests](step10-sync2300-tests.log), [decision tests](step10-sync2300-decision-tests.log), [checks](step10-sync2300-cheap-checks.json). No full-suite claim.
+
+[Final audit](step10-sync2300-final-audit.json) verifies scope, expected row-only mutations, canonical shard/request equality, part hashes, 64-character shown source/target digests, unchanged registry hash after one persistence, and `git diff --check`. Docs, root instructions, scripts, tests, gates, vocabulary, extractor and baselines unchanged this turn. [Scratch reproduction](step10-sync2300-reproduction.json). No fgOS CLI, git writes, workspace .fgos access, source retirement, deletion, promotion, push or landing. MDView skipped: no MCP tool available; CLI would persist an external database outside authorized write scope.
+
+**Remaining:** independent ordinary review and red-team-10; six unavailable historical instruction witnesses remain explicit limitations. L10-12 reviewed the whole seven-unit truth population; no new producer draw. Fresh readers belong to Phase 7. Candidate/alias/native-list reconciliation, global strict D/E comparison, three Rings holds, separate dashboard predecessor, A34 residual/cutover/group obligations, 14 historical runner cutover revalidations, consumers, T9, rehearsal including Step 2, checkpoint refresh/mutations, independent checkpoint and scorecard/effort remain open. Expected partial population remains the previously authorized 24 plus two newly pending A34 partial dispositions; no global acceptance inferred. Phase 6 remains open and ultimately stops at awaiting owner review.
+
+---
+
+# Step 10 replacement package — retained-map correction checkpoint
+
+Assignment `unit-run-1792080300559-b4112a2f/producer/1`; **SYNC 2300d6557**. Native sync complete **640.480s**, one compact persistence, **4,485 files / 91,348 active units**, **99,300 → 99,462 known IDs, zero loss**. Five runner/manifest predecessors reconciled; seven drafts native-resolved; **88 target rows / 22 shards rebound pending**.
+
+Initial full D found **six retained-map source errors** (three stale heading source digests / three unknown predecessor IDs). They are now reconciled under the existing outside-platform navigation decision, pending independent review; all six current native new retained-map navigation units also have explicit pending rows. Full old/current text and native identities in [map reconciliation](step10-sync2300-reading-map-reconciliation.json). Final native verification reuses the same inventory and registry; **no second sync or registry write**. Initial failed results are retained, not overwritten without a witness.
+
+One replacement [request index](review-request-step10-index-2300d6557.md): **1,291 entries / 17 request parts**, max120; counts **120/17/77/120/78/38/42/120/120/120/120/120/120/26/1/23/29**. All current final bindings pending; no producer seed/verdict. A36 all138 unequal rebound rows, all26 partial-carries and all7 truth corrections deep, plus explicitly flagged new-unit/redecision evidence; reviewer-seeded ≥26/173. Old 8d38b18ed requests superseded. A/B/H/I, 59 targeted tests and scope/hash/shard audit pass. Final D / snapshot / verify still in progress; Phase 6 open.
+
+---
+
 # Step 10 correction docs turn — package next
 
 Assignment `unit-run-1792079321432-41fe2051/producer/1`. **SYNC `e7393ea3c`**, input HEAD is that merge. Authoring correction turn only: **zero native sync, zero review packs**. Runner owns the commit. Phase 6 remains open. The requests packaged at **`8d38b18ed` are superseded, will not be reviewed, and carry no approval**. The next turn packages the combined 41b work plus this turn at this turn's runner commit.

@@ -9,19 +9,6 @@
   ],
   "claims": [
     {
-      "claimId": "claim_f9c135d80cce2e8cf98c8b3b5b0db4ad",
-      "sourceUnitDigest": "70c00c205578fc34084e5bf8701a6bde0999cb6f05a1b58f8424ad95ed4c28d4",
-      "targetOwner": "docs/platform/contracts/architecture-manifest.json",
-      "targetAnchor": "file-block",
-      "claimKind": "contract",
-      "disposition": "supersede",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792079321432-41fe2051@2026-10-15",
-      "rationale": "A31 native current source identity; full changed source unit carried verbatim in existing candidate owner. Main-only before/after retained in step8-final-rework-accounting.json. No predecessor identity graft or approval carry; no current-truth or promotion approval. L10-14 / A31: predecessor text conserved in source history; upstream replaced this unit at SYNC e7393ea3c. Pending supersession to current verbatim carrier; source digest remains the predecessor digest. Native gap transition and current identity binding owed next package; no approval carry.",
-      "targetUnitDigest": "92391ce631b0c3602a5e22947a73182a6fd37f148e4b052cb4749a55b7657a6d",
-      "targetAncestry": []
-    },
-    {
       "claimId": "claim_bc091727d4f9526a57978e0ccc1cd5f7",
       "sourceUnitDigest": "d1af2d5a982f5d139fda776a23b4ad0b3776cc40c1fc0177636c44bdc91b968d",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
@@ -64,6 +51,37 @@
         "4. Exit Codes"
       ],
       "reviewReportCommit": "0e8ce7710ac67ad038927b242b2461876bf8c90d"
+    },
+    {
+      "claimId": "claim_b19630ef4dcf1330c9807fc226a90e7b",
+      "sourcePath": "docs/architecture-manifest.json",
+      "sourceAnchor": "file-block",
+      "sourceUnitDigest": "92391ce631b0c3602a5e22947a73182a6fd37f148e4b052cb4749a55b7657a6d",
+      "claimKind": "contract",
+      "targetOwner": "docs/platform/contracts/architecture-manifest.json",
+      "targetAnchor": "file-block",
+      "targetUnitDigest": "92391ce631b0c3602a5e22947a73182a6fd37f148e4b052cb4749a55b7657a6d",
+      "targetAncestry": [],
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
+      "rationale": "L10-14 / A31: every changed upstream span carried verbatim into mapped runner/root carrier; prior labelled truth corrections in the enclosing pointer list remain. Source and target unit digests disclose their inequality where applicable. Native identity resolved by the one sync at 2300d65571968bb3bcb80123a273272586e3f1db; pending independent review; no approval carry."
+    }
+  ],
+  "registryGaps": [
+    {
+      "claimId": "claim_f9c135d80cce2e8cf98c8b3b5b0db4ad",
+      "sourcePath": "docs/architecture-manifest.json",
+      "sourceUnitDigest": "70c00c205578fc34084e5bf8701a6bde0999cb6f05a1b58f8424ad95ed4c28d4",
+      "disposition": "supersede",
+      "targetOwner": "docs/architecture-manifest.json",
+      "targetAnchor": "file-block",
+      "targetUnitDigest": "92391ce631b0c3602a5e22947a73182a6fd37f148e4b052cb4749a55b7657a6d",
+      "targetAncestry": [],
+      "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
+      "reviewStatus": "pending",
+      "rationale": "A22/A34 at SYNC 2300d65571968bb3bcb80123a273272586e3f1db: native predecessor gap preserved; all historical lines occur verbatim in order in current source successor; insertion-only containment. Full source/successor and residual evidence: step10-sync2300-predecessor-residuals.json. No identity graft or approval carry.",
+      "reviewNote": "Pending independent deep review; source history and current successor are separate native identities."
     }
   ]
 }

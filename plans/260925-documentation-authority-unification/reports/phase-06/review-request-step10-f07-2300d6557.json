@@ -1,0 +1,411 @@
+{
+  "version": 1,
+  "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+  "SYNC": "2300d65571968bb3bcb80123a273272586e3f1db",
+  "comparisonBase": "980cb29312b8701f5ea639278f44e1a57a6e5c02",
+  "section": "f",
+  "title": "Current link pass and helper rules",
+  "part": 7,
+  "range": [
+    721,
+    746
+  ],
+  "entryCount": 26,
+  "entries": [
+    {
+      "kind": "explicit-source-relationship-classification",
+      "file": "docs/platform/proposals/coordination-capability-envelope.md",
+      "line": 24,
+      "label": "original source",
+      "legacy": "docs/architect/proposals/coordination-capability-envelope.md",
+      "before": "../../architect/proposals/coordination-capability-envelope.md",
+      "reason": "provenance/legacy-owner",
+      "disposition": "retain-legacy-until-cutover"
+    },
+    {
+      "kind": "explicit-source-relationship-classification",
+      "file": "docs/platform/proposals/coordination-dispatch-contract.md",
+      "line": 24,
+      "label": "original source",
+      "legacy": "docs/architect/proposals/coordination-dispatch-contract.md",
+      "before": "../../architect/proposals/coordination-dispatch-contract.md",
+      "reason": "provenance/legacy-owner",
+      "disposition": "retain-legacy-until-cutover"
+    },
+    {
+      "kind": "explicit-source-relationship-classification",
+      "file": "docs/platform/proposals/coordination-envelope-probe-contract.md",
+      "line": 24,
+      "label": "original source",
+      "legacy": "docs/architect/proposals/coordination-envelope-probe-contract.md",
+      "before": "../../architect/proposals/coordination-envelope-probe-contract.md",
+      "reason": "provenance/legacy-owner",
+      "disposition": "retain-legacy-until-cutover"
+    },
+    {
+      "kind": "explicit-source-relationship-classification",
+      "file": "docs/platform/proposals/coordination-worker-provider-boundary.md",
+      "line": 24,
+      "label": "original source",
+      "legacy": "docs/architect/proposals/coordination-worker-provider-boundary.md",
+      "before": "../../architect/proposals/coordination-worker-provider-boundary.md",
+      "reason": "provenance/legacy-owner",
+      "disposition": "retain-legacy-until-cutover"
+    },
+    {
+      "kind": "explicit-source-relationship-classification",
+      "file": "docs/platform/proposals/dispatch-control-plane-redesign.md",
+      "line": 24,
+      "label": "original source",
+      "legacy": "docs/architect/dispatch-control-plane-redesign.md",
+      "before": "../../architect/dispatch-control-plane-redesign.md",
+      "reason": "provenance/legacy-owner",
+      "disposition": "retain-legacy-until-cutover"
+    },
+    {
+      "kind": "explicit-source-relationship-classification",
+      "file": "docs/platform/proposals/doing-coordination-redesign.md",
+      "line": 24,
+      "label": "original source",
+      "legacy": "docs/architect/doing-coordination-redesign.md",
+      "before": "../../architect/doing-coordination-redesign.md",
+      "reason": "provenance/legacy-owner",
+      "disposition": "retain-legacy-until-cutover"
+    },
+    {
+      "kind": "explicit-source-relationship-classification",
+      "file": "docs/platform/proposals/knowledge-registry-redesign.md",
+      "line": 24,
+      "label": "original source",
+      "legacy": "docs/architect/knowledge-registry-redesign.md",
+      "before": "../../architect/knowledge-registry-redesign.md",
+      "reason": "provenance/legacy-owner",
+      "disposition": "retain-legacy-until-cutover"
+    },
+    {
+      "kind": "explicit-source-relationship-classification",
+      "file": "docs/platform/proposals/step-09-group-thinking-substrate.md",
+      "line": 24,
+      "label": "original source",
+      "legacy": "docs/architect/proposals/step-09-group-thinking-substrate.md",
+      "before": "../../architect/proposals/step-09-group-thinking-substrate.md",
+      "reason": "provenance/legacy-owner",
+      "disposition": "retain-legacy-until-cutover"
+    },
+    {
+      "kind": "explicit-source-relationship-classification",
+      "file": "docs/platform/proposals/step-10-a0-coding-domain-boundary-facade-plan.md",
+      "line": 24,
+      "label": "original source",
+      "legacy": "docs/architect/proposals/step-10-a0-coding-domain-boundary-facade-plan.md",
+      "before": "../../architect/proposals/step-10-a0-coding-domain-boundary-facade-plan.md",
+      "reason": "provenance/legacy-owner",
+      "disposition": "retain-legacy-until-cutover"
+    },
+    {
+      "kind": "explicit-source-relationship-classification",
+      "file": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+      "line": 24,
+      "label": "original source",
+      "legacy": "docs/architect/proposals/step-10-coding-domain-adoption.md",
+      "before": "../../architect/proposals/step-10-coding-domain-adoption.md",
+      "reason": "provenance/legacy-owner",
+      "disposition": "retain-legacy-until-cutover"
+    },
+    {
+      "kind": "explicit-source-relationship-classification",
+      "file": "docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md",
+      "line": 24,
+      "label": "original source",
+      "legacy": "docs/architect/proposals/visibility-and-interactive-contact-herdr-spawn.md",
+      "before": "../../architect/proposals/visibility-and-interactive-contact-herdr-spawn.md",
+      "reason": "provenance/legacy-owner",
+      "disposition": "retain-legacy-until-cutover"
+    },
+    {
+      "kind": "explicit-source-relationship-classification",
+      "file": "docs/platform/work-state/README.md",
+      "line": 34,
+      "label": "docs/specs/work-state.md",
+      "legacy": "docs/specs/work-state.md",
+      "before": "../../specs/work-state.md",
+      "reason": "provenance/legacy-owner",
+      "disposition": "retain-legacy-until-cutover"
+    },
+    {
+      "kind": "explicit-source-relationship-classification",
+      "file": "docs/platform/work-state/README.md",
+      "line": 34,
+      "label": "docs/io-contract.md",
+      "legacy": "docs/io-contract.md",
+      "before": "../../io-contract.md",
+      "reason": "provenance/legacy-owner",
+      "disposition": "retain-legacy-until-cutover"
+    },
+    {
+      "kind": "explicit-source-relationship-classification",
+      "file": "docs/platform/work-state/README.md",
+      "line": 40,
+      "label": "docs/specs/work-state.md",
+      "legacy": "docs/specs/work-state.md",
+      "before": "../../specs/work-state.md",
+      "reason": "provenance/legacy-owner",
+      "disposition": "retain-legacy-until-cutover"
+    },
+    {
+      "kind": "explicit-source-relationship-classification",
+      "file": "docs/platform/work-state/README.md",
+      "line": 40,
+      "label": "docs/io-contract.md",
+      "legacy": "docs/io-contract.md",
+      "before": "../../io-contract.md",
+      "reason": "provenance/legacy-owner",
+      "disposition": "retain-legacy-until-cutover"
+    },
+    {
+      "kind": "explicit-source-relationship-classification",
+      "file": "docs/platform/work-state/README.md",
+      "line": 59,
+      "label": "docs/specs/work-state.md",
+      "legacy": "docs/specs/work-state.md",
+      "before": "../../specs/work-state.md",
+      "reason": "provenance/legacy-owner",
+      "disposition": "retain-legacy-until-cutover"
+    },
+    {
+      "kind": "explicit-source-relationship-classification",
+      "file": "docs/platform/work-state/README.md",
+      "line": 59,
+      "label": "docs/io-contract.md",
+      "legacy": "docs/io-contract.md",
+      "before": "../../io-contract.md",
+      "reason": "provenance/legacy-owner",
+      "disposition": "retain-legacy-until-cutover"
+    },
+    {
+      "kind": "explicit-source-relationship-classification",
+      "file": "docs/platform/work-state/README.md",
+      "line": 72,
+      "label": "../../specs/work-state.md",
+      "legacy": "docs/specs/work-state.md",
+      "before": "../../specs/work-state.md",
+      "reason": "provenance/legacy-owner",
+      "disposition": "retain-legacy-until-cutover"
+    },
+    {
+      "kind": "explicit-source-relationship-classification",
+      "file": "docs/platform/work-state/README.md",
+      "line": 73,
+      "label": "../../io-contract.md",
+      "legacy": "docs/io-contract.md",
+      "before": "../../io-contract.md",
+      "reason": "provenance/legacy-owner",
+      "disposition": "retain-legacy-until-cutover"
+    },
+    {
+      "kind": "explicit-source-relationship-classification",
+      "file": "docs/platform/work-state/architecture/implementation-pointers.md",
+      "line": 58,
+      "label": "Legacy source: docs/specs/work-state.md",
+      "legacy": "docs/specs/work-state.md",
+      "before": "../../../specs/work-state.md",
+      "reason": "provenance/legacy-owner",
+      "disposition": "retain-legacy-until-cutover"
+    },
+    {
+      "kind": "explicit-source-relationship-classification",
+      "file": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "line": 438,
+      "label": "Legacy source: docs/specs/work-state.md",
+      "legacy": "docs/specs/work-state.md",
+      "before": "../../../specs/work-state.md",
+      "reason": "provenance/legacy-owner",
+      "disposition": "retain-legacy-until-cutover"
+    },
+    {
+      "kind": "explicit-source-relationship-classification",
+      "file": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "line": 439,
+      "label": "Legacy source: docs/io-contract.md",
+      "legacy": "docs/io-contract.md",
+      "before": "../../../io-contract.md",
+      "reason": "provenance/legacy-owner",
+      "disposition": "retain-legacy-until-cutover"
+    },
+    {
+      "kind": "explicit-source-relationship-classification",
+      "file": "docs/platform/work-state/spec.md",
+      "line": 1203,
+      "label": "docs/specs/work-state.md",
+      "legacy": "docs/specs/work-state.md",
+      "before": "../../specs/work-state.md",
+      "reason": "self-link",
+      "disposition": "retain-legacy-until-cutover"
+    },
+    {
+      "0": {
+        "file": "docs/platform/README.md",
+        "before": "[../transitional-switchboard.md](documentation/switchboard.md)",
+        "after": "[documentation/switchboard.md](documentation/switchboard.md)"
+      },
+      "1": {
+        "file": "docs/platform/README.md",
+        "before": "[../doc-governance.md](governance.md)",
+        "after": "[governance.md](governance.md)"
+      },
+      "2": {
+        "file": "docs/platform/agent-coordination/spec.md",
+        "before": "[docs/specs/runner.md](../runner/spec.md)",
+        "after": "[docs/platform/runner/spec.md](../runner/spec.md)"
+      },
+      "3": {
+        "file": "docs/platform/component-boundary.md",
+        "before": "[../architect/proposals/component-authority-boundary-map.md](proposals/component-authority-boundary-map.md)",
+        "after": "[proposals/component-authority-boundary-map.md](proposals/component-authority-boundary-map.md)"
+      },
+      "4": {
+        "file": "docs/platform/component-boundary.md",
+        "before": "[../specs/observe.md](observe/spec.md)",
+        "after": "[observe/spec.md](observe/spec.md)"
+      },
+      "5": {
+        "file": "docs/platform/documentation/switchboard.md",
+        "before": "[docs/doc-governance.md](../governance.md)",
+        "after": "[docs/platform/governance.md](../governance.md)"
+      },
+      "6": {
+        "file": "docs/platform/host-invocation-routing/architecture/host-use-cases.md",
+        "before": "[../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../spec.md)",
+        "after": "[../spec.md](../spec.md)"
+      },
+      "7": {
+        "file": "docs/platform/host-invocation-routing/architecture/invocation-kernel.md",
+        "before": "[../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../spec.md)",
+        "after": "[../spec.md](../spec.md)"
+      },
+      "8": {
+        "file": "docs/platform/host-invocation-routing/architecture/provider-routing.md",
+        "before": "[../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../spec.md)",
+        "after": "[../spec.md](../spec.md)"
+      },
+      "9": {
+        "file": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+        "before": "[../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../roadmap.md)",
+        "after": "[../roadmap.md](../roadmap.md)"
+      },
+      "10": {
+        "file": "docs/platform/host-invocation-routing/contracts/legacy-payload.md",
+        "before": "[../../../architect/host-invocation-routing/legacy-cli-transition.md](../architecture/legacy-cli-transition.md)",
+        "after": "[../architecture/legacy-cli-transition.md](../architecture/legacy-cli-transition.md)"
+      },
+      "11": {
+        "file": "docs/platform/host-invocation-routing/contracts/operation-catalog.md",
+        "before": "[../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../spec.md)",
+        "after": "[../spec.md](../spec.md)"
+      },
+      "12": {
+        "file": "docs/platform/host-invocation-routing/contracts/operation-request-outcome.md",
+        "before": "[../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../spec.md)",
+        "after": "[../spec.md](../spec.md)"
+      },
+      "13": {
+        "file": "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
+        "before": "[../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../roadmap.md)",
+        "after": "[../roadmap.md](../roadmap.md)"
+      },
+      "14": {
+        "file": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+        "before": "[../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../roadmap.md)",
+        "after": "[../roadmap.md](../roadmap.md)"
+      },
+      "15": {
+        "file": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+        "before": "[../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../roadmap.md)",
+        "after": "[../roadmap.md](../roadmap.md)"
+      },
+      "16": {
+        "file": "docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md",
+        "before": "[../../../architect/host-invocation-routing/node-to-rust-component-migration.md](../architecture/node-to-rust-migration.md)",
+        "after": "[../architecture/node-to-rust-migration.md](../architecture/node-to-rust-migration.md)"
+      },
+      "17": {
+        "file": "docs/platform/host-invocation-routing/vision.md",
+        "before": "[../../architect/host-invocation-routing/host-invocation-provider-routing.md](spec.md)",
+        "after": "[spec.md](spec.md)"
+      },
+      "18": {
+        "file": "docs/platform/host-invocation-routing/vision.md",
+        "before": "[../../architect/host-invocation-routing/node-to-rust-component-migration.md](architecture/node-to-rust-migration.md)",
+        "after": "[architecture/node-to-rust-migration.md](architecture/node-to-rust-migration.md)"
+      },
+      "19": {
+        "file": "docs/platform/intent-preservation-ledger.md",
+        "before": "[../doc-governance.md](governance.md)",
+        "after": "[governance.md](governance.md)"
+      },
+      "20": {
+        "file": "docs/platform/migration-authoring-rules.md",
+        "before": "[docs/transitional-switchboard.md](documentation/switchboard.md)",
+        "after": "[docs/platform/documentation/switchboard.md](documentation/switchboard.md)"
+      },
+      "21": {
+        "file": "docs/platform/migration-authoring-rules.md",
+        "before": "[docs/doc-governance.md](governance.md)",
+        "after": "[docs/platform/governance.md](governance.md)"
+      },
+      "22": {
+        "file": "docs/platform/packaging-distribution/README.md",
+        "before": "[../../architect/component-boundary/README.md](../component-boundary.md)",
+        "after": "[../component-boundary.md](../component-boundary.md)"
+      },
+      "23": {
+        "file": "docs/platform/packaging-distribution/spec.md",
+        "before": "[docs/architect/workspace-topology.md](../system-architecture/architecture/workspace-topology.md)",
+        "after": "[docs/platform/system-architecture/architecture/workspace-topology.md](../system-architecture/architecture/workspace-topology.md)"
+      },
+      "24": {
+        "file": "docs/platform/vision.md",
+        "before": "[../doc-governance.md](governance.md)",
+        "after": "[governance.md](governance.md)"
+      },
+      "25": {
+        "file": "docs/platform/vision.md",
+        "before": "[../platform-foundations.md](platform-foundations.md)",
+        "after": "[platform-foundations.md](platform-foundations.md)"
+      },
+      "26": {
+        "file": "docs/platform/work-state/README.md",
+        "before": "[docs/work-item-lifecycle-vision.md](../vision.md)",
+        "after": "[docs/platform/vision.md](../vision.md)"
+      },
+      "27": {
+        "file": "docs/platform/work-state/README.md",
+        "before": "[../../work-item-lifecycle-vision.md](../vision.md)",
+        "after": "[../vision.md](../vision.md)"
+      },
+      "28": {
+        "file": "docs/platform/work-state/spec.md",
+        "before": "[docs/io-contract.md](contracts/cli-io-contract.md)",
+        "after": "[docs/platform/work-state/contracts/cli-io-contract.md](contracts/cli-io-contract.md)"
+      },
+      "kind": "path-label-corrections"
+    },
+    {
+      "kind": "helper-rules-and-tests",
+      "path": "scripts/doc-link-pass.mjs",
+      "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+      "SHA256": "80f1fce03d6377f2a4100fd95d6bff31fa5d5888d6169d2fa56c933154cb06e4",
+      "text": "// Semantic guard for the candidate documentation link pass. Pure planning only;\n// callers own writes and retain the returned classification/evidence records.\nimport path from 'node:path';\nconst posix = path.posix;\nconst relation = /source relationship|original source|canonical|legacy (?:source|owner|documents)|current source|source protocol|source document|source of truth|nguồn (?:gốc|chuẩn)/i;\nexport function specificTarget(legacy, aliases, candidates, primaryAnchor) {\n  const name = posix.basename(legacy);\n  const same = candidates.filter(p => posix.basename(p) === name && name !== 'README.md');\n  // Preserve the area suffix where restored copies share a filename.\n  const suffix = legacy.replace(/^docs\\/architect\\//, '');\n  const exact = same.filter(p => p.endsWith(suffix));\n  if (exact.length === 1) return exact[0];\n  if (same.length === 1) return same[0];\n  const restored = same.filter(p => !/\\/(?:history|decisions)\\//.test(p));\n  if (restored.length === 1) return restored[0];\n  const primary = primaryAnchor && aliases.find(a => a.fromPath === legacy + '#' + primaryAnchor);\n  if (primary && !primary.toOwner.endsWith('/README.md')) return primary.toOwner;\n  const anchored = [...new Set(aliases.filter(a => a.fromPath.startsWith(legacy + '#') && !a.toOwner.endsWith('/README.md')).map(a => a.toOwner))];\n  return anchored.length === 1 ? anchored[0] : null;\n}\nexport function planLinkPass({file, text, aliases, candidates, sourceHeadings = {}}) {\n  const edits = [], classified = [], ranges = [];\n  let offset = 0, fence = null, sourceTable = false, inTable = false;\n  for (const line of text.split('\\n')) {\n    const mark = /^\\s*(`{3,}|~{3,})/.exec(line)?.[1];\n    if (mark) fence = fence && mark[0] === fence[0] && mark.length >= fence.length ? null : fence || mark;\n    const tableRow = line.trim().startsWith('|');\n    if (!tableRow) sourceTable = false;\n    if (tableRow && !inTable && /current source|canonical|original source/i.test(line)) sourceTable = true;\n    inTable = tableRow;\n    ranges.push({start:offset, end:offset+line.length+1, protected:!!fence||!!mark, relation:relation.test(line)||sourceTable});\n    offset += line.length + 1;\n  }\n  const result = text.replace(/\\[([^\\]]+)\\]\\(([^\\s)]+)\\)/g, (whole, label, destination, index) => {\n    const range = ranges.find(r => r.start <= index && index < r.end);\n    if (range.protected || /(^|\\/)history\\//.test(file) || /^(?:[a-z]+:|#|\\/)/i.test(destination)) return whole;\n    const [relative, fragment] = destination.split('#');\n    const legacy = posix.normalize(posix.join(posix.dirname(file), relative));\n    const alias = aliases.find(a => a.fromPath === legacy + (fragment ? '#' + fragment : ''));\n    if (!alias) return whole;\n    let target = alias.toOwner, anchor = alias.toAnchor || null, reason = 'explicit-alias';\n    const record = {file, line:text.slice(0,index).split('\\n').length, label, legacy, before:destination};\n    if (range.relation || target === file) {\n      classified.push({...record, reason:range.relation?'provenance/legacy-owner':'self-link', disposition:'retain-legacy-until-cutover'}); return whole;\n    }\n    if (!fragment && target.endsWith('/README.md') && posix.basename(legacy) !== 'README.md') {\n      const specific = specificTarget(legacy, aliases, candidates, sourceHeadings[legacy]);\n      if (!specific && !legacy.startsWith('docs/architect/')) {\n        // A general area spec may intentionally resolve to its area portal.\n      } else if (!specific) {classified.push({...record, reason:'portal-without-specific-target', disposition:'retain-legacy-and-queue'}); return whole;}\n      if (specific) {target = specific; anchor = null; reason = 'specific-candidate';}\n    }\n    if (target === file) {classified.push({...record, reason:'self-link', disposition:'retain-legacy-until-cutover'}); return whole;}\n    let after = posix.relative(posix.dirname(file), target);\n    if (anchor) after += '#' + anchor;\n    edits.push({...record, after, target, anchor, reason});\n    return `[${label}](${after})`;\n  });\n  return {text:result, edits, classified};\n}\n"
+    },
+    {
+      "kind": "helper-rules-and-tests",
+      "path": "test/scripts/doc-link-pass.test.mjs",
+      "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+      "SHA256": "3dd31a7075cd1db1399d5bcb560eb6c475f1302e309ab714272fc1055c9388a4",
+      "text": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { planLinkPass, specificTarget } from '../../scripts/doc-link-pass.mjs';\nconst file = 'docs/platform/a/spec.md';\nconst aliases = [\n { fromPath: 'docs/specs/a.md', toOwner: file },\n { fromPath: 'docs/architect/a/design.md', toOwner: 'docs/platform/a/README.md' },\n { fromPath: 'docs/architect/a/design.md#details', toOwner: 'docs/platform/a/architecture/design.md', toAnchor: 'details' },\n];\nconst candidates = ['docs/platform/a/architecture/design.md'];\nconst run = (text, extra = {}) => planLinkPass({ file, text, aliases, candidates, ...extra });\ntest('never repoints a source relationship or a link to its own file', () => {\n for (const text of ['Source relationship: [original source](../../specs/a.md)',\n  'The legacy documents stay canonical: [source](../../specs/a.md)',\n  '[a spec](../../specs/a.md)',\n  '| Source protocol §3 | [design](../../architect/a/design.md) |']) {\n  const r = run(text); assert.equal(r.text, text); assert.equal(r.edits.length, 0); assert.equal(r.classified.length, 1);\n }\n});\ntest('source column header protects subsequent table rows', () => {\n const text = '| Area | Current source during migration |\\n|---|---|\\n| A | [design](../../architect/a/design.md) |';\n assert.equal(run(text).text, text);\n});\ntest('chooses a restored same-named candidate before a portal', () => {\n const r = run('[Design](../../architect/a/design.md)');\n assert.equal(r.text, '[Design](architecture/design.md)');\n assert.equal(r.edits[0].reason, 'specific-candidate');\n});\ntest('chooses the unique per-anchor target when no same-named candidate exists', () => {\n assert.equal(specificTarget('docs/architect/a/old.md', [\n  { fromPath: 'docs/architect/a/old.md#one', toOwner: 'docs/platform/a/spec.md', toAnchor: 'one' },\n ], []), 'docs/platform/a/spec.md');\n});\ntest('restores and classifies a portal alias with no specific target', () => {\n const r = run('[Specific design](../../architect/a/design.md)', { candidates: [], aliases: aliases.slice(0, 2) });\n assert.equal(r.edits.length, 0); assert.equal(r.classified[0].reason, 'portal-without-specific-target');\n});\ntest('wrapped labels are repointed and labels preserved', () => {\n assert.equal(run('[Dispatch & Execution\\nplane](../../architect/a/design.md)').text,\n '[Dispatch & Execution\\nplane](architecture/design.md)');\n});\ntest('fences and historical referents are retained', () => {\n const text = '```md\\n[design](../../architect/a/design.md)\\n```';\n assert.equal(run(text).text, text);\n assert.equal(run('[design](../../architect/a/design.md)', { file: 'docs/platform/a/history/old.md' }).edits.length, 0);\n});\ntest('anchored destinations preserve the explicit alias anchor', () => {\n assert.equal(run('[details](../../architect/a/design.md#details)').text, '[details](architecture/design.md#details)');\n});\ntest('ambiguous specific targets fail closed', () => {\n assert.equal(specificTarget('docs/architect/a/old.md', [\n {fromPath:'docs/architect/a/old.md#x',toOwner:'docs/platform/a/x.md'},\n {fromPath:'docs/architect/a/old.md#y',toOwner:'docs/platform/a/y.md'},\n ], []), null);\n});\ntest('uses the source heading alias for a split document without guessing among sections', () => {\n assert.equal(specificTarget('docs/architect/a/old.md', [\n {fromPath:'docs/architect/a/old.md#old',toOwner:'docs/platform/a/new.md'},\n {fromPath:'docs/architect/a/old.md#decision',toOwner:'docs/platform/a/decisions/x.md'},\n ], [], 'old'), 'docs/platform/a/new.md');\n});\ntest('a canonical data cell does not protect unrelated following table rows', () => {\n const text='| Need | Read |\\n|---|---|\\n| Canonical source | [a](../../specs/a.md) |\\n| Design | [design](../../architect/a/design.md) |';\n assert.match(run(text).text, /\\[design\\]\\(architecture\\/design.md\\)/);\n});\ntest('restored same-named document takes precedence over an archived heading alias', () => {\n assert.equal(specificTarget('docs/architect/a/design.md', [\n {fromPath:'docs/architect/a/design.md#design',toOwner:'docs/platform/a/history/design.md'},\n ], ['docs/platform/a/architecture/design.md','docs/platform/a/history/design.md'], 'design'), 'docs/platform/a/architecture/design.md');\n});\n"
+    }
+  ],
+  "independentReviewRequired": true,
+  "seedChosen": false,
+  "verdictChosen": false
+}

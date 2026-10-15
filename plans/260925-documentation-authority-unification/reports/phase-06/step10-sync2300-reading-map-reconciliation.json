@@ -1,0 +1,771 @@
+{
+  "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+  "initialDFatalFindings": [
+    {
+      "type": "decision-digest-stale",
+      "message": "claim claim_5e39467512dc05bfe6e3b4a96c660d6c: sourceUnitDigest does not match the current source text (needs at least 16 hex characters of the row's digest)",
+      "path": "docs/reading-map.md"
+    },
+    {
+      "type": "decision-claim-unknown",
+      "message": "shard s5-root-retained-navigation-proposal.json: claim claim_ad83c507f4d4462cd63564650a4a6eb1 is not in the claim ledger"
+    },
+    {
+      "type": "decision-digest-stale",
+      "message": "claim claim_9c8387207fd0c025e7d643a97625a71d: sourceUnitDigest does not match the current source text (needs at least 16 hex characters of the row's digest)",
+      "path": "docs/reading-map.md"
+    },
+    {
+      "type": "decision-claim-unknown",
+      "message": "shard s5-root-retained-navigation-proposal.json: claim claim_218d4b42e8ea4b5f0cdc071b33fa3f54 is not in the claim ledger"
+    },
+    {
+      "type": "decision-digest-stale",
+      "message": "claim claim_aad6d095624ef67fd09cb8c0cc89fd97: sourceUnitDigest does not match the current source text (needs at least 16 hex characters of the row's digest)",
+      "path": "docs/reading-map.md"
+    },
+    {
+      "type": "decision-claim-unknown",
+      "message": "shard s5-root-retained-navigation-proposal.json: claim claim_c3b29b18751a7153eb574a571a8a1009 is not in the claim ledger"
+    }
+  ],
+  "receipts": [
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-retained-navigation-proposal.json",
+      "claimId": "claim_5e39467512dc05bfe6e3b4a96c660d6c",
+      "kind": "navigation-retained-heading",
+      "before": {
+        "claimId": "claim_5e39467512dc05bfe6e3b4a96c660d6c",
+        "sourceUnitDigest": "82e97a857539eea9e5f20bb9b1f5cdfc6209f68afcdf604502c2b3d70ca448be",
+        "claimKind": "navigation",
+        "disposition": "reclassify-out-of-platform-scope",
+        "reviewStatus": "reviewed",
+        "authoredBy": "codex-session:21@2026-10-14",
+        "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This unit of docs/reading-map.md#documentation-reading-map is navigation, not a platform behavioral owner. Preserve it in place; the detailed legacy docs/specs/reading-map.md is still retained during migration and may retire only after the reviewed navigation merge/consumer rewrite at cutover. No reader edit, retirement or source-to-itself carry proof is claimed.",
+        "reviewNote": "mechanical: full digest recomputed by script, anchor reading-map.md#documentation-reading-map exists, shard row equals pack row, source blob equals frozen pin, disposition reclassify-out-of-platform-scope is allowed by the map row",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-14",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-retained-conservation.md",
+        "reviewMode": "ordinary",
+        "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+      },
+      "after": {
+        "claimId": "claim_5e39467512dc05bfe6e3b4a96c660d6c",
+        "sourceUnitDigest": "f56b373a4532d0a280541b1eeda7ba4aee730699cc0e39d338a1abb7d9c9294e",
+        "claimKind": "navigation",
+        "disposition": "reclassify-out-of-platform-scope",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
+        "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This is repository navigation, not a platform behavioral owner. Keep this source/evidence in place; no source retirement, source-to-self carry proof or truth approval. At SYNC 2300d65571968bb3bcb80123a273272586e3f1db, preserve native predecessor history and re-decide the current navigation binding pending independent review. Full original/current text and digests in step10-sync2300-reading-map-reconciliation.json.",
+        "reviewNote": "Pending independent deep review; no old review carried to edited navigation."
+      },
+      "beforeSource": {
+        "unitKind": "heading",
+        "level": 1,
+        "title": "Documentation Reading Map",
+        "anchor": "documentation-reading-map",
+        "githubAnchor": "documentation-reading-map",
+        "stableAnchor": "h-00706e683013",
+        "startLine": 1,
+        "endLine": 1,
+        "textDigest": "82e97a857539eea9e5f20bb9b1f5cdfc6209f68afcdf604502c2b3d70ca448be",
+        "sample": "Documentation Reading Map",
+        "sectionPayloadDigest": "b7022656ee03994bf1048d6f5cea1b7a95fa37eaa1b23ffca72164f8777c1534",
+        "followingBlockDigest": "4b06a227179cdf05a3c4cbfae70c9ffb6aa2be702a226872f61f38c7bfefc79c",
+        "identityFingerprint": "87b7128229b066dec65f6f9481535c3970897e8807b0ded0833a1d1a6bb94e17",
+        "ancestry": [],
+        "text": "# Documentation Reading Map",
+        "sectionText": "# Documentation Reading Map\n\n```txt\nDocument type: Reading map\nAudience: Human reviewer, maintainer, implementer, agent\nPurpose: Tell readers what to read first by purpose\nDesign status: Accepted\nImplementation: Partial\nProvenance: Promoted from documentation-system redesign\nWriter type: Human + agent coauthor\nCanonical for: Documentation entry routing\nUse this when: You need to decide which fgOS docs to read first\nDo not use this for: Documentation governance or complete file inventory\nLast reviewed: 2026-09-25\nRelated:\n- `docs/doc-governance.md`\n- `docs/transitional-switchboard.md`\n- `docs/platform/README.md`\n- `docs/specs/reading-map.md`\n```\n\nThis map is a reader route, not a complete inventory. The legacy\n`docs/specs/reading-map.md` remains the detailed product/source map during\nmigration."
+      },
+      "currentSource": {
+        "unitKind": "heading",
+        "level": 1,
+        "title": "Documentation Reading Map",
+        "anchor": "documentation-reading-map",
+        "githubAnchor": "documentation-reading-map",
+        "stableAnchor": "h-00706e683013",
+        "startLine": 1,
+        "endLine": 1,
+        "textDigest": "f56b373a4532d0a280541b1eeda7ba4aee730699cc0e39d338a1abb7d9c9294e",
+        "sample": "Documentation Reading Map",
+        "sectionPayloadDigest": "05a58822c0f388dc66347f0db1c29f249e16d39764e3ab188a91930b4e14ea04",
+        "followingBlockDigest": "4b06a227179cdf05a3c4cbfae70c9ffb6aa2be702a226872f61f38c7bfefc79c",
+        "identityFingerprint": "e76bc1c098dcff073b8749e9ecebc7de9a431544e50687c7a59eb44af3c9673d",
+        "ancestry": [],
+        "text": "# Documentation Reading Map",
+        "sectionText": "# Documentation Reading Map\n\n```txt\nDocument type: Reading map\nAudience: Human reviewer, maintainer, implementer, agent\nPurpose: Tell readers what to read first by purpose\nDesign status: Accepted\nImplementation: Partial\nProvenance: Promoted from documentation-system redesign\nWriter type: Human + agent coauthor\nCanonical for: Documentation entry routing\nUse this when: You need to decide which fgOS docs to read first\nDo not use this for: Documentation governance or complete file inventory\nLast reviewed: 2026-09-25\nRelated:\n- `docs/doc-governance.md`\n- `docs/transitional-switchboard.md`\n- `docs/platform/README.md`\n- `docs/specs/reading-map.md`\n```\n\nThis map provides reader routes and the merged detailed product/source map in\n[section 5](#5-detailed-product-and-source-map). The legacy source remains\nretained for provenance until consumer cutover."
+      },
+      "native": {
+        "sourcePath": "docs/reading-map.md",
+        "unitDigest": "5d2b6a28a04a687d6042462a41b005e276cf8feca981a2f3a42afddbd3eb2e54",
+        "identityFingerprint": "e76bc1c098dcff073b8749e9ecebc7de9a431544e50687c7a59eb44af3c9673d",
+        "claimId": "claim_5e39467512dc05bfe6e3b4a96c660d6c",
+        "sourceAnchor": "documentation-reading-map",
+        "unitKind": "heading",
+        "sourceUnitDigest": "f56b373a4532d0a280541b1eeda7ba4aee730699cc0e39d338a1abb7d9c9294e",
+        "claimKind": "navigation",
+        "status": "current",
+        "reviewStatus": "needs-review",
+        "lineage": {
+          "fromCommit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+          "fromUnitDigest": "d832d31d45e46fe8b7c2dc4234e478213c486974529260d297a1743a48fcdf4e",
+          "toUnitDigest": "5d2b6a28a04a687d6042462a41b005e276cf8feca981a2f3a42afddbd3eb2e54",
+          "fromSourceUnitDigest": "82e97a857539eea9e5f20bb9b1f5cdfc6209f68afcdf604502c2b3d70ca448be",
+          "toSourceUnitDigest": "f56b373a4532d0a280541b1eeda7ba4aee730699cc0e39d338a1abb7d9c9294e"
+        }
+      },
+      "deepRequired": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-retained-navigation-proposal.json",
+      "claimId": "claim_ad83c507f4d4462cd63564650a4a6eb1",
+      "kind": "navigation-native-gap",
+      "before": {
+        "claimId": "claim_ad83c507f4d4462cd63564650a4a6eb1",
+        "sourceUnitDigest": "44e917a93a892200ff690378f7fc239851ed0777ac931253feacf4efb68e6e87",
+        "claimKind": "navigation",
+        "disposition": "reclassify-out-of-platform-scope",
+        "reviewStatus": "reviewed",
+        "authoredBy": "codex-session:21@2026-10-14",
+        "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This unit of docs/reading-map.md#unheaded-block-2 is navigation, not a platform behavioral owner. Preserve it in place; the detailed legacy docs/specs/reading-map.md is still retained during migration and may retire only after the reviewed navigation merge/consumer rewrite at cutover. No reader edit, retirement or source-to-itself carry proof is claimed.",
+        "reviewNote": "mechanical: full digest recomputed by script, anchor reading-map.md#unheaded-block-2 exists, shard row equals pack row, source blob equals frozen pin, disposition reclassify-out-of-platform-scope is allowed by the map row",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-14",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-retained-conservation.md",
+        "reviewMode": "ordinary",
+        "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+      },
+      "after": {
+        "claimId": "claim_ad83c507f4d4462cd63564650a4a6eb1",
+        "sourceUnitDigest": "44e917a93a892200ff690378f7fc239851ed0777ac931253feacf4efb68e6e87",
+        "claimKind": "navigation",
+        "disposition": "reclassify-out-of-platform-scope",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
+        "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This is repository navigation, not a platform behavioral owner. Keep this source/evidence in place; no source retirement, source-to-self carry proof or truth approval. At SYNC 2300d65571968bb3bcb80123a273272586e3f1db, preserve native predecessor history and re-decide the current navigation binding pending independent review. Full original/current text and digests in step10-sync2300-reading-map-reconciliation.json.",
+        "reviewNote": "Pending independent deep review; no old review carried to edited navigation.",
+        "sourcePath": "docs/reading-map.md"
+      },
+      "beforeSource": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-2",
+        "githubAnchor": "unheaded-block-2",
+        "stableAnchor": "unheaded-block-2",
+        "title": "Unheaded block 2",
+        "startLine": 22,
+        "endLine": 24,
+        "textDigest": "44e917a93a892200ff690378f7fc239851ed0777ac931253feacf4efb68e6e87",
+        "sample": "This map is a reader route, not a complete inventory. The legacy\n`docs/specs/reading-map.md` remains the detailed product/source map during\nmigration.",
+        "identityFingerprint": "9bb608dbc0686679f7280d4cb6610b082d0135bdda68f2a3512db648954f9d30",
+        "ancestry": [
+          "Documentation Reading Map"
+        ],
+        "text": "This map is a reader route, not a complete inventory. The legacy\n`docs/specs/reading-map.md` remains the detailed product/source map during\nmigration."
+      },
+      "currentSource": null,
+      "native": {
+        "sourcePath": "docs/reading-map.md",
+        "unitDigest": "9bb608dbc0686679f7280d4cb6610b082d0135bdda68f2a3512db648954f9d30",
+        "identityFingerprint": "9bb608dbc0686679f7280d4cb6610b082d0135bdda68f2a3512db648954f9d30",
+        "claimId": "claim_ad83c507f4d4462cd63564650a4a6eb1",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "44e917a93a892200ff690378f7fc239851ed0777ac931253feacf4efb68e6e87",
+        "claimKind": "navigation",
+        "status": "current",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-2 is not a stable heading anchor"
+      },
+      "deepRequired": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-retained-navigation-proposal.json",
+      "claimId": "claim_9c8387207fd0c025e7d643a97625a71d",
+      "kind": "navigation-retained-heading",
+      "before": {
+        "claimId": "claim_9c8387207fd0c025e7d643a97625a71d",
+        "sourceUnitDigest": "a0c63d891be180aae3488da0c2035081f03d1e001bfd24499eabee67e7621d4b",
+        "claimKind": "navigation",
+        "disposition": "reclassify-out-of-platform-scope",
+        "reviewStatus": "reviewed",
+        "authoredBy": "codex-session:21@2026-10-14",
+        "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This unit of docs/reading-map.md#1-start-here is navigation, not a platform behavioral owner. Preserve it in place; the detailed legacy docs/specs/reading-map.md is still retained during migration and may retire only after the reviewed navigation merge/consumer rewrite at cutover. No reader edit, retirement or source-to-itself carry proof is claimed.",
+        "reviewNote": "mechanical: full digest recomputed by script, anchor reading-map.md#1-start-here exists, shard row equals pack row, source blob equals frozen pin, disposition reclassify-out-of-platform-scope is allowed by the map row",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-14",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-retained-conservation.md",
+        "reviewMode": "ordinary",
+        "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+      },
+      "after": {
+        "claimId": "claim_9c8387207fd0c025e7d643a97625a71d",
+        "sourceUnitDigest": "1007e818be04d1b580f8e18e3bedc19de7cf71d6d2921441a08d7b04e1318e86",
+        "claimKind": "navigation",
+        "disposition": "reclassify-out-of-platform-scope",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
+        "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This is repository navigation, not a platform behavioral owner. Keep this source/evidence in place; no source retirement, source-to-self carry proof or truth approval. At SYNC 2300d65571968bb3bcb80123a273272586e3f1db, preserve native predecessor history and re-decide the current navigation binding pending independent review. Full original/current text and digests in step10-sync2300-reading-map-reconciliation.json.",
+        "reviewNote": "Pending independent deep review; no old review carried to edited navigation."
+      },
+      "beforeSource": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "1. Start Here",
+        "anchor": "1-start-here",
+        "githubAnchor": "1-start-here",
+        "stableAnchor": "h-0b79d96bc9cc",
+        "startLine": 26,
+        "endLine": 26,
+        "textDigest": "a0c63d891be180aae3488da0c2035081f03d1e001bfd24499eabee67e7621d4b",
+        "sample": "1. Start Here",
+        "sectionPayloadDigest": "8a6a408d2e92d032e23faf4951c3dd36fbeb9d26d32aefb613038924916f8a7d",
+        "followingBlockDigest": "8a6a408d2e92d032e23faf4951c3dd36fbeb9d26d32aefb613038924916f8a7d",
+        "identityFingerprint": "6d49cbba8c2a169e53a55d5b2f4c15c60404d4ff43ce5dbf29c3c7cf913e7255",
+        "ancestry": [
+          "Documentation Reading Map"
+        ],
+        "text": "## 1. Start Here",
+        "sectionText": "## 1. Start Here\n\n| Need | Read |\n|---|---|\n| Understand documentation rules | [doc-governance.md](doc-governance.md) |\n| Resolve authority during transition | [transitional-switchboard.md](transitional-switchboard.md) |\n| Understand platform-wide docs | [platform/README.md](platform/README.md) |\n| Understand packaging, install, activation, setup, and doctor | [platform/packaging-distribution/README.md](platform/packaging-distribution/README.md) |\n| Understand current legacy source map | [specs/reading-map.md](specs/reading-map.md) |\n| Shape a new multi-round design | Create or update a discussion scratchpad |\n| Understand an area | `docs/platform/<area>/README.md`, or current legacy `docs/specs/<area>.md` during migration |"
+      },
+      "currentSource": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "1. Start Here",
+        "anchor": "1-start-here",
+        "githubAnchor": "1-start-here",
+        "stableAnchor": "h-0b79d96bc9cc",
+        "startLine": 26,
+        "endLine": 26,
+        "textDigest": "1007e818be04d1b580f8e18e3bedc19de7cf71d6d2921441a08d7b04e1318e86",
+        "sample": "1. Start Here",
+        "sectionPayloadDigest": "67798e09dff5c22bd679b1b04d1f4ee104f5699de0f19d8c9ebd18c7a8b19c17",
+        "followingBlockDigest": "67798e09dff5c22bd679b1b04d1f4ee104f5699de0f19d8c9ebd18c7a8b19c17",
+        "identityFingerprint": "e23a3974b42f609b3bbb3b069db11ea018cf52372321b14a770149822ca04110",
+        "ancestry": [
+          "Documentation Reading Map"
+        ],
+        "text": "## 1. Start Here",
+        "sectionText": "## 1. Start Here\n\n| Need | Read |\n|---|---|\n| Understand documentation rules | [doc-governance.md](doc-governance.md) |\n| Resolve authority during transition | [transitional-switchboard.md](transitional-switchboard.md) |\n| Understand platform-wide docs | [platform/README.md](platform/README.md) |\n| Understand packaging, install, activation, setup, and doctor | [platform/packaging-distribution/README.md](platform/packaging-distribution/README.md) |\n| Understand the detailed product/source map | [Section 5](#5-detailed-product-and-source-map) |\n| Shape a new multi-round design | Create or update a discussion scratchpad |\n| Understand an area | `docs/platform/<area>/README.md`, or current legacy `docs/specs/<area>.md` during migration |"
+      },
+      "native": {
+        "sourcePath": "docs/reading-map.md",
+        "unitDigest": "4c067e46a22ee1e7d2c99e6bc27df9081c49724699e71c35acd8b27465416174",
+        "identityFingerprint": "e23a3974b42f609b3bbb3b069db11ea018cf52372321b14a770149822ca04110",
+        "claimId": "claim_9c8387207fd0c025e7d643a97625a71d",
+        "sourceAnchor": "1-start-here",
+        "unitKind": "heading",
+        "sourceUnitDigest": "1007e818be04d1b580f8e18e3bedc19de7cf71d6d2921441a08d7b04e1318e86",
+        "claimKind": "navigation",
+        "status": "current",
+        "reviewStatus": "needs-review",
+        "lineage": {
+          "fromCommit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+          "fromUnitDigest": "a7da3c43e74d1d768ea65182735d03a160bbf0c0fedd960fa47e507ba45ab244",
+          "toUnitDigest": "4c067e46a22ee1e7d2c99e6bc27df9081c49724699e71c35acd8b27465416174",
+          "fromSourceUnitDigest": "a0c63d891be180aae3488da0c2035081f03d1e001bfd24499eabee67e7621d4b",
+          "toSourceUnitDigest": "1007e818be04d1b580f8e18e3bedc19de7cf71d6d2921441a08d7b04e1318e86"
+        }
+      },
+      "deepRequired": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-retained-navigation-proposal.json",
+      "claimId": "claim_218d4b42e8ea4b5f0cdc071b33fa3f54",
+      "kind": "navigation-native-gap",
+      "before": {
+        "claimId": "claim_218d4b42e8ea4b5f0cdc071b33fa3f54",
+        "sourceUnitDigest": "8a6a408d2e92d032e23faf4951c3dd36fbeb9d26d32aefb613038924916f8a7d",
+        "claimKind": "navigation",
+        "disposition": "reclassify-out-of-platform-scope",
+        "reviewStatus": "reviewed",
+        "authoredBy": "codex-session:21@2026-10-14",
+        "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This unit of docs/reading-map.md#unheaded-block-3 is navigation, not a platform behavioral owner. Preserve it in place; the detailed legacy docs/specs/reading-map.md is still retained during migration and may retire only after the reviewed navigation merge/consumer rewrite at cutover. No reader edit, retirement or source-to-itself carry proof is claimed.",
+        "reviewNote": "mechanical: full digest recomputed by script, anchor reading-map.md#unheaded-block-3 exists, shard row equals pack row, source blob equals frozen pin, disposition reclassify-out-of-platform-scope is allowed by the map row; digest also hand-recomputed in Python",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-14",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-retained-conservation.md",
+        "reviewMode": "ordinary",
+        "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+      },
+      "after": {
+        "claimId": "claim_218d4b42e8ea4b5f0cdc071b33fa3f54",
+        "sourceUnitDigest": "8a6a408d2e92d032e23faf4951c3dd36fbeb9d26d32aefb613038924916f8a7d",
+        "claimKind": "navigation",
+        "disposition": "reclassify-out-of-platform-scope",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
+        "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This is repository navigation, not a platform behavioral owner. Keep this source/evidence in place; no source retirement, source-to-self carry proof or truth approval. At SYNC 2300d65571968bb3bcb80123a273272586e3f1db, preserve native predecessor history and re-decide the current navigation binding pending independent review. Full original/current text and digests in step10-sync2300-reading-map-reconciliation.json.",
+        "reviewNote": "Pending independent deep review; no old review carried to edited navigation.",
+        "sourcePath": "docs/reading-map.md"
+      },
+      "beforeSource": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 28,
+        "endLine": 36,
+        "textDigest": "8a6a408d2e92d032e23faf4951c3dd36fbeb9d26d32aefb613038924916f8a7d",
+        "sample": "| Need | Read |\n|---|---|\n| Understand documentation rules | [doc-governance.md](doc-governance.md) |\n| Resolve authority during transition | [transitional-switchboard.md](transiti",
+        "identityFingerprint": "fb1ce7e70e0a01ab596d0ec911f79d58cb4b393ecdf5e3288385ec30f4ca8f87",
+        "ancestry": [
+          "Documentation Reading Map",
+          "1. Start Here"
+        ],
+        "text": "| Need | Read |\n|---|---|\n| Understand documentation rules | [doc-governance.md](doc-governance.md) |\n| Resolve authority during transition | [transitional-switchboard.md](transitional-switchboard.md) |\n| Understand platform-wide docs | [platform/README.md](platform/README.md) |\n| Understand packaging, install, activation, setup, and doctor | [platform/packaging-distribution/README.md](platform/packaging-distribution/README.md) |\n| Understand current legacy source map | [specs/reading-map.md](specs/reading-map.md) |\n| Shape a new multi-round design | Create or update a discussion scratchpad |\n| Understand an area | `docs/platform/<area>/README.md`, or current legacy `docs/specs/<area>.md` during migration |"
+      },
+      "currentSource": null,
+      "native": {
+        "sourcePath": "docs/reading-map.md",
+        "unitDigest": "fb1ce7e70e0a01ab596d0ec911f79d58cb4b393ecdf5e3288385ec30f4ca8f87",
+        "identityFingerprint": "fb1ce7e70e0a01ab596d0ec911f79d58cb4b393ecdf5e3288385ec30f4ca8f87",
+        "claimId": "claim_218d4b42e8ea4b5f0cdc071b33fa3f54",
+        "sourceAnchor": "unheaded-block-3",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "8a6a408d2e92d032e23faf4951c3dd36fbeb9d26d32aefb613038924916f8a7d",
+        "claimKind": "navigation",
+        "status": "current",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-3 is not a stable heading anchor"
+      },
+      "deepRequired": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-retained-navigation-proposal.json",
+      "claimId": "claim_aad6d095624ef67fd09cb8c0cc89fd97",
+      "kind": "navigation-retained-heading",
+      "before": {
+        "claimId": "claim_aad6d095624ef67fd09cb8c0cc89fd97",
+        "sourceUnitDigest": "1a1310d64283efdeff2184dff92272d4fbc8ddc1b75d2746b8e7550f42577c90",
+        "claimKind": "navigation",
+        "disposition": "reclassify-out-of-platform-scope",
+        "reviewStatus": "reviewed",
+        "authoredBy": "codex-session:21@2026-10-14",
+        "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This unit of docs/reading-map.md#4-related-files is navigation, not a platform behavioral owner. Preserve it in place; the detailed legacy docs/specs/reading-map.md is still retained during migration and may retire only after the reviewed navigation merge/consumer rewrite at cutover. No reader edit, retirement or source-to-itself carry proof is claimed.",
+        "reviewNote": "mechanical: full digest recomputed by script, anchor reading-map.md#4-related-files exists, shard row equals pack row, source blob equals frozen pin, disposition reclassify-out-of-platform-scope is allowed by the map row",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-14",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-retained-conservation.md",
+        "reviewMode": "ordinary",
+        "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+      },
+      "after": {
+        "claimId": "claim_aad6d095624ef67fd09cb8c0cc89fd97",
+        "sourceUnitDigest": "186264dd1cc951c075a0799d201cf25da7e204191e27327a91d66f367d6c0b7c",
+        "claimKind": "navigation",
+        "disposition": "reclassify-out-of-platform-scope",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
+        "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This is repository navigation, not a platform behavioral owner. Keep this source/evidence in place; no source retirement, source-to-self carry proof or truth approval. At SYNC 2300d65571968bb3bcb80123a273272586e3f1db, preserve native predecessor history and re-decide the current navigation binding pending independent review. Full original/current text and digests in step10-sync2300-reading-map-reconciliation.json.",
+        "reviewNote": "Pending independent deep review; no old review carried to edited navigation."
+      },
+      "beforeSource": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "4. Related Files",
+        "anchor": "4-related-files",
+        "githubAnchor": "4-related-files",
+        "stableAnchor": "h-65d0c992ff81",
+        "startLine": 110,
+        "endLine": 110,
+        "textDigest": "1a1310d64283efdeff2184dff92272d4fbc8ddc1b75d2746b8e7550f42577c90",
+        "sample": "4. Related Files",
+        "sectionPayloadDigest": "e43f4177f48b53c47017f865260dd121d2a54ab56cf22270a4d698ca0b648e02",
+        "followingBlockDigest": "e43f4177f48b53c47017f865260dd121d2a54ab56cf22270a4d698ca0b648e02",
+        "identityFingerprint": "2e6dfdd25f50e0c324745835a55ba78dd717ac9f357be69295c9fd330d8dcfab",
+        "ancestry": [
+          "Documentation Reading Map"
+        ],
+        "text": "## 4. Related Files",
+        "sectionText": "## 4. Related Files\n\n| Relationship | File |\n|---|---|\n| governs documentation system | [doc-governance.md](doc-governance.md) |\n| operative transitional switchboard | [transitional-switchboard.md](transitional-switchboard.md) |\n| platform portal | [platform/README.md](platform/README.md) |\n| legacy/current detailed source map | [specs/reading-map.md](specs/reading-map.md) |\n| verified transitional authority snapshot | [current-authority-map-2026-09-25.md](../plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md) |\n| full-horizon documentation-system proposal | [platform/proposals/documentation-system-unification.md](platform/proposals/documentation-system-unification.md) |\n| preserved future documentation intents | [platform/intent-preservation-ledger.md](platform/intent-preservation-ledger.md) |"
+      },
+      "currentSource": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "4. Related Files",
+        "anchor": "4-related-files",
+        "githubAnchor": "4-related-files",
+        "stableAnchor": "h-65d0c992ff81",
+        "startLine": 110,
+        "endLine": 110,
+        "textDigest": "186264dd1cc951c075a0799d201cf25da7e204191e27327a91d66f367d6c0b7c",
+        "sample": "4. Related Files",
+        "sectionPayloadDigest": "232212bee70408ea591b609f3e2bcda60f640c9bd8643a224a84f63b92cea556",
+        "followingBlockDigest": "232212bee70408ea591b609f3e2bcda60f640c9bd8643a224a84f63b92cea556",
+        "identityFingerprint": "35efada7e051208ba541bbf444ca3a5b2d81beeec660a8feb23799b37a559dd1",
+        "ancestry": [
+          "Documentation Reading Map"
+        ],
+        "text": "## 4. Related Files",
+        "sectionText": "## 4. Related Files\n\n| Relationship | File |\n|---|---|\n| governs documentation system | [doc-governance.md](doc-governance.md) |\n| operative transitional switchboard | [transitional-switchboard.md](transitional-switchboard.md) |\n| platform portal | [platform/README.md](platform/README.md) |\n| merged detailed product/source map | [Section 5](#5-detailed-product-and-source-map) |\n| verified transitional authority snapshot | [current-authority-map-2026-09-25.md](../plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md) |\n| full-horizon documentation-system proposal | [platform/proposals/documentation-system-unification.md](platform/proposals/documentation-system-unification.md) |\n| preserved future documentation intents | [platform/intent-preservation-ledger.md](platform/intent-preservation-ledger.md) |"
+      },
+      "native": {
+        "sourcePath": "docs/reading-map.md",
+        "unitDigest": "f75b64c62d3c9b6c2f6c4d9d30d247030cb47053d6293b1b62fb0461182f09c4",
+        "identityFingerprint": "35efada7e051208ba541bbf444ca3a5b2d81beeec660a8feb23799b37a559dd1",
+        "claimId": "claim_aad6d095624ef67fd09cb8c0cc89fd97",
+        "sourceAnchor": "4-related-files",
+        "unitKind": "heading",
+        "sourceUnitDigest": "186264dd1cc951c075a0799d201cf25da7e204191e27327a91d66f367d6c0b7c",
+        "claimKind": "navigation",
+        "status": "current",
+        "reviewStatus": "needs-review",
+        "lineage": {
+          "fromCommit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+          "fromUnitDigest": "a033c3506ca9a48c60e54d19571b68cb3e4f5bb06eb4ddb059b49b8230a28407",
+          "toUnitDigest": "f75b64c62d3c9b6c2f6c4d9d30d247030cb47053d6293b1b62fb0461182f09c4",
+          "fromSourceUnitDigest": "1a1310d64283efdeff2184dff92272d4fbc8ddc1b75d2746b8e7550f42577c90",
+          "toSourceUnitDigest": "186264dd1cc951c075a0799d201cf25da7e204191e27327a91d66f367d6c0b7c"
+        }
+      },
+      "deepRequired": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-retained-navigation-proposal.json",
+      "claimId": "claim_c3b29b18751a7153eb574a571a8a1009",
+      "kind": "navigation-native-gap",
+      "before": {
+        "claimId": "claim_c3b29b18751a7153eb574a571a8a1009",
+        "sourceUnitDigest": "e43f4177f48b53c47017f865260dd121d2a54ab56cf22270a4d698ca0b648e02",
+        "claimKind": "navigation",
+        "disposition": "reclassify-out-of-platform-scope",
+        "reviewStatus": "reviewed",
+        "authoredBy": "codex-session:21@2026-10-14",
+        "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This unit of docs/reading-map.md#unheaded-block-14 is navigation, not a platform behavioral owner. Preserve it in place; the detailed legacy docs/specs/reading-map.md is still retained during migration and may retire only after the reviewed navigation merge/consumer rewrite at cutover. No reader edit, retirement or source-to-itself carry proof is claimed.",
+        "reviewNote": "mechanical: full digest recomputed by script, anchor reading-map.md#unheaded-block-14 exists, shard row equals pack row, source blob equals frozen pin, disposition reclassify-out-of-platform-scope is allowed by the map row",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-14",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-retained-conservation.md",
+        "reviewMode": "ordinary",
+        "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+      },
+      "after": {
+        "claimId": "claim_c3b29b18751a7153eb574a571a8a1009",
+        "sourceUnitDigest": "e43f4177f48b53c47017f865260dd121d2a54ab56cf22270a4d698ca0b648e02",
+        "claimKind": "navigation",
+        "disposition": "reclassify-out-of-platform-scope",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
+        "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This is repository navigation, not a platform behavioral owner. Keep this source/evidence in place; no source retirement, source-to-self carry proof or truth approval. At SYNC 2300d65571968bb3bcb80123a273272586e3f1db, preserve native predecessor history and re-decide the current navigation binding pending independent review. Full original/current text and digests in step10-sync2300-reading-map-reconciliation.json.",
+        "reviewNote": "Pending independent deep review; no old review carried to edited navigation.",
+        "sourcePath": "docs/reading-map.md"
+      },
+      "beforeSource": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-14",
+        "githubAnchor": "unheaded-block-14",
+        "stableAnchor": "unheaded-block-14",
+        "title": "Unheaded block 14",
+        "startLine": 112,
+        "endLine": 120,
+        "textDigest": "e43f4177f48b53c47017f865260dd121d2a54ab56cf22270a4d698ca0b648e02",
+        "sample": "| Relationship | File |\n|---|---|\n| governs documentation system | [doc-governance.md](doc-governance.md) |\n| operative transitional switchboard | [transitional-switchboard.md](tra",
+        "identityFingerprint": "5708950d1a7866dd068a0b3ff3cecc1852d20b7c851e61290fa806e320dafa33",
+        "ancestry": [
+          "Documentation Reading Map",
+          "4. Related Files"
+        ],
+        "text": "| Relationship | File |\n|---|---|\n| governs documentation system | [doc-governance.md](doc-governance.md) |\n| operative transitional switchboard | [transitional-switchboard.md](transitional-switchboard.md) |\n| platform portal | [platform/README.md](platform/README.md) |\n| legacy/current detailed source map | [specs/reading-map.md](specs/reading-map.md) |\n| verified transitional authority snapshot | [current-authority-map-2026-09-25.md](../plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md) |\n| full-horizon documentation-system proposal | [platform/proposals/documentation-system-unification.md](platform/proposals/documentation-system-unification.md) |\n| preserved future documentation intents | [platform/intent-preservation-ledger.md](platform/intent-preservation-ledger.md) |"
+      },
+      "currentSource": null,
+      "native": {
+        "sourcePath": "docs/reading-map.md",
+        "unitDigest": "5708950d1a7866dd068a0b3ff3cecc1852d20b7c851e61290fa806e320dafa33",
+        "identityFingerprint": "5708950d1a7866dd068a0b3ff3cecc1852d20b7c851e61290fa806e320dafa33",
+        "claimId": "claim_c3b29b18751a7153eb574a571a8a1009",
+        "sourceAnchor": "unheaded-block-14",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "e43f4177f48b53c47017f865260dd121d2a54ab56cf22270a4d698ca0b648e02",
+        "claimKind": "navigation",
+        "status": "current",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-14 is not a stable heading anchor"
+      },
+      "deepRequired": true
+    }
+  ],
+  "newNativeRows": [
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-retained-navigation-proposal.json",
+      "claimId": "claim_c8677c74072e0ac1ac4d9b345de1ee1f",
+      "kind": "new-native-navigation-unit",
+      "after": {
+        "claimId": "claim_c8677c74072e0ac1ac4d9b345de1ee1f",
+        "sourceUnitDigest": "3fc17fdda14e751313ece3ac881cdd17d0eabb6c98a3ce47a39486de3c39ac3f",
+        "claimKind": "navigation",
+        "disposition": "reclassify-out-of-platform-scope",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
+        "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This is repository navigation, not a platform behavioral owner. Keep this source/evidence in place; no source retirement, source-to-self carry proof or truth approval. At SYNC 2300d65571968bb3bcb80123a273272586e3f1db, preserve native predecessor history and re-decide the current navigation binding pending independent review. Full original/current text and digests in step10-sync2300-reading-map-reconciliation.json.",
+        "reviewNote": "Native new retained-map navigation unit; independent review pending."
+      },
+      "native": {
+        "sourcePath": "docs/reading-map.md",
+        "unitDigest": "632567b6d49b3714092feff05522aaf424d6b497f353602518a0d0a769fd7ac2",
+        "identityFingerprint": "18d001bb03d9f494b00a972419a4d660b6aa0f7168f2d298bfd997b915b56072",
+        "claimId": "claim_c8677c74072e0ac1ac4d9b345de1ee1f",
+        "sourceAnchor": "5-detailed-product-and-source-map",
+        "unitKind": "heading",
+        "sourceUnitDigest": "3fc17fdda14e751313ece3ac881cdd17d0eabb6c98a3ce47a39486de3c39ac3f",
+        "claimKind": "navigation",
+        "status": "current",
+        "reviewStatus": "needs-review",
+        "lineage": {
+          "fromCommit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+          "fromUnitDigest": "17b8994c8c65bb0475695d8d1198bc69546f360ac0f743189bd1803c3ddfa6d9",
+          "toUnitDigest": "632567b6d49b3714092feff05522aaf424d6b497f353602518a0d0a769fd7ac2",
+          "fromSourceUnitDigest": "e3d47de7f915ea92861801fef67198f0a7211232be1a18c67b49904ea1917280",
+          "toSourceUnitDigest": "3fc17fdda14e751313ece3ac881cdd17d0eabb6c98a3ce47a39486de3c39ac3f"
+        }
+      },
+      "currentSource": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "5. Detailed Product And Source Map",
+        "anchor": "5-detailed-product-and-source-map",
+        "githubAnchor": "5-detailed-product-and-source-map",
+        "stableAnchor": "h-20f4aaa7e477",
+        "startLine": 122,
+        "endLine": 122,
+        "textDigest": "3fc17fdda14e751313ece3ac881cdd17d0eabb6c98a3ce47a39486de3c39ac3f",
+        "sample": "5. Detailed Product And Source Map",
+        "sectionPayloadDigest": "b01bedc0f4a53e31143bd3973bd6b762f64b4cb2d7504bc78fbdc9cc326dc780",
+        "followingBlockDigest": "2224720e5dba57fb7728214b829cb8850518f0ba27fc9e76b4049b040d596cb7",
+        "identityFingerprint": "18d001bb03d9f494b00a972419a4d660b6aa0f7168f2d298bfd997b915b56072",
+        "ancestry": [
+          "Documentation Reading Map"
+        ],
+        "text": "## 5. Detailed Product And Source Map",
+        "sectionText": "## 5. Detailed Product And Source Map\n\nMerged from `docs/specs/reading-map.md`. The how-to directory and README\nroutes above retain their routing role; their complete source entries below\nreconcile the detailed descriptions. Labelled truth corrections identify known\nstale claims and current evidence. Historical paths are identified explicitly\nwhere no current file exists. The retained legacy map remains a provenance\npointer until consumer cutover; it is not the reader's detailed-map destination.\n\n- `docs/platform-foundations.md` — văn bản gốc 8 luật nền platform (L1–L8); spec: docs/specs/platform-foundations.md\n- `docs/backlog.md` — product backlog (PBI rows, scribing-owned)\n- `docs/architecture-map.md` — bản chuẩn kiến trúc (v0.2, record ADR0010 (bản đồ kiến trúc là bản chuẩn)): 5 tầng + 2 lớp phủ, sổ component + sổ contract (CTR001–CTR009), nghi thức thẻ-căn-cước-trước-code\n- `docs/work-item-lifecycle-vision.md` — tầm nhìn nền tảng: chu trình sống của work-item (mixed-autonomy, base-workflow + domain-extension); khung cho các PBI STR14-STR18\n- `docs/platform/packaging-distribution/README.md` — portal hiện hành cho packaging/distribution: `fgctl` bootstrap/init/repair/upgrade, workspace activation, doctor/fix readiness, legacy Node compatibility, skill/instruction projections. Khi mục này mâu thuẫn với `docs/specs/distribution.md`, đọc portal + implementation-alignment trước; `docs/specs/distribution.md` hiện là legacy/generated-curated source trong lúc migration.\n- `docs/distribution-vision.md` — tầm nhìn nền tảng lịch sử: cài đặt/setup/doctor ổn định + tái dùng được (không cần clone, global/project không xung đột — project ghi đè global, doctor/setup tự fix hạ tầng + merge config thiếu, module mới tự đăng ký năng lực config, CI như một phần của setup); đã được promote/supersede từng phần vào `docs/platform/packaging-distribution/vision.md`.\n- `docs/specs/` — state layer: area spec + system-overview + bản đồ này\n- `docs/routing-handoff-contract.md` — hợp đồng handoff agent↔agent + ranh giới tin cậy\n- `docs/io-contract.md` — hợp đồng giao tiếp VÀO/RA của cửa CLI + bề mặt stdout `fgos-runner` (str46-io-contract): danh tính `writer`/`role`, envelope `fgos.v1` + ngoại lệ có lý do, exit-code một nguồn, sổ verb (`touchesState`/`externalEffect`/`paginated`/`multiValueFormat`), version token, ranh giới ngoài (STR38/STR48/STR83)\n- `docs/coexistence.md` — doctrine chạy cạnh một harness agent khác (record ADR0009 (chống giao thoa lúc cài — fgOS khi cài không giao thoa tiến trình với harness khác)): lãnh địa, một-nhạc-trưởng-mỗi-phiên, nhường-nhịn lúc `init`, manifest `.fgos/coexistence.json`, Known Gaps chưa flip; `src/install/coexist.mjs` — cài đặt detection + manifest (read-only, không đè)\n- `package.json` (`version`, `files`, `bin.fgos`, `bin.fgos-runner`) + `README.md` (mục `## Install`) — cài `fgos` VÀ `fgos-runner` từ ngoài source repo qua GitHub install, cả hai executable ngay sau cài; `test/install-packaging.test.mjs` — proof e2e (pack → install → chạy từ project ngoài, gồm cả hai binary); spec: docs/specs/distribution.md\n- `scripts/fgos-shell-integration.sh` — dev checkout shell helper (STR87 first slice): hàm `fgos`/`fgos-runner` tự resolve root qua `git rev-parse --git-common-dir` (worktree-safe), source từ shell profile của contributor, không cài đặt gì; test: `test/scripts/fgos-shell-integration.test.mjs`; spec: docs/specs/distribution.md §Dev checkout shell helpers\n- `src/setup/` (`ansi.mjs`, `config-merge.mjs`, `shell-rc.mjs`, `checks.mjs`) + `bin/fgos.mjs`'s current legacy `setup`/`doctor` verbs + `src/cli/command-registry.mjs` entries — doctor/fix registry and legacy setup compatibility: `doctor` chẩn đoán read-only, `doctor --fix` chạy registered fixes, current Node `fgos setup` vẫn tồn tại nhưng target architecture supersedes onboarding bằng `fgctl init` + local `fgos init` / `fgos doctor --fix` / `fgos doctor`; manifest: `docs/architecture-manifest.json`; test: `test/setup/*.test.mjs`; current portal: `docs/platform/packaging-distribution/README.md`; legacy spec: docs/specs/distribution.md §Setup, §Doctor\n- `docs/decisions/` — hồ sơ quyết định dài hạn cho người ngoài (decision records); từ str64-backfill, mỗi record còn mang đầu-mô-tả OKF-style (loại/tiêu đề/nhãn/thời điểm/móc-liên-kết-nguồn, xem `frontmatter.mjs` dòng dưới) và được `fgos docs-index` công nhận là vị trí thay thế của ngăn `explanation` (R10, spec: docs/specs/enduser-docs-index.md) — thân ADR không đổi, chỉ thêm đầu-mô-tả; lưu ý `orchestrator` là pinned term đã đổi nghĩa giữa chừng (0026→0028 nghĩa cũ \"launcher\", 0029 nghĩa mới \"tầng hợp thành T0\"; xem chuỗi quyết định tại `docs/decisions/index.md` dòng 28-32)\n- `scripts/check-decision-citation-drift.mjs` + `test/scripts/check-decision-citation-drift.test.mjs` — quét `docs/backlog.md` + `docs/specs/*.md` tìm dòng còn trích một quyết định đã bị supersede mà không nhắc quyết định thay thế trên cùng dòng (STR72 CoS clause 2, PBI p-2d71dfc3); chỉ phát hiện, không tự sửa; spec: docs/specs/decision-citation-drift.md\n- `scripts/check-decision-codes.mjs` + `test/scripts/check-decision-codes.test.mjs` — quét `test/**/*.test.mjs` tìm tên test còn nhúng mã quyết định nội bộ (str##/D#/RUL##/STR##/tsk-xxx) thay vì mô tả bất biến bằng lời thường (review-audit-self-decision.md mục Stable Code Artifacts); chặn (ratchet) chỉ vi phạm MỚI so với `scripts/check-decision-codes.baseline.json` đã chốt, không chặn ngược nợ cũ; `npm test` tự chạy qua glob `test/**/*.test.mjs`, không hook riêng\n- `docs/id-systems-audit.md` — audit + quyết định hình dạng mọi hệ id/mã đang sống trong hệ thống (work.id/kind/Story/ADR/Rule/Contract phía fgOS; D-hex/D-local/cell-id/feature-slug/severity phía bee) — nguồn cho `work.id`'s `tsk-<hash>` và các migration STR53-STR58 (tất cả đã `done`); boundary appendix: `docs/architecture-map.md` Phụ lục B\n- `bin/fgos.mjs` — CLI một cửa của work-state; chạy `node bin/fgos.mjs <verb>`; gồm verb `edit` — sửa đè các trường (title/kind/risk/verify/tier/refs/deps/acceptance/priority/intent — str7-str8-priority-intent) trên một item đã có, cùng cửa ghi CTR002 như `add`/`move`; gồm verb `take`/`return` — cửa pull giao–nhận việc cho tác nhân ngoài runner; gồm verb `pick` — cửa pull GỘP `take` + dựng workspace (`createWorktree`), role cố định `session`, không cờ `--role` (theo str83-fgos-slash-commands); gồm verb `review`/`approve`/`reject` — cổng duyệt PR nội bộ, một cổng cho mọi đề xuất `awaiting-approval`, nay leaf-vs-root-aware (con nhập vào nhánh của gốc, gốc nhập vào cây chính); `review`/`approve` nay chấp nhận thêm `--github [--pr <n>]` — vận chuyển thay thế CÙNG cổng duyệt qua GitHub thay vì diff/merge cục bộ (chỉ nguồn runner, theo github-adapter, spec: docs/specs/runner.md); gồm verb `catchup` — đồng bộ lại một việc đỗ vì gãy nhập/trôi tích hợp (spec: docs/specs/runner.md); gồm verb `session` (`start`/`end`/`list`) — vòng đời phiên checkout đa-phiên tùy chọn, mỗi phiên một worktree detached-HEAD cho cây nguồn, dùng chung MỘT kho `.fgos/` qua symlink (spec: docs/specs/runner.md); spec: docs/specs/work-state.md\n- `src/state/` — lõi work-state: events (nhật ký; `appendEvent` nay khóa liên-tiến-trình `.fgos/events.lock`, per fgos-multi-session-checkout Epic 3/STR35 — xem spec Work-State RUL10 (tiền đề có ngưỡng — một người ghi tại một thời điểm; multi-agent ghi đồng thời qua `.fgos/events.lock`)), work (schema — STATUSES + STAGES + field `parent` lineage + field `domain`), fsm (bảng chuyển status + CAS), stage (bảng chuyển stage + CAS, chiều vĩ mô song song fsm; cạnh chuyển-stage tra theo domain của item — `coding`: `discovery → exploring → planning → executing`, trong đó phán-quyết `clear` ở `discovery` bỏ qua `exploring` để sang thẳng `planning` còn `unclear` đi qua `exploring`; tên `decompose` vẫn còn nhưng chỉ là bí danh legacy chỉ-để-rút-cạn (không việc MỚI nào vào được nữa); `synthetic`: một stage, không cạnh nào), domains (sổ đăng ký domain — stage list + step-mapping base-workflow + cạnh-chuyển mỗi domain; `coding` + ba domain minh họa/thử-nghiệm `synthetic` (đúng một stage), `triage`, `fixture-marketing`; base-workflow-model STR18, hoàn tất S1+S2), replay (fold), frontier (truy vấn sẵn-sàng — lọc theo status, stage domain-aware, VÀ lineage qua `parent`), dep-graph (dò chu trình trên `deps` — bất biến phi-chu-trình tại cửa ghi, per work-graph-intelligence S1), store (chủ ghi duy nhất + readRawEvents), envelope (phong bì output CTR001, `wrapEnvelope` — nay bọc MỌI verb ở một cửa in trong `bin/fgos.mjs main()`, STR37; spec: docs/specs/work-state.md §envelope)\n- `src/cli/command-registry.mjs` — sổ verb máy-đọc của CLI (STR37, kernel, thuần dữ liệu): `SCHEMA_VERSION` + `COMMAND_REGISTRY` (mọi verb với `{name, invoke, description, parameters, examples, access read|mutation, deprecated}`); `bin/fgos.mjs` `--help [--json]` và `<verb> [<sub>] --help [--json]` sinh sổ từ đây; verb có sub-verb mang `subcommands`, `HELP_SELECTORS` (`--help`, `-h`) thành route của Rust host qua `scripts/export-command-selectors.mjs`; test chống-lệch `test/cli/fgos-manifest.test.mjs`, `test/cli/subcommand-flag-drift.test.mjs` (cờ handler ↔ schema sub-verb), `test/cli/fgos-verb-help-json.test.mjs`, `test/rust-host/help-routes.test.mjs` (qua host thật); spec: docs/specs/work-state.md §sổ verb\n- `src/intake/classify.mjs` — logic thuần của `fgos submit`: deriveTitle, classify (tier/kind/risk cơ học), generateId (`tsk-<hash>` chống trùng, STR53)\n- `src/intake/discovery.mjs` — context-discovery của stage `discovery` (stage đầu tiên của domain `coding`): `resolveDiscovery` (đọc-phán-ghi, dùng chung bởi verb `discover` và vòng tự hành) ĐÒI phán-quyết do người gọi cấp — judge lồng `judgeDiscovery` đã rút; phán-quyết `clear` chuyển item sang stage `planning`, `unclear` sang `exploring`\n- `src/intake/plan.mjs` — phán chia-việc của stage `planning`: `resolvePlan` (đọc-phán-ghi, dùng chung bởi verb `plan` và vòng tự hành khi item ở stage `planning`, hoặc ở bí danh legacy `decompose`) ĐÒI phán-quyết do người gọi cấp — judge lồng `judgeDecompose` đã rút, cùng lý do `judgeDiscovery` rút; sinh con qua lineage `parent`, không qua `deps`\n- `domains/coding/AGENTS.md` `## fgOS Workflow` + `.claude/skills/` (`.agents/skills/` mirror byte-identical) — lớp hướng dẫn P50: entry skill (`fgos-routing`) + skill giai đoạn (`fgos-coding-discovering`/`fgos-coding-exploring`/`fgos-coding-planning`/`fgos-coding-validating`/`fgos-coding-implement`/`fgos-coding-knowledge`) trỏ một phiên tự mở tới đúng skill theo `stage` của item; từ str89-fgos-domain-skills, tra cứu này domain-pluggable — đọc trường `domain` + `stage` của item rồi tra qua `skillForStep`/`getDomain` (`src/state/domain-registry.mjs`), không còn giả định ngầm domain `coding`; `fgos-routing` nay có hàng khoá theo **status** `retrospective → fgos-coding-knowledge` (skill tổng hợp cấp nhãn Diataxis + soạn tài liệu người-dùng-cuối) — stage `compound-learn` đã rút, việc tổng hợp nó từng canh nay là việc của status `retrospective`; skill ĐỘC LẬP `fgos-submit-assist` (str51-llm-assist-classify) đã rút (tsk-6ar) — `/fgOS:submit` bước 6 (`plugins/fgOS/skills/submit/SKILL.md`) nay tự chạy clarify+classify trong cùng phiên sống, cùng việc mà skill đó từng làm nhưng trên bản mô tả SẠCH hơn; spec: docs/specs/work-state.md §RUL60 (hành vi), docs/specs/runner.md (lớp hướng dẫn) **Truth correction:** src/state/domain-registry.mjs:193,240; core/skills/fgos-routing/SKILL.md:124-136.\n- `plugins/fgOS/` (`.claude-plugin/plugin.json` + `skills/<verb>/SKILL.md`) — bề mặt slash-command `/fgOS:<verb>` cho Claude Code, 37 wrapper không có tiền tố fgos- trong 55 thư mục skill; `check` không có wrapper. Mỗi wrapper giữ hướng dẫn cửa gọi của riêng nó; spec: docs/specs/fgos-plugin.md **Truth correction:** plugins/fgOS/.claude-plugin/plugin.json:1; plugins/fgOS/skills/submit/SKILL.md:1; plugins/fgOS/skills/answer/SKILL.md:1 (directory enumeration at e7393ea3c).\n- `apps/fgos-gateway/` + `apps/fgos-gateway/web/` — fgos gateway (REST, MCP, bundle web dashboard nhúng sẵn; vòng đời `fgos gateway`) và bề mặt web dashboard: client trình duyệt ĐỘC LẬP (không phải code máy chủ trong gateway, theo tsk-7l9 + decision 0014); `herdr-dashboard/` là plugin herdr (TUI trong pane), `packages/herdr-fgos-common/rust` là adapter CLI fgos dùng chung của cả hai, gọi API REST/RPC của gateway từ ngoài; ba màn đọc (taskboard, task-detail, câu hỏi cần trả lời — phủ cả kênh `ask` lẫn `gate-approve`) cộng các hành động ghi đi qua verb một-cửa-ghi của fgOS (`answer`/`approve`/`add`/`edit`/`move`), không có đường ghi thứ hai; bật mặc định, port 8788, token bắt buộc; spec: docs/specs/herdr-web-dashboard.md (lớp UI/wireframe: docs/reference/herdr-web-dashboard-layout.md)\n- `docs/how-to/`, `docs/tutorials/`, `docs/reference/`, `docs/explanation/` — tài liệu NGƯỜI-DÙNG-CUỐI theo bốn quadrant Diataxis (audience-facing, khác `docs/specs/` là BA-reference nội bộ); sinh bởi kỹ năng `fgos-coding-knowledge` ở status `retrospective` (grow-or-create một tài liệu SỐNG mỗi đường dẫn: gom mọi capture qua `fgos doc-sources` rồi tích luỹ không mất, ngăn Diataxis là trục cấu trúc duy nhất — write-side, spec: docs/specs/enduser-docs-authoring.md), quadrant khớp `docType` capture; `docs/explanation/` từ str64-backfill còn có 6 tài liệu chưng cất từ critical-patterns.md (learnings vận hành bee thật sự thuộc tiến trình hình thành fgOS); chỉ mục đọc-theo-tag máy-đọc-được: `docs/enduser-docs-index.json` (sinh bởi verb `fgos docs-index` / kỹ năng `fgos-indexing`, thay cho việc liệt-kê-tay từng tài liệu — supersedes con trỏ văn xuôi cũ, theo compound-learn-enduser-docs; ngăn `explanation` còn quét thêm `docs/decisions/` làm vị trí thay thế, theo str64-backfill); spec read-side: docs/specs/enduser-docs-index.md\n- `src/runner/` + `bin/fgos-runner.mjs` — vòng tự hành (loop/dispatch/worktree/recovery/anti-loop/write-queue/root-affinity); `loop.mjs`'s `runWatch` + `write-queue.mjs`'s `onCommit` — chế độ `--watch` bền, tín hiệu-cơ-học + nghỉ dự phòng, ghép `runOnce` không đổi làm hộp đen (str7-str8-priority-intent, spec: docs/specs/runner.md §RUL53 (`--watch` — vòng cầm-giao bền, dừng chỉ khi có tín hiệu tường minh)); loop giao việc theo mẻ song song có giới hạn hai tầng (cấu hình `parallel` trong `.fgos/config.json`'s `runner` section, theo tsk-5vf), giữ quyền-sở-hữu-gốc trong một lượt chạy, quét làm-rõ rồi quét chia-việc trước mọi dispatch thi công; gặt-lại bỏ qua claim của cửa pull (`claimRole` human/session); `dispatch.mjs`'s executor là port có tên CTR009 v2 (`EXECUTOR_ADAPTERS`, per-tier qua config's `executors`, STR41), `ensureRunnerConfigForDir` tự sinh cấu hình mặc định tại `.fgos/config.json` khi vắng mặt (không áp dụng cho `--config` tường minh, str76-runner-bootstrap; tsk-5hv xoá hẳn fallback về file flat legacy cũ); worker của loop và fan-out chạy như một Unit run qua `runUnit` (`work-dispatch.mjs`'s `spawnWorker`), `fgos-runner` không còn `--config` (spec: docs/specs/runner.md §RUL93 (the runner loop's worker and the fan-out batch run as one Unit run each)) và prompt worker được tách sang `prompt-templates.mjs` + `prompt-templates/*.txt` (chọn template qua bảng cơ học kind/tier/domain, substitution `{placeholder}` thuần, log dispatch kèm tên+hash template, STR49); `goal-check.mjs` — hàm goal-check dùng chung giữa vòng tự hành và verb `return`; `write-queue.mjs` — cửa ghi tuần tự giữ một-người-ghi dưới song song; `root-affinity.mjs` — quyền-sở-hữu-gốc, giữ mọi con của một gốc chung một chủ trong một lượt chạy; `resolveRepoRoot` nay còn xác nhận HEAD repo resolve được trước khi runner claim bất kỳ item nào (fail-fast, str86-runner-headless-git D ecfd0d1a); config: `.fgos/config.json`'s `runner` section (tự sinh khi vắng mặt tại đường mặc định, nguồn config duy nhất kể từ tsk-5hv); spec: docs/specs/runner.md\n- `docs/specs/confinement-authority.md` + `src/runner/dispatch/confinement/` — Agent Confinement Authority: runtime one-door confinement enforcement (`executeThroughConfinement`), machine backend registry `~/.fgos/confinement-backends.json`, local `bwrap` v1 driver with 8 falsification probes, required fail-closed checks, attestation storage (`confinement-attestation.v1`), herdr convergence with shared `evaluateBypassPairing`, setup defaults and doctor checks; spec: docs/specs/confinement-authority.md Pane herdr confine cho agent không phải claude (codex/agy/pi): công thức private-home + account inventory + lịch sử các commit đã đi qua (và vì sao từng bị quên) ở §13.1.\n- `docs/architect/README.md` + `docs/architect/architecture-intent.md` + `docs/architect/domainization/README.md` — portal architect-level, registry intention xuyên-khu-vực, và deep-dive domainization (core đóng vs `domains/<name>/` adapter mở: manifest/workflow YAML, task-spec, skill, knowledge, doctrine, agent, resolver, enforcement); active thread đầu tiên giữ intent mở rộng fgOS từ fan-out/fan-in + artifact mediation thành năng lực group-thinking/problem-solving rộng hơn (Delphi/NGT/RFC/adversarial/master-coordinator), giữ `group-cognition-framework.yaml` isolation-heavy không bị nới ngầm; liên quan Step 09 group-thinking substrate, Step 10 coding-domain adoption, component authority boundary map, và Domain Components And Extension Layer\n- `src/workflow/` (`definition.mjs`, `runner.mjs`, `step-fsm.mjs`, `units-source.mjs`) + `core/workflows/*.yaml` — Workflow engine (Request-to-Run P3a/P4): DAG steps, human gates, dependency scheduling, runner integration; `units-source.mjs` dịch units file của `fgos workflow start --units` thành Workflow tạm (RUL89 (workflow start --units)); spec: `docs/specs/runner.md`\n- `src/runner/execution/` (`unit.mjs`, `bind.mjs`, `run.mjs`, `patterns/`) — Execution Core (Request-to-Run P1/P2/P4): Unit (hợp đồng dữ liệu duy nhất), `bind()` (chọn executor 5 mức), `fgos run` (cửa chạy mới, herdr mặc định), CollaborationPattern (`solo`, `reviewed`, `panel` + presets `consult`, `research-fan-out`, `rfc`, `code-change`); `src/runner/dispatch/write-scope.mjs` — matcher duy nhất của phạm vi ghi Unit (RUL84 (one write-scope matcher)), dùng cho runner commit, settlement và Workflow; spec: `docs/specs/runner.md`\n- `docs/architect/agent-coordination/` — thiết kế agent-coordination lịch sử (đã thu hồi ở P4 per D-0050, thay bằng Workflow runner và Execution Core); `README.md` là portal ghi nhận chuyển tiếp; `contracts/` lưu giữ hợp đồng lịch sử (`coordination-session.md`, `flow-definition.md`).\n- `docs/architect/host-invocation-routing/` — kiến trúc định tuyến và host runtime Rust (5 tệp: `host-invocation-provider-routing.md` — hợp đồng kernel canonical OperationRequest/ProviderOutcome, pure Router, InvocationService; `legacy-cli-transition.md` — chiến lược exec payload Node với parity harness và descriptor command-routes; `external-provider-protocol.md` — giao thức external provider R2; `node-to-rust-component-migration.md` — lộ trình chuyển dịch component từ Node sang Rust; `rust-cli-and-proof-components-plan.md` — kế hoạch triển khai Rust CLI host và proof components); spec: docs/specs/distribution.md\n- `src/runner/merge.mjs` — cơ chế cổng duyệt PR nội bộ (`classifySource`/`reviewDiff`/`mergeRunnerItem`/`cleanupMergedBranch`), dùng bởi `bin/fgos.mjs` verb `review`/`approve`/`reject`, nay tham số hóa được nhánh đích (cây chính hoặc nhánh của gốc — cây nhánh tích hợp); `catchup` (bin/fgos.mjs) dùng lại cùng cơ chế git cho cả tầng con→gốc lẫn gốc→cây chính; `isMainWorktree` (STR44) — chặn cấu trúc (không dựa sổ đăng ký session) xác nhận `cwd` LÀ worktree chính trước khi `approve` merge/verify, bắt cả worktree tay không đăng ký qua `fgos session start` — cùng `detectTrunk` nay ở `src/runner/worktree.mjs` (theo tsk-49i), không còn ở file này; spec: docs/specs/runner.md\n- `src/verbs/<domain>/<verb>.mjs` — tầng use-case của CLI (theo tsk-49i): logic nghiệp vụ của một verb, chữ ký thống nhất `<verb>UseCase(ctx, options)` — `ctx` là thứ adapter tính từ môi trường (`{dir, cwd?, repoRoot?}`, use-case KHÔNG BAO GIỜ tự đọc `process.cwd()`/`process.env`/argv), `options` là flag đã parse; trả đúng payload `fgos.v1` (bọc envelope + map exit-code vẫn ở `bin/fgos.mjs`), refusal vẫn `throw StoreError`. Cụm đầu tiên: `src/verbs/merge/` (`merge`/`approve`/`review`/`sync-root`/`catchup`/`reject`/`promote-to-component`) — `bin/fgos.mjs` cho 7 verb này nay chỉ parse args, tính `repoRoot` theo chính sách RIÊNG của từng verb, gọi một hàm use-case. Không ngụ ý migrate 7 file use-case-rank sẵn có (`runner/loop.mjs`, `intake/*`, `setup/*`, `state/cursor.mjs`); spec: docs/specs/runner.md\n- `src/report/item-trace.mjs` — trace outcome/friction của MỘT item, đọc thuần trên view (`collectOutcomeEntry`/`collectFrictionData`/`collectReviewTrace`); dùng chung bởi `review` (use-case) và `check`/`show`/`doc-sources`/`evolve` (`bin/fgos.mjs`); spec: docs/specs/runner.md\n- `src/runner/github-adapter.mjs` — vận chuyển GitHub thuần cho cổng duyệt PR nội bộ (`createGitHubPR`/`viewGitHubPRStatus`/`mergeGitHubPR`/`classifyGhFailure`, shell ra `gh` CLI thật, layer infra), dùng bởi `bin/fgos.mjs` verb `review`/`approve --github`; spec: docs/specs/runner.md\n- `src/runner/worker-log.mjs` — cửa ghi DUY NHẤT cho bản ghi output cục bộ của trợ lý (`.fgos/logs/<id>.log`, git-ignored): `appendWorkerLog` — khối kết-cục cuối, gọi bởi `loop.mjs` sau mỗi lượt dispatch; `appendWorkerLogChunk` — live tee từng chunk stdout/stderr khi đến (STR39), gọi bởi `dispatch.mjs`'s `spawnWorker` qua `opts.onChunk`; spec: docs/specs/runner.md\n- `src/runner/session.mjs` — vòng đời phiên checkout đa-phiên tùy chọn (fgos-multi-session-checkout, STR35): `createSession`/`endSession`/`listSessions`/`reclaimOrphanedSessions`, worktree detached-HEAD mỗi phiên (`git worktree add --detach`), `.fgos` symlink dùng chung (KHÔNG BAO GIỜ sao chép), sổ `.fgos/sessions.json` canh bởi `.fgos/sessions.lock` riêng; dùng bởi `bin/fgos.mjs` verb `session`; spec: docs/specs/runner.md\n- `packages/observe/rust/src/metrics_cli/entropy.rs` — tín hiệu entropy-trend + đếm compounding (thuần, đọc trên view work-state), surfaced qua `fgos metrics entropy`; spec: docs/specs/runner.md\n- `src/report/enduser-index.mjs` — bộ sinh CHỈ MỤC đọc-theo-tag tài liệu người-dùng-cuối (biến đổi dữ liệu, không tự thực hiện I/O; ghi chú mirror entropy trong source là lịch sử, `src/report/entropy.mjs` không còn): `QUADRANTS`, bảng nguồn-sự-thật `QUADRANT_META` (quadrant→{purpose,audience}), `QUADRANT_DIR_ALIASES` (quadrant→vị trí thay thế trên đĩa, theo str64-backfill; hiện `explanation`→`['decisions']`), `findSourceCaptureId` (gom một, cho chỉ mục), `findSourceCaptureIds` (gom mọi capture của một đường dẫn, cho `doc-sources`), `buildEnduserIndex`; I/O + verb `fgos docs-index` (quét cả thư mục chính lẫn `QUADRANT_DIR_ALIASES`, ghi manifest `docs/enduser-docs-index.json`) và verb `fgos doc-sources <docPath>` (gom nguồn của một đường dẫn) sống ở `bin/fgos.mjs`, cả hai quyền `read`; vận hành chỉ mục: kỹ năng `fgos-indexing`; spec: docs/specs/enduser-docs-index.md **Truth correction:** src/report/enduser-index.mjs:1-17; packages/observe/rust/src/metrics_cli/entropy.rs:1.\n- `src/report/frontmatter.mjs` — bộ đọc/ghi đầu-mô-tả OKF-style của mỗi tài liệu người-dùng-cuối (thuần, không I/O, không phụ thuộc thư viện ngoài — theo str64-backfill): `parseFrontmatter`/`renderFrontmatter` (loại/tiêu đề/nhãn/thời điểm/móc-liên-kết-nguồn); tách biệt với bộ sinh chỉ mục — đầu-mô-tả là bản sao ghi-lúc-soạn, KHÔNG phải nguồn thẩm quyền của linkage; spec: docs/specs/enduser-docs-index.md\n- Historical `src/evolve/candidates.mjs` — path not present at this commit; `src/report/entropy.mjs`, `listUnsettledFrictionsByWork` và verb `fgos evolve` cũng không còn. Tín hiệu entropy hiện ở `packages/observe/rust/src/metrics_cli/entropy.rs`, qua `fgos metrics entropy`; không có cửa candidate ranking được mô tả ở câu cũ. **Truth correction:** src/cli/command-registry.mjs:98,204-207; packages/observe/rust/src/metrics_cli/entropy.rs:1; src/evolve/iron-law.mjs:1 (only current src/evolve file; full src/bin/packages symbol search has no old ranking symbol).\n- `src/state/impact.mjs` — backlog-triage impact ranking (STR21, cửa 2 của triage — tách bạch khỏi STR14 intake-triage): thuần, xếp hạng item CHƯA `done` theo `blocks` (số item khác chưa `done` liệt kê nó trong `deps`); surfaced qua `fgos triage`; spec: docs/specs/work-state.md\n- `src/state/awaiting-context.mjs` — neo gốc cho cổng chờ-người (str61-chat-context-continuity): thuần, đọc trên view work-state, tính `{parent, changedSinceAsk?}` cho một item `awaiting-human` có `parent` mỗi lần đọc (không lưu trữ); surfaced qua `fgos list`'s khóa cộng thêm `awaitingContext`; spec: docs/specs/work-state.md §RUL45 (awaitingContext — neo gốc cho cổng chờ-người, dẫn xuất đọc-thời-điểm)\n- `src/intake/risk-keywords.mjs` — nguồn duy nhất của `HEAVY_KEYWORDS` (self-improve loop STR13 Slice 2, kernel layer, dùng chung giữa `classify.mjs` và `iron-law.mjs`); spec: docs/specs/runner.md\n- `src/evolve/iron-law.mjs` — Iron Law risk classifier cho vòng tự cải thiện (self-improve loop, STR13 Slice 2): thuần, đã được gọi qua `src/runner/iron-law-gate.mjs` (import và gọi `classifyIronLaw`); spec: docs/specs/runner.md **Truth correction:** src/evolve/iron-law.mjs:64; src/runner/iron-law-gate.mjs:20,59.\n- `docs/specs/observe.md` — spec thành phần Observe (đo lường `fgos metrics` và ghi nhận `fgos friction` trọn sang Rust); source: `packages/observe/rust`, contracts: `packages/observe/contracts/`, store `.fgos/observe/`. `metrics discussions` đọc summary do Node Execution ghi (`src/runner/execution/unit-summary.mjs`, `packages/run-result/contracts/unit-summary.read.v2.json`), `metrics eval` ghi journal `.fgos/observe/evals/`. Rubric: `docs/reference/discussion-quality-rubric.md`; cách so sánh mù: `docs/how-to/compare-discussion-setups-with-metrics-eval.md`.\n- `test/` — node:test suite (`npm test`; tổng số test lịch sử 2970 chưa được đếm lại): smoke + state + cli + runner + report + e2e (rebuild-determinism, runner-loop — gồm kịch bản cửa pull S2-pull + con fork từ tip nhánh gốc, pr-gate — 4 kịch bản trọn vòng review/approve/reject, dispatch song song thật với cửa sổ chồng-lấn đo được); benchmark lịch sử ngoài suite (F4): `docs/history/phase-3-compound-learning/reports/f4-benchmark.md` — path not present at this commit; không có benchmark hiện hành ở đường dẫn này **Truth correction:** package.json:28 (scripts.test); git ls-tree e7393ea3c docs/history/phase-3-compound-learning (no entries).\n- `scripts/run-test-canary.mjs` (`npm run test:canary -- <file...>`) + `scripts/test-select.mjs` (`npm run test:related -- --explain`, plus `test:related:shadow` for evidence-gathering; manifest: `test/test-ownership.mjs`) — additive fast test-feedback doors, `npm test` unchanged/authoritative either way; how-to: `docs/how-to/use-fast-test-feedback-commands.md`; plan: `archive/plans/260920-immediate-test-feedback-reduction/plan.md` **Truth correction:** archive/plans/260920-immediate-test-feedback-reduction/plan.md:5.\n- `.fgos/events.jsonl` — nhật ký sự kiện work-state (truth, committed); `.fgos/state.json` là view gitignored; `.fgos/logs/<id>.log` — bản ghi output cục bộ của trợ lý theo từng việc, gitignored (spec: docs/specs/runner.md)\n- `AGENTS.md`, `CLAUDE.md` — doctrine layer nạp mọi phiên agent (bản sản phẩm — thuần forgent)"
+      },
+      "deepRequired": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-retained-navigation-proposal.json",
+      "claimId": "claim_a4f7ef8823510c108225f922da1261ba",
+      "kind": "new-native-navigation-unit",
+      "after": {
+        "claimId": "claim_a4f7ef8823510c108225f922da1261ba",
+        "sourceUnitDigest": "232212bee70408ea591b609f3e2bcda60f640c9bd8643a224a84f63b92cea556",
+        "claimKind": "navigation",
+        "disposition": "reclassify-out-of-platform-scope",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
+        "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This is repository navigation, not a platform behavioral owner. Keep this source/evidence in place; no source retirement, source-to-self carry proof or truth approval. At SYNC 2300d65571968bb3bcb80123a273272586e3f1db, preserve native predecessor history and re-decide the current navigation binding pending independent review. Full original/current text and digests in step10-sync2300-reading-map-reconciliation.json.",
+        "reviewNote": "Native new retained-map navigation unit; independent review pending."
+      },
+      "native": {
+        "sourcePath": "docs/reading-map.md",
+        "unitDigest": "ae696eaf98f857a4b05aeceb6175ea1c2b27e403462bc5a3dcdb0d5d79085cd2",
+        "identityFingerprint": "ae696eaf98f857a4b05aeceb6175ea1c2b27e403462bc5a3dcdb0d5d79085cd2",
+        "claimId": "claim_a4f7ef8823510c108225f922da1261ba",
+        "sourceAnchor": "unheaded-block-14",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "232212bee70408ea591b609f3e2bcda60f640c9bd8643a224a84f63b92cea556",
+        "claimKind": "navigation",
+        "status": "current",
+        "origin": "added-since-aecdc30aad0ffd65a2956ff642c4be9410686ede"
+      },
+      "currentSource": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-14",
+        "githubAnchor": "unheaded-block-14",
+        "stableAnchor": "unheaded-block-14",
+        "title": "Unheaded block 14",
+        "startLine": 112,
+        "endLine": 120,
+        "textDigest": "232212bee70408ea591b609f3e2bcda60f640c9bd8643a224a84f63b92cea556",
+        "sample": "| Relationship | File |\n|---|---|\n| governs documentation system | [doc-governance.md](doc-governance.md) |\n| operative transitional switchboard | [transitional-switchboard.md](tra",
+        "identityFingerprint": "ae696eaf98f857a4b05aeceb6175ea1c2b27e403462bc5a3dcdb0d5d79085cd2",
+        "ancestry": [
+          "Documentation Reading Map",
+          "4. Related Files"
+        ],
+        "text": "| Relationship | File |\n|---|---|\n| governs documentation system | [doc-governance.md](doc-governance.md) |\n| operative transitional switchboard | [transitional-switchboard.md](transitional-switchboard.md) |\n| platform portal | [platform/README.md](platform/README.md) |\n| merged detailed product/source map | [Section 5](#5-detailed-product-and-source-map) |\n| verified transitional authority snapshot | [current-authority-map-2026-09-25.md](../plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md) |\n| full-horizon documentation-system proposal | [platform/proposals/documentation-system-unification.md](platform/proposals/documentation-system-unification.md) |\n| preserved future documentation intents | [platform/intent-preservation-ledger.md](platform/intent-preservation-ledger.md) |"
+      },
+      "deepRequired": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-retained-navigation-proposal.json",
+      "claimId": "claim_69f68ab48e108dc19e2e8f69936fce60",
+      "kind": "new-native-navigation-unit",
+      "after": {
+        "claimId": "claim_69f68ab48e108dc19e2e8f69936fce60",
+        "sourceUnitDigest": "2224720e5dba57fb7728214b829cb8850518f0ba27fc9e76b4049b040d596cb7",
+        "claimKind": "navigation",
+        "disposition": "reclassify-out-of-platform-scope",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
+        "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This is repository navigation, not a platform behavioral owner. Keep this source/evidence in place; no source retirement, source-to-self carry proof or truth approval. At SYNC 2300d65571968bb3bcb80123a273272586e3f1db, preserve native predecessor history and re-decide the current navigation binding pending independent review. Full original/current text and digests in step10-sync2300-reading-map-reconciliation.json.",
+        "reviewNote": "Native new retained-map navigation unit; independent review pending."
+      },
+      "native": {
+        "sourcePath": "docs/reading-map.md",
+        "unitDigest": "26cb7548aa69ed4505a116ce89218788304b71bfeed8590b2906204b81670be3",
+        "identityFingerprint": "26cb7548aa69ed4505a116ce89218788304b71bfeed8590b2906204b81670be3",
+        "claimId": "claim_69f68ab48e108dc19e2e8f69936fce60",
+        "sourceAnchor": "unheaded-block-15",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "2224720e5dba57fb7728214b829cb8850518f0ba27fc9e76b4049b040d596cb7",
+        "claimKind": "navigation",
+        "status": "current",
+        "origin": "added-since-aecdc30aad0ffd65a2956ff642c4be9410686ede"
+      },
+      "currentSource": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-15",
+        "githubAnchor": "unheaded-block-15",
+        "stableAnchor": "unheaded-block-15",
+        "title": "Unheaded block 15",
+        "startLine": 124,
+        "endLine": 129,
+        "textDigest": "2224720e5dba57fb7728214b829cb8850518f0ba27fc9e76b4049b040d596cb7",
+        "sample": "Merged from `docs/specs/reading-map.md`. The how-to directory and README\nroutes above retain their routing role; their complete source entries below\nreconcile the detailed descript",
+        "identityFingerprint": "26cb7548aa69ed4505a116ce89218788304b71bfeed8590b2906204b81670be3",
+        "ancestry": [
+          "Documentation Reading Map",
+          "5. Detailed Product And Source Map"
+        ],
+        "text": "Merged from `docs/specs/reading-map.md`. The how-to directory and README\nroutes above retain their routing role; their complete source entries below\nreconcile the detailed descriptions. Labelled truth corrections identify known\nstale claims and current evidence. Historical paths are identified explicitly\nwhere no current file exists. The retained legacy map remains a provenance\npointer until consumer cutover; it is not the reader's detailed-map destination."
+      },
+      "deepRequired": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-retained-navigation-proposal.json",
+      "claimId": "claim_2bdbea8cb68325ec8b5b8d1a62447f4d",
+      "kind": "new-native-navigation-unit",
+      "after": {
+        "claimId": "claim_2bdbea8cb68325ec8b5b8d1a62447f4d",
+        "sourceUnitDigest": "9a08a47745ab1aaa1c00c35a181813b16ff2e9f12eb14332d3993c9009d36219",
+        "claimKind": "navigation",
+        "disposition": "reclassify-out-of-platform-scope",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
+        "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This is repository navigation, not a platform behavioral owner. Keep this source/evidence in place; no source retirement, source-to-self carry proof or truth approval. At SYNC 2300d65571968bb3bcb80123a273272586e3f1db, preserve native predecessor history and re-decide the current navigation binding pending independent review. Full original/current text and digests in step10-sync2300-reading-map-reconciliation.json.",
+        "reviewNote": "Native new retained-map navigation unit; independent review pending."
+      },
+      "native": {
+        "sourcePath": "docs/reading-map.md",
+        "unitDigest": "fbe5d6fd0ce9627c67421db7c086913618d8ad8869441187e3f6b37c36177f77",
+        "identityFingerprint": "fbe5d6fd0ce9627c67421db7c086913618d8ad8869441187e3f6b37c36177f77",
+        "claimId": "claim_2bdbea8cb68325ec8b5b8d1a62447f4d",
+        "sourceAnchor": "unheaded-block-16",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "9a08a47745ab1aaa1c00c35a181813b16ff2e9f12eb14332d3993c9009d36219",
+        "claimKind": "navigation",
+        "status": "current",
+        "origin": "added-since-aecdc30aad0ffd65a2956ff642c4be9410686ede"
+      },
+      "currentSource": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-16",
+        "githubAnchor": "unheaded-block-16",
+        "stableAnchor": "unheaded-block-16",
+        "title": "Unheaded block 16",
+        "startLine": 131,
+        "endLine": 183,
+        "textDigest": "9a08a47745ab1aaa1c00c35a181813b16ff2e9f12eb14332d3993c9009d36219",
+        "sample": "- `docs/platform-foundations.md` — văn bản gốc 8 luật nền platform (L1–L8); spec: docs/specs/platform-foundations.md\n- `docs/backlog.md` — product backlog (PBI rows, scribing-owned",
+        "identityFingerprint": "fbe5d6fd0ce9627c67421db7c086913618d8ad8869441187e3f6b37c36177f77",
+        "ancestry": [
+          "Documentation Reading Map",
+          "5. Detailed Product And Source Map"
+        ],
+        "text": "- `docs/platform-foundations.md` — văn bản gốc 8 luật nền platform (L1–L8); spec: docs/specs/platform-foundations.md\n- `docs/backlog.md` — product backlog (PBI rows, scribing-owned)\n- `docs/architecture-map.md` — bản chuẩn kiến trúc (v0.2, record ADR0010 (bản đồ kiến trúc là bản chuẩn)): 5 tầng + 2 lớp phủ, sổ component + sổ contract (CTR001–CTR009), nghi thức thẻ-căn-cước-trước-code\n- `docs/work-item-lifecycle-vision.md` — tầm nhìn nền tảng: chu trình sống của work-item (mixed-autonomy, base-workflow + domain-extension); khung cho các PBI STR14-STR18\n- `docs/platform/packaging-distribution/README.md` — portal hiện hành cho packaging/distribution: `fgctl` bootstrap/init/repair/upgrade, workspace activation, doctor/fix readiness, legacy Node compatibility, skill/instruction projections. Khi mục này mâu thuẫn với `docs/specs/distribution.md`, đọc portal + implementation-alignment trước; `docs/specs/distribution.md` hiện là legacy/generated-curated source trong lúc migration.\n- `docs/distribution-vision.md` — tầm nhìn nền tảng lịch sử: cài đặt/setup/doctor ổn định + tái dùng được (không cần clone, global/project không xung đột — project ghi đè global, doctor/setup tự fix hạ tầng + merge config thiếu, module mới tự đăng ký năng lực config, CI như một phần của setup); đã được promote/supersede từng phần vào `docs/platform/packaging-distribution/vision.md`.\n- `docs/specs/` — state layer: area spec + system-overview + bản đồ này\n- `docs/routing-handoff-contract.md` — hợp đồng handoff agent↔agent + ranh giới tin cậy\n- `docs/io-contract.md` — hợp đồng giao tiếp VÀO/RA của cửa CLI + bề mặt stdout `fgos-runner` (str46-io-contract): danh tính `writer`/`role`, envelope `fgos.v1` + ngoại lệ có lý do, exit-code một nguồn, sổ verb (`touchesState`/`externalEffect`/`paginated`/`multiValueFormat`), version token, ranh giới ngoài (STR38/STR48/STR83)\n- `docs/coexistence.md` — doctrine chạy cạnh một harness agent khác (record ADR0009 (chống giao thoa lúc cài — fgOS khi cài không giao thoa tiến trình với harness khác)): lãnh địa, một-nhạc-trưởng-mỗi-phiên, nhường-nhịn lúc `init`, manifest `.fgos/coexistence.json`, Known Gaps chưa flip; `src/install/coexist.mjs` — cài đặt detection + manifest (read-only, không đè)\n- `package.json` (`version`, `files`, `bin.fgos`, `bin.fgos-runner`) + `README.md` (mục `## Install`) — cài `fgos` VÀ `fgos-runner` từ ngoài source repo qua GitHub install, cả hai executable ngay sau cài; `test/install-packaging.test.mjs` — proof e2e (pack → install → chạy từ project ngoài, gồm cả hai binary); spec: docs/specs/distribution.md\n- `scripts/fgos-shell-integration.sh` — dev checkout shell helper (STR87 first slice): hàm `fgos`/`fgos-runner` tự resolve root qua `git rev-parse --git-common-dir` (worktree-safe), source từ shell profile của contributor, không cài đặt gì; test: `test/scripts/fgos-shell-integration.test.mjs`; spec: docs/specs/distribution.md §Dev checkout shell helpers\n- `src/setup/` (`ansi.mjs`, `config-merge.mjs`, `shell-rc.mjs`, `checks.mjs`) + `bin/fgos.mjs`'s current legacy `setup`/`doctor` verbs + `src/cli/command-registry.mjs` entries — doctor/fix registry and legacy setup compatibility: `doctor` chẩn đoán read-only, `doctor --fix` chạy registered fixes, current Node `fgos setup` vẫn tồn tại nhưng target architecture supersedes onboarding bằng `fgctl init` + local `fgos init` / `fgos doctor --fix` / `fgos doctor`; manifest: `docs/architecture-manifest.json`; test: `test/setup/*.test.mjs`; current portal: `docs/platform/packaging-distribution/README.md`; legacy spec: docs/specs/distribution.md §Setup, §Doctor\n- `docs/decisions/` — hồ sơ quyết định dài hạn cho người ngoài (decision records); từ str64-backfill, mỗi record còn mang đầu-mô-tả OKF-style (loại/tiêu đề/nhãn/thời điểm/móc-liên-kết-nguồn, xem `frontmatter.mjs` dòng dưới) và được `fgos docs-index` công nhận là vị trí thay thế của ngăn `explanation` (R10, spec: docs/specs/enduser-docs-index.md) — thân ADR không đổi, chỉ thêm đầu-mô-tả; lưu ý `orchestrator` là pinned term đã đổi nghĩa giữa chừng (0026→0028 nghĩa cũ \"launcher\", 0029 nghĩa mới \"tầng hợp thành T0\"; xem chuỗi quyết định tại `docs/decisions/index.md` dòng 28-32)\n- `scripts/check-decision-citation-drift.mjs` + `test/scripts/check-decision-citation-drift.test.mjs` — quét `docs/backlog.md` + `docs/specs/*.md` tìm dòng còn trích một quyết định đã bị supersede mà không nhắc quyết định thay thế trên cùng dòng (STR72 CoS clause 2, PBI p-2d71dfc3); chỉ phát hiện, không tự sửa; spec: docs/specs/decision-citation-drift.md\n- `scripts/check-decision-codes.mjs` + `test/scripts/check-decision-codes.test.mjs` — quét `test/**/*.test.mjs` tìm tên test còn nhúng mã quyết định nội bộ (str##/D#/RUL##/STR##/tsk-xxx) thay vì mô tả bất biến bằng lời thường (review-audit-self-decision.md mục Stable Code Artifacts); chặn (ratchet) chỉ vi phạm MỚI so với `scripts/check-decision-codes.baseline.json` đã chốt, không chặn ngược nợ cũ; `npm test` tự chạy qua glob `test/**/*.test.mjs`, không hook riêng\n- `docs/id-systems-audit.md` — audit + quyết định hình dạng mọi hệ id/mã đang sống trong hệ thống (work.id/kind/Story/ADR/Rule/Contract phía fgOS; D-hex/D-local/cell-id/feature-slug/severity phía bee) — nguồn cho `work.id`'s `tsk-<hash>` và các migration STR53-STR58 (tất cả đã `done`); boundary appendix: `docs/architecture-map.md` Phụ lục B\n- `bin/fgos.mjs` — CLI một cửa của work-state; chạy `node bin/fgos.mjs <verb>`; gồm verb `edit` — sửa đè các trường (title/kind/risk/verify/tier/refs/deps/acceptance/priority/intent — str7-str8-priority-intent) trên một item đã có, cùng cửa ghi CTR002 như `add`/`move`; gồm verb `take`/`return` — cửa pull giao–nhận việc cho tác nhân ngoài runner; gồm verb `pick` — cửa pull GỘP `take` + dựng workspace (`createWorktree`), role cố định `session`, không cờ `--role` (theo str83-fgos-slash-commands); gồm verb `review`/`approve`/`reject` — cổng duyệt PR nội bộ, một cổng cho mọi đề xuất `awaiting-approval`, nay leaf-vs-root-aware (con nhập vào nhánh của gốc, gốc nhập vào cây chính); `review`/`approve` nay chấp nhận thêm `--github [--pr <n>]` — vận chuyển thay thế CÙNG cổng duyệt qua GitHub thay vì diff/merge cục bộ (chỉ nguồn runner, theo github-adapter, spec: docs/specs/runner.md); gồm verb `catchup` — đồng bộ lại một việc đỗ vì gãy nhập/trôi tích hợp (spec: docs/specs/runner.md); gồm verb `session` (`start`/`end`/`list`) — vòng đời phiên checkout đa-phiên tùy chọn, mỗi phiên một worktree detached-HEAD cho cây nguồn, dùng chung MỘT kho `.fgos/` qua symlink (spec: docs/specs/runner.md); spec: docs/specs/work-state.md\n- `src/state/` — lõi work-state: events (nhật ký; `appendEvent` nay khóa liên-tiến-trình `.fgos/events.lock`, per fgos-multi-session-checkout Epic 3/STR35 — xem spec Work-State RUL10 (tiền đề có ngưỡng — một người ghi tại một thời điểm; multi-agent ghi đồng thời qua `.fgos/events.lock`)), work (schema — STATUSES + STAGES + field `parent` lineage + field `domain`), fsm (bảng chuyển status + CAS), stage (bảng chuyển stage + CAS, chiều vĩ mô song song fsm; cạnh chuyển-stage tra theo domain của item — `coding`: `discovery → exploring → planning → executing`, trong đó phán-quyết `clear` ở `discovery` bỏ qua `exploring` để sang thẳng `planning` còn `unclear` đi qua `exploring`; tên `decompose` vẫn còn nhưng chỉ là bí danh legacy chỉ-để-rút-cạn (không việc MỚI nào vào được nữa); `synthetic`: một stage, không cạnh nào), domains (sổ đăng ký domain — stage list + step-mapping base-workflow + cạnh-chuyển mỗi domain; `coding` + ba domain minh họa/thử-nghiệm `synthetic` (đúng một stage), `triage`, `fixture-marketing`; base-workflow-model STR18, hoàn tất S1+S2), replay (fold), frontier (truy vấn sẵn-sàng — lọc theo status, stage domain-aware, VÀ lineage qua `parent`), dep-graph (dò chu trình trên `deps` — bất biến phi-chu-trình tại cửa ghi, per work-graph-intelligence S1), store (chủ ghi duy nhất + readRawEvents), envelope (phong bì output CTR001, `wrapEnvelope` — nay bọc MỌI verb ở một cửa in trong `bin/fgos.mjs main()`, STR37; spec: docs/specs/work-state.md §envelope)\n- `src/cli/command-registry.mjs` — sổ verb máy-đọc của CLI (STR37, kernel, thuần dữ liệu): `SCHEMA_VERSION` + `COMMAND_REGISTRY` (mọi verb với `{name, invoke, description, parameters, examples, access read|mutation, deprecated}`); `bin/fgos.mjs` `--help [--json]` và `<verb> [<sub>] --help [--json]` sinh sổ từ đây; verb có sub-verb mang `subcommands`, `HELP_SELECTORS` (`--help`, `-h`) thành route của Rust host qua `scripts/export-command-selectors.mjs`; test chống-lệch `test/cli/fgos-manifest.test.mjs`, `test/cli/subcommand-flag-drift.test.mjs` (cờ handler ↔ schema sub-verb), `test/cli/fgos-verb-help-json.test.mjs`, `test/rust-host/help-routes.test.mjs` (qua host thật); spec: docs/specs/work-state.md §sổ verb\n- `src/intake/classify.mjs` — logic thuần của `fgos submit`: deriveTitle, classify (tier/kind/risk cơ học), generateId (`tsk-<hash>` chống trùng, STR53)\n- `src/intake/discovery.mjs` — context-discovery của stage `discovery` (stage đầu tiên của domain `coding`): `resolveDiscovery` (đọc-phán-ghi, dùng chung bởi verb `discover` và vòng tự hành) ĐÒI phán-quyết do người gọi cấp — judge lồng `judgeDiscovery` đã rút; phán-quyết `clear` chuyển item sang stage `planning`, `unclear` sang `exploring`\n- `src/intake/plan.mjs` — phán chia-việc của stage `planning`: `resolvePlan` (đọc-phán-ghi, dùng chung bởi verb `plan` và vòng tự hành khi item ở stage `planning`, hoặc ở bí danh legacy `decompose`) ĐÒI phán-quyết do người gọi cấp — judge lồng `judgeDecompose` đã rút, cùng lý do `judgeDiscovery` rút; sinh con qua lineage `parent`, không qua `deps`\n- `domains/coding/AGENTS.md` `## fgOS Workflow` + `.claude/skills/` (`.agents/skills/` mirror byte-identical) — lớp hướng dẫn P50: entry skill (`fgos-routing`) + skill giai đoạn (`fgos-coding-discovering`/`fgos-coding-exploring`/`fgos-coding-planning`/`fgos-coding-validating`/`fgos-coding-implement`/`fgos-coding-knowledge`) trỏ một phiên tự mở tới đúng skill theo `stage` của item; từ str89-fgos-domain-skills, tra cứu này domain-pluggable — đọc trường `domain` + `stage` của item rồi tra qua `skillForStep`/`getDomain` (`src/state/domain-registry.mjs`), không còn giả định ngầm domain `coding`; `fgos-routing` nay có hàng khoá theo **status** `retrospective → fgos-coding-knowledge` (skill tổng hợp cấp nhãn Diataxis + soạn tài liệu người-dùng-cuối) — stage `compound-learn` đã rút, việc tổng hợp nó từng canh nay là việc của status `retrospective`; skill ĐỘC LẬP `fgos-submit-assist` (str51-llm-assist-classify) đã rút (tsk-6ar) — `/fgOS:submit` bước 6 (`plugins/fgOS/skills/submit/SKILL.md`) nay tự chạy clarify+classify trong cùng phiên sống, cùng việc mà skill đó từng làm nhưng trên bản mô tả SẠCH hơn; spec: docs/specs/work-state.md §RUL60 (hành vi), docs/specs/runner.md (lớp hướng dẫn) **Truth correction:** src/state/domain-registry.mjs:193,240; core/skills/fgos-routing/SKILL.md:124-136.\n- `plugins/fgOS/` (`.claude-plugin/plugin.json` + `skills/<verb>/SKILL.md`) — bề mặt slash-command `/fgOS:<verb>` cho Claude Code, 37 wrapper không có tiền tố fgos- trong 55 thư mục skill; `check` không có wrapper. Mỗi wrapper giữ hướng dẫn cửa gọi của riêng nó; spec: docs/specs/fgos-plugin.md **Truth correction:** plugins/fgOS/.claude-plugin/plugin.json:1; plugins/fgOS/skills/submit/SKILL.md:1; plugins/fgOS/skills/answer/SKILL.md:1 (directory enumeration at e7393ea3c).\n- `apps/fgos-gateway/` + `apps/fgos-gateway/web/` — fgos gateway (REST, MCP, bundle web dashboard nhúng sẵn; vòng đời `fgos gateway`) và bề mặt web dashboard: client trình duyệt ĐỘC LẬP (không phải code máy chủ trong gateway, theo tsk-7l9 + decision 0014); `herdr-dashboard/` là plugin herdr (TUI trong pane), `packages/herdr-fgos-common/rust` là adapter CLI fgos dùng chung của cả hai, gọi API REST/RPC của gateway từ ngoài; ba màn đọc (taskboard, task-detail, câu hỏi cần trả lời — phủ cả kênh `ask` lẫn `gate-approve`) cộng các hành động ghi đi qua verb một-cửa-ghi của fgOS (`answer`/`approve`/`add`/`edit`/`move`), không có đường ghi thứ hai; bật mặc định, port 8788, token bắt buộc; spec: docs/specs/herdr-web-dashboard.md (lớp UI/wireframe: docs/reference/herdr-web-dashboard-layout.md)\n- `docs/how-to/`, `docs/tutorials/`, `docs/reference/`, `docs/explanation/` — tài liệu NGƯỜI-DÙNG-CUỐI theo bốn quadrant Diataxis (audience-facing, khác `docs/specs/` là BA-reference nội bộ); sinh bởi kỹ năng `fgos-coding-knowledge` ở status `retrospective` (grow-or-create một tài liệu SỐNG mỗi đường dẫn: gom mọi capture qua `fgos doc-sources` rồi tích luỹ không mất, ngăn Diataxis là trục cấu trúc duy nhất — write-side, spec: docs/specs/enduser-docs-authoring.md), quadrant khớp `docType` capture; `docs/explanation/` từ str64-backfill còn có 6 tài liệu chưng cất từ critical-patterns.md (learnings vận hành bee thật sự thuộc tiến trình hình thành fgOS); chỉ mục đọc-theo-tag máy-đọc-được: `docs/enduser-docs-index.json` (sinh bởi verb `fgos docs-index` / kỹ năng `fgos-indexing`, thay cho việc liệt-kê-tay từng tài liệu — supersedes con trỏ văn xuôi cũ, theo compound-learn-enduser-docs; ngăn `explanation` còn quét thêm `docs/decisions/` làm vị trí thay thế, theo str64-backfill); spec read-side: docs/specs/enduser-docs-index.md\n- `src/runner/` + `bin/fgos-runner.mjs` — vòng tự hành (loop/dispatch/worktree/recovery/anti-loop/write-queue/root-affinity); `loop.mjs`'s `runWatch` + `write-queue.mjs`'s `onCommit` — chế độ `--watch` bền, tín hiệu-cơ-học + nghỉ dự phòng, ghép `runOnce` không đổi làm hộp đen (str7-str8-priority-intent, spec: docs/specs/runner.md §RUL53 (`--watch` — vòng cầm-giao bền, dừng chỉ khi có tín hiệu tường minh)); loop giao việc theo mẻ song song có giới hạn hai tầng (cấu hình `parallel` trong `.fgos/config.json`'s `runner` section, theo tsk-5vf), giữ quyền-sở-hữu-gốc trong một lượt chạy, quét làm-rõ rồi quét chia-việc trước mọi dispatch thi công; gặt-lại bỏ qua claim của cửa pull (`claimRole` human/session); `dispatch.mjs`'s executor là port có tên CTR009 v2 (`EXECUTOR_ADAPTERS`, per-tier qua config's `executors`, STR41), `ensureRunnerConfigForDir` tự sinh cấu hình mặc định tại `.fgos/config.json` khi vắng mặt (không áp dụng cho `--config` tường minh, str76-runner-bootstrap; tsk-5hv xoá hẳn fallback về file flat legacy cũ); worker của loop và fan-out chạy như một Unit run qua `runUnit` (`work-dispatch.mjs`'s `spawnWorker`), `fgos-runner` không còn `--config` (spec: docs/specs/runner.md §RUL93 (the runner loop's worker and the fan-out batch run as one Unit run each)) và prompt worker được tách sang `prompt-templates.mjs` + `prompt-templates/*.txt` (chọn template qua bảng cơ học kind/tier/domain, substitution `{placeholder}` thuần, log dispatch kèm tên+hash template, STR49); `goal-check.mjs` — hàm goal-check dùng chung giữa vòng tự hành và verb `return`; `write-queue.mjs` — cửa ghi tuần tự giữ một-người-ghi dưới song song; `root-affinity.mjs` — quyền-sở-hữu-gốc, giữ mọi con của một gốc chung một chủ trong một lượt chạy; `resolveRepoRoot` nay còn xác nhận HEAD repo resolve được trước khi runner claim bất kỳ item nào (fail-fast, str86-runner-headless-git D ecfd0d1a); config: `.fgos/config.json`'s `runner` section (tự sinh khi vắng mặt tại đường mặc định, nguồn config duy nhất kể từ tsk-5hv); spec: docs/specs/runner.md\n- `docs/specs/confinement-authority.md` + `src/runner/dispatch/confinement/` — Agent Confinement Authority: runtime one-door confinement enforcement (`executeThroughConfinement`), machine backend registry `~/.fgos/confinement-backends.json`, local `bwrap` v1 driver with 8 falsification probes, required fail-closed checks, attestation storage (`confinement-attestation.v1`), herdr convergence with shared `evaluateBypassPairing`, setup defaults and doctor checks; spec: docs/specs/confinement-authority.md Pane herdr confine cho agent không phải claude (codex/agy/pi): công thức private-home + account inventory + lịch sử các commit đã đi qua (và vì sao từng bị quên) ở §13.1.\n- `docs/architect/README.md` + `docs/architect/architecture-intent.md` + `docs/architect/domainization/README.md` — portal architect-level, registry intention xuyên-khu-vực, và deep-dive domainization (core đóng vs `domains/<name>/` adapter mở: manifest/workflow YAML, task-spec, skill, knowledge, doctrine, agent, resolver, enforcement); active thread đầu tiên giữ intent mở rộng fgOS từ fan-out/fan-in + artifact mediation thành năng lực group-thinking/problem-solving rộng hơn (Delphi/NGT/RFC/adversarial/master-coordinator), giữ `group-cognition-framework.yaml` isolation-heavy không bị nới ngầm; liên quan Step 09 group-thinking substrate, Step 10 coding-domain adoption, component authority boundary map, và Domain Components And Extension Layer\n- `src/workflow/` (`definition.mjs`, `runner.mjs`, `step-fsm.mjs`, `units-source.mjs`) + `core/workflows/*.yaml` — Workflow engine (Request-to-Run P3a/P4): DAG steps, human gates, dependency scheduling, runner integration; `units-source.mjs` dịch units file của `fgos workflow start --units` thành Workflow tạm (RUL89 (workflow start --units)); spec: `docs/specs/runner.md`\n- `src/runner/execution/` (`unit.mjs`, `bind.mjs`, `run.mjs`, `patterns/`) — Execution Core (Request-to-Run P1/P2/P4): Unit (hợp đồng dữ liệu duy nhất), `bind()` (chọn executor 5 mức), `fgos run` (cửa chạy mới, herdr mặc định), CollaborationPattern (`solo`, `reviewed`, `panel` + presets `consult`, `research-fan-out`, `rfc`, `code-change`); `src/runner/dispatch/write-scope.mjs` — matcher duy nhất của phạm vi ghi Unit (RUL84 (one write-scope matcher)), dùng cho runner commit, settlement và Workflow; spec: `docs/specs/runner.md`\n- `docs/architect/agent-coordination/` — thiết kế agent-coordination lịch sử (đã thu hồi ở P4 per D-0050, thay bằng Workflow runner và Execution Core); `README.md` là portal ghi nhận chuyển tiếp; `contracts/` lưu giữ hợp đồng lịch sử (`coordination-session.md`, `flow-definition.md`).\n- `docs/architect/host-invocation-routing/` — kiến trúc định tuyến và host runtime Rust (5 tệp: `host-invocation-provider-routing.md` — hợp đồng kernel canonical OperationRequest/ProviderOutcome, pure Router, InvocationService; `legacy-cli-transition.md` — chiến lược exec payload Node với parity harness và descriptor command-routes; `external-provider-protocol.md` — giao thức external provider R2; `node-to-rust-component-migration.md` — lộ trình chuyển dịch component từ Node sang Rust; `rust-cli-and-proof-components-plan.md` — kế hoạch triển khai Rust CLI host và proof components); spec: docs/specs/distribution.md\n- `src/runner/merge.mjs` — cơ chế cổng duyệt PR nội bộ (`classifySource`/`reviewDiff`/`mergeRunnerItem`/`cleanupMergedBranch`), dùng bởi `bin/fgos.mjs` verb `review`/`approve`/`reject`, nay tham số hóa được nhánh đích (cây chính hoặc nhánh của gốc — cây nhánh tích hợp); `catchup` (bin/fgos.mjs) dùng lại cùng cơ chế git cho cả tầng con→gốc lẫn gốc→cây chính; `isMainWorktree` (STR44) — chặn cấu trúc (không dựa sổ đăng ký session) xác nhận `cwd` LÀ worktree chính trước khi `approve` merge/verify, bắt cả worktree tay không đăng ký qua `fgos session start` — cùng `detectTrunk` nay ở `src/runner/worktree.mjs` (theo tsk-49i), không còn ở file này; spec: docs/specs/runner.md\n- `src/verbs/<domain>/<verb>.mjs` — tầng use-case của CLI (theo tsk-49i): logic nghiệp vụ của một verb, chữ ký thống nhất `<verb>UseCase(ctx, options)` — `ctx` là thứ adapter tính từ môi trường (`{dir, cwd?, repoRoot?}`, use-case KHÔNG BAO GIỜ tự đọc `process.cwd()`/`process.env`/argv), `options` là flag đã parse; trả đúng payload `fgos.v1` (bọc envelope + map exit-code vẫn ở `bin/fgos.mjs`), refusal vẫn `throw StoreError`. Cụm đầu tiên: `src/verbs/merge/` (`merge`/`approve`/`review`/`sync-root`/`catchup`/`reject`/`promote-to-component`) — `bin/fgos.mjs` cho 7 verb này nay chỉ parse args, tính `repoRoot` theo chính sách RIÊNG của từng verb, gọi một hàm use-case. Không ngụ ý migrate 7 file use-case-rank sẵn có (`runner/loop.mjs`, `intake/*`, `setup/*`, `state/cursor.mjs`); spec: docs/specs/runner.md\n- `src/report/item-trace.mjs` — trace outcome/friction của MỘT item, đọc thuần trên view (`collectOutcomeEntry`/`collectFrictionData`/`collectReviewTrace`); dùng chung bởi `review` (use-case) và `check`/`show`/`doc-sources`/`evolve` (`bin/fgos.mjs`); spec: docs/specs/runner.md\n- `src/runner/github-adapter.mjs` — vận chuyển GitHub thuần cho cổng duyệt PR nội bộ (`createGitHubPR`/`viewGitHubPRStatus`/`mergeGitHubPR`/`classifyGhFailure`, shell ra `gh` CLI thật, layer infra), dùng bởi `bin/fgos.mjs` verb `review`/`approve --github`; spec: docs/specs/runner.md\n- `src/runner/worker-log.mjs` — cửa ghi DUY NHẤT cho bản ghi output cục bộ của trợ lý (`.fgos/logs/<id>.log`, git-ignored): `appendWorkerLog` — khối kết-cục cuối, gọi bởi `loop.mjs` sau mỗi lượt dispatch; `appendWorkerLogChunk` — live tee từng chunk stdout/stderr khi đến (STR39), gọi bởi `dispatch.mjs`'s `spawnWorker` qua `opts.onChunk`; spec: docs/specs/runner.md\n- `src/runner/session.mjs` — vòng đời phiên checkout đa-phiên tùy chọn (fgos-multi-session-checkout, STR35): `createSession`/`endSession`/`listSessions`/`reclaimOrphanedSessions`, worktree detached-HEAD mỗi phiên (`git worktree add --detach`), `.fgos` symlink dùng chung (KHÔNG BAO GIỜ sao chép), sổ `.fgos/sessions.json` canh bởi `.fgos/sessions.lock` riêng; dùng bởi `bin/fgos.mjs` verb `session`; spec: docs/specs/runner.md\n- `packages/observe/rust/src/metrics_cli/entropy.rs` — tín hiệu entropy-trend + đếm compounding (thuần, đọc trên view work-state), surfaced qua `fgos metrics entropy`; spec: docs/specs/runner.md\n- `src/report/enduser-index.mjs` — bộ sinh CHỈ MỤC đọc-theo-tag tài liệu người-dùng-cuối (biến đổi dữ liệu, không tự thực hiện I/O; ghi chú mirror entropy trong source là lịch sử, `src/report/entropy.mjs` không còn): `QUADRANTS`, bảng nguồn-sự-thật `QUADRANT_META` (quadrant→{purpose,audience}), `QUADRANT_DIR_ALIASES` (quadrant→vị trí thay thế trên đĩa, theo str64-backfill; hiện `explanation`→`['decisions']`), `findSourceCaptureId` (gom một, cho chỉ mục), `findSourceCaptureIds` (gom mọi capture của một đường dẫn, cho `doc-sources`), `buildEnduserIndex`; I/O + verb `fgos docs-index` (quét cả thư mục chính lẫn `QUADRANT_DIR_ALIASES`, ghi manifest `docs/enduser-docs-index.json`) và verb `fgos doc-sources <docPath>` (gom nguồn của một đường dẫn) sống ở `bin/fgos.mjs`, cả hai quyền `read`; vận hành chỉ mục: kỹ năng `fgos-indexing`; spec: docs/specs/enduser-docs-index.md **Truth correction:** src/report/enduser-index.mjs:1-17; packages/observe/rust/src/metrics_cli/entropy.rs:1.\n- `src/report/frontmatter.mjs` — bộ đọc/ghi đầu-mô-tả OKF-style của mỗi tài liệu người-dùng-cuối (thuần, không I/O, không phụ thuộc thư viện ngoài — theo str64-backfill): `parseFrontmatter`/`renderFrontmatter` (loại/tiêu đề/nhãn/thời điểm/móc-liên-kết-nguồn); tách biệt với bộ sinh chỉ mục — đầu-mô-tả là bản sao ghi-lúc-soạn, KHÔNG phải nguồn thẩm quyền của linkage; spec: docs/specs/enduser-docs-index.md\n- Historical `src/evolve/candidates.mjs` — path not present at this commit; `src/report/entropy.mjs`, `listUnsettledFrictionsByWork` và verb `fgos evolve` cũng không còn. Tín hiệu entropy hiện ở `packages/observe/rust/src/metrics_cli/entropy.rs`, qua `fgos metrics entropy`; không có cửa candidate ranking được mô tả ở câu cũ. **Truth correction:** src/cli/command-registry.mjs:98,204-207; packages/observe/rust/src/metrics_cli/entropy.rs:1; src/evolve/iron-law.mjs:1 (only current src/evolve file; full src/bin/packages symbol search has no old ranking symbol).\n- `src/state/impact.mjs` — backlog-triage impact ranking (STR21, cửa 2 của triage — tách bạch khỏi STR14 intake-triage): thuần, xếp hạng item CHƯA `done` theo `blocks` (số item khác chưa `done` liệt kê nó trong `deps`); surfaced qua `fgos triage`; spec: docs/specs/work-state.md\n- `src/state/awaiting-context.mjs` — neo gốc cho cổng chờ-người (str61-chat-context-continuity): thuần, đọc trên view work-state, tính `{parent, changedSinceAsk?}` cho một item `awaiting-human` có `parent` mỗi lần đọc (không lưu trữ); surfaced qua `fgos list`'s khóa cộng thêm `awaitingContext`; spec: docs/specs/work-state.md §RUL45 (awaitingContext — neo gốc cho cổng chờ-người, dẫn xuất đọc-thời-điểm)\n- `src/intake/risk-keywords.mjs` — nguồn duy nhất của `HEAVY_KEYWORDS` (self-improve loop STR13 Slice 2, kernel layer, dùng chung giữa `classify.mjs` và `iron-law.mjs`); spec: docs/specs/runner.md\n- `src/evolve/iron-law.mjs` — Iron Law risk classifier cho vòng tự cải thiện (self-improve loop, STR13 Slice 2): thuần, đã được gọi qua `src/runner/iron-law-gate.mjs` (import và gọi `classifyIronLaw`); spec: docs/specs/runner.md **Truth correction:** src/evolve/iron-law.mjs:64; src/runner/iron-law-gate.mjs:20,59.\n- `docs/specs/observe.md` — spec thành phần Observe (đo lường `fgos metrics` và ghi nhận `fgos friction` trọn sang Rust); source: `packages/observe/rust`, contracts: `packages/observe/contracts/`, store `.fgos/observe/`. `metrics discussions` đọc summary do Node Execution ghi (`src/runner/execution/unit-summary.mjs`, `packages/run-result/contracts/unit-summary.read.v2.json`), `metrics eval` ghi journal `.fgos/observe/evals/`. Rubric: `docs/reference/discussion-quality-rubric.md`; cách so sánh mù: `docs/how-to/compare-discussion-setups-with-metrics-eval.md`.\n- `test/` — node:test suite (`npm test`; tổng số test lịch sử 2970 chưa được đếm lại): smoke + state + cli + runner + report + e2e (rebuild-determinism, runner-loop — gồm kịch bản cửa pull S2-pull + con fork từ tip nhánh gốc, pr-gate — 4 kịch bản trọn vòng review/approve/reject, dispatch song song thật với cửa sổ chồng-lấn đo được); benchmark lịch sử ngoài suite (F4): `docs/history/phase-3-compound-learning/reports/f4-benchmark.md` — path not present at this commit; không có benchmark hiện hành ở đường dẫn này **Truth correction:** package.json:28 (scripts.test); git ls-tree e7393ea3c docs/history/phase-3-compound-learning (no entries).\n- `scripts/run-test-canary.mjs` (`npm run test:canary -- <file...>`) + `scripts/test-select.mjs` (`npm run test:related -- --explain`, plus `test:related:shadow` for evidence-gathering; manifest: `test/test-ownership.mjs`) — additive fast test-feedback doors, `npm test` unchanged/authoritative either way; how-to: `docs/how-to/use-fast-test-feedback-commands.md`; plan: `archive/plans/260920-immediate-test-feedback-reduction/plan.md` **Truth correction:** archive/plans/260920-immediate-test-feedback-reduction/plan.md:5.\n- `.fgos/events.jsonl` — nhật ký sự kiện work-state (truth, committed); `.fgos/state.json` là view gitignored; `.fgos/logs/<id>.log` — bản ghi output cục bộ của trợ lý theo từng việc, gitignored (spec: docs/specs/runner.md)\n- `AGENTS.md`, `CLAUDE.md` — doctrine layer nạp mọi phiên agent (bản sản phẩm — thuần forgent)"
+      },
+      "deepRequired": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-retained-navigation-proposal.json",
+      "claimId": "claim_85d25e6ad2429e431b1b4d7d7025a498",
+      "kind": "new-native-navigation-unit",
+      "after": {
+        "claimId": "claim_85d25e6ad2429e431b1b4d7d7025a498",
+        "sourceUnitDigest": "b951d131c085ce17b7fccbcbd71473f53db24b05e4301cdf01cb42945de0b2ec",
+        "claimKind": "navigation",
+        "disposition": "reclassify-out-of-platform-scope",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
+        "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This is repository navigation, not a platform behavioral owner. Keep this source/evidence in place; no source retirement, source-to-self carry proof or truth approval. At SYNC 2300d65571968bb3bcb80123a273272586e3f1db, preserve native predecessor history and re-decide the current navigation binding pending independent review. Full original/current text and digests in step10-sync2300-reading-map-reconciliation.json.",
+        "reviewNote": "Native new retained-map navigation unit; independent review pending."
+      },
+      "native": {
+        "sourcePath": "docs/reading-map.md",
+        "unitDigest": "3adebe39e20de4111a989dc5578c387c3643fc6128519c96624385efef42fb24",
+        "identityFingerprint": "3adebe39e20de4111a989dc5578c387c3643fc6128519c96624385efef42fb24",
+        "claimId": "claim_85d25e6ad2429e431b1b4d7d7025a498",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "b951d131c085ce17b7fccbcbd71473f53db24b05e4301cdf01cb42945de0b2ec",
+        "claimKind": "navigation",
+        "status": "current",
+        "origin": "added-since-aecdc30aad0ffd65a2956ff642c4be9410686ede"
+      },
+      "currentSource": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-2",
+        "githubAnchor": "unheaded-block-2",
+        "stableAnchor": "unheaded-block-2",
+        "title": "Unheaded block 2",
+        "startLine": 22,
+        "endLine": 24,
+        "textDigest": "b951d131c085ce17b7fccbcbd71473f53db24b05e4301cdf01cb42945de0b2ec",
+        "sample": "This map provides reader routes and the merged detailed product/source map in\n[section 5](#5-detailed-product-and-source-map). The legacy source remains\nretained for provenance unt",
+        "identityFingerprint": "3adebe39e20de4111a989dc5578c387c3643fc6128519c96624385efef42fb24",
+        "ancestry": [
+          "Documentation Reading Map"
+        ],
+        "text": "This map provides reader routes and the merged detailed product/source map in\n[section 5](#5-detailed-product-and-source-map). The legacy source remains\nretained for provenance until consumer cutover."
+      },
+      "deepRequired": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-retained-navigation-proposal.json",
+      "claimId": "claim_ddc56de5664b8049f3498eb46899f4ec",
+      "kind": "new-native-navigation-unit",
+      "after": {
+        "claimId": "claim_ddc56de5664b8049f3498eb46899f4ec",
+        "sourceUnitDigest": "67798e09dff5c22bd679b1b04d1f4ee104f5699de0f19d8c9ebd18c7a8b19c17",
+        "claimKind": "navigation",
+        "disposition": "reclassify-out-of-platform-scope",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
+        "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This is repository navigation, not a platform behavioral owner. Keep this source/evidence in place; no source retirement, source-to-self carry proof or truth approval. At SYNC 2300d65571968bb3bcb80123a273272586e3f1db, preserve native predecessor history and re-decide the current navigation binding pending independent review. Full original/current text and digests in step10-sync2300-reading-map-reconciliation.json.",
+        "reviewNote": "Native new retained-map navigation unit; independent review pending."
+      },
+      "native": {
+        "sourcePath": "docs/reading-map.md",
+        "unitDigest": "8d671260e0efa9830d191c2aa43c0a12d75b40abbb626fb17761a05964c2af3d",
+        "identityFingerprint": "8d671260e0efa9830d191c2aa43c0a12d75b40abbb626fb17761a05964c2af3d",
+        "claimId": "claim_ddc56de5664b8049f3498eb46899f4ec",
+        "sourceAnchor": "unheaded-block-3",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "67798e09dff5c22bd679b1b04d1f4ee104f5699de0f19d8c9ebd18c7a8b19c17",
+        "claimKind": "navigation",
+        "status": "current",
+        "origin": "added-since-aecdc30aad0ffd65a2956ff642c4be9410686ede"
+      },
+      "currentSource": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 28,
+        "endLine": 36,
+        "textDigest": "67798e09dff5c22bd679b1b04d1f4ee104f5699de0f19d8c9ebd18c7a8b19c17",
+        "sample": "| Need | Read |\n|---|---|\n| Understand documentation rules | [doc-governance.md](doc-governance.md) |\n| Resolve authority during transition | [transitional-switchboard.md](transiti",
+        "identityFingerprint": "8d671260e0efa9830d191c2aa43c0a12d75b40abbb626fb17761a05964c2af3d",
+        "ancestry": [
+          "Documentation Reading Map",
+          "1. Start Here"
+        ],
+        "text": "| Need | Read |\n|---|---|\n| Understand documentation rules | [doc-governance.md](doc-governance.md) |\n| Resolve authority during transition | [transitional-switchboard.md](transitional-switchboard.md) |\n| Understand platform-wide docs | [platform/README.md](platform/README.md) |\n| Understand packaging, install, activation, setup, and doctor | [platform/packaging-distribution/README.md](platform/packaging-distribution/README.md) |\n| Understand the detailed product/source map | [Section 5](#5-detailed-product-and-source-map) |\n| Shape a new multi-round design | Create or update a discussion scratchpad |\n| Understand an area | `docs/platform/<area>/README.md`, or current legacy `docs/specs/<area>.md` during migration |"
+      },
+      "deepRequired": true
+    }
+  ],
+  "registryWritten": false,
+  "approvalCarried": false
+}

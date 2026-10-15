@@ -2981,18 +2981,13 @@
     },
     {
       "claimId": "claim_5e39467512dc05bfe6e3b4a96c660d6c",
-      "sourceUnitDigest": "82e97a857539eea9e5f20bb9b1f5cdfc6209f68afcdf604502c2b3d70ca448be",
+      "sourceUnitDigest": "f56b373a4532d0a280541b1eeda7ba4aee730699cc0e39d338a1abb7d9c9294e",
       "claimKind": "navigation",
       "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:21@2026-10-14",
-      "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This unit of docs/reading-map.md#documentation-reading-map is navigation, not a platform behavioral owner. Preserve it in place; the detailed legacy docs/specs/reading-map.md is still retained during migration and may retire only after the reviewed navigation merge/consumer rewrite at cutover. No reader edit, retirement or source-to-itself carry proof is claimed.",
-      "reviewNote": "mechanical: full digest recomputed by script, anchor reading-map.md#documentation-reading-map exists, shard row equals pack row, source blob equals frozen pin, disposition reclassify-out-of-platform-scope is allowed by the map row",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-retained-conservation.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
+      "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This is repository navigation, not a platform behavioral owner. Keep this source/evidence in place; no source retirement, source-to-self carry proof or truth approval. At SYNC 2300d65571968bb3bcb80123a273272586e3f1db, preserve native predecessor history and re-decide the current navigation binding pending independent review. Full original/current text and digests in step10-sync2300-reading-map-reconciliation.json.",
+      "reviewNote": "Pending independent deep review; no old review carried to edited navigation."
     },
     {
       "claimId": "claim_e4f918a9c970f2189cd7e18f8f84a913",
@@ -3010,49 +3005,14 @@
       "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
     },
     {
-      "claimId": "claim_ad83c507f4d4462cd63564650a4a6eb1",
-      "sourceUnitDigest": "44e917a93a892200ff690378f7fc239851ed0777ac931253feacf4efb68e6e87",
-      "claimKind": "navigation",
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:21@2026-10-14",
-      "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This unit of docs/reading-map.md#unheaded-block-2 is navigation, not a platform behavioral owner. Preserve it in place; the detailed legacy docs/specs/reading-map.md is still retained during migration and may retire only after the reviewed navigation merge/consumer rewrite at cutover. No reader edit, retirement or source-to-itself carry proof is claimed.",
-      "reviewNote": "mechanical: full digest recomputed by script, anchor reading-map.md#unheaded-block-2 exists, shard row equals pack row, source blob equals frozen pin, disposition reclassify-out-of-platform-scope is allowed by the map row",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-retained-conservation.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
-    },
-    {
       "claimId": "claim_9c8387207fd0c025e7d643a97625a71d",
-      "sourceUnitDigest": "a0c63d891be180aae3488da0c2035081f03d1e001bfd24499eabee67e7621d4b",
+      "sourceUnitDigest": "1007e818be04d1b580f8e18e3bedc19de7cf71d6d2921441a08d7b04e1318e86",
       "claimKind": "navigation",
       "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:21@2026-10-14",
-      "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This unit of docs/reading-map.md#1-start-here is navigation, not a platform behavioral owner. Preserve it in place; the detailed legacy docs/specs/reading-map.md is still retained during migration and may retire only after the reviewed navigation merge/consumer rewrite at cutover. No reader edit, retirement or source-to-itself carry proof is claimed.",
-      "reviewNote": "mechanical: full digest recomputed by script, anchor reading-map.md#1-start-here exists, shard row equals pack row, source blob equals frozen pin, disposition reclassify-out-of-platform-scope is allowed by the map row",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-retained-conservation.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
-    },
-    {
-      "claimId": "claim_218d4b42e8ea4b5f0cdc071b33fa3f54",
-      "sourceUnitDigest": "8a6a408d2e92d032e23faf4951c3dd36fbeb9d26d32aefb613038924916f8a7d",
-      "claimKind": "navigation",
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:21@2026-10-14",
-      "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This unit of docs/reading-map.md#unheaded-block-3 is navigation, not a platform behavioral owner. Preserve it in place; the detailed legacy docs/specs/reading-map.md is still retained during migration and may retire only after the reviewed navigation merge/consumer rewrite at cutover. No reader edit, retirement or source-to-itself carry proof is claimed.",
-      "reviewNote": "mechanical: full digest recomputed by script, anchor reading-map.md#unheaded-block-3 exists, shard row equals pack row, source blob equals frozen pin, disposition reclassify-out-of-platform-scope is allowed by the map row; digest also hand-recomputed in Python",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-retained-conservation.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
+      "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This is repository navigation, not a platform behavioral owner. Keep this source/evidence in place; no source retirement, source-to-self carry proof or truth approval. At SYNC 2300d65571968bb3bcb80123a273272586e3f1db, preserve native predecessor history and re-decide the current navigation binding pending independent review. Full original/current text and digests in step10-sync2300-reading-map-reconciliation.json.",
+      "reviewNote": "Pending independent deep review; no old review carried to edited navigation."
     },
     {
       "claimId": "claim_1e5ecc4e20cef96967146f3761fda801",
@@ -3296,33 +3256,13 @@
     },
     {
       "claimId": "claim_aad6d095624ef67fd09cb8c0cc89fd97",
-      "sourceUnitDigest": "1a1310d64283efdeff2184dff92272d4fbc8ddc1b75d2746b8e7550f42577c90",
+      "sourceUnitDigest": "186264dd1cc951c075a0799d201cf25da7e204191e27327a91d66f367d6c0b7c",
       "claimKind": "navigation",
       "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:21@2026-10-14",
-      "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This unit of docs/reading-map.md#4-related-files is navigation, not a platform behavioral owner. Preserve it in place; the detailed legacy docs/specs/reading-map.md is still retained during migration and may retire only after the reviewed navigation merge/consumer rewrite at cutover. No reader edit, retirement or source-to-itself carry proof is claimed.",
-      "reviewNote": "mechanical: full digest recomputed by script, anchor reading-map.md#4-related-files exists, shard row equals pack row, source blob equals frozen pin, disposition reclassify-out-of-platform-scope is allowed by the map row",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-retained-conservation.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
-    },
-    {
-      "claimId": "claim_c3b29b18751a7153eb574a571a8a1009",
-      "sourceUnitDigest": "e43f4177f48b53c47017f865260dd121d2a54ab56cf22270a4d698ca0b648e02",
-      "claimKind": "navigation",
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:21@2026-10-14",
-      "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This unit of docs/reading-map.md#unheaded-block-14 is navigation, not a platform behavioral owner. Preserve it in place; the detailed legacy docs/specs/reading-map.md is still retained during migration and may retire only after the reviewed navigation merge/consumer rewrite at cutover. No reader edit, retirement or source-to-itself carry proof is claimed.",
-      "reviewNote": "mechanical: full digest recomputed by script, anchor reading-map.md#unheaded-block-14 exists, shard row equals pack row, source blob equals frozen pin, disposition reclassify-out-of-platform-scope is allowed by the map row",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-retained-conservation.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
+      "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This is repository navigation, not a platform behavioral owner. Keep this source/evidence in place; no source retirement, source-to-self carry proof or truth approval. At SYNC 2300d65571968bb3bcb80123a273272586e3f1db, preserve native predecessor history and re-decide the current navigation binding pending independent review. Full original/current text and digests in step10-sync2300-reading-map-reconciliation.json.",
+      "reviewNote": "Pending independent deep review; no old review carried to edited navigation."
     },
     {
       "claimId": "claim_8e290abbe8f1344bf8f19c997da11921",
@@ -3341,6 +3281,66 @@
       "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
       "rationale": "L10-1/L10-4: retain repository-wide navigation outside platform authority. The complete 53-entry curated list from docs/specs/reading-map.md is now preserved verbatim in docs/reading-map.md#5-detailed-product-and-source-map, including the two pre-existing portal routes with reconciled descriptions. Legacy source and paths remain intact; Phase 9 owns consumer repointing. Known stale carried sentences; full truth check owed at promotion (A35). No truth approval or cutover authority is inferred. This native source unit #unheaded-block-1 is re-decided pending independent navigation/conservation review.",
       "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_c8677c74072e0ac1ac4d9b345de1ee1f",
+      "sourceUnitDigest": "3fc17fdda14e751313ece3ac881cdd17d0eabb6c98a3ce47a39486de3c39ac3f",
+      "claimKind": "navigation",
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
+      "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This is repository navigation, not a platform behavioral owner. Keep this source/evidence in place; no source retirement, source-to-self carry proof or truth approval. At SYNC 2300d65571968bb3bcb80123a273272586e3f1db, preserve native predecessor history and re-decide the current navigation binding pending independent review. Full original/current text and digests in step10-sync2300-reading-map-reconciliation.json.",
+      "reviewNote": "Native new retained-map navigation unit; independent review pending."
+    },
+    {
+      "claimId": "claim_a4f7ef8823510c108225f922da1261ba",
+      "sourceUnitDigest": "232212bee70408ea591b609f3e2bcda60f640c9bd8643a224a84f63b92cea556",
+      "claimKind": "navigation",
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
+      "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This is repository navigation, not a platform behavioral owner. Keep this source/evidence in place; no source retirement, source-to-self carry proof or truth approval. At SYNC 2300d65571968bb3bcb80123a273272586e3f1db, preserve native predecessor history and re-decide the current navigation binding pending independent review. Full original/current text and digests in step10-sync2300-reading-map-reconciliation.json.",
+      "reviewNote": "Native new retained-map navigation unit; independent review pending."
+    },
+    {
+      "claimId": "claim_69f68ab48e108dc19e2e8f69936fce60",
+      "sourceUnitDigest": "2224720e5dba57fb7728214b829cb8850518f0ba27fc9e76b4049b040d596cb7",
+      "claimKind": "navigation",
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
+      "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This is repository navigation, not a platform behavioral owner. Keep this source/evidence in place; no source retirement, source-to-self carry proof or truth approval. At SYNC 2300d65571968bb3bcb80123a273272586e3f1db, preserve native predecessor history and re-decide the current navigation binding pending independent review. Full original/current text and digests in step10-sync2300-reading-map-reconciliation.json.",
+      "reviewNote": "Native new retained-map navigation unit; independent review pending."
+    },
+    {
+      "claimId": "claim_2bdbea8cb68325ec8b5b8d1a62447f4d",
+      "sourceUnitDigest": "9a08a47745ab1aaa1c00c35a181813b16ff2e9f12eb14332d3993c9009d36219",
+      "claimKind": "navigation",
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
+      "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This is repository navigation, not a platform behavioral owner. Keep this source/evidence in place; no source retirement, source-to-self carry proof or truth approval. At SYNC 2300d65571968bb3bcb80123a273272586e3f1db, preserve native predecessor history and re-decide the current navigation binding pending independent review. Full original/current text and digests in step10-sync2300-reading-map-reconciliation.json.",
+      "reviewNote": "Native new retained-map navigation unit; independent review pending."
+    },
+    {
+      "claimId": "claim_85d25e6ad2429e431b1b4d7d7025a498",
+      "sourceUnitDigest": "b951d131c085ce17b7fccbcbd71473f53db24b05e4301cdf01cb42945de0b2ec",
+      "claimKind": "navigation",
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
+      "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This is repository navigation, not a platform behavioral owner. Keep this source/evidence in place; no source retirement, source-to-self carry proof or truth approval. At SYNC 2300d65571968bb3bcb80123a273272586e3f1db, preserve native predecessor history and re-decide the current navigation binding pending independent review. Full original/current text and digests in step10-sync2300-reading-map-reconciliation.json.",
+      "reviewNote": "Native new retained-map navigation unit; independent review pending."
+    },
+    {
+      "claimId": "claim_ddc56de5664b8049f3498eb46899f4ec",
+      "sourceUnitDigest": "67798e09dff5c22bd679b1b04d1f4ee104f5699de0f19d8c9ebd18c7a8b19c17",
+      "claimKind": "navigation",
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
+      "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This is repository navigation, not a platform behavioral owner. Keep this source/evidence in place; no source retirement, source-to-self carry proof or truth approval. At SYNC 2300d65571968bb3bcb80123a273272586e3f1db, preserve native predecessor history and re-decide the current navigation binding pending independent review. Full original/current text and digests in step10-sync2300-reading-map-reconciliation.json.",
+      "reviewNote": "Native new retained-map navigation unit; independent review pending."
     }
   ],
   "files": [
@@ -3380,6 +3380,39 @@
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
       "reviewMode": "ordinary",
       "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+    },
+    {
+      "claimId": "claim_ad83c507f4d4462cd63564650a4a6eb1",
+      "sourceUnitDigest": "44e917a93a892200ff690378f7fc239851ed0777ac931253feacf4efb68e6e87",
+      "claimKind": "navigation",
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
+      "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This is repository navigation, not a platform behavioral owner. Keep this source/evidence in place; no source retirement, source-to-self carry proof or truth approval. At SYNC 2300d65571968bb3bcb80123a273272586e3f1db, preserve native predecessor history and re-decide the current navigation binding pending independent review. Full original/current text and digests in step10-sync2300-reading-map-reconciliation.json.",
+      "reviewNote": "Pending independent deep review; no old review carried to edited navigation.",
+      "sourcePath": "docs/reading-map.md"
+    },
+    {
+      "claimId": "claim_218d4b42e8ea4b5f0cdc071b33fa3f54",
+      "sourceUnitDigest": "8a6a408d2e92d032e23faf4951c3dd36fbeb9d26d32aefb613038924916f8a7d",
+      "claimKind": "navigation",
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
+      "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This is repository navigation, not a platform behavioral owner. Keep this source/evidence in place; no source retirement, source-to-self carry proof or truth approval. At SYNC 2300d65571968bb3bcb80123a273272586e3f1db, preserve native predecessor history and re-decide the current navigation binding pending independent review. Full original/current text and digests in step10-sync2300-reading-map-reconciliation.json.",
+      "reviewNote": "Pending independent deep review; no old review carried to edited navigation.",
+      "sourcePath": "docs/reading-map.md"
+    },
+    {
+      "claimId": "claim_c3b29b18751a7153eb574a571a8a1009",
+      "sourceUnitDigest": "e43f4177f48b53c47017f865260dd121d2a54ab56cf22270a4d698ca0b648e02",
+      "claimKind": "navigation",
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792080300559-b4112a2f@2026-10-15",
+      "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This is repository navigation, not a platform behavioral owner. Keep this source/evidence in place; no source retirement, source-to-self carry proof or truth approval. At SYNC 2300d65571968bb3bcb80123a273272586e3f1db, preserve native predecessor history and re-decide the current navigation binding pending independent review. Full original/current text and digests in step10-sync2300-reading-map-reconciliation.json.",
+      "reviewNote": "Pending independent deep review; no old review carried to edited navigation.",
+      "sourcePath": "docs/reading-map.md"
     }
   ]
 }

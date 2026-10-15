@@ -1,3 +1,45 @@
+# Step 10 replacement package complete — independent review next
+
+Assignment `unit-run-1792080300559-b4112a2f/producer/1`; **SYNC `2300d6557`**. **One background native sync 640.480s (10m40.5s)**, compact persistence once, **4,485 files / 91,348 active units**, known IDs **99,300 → 99,462, zero loss**. Five predecessors = two retained heading IDs + three gaps (one supersede, two partial-carries with verbatim SHA256 residuals); seven drafts native-resolved. **88 target rows / 22 shards rebound pending**, no approval carry.
+
+**D = zero fatal in all three runs** against both priors together/each. **Snapshot exit 0, verify exit 0**, no sealing/strict-global claim. [D](step10-sync2300-D-summary.json), [dry runs](step10-sync2300-dry-run.json).
+
+**ONE replacement request** [index](review-request-step10-index-2300d6557.md): **1,291 entries / 17 parts** (max120); part counts **120, 17, 77, 120, 78, 38, 42, 120, 120, 120, 120, 120, 120, 26, 1, 23, 29**. Covers everything since 980cb2931, all current link outcomes/helper/tests, seven truth corrections, headers/history/groups/holds, confinement and runner/manifest re-carry. A36 all138 unequal rows + all26 partial-carries + all7 truth corrections deep; reviewer-seeded ≥26/173, no producer seed/verdict. Old 8d38b18ed requests superseded.
+
+A/B/H/I and scope/hash/shard audit pass; **59/59 targeted tests pass**. No docs/protected-tool/baseline edits, CLI/git writes or authority change. [Report](step-10-report.md), [audit](step10-sync2300-final-audit.json), [sync](step10-sync2300-native-proof.json). Six historical witness limits and global/holds/A34/cutover/consumers/T9/rehearsal/checkpoint/effort obligations remain. **NEXT = independent ordinary review + red-team-10**, then global work; Phase 6 open. Runner commits.
+
+---
+
+# Step 10 replacement package — retained-map correction checkpoint
+
+Assignment `unit-run-1792080300559-b4112a2f/producer/1`; **SYNC 2300d6557**. Native sync complete **640.480s**, one compact persistence, **4,485 files / 91,348 active units**, **99,300 → 99,462 known IDs, zero loss**. Five runner/manifest predecessors reconciled; seven drafts native-resolved; **88 target rows / 22 shards rebound pending**.
+
+Initial full D found **six retained-map source errors** (three stale heading source digests / three unknown predecessor IDs). They are now reconciled under the existing outside-platform navigation decision, pending independent review; all six current native new retained-map navigation units also have explicit pending rows. Full old/current text and native identities in [map reconciliation](step10-sync2300-reading-map-reconciliation.json). Final native verification reuses the same inventory and registry; **no second sync or registry write**. Initial failed results are retained, not overwritten without a witness.
+
+One replacement [request index](review-request-step10-index-2300d6557.md): **1,291 entries / 17 request parts**, max120; counts **120/17/77/120/78/38/42/120/120/120/120/120/120/26/1/23/29**. All current final bindings pending; no producer seed/verdict. A36 all138 unequal rebound rows, all26 partial-carries and all7 truth corrections deep, plus explicitly flagged new-unit/redecision evidence; reviewer-seeded ≥26/173. Old 8d38b18ed requests superseded. A/B/H/I, 59 targeted tests and scope/hash/shard audit pass. Final D / snapshot / verify still in progress; Phase 6 open.
+
+---
+
+# Step 10 native sync complete — D and dry runs running
+
+One background native sync at **SYNC 2300d6557: 640.480s (10m40s)**; compact registry persistence once, **4,485 files / 91,348 active units**. **99,300 → 99,462 known IDs, zero loss**, active inventory/registry tuples equal. D is now running against both prior registries together, then each; snapshot/verify follow. Review set and all pending rebindings are complete; no final native-green claim until these runs return. [Native proof](step10-sync2300-native-proof.json), [log](step10-sync2300-native.log).
+
+---
+
+# Step 10 replacement package checkpoint — native proof running
+
+SYNC **2300d6557**. One compact registry persistence complete; inventory generation remains live (no second sync). **88 native target rebindings / 22 shards, all pending**. Five source predecessors reconciled: **two retained native heading IDs, three native gaps (one supersede, two partial-carry with SHA256-bound verbatim residuals)**. Seven drafts resolved to native IDs. A/B/H/I pass with the explicit L10-13 helper authorization; baseline bytes unchanged. **59 targeted tests pass** (45 + 14), `env -u CLAUDE_CODE_SESSION_ID`.
+
+One replacement request drafted at [index](review-request-step10-index-2300d6557.md): **1,278 entries / 17 parts**, each ≤120. Section counts **a137 / b65 / c198 / d38 / e42 / f746 / g1 / h22 / i29**. Section c unions previous/current rebindings; section f includes 366 original link decisions plus explicit later edits/classifications, rules/tests. A36: all seven truth corrections, all 26 partial-carries, all 138 unequal-digest rebound rows deep; reviewer-seeded ≥26/173 Weak-exact/Judgment, no producer seed/verdict. Current D and snapshot/verify await the complete native inventory. Old 8d38b18ed request set superseded. Phase 6 open; runner owns commit.
+
+---
+
+# Step 10 replacement package in progress
+
+Assignment `unit-run-1792080300559-b4112a2f/producer/1`; **SYNC `2300d65571968bb3bcb80123a273272586e3f1db`** (content plus main merge with no docs change). Requests packaged at `8d38b18ed` are superseded. Native sync once, compact persistence once, five predecessor reconciliations, all drift rebindings, D against both priors, snapshot/verify dry runs and one combined request are in progress. Runner commits; no docs edits, CLI, git writes, seeds or verdicts.
+
+---
+
 # Step 10 correction docs turn complete — package next
 
 Assignment `unit-run-1792079321432-41fe2051/producer/1`; **SYNC `e7393ea3c`**. Lead L10-12/L10-13/L10-14 recorded in [report](step-10-report.md). **Seven truth entries corrected with labelled code evidence**, legacy reading map unchanged; detailed-map reader routes now point to merged section 5. **36/36 self-links restored; 86 architect portal links → 76 specific targets + ten source referents restored**; all 366 original decisions accounted, 72 original repoints restored overall. Wrapped link plus eight vision links repointed, two vision source links classified; 29 path labels corrected. Pure helper + **12 tests**, tests first; no protected-tool/baseline edits. History Purpose/provenance corrected, 31 header synonym sets deduplicated; expected partial population now 24, no acceptance implied.

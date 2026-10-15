@@ -1,0 +1,122 @@
+{
+  "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+  "writeScope": "plans/260925-documentation-authority-unification",
+  "scopePass": true,
+  "onlyExpectedDecisionRowsMutated": true,
+  "currentShardRequestEquality": true,
+  "allCurrentReboundPending": true,
+  "partHashesMatch": true,
+  "parts": [
+    {
+      "file": "review-request-step10-a01-2300d6557.md",
+      "entries": 120,
+      "hashesMatch": true
+    },
+    {
+      "file": "review-request-step10-a02-2300d6557.md",
+      "entries": 17,
+      "hashesMatch": true
+    },
+    {
+      "file": "review-request-step10-b01-2300d6557.md",
+      "entries": 77,
+      "hashesMatch": true
+    },
+    {
+      "file": "review-request-step10-c01-2300d6557.md",
+      "entries": 120,
+      "hashesMatch": true
+    },
+    {
+      "file": "review-request-step10-c02-2300d6557.md",
+      "entries": 78,
+      "hashesMatch": true
+    },
+    {
+      "file": "review-request-step10-d01-2300d6557.md",
+      "entries": 38,
+      "hashesMatch": true
+    },
+    {
+      "file": "review-request-step10-e01-2300d6557.md",
+      "entries": 42,
+      "hashesMatch": true
+    },
+    {
+      "file": "review-request-step10-f01-2300d6557.md",
+      "entries": 120,
+      "hashesMatch": true
+    },
+    {
+      "file": "review-request-step10-f02-2300d6557.md",
+      "entries": 120,
+      "hashesMatch": true
+    },
+    {
+      "file": "review-request-step10-f03-2300d6557.md",
+      "entries": 120,
+      "hashesMatch": true
+    },
+    {
+      "file": "review-request-step10-f04-2300d6557.md",
+      "entries": 120,
+      "hashesMatch": true
+    },
+    {
+      "file": "review-request-step10-f05-2300d6557.md",
+      "entries": 120,
+      "hashesMatch": true
+    },
+    {
+      "file": "review-request-step10-f06-2300d6557.md",
+      "entries": 120,
+      "hashesMatch": true
+    },
+    {
+      "file": "review-request-step10-f07-2300d6557.md",
+      "entries": 26,
+      "hashesMatch": true
+    },
+    {
+      "file": "review-request-step10-g01-2300d6557.md",
+      "entries": 1,
+      "hashesMatch": true
+    },
+    {
+      "file": "review-request-step10-h01-2300d6557.md",
+      "entries": 23,
+      "hashesMatch": true
+    },
+    {
+      "file": "review-request-step10-i01-2300d6557.md",
+      "entries": 29,
+      "hashesMatch": true
+    }
+  ],
+  "entryCount": 1291,
+  "partCount": 17,
+  "registrySHA256": "7c428a66423b9874ad184212883c037f554b369d6a250f12213dd3fd0280d811",
+  "registryPersistedOnce": true,
+  "knownIDsLost": 0,
+  "docsRootInstructionsScriptsTestsUnchanged": true,
+  "ABHI": true,
+  "whitespacePass": true,
+  "noFullSuiteClaim": true,
+  "preview": "Skipped: no mdview MCP available; CLI persists an external database outside the authorized write scope.",
+  "D": {
+    "fatalCounts": [
+      0,
+      0,
+      0
+    ],
+    "sameCompleteInventory": true
+  },
+  "dryRuns": {
+    "snapshotExit": 0,
+    "verifyExit": 0,
+    "rows": 68462,
+    "sha256": "3849730f8c72a963c99b83d0ed21221333e5d1982e81638e8854c90f0c3f23a1",
+    "sealed": false
+  },
+  "canonicalDecisionDuplicates": 0
+}

@@ -1,0 +1,77 @@
+{
+  "contentCommit": "2300d65571968bb3bcb80123a273272586e3f1db",
+  "snapshot": {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "node",
+      "scripts/propose-doc-decisions.mjs",
+      "--inventory",
+      "/tmp/fgos-work/step10-snapshot-inventory.json",
+      "--repo-root",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification",
+      "--identity-registry",
+      "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/pilot/decisions",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions",
+      "--snapshot",
+      "--out",
+      "/tmp/fgos-work/step10-history-dry-snapshot.json"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "error": null,
+    "seconds": 22.855,
+    "stdout": "",
+    "stderr": ""
+  },
+  "verify": {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "node",
+      "scripts/propose-doc-decisions.mjs",
+      "--inventory",
+      "/tmp/fgos-work/step10-snapshot-inventory.json",
+      "--repo-root",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification",
+      "--identity-registry",
+      "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/pilot/decisions",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions",
+      "--verify",
+      "/tmp/fgos-work/step10-history-dry-snapshot.json",
+      "--out",
+      "/tmp/fgos-work/step10-history-dry-verify.json"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "error": null,
+    "seconds": 23.942,
+    "stdout": "",
+    "stderr": ""
+  },
+  "snapshotFields": [
+    "commit",
+    "generatedAt",
+    "items",
+    "claimLedger",
+    "identityRegistry"
+  ],
+  "projectionNote": "All native items and claimLedger rows retained; omitted inventory fields are not consumed by snapshot/verify. Complete native object used for D.",
+  "docsWrites": 0,
+  "sealed": false,
+  "snapshotDigest": "3849730f8c72a963c99b83d0ed21221333e5d1982e81638e8854c90f0c3f23a1",
+  "snapshotRows": 68462,
+  "verification": {
+    "ok": true,
+    "rows": 68462,
+    "sha256": "3849730f8c72a963c99b83d0ed21221333e5d1982e81638e8854c90f0c3f23a1"
+  }
+}

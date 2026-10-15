@@ -1,0 +1,22 @@
+✔ review pack contains full source and target units and reverse unmatched candidate blocks (2.964307ms)
+✔ seeded review uses six real text mutations and scores missed defects and false flags (11.450601ms)
+✔ review application binds current digest and keeps rework and hold pending without inventing approval (4.637439ms)
+✔ valid source digest prefixes survive pack and review application with full seen-text bindings (2.2524ms)
+✔ verdict table names the reviewer and requires an explicit verdict and own note for each row (0.727046ms)
+✔ unknown dispositions remain blocking after a hold verdict and pass decision validation (2.283189ms)
+✔ unknown dispositions remain blocking after a rework verdict and pass decision validation (1.106166ms)
+✔ the same reviewer session on another date is still the author session (0.275966ms)
+✔ pre-reviewed hand rows without committed evidence are rejected instead of skipped (0.309325ms)
+✔ a public seeded pack does not expose its replay inputs or retain original mutated digests (1.880767ms)
+✔ review application requires a passing sensitivity result for the exact shown pack (1.897947ms)
+✔ approval cannot attach to target text or heading ancestry changed after the pack (2.117592ms)
+✔ approved rows retain the seen unit binding and their own report across review rounds (1.674694ms)
+✔ sensitivity controls must belong to the bound batch even when the sensitivity score passes (1.610271ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 101.532315
