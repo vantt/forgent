@@ -139,6 +139,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'observe-host-resolvable',
       'observe-run-coverage',
       'executor-confinement',
+      'executor-posture-coverage',
       'invocation-git-write-grants',
       'herdr-executor-kinds',
       // Phase 06 (executor-policy-dispatch-seams): legacy policy-shaped

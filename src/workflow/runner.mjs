@@ -193,9 +193,7 @@ function unitPatternOf(template) {
  * names falls through to.
  */
 function unitOverridesOf(unit, seatPersonas = [], options = {}) {
-  const { effort = null, timeoutMs = null, account = null } =
-    typeof options === 'string' ? { effort: options } : (options ?? {});
-
+  const { effort = null, timeoutMs = null, account = null } = options ?? {};
   const unitTimeoutMs = unit.timeoutMs ?? unit.template?.timeoutMs;
   const applyTimeout = unitTimeoutMs === undefined && timeoutMs !== null;
 
