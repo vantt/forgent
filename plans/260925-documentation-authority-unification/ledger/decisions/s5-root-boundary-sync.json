@@ -459,14 +459,14 @@
       "authoredBy": "codex-session:37@2026-10-15",
       "rationale": "A31 new upstream source file-block: complete main manifest recarried exactly. Pending native current identity allocation; no synthetic claim ID. Next turn promotes this proposal into a native-ID decision after carry, with historical predecessors pending independently. Main-only diff is the conservation witness, no truth claim.",
       "claimId": "claim_cdb2776a59ac6a8bbc129754ffc7380f",
-      "reviewNote": "deep: new current source file-block proposal (docs/architecture-manifest.json) whose source and target digests are both 5a7e, exact diff empty, native ID and identity 97a2225a verified in the working registry; only a proposal, not yet a shard row, so the author must write the decision from it without carrying any approval",
+      "reviewNote": "deep: new current source file-block (docs/architecture-manifest.json) to contract owner file-block; source and target both recompute to 5a7e59ab, target byte-identical to main manifest (sha256 5a7e59ab at 69dd3ee7f and 2c228f69c); supersede with named native ID, rationale truthful (no approval carry, no synthetic ID); shard row equals pack decision; registry carries claim_cdb2776a with identity 97a2225a",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0451-whole-system-merge.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "5a7e59abe736f2b6d3af229d70366d3b7c83484c682540ec4bcf79c3ec0a1657",
       "targetAncestry": [],
-      "reviewReportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930"
+      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7"
     }
   ],
   "registryGaps": [
@@ -1102,11 +1102,17 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/contracts/architecture-manifest.json",
       "targetAnchor": "file-block",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:39@2026-10-15",
       "rationale": "A31 / A22: historical c1c230462d8e6a3a59005658d279246afcdcee727e89f03ff08b0f9ce8b14e85 to current 5a7e59abe736f2b6d3af229d70366d3b7c83484c682540ec4bcf79c3ec0a1657 differs in exactly ten manifest entries: (1) remove src/runner/dispatch-log.mjs (infra); add (2) src/runner/dispatch/write-scope.mjs (kernel), (3) src/util/git-paths.mjs (kernel), (4) src/runner/execution/account-pin.mjs (infra), (5) src/runner/execution/partial-writes.mjs (infra), (6) src/workflow/units-source.mjs (infra), (7) src/runner/dispatch/run-timeout.mjs (kernel), (8) src/runner/execution/unit-sync.mjs (infra); (9) src/runner/fanout-batch.mjs and (10) src/runner/work-dispatch.mjs change from infra to use-case. Entries 7 and 8 are this merge 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539's two added lines; entries 1–6 and 9–10 preserve the earlier source-to-target difference. The complete target is byte-identical to main. Preserve original predecessor identity and digest; no ID graft, truth approval or promotion. Corrected rationale pending independent review; no approval carry.",
+      "reviewNote": "deep: rework fix verified. The rationale now lists all ten differences between c1c23046 and 5a7e59ab and I recomputed the same ten from the two manifests: remove dispatch-log, add write-scope, git-paths, account-pin, partial-writes, units-source, run-timeout, unit-sync, and fanout-batch and work-dispatch infra to use-case. Entries 7 and 8 are exactly the two lines the merge added (git diff against first parent) and entries 1-6, 9-10 equal the older difference (a216ddfc0 target vs c1c23046 gives those eight); target is byte-identical to main; still pending, no approval carry",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "5a7e59abe736f2b6d3af229d70366d3b7c83484c682540ec4bcf79c3ec0a1657",
-      "targetAncestry": []
+      "targetAncestry": [],
+      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7"
     },
     {
       "claimId": "claim_c201fb480171293641c2fb049fd33936",
@@ -1397,14 +1403,14 @@
       "targetOwner": "docs/platform/contracts/architecture-manifest.json",
       "targetAnchor": "file-block",
       "rationale": "A31 actual native target predecessor, superseded by full main manifest with run-timeout.mjs kernel and unit-sync.mjs infra; real current target claim_2cae83233f2c9f4038e573bc0f50ae5d.",
-      "reviewNote": "deep: native identity gap for the old copy (0eab at the contract path) with same-file carrier claim_2cae83233f2c9f4038e573bc0f50ae5d (5a7e, identity 97a2225a, both in the registry); the diff is exactly main's two lines; no decision row exists yet, its rationale must state the two-line difference when authored",
+      "reviewNote": "deep: historical native gap for the old contract-path copy (0eab58e6) superseded by full main manifest 5a7e59ab; rationale names exactly the two lines main added (run-timeout kernel, unit-sync infra), matches git diff 69dd3ee7f against its first parent; real carrier claim_2cae8323 exists in the registry with 5a7e59ab; row sits in registryGaps only",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0451-whole-system-merge.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "5a7e59abe736f2b6d3af229d70366d3b7c83484c682540ec4bcf79c3ec0a1657",
       "targetAncestry": [],
-      "reviewReportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930"
+      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7"
     },
     {
       "claimId": "claim_0416642260519cf992931a4968e80c03",
@@ -1416,16 +1422,16 @@
       "targetOwner": "docs/platform/contracts/architecture-manifest.json",
       "targetAnchor": "file-block",
       "rationale": "A31: Lead merge 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539 adds run-timeout.mjs as kernel and unit-sync.mjs as infra. Recarry the complete main manifest byte-for-byte into its existing Step 5 contract owner, file-block. This historical predecessor keeps its original source identity/digest; the full new candidate is its supersede target. Independent review is restricted to main’s diff and conservation/native binding consequences, not code truth. Prior approval is retained only in merge accounting; native current source identity/gaps are owed next turn. No promotion or retired-ID guess.",
-      "reviewNote": "deep: source 0eab (old main manifest) to target 5a7e differs by exactly the two lines main added, rationale states exactly those two additions and truthfully; pending, review fields removed; owed (named in request, D red until then) is moving this binding from claims to registryGaps since it is now an identity gap",
+      "sourcePath": "docs/architecture-manifest.json",
+      "sourceAnchor": "file-block",
+      "reviewNote": "deep: bound historical gap 0eab58e6 moved from claims to registryGaps (present only in registryGaps at HEAD, once); supersede to the full main manifest 5a7e59ab with rationale naming exactly the two added lines; prior ok note and report pin retained unchanged",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0451-whole-system-merge.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "5a7e59abe736f2b6d3af229d70366d3b7c83484c682540ec4bcf79c3ec0a1657",
       "targetAncestry": [],
-      "reviewReportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930",
-      "sourcePath": "docs/architecture-manifest.json",
-      "sourceAnchor": "file-block"
+      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7"
     }
   ]
 }

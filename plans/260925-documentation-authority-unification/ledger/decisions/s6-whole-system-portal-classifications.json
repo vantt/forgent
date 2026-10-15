@@ -12,7 +12,19 @@
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
       "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
-      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890"
+      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
+      "ordinaryAssessment": {
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
+        "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+        "reviewNote": "deep: structural-frame is the right class for the portal title and metadata fence (type, audience, purpose, Related list) with no behaviour claim; the three Related files exist; text unchanged in the pre-carriage prefix; identity matches native claim_33cab447; mechanical digest recompute passes",
+        "verdict": "ok",
+        "sourceUnitDigest": "8fc9c0389780b881695ab47666312083822592c77e4e6e7edc4ab35da7c1299e",
+        "targetUnitDigest": "8fc9c0389780b881695ab47666312083822592c77e4e6e7edc4ab35da7c1299e",
+        "scope": "Ordinary assessment; does not satisfy the separate Receipt commit / Class-column report contract."
+      }
     },
     {
       "claimId": "claim_b45c04655f2d6427c8dcb5ee6579e3dd",
@@ -20,7 +32,19 @@
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
       "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
-      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890"
+      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
+      "ordinaryAssessment": {
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
+        "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+        "reviewNote": "deep: structural-frame is the right class for the portal title and metadata fence (type, audience, purpose, Related list) with no behaviour claim; the three Related files exist; text unchanged in the pre-carriage prefix; identity matches native claim_b45c0465; mechanical digest recompute passes",
+        "verdict": "ok",
+        "sourceUnitDigest": "de17bdcf6470426386de3e75549ce8239a1e535e747842facdc53dd258fb1479",
+        "targetUnitDigest": "de17bdcf6470426386de3e75549ce8239a1e535e747842facdc53dd258fb1479",
+        "scope": "Ordinary assessment; does not satisfy the separate Receipt commit / Class-column report contract."
+      }
     },
     {
       "claimId": "claim_026114d1153a519da8c725be403babc1",
@@ -28,7 +52,19 @@
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
       "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
-      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890"
+      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
+      "ordinaryAssessment": {
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
+        "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+        "reviewNote": "deep: the single sentence This is the portal for fgOS platform documentation is navigation or frame, either accepted class, no behaviour claim; digest recomputed. Receipt rationale is generic (it speaks of relative destinations, this unit has none) but harmless",
+        "verdict": "ok",
+        "sourceUnitDigest": "efc34ef6f5aa655035efac51a724089ce84dd17cd231f6dacdef63f5d1356c05",
+        "targetUnitDigest": "efc34ef6f5aa655035efac51a724089ce84dd17cd231f6dacdef63f5d1356c05",
+        "scope": "Ordinary assessment; does not satisfy the separate Receipt commit / Class-column report contract."
+      }
     },
     {
       "claimId": "claim_b4cf0df2f8bcb0d3daa27b5fc3bfdadb",
@@ -36,7 +72,19 @@
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
       "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
-      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890"
+      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
+      "ordinaryAssessment": {
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
+        "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+        "reviewNote": "deep: content receipt; section 1 intro and anchor table verified by me: all five platform-wide targets (vision, intent-preservation-ledger, platform-foundations, architecture-map, component-boundary) exist under docs/platform and every legacy source link resolves (docs/contracts, docs/routing-handoff-contract.md, docs/platform-foundations.md, docs/architect/component-boundary/ and the rest); no stale path in this unit",
+        "verdict": "ok",
+        "sourceUnitDigest": "a50bb1654cb8fda3fd30a1d4de47465b15870f24a5a7034d6c003f6ee386612c",
+        "targetUnitDigest": "a50bb1654cb8fda3fd30a1d4de47465b15870f24a5a7034d6c003f6ee386612c",
+        "scope": "Ordinary assessment; does not satisfy the separate Receipt commit / Class-column report contract."
+      }
     },
     {
       "claimId": "claim_0ce4eb1bfa6b34e3831ae06a72ae3542",
@@ -44,7 +92,19 @@
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
       "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
-      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890"
+      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
+      "ordinaryAssessment": {
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
+        "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+        "reviewNote": "deep: content receipt; the sentence that platform-wide docs live directly under docs/platform in the target structure is true (docs/doc-governance.md lines 91-93 say the same and docs/platform/{vision,platform-foundations,architecture-map,component-boundary}.md exist)",
+        "verdict": "ok",
+        "sourceUnitDigest": "b91459b47f7a7aec45a0e03afc29342b26e9cdba66f334988a648ac9acf6e4bd",
+        "targetUnitDigest": "b91459b47f7a7aec45a0e03afc29342b26e9cdba66f334988a648ac9acf6e4bd",
+        "scope": "Ordinary assessment; does not satisfy the separate Receipt commit / Class-column report contract."
+      }
     },
     {
       "claimId": "claim_8f3435494fd3ab6edecb312621fd044d",
@@ -52,15 +112,40 @@
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
       "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
-      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890"
+      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
+      "ordinaryAssessment": {
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
+        "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+        "reviewNote": "deep: content receipt; table rows checked row by row, every linked target and migration source exists, roles are descriptions of existing documents, no unbuilt mechanism claimed as built",
+        "verdict": "ok",
+        "sourceUnitDigest": "9b4b3a19cc2e07dbd32a971403f26aa29034191bff4c65de59850183866d0e24",
+        "targetUnitDigest": "9b4b3a19cc2e07dbd32a971403f26aa29034191bff4c65de59850183866d0e24",
+        "scope": "Ordinary assessment; does not satisfy the separate Receipt commit / Class-column report contract."
+      }
     },
     {
       "claimId": "claim_1898cdafa7835d675526173d39eb5cd2",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal.json",
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
-      "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
-      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890"
+      "receiptBinding": "Current authored receipt is pending independent classification review; actual native consequences must be reconciled at next sync.",
+      "ordinaryAssessment": {
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
+        "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+        "reviewNote": "deep: content receipt says true-and-current but the unit contains a stale path: the documentation-system row names `plans/260825-1841-knowledge-registry/plan.md` as the implemented end-user registry foundation and that file does not exist at HEAD (moved to archive/plans/260825-1841-knowledge-registry/plan.md, status completed, per plan.md Historical foundation line). The rest is true: convention row matches packages/convention/rust/src/operations.rs:73,113,143,222, cli_projector.rs:81-84, rules shapes name-template and placement-glob only, spec.md Implementation status Implemented. Per A11 a stale unit gets rework and stays open until corrected (an A19 text correction to the archive path, or a finding other than true-and-current)",
+        "verdict": "rework",
+        "sourceUnitDigest": "c1c8d66852c686b940eb0ceab00d7f6abde4f143be360919f223176afeae88d1",
+        "targetUnitDigest": "c1c8d66852c686b940eb0ceab00d7f6abde4f143be360919f223176afeae88d1",
+        "scope": "Ordinary assessment; does not satisfy the separate Receipt commit / Class-column report contract."
+      },
+      "pendingReceiptCommit": "Bind the actual runner settlement commit next turn; no current artifact commit invented.",
+      "amendedBy": "codex-session:42@2026-10-15"
     },
     {
       "claimId": "claim_cb178b2f0832cfa84b1cbd611e0f7e3a",
@@ -68,15 +153,40 @@
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
       "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
-      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890"
+      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
+      "ordinaryAssessment": {
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
+        "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+        "reviewNote": "deep: content receipt; the sentence that target area docs live at docs/platform/<area>/ is a layout statement confirmed by doc-governance.md lines 91-93 and by the existing area directories",
+        "verdict": "ok",
+        "sourceUnitDigest": "ca9b55008482c55a9c860c3c957855a19075bdd07ef9e882435be2c6d2413069",
+        "targetUnitDigest": "ca9b55008482c55a9c860c3c957855a19075bdd07ef9e882435be2c6d2413069",
+        "scope": "Ordinary assessment; does not satisfy the separate Receipt commit / Class-column report contract."
+      }
     },
     {
       "claimId": "claim_ec78621ff44b9fe7fa47ce85bd84bfa6",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal.json",
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
-      "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
-      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890"
+      "receiptBinding": "Current authored receipt is pending independent classification review; actual native consequences must be reconciled at next sync.",
+      "ordinaryAssessment": {
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
+        "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+        "reviewNote": "deep: same defect as the section heading row: the documentation-system line in this table block cites `plans/260825-1841-knowledge-registry/plan.md`, which does not exist at HEAD (now archive/plans/260825-1841-knowledge-registry/plan.md); the receipt finding true-and-current is therefore false for this unit. Other rows verified true (runner, work-state, packaging-distribution, host-invocation-routing, agent-coordination portals and convention/spec.md exist; domains, .agents/skills, plugins/fgOS/skills, docs/ui-spec exist; the active plan path exists)",
+        "verdict": "rework",
+        "sourceUnitDigest": "f2d3701022f39f5669ec2aa50aa078458032d0aad4398630e3aaf3dcc5b353ca",
+        "targetUnitDigest": "f2d3701022f39f5669ec2aa50aa078458032d0aad4398630e3aaf3dcc5b353ca",
+        "scope": "Ordinary assessment; does not satisfy the separate Receipt commit / Class-column report contract."
+      },
+      "pendingReceiptCommit": "Bind the actual runner settlement commit next turn; no current artifact commit invented.",
+      "amendedBy": "codex-session:42@2026-10-15"
     },
     {
       "claimId": "claim_e6c39f56c4d05238618e1a7fb7004af1",
@@ -84,15 +194,41 @@
       "authoredBy": "codex-session:40@2026-10-15",
       "reviewStatus": "pending",
       "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
-      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890"
+      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
+      "ordinaryAssessment": {
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
+        "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+        "reviewNote": "deep: corrected clause verified. Phases 00-04 completed is true against plan.md phase table Legacy # column rows 1-5 (00-04 completed), row 6 (Legacy 05) is the current transformation phase authorized by owner-answers.md line 4 (Phase 6 authorized yes, owner 2026-10-07) and in progress per progress.md, rows 7-10 (Legacy 06-09) unauthorized. Source unit text differs from the old unit only by that clause. Note plan.md own status tables (phase table row 6, detailed status table row 6, header lines) still say pending or not-authorized for this phase and are stale; the portal is right, not plan.md",
+        "verdict": "ok",
+        "sourceUnitDigest": "4f71dfe83dabcb8db41496b7f6ef054a9c8241d3847dd590731f03430e017ccb",
+        "targetUnitDigest": "4f71dfe83dabcb8db41496b7f6ef054a9c8241d3847dd590731f03430e017ccb",
+        "scope": "Ordinary assessment; does not satisfy the separate Receipt commit / Class-column report contract."
+      }
     },
     {
-      "claimId": "claim_afcdab4a068dfd573dfa7ec5a5f21c34",
+      "claimId": "claim_2c69afcc45e403c70c550a3934d0443c",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal.json",
       "authoredBy": "codex-session:40@2026-10-15",
       "reviewStatus": "pending",
-      "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
-      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890"
+      "receiptBinding": "Current authored receipt is pending independent classification review; actual native consequences must be reconciled at next sync.",
+      "ordinaryAssessment": {
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
+        "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+        "reviewNote": "deep: content receipt for the decision table unit; every cell true (doc-governance.md lines 91-93 for the two Settled rows, docs/platform/system and areas do not exist, the plan path exists, proposals/documentation-system-unification.md and intent-preservation-ledger.md exist, corrected phase clause as above). Identity: the receipt is still bound to the old native ID, now an identity gap; the current native ID is claim_2c69afcc, so the successor receipt must be committed bound to claim_2c69afcc before application, it is not accepted against the historical pin here",
+        "verdict": "ok",
+        "sourceUnitDigest": "f2fc847dcc06987d76c83c1e8ab5f049b5d6ab9b049241ca047d517d6b1afd63",
+        "targetUnitDigest": "f2fc847dcc06987d76c83c1e8ab5f049b5d6ab9b049241ca047d517d6b1afd63",
+        "scope": "Ordinary assessment; does not satisfy the separate Receipt commit / Class-column report contract."
+      },
+      "predecessorClaimId": "claim_afcdab4a068dfd573dfa7ec5a5f21c34",
+      "pendingReceiptCommit": "Bind the actual runner settlement commit next turn; no current artifact commit invented.",
+      "amendedBy": "codex-session:42@2026-10-15"
     },
     {
       "claimId": "claim_6143f65cb5e3d4d41e7b957306ab6e4e",
@@ -100,7 +236,19 @@
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
       "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
-      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890"
+      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
+      "ordinaryAssessment": {
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
+        "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+        "reviewNote": "deep: navigation is the right class (reading and editing destinations, how-to steps and related-file table) with no claim that an unbuilt mechanism exists; every relative link and backticked repo path in the unit resolves at HEAD; identity matches native; digest recomputed",
+        "verdict": "ok",
+        "sourceUnitDigest": "26ba4bbb4020dfcf0e9c7691d01fae431c0ade4e92ec48d9e28793ac84ccd34b",
+        "targetUnitDigest": "26ba4bbb4020dfcf0e9c7691d01fae431c0ade4e92ec48d9e28793ac84ccd34b",
+        "scope": "Ordinary assessment; does not satisfy the separate Receipt commit / Class-column report contract."
+      }
     },
     {
       "claimId": "claim_471738010525b3b6490003c96f408273",
@@ -108,7 +256,19 @@
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
       "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
-      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890"
+      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
+      "ordinaryAssessment": {
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
+        "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+        "reviewNote": "deep: navigation is the right class (reading and editing destinations, how-to steps and related-file table) with no claim that an unbuilt mechanism exists; every relative link and backticked repo path in the unit resolves at HEAD; identity matches native; digest recomputed",
+        "verdict": "ok",
+        "sourceUnitDigest": "e4046fd7c27a762982d49241b30e3f99899719586530455fb4e9dfc7fbb6734f",
+        "targetUnitDigest": "e4046fd7c27a762982d49241b30e3f99899719586530455fb4e9dfc7fbb6734f",
+        "scope": "Ordinary assessment; does not satisfy the separate Receipt commit / Class-column report contract."
+      }
     },
     {
       "claimId": "claim_cf06097fa740bba9d230af78ec04463d",
@@ -116,7 +276,19 @@
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
       "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
-      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890"
+      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
+      "ordinaryAssessment": {
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
+        "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+        "reviewNote": "deep: navigation is the right class (reading and editing destinations, how-to steps and related-file table) with no claim that an unbuilt mechanism exists; every relative link and backticked repo path in the unit resolves at HEAD; identity matches native; digest recomputed",
+        "verdict": "ok",
+        "sourceUnitDigest": "c216275c70704b3851ca22c07410a6743b69a249a0fda11cf67bc8b848cce2a5",
+        "targetUnitDigest": "c216275c70704b3851ca22c07410a6743b69a249a0fda11cf67bc8b848cce2a5",
+        "scope": "Ordinary assessment; does not satisfy the separate Receipt commit / Class-column report contract."
+      }
     },
     {
       "claimId": "claim_b9ae3399674ba8e92c79e75b7b35c6c3",
@@ -124,8 +296,53 @@
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
       "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
-      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890"
+      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
+      "ordinaryAssessment": {
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
+        "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+        "reviewNote": "deep: navigation is the right class (reading and editing destinations, how-to steps and related-file table) with no claim that an unbuilt mechanism exists; every relative link and backticked repo path in the unit resolves at HEAD; identity matches native; digest recomputed",
+        "verdict": "ok",
+        "sourceUnitDigest": "233073464aa7a066ec6812e54a3bbc87f523a2f83c8b0a1c87d09448296f8c74",
+        "targetUnitDigest": "233073464aa7a066ec6812e54a3bbc87f523a2f83c8b0a1c87d09448296f8c74",
+        "scope": "Ordinary assessment; does not satisfy the separate Receipt commit / Class-column report contract."
+      }
     }
   ],
-  "amendedBy": "codex-session:40@2026-10-15"
+  "amendedBy": "codex-session:40@2026-10-15",
+  "registryGaps": [
+    {
+      "claimId": "claim_afcdab4a068dfd573dfa7ec5a5f21c34",
+      "sourcePath": "docs/platform/README.md",
+      "sourceAnchor": "unheaded-block-7",
+      "sourceUnitDigest": "d2295aa8bb8ade7d7e359ae65c80b310d7baf8921771294e58d0523302d5269e",
+      "targetOwner": "docs/platform/README.md",
+      "targetAnchor": "unheaded-block-7",
+      "targetUnitDigest": "f2fc847dcc06987d76c83c1e8ab5f049b5d6ab9b049241ca047d517d6b1afd63",
+      "disposition": "supersede",
+      "targetKind": "portal",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:42@2026-10-15",
+      "rationale": "The historical portal authorization block is superseded by the actual native current block claim_2c69afcc45e403c70c550a3934d0443c. Only the authorized legacy phase clause changed; full historical/current texts remain in the committed re-review request. No identity graft or receipt acceptance; new live gap disposition pending independent review.",
+      "claimKind": "architecture",
+      "targetAncestry": [
+        "Platform Documentation",
+        "3. Decision Surface"
+      ],
+      "successorClaimId": "claim_2c69afcc45e403c70c550a3934d0443c",
+      "proposalAssessment": {
+        "claimId": "claim_afcdab4a068dfd573dfa7ec5a5f21c34",
+        "verdict": "ok",
+        "note": "deep: proposed supersede from the old portal gap (d2295aa8) to the current block (f2fc847d, native claim_2c69afcc) is the right relation since only the authorization clause changed; named successor, no ID graft; remains a proposal, no live decision edit",
+        "sourceUnitDigest": "d2295aa8bb8ade7d7e359ae65c80b310d7baf8921771294e58d0523302d5269e",
+        "targetUnitDigest": "f2fc847dcc06987d76c83c1e8ab5f049b5d6ab9b049241ca047d517d6b1afd63",
+        "kind": "native-gap",
+        "reportPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
+        "reportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+        "appliedAs": "ordinary assessment"
+      }
+    }
+  ]
 }

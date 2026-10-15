@@ -3920,12 +3920,18 @@
       },
       "status": "candidate-unverified",
       "priorEligibilityReview": {},
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "nativeStatusRebinding": {
         "contentCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
         "authoredBy": "codex-session:41@2026-10-15",
         "meaning": "Correct stale optional authorityStatus from actual native item; prior eligibility review retained as history, current metadata pending independent review; no source/gap decision content change."
-      }
+      },
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
+      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewNote": "mechanical: optional fileStatus authorityStatus corrected from unrouted to candidate; unit digest recomputes, committed list row equals the proposal, before equals the list at 48da12f2b, and 455 sibling rows already carry candidate. priorEligibilityReview is an empty object (the old row had no review), so the meaning text overstates; harmless"
     },
     {
       "claimId": "claim_b44cc3f8193df5feb28069a3fa147a1c",
@@ -3942,12 +3948,18 @@
       },
       "status": "candidate-unverified",
       "priorEligibilityReview": {},
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "nativeStatusRebinding": {
         "contentCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
         "authoredBy": "codex-session:41@2026-10-15",
         "meaning": "Correct stale optional authorityStatus from actual native item; prior eligibility review retained as history, current metadata pending independent review; no source/gap decision content change."
-      }
+      },
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
+      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewNote": "mechanical: optional fileStatus authorityStatus corrected from unrouted to candidate; unit digest recomputes, committed list row equals the proposal, before equals the list at 48da12f2b, and 455 sibling rows already carry candidate. priorEligibilityReview is an empty object (the old row had no review), so the meaning text overstates; harmless"
     },
     {
       "claimId": "claim_b4ad8770e6fd15133e9a922314b617c3",
@@ -4335,12 +4347,18 @@
       },
       "status": "candidate-unverified",
       "priorEligibilityReview": {},
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "nativeStatusRebinding": {
         "contentCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
         "authoredBy": "codex-session:41@2026-10-15",
         "meaning": "Correct stale optional authorityStatus from actual native item; prior eligibility review retained as history, current metadata pending independent review; no source/gap decision content change."
-      }
+      },
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
+      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewNote": "mechanical: optional fileStatus authorityStatus corrected from unrouted to candidate; unit digest recomputes, committed list row equals the proposal, before equals the list at 48da12f2b, and 455 sibling rows already carry candidate. priorEligibilityReview is an empty object (the old row had no review), so the meaning text overstates; harmless"
     },
     {
       "claimId": "claim_548badb8fc185af4559913e767e31c6f",
@@ -6957,7 +6975,19 @@
       "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "anchor": "unheaded-block-39",
       "unitDigest": "2f26ef793b85a9534c07f2080df713367086ccdf91e96a8cf0652d28acf971a6",
-      "status": "candidate-unverified"
+      "status": "candidate-unverified",
+      "pendingNativeRebinding": {
+        "oldNativeTuple": {
+          "claimId": "claim_366503bd4dadea43469f1586f4f25f60",
+          "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+          "anchor": "unheaded-block-39",
+          "unitDigest": "2f26ef793b85a9534c07f2080df713367086ccdf91e96a8cf0652d28acf971a6",
+          "status": "candidate-unverified"
+        },
+        "currentUnitDigest": "8bb122f565c4d0f699793e476fde329f81c045340d35c03b49952e2263f052d3",
+        "currentShownTextDigest": "8bb122f565c4d0f699793e476fde329f81c045340d35c03b49952e2263f052d3",
+        "status": "pending next native sync; do not assume the old non-stable block ID survives"
+      }
     },
     {
       "claimId": "claim_fa99f4d5cfcd0ea169efdf450e007955",
@@ -7007,7 +7037,19 @@
       "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "anchor": "unheaded-block-47",
       "unitDigest": "1e2dd90c75bf8049d0ad5d55ea4677898a163a1229eb4528d65cc2ae4323effa",
-      "status": "candidate-unverified"
+      "status": "candidate-unverified",
+      "pendingNativeRebinding": {
+        "oldNativeTuple": {
+          "claimId": "claim_c5395a2e8480ce44d27f2873c02b8746",
+          "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+          "anchor": "unheaded-block-47",
+          "unitDigest": "1e2dd90c75bf8049d0ad5d55ea4677898a163a1229eb4528d65cc2ae4323effa",
+          "status": "candidate-unverified"
+        },
+        "currentUnitDigest": "23216df99f389ab83588aeb312e949c92c3ed1817396047257e860a356f47613",
+        "currentShownTextDigest": "23216df99f389ab83588aeb312e949c92c3ed1817396047257e860a356f47613",
+        "status": "pending next native sync; do not assume the old non-stable block ID survives"
+      }
     },
     {
       "claimId": "claim_a37fa3033d1de5c1b45a25ba03e53944",
@@ -9468,7 +9510,8 @@
     "verifiedCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
     "verification": "reports/phase-06/native-rereview-verification.json",
     "reviewStatus": "candidate-unverified; no approval or truth certification",
-    "meaning": "Actual native conservation output; all newly allocated identities and predecessor gaps retained without graft or invented disposition."
+    "meaning": "Actual native conservation output; all newly allocated identities and predecessor gaps retained without graft or invented disposition.",
+    "currentFullTupleEquality": false
   },
   "currentOverlay": {
     "sourceCommit": "69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539",
@@ -9489,6 +9532,8 @@
   "nativeEquality": {
     "contentCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
     "fullTupleEquality": true,
-    "meaning": "Native identity/list equality only; no classification or truth acceptance."
+    "meaning": "Native identity/list equality only; no classification or truth acceptance.",
+    "currentFullTupleEquality": false,
+    "status": "Prior proof only; two authorized line-number corrections require actual native reconciliation next turn."
   }
 }

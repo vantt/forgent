@@ -169,7 +169,7 @@ It is not a new decision beside the Native-First Dispatch Doctrine. Its `mechani
 
 ### 6.1 Shape
 
-Current compiled fields (`src/runner/dispatch/plan.mjs:444-461`) are
+Current compiled fields (`src/runner/dispatch/plan.mjs:455-472`) are
 `selector`, `caller`, `mechanism`, `executorId`, `capability`, `invocation`,
 `governance`, `reasonCodes`, optional `agentType`/`mcpTool`, `configured`,
 `bindingSource`, `tier`, `model`, `providerModel`, `provenance`, and `policy`.
@@ -208,7 +208,7 @@ Allowed mechanisms:
 - `out-of-process` - execute through an external executor/adapter.
 
 For in-process plans, native capability fields are top-level `agentType` or
-`mcpTool` when supplied (`plan.mjs:453-454`), not a `handback` object.
+`mcpTool` when supplied (`plan.mjs:464-465`), not a `handback` object.
 The caller must actually possess the returned live facility; the decision
 does not invoke that facility itself.
 

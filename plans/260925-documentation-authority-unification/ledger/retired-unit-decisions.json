@@ -30714,22 +30714,26 @@
       "targetAnchor": "61-shape",
       "shownTargetDigest": "c4e62eff0e75cc939bbafb020864c76e75e95c721f0a30246e5d5e1dd4abec1a",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "The former candidate identity is superseded by its complete identical primitive unit restored at the same current path. The old whole-file retirement was rejected; live/design content is current by default and is restored, while the complete dated input remains in history. Native inventory unit digest equality proves this primitive carry, not implementation of its surrounding design. The full shown section requires the changed-file independent check. Current-truth binding amended at 96a13ab21670e1f5d9748c02cd615ea5598b53f5: the current successor is docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#61-shape, with the full shown-text digest recorded in this row. The prior retired source identity, accepted carriage and historical preservation remain unchanged. The current correction and section-specific evidence in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json require a new independent truth check; no old approval carries to changed shown text.",
       "shownSourceText": "### 6.1 Shape\n\n```json\n{\n  \"selector\": {\n    \"type\": \"work\",\n    \"value\": \"tsk-123\"\n  },\n  \"target\": {\n    \"capability\": \"fgos-coding-implement\",\n    \"executorId\": \"agy\",\n    \"kind\": \"agent\"\n  },\n  \"mechanism\": \"out-of-process\",\n  \"handback\": null,\n  \"governance\": {\n    \"carries\": [\"repo-content\"],\n    \"egress\": {\n      \"allowed\": true,\n      \"declaredProvider\": \"agy\",\n      \"command\": \"agy\",\n      \"effectiveTarget\": \"agy\"\n    }\n  },\n  \"execution\": {\n    \"invocationVia\": \"cli\",\n    \"adapter\": \"cli-spawn\",\n    \"model\": \"gemini-...\",\n    \"tier\": \"lightweight\"\n  },\n  \"reasonCodes\": [\n    \"capability-prefer\",\n    \"cli-spawn-shaped-executor\",\n    \"native-first-rule-cross-provider\"\n  ]\n}\n```",
       "shownSourceDigest": "b54962ca148842b3d04443bc89c37681c8b46eb1ee70193efa412d08f62cda8d",
       "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
-      "reviewNote": "[changed older binding] proposals/dispatch-control-plane-redesign.md#61-shape -> proposals/dispatch-control-plane-redesign.md#61-shape (move): Successor 61-shape to 61-shape (170-170): section 6.1 field list equals plan.mjs:444-461.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-retired-unit.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "75572928c9c2998330cf1d42f3428567e5e754db5f6d020c7df249556617e807",
+      "targetUnitDigest": "eccd334eee40b5d3dea247a74c141453af4ff788f6bee3e9d9c8d08bd5000343",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "6. DispatchPlan"
       ],
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      "priorReview": {
+        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+        "reviewedAt": "2026-10-10",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-retired-unit.md",
+        "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+        "reviewMode": "ordinary",
+        "reviewNote": "[changed older binding] proposals/dispatch-control-plane-redesign.md#61-shape -> proposals/dispatch-control-plane-redesign.md#61-shape (move): Successor 61-shape to 61-shape (170-170): section 6.1 field list equals plan.mjs:444-461."
+      },
+      "amendedBy": "codex-session:42@2026-10-15",
+      "rebindingReason": "A22 authorized cite correction changes this historical successor target; no approval carried."
     },
     {
       "claimId": "claim_e415506235b575bc5eb32b225a758f5b",
@@ -30778,22 +30782,26 @@
       "targetAnchor": "63-mechanism",
       "shownTargetDigest": "c2a81e912f73b565012a819e5fdb8012cc7e0a923d80d03d5a777fea38176fc9",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "The former candidate identity is superseded by its complete identical primitive unit restored at the same current path. The old whole-file retirement was rejected; live/design content is current by default and is restored, while the complete dated input remains in history. Native inventory unit digest equality proves this primitive carry, not implementation of its surrounding design. The full shown section requires the changed-file independent check. Current-truth binding amended at 96a13ab21670e1f5d9748c02cd615ea5598b53f5: the current successor is docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#63-mechanism, with the full shown-text digest recorded in this row. The prior retired source identity, accepted carriage and historical preservation remain unchanged. The current correction and section-specific evidence in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json require a new independent truth check; no old approval carries to changed shown text.",
       "shownSourceText": "### 6.3 Mechanism\n\nAllowed mechanisms:\n\n- `unavailable` - no configured or permitted dispatch target.\n- `in-process` - use the current live agent/session facility.\n- `out-of-process` - execute through an external executor/adapter.\n\nFor in-process dispatch, `handback` carries the concrete native surface:\n\n```json\n{\n  \"mechanism\": \"in-process\",\n  \"handback\": {\n    \"type\": \"native-task\",\n    \"agentType\": \"fgos-coding-implement\"\n  }\n}\n```\n\nor:\n\n```json\n{\n  \"mechanism\": \"in-process\",\n  \"handback\": {\n    \"type\": \"mcp-tool\",\n    \"tool\": \"mcp__gitnexus__impact\"\n  }\n}\n```",
       "shownSourceDigest": "87c018e8bcf869607ed13c1d86b444cb69bdb364f94ab1da6b3d1017f0767ea3",
       "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
-      "reviewNote": "[changed older binding] proposals/dispatch-control-plane-redesign.md#63-mechanism -> proposals/dispatch-control-plane-redesign.md#63-mechanism (move): Successor 63-mechanism to 63-mechanism (202-202): section 6.3 matches mechanism.mjs values and top-level agentType/mcpTool at plan.mjs:453-454.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-retired-unit.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "78e8f0590a2c7d8b570c1ff23cfe379f3eaf304d221a1f08335de2c5dafadfdf",
+      "targetUnitDigest": "be2f8b6fb6fddd1a9fdcbbcaf100e5d07acacec79f314e563786eb6034c4dbba",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "6. DispatchPlan"
       ],
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      "priorReview": {
+        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+        "reviewedAt": "2026-10-10",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-retired-unit.md",
+        "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+        "reviewMode": "ordinary",
+        "reviewNote": "[changed older binding] proposals/dispatch-control-plane-redesign.md#63-mechanism -> proposals/dispatch-control-plane-redesign.md#63-mechanism (move): Successor 63-mechanism to 63-mechanism (202-202): section 6.3 matches mechanism.mjs values and top-level agentType/mcpTool at plan.mjs:453-454."
+      },
+      "amendedBy": "codex-session:42@2026-10-15",
+      "rebindingReason": "A22 authorized cite correction changes this historical successor target; no approval carried."
     },
     {
       "claimId": "claim_795849074800030e4fa046a072e27ae9",
@@ -33853,22 +33861,26 @@
       "targetAnchor": "61-shape",
       "shownTargetDigest": "c4e62eff0e75cc939bbafb020864c76e75e95c721f0a30246e5d5e1dd4abec1a",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "The former candidate identity is superseded by its complete identical primitive unit restored at the same current path. The old whole-file retirement was rejected; live/design content is current by default and is restored, while the complete dated input remains in history. Native inventory unit digest equality proves this primitive carry, not implementation of its surrounding design. The full shown section requires the changed-file independent check. Current-truth binding amended at 96a13ab21670e1f5d9748c02cd615ea5598b53f5: the current successor is docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#61-shape, with the full shown-text digest recorded in this row. The prior retired source identity, accepted carriage and historical preservation remain unchanged. The current correction and section-specific evidence in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json require a new independent truth check; no old approval carries to changed shown text.",
       "shownSourceText": "```json\n{\n  \"selector\": {\n    \"type\": \"work\",\n    \"value\": \"tsk-123\"\n  },\n  \"target\": {\n    \"capability\": \"fgos-coding-implement\",\n    \"executorId\": \"agy\",\n    \"kind\": \"agent\"\n  },\n  \"mechanism\": \"out-of-process\",\n  \"handback\": null,\n  \"governance\": {\n    \"carries\": [\"repo-content\"],\n    \"egress\": {\n      \"allowed\": true,\n      \"declaredProvider\": \"agy\",\n      \"command\": \"agy\",\n      \"effectiveTarget\": \"agy\"\n    }\n  },\n  \"execution\": {\n    \"invocationVia\": \"cli\",\n    \"adapter\": \"cli-spawn\",\n    \"model\": \"gemini-...\",\n    \"tier\": \"lightweight\"\n  },\n  \"reasonCodes\": [\n    \"capability-prefer\",\n    \"cli-spawn-shaped-executor\",\n    \"native-first-rule-cross-provider\"\n  ]\n}\n```",
       "shownSourceDigest": "5bae5d791db2919b0a4fdc54d9f9898c87d35c97618c125cb64d05827ffb1075",
       "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
-      "reviewNote": "[changed older binding] proposals/dispatch-control-plane-redesign.md#unheaded-block-37 -> proposals/dispatch-control-plane-redesign.md#61-shape (move): Successor unheaded-block-37 to 61-shape (170-170): section 6.1 field list equals plan.mjs:444-461.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-retired-unit.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "75572928c9c2998330cf1d42f3428567e5e754db5f6d020c7df249556617e807",
+      "targetUnitDigest": "eccd334eee40b5d3dea247a74c141453af4ff788f6bee3e9d9c8d08bd5000343",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "6. DispatchPlan"
       ],
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      "priorReview": {
+        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+        "reviewedAt": "2026-10-10",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-retired-unit.md",
+        "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+        "reviewMode": "ordinary",
+        "reviewNote": "[changed older binding] proposals/dispatch-control-plane-redesign.md#unheaded-block-37 -> proposals/dispatch-control-plane-redesign.md#61-shape (move): Successor unheaded-block-37 to 61-shape (170-170): section 6.1 field list equals plan.mjs:444-461."
+      },
+      "amendedBy": "codex-session:42@2026-10-15",
+      "rebindingReason": "A22 authorized cite correction changes this historical successor target; no approval carried."
     },
     {
       "claimId": "claim_919c0f740f8051d68ff58b8638aa95dc",
@@ -34097,22 +34109,26 @@
       "targetAnchor": "63-mechanism",
       "shownTargetDigest": "c2a81e912f73b565012a819e5fdb8012cc7e0a923d80d03d5a777fea38176fc9",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "The former candidate identity is superseded by its complete identical primitive unit restored at the same current path. The old whole-file retirement was rejected; live/design content is current by default and is restored, while the complete dated input remains in history. Native inventory unit digest equality proves this primitive carry, not implementation of its surrounding design. The full shown section requires the changed-file independent check. Current-truth binding amended at 96a13ab21670e1f5d9748c02cd615ea5598b53f5: the current successor is docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#63-mechanism, with the full shown-text digest recorded in this row. The prior retired source identity, accepted carriage and historical preservation remain unchanged. The current correction and section-specific evidence in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json require a new independent truth check; no old approval carries to changed shown text.",
       "shownSourceText": "For in-process dispatch, `handback` carries the concrete native surface:",
       "shownSourceDigest": "064779db227d18f5a360332d5f6d5a3cf1eccb3541b74c35c2f8808f5e6765bd",
       "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
-      "reviewNote": "[changed older binding] proposals/dispatch-control-plane-redesign.md#unheaded-block-44 -> proposals/dispatch-control-plane-redesign.md#63-mechanism (move): Successor unheaded-block-44 to 63-mechanism (202-202): section 6.3 matches mechanism.mjs values and top-level agentType/mcpTool at plan.mjs:453-454.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-retired-unit.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "78e8f0590a2c7d8b570c1ff23cfe379f3eaf304d221a1f08335de2c5dafadfdf",
+      "targetUnitDigest": "be2f8b6fb6fddd1a9fdcbbcaf100e5d07acacec79f314e563786eb6034c4dbba",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "6. DispatchPlan"
       ],
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      "priorReview": {
+        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+        "reviewedAt": "2026-10-10",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-retired-unit.md",
+        "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+        "reviewMode": "ordinary",
+        "reviewNote": "[changed older binding] proposals/dispatch-control-plane-redesign.md#unheaded-block-44 -> proposals/dispatch-control-plane-redesign.md#63-mechanism (move): Successor unheaded-block-44 to 63-mechanism (202-202): section 6.3 matches mechanism.mjs values and top-level agentType/mcpTool at plan.mjs:453-454."
+      },
+      "amendedBy": "codex-session:42@2026-10-15",
+      "rebindingReason": "A22 authorized cite correction changes this historical successor target; no approval carried."
     },
     {
       "claimId": "claim_da7b5991bb2714706e86905a526a632d",
@@ -34125,22 +34141,26 @@
       "targetAnchor": "63-mechanism",
       "shownTargetDigest": "c2a81e912f73b565012a819e5fdb8012cc7e0a923d80d03d5a777fea38176fc9",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "The former candidate identity is superseded by its complete identical primitive unit restored at the same current path. The old whole-file retirement was rejected; live/design content is current by default and is restored, while the complete dated input remains in history. Native inventory unit digest equality proves this primitive carry, not implementation of its surrounding design. The full shown section requires the changed-file independent check. Current-truth binding amended at 96a13ab21670e1f5d9748c02cd615ea5598b53f5: the current successor is docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#63-mechanism, with the full shown-text digest recorded in this row. The prior retired source identity, accepted carriage and historical preservation remain unchanged. The current correction and section-specific evidence in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json require a new independent truth check; no old approval carries to changed shown text.",
       "shownSourceText": "```json\n{\n  \"mechanism\": \"in-process\",\n  \"handback\": {\n    \"type\": \"native-task\",\n    \"agentType\": \"fgos-coding-implement\"\n  }\n}\n```",
       "shownSourceDigest": "54aa679ca4d5d3f3fcb3ce80388c2ca8768fea36739b76d19f349ebcfc3b934e",
       "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
-      "reviewNote": "[changed older binding] proposals/dispatch-control-plane-redesign.md#unheaded-block-45 -> proposals/dispatch-control-plane-redesign.md#63-mechanism (move): Successor unheaded-block-45 to 63-mechanism (202-202): section 6.3 matches mechanism.mjs values and top-level agentType/mcpTool at plan.mjs:453-454.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-retired-unit.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "78e8f0590a2c7d8b570c1ff23cfe379f3eaf304d221a1f08335de2c5dafadfdf",
+      "targetUnitDigest": "be2f8b6fb6fddd1a9fdcbbcaf100e5d07acacec79f314e563786eb6034c4dbba",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "6. DispatchPlan"
       ],
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      "priorReview": {
+        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+        "reviewedAt": "2026-10-10",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-retired-unit.md",
+        "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+        "reviewMode": "ordinary",
+        "reviewNote": "[changed older binding] proposals/dispatch-control-plane-redesign.md#unheaded-block-45 -> proposals/dispatch-control-plane-redesign.md#63-mechanism (move): Successor unheaded-block-45 to 63-mechanism (202-202): section 6.3 matches mechanism.mjs values and top-level agentType/mcpTool at plan.mjs:453-454."
+      },
+      "amendedBy": "codex-session:42@2026-10-15",
+      "rebindingReason": "A22 authorized cite correction changes this historical successor target; no approval carried."
     },
     {
       "claimId": "claim_b80436f90c5f0fa056794f2fb4e2cfb6",
@@ -34153,22 +34173,26 @@
       "targetAnchor": "63-mechanism",
       "shownTargetDigest": "c2a81e912f73b565012a819e5fdb8012cc7e0a923d80d03d5a777fea38176fc9",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "The former candidate identity is superseded by its complete identical primitive unit restored at the same current path. The old whole-file retirement was rejected; live/design content is current by default and is restored, while the complete dated input remains in history. Native inventory unit digest equality proves this primitive carry, not implementation of its surrounding design. The full shown section requires the changed-file independent check. Current-truth binding amended at 96a13ab21670e1f5d9748c02cd615ea5598b53f5: the current successor is docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#63-mechanism, with the full shown-text digest recorded in this row. The prior retired source identity, accepted carriage and historical preservation remain unchanged. The current correction and section-specific evidence in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json require a new independent truth check; no old approval carries to changed shown text.",
       "shownSourceText": "or:\n\n```json\n{\n  \"mechanism\": \"in-process\",\n  \"handback\": {\n    \"type\": \"mcp-tool\",\n    \"tool\": \"mcp__gitnexus__impact\"\n  }\n}\n```",
       "shownSourceDigest": "9a8358da72c22b6c751b1820b9b0a1fce86275081af0b5d2f6d851ce285c844e",
       "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
-      "reviewNote": "[changed older binding] proposals/dispatch-control-plane-redesign.md#unheaded-block-46 -> proposals/dispatch-control-plane-redesign.md#63-mechanism (move): Successor unheaded-block-46 to 63-mechanism (202-202): section 6.3 matches mechanism.mjs values and top-level agentType/mcpTool at plan.mjs:453-454.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-retired-unit.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "78e8f0590a2c7d8b570c1ff23cfe379f3eaf304d221a1f08335de2c5dafadfdf",
+      "targetUnitDigest": "be2f8b6fb6fddd1a9fdcbbcaf100e5d07acacec79f314e563786eb6034c4dbba",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "6. DispatchPlan"
       ],
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      "priorReview": {
+        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+        "reviewedAt": "2026-10-10",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-retired-unit.md",
+        "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+        "reviewMode": "ordinary",
+        "reviewNote": "[changed older binding] proposals/dispatch-control-plane-redesign.md#unheaded-block-46 -> proposals/dispatch-control-plane-redesign.md#63-mechanism (move): Successor unheaded-block-46 to 63-mechanism (202-202): section 6.3 matches mechanism.mjs values and top-level agentType/mcpTool at plan.mjs:453-454."
+      },
+      "amendedBy": "codex-session:42@2026-10-15",
+      "rebindingReason": "A22 authorized cite correction changes this historical successor target; no approval carried."
     },
     {
       "claimId": "claim_d64099932f04b74b9e085afb8dbb28ae",
@@ -80102,21 +80126,25 @@
       "targetAnchor": "63-mechanism",
       "shownTargetDigest": "c2a81e912f73b565012a819e5fdb8012cc7e0a923d80d03d5a777fea38176fc9",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "This candidate identity was retired by the current-truth correction in 96a13ab21670e1f5d9748c02cd615ea5598b53f5, not by a legacy-source deletion. Its prior current-state unit at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-46 is superseded by the corrected current successor at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#63-mechanism; the complete pre-correction text is pinned at af6c116f0e2af1f31f5e1d57830dc60de0c65411 and the accepted historical carriage is unchanged. Section-specific code/CLI evidence and explicit unproven design/proof boundaries are recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. The old claim id is conserved by this pending successor decision and requires independent truth review.",
       "truthContentCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5",
       "beforeShownDigest": "064779db227d18f5a360332d5f6d5a3cf1eccb3541b74c35c2f8808f5e6765bd",
-      "reviewNote": "[new successor] proposals/dispatch-control-plane-redesign.md#unheaded-block-46 -> proposals/dispatch-control-plane-redesign.md#63-mechanism (supersede): Successor unheaded-block-46 to 63-mechanism (202-202): section 6.3 matches mechanism.mjs values and top-level agentType/mcpTool at plan.mjs:453-454.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-retired-unit.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "78e8f0590a2c7d8b570c1ff23cfe379f3eaf304d221a1f08335de2c5dafadfdf",
+      "targetUnitDigest": "be2f8b6fb6fddd1a9fdcbbcaf100e5d07acacec79f314e563786eb6034c4dbba",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "6. DispatchPlan"
       ],
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      "priorReview": {
+        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+        "reviewedAt": "2026-10-10",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-retired-unit.md",
+        "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+        "reviewMode": "ordinary",
+        "reviewNote": "[new successor] proposals/dispatch-control-plane-redesign.md#unheaded-block-46 -> proposals/dispatch-control-plane-redesign.md#63-mechanism (supersede): Successor unheaded-block-46 to 63-mechanism (202-202): section 6.3 matches mechanism.mjs values and top-level agentType/mcpTool at plan.mjs:453-454."
+      },
+      "amendedBy": "codex-session:42@2026-10-15",
+      "rebindingReason": "A22 authorized cite correction changes this historical successor target; no approval carried."
     },
     {
       "claimId": "claim_d3ff80c5cd225865b6a3620a1cda51f4",
@@ -80129,21 +80157,25 @@
       "targetAnchor": "63-mechanism",
       "shownTargetDigest": "c2a81e912f73b565012a819e5fdb8012cc7e0a923d80d03d5a777fea38176fc9",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "This candidate identity was retired by the current-truth correction in 96a13ab21670e1f5d9748c02cd615ea5598b53f5, not by a legacy-source deletion. Its prior current-state unit at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-48 is superseded by the corrected current successor at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#63-mechanism; the complete pre-correction text is pinned at af6c116f0e2af1f31f5e1d57830dc60de0c65411 and the accepted historical carriage is unchanged. Section-specific code/CLI evidence and explicit unproven design/proof boundaries are recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. The old claim id is conserved by this pending successor decision and requires independent truth review.",
       "truthContentCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5",
       "beforeShownDigest": "9a8358da72c22b6c751b1820b9b0a1fce86275081af0b5d2f6d851ce285c844e",
-      "reviewNote": "[new successor] proposals/dispatch-control-plane-redesign.md#unheaded-block-48 -> proposals/dispatch-control-plane-redesign.md#63-mechanism (supersede): Successor unheaded-block-48 to 63-mechanism (202-202): section 6.3 matches mechanism.mjs values and top-level agentType/mcpTool at plan.mjs:453-454.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-retired-unit.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "78e8f0590a2c7d8b570c1ff23cfe379f3eaf304d221a1f08335de2c5dafadfdf",
+      "targetUnitDigest": "be2f8b6fb6fddd1a9fdcbbcaf100e5d07acacec79f314e563786eb6034c4dbba",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "6. DispatchPlan"
       ],
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      "priorReview": {
+        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+        "reviewedAt": "2026-10-10",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-retired-unit.md",
+        "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+        "reviewMode": "ordinary",
+        "reviewNote": "[new successor] proposals/dispatch-control-plane-redesign.md#unheaded-block-48 -> proposals/dispatch-control-plane-redesign.md#63-mechanism (supersede): Successor unheaded-block-48 to 63-mechanism (202-202): section 6.3 matches mechanism.mjs values and top-level agentType/mcpTool at plan.mjs:453-454."
+      },
+      "amendedBy": "codex-session:42@2026-10-15",
+      "rebindingReason": "A22 authorized cite correction changes this historical successor target; no approval carried."
     },
     {
       "claimId": "claim_19144a66f7f280075c2a2b3531eadb4d",
@@ -81221,6 +81253,306 @@
       "reviewMode": "ordinary",
       "reviewNote": "Supersede. Plan paragraph \"This candidate map reflects the current routes in core/skills/fgos-panel/SKILL.md:45-59; not yet the skill's linked authority\" is replaced by main's pointer paragraph (identical bytes to main arch block-8). Successor P:architecture/group-thinking-trigger-surface.md#unheaded-block-8 (current claim_252c3823). Findings: new gap.",
       "rationale": "Main merge f4ed59997325b7bbe94ba38df16d66ab20d9251e, independently accepted conservation identity: supersede from docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-8 to docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-8; the full source and target digests are recorded. This accounts the imported upstream change, not current code truth or target-area promotion."
+    },
+    {
+      "claimId": "claim_15fb4071e9767dd5f80acc30bdee53fa",
+      "sourcePath": "docs/platform/README.md",
+      "sourceAnchor": "area-portals",
+      "sourceUnitDigest": "9de4c9e6e752cf7002d6d260c85a20994df0bdb6b6840f9666617fc6603067c0",
+      "targetOwner": "docs/platform/system-architecture/history/architect-readme.md",
+      "targetAnchor": "area-portals",
+      "targetUnitDigest": "36d5138696cb501946db7a42eb96e4b6ebc6a84393182cdb9ecc79598e108dad",
+      "disposition": "supersede",
+      "targetKind": "history",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:42@2026-10-15",
+      "rationale": "The complete architect README carriage moved from the canonical portal to the non-canonical History carrier. Keep the actual retired portal identity; supersede to the native History successor with rebased links and changed ancestry. All physical link destinations and source clauses are preserved. Live disposition pending independent review.",
+      "claimKind": "historical-context",
+      "targetAncestry": [
+        "Architect README Source Carriage",
+        "Added in candidate: README source carriage",
+        "Architect-Level Design"
+      ],
+      "successorClaimId": "claim_b8e054d8f9963d27d340671aea8c471b",
+      "sourceCommit": "a8a10abc1a24218518a14764f68c8d86f4810f91",
+      "shownSourceText": "#### Area Portals\n\n- [Agent Coordination](../architect/agent-coordination/README.md)\n- [Component Boundary](../architect/component-boundary/README.md)\n- [Domainization](../architect/domainization/README.md)\n- [Host Invocation And Provider Routing](../architect/host-invocation-routing/host-invocation-provider-routing.md)\n- [Packaging And Distribution](../architect/packaging-distribution/README.md)",
+      "shownSourceDigest": "4624fc48c110aadf40750710bf371ea6c7857cf6a04fe132f591b1bc6e7f07db",
+      "shownTargetText": "#### Area Portals\n\n- [Agent Coordination](../../../architect/agent-coordination/README.md)\n- [Component Boundary](../../../architect/component-boundary/README.md)\n- [Domainization](../../../architect/domainization/README.md)\n- [Host Invocation And Provider Routing](../../../architect/host-invocation-routing/host-invocation-provider-routing.md)\n- [Packaging And Distribution](../../../architect/packaging-distribution/README.md)",
+      "shownTargetDigest": "32dfc2f9c321e97e1df90551f7fb62709ae1a1ef6468c643be5f9711edd4519f",
+      "proposalAssessment": {
+        "claimId": "claim_15fb4071e9767dd5f80acc30bdee53fa",
+        "verdict": "ok",
+        "note": "deep: retired portal carriage unit (Area Portals) keeps its real ID and digest; proposed supersede to the history carrier unit whose digest equals the target of the changed decision at row 11 and the native successor in the registry; only link bytes and ancestry differ, no ID graft, proposal only",
+        "sourceUnitDigest": "9de4c9e6e752cf7002d6d260c85a20994df0bdb6b6840f9666617fc6603067c0",
+        "targetUnitDigest": "36d5138696cb501946db7a42eb96e4b6ebc6a84393182cdb9ecc79598e108dad",
+        "kind": "native-retired",
+        "reportPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
+        "reportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+        "appliedAs": "ordinary assessment"
+      }
+    },
+    {
+      "claimId": "claim_25738169c8abaf752373ce1b1c0732be",
+      "sourcePath": "docs/platform/README.md",
+      "sourceAnchor": "cross-area-intentions",
+      "sourceUnitDigest": "0f4433053968e22e3020d90bc74d59c7b07f727d24d1c6cf7fee0cabdad5bb5b",
+      "targetOwner": "docs/platform/system-architecture/history/architect-readme.md",
+      "targetAnchor": "cross-area-intentions",
+      "targetUnitDigest": "a069d8e7d1bafae2d58599146d3913ce15fdbfebcf046a800002803dcfbd5da3",
+      "disposition": "supersede",
+      "targetKind": "history",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:42@2026-10-15",
+      "rationale": "The complete architect README carriage moved from the canonical portal to the non-canonical History carrier. Keep the actual retired portal identity; supersede to the native History successor with rebased links and changed ancestry. All physical link destinations and source clauses are preserved. Live disposition pending independent review.",
+      "claimKind": "historical-context",
+      "targetAncestry": [
+        "Architect README Source Carriage",
+        "Added in candidate: README source carriage",
+        "Architect-Level Design"
+      ],
+      "successorClaimId": "claim_a4684ab8826de459e4d9702ac51debdc",
+      "sourceCommit": "a8a10abc1a24218518a14764f68c8d86f4810f91",
+      "shownSourceText": "#### Cross-Area Intentions\n\n- [Architect Roadmap](../architect/roadmap.md) keeps the high-level sequencing and delivery\n  plan across active architecture streams: agent coordination, coding domain,\n  component boundary, host invocation, Node-to-Rust migration, and packaging\n  distribution.\n- [Architecture Intent](../architect/architecture-intent.md) preserves architecture-wide\n  design intent across deferred capabilities. Its first active thread covers\n  widening fgOS from strict fan-out/fan-in and artifact-mediated coordination\n  toward richer group-thinking/problem-solving capability, while keeping\n  isolation-heavy fixtures intact.\n- [System Vision: Trong Mem Ngoai Cung](../architect/system-vision-trong-mem-ngoai-cung.md)\n  records the cross-system direction that fgOS must combine hard outer\n  contracts with soft inner soul/prose/skill, so architecture slices do not\n  become either unverifiable prose or rigid harness without living operating\n  intelligence.\n- [Workspace Topology Architecture](../architect/workspace-topology.md) defines\n  repository/workspace/work-state/runtime identities, state classes, root\n  ownership, worktree mode invariants, and mutation topology used by\n  packaging, work-state, coding-domain, coordination, and config/init/doctor.\n  Read this contract before packaging activation, work-state relocation,\n  coding-domain worktree changes, or runtime coordination changes.\n- [Workspace Topology Audit](../architect/workspace-topology-audit.md) records current\n  codebase evidence and gaps behind the topology contract.\n- [Workspace Topology Roadmap](../architect/workspace-topology-roadmap.md) sequences the\n  decisions and migration slices needed to make the contract enforceable.",
+      "shownSourceDigest": "3e0f786de152934be8faa9f505f4f62158c7ddeda6884f46bec0523ffc6004de",
+      "shownTargetText": "#### Cross-Area Intentions\n\n- [Architect Roadmap](../../../architect/roadmap.md) keeps the high-level sequencing and delivery\n  plan across active architecture streams: agent coordination, coding domain,\n  component boundary, host invocation, Node-to-Rust migration, and packaging\n  distribution.\n- [Architecture Intent](../../../architect/architecture-intent.md) preserves architecture-wide\n  design intent across deferred capabilities. Its first active thread covers\n  widening fgOS from strict fan-out/fan-in and artifact-mediated coordination\n  toward richer group-thinking/problem-solving capability, while keeping\n  isolation-heavy fixtures intact.\n- [System Vision: Trong Mem Ngoai Cung](../../../architect/system-vision-trong-mem-ngoai-cung.md)\n  records the cross-system direction that fgOS must combine hard outer\n  contracts with soft inner soul/prose/skill, so architecture slices do not\n  become either unverifiable prose or rigid harness without living operating\n  intelligence.\n- [Workspace Topology Architecture](../../../architect/workspace-topology.md) defines\n  repository/workspace/work-state/runtime identities, state classes, root\n  ownership, worktree mode invariants, and mutation topology used by\n  packaging, work-state, coding-domain, coordination, and config/init/doctor.\n  Read this contract before packaging activation, work-state relocation,\n  coding-domain worktree changes, or runtime coordination changes.\n- [Workspace Topology Audit](../../../architect/workspace-topology-audit.md) records current\n  codebase evidence and gaps behind the topology contract.\n- [Workspace Topology Roadmap](../../../architect/workspace-topology-roadmap.md) sequences the\n  decisions and migration slices needed to make the contract enforceable.",
+      "shownTargetDigest": "ea8dd76fe0ec776d34cd07739d05e94c5664f77aeafde58255ccf697dea55522",
+      "proposalAssessment": {
+        "claimId": "claim_25738169c8abaf752373ce1b1c0732be",
+        "verdict": "ok",
+        "note": "deep: retired portal carriage unit (Cross-Area Intentions) keeps its real ID and digest; proposed supersede to the history carrier unit whose digest equals the target of the changed decision at row 9 and the native successor in the registry; only link bytes and ancestry differ, no ID graft, proposal only",
+        "sourceUnitDigest": "0f4433053968e22e3020d90bc74d59c7b07f727d24d1c6cf7fee0cabdad5bb5b",
+        "targetUnitDigest": "a069d8e7d1bafae2d58599146d3913ce15fdbfebcf046a800002803dcfbd5da3",
+        "kind": "native-retired",
+        "reportPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
+        "reportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+        "appliedAs": "ordinary assessment"
+      }
+    },
+    {
+      "claimId": "claim_ef6c0254e5aadc24f40f019fd8d80810",
+      "sourcePath": "docs/platform/README.md",
+      "sourceAnchor": "cross-area-proposals",
+      "sourceUnitDigest": "bca95d4d0317f17a3c721637dcc0da5d019deac1b79733304e81cb867011396d",
+      "targetOwner": "docs/platform/system-architecture/history/architect-readme.md",
+      "targetAnchor": "cross-area-proposals",
+      "targetUnitDigest": "1494a58620d914348f840a29a4eb07ae9f5425d5ceb65838adfa85cdd41e4373",
+      "disposition": "supersede",
+      "targetKind": "history",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:42@2026-10-15",
+      "rationale": "The complete architect README carriage moved from the canonical portal to the non-canonical History carrier. Keep the actual retired portal identity; supersede to the native History successor with rebased links and changed ancestry. All physical link destinations and source clauses are preserved. Live disposition pending independent review.",
+      "claimKind": "historical-context",
+      "targetAncestry": [
+        "Architect README Source Carriage",
+        "Added in candidate: README source carriage",
+        "Architect-Level Design"
+      ],
+      "successorClaimId": "claim_ad09218213e8a4fa666e32b243ba362d",
+      "sourceCommit": "a8a10abc1a24218518a14764f68c8d86f4810f91",
+      "shownSourceText": "#### Cross-Area Proposals\n\n- [Architect-Level Proposals](../architect/proposals/README.md) holds discussion drafts\n  whose scope crosses one architecture area. These are not accepted design\n  until extracted into canonical architect-level or area-specific documents.",
+      "shownSourceDigest": "7995bf279aabc557cdbd8d272a8438e89c1655cab4e103ddb9b3e60a6d899ffc",
+      "shownTargetText": "#### Cross-Area Proposals\n\n- [Architect-Level Proposals](../../../architect/proposals/README.md) holds discussion drafts\n  whose scope crosses one architecture area. These are not accepted design\n  until extracted into canonical architect-level or area-specific documents.",
+      "shownTargetDigest": "4bfeac70d6b78cb50b01b94e02573c58b37cf2cd365c5a3ba905e66c75b8f51f",
+      "proposalAssessment": {
+        "claimId": "claim_ef6c0254e5aadc24f40f019fd8d80810",
+        "verdict": "ok",
+        "note": "deep: retired portal carriage unit (Cross-Area Proposals) keeps its real ID and digest; proposed supersede to the history carrier unit whose digest equals the target of the changed decision at row 13 and the native successor in the registry; only link bytes and ancestry differ, no ID graft, proposal only",
+        "sourceUnitDigest": "bca95d4d0317f17a3c721637dcc0da5d019deac1b79733304e81cb867011396d",
+        "targetUnitDigest": "1494a58620d914348f840a29a4eb07ae9f5425d5ceb65838adfa85cdd41e4373",
+        "kind": "native-retired",
+        "reportPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
+        "reportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+        "appliedAs": "ordinary assessment"
+      }
+    },
+    {
+      "claimId": "claim_f1497619fab3b38741e7a8b5c163a80a",
+      "sourcePath": "docs/platform/README.md",
+      "sourceAnchor": "other-architecture-drafts",
+      "sourceUnitDigest": "3d9cac1e701b09bbd35c7b3753d34ae6d4cdb5dc7e7de6978730c69ee9ffa670",
+      "targetOwner": "docs/platform/system-architecture/history/architect-readme.md",
+      "targetAnchor": "other-architecture-drafts",
+      "targetUnitDigest": "befc35d5a223fafe89b10a251d2679533dc323ff9ab31b3bbaf96e95e3353c8c",
+      "disposition": "supersede",
+      "targetKind": "history",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:42@2026-10-15",
+      "rationale": "The complete architect README carriage moved from the canonical portal to the non-canonical History carrier. Keep the actual retired portal identity; supersede to the native History successor with rebased links and changed ancestry. All physical link destinations and source clauses are preserved. Live disposition pending independent review.",
+      "claimKind": "historical-context",
+      "targetAncestry": [
+        "Architect README Source Carriage",
+        "Added in candidate: README source carriage",
+        "Architect-Level Design"
+      ],
+      "successorClaimId": "claim_9f388fe375c68caea145cb5599a8d24d",
+      "sourceCommit": "a8a10abc1a24218518a14764f68c8d86f4810f91",
+      "shownSourceText": "#### Other Architecture Drafts\n\n- [Dispatch Control Plane Redesign](../architect/dispatch-control-plane-redesign.md)\n- [Doing Coordination Redesign](../architect/doing-coordination-redesign.md)\n- [Knowledge Registry Redesign](../architect/knowledge-registry-redesign.md)",
+      "shownSourceDigest": "c2ee5269b4f40d02e9859c74a620475e30b7b790f6207c0816abe3c34e9b9c6d",
+      "shownTargetText": "#### Other Architecture Drafts\n\n- [Dispatch Control Plane Redesign](../../../architect/dispatch-control-plane-redesign.md)\n- [Doing Coordination Redesign](../../../architect/doing-coordination-redesign.md)\n- [Knowledge Registry Redesign](../../../architect/knowledge-registry-redesign.md)",
+      "shownTargetDigest": "4421b85d5575093a7b2521e0b488a5586b24c82a6eccd51f98aa8cf4971c3db9",
+      "proposalAssessment": {
+        "claimId": "claim_f1497619fab3b38741e7a8b5c163a80a",
+        "verdict": "ok",
+        "note": "deep: retired portal carriage unit (Other Architecture Drafts) keeps its real ID and digest; proposed supersede to the history carrier unit whose digest equals the target of the changed decision at row 15 and the native successor in the registry; only link bytes and ancestry differ, no ID graft, proposal only",
+        "sourceUnitDigest": "3d9cac1e701b09bbd35c7b3753d34ae6d4cdb5dc7e7de6978730c69ee9ffa670",
+        "targetUnitDigest": "befc35d5a223fafe89b10a251d2679533dc323ff9ab31b3bbaf96e95e3353c8c",
+        "kind": "native-retired",
+        "reportPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
+        "reportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+        "appliedAs": "ordinary assessment"
+      }
+    },
+    {
+      "claimId": "claim_f323732392f348ef8f622d71f49cb37d",
+      "sourcePath": "docs/platform/README.md",
+      "sourceAnchor": "unheaded-block-13",
+      "sourceUnitDigest": "317afa51c7f2a4104fb813f126eca9a13f6ae6a7274d31c43fb5822f848b50a4",
+      "targetOwner": "docs/platform/system-architecture/history/architect-readme.md",
+      "targetAnchor": "unheaded-block-6",
+      "targetUnitDigest": "629194b5f11905f78295536eddb5dce3c4e0350a674f37024c68bc3924d62aa9",
+      "disposition": "supersede",
+      "targetKind": "history",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:42@2026-10-15",
+      "rationale": "The complete architect README carriage moved from the canonical portal to the non-canonical History carrier. Keep the actual retired portal identity; supersede to the native History successor with rebased links and changed ancestry. All physical link destinations and source clauses are preserved. Live disposition pending independent review.",
+      "claimKind": "historical-context",
+      "targetAncestry": [
+        "Architect README Source Carriage",
+        "Added in candidate: README source carriage",
+        "Architect-Level Design",
+        "Cross-Area Intentions"
+      ],
+      "successorClaimId": "claim_5bb0323362aac50b515f8a3686e80b59",
+      "sourceCommit": "a8a10abc1a24218518a14764f68c8d86f4810f91",
+      "shownSourceText": "- [Architect Roadmap](../architect/roadmap.md) keeps the high-level sequencing and delivery\n  plan across active architecture streams: agent coordination, coding domain,\n  component boundary, host invocation, Node-to-Rust migration, and packaging\n  distribution.\n- [Architecture Intent](../architect/architecture-intent.md) preserves architecture-wide\n  design intent across deferred capabilities. Its first active thread covers\n  widening fgOS from strict fan-out/fan-in and artifact-mediated coordination\n  toward richer group-thinking/problem-solving capability, while keeping\n  isolation-heavy fixtures intact.\n- [System Vision: Trong Mem Ngoai Cung](../architect/system-vision-trong-mem-ngoai-cung.md)\n  records the cross-system direction that fgOS must combine hard outer\n  contracts with soft inner soul/prose/skill, so architecture slices do not\n  become either unverifiable prose or rigid harness without living operating\n  intelligence.\n- [Workspace Topology Architecture](../architect/workspace-topology.md) defines\n  repository/workspace/work-state/runtime identities, state classes, root\n  ownership, worktree mode invariants, and mutation topology used by\n  packaging, work-state, coding-domain, coordination, and config/init/doctor.\n  Read this contract before packaging activation, work-state relocation,\n  coding-domain worktree changes, or runtime coordination changes.\n- [Workspace Topology Audit](../architect/workspace-topology-audit.md) records current\n  codebase evidence and gaps behind the topology contract.\n- [Workspace Topology Roadmap](../architect/workspace-topology-roadmap.md) sequences the\n  decisions and migration slices needed to make the contract enforceable.",
+      "shownSourceDigest": "317afa51c7f2a4104fb813f126eca9a13f6ae6a7274d31c43fb5822f848b50a4",
+      "shownTargetText": "- [Architect Roadmap](../../../architect/roadmap.md) keeps the high-level sequencing and delivery\n  plan across active architecture streams: agent coordination, coding domain,\n  component boundary, host invocation, Node-to-Rust migration, and packaging\n  distribution.\n- [Architecture Intent](../../../architect/architecture-intent.md) preserves architecture-wide\n  design intent across deferred capabilities. Its first active thread covers\n  widening fgOS from strict fan-out/fan-in and artifact-mediated coordination\n  toward richer group-thinking/problem-solving capability, while keeping\n  isolation-heavy fixtures intact.\n- [System Vision: Trong Mem Ngoai Cung](../../../architect/system-vision-trong-mem-ngoai-cung.md)\n  records the cross-system direction that fgOS must combine hard outer\n  contracts with soft inner soul/prose/skill, so architecture slices do not\n  become either unverifiable prose or rigid harness without living operating\n  intelligence.\n- [Workspace Topology Architecture](../../../architect/workspace-topology.md) defines\n  repository/workspace/work-state/runtime identities, state classes, root\n  ownership, worktree mode invariants, and mutation topology used by\n  packaging, work-state, coding-domain, coordination, and config/init/doctor.\n  Read this contract before packaging activation, work-state relocation,\n  coding-domain worktree changes, or runtime coordination changes.\n- [Workspace Topology Audit](../../../architect/workspace-topology-audit.md) records current\n  codebase evidence and gaps behind the topology contract.\n- [Workspace Topology Roadmap](../../../architect/workspace-topology-roadmap.md) sequences the\n  decisions and migration slices needed to make the contract enforceable.",
+      "shownTargetDigest": "629194b5f11905f78295536eddb5dce3c4e0350a674f37024c68bc3924d62aa9",
+      "proposalAssessment": {
+        "claimId": "claim_f323732392f348ef8f622d71f49cb37d",
+        "verdict": "ok",
+        "note": "deep: retired portal carriage unit (link list block 13) keeps its real ID and digest; proposed supersede to the history carrier unit whose digest equals the target of the changed decision at row 10 and the native successor in the registry; only link bytes and ancestry differ, no ID graft, proposal only",
+        "sourceUnitDigest": "317afa51c7f2a4104fb813f126eca9a13f6ae6a7274d31c43fb5822f848b50a4",
+        "targetUnitDigest": "629194b5f11905f78295536eddb5dce3c4e0350a674f37024c68bc3924d62aa9",
+        "kind": "native-retired",
+        "reportPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
+        "reportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+        "appliedAs": "ordinary assessment"
+      }
+    },
+    {
+      "claimId": "claim_d8aff6d952f0124b500969cdb34f8790",
+      "sourcePath": "docs/platform/README.md",
+      "sourceAnchor": "unheaded-block-14",
+      "sourceUnitDigest": "bf98fd90b7ce1fac97e09a5bde9e43389e4f86f1dae0a108e30d9d4026f4bd61",
+      "targetOwner": "docs/platform/system-architecture/history/architect-readme.md",
+      "targetAnchor": "unheaded-block-7",
+      "targetUnitDigest": "3ef5c06f1dd123cb5fe25f8e992b9345f62474f8f1e3546ac6ccbad0cd3f2307",
+      "disposition": "supersede",
+      "targetKind": "history",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:42@2026-10-15",
+      "rationale": "The complete architect README carriage moved from the canonical portal to the non-canonical History carrier. Keep the actual retired portal identity; supersede to the native History successor with rebased links and changed ancestry. All physical link destinations and source clauses are preserved. Live disposition pending independent review.",
+      "claimKind": "historical-context",
+      "targetAncestry": [
+        "Architect README Source Carriage",
+        "Added in candidate: README source carriage",
+        "Architect-Level Design",
+        "Area Portals"
+      ],
+      "successorClaimId": "claim_a6d152d19e850dc7deb8a187bad20d45",
+      "sourceCommit": "a8a10abc1a24218518a14764f68c8d86f4810f91",
+      "shownSourceText": "- [Agent Coordination](../architect/agent-coordination/README.md)\n- [Component Boundary](../architect/component-boundary/README.md)\n- [Domainization](../architect/domainization/README.md)\n- [Host Invocation And Provider Routing](../architect/host-invocation-routing/host-invocation-provider-routing.md)\n- [Packaging And Distribution](../architect/packaging-distribution/README.md)",
+      "shownSourceDigest": "bf98fd90b7ce1fac97e09a5bde9e43389e4f86f1dae0a108e30d9d4026f4bd61",
+      "shownTargetText": "- [Agent Coordination](../../../architect/agent-coordination/README.md)\n- [Component Boundary](../../../architect/component-boundary/README.md)\n- [Domainization](../../../architect/domainization/README.md)\n- [Host Invocation And Provider Routing](../../../architect/host-invocation-routing/host-invocation-provider-routing.md)\n- [Packaging And Distribution](../../../architect/packaging-distribution/README.md)",
+      "shownTargetDigest": "3ef5c06f1dd123cb5fe25f8e992b9345f62474f8f1e3546ac6ccbad0cd3f2307",
+      "proposalAssessment": {
+        "claimId": "claim_d8aff6d952f0124b500969cdb34f8790",
+        "verdict": "ok",
+        "note": "deep: retired portal carriage unit (link list block 14) keeps its real ID and digest; proposed supersede to the history carrier unit whose digest equals the target of the changed decision at row 12 and the native successor in the registry; only link bytes and ancestry differ, no ID graft, proposal only",
+        "sourceUnitDigest": "bf98fd90b7ce1fac97e09a5bde9e43389e4f86f1dae0a108e30d9d4026f4bd61",
+        "targetUnitDigest": "3ef5c06f1dd123cb5fe25f8e992b9345f62474f8f1e3546ac6ccbad0cd3f2307",
+        "kind": "native-retired",
+        "reportPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
+        "reportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+        "appliedAs": "ordinary assessment"
+      }
+    },
+    {
+      "claimId": "claim_df4971d4daf3dbb4a99a91a17ca7c5ae",
+      "sourcePath": "docs/platform/README.md",
+      "sourceAnchor": "unheaded-block-15",
+      "sourceUnitDigest": "fe53ead8782ad2f6e6fc5f681b19506aeb5d62b3f3e9c7905760b2fb94dbe1ff",
+      "targetOwner": "docs/platform/system-architecture/history/architect-readme.md",
+      "targetAnchor": "unheaded-block-8",
+      "targetUnitDigest": "f8c82a36be72cd1b00ecaff0949242a2e37644ceb4d0250020b0ce8c03cb7356",
+      "disposition": "supersede",
+      "targetKind": "history",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:42@2026-10-15",
+      "rationale": "The complete architect README carriage moved from the canonical portal to the non-canonical History carrier. Keep the actual retired portal identity; supersede to the native History successor with rebased links and changed ancestry. All physical link destinations and source clauses are preserved. Live disposition pending independent review.",
+      "claimKind": "historical-context",
+      "targetAncestry": [
+        "Architect README Source Carriage",
+        "Added in candidate: README source carriage",
+        "Architect-Level Design",
+        "Cross-Area Proposals"
+      ],
+      "successorClaimId": "claim_678186e90c435455f7fec1b6016e84e1",
+      "sourceCommit": "a8a10abc1a24218518a14764f68c8d86f4810f91",
+      "shownSourceText": "- [Architect-Level Proposals](../architect/proposals/README.md) holds discussion drafts\n  whose scope crosses one architecture area. These are not accepted design\n  until extracted into canonical architect-level or area-specific documents.",
+      "shownSourceDigest": "fe53ead8782ad2f6e6fc5f681b19506aeb5d62b3f3e9c7905760b2fb94dbe1ff",
+      "shownTargetText": "- [Architect-Level Proposals](../../../architect/proposals/README.md) holds discussion drafts\n  whose scope crosses one architecture area. These are not accepted design\n  until extracted into canonical architect-level or area-specific documents.",
+      "shownTargetDigest": "f8c82a36be72cd1b00ecaff0949242a2e37644ceb4d0250020b0ce8c03cb7356",
+      "proposalAssessment": {
+        "claimId": "claim_df4971d4daf3dbb4a99a91a17ca7c5ae",
+        "verdict": "ok",
+        "note": "deep: retired portal carriage unit (proposals block 15) keeps its real ID and digest; proposed supersede to the history carrier unit whose digest equals the target of the changed decision at row 14 and the native successor in the registry; only link bytes and ancestry differ, no ID graft, proposal only",
+        "sourceUnitDigest": "fe53ead8782ad2f6e6fc5f681b19506aeb5d62b3f3e9c7905760b2fb94dbe1ff",
+        "targetUnitDigest": "f8c82a36be72cd1b00ecaff0949242a2e37644ceb4d0250020b0ce8c03cb7356",
+        "kind": "native-retired",
+        "reportPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
+        "reportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+        "appliedAs": "ordinary assessment"
+      }
+    },
+    {
+      "claimId": "claim_e11d9541dc49ef78a20e7b57d1cccb36",
+      "sourcePath": "docs/platform/README.md",
+      "sourceAnchor": "unheaded-block-16",
+      "sourceUnitDigest": "442292211d93a3f6229329f1000f6a6d3288a2374569dc8e0ce3754adefdb19b",
+      "targetOwner": "docs/platform/system-architecture/history/architect-readme.md",
+      "targetAnchor": "unheaded-block-9",
+      "targetUnitDigest": "48810a1a605c1eefb6eea33cd3d2b56b445fd2c698e2709ab9dc91d2c6da616b",
+      "disposition": "supersede",
+      "targetKind": "history",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:42@2026-10-15",
+      "rationale": "The complete architect README carriage moved from the canonical portal to the non-canonical History carrier. Keep the actual retired portal identity; supersede to the native History successor with rebased links and changed ancestry. All physical link destinations and source clauses are preserved. Live disposition pending independent review.",
+      "claimKind": "historical-context",
+      "targetAncestry": [
+        "Architect README Source Carriage",
+        "Added in candidate: README source carriage",
+        "Architect-Level Design",
+        "Other Architecture Drafts"
+      ],
+      "successorClaimId": "claim_81dd20bdf38bfb33199ccfc707cf9b7e",
+      "sourceCommit": "a8a10abc1a24218518a14764f68c8d86f4810f91",
+      "shownSourceText": "- [Dispatch Control Plane Redesign](../architect/dispatch-control-plane-redesign.md)\n- [Doing Coordination Redesign](../architect/doing-coordination-redesign.md)\n- [Knowledge Registry Redesign](../architect/knowledge-registry-redesign.md)",
+      "shownSourceDigest": "442292211d93a3f6229329f1000f6a6d3288a2374569dc8e0ce3754adefdb19b",
+      "shownTargetText": "- [Dispatch Control Plane Redesign](../../../architect/dispatch-control-plane-redesign.md)\n- [Doing Coordination Redesign](../../../architect/doing-coordination-redesign.md)\n- [Knowledge Registry Redesign](../../../architect/knowledge-registry-redesign.md)",
+      "shownTargetDigest": "48810a1a605c1eefb6eea33cd3d2b56b445fd2c698e2709ab9dc91d2c6da616b",
+      "proposalAssessment": {
+        "claimId": "claim_e11d9541dc49ef78a20e7b57d1cccb36",
+        "verdict": "ok",
+        "note": "deep: retired portal carriage unit (drafts link list block 16) keeps its real ID and digest; proposed supersede to the history carrier unit whose digest equals the target of the changed decision at row 16 and the native successor in the registry; only link bytes and ancestry differ, no ID graft, proposal only",
+        "sourceUnitDigest": "442292211d93a3f6229329f1000f6a6d3288a2374569dc8e0ce3754adefdb19b",
+        "targetUnitDigest": "48810a1a605c1eefb6eea33cd3d2b56b445fd2c698e2709ab9dc91d2c6da616b",
+        "kind": "native-retired",
+        "reportPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
+        "reportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+        "appliedAs": "ordinary assessment"
+      }
     }
   ]
 }

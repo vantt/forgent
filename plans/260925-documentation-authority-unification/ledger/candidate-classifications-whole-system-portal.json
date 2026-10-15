@@ -245,14 +245,30 @@
       "claimId": "claim_1898cdafa7835d675526173d39eb5cd2",
       "path": "docs/platform/README.md",
       "anchor": "2-area-registry",
-      "unitDigest": "c1c8d66852c686b940eb0ceab00d7f6abde4f143be360919f223176afeae88d1",
-      "shownText": "## 2. Area Registry\n\nTarget area docs live at `docs/platform/<area>/`.\n\n| Area | Current source during migration |\n|---|---|\n| `runner` | [../specs/runner.md](../specs/runner.md), runner architecture docs |\n| `work-state` | [../specs/work-state.md](../specs/work-state.md) |\n| [packaging-distribution](packaging-distribution/README.md) | [packaging-distribution/README.md](packaging-distribution/README.md), [../specs/distribution.md](../specs/distribution.md), [../distribution-vision.md](../distribution-vision.md), [../architect/packaging-distribution/](../architect/packaging-distribution/) |\n| [host-invocation-routing](host-invocation-routing/README.md) | [host-invocation-routing/README.md](host-invocation-routing/README.md), [../architect/host-invocation-routing/](../architect/host-invocation-routing/) |\n| [convention](convention/spec.md) | [convention/spec.md](convention/spec.md) — implemented executable naming and placement authority; no document-body health rules |\n| [agent-coordination](agent-coordination/README.md) | [agent-coordination/README.md](agent-coordination/README.md), [../architect/agent-coordination/](../architect/agent-coordination/), runner coordination specs |\n| `skills` | domain and skill docs under [../../domains/](../../domains/), [../../.agents/skills/](../../.agents/skills/), [../../plugins/fgOS/skills/](../../plugins/fgOS/skills/) |\n| `ui-spec` | [../ui-spec/](../ui-spec/) |\n| `documentation-system` | Full-horizon proposal: [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md); proposed active H1 migration plan: `plans/260925-documentation-authority-unification/plan.md`; implemented end-user registry foundation: `plans/260825-1841-knowledge-registry/plan.md` |",
-      "shownTextDigest": "3e59f62ce08d78b6d09eb355762508b965b05c62689bf12203d1f3acc89b9463",
+      "unitDigest": "6c0e5ff7b8c03d54f72f23c45545a41354cca61c384e8cf6bc2766381c185d66",
+      "shownText": "## 2. Area Registry\n\nTarget area docs live at `docs/platform/<area>/`.\n\n| Area | Current source during migration |\n|---|---|\n| `runner` | [../specs/runner.md](../specs/runner.md), runner architecture docs |\n| `work-state` | [../specs/work-state.md](../specs/work-state.md) |\n| [packaging-distribution](packaging-distribution/README.md) | [packaging-distribution/README.md](packaging-distribution/README.md), [../specs/distribution.md](../specs/distribution.md), [../distribution-vision.md](../distribution-vision.md), [../architect/packaging-distribution/](../architect/packaging-distribution/) |\n| [host-invocation-routing](host-invocation-routing/README.md) | [host-invocation-routing/README.md](host-invocation-routing/README.md), [../architect/host-invocation-routing/](../architect/host-invocation-routing/) |\n| [convention](convention/spec.md) | [convention/spec.md](convention/spec.md) — implemented executable naming and placement authority; no document-body health rules |\n| [agent-coordination](agent-coordination/README.md) | [agent-coordination/README.md](agent-coordination/README.md), [../architect/agent-coordination/](../architect/agent-coordination/), runner coordination specs |\n| `skills` | domain and skill docs under [../../domains/](../../domains/), [../../.agents/skills/](../../.agents/skills/), [../../plugins/fgOS/skills/](../../plugins/fgOS/skills/) |\n| `ui-spec` | [../ui-spec/](../ui-spec/) |\n| `documentation-system` | Full-horizon proposal: [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md); proposed active H1 migration plan: `plans/260925-documentation-authority-unification/plan.md`; implemented end-user registry foundation: `archive/plans/260825-1841-knowledge-registry/plan.md` |",
+      "shownTextDigest": "f5c1667c7fdb67315d2494ac0726098261794fc00f205d99f5b60214c199a21f",
       "class": "candidate-native-content",
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
-      "rationale": "Every descriptive assertion of the unchanged portal payload is subject to current-code/behaviour review, not A28 candidate-unverified. Code-assisted route existence, executable Convention operations and actual owner authorization are recorded below. Independent content review owed; no approval supplied.",
+      "rationale": "Current canonical portal content, with only the stale knowledge-registry foundation path corrected to its existing archived location. Full unit shown, all other assertions unchanged; independent classification/content review pending.",
       "currentEvidence": {
+        "commit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+        "finding": "true-and-current",
+        "scope": "Authored evidence for the authorized path-only correction; independent content acceptance pending. The remaining assertions retain their committed evidence and Lead ordinary assessment.",
+        "citations": [
+          {
+            "path": "archive/plans/260825-1841-knowledge-registry/plan.md",
+            "startLine": 1,
+            "endLine": 25,
+            "blobSha": "ee13eacb7b53e915e0975ec02ad5ccf12f186d1e"
+          }
+        ],
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/accounting-261015-0700-whole-system-verdict-corrections.md.json"
+      },
+      "amendedBy": "codex-session:42@2026-10-15",
+      "rebindingReason": "A19 path-only correction, real extractor unit and full shown-section payload; A22 pending review.",
+      "priorEvidence": {
         "commit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930",
         "finding": "true-and-current",
         "citations": [
@@ -379,14 +395,30 @@
       "claimId": "claim_ec78621ff44b9fe7fa47ce85bd84bfa6",
       "path": "docs/platform/README.md",
       "anchor": "unheaded-block-6",
-      "unitDigest": "f2d3701022f39f5669ec2aa50aa078458032d0aad4398630e3aaf3dcc5b353ca",
-      "shownText": "| Area | Current source during migration |\n|---|---|\n| `runner` | [../specs/runner.md](../specs/runner.md), runner architecture docs |\n| `work-state` | [../specs/work-state.md](../specs/work-state.md) |\n| [packaging-distribution](packaging-distribution/README.md) | [packaging-distribution/README.md](packaging-distribution/README.md), [../specs/distribution.md](../specs/distribution.md), [../distribution-vision.md](../distribution-vision.md), [../architect/packaging-distribution/](../architect/packaging-distribution/) |\n| [host-invocation-routing](host-invocation-routing/README.md) | [host-invocation-routing/README.md](host-invocation-routing/README.md), [../architect/host-invocation-routing/](../architect/host-invocation-routing/) |\n| [convention](convention/spec.md) | [convention/spec.md](convention/spec.md) — implemented executable naming and placement authority; no document-body health rules |\n| [agent-coordination](agent-coordination/README.md) | [agent-coordination/README.md](agent-coordination/README.md), [../architect/agent-coordination/](../architect/agent-coordination/), runner coordination specs |\n| `skills` | domain and skill docs under [../../domains/](../../domains/), [../../.agents/skills/](../../.agents/skills/), [../../plugins/fgOS/skills/](../../plugins/fgOS/skills/) |\n| `ui-spec` | [../ui-spec/](../ui-spec/) |\n| `documentation-system` | Full-horizon proposal: [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md); proposed active H1 migration plan: `plans/260925-documentation-authority-unification/plan.md`; implemented end-user registry foundation: `plans/260825-1841-knowledge-registry/plan.md` |",
-      "shownTextDigest": "f2d3701022f39f5669ec2aa50aa078458032d0aad4398630e3aaf3dcc5b353ca",
+      "unitDigest": "3d92f33871d4b07cd755cc9f55e0b304d041662961e79dcdbe15658d7700dbd2",
+      "shownText": "| Area | Current source during migration |\n|---|---|\n| `runner` | [../specs/runner.md](../specs/runner.md), runner architecture docs |\n| `work-state` | [../specs/work-state.md](../specs/work-state.md) |\n| [packaging-distribution](packaging-distribution/README.md) | [packaging-distribution/README.md](packaging-distribution/README.md), [../specs/distribution.md](../specs/distribution.md), [../distribution-vision.md](../distribution-vision.md), [../architect/packaging-distribution/](../architect/packaging-distribution/) |\n| [host-invocation-routing](host-invocation-routing/README.md) | [host-invocation-routing/README.md](host-invocation-routing/README.md), [../architect/host-invocation-routing/](../architect/host-invocation-routing/) |\n| [convention](convention/spec.md) | [convention/spec.md](convention/spec.md) — implemented executable naming and placement authority; no document-body health rules |\n| [agent-coordination](agent-coordination/README.md) | [agent-coordination/README.md](agent-coordination/README.md), [../architect/agent-coordination/](../architect/agent-coordination/), runner coordination specs |\n| `skills` | domain and skill docs under [../../domains/](../../domains/), [../../.agents/skills/](../../.agents/skills/), [../../plugins/fgOS/skills/](../../plugins/fgOS/skills/) |\n| `ui-spec` | [../ui-spec/](../ui-spec/) |\n| `documentation-system` | Full-horizon proposal: [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md); proposed active H1 migration plan: `plans/260925-documentation-authority-unification/plan.md`; implemented end-user registry foundation: `archive/plans/260825-1841-knowledge-registry/plan.md` |",
+      "shownTextDigest": "3d92f33871d4b07cd755cc9f55e0b304d041662961e79dcdbe15658d7700dbd2",
       "class": "candidate-native-content",
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
-      "rationale": "Every descriptive assertion of the unchanged portal payload is subject to current-code/behaviour review, not A28 candidate-unverified. Code-assisted route existence, executable Convention operations and actual owner authorization are recorded below. Independent content review owed; no approval supplied.",
+      "rationale": "Current canonical portal content, with only the stale knowledge-registry foundation path corrected to its existing archived location. Full unit shown, all other assertions unchanged; independent classification/content review pending.",
       "currentEvidence": {
+        "commit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+        "finding": "true-and-current",
+        "scope": "Authored evidence for the authorized path-only correction; independent content acceptance pending. The remaining assertions retain their committed evidence and Lead ordinary assessment.",
+        "citations": [
+          {
+            "path": "archive/plans/260825-1841-knowledge-registry/plan.md",
+            "startLine": 1,
+            "endLine": 25,
+            "blobSha": "ee13eacb7b53e915e0975ec02ad5ccf12f186d1e"
+          }
+        ],
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/accounting-261015-0700-whole-system-verdict-corrections.md.json"
+      },
+      "amendedBy": "codex-session:42@2026-10-15",
+      "rebindingReason": "A19 path-only correction, real extractor unit and full shown-section payload; A22 pending review.",
+      "priorEvidence": {
         "commit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930",
         "finding": "true-and-current",
         "citations": [
@@ -514,7 +546,7 @@
       }
     },
     {
-      "claimId": "claim_afcdab4a068dfd573dfa7ec5a5f21c34",
+      "claimId": "claim_2c69afcc45e403c70c550a3934d0443c",
       "path": "docs/platform/README.md",
       "anchor": "unheaded-block-7",
       "unitDigest": "f2fc847dcc06987d76c83c1e8ab5f049b5d6ab9b049241ca047d517d6b1afd63",
@@ -582,7 +614,10 @@
           }
         ],
         "scope": "The complete table retains its existing documentation-layout, open-question and proposal/retention descriptions. Only the phase-status clause changes: plan.md phase table Legacy # rows 1–5 prove legacy 00–04 completed; row 6 maps transformation to legacy 05, while owner-answers.md:4 and plan.md:374 authorize it and the committed progress journal proves ongoing work. Legacy 06–09 remain unauthorized in rows 7–10. The plan status table/summary itself is stale for the current phase and is not used as authorization. This is an authored evidence finding, not independent acceptance. The evidence commit pins unchanged authority/code inputs; corrected portal bytes bind by digest until next turn pins the actual runner commit."
-      }
+      },
+      "predecessorClaimId": "claim_afcdab4a068dfd573dfa7ec5a5f21c34",
+      "amendedBy": "codex-session:42@2026-10-15",
+      "rebindingReason": "Real live native successor, no graft; historical predecessor remains an explicit gap."
     },
     {
       "claimId": "claim_6143f65cb5e3d4d41e7b957306ab6e4e",
@@ -633,5 +668,5 @@
       "rationale": "This unit routes readers through existing documents and prescribes reading/editing destinations, with no claim that an unbuilt mechanism is implemented. Every relative destination exists; no text changed. Independent navigation classification review owed."
     }
   ],
-  "amendedBy": "codex-session:40@2026-10-15"
+  "amendedBy": "codex-session:42@2026-10-15"
 }
