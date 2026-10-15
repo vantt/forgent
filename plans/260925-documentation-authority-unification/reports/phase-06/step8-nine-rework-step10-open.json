@@ -1,0 +1,59 @@
+{
+  "id": "step10-host-invocation-stale-successor-digest",
+  "claimId": "claim_9c0e5bb670fb2957bb0998cbe5d8d51e",
+  "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+  "field": "registryGaps",
+  "sourceUnitDigest": "c068f5dddf466e0aa502a6524b019543a8bff6ed6b34ebed2a18adb3d5d1b745",
+  "targetOwner": "docs/platform/packaging-distribution/spec.md",
+  "targetAnchor": "unheaded-block-4",
+  "recordedTargetDigest": "c14f83e85b43064dd321bf0926e6b98f781c23df08cf772ef8959a30837a2e18",
+  "currentTargetDigest": "fd8f41577cf07e6e6713f2a48792d88071e7fa072e87b32c08ec0be373173c6c",
+  "contentCommit": "7854cff84d8bcb67075d4f9c09cd0b6d04808ff4",
+  "owner": "Host Invocation / Packaging-distribution",
+  "stage": "Step 10 link pass",
+  "status": "open; record-only",
+  "cause": "Independent review Notes identify a target digest stale before the current bounded content commit.",
+  "action": "Step 10 owner must inspect the complete old/current successor, rebind pending without carrying approval, obtain its own bounded independent verdict and apply it. Do not include in the nine decision reworks.",
+  "blocks": "Own Step 10 accounting; not a newly introduced Step 8/main-merge rework.",
+  "mutatedDecision": false,
+  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1526-specs-ui-reworks-main-recarry.md",
+  "beforeDecision": {
+    "claimId": "claim_9c0e5bb670fb2957bb0998cbe5d8d51e",
+    "sourcePath": "docs/platform/packaging-distribution/spec.md",
+    "sourceUnitDigest": "c068f5dddf466e0aa502a6524b019543a8bff6ed6b34ebed2a18adb3d5d1b745",
+    "disposition": "supersede",
+    "targetOwner": "docs/platform/packaging-distribution/spec.md",
+    "targetAnchor": "unheaded-block-4",
+    "targetUnitDigest": "c14f83e85b43064dd321bf0926e6b98f781c23df08cf772ef8959a30837a2e18",
+    "authoredBy": "codex-session:5@2026-10-13",
+    "reviewStatus": "reviewed",
+    "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval.",
+    "targetAncestry": [
+      "Spec: Packaging-Distribution",
+      "2. Entry Points"
+    ],
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+    "reviewedAt": "2026-10-13",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-boundary-gaps.md",
+    "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a",
+    "reviewMode": "ordinary",
+    "reviewNote": "ok. packaging-distribution spec table gains one inserted row for the `fgos` launcher (line 6); all old rows unchanged. Main-only addition; three-way equals HEAD."
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-4",
+    "githubAnchor": "unheaded-block-4",
+    "stableAnchor": "unheaded-block-4",
+    "title": "Unheaded block 4",
+    "startLine": 36,
+    "endLine": 51,
+    "textDigest": "fd8f41577cf07e6e6713f2a48792d88071e7fa072e87b32c08ec0be373173c6c",
+    "sample": "| Entry point | Status | Purpose |\n| --- | --- | --- |\n| `install.sh` | Implemented | Installs `fgctl` from release assets into a machine-local install directory. |\n| `install.ps1`",
+    "identityFingerprint": "6d5dff1056c4b1264f2b8dbca3497ad4dc3d269e20e7c2fa68d6f88dd06eb90a",
+    "ancestry": [
+      "Spec: Packaging-Distribution",
+      "2. Entry Points"
+    ],
+    "text": "| Entry point | Status | Purpose |\n| --- | --- | --- |\n| `install.sh` | Implemented | Installs `fgctl` from release assets into a machine-local install directory. |\n| `install.ps1` | Implemented preview | The Windows counterpart of `install.sh` (PowerShell 5.1 or later, no administrator rights, no `PATH` change): installs `fgctl.exe` for `x86_64-pc-windows-msvc` with the same `FGCTL_VERSION` / `FGCTL_INSTALL_DIR` / `FGCTL_ASSET_BASE_URL` / `FGCTL_TARGET` semantics and a mandatory `SHA256SUMS` check (rule RUL16 (Windows is a native release target: same assets, an installer and launchers that need no POSIX shell) in `docs/specs/distribution.md`). |\n| `fgctl init` | Implemented preview | Initializes a project/workspace from a release chosen by `--from` > `FGCTL_FROM` > `FGCTL_VERSION` > the committed pin > the latest GitHub release; a downloaded asset is checksum-verified against `SHA256SUMS` before staging (rule RUL15 (fgctl init downloads a checksum-verified release when no source is given) in `docs/specs/distribution.md`). |\n| `fgos` launcher | Implemented preview | One `fgos` (`fgos.cmd` on Windows) written next to `fgctl` by `fgos doctor --fix` (which `fgctl init` runs): it walks up to the nearest `.fgos/installation/bin/fgos` and runs it, so each project runs its own activated release with no absolute path and no rc edit. A different `fgos` found first on `PATH` is reported, never overwritten. See distribution spec RUL17 (one fgos on PATH runs each project's own activated fgos). |\n| `fgctl upgrade` | Implemented preview | Moves a workspace activation to a new release chosen by `--from` > `FGCTL_FROM` > `FGCTL_VERSION` > the latest GitHub release (checksum-verified against `SHA256SUMS` when downloaded), records the previous release for rollback, and updates `.fgos/distribution.json` (including `releaseVersion` when downloaded). |\n| `fgctl repair` | Implemented preview | Repairs a workspace installation under the selected release model; current preview proof covers repair after activation. |\n| `.fgos/installation/bin/fgos` | Implemented preview | Stable workspace command surface after activation; current preview proof reports `host: \"rust\"` and the activated `artifactDigest`. |\n| `.fgos/installation/bin/fgos.cmd`, `fgos-runner.cmd` | Implemented preview | The same stable surface for PowerShell and `cmd.exe`, written by `fgctl init`/`repair` next to the `sh` pair and needing no POSIX shell; `fgctl verify` reports a missing or edited launcher and `fgctl repair` regenerates it. |\n| `npm install -g github:vantt/forgent` | Implemented legacy deprecated | Installs the legacy Node `fgos` and `fgos-runner` entry points; explicit deprecated escape hatch during the compatibility window, not the public/default posture. |\n| `scripts/fgos-shell-integration.sh` | Implemented | Contributor/dev helper that resolves fgOS command tiers from shell functions. |\n| local `fgos init` | Partial target | Adopts/materializes workspace state after `fgctl` publishes a ready activation. |\n| `fgos doctor` | Implemented | Reports environment checks without writing by default. |\n| `fgos doctor --fix` | Implemented | Runs registered fixes and then reports checks. |\n| `fgos setup` | Implemented deprecated legacy compatibility | Wires local development support and runs registered environment repairs in the current Node CLI; command surfaces point workspace onboarding to `fgctl init` plus local `fgos doctor --fix`/`fgos doctor`, while shell/global integration remains compatibility behavior through the 30-day preview fallback window unless a later release decision replaces it. |"
+  }
+}

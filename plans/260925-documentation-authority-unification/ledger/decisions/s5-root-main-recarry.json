@@ -13,45 +13,63 @@
       "sourceUnitDigest": "70c00c205578fc34084e5bf8701a6bde0999cb6f05a1b58f8424ad95ed4c28d4",
       "targetOwner": "docs/platform/contracts/architecture-manifest.json",
       "targetAnchor": "file-block",
-      "targetUnitDigest": "70c00c205578fc34084e5bf8701a6bde0999cb6f05a1b58f8424ad95ed4c28d4",
-      "targetAncestry": [],
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
-      "rationale": "A31 native current source identity; full changed source unit carried verbatim in existing candidate owner. Main-only before/after retained in step8-final-rework-accounting.json. No predecessor identity graft or approval carry; no current-truth or promotion approval."
+      "rationale": "A31 native current source identity; full changed source unit carried verbatim in existing candidate owner. Main-only before/after retained in step8-final-rework-accounting.json. No predecessor identity graft or approval carry; no current-truth or promotion approval.",
+      "reviewNote": "deep: new native claim for the changed legacy manifest (70c00c20); carrier file byte-equal (cmp, sha256 equal, 12267 bytes both, blob ae8c66912 at the merge); the single upstream line executor-posture-coverage.mjs: use-case is the only difference from the old copy; move true; pending, distinct from predecessors 15, 16, 20, 21, 24",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1526-specs-ui-reworks-main-recarry.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "70c00c205578fc34084e5bf8701a6bde0999cb6f05a1b58f8424ad95ed4c28d4",
+      "targetAncestry": [],
+      "reviewReportCommit": "0e8ce7710ac67ad038927b242b2461876bf8c90d"
     },
     {
       "claimId": "claim_bc091727d4f9526a57978e0ccc1cd5f7",
       "sourceUnitDigest": "d1af2d5a982f5d139fda776a23b4ad0b3776cc40c1fc0177636c44bdc91b968d",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-22",
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+      "rationale": "A31 native current source identity; full changed source unit carried verbatim in existing candidate owner. Main-only before/after retained in step8-final-rework-accounting.json. No predecessor identity graft or approval carry; no current-truth or promotion approval.",
+      "reviewNote": "deep: sampled; new native claim for legacy io-contract block 13 (d1af2d5a); byte-equal to carrier block 22; text read: exit-code table gains 4 not-found and OUTCOME_EXIT_CODES, matches the upstream hunk exactly; move true; pending",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1526-specs-ui-reworks-main-recarry.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "d1af2d5a982f5d139fda776a23b4ad0b3776cc40c1fc0177636c44bdc91b968d",
       "targetAncestry": [
         "CLI I/O Contract",
         "4. Exit Codes"
       ],
-      "claimKind": "contract",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
-      "rationale": "A31 native current source identity; full changed source unit carried verbatim in existing candidate owner. Main-only before/after retained in step8-final-rework-accounting.json. No predecessor identity graft or approval carry; no current-truth or promotion approval."
+      "reviewReportCommit": "0e8ce7710ac67ad038927b242b2461876bf8c90d"
     },
     {
       "claimId": "claim_812873a889bd4222ea0ab3dc9194e1ad",
       "sourceUnitDigest": "131cc0704d753f35dcbec3ebba7be49a0d103732b6f4ee8c5ecc175d5c46167e",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-23",
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+      "rationale": "A31 native current source identity; full changed source unit carried verbatim in existing candidate owner. Main-only before/after retained in step8-final-rework-accounting.json. No predecessor identity graft or approval carry; no current-truth or promotion approval.",
+      "reviewNote": "deep: new native claim for legacy io-contract block 14 (131cc070, the RUL99 execution-outcome paragraph); byte-equal to carrier block 23 (blank-line spacing before the next heading differs, outside unit text); move true; pending",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1526-specs-ui-reworks-main-recarry.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "131cc0704d753f35dcbec3ebba7be49a0d103732b6f4ee8c5ecc175d5c46167e",
       "targetAncestry": [
         "CLI I/O Contract",
         "4. Exit Codes"
       ],
-      "claimKind": "contract",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
-      "rationale": "A31 native current source identity; full changed source unit carried verbatim in existing candidate owner. Main-only before/after retained in step8-final-rework-accounting.json. No predecessor identity graft or approval carry; no current-truth or promotion approval."
+      "reviewReportCommit": "0e8ce7710ac67ad038927b242b2461876bf8c90d"
     }
   ]
 }

@@ -193,13 +193,19 @@
       "targetAnchor": "entry-points-triggers",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
       "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "reviewNote": "deep: section diff is the availability bullet only: cockpit start-stop sentence replaced by fgos gateway start/stop, detached, outlives the pane; true: src/runner/gateway-control.mjs:256-309 (detached spawn, unref) and :363-380 (stopGateway SIGTERM) plus bin/fgos.mjs gateway start/stop/status; static serving and port 4170 clauses unchanged; digest 6b9ec38a recomputes; supersede right",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1526-specs-ui-reworks-main-recarry.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "6b9ec38a44ed69f50f87f21ed48ebb13d3955c582b4df66d5759e5a79b6eca37",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)"
-      ]
+      ],
+      "reviewReportCommit": "0e8ce7710ac67ad038927b242b2461876bf8c90d"
     },
     {
       "claimId": "claim_5877600a52b4cf5568796da3c9044b65",
@@ -208,14 +214,20 @@
       "targetAnchor": "unheaded-block-9",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
       "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "reviewNote": "deep: unheaded block 9 diff is the same availability bullet only; true per gateway-control.mjs:256-309 and :363-380; digest d6b2d0ae recomputes, anchor ok, supersede right, pending",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1526-specs-ui-reworks-main-recarry.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "d6b2d0ae401b9c164dcb2da55dd7163e754c2dacd1b7b3bd7071a71b3be46cb7",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)",
         "Entry Points & Triggers"
-      ]
+      ],
+      "reviewReportCommit": "0e8ce7710ac67ad038927b242b2461876bf8c90d"
     },
     {
       "claimId": "claim_401864f1cbebeef845e6609d3b039738",
@@ -843,13 +855,19 @@
       "targetAnchor": "open-gaps",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
       "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "reviewNote": "deep: the 1-to-1 clause is replaced by 19 paths with GET /runtime registered and /mcp nested outside the contract; true: apps/fgos-gateway/src/gateway.rs:1244-1245 versus docs/contracts/fgos-gateway-api-v1.yaml, 19 path keys (/contract plus 18 authenticated routes, no /runtime or /mcp); 19-count and PATCH editWork sentences kept; prior rework resolved; digest ec3d3fa7 recomputes",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1526-specs-ui-reworks-main-recarry.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "ec3d3fa7611b4dd2fbad534d5dbf7a81055e2a0da7577b194a486ee26103dbe3",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)"
-      ]
+      ],
+      "reviewReportCommit": "0e8ce7710ac67ad038927b242b2461876bf8c90d"
     },
     {
       "claimId": "claim_83dd4d99cd52076452282b5565b0ea22",
@@ -858,14 +876,20 @@
       "targetAnchor": "unheaded-block-25",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
       "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "reviewNote": "deep: unheaded block 25 carries the same corrected sentence as row 32; true per gateway.rs:1244-1245 and the yaml path keys; prior rework resolved, digest 550e42d5 recomputes, supersede right, pending, no approval fields",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1526-specs-ui-reworks-main-recarry.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "550e42d570ef825d96c3d1f339b8fc0d20b82e1b486ba6d4529191fb45cafda4",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)",
         "Open Gaps"
-      ]
+      ],
+      "reviewReportCommit": "0e8ce7710ac67ad038927b242b2461876bf8c90d"
     },
     {
       "claimId": "claim_b2e9e87b9980819fad263ba9c6b02b33",

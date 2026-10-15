@@ -1,0 +1,450 @@
+{
+  "version": 1,
+  "contentCommit": "7854cff84d8bcb67075d4f9c09cd0b6d04808ff4",
+  "inputCommit": "0e8ce7710ac67ad038927b242b2461876bf8c90d",
+  "inventory": {
+    "pin": "0e8ce7710ac67ad038927b242b2461876bf8c90d",
+    "registrySHA256": "b9b4f20ce368ed76b314e84bce31dc7ee0ac32764e9fe9795bdc8f9424a259e7",
+    "registryUnchanged": true,
+    "nativeSync": false,
+    "registryRefresh": false,
+    "durationSeconds": 523.134,
+    "items": 4467,
+    "claims": 90774
+  },
+  "registry": {
+    "path": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+    "bytes": 61576932,
+    "SHA256": "b9b4f20ce368ed76b314e84bce31dc7ee0ac32764e9fe9795bdc8f9424a259e7",
+    "unchanged": true,
+    "nativeSync": false,
+    "refresh": false,
+    "priorSyncProof": "plans/260925-documentation-authority-unification/reports/phase-06/step8-committed-native-verification.json"
+  },
+  "scope": [
+    "docs/specs/confinement-authority.md",
+    "docs/specs/decision-citation-drift.md",
+    "docs/specs/distillery.md",
+    "docs/specs/fgos-plugin.md",
+    "docs/specs/herdr-web-dashboard.md",
+    "docs/specs/observe.md",
+    "docs/ui-spec/00-overview.md",
+    "docs/ui-spec/15-system-events.md",
+    "docs/ui-spec/20-domain-rules.md",
+    "docs/ui-spec/30-states-and-errors.md",
+    "docs/ui-spec/components/C01-item-card.md",
+    "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+    "docs/ui-spec/flows/F02-approve-a-merge.md",
+    "docs/ui-spec/generated/action-registry.csv",
+    "docs/ui-spec/generated/coverage-report.md",
+    "docs/ui-spec/generated/navigation-graph.yaml",
+    "docs/ui-spec/generated/surface-registry.yaml",
+    "docs/ui-spec/generated/wireframe-v2.html",
+    "docs/ui-spec/modals/M01-answer-question.md",
+    "docs/ui-spec/modals/M02-approve-merge.md",
+    "docs/ui-spec/modals/M03-add-edit-item.md",
+    "docs/ui-spec/schema/surface-contract.schema.json",
+    "docs/ui-spec/screens/S01-sign-in.md",
+    "docs/ui-spec/screens/S02-taskboard.md",
+    "docs/ui-spec/screens/S03-task-detail.md",
+    "docs/ui-spec/screens/S04-questions-needing-answer.md",
+    "docs/ui-spec/spec.config.yaml",
+    "docs/io-contract.md",
+    "docs/specs/distribution.md",
+    "docs/architecture-manifest.json",
+    "docs/specs/work-state.md"
+  ],
+  "runs": [
+    {
+      "name": "D-both",
+      "scope": null,
+      "priors": [
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json"
+      ],
+      "durationSeconds": 75.937,
+      "fatalCount": 0,
+      "structuralFatal": [],
+      "open": [
+        {
+          "type": "files-unknown-blocking",
+          "count": 1161
+        },
+        {
+          "type": "claims-unknown-blocking",
+          "count": 22613
+        },
+        {
+          "type": "claims-partial-carry",
+          "count": 14
+        },
+        {
+          "type": "claims-not-reviewed",
+          "count": 22845
+        },
+        {
+          "type": "claims-without-own-rationale",
+          "count": 22613
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "count": 361
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "count": 499
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 2365
+        }
+      ]
+    },
+    {
+      "name": "E-both",
+      "scope": [
+        "docs/specs/confinement-authority.md",
+        "docs/specs/decision-citation-drift.md",
+        "docs/specs/distillery.md",
+        "docs/specs/fgos-plugin.md",
+        "docs/specs/herdr-web-dashboard.md",
+        "docs/specs/observe.md",
+        "docs/ui-spec/00-overview.md",
+        "docs/ui-spec/15-system-events.md",
+        "docs/ui-spec/20-domain-rules.md",
+        "docs/ui-spec/30-states-and-errors.md",
+        "docs/ui-spec/components/C01-item-card.md",
+        "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+        "docs/ui-spec/flows/F02-approve-a-merge.md",
+        "docs/ui-spec/generated/action-registry.csv",
+        "docs/ui-spec/generated/coverage-report.md",
+        "docs/ui-spec/generated/navigation-graph.yaml",
+        "docs/ui-spec/generated/surface-registry.yaml",
+        "docs/ui-spec/generated/wireframe-v2.html",
+        "docs/ui-spec/modals/M01-answer-question.md",
+        "docs/ui-spec/modals/M02-approve-merge.md",
+        "docs/ui-spec/modals/M03-add-edit-item.md",
+        "docs/ui-spec/schema/surface-contract.schema.json",
+        "docs/ui-spec/screens/S01-sign-in.md",
+        "docs/ui-spec/screens/S02-taskboard.md",
+        "docs/ui-spec/screens/S03-task-detail.md",
+        "docs/ui-spec/screens/S04-questions-needing-answer.md",
+        "docs/ui-spec/spec.config.yaml",
+        "docs/io-contract.md",
+        "docs/specs/distribution.md",
+        "docs/architecture-manifest.json",
+        "docs/specs/work-state.md"
+      ],
+      "priors": [
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json"
+      ],
+      "durationSeconds": 83.356,
+      "fatalCount": 3,
+      "structuralFatal": [],
+      "open": [
+        {
+          "type": "claims-not-reviewed",
+          "count": 5
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "count": 1
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 867
+        }
+      ]
+    },
+    {
+      "name": "D-identity",
+      "scope": null,
+      "priors": [
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json"
+      ],
+      "durationSeconds": 84.741,
+      "fatalCount": 0,
+      "structuralFatal": [],
+      "open": [
+        {
+          "type": "files-unknown-blocking",
+          "count": 1161
+        },
+        {
+          "type": "claims-unknown-blocking",
+          "count": 22613
+        },
+        {
+          "type": "claims-partial-carry",
+          "count": 14
+        },
+        {
+          "type": "claims-not-reviewed",
+          "count": 22845
+        },
+        {
+          "type": "claims-without-own-rationale",
+          "count": 22613
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "count": 361
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "count": 499
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 2365
+        }
+      ]
+    },
+    {
+      "name": "E-identity",
+      "scope": [
+        "docs/specs/confinement-authority.md",
+        "docs/specs/decision-citation-drift.md",
+        "docs/specs/distillery.md",
+        "docs/specs/fgos-plugin.md",
+        "docs/specs/herdr-web-dashboard.md",
+        "docs/specs/observe.md",
+        "docs/ui-spec/00-overview.md",
+        "docs/ui-spec/15-system-events.md",
+        "docs/ui-spec/20-domain-rules.md",
+        "docs/ui-spec/30-states-and-errors.md",
+        "docs/ui-spec/components/C01-item-card.md",
+        "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+        "docs/ui-spec/flows/F02-approve-a-merge.md",
+        "docs/ui-spec/generated/action-registry.csv",
+        "docs/ui-spec/generated/coverage-report.md",
+        "docs/ui-spec/generated/navigation-graph.yaml",
+        "docs/ui-spec/generated/surface-registry.yaml",
+        "docs/ui-spec/generated/wireframe-v2.html",
+        "docs/ui-spec/modals/M01-answer-question.md",
+        "docs/ui-spec/modals/M02-approve-merge.md",
+        "docs/ui-spec/modals/M03-add-edit-item.md",
+        "docs/ui-spec/schema/surface-contract.schema.json",
+        "docs/ui-spec/screens/S01-sign-in.md",
+        "docs/ui-spec/screens/S02-taskboard.md",
+        "docs/ui-spec/screens/S03-task-detail.md",
+        "docs/ui-spec/screens/S04-questions-needing-answer.md",
+        "docs/ui-spec/spec.config.yaml",
+        "docs/io-contract.md",
+        "docs/specs/distribution.md",
+        "docs/architecture-manifest.json",
+        "docs/specs/work-state.md"
+      ],
+      "priors": [
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json"
+      ],
+      "durationSeconds": 95.246,
+      "fatalCount": 3,
+      "structuralFatal": [],
+      "open": [
+        {
+          "type": "claims-not-reviewed",
+          "count": 5
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "count": 1
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 867
+        }
+      ]
+    },
+    {
+      "name": "D-phase02",
+      "scope": null,
+      "priors": [
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json"
+      ],
+      "durationSeconds": 84.007,
+      "fatalCount": 0,
+      "structuralFatal": [],
+      "open": [
+        {
+          "type": "files-unknown-blocking",
+          "count": 1161
+        },
+        {
+          "type": "claims-unknown-blocking",
+          "count": 22613
+        },
+        {
+          "type": "claims-partial-carry",
+          "count": 14
+        },
+        {
+          "type": "claims-not-reviewed",
+          "count": 22845
+        },
+        {
+          "type": "claims-without-own-rationale",
+          "count": 22613
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "count": 361
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "count": 499
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 2365
+        }
+      ]
+    },
+    {
+      "name": "E-phase02",
+      "scope": [
+        "docs/specs/confinement-authority.md",
+        "docs/specs/decision-citation-drift.md",
+        "docs/specs/distillery.md",
+        "docs/specs/fgos-plugin.md",
+        "docs/specs/herdr-web-dashboard.md",
+        "docs/specs/observe.md",
+        "docs/ui-spec/00-overview.md",
+        "docs/ui-spec/15-system-events.md",
+        "docs/ui-spec/20-domain-rules.md",
+        "docs/ui-spec/30-states-and-errors.md",
+        "docs/ui-spec/components/C01-item-card.md",
+        "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+        "docs/ui-spec/flows/F02-approve-a-merge.md",
+        "docs/ui-spec/generated/action-registry.csv",
+        "docs/ui-spec/generated/coverage-report.md",
+        "docs/ui-spec/generated/navigation-graph.yaml",
+        "docs/ui-spec/generated/surface-registry.yaml",
+        "docs/ui-spec/generated/wireframe-v2.html",
+        "docs/ui-spec/modals/M01-answer-question.md",
+        "docs/ui-spec/modals/M02-approve-merge.md",
+        "docs/ui-spec/modals/M03-add-edit-item.md",
+        "docs/ui-spec/schema/surface-contract.schema.json",
+        "docs/ui-spec/screens/S01-sign-in.md",
+        "docs/ui-spec/screens/S02-taskboard.md",
+        "docs/ui-spec/screens/S03-task-detail.md",
+        "docs/ui-spec/screens/S04-questions-needing-answer.md",
+        "docs/ui-spec/spec.config.yaml",
+        "docs/io-contract.md",
+        "docs/specs/distribution.md",
+        "docs/architecture-manifest.json",
+        "docs/specs/work-state.md"
+      ],
+      "priors": [
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json"
+      ],
+      "durationSeconds": 85.337,
+      "fatalCount": 3,
+      "structuralFatal": [],
+      "open": [
+        {
+          "type": "claims-not-reviewed",
+          "count": 5
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "count": 1
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 867
+        }
+      ]
+    }
+  ],
+  "applicationFindings": [],
+  "pendingSourceRows": [
+    {
+      "claimId": "claim_74a311a5ab882fe8ee4806125167e2d4",
+      "path": "docs/specs/fgos-plugin.md",
+      "sourceAnchor": "data-dictionary",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_c4c6b55686b7e315f34ae005173b79db",
+      "path": "docs/specs/fgos-plugin.md",
+      "sourceAnchor": "actors-access",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_15a24dbb1f2d0470f04cdf8900da67a0",
+      "path": "docs/specs/work-state.md",
+      "sourceAnchor": "unheaded-block-69",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_5dcb56608e17caeb53c197186ae33827",
+      "path": "docs/specs/work-state.md",
+      "sourceAnchor": "unheaded-block-70",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_6fe86521fead9cec7253443e3275a3cf",
+      "path": "docs/specs/work-state.md",
+      "sourceAnchor": "unheaded-block-73",
+      "reviewStatus": "pending"
+    }
+  ],
+  "pendingPredecessorRows": [
+    {
+      "claimId": "claim_665eb7f4bfb9bee7ba3f5e58368eaba1",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-sc1-gaps.json",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_e597b776163803dcf6e4194962ea4f6e",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-sc1-gaps.json",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_9959e82e2874baeb627a8441faa07e9a",
+      "shard": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_19495d2772ced1aa1af4b20d4640fa3a",
+      "shard": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+      "reviewStatus": "pending"
+    }
+  ],
+  "pendingRowsOutsideRequest": [],
+  "totalBoundedPending": 9,
+  "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1625-specs-ui-nine-decision-reworks.md",
+  "activeTupleEquality": true,
+  "candidateList": {
+    "count": 867,
+    "unchangedFourFieldEquality": true,
+    "fiveFieldEquality": "Reused native lists: docs/constitution bytes and file statuses unchanged; all identity/path/anchor/digest fields rechecked against registry and all three strict E outputs.",
+    "priorFiveFieldEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/step8-committed-native-verification.json",
+    "tupleSHA256": "84be1102fdb6f990ecc85ded080ce6fd8d603501455031b3606956ad29a70b24"
+  },
+  "tests": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/scripts/doc-decision-conservation.test.mjs test/scripts/doc-decision-review.test.mjs test/scripts/doc-review-format.test.mjs",
+    "log": "plans/260925-documentation-authority-unification/reports/phase-06/step8-nine-rework-tests.log",
+    "pass": 44,
+    "fail": 0
+  },
+  "step10RecordOnly": "plans/260925-documentation-authority-unification/reports/phase-06/step8-nine-rework-step10-open.json",
+  "closure": "Strict E remains open; nine independent verdicts/application required. Step 8 and main-merge accounting close only when all nine independent verdicts are accepted and applied. Step 9 next.",
+  "reproduction": {
+    "inventory": "import fs from 'node:fs';import v8 from 'node:v8';import {createHash} from 'node:crypto';\nconst root=process.cwd(),R='plans/260925-documentation-authority-unification/reports/phase-06/',S='/tmp/fgos-work/step8-review-apply/',pin='0e8ce7710ac67ad038927b242b2461876bf8c90d';\nconst {generateInventory}=await import(root+'/scripts/generate-doc-inventory.mjs');\nconst sha=b=>createHash('sha256').update(b).digest('hex'),before=sha(fs.readFileSync(R+'working-identity-registry.json')),t=Date.now();\nconsole.log('READ-ONLY INVENTORY; EXISTING REGISTRY; NO REFRESH',pin);\nconst inventory=generateInventory(root,{commit:pin,identityRegistryPath:R+'working-identity-registry.json'});\nfs.writeFileSync(S+'inventory.bin',v8.serialize(inventory));if(before!==sha(fs.readFileSync(R+'working-identity-registry.json')))throw Error('registry mutated');\nfs.writeFileSync(S+'inventory-proof.json',JSON.stringify({pin,registrySHA256:before,registryUnchanged:true,nativeSync:false,registryRefresh:false,durationSeconds:(Date.now()-t)/1000,items:inventory.items.length,claims:inventory.claimLedger.length},null,2)+'\\n');console.log('DONE',inventory.items.length,inventory.claimLedger.length);\n",
+    "application": "import fs from 'node:fs';import assert from 'node:assert/strict';import {execFileSync as exec} from 'node:child_process';import {createHash} from 'node:crypto';\nconst root=process.cwd(),P='plans/260925-documentation-authority-unification/',R=P+'reports/phase-06/',S='/tmp/fgos-work/step8-review-apply/',read=p=>JSON.parse(fs.readFileSync(p)),write=(p,x)=>fs.writeFileSync(p,JSON.stringify(x,null,2)+'\\n'),sha=b=>createHash('sha256').update(b).digest('hex');\nconst g=await import(root+'/scripts/check-doc-inventory-gates.mjs'),a=await import(root+'/scripts/propose-doc-decisions.mjs'),head=exec('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),pin='7854cff84d8bcb67075d4f9c09cd0b6d04808ff4',reportPath=R+'review-261015-1526-specs-ui-reworks-main-recarry.md',report=exec('git',['show',head+':'+reportPath],{encoding:'utf8',maxBuffer:1e7}),reviewer=report.match(/^Reviewer:\\s*(.+)$/m)[1],request=read(R+'review-request-261015-1526-specs-ui-reworks-main-recarry.md.json'),reg=read(R+'working-identity-registry.json'),unitsOf=g.buildConservationUnitLookup(root,pin);\nassert.equal(report,fs.readFileSync(reportPath,'utf8'));assert.equal(request.contentCommit,pin);exec('git',['diff','--exit-code',pin,head,'--','docs','AGENTS.md','CLAUDE.md',P+'transitional-switchboard.json'],{stdio:'pipe'});\nconst verdicts=a.parseReviewVerdicts(report,reviewer),byId=new Map(verdicts.map(v=>[v.claimId,v])),allVerdicts=report.split('\\n').filter(l=>/^\\| [^|]+ \\| (ok|rework|hold) \\|/.test(l)).map(l=>{const c=l.split(/(?<!\\\\)\\|/).slice(1,-1).map(s=>s.trim().replace(/\\\\\\|/g,'|'));assert.equal(c.length,5);return {entryId:c[0],verdict:c[1],note:c[2],sourceDigest:c[3],targetDigest:c[4]};});\nassert.equal(allVerdicts.length,105);assert.equal(allVerdicts.filter(v=>v.verdict==='ok').length,96);assert.equal(verdicts.length,58);\nconst shardPaths=[...new Set(request.entries.filter(e=>e.shard).map(e=>e.shard))],shards=new Map(shardPaths.map(p=>[p,read(p)])),beforeShards=Object.fromEntries([...shards].map(([p,s])=>[p,structuredClone(s)]));write(S+'before-shards.json',beforeShards);\nfor(const e of request.entries.filter(e=>e.decision)) {const sh=shards.get(e.shard),field=['claims','registryGaps'].find(k=>sh[k]?.some(r=>r.claimId===e.entryId));assert(field,e.entryId);assert.deepEqual(sh[field].find(r=>r.claimId===e.entryId),e.decision);e.__field=field;}\nconst applied=[];\nfor(const p of shardPaths){const shard=shards.get(p);for(const field of ['claims','registryGaps']){const es=request.entries.filter(e=>e.shard===p&&e.__field===field&&byId.get(e.entryId)?.verdict==='ok');if(!es.length)continue;const selected=new Set(es.map(e=>e.entryId)),subset=shard[field].filter(r=>selected.has(r.claimId)),projection={...shard,claims:subset};delete projection.registryGaps;\n const context={repoRoot:root,inventory:{commit:head,claimLedger:[...reg.units,...reg.identityGaps]},unitsOf};\n const result=a.applyReviewVerdicts(context,projection,{verdicts:es.map(e=>byId.get(e.entryId)),reviewer,reportPath,ordinaryReview:true,reviewedAt:'2026-10-15'});\n const index=new Map(result.claims.map(r=>[r.claimId,r]));shard[field]=shard[field].map(r=>index.get(r.claimId)||r);\n for(const e of es){const row=index.get(e.entryId);assert.equal(row.reviewNote,byId.get(e.entryId).note);assert.equal(row.reviewMode,'ordinary');assert.equal(row.reviewReportCommit,head);assert.equal(row.reviewStatus,'reviewed');applied.push({entryId:e.entryId,shard:p,field,decisionBefore:e.decision,decisionAfter:row,verdict:byId.get(e.entryId)});}\n}}\nassert.equal(applied.length,49);\nconst fixes=[];\nfor(const e of request.entries.filter(e=>byId.get(e.entryId)?.verdict==='rework')){const row=shards.get(e.shard)[e.__field].find(r=>r.claimId===e.entryId),before=structuredClone(row),prefix=e.entryId.slice(6,14);assert.equal(row.reviewStatus,'pending');\n if(['74a311a5','c4c6b556'].includes(prefix)){row.disposition='supersede';row.rationale=prefix==='74a311a5'?'The complete Data Dictionary section replaces the legacy section with the corrected Work item id sentence: id is optional for pick/graph, check is not a shipped skill, and behavior when id is unspecified follows the corrected row. The section therefore differs from its source and is supersede, consistent with the corrected sibling units; its whole current section is bound by digest and ancestry.':'The complete Actors & Access section replaces the legacy section with the corrected capability row: check is not a shipped skill. The corrected sentence makes the whole section differ from its source, so supersede matches the corrected sibling units; the full section is retained and bound by digest and ancestry.';}\n else if(['665eb7f4','e597b776'].includes(prefix)){row.targetAnchor='unheaded-block-34';row.rationale=e.beforeDecision.rationale+' Corrected binding: the successor is the bullets unit unheaded-block-34 (name, touchesState, externalEffect, paginated and subcommands), not the paragraph at unheaded-block-33. The old stored anchor/digest pair was inconsistent; no identity is grafted and no approval is carried.';}\n else {assert(['15a24dbb','5dcb5660','6fe86521','9959e82e','19495d27'].includes(prefix));row.disposition=e.beforeDecision.disposition;row.rationale=e.beforeDecision.rationale;\n if(prefix==='9959e82e')row.rationale='Manifest fields are combined from work-state and io-contract in the single Manifest Shape section; the work-state contribution includes the positional-parameter rule. The source schema_version 2.0 sentence is represented by the corrected schema_version 3.0 successor, with the complete fields carried. The reviewed merge disposition is restored: vocabulary merge combines multiple sources and does not require byte equality. The anchor shift changes no target text in this turn.';\n if(prefix==='19495d27')row.rationale='The fgos --help --json manifest contract is combined with the work-state manifest contribution under Manifest Shape. Its schema_version 2.0 source wording is represented by the corrected schema_version 3.0 successor, including commands and per-verb entries; work-state adds the positional-parameter rule. The reviewed merge disposition is restored: vocabulary merge combines multiple sources and does not require byte equality. The anchor shift changes no target text in this turn.';\n }\n const unit=unitsOf(row.targetOwner).find(u=>u.anchor===row.targetAnchor);assert(unit);row.targetUnitDigest=unit.textDigest;row.targetAncestry=unit.ancestry;row.reviewStatus='pending';row.authoredBy='codex-session:unit-run-1792056203419-9b5bd055@2026-10-15';\n for(const key of ['reviewedBy','reviewedAt','reviewNote','reviewReport','reviewReportCommit','reviewMode','reviewPackCommit','reviewPackId','seedScoreId'])delete row[key];\n fixes.push({...Object.fromEntries(Object.entries(e).filter(([k])=>k!=='__field')),beforeDecision:before,previouslyReviewedDecision:e.beforeDecision,decision:structuredClone(row),beforeTarget:e.afterTarget||e.target,afterTarget:unit,reviewFinding:byId.get(e.entryId),reason:row.rationale});\n}\nassert.equal(fixes.length,9);assert.equal(fixes.find(e=>e.entryId.startsWith('claim_665eb7f4')).decision.targetUnitDigest,'e013c5b05d6ff58782aa8231ab4a55967bd5ef853dac4015aec8f16f5fcf9c68');\nfor(const [p,shard]of shards)write(p,shard);\nconst receipts=allVerdicts.map(v=>{const e=request.entries.find(e=>e.entryId===v.entryId);assert(e);return {...v,section:e.section,channel:e.channel,reviewStatus:v.verdict==='ok'?'reviewed':'pending',reviewMode:'ordinary',reviewedBy:v.verdict==='ok'?reviewer:null,reviewReport:reportPath,reviewReportCommit:head,requestCommit:'0068ed498417177761c43319a0da1171e90d2613',contentCommit:pin,meaning:e.decision?'Decision carriage or predecessor-accounting verdict; changed reworks stay pending.':'Bounded accounting/changed-text verdict only; does not approve source carriage, current truth at promotion, or cutover.'};});\nconst proof={version:1,inputCommit:head,contentCommit:pin,reportPath,reviewer,reportSHA256:sha(report),appliedOkCount:96,appliedDecisionCount:49,appliedAccountingCount:47,pendingReworks:9,notesVerbatim:true,ordinaryReview:true,registryUnchanged:true,nativeSync:false,allVerdicts:receipts,applied,fixes,reviewNotes:report.split('## Notes\\n')[1]};write(R+'step8-nine-rework-application.json',proof);write(S+'fixes.json',fixes);\nconsole.log(JSON.stringify({applied:96,decisionRows:49,accountingRows:47,fixed:9,pending:fixes.map(e=>[e.entryId,e.decision.disposition,e.decision.targetAnchor])}));\n",
+    "packaging": "import fs from 'node:fs';import assert from 'node:assert/strict';import {execFileSync as exec} from 'node:child_process';import {createHash} from 'node:crypto';\nconst root=process.cwd(),P='plans/260925-documentation-authority-unification/',R=P+'reports/phase-06/',S='/tmp/fgos-work/step8-review-apply/',read=p=>JSON.parse(fs.readFileSync(p)),write=(p,x)=>fs.writeFileSync(p,JSON.stringify(x,null,2)+'\\n'),sha=b=>createHash('sha256').update(b).digest('hex'),pin='7854cff84d8bcb67075d4f9c09cd0b6d04808ff4',g=await import(root+'/scripts/check-doc-inventory-gates.mjs'),unitsOf=g.buildConservationUnitLookup(root,pin),proof=read(R+'step8-nine-rework-application.json');\nconst name='review-request-261015-1625-specs-ui-nine-decision-reworks.md',path=R+name,entries=proof.fixes.map(e=>{e.historicalBeforeDigest=e.beforeDigest;e.historicalAfterDigest=e.afterDigest;e.beforeDigest=e.beforeDecision.targetUnitDigest;e.afterDigest=e.decision.targetUnitDigest;\n const source=e.sourceNativeUnit;\n if(!source){const refs=[e.inheritedSourceWitness?.reviewReportCommit,e.previouslyReviewedDecision.reviewReportCommit,'977509d5f','9881f8622','c8b2d948d','01fe216b4','54c2698ee','05d6fc7ca'].filter(Boolean);for(const ref of refs){let units;try{units=g.buildConservationUnitLookup(root,ref)(e.sourcePath)||[];}catch{continue;}const u=units.find(u=>u.textDigest===e.sourceDigest);if(u){e.sourceHistoricalUnit={commit:exec('git',['rev-parse',ref],{encoding:'utf8'}).trim(),path:e.sourcePath,...u};break;}}}\n const d=e.decision,t=unitsOf(d.targetOwner).find(u=>u.anchor===d.targetAnchor);assert.deepEqual(t,e.afterTarget);assert.equal(t.textDigest,e.afterDigest);assert.equal(d.reviewStatus,'pending');for(const k of ['reviewedBy','reviewedAt','reviewReport','reviewNote','reviewReportCommit'])assert.equal(d[k],undefined);\n return e;});\nconst packet={version:1,authorSession:'codex-session:unit-run-1792056203419-9b5bd055@2026-10-15',contentCommit:pin,sourceCommit:pin,decisionArtifactCommit:'runner commit containing this packet; reviewer must pin that immutable commit',reviewMode:'ordinary',reviewStatus:'pending',count:9,counts:{a:2,b:7},previousReview:proof.reportPath,previousReviewCommit:proof.inputCommit,previousRequestCommit:'0068ed498417177761c43319a0da1171e90d2613',instructions:'Review exactly these nine changed decisions with full before/after content. Source/target docs remain pinned to 7854cff84. No seed, draw or verdict is chosen by the author. Compare each shown decision to its committed shard; supply ordinary notes and full source/target digests. Unchanged 96 ok verdicts are applied and not reopened. Accounting receipts do not authorize promotion, full truth or cutover.',vocabulary:{path:P+'claim-and-disposition-vocabulary.json',changed:false,decision:'Restored merge/promote for all five named rows. Existing vocabulary permits combined corrected content for merge and continued contract carriage for promote; no changed-unit rule requires supersede. The two manifest rationales explicitly describe 2.0 to 3.0 correction instead of asserting verbatim equality.'},docsUnchanged:true,registry:{path:R+'working-identity-registry.json',sha256:sha(fs.readFileSync(R+'working-identity-registry.json')),reused:true,nativeSync:false},entries};write(path+'.json',packet);\nlet md=`# Nine decision corrections: bounded re-review\\n\\nAuthor: ${packet.authorSession}\\nReview mode: ordinary; review status: pending.\\nContent commit: ${pin}\\n\\nExactly **9 pending rows: (a) 2 Step 8; (b) 7 main re-carry**. Docs bytes are unchanged; all source/target units below use the content pin, except explicitly labelled historical source witnesses. Pin the runner commit containing these decision artifacts when reviewing.\\n\\n${packet.instructions}\\n\\n[Full packet](${name}.json), [96-verdict application and verbatim Notes](step8-nine-rework-application.json). Before means the decision reworked by the committed report; after is the current pending decision. Historical previously reviewed decisions remain separately shown in the JSON. Restored five merge/promote dispositions follow the unchanged vocabulary; schema corrections are explicitly named in the manifest rationales.\\n\\n`;\nconst fence=(s,lang='text')=>'```'+lang+'\\n'+s+'\\n```\\n';\nfor(const [i,e]of entries.entries()){const d=e.decision;md+=`## ${i+1}. ${e.entryId} — section (${e.section})\\n\\nShard: \\`${e.shard}\\`.\\nSource: \\`${e.sourcePath}#${e.sourceAnchor||e.sourceNativeUnit?.anchor||e.sourceHistoricalUnit?.anchor||'historical identity gap'}\\`\\n\\nSource digest: \\`${e.sourceDigest}\\`\\nBefore target digest: \\`${e.beforeDigest}\\`\\nAfter target digest: \\`${e.afterDigest}\\`\\n\\nPrior finding (verbatim):\\n\\n${e.reviewFinding.note}\\n\\n### Before decision\\n\\n${fence(JSON.stringify(e.beforeDecision,null,2),'json')}\\n### After decision\\n\\n${fence(JSON.stringify(d,null,2),'json')}\\n### Source unit\\n\\n`;\n const source=e.sourceNativeUnit||e.sourceHistoricalUnit;if(source){md+=(e.sourceHistoricalUnit?`Historical witness: \\`${source.commit}:${source.path}#${source.anchor}\\`; exact source digest matched.\\n\\n`:'Current committed source at the content pin.\\n\\n')+fence(source.sectionText||source.text);}else md+='Historical identity-gap source; inherited independent source witness (not a new current-source identity):\\n\\n'+fence(JSON.stringify(e.inheritedSourceWitness,null,2),'json');\n md+=`\\n### Before target unit\\n\\n\\`${e.beforeDecision.targetOwner}#${e.beforeDecision.targetAnchor}\\`\\n\\n`+fence(e.beforeTarget.sectionText||e.beforeTarget.text)+`\\n### After target unit\\n\\n\\`${d.targetOwner}#${d.targetAnchor}\\`\\nAncestry: ${JSON.stringify(d.targetAncestry)}\\n\\n`+fence(e.afterTarget.sectionText||e.afterTarget.text)+'\\n';}\nmd+='## Verification and closure boundary\\n\\nSee [D/E verification](step8-nine-rework-verification.json). Reuse the registry synced at request 0068ed498; no native sync, no docs edits, no approval carry. Step 8 closes after the two section (a) verdicts are independently accepted and applied; main-merge accounting closes after the seven section (b) verdicts are accepted and applied. Step 9 is next after both. Runner RUL98/99/100 remain deferred to Step 9.\\n\\nThe unrelated pre-existing host-invocation claim_9c0e5bb6 stale target digest is recorded in the owner queue for the Step 10 link pass; it is outside these nine rows and is not rebound or approved here. Full truth at promotion, Rings holds, A34 residuals, token checkpoint, fresh-reader/isolation limits and navigation/consumer/alias/cutover obligations remain.\\n';fs.writeFileSync(path,md);\nconsole.log(JSON.stringify({path,count:9,historicalSourcesFound:entries.filter(e=>e.sourceHistoricalUnit).map(e=>e.entryId),inheritedWitnessOnly:entries.filter(e=>!e.sourceNativeUnit&&!e.sourceHistoricalUnit).map(e=>e.entryId)}));\n",
+    "gates": "import fs from 'node:fs';import v8 from 'node:v8';import assert from 'node:assert/strict';import {execFileSync as exec} from 'node:child_process';import {createHash} from 'node:crypto';\nconst root=process.cwd(),P='plans/260925-documentation-authority-unification/',R=P+'reports/phase-06/',S='/tmp/fgos-work/step8-review-apply/',read=p=>JSON.parse(fs.readFileSync(p)),write=(p,x)=>fs.writeFileSync(p,JSON.stringify(x,null,2)+'\\n'),sha=b=>createHash('sha256').update(b).digest('hex'),pin='7854cff84d8bcb67075d4f9c09cd0b6d04808ff4',head=exec('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),g=await import(root+'/scripts/check-doc-inventory-gates.mjs'),gen=await import(root+'/scripts/generate-doc-inventory.mjs');\nconst inv=v8.deserialize(fs.readFileSync(S+'inventory.bin')),bytes=fs.readFileSync(R+'working-identity-registry.json'),reg=JSON.parse(bytes),inventoryProof=read(S+'inventory-proof.json'),vocabulary=read(P+'claim-and-disposition-vocabulary.json'),droppedClaimsRegister=read(P+'dropped-claims-register.json'),decisions=[...g.loadDecisionShards(P+'pilot/decisions'),...g.loadDecisionShards(P+'ledger/decisions')],priors=[P+'reports/identity-registry.json',P+'reports/phase-02-identity-registry.json'].map(label=>({label,registry:read(label)})),scope=read(R+'step8-committed-native-verification.json').scope,ratchetResult=g.loadRatchetResult(root),runs=[];\nassert.equal(inv.commit,head);assert.equal(inventoryProof.registrySHA256,sha(bytes));assert.equal(sha(bytes),'b9b4f20ce368ed76b314e84bce31dc7ee0ac32764e9fe9795bdc8f9424a259e7');assert(gen.registryBindsToCommit(pin,head,root));exec('git',['diff','--exit-code',pin,head,'--','docs','AGENTS.md','CLAUDE.md',P+'transitional-switchboard.json'],{stdio:'pipe'});\nconst common={repoRoot:root,inventory:inv,vocabulary,identityRegistry:reg,droppedClaimsRegister,ratchetResult,headCommit:head,registryBytes:bytes,missingInputs:[],decisions};\nfor(const [label,previousRegistries]of [['both',priors],['identity',[priors[0]]],['phase02',[priors[1]]]])for(const strict of [false,true]){const name=(strict?'E':'D')+'-'+label,t=Date.now();console.log('START',name,new Date().toISOString());const result=g.checkInventory({...common,previousRegistries,strict,scope:strict?scope:null});write(R+'step8-nine-rework-'+name+'.json',result);const structuralFatal=result.fatalFindings.filter(x=>!strict||!result.conservationOpen.some(o=>o.type===x.type));runs.push({name,scope:strict?scope:null,priors:previousRegistries.map(x=>x.label),durationSeconds:(Date.now()-t)/1000,fatalCount:result.fatalFindings.length,structuralFatal,open:result.conservationOpen.map(x=>({type:x.type,count:x.count}))});write(S+'gate-summary.json',runs);console.log('DONE',JSON.stringify(runs.at(-1)));}\nconst applied=g.applyDecisions(inv,decisions,{vocabulary,targetAnchorsOf:g.buildTargetAnchorLookup(root,head),targetUnitDigestOf:g.buildTargetUnitDigestLookup(root,head),unitsOf:g.buildConservationUnitLookup(root,head),registry:reg,repoRoot:root});assert.deepEqual(applied.findings,[]);\nconst requested=read(R+'review-request-261015-1625-specs-ui-nine-decision-reworks.md.json'),ids=new Set(requested.entries.map(e=>e.entryId)),pending=applied.inventory.claimLedger.filter(x=>scope.includes(x.sourcePath)&&x.reviewStatus!=='reviewed'),unexpected=pending.filter(x=>!ids.has(x.claimId));assert.deepEqual(unexpected,[]);assert.equal(pending.length,5);\nconst pendingGaps=requested.entries.filter(e=>reg.identityGaps.some(u=>u.claimId===e.entryId));assert.equal(pendingGaps.length,4);\nconst tuple=u=>JSON.stringify([u.claimId,u.sourcePath,u.sourceAnchor,u.sourceUnitDigest]);assert.deepEqual(applied.inventory.claimLedger.map(tuple).sort(),reg.units.map(tuple).sort());\nconst before=read(R+'step8-committed-native-candidate-union.json'),normalize=x=>JSON.stringify([x.claimId,x.path,x.anchor,x.unitDigest]),beforeSet=before.rows.map(normalize).sort(),eResults=['both','identity','phase02'].map(label=>read(R+'step8-nine-rework-E-'+label+'.json')),reverse=eResults[0].explicitOpenFindings.unreferencedCandidateRows;for(const e of eResults)assert.deepEqual(e.explicitOpenFindings.unreferencedCandidateRows.map(normalize).sort(),beforeSet);\nconst currentById=new Map(reg.units.map(u=>[u.claimId,u]));for(const row of before.rows){const native=currentById.get(row.claimId);assert(native);assert.equal(native.sourcePath,row.path);assert.equal(native.sourceAnchor,row.anchor);assert.equal(native.sourceUnitDigest,row.unitDigest);}\nconst proof={version:1,contentCommit:pin,inputCommit:head,inventory:inventoryProof,registry:{path:R+'working-identity-registry.json',bytes:bytes.length,SHA256:sha(bytes),unchanged:true,nativeSync:false,refresh:false,priorSyncProof:R+'step8-committed-native-verification.json'},scope,runs,applicationFindings:applied.findings,pendingSourceRows:pending.map(x=>({claimId:x.claimId,path:x.sourcePath,sourceAnchor:x.sourceAnchor,reviewStatus:x.reviewStatus})),pendingPredecessorRows:pendingGaps.map(e=>({claimId:e.entryId,shard:e.shard,reviewStatus:e.decision.reviewStatus})),pendingRowsOutsideRequest:unexpected,totalBoundedPending:9,request:R+'review-request-261015-1625-specs-ui-nine-decision-reworks.md',activeTupleEquality:true,candidateList:{count:reverse.length,unchangedFourFieldEquality:true,fiveFieldEquality:'Reused native lists: docs/constitution bytes and file statuses unchanged; all identity/path/anchor/digest fields rechecked against registry and all three strict E outputs.',priorFiveFieldEvidence:R+'step8-committed-native-verification.json',tupleSHA256:sha(beforeSet.join('\\n'))},tests:{command:'env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/scripts/doc-decision-conservation.test.mjs test/scripts/doc-decision-review.test.mjs test/scripts/doc-review-format.test.mjs',log:R+'step8-nine-rework-tests.log',pass:44,fail:0},step10RecordOnly:R+'step8-nine-rework-step10-open.json',initialAttempt:{raw:R+'step8-nine-rework-initial-D-both.json',fatalCount:1,type:'decision-loss-without-partial-carry',cause:'The unchanged loss-language rule interpreted omitted-id behavior as a missing-content assertion. The rationale now says behavior when id is unspecified, preserving the same true correction; no checker, disposition or docs changed. E was interrupted and all six runs restarted on final decisions.'},closure:'Strict E remains open; nine independent verdicts/application required. Step 8 and main-merge accounting close only when all nine independent verdicts are accepted and applied. Step 9 next.',reproduction:{inventory:fs.readFileSync(S+'inventory.mjs','utf8'),application:fs.readFileSync(S+'apply.mjs','utf8'),packaging:fs.readFileSync(S+'package.mjs','utf8'),gates:fs.readFileSync(S+'gates.mjs','utf8')}};\nwrite(R+'step8-nine-rework-verification.json',proof);assert(runs.every(r=>!r.structuralFatal.length));assert(runs.filter(r=>r.name.startsWith('D')).every(r=>r.fatalCount===0));assert(runs.filter(r=>r.name.startsWith('E')).every(r=>r.open.every(o=>['claims-not-reviewed','identical-units-multiple-owners','candidate-blocks-unreferenced'].includes(o.type))));console.log('FINISHED',JSON.stringify({runs:runs.map(r=>({name:r.name,fatal:r.fatalCount,structural:r.structuralFatal.length,open:r.open})),pending:pending.length,pendingPredecessors:4,reverse:reverse.length}));\n",
+    "finalization": "from pathlib import Path\nimport json,subprocess,hashlib,shutil\nP=Path('plans/260925-documentation-authority-unification');R=P/'reports/phase-06';S=Path('/tmp/fgos-work/step8-review-apply')\nread=lambda p:json.loads(p.read_text());write=lambda p,x:p.write_text(json.dumps(x,ensure_ascii=False,indent=2)+'\\n')\nv=read(R/'step8-nine-rework-verification.json');app=read(R/'step8-nine-rework-application.json');packet=R/'review-request-261015-1625-specs-ui-nine-decision-reworks.md';j=read(Path(str(packet)+'.json'));assert len(j['entries'])==9\nassert v['totalBoundedPending']==9 and len(v['pendingSourceRows'])==5 and len(v['pendingPredecessorRows'])==4\nassert all(not r['structuralFatal']for r in v['runs']);assert all(r['fatalCount']==0 for r in v['runs']if r['name'].startswith('D'))\nassert all({x['type']:x['count']for x in r['open']}=={'claims-not-reviewed':5,'identical-units-multiple-owners':1,'candidate-blocks-unreferenced':867}for r in v['runs']if r['name'].startswith('E'))\nfor n in ['tests.log','inventory.log']:\n shutil.copyfile(S/n,R/('step8-nine-rework-'+n))\nreg=R/'working-identity-registry.json';assert hashlib.sha256(reg.read_bytes()).hexdigest()==v['registry']['SHA256']=='b9b4f20ce368ed76b314e84bce31dc7ee0ac32764e9fe9795bdc8f9424a259e7'\ninput_head=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip();assert input_head==v['inputCommit'];assert subprocess.run(['git','diff','--quiet','7854cff84','HEAD','--','docs','AGENTS.md','CLAUDE.md',str(P/'transitional-switchboard.json')]).returncode==0\nrows='| Run | Fatal findings | Structural fatal |\\n|---|---:|---:|\\n'+'\\n'.join(f\"| {r['name']} | {r['fatalCount']} | {len(r['structuralFatal'])} |\"for r in v['runs'])\nbody=f'''# Accepted verdicts applied — nine corrected decisions await independent review\n\nAssignment `unit-run-1792056203419-9b5bd055/producer/1`. Input/review report commit **{input_head}**. Request reviewed at **0068ed498417177761c43319a0da1171e90d2613**; all source/target docs remain pinned to **7854cff84d8bcb67075d4f9c09cd0b6d04808ff4**. This checkpoint supersedes earlier current counts; all older checkpoints and their raw proof remain historical.\n\n**Applied all 96 ok verdicts in ordinary mode, with verbatim notes:** 49 claim/predecessor decision rows through unchanged `applyReviewVerdicts`, plus 47 changed-text/accounting receipts in [application record](step8-nine-rework-application.json). Every approval pins the committed report, exact source/target digests and shown decision; 47 accounting receipts certify their bounded channel only, never substitute for source carriage or promotion truth. The report Notes are retained verbatim. Section (a): 16 ok applied, 2 pending reworks; section (b): 80 ok applied, 7 pending reworks.\n\n**All 9 reworks fixed, pending with no approval carry:**\n\n- `claim_74a311a5` and `claim_c4c6b556`: `supersede`; rationales name the corrected Work item id and capability/check sentences within the complete sections.\n- `claim_665eb7f4` and `claim_e597b776`: rebound to the bullets at `cli-io-contract.md#unheaded-block-34`, full digest `e013c5b05d6ff58782aa8231ab4a55967bd5ef853dac4015aec8f16f5fcf9c68`; paragraph block 33 is no longer their target. Earlier inconsistent anchor/digest is stated honestly.\n- `claim_15a24dbb`, `claim_5dcb5660`, `claim_6fe86521`, `claim_9959e82e`, `claim_19495d27`: restored reviewed dispositions `merge`, `merge`, `promote`, `merge`, `merge`. The unchanged vocabulary permits these dispositions; no changed-unit rule requires supersede. The two manifest rationales state the actual schema 2.0 to 3.0 correction and combined-source ownership instead of claiming verbatim equality.\n\n**D: zero fatal, both priors together and each. Strict E: open only five current source rows from this request plus the existing closure-allowed lists.** The other four pending entries are explicit historical identity-gap/predecessor decisions, not current source claims. Exact total pending request = **9**. No unexpected source pending outside the request, no structural fatal, no unexplained open category.\n\n{rows}\n\nEach E run has **5 claims-not-reviewed, 1 identical-units-multiple-owners, 867 candidate-blocks-unreferenced**. Strict E is not green. [Six raw D/E outputs and summary](step8-nine-rework-verification.json). Registry from 0068ed498 reused **unchanged**: 61,576,932 bytes; SHA256 `b9b4f20ce368ed76b314e84bce31dc7ee0ac32764e9fe9795bdc8f9424a259e7`. No native sync, carry-forward or persistence. A read-only inventory was generated at the report-bearing input commit, whose in-scope bytes equal 7854cff84; this admits committed report ancestry without fabricating the content pin. The initial content-only inventory attempt was discarded before use because the later report must be an ancestor of the inventory commit. An initial D found the unchanged loss-language rule interpreted the rationale phrase “omitted-id behavior” as a content-loss assertion. The final rationale says “behavior when id is unspecified”, preserving its meaning; the [initial failed D](step8-nine-rework-initial-D-both.json) remains evidence. E was interrupted and all six D/E runs restarted on the final decision content, without a checker or docs change. Active native/applied tuples equal; all three E reverse sets equal the existing 867-unit list. Existing full file-status evidence remains valid because docs/constitution bytes and registry are unchanged. Candidate truth stays unverified.\n\n**One bounded request:** [{packet.name}]({packet.name}), **9 rows**, full before/after decisions and source/target units with full digests and ancestry, including four exact historical source witnesses. Docs content pin **7854cff84**; reviewer must additionally pin the runner commit containing the changed decision packet. No author-selected seed, draw or verdict. **Step 8 and main-merge accounting remain open until all nine verdicts are independently accepted and applied. Step 9 is next after that closure.** Runner RUL98/99/100 remain deferred to Step 9.\n\n**Record-only Step 10 obligation:** [owner queue](owner-queue.md#step-10-pre-existing-host-invocation-digest-obligation--2026-10-15) and [exact accounting](step8-nine-rework-step10-open.json) retain `claim_9c0e5bb670fb2957bb0998cbe5d8d51e`: stored target `c14f83e8…`, actual `fd8f4157…`, stale before this content commit. Its shard/approval was not changed; it needs its own Step 10 rebind/review. The review's carried stale sentences remain owed at promotion.\n\nTests **44/44 pass**, zero fail/skip/cancel/todo, with `env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/scripts/doc-decision-conservation.test.mjs test/scripts/doc-decision-review.test.mjs test/scripts/doc-review-format.test.mjs`. [Raw tests](step8-nine-rework-tests.log); [mutation audit](step8-nine-rework-mutation-audit.json). Exactly 49 approvals and 9 reworked decisions changed; unrelated decisions stay equal. `git diff --check` passes. Docs, registry, gates/checkers/vocabulary/extractor/baselines and all workspace files outside this plan are untouched; no .fgos workspace, secret, lifecycle or git write. Scratch only `/tmp/fgos-work`; runner owns commit. The mandatory external result is the sole explicit write-scope exception; needsWrites empty.\n\nFull truth at promotion, Rings holds, A34 residuals, token checkpoint, fresh-reader/isolation limits and navigation/consumer/alias/cutover obligations remain. No new owner-direction blocker; independent nine-row review/application is the closure dependency. MDView MCP is unavailable in this session; local preview is omitted under the assignment write boundary. Convention generated the request basename; the legacy plan directory fails the newer `--plan` naming format, so the generated basename is placed in the existing mandated report directory without changing convention tooling or creating another plan.\n\n---\n\n'''\nfor n in ['progress.md','step-08-report.md']:\n p=R/n;p.write_text(body+p.read_text())\nv['initialAttempt']={'raw':str(R/'step8-nine-rework-initial-D-both.json'),'fatalCount':1,'type':'decision-loss-without-partial-carry','resolution':'Changed rationale wording omitted-id behavior to behavior when id is unspecified; same true content, no checker change. Interrupted E and restarted all six final runs.'};v['reproduction']['finalization']=(S/'finalize.py').read_text();v['closureDependency']='Nine independent verdicts/application; Step 8 and main-merge accounting remain open, Step 9 next.';v['mutationAudit']=str(R/'step8-nine-rework-mutation-audit.json');write(R/'step8-nine-rework-verification.json',v)\nprint(json.dumps({'applied':96,'fixed':9,'D':[r['fatalCount']for r in v['runs']if r['name'].startswith('D')],'E':[r['open']for r in v['runs']if r['name'].startswith('E')],'request':str(packet)}))\n"
+  },
+  "initialAttempt": {
+    "raw": "plans/260925-documentation-authority-unification/reports/phase-06/step8-nine-rework-initial-D-both.json",
+    "fatalCount": 1,
+    "type": "decision-loss-without-partial-carry",
+    "resolution": "Changed rationale wording omitted-id behavior to behavior when id is unspecified; same true content, no checker change. Interrupted E and restarted all six final runs."
+  },
+  "closureDependency": "Nine independent verdicts/application; Step 8 and main-merge accounting remain open, Step 9 next.",
+  "mutationAudit": "plans/260925-documentation-authority-unification/reports/phase-06/step8-nine-rework-mutation-audit.json"
+}

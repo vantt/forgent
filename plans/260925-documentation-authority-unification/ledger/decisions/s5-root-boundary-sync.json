@@ -149,15 +149,21 @@
       "targetAnchor": "unheaded-block-32",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
       "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+      "reviewNote": "deep: sampled; legacy io-contract block 19 (51dd3c8a, was block 18 before the merge) byte-equal to carrier block 32; before and after digest equal; anchor shift 31 to 32; supersede unchanged; registry holds the claim at legacy anchor 19; ancestry recomputed equal",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1526-specs-ui-reworks-main-recarry.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "51dd3c8aa026a8f5a15e4c12c522b3bf2ad7c29238c49bf9ba51324806e10e23",
       "targetAncestry": [
         "CLI I/O Contract",
         "7. Machine-Readable Verb Registry",
         "Manifest Shape"
-      ]
+      ],
+      "reviewReportCommit": "0e8ce7710ac67ad038927b242b2461876bf8c90d"
     },
     {
       "claimId": "claim_b8fa7fa2cd614433de754bbb92302140",
@@ -166,15 +172,21 @@
       "targetAnchor": "unheaded-block-34",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
       "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+      "reviewNote": "deep: unequal digests d08ac6f6 vs e013c5b0; diff read: carrier keeps the earlier corrected externalEffect sentence (15 verbs from COMMAND_REGISTRY, no coordination) in place of the legacy see-help sentence; unchanged by this merge (target e013c5b0 before and after, anchor 33 to 34); supersede covers the corrected text",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1526-specs-ui-reworks-main-recarry.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "e013c5b05d6ff58782aa8231ab4a55967bd5ef853dac4015aec8f16f5fcf9c68",
       "targetAncestry": [
         "CLI I/O Contract",
         "7. Machine-Readable Verb Registry",
         "Entry Fields And Effect Axes"
-      ]
+      ],
+      "reviewReportCommit": "0e8ce7710ac67ad038927b242b2461876bf8c90d"
     },
     {
       "claimId": "claim_f7459f118bd93b8769e6c90ace8c68fe",
@@ -314,14 +326,20 @@
       "targetAnchor": "unheaded-block-30",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "reviewNote": "mechanical: legacy work-state block 66 (878d708d) byte-equal to carrier block 30; digests recompute; anchor shift 29 to 30; supersede unchanged; anchor and ancestry checks pass; pending, no approval fields",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1526-specs-ui-reworks-main-recarry.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "878d708db7a0afb3e23a0829f98be122c83ac562946b51ab1989e73e5e4a8bfe",
       "targetAncestry": [
         "CLI I/O Contract",
         "7. Machine-Readable Verb Registry",
         "Manifest Shape"
-      ]
+      ],
+      "reviewReportCommit": "0e8ce7710ac67ad038927b242b2461876bf8c90d"
     },
     {
       "claimId": "claim_045b588f4d839f90c40b48fbc0fc3f4d",
@@ -330,15 +348,21 @@
       "targetAnchor": "unheaded-block-31",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
       "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+      "reviewNote": "mechanical: legacy work-state block 67 (a5128895) byte-equal to carrier block 31; digests recompute; anchor shift 30 to 31; supersede unchanged; pending, no approval fields",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1526-specs-ui-reworks-main-recarry.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "a5128895b71f07c2e1baa3ecb90cd302f016fdb4191518ef02835a768c8dc156",
       "targetAncestry": [
         "CLI I/O Contract",
         "7. Machine-Readable Verb Registry",
         "Manifest Shape"
-      ]
+      ],
+      "reviewReportCommit": "0e8ce7710ac67ad038927b242b2461876bf8c90d"
     },
     {
       "claimId": "claim_e8c37a28267ca355475a2286b90ba453",
@@ -348,13 +372,19 @@
       "targetAnchor": "unheaded-block-38",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "reviewNote": "mechanical: legacy work-state block 71 (7cb2dbfd) byte-equal to carrier block 38; digests recompute; anchor shift 37 to 38; supersede unchanged; pending, no approval fields",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1526-specs-ui-reworks-main-recarry.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "7cb2dbfd3b698c923c15d17222daf08e96f5fcbf54aa79afd3e1248fdd8d9b2e",
       "targetAncestry": [
         "CLI I/O Contract",
         "9. Per-Verb Help"
-      ]
+      ],
+      "reviewReportCommit": "0e8ce7710ac67ad038927b242b2461876bf8c90d"
     },
     {
       "claimId": "claim_b69096018a7da1d3dc629b5d37f6fdac",
@@ -363,14 +393,20 @@
       "targetAnchor": "unheaded-block-39",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
       "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+      "reviewNote": "deep: sampled; legacy work-state block 72 (9b711cb5) byte-equal to carrier block 39 (machine-readable help bullet read); anchor shift 38 to 39; supersede unchanged; digests, anchor and ancestry recompute; pending",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1526-specs-ui-reworks-main-recarry.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "9b711cb5a088ede56ad00207289f1fed2ccc05887597169bbc41eb2e55429db3",
       "targetAncestry": [
         "CLI I/O Contract",
         "9. Per-Verb Help"
-      ]
+      ],
+      "reviewReportCommit": "0e8ce7710ac67ad038927b242b2461876bf8c90d"
     },
     {
       "claimId": "claim_2ae81c7bed935553943d6777b81e2114",
@@ -1021,11 +1057,17 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/contracts/architecture-manifest.json",
       "targetAnchor": "file-block",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
       "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "reviewNote": "deep: gap row; older platform-copy generation (digest c1c23046 found at 86ce0d284); successor is the same file now 70c00c20 byte-equal to the legacy manifest; word diff read: newer module entries added, dispatch-log.mjs and work-dispatch.mjs entries gone and fanout-batch reclassified, i.e. an older whole-file generation superseded by the current file; supersede true; pending",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1526-specs-ui-reworks-main-recarry.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "70c00c205578fc34084e5bf8701a6bde0999cb6f05a1b58f8424ad95ed4c28d4",
-      "targetAncestry": []
+      "targetAncestry": [],
+      "reviewReportCommit": "0e8ce7710ac67ad038927b242b2461876bf8c90d"
     },
     {
       "claimId": "claim_c201fb480171293641c2fb049fd33936",
@@ -1150,14 +1192,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-25",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
       "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "reviewNote": "deep: gap row; old digest 4a338e4d found at c8b2d948d block 24 (exceptions list, four-item generation); successor block 25 f5825340 unchanged, anchor shift 24 to 25; word diff read: help-flag wording only; supersede unchanged",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1526-specs-ui-reworks-main-recarry.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "f58253403717e416cd5aa169d971bc332b43ab40f16ab6845c90d959d4283221",
       "targetAncestry": [
         "CLI I/O Contract",
         "5. Reasoned Envelope Exceptions"
-      ]
+      ],
+      "reviewReportCommit": "0e8ce7710ac67ad038927b242b2461876bf8c90d"
     },
     {
       "claimId": "claim_0bf4d10d1c0f4cda16abe6091d639b64",
@@ -1167,15 +1215,21 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-30",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
       "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "reviewNote": "deep: gap row; old digest a2e6a5ff found at c8b2d948d block 29 (manifest paragraph with schema 2.0); successor block 30 878d708d unchanged, shift only; word diff read: 2.0 to 3.0 wording; supersede unchanged",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1526-specs-ui-reworks-main-recarry.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "878d708db7a0afb3e23a0829f98be122c83ac562946b51ab1989e73e5e4a8bfe",
       "targetAncestry": [
         "CLI I/O Contract",
         "7. Machine-Readable Verb Registry",
         "Manifest Shape"
-      ]
+      ],
+      "reviewReportCommit": "0e8ce7710ac67ad038927b242b2461876bf8c90d"
     },
     {
       "claimId": "claim_bc055098a9e2bedf2ed30ab0dfcacf79",
@@ -1185,15 +1239,21 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-32",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
       "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "reviewNote": "deep: gap row; old digest 83773dda found at c8b2d948d block 30; successor block 32 51dd3c8a unchanged, shift only; word diff read: 2.0 to 3.0 and the verb-entry sentences; supersede unchanged",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1526-specs-ui-reworks-main-recarry.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "51dd3c8aa026a8f5a15e4c12c522b3bf2ad7c29238c49bf9ba51324806e10e23",
       "targetAncestry": [
         "CLI I/O Contract",
         "7. Machine-Readable Verb Registry",
         "Manifest Shape"
-      ]
+      ],
+      "reviewReportCommit": "0e8ce7710ac67ad038927b242b2461876bf8c90d"
     },
     {
       "claimId": "claim_3d2d87a2a9582e2faebabc79470d8ee8",
@@ -1294,27 +1354,39 @@
       "claimKind": "contract",
       "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "targetOwner": "docs/platform/contracts/architecture-manifest.json",
       "targetAnchor": "file-block",
       "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "reviewNote": "deep: gap row; old whole-file digest 0eab58e6 found at 6c6a65e85 (older manifest); successor platform copy 70c00c20 byte-equal to current legacy; word diff read: three entries added (run-timeout, executor-posture-coverage, unit-sync); supersede true",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1526-specs-ui-reworks-main-recarry.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "70c00c205578fc34084e5bf8701a6bde0999cb6f05a1b58f8424ad95ed4c28d4",
-      "targetAncestry": []
+      "targetAncestry": [],
+      "reviewReportCommit": "0e8ce7710ac67ad038927b242b2461876bf8c90d"
     },
     {
       "claimId": "claim_0416642260519cf992931a4968e80c03",
       "sourceUnitDigest": "0eab58e60acc4e19019d05f6317967bbfe06fc70a222b7f6297b107a3071559f",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
       "targetOwner": "docs/platform/contracts/architecture-manifest.json",
       "targetAnchor": "file-block",
       "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
       "sourcePath": "docs/architecture-manifest.json",
       "sourceAnchor": "file-block",
+      "reviewNote": "deep: gap row on docs/architecture-manifest.json; old digest 0eab58e6 found at 84fe38b2f; successor platform copy 70c00c20 byte-equal to the legacy file; diff read: same three added entries; supersede true; pending",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1526-specs-ui-reworks-main-recarry.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "70c00c205578fc34084e5bf8701a6bde0999cb6f05a1b58f8424ad95ed4c28d4",
-      "targetAncestry": []
+      "targetAncestry": [],
+      "reviewReportCommit": "0e8ce7710ac67ad038927b242b2461876bf8c90d"
     },
     {
       "claimId": "claim_daaf3726036adad15b2529ad43f71d44",
@@ -1323,9 +1395,15 @@
       "targetAnchor": "unheaded-block-85",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
       "rationale": "A31 native source predecessor became identity gap; retain native ID, supersede accounting to current carrier. A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "sourcePath": "docs/specs/distribution.md",
+      "reviewNote": "deep: gap row; old digest b2602ce1 equals pre-merge legacy block 5 (found at af0057e13 parent 1); successor block 85 034305c4 is byte-equal to current block 5, the only change being doctor row 7 (matches the upstream hunk); the identity-gap rationale and supersede are true; sourcePath added; pending",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1526-specs-ui-reworks-main-recarry.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "034305c494ee289535b1b4121c8b90ed9d2eb5b850364e1c2a63e936221d40e3",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
@@ -1333,7 +1411,7 @@
         "Spec: Distribution",
         "Data Dictionary"
       ],
-      "sourcePath": "docs/specs/distribution.md"
+      "reviewReportCommit": "0e8ce7710ac67ad038927b242b2461876bf8c90d"
     },
     {
       "sourcePath": "docs/architecture-manifest.json",
@@ -1343,12 +1421,18 @@
       "targetAnchor": "file-block",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
       "rationale": "A31 native source predecessor became identity gap; retain native ID, supersede accounting to current carrier. A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
       "claimId": "claim_cdb2776a59ac6a8bbc129754ffc7380f",
+      "reviewNote": "deep: gap row; old whole-file digest 5a7e59ab equals the pre-merge docs/architecture-manifest.json (parent 1); successor is the platform copy, now byte-equal (sha256 70c00c20, 12267 bytes); the one added line src/setup/executor-posture-coverage.mjs: use-case matches the upstream hunk; supersede true",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1526-specs-ui-reworks-main-recarry.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "70c00c205578fc34084e5bf8701a6bde0999cb6f05a1b58f8424ad95ed4c28d4",
-      "targetAncestry": []
+      "targetAncestry": [],
+      "reviewReportCommit": "0e8ce7710ac67ad038927b242b2461876bf8c90d"
     }
   ]
 }

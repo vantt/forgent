@@ -150,15 +150,21 @@
       "targetAnchor": "data-dictionary",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
       "rationale": "A31 current source digest rebound; decision-digest-stale resolved. A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "reviewNote": "deep: unequal digests; diff read: the heading depth (## to ####) is the only difference in the section; source digest rebound because the legacy row 7 changed inside the section, target 6c8e1dd0 recomputes; move stays true; rationale states the rebind truthfully; pending, no approval fields",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1526-specs-ui-reworks-main-recarry.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "6c8e1dd03ab2944884eeffa46ab058e714f6b5008fdeab13cf7c443ac50c744f",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
         "Spec: Distribution"
-      ]
+      ],
+      "reviewReportCommit": "0e8ce7710ac67ad038927b242b2461876bf8c90d"
     },
     {
       "claimId": "claim_35e55882f79d7ab6b9435f03982beba3",
@@ -765,18 +771,24 @@
       "targetAnchor": "unheaded-block-85",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
       "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
       "sourcePath": "docs/specs/distribution.md",
       "sourceAnchor": "unheaded-block-5",
+      "reviewNote": "deep: gap row; old digest 648a2fee found in history (7df21d6ca, distribution.md block 5); named successor is carrier block 85 034305c4, byte-equal to current legacy block 5; word diff old to current read: the registry-row edits only; supersede with named owner and anchor is true; pending",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1526-specs-ui-reworks-main-recarry.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "034305c494ee289535b1b4121c8b90ed9d2eb5b850364e1c2a63e936221d40e3",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
         "Spec: Distribution",
         "Data Dictionary"
-      ]
+      ],
+      "reviewReportCommit": "0e8ce7710ac67ad038927b242b2461876bf8c90d"
     },
     {
       "claimId": "claim_bdeaa6f1cce78532047ba6bf959cc43a",

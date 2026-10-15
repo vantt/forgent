@@ -125,10 +125,10 @@
       "targetOwner": "docs/platform/claude-plugin/spec.md",
       "targetAnchor": "data-dictionary",
       "claimKind": "specification",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
-      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "authoredBy": "codex-session:unit-run-1792056203419-9b5bd055@2026-10-15",
+      "rationale": "The complete Data Dictionary section replaces the legacy section with the corrected Work item id sentence: id is optional for pick/graph, check is not a shipped skill, and behavior when id is unspecified follows the corrected row. The section therefore differs from its source and is supersede, consistent with the corrected sibling units; its whole current section is bound by digest and ancestry.",
       "targetUnitDigest": "80aad4984704cb2169f9b47f19b917eb49396d225f5ba07cd499b7ce6c68e015",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)"
@@ -141,14 +141,20 @@
       "targetAnchor": "unheaded-block-6",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
       "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "reviewNote": "deep: block 6 differs from the source only in the Work item id row (optional for pick/graph, check not shipped, omitted-id wording); true: plugins/fgOS/skills has no check directory and git ls-files shows no check/SKILL.md; move to supersede is right for changed text; rationale is only a rebind line, not false but silent on why; digests recomputed equal, pending, no approval fields",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1526-specs-ui-reworks-main-recarry.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "8341c4c3c7e2671f39ab511ae332704e9a4b035737fd9539169c805b7093eeae",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Data Dictionary"
-      ]
+      ],
+      "reviewReportCommit": "0e8ce7710ac67ad038927b242b2461876bf8c90d"
     },
     {
       "claimId": "claim_3ec4250ed3c32495b43a85a96c5cff70",
@@ -605,15 +611,21 @@
       "targetAnchor": "unheaded-block-16",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
       "rationale": "A19 corrected Runs-when text supersedes stale unheaded block; no heading-binding rationale. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "reviewNote": "deep: only change is the Runs-when line (legacy description only, no /fgOS:check skill; true, no check/SKILL.md); disposition is now supersede, matching corrected siblings claim_40755fce (check heading) and rows 26 and 29; rationale names the A19 corrected text and drops the heading-binding wording that failed last round; target 198b783f recomputes and is unchanged; pending",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1526-specs-ui-reworks-main-recarry.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "198b783f76cc48a151d57bb5ecad73617c356411d147ae4374d67c274934918b",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Behaviors & Operations",
         "check"
-      ]
+      ],
+      "reviewReportCommit": "0e8ce7710ac67ad038927b242b2461876bf8c90d"
     },
     {
       "claimId": "claim_b92f03e0e94bc1ed715a6da0c42bbcf0",
@@ -711,10 +723,10 @@
       "targetOwner": "docs/platform/claude-plugin/spec.md",
       "targetAnchor": "actors-access",
       "claimKind": "specification",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
-      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "authoredBy": "codex-session:unit-run-1792056203419-9b5bd055@2026-10-15",
+      "rationale": "The complete Actors & Access section replaces the legacy section with the corrected capability row: check is not a shipped skill. The corrected sentence makes the whole section differ from its source, so supersede matches the corrected sibling units; the full section is retained and bound by digest and ancestry.",
       "targetUnitDigest": "b1405975f4c717c854a7bb988a6af790be278401ffa1d415b2a24ec69c442c50",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)"
@@ -727,14 +739,20 @@
       "targetAnchor": "unheaded-block-19",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
       "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+      "reviewNote": "deep: block 19 differs from the source only in the capability-table row (check dropped from the read list, note that it is not shipped; true per plugins/fgOS/skills); move to supersede is right; digests recomputed equal, anchor ok, pending, no approval fields",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1526-specs-ui-reworks-main-recarry.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "f88a5c11a70dda7a7cf1102658cb21c3ee1d7b7f469f764954a389a4ca599993",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Actors & Access"
-      ]
+      ],
+      "reviewReportCommit": "0e8ce7710ac67ad038927b242b2461876bf8c90d"
     },
     {
       "claimId": "claim_dd811f34a76357f46fd5bdf22fc90c93",

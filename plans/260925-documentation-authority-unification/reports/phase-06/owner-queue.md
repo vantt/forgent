@@ -398,3 +398,13 @@ This is an obligation list under the Lead’s author-run brief, not an approval 
 | specs-ui-contextual-heading | Citation-drift and plugin share one empty Behaviors & Operations heading digest but own different child behavior sections. | Separate accounting verdict is ok in review-261015-1410-specs-ui-identical-1276467f3.md, pinned to 1276467f3; exact Step 8 membership remains in step8-open-accounting.json. Global accounting must also retain the separately reviewed Step 4 row noted by the reviewer. | Explicit E closure-allowed list remains visible | Independently accepted accounting; no source/truth approval |
 | specs-ui-observe-link-rebases | Two relative links in Observe spec section 5 were rebased in the candidate at 1276467f3: ../reference/discussion-quality-rubric.md and ../how-to/compare-discussion-setups-with-metrics-eval.md gain one ../. | Candidate destinations are ../../reference/discussion-quality-rubric.md and ../../how-to/compare-discussion-setups-with-metrics-eval.md; labels and repository referents unchanged. step8-owed-repoints.json records the rebases. Revalidate at cutover. | Link pass / promotion | Candidate rebases complete; downstream consumer repoint remains owed |
 | specs-ui-point-in-time-records | 78 line hits across 24 files under docs/history and CHANGELOG.md cite the Step 8 legacy sources. | Excluded from repointing by Lead decision: these are point-in-time records. Preserve their dated references; do not rewrite them into current-authority claims. | None; deliberate historical exclusion | Excluded, Lead decision in current assignment |
+
+## Step 10 pre-existing host-invocation digest obligation — 2026-10-15
+
+Record-only from the committed 105-entry review Notes; outside the nine submitted reworks. No owner direction question remains.
+
+| Id | Owner | Open obligation | When | Effect |
+|---|---|---|---|---|
+| step10-host-invocation-stale-successor-digest | Host Invocation / Packaging-distribution | `claim_9c0e5bb670fb2957bb0998cbe5d8d51e`, `docs/platform/packaging-distribution/spec.md#unheaded-block-4`: recorded target digest `c14f83e85b43064dd321bf0926e6b98f781c23df08cf772ef8959a30837a2e18`, actual `fd8f41577cf07e6e6713f2a48792d88071e7fa072e87b32c08ec0be373173c6c` at `7854cff84d8bcb67075d4f9c09cd0b6d04808ff4`. Inspect and independently rebind; old approval cannot carry. | Step 10 link pass | Pre-existing stale binding; record only, no shard mutation and no new Step 8 request row. |
+
+[Complete old decision and current unit](step8-nine-rework-step10-open.json). Carried stale sentences named by the reviewer (io-contract manifest table schema 2.0, herdr R6/child-process rationale, decision-citation-drift R3 scope) remain owed at promotion.

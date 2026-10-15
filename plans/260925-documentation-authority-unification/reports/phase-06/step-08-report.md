@@ -1,3 +1,38 @@
+# Accepted verdicts applied — nine corrected decisions await independent review
+
+Assignment `unit-run-1792056203419-9b5bd055/producer/1`. Input/review report commit **0e8ce7710ac67ad038927b242b2461876bf8c90d**. Request reviewed at **0068ed498417177761c43319a0da1171e90d2613**; all source/target docs remain pinned to **7854cff84d8bcb67075d4f9c09cd0b6d04808ff4**. This checkpoint supersedes earlier current counts; all older checkpoints and their raw proof remain historical.
+
+**Applied all 96 ok verdicts in ordinary mode, with verbatim notes:** 49 claim/predecessor decision rows through unchanged `applyReviewVerdicts`, plus 47 changed-text/accounting receipts in [application record](step8-nine-rework-application.json). Every approval pins the committed report, exact source/target digests and shown decision; 47 accounting receipts certify their bounded channel only, never substitute for source carriage or promotion truth. The report Notes are retained verbatim. Section (a): 16 ok applied, 2 pending reworks; section (b): 80 ok applied, 7 pending reworks.
+
+**All 9 reworks fixed, pending with no approval carry:**
+
+- `claim_74a311a5` and `claim_c4c6b556`: `supersede`; rationales name the corrected Work item id and capability/check sentences within the complete sections.
+- `claim_665eb7f4` and `claim_e597b776`: rebound to the bullets at `cli-io-contract.md#unheaded-block-34`, full digest `e013c5b05d6ff58782aa8231ab4a55967bd5ef853dac4015aec8f16f5fcf9c68`; paragraph block 33 is no longer their target. Earlier inconsistent anchor/digest is stated honestly.
+- `claim_15a24dbb`, `claim_5dcb5660`, `claim_6fe86521`, `claim_9959e82e`, `claim_19495d27`: restored reviewed dispositions `merge`, `merge`, `promote`, `merge`, `merge`. The unchanged vocabulary permits these dispositions; no changed-unit rule requires supersede. The two manifest rationales state the actual schema 2.0 to 3.0 correction and combined-source ownership instead of claiming verbatim equality.
+
+**D: zero fatal, both priors together and each. Strict E: open only five current source rows from this request plus the existing closure-allowed lists.** The other four pending entries are explicit historical identity-gap/predecessor decisions, not current source claims. Exact total pending request = **9**. No unexpected source pending outside the request, no structural fatal, no unexplained open category.
+
+| Run | Fatal findings | Structural fatal |
+|---|---:|---:|
+| D-both | 0 | 0 |
+| E-both | 3 | 0 |
+| D-identity | 0 | 0 |
+| E-identity | 3 | 0 |
+| D-phase02 | 0 | 0 |
+| E-phase02 | 3 | 0 |
+
+Each E run has **5 claims-not-reviewed, 1 identical-units-multiple-owners, 867 candidate-blocks-unreferenced**. Strict E is not green. [Six raw D/E outputs and summary](step8-nine-rework-verification.json). Registry from 0068ed498 reused **unchanged**: 61,576,932 bytes; SHA256 `b9b4f20ce368ed76b314e84bce31dc7ee0ac32764e9fe9795bdc8f9424a259e7`. No native sync, carry-forward or persistence. A read-only inventory was generated at the report-bearing input commit, whose in-scope bytes equal 7854cff84; this admits committed report ancestry without fabricating the content pin. The initial content-only inventory attempt was discarded before use because the later report must be an ancestor of the inventory commit. An initial D found the unchanged loss-language rule interpreted the rationale phrase “omitted-id behavior” as a content-loss assertion. The final rationale says “behavior when id is unspecified”, preserving its meaning; the [initial failed D](step8-nine-rework-initial-D-both.json) remains evidence. E was interrupted and all six D/E runs restarted on the final decision content, without a checker or docs change. Active native/applied tuples equal; all three E reverse sets equal the existing 867-unit list. Existing full file-status evidence remains valid because docs/constitution bytes and registry are unchanged. Candidate truth stays unverified.
+
+**One bounded request:** [review-request-261015-1625-specs-ui-nine-decision-reworks.md](review-request-261015-1625-specs-ui-nine-decision-reworks.md), **9 rows**, full before/after decisions and source/target units with full digests and ancestry, including four exact historical source witnesses. Docs content pin **7854cff84**; reviewer must additionally pin the runner commit containing the changed decision packet. No author-selected seed, draw or verdict. **Step 8 and main-merge accounting remain open until all nine verdicts are independently accepted and applied. Step 9 is next after that closure.** Runner RUL98/99/100 remain deferred to Step 9.
+
+**Record-only Step 10 obligation:** [owner queue](owner-queue.md#step-10-pre-existing-host-invocation-digest-obligation--2026-10-15) and [exact accounting](step8-nine-rework-step10-open.json) retain `claim_9c0e5bb670fb2957bb0998cbe5d8d51e`: stored target `c14f83e8…`, actual `fd8f4157…`, stale before this content commit. Its shard/approval was not changed; it needs its own Step 10 rebind/review. The review's carried stale sentences remain owed at promotion.
+
+Tests **44/44 pass**, zero fail/skip/cancel/todo, with `env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/scripts/doc-decision-conservation.test.mjs test/scripts/doc-decision-review.test.mjs test/scripts/doc-review-format.test.mjs`. [Raw tests](step8-nine-rework-tests.log); [mutation audit](step8-nine-rework-mutation-audit.json). Exactly 49 approvals and 9 reworked decisions changed; unrelated decisions stay equal. `git diff --check` passes. Docs, registry, gates/checkers/vocabulary/extractor/baselines and all workspace files outside this plan are untouched; no .fgos workspace, secret, lifecycle or git write. Scratch only `/tmp/fgos-work`; runner owns commit. The mandatory external result is the sole explicit write-scope exception; needsWrites empty.
+
+Full truth at promotion, Rings holds, A34 residuals, token checkpoint, fresh-reader/isolation limits and navigation/consumer/alias/cutover obligations remain. No new owner-direction blocker; independent nine-row review/application is the closure dependency. MDView MCP is unavailable in this session; local preview is omitted under the assignment write boundary. Convention generated the request basename; the legacy plan directory fails the newer `--plan` naming format, so the generated basename is placed in the existing mandated report directory without changing convention tooling or creating another plan.
+
+---
+
 # Committed native proof complete — bounded independent review pending
 
 One background native sync at **7854cff84d8bcb67075d4f9c09cd0b6d04808ff4**: **550.181s**, 4467 files / 90774 claims; known IDs **98462 → 98470**, zero loss. Compact registry persisted **once**, 61576932 bytes, SHA256 `b9b4f20ce368ed76b314e84bce31dc7ee0ac32764e9fe9795bdc8f9424a259e7`. Native inventory, active registry and applied identity/path/anchor/digest tuples equal. Seven new candidate identity gaps remain explicit in [gap accounting](step8-committed-native-gap-accounting.json), without identity graft or approval carry.

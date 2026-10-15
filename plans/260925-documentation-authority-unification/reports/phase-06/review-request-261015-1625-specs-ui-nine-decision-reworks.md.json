@@ -1,0 +1,1347 @@
+{
+  "version": 1,
+  "authorSession": "codex-session:unit-run-1792056203419-9b5bd055@2026-10-15",
+  "contentCommit": "7854cff84d8bcb67075d4f9c09cd0b6d04808ff4",
+  "sourceCommit": "7854cff84d8bcb67075d4f9c09cd0b6d04808ff4",
+  "decisionArtifactCommit": "runner commit containing this packet; reviewer must pin that immutable commit",
+  "reviewMode": "ordinary",
+  "reviewStatus": "pending",
+  "count": 9,
+  "counts": {
+    "a": 2,
+    "b": 7
+  },
+  "previousReview": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1526-specs-ui-reworks-main-recarry.md",
+  "previousReviewCommit": "0e8ce7710ac67ad038927b242b2461876bf8c90d",
+  "previousRequestCommit": "0068ed498417177761c43319a0da1171e90d2613",
+  "instructions": "Review exactly these nine changed decisions with full before/after content. Source/target docs remain pinned to 7854cff84. No seed, draw or verdict is chosen by the author. Compare each shown decision to its committed shard; supply ordinary notes and full source/target digests. Unchanged 96 ok verdicts are applied and not reopened. Accounting receipts do not authorize promotion, full truth or cutover.",
+  "vocabulary": {
+    "path": "plans/260925-documentation-authority-unification/claim-and-disposition-vocabulary.json",
+    "changed": false,
+    "decision": "Restored merge/promote for all five named rows. Existing vocabulary permits combined corrected content for merge and continued contract carriage for promote; no changed-unit rule requires supersede. The two manifest rationales explicitly describe 2.0 to 3.0 correction instead of asserting verbatim equality."
+  },
+  "docsUnchanged": true,
+  "registry": {
+    "path": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+    "sha256": "b9b4f20ce368ed76b314e84bce31dc7ee0ac32764e9fe9795bdc8f9424a259e7",
+    "reused": true,
+    "nativeSync": false
+  },
+  "entries": [
+    {
+      "entryId": "claim_665eb7f4bfb9bee7ba3f5e58368eaba1",
+      "section": "b",
+      "channel": "predecessor-accounting-rebinding",
+      "reviewStatus": "pending",
+      "sourceDigest": "ba9c9d6e641e3049b46d0596077eabd74593dd83e12391cd7336986f7733d796",
+      "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "sourceAnchor": null,
+      "beforeDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2",
+      "afterDigest": "e013c5b05d6ff58782aa8231ab4a55967bd5ef853dac4015aec8f16f5fcf9c68",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-sc1-gaps.json",
+      "beforeDecision": {
+        "claimId": "claim_665eb7f4bfb9bee7ba3f5e58368eaba1",
+        "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "sourceUnitDigest": "ba9c9d6e641e3049b46d0596077eabd74593dd83e12391cd7336986f7733d796",
+        "disposition": "supersede",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-33",
+        "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+        "reviewStatus": "pending",
+        "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+        "targetUnitDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ]
+      },
+      "decision": {
+        "claimId": "claim_665eb7f4bfb9bee7ba3f5e58368eaba1",
+        "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "sourceUnitDigest": "ba9c9d6e641e3049b46d0596077eabd74593dd83e12391cd7336986f7733d796",
+        "disposition": "supersede",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-34",
+        "authoredBy": "codex-session:unit-run-1792056203419-9b5bd055@2026-10-15",
+        "reviewStatus": "pending",
+        "rationale": "The native predecessor docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-32 at 01fe216b4 is superseded by the complete same-file effect-axis unit. It preserves the field definitions, review/--github rationale where present, every list item and the external dispatch qualifier, adds explicit COMMAND_REGISTRY/15/no-coordination manifest wording, and keeps the valid review/approve/run examples. Whole source and target are shown; no identity graft or approval carry. Corrected binding: the successor is the bullets unit unheaded-block-34 (name, touchesState, externalEffect, paginated and subcommands), not the paragraph at unheaded-block-33. The old stored anchor/digest pair was inconsistent; no identity is grafted and no approval is carried.",
+        "targetUnitDigest": "e013c5b05d6ff58782aa8231ab4a55967bd5ef853dac4015aec8f16f5fcf9c68",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ]
+      },
+      "beforeTarget": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-33",
+        "githubAnchor": "unheaded-block-33",
+        "stableAnchor": "unheaded-block-33",
+        "title": "Unheaded block 33",
+        "startLine": 292,
+        "endLine": 302,
+        "textDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2",
+        "sample": "**Hai trục thay cho `access` (per str46-io-contract).** Cờ `access`\nđơn (`read` hay `mutation`) từng gộp hai câu hỏi khác nhau vào một giá trị —\nlộ rõ khi `review` khai `mutation` ",
+        "identityFingerprint": "abdaf7574d8107b6e5d325a95cb8c7327dac1248939788580176154fa990dace",
+        "ancestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ],
+        "text": "**Hai trục thay cho `access` (per str46-io-contract).** Cờ `access`\nđơn (`read` hay `mutation`) từng gộp hai câu hỏi khác nhau vào một giá trị —\nlộ rõ khi `review` khai `mutation` chỉ vì chế độ `--github` của nó tạo một\nPR thật, dù bản thân `review` (không `--github`) không hề đổi trạng thái\nfgOS. Sổ verb nay tách thành **hai trường độc lập**: `touchesState`\n(verb có bao giờ ghi trạng thái fgOS hay không) và `externalEffect` (verb\ncó bao giờ gọi một dịch vụ ngoài fgOS hay không — danh sách hiện hành mang `externalEffect: true` lấy từ manifest `COMMAND_REGISTRY` qua `fgos --help --json`: 15 verb, không có `coordination` (ví dụ `review`, `approve`, `run` — dispatch executor thật tính là effect ngoài `.fgos/`);\n`review` mang `touchesState: false` vì nó không bao giờ ghi trạng thái, kể\ncả qua `--github`). Cả hai cờ vẫn thuần **khai báo** — chưa nối vào điều\nphối hay xác danh; cổng \"ai được nói verb nào\" vẫn là việc riêng sau này\n(backlog STR38).",
+        "sectionText": "**Hai trục thay cho `access` (per str46-io-contract).** Cờ `access`\nđơn (`read` hay `mutation`) từng gộp hai câu hỏi khác nhau vào một giá trị —\nlộ rõ khi `review` khai `mutation` chỉ vì chế độ `--github` của nó tạo một\nPR thật, dù bản thân `review` (không `--github`) không hề đổi trạng thái\nfgOS. Sổ verb nay tách thành **hai trường độc lập**: `touchesState`\n(verb có bao giờ ghi trạng thái fgOS hay không) và `externalEffect` (verb\ncó bao giờ gọi một dịch vụ ngoài fgOS hay không — danh sách hiện hành mang `externalEffect: true` lấy từ manifest `COMMAND_REGISTRY` qua `fgos --help --json`: 15 verb, không có `coordination` (ví dụ `review`, `approve`, `run` — dispatch executor thật tính là effect ngoài `.fgos/`);\n`review` mang `touchesState: false` vì nó không bao giờ ghi trạng thái, kể\ncả qua `--github`). Cả hai cờ vẫn thuần **khai báo** — chưa nối vào điều\nphối hay xác danh; cổng \"ai được nói verb nào\" vẫn là việc riêng sau này\n(backlog STR38)."
+      },
+      "afterTarget": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-34",
+        "githubAnchor": "unheaded-block-34",
+        "stableAnchor": "unheaded-block-34",
+        "title": "Unheaded block 34",
+        "startLine": 304,
+        "endLine": 318,
+        "textDigest": "e013c5b05d6ff58782aa8231ab4a55967bd5ef853dac4015aec8f16f5fcf9c68",
+        "sample": "- `name`, cách gọi, mô tả một dòng, lược đồ tham số, ví dụ, `deprecated`\n  (null hoặc chuỗi hướng dẫn deprecation; CLI renderer cũng chấp nhận metadata\n  cấu trúc để không rò `unde",
+        "identityFingerprint": "a2e363fadb4249200e60df2aadad52b9400844e58930f9461c17ddb0feb33e8d",
+        "ancestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ],
+        "text": "- `name`, cách gọi, mô tả một dòng, lược đồ tham số, ví dụ, `deprecated`\n  (null hoặc chuỗi hướng dẫn deprecation; CLI renderer cũng chấp nhận metadata\n  cấu trúc để không rò `undefined`/`[object Object]` nếu schema tương lai mở rộng).\n- **`touchesState`** (verb có bao giờ ghi trạng thái fgOS) và\n  **`externalEffect`** (verb có bao giờ gọi dịch vụ ngoài fgOS) — hai trục\n  độc lập thay cho `access` cũ (từng gộp hai câu hỏi vào một giá trị,\n  sai cho `review`: nó khai `mutation` chỉ vì `--github` tạo PR thật, dù\n  bản thân `review` không hề ghi trạng thái). Danh sách hiện hành mang `externalEffect: true` lấy từ manifest\n  `COMMAND_REGISTRY` qua `fgos --help --json`: 15 verb, không có\n  `coordination` (ví dụ `review`, `approve`, `run` — dispatch executor thật\n  tính là effect ngoài `.fgos/`).\n- `paginated` (xem trên) và `multiValueFormat` (dưới) khi áp dụng.\n- `subcommands` cho verb có sub-verb ở vị trí đầu: `{<sub>: {description,\n  parameters, examples}}`, mỗi sub-verb chỉ mang cờ nó thật sự đọc;\n  `parameters` cấp verb khi đó chỉ còn `sub`."
+      },
+      "sourceNativeUnit": null,
+      "inheritedSourceWitness": {
+        "meaning": "Existing historical identity-gap accounting. Source digest and original disposition/review are preserved; only the current successor target binding changes. The earlier report remains the source-text witness, not a new current-source claim.",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-sc1.md",
+        "reviewReportCommit": "563247893e1b8fd795c43d611fd1d5ed28d150b5",
+        "sourceDigest": "ba9c9d6e641e3049b46d0596077eabd74593dd83e12391cd7336986f7733d796"
+      },
+      "previouslyReviewedDecision": {
+        "claimId": "claim_665eb7f4bfb9bee7ba3f5e58368eaba1",
+        "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "sourceUnitDigest": "ba9c9d6e641e3049b46d0596077eabd74593dd83e12391cd7336986f7733d796",
+        "disposition": "supersede",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-32",
+        "authoredBy": "codex-session:17@2026-10-14",
+        "reviewStatus": "reviewed",
+        "rationale": "The native predecessor docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-32 at 01fe216b4 is superseded by the complete same-file effect-axis unit. It preserves the field definitions, review/--github rationale where present, every list item and the external dispatch qualifier, adds explicit COMMAND_REGISTRY/15/no-coordination manifest wording, and keeps the valid review/approve/run examples. Whole source and target are shown; no identity graft or approval carry.",
+        "reviewNote": "Predecessor is block 32 at 01fe216b4 (digest recomputed, new gap row, previously live). Successor e1577e3b rewrites only the deferral sentence and adds the registry/15/no-coordination statement; examples, the dispatch executor qualifier and all other bullets are carried unchanged. Rationale wording \"review/--github rationale where present\" is generic but not false.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-14",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-sc1.md",
+        "reviewMode": "ordinary",
+        "targetUnitDigest": "e1577e3b51decf45fde9d2754d740429b7714340ec90baf7e5e4156b316e33d1",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ],
+        "reviewReportCommit": "563247893e1b8fd795c43d611fd1d5ed28d150b5"
+      },
+      "reviewFinding": {
+        "claimId": "claim_665eb7f4bfb9bee7ba3f5e58368eaba1",
+        "verdict": "rework",
+        "note": "deep: gap row whose old unit (digest 665eb7f4, found at 977509d5f block 32) is the BULLET list (name, touchesState, externalEffect, paginated); it differs from carrier bullets block 34 (e013c5b0) only by the upstream-era wording and the added subcommands bullet, but the rebind points it at paragraph block 33 (0b3d8cfa), a different unit with no list items; the stored digest e1577e3b was already the bullets unit (found at c8b2d948d block 32) and the reviewed rationale says every list item is preserved; repoint target to cli-io-contract.md#unheaded-block-34 with digest e013c5b0 like row 54",
+        "sourceUnitDigest": "ba9c9d6e641e3049b46d0596077eabd74593dd83e12391cd7336986f7733d796",
+        "targetUnitDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2"
+      },
+      "reason": "The native predecessor docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-32 at 01fe216b4 is superseded by the complete same-file effect-axis unit. It preserves the field definitions, review/--github rationale where present, every list item and the external dispatch qualifier, adds explicit COMMAND_REGISTRY/15/no-coordination manifest wording, and keeps the valid review/approve/run examples. Whole source and target are shown; no identity graft or approval carry. Corrected binding: the successor is the bullets unit unheaded-block-34 (name, touchesState, externalEffect, paginated and subcommands), not the paragraph at unheaded-block-33. The old stored anchor/digest pair was inconsistent; no identity is grafted and no approval is carried.",
+      "historicalBeforeDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2",
+      "historicalAfterDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2",
+      "sourceHistoricalUnit": {
+        "commit": "977509d5f8c49a31c781b54ea53c2b3617f70a13",
+        "path": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-32",
+        "githubAnchor": "unheaded-block-32",
+        "stableAnchor": "unheaded-block-32",
+        "title": "Unheaded block 32",
+        "startLine": 281,
+        "endLine": 291,
+        "textDigest": "ba9c9d6e641e3049b46d0596077eabd74593dd83e12391cd7336986f7733d796",
+        "sample": "- `name`, cách gọi, mô tả một dòng, lược đồ tham số, ví dụ, `deprecated`\n  (null hoặc chuỗi hướng dẫn deprecation; CLI renderer cũng chấp nhận metadata\n  cấu trúc để không rò `unde",
+        "identityFingerprint": "23e79b860ebcfeacc7ad826543bdf91857ea11d7ff168b28ea8ae92955ec5d27",
+        "ancestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ],
+        "text": "- `name`, cách gọi, mô tả một dòng, lược đồ tham số, ví dụ, `deprecated`\n  (null hoặc chuỗi hướng dẫn deprecation; CLI renderer cũng chấp nhận metadata\n  cấu trúc để không rò `undefined`/`[object Object]` nếu schema tương lai mở rộng).\n- **`touchesState`** (verb có bao giờ ghi trạng thái fgOS) và\n  **`externalEffect`** (verb có bao giờ gọi dịch vụ ngoài fgOS) — hai trục\n  độc lập thay cho `access` cũ (từng gộp hai câu hỏi vào một giá trị,\n  sai cho `review`: nó khai `mutation` chỉ vì `--github` tạo PR thật, dù\n  bản thân `review` không hề ghi trạng thái). Xem `fgos --help --json` cho\n  danh sách hiện hành mang `externalEffect: true` (ví dụ `review`, `approve`,\n  `run` — dispatch executor thật tính là effect ngoài `.fgos/`).\n- `paginated` (xem trên) và `multiValueFormat` (dưới) khi áp dụng."
+      }
+    },
+    {
+      "entryId": "claim_e597b776163803dcf6e4194962ea4f6e",
+      "section": "b",
+      "channel": "predecessor-accounting-rebinding",
+      "reviewStatus": "pending",
+      "sourceDigest": "5bed5c61440ab7ef0a9c595d18e3485c47c1952c78cbd07a0ea354db8ad750c3",
+      "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "sourceAnchor": null,
+      "beforeDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2",
+      "afterDigest": "e013c5b05d6ff58782aa8231ab4a55967bd5ef853dac4015aec8f16f5fcf9c68",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-sc1-gaps.json",
+      "beforeDecision": {
+        "claimId": "claim_e597b776163803dcf6e4194962ea4f6e",
+        "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "sourceUnitDigest": "5bed5c61440ab7ef0a9c595d18e3485c47c1952c78cbd07a0ea354db8ad750c3",
+        "disposition": "supersede",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-33",
+        "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+        "reviewStatus": "pending",
+        "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+        "targetUnitDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ]
+      },
+      "decision": {
+        "claimId": "claim_e597b776163803dcf6e4194962ea4f6e",
+        "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "sourceUnitDigest": "5bed5c61440ab7ef0a9c595d18e3485c47c1952c78cbd07a0ea354db8ad750c3",
+        "disposition": "supersede",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-34",
+        "authoredBy": "codex-session:unit-run-1792056203419-9b5bd055@2026-10-15",
+        "reviewStatus": "pending",
+        "rationale": "The predecessor block 32 at 9881f8622 already states COMMAND_REGISTRY, 15 externalEffect verbs and no coordination. The only delta to the real same-file successor is adding review/approve/run examples. All other wording, list items and dispatch executor qualifier are retained. Native predecessor identity is conserved without graft or approval carry. Corrected binding: the successor is the bullets unit unheaded-block-34 (name, touchesState, externalEffect, paginated and subcommands), not the paragraph at unheaded-block-33. The old stored anchor/digest pair was inconsistent; no identity is grafted and no approval is carried.",
+        "targetUnitDigest": "e013c5b05d6ff58782aa8231ab4a55967bd5ef853dac4015aec8f16f5fcf9c68",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ]
+      },
+      "beforeTarget": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-33",
+        "githubAnchor": "unheaded-block-33",
+        "stableAnchor": "unheaded-block-33",
+        "title": "Unheaded block 33",
+        "startLine": 292,
+        "endLine": 302,
+        "textDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2",
+        "sample": "**Hai trục thay cho `access` (per str46-io-contract).** Cờ `access`\nđơn (`read` hay `mutation`) từng gộp hai câu hỏi khác nhau vào một giá trị —\nlộ rõ khi `review` khai `mutation` ",
+        "identityFingerprint": "abdaf7574d8107b6e5d325a95cb8c7327dac1248939788580176154fa990dace",
+        "ancestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ],
+        "text": "**Hai trục thay cho `access` (per str46-io-contract).** Cờ `access`\nđơn (`read` hay `mutation`) từng gộp hai câu hỏi khác nhau vào một giá trị —\nlộ rõ khi `review` khai `mutation` chỉ vì chế độ `--github` của nó tạo một\nPR thật, dù bản thân `review` (không `--github`) không hề đổi trạng thái\nfgOS. Sổ verb nay tách thành **hai trường độc lập**: `touchesState`\n(verb có bao giờ ghi trạng thái fgOS hay không) và `externalEffect` (verb\ncó bao giờ gọi một dịch vụ ngoài fgOS hay không — danh sách hiện hành mang `externalEffect: true` lấy từ manifest `COMMAND_REGISTRY` qua `fgos --help --json`: 15 verb, không có `coordination` (ví dụ `review`, `approve`, `run` — dispatch executor thật tính là effect ngoài `.fgos/`);\n`review` mang `touchesState: false` vì nó không bao giờ ghi trạng thái, kể\ncả qua `--github`). Cả hai cờ vẫn thuần **khai báo** — chưa nối vào điều\nphối hay xác danh; cổng \"ai được nói verb nào\" vẫn là việc riêng sau này\n(backlog STR38).",
+        "sectionText": "**Hai trục thay cho `access` (per str46-io-contract).** Cờ `access`\nđơn (`read` hay `mutation`) từng gộp hai câu hỏi khác nhau vào một giá trị —\nlộ rõ khi `review` khai `mutation` chỉ vì chế độ `--github` của nó tạo một\nPR thật, dù bản thân `review` (không `--github`) không hề đổi trạng thái\nfgOS. Sổ verb nay tách thành **hai trường độc lập**: `touchesState`\n(verb có bao giờ ghi trạng thái fgOS hay không) và `externalEffect` (verb\ncó bao giờ gọi một dịch vụ ngoài fgOS hay không — danh sách hiện hành mang `externalEffect: true` lấy từ manifest `COMMAND_REGISTRY` qua `fgos --help --json`: 15 verb, không có `coordination` (ví dụ `review`, `approve`, `run` — dispatch executor thật tính là effect ngoài `.fgos/`);\n`review` mang `touchesState: false` vì nó không bao giờ ghi trạng thái, kể\ncả qua `--github`). Cả hai cờ vẫn thuần **khai báo** — chưa nối vào điều\nphối hay xác danh; cổng \"ai được nói verb nào\" vẫn là việc riêng sau này\n(backlog STR38)."
+      },
+      "afterTarget": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-34",
+        "githubAnchor": "unheaded-block-34",
+        "stableAnchor": "unheaded-block-34",
+        "title": "Unheaded block 34",
+        "startLine": 304,
+        "endLine": 318,
+        "textDigest": "e013c5b05d6ff58782aa8231ab4a55967bd5ef853dac4015aec8f16f5fcf9c68",
+        "sample": "- `name`, cách gọi, mô tả một dòng, lược đồ tham số, ví dụ, `deprecated`\n  (null hoặc chuỗi hướng dẫn deprecation; CLI renderer cũng chấp nhận metadata\n  cấu trúc để không rò `unde",
+        "identityFingerprint": "a2e363fadb4249200e60df2aadad52b9400844e58930f9461c17ddb0feb33e8d",
+        "ancestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ],
+        "text": "- `name`, cách gọi, mô tả một dòng, lược đồ tham số, ví dụ, `deprecated`\n  (null hoặc chuỗi hướng dẫn deprecation; CLI renderer cũng chấp nhận metadata\n  cấu trúc để không rò `undefined`/`[object Object]` nếu schema tương lai mở rộng).\n- **`touchesState`** (verb có bao giờ ghi trạng thái fgOS) và\n  **`externalEffect`** (verb có bao giờ gọi dịch vụ ngoài fgOS) — hai trục\n  độc lập thay cho `access` cũ (từng gộp hai câu hỏi vào một giá trị,\n  sai cho `review`: nó khai `mutation` chỉ vì `--github` tạo PR thật, dù\n  bản thân `review` không hề ghi trạng thái). Danh sách hiện hành mang `externalEffect: true` lấy từ manifest\n  `COMMAND_REGISTRY` qua `fgos --help --json`: 15 verb, không có\n  `coordination` (ví dụ `review`, `approve`, `run` — dispatch executor thật\n  tính là effect ngoài `.fgos/`).\n- `paginated` (xem trên) và `multiValueFormat` (dưới) khi áp dụng.\n- `subcommands` cho verb có sub-verb ở vị trí đầu: `{<sub>: {description,\n  parameters, examples}}`, mỗi sub-verb chỉ mang cờ nó thật sự đọc;\n  `parameters` cấp verb khi đó chỉ còn `sub`."
+      },
+      "sourceNativeUnit": null,
+      "inheritedSourceWitness": {
+        "meaning": "Existing historical identity-gap accounting. Source digest and original disposition/review are preserved; only the current successor target binding changes. The earlier report remains the source-text witness, not a new current-source claim.",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-rework.md",
+        "reviewReportCommit": "18962827a371c629b91475e6b2540a998fa30e9a",
+        "sourceDigest": "5bed5c61440ab7ef0a9c595d18e3485c47c1952c78cbd07a0ea354db8ad750c3"
+      },
+      "previouslyReviewedDecision": {
+        "claimId": "claim_e597b776163803dcf6e4194962ea4f6e",
+        "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "sourceUnitDigest": "5bed5c61440ab7ef0a9c595d18e3485c47c1952c78cbd07a0ea354db8ad750c3",
+        "disposition": "supersede",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-32",
+        "authoredBy": "codex-session:17@2026-10-14",
+        "reviewStatus": "reviewed",
+        "rationale": "The predecessor block 32 at 9881f8622 already states COMMAND_REGISTRY, 15 externalEffect verbs and no coordination. The only delta to the real same-file successor is adding review/approve/run examples. All other wording, list items and dispatch executor qualifier are retained. Native predecessor identity is conserved without graft or approval carry.",
+        "reviewNote": "Predecessor block 32 at 9881f8622 (digest verified) differs from the current unit only by the added example list plus a line reflow, which is whitespace only; the dispatch executor qualifier and all bullets are retained, and the rationale no longer claims the manifest wording is new.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-14",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-rework.md",
+        "reviewMode": "ordinary",
+        "targetUnitDigest": "e1577e3b51decf45fde9d2754d740429b7714340ec90baf7e5e4156b316e33d1",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ],
+        "reviewReportCommit": "18962827a371c629b91475e6b2540a998fa30e9a"
+      },
+      "reviewFinding": {
+        "claimId": "claim_e597b776163803dcf6e4194962ea4f6e",
+        "verdict": "rework",
+        "note": "deep: gap row whose old unit (digest 5bed5c61, found at 9881f8622 block 32) is the BULLET list; word diff against carrier bullets block 34 (e013c5b0) is only the example list and the added subcommands bullet, but the rebind points it at paragraph block 33 (0b3d8cfa); stored digest e1577e3b was the bullets unit; same defect as row 6; repoint to cli-io-contract.md#unheaded-block-34 digest e013c5b0",
+        "sourceUnitDigest": "5bed5c61440ab7ef0a9c595d18e3485c47c1952c78cbd07a0ea354db8ad750c3",
+        "targetUnitDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2"
+      },
+      "reason": "The predecessor block 32 at 9881f8622 already states COMMAND_REGISTRY, 15 externalEffect verbs and no coordination. The only delta to the real same-file successor is adding review/approve/run examples. All other wording, list items and dispatch executor qualifier are retained. Native predecessor identity is conserved without graft or approval carry. Corrected binding: the successor is the bullets unit unheaded-block-34 (name, touchesState, externalEffect, paginated and subcommands), not the paragraph at unheaded-block-33. The old stored anchor/digest pair was inconsistent; no identity is grafted and no approval is carried.",
+      "historicalBeforeDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2",
+      "historicalAfterDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2",
+      "sourceHistoricalUnit": {
+        "commit": "9881f8622732e3ba7c8e203097d42674b8aba36d",
+        "path": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-32",
+        "githubAnchor": "unheaded-block-32",
+        "stableAnchor": "unheaded-block-32",
+        "title": "Unheaded block 32",
+        "startLine": 281,
+        "endLine": 291,
+        "textDigest": "5bed5c61440ab7ef0a9c595d18e3485c47c1952c78cbd07a0ea354db8ad750c3",
+        "sample": "- `name`, cách gọi, mô tả một dòng, lược đồ tham số, ví dụ, `deprecated`\n  (null hoặc chuỗi hướng dẫn deprecation; CLI renderer cũng chấp nhận metadata\n  cấu trúc để không rò `unde",
+        "identityFingerprint": "2911a2b03dc981b527055f9a4217c22644d3515eb10ecf138e73aba0a0831662",
+        "ancestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ],
+        "text": "- `name`, cách gọi, mô tả một dòng, lược đồ tham số, ví dụ, `deprecated`\n  (null hoặc chuỗi hướng dẫn deprecation; CLI renderer cũng chấp nhận metadata\n  cấu trúc để không rò `undefined`/`[object Object]` nếu schema tương lai mở rộng).\n- **`touchesState`** (verb có bao giờ ghi trạng thái fgOS) và\n  **`externalEffect`** (verb có bao giờ gọi dịch vụ ngoài fgOS) — hai trục\n  độc lập thay cho `access` cũ (từng gộp hai câu hỏi vào một giá trị,\n  sai cho `review`: nó khai `mutation` chỉ vì `--github` tạo PR thật, dù\n  bản thân `review` không hề ghi trạng thái). Danh sách hiện hành mang `externalEffect: true` lấy từ manifest\n  `COMMAND_REGISTRY` qua `fgos --help --json`: 15 verb, không có\n  `coordination` (dispatch executor thật tính là effect ngoài `.fgos/`).\n- `paginated` (xem trên) và `multiValueFormat` (dưới) khi áp dụng."
+      }
+    },
+    {
+      "entryId": "claim_74a311a5ab882fe8ee4806125167e2d4",
+      "section": "a",
+      "channel": "source-carriage-rebinding",
+      "reviewStatus": "pending",
+      "sourceDigest": "5f7bbc0ccb0a688217a410356a618559820b7dfd24315cdd7dde1ca8ba7df0be",
+      "sourcePath": "docs/specs/fgos-plugin.md",
+      "sourceAnchor": "data-dictionary",
+      "beforeDigest": "80aad4984704cb2169f9b47f19b917eb49396d225f5ba07cd499b7ce6c68e015",
+      "afterDigest": "80aad4984704cb2169f9b47f19b917eb49396d225f5ba07cd499b7ce6c68e015",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s8-claude-plugin-01.json",
+      "beforeDecision": {
+        "claimId": "claim_74a311a5ab882fe8ee4806125167e2d4",
+        "sourceUnitDigest": "5f7bbc0ccb0a688217a410356a618559820b7dfd24315cdd7dde1ca8ba7df0be",
+        "targetOwner": "docs/platform/claude-plugin/spec.md",
+        "targetAnchor": "data-dictionary",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+        "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+        "targetUnitDigest": "80aad4984704cb2169f9b47f19b917eb49396d225f5ba07cd499b7ce6c68e015",
+        "targetAncestry": [
+          "Spec: fgOS Plugin (Claude Code slash-command surface)"
+        ]
+      },
+      "decision": {
+        "claimId": "claim_74a311a5ab882fe8ee4806125167e2d4",
+        "sourceUnitDigest": "5f7bbc0ccb0a688217a410356a618559820b7dfd24315cdd7dde1ca8ba7df0be",
+        "targetOwner": "docs/platform/claude-plugin/spec.md",
+        "targetAnchor": "data-dictionary",
+        "claimKind": "specification",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792056203419-9b5bd055@2026-10-15",
+        "rationale": "The complete Data Dictionary section replaces the legacy section with the corrected Work item id sentence: id is optional for pick/graph, check is not a shipped skill, and behavior when id is unspecified follows the corrected row. The section therefore differs from its source and is supersede, consistent with the corrected sibling units; its whole current section is bound by digest and ancestry.",
+        "targetUnitDigest": "80aad4984704cb2169f9b47f19b917eb49396d225f5ba07cd499b7ce6c68e015",
+        "targetAncestry": [
+          "Spec: fgOS Plugin (Claude Code slash-command surface)"
+        ]
+      },
+      "beforeTarget": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Data Dictionary",
+        "anchor": "data-dictionary",
+        "githubAnchor": "data-dictionary",
+        "stableAnchor": "h-e40e22cbbe39",
+        "startLine": 59,
+        "endLine": 59,
+        "textDigest": "80aad4984704cb2169f9b47f19b917eb49396d225f5ba07cd499b7ce6c68e015",
+        "sample": "Data Dictionary",
+        "sectionPayloadDigest": "8341c4c3c7e2671f39ab511ae332704e9a4b035737fd9539169c805b7093eeae",
+        "followingBlockDigest": "8341c4c3c7e2671f39ab511ae332704e9a4b035737fd9539169c805b7093eeae",
+        "identityFingerprint": "9342bfdacaa7b27dd5a5c9732b5ce6284718cc43790adb16037c2deeaab5fe97",
+        "ancestry": [
+          "Spec: fgOS Plugin (Claude Code slash-command surface)"
+        ],
+        "text": "## Data Dictionary",
+        "sectionText": "## Data Dictionary\n\n| # | Element | Meaning | Values | Required | Default |\n|---|---------|---------|--------|----------|---------|\n| 1 | Work item id | The identifier of the item a command acts on or reports on | free text, must match an existing item for verbs that require one | required for `move`/`return`/`ask`/`answer`/`rollup`; optional for `pick`/`graph`; `check` has no shipped plugin skill | — (no default; an optional id omitted means \"the frontier head\" for `pick`, \"full metrics\" for `graph`; the legacy `check` description does not define a shipped skill) |\n| 2 | Target status | The status `move` transitions a work item to | any status in the item's lifecycle (owned by Work-State) | yes, for `move` | — |\n| 3 | Question text | The question attached when parking an item | free text | yes, for `ask` | — |\n| 4 | Answer text | The answer recorded to resume a parked item | free text | yes, for `answer` | — |\n| 5 | Free-text description | The plain-language input a new item is intaken from | free text | yes, for `submit` | — |"
+      },
+      "afterTarget": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Data Dictionary",
+        "anchor": "data-dictionary",
+        "githubAnchor": "data-dictionary",
+        "stableAnchor": "h-e40e22cbbe39",
+        "startLine": 59,
+        "endLine": 59,
+        "textDigest": "80aad4984704cb2169f9b47f19b917eb49396d225f5ba07cd499b7ce6c68e015",
+        "sample": "Data Dictionary",
+        "sectionPayloadDigest": "8341c4c3c7e2671f39ab511ae332704e9a4b035737fd9539169c805b7093eeae",
+        "followingBlockDigest": "8341c4c3c7e2671f39ab511ae332704e9a4b035737fd9539169c805b7093eeae",
+        "identityFingerprint": "9342bfdacaa7b27dd5a5c9732b5ce6284718cc43790adb16037c2deeaab5fe97",
+        "ancestry": [
+          "Spec: fgOS Plugin (Claude Code slash-command surface)"
+        ],
+        "text": "## Data Dictionary",
+        "sectionText": "## Data Dictionary\n\n| # | Element | Meaning | Values | Required | Default |\n|---|---------|---------|--------|----------|---------|\n| 1 | Work item id | The identifier of the item a command acts on or reports on | free text, must match an existing item for verbs that require one | required for `move`/`return`/`ask`/`answer`/`rollup`; optional for `pick`/`graph`; `check` has no shipped plugin skill | — (no default; an optional id omitted means \"the frontier head\" for `pick`, \"full metrics\" for `graph`; the legacy `check` description does not define a shipped skill) |\n| 2 | Target status | The status `move` transitions a work item to | any status in the item's lifecycle (owned by Work-State) | yes, for `move` | — |\n| 3 | Question text | The question attached when parking an item | free text | yes, for `ask` | — |\n| 4 | Answer text | The answer recorded to resume a parked item | free text | yes, for `answer` | — |\n| 5 | Free-text description | The plain-language input a new item is intaken from | free text | yes, for `submit` | — |"
+      },
+      "sourceNativeUnit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Data Dictionary",
+        "anchor": "data-dictionary",
+        "githubAnchor": "data-dictionary",
+        "stableAnchor": "h-acb3b59cb493",
+        "startLine": 37,
+        "endLine": 37,
+        "textDigest": "5f7bbc0ccb0a688217a410356a618559820b7dfd24315cdd7dde1ca8ba7df0be",
+        "sample": "Data Dictionary",
+        "sectionPayloadDigest": "c4423a6e79bd0e75d2d4ddce1e935e386ad69ad08b3411958a40879bf0a320f9",
+        "followingBlockDigest": "c4423a6e79bd0e75d2d4ddce1e935e386ad69ad08b3411958a40879bf0a320f9",
+        "identityFingerprint": "0586918299b81344a3b6a871598b677e1f4d13f0e4b20957cd6787abc45c8cdf",
+        "text": "## Data Dictionary",
+        "sectionText": "## Data Dictionary\n\n| # | Element | Meaning | Values | Required | Default |\n|---|---------|---------|--------|----------|---------|\n| 1 | Work item id | The identifier of the item a command acts on or reports on | free text, must match an existing item for verbs that require one | required for `move`/`return`/`ask`/`answer`/`rollup`; optional for `pick`/`check`/`graph` | — (no default; an optional id omitted means \"every item\" for `check`, \"the frontier head\" for `pick`, \"full metrics\" for `graph`) |\n| 2 | Target status | The status `move` transitions a work item to | any status in the item's lifecycle (owned by Work-State) | yes, for `move` | — |\n| 3 | Question text | The question attached when parking an item | free text | yes, for `ask` | — |\n| 4 | Answer text | The answer recorded to resume a parked item | free text | yes, for `answer` | — |\n| 5 | Free-text description | The plain-language input a new item is intaken from | free text | yes, for `submit` | — |"
+      },
+      "sourceShownText": "## Data Dictionary\n\n| # | Element | Meaning | Values | Required | Default |\n|---|---------|---------|--------|----------|---------|\n| 1 | Work item id | The identifier of the item a command acts on or reports on | free text, must match an existing item for verbs that require one | required for `move`/`return`/`ask`/`answer`/`rollup`; optional for `pick`/`check`/`graph` | — (no default; an optional id omitted means \"every item\" for `check`, \"the frontier head\" for `pick`, \"full metrics\" for `graph`) |\n| 2 | Target status | The status `move` transitions a work item to | any status in the item's lifecycle (owned by Work-State) | yes, for `move` | — |\n| 3 | Question text | The question attached when parking an item | free text | yes, for `ask` | — |\n| 4 | Answer text | The answer recorded to resume a parked item | free text | yes, for `answer` | — |\n| 5 | Free-text description | The plain-language input a new item is intaken from | free text | yes, for `submit` | — |",
+      "beforeMainSameAnchorWitness": {
+        "unit": {
+          "unitKind": "heading",
+          "level": 2,
+          "title": "Data Dictionary",
+          "anchor": "data-dictionary",
+          "githubAnchor": "data-dictionary",
+          "stableAnchor": "h-acb3b59cb493",
+          "startLine": 37,
+          "endLine": 37,
+          "textDigest": "5f7bbc0ccb0a688217a410356a618559820b7dfd24315cdd7dde1ca8ba7df0be",
+          "sample": "Data Dictionary",
+          "sectionPayloadDigest": "c4423a6e79bd0e75d2d4ddce1e935e386ad69ad08b3411958a40879bf0a320f9",
+          "followingBlockDigest": "c4423a6e79bd0e75d2d4ddce1e935e386ad69ad08b3411958a40879bf0a320f9",
+          "identityFingerprint": "0586918299b81344a3b6a871598b677e1f4d13f0e4b20957cd6787abc45c8cdf",
+          "text": "## Data Dictionary",
+          "sectionText": "## Data Dictionary\n\n| # | Element | Meaning | Values | Required | Default |\n|---|---------|---------|--------|----------|---------|\n| 1 | Work item id | The identifier of the item a command acts on or reports on | free text, must match an existing item for verbs that require one | required for `move`/`return`/`ask`/`answer`/`rollup`; optional for `pick`/`check`/`graph` | — (no default; an optional id omitted means \"every item\" for `check`, \"the frontier head\" for `pick`, \"full metrics\" for `graph`) |\n| 2 | Target status | The status `move` transitions a work item to | any status in the item's lifecycle (owned by Work-State) | yes, for `move` | — |\n| 3 | Question text | The question attached when parking an item | free text | yes, for `ask` | — |\n| 4 | Answer text | The answer recorded to resume a parked item | free text | yes, for `answer` | — |\n| 5 | Free-text description | The plain-language input a new item is intaken from | free text | yes, for `submit` | — |"
+        },
+        "meaning": "Positional same-anchor witness before main merge, not an identity or semantic-equivalence assertion."
+      },
+      "previouslyReviewedDecision": {
+        "claimId": "claim_74a311a5ab882fe8ee4806125167e2d4",
+        "sourceUnitDigest": "5f7bbc0ccb0a688217a410356a618559820b7dfd24315cdd7dde1ca8ba7df0be",
+        "targetOwner": "docs/platform/claude-plugin/spec.md",
+        "targetAnchor": "data-dictionary",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "reviewed",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/fgos-plugin.md#data-dictionary (source lines 37-37) is carried at docs/platform/claude-plugin/spec.md#data-dictionary (candidate lines 59-59). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "reviewNote": "deep: seeded sample. Heading section data-dictionary (starts # Element Meaning Values Required Default) read in full both directions: source lines 37-37 equal target lines 59-59 byte for byte, shifted only by the 22 added lines; rationale (short heading title makes it Weak-exact, digest equal, whole unit carried) is true; no link rewrite.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-08-1276467f3.md",
+        "reviewMode": "ordinary",
+        "targetUnitDigest": "5f7bbc0ccb0a688217a410356a618559820b7dfd24315cdd7dde1ca8ba7df0be",
+        "targetAncestry": [
+          "Spec: fgOS Plugin (Claude Code slash-command surface)"
+        ],
+        "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
+      },
+      "reviewFinding": {
+        "claimId": "claim_74a311a5ab882fe8ee4806125167e2d4",
+        "verdict": "rework",
+        "note": "deep: the heading section differs from the source by exactly the corrected Work item id row (diff read, only line 5 of the section) yet disposition stays move, a verbatim-carry basis that is no longer true; siblings with a corrected sentence inside the section (claim_3459a397, claim_111f864d, claim_2aae8d68) are supersede and unheaded row 26 below was switched to supersede; set disposition supersede, name the corrected sentence in the rationale, rebind. Target 80aad498 recomputes, anchor ok, pending, no approval fields",
+        "sourceUnitDigest": "5f7bbc0ccb0a688217a410356a618559820b7dfd24315cdd7dde1ca8ba7df0be",
+        "targetUnitDigest": "80aad4984704cb2169f9b47f19b917eb49396d225f5ba07cd499b7ce6c68e015"
+      },
+      "reason": "The complete Data Dictionary section replaces the legacy section with the corrected Work item id sentence: id is optional for pick/graph, check is not a shipped skill, and behavior when id is unspecified follows the corrected row. The section therefore differs from its source and is supersede, consistent with the corrected sibling units; its whole current section is bound by digest and ancestry.",
+      "historicalBeforeDigest": "5f7bbc0ccb0a688217a410356a618559820b7dfd24315cdd7dde1ca8ba7df0be",
+      "historicalAfterDigest": "80aad4984704cb2169f9b47f19b917eb49396d225f5ba07cd499b7ce6c68e015"
+    },
+    {
+      "entryId": "claim_c4c6b55686b7e315f34ae005173b79db",
+      "section": "a",
+      "channel": "source-carriage-rebinding",
+      "reviewStatus": "pending",
+      "sourceDigest": "4be8acef415d77200e8b8bef2f2f78665c99cf7882f2395a2597c5b9b99c8f01",
+      "sourcePath": "docs/specs/fgos-plugin.md",
+      "sourceAnchor": "actors-access",
+      "beforeDigest": "b1405975f4c717c854a7bb988a6af790be278401ffa1d415b2a24ec69c442c50",
+      "afterDigest": "b1405975f4c717c854a7bb988a6af790be278401ffa1d415b2a24ec69c442c50",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s8-claude-plugin-01.json",
+      "beforeDecision": {
+        "claimId": "claim_c4c6b55686b7e315f34ae005173b79db",
+        "sourceUnitDigest": "4be8acef415d77200e8b8bef2f2f78665c99cf7882f2395a2597c5b9b99c8f01",
+        "targetOwner": "docs/platform/claude-plugin/spec.md",
+        "targetAnchor": "actors-access",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+        "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+        "targetUnitDigest": "b1405975f4c717c854a7bb988a6af790be278401ffa1d415b2a24ec69c442c50",
+        "targetAncestry": [
+          "Spec: fgOS Plugin (Claude Code slash-command surface)"
+        ]
+      },
+      "decision": {
+        "claimId": "claim_c4c6b55686b7e315f34ae005173b79db",
+        "sourceUnitDigest": "4be8acef415d77200e8b8bef2f2f78665c99cf7882f2395a2597c5b9b99c8f01",
+        "targetOwner": "docs/platform/claude-plugin/spec.md",
+        "targetAnchor": "actors-access",
+        "claimKind": "specification",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792056203419-9b5bd055@2026-10-15",
+        "rationale": "The complete Actors & Access section replaces the legacy section with the corrected capability row: check is not a shipped skill. The corrected sentence makes the whole section differ from its source, so supersede matches the corrected sibling units; the full section is retained and bound by digest and ancestry.",
+        "targetUnitDigest": "b1405975f4c717c854a7bb988a6af790be278401ffa1d415b2a24ec69c442c50",
+        "targetAncestry": [
+          "Spec: fgOS Plugin (Claude Code slash-command surface)"
+        ]
+      },
+      "beforeTarget": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Actors & Access",
+        "anchor": "actors-access",
+        "githubAnchor": "actors-access",
+        "stableAnchor": "h-78a8cbbbb852",
+        "startLine": 155,
+        "endLine": 155,
+        "textDigest": "b1405975f4c717c854a7bb988a6af790be278401ffa1d415b2a24ec69c442c50",
+        "sample": "Actors & Access",
+        "sectionPayloadDigest": "6cebf1ad7855d1e28c93cb7abb6c923c8858314af60c69d1e7f937329e9d04b7",
+        "followingBlockDigest": "f88a5c11a70dda7a7cf1102658cb21c3ee1d7b7f469f764954a389a4ca599993",
+        "identityFingerprint": "924716876155c52627d9c3cc67e2581c4a8d9da8776e7758786a4a08ab14a713",
+        "ancestry": [
+          "Spec: fgOS Plugin (Claude Code slash-command surface)"
+        ],
+        "text": "## Actors & Access",
+        "sectionText": "## Actors & Access\n\n| Capability | Person in a Claude Code session |\n|---|---|\n| Submit / pick / move / return / ask / answer (mutating verbs) | ✓ |\n| Read frontier / staleness / rollup / graph / conflicts (`check` has no shipped skill) | ✓ |\n\nEvery command runs as whatever role the underlying tool itself assigns (a\nhuman role for the mutating verbs) — the plugin layer introduces no separate\nrole model of its own."
+      },
+      "afterTarget": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Actors & Access",
+        "anchor": "actors-access",
+        "githubAnchor": "actors-access",
+        "stableAnchor": "h-78a8cbbbb852",
+        "startLine": 155,
+        "endLine": 155,
+        "textDigest": "b1405975f4c717c854a7bb988a6af790be278401ffa1d415b2a24ec69c442c50",
+        "sample": "Actors & Access",
+        "sectionPayloadDigest": "6cebf1ad7855d1e28c93cb7abb6c923c8858314af60c69d1e7f937329e9d04b7",
+        "followingBlockDigest": "f88a5c11a70dda7a7cf1102658cb21c3ee1d7b7f469f764954a389a4ca599993",
+        "identityFingerprint": "924716876155c52627d9c3cc67e2581c4a8d9da8776e7758786a4a08ab14a713",
+        "ancestry": [
+          "Spec: fgOS Plugin (Claude Code slash-command surface)"
+        ],
+        "text": "## Actors & Access",
+        "sectionText": "## Actors & Access\n\n| Capability | Person in a Claude Code session |\n|---|---|\n| Submit / pick / move / return / ask / answer (mutating verbs) | ✓ |\n| Read frontier / staleness / rollup / graph / conflicts (`check` has no shipped skill) | ✓ |\n\nEvery command runs as whatever role the underlying tool itself assigns (a\nhuman role for the mutating verbs) — the plugin layer introduces no separate\nrole model of its own."
+      },
+      "sourceNativeUnit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Actors & Access",
+        "anchor": "actors-access",
+        "githubAnchor": "actors-access",
+        "stableAnchor": "h-6c0709492606",
+        "startLine": 133,
+        "endLine": 133,
+        "textDigest": "4be8acef415d77200e8b8bef2f2f78665c99cf7882f2395a2597c5b9b99c8f01",
+        "sample": "Actors & Access",
+        "sectionPayloadDigest": "2c51bab21ec23756b529824e5ed886c4f9b902359ca5c089efee0c0c5d5b5129",
+        "followingBlockDigest": "e02f12896615760aad3f55c30a0d47c09cf0019eb7e05580b82722c372172891",
+        "identityFingerprint": "30edbbfe69dfa9bc52cf03fa2f94c12c10698e18a577b5658320d19890319056",
+        "text": "## Actors & Access",
+        "sectionText": "## Actors & Access\n\n| Capability | Person in a Claude Code session |\n|---|---|\n| Submit / pick / move / return / ask / answer (mutating verbs) | ✓ |\n| Read frontier / staleness / rollup / check / graph / conflicts | ✓ |\n\nEvery command runs as whatever role the underlying tool itself assigns (a\nhuman role for the mutating verbs) — the plugin layer introduces no separate\nrole model of its own."
+      },
+      "sourceShownText": "## Actors & Access\n\n| Capability | Person in a Claude Code session |\n|---|---|\n| Submit / pick / move / return / ask / answer (mutating verbs) | ✓ |\n| Read frontier / staleness / rollup / check / graph / conflicts | ✓ |\n\nEvery command runs as whatever role the underlying tool itself assigns (a\nhuman role for the mutating verbs) — the plugin layer introduces no separate\nrole model of its own.",
+      "beforeMainSameAnchorWitness": {
+        "unit": {
+          "unitKind": "heading",
+          "level": 2,
+          "title": "Actors & Access",
+          "anchor": "actors-access",
+          "githubAnchor": "actors-access",
+          "stableAnchor": "h-6c0709492606",
+          "startLine": 133,
+          "endLine": 133,
+          "textDigest": "4be8acef415d77200e8b8bef2f2f78665c99cf7882f2395a2597c5b9b99c8f01",
+          "sample": "Actors & Access",
+          "sectionPayloadDigest": "2c51bab21ec23756b529824e5ed886c4f9b902359ca5c089efee0c0c5d5b5129",
+          "followingBlockDigest": "e02f12896615760aad3f55c30a0d47c09cf0019eb7e05580b82722c372172891",
+          "identityFingerprint": "30edbbfe69dfa9bc52cf03fa2f94c12c10698e18a577b5658320d19890319056",
+          "text": "## Actors & Access",
+          "sectionText": "## Actors & Access\n\n| Capability | Person in a Claude Code session |\n|---|---|\n| Submit / pick / move / return / ask / answer (mutating verbs) | ✓ |\n| Read frontier / staleness / rollup / check / graph / conflicts | ✓ |\n\nEvery command runs as whatever role the underlying tool itself assigns (a\nhuman role for the mutating verbs) — the plugin layer introduces no separate\nrole model of its own."
+        },
+        "meaning": "Positional same-anchor witness before main merge, not an identity or semantic-equivalence assertion."
+      },
+      "previouslyReviewedDecision": {
+        "claimId": "claim_c4c6b55686b7e315f34ae005173b79db",
+        "sourceUnitDigest": "4be8acef415d77200e8b8bef2f2f78665c99cf7882f2395a2597c5b9b99c8f01",
+        "targetOwner": "docs/platform/claude-plugin/spec.md",
+        "targetAnchor": "actors-access",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "reviewed",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/fgos-plugin.md#actors-access (source lines 133-133) is carried at docs/platform/claude-plugin/spec.md#actors-access (candidate lines 155-155). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "reviewNote": "deep: seeded sample. Heading section actors-access (starts Capability Person in a Claude Code session) read in full both directions: source lines 133-133 equal target lines 155-155 byte for byte, shifted only by the 22 added lines; rationale (short heading title makes it Weak-exact, digest equal, whole unit carried) is true; no link rewrite.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-08-1276467f3.md",
+        "reviewMode": "ordinary",
+        "targetUnitDigest": "4be8acef415d77200e8b8bef2f2f78665c99cf7882f2395a2597c5b9b99c8f01",
+        "targetAncestry": [
+          "Spec: fgOS Plugin (Claude Code slash-command surface)"
+        ],
+        "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
+      },
+      "reviewFinding": {
+        "claimId": "claim_c4c6b55686b7e315f34ae005173b79db",
+        "verdict": "rework",
+        "note": "deep: the heading section differs from the source by the corrected capability-table row (diff read, only that row; check not shipped, true) yet disposition stays move; same defect as row 25 and as the earlier claim_511605d3 rework; set supersede with the corrected row named, rebind. Target b1405975 recomputes, anchor ok, pending, no approval fields",
+        "sourceUnitDigest": "4be8acef415d77200e8b8bef2f2f78665c99cf7882f2395a2597c5b9b99c8f01",
+        "targetUnitDigest": "b1405975f4c717c854a7bb988a6af790be278401ffa1d415b2a24ec69c442c50"
+      },
+      "reason": "The complete Actors & Access section replaces the legacy section with the corrected capability row: check is not a shipped skill. The corrected sentence makes the whole section differ from its source, so supersede matches the corrected sibling units; the full section is retained and bound by digest and ancestry.",
+      "historicalBeforeDigest": "4be8acef415d77200e8b8bef2f2f78665c99cf7882f2395a2597c5b9b99c8f01",
+      "historicalAfterDigest": "b1405975f4c717c854a7bb988a6af790be278401ffa1d415b2a24ec69c442c50"
+    },
+    {
+      "entryId": "claim_15a24dbb1f2d0470f04cdf8900da67a0",
+      "section": "b",
+      "channel": "source-carriage-rebinding",
+      "reviewStatus": "pending",
+      "sourceDigest": "2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9",
+      "sourcePath": "docs/specs/work-state.md",
+      "sourceAnchor": "unheaded-block-69",
+      "beforeDigest": "2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9",
+      "afterDigest": "2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9",
+      "shard": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+      "beforeDecision": {
+        "claimId": "claim_15a24dbb1f2d0470f04cdf8900da67a0",
+        "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+        "sourceUnitDigest": "2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-27",
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+        "targetUnitDigest": "2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "6. Cursor Pagination"
+        ]
+      },
+      "decision": {
+        "claimId": "claim_15a24dbb1f2d0470f04cdf8900da67a0",
+        "authoredBy": "codex-session:unit-run-1792056203419-9b5bd055@2026-10-15",
+        "sourceUnitDigest": "2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-27",
+        "claimKind": "contract",
+        "disposition": "merge",
+        "reviewStatus": "pending",
+        "rationale": "Cursor pagination superset (adds permanent list --all --json exception and side-log narrowing) is carried verbatim; the io-contract short text follows it in the same section, so both sources are present.",
+        "targetUnitDigest": "2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "6. Cursor Pagination"
+        ]
+      },
+      "beforeTarget": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-27",
+        "githubAnchor": "unheaded-block-27",
+        "stableAnchor": "unheaded-block-27",
+        "title": "Unheaded block 27",
+        "startLine": 207,
+        "endLine": 231,
+        "textDigest": "2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9",
+        "sample": "**Phân trang cho verb trả tập lớn (per str46-io-contract, được tsk-483 mở lại — xem `docs/history/tsk-483-list-side-log-pagination-\nscoping/CONTEXT.md`).** Sổ verb khai thêm cờ `pa",
+        "identityFingerprint": "0c4d416214101537d7ba4005ceea36a6978aa90efb8dc69e750359b5ccb0647d",
+        "ancestry": [
+          "CLI I/O Contract",
+          "6. Cursor Pagination"
+        ],
+        "text": "**Phân trang cho verb trả tập lớn (per str46-io-contract, được tsk-483 mở lại — xem `docs/history/tsk-483-list-side-log-pagination-\nscoping/CONTEXT.md`).** Sổ verb khai thêm cờ `paginated` (đúng/sai) cho\nMỌI verb — chỉ bốn verb mang `paginated: true`: `ready`, `triage`,\n`evolve` (lượt liệt-kê không cờ của nó), và khoá `work` của `list`. Bốn\nverb này nhận thêm hai tham số tuỳ chọn `--cursor`/`--limit`: không\ntruyền cờ nào → kết quả y hệt hôm nay (mảng/map đầy đủ, không đổi hình\ndạng) — NGOẠI LỆ DUY NHẤT: `list --all --json` không kèm `--cursor`/\n`--limit` giữ nguyên hình dạng thô này VĨNH VIỄN, vì `packages/herdr-fgos-common/rust/src/\nfgos.rs` (crate Rust ngoài repo Node này) đọc đúng lời gọi đó làm hợp\nđồng công khai. Mọi tổ hợp KHÁC của `list` (mặc định trần không cờ nào,\n`--id`, hoặc bất kỳ tổ hợp nào có `--cursor`/`--limit` — kể cả kèm\n`--all`) đều thu hẹp `decisions`/`discovery`/`gates`/`settlements`/\n`outcomes`/`frictions`/`learnings`/`decisionsById` xuống đúng tập id đang\nthật sự được trả trong `work` — `tools` (khoá theo TÊN công cụ, không\ntheo id việc) không bao giờ bị đụng tới. Với ba verb còn lại (`ready`/\n`triage`/`evolve`), truyền một trong hai `--cursor`/`--limit` → kết quả\nđổi hình dạng thành `{items, nextCursor}`. Con trỏ (`cursor`) là **đục\nhoàn toàn** —\nngười gọi chỉ nhận lại nguyên văn từ `nextCursor` của lượt trước rồi truyền\ntiếp, không bao giờ tự phân tích hay tự chế. `nextCursor` là `null` khi đã\ntới cuối tập. Một con trỏ trỏ tới một mục đã rời tập (vd việc đã `done` từ\nlượt trước) là lỗi phạm trù `validation` — thông điệp lỗi tự nêu cách sửa\n(bắt đầu lại không kèm `--cursor`). `conflicts` CỐ Ý không phân trang\n(`paginated: false`, lý do ghi ngay trong mô tả verb) — mỗi dòng của nó là\nmột cặp `(a,b)`, không có khoá riêng cho một dòng để làm mốc con trỏ.",
+        "sectionText": "**Phân trang cho verb trả tập lớn (per str46-io-contract, được tsk-483 mở lại — xem `docs/history/tsk-483-list-side-log-pagination-\nscoping/CONTEXT.md`).** Sổ verb khai thêm cờ `paginated` (đúng/sai) cho\nMỌI verb — chỉ bốn verb mang `paginated: true`: `ready`, `triage`,\n`evolve` (lượt liệt-kê không cờ của nó), và khoá `work` của `list`. Bốn\nverb này nhận thêm hai tham số tuỳ chọn `--cursor`/`--limit`: không\ntruyền cờ nào → kết quả y hệt hôm nay (mảng/map đầy đủ, không đổi hình\ndạng) — NGOẠI LỆ DUY NHẤT: `list --all --json` không kèm `--cursor`/\n`--limit` giữ nguyên hình dạng thô này VĨNH VIỄN, vì `packages/herdr-fgos-common/rust/src/\nfgos.rs` (crate Rust ngoài repo Node này) đọc đúng lời gọi đó làm hợp\nđồng công khai. Mọi tổ hợp KHÁC của `list` (mặc định trần không cờ nào,\n`--id`, hoặc bất kỳ tổ hợp nào có `--cursor`/`--limit` — kể cả kèm\n`--all`) đều thu hẹp `decisions`/`discovery`/`gates`/`settlements`/\n`outcomes`/`frictions`/`learnings`/`decisionsById` xuống đúng tập id đang\nthật sự được trả trong `work` — `tools` (khoá theo TÊN công cụ, không\ntheo id việc) không bao giờ bị đụng tới. Với ba verb còn lại (`ready`/\n`triage`/`evolve`), truyền một trong hai `--cursor`/`--limit` → kết quả\nđổi hình dạng thành `{items, nextCursor}`. Con trỏ (`cursor`) là **đục\nhoàn toàn** —\nngười gọi chỉ nhận lại nguyên văn từ `nextCursor` của lượt trước rồi truyền\ntiếp, không bao giờ tự phân tích hay tự chế. `nextCursor` là `null` khi đã\ntới cuối tập. Một con trỏ trỏ tới một mục đã rời tập (vd việc đã `done` từ\nlượt trước) là lỗi phạm trù `validation` — thông điệp lỗi tự nêu cách sửa\n(bắt đầu lại không kèm `--cursor`). `conflicts` CỐ Ý không phân trang\n(`paginated: false`, lý do ghi ngay trong mô tả verb) — mỗi dòng của nó là\nmột cặp `(a,b)`, không có khoá riêng cho một dòng để làm mốc con trỏ."
+      },
+      "afterTarget": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-27",
+        "githubAnchor": "unheaded-block-27",
+        "stableAnchor": "unheaded-block-27",
+        "title": "Unheaded block 27",
+        "startLine": 207,
+        "endLine": 231,
+        "textDigest": "2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9",
+        "sample": "**Phân trang cho verb trả tập lớn (per str46-io-contract, được tsk-483 mở lại — xem `docs/history/tsk-483-list-side-log-pagination-\nscoping/CONTEXT.md`).** Sổ verb khai thêm cờ `pa",
+        "identityFingerprint": "0c4d416214101537d7ba4005ceea36a6978aa90efb8dc69e750359b5ccb0647d",
+        "ancestry": [
+          "CLI I/O Contract",
+          "6. Cursor Pagination"
+        ],
+        "text": "**Phân trang cho verb trả tập lớn (per str46-io-contract, được tsk-483 mở lại — xem `docs/history/tsk-483-list-side-log-pagination-\nscoping/CONTEXT.md`).** Sổ verb khai thêm cờ `paginated` (đúng/sai) cho\nMỌI verb — chỉ bốn verb mang `paginated: true`: `ready`, `triage`,\n`evolve` (lượt liệt-kê không cờ của nó), và khoá `work` của `list`. Bốn\nverb này nhận thêm hai tham số tuỳ chọn `--cursor`/`--limit`: không\ntruyền cờ nào → kết quả y hệt hôm nay (mảng/map đầy đủ, không đổi hình\ndạng) — NGOẠI LỆ DUY NHẤT: `list --all --json` không kèm `--cursor`/\n`--limit` giữ nguyên hình dạng thô này VĨNH VIỄN, vì `packages/herdr-fgos-common/rust/src/\nfgos.rs` (crate Rust ngoài repo Node này) đọc đúng lời gọi đó làm hợp\nđồng công khai. Mọi tổ hợp KHÁC của `list` (mặc định trần không cờ nào,\n`--id`, hoặc bất kỳ tổ hợp nào có `--cursor`/`--limit` — kể cả kèm\n`--all`) đều thu hẹp `decisions`/`discovery`/`gates`/`settlements`/\n`outcomes`/`frictions`/`learnings`/`decisionsById` xuống đúng tập id đang\nthật sự được trả trong `work` — `tools` (khoá theo TÊN công cụ, không\ntheo id việc) không bao giờ bị đụng tới. Với ba verb còn lại (`ready`/\n`triage`/`evolve`), truyền một trong hai `--cursor`/`--limit` → kết quả\nđổi hình dạng thành `{items, nextCursor}`. Con trỏ (`cursor`) là **đục\nhoàn toàn** —\nngười gọi chỉ nhận lại nguyên văn từ `nextCursor` của lượt trước rồi truyền\ntiếp, không bao giờ tự phân tích hay tự chế. `nextCursor` là `null` khi đã\ntới cuối tập. Một con trỏ trỏ tới một mục đã rời tập (vd việc đã `done` từ\nlượt trước) là lỗi phạm trù `validation` — thông điệp lỗi tự nêu cách sửa\n(bắt đầu lại không kèm `--cursor`). `conflicts` CỐ Ý không phân trang\n(`paginated: false`, lý do ghi ngay trong mô tả verb) — mỗi dòng của nó là\nmột cặp `(a,b)`, không có khoá riêng cho một dòng để làm mốc con trỏ."
+      },
+      "sourceNativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-69",
+        "githubAnchor": "unheaded-block-69",
+        "stableAnchor": "unheaded-block-69",
+        "title": "Unheaded block 69",
+        "startLine": 692,
+        "endLine": 716,
+        "textDigest": "2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9",
+        "sample": "**Phân trang cho verb trả tập lớn (per str46-io-contract, được tsk-483 mở lại — xem `docs/history/tsk-483-list-side-log-pagination-\nscoping/CONTEXT.md`).** Sổ verb khai thêm cờ `pa",
+        "identityFingerprint": "0c4d416214101537d7ba4005ceea36a6978aa90efb8dc69e750359b5ccb0647d",
+        "text": "**Phân trang cho verb trả tập lớn (per str46-io-contract, được tsk-483 mở lại — xem `docs/history/tsk-483-list-side-log-pagination-\nscoping/CONTEXT.md`).** Sổ verb khai thêm cờ `paginated` (đúng/sai) cho\nMỌI verb — chỉ bốn verb mang `paginated: true`: `ready`, `triage`,\n`evolve` (lượt liệt-kê không cờ của nó), và khoá `work` của `list`. Bốn\nverb này nhận thêm hai tham số tuỳ chọn `--cursor`/`--limit`: không\ntruyền cờ nào → kết quả y hệt hôm nay (mảng/map đầy đủ, không đổi hình\ndạng) — NGOẠI LỆ DUY NHẤT: `list --all --json` không kèm `--cursor`/\n`--limit` giữ nguyên hình dạng thô này VĨNH VIỄN, vì `packages/herdr-fgos-common/rust/src/\nfgos.rs` (crate Rust ngoài repo Node này) đọc đúng lời gọi đó làm hợp\nđồng công khai. Mọi tổ hợp KHÁC của `list` (mặc định trần không cờ nào,\n`--id`, hoặc bất kỳ tổ hợp nào có `--cursor`/`--limit` — kể cả kèm\n`--all`) đều thu hẹp `decisions`/`discovery`/`gates`/`settlements`/\n`outcomes`/`frictions`/`learnings`/`decisionsById` xuống đúng tập id đang\nthật sự được trả trong `work` — `tools` (khoá theo TÊN công cụ, không\ntheo id việc) không bao giờ bị đụng tới. Với ba verb còn lại (`ready`/\n`triage`/`evolve`), truyền một trong hai `--cursor`/`--limit` → kết quả\nđổi hình dạng thành `{items, nextCursor}`. Con trỏ (`cursor`) là **đục\nhoàn toàn** —\nngười gọi chỉ nhận lại nguyên văn từ `nextCursor` của lượt trước rồi truyền\ntiếp, không bao giờ tự phân tích hay tự chế. `nextCursor` là `null` khi đã\ntới cuối tập. Một con trỏ trỏ tới một mục đã rời tập (vd việc đã `done` từ\nlượt trước) là lỗi phạm trù `validation` — thông điệp lỗi tự nêu cách sửa\n(bắt đầu lại không kèm `--cursor`). `conflicts` CỐ Ý không phân trang\n(`paginated: false`, lý do ghi ngay trong mô tả verb) — mỗi dòng của nó là\nmột cặp `(a,b)`, không có khoá riêng cho một dòng để làm mốc con trỏ.",
+        "sectionText": "**Phân trang cho verb trả tập lớn (per str46-io-contract, được tsk-483 mở lại — xem `docs/history/tsk-483-list-side-log-pagination-\nscoping/CONTEXT.md`).** Sổ verb khai thêm cờ `paginated` (đúng/sai) cho\nMỌI verb — chỉ bốn verb mang `paginated: true`: `ready`, `triage`,\n`evolve` (lượt liệt-kê không cờ của nó), và khoá `work` của `list`. Bốn\nverb này nhận thêm hai tham số tuỳ chọn `--cursor`/`--limit`: không\ntruyền cờ nào → kết quả y hệt hôm nay (mảng/map đầy đủ, không đổi hình\ndạng) — NGOẠI LỆ DUY NHẤT: `list --all --json` không kèm `--cursor`/\n`--limit` giữ nguyên hình dạng thô này VĨNH VIỄN, vì `packages/herdr-fgos-common/rust/src/\nfgos.rs` (crate Rust ngoài repo Node này) đọc đúng lời gọi đó làm hợp\nđồng công khai. Mọi tổ hợp KHÁC của `list` (mặc định trần không cờ nào,\n`--id`, hoặc bất kỳ tổ hợp nào có `--cursor`/`--limit` — kể cả kèm\n`--all`) đều thu hẹp `decisions`/`discovery`/`gates`/`settlements`/\n`outcomes`/`frictions`/`learnings`/`decisionsById` xuống đúng tập id đang\nthật sự được trả trong `work` — `tools` (khoá theo TÊN công cụ, không\ntheo id việc) không bao giờ bị đụng tới. Với ba verb còn lại (`ready`/\n`triage`/`evolve`), truyền một trong hai `--cursor`/`--limit` → kết quả\nđổi hình dạng thành `{items, nextCursor}`. Con trỏ (`cursor`) là **đục\nhoàn toàn** —\nngười gọi chỉ nhận lại nguyên văn từ `nextCursor` của lượt trước rồi truyền\ntiếp, không bao giờ tự phân tích hay tự chế. `nextCursor` là `null` khi đã\ntới cuối tập. Một con trỏ trỏ tới một mục đã rời tập (vd việc đã `done` từ\nlượt trước) là lỗi phạm trù `validation` — thông điệp lỗi tự nêu cách sửa\n(bắt đầu lại không kèm `--cursor`). `conflicts` CỐ Ý không phân trang\n(`paginated: false`, lý do ghi ngay trong mô tả verb) — mỗi dòng của nó là\nmột cặp `(a,b)`, không có khoá riêng cho một dòng để làm mốc con trỏ."
+      },
+      "sourceShownText": "**Phân trang cho verb trả tập lớn (per str46-io-contract, được tsk-483 mở lại — xem `docs/history/tsk-483-list-side-log-pagination-\nscoping/CONTEXT.md`).** Sổ verb khai thêm cờ `paginated` (đúng/sai) cho\nMỌI verb — chỉ bốn verb mang `paginated: true`: `ready`, `triage`,\n`evolve` (lượt liệt-kê không cờ của nó), và khoá `work` của `list`. Bốn\nverb này nhận thêm hai tham số tuỳ chọn `--cursor`/`--limit`: không\ntruyền cờ nào → kết quả y hệt hôm nay (mảng/map đầy đủ, không đổi hình\ndạng) — NGOẠI LỆ DUY NHẤT: `list --all --json` không kèm `--cursor`/\n`--limit` giữ nguyên hình dạng thô này VĨNH VIỄN, vì `packages/herdr-fgos-common/rust/src/\nfgos.rs` (crate Rust ngoài repo Node này) đọc đúng lời gọi đó làm hợp\nđồng công khai. Mọi tổ hợp KHÁC của `list` (mặc định trần không cờ nào,\n`--id`, hoặc bất kỳ tổ hợp nào có `--cursor`/`--limit` — kể cả kèm\n`--all`) đều thu hẹp `decisions`/`discovery`/`gates`/`settlements`/\n`outcomes`/`frictions`/`learnings`/`decisionsById` xuống đúng tập id đang\nthật sự được trả trong `work` — `tools` (khoá theo TÊN công cụ, không\ntheo id việc) không bao giờ bị đụng tới. Với ba verb còn lại (`ready`/\n`triage`/`evolve`), truyền một trong hai `--cursor`/`--limit` → kết quả\nđổi hình dạng thành `{items, nextCursor}`. Con trỏ (`cursor`) là **đục\nhoàn toàn** —\nngười gọi chỉ nhận lại nguyên văn từ `nextCursor` của lượt trước rồi truyền\ntiếp, không bao giờ tự phân tích hay tự chế. `nextCursor` là `null` khi đã\ntới cuối tập. Một con trỏ trỏ tới một mục đã rời tập (vd việc đã `done` từ\nlượt trước) là lỗi phạm trù `validation` — thông điệp lỗi tự nêu cách sửa\n(bắt đầu lại không kèm `--cursor`). `conflicts` CỐ Ý không phân trang\n(`paginated: false`, lý do ghi ngay trong mô tả verb) — mỗi dòng của nó là\nmột cặp `(a,b)`, không có khoá riêng cho một dòng để làm mốc con trỏ.",
+      "beforeMainSameAnchorWitness": {
+        "unit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-69",
+          "githubAnchor": "unheaded-block-69",
+          "stableAnchor": "unheaded-block-69",
+          "title": "Unheaded block 69",
+          "startLine": 692,
+          "endLine": 716,
+          "textDigest": "2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9",
+          "sample": "**Phân trang cho verb trả tập lớn (per str46-io-contract, được tsk-483 mở lại — xem `docs/history/tsk-483-list-side-log-pagination-\nscoping/CONTEXT.md`).** Sổ verb khai thêm cờ `pa",
+          "identityFingerprint": "0c4d416214101537d7ba4005ceea36a6978aa90efb8dc69e750359b5ccb0647d",
+          "text": "**Phân trang cho verb trả tập lớn (per str46-io-contract, được tsk-483 mở lại — xem `docs/history/tsk-483-list-side-log-pagination-\nscoping/CONTEXT.md`).** Sổ verb khai thêm cờ `paginated` (đúng/sai) cho\nMỌI verb — chỉ bốn verb mang `paginated: true`: `ready`, `triage`,\n`evolve` (lượt liệt-kê không cờ của nó), và khoá `work` của `list`. Bốn\nverb này nhận thêm hai tham số tuỳ chọn `--cursor`/`--limit`: không\ntruyền cờ nào → kết quả y hệt hôm nay (mảng/map đầy đủ, không đổi hình\ndạng) — NGOẠI LỆ DUY NHẤT: `list --all --json` không kèm `--cursor`/\n`--limit` giữ nguyên hình dạng thô này VĨNH VIỄN, vì `packages/herdr-fgos-common/rust/src/\nfgos.rs` (crate Rust ngoài repo Node này) đọc đúng lời gọi đó làm hợp\nđồng công khai. Mọi tổ hợp KHÁC của `list` (mặc định trần không cờ nào,\n`--id`, hoặc bất kỳ tổ hợp nào có `--cursor`/`--limit` — kể cả kèm\n`--all`) đều thu hẹp `decisions`/`discovery`/`gates`/`settlements`/\n`outcomes`/`frictions`/`learnings`/`decisionsById` xuống đúng tập id đang\nthật sự được trả trong `work` — `tools` (khoá theo TÊN công cụ, không\ntheo id việc) không bao giờ bị đụng tới. Với ba verb còn lại (`ready`/\n`triage`/`evolve`), truyền một trong hai `--cursor`/`--limit` → kết quả\nđổi hình dạng thành `{items, nextCursor}`. Con trỏ (`cursor`) là **đục\nhoàn toàn** —\nngười gọi chỉ nhận lại nguyên văn từ `nextCursor` của lượt trước rồi truyền\ntiếp, không bao giờ tự phân tích hay tự chế. `nextCursor` là `null` khi đã\ntới cuối tập. Một con trỏ trỏ tới một mục đã rời tập (vd việc đã `done` từ\nlượt trước) là lỗi phạm trù `validation` — thông điệp lỗi tự nêu cách sửa\n(bắt đầu lại không kèm `--cursor`). `conflicts` CỐ Ý không phân trang\n(`paginated: false`, lý do ghi ngay trong mô tả verb) — mỗi dòng của nó là\nmột cặp `(a,b)`, không có khoá riêng cho một dòng để làm mốc con trỏ.",
+          "sectionText": "**Phân trang cho verb trả tập lớn (per str46-io-contract, được tsk-483 mở lại — xem `docs/history/tsk-483-list-side-log-pagination-\nscoping/CONTEXT.md`).** Sổ verb khai thêm cờ `paginated` (đúng/sai) cho\nMỌI verb — chỉ bốn verb mang `paginated: true`: `ready`, `triage`,\n`evolve` (lượt liệt-kê không cờ của nó), và khoá `work` của `list`. Bốn\nverb này nhận thêm hai tham số tuỳ chọn `--cursor`/`--limit`: không\ntruyền cờ nào → kết quả y hệt hôm nay (mảng/map đầy đủ, không đổi hình\ndạng) — NGOẠI LỆ DUY NHẤT: `list --all --json` không kèm `--cursor`/\n`--limit` giữ nguyên hình dạng thô này VĨNH VIỄN, vì `packages/herdr-fgos-common/rust/src/\nfgos.rs` (crate Rust ngoài repo Node này) đọc đúng lời gọi đó làm hợp\nđồng công khai. Mọi tổ hợp KHÁC của `list` (mặc định trần không cờ nào,\n`--id`, hoặc bất kỳ tổ hợp nào có `--cursor`/`--limit` — kể cả kèm\n`--all`) đều thu hẹp `decisions`/`discovery`/`gates`/`settlements`/\n`outcomes`/`frictions`/`learnings`/`decisionsById` xuống đúng tập id đang\nthật sự được trả trong `work` — `tools` (khoá theo TÊN công cụ, không\ntheo id việc) không bao giờ bị đụng tới. Với ba verb còn lại (`ready`/\n`triage`/`evolve`), truyền một trong hai `--cursor`/`--limit` → kết quả\nđổi hình dạng thành `{items, nextCursor}`. Con trỏ (`cursor`) là **đục\nhoàn toàn** —\nngười gọi chỉ nhận lại nguyên văn từ `nextCursor` của lượt trước rồi truyền\ntiếp, không bao giờ tự phân tích hay tự chế. `nextCursor` là `null` khi đã\ntới cuối tập. Một con trỏ trỏ tới một mục đã rời tập (vd việc đã `done` từ\nlượt trước) là lỗi phạm trù `validation` — thông điệp lỗi tự nêu cách sửa\n(bắt đầu lại không kèm `--cursor`). `conflicts` CỐ Ý không phân trang\n(`paginated: false`, lý do ghi ngay trong mô tả verb) — mỗi dòng của nó là\nmột cặp `(a,b)`, không có khoá riêng cho một dòng để làm mốc con trỏ."
+        },
+        "meaning": "Positional same-anchor witness before main merge, not an identity or semantic-equivalence assertion."
+      },
+      "previouslyReviewedDecision": {
+        "claimId": "claim_15a24dbb1f2d0470f04cdf8900da67a0",
+        "authoredBy": "codex-session:1@2026-10-09",
+        "sourceUnitDigest": "2140755c1b59f62f",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-26",
+        "claimKind": "contract",
+        "disposition": "merge",
+        "reviewStatus": "reviewed",
+        "rationale": "Cursor pagination superset (adds permanent list --all --json exception and side-log narrowing) is carried verbatim; the io-contract short text follows it in the same section, so both sources are present.",
+        "reviewNote": "Unchanged under A14. merge/contract: work-state.md L678-702 (unheaded-block-68) -> contracts/cli-io-contract.md#unheaded-block-26 L202-226; targetOwner/targetAnchor contracts/cli-io-contract.md#unheaded-block-26. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+        "reviewedAt": "2026-10-09",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+        "reviewMode": "ordinary",
+        "targetUnitDigest": "2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "6. Cursor Pagination"
+        ],
+        "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
+      },
+      "reviewFinding": {
+        "claimId": "claim_15a24dbb1f2d0470f04cdf8900da67a0",
+        "verdict": "rework",
+        "note": "deep: sampled; legacy block 69 byte-equal to carrier block 27 (cursor pagination, 2196 bytes), digests and shift 26 to 27 verified; but disposition change; the reviewed decision was merge with its own rationale, now silently supersede with only the generic rebind rationale; restore merge and its rationale (re-point anchor and digest only) or state why supersede is right; siblings 41 to 44 keep merge",
+        "sourceUnitDigest": "2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9",
+        "targetUnitDigest": "2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9"
+      },
+      "reason": "Cursor pagination superset (adds permanent list --all --json exception and side-log narrowing) is carried verbatim; the io-contract short text follows it in the same section, so both sources are present.",
+      "historicalBeforeDigest": "2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9",
+      "historicalAfterDigest": "2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9"
+    },
+    {
+      "entryId": "claim_5dcb56608e17caeb53c197186ae33827",
+      "section": "b",
+      "channel": "source-carriage-rebinding",
+      "reviewStatus": "pending",
+      "sourceDigest": "3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62",
+      "sourcePath": "docs/specs/work-state.md",
+      "sourceAnchor": "unheaded-block-70",
+      "beforeDigest": "3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62",
+      "afterDigest": "3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62",
+      "shard": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+      "beforeDecision": {
+        "claimId": "claim_5dcb56608e17caeb53c197186ae33827",
+        "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+        "sourceUnitDigest": "3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-36",
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+        "targetUnitDigest": "3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "8. Multi-Value Flag Convention"
+        ]
+      },
+      "decision": {
+        "claimId": "claim_5dcb56608e17caeb53c197186ae33827",
+        "authoredBy": "codex-session:unit-run-1792056203419-9b5bd055@2026-10-15",
+        "sourceUnitDigest": "3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-36",
+        "claimKind": "contract",
+        "disposition": "merge",
+        "reviewStatus": "pending",
+        "rationale": "csv versus json-array multiValueFormat rule is stated in both sources; candidate carries both texts under the H2 8. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
+        "targetUnitDigest": "3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "8. Multi-Value Flag Convention"
+        ]
+      },
+      "beforeTarget": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-36",
+        "githubAnchor": "unheaded-block-36",
+        "stableAnchor": "unheaded-block-36",
+        "title": "Unheaded block 36",
+        "startLine": 325,
+        "endLine": 332,
+        "textDigest": "3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62",
+        "sample": "**Quy ước cờ nhiều-giá-trị (per str46-io-contract).** Sổ verb khai thêm\ntrường `multiValueFormat` (`'csv'` hay `'json-array'`) trên đúng những tham\nsố nào mang nhiều giá trị — trướ",
+        "identityFingerprint": "3106ff6efc6244bea6ee9a9696727e25ff45124b65419573616164315cfb46dd",
+        "ancestry": [
+          "CLI I/O Contract",
+          "8. Multi-Value Flag Convention"
+        ],
+        "text": "**Quy ước cờ nhiều-giá-trị (per str46-io-contract).** Sổ verb khai thêm\ntrường `multiValueFormat` (`'csv'` hay `'json-array'`) trên đúng những tham\nsố nào mang nhiều giá trị — trước đây khác biệt này chỉ nằm trong văn xuôi\nmô tả, không đọc được bằng máy. `deps`, `refs`, `footprint`, `targets` mang\n`multiValueFormat: 'csv'` (phân tách bằng dấu phẩy). `acceptance` mang\n`multiValueFormat: 'json-array'` (chuỗi JSON-hoá, CỐ Ý không phẩy vì văn\nbản một clause có thể tự chứa dấu phẩy). Tham số không mang nhiều giá trị\nkhông có trường này.",
+        "sectionText": "**Quy ước cờ nhiều-giá-trị (per str46-io-contract).** Sổ verb khai thêm\ntrường `multiValueFormat` (`'csv'` hay `'json-array'`) trên đúng những tham\nsố nào mang nhiều giá trị — trước đây khác biệt này chỉ nằm trong văn xuôi\nmô tả, không đọc được bằng máy. `deps`, `refs`, `footprint`, `targets` mang\n`multiValueFormat: 'csv'` (phân tách bằng dấu phẩy). `acceptance` mang\n`multiValueFormat: 'json-array'` (chuỗi JSON-hoá, CỐ Ý không phẩy vì văn\nbản một clause có thể tự chứa dấu phẩy). Tham số không mang nhiều giá trị\nkhông có trường này."
+      },
+      "afterTarget": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-36",
+        "githubAnchor": "unheaded-block-36",
+        "stableAnchor": "unheaded-block-36",
+        "title": "Unheaded block 36",
+        "startLine": 325,
+        "endLine": 332,
+        "textDigest": "3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62",
+        "sample": "**Quy ước cờ nhiều-giá-trị (per str46-io-contract).** Sổ verb khai thêm\ntrường `multiValueFormat` (`'csv'` hay `'json-array'`) trên đúng những tham\nsố nào mang nhiều giá trị — trướ",
+        "identityFingerprint": "3106ff6efc6244bea6ee9a9696727e25ff45124b65419573616164315cfb46dd",
+        "ancestry": [
+          "CLI I/O Contract",
+          "8. Multi-Value Flag Convention"
+        ],
+        "text": "**Quy ước cờ nhiều-giá-trị (per str46-io-contract).** Sổ verb khai thêm\ntrường `multiValueFormat` (`'csv'` hay `'json-array'`) trên đúng những tham\nsố nào mang nhiều giá trị — trước đây khác biệt này chỉ nằm trong văn xuôi\nmô tả, không đọc được bằng máy. `deps`, `refs`, `footprint`, `targets` mang\n`multiValueFormat: 'csv'` (phân tách bằng dấu phẩy). `acceptance` mang\n`multiValueFormat: 'json-array'` (chuỗi JSON-hoá, CỐ Ý không phẩy vì văn\nbản một clause có thể tự chứa dấu phẩy). Tham số không mang nhiều giá trị\nkhông có trường này."
+      },
+      "sourceNativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-70",
+        "githubAnchor": "unheaded-block-70",
+        "stableAnchor": "unheaded-block-70",
+        "title": "Unheaded block 70",
+        "startLine": 718,
+        "endLine": 725,
+        "textDigest": "3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62",
+        "sample": "**Quy ước cờ nhiều-giá-trị (per str46-io-contract).** Sổ verb khai thêm\ntrường `multiValueFormat` (`'csv'` hay `'json-array'`) trên đúng những tham\nsố nào mang nhiều giá trị — trướ",
+        "identityFingerprint": "3106ff6efc6244bea6ee9a9696727e25ff45124b65419573616164315cfb46dd",
+        "text": "**Quy ước cờ nhiều-giá-trị (per str46-io-contract).** Sổ verb khai thêm\ntrường `multiValueFormat` (`'csv'` hay `'json-array'`) trên đúng những tham\nsố nào mang nhiều giá trị — trước đây khác biệt này chỉ nằm trong văn xuôi\nmô tả, không đọc được bằng máy. `deps`, `refs`, `footprint`, `targets` mang\n`multiValueFormat: 'csv'` (phân tách bằng dấu phẩy). `acceptance` mang\n`multiValueFormat: 'json-array'` (chuỗi JSON-hoá, CỐ Ý không phẩy vì văn\nbản một clause có thể tự chứa dấu phẩy). Tham số không mang nhiều giá trị\nkhông có trường này.",
+        "sectionText": "**Quy ước cờ nhiều-giá-trị (per str46-io-contract).** Sổ verb khai thêm\ntrường `multiValueFormat` (`'csv'` hay `'json-array'`) trên đúng những tham\nsố nào mang nhiều giá trị — trước đây khác biệt này chỉ nằm trong văn xuôi\nmô tả, không đọc được bằng máy. `deps`, `refs`, `footprint`, `targets` mang\n`multiValueFormat: 'csv'` (phân tách bằng dấu phẩy). `acceptance` mang\n`multiValueFormat: 'json-array'` (chuỗi JSON-hoá, CỐ Ý không phẩy vì văn\nbản một clause có thể tự chứa dấu phẩy). Tham số không mang nhiều giá trị\nkhông có trường này."
+      },
+      "sourceShownText": "**Quy ước cờ nhiều-giá-trị (per str46-io-contract).** Sổ verb khai thêm\ntrường `multiValueFormat` (`'csv'` hay `'json-array'`) trên đúng những tham\nsố nào mang nhiều giá trị — trước đây khác biệt này chỉ nằm trong văn xuôi\nmô tả, không đọc được bằng máy. `deps`, `refs`, `footprint`, `targets` mang\n`multiValueFormat: 'csv'` (phân tách bằng dấu phẩy). `acceptance` mang\n`multiValueFormat: 'json-array'` (chuỗi JSON-hoá, CỐ Ý không phẩy vì văn\nbản một clause có thể tự chứa dấu phẩy). Tham số không mang nhiều giá trị\nkhông có trường này.",
+      "beforeMainSameAnchorWitness": {
+        "unit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-70",
+          "githubAnchor": "unheaded-block-70",
+          "stableAnchor": "unheaded-block-70",
+          "title": "Unheaded block 70",
+          "startLine": 718,
+          "endLine": 725,
+          "textDigest": "3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62",
+          "sample": "**Quy ước cờ nhiều-giá-trị (per str46-io-contract).** Sổ verb khai thêm\ntrường `multiValueFormat` (`'csv'` hay `'json-array'`) trên đúng những tham\nsố nào mang nhiều giá trị — trướ",
+          "identityFingerprint": "3106ff6efc6244bea6ee9a9696727e25ff45124b65419573616164315cfb46dd",
+          "text": "**Quy ước cờ nhiều-giá-trị (per str46-io-contract).** Sổ verb khai thêm\ntrường `multiValueFormat` (`'csv'` hay `'json-array'`) trên đúng những tham\nsố nào mang nhiều giá trị — trước đây khác biệt này chỉ nằm trong văn xuôi\nmô tả, không đọc được bằng máy. `deps`, `refs`, `footprint`, `targets` mang\n`multiValueFormat: 'csv'` (phân tách bằng dấu phẩy). `acceptance` mang\n`multiValueFormat: 'json-array'` (chuỗi JSON-hoá, CỐ Ý không phẩy vì văn\nbản một clause có thể tự chứa dấu phẩy). Tham số không mang nhiều giá trị\nkhông có trường này.",
+          "sectionText": "**Quy ước cờ nhiều-giá-trị (per str46-io-contract).** Sổ verb khai thêm\ntrường `multiValueFormat` (`'csv'` hay `'json-array'`) trên đúng những tham\nsố nào mang nhiều giá trị — trước đây khác biệt này chỉ nằm trong văn xuôi\nmô tả, không đọc được bằng máy. `deps`, `refs`, `footprint`, `targets` mang\n`multiValueFormat: 'csv'` (phân tách bằng dấu phẩy). `acceptance` mang\n`multiValueFormat: 'json-array'` (chuỗi JSON-hoá, CỐ Ý không phẩy vì văn\nbản một clause có thể tự chứa dấu phẩy). Tham số không mang nhiều giá trị\nkhông có trường này."
+        },
+        "meaning": "Positional same-anchor witness before main merge, not an identity or semantic-equivalence assertion."
+      },
+      "previouslyReviewedDecision": {
+        "claimId": "claim_5dcb56608e17caeb53c197186ae33827",
+        "authoredBy": "codex-session:27@2026-10-14",
+        "sourceUnitDigest": "3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-35",
+        "claimKind": "contract",
+        "disposition": "merge",
+        "reviewStatus": "reviewed",
+        "rationale": "csv versus json-array multiValueFormat rule is stated in both sources; candidate carries both texts under the H2 8. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
+        "reviewNote": "deep: . Source and target text byte-equal, anchors 70 to 35 after the Sub-verb paragraph insertion; target ancestry 8. Multi-Value Flag Convention.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+        "reviewMode": "ordinary",
+        "targetUnitDigest": "3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "8. Multi-Value Flag Convention"
+        ],
+        "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+      },
+      "reviewFinding": {
+        "claimId": "claim_5dcb56608e17caeb53c197186ae33827",
+        "verdict": "rework",
+        "note": "mechanical: digests, anchor and byte equality pass (legacy block 70 3964ac13 equals carrier block 36, shift 35 to 36); but disposition change found by comparing the decision with its reviewed form; the reviewed decision was merge with its own rationale, now silently supersede with only the generic rebind rationale; restore merge and its rationale (re-point anchor and digest only) or state why supersede is right; the reviewed rationale says both sources state the csv/json-array rule, a merge fact",
+        "sourceUnitDigest": "3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62",
+        "targetUnitDigest": "3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62"
+      },
+      "reason": "csv versus json-array multiValueFormat rule is stated in both sources; candidate carries both texts under the H2 8. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
+      "historicalBeforeDigest": "3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62",
+      "historicalAfterDigest": "3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62"
+    },
+    {
+      "entryId": "claim_6fe86521fead9cec7253443e3275a3cf",
+      "section": "b",
+      "channel": "source-carriage-rebinding",
+      "reviewStatus": "pending",
+      "sourceDigest": "a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798",
+      "sourcePath": "docs/specs/work-state.md",
+      "sourceAnchor": "unheaded-block-73",
+      "beforeDigest": "a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798",
+      "afterDigest": "a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798",
+      "shard": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+      "beforeDecision": {
+        "claimId": "claim_6fe86521fead9cec7253443e3275a3cf",
+        "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+        "sourceUnitDigest": "a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-40",
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+        "targetUnitDigest": "a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "9. Per-Verb Help"
+        ]
+      },
+      "decision": {
+        "claimId": "claim_6fe86521fead9cec7253443e3275a3cf",
+        "authoredBy": "codex-session:unit-run-1792056203419-9b5bd055@2026-10-15",
+        "sourceUnitDigest": "a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-40",
+        "claimKind": "contract",
+        "disposition": "promote",
+        "reviewStatus": "pending",
+        "rationale": "Runs-when / Blocked-when bullets of per-verb help are carried verbatim; kept as contract since it is a CLI surface guarantee. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
+        "targetUnitDigest": "a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "9. Per-Verb Help"
+        ]
+      },
+      "beforeTarget": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-40",
+        "githubAnchor": "unheaded-block-40",
+        "stableAnchor": "unheaded-block-40",
+        "title": "Unheaded block 40",
+        "startLine": 364,
+        "endLine": 375,
+        "textDigest": "a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798",
+        "sample": "- **Runs when:** người/agent gọi `fgos <verb> --help` cho bất kỳ verb nào\n  trong sổ verb.\n- **Blocked when:** không có điều kiện chặn — mọi verb đều có mục trợ giúp\n  riêng.\n- **W",
+        "identityFingerprint": "a4b8f46267345e4fc04574b601726648feb938131fcf8d1d3ead6872ed968d73",
+        "ancestry": [
+          "CLI I/O Contract",
+          "9. Per-Verb Help"
+        ],
+        "text": "- **Runs when:** người/agent gọi `fgos <verb> --help` cho bất kỳ verb nào\n  trong sổ verb.\n- **Blocked when:** không có điều kiện chặn — mọi verb đều có mục trợ giúp\n  riêng.\n- **What changes:** không gì — đây là thao tác chỉ-đọc, không ghi sự kiện,\n  không đổi bản chiếu, không có tác dụng phụ nào (kể cả với `init` — gọi `fgos\n  init --help` KHÔNG chạy `init` thật, không tạo `.fgos/`).\n- **Side effects:** không có, cho MỌI verb kể cả những verb thường có tác\n  dụng phụ khi gọi thật (vd `init`).\n- **Afterwards:** người gọi thấy đúng mục trợ giúp của verb đã nêu tên, thoát\n  mã 0 — không bao giờ thoát ở phạm trù lỗi (mã 4) vì thiếu tham số bắt buộc,\n  dù tham số đó có mặt hay không (per str77-79-doc-gap-fixes / ea8b9a8d — RUL55 (trợ giúp theo từng verb luôn có thật, không tác dụng phụ)).",
+        "sectionText": "- **Runs when:** người/agent gọi `fgos <verb> --help` cho bất kỳ verb nào\n  trong sổ verb.\n- **Blocked when:** không có điều kiện chặn — mọi verb đều có mục trợ giúp\n  riêng.\n- **What changes:** không gì — đây là thao tác chỉ-đọc, không ghi sự kiện,\n  không đổi bản chiếu, không có tác dụng phụ nào (kể cả với `init` — gọi `fgos\n  init --help` KHÔNG chạy `init` thật, không tạo `.fgos/`).\n- **Side effects:** không có, cho MỌI verb kể cả những verb thường có tác\n  dụng phụ khi gọi thật (vd `init`).\n- **Afterwards:** người gọi thấy đúng mục trợ giúp của verb đã nêu tên, thoát\n  mã 0 — không bao giờ thoát ở phạm trù lỗi (mã 4) vì thiếu tham số bắt buộc,\n  dù tham số đó có mặt hay không (per str77-79-doc-gap-fixes / ea8b9a8d — RUL55 (trợ giúp theo từng verb luôn có thật, không tác dụng phụ))."
+      },
+      "afterTarget": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-40",
+        "githubAnchor": "unheaded-block-40",
+        "stableAnchor": "unheaded-block-40",
+        "title": "Unheaded block 40",
+        "startLine": 364,
+        "endLine": 375,
+        "textDigest": "a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798",
+        "sample": "- **Runs when:** người/agent gọi `fgos <verb> --help` cho bất kỳ verb nào\n  trong sổ verb.\n- **Blocked when:** không có điều kiện chặn — mọi verb đều có mục trợ giúp\n  riêng.\n- **W",
+        "identityFingerprint": "a4b8f46267345e4fc04574b601726648feb938131fcf8d1d3ead6872ed968d73",
+        "ancestry": [
+          "CLI I/O Contract",
+          "9. Per-Verb Help"
+        ],
+        "text": "- **Runs when:** người/agent gọi `fgos <verb> --help` cho bất kỳ verb nào\n  trong sổ verb.\n- **Blocked when:** không có điều kiện chặn — mọi verb đều có mục trợ giúp\n  riêng.\n- **What changes:** không gì — đây là thao tác chỉ-đọc, không ghi sự kiện,\n  không đổi bản chiếu, không có tác dụng phụ nào (kể cả với `init` — gọi `fgos\n  init --help` KHÔNG chạy `init` thật, không tạo `.fgos/`).\n- **Side effects:** không có, cho MỌI verb kể cả những verb thường có tác\n  dụng phụ khi gọi thật (vd `init`).\n- **Afterwards:** người gọi thấy đúng mục trợ giúp của verb đã nêu tên, thoát\n  mã 0 — không bao giờ thoát ở phạm trù lỗi (mã 4) vì thiếu tham số bắt buộc,\n  dù tham số đó có mặt hay không (per str77-79-doc-gap-fixes / ea8b9a8d — RUL55 (trợ giúp theo từng verb luôn có thật, không tác dụng phụ))."
+      },
+      "sourceNativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-73",
+        "githubAnchor": "unheaded-block-73",
+        "stableAnchor": "unheaded-block-73",
+        "title": "Unheaded block 73",
+        "startLine": 751,
+        "endLine": 762,
+        "textDigest": "a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798",
+        "sample": "- **Runs when:** người/agent gọi `fgos <verb> --help` cho bất kỳ verb nào\n  trong sổ verb.\n- **Blocked when:** không có điều kiện chặn — mọi verb đều có mục trợ giúp\n  riêng.\n- **W",
+        "identityFingerprint": "a4b8f46267345e4fc04574b601726648feb938131fcf8d1d3ead6872ed968d73",
+        "text": "- **Runs when:** người/agent gọi `fgos <verb> --help` cho bất kỳ verb nào\n  trong sổ verb.\n- **Blocked when:** không có điều kiện chặn — mọi verb đều có mục trợ giúp\n  riêng.\n- **What changes:** không gì — đây là thao tác chỉ-đọc, không ghi sự kiện,\n  không đổi bản chiếu, không có tác dụng phụ nào (kể cả với `init` — gọi `fgos\n  init --help` KHÔNG chạy `init` thật, không tạo `.fgos/`).\n- **Side effects:** không có, cho MỌI verb kể cả những verb thường có tác\n  dụng phụ khi gọi thật (vd `init`).\n- **Afterwards:** người gọi thấy đúng mục trợ giúp của verb đã nêu tên, thoát\n  mã 0 — không bao giờ thoát ở phạm trù lỗi (mã 4) vì thiếu tham số bắt buộc,\n  dù tham số đó có mặt hay không (per str77-79-doc-gap-fixes / ea8b9a8d — RUL55 (trợ giúp theo từng verb luôn có thật, không tác dụng phụ)).",
+        "sectionText": "- **Runs when:** người/agent gọi `fgos <verb> --help` cho bất kỳ verb nào\n  trong sổ verb.\n- **Blocked when:** không có điều kiện chặn — mọi verb đều có mục trợ giúp\n  riêng.\n- **What changes:** không gì — đây là thao tác chỉ-đọc, không ghi sự kiện,\n  không đổi bản chiếu, không có tác dụng phụ nào (kể cả với `init` — gọi `fgos\n  init --help` KHÔNG chạy `init` thật, không tạo `.fgos/`).\n- **Side effects:** không có, cho MỌI verb kể cả những verb thường có tác\n  dụng phụ khi gọi thật (vd `init`).\n- **Afterwards:** người gọi thấy đúng mục trợ giúp của verb đã nêu tên, thoát\n  mã 0 — không bao giờ thoát ở phạm trù lỗi (mã 4) vì thiếu tham số bắt buộc,\n  dù tham số đó có mặt hay không (per str77-79-doc-gap-fixes / ea8b9a8d — RUL55 (trợ giúp theo từng verb luôn có thật, không tác dụng phụ))."
+      },
+      "sourceShownText": "- **Runs when:** người/agent gọi `fgos <verb> --help` cho bất kỳ verb nào\n  trong sổ verb.\n- **Blocked when:** không có điều kiện chặn — mọi verb đều có mục trợ giúp\n  riêng.\n- **What changes:** không gì — đây là thao tác chỉ-đọc, không ghi sự kiện,\n  không đổi bản chiếu, không có tác dụng phụ nào (kể cả với `init` — gọi `fgos\n  init --help` KHÔNG chạy `init` thật, không tạo `.fgos/`).\n- **Side effects:** không có, cho MỌI verb kể cả những verb thường có tác\n  dụng phụ khi gọi thật (vd `init`).\n- **Afterwards:** người gọi thấy đúng mục trợ giúp của verb đã nêu tên, thoát\n  mã 0 — không bao giờ thoát ở phạm trù lỗi (mã 4) vì thiếu tham số bắt buộc,\n  dù tham số đó có mặt hay không (per str77-79-doc-gap-fixes / ea8b9a8d — RUL55 (trợ giúp theo từng verb luôn có thật, không tác dụng phụ)).",
+      "beforeMainSameAnchorWitness": {
+        "unit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-73",
+          "githubAnchor": "unheaded-block-73",
+          "stableAnchor": "unheaded-block-73",
+          "title": "Unheaded block 73",
+          "startLine": 751,
+          "endLine": 762,
+          "textDigest": "a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798",
+          "sample": "- **Runs when:** người/agent gọi `fgos <verb> --help` cho bất kỳ verb nào\n  trong sổ verb.\n- **Blocked when:** không có điều kiện chặn — mọi verb đều có mục trợ giúp\n  riêng.\n- **W",
+          "identityFingerprint": "a4b8f46267345e4fc04574b601726648feb938131fcf8d1d3ead6872ed968d73",
+          "text": "- **Runs when:** người/agent gọi `fgos <verb> --help` cho bất kỳ verb nào\n  trong sổ verb.\n- **Blocked when:** không có điều kiện chặn — mọi verb đều có mục trợ giúp\n  riêng.\n- **What changes:** không gì — đây là thao tác chỉ-đọc, không ghi sự kiện,\n  không đổi bản chiếu, không có tác dụng phụ nào (kể cả với `init` — gọi `fgos\n  init --help` KHÔNG chạy `init` thật, không tạo `.fgos/`).\n- **Side effects:** không có, cho MỌI verb kể cả những verb thường có tác\n  dụng phụ khi gọi thật (vd `init`).\n- **Afterwards:** người gọi thấy đúng mục trợ giúp của verb đã nêu tên, thoát\n  mã 0 — không bao giờ thoát ở phạm trù lỗi (mã 4) vì thiếu tham số bắt buộc,\n  dù tham số đó có mặt hay không (per str77-79-doc-gap-fixes / ea8b9a8d — RUL55 (trợ giúp theo từng verb luôn có thật, không tác dụng phụ)).",
+          "sectionText": "- **Runs when:** người/agent gọi `fgos <verb> --help` cho bất kỳ verb nào\n  trong sổ verb.\n- **Blocked when:** không có điều kiện chặn — mọi verb đều có mục trợ giúp\n  riêng.\n- **What changes:** không gì — đây là thao tác chỉ-đọc, không ghi sự kiện,\n  không đổi bản chiếu, không có tác dụng phụ nào (kể cả với `init` — gọi `fgos\n  init --help` KHÔNG chạy `init` thật, không tạo `.fgos/`).\n- **Side effects:** không có, cho MỌI verb kể cả những verb thường có tác\n  dụng phụ khi gọi thật (vd `init`).\n- **Afterwards:** người gọi thấy đúng mục trợ giúp của verb đã nêu tên, thoát\n  mã 0 — không bao giờ thoát ở phạm trù lỗi (mã 4) vì thiếu tham số bắt buộc,\n  dù tham số đó có mặt hay không (per str77-79-doc-gap-fixes / ea8b9a8d — RUL55 (trợ giúp theo từng verb luôn có thật, không tác dụng phụ))."
+        },
+        "meaning": "Positional same-anchor witness before main merge, not an identity or semantic-equivalence assertion."
+      },
+      "previouslyReviewedDecision": {
+        "claimId": "claim_6fe86521fead9cec7253443e3275a3cf",
+        "authoredBy": "codex-session:27@2026-10-14",
+        "sourceUnitDigest": "a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-39",
+        "claimKind": "contract",
+        "disposition": "promote",
+        "reviewStatus": "reviewed",
+        "rationale": "Runs-when / Blocked-when bullets of per-verb help are carried verbatim; kept as contract since it is a CLI surface guarantee. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
+        "reviewNote": "mechanical: Digests, anchor and shard/pack equality pass; source and target text are script-equal (renumbered only).",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+        "reviewMode": "ordinary",
+        "targetUnitDigest": "a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "9. Per-Verb Help"
+        ],
+        "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+      },
+      "reviewFinding": {
+        "claimId": "claim_6fe86521fead9cec7253443e3275a3cf",
+        "verdict": "rework",
+        "note": "deep: sampled; legacy block 73 byte-equal to carrier block 40 (help Runs-when bullets); shift 39 to 40 verified; but disposition change; the reviewed decision was promote with its own rationale, now silently supersede with only the generic rebind rationale; restore promote and its rationale (re-point anchor and digest only) or state why supersede is right",
+        "sourceUnitDigest": "a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798",
+        "targetUnitDigest": "a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798"
+      },
+      "reason": "Runs-when / Blocked-when bullets of per-verb help are carried verbatim; kept as contract since it is a CLI surface guarantee. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
+      "historicalBeforeDigest": "a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798",
+      "historicalAfterDigest": "a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798"
+    },
+    {
+      "entryId": "claim_9959e82e2874baeb627a8441faa07e9a",
+      "section": "b",
+      "channel": "predecessor-accounting-rebinding",
+      "reviewStatus": "pending",
+      "sourceDigest": "a2e6a5ffa58ec1f13d1321cf4b14d70b2a261fba6ce0f15c0bda50975cf8de04",
+      "sourcePath": "docs/specs/work-state.md",
+      "sourceAnchor": null,
+      "beforeDigest": "878d708db7a0afb3e23a0829f98be122c83ac562946b51ab1989e73e5e4a8bfe",
+      "afterDigest": "878d708db7a0afb3e23a0829f98be122c83ac562946b51ab1989e73e5e4a8bfe",
+      "shard": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+      "beforeDecision": {
+        "claimId": "claim_9959e82e2874baeb627a8441faa07e9a",
+        "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+        "sourceUnitDigest": "a2e6a5ffa58ec1f13d1321cf4b14d70b2a261fba6ce0f15c0bda50975cf8de04",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-30",
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+        "sourcePath": "docs/specs/work-state.md",
+        "sourceAnchor": "unheaded-block-66",
+        "targetUnitDigest": "878d708db7a0afb3e23a0829f98be122c83ac562946b51ab1989e73e5e4a8bfe",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Manifest Shape"
+        ]
+      },
+      "decision": {
+        "claimId": "claim_9959e82e2874baeb627a8441faa07e9a",
+        "authoredBy": "codex-session:unit-run-1792056203419-9b5bd055@2026-10-15",
+        "sourceUnitDigest": "a2e6a5ffa58ec1f13d1321cf4b14d70b2a261fba6ce0f15c0bda50975cf8de04",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-30",
+        "claimKind": "contract",
+        "disposition": "merge",
+        "reviewStatus": "pending",
+        "rationale": "Manifest fields are combined from work-state and io-contract in the single Manifest Shape section; the work-state contribution includes the positional-parameter rule. The source schema_version 2.0 sentence is represented by the corrected schema_version 3.0 successor, with the complete fields carried. The reviewed merge disposition is restored: vocabulary merge combines multiple sources and does not require byte equality. The anchor shift changes no target text in this turn.",
+        "sourcePath": "docs/specs/work-state.md",
+        "sourceAnchor": "unheaded-block-66",
+        "targetUnitDigest": "878d708db7a0afb3e23a0829f98be122c83ac562946b51ab1989e73e5e4a8bfe",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Manifest Shape"
+        ]
+      },
+      "beforeTarget": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-30",
+        "githubAnchor": "unheaded-block-30",
+        "stableAnchor": "unheaded-block-30",
+        "title": "Unheaded block 30",
+        "startLine": 251,
+        "endLine": 266,
+        "textDigest": "878d708db7a0afb3e23a0829f98be122c83ac562946b51ab1989e73e5e4a8bfe",
+        "sample": "CLI công bố **toàn bộ mặt verb** dưới dạng một sổ máy-đọc: gọi trợ giúp ở dạng\nmáy-đọc trả `{schema_version, commands: […]}` (`schema_version` hiện hành\n`'3.0'` — tăng từ `'2.0'` k",
+        "identityFingerprint": "32c6dad9c72451cefbaa2daad7d5abc2f6a32ee533e487fb41a7ca37f6994400",
+        "ancestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Manifest Shape"
+        ],
+        "text": "CLI công bố **toàn bộ mặt verb** dưới dạng một sổ máy-đọc: gọi trợ giúp ở dạng\nmáy-đọc trả `{schema_version, commands: […]}` (`schema_version` hiện hành\n`'3.0'` — tăng từ `'2.0'` khi cờ của verb có sub-verb dời vào\n`subcommands`, xem ngay dưới; `'2.0'` từng tăng từ `'1.0'` vì một trường bị\nxoá, per str46-io-contract), mỗi mục mô tả một verb — `name`, cách gọi, mô tả một dòng,\nlược đồ tham số (cờ/positional), ví dụ, và ô `deprecated`. Sổ này để một\nlistener/giao diện **sinh** khung lệnh và khung form từ manifest thay vì\nhard-code từng verb. Bản thân sổ verb là **siêu dữ liệu về CLI**, KHÔNG bọc\ntrong phong bì `data` (nó mô tả CLI, không phải kết quả một verb). Dạng trợ\ngiúp thường (không máy-đọc) in cùng thông tin ở dạng chữ cho người đọc. Với\nmột tham số CHỈ nhận qua vị trí trên dòng lệnh (positional — vd `text` của\n`submit`, đọc từ đối số đầu, không bao giờ qua một cờ `--text`), sổ verb\nđánh dấu riêng tham số đó là positional; dạng trợ giúp chữ cho người đọc in\ndòng \"positional: `<tên>`\" cho tham số này, KHÔNG BAO GIỜ in nhầm thành\n\"required: `--<tên>`\" như một cờ thật — một tham số vừa nhận positional vừa\nnhận qua cờ (vd `id` của `discover`/`take`) in cả hai dạng phân biệt (per str77-79-doc-gap-fixes / ea8b9a8d — RUL54 (sổ verb máy-đọc không in nhầm tham số positional thành cờ bắt buộc)).",
+        "sectionText": "CLI công bố **toàn bộ mặt verb** dưới dạng một sổ máy-đọc: gọi trợ giúp ở dạng\nmáy-đọc trả `{schema_version, commands: […]}` (`schema_version` hiện hành\n`'3.0'` — tăng từ `'2.0'` khi cờ của verb có sub-verb dời vào\n`subcommands`, xem ngay dưới; `'2.0'` từng tăng từ `'1.0'` vì một trường bị\nxoá, per str46-io-contract), mỗi mục mô tả một verb — `name`, cách gọi, mô tả một dòng,\nlược đồ tham số (cờ/positional), ví dụ, và ô `deprecated`. Sổ này để một\nlistener/giao diện **sinh** khung lệnh và khung form từ manifest thay vì\nhard-code từng verb. Bản thân sổ verb là **siêu dữ liệu về CLI**, KHÔNG bọc\ntrong phong bì `data` (nó mô tả CLI, không phải kết quả một verb). Dạng trợ\ngiúp thường (không máy-đọc) in cùng thông tin ở dạng chữ cho người đọc. Với\nmột tham số CHỈ nhận qua vị trí trên dòng lệnh (positional — vd `text` của\n`submit`, đọc từ đối số đầu, không bao giờ qua một cờ `--text`), sổ verb\nđánh dấu riêng tham số đó là positional; dạng trợ giúp chữ cho người đọc in\ndòng \"positional: `<tên>`\" cho tham số này, KHÔNG BAO GIỜ in nhầm thành\n\"required: `--<tên>`\" như một cờ thật — một tham số vừa nhận positional vừa\nnhận qua cờ (vd `id` của `discover`/`take`) in cả hai dạng phân biệt (per str77-79-doc-gap-fixes / ea8b9a8d — RUL54 (sổ verb máy-đọc không in nhầm tham số positional thành cờ bắt buộc))."
+      },
+      "afterTarget": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-30",
+        "githubAnchor": "unheaded-block-30",
+        "stableAnchor": "unheaded-block-30",
+        "title": "Unheaded block 30",
+        "startLine": 251,
+        "endLine": 266,
+        "textDigest": "878d708db7a0afb3e23a0829f98be122c83ac562946b51ab1989e73e5e4a8bfe",
+        "sample": "CLI công bố **toàn bộ mặt verb** dưới dạng một sổ máy-đọc: gọi trợ giúp ở dạng\nmáy-đọc trả `{schema_version, commands: […]}` (`schema_version` hiện hành\n`'3.0'` — tăng từ `'2.0'` k",
+        "identityFingerprint": "32c6dad9c72451cefbaa2daad7d5abc2f6a32ee533e487fb41a7ca37f6994400",
+        "ancestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Manifest Shape"
+        ],
+        "text": "CLI công bố **toàn bộ mặt verb** dưới dạng một sổ máy-đọc: gọi trợ giúp ở dạng\nmáy-đọc trả `{schema_version, commands: […]}` (`schema_version` hiện hành\n`'3.0'` — tăng từ `'2.0'` khi cờ của verb có sub-verb dời vào\n`subcommands`, xem ngay dưới; `'2.0'` từng tăng từ `'1.0'` vì một trường bị\nxoá, per str46-io-contract), mỗi mục mô tả một verb — `name`, cách gọi, mô tả một dòng,\nlược đồ tham số (cờ/positional), ví dụ, và ô `deprecated`. Sổ này để một\nlistener/giao diện **sinh** khung lệnh và khung form từ manifest thay vì\nhard-code từng verb. Bản thân sổ verb là **siêu dữ liệu về CLI**, KHÔNG bọc\ntrong phong bì `data` (nó mô tả CLI, không phải kết quả một verb). Dạng trợ\ngiúp thường (không máy-đọc) in cùng thông tin ở dạng chữ cho người đọc. Với\nmột tham số CHỈ nhận qua vị trí trên dòng lệnh (positional — vd `text` của\n`submit`, đọc từ đối số đầu, không bao giờ qua một cờ `--text`), sổ verb\nđánh dấu riêng tham số đó là positional; dạng trợ giúp chữ cho người đọc in\ndòng \"positional: `<tên>`\" cho tham số này, KHÔNG BAO GIỜ in nhầm thành\n\"required: `--<tên>`\" như một cờ thật — một tham số vừa nhận positional vừa\nnhận qua cờ (vd `id` của `discover`/`take`) in cả hai dạng phân biệt (per str77-79-doc-gap-fixes / ea8b9a8d — RUL54 (sổ verb máy-đọc không in nhầm tham số positional thành cờ bắt buộc))."
+      },
+      "sourceNativeUnit": null,
+      "inheritedSourceWitness": {
+        "meaning": "Existing historical identity-gap accounting. Source digest and original disposition/review are preserved; only the current successor target binding changes. The earlier report remains the source-text witness, not a new current-source claim.",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+        "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2",
+        "sourceDigest": "a2e6a5ffa58ec1f13d1321cf4b14d70b2a261fba6ce0f15c0bda50975cf8de04"
+      },
+      "previouslyReviewedDecision": {
+        "claimId": "claim_9959e82e2874baeb627a8441faa07e9a",
+        "authoredBy": "codex-session:27@2026-10-14",
+        "sourceUnitDigest": "a2e6a5ffa58ec1f1",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-29",
+        "claimKind": "contract",
+        "disposition": "merge",
+        "reviewStatus": "reviewed",
+        "rationale": "Manifest fields (schema_version 2.0, commands) are stated in both sources; candidate carries both texts, the work-state one adds the positional-parameter rule. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
+        "sourcePath": "docs/specs/work-state.md",
+        "sourceAnchor": "unheaded-block-66",
+        "reviewNote": "deep: Old block-66 gap row; the successor target block now carries the 3.0 sentence (diff shows only the two upstream lines replaced); disposition and carrier unchanged.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+        "reviewMode": "ordinary",
+        "targetUnitDigest": "878d708db7a0afb3e23a0829f98be122c83ac562946b51ab1989e73e5e4a8bfe",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Manifest Shape"
+        ],
+        "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+      },
+      "reviewFinding": {
+        "claimId": "claim_9959e82e2874baeb627a8441faa07e9a",
+        "verdict": "rework",
+        "note": "deep: gap row, old digest a2e6a5ff found at 2636ba229 block 66, successor block 30 878d708d correct and unchanged, but disposition change; the reviewed decision was merge with its own rationale, now silently supersede with only the generic rebind rationale; restore merge and its rationale (re-point anchor and digest only) or state why supersede is right (supersede does match the other gap rows, so a one-line reason is enough)",
+        "sourceUnitDigest": "a2e6a5ffa58ec1f13d1321cf4b14d70b2a261fba6ce0f15c0bda50975cf8de04",
+        "targetUnitDigest": "878d708db7a0afb3e23a0829f98be122c83ac562946b51ab1989e73e5e4a8bfe"
+      },
+      "reason": "Manifest fields are combined from work-state and io-contract in the single Manifest Shape section; the work-state contribution includes the positional-parameter rule. The source schema_version 2.0 sentence is represented by the corrected schema_version 3.0 successor, with the complete fields carried. The reviewed merge disposition is restored: vocabulary merge combines multiple sources and does not require byte equality. The anchor shift changes no target text in this turn.",
+      "historicalBeforeDigest": "878d708db7a0afb3e23a0829f98be122c83ac562946b51ab1989e73e5e4a8bfe",
+      "historicalAfterDigest": "878d708db7a0afb3e23a0829f98be122c83ac562946b51ab1989e73e5e4a8bfe",
+      "sourceHistoricalUnit": {
+        "commit": "977509d5f8c49a31c781b54ea53c2b3617f70a13",
+        "path": "docs/specs/work-state.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-66",
+        "githubAnchor": "unheaded-block-66",
+        "stableAnchor": "unheaded-block-66",
+        "title": "Unheaded block 66",
+        "startLine": 649,
+        "endLine": 663,
+        "textDigest": "a2e6a5ffa58ec1f13d1321cf4b14d70b2a261fba6ce0f15c0bda50975cf8de04",
+        "sample": "CLI công bố **toàn bộ mặt verb** dưới dạng một sổ máy-đọc: gọi trợ giúp ở dạng\nmáy-đọc trả `{schema_version, commands: […]}` (`schema_version` hiện hành\n`'2.0'`, per str46-io-contr",
+        "identityFingerprint": "bf7edb27c3307e0712e31435c5507ebd2b1041e52b595337cddfdbbb9baf2734",
+        "ancestry": [
+          "Spec: Work-State (tầng quản việc của forgent)",
+          "Data Dictionary",
+          "Sổ verb máy-đọc (manifest) — `--help --json`"
+        ],
+        "text": "CLI công bố **toàn bộ mặt verb** dưới dạng một sổ máy-đọc: gọi trợ giúp ở dạng\nmáy-đọc trả `{schema_version, commands: […]}` (`schema_version` hiện hành\n`'2.0'`, per str46-io-contract — tăng từ `'1.0'` vì một trường bị xoá,\nxem ngay dưới), mỗi mục mô tả một verb — `name`, cách gọi, mô tả một dòng,\nlược đồ tham số (cờ/positional), ví dụ, và ô `deprecated`. Sổ này để một\nlistener/giao diện **sinh** khung lệnh và khung form từ manifest thay vì\nhard-code từng verb. Bản thân sổ verb là **siêu dữ liệu về CLI**, KHÔNG bọc\ntrong phong bì `data` (nó mô tả CLI, không phải kết quả một verb). Dạng trợ\ngiúp thường (không máy-đọc) in cùng thông tin ở dạng chữ cho người đọc. Với\nmột tham số CHỈ nhận qua vị trí trên dòng lệnh (positional — vd `text` của\n`submit`, đọc từ đối số đầu, không bao giờ qua một cờ `--text`), sổ verb\nđánh dấu riêng tham số đó là positional; dạng trợ giúp chữ cho người đọc in\ndòng \"positional: `<tên>`\" cho tham số này, KHÔNG BAO GIỜ in nhầm thành\n\"required: `--<tên>`\" như một cờ thật — một tham số vừa nhận positional vừa\nnhận qua cờ (vd `id` của `discover`/`take`) in cả hai dạng phân biệt (per str77-79-doc-gap-fixes / ea8b9a8d — RUL54 (sổ verb máy-đọc không in nhầm tham số positional thành cờ bắt buộc))."
+      }
+    },
+    {
+      "entryId": "claim_19495d2772ced1aa1af4b20d4640fa3a",
+      "section": "b",
+      "channel": "predecessor-accounting-rebinding",
+      "reviewStatus": "pending",
+      "sourceDigest": "83773dda67db8d5f71205bb8c7106186023672125b08cbe4f33b09b0578163ca",
+      "sourcePath": "docs/io-contract.md",
+      "sourceAnchor": null,
+      "beforeDigest": "51dd3c8aa026a8f5a15e4c12c522b3bf2ad7c29238c49bf9ba51324806e10e23",
+      "afterDigest": "51dd3c8aa026a8f5a15e4c12c522b3bf2ad7c29238c49bf9ba51324806e10e23",
+      "shard": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+      "beforeDecision": {
+        "claimId": "claim_19495d2772ced1aa1af4b20d4640fa3a",
+        "sourceUnitDigest": "83773dda67db8d5f71205bb8c7106186023672125b08cbe4f33b09b0578163ca",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-32",
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover.",
+        "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+        "sourcePath": "docs/io-contract.md",
+        "sourceAnchor": "unheaded-block-18",
+        "targetUnitDigest": "51dd3c8aa026a8f5a15e4c12c522b3bf2ad7c29238c49bf9ba51324806e10e23",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Manifest Shape"
+        ]
+      },
+      "decision": {
+        "claimId": "claim_19495d2772ced1aa1af4b20d4640fa3a",
+        "sourceUnitDigest": "83773dda67db8d5f71205bb8c7106186023672125b08cbe4f33b09b0578163ca",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-32",
+        "claimKind": "contract",
+        "disposition": "merge",
+        "reviewStatus": "pending",
+        "rationale": "The fgos --help --json manifest contract is combined with the work-state manifest contribution under Manifest Shape. Its schema_version 2.0 source wording is represented by the corrected schema_version 3.0 successor, including commands and per-verb entries; work-state adds the positional-parameter rule. The reviewed merge disposition is restored: vocabulary merge combines multiple sources and does not require byte equality. The anchor shift changes no target text in this turn.",
+        "authoredBy": "codex-session:unit-run-1792056203419-9b5bd055@2026-10-15",
+        "sourcePath": "docs/io-contract.md",
+        "sourceAnchor": "unheaded-block-18",
+        "targetUnitDigest": "51dd3c8aa026a8f5a15e4c12c522b3bf2ad7c29238c49bf9ba51324806e10e23",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Manifest Shape"
+        ]
+      },
+      "beforeTarget": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-32",
+        "githubAnchor": "unheaded-block-32",
+        "stableAnchor": "unheaded-block-32",
+        "title": "Unheaded block 32",
+        "startLine": 281,
+        "endLine": 288,
+        "textDigest": "51dd3c8aa026a8f5a15e4c12c522b3bf2ad7c29238c49bf9ba51324806e10e23",
+        "sample": "`fgos --help --json` trả `{schema_version, commands: […]}` — CLI công bố\ntoàn bộ mặt verb để một listener/giao diện **sinh** khung lệnh từ manifest\nthay vì hard-code từng verb. `sc",
+        "identityFingerprint": "49d3e9858947d27fe5eed264949a7b4b22caed396f6bebb112a9eae50fa460fd",
+        "ancestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Manifest Shape"
+        ],
+        "text": "`fgos --help --json` trả `{schema_version, commands: […]}` — CLI công bố\ntoàn bộ mặt verb để một listener/giao diện **sinh** khung lệnh từ manifest\nthay vì hard-code từng verb. `schema_version` hiện `'3.0'` (tăng từ `'2.0'`\nkhi cờ của verb có sub-verb dời vào `subcommands`; `'2.0'` từng tăng từ\n`'1.0'` vì trường `access` bị xoá). `fgos <verb> [<sub>] --help --json` trả\nriêng mục của một verb (thu hẹp về một sub-verb khi có), cùng hình dạng một\nphần tử `commands[]`. Cả hai chạy được qua Rust host ở mọi project và không\nbao giờ chạy verb. Mỗi mục verb mang:",
+        "sectionText": "`fgos --help --json` trả `{schema_version, commands: […]}` — CLI công bố\ntoàn bộ mặt verb để một listener/giao diện **sinh** khung lệnh từ manifest\nthay vì hard-code từng verb. `schema_version` hiện `'3.0'` (tăng từ `'2.0'`\nkhi cờ của verb có sub-verb dời vào `subcommands`; `'2.0'` từng tăng từ\n`'1.0'` vì trường `access` bị xoá). `fgos <verb> [<sub>] --help --json` trả\nriêng mục của một verb (thu hẹp về một sub-verb khi có), cùng hình dạng một\nphần tử `commands[]`. Cả hai chạy được qua Rust host ở mọi project và không\nbao giờ chạy verb. Mỗi mục verb mang:"
+      },
+      "afterTarget": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-32",
+        "githubAnchor": "unheaded-block-32",
+        "stableAnchor": "unheaded-block-32",
+        "title": "Unheaded block 32",
+        "startLine": 281,
+        "endLine": 288,
+        "textDigest": "51dd3c8aa026a8f5a15e4c12c522b3bf2ad7c29238c49bf9ba51324806e10e23",
+        "sample": "`fgos --help --json` trả `{schema_version, commands: […]}` — CLI công bố\ntoàn bộ mặt verb để một listener/giao diện **sinh** khung lệnh từ manifest\nthay vì hard-code từng verb. `sc",
+        "identityFingerprint": "49d3e9858947d27fe5eed264949a7b4b22caed396f6bebb112a9eae50fa460fd",
+        "ancestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Manifest Shape"
+        ],
+        "text": "`fgos --help --json` trả `{schema_version, commands: […]}` — CLI công bố\ntoàn bộ mặt verb để một listener/giao diện **sinh** khung lệnh từ manifest\nthay vì hard-code từng verb. `schema_version` hiện `'3.0'` (tăng từ `'2.0'`\nkhi cờ của verb có sub-verb dời vào `subcommands`; `'2.0'` từng tăng từ\n`'1.0'` vì trường `access` bị xoá). `fgos <verb> [<sub>] --help --json` trả\nriêng mục của một verb (thu hẹp về một sub-verb khi có), cùng hình dạng một\nphần tử `commands[]`. Cả hai chạy được qua Rust host ở mọi project và không\nbao giờ chạy verb. Mỗi mục verb mang:"
+      },
+      "sourceNativeUnit": null,
+      "inheritedSourceWitness": {
+        "meaning": "Existing historical identity-gap accounting. Source digest and original disposition/review are preserved; only the current successor target binding changes. The earlier report remains the source-text witness, not a new current-source claim.",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+        "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2",
+        "sourceDigest": "83773dda67db8d5f71205bb8c7106186023672125b08cbe4f33b09b0578163ca"
+      },
+      "previouslyReviewedDecision": {
+        "claimId": "claim_19495d2772ced1aa1af4b20d4640fa3a",
+        "sourceUnitDigest": "83773dda67db8d5f",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-31",
+        "claimKind": "contract",
+        "disposition": "merge",
+        "reviewStatus": "reviewed",
+        "rationale": "fgos --help --json returns {schema_version, commands}, schema_version 2.0 raised from 1.0 because access was removed; carried verbatim under Manifest Shape, duplicating the manifest claim of work-state.md 647-663 (which adds the positional-parameter rule). A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
+        "authoredBy": "codex-session:27@2026-10-14",
+        "sourcePath": "docs/io-contract.md",
+        "sourceAnchor": "unheaded-block-18",
+        "reviewNote": "deep: Old block-18 gap row; successor block-31 now holds the 3.0 text and the --help --json verb-entry sentences, matching the upstream io-contract diff.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+        "reviewMode": "ordinary",
+        "targetUnitDigest": "51dd3c8aa026a8f5a15e4c12c522b3bf2ad7c29238c49bf9ba51324806e10e23",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Manifest Shape"
+        ],
+        "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+      },
+      "reviewFinding": {
+        "claimId": "claim_19495d2772ced1aa1af4b20d4640fa3a",
+        "verdict": "rework",
+        "note": "deep: gap row, old digest 83773dda found at 3ea75475d block 18, successor block 32 51dd3c8a correct and unchanged, but disposition change; the reviewed decision was merge with its own rationale, now silently supersede with only the generic rebind rationale; restore merge and its rationale (re-point anchor and digest only) or state why supersede is right (supersede does match the other gap rows, so a one-line reason is enough)",
+        "sourceUnitDigest": "83773dda67db8d5f71205bb8c7106186023672125b08cbe4f33b09b0578163ca",
+        "targetUnitDigest": "51dd3c8aa026a8f5a15e4c12c522b3bf2ad7c29238c49bf9ba51324806e10e23"
+      },
+      "reason": "The fgos --help --json manifest contract is combined with the work-state manifest contribution under Manifest Shape. Its schema_version 2.0 source wording is represented by the corrected schema_version 3.0 successor, including commands and per-verb entries; work-state adds the positional-parameter rule. The reviewed merge disposition is restored: vocabulary merge combines multiple sources and does not require byte equality. The anchor shift changes no target text in this turn.",
+      "historicalBeforeDigest": "51dd3c8aa026a8f5a15e4c12c522b3bf2ad7c29238c49bf9ba51324806e10e23",
+      "historicalAfterDigest": "51dd3c8aa026a8f5a15e4c12c522b3bf2ad7c29238c49bf9ba51324806e10e23",
+      "sourceHistoricalUnit": {
+        "commit": "977509d5f8c49a31c781b54ea53c2b3617f70a13",
+        "path": "docs/io-contract.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-18",
+        "githubAnchor": "unheaded-block-18",
+        "stableAnchor": "unheaded-block-18",
+        "title": "Unheaded block 18",
+        "startLine": 122,
+        "endLine": 125,
+        "textDigest": "83773dda67db8d5f71205bb8c7106186023672125b08cbe4f33b09b0578163ca",
+        "sample": "`fgos --help --json` trả `{schema_version, commands: […]}` — CLI công bố\ntoàn bộ mặt verb để một listener/giao diện **sinh** khung lệnh từ manifest\nthay vì hard-code từng verb. `sc",
+        "identityFingerprint": "3edee75356be0e07df3fad29a0969781fa982e0b5c30d8844e162533fa887841",
+        "ancestry": [
+          "Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner`",
+          "Sổ verb máy-đọc — CLI tự mô tả"
+        ],
+        "text": "`fgos --help --json` trả `{schema_version, commands: […]}` — CLI công bố\ntoàn bộ mặt verb để một listener/giao diện **sinh** khung lệnh từ manifest\nthay vì hard-code từng verb. `schema_version` hiện `'2.0'` (tăng từ `'1.0'`\nvì trường `access` bị xoá). Mỗi mục verb mang:"
+      }
+    }
+  ],
+  "closure": "Step 8 and main-merge accounting remain open until all nine independent verdicts are accepted and applied; Step 9 next."
+}

@@ -12,6 +12,16 @@
       "sourceUnitDigest": "034305c494ee289535b1b4121c8b90ed9d2eb5b850364e1c2a63e936221d40e3",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
       "targetAnchor": "unheaded-block-85",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+      "rationale": "A31 native current source identity; full changed source unit carried verbatim in existing candidate owner. Main-only before/after retained in step8-final-rework-accounting.json. No predecessor identity graft or approval carry; no current-truth or promotion approval.",
+      "reviewNote": "deep: sampled; new native claim for legacy distribution block 5 (034305c4); byte-equal to carrier block 85 (19786 bytes), the only difference from the previous carrier text is row 7 and the diff equals the upstream hunk; move true; pending",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1526-specs-ui-reworks-main-recarry.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "034305c494ee289535b1b4121c8b90ed9d2eb5b850364e1c2a63e936221d40e3",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
@@ -19,11 +29,7 @@
         "Spec: Distribution",
         "Data Dictionary"
       ],
-      "claimKind": "specification",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
-      "rationale": "A31 native current source identity; full changed source unit carried verbatim in existing candidate owner. Main-only before/after retained in step8-final-rework-accounting.json. No predecessor identity graft or approval carry; no current-truth or promotion approval."
+      "reviewReportCommit": "0e8ce7710ac67ad038927b242b2461876bf8c90d"
     }
   ]
 }
