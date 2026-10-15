@@ -416,9 +416,19 @@ export async function runDetachedRunSupervisor(envelopePath, opts = {}) {
         opts.onChunk(stream, chunk);
       } catch {}
     }
-    if (process.send) {
+    // The controller that holds the IPC channel can die mid-run. Without a
+    // callback, process.send on a closed channel emits ERR_IPC_CHANNEL_CLOSED
+    // asynchronously on `process`, which the try/catch cannot see and which
+    // kills the supervisor (and the worker with it). Live chunks are a
+    // courtesy to a live controller only: skip once disconnected, and route
+    // a send that races the disconnect into the callback.
+    if (process.send && process.connected) {
       try {
-        process.send({ type: 'chunk', stream, chunk: chunk.toString('utf8') });
+        process.send({ type: 'chunk', stream, chunk: chunk.toString('utf8') }, (err) => {
+          if (err && err.code !== 'ERR_IPC_CHANNEL_CLOSED' && err.code !== 'EPIPE') {
+            try { process.stderr.write(`supervisor: live chunk delivery failed: ${err.message}\n`); } catch {}
+          }
+        });
       } catch {}
     }
     try {
