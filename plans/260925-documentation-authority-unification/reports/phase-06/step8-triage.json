@@ -1,0 +1,777 @@
+{
+  "version": 1,
+  "sourceCommit": "111adc51fd047d99121fd9d076eb4794c87045a4",
+  "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+  "files": [
+    {
+      "source": "docs/specs/decision-citation-drift.md",
+      "sourceBlob": "ee00ac178d1aa7aea151c08877222ee228923853",
+      "mapBlob": "ee00ac178d1aa7aea151c08877222ee228923853",
+      "sourceSHA256": "4774f723f8d3ab5e4a753cd2b74919f27c62c2c7857644606337def5bd922cff",
+      "units": 20,
+      "kind": "spec",
+      "mapTarget": "docs/platform/decision-citation-drift/spec.md",
+      "targets": [
+        "docs/platform/decision-citation-drift/spec.md"
+      ],
+      "segments": [
+        {
+          "startLine": 1,
+          "endLine": 116,
+          "target": "docs/platform/decision-citation-drift/spec.md",
+          "sha256": "4774f723f8d3ab5e4a753cd2b74919f27c62c2c7857644606337def5bd922cff"
+        }
+      ],
+      "review": {
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15"
+      },
+      "disposition": "move"
+    },
+    {
+      "source": "docs/specs/distillery.md",
+      "sourceBlob": "358eff4235102db17f166551dc1d51199f3c4abc",
+      "mapBlob": "358eff4235102db17f166551dc1d51199f3c4abc",
+      "sourceSHA256": "518accb5c959ac5dc42b154cb735f3f3af962a51afca4a4976972d059d0c7196",
+      "units": 21,
+      "kind": "spec",
+      "mapTarget": "docs/platform/distillery/spec.md",
+      "targets": [
+        "docs/platform/distillery/spec.md"
+      ],
+      "segments": [
+        {
+          "startLine": 1,
+          "endLine": 139,
+          "target": "docs/platform/distillery/spec.md",
+          "sha256": "518accb5c959ac5dc42b154cb735f3f3af962a51afca4a4976972d059d0c7196"
+        }
+      ],
+      "review": {
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15"
+      },
+      "disposition": "move"
+    },
+    {
+      "source": "docs/specs/fgos-plugin.md",
+      "sourceBlob": "fd3609b13dd023c66767db856f0b767315b952fa",
+      "mapBlob": "fd3609b13dd023c66767db856f0b767315b952fa",
+      "sourceSHA256": "2e7632ffbcbaae5c7ba4e3c7d6e0a3e7fe888ee278b5bc0bf9039f3ff276b687",
+      "units": 45,
+      "kind": "spec",
+      "mapTarget": "docs/platform/claude-plugin/spec.md",
+      "targets": [
+        "docs/platform/claude-plugin/spec.md"
+      ],
+      "segments": [
+        {
+          "startLine": 1,
+          "endLine": 170,
+          "target": "docs/platform/claude-plugin/spec.md",
+          "sha256": "2e7632ffbcbaae5c7ba4e3c7d6e0a3e7fe888ee278b5bc0bf9039f3ff276b687"
+        }
+      ],
+      "review": {
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15"
+      },
+      "disposition": "move"
+    },
+    {
+      "source": "docs/specs/herdr-web-dashboard.md",
+      "sourceBlob": "e7edb5668119e67384175cace620459e97175ddd",
+      "mapBlob": "56055733005b4b3c3ce2473c787ded591951843a",
+      "sourceSHA256": "a1c2c500b8cbd573b965fc94ee80d3730237a07ac8f83547d0eda8a5c2e66a1d",
+      "units": 44,
+      "kind": "spec",
+      "mapTarget": "docs/platform/herdr-web-dashboard/spec.md",
+      "targets": [
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "segments": [
+        {
+          "startLine": 1,
+          "endLine": 332,
+          "target": "docs/platform/herdr-web-dashboard/spec.md",
+          "sha256": "a1c2c500b8cbd573b965fc94ee80d3730237a07ac8f83547d0eda8a5c2e66a1d"
+        }
+      ],
+      "review": {
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15"
+      },
+      "disposition": "move"
+    },
+    {
+      "source": "docs/ui-spec/00-overview.md",
+      "sourceBlob": "4650474a4a120ad30291b58c4f4c55b4a6caef83",
+      "mapBlob": "4650474a4a120ad30291b58c4f4c55b4a6caef83",
+      "sourceSHA256": "76af5d449a69613a2cd3871e5b898934f8b57db685d0d87d1cb4eb3375ff71d7",
+      "units": 16,
+      "kind": "spec",
+      "mapTarget": "docs/platform/ui-spec/spec.md",
+      "targets": [
+        "docs/platform/ui-spec/spec.md"
+      ],
+      "segments": [
+        {
+          "startLine": 1,
+          "endLine": 95,
+          "target": "docs/platform/ui-spec/spec.md",
+          "sha256": "76af5d449a69613a2cd3871e5b898934f8b57db685d0d87d1cb4eb3375ff71d7"
+        }
+      ],
+      "review": {
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15"
+      },
+      "disposition": "move"
+    },
+    {
+      "source": "docs/ui-spec/15-system-events.md",
+      "sourceBlob": "6f90ca72cd9860ba3672e7f249906e1c0a44a8ab",
+      "mapBlob": "6f90ca72cd9860ba3672e7f249906e1c0a44a8ab",
+      "sourceSHA256": "c0cd51f52e54872823d6f683bc25ff396df706712ef76b57794de5e0fcca75a9",
+      "units": 9,
+      "kind": "contract",
+      "mapTarget": "docs/platform/ui-spec/contracts/15-system-events.md",
+      "targets": [
+        "docs/platform/ui-spec/contracts/15-system-events.md"
+      ],
+      "segments": [
+        {
+          "startLine": 1,
+          "endLine": 49,
+          "target": "docs/platform/ui-spec/contracts/15-system-events.md",
+          "sha256": "c0cd51f52e54872823d6f683bc25ff396df706712ef76b57794de5e0fcca75a9"
+        }
+      ],
+      "review": {
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15"
+      },
+      "disposition": "move"
+    },
+    {
+      "source": "docs/ui-spec/20-domain-rules.md",
+      "sourceBlob": "65f412bfc8304ee6bba82cfc0bdf2484ef3e04b3",
+      "mapBlob": "65f412bfc8304ee6bba82cfc0bdf2484ef3e04b3",
+      "sourceSHA256": "cefbf0207b8492ffaffff1f23e13494e94f1343cd9ae4ae1fd82a187dc212e32",
+      "units": 5,
+      "kind": "contract",
+      "mapTarget": "docs/platform/ui-spec/contracts/20-domain-rules.md",
+      "targets": [
+        "docs/platform/ui-spec/contracts/20-domain-rules.md"
+      ],
+      "segments": [
+        {
+          "startLine": 1,
+          "endLine": 67,
+          "target": "docs/platform/ui-spec/contracts/20-domain-rules.md",
+          "sha256": "cefbf0207b8492ffaffff1f23e13494e94f1343cd9ae4ae1fd82a187dc212e32"
+        }
+      ],
+      "review": {
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15"
+      },
+      "disposition": "move"
+    },
+    {
+      "source": "docs/ui-spec/30-states-and-errors.md",
+      "sourceBlob": "d325391eabce213f65f9dea5dfad3c9387b14d7b",
+      "mapBlob": "d325391eabce213f65f9dea5dfad3c9387b14d7b",
+      "sourceSHA256": "5fe51d275b13c958c865da6c8a0bf60142506e1c5c637829afa23e9b0579736e",
+      "units": 30,
+      "kind": "contract",
+      "mapTarget": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "targets": [
+        "docs/platform/ui-spec/contracts/30-states-and-errors.md"
+      ],
+      "segments": [
+        {
+          "startLine": 1,
+          "endLine": 66,
+          "target": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+          "sha256": "5fe51d275b13c958c865da6c8a0bf60142506e1c5c637829afa23e9b0579736e"
+        }
+      ],
+      "review": {
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15"
+      },
+      "disposition": "move"
+    },
+    {
+      "source": "docs/ui-spec/components/C01-item-card.md",
+      "sourceBlob": "271420848336ec91b670bf2481344e21b154ad49",
+      "mapBlob": "271420848336ec91b670bf2481344e21b154ad49",
+      "sourceSHA256": "3c31c82cef06bb6f819b4bf8a37fe8f7afa2991daff0a180f827f8b66641ab0a",
+      "units": 12,
+      "kind": "architecture",
+      "mapTarget": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "targets": [
+        "docs/platform/ui-spec/architecture/components/C01-item-card.md"
+      ],
+      "segments": [
+        {
+          "startLine": 1,
+          "endLine": 68,
+          "target": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+          "sha256": "3c31c82cef06bb6f819b4bf8a37fe8f7afa2991daff0a180f827f8b66641ab0a"
+        }
+      ],
+      "review": {
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15"
+      },
+      "disposition": "move"
+    },
+    {
+      "source": "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+      "sourceBlob": "d0600c229df25316b734289a17533f2a11c59b30",
+      "mapBlob": "d0600c229df25316b734289a17533f2a11c59b30",
+      "sourceSHA256": "dfbc24dda82d286ae4934255d0dbe56fe58b92012048cddca56ffc70a47c6b28",
+      "units": 10,
+      "kind": "guide-runbook",
+      "mapTarget": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+      "targets": [
+        "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md"
+      ],
+      "segments": [
+        {
+          "startLine": 1,
+          "endLine": 74,
+          "target": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+          "sha256": "dfbc24dda82d286ae4934255d0dbe56fe58b92012048cddca56ffc70a47c6b28"
+        }
+      ],
+      "review": {
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15"
+      },
+      "disposition": "move"
+    },
+    {
+      "source": "docs/ui-spec/flows/F02-approve-a-merge.md",
+      "sourceBlob": "73809ee31a5be5fed418d03ae49ac12de6777603",
+      "mapBlob": "73809ee31a5be5fed418d03ae49ac12de6777603",
+      "sourceSHA256": "0ee36f45917952bebc2eb4c95f00c770e4514b8e029ce120c761a45d0ed8ca1d",
+      "units": 9,
+      "kind": "guide-runbook",
+      "mapTarget": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+      "targets": [
+        "docs/platform/ui-spec/operations/F02-approve-a-merge.md"
+      ],
+      "segments": [
+        {
+          "startLine": 1,
+          "endLine": 65,
+          "target": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+          "sha256": "0ee36f45917952bebc2eb4c95f00c770e4514b8e029ce120c761a45d0ed8ca1d"
+        }
+      ],
+      "review": {
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15"
+      },
+      "disposition": "move"
+    },
+    {
+      "source": "docs/ui-spec/generated/action-registry.csv",
+      "sourceBlob": "63fe771b1f13e322fce4316b3c6e02cd3b74a214",
+      "mapBlob": "63fe771b1f13e322fce4316b3c6e02cd3b74a214",
+      "sourceSHA256": "9061f86a22a4aa7506e627c8bf2decf3ccdb5b75cf88f2382481851b1d5a02bc",
+      "units": 1,
+      "kind": "history",
+      "mapTarget": "docs/platform/ui-spec/history/generated/action-registry.csv",
+      "targets": [],
+      "segments": [],
+      "review": {
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15"
+      },
+      "disposition": "regenerate-from-source",
+      "override": {
+        "rule": "A9/N1; constitution section 4; explicit Lead decision 1",
+        "mapTarget": "docs/platform/ui-spec/history/generated/action-registry.csv",
+        "mapKind": "history",
+        "mapOperation": "place verbatim",
+        "effectiveTarget": null,
+        "effectiveDisposition": "regenerate-from-source",
+        "reason": "Declared ui-spec build output remains at its legacy path; regenerate using .claude/skills/ui-spec/tools/build.mjs and interpret-wireframe.mjs against docs/ui-spec. No candidate snapshot or candidate carrier is created."
+      }
+    },
+    {
+      "source": "docs/ui-spec/generated/coverage-report.md",
+      "sourceBlob": "58fdd374b272f69d0896098d6779ce7159c189d6",
+      "mapBlob": "58fdd374b272f69d0896098d6779ce7159c189d6",
+      "sourceSHA256": "738eba6ed62f160d8637e9d6b012c1c74f15cd89fe87df28a53b55e0cc41c101",
+      "units": 5,
+      "kind": "history",
+      "mapTarget": "docs/platform/ui-spec/history/generated/coverage-report.md",
+      "targets": [],
+      "segments": [],
+      "review": {
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15"
+      },
+      "disposition": "regenerate-from-source",
+      "override": {
+        "rule": "A9/N1; constitution section 4; explicit Lead decision 1",
+        "mapTarget": "docs/platform/ui-spec/history/generated/coverage-report.md",
+        "mapKind": "history",
+        "mapOperation": "place verbatim",
+        "effectiveTarget": null,
+        "effectiveDisposition": "regenerate-from-source",
+        "reason": "Declared ui-spec build output remains at its legacy path; regenerate using .claude/skills/ui-spec/tools/build.mjs and interpret-wireframe.mjs against docs/ui-spec. No candidate snapshot or candidate carrier is created."
+      }
+    },
+    {
+      "source": "docs/ui-spec/generated/navigation-graph.yaml",
+      "sourceBlob": "cf03812f5036a34ef874f9f142e897f255810370",
+      "mapBlob": "cf03812f5036a34ef874f9f142e897f255810370",
+      "sourceSHA256": "0b28f3554b2a5fba6a70d8fa728742ebfdd6f3e5a9f0a2bfe1149721d40617de",
+      "units": 1,
+      "kind": "history",
+      "mapTarget": "docs/platform/ui-spec/history/generated/navigation-graph.yaml",
+      "targets": [],
+      "segments": [],
+      "review": {
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15"
+      },
+      "disposition": "regenerate-from-source",
+      "override": {
+        "rule": "A9/N1; constitution section 4; explicit Lead decision 1",
+        "mapTarget": "docs/platform/ui-spec/history/generated/navigation-graph.yaml",
+        "mapKind": "history",
+        "mapOperation": "place verbatim",
+        "effectiveTarget": null,
+        "effectiveDisposition": "regenerate-from-source",
+        "reason": "Declared ui-spec build output remains at its legacy path; regenerate using .claude/skills/ui-spec/tools/build.mjs and interpret-wireframe.mjs against docs/ui-spec. No candidate snapshot or candidate carrier is created."
+      }
+    },
+    {
+      "source": "docs/ui-spec/generated/surface-registry.yaml",
+      "sourceBlob": "2365591cefa3da5a53b16ed7e60e557c6caf4ab4",
+      "mapBlob": "2365591cefa3da5a53b16ed7e60e557c6caf4ab4",
+      "sourceSHA256": "b066bdeb267eda13000e3c575293220faeb1864e52df716460e5439528aae909",
+      "units": 1,
+      "kind": "history",
+      "mapTarget": "docs/platform/ui-spec/history/generated/surface-registry.yaml",
+      "targets": [],
+      "segments": [],
+      "review": {
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15"
+      },
+      "disposition": "regenerate-from-source",
+      "override": {
+        "rule": "A9/N1; constitution section 4; explicit Lead decision 1",
+        "mapTarget": "docs/platform/ui-spec/history/generated/surface-registry.yaml",
+        "mapKind": "history",
+        "mapOperation": "place verbatim",
+        "effectiveTarget": null,
+        "effectiveDisposition": "regenerate-from-source",
+        "reason": "Declared ui-spec build output remains at its legacy path; regenerate using .claude/skills/ui-spec/tools/build.mjs and interpret-wireframe.mjs against docs/ui-spec. No candidate snapshot or candidate carrier is created."
+      }
+    },
+    {
+      "source": "docs/ui-spec/generated/wireframe-v2.html",
+      "sourceBlob": "8dbcdfb265010bde1c3cbb3fe1f2dbd0292aacc0",
+      "mapBlob": "8dbcdfb265010bde1c3cbb3fe1f2dbd0292aacc0",
+      "sourceSHA256": "77894fdda0966833d6d9ba595745a315db67d64feea7c9e6d5faed34a8d2ce80",
+      "units": 1,
+      "kind": "history",
+      "mapTarget": "docs/platform/ui-spec/history/generated/wireframe-v2.html",
+      "targets": [],
+      "segments": [],
+      "review": {
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15"
+      },
+      "disposition": "regenerate-from-source",
+      "override": {
+        "rule": "A9/N1; constitution section 4; explicit Lead decision 1",
+        "mapTarget": "docs/platform/ui-spec/history/generated/wireframe-v2.html",
+        "mapKind": "history",
+        "mapOperation": "place verbatim",
+        "effectiveTarget": null,
+        "effectiveDisposition": "regenerate-from-source",
+        "reason": "Declared ui-spec build output remains at its legacy path; regenerate using .claude/skills/ui-spec/tools/build.mjs and interpret-wireframe.mjs against docs/ui-spec. No candidate snapshot or candidate carrier is created."
+      }
+    },
+    {
+      "source": "docs/ui-spec/modals/M01-answer-question.md",
+      "sourceBlob": "6dc51a45d24ffc3fca7b051c121b5d1d7b63aa9d",
+      "mapBlob": "6dc51a45d24ffc3fca7b051c121b5d1d7b63aa9d",
+      "sourceSHA256": "6c459c08d0ad35c362181fac748b68c765c60441597049e3e3c00c8485a61f23",
+      "units": 11,
+      "kind": "architecture",
+      "mapTarget": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+      "targets": [
+        "docs/platform/ui-spec/architecture/modals/M01-answer-question.md"
+      ],
+      "segments": [
+        {
+          "startLine": 1,
+          "endLine": 93,
+          "target": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+          "sha256": "6c459c08d0ad35c362181fac748b68c765c60441597049e3e3c00c8485a61f23"
+        }
+      ],
+      "review": {
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15"
+      },
+      "disposition": "move"
+    },
+    {
+      "source": "docs/ui-spec/modals/M02-approve-merge.md",
+      "sourceBlob": "4a4d851df85cb09c915f0fbf2d1b71ae174aa563",
+      "mapBlob": "4a4d851df85cb09c915f0fbf2d1b71ae174aa563",
+      "sourceSHA256": "f52cb369e8ec0039fa64b0f4a7ca3bbf9ccfd37b3fe2fc342a410d59c5bb23b8",
+      "units": 12,
+      "kind": "architecture",
+      "mapTarget": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "targets": [
+        "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md"
+      ],
+      "segments": [
+        {
+          "startLine": 1,
+          "endLine": 91,
+          "target": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+          "sha256": "f52cb369e8ec0039fa64b0f4a7ca3bbf9ccfd37b3fe2fc342a410d59c5bb23b8"
+        }
+      ],
+      "review": {
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15"
+      },
+      "disposition": "move"
+    },
+    {
+      "source": "docs/ui-spec/modals/M03-add-edit-item.md",
+      "sourceBlob": "09aa20dbc0fae13211c64077188d5e7950d56120",
+      "mapBlob": "09aa20dbc0fae13211c64077188d5e7950d56120",
+      "sourceSHA256": "b0a16742180949c5a1b6836690c67c74c9dbd7f0ebf400d3c26eb7a4d18fe3d1",
+      "units": 13,
+      "kind": "architecture",
+      "mapTarget": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "targets": [
+        "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md"
+      ],
+      "segments": [
+        {
+          "startLine": 1,
+          "endLine": 93,
+          "target": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+          "sha256": "b0a16742180949c5a1b6836690c67c74c9dbd7f0ebf400d3c26eb7a4d18fe3d1"
+        }
+      ],
+      "review": {
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15"
+      },
+      "disposition": "move"
+    },
+    {
+      "source": "docs/ui-spec/schema/surface-contract.schema.json",
+      "sourceBlob": "2f163ff6092e16b1cb619c7dcc0765f316af1753",
+      "mapBlob": "2f163ff6092e16b1cb619c7dcc0765f316af1753",
+      "sourceSHA256": "2ce8f77f92bb0cf512f74f5eac133be50a8a0d301b3de13b82e5fbf4d950db7e",
+      "units": 1,
+      "kind": "history",
+      "mapTarget": "docs/platform/ui-spec/history/schema/surface-contract.schema.json",
+      "targets": [
+        "docs/platform/ui-spec/history/schema/surface-contract.schema.json"
+      ],
+      "segments": [
+        {
+          "startLine": 1,
+          "endLine": 124,
+          "target": "docs/platform/ui-spec/history/schema/surface-contract.schema.json",
+          "byteEqual": true,
+          "sha256": "2ce8f77f92bb0cf512f74f5eac133be50a8a0d301b3de13b82e5fbf4d950db7e"
+        }
+      ],
+      "review": {
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15"
+      },
+      "disposition": "move",
+      "provenanceSidecar": "docs/platform/ui-spec/history/schema/surface-contract.schema.json.md"
+    },
+    {
+      "source": "docs/ui-spec/screens/S01-sign-in.md",
+      "sourceBlob": "04b2bb2c1861e0557a43f8fd1ab7d6948dde1409",
+      "mapBlob": "04b2bb2c1861e0557a43f8fd1ab7d6948dde1409",
+      "sourceSHA256": "725f76c4946a2c051770d59891b395eb194003cbb916a5731945ee5e22ac3eff",
+      "units": 14,
+      "kind": "architecture",
+      "mapTarget": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "targets": [
+        "docs/platform/ui-spec/architecture/screens/S01-sign-in.md"
+      ],
+      "segments": [
+        {
+          "startLine": 1,
+          "endLine": 90,
+          "target": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+          "sha256": "725f76c4946a2c051770d59891b395eb194003cbb916a5731945ee5e22ac3eff"
+        }
+      ],
+      "review": {
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15"
+      },
+      "disposition": "move"
+    },
+    {
+      "source": "docs/ui-spec/screens/S02-taskboard.md",
+      "sourceBlob": "d8a20dd65bf1933d31ff334b5200b6efb0f4cb08",
+      "mapBlob": "d8a20dd65bf1933d31ff334b5200b6efb0f4cb08",
+      "sourceSHA256": "d84abd8635907d8b69402c6fc767e97479348e2c66517d38e7bb3f03b9bf800f",
+      "units": 20,
+      "kind": "architecture",
+      "mapTarget": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "targets": [
+        "docs/platform/ui-spec/architecture/screens/S02-taskboard.md"
+      ],
+      "segments": [
+        {
+          "startLine": 1,
+          "endLine": 225,
+          "target": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+          "sha256": "d84abd8635907d8b69402c6fc767e97479348e2c66517d38e7bb3f03b9bf800f"
+        }
+      ],
+      "review": {
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15"
+      },
+      "disposition": "move"
+    },
+    {
+      "source": "docs/ui-spec/screens/S03-task-detail.md",
+      "sourceBlob": "e62243c904ab68c7b0fcdb65cf203e5fdf112072",
+      "mapBlob": "e62243c904ab68c7b0fcdb65cf203e5fdf112072",
+      "sourceSHA256": "df9faacc4ec5e989f935d7e7a3ef327ba751e7271f6e55be7d9891cb0f7b52b3",
+      "units": 24,
+      "kind": "architecture",
+      "mapTarget": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "targets": [
+        "docs/platform/ui-spec/architecture/screens/S03-task-detail.md"
+      ],
+      "segments": [
+        {
+          "startLine": 1,
+          "endLine": 235,
+          "target": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+          "sha256": "df9faacc4ec5e989f935d7e7a3ef327ba751e7271f6e55be7d9891cb0f7b52b3"
+        }
+      ],
+      "review": {
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15"
+      },
+      "disposition": "move"
+    },
+    {
+      "source": "docs/ui-spec/screens/S04-questions-needing-answer.md",
+      "sourceBlob": "01dedd23e6a1565ae463c421d2873fa8ad3482ec",
+      "mapBlob": "01dedd23e6a1565ae463c421d2873fa8ad3482ec",
+      "sourceSHA256": "0f358fadb71d6aa504c26c7e8f851c911e4feee10b5ef102456df0007da5ab7b",
+      "units": 15,
+      "kind": "architecture",
+      "mapTarget": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+      "targets": [
+        "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md"
+      ],
+      "segments": [
+        {
+          "startLine": 1,
+          "endLine": 113,
+          "target": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+          "sha256": "0f358fadb71d6aa504c26c7e8f851c911e4feee10b5ef102456df0007da5ab7b"
+        }
+      ],
+      "review": {
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15"
+      },
+      "disposition": "move"
+    },
+    {
+      "source": "docs/ui-spec/spec.config.yaml",
+      "sourceBlob": "c51d822673e66f5012eab484c0974f57dd21a2ae",
+      "mapBlob": "c51d822673e66f5012eab484c0974f57dd21a2ae",
+      "sourceSHA256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+      "units": 1,
+      "kind": "architecture",
+      "mapTarget": "docs/platform/ui-spec/architecture/spec.config.yaml",
+      "targets": [
+        "docs/platform/ui-spec/architecture/spec.config.yaml"
+      ],
+      "segments": [
+        {
+          "startLine": 1,
+          "endLine": 24,
+          "target": "docs/platform/ui-spec/architecture/spec.config.yaml",
+          "byteEqual": true,
+          "sha256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb"
+        }
+      ],
+      "review": {
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15"
+      },
+      "disposition": "move",
+      "provenanceSidecar": "docs/platform/ui-spec/architecture/spec.config.yaml.md"
+    },
+    {
+      "source": "docs/specs/observe.md",
+      "sourceBlob": "2e2fe74304bb6732b0307bb822c338d93dbc7569",
+      "mapBlob": "2e2fe74304bb6732b0307bb822c338d93dbc7569",
+      "sourceSHA256": "f367b7dbe06df621ddc178e6fd7d1f610483e1504dec324fb1dfd49c97ee5272",
+      "units": 25,
+      "kind": "spec",
+      "mapTarget": "docs/platform/observe/spec.md",
+      "targets": [
+        "docs/platform/observe/spec.md",
+        "docs/platform/observe/decisions/observe-component-architecture.md"
+      ],
+      "segments": [
+        {
+          "startLine": 1,
+          "endLine": 75,
+          "target": "docs/platform/observe/spec.md",
+          "kind": "spec",
+          "sha256": "cc40b601e3523a80ae5cfa9fa82d1a9cb9646686a4a1e58e6530d758386b29d7"
+        },
+        {
+          "startLine": 76,
+          "endLine": 92,
+          "target": "docs/platform/observe/decisions/observe-component-architecture.md",
+          "kind": "decision",
+          "sha256": "75130704d2f68f4a8311e4d96802e626f7ee901fd6288b1120d9f3d3dc48f45c"
+        }
+      ],
+      "review": {
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15"
+      },
+      "disposition": "split",
+      "hotSourceCheck": {
+        "baselineLine": "docs/specs/observe.md 2e2fe74304bb6732b0307bb822c338d93dbc7569",
+        "mapBlob": "2e2fe74304bb6732b0307bb822c338d93dbc7569",
+        "headBlob": "2e2fe74304bb6732b0307bb822c338d93dbc7569",
+        "comparison": "unchanged",
+        "checkedImmediatelyBeforeRows": true
+      }
+    },
+    {
+      "source": "docs/specs/confinement-authority.md",
+      "sourceBlob": "63a2cb78586805cfccd765b8f6a814351281c6d5",
+      "mapBlob": "778a93f0368a32b4179dfc138118959dd0e5b6a7",
+      "sourceSHA256": "435f3ccca09d9383d489efa8961edd7ae2b8bf5a35d063a91486a8a551325ae0",
+      "units": 200,
+      "kind": "spec",
+      "mapTarget": "docs/platform/agent-confinement/spec.md",
+      "targets": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "segments": [
+        {
+          "startLine": 1,
+          "endLine": 210,
+          "target": "docs/platform/agent-confinement/spec.md",
+          "kind": "spec",
+          "sha256": "356384a78a6df13734f8c8f926083441515c4f9985845aa7d636125679dba3f6"
+        },
+        {
+          "startLine": 211,
+          "endLine": 968,
+          "target": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+          "kind": "contract",
+          "sha256": "b1f220d8cafb3166abcbe77928e1d6d7ef011f754ec0ec9d2f4185dae7aa3d00"
+        },
+        {
+          "startLine": 969,
+          "endLine": 1244,
+          "target": "docs/platform/agent-confinement/spec.md",
+          "kind": "spec",
+          "sha256": "653ec7f7dcfc583b1f6a57155927aae4c739a220a599df886fbf6639c74371bd"
+        },
+        {
+          "startLine": 1245,
+          "endLine": 1259,
+          "target": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+          "kind": "history",
+          "sha256": "b62c3d7311b4e953a447ab7e9022abcc7dee90a58abbbbdbe1ae0af9b40fa3c4"
+        },
+        {
+          "startLine": 1260,
+          "endLine": 1323,
+          "target": "docs/platform/agent-confinement/spec.md",
+          "kind": "spec",
+          "sha256": "256e475356158733f59009cd2dd23ad582eb4f91f43cd9e0fab5c8737fe3b46f"
+        },
+        {
+          "startLine": 1324,
+          "endLine": 1340,
+          "target": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+          "kind": "decision",
+          "sha256": "037baf7b64c9471cfc8d5c20b9a5eb5a85139352a4a6f3550beda65ec2d0cdeb"
+        },
+        {
+          "startLine": 1341,
+          "endLine": 1364,
+          "target": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+          "kind": "history",
+          "sha256": "89d8169e527841280cae55a09b348312b4764b0126f58cd24b7d2a48965ff08e"
+        },
+        {
+          "startLine": 1365,
+          "endLine": 1371,
+          "target": "docs/platform/agent-confinement/spec.md",
+          "kind": "spec",
+          "label": "Current settled facts and deferred items",
+          "sha256": "350d0f7bcab9da669a5b34708ad0ad35b367429b8abec43d465bb2b05e681f1e"
+        },
+        {
+          "startLine": 1372,
+          "endLine": 1381,
+          "target": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+          "kind": "decision",
+          "sha256": "9ceee9921e907d2a66937a57ce66d1072bc8d129dc99a9a7a2bb210a07bcbe5e"
+        },
+        {
+          "startLine": 1382,
+          "endLine": 1400,
+          "target": "docs/platform/agent-confinement/spec.md",
+          "kind": "spec",
+          "sha256": "b9a90b5bf5da8cdf9c9891100453e2cc0b3032f07a29e5b4610ddea86051e138"
+        }
+      ],
+      "review": {
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15"
+      },
+      "disposition": "split",
+      "hotSourceCheck": {
+        "baselineLine": "docs/specs/confinement-authority.md 778a93f0368a32b4179dfc138118959dd0e5b6a7",
+        "mapBlob": "778a93f0368a32b4179dfc138118959dd0e5b6a7",
+        "headBlob": "63a2cb78586805cfccd765b8f6a814351281c6d5",
+        "comparison": "changed since pin; HEAD text and native current identities used",
+        "checkedImmediatelyBeforeRows": true
+      }
+    }
+  ]
+}

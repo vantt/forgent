@@ -1,0 +1,418 @@
+{
+  "version": 1,
+  "shard": "s8-observe-01.json",
+  "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+  "authorshipRequired": true,
+  "sources": [
+    "docs/specs/observe.md"
+  ],
+  "files": [
+    {
+      "path": "docs/specs/observe.md",
+      "disposition": "split",
+      "rationale": "Frozen specs-ui map and Step 8: preserve docs/specs/observe.md verbatim in docs/platform/observe/spec.md, docs/platform/observe/decisions/observe-component-architecture.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement.",
+      "targets": [
+        "docs/platform/observe/spec.md",
+        "docs/platform/observe/decisions/observe-component-architecture.md"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "claimId": "claim_c9cc1ff2abdd7adf91641d4c8b240523",
+      "sourceUnitDigest": "53e7d20d4f0fc326b73efbd72dcbb66009bc65ec37e130c0e2178c948161adf8",
+      "targetOwner": "docs/platform/observe/spec.md",
+      "targetAnchor": "observe-component-specification",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Judgment: no target digest match. The whole heading unit docs/specs/observe.md#observe-component-specification (source lines 1-1) is carried at docs/platform/observe/spec.md#observe-component-specification (candidate lines 1-1). The heading section digest changes because labelled candidate metadata is inserted after the original H1; original heading and direct source payload remain verbatim. Frozen specs-ui map and Step 8: preserve docs/specs/observe.md verbatim in docs/platform/observe/spec.md, docs/platform/observe/decisions/observe-component-architecture.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "ff9cff7275281c657fa87c9fdb4248cc090be18195f5e333eba5b02685785850",
+      "targetAncestry": []
+    },
+    {
+      "claimId": "claim_398a2a6235ab1ae2d5264325daf42a5c",
+      "sourceUnitDigest": "b268929538ae29dad4d30bcab03673684209ffaad00be9cf4e111374c1827513",
+      "targetOwner": "docs/platform/observe/spec.md",
+      "targetAnchor": "unheaded-block-3",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/observe.md#unheaded-block-1 (source lines 3-5) is carried at docs/platform/observe/spec.md#unheaded-block-3 (candidate lines 25-27). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/observe.md verbatim in docs/platform/observe/spec.md, docs/platform/observe/decisions/observe-component-architecture.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "b268929538ae29dad4d30bcab03673684209ffaad00be9cf4e111374c1827513",
+      "targetAncestry": [
+        "Observe Component Specification"
+      ]
+    },
+    {
+      "claimId": "claim_a1ef5e3f7d16b7ab938e8ac6eb2209c3",
+      "sourceUnitDigest": "f3f902093f4846a4bad6229589c0ab856ff959871b4fe3a99cac6f176ec35e48",
+      "targetOwner": "docs/platform/observe/spec.md",
+      "targetAnchor": "1-overview-boundaries",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/observe.md#1-overview-boundaries (source lines 7-7) is carried at docs/platform/observe/spec.md#1-overview-boundaries (candidate lines 29-29). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/observe.md verbatim in docs/platform/observe/spec.md, docs/platform/observe/decisions/observe-component-architecture.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "f3f902093f4846a4bad6229589c0ab856ff959871b4fe3a99cac6f176ec35e48",
+      "targetAncestry": [
+        "Observe Component Specification"
+      ]
+    },
+    {
+      "claimId": "claim_a2b2774f89a89257732a551b52addc22",
+      "sourceUnitDigest": "4b789fc020f2595baff813b25b8f25e819353196670c3d4d838d46c72d70012d",
+      "targetOwner": "docs/platform/observe/spec.md",
+      "targetAnchor": "unheaded-block-4",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/observe.md#unheaded-block-2 (source lines 9-10) is carried at docs/platform/observe/spec.md#unheaded-block-4 (candidate lines 31-32). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/observe.md verbatim in docs/platform/observe/spec.md, docs/platform/observe/decisions/observe-component-architecture.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "4b789fc020f2595baff813b25b8f25e819353196670c3d4d838d46c72d70012d",
+      "targetAncestry": [
+        "Observe Component Specification",
+        "1. Overview & Boundaries"
+      ]
+    },
+    {
+      "claimId": "claim_b2a51d5d39832d330879947bdbbcb227",
+      "sourceUnitDigest": "867c3b15546d97e9565b557a2dbff37cfde054ad310e8a19be48d316ef159476",
+      "targetOwner": "docs/platform/observe/spec.md",
+      "targetAnchor": "owns",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/observe.md#owns (source lines 12-12) is carried at docs/platform/observe/spec.md#owns (candidate lines 34-34). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/observe.md verbatim in docs/platform/observe/spec.md, docs/platform/observe/decisions/observe-component-architecture.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "867c3b15546d97e9565b557a2dbff37cfde054ad310e8a19be48d316ef159476",
+      "targetAncestry": [
+        "Observe Component Specification",
+        "1. Overview & Boundaries"
+      ]
+    },
+    {
+      "claimId": "claim_a7278e1567e5432cfb079506cf2f5050",
+      "sourceUnitDigest": "1840cc4b1da22587ed69755276cad9a882139c62a36179d8fba2269905414623",
+      "targetOwner": "docs/platform/observe/spec.md",
+      "targetAnchor": "unheaded-block-5",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/observe.md#unheaded-block-3 (source lines 13-17) is carried at docs/platform/observe/spec.md#unheaded-block-5 (candidate lines 35-39). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/observe.md verbatim in docs/platform/observe/spec.md, docs/platform/observe/decisions/observe-component-architecture.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "1840cc4b1da22587ed69755276cad9a882139c62a36179d8fba2269905414623",
+      "targetAncestry": [
+        "Observe Component Specification",
+        "1. Overview & Boundaries",
+        "Owns"
+      ]
+    },
+    {
+      "claimId": "claim_fde5bf697a74032ae96b87746d5f5f25",
+      "sourceUnitDigest": "24eb30e7b62ea4e840780b81f404e924c679dbc4002866fca5077bccb2b92b6e",
+      "targetOwner": "docs/platform/observe/spec.md",
+      "targetAnchor": "must-not-own",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/observe.md#must-not-own (source lines 19-19) is carried at docs/platform/observe/spec.md#must-not-own (candidate lines 41-41). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/observe.md verbatim in docs/platform/observe/spec.md, docs/platform/observe/decisions/observe-component-architecture.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "24eb30e7b62ea4e840780b81f404e924c679dbc4002866fca5077bccb2b92b6e",
+      "targetAncestry": [
+        "Observe Component Specification",
+        "1. Overview & Boundaries"
+      ]
+    },
+    {
+      "claimId": "claim_50d0f11082f8a7c2a9460b3a970586af",
+      "sourceUnitDigest": "cda71f698f80c3f641fc0c525f08d2e8ae35083e5e6b3619f97f815b5ec99f93",
+      "targetOwner": "docs/platform/observe/spec.md",
+      "targetAnchor": "unheaded-block-6",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/observe.md#unheaded-block-4 (source lines 20-23) is carried at docs/platform/observe/spec.md#unheaded-block-6 (candidate lines 42-45). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/observe.md verbatim in docs/platform/observe/spec.md, docs/platform/observe/decisions/observe-component-architecture.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "cda71f698f80c3f641fc0c525f08d2e8ae35083e5e6b3619f97f815b5ec99f93",
+      "targetAncestry": [
+        "Observe Component Specification",
+        "1. Overview & Boundaries",
+        "Must Not Own"
+      ]
+    },
+    {
+      "claimId": "claim_0494c6c790b6a6cb8aaaa6822467772e",
+      "sourceUnitDigest": "f3c03447025b806dfd933bff337de6626a77b8838d4fff1036b24bcab85a93ff",
+      "targetOwner": "docs/platform/observe/spec.md",
+      "targetAnchor": "2-shared-entities-subjects",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/observe.md#2-shared-entities-subjects (source lines 25-25) is carried at docs/platform/observe/spec.md#2-shared-entities-subjects (candidate lines 47-47). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/observe.md verbatim in docs/platform/observe/spec.md, docs/platform/observe/decisions/observe-component-architecture.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "f3c03447025b806dfd933bff337de6626a77b8838d4fff1036b24bcab85a93ff",
+      "targetAncestry": [
+        "Observe Component Specification"
+      ]
+    },
+    {
+      "claimId": "claim_7910591f62e9bc90ce6c1a90b8aa31bc",
+      "sourceUnitDigest": "f8410587c25fa1a5be9615ca6551e2347ce424eb682e8fe3867fd7775e96fadc",
+      "targetOwner": "docs/platform/observe/spec.md",
+      "targetAnchor": "unheaded-block-7",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/observe.md#unheaded-block-5 (source lines 27-34) is carried at docs/platform/observe/spec.md#unheaded-block-7 (candidate lines 49-56). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/observe.md verbatim in docs/platform/observe/spec.md, docs/platform/observe/decisions/observe-component-architecture.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "f8410587c25fa1a5be9615ca6551e2347ce424eb682e8fe3867fd7775e96fadc",
+      "targetAncestry": [
+        "Observe Component Specification",
+        "2. Shared Entities & Subjects"
+      ]
+    },
+    {
+      "claimId": "claim_33ce1e718f0906ee1a5f76fb4907b417",
+      "sourceUnitDigest": "da423b363032cc2e45d09d600c48d1da56a5ec68e1f2a8257529b8a1220cd2cb",
+      "targetOwner": "docs/platform/observe/spec.md",
+      "targetAnchor": "3-storage-model",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/observe.md#3-storage-model (source lines 36-36) is carried at docs/platform/observe/spec.md#3-storage-model (candidate lines 58-58). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/observe.md verbatim in docs/platform/observe/spec.md, docs/platform/observe/decisions/observe-component-architecture.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "da423b363032cc2e45d09d600c48d1da56a5ec68e1f2a8257529b8a1220cd2cb",
+      "targetAncestry": [
+        "Observe Component Specification"
+      ]
+    },
+    {
+      "claimId": "claim_7ff19d6895d1d1e5ea2d56e881259e4d",
+      "sourceUnitDigest": "91ec155bfcec407b060d39ed9ca7458c928f51cc4ff4a69be8942daa0e8c943d",
+      "targetOwner": "docs/platform/observe/spec.md",
+      "targetAnchor": "unheaded-block-8",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/observe.md#unheaded-block-6 (source lines 38-40) is carried at docs/platform/observe/spec.md#unheaded-block-8 (candidate lines 60-62). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/observe.md verbatim in docs/platform/observe/spec.md, docs/platform/observe/decisions/observe-component-architecture.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "91ec155bfcec407b060d39ed9ca7458c928f51cc4ff4a69be8942daa0e8c943d",
+      "targetAncestry": [
+        "Observe Component Specification",
+        "3. Storage Model"
+      ]
+    },
+    {
+      "claimId": "claim_908fe7d610c47ed8348c6b10768539c9",
+      "sourceUnitDigest": "b0b1d84706367b794a79b08b31f2e5bcba0e4656af65400e602890505457198d",
+      "targetOwner": "docs/platform/observe/spec.md",
+      "targetAnchor": "4-commands-routing",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/observe.md#4-commands-routing (source lines 42-42) is carried at docs/platform/observe/spec.md#4-commands-routing (candidate lines 64-64). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/observe.md verbatim in docs/platform/observe/spec.md, docs/platform/observe/decisions/observe-component-architecture.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "b0b1d84706367b794a79b08b31f2e5bcba0e4656af65400e602890505457198d",
+      "targetAncestry": [
+        "Observe Component Specification"
+      ]
+    },
+    {
+      "claimId": "claim_af8421bdba71901b8706678586ae03cb",
+      "sourceUnitDigest": "9c492a74b2527331a937aced7683a78cd847277317273fe52b6a41c8119931ee",
+      "targetOwner": "docs/platform/observe/spec.md",
+      "targetAnchor": "unheaded-block-9",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/observe.md#unheaded-block-7 (source lines 44-45) is carried at docs/platform/observe/spec.md#unheaded-block-9 (candidate lines 66-67). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/observe.md verbatim in docs/platform/observe/spec.md, docs/platform/observe/decisions/observe-component-architecture.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "9c492a74b2527331a937aced7683a78cd847277317273fe52b6a41c8119931ee",
+      "targetAncestry": [
+        "Observe Component Specification",
+        "4. Commands & Routing"
+      ]
+    },
+    {
+      "claimId": "claim_9e9c3f9e870fed7d23af811ce2178b47",
+      "sourceUnitDigest": "ba7d2394b0857879e6448aaba7d9f085662941256e47407f0b72bd18e178a75c",
+      "targetOwner": "docs/platform/observe/spec.md",
+      "targetAnchor": "unheaded-block-10",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/observe.md#unheaded-block-8 (source lines 47-48) is carried at docs/platform/observe/spec.md#unheaded-block-10 (candidate lines 69-70). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/observe.md verbatim in docs/platform/observe/spec.md, docs/platform/observe/decisions/observe-component-architecture.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "ba7d2394b0857879e6448aaba7d9f085662941256e47407f0b72bd18e178a75c",
+      "targetAncestry": [
+        "Observe Component Specification",
+        "4. Commands & Routing"
+      ]
+    },
+    {
+      "claimId": "claim_7e870015f558a75e65adab6d1b3230d2",
+      "sourceUnitDigest": "bdac824aa1ded5a576aeca01899a159abcc604b48cfa2e31ad3f660415e78cd3",
+      "targetOwner": "docs/platform/observe/spec.md",
+      "targetAnchor": "5-mục-theo-làn-sub-spec-sections",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/observe.md#5-mục-theo-làn-sub-spec-sections (source lines 50-50) is carried at docs/platform/observe/spec.md#5-mục-theo-làn-sub-spec-sections (candidate lines 72-72). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/observe.md verbatim in docs/platform/observe/spec.md, docs/platform/observe/decisions/observe-component-architecture.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "bdac824aa1ded5a576aeca01899a159abcc604b48cfa2e31ad3f660415e78cd3",
+      "targetAncestry": [
+        "Observe Component Specification"
+      ]
+    },
+    {
+      "claimId": "claim_b0e62ed94ed2770d0225ff91b34cbadf",
+      "sourceUnitDigest": "2ded62db9d6370e17b2cc65f35e45d117ee7b94c792128d359eb1229e628986f",
+      "targetOwner": "docs/platform/observe/spec.md",
+      "targetAnchor": "metrics-làn-a",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/observe.md#metrics-làn-a (source lines 52-52) is carried at docs/platform/observe/spec.md#metrics-làn-a (candidate lines 74-74). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/observe.md verbatim in docs/platform/observe/spec.md, docs/platform/observe/decisions/observe-component-architecture.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "2ded62db9d6370e17b2cc65f35e45d117ee7b94c792128d359eb1229e628986f",
+      "targetAncestry": [
+        "Observe Component Specification",
+        "5. Mục theo làn (Sub-spec sections)"
+      ]
+    },
+    {
+      "claimId": "claim_46877d1e9417370e4b6f2c36cd2a84cb",
+      "sourceUnitDigest": "38a6ec109f43ee224a59731555260f01a4727b8b0a39937a7e15fd7af3b3d731",
+      "targetOwner": "docs/platform/observe/spec.md",
+      "targetAnchor": "unheaded-block-11",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/observe.md#unheaded-block-9 (source lines 53-65) is carried at docs/platform/observe/spec.md#unheaded-block-11 (candidate lines 75-87). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/observe.md verbatim in docs/platform/observe/spec.md, docs/platform/observe/decisions/observe-component-architecture.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "38a6ec109f43ee224a59731555260f01a4727b8b0a39937a7e15fd7af3b3d731",
+      "targetAncestry": [
+        "Observe Component Specification",
+        "5. Mục theo làn (Sub-spec sections)",
+        "§ Metrics (Làn A)"
+      ]
+    },
+    {
+      "claimId": "claim_3c03309b66efa4925f1255511ed80e22",
+      "sourceUnitDigest": "beb19f3cb48940ebb818fbbd587c431842314f1d66534d641baa04d9a48396ae",
+      "targetOwner": "docs/platform/observe/spec.md",
+      "targetAnchor": "friction-làn-b",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/observe.md#friction-làn-b (source lines 66-66) is carried at docs/platform/observe/spec.md#friction-làn-b (candidate lines 88-88). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/observe.md verbatim in docs/platform/observe/spec.md, docs/platform/observe/decisions/observe-component-architecture.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "beb19f3cb48940ebb818fbbd587c431842314f1d66534d641baa04d9a48396ae",
+      "targetAncestry": [
+        "Observe Component Specification",
+        "5. Mục theo làn (Sub-spec sections)"
+      ]
+    },
+    {
+      "claimId": "claim_d8df03b03865a0d0968739d00129f0a3",
+      "sourceUnitDigest": "6b68a1227525c179699df85a2740ac5cddef67482e08d171e27dfac789472e8b",
+      "targetOwner": "docs/platform/observe/spec.md",
+      "targetAnchor": "unheaded-block-12",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/observe.md#unheaded-block-10 (source lines 67-67) is carried at docs/platform/observe/spec.md#unheaded-block-12 (candidate lines 89-89). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/observe.md verbatim in docs/platform/observe/spec.md, docs/platform/observe/decisions/observe-component-architecture.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "6b68a1227525c179699df85a2740ac5cddef67482e08d171e27dfac789472e8b",
+      "targetAncestry": [
+        "Observe Component Specification",
+        "5. Mục theo làn (Sub-spec sections)",
+        "§ Friction (Làn B)"
+      ]
+    },
+    {
+      "claimId": "claim_12da781dbd66869bbf765410d887c7f0",
+      "sourceUnitDigest": "1524c34dd5cd1df09f8b4a30a383264347263a484824aab9af796fd95f4c9e03",
+      "targetOwner": "docs/platform/observe/spec.md",
+      "targetAnchor": "contract-quyết-định-làn-c-f8",
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole heading unit docs/specs/observe.md#contract-quyết-định-làn-c-f8 (source lines 69-69) is carried at docs/platform/observe/spec.md#contract-quyết-định-làn-c-f8 (candidate lines 91-91). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/observe.md verbatim in docs/platform/observe/spec.md, docs/platform/observe/decisions/observe-component-architecture.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "1524c34dd5cd1df09f8b4a30a383264347263a484824aab9af796fd95f4c9e03",
+      "targetAncestry": [
+        "Observe Component Specification",
+        "5. Mục theo làn (Sub-spec sections)"
+      ]
+    },
+    {
+      "claimId": "claim_41988cae1fdd914bf7a8a4d1df2aeb82",
+      "sourceUnitDigest": "46e05dc484d8e352983b2835fed11fa9ff77e8a16af7387a1423a930a1f6767f",
+      "targetOwner": "docs/platform/observe/spec.md",
+      "targetAnchor": "unheaded-block-13",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/observe.md#unheaded-block-11 (source lines 70-74) is carried at docs/platform/observe/spec.md#unheaded-block-13 (candidate lines 92-96). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/observe.md verbatim in docs/platform/observe/spec.md, docs/platform/observe/decisions/observe-component-architecture.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "46e05dc484d8e352983b2835fed11fa9ff77e8a16af7387a1423a930a1f6767f",
+      "targetAncestry": [
+        "Observe Component Specification",
+        "5. Mục theo làn (Sub-spec sections)",
+        "§ Contract & Quyết định (Làn C / F8)"
+      ]
+    },
+    {
+      "claimId": "claim_2958b880278b18a7c00bb32287ef35d5",
+      "sourceUnitDigest": "2395711f7f1021e4ef362412f26aea6abf63869205a3b89e8ccc19f5376a0227",
+      "targetOwner": "docs/platform/observe/decisions/observe-component-architecture.md",
+      "targetAnchor": "6-lịch-sử-quyết-định",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ; source unit shorter than 40 characters; document exact share below one half. The whole heading unit docs/specs/observe.md#6-lịch-sử-quyết-định (source lines 76-76) is carried at docs/platform/observe/decisions/observe-component-architecture.md#6-lịch-sử-quyết-định (candidate lines 24-24). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/observe.md verbatim in docs/platform/observe/spec.md, docs/platform/observe/decisions/observe-component-architecture.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "2395711f7f1021e4ef362412f26aea6abf63869205a3b89e8ccc19f5376a0227",
+      "targetAncestry": [
+        "Added in candidate: observe component architecture"
+      ]
+    },
+    {
+      "claimId": "claim_2d3869be7e1c9fa2195930f46d9d6f3f",
+      "sourceUnitDigest": "0041148c6d694b756eba9bb8783d2168ae4a3e8081194988a65d55612843366b",
+      "targetOwner": "docs/platform/observe/decisions/observe-component-architecture.md",
+      "targetAnchor": "d-adr0037-observe-component-architecture",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. The whole heading unit docs/specs/observe.md#d-adr0037-observe-component-architecture (source lines 78-78) is carried at docs/platform/observe/decisions/observe-component-architecture.md#d-adr0037-observe-component-architecture (candidate lines 26-26). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/observe.md verbatim in docs/platform/observe/spec.md, docs/platform/observe/decisions/observe-component-architecture.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "0041148c6d694b756eba9bb8783d2168ae4a3e8081194988a65d55612843366b",
+      "targetAncestry": [
+        "Added in candidate: observe component architecture",
+        "6. Lịch sử quyết định"
+      ]
+    },
+    {
+      "claimId": "claim_212faf152b045009bd39be195155b339",
+      "sourceUnitDigest": "04b6bf704305aac6e7a7d28587982de8005ac5684ec8cc4d377f20308151b7cc",
+      "targetOwner": "docs/platform/observe/decisions/observe-component-architecture.md",
+      "targetAnchor": "unheaded-block-3",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. The whole unheaded-block unit docs/specs/observe.md#unheaded-block-12 (source lines 80-91) is carried at docs/platform/observe/decisions/observe-component-architecture.md#unheaded-block-3 (candidate lines 28-39). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/observe.md verbatim in docs/platform/observe/spec.md, docs/platform/observe/decisions/observe-component-architecture.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "04b6bf704305aac6e7a7d28587982de8005ac5684ec8cc4d377f20308151b7cc",
+      "targetAncestry": [
+        "Added in candidate: observe component architecture",
+        "6. Lịch sử quyết định",
+        "D-ADR0037 (Observe Component Architecture)"
+      ]
+    }
+  ]
+}

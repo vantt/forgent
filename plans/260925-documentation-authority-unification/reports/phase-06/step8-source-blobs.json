@@ -1,0 +1,195 @@
+{
+  "commit": "111adc51fd047d99121fd9d076eb4794c87045a4",
+  "mapPin": "fd6c9ab9e8aac12f99462a1d4f1bf78448d6e9f7",
+  "sources": [
+    {
+      "path": "docs/specs/confinement-authority.md",
+      "blob": "63a2cb78586805cfccd765b8f6a814351281c6d5",
+      "mapBlob": "778a93f0368a32b4179dfc138118959dd0e5b6a7",
+      "sha256": "435f3ccca09d9383d489efa8961edd7ae2b8bf5a35d063a91486a8a551325ae0",
+      "units": 200
+    },
+    {
+      "path": "docs/specs/decision-citation-drift.md",
+      "blob": "ee00ac178d1aa7aea151c08877222ee228923853",
+      "mapBlob": "ee00ac178d1aa7aea151c08877222ee228923853",
+      "sha256": "4774f723f8d3ab5e4a753cd2b74919f27c62c2c7857644606337def5bd922cff",
+      "units": 20
+    },
+    {
+      "path": "docs/specs/distillery.md",
+      "blob": "358eff4235102db17f166551dc1d51199f3c4abc",
+      "mapBlob": "358eff4235102db17f166551dc1d51199f3c4abc",
+      "sha256": "518accb5c959ac5dc42b154cb735f3f3af962a51afca4a4976972d059d0c7196",
+      "units": 21
+    },
+    {
+      "path": "docs/specs/fgos-plugin.md",
+      "blob": "fd3609b13dd023c66767db856f0b767315b952fa",
+      "mapBlob": "fd3609b13dd023c66767db856f0b767315b952fa",
+      "sha256": "2e7632ffbcbaae5c7ba4e3c7d6e0a3e7fe888ee278b5bc0bf9039f3ff276b687",
+      "units": 45
+    },
+    {
+      "path": "docs/specs/herdr-web-dashboard.md",
+      "blob": "e7edb5668119e67384175cace620459e97175ddd",
+      "mapBlob": "56055733005b4b3c3ce2473c787ded591951843a",
+      "sha256": "a1c2c500b8cbd573b965fc94ee80d3730237a07ac8f83547d0eda8a5c2e66a1d",
+      "units": 44
+    },
+    {
+      "path": "docs/specs/observe.md",
+      "blob": "2e2fe74304bb6732b0307bb822c338d93dbc7569",
+      "mapBlob": "2e2fe74304bb6732b0307bb822c338d93dbc7569",
+      "sha256": "f367b7dbe06df621ddc178e6fd7d1f610483e1504dec324fb1dfd49c97ee5272",
+      "units": 25
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "blob": "4650474a4a120ad30291b58c4f4c55b4a6caef83",
+      "mapBlob": "4650474a4a120ad30291b58c4f4c55b4a6caef83",
+      "sha256": "76af5d449a69613a2cd3871e5b898934f8b57db685d0d87d1cb4eb3375ff71d7",
+      "units": 16
+    },
+    {
+      "path": "docs/ui-spec/15-system-events.md",
+      "blob": "6f90ca72cd9860ba3672e7f249906e1c0a44a8ab",
+      "mapBlob": "6f90ca72cd9860ba3672e7f249906e1c0a44a8ab",
+      "sha256": "c0cd51f52e54872823d6f683bc25ff396df706712ef76b57794de5e0fcca75a9",
+      "units": 9
+    },
+    {
+      "path": "docs/ui-spec/20-domain-rules.md",
+      "blob": "65f412bfc8304ee6bba82cfc0bdf2484ef3e04b3",
+      "mapBlob": "65f412bfc8304ee6bba82cfc0bdf2484ef3e04b3",
+      "sha256": "cefbf0207b8492ffaffff1f23e13494e94f1343cd9ae4ae1fd82a187dc212e32",
+      "units": 5
+    },
+    {
+      "path": "docs/ui-spec/30-states-and-errors.md",
+      "blob": "d325391eabce213f65f9dea5dfad3c9387b14d7b",
+      "mapBlob": "d325391eabce213f65f9dea5dfad3c9387b14d7b",
+      "sha256": "5fe51d275b13c958c865da6c8a0bf60142506e1c5c637829afa23e9b0579736e",
+      "units": 30
+    },
+    {
+      "path": "docs/ui-spec/components/C01-item-card.md",
+      "blob": "271420848336ec91b670bf2481344e21b154ad49",
+      "mapBlob": "271420848336ec91b670bf2481344e21b154ad49",
+      "sha256": "3c31c82cef06bb6f819b4bf8a37fe8f7afa2991daff0a180f827f8b66641ab0a",
+      "units": 12
+    },
+    {
+      "path": "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+      "blob": "d0600c229df25316b734289a17533f2a11c59b30",
+      "mapBlob": "d0600c229df25316b734289a17533f2a11c59b30",
+      "sha256": "dfbc24dda82d286ae4934255d0dbe56fe58b92012048cddca56ffc70a47c6b28",
+      "units": 10
+    },
+    {
+      "path": "docs/ui-spec/flows/F02-approve-a-merge.md",
+      "blob": "73809ee31a5be5fed418d03ae49ac12de6777603",
+      "mapBlob": "73809ee31a5be5fed418d03ae49ac12de6777603",
+      "sha256": "0ee36f45917952bebc2eb4c95f00c770e4514b8e029ce120c761a45d0ed8ca1d",
+      "units": 9
+    },
+    {
+      "path": "docs/ui-spec/generated/action-registry.csv",
+      "blob": "63fe771b1f13e322fce4316b3c6e02cd3b74a214",
+      "mapBlob": "63fe771b1f13e322fce4316b3c6e02cd3b74a214",
+      "sha256": "9061f86a22a4aa7506e627c8bf2decf3ccdb5b75cf88f2382481851b1d5a02bc",
+      "units": 1
+    },
+    {
+      "path": "docs/ui-spec/generated/coverage-report.md",
+      "blob": "58fdd374b272f69d0896098d6779ce7159c189d6",
+      "mapBlob": "58fdd374b272f69d0896098d6779ce7159c189d6",
+      "sha256": "738eba6ed62f160d8637e9d6b012c1c74f15cd89fe87df28a53b55e0cc41c101",
+      "units": 5
+    },
+    {
+      "path": "docs/ui-spec/generated/navigation-graph.yaml",
+      "blob": "cf03812f5036a34ef874f9f142e897f255810370",
+      "mapBlob": "cf03812f5036a34ef874f9f142e897f255810370",
+      "sha256": "0b28f3554b2a5fba6a70d8fa728742ebfdd6f3e5a9f0a2bfe1149721d40617de",
+      "units": 1
+    },
+    {
+      "path": "docs/ui-spec/generated/surface-registry.yaml",
+      "blob": "2365591cefa3da5a53b16ed7e60e557c6caf4ab4",
+      "mapBlob": "2365591cefa3da5a53b16ed7e60e557c6caf4ab4",
+      "sha256": "b066bdeb267eda13000e3c575293220faeb1864e52df716460e5439528aae909",
+      "units": 1
+    },
+    {
+      "path": "docs/ui-spec/generated/wireframe-v2.html",
+      "blob": "8dbcdfb265010bde1c3cbb3fe1f2dbd0292aacc0",
+      "mapBlob": "8dbcdfb265010bde1c3cbb3fe1f2dbd0292aacc0",
+      "sha256": "77894fdda0966833d6d9ba595745a315db67d64feea7c9e6d5faed34a8d2ce80",
+      "units": 1
+    },
+    {
+      "path": "docs/ui-spec/modals/M01-answer-question.md",
+      "blob": "6dc51a45d24ffc3fca7b051c121b5d1d7b63aa9d",
+      "mapBlob": "6dc51a45d24ffc3fca7b051c121b5d1d7b63aa9d",
+      "sha256": "6c459c08d0ad35c362181fac748b68c765c60441597049e3e3c00c8485a61f23",
+      "units": 11
+    },
+    {
+      "path": "docs/ui-spec/modals/M02-approve-merge.md",
+      "blob": "4a4d851df85cb09c915f0fbf2d1b71ae174aa563",
+      "mapBlob": "4a4d851df85cb09c915f0fbf2d1b71ae174aa563",
+      "sha256": "f52cb369e8ec0039fa64b0f4a7ca3bbf9ccfd37b3fe2fc342a410d59c5bb23b8",
+      "units": 12
+    },
+    {
+      "path": "docs/ui-spec/modals/M03-add-edit-item.md",
+      "blob": "09aa20dbc0fae13211c64077188d5e7950d56120",
+      "mapBlob": "09aa20dbc0fae13211c64077188d5e7950d56120",
+      "sha256": "b0a16742180949c5a1b6836690c67c74c9dbd7f0ebf400d3c26eb7a4d18fe3d1",
+      "units": 13
+    },
+    {
+      "path": "docs/ui-spec/schema/surface-contract.schema.json",
+      "blob": "2f163ff6092e16b1cb619c7dcc0765f316af1753",
+      "mapBlob": "2f163ff6092e16b1cb619c7dcc0765f316af1753",
+      "sha256": "2ce8f77f92bb0cf512f74f5eac133be50a8a0d301b3de13b82e5fbf4d950db7e",
+      "units": 1
+    },
+    {
+      "path": "docs/ui-spec/screens/S01-sign-in.md",
+      "blob": "04b2bb2c1861e0557a43f8fd1ab7d6948dde1409",
+      "mapBlob": "04b2bb2c1861e0557a43f8fd1ab7d6948dde1409",
+      "sha256": "725f76c4946a2c051770d59891b395eb194003cbb916a5731945ee5e22ac3eff",
+      "units": 14
+    },
+    {
+      "path": "docs/ui-spec/screens/S02-taskboard.md",
+      "blob": "d8a20dd65bf1933d31ff334b5200b6efb0f4cb08",
+      "mapBlob": "d8a20dd65bf1933d31ff334b5200b6efb0f4cb08",
+      "sha256": "d84abd8635907d8b69402c6fc767e97479348e2c66517d38e7bb3f03b9bf800f",
+      "units": 20
+    },
+    {
+      "path": "docs/ui-spec/screens/S03-task-detail.md",
+      "blob": "e62243c904ab68c7b0fcdb65cf203e5fdf112072",
+      "mapBlob": "e62243c904ab68c7b0fcdb65cf203e5fdf112072",
+      "sha256": "df9faacc4ec5e989f935d7e7a3ef327ba751e7271f6e55be7d9891cb0f7b52b3",
+      "units": 24
+    },
+    {
+      "path": "docs/ui-spec/screens/S04-questions-needing-answer.md",
+      "blob": "01dedd23e6a1565ae463c421d2873fa8ad3482ec",
+      "mapBlob": "01dedd23e6a1565ae463c421d2873fa8ad3482ec",
+      "sha256": "0f358fadb71d6aa504c26c7e8f851c911e4feee10b5ef102456df0007da5ab7b",
+      "units": 15
+    },
+    {
+      "path": "docs/ui-spec/spec.config.yaml",
+      "blob": "c51d822673e66f5012eab484c0974f57dd21a2ae",
+      "mapBlob": "c51d822673e66f5012eab484c0974f57dd21a2ae",
+      "sha256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+      "units": 1
+    }
+  ]
+}

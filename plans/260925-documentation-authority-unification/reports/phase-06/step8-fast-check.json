@@ -1,0 +1,1513 @@
+{
+  "version": 1,
+  "method": "Scoped D/E FAST CHECK ONLY: unchanged applyDecisions, vocabulary validator and checkConservation on working-tree source/candidate overlay; 27 repeated --scope equivalents, both prior registry row-set checks. No native sync, git tree writes, checkInventory committed-tree scan, persisted registry mutation or review pack. Source IDs are actual current native IDs; new candidate local gap IDs are diagnostic and omitted from this report. Full D/E/native identity and reverse-list equality must run once after runner commits.",
+  "sourceCommit": "111adc51fd047d99121fd9d076eb4794c87045a4",
+  "registry": {
+    "path": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+    "sha256": "b5b11092ccd69cf70bda295c50c614fb5d76a9b18440ae2ca6df3aa68ef96e54",
+    "bytes": 61217378,
+    "unchanged": true
+  },
+  "scopeArguments": [
+    "--scope",
+    "docs/specs/confinement-authority.md",
+    "--scope",
+    "docs/specs/decision-citation-drift.md",
+    "--scope",
+    "docs/specs/distillery.md",
+    "--scope",
+    "docs/specs/fgos-plugin.md",
+    "--scope",
+    "docs/specs/herdr-web-dashboard.md",
+    "--scope",
+    "docs/specs/observe.md",
+    "--scope",
+    "docs/ui-spec/00-overview.md",
+    "--scope",
+    "docs/ui-spec/15-system-events.md",
+    "--scope",
+    "docs/ui-spec/20-domain-rules.md",
+    "--scope",
+    "docs/ui-spec/30-states-and-errors.md",
+    "--scope",
+    "docs/ui-spec/components/C01-item-card.md",
+    "--scope",
+    "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+    "--scope",
+    "docs/ui-spec/flows/F02-approve-a-merge.md",
+    "--scope",
+    "docs/ui-spec/generated/action-registry.csv",
+    "--scope",
+    "docs/ui-spec/generated/coverage-report.md",
+    "--scope",
+    "docs/ui-spec/generated/navigation-graph.yaml",
+    "--scope",
+    "docs/ui-spec/generated/surface-registry.yaml",
+    "--scope",
+    "docs/ui-spec/generated/wireframe-v2.html",
+    "--scope",
+    "docs/ui-spec/modals/M01-answer-question.md",
+    "--scope",
+    "docs/ui-spec/modals/M02-approve-merge.md",
+    "--scope",
+    "docs/ui-spec/modals/M03-add-edit-item.md",
+    "--scope",
+    "docs/ui-spec/schema/surface-contract.schema.json",
+    "--scope",
+    "docs/ui-spec/screens/S01-sign-in.md",
+    "--scope",
+    "docs/ui-spec/screens/S02-taskboard.md",
+    "--scope",
+    "docs/ui-spec/screens/S03-task-detail.md",
+    "--scope",
+    "docs/ui-spec/screens/S04-questions-needing-answer.md",
+    "--scope",
+    "docs/ui-spec/spec.config.yaml"
+  ],
+  "D": {
+    "fatalFindings": [
+      {
+        "type": "file-class-not-allowed-for-disposition",
+        "path": "docs/ui-spec/generated/action-registry.csv",
+        "message": "docs/ui-spec/generated/action-registry.csv: fileClass \"maintained-authority\" is not allowed for disposition \"regenerate-from-source\" (allowed: generated)"
+      },
+      {
+        "type": "file-class-not-allowed-for-disposition",
+        "path": "docs/ui-spec/generated/coverage-report.md",
+        "message": "docs/ui-spec/generated/coverage-report.md: fileClass \"maintained-authority\" is not allowed for disposition \"regenerate-from-source\" (allowed: generated)"
+      },
+      {
+        "type": "file-class-not-allowed-for-disposition",
+        "path": "docs/ui-spec/generated/navigation-graph.yaml",
+        "message": "docs/ui-spec/generated/navigation-graph.yaml: fileClass \"maintained-authority\" is not allowed for disposition \"regenerate-from-source\" (allowed: generated)"
+      },
+      {
+        "type": "file-class-not-allowed-for-disposition",
+        "path": "docs/ui-spec/generated/surface-registry.yaml",
+        "message": "docs/ui-spec/generated/surface-registry.yaml: fileClass \"maintained-authority\" is not allowed for disposition \"regenerate-from-source\" (allowed: generated)"
+      },
+      {
+        "type": "file-class-not-allowed-for-disposition",
+        "path": "docs/ui-spec/generated/wireframe-v2.html",
+        "message": "docs/ui-spec/generated/wireframe-v2.html: fileClass \"maintained-authority\" is not allowed for disposition \"regenerate-from-source\" (allowed: generated)"
+      }
+    ],
+    "count": 5,
+    "scope": [
+      "docs/specs/confinement-authority.md",
+      "docs/specs/decision-citation-drift.md",
+      "docs/specs/distillery.md",
+      "docs/specs/fgos-plugin.md",
+      "docs/specs/herdr-web-dashboard.md",
+      "docs/specs/observe.md",
+      "docs/ui-spec/00-overview.md",
+      "docs/ui-spec/15-system-events.md",
+      "docs/ui-spec/20-domain-rules.md",
+      "docs/ui-spec/30-states-and-errors.md",
+      "docs/ui-spec/components/C01-item-card.md",
+      "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+      "docs/ui-spec/flows/F02-approve-a-merge.md",
+      "docs/ui-spec/generated/action-registry.csv",
+      "docs/ui-spec/generated/coverage-report.md",
+      "docs/ui-spec/generated/navigation-graph.yaml",
+      "docs/ui-spec/generated/surface-registry.yaml",
+      "docs/ui-spec/generated/wireframe-v2.html",
+      "docs/ui-spec/modals/M01-answer-question.md",
+      "docs/ui-spec/modals/M02-approve-merge.md",
+      "docs/ui-spec/modals/M03-add-edit-item.md",
+      "docs/ui-spec/schema/surface-contract.schema.json",
+      "docs/ui-spec/screens/S01-sign-in.md",
+      "docs/ui-spec/screens/S02-taskboard.md",
+      "docs/ui-spec/screens/S03-task-detail.md",
+      "docs/ui-spec/screens/S04-questions-needing-answer.md",
+      "docs/ui-spec/spec.config.yaml"
+    ]
+  },
+  "E": {
+    "structuralFatal": [
+      {
+        "type": "file-class-not-allowed-for-disposition",
+        "path": "docs/ui-spec/generated/action-registry.csv",
+        "message": "docs/ui-spec/generated/action-registry.csv: fileClass \"maintained-authority\" is not allowed for disposition \"regenerate-from-source\" (allowed: generated)"
+      },
+      {
+        "type": "file-class-not-allowed-for-disposition",
+        "path": "docs/ui-spec/generated/coverage-report.md",
+        "message": "docs/ui-spec/generated/coverage-report.md: fileClass \"maintained-authority\" is not allowed for disposition \"regenerate-from-source\" (allowed: generated)"
+      },
+      {
+        "type": "file-class-not-allowed-for-disposition",
+        "path": "docs/ui-spec/generated/navigation-graph.yaml",
+        "message": "docs/ui-spec/generated/navigation-graph.yaml: fileClass \"maintained-authority\" is not allowed for disposition \"regenerate-from-source\" (allowed: generated)"
+      },
+      {
+        "type": "file-class-not-allowed-for-disposition",
+        "path": "docs/ui-spec/generated/surface-registry.yaml",
+        "message": "docs/ui-spec/generated/surface-registry.yaml: fileClass \"maintained-authority\" is not allowed for disposition \"regenerate-from-source\" (allowed: generated)"
+      },
+      {
+        "type": "file-class-not-allowed-for-disposition",
+        "path": "docs/ui-spec/generated/wireframe-v2.html",
+        "message": "docs/ui-spec/generated/wireframe-v2.html: fileClass \"maintained-authority\" is not allowed for disposition \"regenerate-from-source\" (allowed: generated)"
+      }
+    ],
+    "conservationOpen": [
+      {
+        "type": "claims-not-reviewed",
+        "message": "claim rows whose reviewStatus is not reviewed",
+        "count": 566,
+        "examples": [
+          "docs/specs/confinement-authority.md#unheaded-block-1",
+          "docs/specs/confinement-authority.md#spec-agent-confinement-authority",
+          "docs/specs/confinement-authority.md#unheaded-block-2",
+          "docs/specs/confinement-authority.md#1-quyết-định-kiến-trúc",
+          "docs/specs/confinement-authority.md#unheaded-block-3"
+        ]
+      },
+      {
+        "type": "identical-units-multiple-owners",
+        "message": "identical source units whose rows name different target owners",
+        "count": 1,
+        "examples": [
+          "39a803b85af8: docs/platform/claude-plugin/spec.md, docs/platform/decision-citation-drift/spec.md"
+        ]
+      },
+      {
+        "type": "registry-gaps-without-disposition",
+        "message": "registry identity-gap rows with no vocabulary disposition",
+        "count": 3,
+        "examples": [
+          "docs/specs/confinement-authority.md#unheaded-block-144",
+          "docs/specs/confinement-authority.md#unheaded-block-144",
+          "docs/specs/herdr-web-dashboard.md#unheaded-block-21"
+        ]
+      },
+      {
+        "type": "candidate-blocks-unreferenced",
+        "message": "candidate conservation units not named by a source decision",
+        "count": 136,
+        "examples": [
+          "docs/platform/decision-citation-drift/spec.md#unheaded-block-2",
+          "docs/platform/decision-citation-drift/spec.md#unheaded-block-3",
+          "docs/platform/distillery/spec.md#unheaded-block-2",
+          "docs/platform/distillery/spec.md#unheaded-block-3",
+          "docs/platform/claude-plugin/spec.md#unheaded-block-2"
+        ]
+      }
+    ],
+    "strictGreen": false,
+    "pendingSourceRows": 566
+  },
+  "stats": {
+    "sourceRows": 566,
+    "withCarrier": 557,
+    "noCandidateGenerated": 9,
+    "candidates": 35,
+    "scopes": 27,
+    "allScopesMatched": true,
+    "allSourceNativeIdentitiesPresent": true,
+    "allSourceTextAndTargetBindingsChecked": true,
+    "originalHeadingPayloadContained": true,
+    "frontmatterChecks": [
+      "docs/specs/decision-citation-drift.md",
+      "docs/specs/distillery.md",
+      "docs/specs/fgos-plugin.md",
+      "docs/specs/herdr-web-dashboard.md",
+      "docs/ui-spec/00-overview.md",
+      "docs/ui-spec/15-system-events.md",
+      "docs/ui-spec/20-domain-rules.md",
+      "docs/ui-spec/components/C01-item-card.md",
+      "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+      "docs/ui-spec/flows/F02-approve-a-merge.md",
+      "docs/ui-spec/modals/M01-answer-question.md",
+      "docs/ui-spec/modals/M02-approve-merge.md",
+      "docs/ui-spec/modals/M03-add-edit-item.md",
+      "docs/ui-spec/screens/S01-sign-in.md",
+      "docs/ui-spec/screens/S02-taskboard.md",
+      "docs/ui-spec/screens/S03-task-detail.md",
+      "docs/ui-spec/screens/S04-questions-needing-answer.md",
+      "docs/specs/confinement-authority.md"
+    ],
+    "machineByteChecks": [
+      "docs/ui-spec/schema/surface-contract.schema.json",
+      "docs/ui-spec/spec.config.yaml"
+    ],
+    "segmentReconstructionChecks": [
+      "docs/specs/decision-citation-drift.md",
+      "docs/specs/distillery.md",
+      "docs/specs/fgos-plugin.md",
+      "docs/specs/herdr-web-dashboard.md",
+      "docs/ui-spec/00-overview.md",
+      "docs/ui-spec/15-system-events.md",
+      "docs/ui-spec/20-domain-rules.md",
+      "docs/ui-spec/30-states-and-errors.md",
+      "docs/ui-spec/components/C01-item-card.md",
+      "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+      "docs/ui-spec/flows/F02-approve-a-merge.md",
+      "docs/ui-spec/modals/M01-answer-question.md",
+      "docs/ui-spec/modals/M02-approve-merge.md",
+      "docs/ui-spec/modals/M03-add-edit-item.md",
+      "docs/ui-spec/schema/surface-contract.schema.json",
+      "docs/ui-spec/screens/S01-sign-in.md",
+      "docs/ui-spec/screens/S02-taskboard.md",
+      "docs/ui-spec/screens/S03-task-detail.md",
+      "docs/ui-spec/screens/S04-questions-needing-answer.md",
+      "docs/ui-spec/spec.config.yaml",
+      "docs/specs/observe.md",
+      "docs/specs/confinement-authority.md"
+    ]
+  },
+  "preliminaryCandidateUnverified": {
+    "native": false,
+    "count": 136,
+    "units": [
+      {
+        "path": "docs/platform/decision-citation-drift/spec.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "ccf015b07b039b56559401d69d8b599440778962dc50befbbe36001c940108d8",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/decision-citation-drift/spec.md",
+        "anchor": "unheaded-block-3",
+        "unitDigest": "7a16f93c0d7d23c5915d7afe7e93d6b32d9eda0b659d66f240912d863eeaa196",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/distillery/spec.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "78ae6650ca59a3b8667bc2f825a55a9248b7dfdd72c69f70a6b894ef819e96de",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/distillery/spec.md",
+        "anchor": "unheaded-block-3",
+        "unitDigest": "7a16f93c0d7d23c5915d7afe7e93d6b32d9eda0b659d66f240912d863eeaa196",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/claude-plugin/spec.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "c573e7a7f2c5bdea9cd6c0e5f1261e014e63aaeab98f3fd369bab2a186a98541",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/claude-plugin/spec.md",
+        "anchor": "unheaded-block-3",
+        "unitDigest": "7a16f93c0d7d23c5915d7afe7e93d6b32d9eda0b659d66f240912d863eeaa196",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/spec.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "cc4a3791b26dc7ee677d5c3882ea4646ebe3d761f4f97130c969c3fc313d46fc",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/spec.md",
+        "anchor": "unheaded-block-3",
+        "unitDigest": "7a16f93c0d7d23c5915d7afe7e93d6b32d9eda0b659d66f240912d863eeaa196",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/spec.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "1f0a905d563027e15844e4b9dfff0ba7ac076a1a7eb05ada3c24b4bc5f81d5f6",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/spec.md",
+        "anchor": "unheaded-block-3",
+        "unitDigest": "7a16f93c0d7d23c5915d7afe7e93d6b32d9eda0b659d66f240912d863eeaa196",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/contracts/15-system-events.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "82ad4b95a95ca6fd12a6cbc2ba1d7e20a0613d7fb9967409e5219a568b95e75c",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/contracts/15-system-events.md",
+        "anchor": "unheaded-block-3",
+        "unitDigest": "7a16f93c0d7d23c5915d7afe7e93d6b32d9eda0b659d66f240912d863eeaa196",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/contracts/20-domain-rules.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "4c0794638277fac4696c069781ddf9bea75a43146ec62aa3be2ddb848708f096",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/contracts/20-domain-rules.md",
+        "anchor": "unheaded-block-3",
+        "unitDigest": "7a16f93c0d7d23c5915d7afe7e93d6b32d9eda0b659d66f240912d863eeaa196",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+        "anchor": "unheaded-block-1",
+        "unitDigest": "0a7601acd2512fbd04d70f18e40d8949a4cda52688960970e95a350ae22523f7",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "7a16f93c0d7d23c5915d7afe7e93d6b32d9eda0b659d66f240912d863eeaa196",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "bc1ef3aa25bbd55d0ff400fc0ee8bc6e77e8d788fb8048860f3817fcd51585bc",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+        "anchor": "unheaded-block-3",
+        "unitDigest": "7a16f93c0d7d23c5915d7afe7e93d6b32d9eda0b659d66f240912d863eeaa196",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "60df5ee75aeda28ea54dce20e2b61833724ce513a6a0038cf9945a75b78c39a7",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+        "anchor": "unheaded-block-3",
+        "unitDigest": "7a16f93c0d7d23c5915d7afe7e93d6b32d9eda0b659d66f240912d863eeaa196",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "a84c511067da8dae846303eac65dc5a197a3d65f267328b344ce9dfb12182690",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+        "anchor": "unheaded-block-3",
+        "unitDigest": "7a16f93c0d7d23c5915d7afe7e93d6b32d9eda0b659d66f240912d863eeaa196",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "f595d0f9ef916266e4bd3f97cc9d706e4c2a626508835c909131f922d57ddb9a",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+        "anchor": "unheaded-block-3",
+        "unitDigest": "7a16f93c0d7d23c5915d7afe7e93d6b32d9eda0b659d66f240912d863eeaa196",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "a24d7cda246a135326ee84c4f5045c82ea788564b713ffb8383c6b9614175223",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+        "anchor": "unheaded-block-3",
+        "unitDigest": "7a16f93c0d7d23c5915d7afe7e93d6b32d9eda0b659d66f240912d863eeaa196",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "1052d33c3e1746e23b7fe9e479e4b19c51e2c5ef8acfe7a4ed809468e987d856",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+        "anchor": "unheaded-block-3",
+        "unitDigest": "7a16f93c0d7d23c5915d7afe7e93d6b32d9eda0b659d66f240912d863eeaa196",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/history/schema/surface-contract.schema.json.md",
+        "anchor": "added-in-candidate-provenance-for-surface-contractschemajson",
+        "unitDigest": "fc49272fddc767a2bc4af8acd868afde8fc534e10729240ab72039195b9e6876",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/history/schema/surface-contract.schema.json.md",
+        "anchor": "unheaded-block-1",
+        "unitDigest": "7b829173178efbefd8ad47e0078b3c0f58fdfef48d5050fd61ae9fb3480f2fab",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/history/schema/surface-contract.schema.json.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "63f9a206e9ecf1305739c017f04c43e70863851236c42cbb2b514bf5ad52828b",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/history/schema/surface-contract.schema.json.md",
+        "anchor": "unheaded-block-3",
+        "unitDigest": "f3cfe1042ac7637fb54b1532876916994cc03789e9b59fa079de967e97297866",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "f156c5fc0daea4a5a2f207530419ae80cc785a914a993522c57d73e0e5e649c8",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+        "anchor": "unheaded-block-3",
+        "unitDigest": "7a16f93c0d7d23c5915d7afe7e93d6b32d9eda0b659d66f240912d863eeaa196",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "e5f00999d045638f3bccf3def0dccee4bbb3e2ff756f79e3e3f5bb31fc20facd",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+        "anchor": "unheaded-block-3",
+        "unitDigest": "7a16f93c0d7d23c5915d7afe7e93d6b32d9eda0b659d66f240912d863eeaa196",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "c15e158b9ed176c6809d36a9c858cb0f06743bece223668f7622121e08e5ec17",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+        "anchor": "unheaded-block-3",
+        "unitDigest": "7a16f93c0d7d23c5915d7afe7e93d6b32d9eda0b659d66f240912d863eeaa196",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "7c0bf97954186a784a4c6cdaa755e78b618ddabc995f4151e8cfa8bb90b78d6b",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+        "anchor": "unheaded-block-3",
+        "unitDigest": "7a16f93c0d7d23c5915d7afe7e93d6b32d9eda0b659d66f240912d863eeaa196",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/architecture/spec.config.yaml.md",
+        "anchor": "added-in-candidate-provenance-for-specconfigyaml",
+        "unitDigest": "db811145404d1f3a9dee9f51090bf6c861182aef9052d80f30d1e9cc60e97f81",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/architecture/spec.config.yaml.md",
+        "anchor": "unheaded-block-1",
+        "unitDigest": "51608a2c9230afc2534c96424cbbab56b24e55a645a6548d746eff0e7ea2474a",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/architecture/spec.config.yaml.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "63f9a206e9ecf1305739c017f04c43e70863851236c42cbb2b514bf5ad52828b",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/architecture/spec.config.yaml.md",
+        "anchor": "unheaded-block-3",
+        "unitDigest": "4c643121965e2e12dce0b79fb28bb667cafb1c3ca55d8a8b6abaaf227c432c31",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/observe/spec.md",
+        "anchor": "unheaded-block-1",
+        "unitDigest": "65858f14a8866d99ab79ada3b40242a90b2c18c05531b2d9d574c6cce22c2120",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/observe/spec.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "5872213e7045308646ea615963c6fb4dd624e2b0dfa8fa445e6a4b0b45351559",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/observe/decisions/observe-component-architecture.md",
+        "anchor": "added-in-candidate-observe-component-architecture",
+        "unitDigest": "e70dac7c44e20f416dee938f4465b08e5275aada0a2bb6fc226ef6b59f1b0f52",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/observe/decisions/observe-component-architecture.md",
+        "anchor": "unheaded-block-1",
+        "unitDigest": "e4e238d6b367db4c066be61009d3ff3e6ef2e5c712833edb430df97e63ba79e8",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/observe/decisions/observe-component-architecture.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "66aa8277df23cb50198ec2bacc3c3c8533e800d0913449c515c8993d1e167bb0",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/agent-confinement/spec.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "5918aa743471afecb99ec49acf36659bb6cdea88d7924334a8d2f9f5829c197c",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/agent-confinement/spec.md",
+        "anchor": "unheaded-block-3",
+        "unitDigest": "5872213e7045308646ea615963c6fb4dd624e2b0dfa8fa445e6a4b0b45351559",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/agent-confinement/spec.md",
+        "anchor": "added-in-candidate-current-settled-facts-and-deferred-items",
+        "unitDigest": "b363d2160b73e96233393d0708713d35ead358d7966589dd3361360b5d1874b8",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "anchor": "added-in-candidate-confinement-authority-v1",
+        "unitDigest": "6899e9ad05681cfae94b66fc4d9baba0486eeba1016c05ce31a84611b4b9dd2a",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "anchor": "unheaded-block-1",
+        "unitDigest": "2d401faef1790d0583de179eedec90f2f99652d93bcd11014cfeedf1e1718c87",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "66aa8277df23cb50198ec2bacc3c3c8533e800d0913449c515c8993d1e167bb0",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "anchor": "added-in-candidate-rollout-and-settled-facts",
+        "unitDigest": "145efc2b0f94ac5c4805a029ffbb0a2aa2cbf2e18a631eb41509b25bb3c34d02",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "anchor": "unheaded-block-1",
+        "unitDigest": "f6baea0d0deaa57d5d1449e87a457095ecffc2f4a590c9624a0ae416ee826d26",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "66aa8277df23cb50198ec2bacc3c3c8533e800d0913449c515c8993d1e167bb0",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+        "anchor": "added-in-candidate-confinement-authority-decisions",
+        "unitDigest": "ba95dc3c21b44e5deb22752200ae484f88dff6b7bc6761916e5af5aac0f1e487",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+        "anchor": "unheaded-block-1",
+        "unitDigest": "e94a2694614f8719c18efddeb583923dc8cad517bc62ab39c60ec699455791e3",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "66aa8277df23cb50198ec2bacc3c3c8533e800d0913449c515c8993d1e167bb0",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/decision-citation-drift/README.md",
+        "anchor": "decision-citation-drift-candidate-area",
+        "unitDigest": "c3fa3160f6586166eaf421d2adcb085399d39a3992a18a4eb226dc77c8a51757",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/decision-citation-drift/README.md",
+        "anchor": "unheaded-block-1",
+        "unitDigest": "c05fc4f4beef7e5530b2eddba91f078925db93c7c6680fb636d91c51475ef76c",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/decision-citation-drift/README.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "71fe6fd752cf765de2e06475eb425b9ca31b4bdf11fa49e640673a5d449a3f63",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/decision-citation-drift/README.md",
+        "anchor": "added-in-candidate-read-this-area",
+        "unitDigest": "b40cfe816e347ac8eb953f8c416d821aa1f67634ed9c6ab9fd8bf5f215b7d417",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/decision-citation-drift/README.md",
+        "anchor": "unheaded-block-3",
+        "unitDigest": "aa79c5c0a25c4ae18597a52e583e5abbf7800a64be258063de2ca2cf2e51cdc8",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/decision-citation-drift/README.md",
+        "anchor": "added-in-candidate-verification-and-change-boundary",
+        "unitDigest": "6c3c047ddd7118f92f4b6f66178d3e7a27207c28cd5f04fdf5ed65c718286c54",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/decision-citation-drift/README.md",
+        "anchor": "unheaded-block-4",
+        "unitDigest": "50744c72ca12a2b0a1e8e48d687e6896a71683106ba6839335a1c24eed18a6ad",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/distillery/README.md",
+        "anchor": "distillery-candidate-area",
+        "unitDigest": "5b602ac5e2f01442b32af204f406a3ab4577f99d3ecdf5a20454b0463145ab82",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/distillery/README.md",
+        "anchor": "unheaded-block-1",
+        "unitDigest": "cdbe17a6c370d14ca383f0d8a9490aec9fff17aa3eca3c1e9c3712f29d36ee07",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/distillery/README.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "71fe6fd752cf765de2e06475eb425b9ca31b4bdf11fa49e640673a5d449a3f63",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/distillery/README.md",
+        "anchor": "added-in-candidate-read-this-area",
+        "unitDigest": "b40cfe816e347ac8eb953f8c416d821aa1f67634ed9c6ab9fd8bf5f215b7d417",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/distillery/README.md",
+        "anchor": "unheaded-block-3",
+        "unitDigest": "aa79c5c0a25c4ae18597a52e583e5abbf7800a64be258063de2ca2cf2e51cdc8",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/distillery/README.md",
+        "anchor": "added-in-candidate-verification-and-change-boundary",
+        "unitDigest": "6c3c047ddd7118f92f4b6f66178d3e7a27207c28cd5f04fdf5ed65c718286c54",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/distillery/README.md",
+        "anchor": "unheaded-block-4",
+        "unitDigest": "50744c72ca12a2b0a1e8e48d687e6896a71683106ba6839335a1c24eed18a6ad",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/claude-plugin/README.md",
+        "anchor": "claude-plugin-candidate-area",
+        "unitDigest": "aa14548f3aa59e02ebaff3e5c6c5c8b30d0b00be529c8d5b571056c1bfb09f57",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/claude-plugin/README.md",
+        "anchor": "unheaded-block-1",
+        "unitDigest": "d4dc61be17a567f6cf07282af0fe072aa0526b06f9cc1459681c20b0a492b92b",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/claude-plugin/README.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "71fe6fd752cf765de2e06475eb425b9ca31b4bdf11fa49e640673a5d449a3f63",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/claude-plugin/README.md",
+        "anchor": "added-in-candidate-read-this-area",
+        "unitDigest": "b40cfe816e347ac8eb953f8c416d821aa1f67634ed9c6ab9fd8bf5f215b7d417",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/claude-plugin/README.md",
+        "anchor": "unheaded-block-3",
+        "unitDigest": "aa79c5c0a25c4ae18597a52e583e5abbf7800a64be258063de2ca2cf2e51cdc8",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/claude-plugin/README.md",
+        "anchor": "added-in-candidate-verification-and-change-boundary",
+        "unitDigest": "6c3c047ddd7118f92f4b6f66178d3e7a27207c28cd5f04fdf5ed65c718286c54",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/claude-plugin/README.md",
+        "anchor": "unheaded-block-4",
+        "unitDigest": "50744c72ca12a2b0a1e8e48d687e6896a71683106ba6839335a1c24eed18a6ad",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/README.md",
+        "anchor": "herdr-web-dashboard-candidate-area",
+        "unitDigest": "53172a935f21e0c958817eb859b72809a693ebc6965745a83c9789f2a13b0a41",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/README.md",
+        "anchor": "unheaded-block-1",
+        "unitDigest": "c05e17742a66f0983c0fa113a11b124c838abdb4c1fe3cda6229f7b27e7e0c46",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/README.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "71fe6fd752cf765de2e06475eb425b9ca31b4bdf11fa49e640673a5d449a3f63",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/README.md",
+        "anchor": "added-in-candidate-read-this-area",
+        "unitDigest": "5ff4313f48c3562a6782061ad5a19a37c277c4bb3c785ff25fe131d6f7e69747",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/README.md",
+        "anchor": "unheaded-block-3",
+        "unitDigest": "aa79c5c0a25c4ae18597a52e583e5abbf7800a64be258063de2ca2cf2e51cdc8",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/README.md",
+        "anchor": "unheaded-block-4",
+        "unitDigest": "e1aeff36c7bdb9aa9126378b2f42caef3e5be08e0994cebd9d756e39b54d3158",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/README.md",
+        "anchor": "added-in-candidate-verification-and-change-boundary",
+        "unitDigest": "6c3c047ddd7118f92f4b6f66178d3e7a27207c28cd5f04fdf5ed65c718286c54",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/README.md",
+        "anchor": "unheaded-block-5",
+        "unitDigest": "50744c72ca12a2b0a1e8e48d687e6896a71683106ba6839335a1c24eed18a6ad",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/README.md",
+        "anchor": "ui-spec-candidate-area",
+        "unitDigest": "ac5c3a02f2a949efbf25c447075bc3408b8ab8bdb6e6cb53b9bb48a8a6f397bb",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/README.md",
+        "anchor": "unheaded-block-1",
+        "unitDigest": "db407f93c0c7383c1016ddfc5938af146800a44eb6359341f78181d54235346c",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/README.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "71fe6fd752cf765de2e06475eb425b9ca31b4bdf11fa49e640673a5d449a3f63",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/README.md",
+        "anchor": "added-in-candidate-read-this-area",
+        "unitDigest": "636dda94a1c0cfac18a6e994fde88065e9353c311c49f717a294bdcca33bb308",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/README.md",
+        "anchor": "unheaded-block-3",
+        "unitDigest": "aa79c5c0a25c4ae18597a52e583e5abbf7800a64be258063de2ca2cf2e51cdc8",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/README.md",
+        "anchor": "unheaded-block-4",
+        "unitDigest": "f994379e4db3aaa29a58a74ae1f1fb83959c76367fb54073269352be5eb8ec7b",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/README.md",
+        "anchor": "added-in-candidate-tool-root-obligation",
+        "unitDigest": "d1b0f95e4cb7e3fdd0af56553b8eaad80a4be0dff9c1251db19f3b8603964241",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/README.md",
+        "anchor": "unheaded-block-5",
+        "unitDigest": "1444111c05c261518780651bd7ca9d59bb69d3259f9401c4cb3ce345c06dcacb",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/README.md",
+        "anchor": "added-in-candidate-verification-and-change-boundary",
+        "unitDigest": "6c3c047ddd7118f92f4b6f66178d3e7a27207c28cd5f04fdf5ed65c718286c54",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/ui-spec/README.md",
+        "anchor": "unheaded-block-6",
+        "unitDigest": "50744c72ca12a2b0a1e8e48d687e6896a71683106ba6839335a1c24eed18a6ad",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/observe/README.md",
+        "anchor": "observe-candidate-area",
+        "unitDigest": "77465e0e15db88b5d1d8dac1ce1231ba1d216f68a2eb5858cf37ec73421909f3",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/observe/README.md",
+        "anchor": "unheaded-block-1",
+        "unitDigest": "aa596f84e9889b939fb625d75af7ba2528f6c8ce1ee38e71f91a200d65f086a7",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/observe/README.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "71fe6fd752cf765de2e06475eb425b9ca31b4bdf11fa49e640673a5d449a3f63",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/observe/README.md",
+        "anchor": "added-in-candidate-read-this-area",
+        "unitDigest": "34161c62c2ea19e74edf97439ec3355b6f90c92bb73a19e1046fecdbdcbd553d",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/observe/README.md",
+        "anchor": "unheaded-block-3",
+        "unitDigest": "aa79c5c0a25c4ae18597a52e583e5abbf7800a64be258063de2ca2cf2e51cdc8",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/observe/README.md",
+        "anchor": "unheaded-block-4",
+        "unitDigest": "405c9b8cdc044b45da153f41f5a453bd20ab4ca00e5f2f169468128b27080999",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/observe/README.md",
+        "anchor": "added-in-candidate-verification-and-change-boundary",
+        "unitDigest": "6c3c047ddd7118f92f4b6f66178d3e7a27207c28cd5f04fdf5ed65c718286c54",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/observe/README.md",
+        "anchor": "unheaded-block-5",
+        "unitDigest": "50744c72ca12a2b0a1e8e48d687e6896a71683106ba6839335a1c24eed18a6ad",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/agent-confinement/README.md",
+        "anchor": "agent-confinement-candidate-area",
+        "unitDigest": "584ec0449e954d60aecf858e8caf68ae54fd6de1ec147b6ae82a0782edab466c",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/agent-confinement/README.md",
+        "anchor": "unheaded-block-1",
+        "unitDigest": "f5a06d91953d474d069c22434c0a6fe8c094ef1e10664fe4331f6032a31f9dcd",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/agent-confinement/README.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "71fe6fd752cf765de2e06475eb425b9ca31b4bdf11fa49e640673a5d449a3f63",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/agent-confinement/README.md",
+        "anchor": "added-in-candidate-read-this-area",
+        "unitDigest": "98de6e3fc59c7639b7482b0e30e2e107e8fe71e24f74c3f91169458a768b4e9e",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/agent-confinement/README.md",
+        "anchor": "unheaded-block-3",
+        "unitDigest": "aa79c5c0a25c4ae18597a52e583e5abbf7800a64be258063de2ca2cf2e51cdc8",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/agent-confinement/README.md",
+        "anchor": "unheaded-block-4",
+        "unitDigest": "71a850db0ee5e616279003738478fcf27c474b3a8289214522dbbd016cf1073c",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/agent-confinement/README.md",
+        "anchor": "added-in-candidate-verification-and-change-boundary",
+        "unitDigest": "6c3c047ddd7118f92f4b6f66178d3e7a27207c28cd5f04fdf5ed65c718286c54",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/agent-confinement/README.md",
+        "anchor": "unheaded-block-5",
+        "unitDigest": "50744c72ca12a2b0a1e8e48d687e6896a71683106ba6839335a1c24eed18a6ad",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "missing-source-registry-gap",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/operations/operator-runbook.md",
+        "anchor": "operator-runbook-herdr-cockpit",
+        "unitDigest": "bd53ab9a9c785423e4a7ad85ef6ccb26b610d762fab9f1ea57b1d031a24b130b",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "carried-forward",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/operations/operator-runbook.md",
+        "anchor": "unheaded-block-1",
+        "unitDigest": "82346049044e6585bcd9ae5058bb3fbce6adfa34acf85a1adeef658f5ccc7e57",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "carried-forward",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/operations/operator-runbook.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "681998fc48ddf2b1a16693b13fde4ce04a93ce726baf676187bb398173d13df2",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "carried-forward",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/operations/operator-runbook.md",
+        "anchor": "prerequisites",
+        "unitDigest": "e8d6cfa1e6531fac7f3d14d6ada936f3597416aae5c79206f2b70201d77f1bdb",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "carried-forward",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/operations/operator-runbook.md",
+        "anchor": "unheaded-block-3",
+        "unitDigest": "d9a42f9c58f800959f042152ba90bf1f2e195c69657e417b42bb2d898ba85b9f",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "carried-forward",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/operations/operator-runbook.md",
+        "anchor": "quick-start",
+        "unitDigest": "cdc96e0555cb882e3bf09d2d4fc8dfd800fc9bcf47b0566cb7385f3285d4c251",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "carried-forward",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/operations/operator-runbook.md",
+        "anchor": "unheaded-block-4",
+        "unitDigest": "39ab65fc3b43b4d0d896c06367658a6b4a69aa5def2ab3b4e5af507c86dc401d",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "carried-forward",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/operations/operator-runbook.md",
+        "anchor": "unheaded-block-5",
+        "unitDigest": "720a4ed3da3b0783cd767ef51cb08d571558c636621171f7067a32d7a6df2a83",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "carried-forward",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/operations/operator-runbook.md",
+        "anchor": "unheaded-block-6",
+        "unitDigest": "2de21bfa3d698bce1908e962df4fb41e2208a9dacedb5bb4d01cc46da7d8bf49",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "carried-forward",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/operations/operator-runbook.md",
+        "anchor": "unheaded-block-7",
+        "unitDigest": "268389d63078c9f133aa5d6324c1e870294e3bca01a4c4cb94b1af8dd5179d31",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "carried-forward",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/operations/operator-runbook.md",
+        "anchor": "what-each-pane-does",
+        "unitDigest": "e0cca48c30c767de1a557525fce7013c8e1f8665bf8a74e68543beb746afae6c",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "carried-forward",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/operations/operator-runbook.md",
+        "anchor": "unheaded-block-8",
+        "unitDigest": "eb07b198b4c01cc50071d1edbd914f51f2304f73d0216560e0da2be1f60fd17f",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "carried-forward",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/operations/operator-runbook.md",
+        "anchor": "hard-rule",
+        "unitDigest": "a22779729ca512e472fb7ab524ba43386c82914904b72dab32b2607010a0de76",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "carried-forward",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/operations/operator-runbook.md",
+        "anchor": "unheaded-block-9",
+        "unitDigest": "df588dc685d48066e0e45d4d7fd6cb05715c66f7763f4be462364d416ffebed2",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "carried-forward",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/operations/operator-runbook.md",
+        "anchor": "unheaded-block-10",
+        "unitDigest": "252e9a74d8d47746c674fdd11cc3073b977cadc33abbf028d7128b55a1e29e86",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "carried-forward",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/operations/operator-runbook.md",
+        "anchor": "multi-operator-use",
+        "unitDigest": "1f668227d2c0fee889ceca2b962ca77213072b9d9dbcb6ad35e9217289186da0",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "carried-forward",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/operations/operator-runbook.md",
+        "anchor": "unheaded-block-11",
+        "unitDigest": "aaca4fa176c972e45193fcaf5d099da837444d6dd5f57bdbedf5df42c6480d52",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "carried-forward",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/operations/operator-runbook.md",
+        "anchor": "concurrent-merge-safety",
+        "unitDigest": "280d43e801ced7aeb5104959f8452af1aae5f2ca90c5b37c698edbcfcecbee8e",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "carried-forward",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/operations/operator-runbook.md",
+        "anchor": "unheaded-block-12",
+        "unitDigest": "fe7b96412a8bbe310e18527da7e60892ffa4f0cd47a9fdf14d4b520b4d6f96a2",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "carried-forward",
+        "provisionalLocalIdentity": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+        "anchor": "file-block",
+        "unitDigest": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+        "fileStatus": "Candidate",
+        "canonical": false,
+        "identityState": "carried-forward",
+        "provisionalLocalIdentity": true
+      }
+    ]
+  },
+  "duplicateGroups": [
+    {
+      "digest": "39a803b85af853156a7029460b132103eac8017b2b1b7eb0b82d181f699b86f3",
+      "members": [
+        {
+          "claimId": "claim_293d81b12e6ce78ccc407ec7ac03faff",
+          "sourcePath": "docs/specs/decision-citation-drift.md",
+          "sourceAnchor": "behaviors-operations",
+          "targetOwner": "docs/platform/decision-citation-drift/spec.md",
+          "targetAnchor": "behaviors-operations"
+        },
+        {
+          "claimId": "claim_3ec4250ed3c32495b43a85a96c5cff70",
+          "sourcePath": "docs/specs/fgos-plugin.md",
+          "sourceAnchor": "behaviors-operations",
+          "targetOwner": "docs/platform/claude-plugin/spec.md",
+          "targetAnchor": "behaviors-operations"
+        }
+      ],
+      "status": "pending independent contextual exception review",
+      "rationale": "Shared heading-only Behaviors & Operations has different area subjects and different child operations. Preserve contextual owners per the frozen area map; do not treat the plugin behavior section as citation-check behavior or the converse."
+    }
+  ]
+}

@@ -1,0 +1,327 @@
+{
+  "version": 1,
+  "shard": "s8-decision-citation-drift-01.json",
+  "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+  "authorshipRequired": true,
+  "sources": [
+    "docs/specs/decision-citation-drift.md"
+  ],
+  "files": [
+    {
+      "path": "docs/specs/decision-citation-drift.md",
+      "disposition": "move",
+      "rationale": "Frozen specs-ui map and Step 8: preserve docs/specs/decision-citation-drift.md verbatim in docs/platform/decision-citation-drift/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement.",
+      "targets": [
+        "docs/platform/decision-citation-drift/spec.md"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "claimId": "claim_e20f7ff7ebbd47f4699edd6198797231",
+      "sourceUnitDigest": "3893aff63d9705062d55c666da7760e16657cf2d144d1f702329a14948f64630",
+      "targetOwner": "docs/platform/decision-citation-drift/spec.md",
+      "targetAnchor": "unheaded-block-1",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-preamble unit docs/specs/decision-citation-drift.md#unheaded-block-1 (source lines 1-7) is carried at docs/platform/decision-citation-drift/spec.md#unheaded-block-1 (candidate lines 1-7). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/decision-citation-drift.md verbatim in docs/platform/decision-citation-drift/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "3893aff63d9705062d55c666da7760e16657cf2d144d1f702329a14948f64630",
+      "targetAncestry": []
+    },
+    {
+      "claimId": "claim_f8a80ce657505415a0cf4bdcbb8b1a82",
+      "sourceUnitDigest": "e8b9eb660b5d8258804095e0c6b41a1fee95ab12030b93890f7deaba3ec9bf12",
+      "targetOwner": "docs/platform/decision-citation-drift/spec.md",
+      "targetAnchor": "spec-decision-citation-drift-check",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Judgment: no target digest match. The whole heading unit docs/specs/decision-citation-drift.md#spec-decision-citation-drift-check (source lines 9-9) is carried at docs/platform/decision-citation-drift/spec.md#spec-decision-citation-drift-check (candidate lines 9-9). The heading section digest changes because labelled candidate metadata is inserted after the original H1; original heading and direct source payload remain verbatim. Frozen specs-ui map and Step 8: preserve docs/specs/decision-citation-drift.md verbatim in docs/platform/decision-citation-drift/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "220c53cff76e8336290a335d8577e7bae5cc8394d137253ed17eb5956477d5ae",
+      "targetAncestry": []
+    },
+    {
+      "claimId": "claim_799091fae7d0b1a35a7053b22b43d065",
+      "sourceUnitDigest": "408313efba87b25d55682f602abb76cc4728e6be0c0866bb434e7c027c0ce19e",
+      "targetOwner": "docs/platform/decision-citation-drift/spec.md",
+      "targetAnchor": "unheaded-block-4",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/decision-citation-drift.md#unheaded-block-2 (source lines 11-18) is carried at docs/platform/decision-citation-drift/spec.md#unheaded-block-4 (candidate lines 33-40). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/decision-citation-drift.md verbatim in docs/platform/decision-citation-drift/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "408313efba87b25d55682f602abb76cc4728e6be0c0866bb434e7c027c0ce19e",
+      "targetAncestry": [
+        "Spec: Decision Citation Drift Check"
+      ]
+    },
+    {
+      "claimId": "claim_4302bf09de5db8e70b5486c8bf75207b",
+      "sourceUnitDigest": "c9fa0bb4f0fef1f62d90ca25359f7fc35f704628fe89c456c5f8517f8f84c2f0",
+      "targetOwner": "docs/platform/decision-citation-drift/spec.md",
+      "targetAnchor": "entry-points-triggers",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/decision-citation-drift.md#entry-points-triggers (source lines 20-20) is carried at docs/platform/decision-citation-drift/spec.md#entry-points-triggers (candidate lines 42-42). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/decision-citation-drift.md verbatim in docs/platform/decision-citation-drift/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "c9fa0bb4f0fef1f62d90ca25359f7fc35f704628fe89c456c5f8517f8f84c2f0",
+      "targetAncestry": [
+        "Spec: Decision Citation Drift Check"
+      ]
+    },
+    {
+      "claimId": "claim_3556818f023663dfcad72a90b7782e02",
+      "sourceUnitDigest": "8914cbc1229686fc16ddda1dbde86708ac60615b0b313050b59e740ef45f8e9c",
+      "targetOwner": "docs/platform/decision-citation-drift/spec.md",
+      "targetAnchor": "unheaded-block-5",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/decision-citation-drift.md#unheaded-block-3 (source lines 22-27) is carried at docs/platform/decision-citation-drift/spec.md#unheaded-block-5 (candidate lines 44-49). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/decision-citation-drift.md verbatim in docs/platform/decision-citation-drift/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "8914cbc1229686fc16ddda1dbde86708ac60615b0b313050b59e740ef45f8e9c",
+      "targetAncestry": [
+        "Spec: Decision Citation Drift Check",
+        "Entry Points & Triggers"
+      ]
+    },
+    {
+      "claimId": "claim_aef792d407cb3aa4c3eba1a859948b92",
+      "sourceUnitDigest": "f327b12e6765878263e7c6ff7a5d9c1cf5171fa017c71b3a0e24b2e59044eea7",
+      "targetOwner": "docs/platform/decision-citation-drift/spec.md",
+      "targetAnchor": "data-dictionary",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/decision-citation-drift.md#data-dictionary (source lines 29-29) is carried at docs/platform/decision-citation-drift/spec.md#data-dictionary (candidate lines 51-51). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/decision-citation-drift.md verbatim in docs/platform/decision-citation-drift/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "f327b12e6765878263e7c6ff7a5d9c1cf5171fa017c71b3a0e24b2e59044eea7",
+      "targetAncestry": [
+        "Spec: Decision Citation Drift Check"
+      ]
+    },
+    {
+      "claimId": "claim_7e425277fb658644e211d3a6ba18f5c5",
+      "sourceUnitDigest": "ddc10a212e811df7dfee1b3c902aa0417b08473aad551911cc5e52a0a2dc2ff8",
+      "targetOwner": "docs/platform/decision-citation-drift/spec.md",
+      "targetAnchor": "unheaded-block-6",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/decision-citation-drift.md#unheaded-block-4 (source lines 31-37) is carried at docs/platform/decision-citation-drift/spec.md#unheaded-block-6 (candidate lines 53-59). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/decision-citation-drift.md verbatim in docs/platform/decision-citation-drift/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "ddc10a212e811df7dfee1b3c902aa0417b08473aad551911cc5e52a0a2dc2ff8",
+      "targetAncestry": [
+        "Spec: Decision Citation Drift Check",
+        "Data Dictionary"
+      ]
+    },
+    {
+      "claimId": "claim_293d81b12e6ce78ccc407ec7ac03faff",
+      "sourceUnitDigest": "39a803b85af853156a7029460b132103eac8017b2b1b7eb0b82d181f699b86f3",
+      "targetOwner": "docs/platform/decision-citation-drift/spec.md",
+      "targetAnchor": "behaviors-operations",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/decision-citation-drift.md#behaviors-operations (source lines 39-39) is carried at docs/platform/decision-citation-drift/spec.md#behaviors-operations (candidate lines 61-61). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/decision-citation-drift.md verbatim in docs/platform/decision-citation-drift/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "39a803b85af853156a7029460b132103eac8017b2b1b7eb0b82d181f699b86f3",
+      "targetAncestry": [
+        "Spec: Decision Citation Drift Check"
+      ]
+    },
+    {
+      "claimId": "claim_8ab66349995ddbb61028b6220f2e1efa",
+      "sourceUnitDigest": "eaa622ae3f4ba7bcc253b063673b258f543583b8132c6458b4beaf2e4e2c25f5",
+      "targetOwner": "docs/platform/decision-citation-drift/spec.md",
+      "targetAnchor": "run-citation-drift-scan",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/decision-citation-drift.md#run-citation-drift-scan (source lines 41-41) is carried at docs/platform/decision-citation-drift/spec.md#run-citation-drift-scan (candidate lines 63-63). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/decision-citation-drift.md verbatim in docs/platform/decision-citation-drift/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "eaa622ae3f4ba7bcc253b063673b258f543583b8132c6458b4beaf2e4e2c25f5",
+      "targetAncestry": [
+        "Spec: Decision Citation Drift Check",
+        "Behaviors & Operations"
+      ]
+    },
+    {
+      "claimId": "claim_98824ede2fb41b178a6a92aed5591b28",
+      "sourceUnitDigest": "587dc1ed801795c039c0cf635242d774809fdd15591993e049f779d4cd523121",
+      "targetOwner": "docs/platform/decision-citation-drift/spec.md",
+      "targetAnchor": "unheaded-block-7",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/decision-citation-drift.md#unheaded-block-5 (source lines 43-51) is carried at docs/platform/decision-citation-drift/spec.md#unheaded-block-7 (candidate lines 65-73). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/decision-citation-drift.md verbatim in docs/platform/decision-citation-drift/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "587dc1ed801795c039c0cf635242d774809fdd15591993e049f779d4cd523121",
+      "targetAncestry": [
+        "Spec: Decision Citation Drift Check",
+        "Behaviors & Operations",
+        "Run citation-drift scan"
+      ]
+    },
+    {
+      "claimId": "claim_69cda08aab2b0c3dadce7df3298cbe89",
+      "sourceUnitDigest": "7759adf4c9dcd9a1639bf350678d4d485ee698e66811a75de699bbcfe31bd396",
+      "targetOwner": "docs/platform/decision-citation-drift/spec.md",
+      "targetAnchor": "actors-access",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/decision-citation-drift.md#actors-access (source lines 53-53) is carried at docs/platform/decision-citation-drift/spec.md#actors-access (candidate lines 75-75). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/decision-citation-drift.md verbatim in docs/platform/decision-citation-drift/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "7759adf4c9dcd9a1639bf350678d4d485ee698e66811a75de699bbcfe31bd396",
+      "targetAncestry": [
+        "Spec: Decision Citation Drift Check"
+      ]
+    },
+    {
+      "claimId": "claim_5176afd2c7a6b5cf980c6ea133419f9e",
+      "sourceUnitDigest": "fa66523b9149930dae2c9cbeb4d5dbfb5559e8ec842310f86505af1c0ae0ea54",
+      "targetOwner": "docs/platform/decision-citation-drift/spec.md",
+      "targetAnchor": "unheaded-block-8",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/decision-citation-drift.md#unheaded-block-6 (source lines 55-59) is carried at docs/platform/decision-citation-drift/spec.md#unheaded-block-8 (candidate lines 77-81). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/decision-citation-drift.md verbatim in docs/platform/decision-citation-drift/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "fa66523b9149930dae2c9cbeb4d5dbfb5559e8ec842310f86505af1c0ae0ea54",
+      "targetAncestry": [
+        "Spec: Decision Citation Drift Check",
+        "Actors & Access"
+      ]
+    },
+    {
+      "claimId": "claim_8b1b71aab191aac54f12d37fccebc856",
+      "sourceUnitDigest": "bd420c8f19c3d9aea688e4987228171062ce0af9bd385d9d85fd25e424f81c63",
+      "targetOwner": "docs/platform/decision-citation-drift/spec.md",
+      "targetAnchor": "business-rules",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/decision-citation-drift.md#business-rules (source lines 61-61) is carried at docs/platform/decision-citation-drift/spec.md#business-rules (candidate lines 83-83). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/decision-citation-drift.md verbatim in docs/platform/decision-citation-drift/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "bd420c8f19c3d9aea688e4987228171062ce0af9bd385d9d85fd25e424f81c63",
+      "targetAncestry": [
+        "Spec: Decision Citation Drift Check"
+      ]
+    },
+    {
+      "claimId": "claim_e26e9f5cc87f216bf7a4144f6a2fd62a",
+      "sourceUnitDigest": "99281802ea8714ea8170f59bd553f0b307f603a746c6596110379cea0b5b1adc",
+      "targetOwner": "docs/platform/decision-citation-drift/spec.md",
+      "targetAnchor": "unheaded-block-9",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/decision-citation-drift.md#unheaded-block-7 (source lines 63-73) is carried at docs/platform/decision-citation-drift/spec.md#unheaded-block-9 (candidate lines 85-95). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/decision-citation-drift.md verbatim in docs/platform/decision-citation-drift/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "99281802ea8714ea8170f59bd553f0b307f603a746c6596110379cea0b5b1adc",
+      "targetAncestry": [
+        "Spec: Decision Citation Drift Check",
+        "Business Rules"
+      ]
+    },
+    {
+      "claimId": "claim_1564e054266b55377f35a78418057318",
+      "sourceUnitDigest": "01746da465cdcc5164e7031e314f9845dff72913f6118b480a75078f2c173ccb",
+      "targetOwner": "docs/platform/decision-citation-drift/spec.md",
+      "targetAnchor": "edge-cases-settled",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/decision-citation-drift.md#edge-cases-settled (source lines 75-75) is carried at docs/platform/decision-citation-drift/spec.md#edge-cases-settled (candidate lines 97-97). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/decision-citation-drift.md verbatim in docs/platform/decision-citation-drift/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "01746da465cdcc5164e7031e314f9845dff72913f6118b480a75078f2c173ccb",
+      "targetAncestry": [
+        "Spec: Decision Citation Drift Check"
+      ]
+    },
+    {
+      "claimId": "claim_2cba8bb652aeb76ce0ab3c0317c39a6b",
+      "sourceUnitDigest": "590a6241c63ec4da994d248188f60056371d9051dcbd657d8ff59335dd382b60",
+      "targetOwner": "docs/platform/decision-citation-drift/spec.md",
+      "targetAnchor": "unheaded-block-10",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/decision-citation-drift.md#unheaded-block-8 (source lines 77-87) is carried at docs/platform/decision-citation-drift/spec.md#unheaded-block-10 (candidate lines 99-109). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/decision-citation-drift.md verbatim in docs/platform/decision-citation-drift/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "590a6241c63ec4da994d248188f60056371d9051dcbd657d8ff59335dd382b60",
+      "targetAncestry": [
+        "Spec: Decision Citation Drift Check",
+        "Edge Cases Settled"
+      ]
+    },
+    {
+      "claimId": "claim_10e84e63af173981738360d779c8039b",
+      "sourceUnitDigest": "2feb5276d5dc970b753498733b260a49392fe2200c9d02aaa915e5ed51cdd86d",
+      "targetOwner": "docs/platform/decision-citation-drift/spec.md",
+      "targetAnchor": "open-gaps",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/decision-citation-drift.md#open-gaps (source lines 89-89) is carried at docs/platform/decision-citation-drift/spec.md#open-gaps (candidate lines 111-111). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/decision-citation-drift.md verbatim in docs/platform/decision-citation-drift/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "2feb5276d5dc970b753498733b260a49392fe2200c9d02aaa915e5ed51cdd86d",
+      "targetAncestry": [
+        "Spec: Decision Citation Drift Check"
+      ]
+    },
+    {
+      "claimId": "claim_231e775c29956a4a2a776810cc12a935",
+      "sourceUnitDigest": "7a22bf47723aee067c9ee720b0fc8d75121b13f4aeb9aa8ed233d20da9c93500",
+      "targetOwner": "docs/platform/decision-citation-drift/spec.md",
+      "targetAnchor": "unheaded-block-11",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/decision-citation-drift.md#unheaded-block-9 (source lines 91-96) is carried at docs/platform/decision-citation-drift/spec.md#unheaded-block-11 (candidate lines 113-118). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/decision-citation-drift.md verbatim in docs/platform/decision-citation-drift/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "7a22bf47723aee067c9ee720b0fc8d75121b13f4aeb9aa8ed233d20da9c93500",
+      "targetAncestry": [
+        "Spec: Decision Citation Drift Check",
+        "Open Gaps"
+      ]
+    },
+    {
+      "claimId": "claim_fefb1bf47fc375b9e83089dc6059326c",
+      "sourceUnitDigest": "95e71b5dfa80858cdc6300b28de97966fb7de22d77bdba919c47ad7c9b81d32f",
+      "targetOwner": "docs/platform/decision-citation-drift/spec.md",
+      "targetAnchor": "pointers-implementation",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/decision-citation-drift.md#pointers-implementation (source lines 98-98) is carried at docs/platform/decision-citation-drift/spec.md#pointers-implementation (candidate lines 120-120). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/decision-citation-drift.md verbatim in docs/platform/decision-citation-drift/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "95e71b5dfa80858cdc6300b28de97966fb7de22d77bdba919c47ad7c9b81d32f",
+      "targetAncestry": [
+        "Spec: Decision Citation Drift Check"
+      ]
+    },
+    {
+      "claimId": "claim_4966e71788ccddf622cb3c79fa20b4ec",
+      "sourceUnitDigest": "b2c59c202dc6de42a01a6cec95a4aeca692960350aee8e0f37198a01c736dacd",
+      "targetOwner": "docs/platform/decision-citation-drift/spec.md",
+      "targetAnchor": "unheaded-block-12",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/decision-citation-drift.md#unheaded-block-10 (source lines 100-115) is carried at docs/platform/decision-citation-drift/spec.md#unheaded-block-12 (candidate lines 122-137). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/decision-citation-drift.md verbatim in docs/platform/decision-citation-drift/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "targetUnitDigest": "b2c59c202dc6de42a01a6cec95a4aeca692960350aee8e0f37198a01c736dacd",
+      "targetAncestry": [
+        "Spec: Decision Citation Drift Check",
+        "Pointers (implementation)"
+      ]
+    }
+  ]
+}

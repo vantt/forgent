@@ -1,0 +1,23 @@
+# UI Spec configuration — herdr web dashboard
+#
+# Product source of truth: docs/specs/herdr-web-dashboard.md (tsk-54j).
+# This spec adds the interaction/layout layer only; it never re-decides a
+# product question the area spec already settled.
+
+project: herdrweb
+contract_tag: herdrweb-contract
+entry_surface: S01
+platforms: [desktop, mobile]
+
+surface_dirs:
+  - screens
+  - modals
+  - components
+  - flows
+
+cross_cutting:
+  - 20-domain-rules.md
+  - 15-system-events.md
+
+extra_triggers: []
+extra_actions: []

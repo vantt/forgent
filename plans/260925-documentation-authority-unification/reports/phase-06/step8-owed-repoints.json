@@ -1,0 +1,3696 @@
+{
+  "version": 1,
+  "sourceCommit": "111adc51fd047d99121fd9d076eb4794c87045a4",
+  "rules": [
+    "P3",
+    "Step 10 link pass",
+    "A19/A28",
+    "Lead decision 2 and 4"
+  ],
+  "toolRoot": {
+    "path": "docs/ui-spec",
+    "generator": ".claude/skills/ui-spec/tools",
+    "requiredLayout": [
+      "spec.config.yaml",
+      "schema/",
+      "screens/",
+      "modals/",
+      "components/",
+      "flows/"
+    ],
+    "owed": "Before promotion, repoint tool root to a working layout or retain docs/ui-spec as the tool root. Candidate layout alone is not a functioning replacement.",
+    "owner": "UI tool and promotion/navigation owner",
+    "references": [
+      {
+        "path": ".claude/skills/ui-spec/SKILL.md",
+        "line": 20,
+        "text": "### `generate <prd-path> [--output docs/ui-spec]`",
+        "action": "Verify tool root/default and repoint only after layout decision; no generated skill edits here."
+      },
+      {
+        "path": ".claude/skills/ui-spec/SKILL.md",
+        "line": 31,
+        "text": "### `init <project-name> [--output docs/ui-spec]`",
+        "action": "Verify tool root/default and repoint only after layout decision; no generated skill edits here."
+      },
+      {
+        "path": ".claude/skills/ui-spec/SKILL.md",
+        "line": 36,
+        "text": "docs/ui-spec/",
+        "action": "Verify tool root/default and repoint only after layout decision; no generated skill edits here."
+      },
+      {
+        "path": ".claude/skills/ui-spec/SKILL.md",
+        "line": 246,
+        "text": "6. **Run `npm run check`** (= validate + build) from `docs/ui-spec/tools/`. Fix every error:",
+        "action": "Verify tool root/default and repoint only after layout decision; no generated skill edits here."
+      },
+      {
+        "path": ".claude/skills/ui-spec/CONVENTION.md",
+        "line": 173,
+        "text": "cd docs/ui-spec/tools",
+        "action": "Verify tool root/default and repoint only after layout decision; no generated skill edits here."
+      },
+      {
+        "path": ".claude/skills/ui-spec/tools/config.mjs",
+        "line": 39,
+        "text": "      \"  Example: node validate.mjs --root ./docs/ui-spec\"",
+        "action": "Verify tool root/default and repoint only after layout decision; no generated skill edits here."
+      },
+      {
+        "path": ".claude/skills/ui-spec/tools/wireframe/verify-runtime.mjs",
+        "line": 14,
+        "text": "const HTML_PATH = resolve(__dir, \"../../../../../frontend/docs/ui-spec/generated/wireframe-v2.html\");",
+        "action": "Verify tool root/default and repoint only after layout decision; no generated skill edits here."
+      },
+      {
+        "path": "docs/generated/README.md",
+        "line": 31,
+        "text": "| `docs/ui-spec/generated/**` | UI spec build tooling |",
+        "action": "Retain generated declaration and legacy generated output paths."
+      }
+    ]
+  },
+  "references": [
+    {
+      "path": "docs/architect/documentation-system-discussion.md",
+      "line": 740,
+      "text": "- `docs/specs/confinement-authority.md` has strong structure:",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "src/setup/registrations.mjs",
+      "line": 5175,
+      "text": "// ─── Confinement Authority (Phase 01 R7, docs/specs/confinement-authority.md) ─",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+      "line": 5905,
+      "text": "    \"docs/specs/confinement-authority.md\": {",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
+      "line": 207,
+      "text": "      \"path\": \"docs/specs/confinement-authority.md\",",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/reference/dispatch-module-boundaries.md",
+      "line": 27,
+      "text": "| `dispatch/confinement/` | Confinement Authority subcomponent: one-door runtime execution wrapper (`executeThroughConfinement`), request builder, plan compiler, policy normalizer, backend registry and drivers (local `bwrap` v1 with 8 falsification probes), attestation generator, and evidence store. See `docs/specs/confinement-authority.md`. |",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/architecture-map.md",
+      "line": 372,
+      "text": "| **CTR010** | dispatch ↔ executor adapter | `confinement-authority.v1`: một cửa runtime duy nhất `executeThroughConfinement(request, adapterPort)` trước khi adapter được spawn agent; chuẩn hóa `confinement-policy.v1`, compile `confinement-plan.v1`, đối chiếu năng lực backend driver (`bwrap` v1 với 8 falsification probes), fail-closed cho `required`, cấm bypass thiếu full confinement, và phát `confinement-attestation.v1` bền | **live** | `src/runner/dispatch/confinement/` · spec `docs/specs/confinement-authority.md` |",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/transitional-switchboard.md",
+      "line": 59,
+      "text": "| Agent confinement | legacy-current | maintained-authority | `docs/specs/confinement-authority.md` | `src/runner/dispatch/confinement/**` | Spec owns runtime confinement contract, machine backend registry, and driver rules; verified by test suite. |",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/routing-handoff-contract.md",
+      "line": 88,
+      "text": "  trong `inputs/` của thư mục đó) và bị từ chối chạy nếu không thực thi được (`docs/specs/confinement-authority.md` §9.2).",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/how-to/configure-and-operate-agent-confinement.md",
+      "line": 264,
+      "text": "A Unit (or Workflow unit template) with `blind: true` runs every role with `hostRead: blind`: the worker cannot read a peer's run state (`.fgos/assignments`, `.fgos/workflow-runs`, `.fgos/dispatch-runs`), the herdr socket directory, another dispatch's private home or process list. It still reads the repo, tracked `.fgos` files and `node`, reads its own assignment directory (read-only) and writes its outbox. Blind needs a working bwrap backend and a fresh blind probe; otherwise the unit is refused, never run unblind. Inputs that live in the hidden run state (`unit-run:` and `gate-answer:` inputs, a panel synthesizer's panelist reports) reach each blind role as byte-identical copies in `inputs/` of its own assignment directory, neutral names (`seat-A`) with `anonymizeInputs`; a source that changed since it settled refuses the unit. The `delphi`, `nominal-group` and `group-cognition` panel steps that must not see each other run blind. Check readiness with the `confinement-blind-read` row of `fgos doctor`. Details: `docs/specs/confinement-authority.md` §9.2.",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "test/runner/dispatch-confinement-p04.test.mjs",
+      "line": 3,
+      "text": "// Spec: docs/specs/confinement-authority.md, plans/.../phase-04-required-enforcement-and-executor-migration.md",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "test/runner/dispatch-confinement-p05.test.mjs",
+      "line": 3,
+      "text": "// Spec: docs/specs/confinement-authority.md, plans/.../phase-05-herdr-and-legacy-convergence.md",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "src/runner/dispatch/confinement/request.mjs",
+      "line": 2,
+      "text": "// (Phase 02 R1-R2, docs/specs/confinement-authority.md §6.4, §6.10).",
+      "reason": "Section-number citation inherits this module’s confinement spec binding",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "src/runner/dispatch/confinement/backend-registry.mjs",
+      "line": 2,
+      "text": "// for confinement-backend-registry.v1 (Phase 01 R5, docs/specs/confinement-authority.md §6.2-§6.2.1).",
+      "reason": "Section-number citation inherits this module’s confinement spec binding",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "src/runner/dispatch/confinement/authority.mjs",
+      "line": 2,
+      "text": "// (Phase 02 R1-R7, docs/specs/confinement-authority.md §1, §5.2, §6.6, §6.9).",
+      "reason": "Section-number citation inherits this module’s confinement spec binding",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/specs/runner.md",
+      "line": 1026,
+      "text": "  Selection evidence là Run-owned (`provider-capacity-selection.json`, effective execution contract/evidence) và chỉ được persist dạng redacted: provider, account id/label, lease owner, reason codes/quarantine state, `credentialProvisioned`; không persist credential home path, env values, token, `auth.json` bytes, raw digest/SHA-256. Provisioning của invocation bwrap (cli-spawn và herdr-spawn) dùng selected account `credentialSource` để copy vào private home trước spawn — kind `codex-home` copy `auth.json` vào private `CODEX_HOME`, kind `home-files` (`files`: danh sách đường dẫn tương đối, không `..`) copy đúng các file đó vào private home của agent khác (pi, agy), owner-only, giữ exec bit của helper; inventory vẫn chỉ ở `~/.fgos/config.json`, và pane herdr confine dựa vào nó để khởi động đã đăng nhập (`docs/specs/confinement-authority.md` §13.1, doctor `confined-pane-accounts`); mất/không đọc/copy lỗi thì fail closed trước spawn với class credential-provisioning/config, không quarantine account, không bind-mount real Codex home, và không còn dùng `FGOS_CODEX_CREDENTIAL_HOMES` hash rotation hay executor-id allowlist làm authority placement.",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/specs/runner.md",
+      "line": 1093,
+      "text": "- **RUL77 ([ĐÃ BỊ THAY phần \"each door carries one posture lane\" bởi RUL90 (the raw dispatch doors are removed), decision 0062 — posture now comes from the Unit's `writes` plus the capability; \"an agent executor declares no `for`\" stands] posture belongs to the capability, an agent executor declares no `for`, and each door carries one posture lane; supersedes RUL76 (`execute <id> --for <capability>` with a \"must declare\" gate), 2026-10-13).** An agent executor can do any kind of work, so no `for` list describes it, and a list on one was read as the posture of every dispatch to it (`docs/specs/confinement-authority.md` already said a direct executor call must carry a capability anchor and never infer the minimum from `executor.for`). `resolveCapabilityDetailsFromHints` reads `for` from tool executors only; on an agent executor it is inert (config still loads, so projects and worktrees that carry one keep dispatching) and `fgos doctor` names it under `executor-profile-warnings` (`executor.<id>.agent-for-inert`); the agent executors' `for` lists are gone from this repo's `.fgos/config.json` (`decide --for` routing unchanged: it reads `capabilities.<name>.prefer`). The CLI door `execute <agent>` refuses before spawning when no `--for` is given (`capability-required`, listing the writing capabilities and the read-only door); programmatic callers (Assignment, Work) pass their own capability hints and are unchanged. `execute <agent> --for <capability>` runs the invocation that capability `prefer`s for that executor, else the first plain cli invocation with no sandbox backend, instead of always the first cli invocation. That door leases no provider account, so it carries writing work only: a capability with required confinement is refused (`posture-needs-assignment`). Read-only work runs sandboxed as a Workflow unit with `writes: []` (`fgos workflow start --units`), which binds the read-only posture and leases the account (the architecture-advisory seats ran that way: `confined-bwrap`, login provisioned); `execute --contract <file> --executor <id>` keeps a named provider and leases its account but runs unconfined, read-only by instruction only (measured: `execute openai --for code:review` on the bare door ran `codex-cli-bwrap` confined and got 401 with no login; the same read through `--contract --executor openai` answered, on `cli-spawn` with `confinement: null`). A sandboxed read-only door that also keeps a named provider does not exist yet. The calling agent answers Q1 (does it write? does a provider matter?) from prose doctrine in `core/skills/_shared/capability-matching.md`, with no classifier or workflow generator. Decided after an `architecture-advisory` run (`wf-run-1791875339761-10315b91`: framing and shaping with three blind seats and a synthesizer completed; critique was blocked by a Codex trust prompt, so no reviewed synthesis exists). Not built: a soft provider hint on `decide` (`--prefer`, the synthesizer's recommendation) — naming the executor on `execute` already lets a caller pick a provider, and the hint would change `bind()`, shared with Workflow binding; revisit when a caller needs \"this provider if it can, else any\". Since 2026-10-14 (RUL88 (ad-hoc Unit prefer and persona, the one-liner), decision 0061) that hint exists on the Unit, not on `decide`: `fgos run \"<prompt>\" --provider <id>` and an ad-hoc Unit's `prefer` try the provider first and fail over into the pool, and a read-only one-liner is the sandboxed read-only door that keeps a preferred provider.",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/specs/runner.md",
+      "line": 1495,
+      "text": "**Vai mù thật sự (`blind`) — chặn đọc run state của peer.** Mặc định tắt (không đổi hành vi). Một cờ ở Unit (và ở `template` của Workflow): `blind: true` làm *mọi vai* của Unit chạy với `hostRead: blind` (`docs/specs/confinement-authority.md` §9.2): worker không đọc được `.fgos/assignments`, `.fgos/workflow-runs`, `.fgos/dispatch-runs` của project, thư mục socket herdr, private home của dispatch khác, hay `/proc/<pid>` của tiến trình anh em; chỉ đọc được thư mục của chính nó (brief, ref đã được trao — chỉ-đọc) và ghi outbox. Phần còn lại của host (repo, `node`, DNS) và file tracked trong `.fgos` không đổi. Unit `blind` không bao giờ chạy không-blind: nếu không thực thi được — `bind()` không chọn in-process/inline, không có bwrap, mode không `required`, probe hỏng/chưa tươi, `cwd` hay ref nằm trong vùng bị che — dispatch bị từ chối trước khi spawn với lý do có tên (`blind-in-process`, `blind-requires-confinement`, `blind-hides-workspace`, `blind-ref-hidden`, `confinement-probe-failed`, ...). Với Unit `blind`, input `unit-run:`/`gate-answer:` (và ref bất kỳ nằm trong vùng bị che) không được giao bằng đường dẫn gốc: lúc dispatch, `resolveUnitInputs` + `copyHandoffsInto` chép nguyên byte (kiểm sha256) vào `inputs/` của round dir của chính vai đó, mỗi vai một bản, tên trung tính khi có `anonymizeInputs`; `unit.json` giữ `inputMap`, resume dùng lại bản chép. `blind-ref-hidden` chỉ còn cho ref không chép được. Workflow bật `blind`: hai bước panel của `delphi` (`propose-round-1`, `propose-round-2`), `generate-ideas` của `nominal-group`, `sense-making-panel` của `group-cognition`, `shaping` của `architecture-advisory` (`core/workflows/architecture-advisory.yaml`) và `perspectives` của `business-discussion` (`core/workflows/business-discussion.yaml`).",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/specs/runner.md",
+      "line": 3142,
+      "text": "  4. **Pane confine cho cả năm họ** (claude, claude qua OpenRouter, codex, agy, pi): mỗi agent giữ state trong private home dựng từ account được lease; công thức và lý do ở [confinement-authority.md §13.1](./confinement-authority.md), account inventory toàn máy ở RUL65b (trên).",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/specs/reading-map.md",
+      "line": 39,
+      "text": "- `docs/specs/confinement-authority.md` + `src/runner/dispatch/confinement/` — Agent Confinement Authority: runtime one-door confinement enforcement (`executeThroughConfinement`), machine backend registry `~/.fgos/confinement-backends.json`, local `bwrap` v1 driver with 8 falsification probes, required fail-closed checks, attestation storage (`confinement-attestation.v1`), herdr convergence with shared `evaluateBypassPairing`, setup defaults and doctor checks; spec: docs/specs/confinement-authority.md Pane herdr confine cho agent không phải claude (codex/agy/pi): công thức private-home + account inventory + lịch sử các commit đã đi qua (và vì sao từng bị quên) ở §13.1.",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "src/runner/dispatch/confinement/policies.mjs",
+      "line": 2,
+      "text": "// validation, and legacy normalization (Phase 01 R1-R4, docs/specs/confinement-authority.md §6.1-§6.2).",
+      "reason": "Section-number citation inherits this module’s confinement spec binding",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/confinement-authority-implementation/merge-to-main.md",
+      "line": 95,
+      "text": "  limitation (`docs/specs/confinement-authority.md` already states host",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/confinement-authority-implementation/merge-to-main.md",
+      "line": 147,
+      "text": "  documented in `docs/specs/confinement-authority.md`, not a regression).",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/confinement-authority-implementation/P07.md",
+      "line": 42,
+      "text": "| `--p07` | Produce | Doer (op_083, `agy-herdr`) executed R1-R7: recorded the R1 decision above, updated `docs/specs/confinement-authority.md`/`runner.md`/`distribution.md`, wrote a new `docs/how-to/configure-and-operate-agent-confinement.md`, updated `CHANGELOG.md`, ran the FULL test suite (not the focused subset used by prior phases), and produced a closeout report. Committed as `fbff7630`. The orchestrating CLI was killed by system memory pressure (the 4th such incident this session) immediately after the Doer settled — recovered via the established detached-pane pattern, result read directly from `outbox/`. |",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/confinement-authority-implementation/P07.md",
+      "line": 43,
+      "text": "| `--p07` (continuation, review) | Review | Reviewer (op_084, `claude-reviewer-herdr`) independently confirmed R1's decision is correct in source, and independently re-ran the full suite (6076/6064 pass/4 fail/8 skip, every failure mapped to a documented finding). But it did NOT rubber-stamp the docs deliverables: found **2 real HIGH** — the closeout report's own deferral register was fabricated (it re-labeled the four already-CLOSED fail-open paths F-a..F-d as invented open items, cited a nonexistent \"herdr-native driver\", and omitted ~20 real documented open deferrals from P01-P04) and `confinement-authority.md` overclaimed that the 3 bwrap executors migrated to live backend references, when P04.md's own R4 says that migration was fixture-scoped only — a direct violation of this phase's own \"do not overclaim bwrap\" requirement, the same no-overclaim theme recurring across this entire track. Plus 5 MEDIUM (3 how-to code samples that fail against the REAL shipped validators — an operator copying them would get errors; wrong attestation-channel vocabulary in `runner.md`; uncited closeout claims) and 6 LOW. |",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/confinement-authority-implementation/P07.md",
+      "line": 62,
+      "text": "| R2 | `docs/specs/confinement-authority.md`, `runner.md`, `distribution.md` updated with settled facts, corrected through 2 fix rounds to remove overclaims | satisfied |",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/confinement-authority-implementation/P00.md",
+      "line": 41,
+      "text": "| R1 | Report §R1, sourced from `docs/specs/confinement-authority.md` §9/§9.1; verified by 3 independent review passes | satisfied |",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/confinement-authority-implementation/P00.md",
+      "line": 56,
+      "text": "- Spec §2's stale `0/17` denominator (`docs/specs/confinement-authority.md:59`, should read `0/18`) — substance correct, only the count is stale; outside P00's lease, a P07 (docs-closeout) item.",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+      "line": 5911,
+      "text": "    \"docs/specs/decision-citation-drift.md\": {",
+      "source": "docs/specs/decision-citation-drift.md",
+      "targetCandidates": [
+        "docs/platform/decision-citation-drift/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/transitional-switchboard.md",
+      "line": 63,
+      "text": "| Decision citation drift | legacy-current | maintained-authority | `docs/specs/decision-citation-drift.md` | `scripts/check-decision-citation-drift.mjs` | Spec owns citation drift detection invariants and baseline ratchet rules. |",
+      "source": "docs/specs/decision-citation-drift.md",
+      "targetCandidates": [
+        "docs/platform/decision-citation-drift/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/specs/system-overview.md",
+      "line": 21,
+      "text": "- decision-citation-drift — quét backlog/spec tìm dòng còn trích một quyết định đã bị supersede mà không nhắc quyết định thay thế (chỉ phát hiện, không tự sửa); spec: decision-citation-drift.md",
+      "source": "docs/specs/decision-citation-drift.md",
+      "targetCandidates": [
+        "docs/platform/decision-citation-drift/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/specs/work-state.md",
+      "line": 1361,
+      "text": "- Test: `npm test` (`node --test 'test/**/*.test.mjs'`); e2e tại `test/e2e/rebuild-determinism.test.mjs` + `test/e2e/runner-loop.test.mjs` — bao gồm các kịch bản của hai stage đầu chuỗi, các kịch bản của stage lập-kế-hoạch (pass-through, chia-con-chặn-frontier, cần-người), VÀ 1 kịch bản S2-pull (submit → pass-through 2 stage → `take` người → một `fgos-runner --once` song song không giẫm claim người → người `return` xanh → `awaiting-approval`) chạy qua binary thật; round-trip cổng chờ-người tại `test/state/awaiting.test.mjs` + e2e CLI tại `test/cli/fgos.test.mjs`; unit tại `test/intake/{classify,discovery,plan}.test.mjs` + `test/state/{envelope,stage,store,frontier,work,replay}.test.mjs`; entropy-trend tại `test/report/entropy.test.mjs`. LƯU Ý phạm vi: suite KHÔNG đọc chính tài liệu này — không có test nào quét nội dung `docs/specs/*.md`, nên `npm test` xanh KHÔNG phải bằng chứng spec còn đúng với code. Bộ dò trích-dẫn-quyết-định-đã-lỗi-thời (`scripts/check-decision-citation-drift.mjs`) có quét `docs/specs/`, nhưng là script chạy tay, chỉ phát hiện, KHÔNG nối vào `npm test` (per `docs/specs/decision-citation-drift.md`)",
+      "source": "docs/specs/decision-citation-drift.md",
+      "targetCandidates": [
+        "docs/platform/decision-citation-drift/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/specs/reading-map.md",
+      "line": 25,
+      "text": "- `scripts/check-decision-citation-drift.mjs` + `test/scripts/check-decision-citation-drift.test.mjs` — quét `docs/backlog.md` + `docs/specs/*.md` tìm dòng còn trích một quyết định đã bị supersede mà không nhắc quyết định thay thế trên cùng dòng (STR72 CoS clause 2, PBI p-2d71dfc3); chỉ phát hiện, không tự sửa; spec: docs/specs/decision-citation-drift.md",
+      "source": "docs/specs/decision-citation-drift.md",
+      "targetCandidates": [
+        "docs/platform/decision-citation-drift/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+      "line": 5917,
+      "text": "    \"docs/specs/distillery.md\": {",
+      "source": "docs/specs/distillery.md",
+      "targetCandidates": [
+        "docs/platform/distillery/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/transitional-switchboard.md",
+      "line": 64,
+      "text": "| Distillery / reference learning | legacy-current | maintained-authority | `docs/specs/distillery.md` | `.agents/skills/distill/SKILL.md` | Spec owns bounded reference-learning behavior; skill owns operational surface. |",
+      "source": "docs/specs/distillery.md",
+      "targetCandidates": [
+        "docs/platform/distillery/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/specs/system-overview.md",
+      "line": 22,
+      "text": "- distillery — vùng học từ reference sources: index feature từng nguồn, so sánh chéo, porting log; spec: distillery.md (partial — chỉ phủ porting lifecycle, xem Open Gaps trong spec đó)",
+      "source": "docs/specs/distillery.md",
+      "targetCandidates": [
+        "docs/platform/distillery/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/specs/system-overview.md",
+      "line": 62,
+      "text": "- distillery: spec chỉ phủ porting lifecycle (docs/specs/distillery.md) — các khả năng khác (tìm nguồn mới, so sánh chéo, xếp hạng candidate) chưa có spec.",
+      "source": "docs/specs/distillery.md",
+      "targetCandidates": [
+        "docs/platform/distillery/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/architect/component-boundary/component-boundary-advisory.md",
+      "line": 145,
+      "text": "| Host And Surface Layer | Inbound/outbound surfaces and operator visibility. It translates CLI/API/plugin/dashboard/webhook/chat/Herdr interactions into calls against the engines, without becoming lifecycle or evidence truth. | CLI/API/plugin adapters, Herdr/dashboard visibility, host adapters, surface auth, command/API envelopes. | [fgOS Plugin Spec](../../specs/fgos-plugin.md), [Herdr Web Dashboard Spec](../../specs/herdr-web-dashboard.md), [Visibility And Herdr](../agent-coordination/architecture/visibility-and-herdr.md), [IO Contract](../../io-contract.md) |",
+      "source": "docs/specs/fgos-plugin.md",
+      "targetCandidates": [
+        "docs/platform/claude-plugin/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+      "line": 61,
+      "text": "| `docs/specs/fgos-plugin.md` | Claude Code plugin is a host-surface distribution. Slash-command wrappers shell out to the underlying `fgos`; they do not write the store directly. Old resolver prefers project-local checkout/bin, then global PATH, then clear error. | Plugin/skill distribution belongs in payload/projection model. The wrapper-shells-to-`fgos` rule should stay, but command resolution must become runtime-root/active-record based rather than PATH-based. |",
+      "source": "docs/specs/fgos-plugin.md",
+      "targetCandidates": [
+        "docs/platform/claude-plugin/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+      "line": 5941,
+      "text": "    \"docs/specs/fgos-plugin.md\": {",
+      "source": "docs/specs/fgos-plugin.md",
+      "targetCandidates": [
+        "docs/platform/claude-plugin/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/transitional-switchboard.md",
+      "line": 60,
+      "text": "| Claude plugin surface | legacy-current | maintained-authority | `docs/specs/fgos-plugin.md` | `plugins/fgOS/**` | Spec owns slash-command wrappers and plugin manifest behavior. |",
+      "source": "docs/specs/fgos-plugin.md",
+      "targetCandidates": [
+        "docs/platform/claude-plugin/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/specs/system-overview.md",
+      "line": 19,
+      "text": "- fgos-plugin — bề mặt slash-command `/fgOS:<verb>` cho Claude Code, 12 verb wrapper one-door-write bọc quanh CLI `fgos`; spec: fgos-plugin.md",
+      "source": "docs/specs/fgos-plugin.md",
+      "targetCandidates": [
+        "docs/platform/claude-plugin/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/specs/reading-map.md",
+      "line": 35,
+      "text": "- `plugins/fgOS/` (`.claude-plugin/plugin.json` + `skills/<verb>/SKILL.md`) — bề mặt slash-command `/fgOS:<verb>` cho Claude Code, 12 verb wrapper (submit, pick, move, return, ask, answer, ready, stale, rollup, check, graph, conflicts), mỗi verb một wrapper one-door-write qua `bin/fgos.mjs <verb>`; spec: docs/specs/fgos-plugin.md",
+      "source": "docs/specs/fgos-plugin.md",
+      "targetCandidates": [
+        "docs/platform/claude-plugin/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/architect/component-boundary/component-boundary-advisory.md",
+      "line": 145,
+      "text": "| Host And Surface Layer | Inbound/outbound surfaces and operator visibility. It translates CLI/API/plugin/dashboard/webhook/chat/Herdr interactions into calls against the engines, without becoming lifecycle or evidence truth. | CLI/API/plugin adapters, Herdr/dashboard visibility, host adapters, surface auth, command/API envelopes. | [fgOS Plugin Spec](../../specs/fgos-plugin.md), [Herdr Web Dashboard Spec](../../specs/herdr-web-dashboard.md), [Visibility And Herdr](../agent-coordination/architecture/visibility-and-herdr.md), [IO Contract](../../io-contract.md) |",
+      "source": "docs/specs/herdr-web-dashboard.md",
+      "targetCandidates": [
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "apps/fgos-gateway/web/src/api/errors.ts",
+      "line": 3,
+      "text": "// Area spec Edge Cases Settled (docs/specs/herdr-web-dashboard.md:259-260):",
+      "source": "docs/specs/herdr-web-dashboard.md",
+      "targetCandidates": [
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+      "line": 62,
+      "text": "| `docs/specs/herdr-web-dashboard.md` and dashboard references | Herdr is a browser dashboard/gateway surface, not workflow authority itself. It reads/mutates through fgOS verbs/contracts and must avoid becoming a second state writer. | Shared web/gateway remains future constraint only for this delivery slice. Later it must delegate through selected project runtime/adapter. |",
+      "source": "docs/specs/herdr-web-dashboard.md",
+      "targetCandidates": [
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+      "line": 5947,
+      "text": "    \"docs/specs/herdr-web-dashboard.md\": {",
+      "source": "docs/specs/herdr-web-dashboard.md",
+      "targetCandidates": [
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
+      "line": 217,
+      "text": "      \"path\": \"docs/specs/herdr-web-dashboard.md\",",
+      "source": "docs/specs/herdr-web-dashboard.md",
+      "targetCandidates": [
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/transitional-switchboard.md",
+      "line": 61,
+      "text": "| Herdr gateway and web dashboard | legacy-current | maintained-authority | `docs/specs/herdr-web-dashboard.md` | `docs/operator-runbook-herdr-cockpit.md`, `docs/specs/runner.md` | Spec owns web dashboard client behavior; runbook owns cockpit operations. |",
+      "source": "docs/specs/herdr-web-dashboard.md",
+      "targetCandidates": [
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 13,
+      "text": "**Product source of truth:** `docs/specs/herdr-web-dashboard.md` (the area",
+      "source": "docs/specs/herdr-web-dashboard.md",
+      "targetCandidates": [
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/ui-spec/spec.config.yaml",
+      "line": 3,
+      "text": "# Product source of truth: docs/specs/herdr-web-dashboard.md (tsk-54j).",
+      "source": "docs/specs/herdr-web-dashboard.md",
+      "targetCandidates": [
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/ui-spec/screens/S01-sign-in.md",
+      "line": 18,
+      "text": "(`docs/specs/herdr-web-dashboard.md` §Sign in, R3). It exists to take one",
+      "source": "docs/specs/herdr-web-dashboard.md",
+      "targetCandidates": [
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/ui-spec/screens/S02-taskboard.md",
+      "line": 21,
+      "text": "regroup (`docs/specs/herdr-web-dashboard.md` §View the taskboard).",
+      "source": "docs/specs/herdr-web-dashboard.md",
+      "targetCandidates": [
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/ui-spec/screens/S03-task-detail.md",
+      "line": 19,
+      "text": "(`docs/specs/herdr-web-dashboard.md` §View a task's detail).",
+      "source": "docs/specs/herdr-web-dashboard.md",
+      "targetCandidates": [
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/ui-spec/screens/S04-questions-needing-answer.md",
+      "line": 19,
+      "text": "`docs/specs/herdr-web-dashboard.md` Data Dictionary #4). D4's whole point",
+      "source": "docs/specs/herdr-web-dashboard.md",
+      "targetCandidates": [
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/ui-spec/30-states-and-errors.md",
+      "line": 30,
+      "text": "(`docs/specs/herdr-web-dashboard.md` Edge Cases Settled).",
+      "source": "docs/specs/herdr-web-dashboard.md",
+      "targetCandidates": [
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/ui-spec/modals/M03-add-edit-item.md",
+      "line": 18,
+      "text": "(`docs/specs/herdr-web-dashboard.md` §Add a work item, §Edit a work item).",
+      "source": "docs/specs/herdr-web-dashboard.md",
+      "targetCandidates": [
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/ui-spec/modals/M02-approve-merge.md",
+      "line": 18,
+      "text": "(`docs/specs/herdr-web-dashboard.md` §Approve a merge). It exists as its",
+      "source": "docs/specs/herdr-web-dashboard.md",
+      "targetCandidates": [
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/ui-spec/modals/M01-answer-question.md",
+      "line": 21,
+      "text": "against (`docs/specs/herdr-web-dashboard.md` §Answer a parked question).",
+      "source": "docs/specs/herdr-web-dashboard.md",
+      "targetCandidates": [
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/ui-spec/20-domain-rules.md",
+      "line": 10,
+      "text": "Every rule here is taken from `docs/specs/herdr-web-dashboard.md`",
+      "source": "docs/specs/herdr-web-dashboard.md",
+      "targetCandidates": [
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/ui-spec/components/C01-item-card.md",
+      "line": 21,
+      "text": "(`docs/specs/herdr-web-dashboard.md` §View the taskboard).",
+      "source": "docs/specs/herdr-web-dashboard.md",
+      "targetCandidates": [
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/ui-spec/components/C01-item-card.md",
+      "line": 46,
+      "text": "(`docs/specs/herdr-web-dashboard.md` §Retire a work item).",
+      "source": "docs/specs/herdr-web-dashboard.md",
+      "targetCandidates": [
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/specs/reading-map.md",
+      "line": 36,
+      "text": "- `apps/fgos-gateway/` + `apps/fgos-gateway/web/` — fgos gateway (REST, MCP, bundle web dashboard nhúng sẵn; vòng đời `fgos gateway`) và bề mặt web dashboard: client trình duyệt ĐỘC LẬP (không phải code máy chủ trong gateway, theo tsk-7l9 + decision 0014); `herdr-dashboard/` là plugin herdr (TUI trong pane), `packages/herdr-fgos-common/rust` là adapter CLI fgos dùng chung của cả hai, gọi API REST/RPC của gateway từ ngoài; ba màn đọc (taskboard, task-detail, câu hỏi cần trả lời — phủ cả kênh `ask` lẫn `gate-approve`) cộng các hành động ghi đi qua verb một-cửa-ghi của fgOS (`answer`/`approve`/`add`/`edit`/`move`), không có đường ghi thứ hai; bật mặc định, port 8788, token bắt buộc; spec: docs/specs/herdr-web-dashboard.md (lớp UI/wireframe: docs/reference/herdr-web-dashboard-layout.md)",
+      "source": "docs/specs/herdr-web-dashboard.md",
+      "targetCandidates": [
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md",
+      "line": 10,
+      "text": "**Product source:** `docs/specs/herdr-web-dashboard.md` — the area spec.",
+      "source": "docs/specs/herdr-web-dashboard.md",
+      "targetCandidates": [
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/knowledge/why-the-herdr-web-dashboard-s-architecture-moved-from-a-stan/why-the-herdr-web-dashboard-became-a-static-client-of-the-gateway-not-its-own-server.md",
+      "line": 13,
+      "text": "spec at `docs/specs/herdr-web-dashboard.md`, following `AGENTS.md`'s own",
+      "source": "docs/specs/herdr-web-dashboard.md",
+      "targetCandidates": [
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
+      "line": 227,
+      "text": "      \"path\": \"docs/specs/observe.md\",",
+      "source": "docs/specs/observe.md",
+      "targetCandidates": [
+        "docs/platform/observe/spec.md",
+        "docs/platform/observe/decisions/observe-component-architecture.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/transitional-switchboard.md",
+      "line": 65,
+      "text": "| Observe (metrics and friction) | legacy-current | maintained-authority | `docs/specs/observe.md` | `packages/observe/rust/**` | Spec owns observation behavior (metrics and friction); the Rust package owns the implementation. |",
+      "source": "docs/specs/observe.md",
+      "targetCandidates": [
+        "docs/platform/observe/spec.md",
+        "docs/platform/observe/decisions/observe-component-architecture.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/specs/reading-map.md",
+      "line": 59,
+      "text": "- `docs/specs/observe.md` — spec thành phần Observe (đo lường `fgos metrics` và ghi nhận `fgos friction` trọn sang Rust); source: `packages/observe/rust`, contracts: `packages/observe/contracts/`, store `.fgos/observe/`. `metrics discussions` đọc summary do Node Execution ghi (`src/runner/execution/unit-summary.mjs`, `packages/run-result/contracts/unit-summary.read.v2.json`), `metrics eval` ghi journal `.fgos/observe/evals/`. Rubric: `docs/reference/discussion-quality-rubric.md`; cách so sánh mù: `docs/how-to/compare-discussion-setups-with-metrics-eval.md`.",
+      "source": "docs/specs/observe.md",
+      "targetCandidates": [
+        "docs/platform/observe/spec.md",
+        "docs/platform/observe/decisions/observe-component-architecture.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/templates/surfaces/overview.md",
+      "line": 20,
+      "text": "├── 00-overview.md              ← this file",
+      "source": "docs/ui-spec/00-overview.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 26,
+      "text": "3. **Pass 1 — Skeleton:** generate `spec.config.yaml`, `00-overview.md`, `20-domain-rules.md`, `30-states-and-errors.md`, `15-system-events.md`; create all surface files with frontmatter + prose only (no contract blocks yet)",
+      "source": "docs/ui-spec/00-overview.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 173,
+      "text": "| PM | `00-overview.md`, `flows/`, `generated/coverage-report.md` |",
+      "source": "docs/ui-spec/00-overview.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 237,
+      "text": "   - `00-overview.md` — surface index table (fill as you go; keep current)",
+      "source": "docs/ui-spec/00-overview.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 276,
+      "text": "| Rename surface ID | Find+replace the old ID across ALL spec files + `00-overview.md` index |",
+      "source": "docs/ui-spec/00-overview.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 282,
+      "text": "| Split surface into two new IDs | Old ID must be replaced everywhere; update `00-overview.md`; re-wire flows |",
+      "source": "docs/ui-spec/00-overview.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 298,
+      "text": "   - ☐ `00-overview.md` — add a row to the surface index table **AND a path to the directory tree** (both live in this file)",
+      "source": "docs/ui-spec/00-overview.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 332,
+      "text": "| `00-overview.md` index | id + name rows must match frontmatter | VR-OVERVIEW | warn |",
+      "source": "docs/ui-spec/00-overview.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+      "line": 361,
+      "text": "    \"docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md\": {",
+      "source": "docs/ui-spec/00-overview.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+      "line": 776,
+      "text": "- docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md",
+      "source": "docs/ui-spec/00-overview.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/transitional-switchboard.md",
+      "line": 67,
+      "text": "| UI specification | legacy-current | maintained-authority | `docs/ui-spec/00-overview.md` (entry for `docs/ui-spec/**`) | Relevant area spec | Visual and UI layout contracts; functional behavior owned by area specs. |",
+      "source": "docs/ui-spec/00-overview.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md",
+      "line": 4,
+      "text": "> `docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md`. Do not edit divergent design",
+      "source": "docs/ui-spec/00-overview.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md",
+      "line": 1542,
+      "text": "- Confirm the implementation matches docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md.",
+      "source": "docs/ui-spec/00-overview.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md",
+      "line": 1548,
+      "text": "- docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md",
+      "source": "docs/ui-spec/00-overview.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/README.md",
+      "line": 15,
+      "text": "1. [Step 00: Overview](step-00-overview.md)",
+      "source": "docs/ui-spec/00-overview.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md",
+      "line": 17,
+      "text": "with the commands in `docs/ui-spec/00-overview.md`. Current state:",
+      "source": "docs/ui-spec/00-overview.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/spec.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/templates/spec.config.yaml",
+      "line": 22,
+      "text": "  - 15-system-events.md",
+      "source": "docs/ui-spec/15-system-events.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/15-system-events.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/templates/surfaces/overview.md",
+      "line": 23,
+      "text": "├── 15-system-events.md         ← system-initiated events",
+      "source": "docs/ui-spec/15-system-events.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/15-system-events.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 26,
+      "text": "3. **Pass 1 — Skeleton:** generate `spec.config.yaml`, `00-overview.md`, `20-domain-rules.md`, `30-states-and-errors.md`, `15-system-events.md`; create all surface files with frontmatter + prose only (no contract blocks yet)",
+      "source": "docs/ui-spec/15-system-events.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/15-system-events.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 234,
+      "text": "   - `15-system-events.md` — all backend/SSE events surfaces will listen to (dotted names, e.g. `upload.done`)",
+      "source": "docs/ui-spec/15-system-events.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/15-system-events.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 278,
+      "text": "| Rename/remove emitted event | Update `listens_to:` in every host screen that consumed it; update `15-system-events.md` if it was declared there |",
+      "source": "docs/ui-spec/15-system-events.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/15-system-events.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 299,
+      "text": "   - ☐ `15-system-events.md` — if the new surface needs a new backend/SSE event, declare it here (dotted name convention)",
+      "source": "docs/ui-spec/15-system-events.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/15-system-events.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 322,
+      "text": "| external/system signal | `listens_to:` a dotted name (e.g. `upload.done`) — declared in `15-system-events.md` | exempt from VR-LISTEN-ORPHAN (dotted = backend SSE) | — |",
+      "source": "docs/ui-spec/15-system-events.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/15-system-events.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 48,
+      "text": "├── 15-system-events.md",
+      "source": "docs/ui-spec/15-system-events.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/15-system-events.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/ui-spec/spec.config.yaml",
+      "line": 20,
+      "text": "  - 15-system-events.md",
+      "source": "docs/ui-spec/15-system-events.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/15-system-events.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/specs/herdr-web-dashboard.md",
+      "line": 287,
+      "text": "  only a `GET /state/digest` cheap poll, which is why `15-system-events.md`",
+      "source": "docs/ui-spec/15-system-events.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/15-system-events.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/references/METHODOLOGY.md",
+      "line": 55,
+      "text": "- Rule drift: bidirectional check between `20-domain-rules.md` and surface frontmatter",
+      "source": "docs/ui-spec/20-domain-rules.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/20-domain-rules.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/references/METHODOLOGY.md",
+      "line": 88,
+      "text": "  20-domain-rules.md, surface files, flow files",
+      "source": "docs/ui-spec/20-domain-rules.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/20-domain-rules.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/references/METHODOLOGY.md",
+      "line": 102,
+      "text": "3. `20-domain-rules.md` — load domain rules relevant to the target surface",
+      "source": "docs/ui-spec/20-domain-rules.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/20-domain-rules.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/references/CONVENTION.md",
+      "line": 132,
+      "text": "`20-domain-rules.md` carries one `yaml {project}-contract` block declaring rules → surfaces. Validator checks that every surface listed under a rule has that rule ID in frontmatter `rules:`.",
+      "source": "docs/ui-spec/20-domain-rules.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/20-domain-rules.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/references/CONVENTION.md",
+      "line": 191,
+      "text": "| Business rules | `WARN: no business rules — 20-domain-rules.md will be empty` |",
+      "source": "docs/ui-spec/20-domain-rules.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/20-domain-rules.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/templates/spec.config.yaml",
+      "line": 21,
+      "text": "  - 20-domain-rules.md",
+      "source": "docs/ui-spec/20-domain-rules.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/20-domain-rules.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/templates/surfaces/overview.md",
+      "line": 24,
+      "text": "├── 20-domain-rules.md          ← cross-cutting business rules",
+      "source": "docs/ui-spec/20-domain-rules.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/20-domain-rules.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 26,
+      "text": "3. **Pass 1 — Skeleton:** generate `spec.config.yaml`, `00-overview.md`, `20-domain-rules.md`, `30-states-and-errors.md`, `15-system-events.md`; create all surface files with frontmatter + prose only (no contract blocks yet)",
+      "source": "docs/ui-spec/20-domain-rules.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/20-domain-rules.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 146,
+      "text": "Declared in `20-domain-rules.md` with bidirectional surface mapping. Validator checks that every surface listed under a rule has that rule ID in its frontmatter `rules:` array.",
+      "source": "docs/ui-spec/20-domain-rules.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/20-domain-rules.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 175,
+      "text": "| Dev / LLM codegen | target surface + `20-domain-rules.md` + `30-states-and-errors.md` |",
+      "source": "docs/ui-spec/20-domain-rules.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/20-domain-rules.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 235,
+      "text": "   - `20-domain-rules.md` — all business rules + `surfaces[]` lists (populate after surfaces are named)",
+      "source": "docs/ui-spec/20-domain-rules.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/20-domain-rules.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 243,
+      "text": "   - Set `rules:` frontmatter to match `20-domain-rules.md` `surfaces[]` entries (bidirectional)",
+      "source": "docs/ui-spec/20-domain-rules.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/20-domain-rules.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 279,
+      "text": "| Add/remove `rules:` frontmatter entry | Sync `20-domain-rules.md` `surfaces[]` for that rule (bidirectional) |",
+      "source": "docs/ui-spec/20-domain-rules.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/20-domain-rules.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 295,
+      "text": "2. Fill frontmatter + prose + contract block, following CONVENTION §1–3. **Read `20-domain-rules.md` and set `rules:` to the existing rule IDs that apply** — VR-RULE-DRIFT errors if a rule lists this surface but the surface omits it (or vice-versa).",
+      "source": "docs/ui-spec/20-domain-rules.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/20-domain-rules.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 300,
+      "text": "   - ☐ `20-domain-rules.md` — if a NEW domain rule is needed: add rule + add surface ID to `surfaces[]`; also add the rule ID to the surface's `rules:` frontmatter (bidirectional)",
+      "source": "docs/ui-spec/20-domain-rules.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/20-domain-rules.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 324,
+      "text": "| rule ↔ surface (bidirectional) | surface `rules: [Rn]` ↔ `20-domain-rules.md` `surfaces: [Sxx]` | VR-RULE-DRIFT | **error** |",
+      "source": "docs/ui-spec/20-domain-rules.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/20-domain-rules.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/METHODOLOGY.md",
+      "line": 55,
+      "text": "- Rule drift: bidirectional check between `20-domain-rules.md` and surface frontmatter",
+      "source": "docs/ui-spec/20-domain-rules.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/20-domain-rules.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/METHODOLOGY.md",
+      "line": 88,
+      "text": "  20-domain-rules.md, surface files, flow files",
+      "source": "docs/ui-spec/20-domain-rules.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/20-domain-rules.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/METHODOLOGY.md",
+      "line": 102,
+      "text": "3. `20-domain-rules.md` — load domain rules relevant to the target surface",
+      "source": "docs/ui-spec/20-domain-rules.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/20-domain-rules.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/CONVENTION.md",
+      "line": 132,
+      "text": "`20-domain-rules.md` carries one `yaml {project}-contract` block declaring rules → surfaces. Validator checks that every surface listed under a rule has that rule ID in frontmatter `rules:`.",
+      "source": "docs/ui-spec/20-domain-rules.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/20-domain-rules.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/CONVENTION.md",
+      "line": 191,
+      "text": "| Business rules | `WARN: no business rules — 20-domain-rules.md will be empty` |",
+      "source": "docs/ui-spec/20-domain-rules.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/20-domain-rules.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 49,
+      "text": "├── 20-domain-rules.md              ← R1–R11, taken from the area spec",
+      "source": "docs/ui-spec/20-domain-rules.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/20-domain-rules.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/ui-spec/spec.config.yaml",
+      "line": 19,
+      "text": "  - 20-domain-rules.md",
+      "source": "docs/ui-spec/20-domain-rules.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/20-domain-rules.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/references/METHODOLOGY.md",
+      "line": 105,
+      "text": "6. `30-states-and-errors.md` — load state/error definitions referenced in the surface",
+      "source": "docs/ui-spec/30-states-and-errors.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/30-states-and-errors.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/references/CONVENTION.md",
+      "line": 54,
+      "text": "(prose or links to 30-states-and-errors.md)",
+      "source": "docs/ui-spec/30-states-and-errors.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/30-states-and-errors.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 26,
+      "text": "3. **Pass 1 — Skeleton:** generate `spec.config.yaml`, `00-overview.md`, `20-domain-rules.md`, `30-states-and-errors.md`, `15-system-events.md`; create all surface files with frontmatter + prose only (no contract blocks yet)",
+      "source": "docs/ui-spec/30-states-and-errors.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/30-states-and-errors.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 175,
+      "text": "| Dev / LLM codegen | target surface + `20-domain-rules.md` + `30-states-and-errors.md` |",
+      "source": "docs/ui-spec/30-states-and-errors.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/30-states-and-errors.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 236,
+      "text": "   - `30-states-and-errors.md` — state + error catalogue (prose; no contract block needed)",
+      "source": "docs/ui-spec/30-states-and-errors.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/30-states-and-errors.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 288,
+      "text": "> **State refs:** `ST-*` references in prose are now checked by **VR-STATE** (warn) against the `### ST-*` headings in `30-states-and-errors.md` — a typo'd / missing state shows as a warning in `check`. It's a prose scan at warn level, so still eyeball semantic correctness; `ERR-*` ids are not yet cataloged.",
+      "source": "docs/ui-spec/30-states-and-errors.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/30-states-and-errors.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 331,
+      "text": "| state IDs (`ST-*`) | referenced in prose; registry = `### ST-*` headings in `30-states-and-errors.md` | VR-STATE | warn |",
+      "source": "docs/ui-spec/30-states-and-errors.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/30-states-and-errors.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/METHODOLOGY.md",
+      "line": 105,
+      "text": "6. `30-states-and-errors.md` — load state/error definitions referenced in the surface",
+      "source": "docs/ui-spec/30-states-and-errors.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/30-states-and-errors.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "apps/fgos-gateway/web/src/screens/Taskboard.tsx",
+      "line": 76,
+      "text": "  // ST-DISCONNECTED (area spec Edge Cases / 30-states-and-errors.md):",
+      "source": "docs/ui-spec/30-states-and-errors.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/30-states-and-errors.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/validate.mjs",
+      "line": 179,
+      "text": "// VR-STATE: a surface's prose state references (ST-*) must exist in the 30-states-and-errors.md",
+      "source": "docs/ui-spec/30-states-and-errors.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/30-states-and-errors.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/validate.mjs",
+      "line": 182,
+      "text": "// The states catalog (e.g. 30-states-and-errors.md) is a cross-cutting prose file that may",
+      "source": "docs/ui-spec/30-states-and-errors.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/30-states-and-errors.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/validate.mjs",
+      "line": 202,
+      "text": "      warn(f.file, `references state \\`${id}\\` not defined in 30-states-and-errors.md catalog (typo or missing state)`);",
+      "source": "docs/ui-spec/30-states-and-errors.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/30-states-and-errors.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/CONVENTION.md",
+      "line": 54,
+      "text": "(prose or links to 30-states-and-errors.md)",
+      "source": "docs/ui-spec/30-states-and-errors.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/30-states-and-errors.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 50,
+      "text": "├── 30-states-and-errors.md",
+      "source": "docs/ui-spec/30-states-and-errors.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/30-states-and-errors.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/ui-spec/screens/S02-taskboard.md",
+      "line": 138,
+      "text": "screens — see `30-states-and-errors.md`. **ST-DISCONNECTED** marks the",
+      "source": "docs/ui-spec/30-states-and-errors.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/30-states-and-errors.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md",
+      "line": 194,
+      "text": "Full catalogue in `docs/ui-spec/30-states-and-errors.md`. The ones that",
+      "source": "docs/ui-spec/30-states-and-errors.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/contracts/30-states-and-errors.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 63,
+      "text": "│   └── C01-item-card.md",
+      "source": "docs/ui-spec/components/C01-item-card.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/components/C01-item-card.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 65,
+      "text": "    ├── F01-answer-a-parked-question.md",
+      "source": "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 66,
+      "text": "    └── F02-approve-a-merge.md",
+      "source": "docs/ui-spec/flows/F02-approve-a-merge.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/operations/F02-approve-a-merge.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/references/CONVENTION.md",
+      "line": 166,
+      "text": "                                                  action-registry.csv",
+      "source": "docs/ui-spec/generated/action-registry.csv",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 29,
+      "text": "6. Run `build` → generate artifacts (`surface-registry.yaml`, `navigation-graph.yaml`, `action-registry.csv`, `coverage-report.md`)",
+      "source": "docs/ui-spec/generated/action-registry.csv",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 56,
+      "text": "- `generated/action-registry.csv` — all action IDs, elements, triggers, targets",
+      "source": "docs/ui-spec/generated/action-registry.csv",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 266,
+      "text": "| action IDs of this surface (e.g. `A-S05-*`) | `generated/action-registry.csv` or grep spec tree | flow `steps`/`branches` using those action IDs |",
+      "source": "docs/ui-spec/generated/action-registry.csv",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/build.mjs",
+      "line": 3,
+      "text": "// Output: surface-registry.yaml, navigation-graph.yaml, action-registry.csv, coverage-report.md",
+      "source": "docs/ui-spec/generated/action-registry.csv",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/build.mjs",
+      "line": 34,
+      "text": "// ---- navigation-graph.yaml + action-registry.csv ----",
+      "source": "docs/ui-spec/generated/action-registry.csv",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/build.mjs",
+      "line": 73,
+      "text": "// action-registry.csv — flat table for spreadsheet/tooling consumption",
+      "source": "docs/ui-spec/generated/action-registry.csv",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/build.mjs",
+      "line": 86,
+      "text": "writeFileSync(join(OUT, \"action-registry.csv\"), csvRows.map((r) => r.join(\",\")).join(\"\\n\") + \"\\n\");",
+      "source": "docs/ui-spec/generated/action-registry.csv",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/build.mjs",
+      "line": 106,
+      "text": "console.log(`✓ built generated/: surface-registry.yaml, navigation-graph.yaml, action-registry.csv, coverage-report.md`);",
+      "source": "docs/ui-spec/generated/action-registry.csv",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/CONVENTION.md",
+      "line": 166,
+      "text": "                                                  action-registry.csv",
+      "source": "docs/ui-spec/generated/action-registry.csv",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/references/CONVENTION.md",
+      "line": 167,
+      "text": "                                                  coverage-report.md",
+      "source": "docs/ui-spec/generated/coverage-report.md",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 29,
+      "text": "6. Run `build` → generate artifacts (`surface-registry.yaml`, `navigation-graph.yaml`, `action-registry.csv`, `coverage-report.md`)",
+      "source": "docs/ui-spec/generated/coverage-report.md",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 57,
+      "text": "- `generated/coverage-report.md` — surface coverage, flow coverage, rule coverage",
+      "source": "docs/ui-spec/generated/coverage-report.md",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 173,
+      "text": "| PM | `00-overview.md`, `flows/`, `generated/coverage-report.md` |",
+      "source": "docs/ui-spec/generated/coverage-report.md",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/build.mjs",
+      "line": 3,
+      "text": "// Output: surface-registry.yaml, navigation-graph.yaml, action-registry.csv, coverage-report.md",
+      "source": "docs/ui-spec/generated/coverage-report.md",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/build.mjs",
+      "line": 88,
+      "text": "// ---- coverage-report.md ----",
+      "source": "docs/ui-spec/generated/coverage-report.md",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/build.mjs",
+      "line": 104,
+      "text": "writeFileSync(join(OUT, \"coverage-report.md\"), cov);",
+      "source": "docs/ui-spec/generated/coverage-report.md",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/build.mjs",
+      "line": 106,
+      "text": "console.log(`✓ built generated/: surface-registry.yaml, navigation-graph.yaml, action-registry.csv, coverage-report.md`);",
+      "source": "docs/ui-spec/generated/coverage-report.md",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/CONVENTION.md",
+      "line": 167,
+      "text": "                                                  coverage-report.md",
+      "source": "docs/ui-spec/generated/coverage-report.md",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/references/CONVENTION.md",
+      "line": 165,
+      "text": "                                                  navigation-graph.yaml",
+      "source": "docs/ui-spec/generated/navigation-graph.yaml",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 29,
+      "text": "6. Run `build` → generate artifacts (`surface-registry.yaml`, `navigation-graph.yaml`, `action-registry.csv`, `coverage-report.md`)",
+      "source": "docs/ui-spec/generated/navigation-graph.yaml",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 55,
+      "text": "- `generated/navigation-graph.yaml` — navigate edges between surfaces",
+      "source": "docs/ui-spec/generated/navigation-graph.yaml",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 176,
+      "text": "| QA | `flows/`, `generated/navigation-graph.yaml` |",
+      "source": "docs/ui-spec/generated/navigation-graph.yaml",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 264,
+      "text": "| `target: <SurfaceId>` | `generated/navigation-graph.yaml` | surfaces that navigate/open_overlay TO this one |",
+      "source": "docs/ui-spec/generated/navigation-graph.yaml",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/build.mjs",
+      "line": 3,
+      "text": "// Output: surface-registry.yaml, navigation-graph.yaml, action-registry.csv, coverage-report.md",
+      "source": "docs/ui-spec/generated/navigation-graph.yaml",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/build.mjs",
+      "line": 34,
+      "text": "// ---- navigation-graph.yaml + action-registry.csv ----",
+      "source": "docs/ui-spec/generated/navigation-graph.yaml",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/build.mjs",
+      "line": 69,
+      "text": "  join(OUT, \"navigation-graph.yaml\"),",
+      "source": "docs/ui-spec/generated/navigation-graph.yaml",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/build.mjs",
+      "line": 106,
+      "text": "console.log(`✓ built generated/: surface-registry.yaml, navigation-graph.yaml, action-registry.csv, coverage-report.md`);",
+      "source": "docs/ui-spec/generated/navigation-graph.yaml",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/CONVENTION.md",
+      "line": 165,
+      "text": "                                                  navigation-graph.yaml",
+      "source": "docs/ui-spec/generated/navigation-graph.yaml",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/references/METHODOLOGY.md",
+      "line": 101,
+      "text": "2. `generated/surface-registry.yaml` — get full surface inventory (IDs, types, names)",
+      "source": "docs/ui-spec/generated/surface-registry.yaml",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/references/CONVENTION.md",
+      "line": 164,
+      "text": "                                                  surface-registry.yaml",
+      "source": "docs/ui-spec/generated/surface-registry.yaml",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 29,
+      "text": "6. Run `build` → generate artifacts (`surface-registry.yaml`, `navigation-graph.yaml`, `action-registry.csv`, `coverage-report.md`)",
+      "source": "docs/ui-spec/generated/surface-registry.yaml",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 54,
+      "text": "- `generated/surface-registry.yaml` — all surfaces with metadata",
+      "source": "docs/ui-spec/generated/surface-registry.yaml",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 240,
+      "text": "4. **Pass 2 — Contracts**: read the full surface list (`generated/surface-registry.yaml` if already built, otherwise your inventory), then fill the `{project}-contract` block in each surface:",
+      "source": "docs/ui-spec/generated/surface-registry.yaml",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 268,
+      "text": "| `hosts: [<SurfaceId>]` | `generated/surface-registry.yaml` | components listing this screen as host |",
+      "source": "docs/ui-spec/generated/surface-registry.yaml",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/METHODOLOGY.md",
+      "line": 101,
+      "text": "2. `generated/surface-registry.yaml` — get full surface inventory (IDs, types, names)",
+      "source": "docs/ui-spec/generated/surface-registry.yaml",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/build.mjs",
+      "line": 3,
+      "text": "// Output: surface-registry.yaml, navigation-graph.yaml, action-registry.csv, coverage-report.md",
+      "source": "docs/ui-spec/generated/surface-registry.yaml",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/build.mjs",
+      "line": 16,
+      "text": "// ---- surface-registry.yaml ----",
+      "source": "docs/ui-spec/generated/surface-registry.yaml",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/build.mjs",
+      "line": 32,
+      "text": "writeFileSync(join(OUT, \"surface-registry.yaml\"), HEADER + yaml.dump(registry, { lineWidth: 120 }));",
+      "source": "docs/ui-spec/generated/surface-registry.yaml",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/build.mjs",
+      "line": 106,
+      "text": "console.log(`✓ built generated/: surface-registry.yaml, navigation-graph.yaml, action-registry.csv, coverage-report.md`);",
+      "source": "docs/ui-spec/generated/surface-registry.yaml",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/CONVENTION.md",
+      "line": 164,
+      "text": "                                                  surface-registry.yaml",
+      "source": "docs/ui-spec/generated/surface-registry.yaml",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 79,
+      "text": "- Output: `generated/wireframe-v2.html` (does not overwrite v1's `wireframe.html`)",
+      "source": "docs/ui-spec/generated/wireframe-v2.html",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/interpret-wireframe.mjs",
+      "line": 8,
+      "text": "// Output: generated/wireframe-v2.html (separate from interpret.mjs's wireframe.html)",
+      "source": "docs/ui-spec/generated/wireframe-v2.html",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/interpret-wireframe.mjs",
+      "line": 81,
+      "text": "const outPath = join(genDir, \"wireframe-v2.html\");",
+      "source": "docs/ui-spec/generated/wireframe-v2.html",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/wireframe/verify-runtime.mjs",
+      "line": 2,
+      "text": "// NODE: Runtime smoke-test for wireframe-v2.html using jsdom.",
+      "source": "docs/ui-spec/generated/wireframe-v2.html",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/wireframe/verify-runtime.mjs",
+      "line": 14,
+      "text": "const HTML_PATH = resolve(__dir, \"../../../../../frontend/docs/ui-spec/generated/wireframe-v2.html\");",
+      "source": "docs/ui-spec/generated/wireframe-v2.html",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/wireframe/verify-runtime.mjs",
+      "line": 37,
+      "text": "console.log(\"Loading wireframe-v2.html …\");",
+      "source": "docs/ui-spec/generated/wireframe-v2.html",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/wireframe/styles.mjs",
+      "line": 2,
+      "text": "// NODE: exports combined CSS string for wireframe-v2.html.",
+      "source": "docs/ui-spec/generated/wireframe-v2.html",
+      "targetCandidates": [],
+      "action": "Retain generated path; no generated output relocation",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 59,
+      "text": "│   ├── M01-answer-question.md",
+      "source": "docs/ui-spec/modals/M01-answer-question.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/modals/M01-answer-question.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 60,
+      "text": "│   ├── M02-approve-merge.md",
+      "source": "docs/ui-spec/modals/M02-approve-merge.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "apps/fgos-gateway/web/src/screens/TaskDetail.tsx",
+      "line": 487,
+      "text": "        // M03 (docs/ui-spec/modals/M03-add-edit-item.md) is not owned by",
+      "source": "docs/ui-spec/modals/M03-add-edit-item.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "apps/fgos-gateway/web/src/screens/Taskboard.tsx",
+      "line": 439,
+      "text": "        // M03 (docs/ui-spec/modals/M03-add-edit-item.md) is not owned by",
+      "source": "docs/ui-spec/modals/M03-add-edit-item.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 61,
+      "text": "│   └── M03-add-edit-item.md",
+      "source": "docs/ui-spec/modals/M03-add-edit-item.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/knowledge/why-the-gateway-s-patch-work-id-edit-route-uses-patch-semant/why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md",
+      "line": 10,
+      "text": "item — `POST /work` only adds. `docs/ui-spec/modals/M03-add-edit-item.md`'s",
+      "source": "docs/ui-spec/modals/M03-add-edit-item.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/templates/README.md",
+      "line": 48,
+      "text": "The compiler extracts and validates all contract blocks against `schema/surface-contract.schema.json`.",
+      "source": "docs/ui-spec/schema/surface-contract.schema.json",
+      "targetCandidates": [
+        "docs/platform/ui-spec/history/schema/surface-contract.schema.json"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 38,
+      "text": "├── schema/surface-contract.schema.json",
+      "source": "docs/ui-spec/schema/surface-contract.schema.json",
+      "targetCandidates": [
+        "docs/platform/ui-spec/history/schema/surface-contract.schema.json"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/config.mjs",
+      "line": 57,
+      "text": "  const schemaPath = join(specRoot, config.schema_path ?? \"schema/surface-contract.schema.json\");",
+      "source": "docs/ui-spec/schema/surface-contract.schema.json",
+      "targetCandidates": [
+        "docs/platform/ui-spec/history/schema/surface-contract.schema.json"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/validate.mjs",
+      "line": 17,
+      "text": "  console.error(`ERROR: Schema not found at ${schemaPath}\\n  Create schema/surface-contract.schema.json in your spec root.`);",
+      "source": "docs/ui-spec/schema/surface-contract.schema.json",
+      "targetCandidates": [
+        "docs/platform/ui-spec/history/schema/surface-contract.schema.json"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 52,
+      "text": "│   └── surface-contract.schema.json",
+      "source": "docs/ui-spec/schema/surface-contract.schema.json",
+      "targetCandidates": [
+        "docs/platform/ui-spec/history/schema/surface-contract.schema.json"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "apps/fgos-gateway/web/src/App.tsx",
+      "line": 24,
+      "text": "// S01 — Sign in (docs/ui-spec/screens/S01-sign-in.md). \"The first and",
+      "source": "docs/ui-spec/screens/S01-sign-in.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/screens/S01-sign-in.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "apps/fgos-gateway/web/src/App.test.tsx",
+      "line": 6,
+      "text": "// S01 — Sign in (docs/ui-spec/screens/S01-sign-in.md). tsk-51i: the",
+      "source": "docs/ui-spec/screens/S01-sign-in.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/screens/S01-sign-in.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 54,
+      "text": "│   ├── S01-sign-in.md",
+      "source": "docs/ui-spec/screens/S01-sign-in.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/screens/S01-sign-in.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "apps/fgos-gateway/web/src/screens/Taskboard.tsx",
+      "line": 9,
+      "text": "// S02 — Taskboard (docs/ui-spec/screens/S02-taskboard.md). Statuses that",
+      "source": "docs/ui-spec/screens/S02-taskboard.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/screens/S02-taskboard.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "apps/fgos-gateway/web/src/screens/Taskboard.tsx",
+      "line": 65,
+      "text": "  // A-S02-006 (S02-taskboard.md): a rail entry click navigates to S04",
+      "source": "docs/ui-spec/screens/S02-taskboard.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/screens/S02-taskboard.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 55,
+      "text": "│   ├── S02-taskboard.md",
+      "source": "docs/ui-spec/screens/S02-taskboard.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/screens/S02-taskboard.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "apps/fgos-gateway/web/src/screens/TaskDetail.tsx",
+      "line": 9,
+      "text": "// S03 — Task detail (docs/ui-spec/screens/S03-task-detail.md). \"The core",
+      "source": "docs/ui-spec/screens/S03-task-detail.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/screens/S03-task-detail.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 56,
+      "text": "│   ├── S03-task-detail.md",
+      "source": "docs/ui-spec/screens/S03-task-detail.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/screens/S03-task-detail.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 57,
+      "text": "│   └── S04-questions-needing-answer.md",
+      "source": "docs/ui-spec/screens/S04-questions-needing-answer.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/references/METHODOLOGY.md",
+      "line": 84,
+      "text": "  spec.config.yaml → contract_tag, ID prefixes, entry_surface",
+      "source": "docs/ui-spec/spec.config.yaml",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/spec.config.yaml"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/references/METHODOLOGY.md",
+      "line": 100,
+      "text": "1. `spec.config.yaml` — understand project name, contract tag, ID prefixes",
+      "source": "docs/ui-spec/spec.config.yaml",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/spec.config.yaml"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/references/CONVENTION.md",
+      "line": 4,
+      "text": "> The `{project}-contract` tag is configured in `spec.config.yaml` → `contract_tag`. Example: `crm-contract`, `shop-contract`.",
+      "source": "docs/ui-spec/spec.config.yaml",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/spec.config.yaml"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/references/CONVENTION.md",
+      "line": 198,
+      "text": "## 8. `spec.config.yaml` reference",
+      "source": "docs/ui-spec/spec.config.yaml",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/spec.config.yaml"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/templates/README.md",
+      "line": 10,
+      "text": "cp spec.config.yaml my-app/spec.config.yaml",
+      "source": "docs/ui-spec/spec.config.yaml",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/spec.config.yaml"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/templates/surfaces/overview.md",
+      "line": 25,
+      "text": "├── spec.config.yaml            ← compiler config",
+      "source": "docs/ui-spec/spec.config.yaml",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/spec.config.yaml"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 26,
+      "text": "3. **Pass 1 — Skeleton:** generate `spec.config.yaml`, `00-overview.md`, `20-domain-rules.md`, `30-states-and-errors.md`, `15-system-events.md`; create all surface files with frontmatter + prose only (no contract blocks yet)",
+      "source": "docs/ui-spec/spec.config.yaml",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/spec.config.yaml"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 37,
+      "text": "├── spec.config.yaml          # project name, contract tag, surface ID prefixes",
+      "source": "docs/ui-spec/spec.config.yaml",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/spec.config.yaml"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 66,
+      "text": "- Resolves entry surface from `spec.config.yaml`",
+      "source": "docs/ui-spec/spec.config.yaml",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/spec.config.yaml"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 232,
+      "text": "1. **Inventory surfaces** from the PRD: list every screen (S), panel (P), modal (M), overlay (OV), component (C), flow (F) + assign IDs using `spec.config.yaml` prefixes.",
+      "source": "docs/ui-spec/spec.config.yaml",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/spec.config.yaml"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/METHODOLOGY.md",
+      "line": 84,
+      "text": "  spec.config.yaml → contract_tag, ID prefixes, entry_surface",
+      "source": "docs/ui-spec/spec.config.yaml",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/spec.config.yaml"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/METHODOLOGY.md",
+      "line": 100,
+      "text": "1. `spec.config.yaml` — understand project name, contract tag, ID prefixes",
+      "source": "docs/ui-spec/spec.config.yaml",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/spec.config.yaml"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/interpret.mjs",
+      "line": 734,
+      "text": "    '<p style=\"color:#9ca3af;padding:40px;text-align:center\">No surfaces found. Check your spec.config.yaml and surface directories.</p>';",
+      "source": "docs/ui-spec/spec.config.yaml",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/spec.config.yaml"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/config.mjs",
+      "line": 2,
+      "text": "// Reads spec.config.yaml from spec root. Spec root is found via:",
+      "source": "docs/ui-spec/spec.config.yaml",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/spec.config.yaml"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/config.mjs",
+      "line": 4,
+      "text": "//   2. Walking up from CWD looking for spec.config.yaml",
+      "source": "docs/ui-spec/spec.config.yaml",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/spec.config.yaml"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/config.mjs",
+      "line": 10,
+      "text": "/** Find spec root by walking up from startDir looking for spec.config.yaml. */",
+      "source": "docs/ui-spec/spec.config.yaml",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/spec.config.yaml"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/config.mjs",
+      "line": 14,
+      "text": "    if (existsSync(join(dir, \"spec.config.yaml\"))) return dir;",
+      "source": "docs/ui-spec/spec.config.yaml",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/spec.config.yaml"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/config.mjs",
+      "line": 31,
+      "text": "/** Load and validate spec.config.yaml. Exits with helpful message on failure. */",
+      "source": "docs/ui-spec/spec.config.yaml",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/spec.config.yaml"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/config.mjs",
+      "line": 37,
+      "text": "      \"ERROR: Cannot find spec.config.yaml.\\n\" +",
+      "source": "docs/ui-spec/spec.config.yaml",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/spec.config.yaml"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/config.mjs",
+      "line": 44,
+      "text": "  const configPath = join(specRoot, \"spec.config.yaml\");",
+      "source": "docs/ui-spec/spec.config.yaml",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/spec.config.yaml"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/config.mjs",
+      "line": 49,
+      "text": "    console.error(`ERROR: Cannot read spec.config.yaml at ${configPath}\\n  ${e.message}`);",
+      "source": "docs/ui-spec/spec.config.yaml",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/spec.config.yaml"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/CONVENTION.md",
+      "line": 4,
+      "text": "> The `{project}-contract` tag is configured in `spec.config.yaml` → `contract_tag`. Example: `crm-contract`, `shop-contract`.",
+      "source": "docs/ui-spec/spec.config.yaml",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/spec.config.yaml"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/CONVENTION.md",
+      "line": 198,
+      "text": "## 8. `spec.config.yaml` reference",
+      "source": "docs/ui-spec/spec.config.yaml",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/spec.config.yaml"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/wireframe/client/app.js",
+      "line": 191,
+      "text": "    '<p style=\"color:#9ca3af;padding:40px;text-align:center\">No surfaces found. Check spec.config.yaml.</p>';",
+      "source": "docs/ui-spec/spec.config.yaml",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/spec.config.yaml"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 46,
+      "text": "├── spec.config.yaml",
+      "source": "docs/ui-spec/spec.config.yaml",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/spec.config.yaml"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "src/runner/dispatch/confinement/authority.mjs",
+      "line": 134,
+      "text": "    // Spec §6.6/§6.9: a resource grant is optional by default.  In particular,",
+      "reason": "Section-number citation inherits this module’s confinement spec binding",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "src/runner/dispatch/confinement/authority.mjs",
+      "line": 185,
+      "text": " * Build a canonical ConfinementAttestationV1 (spec §6.6).",
+      "reason": "Section-number citation inherits this module’s confinement spec binding",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "src/runner/dispatch/confinement/backend-registry.mjs",
+      "line": 6,
+      "text": "// (trust boundary §6.2.1, error confinement-backend-registry-forbidden).",
+      "reason": "Section-number citation inherits this module’s confinement spec binding",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "src/runner/dispatch/confinement/backend-registry.mjs",
+      "line": 48,
+      "text": " * Default machine backend registry template (spec §6.2).",
+      "reason": "Section-number citation inherits this module’s confinement spec binding",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "src/runner/dispatch/confinement/backend-registry.mjs",
+      "line": 62,
+      "text": " * Validate one backend instance config according to its driver type schema (spec §6.2).",
+      "reason": "Section-number citation inherits this module’s confinement spec binding",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "src/runner/dispatch/confinement/backend-registry.mjs",
+      "line": 138,
+      "text": " * Validate full machine confinement backend registry document (spec §6.2).",
+      "reason": "Section-number citation inherits this module’s confinement spec binding",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "src/runner/dispatch/confinement/backend-registry.mjs",
+      "line": 172,
+      "text": " * Rejects project-local attempts to define or override machine backend instances (spec §6.2.1, §6.8).",
+      "reason": "Section-number citation inherits this module’s confinement spec binding",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "src/runner/dispatch/confinement/backend-registry.mjs",
+      "line": 195,
+      "text": " * Read and validate the machine backend registry document from disk (spec §6.2.1).",
+      "reason": "Section-number citation inherits this module’s confinement spec binding",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "src/runner/dispatch/confinement/backend-registry.mjs",
+      "line": 231,
+      "text": " * Creates an immutable snapshot for a dispatch with a `.resolve(instanceId)` method (spec §6.5).",
+      "reason": "Section-number citation inherits this module’s confinement spec binding",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "src/runner/dispatch/confinement/backend-registry.mjs",
+      "line": 254,
+      "text": " * Bootstraps missing defaults in machine backend registry without overwriting existing custom configs (spec §11.5, R6).",
+      "reason": "Section-number citation inherits this module’s confinement spec binding",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "src/runner/dispatch/confinement/backend-registry.mjs",
+      "line": 363,
+      "text": " * own config, spec §6.2; resources.mjs allocates a home under `privateHomeRoot` first). Absolute and without",
+      "reason": "Section-number citation inherits this module’s confinement spec binding",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "src/runner/dispatch/confinement/policies.mjs",
+      "line": 24,
+      "text": " * Built-in policy definitions (spec §6.2).",
+      "reason": "Section-number citation inherits this module’s confinement spec binding",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "src/runner/dispatch/confinement/policies.mjs",
+      "line": 81,
+      "text": " * Control protection strength order (spec §6.1):",
+      "reason": "Section-number citation inherits this module’s confinement spec binding",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "src/runner/dispatch/confinement/policies.mjs",
+      "line": 150,
+      "text": " * Closed schema validation for `NetworkFilterV1` (spec §6.1).",
+      "reason": "Section-number citation inherits this module’s confinement spec binding",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "src/runner/dispatch/confinement/policies.mjs",
+      "line": 209,
+      "text": "    // Spec §6.1: DNS is exact normalized name, no wildcards",
+      "reason": "Section-number citation inherits this module’s confinement spec binding",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "src/runner/dispatch/confinement/policies.mjs",
+      "line": 250,
+      "text": " * Closed schema validation for `ConfinementPolicyV1` (spec §6.1).",
+      "reason": "Section-number citation inherits this module’s confinement spec binding",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "src/runner/dispatch/confinement/policies.mjs",
+      "line": 345,
+      "text": " * Shape check for capability-level confinement configuration (spec §6.1).",
+      "reason": "Section-number citation inherits this module’s confinement spec binding",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "src/runner/dispatch/confinement/policies.mjs",
+      "line": 389,
+      "text": " * Validate an invocation-level confinement override (spec §6.1).",
+      "reason": "Section-number citation inherits this module’s confinement spec binding",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "src/runner/dispatch/confinement/policies.mjs",
+      "line": 553,
+      "text": " * into a canonical `ConfinementPolicyV1` shape at the normalization boundary (spec §6.2).",
+      "reason": "Section-number citation inherits this module’s confinement spec binding",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "src/runner/dispatch/confinement/request.mjs",
+      "line": 195,
+      "text": " * Validate a ConfinementRequestV1 shape (spec §6.4, §6.10 closed-shape).",
+      "reason": "Section-number citation inherits this module’s confinement spec binding",
+      "source": "docs/specs/confinement-authority.md",
+      "targetCandidates": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Repoint consumer at atomic promotion/cutover; verify target anchor and context",
+      "status": "owed; no consumer edits in author turn"
+    },
+    {
+      "path": "apps/fgos-gateway/web/src/screens/NeedsAnswer.tsx",
+      "line": 7,
+      "text": "// S04 — Questions needing answer (docs/ui-spec/screens/S04-questions-\n// needing-answer.md). D15 (docs/history/herdr-web-dashboard/CONTEXT.md):",
+      "source": "docs/ui-spec/screens/S04-questions-needing-answer.md",
+      "targetCandidates": [
+        "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md"
+      ],
+      "reason": "Explicit Lead-cited consumer; includes split-line source path where necessary.",
+      "action": "Repoint and validate at atomic promotion/cutover.",
+      "status": "owed; no consumer edit"
+    }
+  ],
+  "relativeLinks": [
+    {
+      "source": "docs/specs/decision-citation-drift.md",
+      "raw": "docs/backlog.md",
+      "sourceResolvedPath": "docs/backlog.md",
+      "candidateOwners": [
+        "docs/platform/decision-citation-drift/spec.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/decision-citation-drift.md",
+      "raw": "docs/decisions",
+      "sourceResolvedPath": "docs/decisions",
+      "candidateOwners": [
+        "docs/platform/decision-citation-drift/spec.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/decision-citation-drift.md",
+      "raw": "docs/decisions/*.md",
+      "sourceResolvedPath": "docs/decisions/*.md",
+      "candidateOwners": [
+        "docs/platform/decision-citation-drift/spec.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/decision-citation-drift.md",
+      "raw": "docs/decisions/NNNN-*.md",
+      "sourceResolvedPath": "docs/decisions/NNNN-*.md",
+      "candidateOwners": [
+        "docs/platform/decision-citation-drift/spec.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/decision-citation-drift.md",
+      "raw": "docs/specs",
+      "sourceResolvedPath": "docs/specs",
+      "candidateOwners": [
+        "docs/platform/decision-citation-drift/spec.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/decision-citation-drift.md",
+      "raw": "docs/specs/*.md",
+      "sourceResolvedPath": "docs/specs/*.md",
+      "candidateOwners": [
+        "docs/platform/decision-citation-drift/spec.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/decision-citation-drift.md",
+      "raw": "scripts/check-decision-citation-drift.mjs",
+      "sourceResolvedPath": "scripts/check-decision-citation-drift.mjs",
+      "candidateOwners": [
+        "docs/platform/decision-citation-drift/spec.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/decision-citation-drift.md",
+      "raw": "scripts/check-decision-supersession.mjs",
+      "sourceResolvedPath": "scripts/check-decision-supersession.mjs",
+      "candidateOwners": [
+        "docs/platform/decision-citation-drift/spec.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/decision-citation-drift.md",
+      "raw": "src/report/frontmatter.mjs",
+      "sourceResolvedPath": "src/report/frontmatter.mjs",
+      "candidateOwners": [
+        "docs/platform/decision-citation-drift/spec.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/decision-citation-drift.md",
+      "raw": "test/scripts/check-decision-citation-drift.test.mjs",
+      "sourceResolvedPath": "test/scripts/check-decision-citation-drift.test.mjs",
+      "candidateOwners": [
+        "docs/platform/decision-citation-drift/spec.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/distillery.md",
+      "raw": ".agents/skills/distill/scripts/distill.mjs",
+      "sourceResolvedPath": ".agents/skills/distill/scripts/distill.mjs",
+      "candidateOwners": [
+        "docs/platform/distillery/spec.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/distillery.md",
+      "raw": ".agents/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+      "sourceResolvedPath": ".agents/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+      "candidateOwners": [
+        "docs/platform/distillery/spec.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/distillery.md",
+      "raw": "docs/distillery/porting-log.md",
+      "sourceResolvedPath": "docs/distillery/porting-log.md",
+      "candidateOwners": [
+        "docs/platform/distillery/spec.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/distillery.md",
+      "raw": "docs/distillery/state/porting/",
+      "sourceResolvedPath": "docs/distillery/state/porting",
+      "candidateOwners": [
+        "docs/platform/distillery/spec.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/distillery.md",
+      "raw": "docs/specs/system-overview.md",
+      "sourceResolvedPath": "docs/specs/system-overview.md",
+      "candidateOwners": [
+        "docs/platform/distillery/spec.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/distillery.md",
+      "raw": "src/state/porting-store.mjs",
+      "sourceResolvedPath": "src/state/porting-store.mjs",
+      "candidateOwners": [
+        "docs/platform/distillery/spec.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/distillery.md",
+      "raw": "src/state/porting.mjs",
+      "sourceResolvedPath": "src/state/porting.mjs",
+      "candidateOwners": [
+        "docs/platform/distillery/spec.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/fgos-plugin.md",
+      "raw": "docs/backlog.md",
+      "sourceResolvedPath": "docs/backlog.md",
+      "candidateOwners": [
+        "docs/platform/claude-plugin/spec.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/fgos-plugin.md",
+      "raw": "docs/specs/work-state.md",
+      "sourceResolvedPath": "docs/specs/work-state.md",
+      "candidateOwners": [
+        "docs/platform/claude-plugin/spec.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/herdr-web-dashboard.md",
+      "raw": "docs/contracts/fgos-gateway-api-v1.yaml",
+      "sourceResolvedPath": "docs/contracts/fgos-gateway-api-v1.yaml",
+      "candidateOwners": [
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/herdr-web-dashboard.md",
+      "raw": "docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md",
+      "sourceResolvedPath": "docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md",
+      "candidateOwners": [
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/herdr-web-dashboard.md",
+      "raw": "docs/history/fgos-interface-daemon/CONTEXT.md",
+      "sourceResolvedPath": "docs/history/fgos-interface-daemon/CONTEXT.md",
+      "candidateOwners": [
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/herdr-web-dashboard.md",
+      "raw": "docs/history/herdr-web-dashboard/CONTEXT.md",
+      "sourceResolvedPath": "docs/history/herdr-web-dashboard/CONTEXT.md",
+      "candidateOwners": [
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/herdr-web-dashboard.md",
+      "raw": "docs/history/herdr-web-dashboard/DISCUSSION.md",
+      "sourceResolvedPath": "docs/history/herdr-web-dashboard/DISCUSSION.md",
+      "candidateOwners": [
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/herdr-web-dashboard.md",
+      "raw": "docs/history/herdr-web-dashboard/plan.md",
+      "sourceResolvedPath": "docs/history/herdr-web-dashboard/plan.md",
+      "candidateOwners": [
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/herdr-web-dashboard.md",
+      "raw": "docs/io-contract.md",
+      "sourceResolvedPath": "docs/io-contract.md",
+      "candidateOwners": [
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/herdr-web-dashboard.md",
+      "raw": "docs/reference/herdr-web-dashboard-layout.md",
+      "sourceResolvedPath": "docs/reference/herdr-web-dashboard-layout.md",
+      "candidateOwners": [
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/herdr-web-dashboard.md",
+      "raw": "docs/specs/work-state.md",
+      "sourceResolvedPath": "docs/specs/work-state.md",
+      "candidateOwners": [
+        "docs/platform/herdr-web-dashboard/spec.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/ui-spec/00-overview.md",
+      "raw": "docs/reference/herdr-web-dashboard-layout.md",
+      "sourceResolvedPath": "docs/reference/herdr-web-dashboard-layout.md",
+      "candidateOwners": [
+        "docs/platform/ui-spec/spec.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/ui-spec/00-overview.md",
+      "raw": "docs/specs/herdr-web-dashboard.md",
+      "sourceResolvedPath": "docs/specs/herdr-web-dashboard.md",
+      "candidateOwners": [
+        "docs/platform/ui-spec/spec.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/ui-spec/00-overview.md",
+      "raw": "docs/ui-spec/",
+      "sourceResolvedPath": "docs/ui-spec",
+      "candidateOwners": [
+        "docs/platform/ui-spec/spec.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/ui-spec/15-system-events.md",
+      "raw": "docs/contracts/fgos-gateway-api-v1.yaml",
+      "sourceResolvedPath": "docs/contracts/fgos-gateway-api-v1.yaml",
+      "candidateOwners": [
+        "docs/platform/ui-spec/contracts/15-system-events.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/ui-spec/20-domain-rules.md",
+      "raw": "docs/specs/herdr-web-dashboard.md",
+      "sourceResolvedPath": "docs/specs/herdr-web-dashboard.md",
+      "candidateOwners": [
+        "docs/platform/ui-spec/contracts/20-domain-rules.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/ui-spec/30-states-and-errors.md",
+      "raw": "docs/specs/herdr-web-dashboard.md",
+      "sourceResolvedPath": "docs/specs/herdr-web-dashboard.md",
+      "candidateOwners": [
+        "docs/platform/ui-spec/contracts/30-states-and-errors.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/ui-spec/components/C01-item-card.md",
+      "raw": "docs/specs/herdr-web-dashboard.md",
+      "sourceResolvedPath": "docs/specs/herdr-web-dashboard.md",
+      "candidateOwners": [
+        "docs/platform/ui-spec/architecture/components/C01-item-card.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/ui-spec/modals/M01-answer-question.md",
+      "raw": "docs/specs/herdr-web-dashboard.md",
+      "sourceResolvedPath": "docs/specs/herdr-web-dashboard.md",
+      "candidateOwners": [
+        "docs/platform/ui-spec/architecture/modals/M01-answer-question.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/ui-spec/modals/M02-approve-merge.md",
+      "raw": "docs/specs/herdr-web-dashboard.md",
+      "sourceResolvedPath": "docs/specs/herdr-web-dashboard.md",
+      "candidateOwners": [
+        "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/ui-spec/modals/M03-add-edit-item.md",
+      "raw": "docs/specs/herdr-web-dashboard.md",
+      "sourceResolvedPath": "docs/specs/herdr-web-dashboard.md",
+      "candidateOwners": [
+        "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/ui-spec/screens/S01-sign-in.md",
+      "raw": "docs/specs/herdr-web-dashboard.md",
+      "sourceResolvedPath": "docs/specs/herdr-web-dashboard.md",
+      "candidateOwners": [
+        "docs/platform/ui-spec/architecture/screens/S01-sign-in.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/ui-spec/screens/S02-taskboard.md",
+      "raw": "docs/history/herdr-web-dashboard/CONTEXT.md",
+      "sourceResolvedPath": "docs/history/herdr-web-dashboard/CONTEXT.md",
+      "candidateOwners": [
+        "docs/platform/ui-spec/architecture/screens/S02-taskboard.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/ui-spec/screens/S02-taskboard.md",
+      "raw": "docs/specs/herdr-web-dashboard.md",
+      "sourceResolvedPath": "docs/specs/herdr-web-dashboard.md",
+      "candidateOwners": [
+        "docs/platform/ui-spec/architecture/screens/S02-taskboard.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/ui-spec/screens/S03-task-detail.md",
+      "raw": "docs/contracts/fgos-gateway-api-v1.yaml",
+      "sourceResolvedPath": "docs/contracts/fgos-gateway-api-v1.yaml",
+      "candidateOwners": [
+        "docs/platform/ui-spec/architecture/screens/S03-task-detail.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/ui-spec/screens/S03-task-detail.md",
+      "raw": "docs/history/tsk-4id",
+      "sourceResolvedPath": "docs/history/tsk-4id",
+      "candidateOwners": [
+        "docs/platform/ui-spec/architecture/screens/S03-task-detail.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/ui-spec/screens/S03-task-detail.md",
+      "raw": "docs/specs/herdr-web-dashboard.md",
+      "sourceResolvedPath": "docs/specs/herdr-web-dashboard.md",
+      "candidateOwners": [
+        "docs/platform/ui-spec/architecture/screens/S03-task-detail.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/ui-spec/screens/S04-questions-needing-answer.md",
+      "raw": "docs/specs/herdr-web-dashboard.md",
+      "sourceResolvedPath": "docs/specs/herdr-web-dashboard.md",
+      "candidateOwners": [
+        "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/observe.md",
+      "raw": ".fgos/assignments",
+      "sourceResolvedPath": ".fgos/assignments",
+      "candidateOwners": [
+        "docs/platform/observe/spec.md",
+        "docs/platform/observe/decisions/observe-component-architecture.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/observe.md",
+      "raw": ".fgos/assignments/",
+      "sourceResolvedPath": ".fgos/assignments",
+      "candidateOwners": [
+        "docs/platform/observe/spec.md",
+        "docs/platform/observe/decisions/observe-component-architecture.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/observe.md",
+      "raw": ".fgos/config.json",
+      "sourceResolvedPath": ".fgos/config.json",
+      "candidateOwners": [
+        "docs/platform/observe/spec.md",
+        "docs/platform/observe/decisions/observe-component-architecture.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/observe.md",
+      "raw": ".fgos/installation",
+      "sourceResolvedPath": ".fgos/installation",
+      "candidateOwners": [
+        "docs/platform/observe/spec.md",
+        "docs/platform/observe/decisions/observe-component-architecture.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/observe.md",
+      "raw": ".fgos/observe/",
+      "sourceResolvedPath": ".fgos/observe",
+      "candidateOwners": [
+        "docs/platform/observe/spec.md",
+        "docs/platform/observe/decisions/observe-component-architecture.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/observe.md",
+      "raw": ".fgos/observe/.lock",
+      "sourceResolvedPath": ".fgos/observe/.lock",
+      "candidateOwners": [
+        "docs/platform/observe/spec.md",
+        "docs/platform/observe/decisions/observe-component-architecture.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/observe.md",
+      "raw": ".fgos/observe/evals/",
+      "sourceResolvedPath": ".fgos/observe/evals",
+      "candidateOwners": [
+        "docs/platform/observe/spec.md",
+        "docs/platform/observe/decisions/observe-component-architecture.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/observe.md",
+      "raw": ".fgos/observe/friction/",
+      "sourceResolvedPath": ".fgos/observe/friction",
+      "candidateOwners": [
+        "docs/platform/observe/spec.md",
+        "docs/platform/observe/decisions/observe-component-architecture.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/observe.md",
+      "raw": "../how-to/compare-discussion-setups-with-metrics-eval.md",
+      "sourceResolvedPath": "docs/how-to/compare-discussion-setups-with-metrics-eval.md",
+      "candidateOwners": [
+        "docs/platform/observe/spec.md",
+        "docs/platform/observe/decisions/observe-component-architecture.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/observe.md",
+      "raw": "../reference/discussion-quality-rubric.md",
+      "sourceResolvedPath": "docs/reference/discussion-quality-rubric.md",
+      "candidateOwners": [
+        "docs/platform/observe/spec.md",
+        "docs/platform/observe/decisions/observe-component-architecture.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/observe.md",
+      "raw": "plans/260929-1501-metrics-friction-rust-native",
+      "sourceResolvedPath": "plans/260929-1501-metrics-friction-rust-native",
+      "candidateOwners": [
+        "docs/platform/observe/spec.md",
+        "docs/platform/observe/decisions/observe-component-architecture.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/observe.md",
+      "raw": "scripts/regenerate-observe-fixtures.mjs",
+      "sourceResolvedPath": "scripts/regenerate-observe-fixtures.mjs",
+      "candidateOwners": [
+        "docs/platform/observe/spec.md",
+        "docs/platform/observe/decisions/observe-component-architecture.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/observe.md",
+      "raw": "src/setup/registrations.mjs",
+      "sourceResolvedPath": "src/setup/registrations.mjs",
+      "candidateOwners": [
+        "docs/platform/observe/spec.md",
+        "docs/platform/observe/decisions/observe-component-architecture.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/observe.md",
+      "raw": "src/util/host-bin.mjs",
+      "sourceResolvedPath": "src/util/host-bin.mjs",
+      "candidateOwners": [
+        "docs/platform/observe/spec.md",
+        "docs/platform/observe/decisions/observe-component-architecture.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/observe.md",
+      "raw": "test/fixtures/observe/",
+      "sourceResolvedPath": "test/fixtures/observe",
+      "candidateOwners": [
+        "docs/platform/observe/spec.md",
+        "docs/platform/observe/decisions/observe-component-architecture.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/observe.md",
+      "raw": "test/fixtures/run-layout/expected.json",
+      "sourceResolvedPath": "test/fixtures/run-layout/expected.json",
+      "candidateOwners": [
+        "docs/platform/observe/spec.md",
+        "docs/platform/observe/decisions/observe-component-architecture.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/confinement-authority.md",
+      "raw": ".fgos/assignments",
+      "sourceResolvedPath": ".fgos/assignments",
+      "candidateOwners": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/confinement-authority.md",
+      "raw": ".fgos/config.json",
+      "sourceResolvedPath": ".fgos/config.json",
+      "candidateOwners": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/confinement-authority.md",
+      "raw": ".fgos/secrets.local.env",
+      "sourceResolvedPath": ".fgos/secrets.local.env",
+      "candidateOwners": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/confinement-authority.md",
+      "raw": "docs/architecture-map.md",
+      "sourceResolvedPath": "docs/architecture-map.md",
+      "candidateOwners": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/confinement-authority.md",
+      "raw": "docs/routing-handoff-contract.md",
+      "sourceResolvedPath": "docs/routing-handoff-contract.md",
+      "candidateOwners": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/confinement-authority.md",
+      "raw": "docs/specs/runner.md",
+      "sourceResolvedPath": "docs/specs/runner.md",
+      "candidateOwners": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/confinement-authority.md",
+      "raw": "plans/reports/architecture-advisory-panel-260909-2107-confinement-authority-fgos-dispatch-report.md",
+      "sourceResolvedPath": "plans/reports/architecture-advisory-panel-260909-2107-confinement-authority-fgos-dispatch-report.md",
+      "candidateOwners": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/confinement-authority.md",
+      "raw": "plans/reports/architecture-advisory-panel-260910-0216-confinement-authority-run2-decision-and-run1-comparison-report.md",
+      "sourceResolvedPath": "plans/reports/architecture-advisory-panel-260910-0216-confinement-authority-run2-decision-and-run1-comparison-report.md",
+      "candidateOwners": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/confinement-authority.md",
+      "raw": "plans/reports/dispatch-execution-engine-architecture-review-260920.md",
+      "sourceResolvedPath": "plans/reports/dispatch-execution-engine-architecture-review-260920.md",
+      "candidateOwners": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/confinement-authority.md",
+      "raw": "src/runner/dispatch.mjs",
+      "sourceResolvedPath": "src/runner/dispatch.mjs",
+      "candidateOwners": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/confinement-authority.md",
+      "raw": "src/runner/dispatch/cli.mjs",
+      "sourceResolvedPath": "src/runner/dispatch/cli.mjs",
+      "candidateOwners": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/confinement-authority.md",
+      "raw": "src/runner/dispatch/config.mjs",
+      "sourceResolvedPath": "src/runner/dispatch/config.mjs",
+      "candidateOwners": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/confinement-authority.md",
+      "raw": "src/runner/dispatch/confinement/",
+      "sourceResolvedPath": "src/runner/dispatch/confinement",
+      "candidateOwners": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/confinement-authority.md",
+      "raw": "src/runner/dispatch/confinement/probes/",
+      "sourceResolvedPath": "src/runner/dispatch/confinement/probes",
+      "candidateOwners": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/confinement-authority.md",
+      "raw": "src/runner/dispatch/herdr-round.mjs",
+      "sourceResolvedPath": "src/runner/dispatch/herdr-round.mjs",
+      "candidateOwners": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/confinement-authority.md",
+      "raw": "src/runner/dispatch/resolve.mjs",
+      "sourceResolvedPath": "src/runner/dispatch/resolve.mjs",
+      "candidateOwners": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/confinement-authority.md",
+      "raw": "src/runner/dispatch/transport.mjs",
+      "sourceResolvedPath": "src/runner/dispatch/transport.mjs",
+      "candidateOwners": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/confinement-authority.md",
+      "raw": "src/runner/execution/handoff-refs.mjs",
+      "sourceResolvedPath": "src/runner/execution/handoff-refs.mjs",
+      "candidateOwners": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/confinement-authority.md",
+      "raw": "src/setup/registrations.mjs",
+      "sourceResolvedPath": "src/setup/registrations.mjs",
+      "candidateOwners": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    },
+    {
+      "source": "docs/specs/confinement-authority.md",
+      "raw": "test/architecture.test.mjs",
+      "sourceResolvedPath": "test/architecture.test.mjs",
+      "candidateOwners": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+      ],
+      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+    }
+  ],
+  "knownStaleText": "step8-evidence.md section 4; explicitly carried, truth sample and full promotion truth check owed."
+}

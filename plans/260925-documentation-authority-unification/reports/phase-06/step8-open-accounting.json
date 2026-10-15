@@ -1,0 +1,110 @@
+{
+  "version": 1,
+  "sourceCommit": "111adc51fd047d99121fd9d076eb4794c87045a4",
+  "generatedClassConflict": {
+    "pending": true,
+    "findings": [
+      {
+        "type": "file-class-not-allowed-for-disposition",
+        "path": "docs/ui-spec/generated/action-registry.csv",
+        "message": "docs/ui-spec/generated/action-registry.csv: fileClass \"maintained-authority\" is not allowed for disposition \"regenerate-from-source\" (allowed: generated)"
+      },
+      {
+        "type": "file-class-not-allowed-for-disposition",
+        "path": "docs/ui-spec/generated/coverage-report.md",
+        "message": "docs/ui-spec/generated/coverage-report.md: fileClass \"maintained-authority\" is not allowed for disposition \"regenerate-from-source\" (allowed: generated)"
+      },
+      {
+        "type": "file-class-not-allowed-for-disposition",
+        "path": "docs/ui-spec/generated/navigation-graph.yaml",
+        "message": "docs/ui-spec/generated/navigation-graph.yaml: fileClass \"maintained-authority\" is not allowed for disposition \"regenerate-from-source\" (allowed: generated)"
+      },
+      {
+        "type": "file-class-not-allowed-for-disposition",
+        "path": "docs/ui-spec/generated/surface-registry.yaml",
+        "message": "docs/ui-spec/generated/surface-registry.yaml: fileClass \"maintained-authority\" is not allowed for disposition \"regenerate-from-source\" (allowed: generated)"
+      },
+      {
+        "type": "file-class-not-allowed-for-disposition",
+        "path": "docs/ui-spec/generated/wireframe-v2.html",
+        "message": "docs/ui-spec/generated/wireframe-v2.html: fileClass \"maintained-authority\" is not allowed for disposition \"regenerate-from-source\" (allowed: generated)"
+      }
+    ],
+    "codeEvidence": {
+      "source": "scripts/generate-doc-inventory.mjs",
+      "functions": [
+        "buildSwitchboardIndex",
+        "deriveFileClassFromAuthority",
+        "classifyDocPath"
+      ],
+      "facts": "docs/ui-spec/generated/** inherits the ui-spec corpusRoot role, which does not say generated/projection; currentRoutes supplies no more specific generated declaration. Existing unchanged vocabulary allows regenerate-from-source only on fileClass generated. A9/N1 and Lead require that disposition, so no disposition workaround or fake local class overlay is used."
+    },
+    "needed": "Lead must authorize/land a data-only generated-source classification declaration through the switchboard’s existing role contract, preserving area authority status, or give a scoped amendment. The phase allowlist permits additive candidate routes only; this producer leaves the switchboard unchanged. No checker/vocabulary/extractor/baseline change is requested."
+  },
+  "inheritedUndisposedGaps": [
+    {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "3d4751967c5b44e63ecadecb5e80c895aad77a7b6a6bc1092d8a1fae30aa6826",
+      "identityFingerprint": "3d4751967c5b44e63ecadecb5e80c895aad77a7b6a6bc1092d8a1fae30aa6826",
+      "claimId": "claim_04703f011b22383992b94545055b9e56",
+      "sourceAnchor": "unheaded-block-144",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "12018d6ddfb98564eca2e0dbd9267ffa859e1e5e69c11db3f506886fa0ab717c",
+      "claimKind": "specification",
+      "status": "current",
+      "identityStatus": "identity-gap",
+      "gapReason": "edited unit whose anchor unheaded-block-144 is not a stable heading anchor"
+    },
+    {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "f0497be690212402e7550b99a6c30a7660f779d88159f5baf5e3c97c2558b2ed",
+      "identityFingerprint": "f0497be690212402e7550b99a6c30a7660f779d88159f5baf5e3c97c2558b2ed",
+      "claimId": "claim_de531cd96f9f92540f16d2ec822dbaf3",
+      "sourceAnchor": "unheaded-block-144",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "f99e0d4d9f055f630281cd3e3aead0de52d35fd8fa152c8d429bf0af333ca246",
+      "claimKind": "specification",
+      "status": "current",
+      "origin": "added-since-744fecf087841e3600c44bb3d07a681a37203ef0",
+      "identityStatus": "identity-gap",
+      "gapReason": "edited unit whose anchor unheaded-block-144 is not a stable heading anchor"
+    },
+    {
+      "sourcePath": "docs/specs/herdr-web-dashboard.md",
+      "unitDigest": "3000ed31cf9a5b81c4fe4aa1018c9e92317954afaabaa7311dc76111f15da9d6",
+      "identityFingerprint": "3000ed31cf9a5b81c4fe4aa1018c9e92317954afaabaa7311dc76111f15da9d6",
+      "claimId": "claim_7d5937c751aa5fa0db3a489560c25b6b",
+      "sourceAnchor": "unheaded-block-21",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "dfb39feda064d64c81b97e75de9dc9de5f2f795a6828e777f50fad3014f56e97",
+      "claimKind": "decision",
+      "status": "current",
+      "identityStatus": "identity-gap",
+      "gapReason": "edited unit whose anchor unheaded-block-21 is not a stable heading anchor"
+    }
+  ],
+  "duplicateGroups": [
+    {
+      "digest": "39a803b85af853156a7029460b132103eac8017b2b1b7eb0b82d181f699b86f3",
+      "members": [
+        {
+          "claimId": "claim_293d81b12e6ce78ccc407ec7ac03faff",
+          "sourcePath": "docs/specs/decision-citation-drift.md",
+          "sourceAnchor": "behaviors-operations",
+          "targetOwner": "docs/platform/decision-citation-drift/spec.md",
+          "targetAnchor": "behaviors-operations"
+        },
+        {
+          "claimId": "claim_3ec4250ed3c32495b43a85a96c5cff70",
+          "sourcePath": "docs/specs/fgos-plugin.md",
+          "sourceAnchor": "behaviors-operations",
+          "targetOwner": "docs/platform/claude-plugin/spec.md",
+          "targetAnchor": "behaviors-operations"
+        }
+      ],
+      "status": "pending independent contextual exception review",
+      "rationale": "Shared heading-only Behaviors & Operations has different area subjects and different child operations. Preserve contextual owners per the frozen area map; do not treat the plugin behavior section as citation-check behavior or the converse."
+    }
+  ],
+  "notes": "All 566 HEAD source rows have real native identities and pending decisions. Three inherited predecessor gaps remain distinct; source decisions do not silently close them. Next native sync must preserve all IDs and account exact predecessors/successors under A22/A34 as applicable, without approval carry."
+}
