@@ -1,0 +1,4496 @@
+# Independent runner current-truth sample population
+
+Content commit: 81d0ed0747014e976c0d29222439fd6e3592b468
+
+Author session: codex-session:unit-run-1792057868388-68b4a62c@2026-10-15
+
+Entries: **65**. Separate non-source channel; pending independent review. Source/candidate content is immutable at this pin. New proof/request bytes require the subsequent runner commit as the request pin; do not pretend these new artifacts existed at the content pin.
+
+A19/A28: this is one complete 181-unit current-by-default pool spread across three packets. Reviewer draws 30 units globally with an independently chosen/recorded seed and IDs; do not sample 30 per packet. Check each sampled current assertion against code with evidence. More than 10% false stops for owner direction. No current assertions inside decision/history are waived merely by placement. Known stale carriage and full truth at promotion remain owed. No author sample is selected and this request grants no truth verdict.
+
+Return Reviewer, Author session(s), Review mode: ordinary, content/request pins and one row per entryId in Claim | Verdict | Note | Source digest | Target digest. Evidence JSON digests below bind non-source accounting only and cannot apply source approval. No seed, sample or verdict supplied.
+
+## claim_a5f8435c8d549e5b41a34cf3e1f3e351
+
+Source digest (evidence JSON): 462aa33d9fe3f6c2cc41cc96837c0f16730961101bdc14f6a11036e93cfdddc8
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_a5f8435c8d549e5b41a34cf3e1f3e351",
+  "record": {
+    "claimId": "claim_a5f8435c8d549e5b41a34cf3e1f3e351",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "unheaded-block-1",
+    "sourceLines": [
+      1,
+      7
+    ],
+    "sourceDigest": "6995106e543166fec7e46573ed70ab54a171c1d87f545ef19ade28df2cd97866",
+    "targetOwner": "docs/platform/runner/spec.md",
+    "targetAnchor": "unheaded-block-1",
+    "targetDigest": "6995106e543166fec7e46573ed70ab54a171c1d87f545ef19ade28df2cd97866",
+    "class": "Weak-exact",
+    "classReason": "document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "unheaded-preamble",
+    "anchor": "unheaded-block-1",
+    "githubAnchor": "unheaded-block-1",
+    "stableAnchor": "unheaded-block-1",
+    "title": "Unheaded preamble",
+    "startLine": 1,
+    "endLine": 7,
+    "textDigest": "6995106e543166fec7e46573ed70ab54a171c1d87f545ef19ade28df2cd97866",
+    "sample": "---\narea: runner\nupdated: 2026-08-12\nsources: [phase-2-routing, post-divorce-hardening, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-clo",
+    "identityFingerprint": "fe4c34528a024172a1282c3a71f53ab613607e336be2aa24fe56e134fea7fe68",
+    "ancestry": [],
+    "text": "---\narea: runner\nupdated: 2026-08-12\nsources: [phase-2-routing, post-divorce-hardening, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-closeout, stage-clarify, stage-decompose-s1, stage-decompose-s2, pr-lifecycle-s1, discovery-context, worker-execution, fan-out-parallel, human-rounds, worker-dispatch-log, self-improve-loop, base-workflow-model-s2, fgos-multi-session-checkout, github-adapter-s3, github-adapter-s4, work-graph-intelligence-s2b, work-graph-intelligence-s10, work-graph-intelligence-s11, fgos-sample-testbed, p50-workflow-induct, str68-discovery-judge-robustness, str76-runner-bootstrap, str86-runner-headless-git, str7-str8-priority-intent, str51-2-reclaim-self-mount-fix, mvp2-scope-test-infra, str46-io-contract-lat2, spec-docs-lifecycle-realignment]\ndecisions: [feed7428, 14396a5c, 1a80b4d3, 9a19eea5, 96a65365, a7c099af, 43f257ae, 44936500, e1218b22, 6f2cbc47, a30a3d3c, 1359ab5e, cfae0120, 22699c61, 04a6cd05, 396d9d9e, 2e92b7a5, f0c40acc, 5a6900b2, 8575f1a3, c8df2479, cb09d6fd, b1aa1bdc, caecb9d1, 9b141173, a3176299, 140eb8a4, 76b7a36b, 8d04bba3, 1cd895e1, 38160a70, c11322cb, 2ac16176, f8a3a5d9, 3d4ea29c, 3c8e5926, 342102b9, d4c59ba2, 644916a4, ef6ed305, a4fe4c2b, f69951df, 5208dfe9, 8cf7effe, 7bbe6315, a7c93ec8, cfdd808f, 31b5f045, 87536f3f, 38f7e0b8, ecfd0d1a, f176c18a, d3445024, cf3ee399, fa12fd97, a58a7563, 6e2776cc, 8b95f883]\ncoverage: full\n---"
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/spec.md",
+    "unitKind": "unheaded-preamble",
+    "anchor": "unheaded-block-1",
+    "githubAnchor": "unheaded-block-1",
+    "stableAnchor": "unheaded-block-1",
+    "title": "Unheaded preamble",
+    "startLine": 1,
+    "endLine": 7,
+    "textDigest": "6995106e543166fec7e46573ed70ab54a171c1d87f545ef19ade28df2cd97866",
+    "sample": "---\narea: runner\nupdated: 2026-08-12\nsources: [phase-2-routing, post-divorce-hardening, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-clo",
+    "identityFingerprint": "fe4c34528a024172a1282c3a71f53ab613607e336be2aa24fe56e134fea7fe68",
+    "ancestry": [],
+    "text": "---\narea: runner\nupdated: 2026-08-12\nsources: [phase-2-routing, post-divorce-hardening, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-closeout, stage-clarify, stage-decompose-s1, stage-decompose-s2, pr-lifecycle-s1, discovery-context, worker-execution, fan-out-parallel, human-rounds, worker-dispatch-log, self-improve-loop, base-workflow-model-s2, fgos-multi-session-checkout, github-adapter-s3, github-adapter-s4, work-graph-intelligence-s2b, work-graph-intelligence-s10, work-graph-intelligence-s11, fgos-sample-testbed, p50-workflow-induct, str68-discovery-judge-robustness, str76-runner-bootstrap, str86-runner-headless-git, str7-str8-priority-intent, str51-2-reclaim-self-mount-fix, mvp2-scope-test-infra, str46-io-contract-lat2, spec-docs-lifecycle-realignment]\ndecisions: [feed7428, 14396a5c, 1a80b4d3, 9a19eea5, 96a65365, a7c099af, 43f257ae, 44936500, e1218b22, 6f2cbc47, a30a3d3c, 1359ab5e, cfae0120, 22699c61, 04a6cd05, 396d9d9e, 2e92b7a5, f0c40acc, 5a6900b2, 8575f1a3, c8df2479, cb09d6fd, b1aa1bdc, caecb9d1, 9b141173, a3176299, 140eb8a4, 76b7a36b, 8d04bba3, 1cd895e1, 38160a70, c11322cb, 2ac16176, f8a3a5d9, 3d4ea29c, 3c8e5926, 342102b9, d4c59ba2, 644916a4, ef6ed305, a4fe4c2b, f69951df, 5208dfe9, 8cf7effe, 7bbe6315, a7c93ec8, cfdd808f, 31b5f045, 87536f3f, 38f7e0b8, ecfd0d1a, f176c18a, d3445024, cf3ee399, fa12fd97, a58a7563, 6e2776cc, 8b95f883]\ncoverage: full\n---"
+  }
+}
+```
+
+## claim_d8ac30166d62dd668cf76d7dfb0a8170
+
+Source digest (evidence JSON): a6e4132f0e37b0c8b21636229b98f98cf3b2f079b3dc286161844742775a6707
+
+Target digest: none
+
+````json
+{
+  "entryId": "claim_d8ac30166d62dd668cf76d7dfb0a8170",
+  "record": {
+    "claimId": "claim_d8ac30166d62dd668cf76d7dfb0a8170",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "spec-runner-vòng-tự-hành",
+    "sourceLines": [
+      9,
+      9
+    ],
+    "sourceDigest": "a86d867279b4935bdfdfe419a3121f088ead4fe51ea0a62fbfec1da3949cb54c",
+    "targetOwner": "docs/platform/runner/spec.md",
+    "targetAnchor": "spec-runner-vòng-tự-hành",
+    "targetDigest": "8e268a88fd1470f40fe63c54b8f819ebdf8fcc3c539d6ad3165f39bd064ac705",
+    "class": "Judgment",
+    "classReason": "no target digest match",
+    "mandatoryDeep": true,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "heading",
+    "level": 1,
+    "title": "Spec: Runner (vòng tự hành)",
+    "anchor": "spec-runner-vòng-tự-hành",
+    "githubAnchor": "spec-runner-vòng-tự-hành",
+    "stableAnchor": "h-cf32145a0715",
+    "startLine": 9,
+    "endLine": 9,
+    "textDigest": "a86d867279b4935bdfdfe419a3121f088ead4fe51ea0a62fbfec1da3949cb54c",
+    "sample": "Spec: Runner (vòng tự hành)",
+    "sectionPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "followingBlockDigest": null,
+    "identityFingerprint": "3cd6fbc17111343773fbdc31c12203474377a0dd3fd697308c6eb7fdf0326213",
+    "ancestry": [],
+    "text": "# Spec: Runner (vòng tự hành)",
+    "sectionText": "# Spec: Runner (vòng tự hành)"
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/spec.md",
+    "unitKind": "heading",
+    "level": 1,
+    "title": "Spec: Runner (vòng tự hành)",
+    "anchor": "spec-runner-vòng-tự-hành",
+    "githubAnchor": "spec-runner-vòng-tự-hành",
+    "stableAnchor": "h-cf32145a0715",
+    "startLine": 9,
+    "endLine": 9,
+    "textDigest": "8e268a88fd1470f40fe63c54b8f819ebdf8fcc3c539d6ad3165f39bd064ac705",
+    "sample": "Spec: Runner (vòng tự hành)",
+    "sectionPayloadDigest": "7ee158f5f4676f98bc454e1789052a20f652633fd43164bc40d62f2fdbdea92b",
+    "followingBlockDigest": "2730bf6f8bfb9c582e083aed821d0f0994f072c3006dd26d87d5a3da152c0b9a",
+    "identityFingerprint": "48d038bf110590330c45f2aceba351e76709f5f6a06012a3875d6fe7cc31e7b9",
+    "ancestry": [],
+    "text": "# Spec: Runner (vòng tự hành)",
+    "sectionText": "# Spec: Runner (vòng tự hành)\n\n```txt\nDocument type: Specification\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve frozen-map runner content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; implementation truth not certified\nProvenance: docs/specs/runner.md at 63fa6f15266f45c881f610235e0be8d61ff07120; blob ddfa78cc7183cf1f7db8ee64d2339653a0aa0023\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing runner carriage, placement and conservation\nDo not use this for: Canonical behavior, source retirement or current truth proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/specs/runner.md\nSupersedes: None; legacy authority retained\nSuperseded by: None\n```\n\n> Added in candidate: Metadata and map-based placement scaffolding. The area introduction follows the frozen map into architecture/h-e53a3a9829a8.md. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim."
+  }
+}
+````
+
+## claim_db73c791da40554dda8dacd8405de722
+
+Source digest (evidence JSON): 6dd3c022ed40cdf962715d27c99a2f297b6adf468fac7750ba16cd5fc21852f7
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_db73c791da40554dda8dacd8405de722",
+  "record": {
+    "claimId": "claim_db73c791da40554dda8dacd8405de722",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "dispatch-runtime-inspection",
+    "sourceLines": [
+      11,
+      11
+    ],
+    "sourceDigest": "5ed555b20633e3d02aab26557fd2c1a144c2cac1cc1da5e7048986c280cfa1e0",
+    "targetOwner": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+    "targetAnchor": "dispatch-runtime-inspection",
+    "targetDigest": "5ed555b20633e3d02aab26557fd2c1a144c2cac1cc1da5e7048986c280cfa1e0",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; source unit shorter than 40 characters; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "heading",
+    "level": 2,
+    "title": "Dispatch runtime inspection",
+    "anchor": "dispatch-runtime-inspection",
+    "githubAnchor": "dispatch-runtime-inspection",
+    "stableAnchor": "h-e53a3a9829a8",
+    "startLine": 11,
+    "endLine": 11,
+    "textDigest": "5ed555b20633e3d02aab26557fd2c1a144c2cac1cc1da5e7048986c280cfa1e0",
+    "sample": "Dispatch runtime inspection",
+    "sectionPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "followingBlockDigest": null,
+    "identityFingerprint": "9a24ee1d82af3d99156bcfe3ac67bcb1a87b727554ffbc85b060fcf4f0a996be",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)"
+    ],
+    "text": "## Dispatch runtime inspection",
+    "sectionText": "## Dispatch runtime inspection"
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+    "unitKind": "heading",
+    "level": 2,
+    "title": "Dispatch runtime inspection",
+    "anchor": "dispatch-runtime-inspection",
+    "githubAnchor": "dispatch-runtime-inspection",
+    "stableAnchor": "h-f4169c104d8f",
+    "startLine": 25,
+    "endLine": 25,
+    "textDigest": "5ed555b20633e3d02aab26557fd2c1a144c2cac1cc1da5e7048986c280cfa1e0",
+    "sample": "Dispatch runtime inspection",
+    "sectionPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "followingBlockDigest": null,
+    "identityFingerprint": "9a24ee1d82af3d99156bcfe3ac67bcb1a87b727554ffbc85b060fcf4f0a996be",
+    "ancestry": [
+      "Added in candidate: Runner Dispatch runtime inspection"
+    ],
+    "text": "## Dispatch runtime inspection",
+    "sectionText": "## Dispatch runtime inspection"
+  }
+}
+```
+
+## claim_383a6485c1aaed79a640a59463183fe8
+
+Source digest (evidence JSON): e11bbe13ef31b18a0f5ea164ae4443232cbd32978ab3bf6efcf96bf14d800d58
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_383a6485c1aaed79a640a59463183fe8",
+  "record": {
+    "claimId": "claim_383a6485c1aaed79a640a59463183fe8",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "guard-reconciliation",
+    "sourceLines": [
+      13,
+      13
+    ],
+    "sourceDigest": "16c2b3dace9daab9a6d90e29bd7f00fbad2c313cbedb0e28ed031664fa81b255",
+    "targetOwner": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+    "targetAnchor": "guard-reconciliation",
+    "targetDigest": "16c2b3dace9daab9a6d90e29bd7f00fbad2c313cbedb0e28ed031664fa81b255",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; source unit shorter than 40 characters; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Guard reconciliation",
+    "anchor": "guard-reconciliation",
+    "githubAnchor": "guard-reconciliation",
+    "stableAnchor": "h-735ab6cd1aca",
+    "startLine": 13,
+    "endLine": 13,
+    "textDigest": "16c2b3dace9daab9a6d90e29bd7f00fbad2c313cbedb0e28ed031664fa81b255",
+    "sample": "Guard reconciliation",
+    "sectionPayloadDigest": "ed35e434b12069d79f031d12e990b5c40a430577ba8b4bc8905f2748e4f6d4af",
+    "followingBlockDigest": "52b140cfe4f41a03526182348d228ca206a88dade16f7969fe3852284677c39a",
+    "identityFingerprint": "14be3d5558678d5393fd902d9dfff1e943d20edb8b2b4b8b265d2f5c391a6910",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Dispatch runtime inspection"
+    ],
+    "text": "### Guard reconciliation",
+    "sectionText": "### Guard reconciliation\n\n`fgos dispatch reconcile` is the separate Dispatch-owned write door for local\nguard/projection repair. Its plan/apply protocol binds the action key, snapshot\ndigest, resource incarnation, and expiry; apply re-reads under a local lock.\nIt never recovers, signals, retries, relaunches, resumes, reassigns, admits,\ncancels, or takes over a Run.\n\nFour actions are supported: `clear-cwd-lock` (default; removes a cwd dispatch\nlock after proving its holder's exact PID/start-time incarnation is dead),\n`collect-result --run <runId>` (links an already-written, already-valid\n`result.json` through its owning Assignment, reusing\n`dispatch.runtime.inspect`'s own owner and admission-ledger current-Run views\nso the two operations can never disagree about ownership or currency; a\nCoordinationSession-owned Run is refused, since linking its result is that\nsession's own driver-authored write), `clear-assignment-claim --assignment\n<id>` (removes a dead-holder `dispatch.claim` once no admitted-but-\nunmaterialized launch, unsettled Run, or uncollected result is still pending\nfor that Assignment; also refused on a CoordinationSession-owned claim), and\n`repair-projection --run <runId>` (additively patches a stale\n`run.json.status` back to `settled` once an already-validated terminal\nRunResult proves the Run finished, reusing `dispatch.runtime.inspect`'s own\nRunResult interpretation so it can never disagree with inspection or\ncollect-result about whether a Run settled).\n\n`fgos dispatch inspect` projects Dispatch-owned `dispatch.runtime.inspect` as a\nread-only operation. It accepts exactly one selector: `--run`, `--assignment`,\nor `--cwd`. Resolution, duplicate detection, current-run derivation, and any\nrecovery ownership hint happen inside Dispatch; the CLI only passes the typed\npayload. Inspection never executes, forwards, or authorizes recovery.\n\nAssignment and workspace projections fail closed: every materialized Run must\nbe unambiguous and corroborated by its Assignment admission ledger before an\ninspection is ownership-complete or exposes a recovery hint. A duplicate\nmaterialization of a current admitted run is conflicting, returns every\ncandidate location, and selects no single Run.\n\nThe reader returns mutable `RunObservation` facts and the immutable terminal\n`RunResult` when present. A RunObservation never settles a Run; `result.json`\nremains the only terminal Run truth.\n\nVòng lặp tự hành của forgent: tự lấy việc sẵn-sàng từ work-state, giao cho một trợ lý thông minh chạy nền trong không gian cô lập, tự chấm kết quả bằng proof của chính việc đó, rồi ghi lại thành **đề xuất chờ duyệt**. Người dùng: người vận hành repo (khởi động vòng, duyệt đề xuất). Nguyên tắc sống còn: trong vòng dispatch, chỉ runner được ghi trạng thái; worker chỉ để lại commit trên nhánh riêng."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Guard reconciliation",
+    "anchor": "guard-reconciliation",
+    "githubAnchor": "guard-reconciliation",
+    "stableAnchor": "h-e11e1ccab816",
+    "startLine": 27,
+    "endLine": 27,
+    "textDigest": "16c2b3dace9daab9a6d90e29bd7f00fbad2c313cbedb0e28ed031664fa81b255",
+    "sample": "Guard reconciliation",
+    "sectionPayloadDigest": "ed35e434b12069d79f031d12e990b5c40a430577ba8b4bc8905f2748e4f6d4af",
+    "followingBlockDigest": "52b140cfe4f41a03526182348d228ca206a88dade16f7969fe3852284677c39a",
+    "identityFingerprint": "14be3d5558678d5393fd902d9dfff1e943d20edb8b2b4b8b265d2f5c391a6910",
+    "ancestry": [
+      "Added in candidate: Runner Dispatch runtime inspection",
+      "Dispatch runtime inspection"
+    ],
+    "text": "### Guard reconciliation",
+    "sectionText": "### Guard reconciliation\n\n`fgos dispatch reconcile` is the separate Dispatch-owned write door for local\nguard/projection repair. Its plan/apply protocol binds the action key, snapshot\ndigest, resource incarnation, and expiry; apply re-reads under a local lock.\nIt never recovers, signals, retries, relaunches, resumes, reassigns, admits,\ncancels, or takes over a Run.\n\nFour actions are supported: `clear-cwd-lock` (default; removes a cwd dispatch\nlock after proving its holder's exact PID/start-time incarnation is dead),\n`collect-result --run <runId>` (links an already-written, already-valid\n`result.json` through its owning Assignment, reusing\n`dispatch.runtime.inspect`'s own owner and admission-ledger current-Run views\nso the two operations can never disagree about ownership or currency; a\nCoordinationSession-owned Run is refused, since linking its result is that\nsession's own driver-authored write), `clear-assignment-claim --assignment\n<id>` (removes a dead-holder `dispatch.claim` once no admitted-but-\nunmaterialized launch, unsettled Run, or uncollected result is still pending\nfor that Assignment; also refused on a CoordinationSession-owned claim), and\n`repair-projection --run <runId>` (additively patches a stale\n`run.json.status` back to `settled` once an already-validated terminal\nRunResult proves the Run finished, reusing `dispatch.runtime.inspect`'s own\nRunResult interpretation so it can never disagree with inspection or\ncollect-result about whether a Run settled).\n\n`fgos dispatch inspect` projects Dispatch-owned `dispatch.runtime.inspect` as a\nread-only operation. It accepts exactly one selector: `--run`, `--assignment`,\nor `--cwd`. Resolution, duplicate detection, current-run derivation, and any\nrecovery ownership hint happen inside Dispatch; the CLI only passes the typed\npayload. Inspection never executes, forwards, or authorizes recovery.\n\nAssignment and workspace projections fail closed: every materialized Run must\nbe unambiguous and corroborated by its Assignment admission ledger before an\ninspection is ownership-complete or exposes a recovery hint. A duplicate\nmaterialization of a current admitted run is conflicting, returns every\ncandidate location, and selects no single Run.\n\nThe reader returns mutable `RunObservation` facts and the immutable terminal\n`RunResult` when present. A RunObservation never settles a Run; `result.json`\nremains the only terminal Run truth.\n\nVòng lặp tự hành của forgent: tự lấy việc sẵn-sàng từ work-state, giao cho một trợ lý thông minh chạy nền trong không gian cô lập, tự chấm kết quả bằng proof của chính việc đó, rồi ghi lại thành **đề xuất chờ duyệt**. Người dùng: người vận hành repo (khởi động vòng, duyệt đề xuất). Nguyên tắc sống còn: trong vòng dispatch, chỉ runner được ghi trạng thái; worker chỉ để lại commit trên nhánh riêng."
+  }
+}
+```
+
+## claim_9a0635bb67690683a0a7465eadae82af
+
+Source digest (evidence JSON): 15caf69251b030a6124e27612c9abb29510a3cc71a428be2468e2153e25bf636
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_9a0635bb67690683a0a7465eadae82af",
+  "record": {
+    "claimId": "claim_9a0635bb67690683a0a7465eadae82af",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "unheaded-block-2",
+    "sourceLines": [
+      15,
+      19
+    ],
+    "sourceDigest": "52b140cfe4f41a03526182348d228ca206a88dade16f7969fe3852284677c39a",
+    "targetOwner": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+    "targetAnchor": "unheaded-block-3",
+    "targetDigest": "52b140cfe4f41a03526182348d228ca206a88dade16f7969fe3852284677c39a",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-2",
+    "githubAnchor": "unheaded-block-2",
+    "stableAnchor": "unheaded-block-2",
+    "title": "Unheaded block 2",
+    "startLine": 15,
+    "endLine": 19,
+    "textDigest": "52b140cfe4f41a03526182348d228ca206a88dade16f7969fe3852284677c39a",
+    "sample": "`fgos dispatch reconcile` is the separate Dispatch-owned write door for local\nguard/projection repair. Its plan/apply protocol binds the action key, snapshot\ndigest, resource incar",
+    "identityFingerprint": "4bb553a2a2521737b286030a8f9b1bd002fb14abf546716be0abf89f30001c98",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Dispatch runtime inspection",
+      "Guard reconciliation"
+    ],
+    "text": "`fgos dispatch reconcile` is the separate Dispatch-owned write door for local\nguard/projection repair. Its plan/apply protocol binds the action key, snapshot\ndigest, resource incarnation, and expiry; apply re-reads under a local lock.\nIt never recovers, signals, retries, relaunches, resumes, reassigns, admits,\ncancels, or takes over a Run."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-3",
+    "githubAnchor": "unheaded-block-3",
+    "stableAnchor": "unheaded-block-3",
+    "title": "Unheaded block 3",
+    "startLine": 29,
+    "endLine": 33,
+    "textDigest": "52b140cfe4f41a03526182348d228ca206a88dade16f7969fe3852284677c39a",
+    "sample": "`fgos dispatch reconcile` is the separate Dispatch-owned write door for local\nguard/projection repair. Its plan/apply protocol binds the action key, snapshot\ndigest, resource incar",
+    "identityFingerprint": "4bb553a2a2521737b286030a8f9b1bd002fb14abf546716be0abf89f30001c98",
+    "ancestry": [
+      "Added in candidate: Runner Dispatch runtime inspection",
+      "Dispatch runtime inspection",
+      "Guard reconciliation"
+    ],
+    "text": "`fgos dispatch reconcile` is the separate Dispatch-owned write door for local\nguard/projection repair. Its plan/apply protocol binds the action key, snapshot\ndigest, resource incarnation, and expiry; apply re-reads under a local lock.\nIt never recovers, signals, retries, relaunches, resumes, reassigns, admits,\ncancels, or takes over a Run."
+  }
+}
+```
+
+## claim_cdf8c5562fb083bbdccf7d8c03decb7a
+
+Source digest (evidence JSON): aefbea3af06500146db46cac4ff236c046564e5093f312a759483c4e6b7f90e1
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_cdf8c5562fb083bbdccf7d8c03decb7a",
+  "record": {
+    "claimId": "claim_cdf8c5562fb083bbdccf7d8c03decb7a",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "unheaded-block-3",
+    "sourceLines": [
+      21,
+      36
+    ],
+    "sourceDigest": "026046f0b0c9dff4fa16ad675837105849db185678d8263e091270e599c0ba72",
+    "targetOwner": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+    "targetAnchor": "unheaded-block-4",
+    "targetDigest": "026046f0b0c9dff4fa16ad675837105849db185678d8263e091270e599c0ba72",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-3",
+    "githubAnchor": "unheaded-block-3",
+    "stableAnchor": "unheaded-block-3",
+    "title": "Unheaded block 3",
+    "startLine": 21,
+    "endLine": 36,
+    "textDigest": "026046f0b0c9dff4fa16ad675837105849db185678d8263e091270e599c0ba72",
+    "sample": "Four actions are supported: `clear-cwd-lock` (default; removes a cwd dispatch\nlock after proving its holder's exact PID/start-time incarnation is dead),\n`collect-result --run <runI",
+    "identityFingerprint": "f910f6f75425fbbf4aecc27f405fe0cdaa51e0abdd7fa033a81dee99cdd5e11a",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Dispatch runtime inspection",
+      "Guard reconciliation"
+    ],
+    "text": "Four actions are supported: `clear-cwd-lock` (default; removes a cwd dispatch\nlock after proving its holder's exact PID/start-time incarnation is dead),\n`collect-result --run <runId>` (links an already-written, already-valid\n`result.json` through its owning Assignment, reusing\n`dispatch.runtime.inspect`'s own owner and admission-ledger current-Run views\nso the two operations can never disagree about ownership or currency; a\nCoordinationSession-owned Run is refused, since linking its result is that\nsession's own driver-authored write), `clear-assignment-claim --assignment\n<id>` (removes a dead-holder `dispatch.claim` once no admitted-but-\nunmaterialized launch, unsettled Run, or uncollected result is still pending\nfor that Assignment; also refused on a CoordinationSession-owned claim), and\n`repair-projection --run <runId>` (additively patches a stale\n`run.json.status` back to `settled` once an already-validated terminal\nRunResult proves the Run finished, reusing `dispatch.runtime.inspect`'s own\nRunResult interpretation so it can never disagree with inspection or\ncollect-result about whether a Run settled)."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-4",
+    "githubAnchor": "unheaded-block-4",
+    "stableAnchor": "unheaded-block-4",
+    "title": "Unheaded block 4",
+    "startLine": 35,
+    "endLine": 50,
+    "textDigest": "026046f0b0c9dff4fa16ad675837105849db185678d8263e091270e599c0ba72",
+    "sample": "Four actions are supported: `clear-cwd-lock` (default; removes a cwd dispatch\nlock after proving its holder's exact PID/start-time incarnation is dead),\n`collect-result --run <runI",
+    "identityFingerprint": "f910f6f75425fbbf4aecc27f405fe0cdaa51e0abdd7fa033a81dee99cdd5e11a",
+    "ancestry": [
+      "Added in candidate: Runner Dispatch runtime inspection",
+      "Dispatch runtime inspection",
+      "Guard reconciliation"
+    ],
+    "text": "Four actions are supported: `clear-cwd-lock` (default; removes a cwd dispatch\nlock after proving its holder's exact PID/start-time incarnation is dead),\n`collect-result --run <runId>` (links an already-written, already-valid\n`result.json` through its owning Assignment, reusing\n`dispatch.runtime.inspect`'s own owner and admission-ledger current-Run views\nso the two operations can never disagree about ownership or currency; a\nCoordinationSession-owned Run is refused, since linking its result is that\nsession's own driver-authored write), `clear-assignment-claim --assignment\n<id>` (removes a dead-holder `dispatch.claim` once no admitted-but-\nunmaterialized launch, unsettled Run, or uncollected result is still pending\nfor that Assignment; also refused on a CoordinationSession-owned claim), and\n`repair-projection --run <runId>` (additively patches a stale\n`run.json.status` back to `settled` once an already-validated terminal\nRunResult proves the Run finished, reusing `dispatch.runtime.inspect`'s own\nRunResult interpretation so it can never disagree with inspection or\ncollect-result about whether a Run settled)."
+  }
+}
+```
+
+## claim_5d9ba2698cc42766513d2f6892f4456c
+
+Source digest (evidence JSON): c29e9206002ef79fe1f0358a6c7d80cdfba7d179287771fe499738472d3ab751
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_5d9ba2698cc42766513d2f6892f4456c",
+  "record": {
+    "claimId": "claim_5d9ba2698cc42766513d2f6892f4456c",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "unheaded-block-4",
+    "sourceLines": [
+      38,
+      42
+    ],
+    "sourceDigest": "8e07eb62e2a93097b82a4428a8f5bb3a2880bff4992130393b9b7783c4cccdc1",
+    "targetOwner": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+    "targetAnchor": "unheaded-block-5",
+    "targetDigest": "8e07eb62e2a93097b82a4428a8f5bb3a2880bff4992130393b9b7783c4cccdc1",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-4",
+    "githubAnchor": "unheaded-block-4",
+    "stableAnchor": "unheaded-block-4",
+    "title": "Unheaded block 4",
+    "startLine": 38,
+    "endLine": 42,
+    "textDigest": "8e07eb62e2a93097b82a4428a8f5bb3a2880bff4992130393b9b7783c4cccdc1",
+    "sample": "`fgos dispatch inspect` projects Dispatch-owned `dispatch.runtime.inspect` as a\nread-only operation. It accepts exactly one selector: `--run`, `--assignment`,\nor `--cwd`. Resolutio",
+    "identityFingerprint": "024145d2f796b93b5dc642008b8ffed4acd42aa394432e131b441c03be46e162",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Dispatch runtime inspection",
+      "Guard reconciliation"
+    ],
+    "text": "`fgos dispatch inspect` projects Dispatch-owned `dispatch.runtime.inspect` as a\nread-only operation. It accepts exactly one selector: `--run`, `--assignment`,\nor `--cwd`. Resolution, duplicate detection, current-run derivation, and any\nrecovery ownership hint happen inside Dispatch; the CLI only passes the typed\npayload. Inspection never executes, forwards, or authorizes recovery."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-5",
+    "githubAnchor": "unheaded-block-5",
+    "stableAnchor": "unheaded-block-5",
+    "title": "Unheaded block 5",
+    "startLine": 52,
+    "endLine": 56,
+    "textDigest": "8e07eb62e2a93097b82a4428a8f5bb3a2880bff4992130393b9b7783c4cccdc1",
+    "sample": "`fgos dispatch inspect` projects Dispatch-owned `dispatch.runtime.inspect` as a\nread-only operation. It accepts exactly one selector: `--run`, `--assignment`,\nor `--cwd`. Resolutio",
+    "identityFingerprint": "024145d2f796b93b5dc642008b8ffed4acd42aa394432e131b441c03be46e162",
+    "ancestry": [
+      "Added in candidate: Runner Dispatch runtime inspection",
+      "Dispatch runtime inspection",
+      "Guard reconciliation"
+    ],
+    "text": "`fgos dispatch inspect` projects Dispatch-owned `dispatch.runtime.inspect` as a\nread-only operation. It accepts exactly one selector: `--run`, `--assignment`,\nor `--cwd`. Resolution, duplicate detection, current-run derivation, and any\nrecovery ownership hint happen inside Dispatch; the CLI only passes the typed\npayload. Inspection never executes, forwards, or authorizes recovery."
+  }
+}
+```
+
+## claim_a48d3e36ff3950e3637e7a0945d8a26a
+
+Source digest (evidence JSON): 4ac660685e056c397f0adf28bb871c35b62d50723a7c4fd22318dfa8e0e50a78
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_a48d3e36ff3950e3637e7a0945d8a26a",
+  "record": {
+    "claimId": "claim_a48d3e36ff3950e3637e7a0945d8a26a",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "unheaded-block-5",
+    "sourceLines": [
+      44,
+      48
+    ],
+    "sourceDigest": "0eced0ecaa6ff9b75497aef41ccbf40df3e5435c41dd06de86afdc82047ce5c9",
+    "targetOwner": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+    "targetAnchor": "unheaded-block-6",
+    "targetDigest": "0eced0ecaa6ff9b75497aef41ccbf40df3e5435c41dd06de86afdc82047ce5c9",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-5",
+    "githubAnchor": "unheaded-block-5",
+    "stableAnchor": "unheaded-block-5",
+    "title": "Unheaded block 5",
+    "startLine": 44,
+    "endLine": 48,
+    "textDigest": "0eced0ecaa6ff9b75497aef41ccbf40df3e5435c41dd06de86afdc82047ce5c9",
+    "sample": "Assignment and workspace projections fail closed: every materialized Run must\nbe unambiguous and corroborated by its Assignment admission ledger before an\ninspection is ownership-c",
+    "identityFingerprint": "9ad94fae2d9fb6d5c3609c1b51dbc5d609dbf3296ef9741370ce69e1b634ee10",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Dispatch runtime inspection",
+      "Guard reconciliation"
+    ],
+    "text": "Assignment and workspace projections fail closed: every materialized Run must\nbe unambiguous and corroborated by its Assignment admission ledger before an\ninspection is ownership-complete or exposes a recovery hint. A duplicate\nmaterialization of a current admitted run is conflicting, returns every\ncandidate location, and selects no single Run."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-6",
+    "githubAnchor": "unheaded-block-6",
+    "stableAnchor": "unheaded-block-6",
+    "title": "Unheaded block 6",
+    "startLine": 58,
+    "endLine": 62,
+    "textDigest": "0eced0ecaa6ff9b75497aef41ccbf40df3e5435c41dd06de86afdc82047ce5c9",
+    "sample": "Assignment and workspace projections fail closed: every materialized Run must\nbe unambiguous and corroborated by its Assignment admission ledger before an\ninspection is ownership-c",
+    "identityFingerprint": "9ad94fae2d9fb6d5c3609c1b51dbc5d609dbf3296ef9741370ce69e1b634ee10",
+    "ancestry": [
+      "Added in candidate: Runner Dispatch runtime inspection",
+      "Dispatch runtime inspection",
+      "Guard reconciliation"
+    ],
+    "text": "Assignment and workspace projections fail closed: every materialized Run must\nbe unambiguous and corroborated by its Assignment admission ledger before an\ninspection is ownership-complete or exposes a recovery hint. A duplicate\nmaterialization of a current admitted run is conflicting, returns every\ncandidate location, and selects no single Run."
+  }
+}
+```
+
+## claim_6dba9226798857c2c2eedd1837fc382b
+
+Source digest (evidence JSON): 777bda37bca9ad3ef8e2108b06262e8658bf0c80369f03281884cfcfd2567227
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_6dba9226798857c2c2eedd1837fc382b",
+  "record": {
+    "claimId": "claim_6dba9226798857c2c2eedd1837fc382b",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "unheaded-block-6",
+    "sourceLines": [
+      50,
+      52
+    ],
+    "sourceDigest": "c46300ac8ef4f83a196a65ab08fc44def29be98df645c8321a7b0a310d05a8de",
+    "targetOwner": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+    "targetAnchor": "unheaded-block-7",
+    "targetDigest": "c46300ac8ef4f83a196a65ab08fc44def29be98df645c8321a7b0a310d05a8de",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-6",
+    "githubAnchor": "unheaded-block-6",
+    "stableAnchor": "unheaded-block-6",
+    "title": "Unheaded block 6",
+    "startLine": 50,
+    "endLine": 52,
+    "textDigest": "c46300ac8ef4f83a196a65ab08fc44def29be98df645c8321a7b0a310d05a8de",
+    "sample": "The reader returns mutable `RunObservation` facts and the immutable terminal\n`RunResult` when present. A RunObservation never settles a Run; `result.json`\nremains the only terminal",
+    "identityFingerprint": "58ca623c36a04faf272a5851259cafba41dae30793aecfa75660195bb1dd5b0a",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Dispatch runtime inspection",
+      "Guard reconciliation"
+    ],
+    "text": "The reader returns mutable `RunObservation` facts and the immutable terminal\n`RunResult` when present. A RunObservation never settles a Run; `result.json`\nremains the only terminal Run truth."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-7",
+    "githubAnchor": "unheaded-block-7",
+    "stableAnchor": "unheaded-block-7",
+    "title": "Unheaded block 7",
+    "startLine": 64,
+    "endLine": 66,
+    "textDigest": "c46300ac8ef4f83a196a65ab08fc44def29be98df645c8321a7b0a310d05a8de",
+    "sample": "The reader returns mutable `RunObservation` facts and the immutable terminal\n`RunResult` when present. A RunObservation never settles a Run; `result.json`\nremains the only terminal",
+    "identityFingerprint": "58ca623c36a04faf272a5851259cafba41dae30793aecfa75660195bb1dd5b0a",
+    "ancestry": [
+      "Added in candidate: Runner Dispatch runtime inspection",
+      "Dispatch runtime inspection",
+      "Guard reconciliation"
+    ],
+    "text": "The reader returns mutable `RunObservation` facts and the immutable terminal\n`RunResult` when present. A RunObservation never settles a Run; `result.json`\nremains the only terminal Run truth."
+  }
+}
+```
+
+## claim_2073b7160c35c63c611d02087866ddec
+
+Source digest (evidence JSON): 7d4cca6e8a42b547dae74b5312534e0a3c6a610bf5274635e84166665dadf986
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_2073b7160c35c63c611d02087866ddec",
+  "record": {
+    "claimId": "claim_2073b7160c35c63c611d02087866ddec",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "unheaded-block-7",
+    "sourceLines": [
+      54,
+      54
+    ],
+    "sourceDigest": "a0ac201ce63ad313f1e8cd2584ab6ffc111a74a4b25a96f24c3a1c939b4ddeb2",
+    "targetOwner": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+    "targetAnchor": "unheaded-block-8",
+    "targetDigest": "a0ac201ce63ad313f1e8cd2584ab6ffc111a74a4b25a96f24c3a1c939b4ddeb2",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-7",
+    "githubAnchor": "unheaded-block-7",
+    "stableAnchor": "unheaded-block-7",
+    "title": "Unheaded block 7",
+    "startLine": 54,
+    "endLine": 54,
+    "textDigest": "a0ac201ce63ad313f1e8cd2584ab6ffc111a74a4b25a96f24c3a1c939b4ddeb2",
+    "sample": "Vòng lặp tự hành của forgent: tự lấy việc sẵn-sàng từ work-state, giao cho một trợ lý thông minh chạy nền trong không gian cô lập, tự chấm kết quả bằng proof của chính việc đó, rồi",
+    "identityFingerprint": "a1b513ff6ce1f32f899c7824e2c7e6eec64e4799fdb78e9ebac3fc8f95e25734",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Dispatch runtime inspection",
+      "Guard reconciliation"
+    ],
+    "text": "Vòng lặp tự hành của forgent: tự lấy việc sẵn-sàng từ work-state, giao cho một trợ lý thông minh chạy nền trong không gian cô lập, tự chấm kết quả bằng proof của chính việc đó, rồi ghi lại thành **đề xuất chờ duyệt**. Người dùng: người vận hành repo (khởi động vòng, duyệt đề xuất). Nguyên tắc sống còn: trong vòng dispatch, chỉ runner được ghi trạng thái; worker chỉ để lại commit trên nhánh riêng."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-8",
+    "githubAnchor": "unheaded-block-8",
+    "stableAnchor": "unheaded-block-8",
+    "title": "Unheaded block 8",
+    "startLine": 68,
+    "endLine": 68,
+    "textDigest": "a0ac201ce63ad313f1e8cd2584ab6ffc111a74a4b25a96f24c3a1c939b4ddeb2",
+    "sample": "Vòng lặp tự hành của forgent: tự lấy việc sẵn-sàng từ work-state, giao cho một trợ lý thông minh chạy nền trong không gian cô lập, tự chấm kết quả bằng proof của chính việc đó, rồi",
+    "identityFingerprint": "a1b513ff6ce1f32f899c7824e2c7e6eec64e4799fdb78e9ebac3fc8f95e25734",
+    "ancestry": [
+      "Added in candidate: Runner Dispatch runtime inspection",
+      "Dispatch runtime inspection",
+      "Guard reconciliation"
+    ],
+    "text": "Vòng lặp tự hành của forgent: tự lấy việc sẵn-sàng từ work-state, giao cho một trợ lý thông minh chạy nền trong không gian cô lập, tự chấm kết quả bằng proof của chính việc đó, rồi ghi lại thành **đề xuất chờ duyệt**. Người dùng: người vận hành repo (khởi động vòng, duyệt đề xuất). Nguyên tắc sống còn: trong vòng dispatch, chỉ runner được ghi trạng thái; worker chỉ để lại commit trên nhánh riêng."
+  }
+}
+```
+
+## claim_38036fa49508cc4b76e5e20fdb797a77
+
+Source digest (evidence JSON): 29b0206f7e0eb2ecc65b0dd7c465f5df442891783cb204b571d85503fc55a58d
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_38036fa49508cc4b76e5e20fdb797a77",
+  "record": {
+    "claimId": "claim_38036fa49508cc4b76e5e20fdb797a77",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "entry-points-triggers",
+    "sourceLines": [
+      56,
+      56
+    ],
+    "sourceDigest": "72526beea6ee0dab3fb182c1754440a8b37f4be2a7c4ffe734e7ef583c833b68",
+    "targetOwner": "docs/platform/runner/subcomponents/h-ce5b9771a26a/spec.md",
+    "targetAnchor": "entry-points-triggers",
+    "targetDigest": "72526beea6ee0dab3fb182c1754440a8b37f4be2a7c4ffe734e7ef583c833b68",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; source unit shorter than 40 characters; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "heading",
+    "level": 2,
+    "title": "Entry Points & Triggers",
+    "anchor": "entry-points-triggers",
+    "githubAnchor": "entry-points-triggers",
+    "stableAnchor": "h-ce5b9771a26a",
+    "startLine": 56,
+    "endLine": 56,
+    "textDigest": "72526beea6ee0dab3fb182c1754440a8b37f4be2a7c4ffe734e7ef583c833b68",
+    "sample": "Entry Points & Triggers",
+    "sectionPayloadDigest": "66c396e78df6e72f66e4870a5c211b0deff5387b6985d9362a528e94cbfcd8a6",
+    "followingBlockDigest": "66c396e78df6e72f66e4870a5c211b0deff5387b6985d9362a528e94cbfcd8a6",
+    "identityFingerprint": "c7cf329e5341ec7057fae3cd2f9c59b6cdb225c822e1c0efb61c34ce102bd789",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)"
+    ],
+    "text": "## Entry Points & Triggers",
+    "sectionText": "## Entry Points & Triggers\n\n- `fgos-runner --once` → chạy đúng một vòng: gặt-lại → tìm việc → giao việc theo MẺ (nhiều việc cùng lúc, giới hạn hai tầng) → chấm từng việc → ghi, rồi nạp lại mẻ kế tiếp — lặp tới khi không còn việc đang chạy VÀ không còn việc sẵn-sàng (xem \"Giao việc theo mẻ, song song có giới hạn\" dưới)\n- `fgos-runner --dry-run` → in kế hoạch (việc nào sẽ chạy, model nào) mà không làm gì\n- `fgos-runner --watch [--poll-ms <n>]` → chạy BỀN, không tự thoát khi frontier rỗng; lặp lại vòng đời `--once` mỗi lượt, phản ứng gần-tức-thời khi lượt vừa xong có ghi gì đó, nghỉ `--poll-ms` (mặc định 5000) khi lượt đó không ghi gì; dừng CHỈ qua SIGINT/SIGTERM tường minh — xem \"Vòng cầm-giao bền (--watch)\" dưới\n- Khởi động MỌI vòng đều bắt đầu bằng bước **gặt-lại** (reap): giải quyết các claim runtime (hoặc item mang trạng thái bền `doing` di sản) từ lần chạy trước bị crash trước khi tìm việc mới — xem \"Gặt-lại lúc khởi động\" dưới\n- Ngay sau gặt-lại, TRƯỚC khi tìm việc thi công: **quét nghiên-cứu** — giao worker thật cho mọi item ở stage `discovery`; xem \"Quét nghiên-cứu trước dispatch\" dưới\n- Ngay sau quét nghiên-cứu, CÙNG TRƯỚC khi tìm việc thi công: **quét chia-việc** — mọi item ở stage `planning`, cộng tên stage di sản `decompose`; xem \"Quét chia-việc trước dispatch\" dưới\n- `fgos take`/`fgos return` (cửa pull, ngoài vòng runner — xem spec Work-State \"Cửa pull giao–nhận việc\") claim/trả việc qua bản ghi runtime claim (mọi claim mới KHÔNG BAO GIỜ ghi bền giá trị `doing` — *new claims do not durably write into doing*) + CAS + goal-check runner tự dùng; gặt-lại lúc khởi động BỎ QUA claim đến từ cửa pull — xem \"Gặt-lại lúc khởi động\" dưới\n- `fgos review <id>` / `fgos approve <id> [--timeout <ms>] [--acknowledge-iron-law]` / `fgos reject <id> --reason \"...\"` (ngoài vòng runner, gọi bởi người vận hành) — cổng duyệt PR nội bộ cho một đề xuất `awaiting-approval` đã sẵn, MỘT cổng cho cả nguồn runner lẫn pull-door; `approve` nguồn runner còn chạy phán Iron Law trước khi merge, nhưng CHỈ khi lần merge đó land lên trunk (self-improve loop STR13 Slice 3, ranh giới trunk per `0032`) — xem \"Cổng duyệt PR nội bộ\" dưới\n- `fgos review <id> --github [--pr <n>]` / `fgos approve <id> --github --pr <n>` (ngoài vòng runner, gọi bởi người vận hành, tuỳ chọn — github-adapter) — vận chuyển thay thế của CÙNG cổng duyệt trên, đưa việc duyệt sang GitHub thay vì diff/merge cục bộ, chỉ áp dụng cho đề xuất nguồn runner; `review --github` kèm `--pr` là phép hỏi thăm trạng thái sống của một PR đã mở, không mở PR mới (github-adapter, phát hiện đóng-không-merge) — xem \"Cổng duyệt qua GitHub\" dưới\n- `fgos catchup <id>` (ngoài vòng runner, gọi bởi người vận hành) — đồng bộ lại một việc đang đỗ (`blocked`) vì gãy nhập (xung đột, verify đỏ sau nhập, hoặc trôi tích hợp): kéo trạng thái mới nhất của đích vào nhánh riêng của việc rồi thử lại — xem \"Đồng bộ lại một việc đỗ (catch-up)\" dưới\n- `fgos evolve` / `fgos evolve --pick <id>` / `fgos evolve --submit <id>` (ngoài vòng runner, gọi bởi người vận hành, on-demand — self-improve loop STR13) — Gate A của vòng tự cải thiện: xếp hạng candidate từ friction chưa ngã-ngũ, người chọn một hoặc dừng (đọc-thuần tuyệt đối), hoặc bắc cầu candidate đã chọn sang một việc thật (`--submit`, hành động ghi duy nhất của bề mặt evolve) — xem \"Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)\" dưới\n- `fgos session start [--item <id>]` / `fgos session end <session-id> [--force]` / `fgos session list` / `fgos session gc` (ngoài vòng runner, gọi bởi người vận hành/một tác nhân) — vòng đời phiên checkout đa-phiên tùy chọn: một worktree detached-HEAD mỗi phiên cho cây nguồn, dùng chung MỘT kho `.fgos/` qua symlink; `end` từ chối một phiên đã rời commit khởi tạo trừ khi `--force`; `gc` dọn các mục sổ mồ côi (worktree đã mất khỏi git, hoặc pid của lệnh `start` một-lần đã chết), tha các phiên còn commit lửng hoặc còn thay đổi chưa commit — xem \"Phiên checkout đa-phiên\" dưới"
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/subcomponents/h-ce5b9771a26a/spec.md",
+    "unitKind": "heading",
+    "level": 2,
+    "title": "Entry Points & Triggers",
+    "anchor": "entry-points-triggers",
+    "githubAnchor": "entry-points-triggers",
+    "stableAnchor": "h-3b3f564e51e1",
+    "startLine": 25,
+    "endLine": 25,
+    "textDigest": "72526beea6ee0dab3fb182c1754440a8b37f4be2a7c4ffe734e7ef583c833b68",
+    "sample": "Entry Points & Triggers",
+    "sectionPayloadDigest": "66c396e78df6e72f66e4870a5c211b0deff5387b6985d9362a528e94cbfcd8a6",
+    "followingBlockDigest": "66c396e78df6e72f66e4870a5c211b0deff5387b6985d9362a528e94cbfcd8a6",
+    "identityFingerprint": "c7cf329e5341ec7057fae3cd2f9c59b6cdb225c822e1c0efb61c34ce102bd789",
+    "ancestry": [
+      "Added in candidate: Runner Entry Points & Triggers"
+    ],
+    "text": "## Entry Points & Triggers",
+    "sectionText": "## Entry Points & Triggers\n\n- `fgos-runner --once` → chạy đúng một vòng: gặt-lại → tìm việc → giao việc theo MẺ (nhiều việc cùng lúc, giới hạn hai tầng) → chấm từng việc → ghi, rồi nạp lại mẻ kế tiếp — lặp tới khi không còn việc đang chạy VÀ không còn việc sẵn-sàng (xem \"Giao việc theo mẻ, song song có giới hạn\" dưới)\n- `fgos-runner --dry-run` → in kế hoạch (việc nào sẽ chạy, model nào) mà không làm gì\n- `fgos-runner --watch [--poll-ms <n>]` → chạy BỀN, không tự thoát khi frontier rỗng; lặp lại vòng đời `--once` mỗi lượt, phản ứng gần-tức-thời khi lượt vừa xong có ghi gì đó, nghỉ `--poll-ms` (mặc định 5000) khi lượt đó không ghi gì; dừng CHỈ qua SIGINT/SIGTERM tường minh — xem \"Vòng cầm-giao bền (--watch)\" dưới\n- Khởi động MỌI vòng đều bắt đầu bằng bước **gặt-lại** (reap): giải quyết các claim runtime (hoặc item mang trạng thái bền `doing` di sản) từ lần chạy trước bị crash trước khi tìm việc mới — xem \"Gặt-lại lúc khởi động\" dưới\n- Ngay sau gặt-lại, TRƯỚC khi tìm việc thi công: **quét nghiên-cứu** — giao worker thật cho mọi item ở stage `discovery`; xem \"Quét nghiên-cứu trước dispatch\" dưới\n- Ngay sau quét nghiên-cứu, CÙNG TRƯỚC khi tìm việc thi công: **quét chia-việc** — mọi item ở stage `planning`, cộng tên stage di sản `decompose`; xem \"Quét chia-việc trước dispatch\" dưới\n- `fgos take`/`fgos return` (cửa pull, ngoài vòng runner — xem spec Work-State \"Cửa pull giao–nhận việc\") claim/trả việc qua bản ghi runtime claim (mọi claim mới KHÔNG BAO GIỜ ghi bền giá trị `doing` — *new claims do not durably write into doing*) + CAS + goal-check runner tự dùng; gặt-lại lúc khởi động BỎ QUA claim đến từ cửa pull — xem \"Gặt-lại lúc khởi động\" dưới\n- `fgos review <id>` / `fgos approve <id> [--timeout <ms>] [--acknowledge-iron-law]` / `fgos reject <id> --reason \"...\"` (ngoài vòng runner, gọi bởi người vận hành) — cổng duyệt PR nội bộ cho một đề xuất `awaiting-approval` đã sẵn, MỘT cổng cho cả nguồn runner lẫn pull-door; `approve` nguồn runner còn chạy phán Iron Law trước khi merge, nhưng CHỈ khi lần merge đó land lên trunk (self-improve loop STR13 Slice 3, ranh giới trunk per `0032`) — xem \"Cổng duyệt PR nội bộ\" dưới\n- `fgos review <id> --github [--pr <n>]` / `fgos approve <id> --github --pr <n>` (ngoài vòng runner, gọi bởi người vận hành, tuỳ chọn — github-adapter) — vận chuyển thay thế của CÙNG cổng duyệt trên, đưa việc duyệt sang GitHub thay vì diff/merge cục bộ, chỉ áp dụng cho đề xuất nguồn runner; `review --github` kèm `--pr` là phép hỏi thăm trạng thái sống của một PR đã mở, không mở PR mới (github-adapter, phát hiện đóng-không-merge) — xem \"Cổng duyệt qua GitHub\" dưới\n- `fgos catchup <id>` (ngoài vòng runner, gọi bởi người vận hành) — đồng bộ lại một việc đang đỗ (`blocked`) vì gãy nhập (xung đột, verify đỏ sau nhập, hoặc trôi tích hợp): kéo trạng thái mới nhất của đích vào nhánh riêng của việc rồi thử lại — xem \"Đồng bộ lại một việc đỗ (catch-up)\" dưới\n- `fgos evolve` / `fgos evolve --pick <id>` / `fgos evolve --submit <id>` (ngoài vòng runner, gọi bởi người vận hành, on-demand — self-improve loop STR13) — Gate A của vòng tự cải thiện: xếp hạng candidate từ friction chưa ngã-ngũ, người chọn một hoặc dừng (đọc-thuần tuyệt đối), hoặc bắc cầu candidate đã chọn sang một việc thật (`--submit`, hành động ghi duy nhất của bề mặt evolve) — xem \"Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)\" dưới\n- `fgos session start [--item <id>]` / `fgos session end <session-id> [--force]` / `fgos session list` / `fgos session gc` (ngoài vòng runner, gọi bởi người vận hành/một tác nhân) — vòng đời phiên checkout đa-phiên tùy chọn: một worktree detached-HEAD mỗi phiên cho cây nguồn, dùng chung MỘT kho `.fgos/` qua symlink; `end` từ chối một phiên đã rời commit khởi tạo trừ khi `--force`; `gc` dọn các mục sổ mồ côi (worktree đã mất khỏi git, hoặc pid của lệnh `start` một-lần đã chết), tha các phiên còn commit lửng hoặc còn thay đổi chưa commit — xem \"Phiên checkout đa-phiên\" dưới"
+  }
+}
+```
+
+## claim_9e761df1b2c15fd9a0e722d1f0324a4a
+
+Source digest (evidence JSON): 150883259e4cace3d2f5b49ee4e3ed75e5cc96872171b963f3dde8983b4c78ba
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_9e761df1b2c15fd9a0e722d1f0324a4a",
+  "record": {
+    "claimId": "claim_9e761df1b2c15fd9a0e722d1f0324a4a",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "unheaded-block-8",
+    "sourceLines": [
+      58,
+      69
+    ],
+    "sourceDigest": "66c396e78df6e72f66e4870a5c211b0deff5387b6985d9362a528e94cbfcd8a6",
+    "targetOwner": "docs/platform/runner/subcomponents/h-ce5b9771a26a/spec.md",
+    "targetAnchor": "unheaded-block-3",
+    "targetDigest": "66c396e78df6e72f66e4870a5c211b0deff5387b6985d9362a528e94cbfcd8a6",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-8",
+    "githubAnchor": "unheaded-block-8",
+    "stableAnchor": "unheaded-block-8",
+    "title": "Unheaded block 8",
+    "startLine": 58,
+    "endLine": 69,
+    "textDigest": "66c396e78df6e72f66e4870a5c211b0deff5387b6985d9362a528e94cbfcd8a6",
+    "sample": "- `fgos-runner --once` → chạy đúng một vòng: gặt-lại → tìm việc → giao việc theo MẺ (nhiều việc cùng lúc, giới hạn hai tầng) → chấm từng việc → ghi, rồi nạp lại mẻ kế tiếp — lặp tớ",
+    "identityFingerprint": "028c6be77fe8a327b7a1b8718c389e213c94e9f466ac0f31e182027a5230c581",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Entry Points & Triggers"
+    ],
+    "text": "- `fgos-runner --once` → chạy đúng một vòng: gặt-lại → tìm việc → giao việc theo MẺ (nhiều việc cùng lúc, giới hạn hai tầng) → chấm từng việc → ghi, rồi nạp lại mẻ kế tiếp — lặp tới khi không còn việc đang chạy VÀ không còn việc sẵn-sàng (xem \"Giao việc theo mẻ, song song có giới hạn\" dưới)\n- `fgos-runner --dry-run` → in kế hoạch (việc nào sẽ chạy, model nào) mà không làm gì\n- `fgos-runner --watch [--poll-ms <n>]` → chạy BỀN, không tự thoát khi frontier rỗng; lặp lại vòng đời `--once` mỗi lượt, phản ứng gần-tức-thời khi lượt vừa xong có ghi gì đó, nghỉ `--poll-ms` (mặc định 5000) khi lượt đó không ghi gì; dừng CHỈ qua SIGINT/SIGTERM tường minh — xem \"Vòng cầm-giao bền (--watch)\" dưới\n- Khởi động MỌI vòng đều bắt đầu bằng bước **gặt-lại** (reap): giải quyết các claim runtime (hoặc item mang trạng thái bền `doing` di sản) từ lần chạy trước bị crash trước khi tìm việc mới — xem \"Gặt-lại lúc khởi động\" dưới\n- Ngay sau gặt-lại, TRƯỚC khi tìm việc thi công: **quét nghiên-cứu** — giao worker thật cho mọi item ở stage `discovery`; xem \"Quét nghiên-cứu trước dispatch\" dưới\n- Ngay sau quét nghiên-cứu, CÙNG TRƯỚC khi tìm việc thi công: **quét chia-việc** — mọi item ở stage `planning`, cộng tên stage di sản `decompose`; xem \"Quét chia-việc trước dispatch\" dưới\n- `fgos take`/`fgos return` (cửa pull, ngoài vòng runner — xem spec Work-State \"Cửa pull giao–nhận việc\") claim/trả việc qua bản ghi runtime claim (mọi claim mới KHÔNG BAO GIỜ ghi bền giá trị `doing` — *new claims do not durably write into doing*) + CAS + goal-check runner tự dùng; gặt-lại lúc khởi động BỎ QUA claim đến từ cửa pull — xem \"Gặt-lại lúc khởi động\" dưới\n- `fgos review <id>` / `fgos approve <id> [--timeout <ms>] [--acknowledge-iron-law]` / `fgos reject <id> --reason \"...\"` (ngoài vòng runner, gọi bởi người vận hành) — cổng duyệt PR nội bộ cho một đề xuất `awaiting-approval` đã sẵn, MỘT cổng cho cả nguồn runner lẫn pull-door; `approve` nguồn runner còn chạy phán Iron Law trước khi merge, nhưng CHỈ khi lần merge đó land lên trunk (self-improve loop STR13 Slice 3, ranh giới trunk per `0032`) — xem \"Cổng duyệt PR nội bộ\" dưới\n- `fgos review <id> --github [--pr <n>]` / `fgos approve <id> --github --pr <n>` (ngoài vòng runner, gọi bởi người vận hành, tuỳ chọn — github-adapter) — vận chuyển thay thế của CÙNG cổng duyệt trên, đưa việc duyệt sang GitHub thay vì diff/merge cục bộ, chỉ áp dụng cho đề xuất nguồn runner; `review --github` kèm `--pr` là phép hỏi thăm trạng thái sống của một PR đã mở, không mở PR mới (github-adapter, phát hiện đóng-không-merge) — xem \"Cổng duyệt qua GitHub\" dưới\n- `fgos catchup <id>` (ngoài vòng runner, gọi bởi người vận hành) — đồng bộ lại một việc đang đỗ (`blocked`) vì gãy nhập (xung đột, verify đỏ sau nhập, hoặc trôi tích hợp): kéo trạng thái mới nhất của đích vào nhánh riêng của việc rồi thử lại — xem \"Đồng bộ lại một việc đỗ (catch-up)\" dưới\n- `fgos evolve` / `fgos evolve --pick <id>` / `fgos evolve --submit <id>` (ngoài vòng runner, gọi bởi người vận hành, on-demand — self-improve loop STR13) — Gate A của vòng tự cải thiện: xếp hạng candidate từ friction chưa ngã-ngũ, người chọn một hoặc dừng (đọc-thuần tuyệt đối), hoặc bắc cầu candidate đã chọn sang một việc thật (`--submit`, hành động ghi duy nhất của bề mặt evolve) — xem \"Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)\" dưới\n- `fgos session start [--item <id>]` / `fgos session end <session-id> [--force]` / `fgos session list` / `fgos session gc` (ngoài vòng runner, gọi bởi người vận hành/một tác nhân) — vòng đời phiên checkout đa-phiên tùy chọn: một worktree detached-HEAD mỗi phiên cho cây nguồn, dùng chung MỘT kho `.fgos/` qua symlink; `end` từ chối một phiên đã rời commit khởi tạo trừ khi `--force`; `gc` dọn các mục sổ mồ côi (worktree đã mất khỏi git, hoặc pid của lệnh `start` một-lần đã chết), tha các phiên còn commit lửng hoặc còn thay đổi chưa commit — xem \"Phiên checkout đa-phiên\" dưới"
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/subcomponents/h-ce5b9771a26a/spec.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-3",
+    "githubAnchor": "unheaded-block-3",
+    "stableAnchor": "unheaded-block-3",
+    "title": "Unheaded block 3",
+    "startLine": 27,
+    "endLine": 38,
+    "textDigest": "66c396e78df6e72f66e4870a5c211b0deff5387b6985d9362a528e94cbfcd8a6",
+    "sample": "- `fgos-runner --once` → chạy đúng một vòng: gặt-lại → tìm việc → giao việc theo MẺ (nhiều việc cùng lúc, giới hạn hai tầng) → chấm từng việc → ghi, rồi nạp lại mẻ kế tiếp — lặp tớ",
+    "identityFingerprint": "028c6be77fe8a327b7a1b8718c389e213c94e9f466ac0f31e182027a5230c581",
+    "ancestry": [
+      "Added in candidate: Runner Entry Points & Triggers",
+      "Entry Points & Triggers"
+    ],
+    "text": "- `fgos-runner --once` → chạy đúng một vòng: gặt-lại → tìm việc → giao việc theo MẺ (nhiều việc cùng lúc, giới hạn hai tầng) → chấm từng việc → ghi, rồi nạp lại mẻ kế tiếp — lặp tới khi không còn việc đang chạy VÀ không còn việc sẵn-sàng (xem \"Giao việc theo mẻ, song song có giới hạn\" dưới)\n- `fgos-runner --dry-run` → in kế hoạch (việc nào sẽ chạy, model nào) mà không làm gì\n- `fgos-runner --watch [--poll-ms <n>]` → chạy BỀN, không tự thoát khi frontier rỗng; lặp lại vòng đời `--once` mỗi lượt, phản ứng gần-tức-thời khi lượt vừa xong có ghi gì đó, nghỉ `--poll-ms` (mặc định 5000) khi lượt đó không ghi gì; dừng CHỈ qua SIGINT/SIGTERM tường minh — xem \"Vòng cầm-giao bền (--watch)\" dưới\n- Khởi động MỌI vòng đều bắt đầu bằng bước **gặt-lại** (reap): giải quyết các claim runtime (hoặc item mang trạng thái bền `doing` di sản) từ lần chạy trước bị crash trước khi tìm việc mới — xem \"Gặt-lại lúc khởi động\" dưới\n- Ngay sau gặt-lại, TRƯỚC khi tìm việc thi công: **quét nghiên-cứu** — giao worker thật cho mọi item ở stage `discovery`; xem \"Quét nghiên-cứu trước dispatch\" dưới\n- Ngay sau quét nghiên-cứu, CÙNG TRƯỚC khi tìm việc thi công: **quét chia-việc** — mọi item ở stage `planning`, cộng tên stage di sản `decompose`; xem \"Quét chia-việc trước dispatch\" dưới\n- `fgos take`/`fgos return` (cửa pull, ngoài vòng runner — xem spec Work-State \"Cửa pull giao–nhận việc\") claim/trả việc qua bản ghi runtime claim (mọi claim mới KHÔNG BAO GIỜ ghi bền giá trị `doing` — *new claims do not durably write into doing*) + CAS + goal-check runner tự dùng; gặt-lại lúc khởi động BỎ QUA claim đến từ cửa pull — xem \"Gặt-lại lúc khởi động\" dưới\n- `fgos review <id>` / `fgos approve <id> [--timeout <ms>] [--acknowledge-iron-law]` / `fgos reject <id> --reason \"...\"` (ngoài vòng runner, gọi bởi người vận hành) — cổng duyệt PR nội bộ cho một đề xuất `awaiting-approval` đã sẵn, MỘT cổng cho cả nguồn runner lẫn pull-door; `approve` nguồn runner còn chạy phán Iron Law trước khi merge, nhưng CHỈ khi lần merge đó land lên trunk (self-improve loop STR13 Slice 3, ranh giới trunk per `0032`) — xem \"Cổng duyệt PR nội bộ\" dưới\n- `fgos review <id> --github [--pr <n>]` / `fgos approve <id> --github --pr <n>` (ngoài vòng runner, gọi bởi người vận hành, tuỳ chọn — github-adapter) — vận chuyển thay thế của CÙNG cổng duyệt trên, đưa việc duyệt sang GitHub thay vì diff/merge cục bộ, chỉ áp dụng cho đề xuất nguồn runner; `review --github` kèm `--pr` là phép hỏi thăm trạng thái sống của một PR đã mở, không mở PR mới (github-adapter, phát hiện đóng-không-merge) — xem \"Cổng duyệt qua GitHub\" dưới\n- `fgos catchup <id>` (ngoài vòng runner, gọi bởi người vận hành) — đồng bộ lại một việc đang đỗ (`blocked`) vì gãy nhập (xung đột, verify đỏ sau nhập, hoặc trôi tích hợp): kéo trạng thái mới nhất của đích vào nhánh riêng của việc rồi thử lại — xem \"Đồng bộ lại một việc đỗ (catch-up)\" dưới\n- `fgos evolve` / `fgos evolve --pick <id>` / `fgos evolve --submit <id>` (ngoài vòng runner, gọi bởi người vận hành, on-demand — self-improve loop STR13) — Gate A của vòng tự cải thiện: xếp hạng candidate từ friction chưa ngã-ngũ, người chọn một hoặc dừng (đọc-thuần tuyệt đối), hoặc bắc cầu candidate đã chọn sang một việc thật (`--submit`, hành động ghi duy nhất của bề mặt evolve) — xem \"Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)\" dưới\n- `fgos session start [--item <id>]` / `fgos session end <session-id> [--force]` / `fgos session list` / `fgos session gc` (ngoài vòng runner, gọi bởi người vận hành/một tác nhân) — vòng đời phiên checkout đa-phiên tùy chọn: một worktree detached-HEAD mỗi phiên cho cây nguồn, dùng chung MỘT kho `.fgos/` qua symlink; `end` từ chối một phiên đã rời commit khởi tạo trừ khi `--force`; `gc` dọn các mục sổ mồ côi (worktree đã mất khỏi git, hoặc pid của lệnh `start` một-lần đã chết), tha các phiên còn commit lửng hoặc còn thay đổi chưa commit — xem \"Phiên checkout đa-phiên\" dưới"
+  }
+}
+```
+
+## claim_552ef3d6e22bac10c24cc31e48463d50
+
+Source digest (evidence JSON): a34cf9b429ca03afe12ebf1ba4175e1072fb0a9ea5ad6edff47d6279cfc6d2f7
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_552ef3d6e22bac10c24cc31e48463d50",
+  "record": {
+    "claimId": "claim_552ef3d6e22bac10c24cc31e48463d50",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "data-dictionary",
+    "sourceLines": [
+      71,
+      71
+    ],
+    "sourceDigest": "b91663aeb373f3e9759bda7e8edf97edc512497d6d3adbf55ebdb6b8c7af5187",
+    "targetOwner": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+    "targetAnchor": "data-dictionary",
+    "targetDigest": "b91663aeb373f3e9759bda7e8edf97edc512497d6d3adbf55ebdb6b8c7af5187",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; source unit shorter than 40 characters; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "heading",
+    "level": 2,
+    "title": "Data Dictionary",
+    "anchor": "data-dictionary",
+    "githubAnchor": "data-dictionary",
+    "stableAnchor": "h-02842f76ffd2",
+    "startLine": 71,
+    "endLine": 71,
+    "textDigest": "b91663aeb373f3e9759bda7e8edf97edc512497d6d3adbf55ebdb6b8c7af5187",
+    "sample": "Data Dictionary",
+    "sectionPayloadDigest": "43f03eb4dffdeff420f464531d60be7e37e13192429963b10ba302be1e9b777e",
+    "followingBlockDigest": "43f03eb4dffdeff420f464531d60be7e37e13192429963b10ba302be1e9b777e",
+    "identityFingerprint": "fe9e6edd48fc349bec6aaa62276311bcaef9cf05282aa9610622f43c6eb0674a",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)"
+    ],
+    "text": "## Data Dictionary",
+    "sectionText": "## Data Dictionary\n\n| # | Element | Meaning | Values | Required | Default |\n|---|-------|---------|--------|----------|---------|\n| 1 | Cấu hình runner (file committed ở gốc repo) | Chính sách thực thi — LÀ CONFIG THỰC THI ĐƯỢC: ai sửa nó điều khiển tiến trình được spawn (đầu vào tin cậy) | `executor` — mẫu lệnh gọi trợ lý (thay thế `{prompt}`/`{model}` theo từng phần tử, không bao giờ qua shell), tùy chọn `adapter` (mặc định `cli-spawn`) · `executors` — catalog executor theo danh tính provider/cách gọi, không mang khẩu vị chất lượng · `modelPolicies` — bảng bắt buộc provider→tier→model với tier cung `nano|mini|standard|advanced|flagship|frontier` · `rigorToTier` — bảng bắt buộc ánh xạ đủ bốn mức cầu `low|standard|high|critical` sang tier cung · `capabilities.<name>.rigor` — sàn cầu tùy chọn, chỉ nâng; khối `capabilities.<name>.overrides` bị từ chối · `timeoutMs` — trần thời gian mặc định của một worker, tối đa 4h; một lượt chạy có thể xin thời gian riêng (RUL96 (one run may take its own timeout)) · `confinement`/`confinementPolicies` — chính sách giam giữ · `capabilities` — catalog lời hứa hành vi và binding executor/invocation | yes | tự sinh khi vắng mặt tại đường dẫn mặc định (không kèm `--config`); `fgos setup` điền `rigorToTier`, `fgos doctor` kiểm bảng này và các khoá placement đã retired; một `--config <path>` tường minh trỏ vào đường vắng mặt vẫn báo lỗi ngay (`fgos discover`/`plan`; `fgos-runner` không còn `--config`, RUL93 (the runner loop's worker and the fan-out batch run as one Unit run each)) |\n| 1b | Provider-capacity inventory/state (slice 1) | Pool account cho một provider agent CLI khi provider đó có quota/capacity theo account. Inventory là machine-local secret-bearing config, không phải project policy; state/lease/quarantine là runtime-local evidence. | Inventory chỉ đọc từ `~/.fgos/config.json` tại `runner.providers.<provider>.accounts.<accountId>`; account là keyed object, không phải array. Slice 1 hỗ trợ `openai-codex` account với `label?` và `credentialSource: { kind: \"codex-home\", home }`; nay mỗi account khai đúng một trong `credentialSource` (một store cho mọi CLI, kind `codex-home` hoặc `home-files`) hoặc `credentialSources` (một store cho mỗi CLI, key là tên lệnh `codex`/`pi`/`omp`/`agy`; RUL80 (account trước, CLI sau: một login store cho mỗi CLI)). Account entry bị từ chối nếu khai placement/runtime policy (`executor`, `capability`, `model`, `modelTier`, `mutation`, `confinement`, `tool`, `fallback`, `runtimeClass`, `providerRuntimes`, ...). Project-local `.fgos/config.json` bị từ chối nếu chứa `runner.providers.*.accounts`. State ở `~/.fgos/runtime/provider-capacity/state.json`, lock ở `~/.fgos/runtime/provider-capacity/state.lock`. | no | vắng inventory nghĩa là mọi dispatch giữ hành vi cũ, không selection/lease |\n| 2 | Nhánh đề xuất | Không gian kết quả của một worker, tên mang tiền tố nhận diện `fgw/<id>` | — | — | — |\n| 3 | Bảng phục hồi | Lớp-lỗi → hành-động, máy đọc được | 8 lớp: hỏng-spawn, quá-giờ, chấm-trượt, hỏng-worktree, nhật-ký-hỏng, đề-xuất-bị-trả, việc-kẹt-do-crash, tranh-chấp-ghi → hành động ∈ thử-lại (có trần) / đỗ-lại / dừng; lớp LẠ → dừng (an toàn trước) | — | — |\n| 4 | Bộ đếm chống-lặp (lifetime) | visitCount: số lần một việc vào `doing` TÍNH TỪ ĐẦU đời việc — dẫn xuất từ nhật ký sự kiện, không trường mới; dùng cho các bản ghi outcome/metric đã ship (KHÔNG dùng để chặn dispatch nữa — xem #4b) | — | — | — |\n| 4b | Ngân sách cổng chống-lặp (kể từ can thiệp người) | visitsSinceLastHumanEvent: số lần việc vào `doing` **ở stage executing** TÍNH TỪ sự kiện người CUỐI CÙNG của chính việc đó — đây là con số CỔNG dùng để chặn/park dispatch (thay `visitCount` ở vai trò này); một can thiệp người (xem trigger-set) đưa ngân sách về lại đủ 3 cho vòng kế tiếp. Executing-phase-only scoping (claim-lock): trước đây, pick/take chỉ mở frontier (executing-phase), nên counting mọi `todo→doing` move tương đương dispatch attempts. Claim-lock cho phép `pick` cầm stage khác — claim-release cycle ở các stage đầu vòng (`discovery`/`exploring`/`planning`, cộng tên di sản `decompose`) không được tính vào ngân sách executing-phase (per claim-lock code-review finding) | — | — | trần mặc định 3, dùng chung `MAX_VISITS` |\n| 5 | Cầu dao (breaker) | Số lần chấm-trượt liên tiếp trong MỘT lần chạy (bộ nhớ trong phiên, không dẫn xuất từ nhật ký — chủ đích, vì nhật ký không phân biệt người/máy ghi); trần mặc định 3, đếm RIÊNG cho từng việc dưới dispatch song song (một việc chấm-trượt không kéo cầu dao của việc khác). **Trơ trong `--once`:** một việc đỗ lại (park) tối đa sau `maxRetries` (mặc định 2) lần thử trong CÙNG một lượt `--once`, nên không bao giờ chạm trần 3 của cầu dao trong một lượt đơn — cầu dao chỉ có thể kéo khi có một cơ chế chia-sẻ/nhiều-lượt tích luỹ miss xuyên lượt (chưa xây, xem Open Gaps) | — | — | — |\n| 6 | Trần song song hai tầng | Giới hạn số việc chạy đồng thời trong một mẻ, đọc từ cấu hình committed | tầng 1 — số việc GỐC đồng thời; tầng 2 — số việc CON đồng thời trong MỖI gốc; mỗi lần nạp mẻ lấy `min(trần, số việc sẵn-sàng sau lọc quyền-sở-hữu-gốc)` | no (có mặc định) | 4 gốc × 4 con mỗi gốc |\n| 7 | Quyền sở-hữu gốc | Ai đang cầm mọi việc CON của một gốc trong MỘT lượt chạy — gắn lúc con đầu tiên của gốc được nhận, xả khi gốc xong; sống trong bộ nhớ của lượt chạy, KHÔNG bền qua lượt chạy khác/tiến trình khác | một định danh (per lượt chạy) | — | chưa-chủ |\n| 8 | Bản ghi output cục bộ (một file mỗi việc) | Lưu lại output của trợ lý cho MỌI lượt dispatch của một việc — đọc được sau khi console đã cuộn qua; không bao giờ vào cây committed. Cùng file còn nhận chunk stdout/stderr LIVE khi worker đang chạy (STR39, xem \"Xem live output worker khi đang chạy\") — `tail -f` thấy được ngay, không đợi khối kết-cục cuối | mỗi khối kết-cục: dấu thời gian, số lần thử, loại kết cục (đề xuất/quá-giờ/hỏng-spawn/…), output (khi trợ lý kịp sinh ra); xen giữa các khối kết-cục là chunk thô không bọc, ghi ngay khi đến | no (chỉ tồn tại sau lượt dispatch đầu tiên của việc) | — |\n| 9 | Candidate (Gate A, self-improve loop STR13 Slice 1) | Một việc mang ít nhất một bản ghi friction chưa ngã-ngũ, xếp hạng làm ứng viên tự cải thiện — dẫn xuất TỪ friction đã ghi, không phải một bản ghi độc lập, không bền qua lần `evolve` khác | id, disposition, errorClass, layer, detail, attempts (tất cả lấy từ bản ghi friction MỚI NHẤT theo dấu thời gian của id đó khi id có nhiều bản ghi chưa ngã-ngũ), score (cộng dồn TOÀN BỘ bản ghi chưa ngã-ngũ của id đó, không chỉ bản mới nhất) | — | dẫn xuất mỗi lần gọi `evolve` |\n| 10 | Phán quyết Iron Law (self-improve loop STR13 Slice 2/3) | Kết quả của phép tính hai-cửa (module + từ khóa) trên MỘT candidate fix — dẫn xuất thuần từ đầu vào truyền vào, không bền. Gọi từ bên trong `approve` nguồn `runner` (Cổng duyệt PR nội bộ), ngay trước bước kiểm cây sạch, cho MỌI đề xuất nguồn runner đang land LÊN TRUNK (thu hẹp về ranh giới trunk per `0032`) — xem \"Cổng duyệt PR nội bộ\" và \"Iron Law\" dưới, Business Rules RUL36 (`evolve --submit` là hành động ghi duy nhất trên bề mặt evolve, tái dùng chính cửa `submit`)/RUL37 (Iron Law hỏi ở đúng một ranh giới — trunk — cho mọi đề xuất nguồn runner tới đó)/RUL64 (`ironLaw.level` — key config riêng của cổng Iron Law, fail-closed về `ask`) | required (có/không cần chứng minh test-đỏ-trước), matchedFlags (danh sách từ khóa rủi ro nặng khớp trong mô tả fix), matchedModules (danh sách file khớp danh sách module minh họa) | — | required mặc định `false` khi cả hai phép thử đều không khớp |\n| 11 | Prompt template worker (STR49, `src/runner/prompt-templates/`) | Nội dung chữ nghĩa của `buildPrompt`, tách khỏi code sang file committed — sửa prompt là sửa MỘT file, không đụng code | `selectTemplate({kind, tier, domain})` — bảng luật cơ học, wildcard cuối luôn khớp (từ STR91: luật `domain: 'coding'` khớp TRƯỚC wildcard — domain vắng mặt hay không nhận diện được đều fold về `coding` giống mọi nơi khác trong hệ, không phải một fallback riêng — trỏ `worker-prompt-skill-pointer.txt`; mọi domain đã đăng ký khác `coding` (vd `synthetic`) vẫn rơi về wildcard, trỏ `worker-prompt-default.txt` như trước STR91) · `renderTemplate` — substitution `{placeholder}` string-replace thuần, không engine · `hashTemplate` — sha256 nội dung raw file, ghi kèm dispatch log (xem RUL44 (đã xây — STR49, `src/runner/prompt-templates.mjs`)) · template `worker-prompt-skill-pointer.txt` giữ đủ 6 mục cố định sẵn có, CHỈ thêm đúng một mục `# Agent skill` trỏ `SKILL.md` của domain đó — đường dẫn luôn resolve qua sổ đăng ký domain→skill (`skillForStage`, spec Work-State \"Mô hình domain\"), không bao giờ hardcode (xem RUL52 (luật template theo domain `coding` khớp trước wildcard; domain lạ/vắng mặt fold về `coding`)) | yes (một template mặc định luôn có) | `worker-prompt-default.txt`, `worker-prompt-skill-pointer.txt` |"
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+    "unitKind": "heading",
+    "level": 2,
+    "title": "Data Dictionary",
+    "anchor": "data-dictionary",
+    "githubAnchor": "data-dictionary",
+    "stableAnchor": "h-5a888960eb72",
+    "startLine": 25,
+    "endLine": 25,
+    "textDigest": "b91663aeb373f3e9759bda7e8edf97edc512497d6d3adbf55ebdb6b8c7af5187",
+    "sample": "Data Dictionary",
+    "sectionPayloadDigest": "43f03eb4dffdeff420f464531d60be7e37e13192429963b10ba302be1e9b777e",
+    "followingBlockDigest": "43f03eb4dffdeff420f464531d60be7e37e13192429963b10ba302be1e9b777e",
+    "identityFingerprint": "fe9e6edd48fc349bec6aaa62276311bcaef9cf05282aa9610622f43c6eb0674a",
+    "ancestry": [
+      "Added in candidate: Runner Data Dictionary"
+    ],
+    "text": "## Data Dictionary",
+    "sectionText": "## Data Dictionary\n\n| # | Element | Meaning | Values | Required | Default |\n|---|-------|---------|--------|----------|---------|\n| 1 | Cấu hình runner (file committed ở gốc repo) | Chính sách thực thi — LÀ CONFIG THỰC THI ĐƯỢC: ai sửa nó điều khiển tiến trình được spawn (đầu vào tin cậy) | `executor` — mẫu lệnh gọi trợ lý (thay thế `{prompt}`/`{model}` theo từng phần tử, không bao giờ qua shell), tùy chọn `adapter` (mặc định `cli-spawn`) · `executors` — catalog executor theo danh tính provider/cách gọi, không mang khẩu vị chất lượng · `modelPolicies` — bảng bắt buộc provider→tier→model với tier cung `nano|mini|standard|advanced|flagship|frontier` · `rigorToTier` — bảng bắt buộc ánh xạ đủ bốn mức cầu `low|standard|high|critical` sang tier cung · `capabilities.<name>.rigor` — sàn cầu tùy chọn, chỉ nâng; khối `capabilities.<name>.overrides` bị từ chối · `timeoutMs` — trần thời gian mặc định của một worker, tối đa 4h; một lượt chạy có thể xin thời gian riêng (RUL96 (one run may take its own timeout)) · `confinement`/`confinementPolicies` — chính sách giam giữ · `capabilities` — catalog lời hứa hành vi và binding executor/invocation | yes | tự sinh khi vắng mặt tại đường dẫn mặc định (không kèm `--config`); `fgos setup` điền `rigorToTier`, `fgos doctor` kiểm bảng này và các khoá placement đã retired; một `--config <path>` tường minh trỏ vào đường vắng mặt vẫn báo lỗi ngay (`fgos discover`/`plan`; `fgos-runner` không còn `--config`, RUL93 (the runner loop's worker and the fan-out batch run as one Unit run each)) |\n| 1b | Provider-capacity inventory/state (slice 1) | Pool account cho một provider agent CLI khi provider đó có quota/capacity theo account. Inventory là machine-local secret-bearing config, không phải project policy; state/lease/quarantine là runtime-local evidence. | Inventory chỉ đọc từ `~/.fgos/config.json` tại `runner.providers.<provider>.accounts.<accountId>`; account là keyed object, không phải array. Slice 1 hỗ trợ `openai-codex` account với `label?` và `credentialSource: { kind: \"codex-home\", home }`; nay mỗi account khai đúng một trong `credentialSource` (một store cho mọi CLI, kind `codex-home` hoặc `home-files`) hoặc `credentialSources` (một store cho mỗi CLI, key là tên lệnh `codex`/`pi`/`omp`/`agy`; RUL80 (account trước, CLI sau: một login store cho mỗi CLI)). Account entry bị từ chối nếu khai placement/runtime policy (`executor`, `capability`, `model`, `modelTier`, `mutation`, `confinement`, `tool`, `fallback`, `runtimeClass`, `providerRuntimes`, ...). Project-local `.fgos/config.json` bị từ chối nếu chứa `runner.providers.*.accounts`. State ở `~/.fgos/runtime/provider-capacity/state.json`, lock ở `~/.fgos/runtime/provider-capacity/state.lock`. | no | vắng inventory nghĩa là mọi dispatch giữ hành vi cũ, không selection/lease |\n| 2 | Nhánh đề xuất | Không gian kết quả của một worker, tên mang tiền tố nhận diện `fgw/<id>` | — | — | — |\n| 3 | Bảng phục hồi | Lớp-lỗi → hành-động, máy đọc được | 8 lớp: hỏng-spawn, quá-giờ, chấm-trượt, hỏng-worktree, nhật-ký-hỏng, đề-xuất-bị-trả, việc-kẹt-do-crash, tranh-chấp-ghi → hành động ∈ thử-lại (có trần) / đỗ-lại / dừng; lớp LẠ → dừng (an toàn trước) | — | — |\n| 4 | Bộ đếm chống-lặp (lifetime) | visitCount: số lần một việc vào `doing` TÍNH TỪ ĐẦU đời việc — dẫn xuất từ nhật ký sự kiện, không trường mới; dùng cho các bản ghi outcome/metric đã ship (KHÔNG dùng để chặn dispatch nữa — xem #4b) | — | — | — |\n| 4b | Ngân sách cổng chống-lặp (kể từ can thiệp người) | visitsSinceLastHumanEvent: số lần việc vào `doing` **ở stage executing** TÍNH TỪ sự kiện người CUỐI CÙNG của chính việc đó — đây là con số CỔNG dùng để chặn/park dispatch (thay `visitCount` ở vai trò này); một can thiệp người (xem trigger-set) đưa ngân sách về lại đủ 3 cho vòng kế tiếp. Executing-phase-only scoping (claim-lock): trước đây, pick/take chỉ mở frontier (executing-phase), nên counting mọi `todo→doing` move tương đương dispatch attempts. Claim-lock cho phép `pick` cầm stage khác — claim-release cycle ở các stage đầu vòng (`discovery`/`exploring`/`planning`, cộng tên di sản `decompose`) không được tính vào ngân sách executing-phase (per claim-lock code-review finding) | — | — | trần mặc định 3, dùng chung `MAX_VISITS` |\n| 5 | Cầu dao (breaker) | Số lần chấm-trượt liên tiếp trong MỘT lần chạy (bộ nhớ trong phiên, không dẫn xuất từ nhật ký — chủ đích, vì nhật ký không phân biệt người/máy ghi); trần mặc định 3, đếm RIÊNG cho từng việc dưới dispatch song song (một việc chấm-trượt không kéo cầu dao của việc khác). **Trơ trong `--once`:** một việc đỗ lại (park) tối đa sau `maxRetries` (mặc định 2) lần thử trong CÙNG một lượt `--once`, nên không bao giờ chạm trần 3 của cầu dao trong một lượt đơn — cầu dao chỉ có thể kéo khi có một cơ chế chia-sẻ/nhiều-lượt tích luỹ miss xuyên lượt (chưa xây, xem Open Gaps) | — | — | — |\n| 6 | Trần song song hai tầng | Giới hạn số việc chạy đồng thời trong một mẻ, đọc từ cấu hình committed | tầng 1 — số việc GỐC đồng thời; tầng 2 — số việc CON đồng thời trong MỖI gốc; mỗi lần nạp mẻ lấy `min(trần, số việc sẵn-sàng sau lọc quyền-sở-hữu-gốc)` | no (có mặc định) | 4 gốc × 4 con mỗi gốc |\n| 7 | Quyền sở-hữu gốc | Ai đang cầm mọi việc CON của một gốc trong MỘT lượt chạy — gắn lúc con đầu tiên của gốc được nhận, xả khi gốc xong; sống trong bộ nhớ của lượt chạy, KHÔNG bền qua lượt chạy khác/tiến trình khác | một định danh (per lượt chạy) | — | chưa-chủ |\n| 8 | Bản ghi output cục bộ (một file mỗi việc) | Lưu lại output của trợ lý cho MỌI lượt dispatch của một việc — đọc được sau khi console đã cuộn qua; không bao giờ vào cây committed. Cùng file còn nhận chunk stdout/stderr LIVE khi worker đang chạy (STR39, xem \"Xem live output worker khi đang chạy\") — `tail -f` thấy được ngay, không đợi khối kết-cục cuối | mỗi khối kết-cục: dấu thời gian, số lần thử, loại kết cục (đề xuất/quá-giờ/hỏng-spawn/…), output (khi trợ lý kịp sinh ra); xen giữa các khối kết-cục là chunk thô không bọc, ghi ngay khi đến | no (chỉ tồn tại sau lượt dispatch đầu tiên của việc) | — |\n| 9 | Candidate (Gate A, self-improve loop STR13 Slice 1) | Một việc mang ít nhất một bản ghi friction chưa ngã-ngũ, xếp hạng làm ứng viên tự cải thiện — dẫn xuất TỪ friction đã ghi, không phải một bản ghi độc lập, không bền qua lần `evolve` khác | id, disposition, errorClass, layer, detail, attempts (tất cả lấy từ bản ghi friction MỚI NHẤT theo dấu thời gian của id đó khi id có nhiều bản ghi chưa ngã-ngũ), score (cộng dồn TOÀN BỘ bản ghi chưa ngã-ngũ của id đó, không chỉ bản mới nhất) | — | dẫn xuất mỗi lần gọi `evolve` |\n| 10 | Phán quyết Iron Law (self-improve loop STR13 Slice 2/3) | Kết quả của phép tính hai-cửa (module + từ khóa) trên MỘT candidate fix — dẫn xuất thuần từ đầu vào truyền vào, không bền. Gọi từ bên trong `approve` nguồn `runner` (Cổng duyệt PR nội bộ), ngay trước bước kiểm cây sạch, cho MỌI đề xuất nguồn runner đang land LÊN TRUNK (thu hẹp về ranh giới trunk per `0032`) — xem \"Cổng duyệt PR nội bộ\" và \"Iron Law\" dưới, Business Rules RUL36 (`evolve --submit` là hành động ghi duy nhất trên bề mặt evolve, tái dùng chính cửa `submit`)/RUL37 (Iron Law hỏi ở đúng một ranh giới — trunk — cho mọi đề xuất nguồn runner tới đó)/RUL64 (`ironLaw.level` — key config riêng của cổng Iron Law, fail-closed về `ask`) | required (có/không cần chứng minh test-đỏ-trước), matchedFlags (danh sách từ khóa rủi ro nặng khớp trong mô tả fix), matchedModules (danh sách file khớp danh sách module minh họa) | — | required mặc định `false` khi cả hai phép thử đều không khớp |\n| 11 | Prompt template worker (STR49, `src/runner/prompt-templates/`) | Nội dung chữ nghĩa của `buildPrompt`, tách khỏi code sang file committed — sửa prompt là sửa MỘT file, không đụng code | `selectTemplate({kind, tier, domain})` — bảng luật cơ học, wildcard cuối luôn khớp (từ STR91: luật `domain: 'coding'` khớp TRƯỚC wildcard — domain vắng mặt hay không nhận diện được đều fold về `coding` giống mọi nơi khác trong hệ, không phải một fallback riêng — trỏ `worker-prompt-skill-pointer.txt`; mọi domain đã đăng ký khác `coding` (vd `synthetic`) vẫn rơi về wildcard, trỏ `worker-prompt-default.txt` như trước STR91) · `renderTemplate` — substitution `{placeholder}` string-replace thuần, không engine · `hashTemplate` — sha256 nội dung raw file, ghi kèm dispatch log (xem RUL44 (đã xây — STR49, `src/runner/prompt-templates.mjs`)) · template `worker-prompt-skill-pointer.txt` giữ đủ 6 mục cố định sẵn có, CHỈ thêm đúng một mục `# Agent skill` trỏ `SKILL.md` của domain đó — đường dẫn luôn resolve qua sổ đăng ký domain→skill (`skillForStage`, spec Work-State \"Mô hình domain\"), không bao giờ hardcode (xem RUL52 (luật template theo domain `coding` khớp trước wildcard; domain lạ/vắng mặt fold về `coding`)) | yes (một template mặc định luôn có) | `worker-prompt-default.txt`, `worker-prompt-skill-pointer.txt` |"
+  }
+}
+```
+
+## claim_5a944093894be93c5792a1c5e14990c6
+
+Source digest (evidence JSON): 7881d803a6ee02efec7c6959b3808bd6b783cb945d546ce4b922daa9455e5a74
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_5a944093894be93c5792a1c5e14990c6",
+  "record": {
+    "claimId": "claim_5a944093894be93c5792a1c5e14990c6",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "unheaded-block-9",
+    "sourceLines": [
+      73,
+      87
+    ],
+    "sourceDigest": "43f03eb4dffdeff420f464531d60be7e37e13192429963b10ba302be1e9b777e",
+    "targetOwner": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+    "targetAnchor": "unheaded-block-3",
+    "targetDigest": "43f03eb4dffdeff420f464531d60be7e37e13192429963b10ba302be1e9b777e",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-9",
+    "githubAnchor": "unheaded-block-9",
+    "stableAnchor": "unheaded-block-9",
+    "title": "Unheaded block 9",
+    "startLine": 73,
+    "endLine": 87,
+    "textDigest": "43f03eb4dffdeff420f464531d60be7e37e13192429963b10ba302be1e9b777e",
+    "sample": "| # | Element | Meaning | Values | Required | Default |\n|---|-------|---------|--------|----------|---------|\n| 1 | Cấu hình runner (file committed ở gốc repo) | Chính sách thực th",
+    "identityFingerprint": "156792a91288937ec4222d0036cc22e1fde964343a223afbed781377dfc5022d",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Data Dictionary"
+    ],
+    "text": "| # | Element | Meaning | Values | Required | Default |\n|---|-------|---------|--------|----------|---------|\n| 1 | Cấu hình runner (file committed ở gốc repo) | Chính sách thực thi — LÀ CONFIG THỰC THI ĐƯỢC: ai sửa nó điều khiển tiến trình được spawn (đầu vào tin cậy) | `executor` — mẫu lệnh gọi trợ lý (thay thế `{prompt}`/`{model}` theo từng phần tử, không bao giờ qua shell), tùy chọn `adapter` (mặc định `cli-spawn`) · `executors` — catalog executor theo danh tính provider/cách gọi, không mang khẩu vị chất lượng · `modelPolicies` — bảng bắt buộc provider→tier→model với tier cung `nano|mini|standard|advanced|flagship|frontier` · `rigorToTier` — bảng bắt buộc ánh xạ đủ bốn mức cầu `low|standard|high|critical` sang tier cung · `capabilities.<name>.rigor` — sàn cầu tùy chọn, chỉ nâng; khối `capabilities.<name>.overrides` bị từ chối · `timeoutMs` — trần thời gian mặc định của một worker, tối đa 4h; một lượt chạy có thể xin thời gian riêng (RUL96 (one run may take its own timeout)) · `confinement`/`confinementPolicies` — chính sách giam giữ · `capabilities` — catalog lời hứa hành vi và binding executor/invocation | yes | tự sinh khi vắng mặt tại đường dẫn mặc định (không kèm `--config`); `fgos setup` điền `rigorToTier`, `fgos doctor` kiểm bảng này và các khoá placement đã retired; một `--config <path>` tường minh trỏ vào đường vắng mặt vẫn báo lỗi ngay (`fgos discover`/`plan`; `fgos-runner` không còn `--config`, RUL93 (the runner loop's worker and the fan-out batch run as one Unit run each)) |\n| 1b | Provider-capacity inventory/state (slice 1) | Pool account cho một provider agent CLI khi provider đó có quota/capacity theo account. Inventory là machine-local secret-bearing config, không phải project policy; state/lease/quarantine là runtime-local evidence. | Inventory chỉ đọc từ `~/.fgos/config.json` tại `runner.providers.<provider>.accounts.<accountId>`; account là keyed object, không phải array. Slice 1 hỗ trợ `openai-codex` account với `label?` và `credentialSource: { kind: \"codex-home\", home }`; nay mỗi account khai đúng một trong `credentialSource` (một store cho mọi CLI, kind `codex-home` hoặc `home-files`) hoặc `credentialSources` (một store cho mỗi CLI, key là tên lệnh `codex`/`pi`/`omp`/`agy`; RUL80 (account trước, CLI sau: một login store cho mỗi CLI)). Account entry bị từ chối nếu khai placement/runtime policy (`executor`, `capability`, `model`, `modelTier`, `mutation`, `confinement`, `tool`, `fallback`, `runtimeClass`, `providerRuntimes`, ...). Project-local `.fgos/config.json` bị từ chối nếu chứa `runner.providers.*.accounts`. State ở `~/.fgos/runtime/provider-capacity/state.json`, lock ở `~/.fgos/runtime/provider-capacity/state.lock`. | no | vắng inventory nghĩa là mọi dispatch giữ hành vi cũ, không selection/lease |\n| 2 | Nhánh đề xuất | Không gian kết quả của một worker, tên mang tiền tố nhận diện `fgw/<id>` | — | — | — |\n| 3 | Bảng phục hồi | Lớp-lỗi → hành-động, máy đọc được | 8 lớp: hỏng-spawn, quá-giờ, chấm-trượt, hỏng-worktree, nhật-ký-hỏng, đề-xuất-bị-trả, việc-kẹt-do-crash, tranh-chấp-ghi → hành động ∈ thử-lại (có trần) / đỗ-lại / dừng; lớp LẠ → dừng (an toàn trước) | — | — |\n| 4 | Bộ đếm chống-lặp (lifetime) | visitCount: số lần một việc vào `doing` TÍNH TỪ ĐẦU đời việc — dẫn xuất từ nhật ký sự kiện, không trường mới; dùng cho các bản ghi outcome/metric đã ship (KHÔNG dùng để chặn dispatch nữa — xem #4b) | — | — | — |\n| 4b | Ngân sách cổng chống-lặp (kể từ can thiệp người) | visitsSinceLastHumanEvent: số lần việc vào `doing` **ở stage executing** TÍNH TỪ sự kiện người CUỐI CÙNG của chính việc đó — đây là con số CỔNG dùng để chặn/park dispatch (thay `visitCount` ở vai trò này); một can thiệp người (xem trigger-set) đưa ngân sách về lại đủ 3 cho vòng kế tiếp. Executing-phase-only scoping (claim-lock): trước đây, pick/take chỉ mở frontier (executing-phase), nên counting mọi `todo→doing` move tương đương dispatch attempts. Claim-lock cho phép `pick` cầm stage khác — claim-release cycle ở các stage đầu vòng (`discovery`/`exploring`/`planning`, cộng tên di sản `decompose`) không được tính vào ngân sách executing-phase (per claim-lock code-review finding) | — | — | trần mặc định 3, dùng chung `MAX_VISITS` |\n| 5 | Cầu dao (breaker) | Số lần chấm-trượt liên tiếp trong MỘT lần chạy (bộ nhớ trong phiên, không dẫn xuất từ nhật ký — chủ đích, vì nhật ký không phân biệt người/máy ghi); trần mặc định 3, đếm RIÊNG cho từng việc dưới dispatch song song (một việc chấm-trượt không kéo cầu dao của việc khác). **Trơ trong `--once`:** một việc đỗ lại (park) tối đa sau `maxRetries` (mặc định 2) lần thử trong CÙNG một lượt `--once`, nên không bao giờ chạm trần 3 của cầu dao trong một lượt đơn — cầu dao chỉ có thể kéo khi có một cơ chế chia-sẻ/nhiều-lượt tích luỹ miss xuyên lượt (chưa xây, xem Open Gaps) | — | — | — |\n| 6 | Trần song song hai tầng | Giới hạn số việc chạy đồng thời trong một mẻ, đọc từ cấu hình committed | tầng 1 — số việc GỐC đồng thời; tầng 2 — số việc CON đồng thời trong MỖI gốc; mỗi lần nạp mẻ lấy `min(trần, số việc sẵn-sàng sau lọc quyền-sở-hữu-gốc)` | no (có mặc định) | 4 gốc × 4 con mỗi gốc |\n| 7 | Quyền sở-hữu gốc | Ai đang cầm mọi việc CON của một gốc trong MỘT lượt chạy — gắn lúc con đầu tiên của gốc được nhận, xả khi gốc xong; sống trong bộ nhớ của lượt chạy, KHÔNG bền qua lượt chạy khác/tiến trình khác | một định danh (per lượt chạy) | — | chưa-chủ |\n| 8 | Bản ghi output cục bộ (một file mỗi việc) | Lưu lại output của trợ lý cho MỌI lượt dispatch của một việc — đọc được sau khi console đã cuộn qua; không bao giờ vào cây committed. Cùng file còn nhận chunk stdout/stderr LIVE khi worker đang chạy (STR39, xem \"Xem live output worker khi đang chạy\") — `tail -f` thấy được ngay, không đợi khối kết-cục cuối | mỗi khối kết-cục: dấu thời gian, số lần thử, loại kết cục (đề xuất/quá-giờ/hỏng-spawn/…), output (khi trợ lý kịp sinh ra); xen giữa các khối kết-cục là chunk thô không bọc, ghi ngay khi đến | no (chỉ tồn tại sau lượt dispatch đầu tiên của việc) | — |\n| 9 | Candidate (Gate A, self-improve loop STR13 Slice 1) | Một việc mang ít nhất một bản ghi friction chưa ngã-ngũ, xếp hạng làm ứng viên tự cải thiện — dẫn xuất TỪ friction đã ghi, không phải một bản ghi độc lập, không bền qua lần `evolve` khác | id, disposition, errorClass, layer, detail, attempts (tất cả lấy từ bản ghi friction MỚI NHẤT theo dấu thời gian của id đó khi id có nhiều bản ghi chưa ngã-ngũ), score (cộng dồn TOÀN BỘ bản ghi chưa ngã-ngũ của id đó, không chỉ bản mới nhất) | — | dẫn xuất mỗi lần gọi `evolve` |\n| 10 | Phán quyết Iron Law (self-improve loop STR13 Slice 2/3) | Kết quả của phép tính hai-cửa (module + từ khóa) trên MỘT candidate fix — dẫn xuất thuần từ đầu vào truyền vào, không bền. Gọi từ bên trong `approve` nguồn `runner` (Cổng duyệt PR nội bộ), ngay trước bước kiểm cây sạch, cho MỌI đề xuất nguồn runner đang land LÊN TRUNK (thu hẹp về ranh giới trunk per `0032`) — xem \"Cổng duyệt PR nội bộ\" và \"Iron Law\" dưới, Business Rules RUL36 (`evolve --submit` là hành động ghi duy nhất trên bề mặt evolve, tái dùng chính cửa `submit`)/RUL37 (Iron Law hỏi ở đúng một ranh giới — trunk — cho mọi đề xuất nguồn runner tới đó)/RUL64 (`ironLaw.level` — key config riêng của cổng Iron Law, fail-closed về `ask`) | required (có/không cần chứng minh test-đỏ-trước), matchedFlags (danh sách từ khóa rủi ro nặng khớp trong mô tả fix), matchedModules (danh sách file khớp danh sách module minh họa) | — | required mặc định `false` khi cả hai phép thử đều không khớp |\n| 11 | Prompt template worker (STR49, `src/runner/prompt-templates/`) | Nội dung chữ nghĩa của `buildPrompt`, tách khỏi code sang file committed — sửa prompt là sửa MỘT file, không đụng code | `selectTemplate({kind, tier, domain})` — bảng luật cơ học, wildcard cuối luôn khớp (từ STR91: luật `domain: 'coding'` khớp TRƯỚC wildcard — domain vắng mặt hay không nhận diện được đều fold về `coding` giống mọi nơi khác trong hệ, không phải một fallback riêng — trỏ `worker-prompt-skill-pointer.txt`; mọi domain đã đăng ký khác `coding` (vd `synthetic`) vẫn rơi về wildcard, trỏ `worker-prompt-default.txt` như trước STR91) · `renderTemplate` — substitution `{placeholder}` string-replace thuần, không engine · `hashTemplate` — sha256 nội dung raw file, ghi kèm dispatch log (xem RUL44 (đã xây — STR49, `src/runner/prompt-templates.mjs`)) · template `worker-prompt-skill-pointer.txt` giữ đủ 6 mục cố định sẵn có, CHỈ thêm đúng một mục `# Agent skill` trỏ `SKILL.md` của domain đó — đường dẫn luôn resolve qua sổ đăng ký domain→skill (`skillForStage`, spec Work-State \"Mô hình domain\"), không bao giờ hardcode (xem RUL52 (luật template theo domain `coding` khớp trước wildcard; domain lạ/vắng mặt fold về `coding`)) | yes (một template mặc định luôn có) | `worker-prompt-default.txt`, `worker-prompt-skill-pointer.txt` |"
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-3",
+    "githubAnchor": "unheaded-block-3",
+    "stableAnchor": "unheaded-block-3",
+    "title": "Unheaded block 3",
+    "startLine": 27,
+    "endLine": 41,
+    "textDigest": "43f03eb4dffdeff420f464531d60be7e37e13192429963b10ba302be1e9b777e",
+    "sample": "| # | Element | Meaning | Values | Required | Default |\n|---|-------|---------|--------|----------|---------|\n| 1 | Cấu hình runner (file committed ở gốc repo) | Chính sách thực th",
+    "identityFingerprint": "156792a91288937ec4222d0036cc22e1fde964343a223afbed781377dfc5022d",
+    "ancestry": [
+      "Added in candidate: Runner Data Dictionary",
+      "Data Dictionary"
+    ],
+    "text": "| # | Element | Meaning | Values | Required | Default |\n|---|-------|---------|--------|----------|---------|\n| 1 | Cấu hình runner (file committed ở gốc repo) | Chính sách thực thi — LÀ CONFIG THỰC THI ĐƯỢC: ai sửa nó điều khiển tiến trình được spawn (đầu vào tin cậy) | `executor` — mẫu lệnh gọi trợ lý (thay thế `{prompt}`/`{model}` theo từng phần tử, không bao giờ qua shell), tùy chọn `adapter` (mặc định `cli-spawn`) · `executors` — catalog executor theo danh tính provider/cách gọi, không mang khẩu vị chất lượng · `modelPolicies` — bảng bắt buộc provider→tier→model với tier cung `nano|mini|standard|advanced|flagship|frontier` · `rigorToTier` — bảng bắt buộc ánh xạ đủ bốn mức cầu `low|standard|high|critical` sang tier cung · `capabilities.<name>.rigor` — sàn cầu tùy chọn, chỉ nâng; khối `capabilities.<name>.overrides` bị từ chối · `timeoutMs` — trần thời gian mặc định của một worker, tối đa 4h; một lượt chạy có thể xin thời gian riêng (RUL96 (one run may take its own timeout)) · `confinement`/`confinementPolicies` — chính sách giam giữ · `capabilities` — catalog lời hứa hành vi và binding executor/invocation | yes | tự sinh khi vắng mặt tại đường dẫn mặc định (không kèm `--config`); `fgos setup` điền `rigorToTier`, `fgos doctor` kiểm bảng này và các khoá placement đã retired; một `--config <path>` tường minh trỏ vào đường vắng mặt vẫn báo lỗi ngay (`fgos discover`/`plan`; `fgos-runner` không còn `--config`, RUL93 (the runner loop's worker and the fan-out batch run as one Unit run each)) |\n| 1b | Provider-capacity inventory/state (slice 1) | Pool account cho một provider agent CLI khi provider đó có quota/capacity theo account. Inventory là machine-local secret-bearing config, không phải project policy; state/lease/quarantine là runtime-local evidence. | Inventory chỉ đọc từ `~/.fgos/config.json` tại `runner.providers.<provider>.accounts.<accountId>`; account là keyed object, không phải array. Slice 1 hỗ trợ `openai-codex` account với `label?` và `credentialSource: { kind: \"codex-home\", home }`; nay mỗi account khai đúng một trong `credentialSource` (một store cho mọi CLI, kind `codex-home` hoặc `home-files`) hoặc `credentialSources` (một store cho mỗi CLI, key là tên lệnh `codex`/`pi`/`omp`/`agy`; RUL80 (account trước, CLI sau: một login store cho mỗi CLI)). Account entry bị từ chối nếu khai placement/runtime policy (`executor`, `capability`, `model`, `modelTier`, `mutation`, `confinement`, `tool`, `fallback`, `runtimeClass`, `providerRuntimes`, ...). Project-local `.fgos/config.json` bị từ chối nếu chứa `runner.providers.*.accounts`. State ở `~/.fgos/runtime/provider-capacity/state.json`, lock ở `~/.fgos/runtime/provider-capacity/state.lock`. | no | vắng inventory nghĩa là mọi dispatch giữ hành vi cũ, không selection/lease |\n| 2 | Nhánh đề xuất | Không gian kết quả của một worker, tên mang tiền tố nhận diện `fgw/<id>` | — | — | — |\n| 3 | Bảng phục hồi | Lớp-lỗi → hành-động, máy đọc được | 8 lớp: hỏng-spawn, quá-giờ, chấm-trượt, hỏng-worktree, nhật-ký-hỏng, đề-xuất-bị-trả, việc-kẹt-do-crash, tranh-chấp-ghi → hành động ∈ thử-lại (có trần) / đỗ-lại / dừng; lớp LẠ → dừng (an toàn trước) | — | — |\n| 4 | Bộ đếm chống-lặp (lifetime) | visitCount: số lần một việc vào `doing` TÍNH TỪ ĐẦU đời việc — dẫn xuất từ nhật ký sự kiện, không trường mới; dùng cho các bản ghi outcome/metric đã ship (KHÔNG dùng để chặn dispatch nữa — xem #4b) | — | — | — |\n| 4b | Ngân sách cổng chống-lặp (kể từ can thiệp người) | visitsSinceLastHumanEvent: số lần việc vào `doing` **ở stage executing** TÍNH TỪ sự kiện người CUỐI CÙNG của chính việc đó — đây là con số CỔNG dùng để chặn/park dispatch (thay `visitCount` ở vai trò này); một can thiệp người (xem trigger-set) đưa ngân sách về lại đủ 3 cho vòng kế tiếp. Executing-phase-only scoping (claim-lock): trước đây, pick/take chỉ mở frontier (executing-phase), nên counting mọi `todo→doing` move tương đương dispatch attempts. Claim-lock cho phép `pick` cầm stage khác — claim-release cycle ở các stage đầu vòng (`discovery`/`exploring`/`planning`, cộng tên di sản `decompose`) không được tính vào ngân sách executing-phase (per claim-lock code-review finding) | — | — | trần mặc định 3, dùng chung `MAX_VISITS` |\n| 5 | Cầu dao (breaker) | Số lần chấm-trượt liên tiếp trong MỘT lần chạy (bộ nhớ trong phiên, không dẫn xuất từ nhật ký — chủ đích, vì nhật ký không phân biệt người/máy ghi); trần mặc định 3, đếm RIÊNG cho từng việc dưới dispatch song song (một việc chấm-trượt không kéo cầu dao của việc khác). **Trơ trong `--once`:** một việc đỗ lại (park) tối đa sau `maxRetries` (mặc định 2) lần thử trong CÙNG một lượt `--once`, nên không bao giờ chạm trần 3 của cầu dao trong một lượt đơn — cầu dao chỉ có thể kéo khi có một cơ chế chia-sẻ/nhiều-lượt tích luỹ miss xuyên lượt (chưa xây, xem Open Gaps) | — | — | — |\n| 6 | Trần song song hai tầng | Giới hạn số việc chạy đồng thời trong một mẻ, đọc từ cấu hình committed | tầng 1 — số việc GỐC đồng thời; tầng 2 — số việc CON đồng thời trong MỖI gốc; mỗi lần nạp mẻ lấy `min(trần, số việc sẵn-sàng sau lọc quyền-sở-hữu-gốc)` | no (có mặc định) | 4 gốc × 4 con mỗi gốc |\n| 7 | Quyền sở-hữu gốc | Ai đang cầm mọi việc CON của một gốc trong MỘT lượt chạy — gắn lúc con đầu tiên của gốc được nhận, xả khi gốc xong; sống trong bộ nhớ của lượt chạy, KHÔNG bền qua lượt chạy khác/tiến trình khác | một định danh (per lượt chạy) | — | chưa-chủ |\n| 8 | Bản ghi output cục bộ (một file mỗi việc) | Lưu lại output của trợ lý cho MỌI lượt dispatch của một việc — đọc được sau khi console đã cuộn qua; không bao giờ vào cây committed. Cùng file còn nhận chunk stdout/stderr LIVE khi worker đang chạy (STR39, xem \"Xem live output worker khi đang chạy\") — `tail -f` thấy được ngay, không đợi khối kết-cục cuối | mỗi khối kết-cục: dấu thời gian, số lần thử, loại kết cục (đề xuất/quá-giờ/hỏng-spawn/…), output (khi trợ lý kịp sinh ra); xen giữa các khối kết-cục là chunk thô không bọc, ghi ngay khi đến | no (chỉ tồn tại sau lượt dispatch đầu tiên của việc) | — |\n| 9 | Candidate (Gate A, self-improve loop STR13 Slice 1) | Một việc mang ít nhất một bản ghi friction chưa ngã-ngũ, xếp hạng làm ứng viên tự cải thiện — dẫn xuất TỪ friction đã ghi, không phải một bản ghi độc lập, không bền qua lần `evolve` khác | id, disposition, errorClass, layer, detail, attempts (tất cả lấy từ bản ghi friction MỚI NHẤT theo dấu thời gian của id đó khi id có nhiều bản ghi chưa ngã-ngũ), score (cộng dồn TOÀN BỘ bản ghi chưa ngã-ngũ của id đó, không chỉ bản mới nhất) | — | dẫn xuất mỗi lần gọi `evolve` |\n| 10 | Phán quyết Iron Law (self-improve loop STR13 Slice 2/3) | Kết quả của phép tính hai-cửa (module + từ khóa) trên MỘT candidate fix — dẫn xuất thuần từ đầu vào truyền vào, không bền. Gọi từ bên trong `approve` nguồn `runner` (Cổng duyệt PR nội bộ), ngay trước bước kiểm cây sạch, cho MỌI đề xuất nguồn runner đang land LÊN TRUNK (thu hẹp về ranh giới trunk per `0032`) — xem \"Cổng duyệt PR nội bộ\" và \"Iron Law\" dưới, Business Rules RUL36 (`evolve --submit` là hành động ghi duy nhất trên bề mặt evolve, tái dùng chính cửa `submit`)/RUL37 (Iron Law hỏi ở đúng một ranh giới — trunk — cho mọi đề xuất nguồn runner tới đó)/RUL64 (`ironLaw.level` — key config riêng của cổng Iron Law, fail-closed về `ask`) | required (có/không cần chứng minh test-đỏ-trước), matchedFlags (danh sách từ khóa rủi ro nặng khớp trong mô tả fix), matchedModules (danh sách file khớp danh sách module minh họa) | — | required mặc định `false` khi cả hai phép thử đều không khớp |\n| 11 | Prompt template worker (STR49, `src/runner/prompt-templates/`) | Nội dung chữ nghĩa của `buildPrompt`, tách khỏi code sang file committed — sửa prompt là sửa MỘT file, không đụng code | `selectTemplate({kind, tier, domain})` — bảng luật cơ học, wildcard cuối luôn khớp (từ STR91: luật `domain: 'coding'` khớp TRƯỚC wildcard — domain vắng mặt hay không nhận diện được đều fold về `coding` giống mọi nơi khác trong hệ, không phải một fallback riêng — trỏ `worker-prompt-skill-pointer.txt`; mọi domain đã đăng ký khác `coding` (vd `synthetic`) vẫn rơi về wildcard, trỏ `worker-prompt-default.txt` như trước STR91) · `renderTemplate` — substitution `{placeholder}` string-replace thuần, không engine · `hashTemplate` — sha256 nội dung raw file, ghi kèm dispatch log (xem RUL44 (đã xây — STR49, `src/runner/prompt-templates.mjs`)) · template `worker-prompt-skill-pointer.txt` giữ đủ 6 mục cố định sẵn có, CHỈ thêm đúng một mục `# Agent skill` trỏ `SKILL.md` của domain đó — đường dẫn luôn resolve qua sổ đăng ký domain→skill (`skillForStage`, spec Work-State \"Mô hình domain\"), không bao giờ hardcode (xem RUL52 (luật template theo domain `coding` khớp trước wildcard; domain lạ/vắng mặt fold về `coding`)) | yes (một template mặc định luôn có) | `worker-prompt-default.txt`, `worker-prompt-skill-pointer.txt` |"
+  }
+}
+```
+
+## claim_2c3300909e21da9dd0feb02e991c5f0a
+
+Source digest (evidence JSON): 6a53d5411b951136a9bfbb245948cf59f5fa202dcda4e984adf16bd4a193524a
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_2c3300909e21da9dd0feb02e991c5f0a",
+  "record": {
+    "claimId": "claim_2c3300909e21da9dd0feb02e991c5f0a",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "hợp-đồng-rigor-tier-phase-2-2026-10-01",
+    "sourceLines": [
+      89,
+      89
+    ],
+    "sourceDigest": "cfd79dea41e34baf7969fddba3e30ecc5666de6a7ee32a50dd97cf099bfd8448",
+    "targetOwner": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+    "targetAnchor": "hợp-đồng-rigor-tier-phase-2-2026-10-01",
+    "targetDigest": "cfd79dea41e34baf7969fddba3e30ecc5666de6a7ee32a50dd97cf099bfd8448",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Hợp đồng rigor → tier (Phase 2, 2026-10-01)",
+    "anchor": "hợp-đồng-rigor-tier-phase-2-2026-10-01",
+    "githubAnchor": "hợp-đồng-rigor-tier-phase-2-2026-10-01",
+    "stableAnchor": "h-5acb7dc822fb",
+    "startLine": 89,
+    "endLine": 89,
+    "textDigest": "cfd79dea41e34baf7969fddba3e30ecc5666de6a7ee32a50dd97cf099bfd8448",
+    "sample": "Hợp đồng rigor → tier (Phase 2, 2026-10-01)",
+    "sectionPayloadDigest": "440fd18cc90352f81cac25ca0675e37ed9e700866e18e8e1515399455cbf3c7c",
+    "followingBlockDigest": "2431683892c8c5b500b16f2b6cb61a09cdf6832f5955012397fd028aabaf5d73",
+    "identityFingerprint": "d6b0ab07a48261c6af81e1c941b2dba541c1e200782154dc7ea43c495c4c981c",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Data Dictionary"
+    ],
+    "text": "### Hợp đồng rigor → tier (Phase 2, 2026-10-01)",
+    "sectionText": "### Hợp đồng rigor → tier (Phase 2, 2026-10-01)\n\nWorkflow/Unit và operation chỉ phát biểu nhu cầu bằng `rigor = low|standard|high|critical`. `rigor` gộp chỉ-nâng qua workflow → unit → assignment, rồi gộp sàn `capabilities.<cap>.rigor`. Runner ánh xạ mức cầu cuối qua `runner.rigorToTier`, sau đó chọn model tại `runner.modelPolicies[provider][tier]`. `reasoningEffort` suy từ `rigor`; một override `tier` tường minh không tự nâng effort.\n\n**Effort và model khi launch (2026-10-14).** `reasoningEffort` suy từ `rigor` chỉ là ghi nhận trong policy, không được render vào lệnh chạy: đo trên `.fgos/assignments` ngày 2026-10-14, 21/32 run Codex có policy ghi effort chạy ở mức khác (header Codex `reasoning effort:` lấy từ `config.toml` của `CODEX_HOME`). Một mức nêu tường minh được render. Ở cửa chuẩn, `fgos run --effort low|medium|high|max` (hoặc khoá `reasoningEffort` trong `--override`) là một override của `bind()`; `bind()` kiểm bằng `assertReasoningEffort` (từ vựng chuẩn, rồi `executors.<id>.supports.reasoningEffort` của executor được bind — danh sách hẹp hơn là giới hạn có chủ đích, mức ngoài danh sách thành binding bị từ chối `reasoning-effort`), ghi `binding.reasoningEffort` + `provenance.reasoningEffort`, rồi Assignment mang nó xuống. Cửa compat `fgos dispatch execute --effort` (plain, `--assignment`, `--contract`) và `reasoningEffort` của operation policy đi cùng hàm kiểm đó. Render ở một chỗ, `resolveExecutorCommand`, vào template theo CLI được spawn (`provider-adapter.mjs` `renderReasoningEffortArgs`): claude/agy `--effort`, pi/omp `--thinking` (thay giá trị template đã ghi cứng), codex `-c model_reasoning_effort=` (`max` → `xhigh`); CLI không có điều khiển effort → từ chối trước khi spawn.\n\nModel chạy lệch với model đã bind được ghi thành provenance: receipt `assignment-run-result` mang `policy.provenance.modelDrift = {value: [...], source}` và `policy.provenance.reasoningEffort.rendered` (cờ thật đã render). Mã cảnh báo: `model-overridden` (policy thay model trước launch, vd redirect sang provider khác tính lại theo tier), `model-not-passed` (argv không chứa model), `model-unsupported` (CLI từ chối/không biết model — câu từ chối thật của agy, pi, codex), `model-reported-different` (header `model:` trên stderr của codex khác model đã truyền). Kiểm trước-spawn ở `resolveExecutorCommand` (`modelCheck`), sau-run ở `collectModelWarnings`, cả hai trong `provider-adapter.mjs`, dùng chung cho mọi cửa; kết quả `execute` thô (compat) mang cùng dữ liệu ở `reasoningEffort`/`modelWarnings`.\n\n`tier` là kênh placement tường minh, chỉ hợp lệ ở actor/assignment/CLI và chỉ được nâng so với tier suy từ rigor. Workflow/Unit dùng `tier` bị từ chối. Contract/assignment đã lưu trước Phase 2 được đọc một lần tại biên load để đổi field tier cũ thành `tier`; mọi bản ghi mới chỉ ghi `tier`.\n\nCapability không được ghi model hoặc tier trực tiếp: `capabilities.<cap>.rigor` là sàn duy nhất theo loại việc. Config còn `capabilities.*.overrides`, bảng model phẳng, hoặc field quality bridge cũ bị fail-fast với hướng dẫn sửa; setup/doctor sở hữu default và chẩn đoán tương ứng."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Hợp đồng rigor → tier (Phase 2, 2026-10-01)",
+    "anchor": "hợp-đồng-rigor-tier-phase-2-2026-10-01",
+    "githubAnchor": "hợp-đồng-rigor-tier-phase-2-2026-10-01",
+    "stableAnchor": "h-e47b96715704",
+    "startLine": 43,
+    "endLine": 43,
+    "textDigest": "cfd79dea41e34baf7969fddba3e30ecc5666de6a7ee32a50dd97cf099bfd8448",
+    "sample": "Hợp đồng rigor → tier (Phase 2, 2026-10-01)",
+    "sectionPayloadDigest": "440fd18cc90352f81cac25ca0675e37ed9e700866e18e8e1515399455cbf3c7c",
+    "followingBlockDigest": "2431683892c8c5b500b16f2b6cb61a09cdf6832f5955012397fd028aabaf5d73",
+    "identityFingerprint": "d6b0ab07a48261c6af81e1c941b2dba541c1e200782154dc7ea43c495c4c981c",
+    "ancestry": [
+      "Added in candidate: Runner Data Dictionary",
+      "Data Dictionary"
+    ],
+    "text": "### Hợp đồng rigor → tier (Phase 2, 2026-10-01)",
+    "sectionText": "### Hợp đồng rigor → tier (Phase 2, 2026-10-01)\n\nWorkflow/Unit và operation chỉ phát biểu nhu cầu bằng `rigor = low|standard|high|critical`. `rigor` gộp chỉ-nâng qua workflow → unit → assignment, rồi gộp sàn `capabilities.<cap>.rigor`. Runner ánh xạ mức cầu cuối qua `runner.rigorToTier`, sau đó chọn model tại `runner.modelPolicies[provider][tier]`. `reasoningEffort` suy từ `rigor`; một override `tier` tường minh không tự nâng effort.\n\n**Effort và model khi launch (2026-10-14).** `reasoningEffort` suy từ `rigor` chỉ là ghi nhận trong policy, không được render vào lệnh chạy: đo trên `.fgos/assignments` ngày 2026-10-14, 21/32 run Codex có policy ghi effort chạy ở mức khác (header Codex `reasoning effort:` lấy từ `config.toml` của `CODEX_HOME`). Một mức nêu tường minh được render. Ở cửa chuẩn, `fgos run --effort low|medium|high|max` (hoặc khoá `reasoningEffort` trong `--override`) là một override của `bind()`; `bind()` kiểm bằng `assertReasoningEffort` (từ vựng chuẩn, rồi `executors.<id>.supports.reasoningEffort` của executor được bind — danh sách hẹp hơn là giới hạn có chủ đích, mức ngoài danh sách thành binding bị từ chối `reasoning-effort`), ghi `binding.reasoningEffort` + `provenance.reasoningEffort`, rồi Assignment mang nó xuống. Cửa compat `fgos dispatch execute --effort` (plain, `--assignment`, `--contract`) và `reasoningEffort` của operation policy đi cùng hàm kiểm đó. Render ở một chỗ, `resolveExecutorCommand`, vào template theo CLI được spawn (`provider-adapter.mjs` `renderReasoningEffortArgs`): claude/agy `--effort`, pi/omp `--thinking` (thay giá trị template đã ghi cứng), codex `-c model_reasoning_effort=` (`max` → `xhigh`); CLI không có điều khiển effort → từ chối trước khi spawn.\n\nModel chạy lệch với model đã bind được ghi thành provenance: receipt `assignment-run-result` mang `policy.provenance.modelDrift = {value: [...], source}` và `policy.provenance.reasoningEffort.rendered` (cờ thật đã render). Mã cảnh báo: `model-overridden` (policy thay model trước launch, vd redirect sang provider khác tính lại theo tier), `model-not-passed` (argv không chứa model), `model-unsupported` (CLI từ chối/không biết model — câu từ chối thật của agy, pi, codex), `model-reported-different` (header `model:` trên stderr của codex khác model đã truyền). Kiểm trước-spawn ở `resolveExecutorCommand` (`modelCheck`), sau-run ở `collectModelWarnings`, cả hai trong `provider-adapter.mjs`, dùng chung cho mọi cửa; kết quả `execute` thô (compat) mang cùng dữ liệu ở `reasoningEffort`/`modelWarnings`.\n\n`tier` là kênh placement tường minh, chỉ hợp lệ ở actor/assignment/CLI và chỉ được nâng so với tier suy từ rigor. Workflow/Unit dùng `tier` bị từ chối. Contract/assignment đã lưu trước Phase 2 được đọc một lần tại biên load để đổi field tier cũ thành `tier`; mọi bản ghi mới chỉ ghi `tier`.\n\nCapability không được ghi model hoặc tier trực tiếp: `capabilities.<cap>.rigor` là sàn duy nhất theo loại việc. Config còn `capabilities.*.overrides`, bảng model phẳng, hoặc field quality bridge cũ bị fail-fast với hướng dẫn sửa; setup/doctor sở hữu default và chẩn đoán tương ứng."
+  }
+}
+```
+
+## claim_62d9996e5897714517de064047f1ff83
+
+Source digest (evidence JSON): 24fc8a71d0d49c3a032b9e0db896b91e572109e39b483e7a0660fb7bb95c4a9d
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_62d9996e5897714517de064047f1ff83",
+  "record": {
+    "claimId": "claim_62d9996e5897714517de064047f1ff83",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "unheaded-block-10",
+    "sourceLines": [
+      91,
+      91
+    ],
+    "sourceDigest": "2431683892c8c5b500b16f2b6cb61a09cdf6832f5955012397fd028aabaf5d73",
+    "targetOwner": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+    "targetAnchor": "unheaded-block-4",
+    "targetDigest": "2431683892c8c5b500b16f2b6cb61a09cdf6832f5955012397fd028aabaf5d73",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-10",
+    "githubAnchor": "unheaded-block-10",
+    "stableAnchor": "unheaded-block-10",
+    "title": "Unheaded block 10",
+    "startLine": 91,
+    "endLine": 91,
+    "textDigest": "2431683892c8c5b500b16f2b6cb61a09cdf6832f5955012397fd028aabaf5d73",
+    "sample": "Workflow/Unit và operation chỉ phát biểu nhu cầu bằng `rigor = low|standard|high|critical`. `rigor` gộp chỉ-nâng qua workflow → unit → assignment, rồi gộp sàn `capabilities.<cap>.r",
+    "identityFingerprint": "ab3d87399e5266579d2604cace0b079581b04de76026775020cb7e3cd9b7c3a4",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Data Dictionary",
+      "Hợp đồng rigor → tier (Phase 2, 2026-10-01)"
+    ],
+    "text": "Workflow/Unit và operation chỉ phát biểu nhu cầu bằng `rigor = low|standard|high|critical`. `rigor` gộp chỉ-nâng qua workflow → unit → assignment, rồi gộp sàn `capabilities.<cap>.rigor`. Runner ánh xạ mức cầu cuối qua `runner.rigorToTier`, sau đó chọn model tại `runner.modelPolicies[provider][tier]`. `reasoningEffort` suy từ `rigor`; một override `tier` tường minh không tự nâng effort."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-4",
+    "githubAnchor": "unheaded-block-4",
+    "stableAnchor": "unheaded-block-4",
+    "title": "Unheaded block 4",
+    "startLine": 45,
+    "endLine": 45,
+    "textDigest": "2431683892c8c5b500b16f2b6cb61a09cdf6832f5955012397fd028aabaf5d73",
+    "sample": "Workflow/Unit và operation chỉ phát biểu nhu cầu bằng `rigor = low|standard|high|critical`. `rigor` gộp chỉ-nâng qua workflow → unit → assignment, rồi gộp sàn `capabilities.<cap>.r",
+    "identityFingerprint": "ab3d87399e5266579d2604cace0b079581b04de76026775020cb7e3cd9b7c3a4",
+    "ancestry": [
+      "Added in candidate: Runner Data Dictionary",
+      "Data Dictionary",
+      "Hợp đồng rigor → tier (Phase 2, 2026-10-01)"
+    ],
+    "text": "Workflow/Unit và operation chỉ phát biểu nhu cầu bằng `rigor = low|standard|high|critical`. `rigor` gộp chỉ-nâng qua workflow → unit → assignment, rồi gộp sàn `capabilities.<cap>.rigor`. Runner ánh xạ mức cầu cuối qua `runner.rigorToTier`, sau đó chọn model tại `runner.modelPolicies[provider][tier]`. `reasoningEffort` suy từ `rigor`; một override `tier` tường minh không tự nâng effort."
+  }
+}
+```
+
+## claim_0735a1a1ac2e5c08ab7dde6f393746f0
+
+Source digest (evidence JSON): b85c141845daea2b88a4fa325f50af898ced5153e9276f29ba2e4c6aef707704
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_0735a1a1ac2e5c08ab7dde6f393746f0",
+  "record": {
+    "claimId": "claim_0735a1a1ac2e5c08ab7dde6f393746f0",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "unheaded-block-11",
+    "sourceLines": [
+      93,
+      93
+    ],
+    "sourceDigest": "940f6b04cc13b1d6f8fbd92cf30fab8804ad74f218ab9ca618ca424dba8583d6",
+    "targetOwner": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+    "targetAnchor": "unheaded-block-5",
+    "targetDigest": "940f6b04cc13b1d6f8fbd92cf30fab8804ad74f218ab9ca618ca424dba8583d6",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-11",
+    "githubAnchor": "unheaded-block-11",
+    "stableAnchor": "unheaded-block-11",
+    "title": "Unheaded block 11",
+    "startLine": 93,
+    "endLine": 93,
+    "textDigest": "940f6b04cc13b1d6f8fbd92cf30fab8804ad74f218ab9ca618ca424dba8583d6",
+    "sample": "**Effort và model khi launch (2026-10-14).** `reasoningEffort` suy từ `rigor` chỉ là ghi nhận trong policy, không được render vào lệnh chạy: đo trên `.fgos/assignments` ngày 2026-1",
+    "identityFingerprint": "537f6ea545445c113ff0453403ab619a55329c93698bdec9f3b5829ff6ce5f48",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Data Dictionary",
+      "Hợp đồng rigor → tier (Phase 2, 2026-10-01)"
+    ],
+    "text": "**Effort và model khi launch (2026-10-14).** `reasoningEffort` suy từ `rigor` chỉ là ghi nhận trong policy, không được render vào lệnh chạy: đo trên `.fgos/assignments` ngày 2026-10-14, 21/32 run Codex có policy ghi effort chạy ở mức khác (header Codex `reasoning effort:` lấy từ `config.toml` của `CODEX_HOME`). Một mức nêu tường minh được render. Ở cửa chuẩn, `fgos run --effort low|medium|high|max` (hoặc khoá `reasoningEffort` trong `--override`) là một override của `bind()`; `bind()` kiểm bằng `assertReasoningEffort` (từ vựng chuẩn, rồi `executors.<id>.supports.reasoningEffort` của executor được bind — danh sách hẹp hơn là giới hạn có chủ đích, mức ngoài danh sách thành binding bị từ chối `reasoning-effort`), ghi `binding.reasoningEffort` + `provenance.reasoningEffort`, rồi Assignment mang nó xuống. Cửa compat `fgos dispatch execute --effort` (plain, `--assignment`, `--contract`) và `reasoningEffort` của operation policy đi cùng hàm kiểm đó. Render ở một chỗ, `resolveExecutorCommand`, vào template theo CLI được spawn (`provider-adapter.mjs` `renderReasoningEffortArgs`): claude/agy `--effort`, pi/omp `--thinking` (thay giá trị template đã ghi cứng), codex `-c model_reasoning_effort=` (`max` → `xhigh`); CLI không có điều khiển effort → từ chối trước khi spawn."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-5",
+    "githubAnchor": "unheaded-block-5",
+    "stableAnchor": "unheaded-block-5",
+    "title": "Unheaded block 5",
+    "startLine": 47,
+    "endLine": 47,
+    "textDigest": "940f6b04cc13b1d6f8fbd92cf30fab8804ad74f218ab9ca618ca424dba8583d6",
+    "sample": "**Effort và model khi launch (2026-10-14).** `reasoningEffort` suy từ `rigor` chỉ là ghi nhận trong policy, không được render vào lệnh chạy: đo trên `.fgos/assignments` ngày 2026-1",
+    "identityFingerprint": "537f6ea545445c113ff0453403ab619a55329c93698bdec9f3b5829ff6ce5f48",
+    "ancestry": [
+      "Added in candidate: Runner Data Dictionary",
+      "Data Dictionary",
+      "Hợp đồng rigor → tier (Phase 2, 2026-10-01)"
+    ],
+    "text": "**Effort và model khi launch (2026-10-14).** `reasoningEffort` suy từ `rigor` chỉ là ghi nhận trong policy, không được render vào lệnh chạy: đo trên `.fgos/assignments` ngày 2026-10-14, 21/32 run Codex có policy ghi effort chạy ở mức khác (header Codex `reasoning effort:` lấy từ `config.toml` của `CODEX_HOME`). Một mức nêu tường minh được render. Ở cửa chuẩn, `fgos run --effort low|medium|high|max` (hoặc khoá `reasoningEffort` trong `--override`) là một override của `bind()`; `bind()` kiểm bằng `assertReasoningEffort` (từ vựng chuẩn, rồi `executors.<id>.supports.reasoningEffort` của executor được bind — danh sách hẹp hơn là giới hạn có chủ đích, mức ngoài danh sách thành binding bị từ chối `reasoning-effort`), ghi `binding.reasoningEffort` + `provenance.reasoningEffort`, rồi Assignment mang nó xuống. Cửa compat `fgos dispatch execute --effort` (plain, `--assignment`, `--contract`) và `reasoningEffort` của operation policy đi cùng hàm kiểm đó. Render ở một chỗ, `resolveExecutorCommand`, vào template theo CLI được spawn (`provider-adapter.mjs` `renderReasoningEffortArgs`): claude/agy `--effort`, pi/omp `--thinking` (thay giá trị template đã ghi cứng), codex `-c model_reasoning_effort=` (`max` → `xhigh`); CLI không có điều khiển effort → từ chối trước khi spawn."
+  }
+}
+```
+
+## claim_092c6c62f6b2c014d24f74aca3dee571
+
+Source digest (evidence JSON): 32a1cf305782cb427cdd11d766fa0666243811f93fd94fab8199b171ed8fa476
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_092c6c62f6b2c014d24f74aca3dee571",
+  "record": {
+    "claimId": "claim_092c6c62f6b2c014d24f74aca3dee571",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "unheaded-block-12",
+    "sourceLines": [
+      95,
+      95
+    ],
+    "sourceDigest": "344985adb8cb7f6b7f62c1b4ef88be9a3d3f73e531130851c57fa9a9106d3c12",
+    "targetOwner": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+    "targetAnchor": "unheaded-block-6",
+    "targetDigest": "344985adb8cb7f6b7f62c1b4ef88be9a3d3f73e531130851c57fa9a9106d3c12",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-12",
+    "githubAnchor": "unheaded-block-12",
+    "stableAnchor": "unheaded-block-12",
+    "title": "Unheaded block 12",
+    "startLine": 95,
+    "endLine": 95,
+    "textDigest": "344985adb8cb7f6b7f62c1b4ef88be9a3d3f73e531130851c57fa9a9106d3c12",
+    "sample": "Model chạy lệch với model đã bind được ghi thành provenance: receipt `assignment-run-result` mang `policy.provenance.modelDrift = {value: [...], source}` và `policy.provenance.reas",
+    "identityFingerprint": "6ab6c2098ed6a7d5f0e59de8c657956e71b921143b53b9f5508995501eafd0d4",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Data Dictionary",
+      "Hợp đồng rigor → tier (Phase 2, 2026-10-01)"
+    ],
+    "text": "Model chạy lệch với model đã bind được ghi thành provenance: receipt `assignment-run-result` mang `policy.provenance.modelDrift = {value: [...], source}` và `policy.provenance.reasoningEffort.rendered` (cờ thật đã render). Mã cảnh báo: `model-overridden` (policy thay model trước launch, vd redirect sang provider khác tính lại theo tier), `model-not-passed` (argv không chứa model), `model-unsupported` (CLI từ chối/không biết model — câu từ chối thật của agy, pi, codex), `model-reported-different` (header `model:` trên stderr của codex khác model đã truyền). Kiểm trước-spawn ở `resolveExecutorCommand` (`modelCheck`), sau-run ở `collectModelWarnings`, cả hai trong `provider-adapter.mjs`, dùng chung cho mọi cửa; kết quả `execute` thô (compat) mang cùng dữ liệu ở `reasoningEffort`/`modelWarnings`."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-6",
+    "githubAnchor": "unheaded-block-6",
+    "stableAnchor": "unheaded-block-6",
+    "title": "Unheaded block 6",
+    "startLine": 49,
+    "endLine": 49,
+    "textDigest": "344985adb8cb7f6b7f62c1b4ef88be9a3d3f73e531130851c57fa9a9106d3c12",
+    "sample": "Model chạy lệch với model đã bind được ghi thành provenance: receipt `assignment-run-result` mang `policy.provenance.modelDrift = {value: [...], source}` và `policy.provenance.reas",
+    "identityFingerprint": "6ab6c2098ed6a7d5f0e59de8c657956e71b921143b53b9f5508995501eafd0d4",
+    "ancestry": [
+      "Added in candidate: Runner Data Dictionary",
+      "Data Dictionary",
+      "Hợp đồng rigor → tier (Phase 2, 2026-10-01)"
+    ],
+    "text": "Model chạy lệch với model đã bind được ghi thành provenance: receipt `assignment-run-result` mang `policy.provenance.modelDrift = {value: [...], source}` và `policy.provenance.reasoningEffort.rendered` (cờ thật đã render). Mã cảnh báo: `model-overridden` (policy thay model trước launch, vd redirect sang provider khác tính lại theo tier), `model-not-passed` (argv không chứa model), `model-unsupported` (CLI từ chối/không biết model — câu từ chối thật của agy, pi, codex), `model-reported-different` (header `model:` trên stderr của codex khác model đã truyền). Kiểm trước-spawn ở `resolveExecutorCommand` (`modelCheck`), sau-run ở `collectModelWarnings`, cả hai trong `provider-adapter.mjs`, dùng chung cho mọi cửa; kết quả `execute` thô (compat) mang cùng dữ liệu ở `reasoningEffort`/`modelWarnings`."
+  }
+}
+```
+
+## claim_ec3f286e81c31817022a1caa3eebda54
+
+Source digest (evidence JSON): db11a31b38deeeb1c9c72b71c2c5a3727d4ae071a72ad84983cd1633ce71171b
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_ec3f286e81c31817022a1caa3eebda54",
+  "record": {
+    "claimId": "claim_ec3f286e81c31817022a1caa3eebda54",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "unheaded-block-13",
+    "sourceLines": [
+      97,
+      97
+    ],
+    "sourceDigest": "a52e7ad1d984e28c180b20e213675e16bd0225c3a2746cbe06a3f3f1168e63cb",
+    "targetOwner": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+    "targetAnchor": "unheaded-block-7",
+    "targetDigest": "a52e7ad1d984e28c180b20e213675e16bd0225c3a2746cbe06a3f3f1168e63cb",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-13",
+    "githubAnchor": "unheaded-block-13",
+    "stableAnchor": "unheaded-block-13",
+    "title": "Unheaded block 13",
+    "startLine": 97,
+    "endLine": 97,
+    "textDigest": "a52e7ad1d984e28c180b20e213675e16bd0225c3a2746cbe06a3f3f1168e63cb",
+    "sample": "`tier` là kênh placement tường minh, chỉ hợp lệ ở actor/assignment/CLI và chỉ được nâng so với tier suy từ rigor. Workflow/Unit dùng `tier` bị từ chối. Contract/assignment đã lưu t",
+    "identityFingerprint": "c4f94359edd6af739d8bc13cdc0f126ec8fa4a6e3d1e6dd34f8fef5f72bd93df",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Data Dictionary",
+      "Hợp đồng rigor → tier (Phase 2, 2026-10-01)"
+    ],
+    "text": "`tier` là kênh placement tường minh, chỉ hợp lệ ở actor/assignment/CLI và chỉ được nâng so với tier suy từ rigor. Workflow/Unit dùng `tier` bị từ chối. Contract/assignment đã lưu trước Phase 2 được đọc một lần tại biên load để đổi field tier cũ thành `tier`; mọi bản ghi mới chỉ ghi `tier`."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-7",
+    "githubAnchor": "unheaded-block-7",
+    "stableAnchor": "unheaded-block-7",
+    "title": "Unheaded block 7",
+    "startLine": 51,
+    "endLine": 51,
+    "textDigest": "a52e7ad1d984e28c180b20e213675e16bd0225c3a2746cbe06a3f3f1168e63cb",
+    "sample": "`tier` là kênh placement tường minh, chỉ hợp lệ ở actor/assignment/CLI và chỉ được nâng so với tier suy từ rigor. Workflow/Unit dùng `tier` bị từ chối. Contract/assignment đã lưu t",
+    "identityFingerprint": "c4f94359edd6af739d8bc13cdc0f126ec8fa4a6e3d1e6dd34f8fef5f72bd93df",
+    "ancestry": [
+      "Added in candidate: Runner Data Dictionary",
+      "Data Dictionary",
+      "Hợp đồng rigor → tier (Phase 2, 2026-10-01)"
+    ],
+    "text": "`tier` là kênh placement tường minh, chỉ hợp lệ ở actor/assignment/CLI và chỉ được nâng so với tier suy từ rigor. Workflow/Unit dùng `tier` bị từ chối. Contract/assignment đã lưu trước Phase 2 được đọc một lần tại biên load để đổi field tier cũ thành `tier`; mọi bản ghi mới chỉ ghi `tier`."
+  }
+}
+```
+
+## claim_e9802a0cf16dad3c227c5159d457e3dd
+
+Source digest (evidence JSON): 6df2b0c5728c18ab65ee42fa9791e61a761c8456fd93722aca7d0394800e01a6
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_e9802a0cf16dad3c227c5159d457e3dd",
+  "record": {
+    "claimId": "claim_e9802a0cf16dad3c227c5159d457e3dd",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "unheaded-block-14",
+    "sourceLines": [
+      99,
+      99
+    ],
+    "sourceDigest": "c9c5d3f64f4d2259f31180907787ac87bd85322dc67c1ae9a63bac140497ce41",
+    "targetOwner": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+    "targetAnchor": "unheaded-block-8",
+    "targetDigest": "c9c5d3f64f4d2259f31180907787ac87bd85322dc67c1ae9a63bac140497ce41",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-14",
+    "githubAnchor": "unheaded-block-14",
+    "stableAnchor": "unheaded-block-14",
+    "title": "Unheaded block 14",
+    "startLine": 99,
+    "endLine": 99,
+    "textDigest": "c9c5d3f64f4d2259f31180907787ac87bd85322dc67c1ae9a63bac140497ce41",
+    "sample": "Capability không được ghi model hoặc tier trực tiếp: `capabilities.<cap>.rigor` là sàn duy nhất theo loại việc. Config còn `capabilities.*.overrides`, bảng model phẳng, hoặc field ",
+    "identityFingerprint": "34c5ceff50bd83003eb739de6fc90d2c2b012682efdee80d6366f3bb2fb87b26",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Data Dictionary",
+      "Hợp đồng rigor → tier (Phase 2, 2026-10-01)"
+    ],
+    "text": "Capability không được ghi model hoặc tier trực tiếp: `capabilities.<cap>.rigor` là sàn duy nhất theo loại việc. Config còn `capabilities.*.overrides`, bảng model phẳng, hoặc field quality bridge cũ bị fail-fast với hướng dẫn sửa; setup/doctor sở hữu default và chẩn đoán tương ứng."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-8",
+    "githubAnchor": "unheaded-block-8",
+    "stableAnchor": "unheaded-block-8",
+    "title": "Unheaded block 8",
+    "startLine": 53,
+    "endLine": 53,
+    "textDigest": "c9c5d3f64f4d2259f31180907787ac87bd85322dc67c1ae9a63bac140497ce41",
+    "sample": "Capability không được ghi model hoặc tier trực tiếp: `capabilities.<cap>.rigor` là sàn duy nhất theo loại việc. Config còn `capabilities.*.overrides`, bảng model phẳng, hoặc field ",
+    "identityFingerprint": "34c5ceff50bd83003eb739de6fc90d2c2b012682efdee80d6366f3bb2fb87b26",
+    "ancestry": [
+      "Added in candidate: Runner Data Dictionary",
+      "Data Dictionary",
+      "Hợp đồng rigor → tier (Phase 2, 2026-10-01)"
+    ],
+    "text": "Capability không được ghi model hoặc tier trực tiếp: `capabilities.<cap>.rigor` là sàn duy nhất theo loại việc. Config còn `capabilities.*.overrides`, bảng model phẳng, hoặc field quality bridge cũ bị fail-fast với hướng dẫn sửa; setup/doctor sở hữu default và chẩn đoán tương ứng."
+  }
+}
+```
+
+## claim_7a21644819481756f27864ae791d992f
+
+Source digest (evidence JSON): 79551c6a396aa954c06acc37302f10a7cb768eaf851a0ee519607e46f658e707
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_7a21644819481756f27864ae791d992f",
+  "record": {
+    "claimId": "claim_7a21644819481756f27864ae791d992f",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "behaviors-operations",
+    "sourceLines": [
+      101,
+      101
+    ],
+    "sourceDigest": "39a803b85af853156a7029460b132103eac8017b2b1b7eb0b82d181f699b86f3",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "behaviors-operations",
+    "targetDigest": "39a803b85af853156a7029460b132103eac8017b2b1b7eb0b82d181f699b86f3",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; source unit shorter than 40 characters; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "heading",
+    "level": 2,
+    "title": "Behaviors & Operations",
+    "anchor": "behaviors-operations",
+    "githubAnchor": "behaviors-operations",
+    "stableAnchor": "h-14a4d61bc5b3",
+    "startLine": 101,
+    "endLine": 101,
+    "textDigest": "39a803b85af853156a7029460b132103eac8017b2b1b7eb0b82d181f699b86f3",
+    "sample": "Behaviors & Operations",
+    "sectionPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "followingBlockDigest": null,
+    "identityFingerprint": "eec5726290be124f298da36ff122a3c08472803c2ed7bf01a9d13d53c03c0b78",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)"
+    ],
+    "text": "## Behaviors & Operations",
+    "sectionText": "## Behaviors & Operations"
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "heading",
+    "level": 2,
+    "title": "Behaviors & Operations",
+    "anchor": "behaviors-operations",
+    "githubAnchor": "behaviors-operations",
+    "stableAnchor": "h-1e18ec78cf23",
+    "startLine": 25,
+    "endLine": 25,
+    "textDigest": "39a803b85af853156a7029460b132103eac8017b2b1b7eb0b82d181f699b86f3",
+    "sample": "Behaviors & Operations",
+    "sectionPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "followingBlockDigest": null,
+    "identityFingerprint": "eec5726290be124f298da36ff122a3c08472803c2ed7bf01a9d13d53c03c0b78",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations"
+    ],
+    "text": "## Behaviors & Operations",
+    "sectionText": "## Behaviors & Operations"
+  }
+}
+```
+
+## claim_99328b57521ed5691733ccfb07a8a8ef
+
+Source digest (evidence JSON): 6e5e6daaf5e3b6415d03d656b2dd5426f9cd713a02d62e0b59a318dd56a8bf81
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_99328b57521ed5691733ccfb07a8a8ef",
+  "record": {
+    "claimId": "claim_99328b57521ed5691733ccfb07a8a8ef",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "kiểm-tra-tiền-điều-kiện-lúc-khởi-động-repo-root-head-phải-resolve-được",
+    "sourceLines": [
+      103,
+      103
+    ],
+    "sourceDigest": "b48b297ef79c6722fdefed76b59feba2ce2501b155c61c42ae3d4075b650d669",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "kiểm-tra-tiền-điều-kiện-lúc-khởi-động-repo-root-head-phải-resolve-được",
+    "targetDigest": "b48b297ef79c6722fdefed76b59feba2ce2501b155c61c42ae3d4075b650d669",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Kiểm tra tiền-điều-kiện lúc khởi động (repo root + HEAD phải resolve được)",
+    "anchor": "kiểm-tra-tiền-điều-kiện-lúc-khởi-động-repo-root-head-phải-resolve-được",
+    "githubAnchor": "kiểm-tra-tiền-điều-kiện-lúc-khởi-động-repo-root-head-phải-resolve-được",
+    "stableAnchor": "h-e19fa0e5c95b",
+    "startLine": 103,
+    "endLine": 103,
+    "textDigest": "b48b297ef79c6722fdefed76b59feba2ce2501b155c61c42ae3d4075b650d669",
+    "sample": "Kiểm tra tiền-điều-kiện lúc khởi động (repo root + HEAD phải resolve được)",
+    "sectionPayloadDigest": "b7ef0d6ed40afb21591309ec13d89a5287c6787c63d3e33f6548e4c5051810f2",
+    "followingBlockDigest": "b7ef0d6ed40afb21591309ec13d89a5287c6787c63d3e33f6548e4c5051810f2",
+    "identityFingerprint": "c595ad0901e9d6f5deae84fabfeb89a059d57a60f8d2c72b3adf0a0613071325",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations"
+    ],
+    "text": "### Kiểm tra tiền-điều-kiện lúc khởi động (repo root + HEAD phải resolve được)",
+    "sectionText": "### Kiểm tra tiền-điều-kiện lúc khởi động (repo root + HEAD phải resolve được)\n\n- **Runs when:** MỌI lần `fgos-runner` khởi động — TRƯỚC CẢ bước gặt-lại, một lần duy nhất mỗi lần chạy.\n- **Blocked when:** thư mục làm việc không nằm trong một repo git (`git rev-parse --show-toplevel` thất bại) — `validation`; repo tìm được nhưng KHÔNG có commit nào nên HEAD không resolve được (`git rev-parse --verify --quiet HEAD` thất bại) — CŨNG `validation`, cùng phạm trù với nhánh \"không phải repo git\" ngay phía trên, thông điệp nêu rõ nguyên nhân (0 commit) VÀ cách sửa (chạy `git commit` trước).\n- **What changes:** không gì — đây là một kiểm tra thuần, dừng tiến trình runner trước khi bất kỳ item nào được claim, không ghi sự kiện nào.\n- **Afterwards:** repo hợp lệ (có ≥1 commit) → runner tiếp tục xuống gặt-lại như trước, không đổi hành vi; repo 0 commit → runner dừng ngay tại đây với lỗi `validation` rõ ràng, KHÔNG còn đường cũ (thử claim một item, `git worktree add` thất bại vì HEAD không resolve, thử lại theo bảng phục hồi, rồi đỗ item sau khi tốn hai lượt thử vô ích) — lỗi bây giờ nêu đúng nguyên nhân gốc thay vì một lỗi worktree khó hiểu (per D ecfd0d1a)."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Kiểm tra tiền-điều-kiện lúc khởi động (repo root + HEAD phải resolve được)",
+    "anchor": "kiểm-tra-tiền-điều-kiện-lúc-khởi-động-repo-root-head-phải-resolve-được",
+    "githubAnchor": "kiểm-tra-tiền-điều-kiện-lúc-khởi-động-repo-root-head-phải-resolve-được",
+    "stableAnchor": "h-254241c59f82",
+    "startLine": 27,
+    "endLine": 27,
+    "textDigest": "b48b297ef79c6722fdefed76b59feba2ce2501b155c61c42ae3d4075b650d669",
+    "sample": "Kiểm tra tiền-điều-kiện lúc khởi động (repo root + HEAD phải resolve được)",
+    "sectionPayloadDigest": "b7ef0d6ed40afb21591309ec13d89a5287c6787c63d3e33f6548e4c5051810f2",
+    "followingBlockDigest": "b7ef0d6ed40afb21591309ec13d89a5287c6787c63d3e33f6548e4c5051810f2",
+    "identityFingerprint": "c595ad0901e9d6f5deae84fabfeb89a059d57a60f8d2c72b3adf0a0613071325",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations"
+    ],
+    "text": "### Kiểm tra tiền-điều-kiện lúc khởi động (repo root + HEAD phải resolve được)",
+    "sectionText": "### Kiểm tra tiền-điều-kiện lúc khởi động (repo root + HEAD phải resolve được)\n\n- **Runs when:** MỌI lần `fgos-runner` khởi động — TRƯỚC CẢ bước gặt-lại, một lần duy nhất mỗi lần chạy.\n- **Blocked when:** thư mục làm việc không nằm trong một repo git (`git rev-parse --show-toplevel` thất bại) — `validation`; repo tìm được nhưng KHÔNG có commit nào nên HEAD không resolve được (`git rev-parse --verify --quiet HEAD` thất bại) — CŨNG `validation`, cùng phạm trù với nhánh \"không phải repo git\" ngay phía trên, thông điệp nêu rõ nguyên nhân (0 commit) VÀ cách sửa (chạy `git commit` trước).\n- **What changes:** không gì — đây là một kiểm tra thuần, dừng tiến trình runner trước khi bất kỳ item nào được claim, không ghi sự kiện nào.\n- **Afterwards:** repo hợp lệ (có ≥1 commit) → runner tiếp tục xuống gặt-lại như trước, không đổi hành vi; repo 0 commit → runner dừng ngay tại đây với lỗi `validation` rõ ràng, KHÔNG còn đường cũ (thử claim một item, `git worktree add` thất bại vì HEAD không resolve, thử lại theo bảng phục hồi, rồi đỗ item sau khi tốn hai lượt thử vô ích) — lỗi bây giờ nêu đúng nguyên nhân gốc thay vì một lỗi worktree khó hiểu (per D ecfd0d1a)."
+  }
+}
+```
+
+## claim_320d0101f32ca1c7ee7f6b5d307f4d07
+
+Source digest (evidence JSON): 416a71281c1e53ba0a9cb38f4b68f275d2d030f411f03469ee083e1887444f2d
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_320d0101f32ca1c7ee7f6b5d307f4d07",
+  "record": {
+    "claimId": "claim_320d0101f32ca1c7ee7f6b5d307f4d07",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "unheaded-block-15",
+    "sourceLines": [
+      105,
+      108
+    ],
+    "sourceDigest": "b7ef0d6ed40afb21591309ec13d89a5287c6787c63d3e33f6548e4c5051810f2",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "unheaded-block-3",
+    "targetDigest": "b7ef0d6ed40afb21591309ec13d89a5287c6787c63d3e33f6548e4c5051810f2",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-15",
+    "githubAnchor": "unheaded-block-15",
+    "stableAnchor": "unheaded-block-15",
+    "title": "Unheaded block 15",
+    "startLine": 105,
+    "endLine": 108,
+    "textDigest": "b7ef0d6ed40afb21591309ec13d89a5287c6787c63d3e33f6548e4c5051810f2",
+    "sample": "- **Runs when:** MỌI lần `fgos-runner` khởi động — TRƯỚC CẢ bước gặt-lại, một lần duy nhất mỗi lần chạy.\n- **Blocked when:** thư mục làm việc không nằm trong một repo git (`git rev",
+    "identityFingerprint": "602843c348b7217ec28d2dab9f1c648cade71d2c1c91786993a860bbbb27247f",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations",
+      "Kiểm tra tiền-điều-kiện lúc khởi động (repo root + HEAD phải resolve được)"
+    ],
+    "text": "- **Runs when:** MỌI lần `fgos-runner` khởi động — TRƯỚC CẢ bước gặt-lại, một lần duy nhất mỗi lần chạy.\n- **Blocked when:** thư mục làm việc không nằm trong một repo git (`git rev-parse --show-toplevel` thất bại) — `validation`; repo tìm được nhưng KHÔNG có commit nào nên HEAD không resolve được (`git rev-parse --verify --quiet HEAD` thất bại) — CŨNG `validation`, cùng phạm trù với nhánh \"không phải repo git\" ngay phía trên, thông điệp nêu rõ nguyên nhân (0 commit) VÀ cách sửa (chạy `git commit` trước).\n- **What changes:** không gì — đây là một kiểm tra thuần, dừng tiến trình runner trước khi bất kỳ item nào được claim, không ghi sự kiện nào.\n- **Afterwards:** repo hợp lệ (có ≥1 commit) → runner tiếp tục xuống gặt-lại như trước, không đổi hành vi; repo 0 commit → runner dừng ngay tại đây với lỗi `validation` rõ ràng, KHÔNG còn đường cũ (thử claim một item, `git worktree add` thất bại vì HEAD không resolve, thử lại theo bảng phục hồi, rồi đỗ item sau khi tốn hai lượt thử vô ích) — lỗi bây giờ nêu đúng nguyên nhân gốc thay vì một lỗi worktree khó hiểu (per D ecfd0d1a)."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-3",
+    "githubAnchor": "unheaded-block-3",
+    "stableAnchor": "unheaded-block-3",
+    "title": "Unheaded block 3",
+    "startLine": 29,
+    "endLine": 32,
+    "textDigest": "b7ef0d6ed40afb21591309ec13d89a5287c6787c63d3e33f6548e4c5051810f2",
+    "sample": "- **Runs when:** MỌI lần `fgos-runner` khởi động — TRƯỚC CẢ bước gặt-lại, một lần duy nhất mỗi lần chạy.\n- **Blocked when:** thư mục làm việc không nằm trong một repo git (`git rev",
+    "identityFingerprint": "602843c348b7217ec28d2dab9f1c648cade71d2c1c91786993a860bbbb27247f",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations",
+      "Kiểm tra tiền-điều-kiện lúc khởi động (repo root + HEAD phải resolve được)"
+    ],
+    "text": "- **Runs when:** MỌI lần `fgos-runner` khởi động — TRƯỚC CẢ bước gặt-lại, một lần duy nhất mỗi lần chạy.\n- **Blocked when:** thư mục làm việc không nằm trong một repo git (`git rev-parse --show-toplevel` thất bại) — `validation`; repo tìm được nhưng KHÔNG có commit nào nên HEAD không resolve được (`git rev-parse --verify --quiet HEAD` thất bại) — CŨNG `validation`, cùng phạm trù với nhánh \"không phải repo git\" ngay phía trên, thông điệp nêu rõ nguyên nhân (0 commit) VÀ cách sửa (chạy `git commit` trước).\n- **What changes:** không gì — đây là một kiểm tra thuần, dừng tiến trình runner trước khi bất kỳ item nào được claim, không ghi sự kiện nào.\n- **Afterwards:** repo hợp lệ (có ≥1 commit) → runner tiếp tục xuống gặt-lại như trước, không đổi hành vi; repo 0 commit → runner dừng ngay tại đây với lỗi `validation` rõ ràng, KHÔNG còn đường cũ (thử claim một item, `git worktree add` thất bại vì HEAD không resolve, thử lại theo bảng phục hồi, rồi đỗ item sau khi tốn hai lượt thử vô ích) — lỗi bây giờ nêu đúng nguyên nhân gốc thay vì một lỗi worktree khó hiểu (per D ecfd0d1a)."
+  }
+}
+```
+
+## claim_f39e4d12f25ee15624fbe91c5f5494c5
+
+Source digest (evidence JSON): dbf5a782bd37a5c2b0846dddd82d56d4c76494525e2c7c19340fbf6f054839b7
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_f39e4d12f25ee15624fbe91c5f5494c5",
+  "record": {
+    "claimId": "claim_f39e4d12f25ee15624fbe91c5f5494c5",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "một-vòng---once-hạnh-phúc",
+    "sourceLines": [
+      110,
+      110
+    ],
+    "sourceDigest": "a6819204e999f51369aec6f2e0af4da6c09741d645d97ce8aaa2ab874412be38",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "một-vòng---once-hạnh-phúc",
+    "targetDigest": "a6819204e999f51369aec6f2e0af4da6c09741d645d97ce8aaa2ab874412be38",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; source unit shorter than 40 characters; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Một vòng --once (hạnh phúc)",
+    "anchor": "một-vòng---once-hạnh-phúc",
+    "githubAnchor": "một-vòng---once-hạnh-phúc",
+    "stableAnchor": "h-9dd4843252e4",
+    "startLine": 110,
+    "endLine": 110,
+    "textDigest": "a6819204e999f51369aec6f2e0af4da6c09741d645d97ce8aaa2ab874412be38",
+    "sample": "Một vòng --once (hạnh phúc)",
+    "sectionPayloadDigest": "2bc3d1aca72c5050ce1aa4f7c9aacd12b459c7dffd004ce68795c79d1cea5739",
+    "followingBlockDigest": "2bc3d1aca72c5050ce1aa4f7c9aacd12b459c7dffd004ce68795c79d1cea5739",
+    "identityFingerprint": "9b4017beb6a735dd99681a23c8e80158c0e66bb5259f750871564fb824544bfa",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations"
+    ],
+    "text": "### Một vòng --once (hạnh phúc)",
+    "sectionText": "### Một vòng --once (hạnh phúc)\n\n- **Runs when:** người vận hành gọi; MỘT hoặc NHIỀU việc cùng lúc trong một mẻ (xem \"Giao việc theo mẻ, song song có giới hạn\" dưới) — mỗi việc đi đúng vòng đời dưới đây, độc lập với việc khác trong cùng mẻ.\n- **What changes:** việc đầu frontier được claim qua `claimWork` / `acquireClaim` (tạo bản ghi claim runtime `.fgos/runtime/claims/<id>.json`, trạng thái bền giữ nguyên pre-claim, trạng thái hiệu lực `effectiveStatus` hiển thị `doing`; mọi claim mới KHÔNG BAO GIỜ ghi bền giá trị `doing` vào nhật ký — *new claims do not durably write into doing*); **ngay sau khi claim, runner ghi nửa DỰ ĐOÁN của một bản ghi kết quả (outcome) cho việc đó** — tier dự kiến, số dep, số lần nhận trước đó (xem spec Work-State); worktree + nhánh `fgw/<id>` mở ra từ đỉnh cây chính; trợ lý chạy nền với prompt dựng từ chính việc đó (mục tiêu / mô tả gốc nguyên văn / ranh giới worktree / proof kỳ vọng / cấm tự ghi trạng thái — cộng thêm một mục Human feedback khi item mang câu trả lời làm-rõ mới nhất và/hoặc lý do từ-chối/đỗ mới nhất, xem RUL23 (phản hồi người threading vào prompt worker)), dưới quyền TỐI THIỂU khai trong `.fgos/config.json`'s `runner` section (xem RUL6 (consumer rẽ nhánh theo mã thoát phạm trù, không bao giờ theo thông điệp)), model chọn theo tier của việc; trợ lý tự commit trong worktree; **runner tự chạy lệnh proof của việc trong worktree** — không tin lời trợ lý; đạt → `settleClaim` chuyển bền trực tiếp từ `preClaimStatus → awaiting-approval` (không qua trạng thái trung gian bền `doing`) và giải phóng claim file, và **CÙNG LÚC runner ghi nửa THỰC TẾ tương ứng** (kết cục `awaiting-approval`, goal-check đạt, số lần thử, số commit, số lần nhận) — đo từ chính goal-check/kiểm nhánh của runner, không bao giờ từ lời tự báo của trợ lý; worktree dọn đi, **nhánh ở lại** làm đề xuất.\n- **Side effects:** đúng các sự kiện chuyển trạng thái trong nhật ký; output của trợ lý được in console NHƯ CŨ, và CÒN được nối thêm vào một bản ghi cục bộ riêng cho việc đó (xem \"Ghi lại output của trợ lý sau mỗi lượt dispatch\" dưới) — bản ghi này không bao giờ vào cây committed.\n- **Afterwards:** người vận hành thấy việc ở `awaiting-approval` + nhánh để review; việc phụ thuộc CHƯA mở (chờ duyệt/merge → `done`); vòng --once thứ hai không giao lại việc nào (frontier trống). Kết cục cuối của lượt được in ra dưới dạng phong bì máy-đọc (xem RUL61 (kết-cục cuối của `fgos-runner` nay bọc cùng phong bì máy-đọc `fgos.v1` như mọi verb) dưới), dòng cuối cùng của output."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Một vòng --once (hạnh phúc)",
+    "anchor": "một-vòng---once-hạnh-phúc",
+    "githubAnchor": "một-vòng---once-hạnh-phúc",
+    "stableAnchor": "h-f8f156ce8554",
+    "startLine": 34,
+    "endLine": 34,
+    "textDigest": "a6819204e999f51369aec6f2e0af4da6c09741d645d97ce8aaa2ab874412be38",
+    "sample": "Một vòng --once (hạnh phúc)",
+    "sectionPayloadDigest": "2bc3d1aca72c5050ce1aa4f7c9aacd12b459c7dffd004ce68795c79d1cea5739",
+    "followingBlockDigest": "2bc3d1aca72c5050ce1aa4f7c9aacd12b459c7dffd004ce68795c79d1cea5739",
+    "identityFingerprint": "9b4017beb6a735dd99681a23c8e80158c0e66bb5259f750871564fb824544bfa",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations"
+    ],
+    "text": "### Một vòng --once (hạnh phúc)",
+    "sectionText": "### Một vòng --once (hạnh phúc)\n\n- **Runs when:** người vận hành gọi; MỘT hoặc NHIỀU việc cùng lúc trong một mẻ (xem \"Giao việc theo mẻ, song song có giới hạn\" dưới) — mỗi việc đi đúng vòng đời dưới đây, độc lập với việc khác trong cùng mẻ.\n- **What changes:** việc đầu frontier được claim qua `claimWork` / `acquireClaim` (tạo bản ghi claim runtime `.fgos/runtime/claims/<id>.json`, trạng thái bền giữ nguyên pre-claim, trạng thái hiệu lực `effectiveStatus` hiển thị `doing`; mọi claim mới KHÔNG BAO GIỜ ghi bền giá trị `doing` vào nhật ký — *new claims do not durably write into doing*); **ngay sau khi claim, runner ghi nửa DỰ ĐOÁN của một bản ghi kết quả (outcome) cho việc đó** — tier dự kiến, số dep, số lần nhận trước đó (xem spec Work-State); worktree + nhánh `fgw/<id>` mở ra từ đỉnh cây chính; trợ lý chạy nền với prompt dựng từ chính việc đó (mục tiêu / mô tả gốc nguyên văn / ranh giới worktree / proof kỳ vọng / cấm tự ghi trạng thái — cộng thêm một mục Human feedback khi item mang câu trả lời làm-rõ mới nhất và/hoặc lý do từ-chối/đỗ mới nhất, xem RUL23 (phản hồi người threading vào prompt worker)), dưới quyền TỐI THIỂU khai trong `.fgos/config.json`'s `runner` section (xem RUL6 (consumer rẽ nhánh theo mã thoát phạm trù, không bao giờ theo thông điệp)), model chọn theo tier của việc; trợ lý tự commit trong worktree; **runner tự chạy lệnh proof của việc trong worktree** — không tin lời trợ lý; đạt → `settleClaim` chuyển bền trực tiếp từ `preClaimStatus → awaiting-approval` (không qua trạng thái trung gian bền `doing`) và giải phóng claim file, và **CÙNG LÚC runner ghi nửa THỰC TẾ tương ứng** (kết cục `awaiting-approval`, goal-check đạt, số lần thử, số commit, số lần nhận) — đo từ chính goal-check/kiểm nhánh của runner, không bao giờ từ lời tự báo của trợ lý; worktree dọn đi, **nhánh ở lại** làm đề xuất.\n- **Side effects:** đúng các sự kiện chuyển trạng thái trong nhật ký; output của trợ lý được in console NHƯ CŨ, và CÒN được nối thêm vào một bản ghi cục bộ riêng cho việc đó (xem \"Ghi lại output của trợ lý sau mỗi lượt dispatch\" dưới) — bản ghi này không bao giờ vào cây committed.\n- **Afterwards:** người vận hành thấy việc ở `awaiting-approval` + nhánh để review; việc phụ thuộc CHƯA mở (chờ duyệt/merge → `done`); vòng --once thứ hai không giao lại việc nào (frontier trống). Kết cục cuối của lượt được in ra dưới dạng phong bì máy-đọc (xem RUL61 (kết-cục cuối của `fgos-runner` nay bọc cùng phong bì máy-đọc `fgos.v1` như mọi verb) dưới), dòng cuối cùng của output."
+  }
+}
+```
+
+## claim_3f78ee0b030eedd2797c24ffe5c40984
+
+Source digest (evidence JSON): 2f7cb8c120649a7f2880ea5b0b66538f06cb32dc779e605d7392a2c2797df1d1
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_3f78ee0b030eedd2797c24ffe5c40984",
+  "record": {
+    "claimId": "claim_3f78ee0b030eedd2797c24ffe5c40984",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "unheaded-block-16",
+    "sourceLines": [
+      112,
+      115
+    ],
+    "sourceDigest": "2bc3d1aca72c5050ce1aa4f7c9aacd12b459c7dffd004ce68795c79d1cea5739",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "unheaded-block-4",
+    "targetDigest": "2bc3d1aca72c5050ce1aa4f7c9aacd12b459c7dffd004ce68795c79d1cea5739",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-16",
+    "githubAnchor": "unheaded-block-16",
+    "stableAnchor": "unheaded-block-16",
+    "title": "Unheaded block 16",
+    "startLine": 112,
+    "endLine": 115,
+    "textDigest": "2bc3d1aca72c5050ce1aa4f7c9aacd12b459c7dffd004ce68795c79d1cea5739",
+    "sample": "- **Runs when:** người vận hành gọi; MỘT hoặc NHIỀU việc cùng lúc trong một mẻ (xem \"Giao việc theo mẻ, song song có giới hạn\" dưới) — mỗi việc đi đúng vòng đời dưới đây, độc lập v",
+    "identityFingerprint": "bb06845212880ba8e4a9c96785664f3d53854ad2934d80c30ef7bde58728c1dc",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations",
+      "Một vòng --once (hạnh phúc)"
+    ],
+    "text": "- **Runs when:** người vận hành gọi; MỘT hoặc NHIỀU việc cùng lúc trong một mẻ (xem \"Giao việc theo mẻ, song song có giới hạn\" dưới) — mỗi việc đi đúng vòng đời dưới đây, độc lập với việc khác trong cùng mẻ.\n- **What changes:** việc đầu frontier được claim qua `claimWork` / `acquireClaim` (tạo bản ghi claim runtime `.fgos/runtime/claims/<id>.json`, trạng thái bền giữ nguyên pre-claim, trạng thái hiệu lực `effectiveStatus` hiển thị `doing`; mọi claim mới KHÔNG BAO GIỜ ghi bền giá trị `doing` vào nhật ký — *new claims do not durably write into doing*); **ngay sau khi claim, runner ghi nửa DỰ ĐOÁN của một bản ghi kết quả (outcome) cho việc đó** — tier dự kiến, số dep, số lần nhận trước đó (xem spec Work-State); worktree + nhánh `fgw/<id>` mở ra từ đỉnh cây chính; trợ lý chạy nền với prompt dựng từ chính việc đó (mục tiêu / mô tả gốc nguyên văn / ranh giới worktree / proof kỳ vọng / cấm tự ghi trạng thái — cộng thêm một mục Human feedback khi item mang câu trả lời làm-rõ mới nhất và/hoặc lý do từ-chối/đỗ mới nhất, xem RUL23 (phản hồi người threading vào prompt worker)), dưới quyền TỐI THIỂU khai trong `.fgos/config.json`'s `runner` section (xem RUL6 (consumer rẽ nhánh theo mã thoát phạm trù, không bao giờ theo thông điệp)), model chọn theo tier của việc; trợ lý tự commit trong worktree; **runner tự chạy lệnh proof của việc trong worktree** — không tin lời trợ lý; đạt → `settleClaim` chuyển bền trực tiếp từ `preClaimStatus → awaiting-approval` (không qua trạng thái trung gian bền `doing`) và giải phóng claim file, và **CÙNG LÚC runner ghi nửa THỰC TẾ tương ứng** (kết cục `awaiting-approval`, goal-check đạt, số lần thử, số commit, số lần nhận) — đo từ chính goal-check/kiểm nhánh của runner, không bao giờ từ lời tự báo của trợ lý; worktree dọn đi, **nhánh ở lại** làm đề xuất.\n- **Side effects:** đúng các sự kiện chuyển trạng thái trong nhật ký; output của trợ lý được in console NHƯ CŨ, và CÒN được nối thêm vào một bản ghi cục bộ riêng cho việc đó (xem \"Ghi lại output của trợ lý sau mỗi lượt dispatch\" dưới) — bản ghi này không bao giờ vào cây committed.\n- **Afterwards:** người vận hành thấy việc ở `awaiting-approval` + nhánh để review; việc phụ thuộc CHƯA mở (chờ duyệt/merge → `done`); vòng --once thứ hai không giao lại việc nào (frontier trống). Kết cục cuối của lượt được in ra dưới dạng phong bì máy-đọc (xem RUL61 (kết-cục cuối của `fgos-runner` nay bọc cùng phong bì máy-đọc `fgos.v1` như mọi verb) dưới), dòng cuối cùng của output."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-4",
+    "githubAnchor": "unheaded-block-4",
+    "stableAnchor": "unheaded-block-4",
+    "title": "Unheaded block 4",
+    "startLine": 36,
+    "endLine": 39,
+    "textDigest": "2bc3d1aca72c5050ce1aa4f7c9aacd12b459c7dffd004ce68795c79d1cea5739",
+    "sample": "- **Runs when:** người vận hành gọi; MỘT hoặc NHIỀU việc cùng lúc trong một mẻ (xem \"Giao việc theo mẻ, song song có giới hạn\" dưới) — mỗi việc đi đúng vòng đời dưới đây, độc lập v",
+    "identityFingerprint": "bb06845212880ba8e4a9c96785664f3d53854ad2934d80c30ef7bde58728c1dc",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations",
+      "Một vòng --once (hạnh phúc)"
+    ],
+    "text": "- **Runs when:** người vận hành gọi; MỘT hoặc NHIỀU việc cùng lúc trong một mẻ (xem \"Giao việc theo mẻ, song song có giới hạn\" dưới) — mỗi việc đi đúng vòng đời dưới đây, độc lập với việc khác trong cùng mẻ.\n- **What changes:** việc đầu frontier được claim qua `claimWork` / `acquireClaim` (tạo bản ghi claim runtime `.fgos/runtime/claims/<id>.json`, trạng thái bền giữ nguyên pre-claim, trạng thái hiệu lực `effectiveStatus` hiển thị `doing`; mọi claim mới KHÔNG BAO GIỜ ghi bền giá trị `doing` vào nhật ký — *new claims do not durably write into doing*); **ngay sau khi claim, runner ghi nửa DỰ ĐOÁN của một bản ghi kết quả (outcome) cho việc đó** — tier dự kiến, số dep, số lần nhận trước đó (xem spec Work-State); worktree + nhánh `fgw/<id>` mở ra từ đỉnh cây chính; trợ lý chạy nền với prompt dựng từ chính việc đó (mục tiêu / mô tả gốc nguyên văn / ranh giới worktree / proof kỳ vọng / cấm tự ghi trạng thái — cộng thêm một mục Human feedback khi item mang câu trả lời làm-rõ mới nhất và/hoặc lý do từ-chối/đỗ mới nhất, xem RUL23 (phản hồi người threading vào prompt worker)), dưới quyền TỐI THIỂU khai trong `.fgos/config.json`'s `runner` section (xem RUL6 (consumer rẽ nhánh theo mã thoát phạm trù, không bao giờ theo thông điệp)), model chọn theo tier của việc; trợ lý tự commit trong worktree; **runner tự chạy lệnh proof của việc trong worktree** — không tin lời trợ lý; đạt → `settleClaim` chuyển bền trực tiếp từ `preClaimStatus → awaiting-approval` (không qua trạng thái trung gian bền `doing`) và giải phóng claim file, và **CÙNG LÚC runner ghi nửa THỰC TẾ tương ứng** (kết cục `awaiting-approval`, goal-check đạt, số lần thử, số commit, số lần nhận) — đo từ chính goal-check/kiểm nhánh của runner, không bao giờ từ lời tự báo của trợ lý; worktree dọn đi, **nhánh ở lại** làm đề xuất.\n- **Side effects:** đúng các sự kiện chuyển trạng thái trong nhật ký; output của trợ lý được in console NHƯ CŨ, và CÒN được nối thêm vào một bản ghi cục bộ riêng cho việc đó (xem \"Ghi lại output của trợ lý sau mỗi lượt dispatch\" dưới) — bản ghi này không bao giờ vào cây committed.\n- **Afterwards:** người vận hành thấy việc ở `awaiting-approval` + nhánh để review; việc phụ thuộc CHƯA mở (chờ duyệt/merge → `done`); vòng --once thứ hai không giao lại việc nào (frontier trống). Kết cục cuối của lượt được in ra dưới dạng phong bì máy-đọc (xem RUL61 (kết-cục cuối của `fgos-runner` nay bọc cùng phong bì máy-đọc `fgos.v1` như mọi verb) dưới), dòng cuối cùng của output."
+  }
+}
+```
+
+## claim_b959eede39e94094af895e70dd5eb8bf
+
+Source digest (evidence JSON): 27fec3a0a386a89267a0d93b01ea053fa47ec60f80a4ca9050b843a71664404e
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_b959eede39e94094af895e70dd5eb8bf",
+  "record": {
+    "claimId": "claim_b959eede39e94094af895e70dd5eb8bf",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "vòng-cầm-giao-bền---watch-str7-str8-priority-intent",
+    "sourceLines": [
+      117,
+      117
+    ],
+    "sourceDigest": "384d3e845064d0c9958ceb5757a96b7644512f7ff69ddefbabab6d4a8ed80a81",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "vòng-cầm-giao-bền---watch-str7-str8-priority-intent",
+    "targetDigest": "384d3e845064d0c9958ceb5757a96b7644512f7ff69ddefbabab6d4a8ed80a81",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Vòng cầm-giao bền (`--watch`) — str7-str8-priority-intent",
+    "anchor": "vòng-cầm-giao-bền---watch-str7-str8-priority-intent",
+    "githubAnchor": "vòng-cầm-giao-bền---watch-str7-str8-priority-intent",
+    "stableAnchor": "h-35523c7cfb49",
+    "startLine": 117,
+    "endLine": 117,
+    "textDigest": "384d3e845064d0c9958ceb5757a96b7644512f7ff69ddefbabab6d4a8ed80a81",
+    "sample": "Vòng cầm-giao bền (`--watch`) — str7-str8-priority-intent",
+    "sectionPayloadDigest": "88c7a6c10418d546d1ec862c4368ffc4b93142064d7d8b1a9d280c56e6c025ef",
+    "followingBlockDigest": "88c7a6c10418d546d1ec862c4368ffc4b93142064d7d8b1a9d280c56e6c025ef",
+    "identityFingerprint": "24c295df42d169095229566feec23751a56cc106810921dda7607782f292f775",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations"
+    ],
+    "text": "### Vòng cầm-giao bền (`--watch`) — str7-str8-priority-intent",
+    "sectionText": "### Vòng cầm-giao bền (`--watch`) — str7-str8-priority-intent\n\n- **Runs when:** người vận hành gọi `fgos-runner --watch` — thay thế `--once` cho một tiến trình muốn sống lâu, phản ứng khi có việc thay vì phải gọi lại tay mỗi lần.\n- **What changes:** mỗi LƯỢT bên trong đi đúng vòng đời \"Một vòng --once\" ở trên nguyên vẹn, không đổi gì trong đó. Giữa các lượt: lượt vừa xong ghi được ít nhất một sự kiện (claim, chuyển stage, kết quả, …) → lượt kế tiếp bắt đầu NGAY; lượt vừa xong không ghi gì (frontier rỗng, hoặc cả mẻ đều bị từ chối nhận) → chờ một khoảng nghỉ (`--poll-ms`, mặc định 5000ms) rồi mới thử lại. Cầu dao (Data Dictionary #5) và hàng-đợi-ghi tuần tự (RUL24 (một-người-ghi vẫn giữ nguyên dưới song song, qua một cửa ghi tuần tự)) đều dùng CHUNG một thực thể xuyên suốt cả tiến trình `--watch`, không tạo mới mỗi lượt — xem RUL53 (`--watch` — vòng cầm-giao bền, dừng chỉ khi có tín hiệu tường minh).\n- **Blocked when:** `--watch` kèm `--dry-run` → `validation` (mã 4), từ chối trước khi chạy lượt nào.\n- **Side effects:** một lượt gặp lỗi/dừng (halted) chỉ dừng LƯỢT đó — được ghi nhận, tiến trình vẫn tiếp tục nghỉ-rồi-thử-lượt-kế-tiếp, không bao giờ tự thoát vì một lượt lỗi.\n- **Afterwards:** tiến trình chạy tới khi nhận SIGINT/SIGTERM — thoát sạch, mã 0, in dòng xác nhận đã dừng, bất kể lượt cuối cùng ra sao; một tín hiệu dừng THỨ HAI trong lúc lượt đang dở buộc thoát ngay (mã 130), không chờ lượt đó tự xong. Mỗi chu kỳ bên trong in phong bì kết cục riêng của nó (xem RUL61 (kết-cục cuối của `fgos-runner` nay bọc cùng phong bì máy-đọc `fgos.v1` như mọi verb)) trước khi chờ chu kỳ kế tiếp; dòng xác nhận-đã-dừng cuối cùng vẫn là chữ trần, không bọc phong bì."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Vòng cầm-giao bền (`--watch`) — str7-str8-priority-intent",
+    "anchor": "vòng-cầm-giao-bền---watch-str7-str8-priority-intent",
+    "githubAnchor": "vòng-cầm-giao-bền---watch-str7-str8-priority-intent",
+    "stableAnchor": "h-ab747c977f53",
+    "startLine": 41,
+    "endLine": 41,
+    "textDigest": "384d3e845064d0c9958ceb5757a96b7644512f7ff69ddefbabab6d4a8ed80a81",
+    "sample": "Vòng cầm-giao bền (`--watch`) — str7-str8-priority-intent",
+    "sectionPayloadDigest": "88c7a6c10418d546d1ec862c4368ffc4b93142064d7d8b1a9d280c56e6c025ef",
+    "followingBlockDigest": "88c7a6c10418d546d1ec862c4368ffc4b93142064d7d8b1a9d280c56e6c025ef",
+    "identityFingerprint": "24c295df42d169095229566feec23751a56cc106810921dda7607782f292f775",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations"
+    ],
+    "text": "### Vòng cầm-giao bền (`--watch`) — str7-str8-priority-intent",
+    "sectionText": "### Vòng cầm-giao bền (`--watch`) — str7-str8-priority-intent\n\n- **Runs when:** người vận hành gọi `fgos-runner --watch` — thay thế `--once` cho một tiến trình muốn sống lâu, phản ứng khi có việc thay vì phải gọi lại tay mỗi lần.\n- **What changes:** mỗi LƯỢT bên trong đi đúng vòng đời \"Một vòng --once\" ở trên nguyên vẹn, không đổi gì trong đó. Giữa các lượt: lượt vừa xong ghi được ít nhất một sự kiện (claim, chuyển stage, kết quả, …) → lượt kế tiếp bắt đầu NGAY; lượt vừa xong không ghi gì (frontier rỗng, hoặc cả mẻ đều bị từ chối nhận) → chờ một khoảng nghỉ (`--poll-ms`, mặc định 5000ms) rồi mới thử lại. Cầu dao (Data Dictionary #5) và hàng-đợi-ghi tuần tự (RUL24 (một-người-ghi vẫn giữ nguyên dưới song song, qua một cửa ghi tuần tự)) đều dùng CHUNG một thực thể xuyên suốt cả tiến trình `--watch`, không tạo mới mỗi lượt — xem RUL53 (`--watch` — vòng cầm-giao bền, dừng chỉ khi có tín hiệu tường minh).\n- **Blocked when:** `--watch` kèm `--dry-run` → `validation` (mã 4), từ chối trước khi chạy lượt nào.\n- **Side effects:** một lượt gặp lỗi/dừng (halted) chỉ dừng LƯỢT đó — được ghi nhận, tiến trình vẫn tiếp tục nghỉ-rồi-thử-lượt-kế-tiếp, không bao giờ tự thoát vì một lượt lỗi.\n- **Afterwards:** tiến trình chạy tới khi nhận SIGINT/SIGTERM — thoát sạch, mã 0, in dòng xác nhận đã dừng, bất kể lượt cuối cùng ra sao; một tín hiệu dừng THỨ HAI trong lúc lượt đang dở buộc thoát ngay (mã 130), không chờ lượt đó tự xong. Mỗi chu kỳ bên trong in phong bì kết cục riêng của nó (xem RUL61 (kết-cục cuối của `fgos-runner` nay bọc cùng phong bì máy-đọc `fgos.v1` như mọi verb)) trước khi chờ chu kỳ kế tiếp; dòng xác nhận-đã-dừng cuối cùng vẫn là chữ trần, không bọc phong bì."
+  }
+}
+```
+
+## claim_c08649cbbf926cfe051d6ff44a8a59a3
+
+Source digest (evidence JSON): f4807605a1fade1a2da1459a6b3b06c5fa3e878877d129ecbf2c2bdf8833ef1a
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_c08649cbbf926cfe051d6ff44a8a59a3",
+  "record": {
+    "claimId": "claim_c08649cbbf926cfe051d6ff44a8a59a3",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "unheaded-block-17",
+    "sourceLines": [
+      119,
+      123
+    ],
+    "sourceDigest": "88c7a6c10418d546d1ec862c4368ffc4b93142064d7d8b1a9d280c56e6c025ef",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "unheaded-block-5",
+    "targetDigest": "88c7a6c10418d546d1ec862c4368ffc4b93142064d7d8b1a9d280c56e6c025ef",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-17",
+    "githubAnchor": "unheaded-block-17",
+    "stableAnchor": "unheaded-block-17",
+    "title": "Unheaded block 17",
+    "startLine": 119,
+    "endLine": 123,
+    "textDigest": "88c7a6c10418d546d1ec862c4368ffc4b93142064d7d8b1a9d280c56e6c025ef",
+    "sample": "- **Runs when:** người vận hành gọi `fgos-runner --watch` — thay thế `--once` cho một tiến trình muốn sống lâu, phản ứng khi có việc thay vì phải gọi lại tay mỗi lần.\n- **What chan",
+    "identityFingerprint": "49f523ff5ccc4009a2ae8df4f491111b57110dee95f0c0bf22bf00fc7fb23ae1",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations",
+      "Vòng cầm-giao bền (`--watch`) — str7-str8-priority-intent"
+    ],
+    "text": "- **Runs when:** người vận hành gọi `fgos-runner --watch` — thay thế `--once` cho một tiến trình muốn sống lâu, phản ứng khi có việc thay vì phải gọi lại tay mỗi lần.\n- **What changes:** mỗi LƯỢT bên trong đi đúng vòng đời \"Một vòng --once\" ở trên nguyên vẹn, không đổi gì trong đó. Giữa các lượt: lượt vừa xong ghi được ít nhất một sự kiện (claim, chuyển stage, kết quả, …) → lượt kế tiếp bắt đầu NGAY; lượt vừa xong không ghi gì (frontier rỗng, hoặc cả mẻ đều bị từ chối nhận) → chờ một khoảng nghỉ (`--poll-ms`, mặc định 5000ms) rồi mới thử lại. Cầu dao (Data Dictionary #5) và hàng-đợi-ghi tuần tự (RUL24 (một-người-ghi vẫn giữ nguyên dưới song song, qua một cửa ghi tuần tự)) đều dùng CHUNG một thực thể xuyên suốt cả tiến trình `--watch`, không tạo mới mỗi lượt — xem RUL53 (`--watch` — vòng cầm-giao bền, dừng chỉ khi có tín hiệu tường minh).\n- **Blocked when:** `--watch` kèm `--dry-run` → `validation` (mã 4), từ chối trước khi chạy lượt nào.\n- **Side effects:** một lượt gặp lỗi/dừng (halted) chỉ dừng LƯỢT đó — được ghi nhận, tiến trình vẫn tiếp tục nghỉ-rồi-thử-lượt-kế-tiếp, không bao giờ tự thoát vì một lượt lỗi.\n- **Afterwards:** tiến trình chạy tới khi nhận SIGINT/SIGTERM — thoát sạch, mã 0, in dòng xác nhận đã dừng, bất kể lượt cuối cùng ra sao; một tín hiệu dừng THỨ HAI trong lúc lượt đang dở buộc thoát ngay (mã 130), không chờ lượt đó tự xong. Mỗi chu kỳ bên trong in phong bì kết cục riêng của nó (xem RUL61 (kết-cục cuối của `fgos-runner` nay bọc cùng phong bì máy-đọc `fgos.v1` như mọi verb)) trước khi chờ chu kỳ kế tiếp; dòng xác nhận-đã-dừng cuối cùng vẫn là chữ trần, không bọc phong bì."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-5",
+    "githubAnchor": "unheaded-block-5",
+    "stableAnchor": "unheaded-block-5",
+    "title": "Unheaded block 5",
+    "startLine": 43,
+    "endLine": 47,
+    "textDigest": "88c7a6c10418d546d1ec862c4368ffc4b93142064d7d8b1a9d280c56e6c025ef",
+    "sample": "- **Runs when:** người vận hành gọi `fgos-runner --watch` — thay thế `--once` cho một tiến trình muốn sống lâu, phản ứng khi có việc thay vì phải gọi lại tay mỗi lần.\n- **What chan",
+    "identityFingerprint": "49f523ff5ccc4009a2ae8df4f491111b57110dee95f0c0bf22bf00fc7fb23ae1",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations",
+      "Vòng cầm-giao bền (`--watch`) — str7-str8-priority-intent"
+    ],
+    "text": "- **Runs when:** người vận hành gọi `fgos-runner --watch` — thay thế `--once` cho một tiến trình muốn sống lâu, phản ứng khi có việc thay vì phải gọi lại tay mỗi lần.\n- **What changes:** mỗi LƯỢT bên trong đi đúng vòng đời \"Một vòng --once\" ở trên nguyên vẹn, không đổi gì trong đó. Giữa các lượt: lượt vừa xong ghi được ít nhất một sự kiện (claim, chuyển stage, kết quả, …) → lượt kế tiếp bắt đầu NGAY; lượt vừa xong không ghi gì (frontier rỗng, hoặc cả mẻ đều bị từ chối nhận) → chờ một khoảng nghỉ (`--poll-ms`, mặc định 5000ms) rồi mới thử lại. Cầu dao (Data Dictionary #5) và hàng-đợi-ghi tuần tự (RUL24 (một-người-ghi vẫn giữ nguyên dưới song song, qua một cửa ghi tuần tự)) đều dùng CHUNG một thực thể xuyên suốt cả tiến trình `--watch`, không tạo mới mỗi lượt — xem RUL53 (`--watch` — vòng cầm-giao bền, dừng chỉ khi có tín hiệu tường minh).\n- **Blocked when:** `--watch` kèm `--dry-run` → `validation` (mã 4), từ chối trước khi chạy lượt nào.\n- **Side effects:** một lượt gặp lỗi/dừng (halted) chỉ dừng LƯỢT đó — được ghi nhận, tiến trình vẫn tiếp tục nghỉ-rồi-thử-lượt-kế-tiếp, không bao giờ tự thoát vì một lượt lỗi.\n- **Afterwards:** tiến trình chạy tới khi nhận SIGINT/SIGTERM — thoát sạch, mã 0, in dòng xác nhận đã dừng, bất kể lượt cuối cùng ra sao; một tín hiệu dừng THỨ HAI trong lúc lượt đang dở buộc thoát ngay (mã 130), không chờ lượt đó tự xong. Mỗi chu kỳ bên trong in phong bì kết cục riêng của nó (xem RUL61 (kết-cục cuối của `fgos-runner` nay bọc cùng phong bì máy-đọc `fgos.v1` như mọi verb)) trước khi chờ chu kỳ kế tiếp; dòng xác nhận-đã-dừng cuối cùng vẫn là chữ trần, không bọc phong bì."
+  }
+}
+```
+
+## claim_d06a95f38d682c48135481fd702e5c26
+
+Source digest (evidence JSON): bfa8b8340cadf7ddc85659d63d048a0df0822a755d43e9aac6ac115bc0d567b4
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_d06a95f38d682c48135481fd702e5c26",
+  "record": {
+    "claimId": "claim_d06a95f38d682c48135481fd702e5c26",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "giao-việc-theo-mẻ-song-song-có-giới-hạn-giữ-quyền-sở-hữu-gốc",
+    "sourceLines": [
+      125,
+      125
+    ],
+    "sourceDigest": "1eb8d70495713021803680d977e3d8788012c662e03b0b01aaff56cdc3fb53ff",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "giao-việc-theo-mẻ-song-song-có-giới-hạn-giữ-quyền-sở-hữu-gốc",
+    "targetDigest": "1eb8d70495713021803680d977e3d8788012c662e03b0b01aaff56cdc3fb53ff",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Giao việc theo mẻ, song song có giới hạn, giữ quyền-sở-hữu-gốc",
+    "anchor": "giao-việc-theo-mẻ-song-song-có-giới-hạn-giữ-quyền-sở-hữu-gốc",
+    "githubAnchor": "giao-việc-theo-mẻ-song-song-có-giới-hạn-giữ-quyền-sở-hữu-gốc",
+    "stableAnchor": "h-38ddb8fb7421",
+    "startLine": 125,
+    "endLine": 125,
+    "textDigest": "1eb8d70495713021803680d977e3d8788012c662e03b0b01aaff56cdc3fb53ff",
+    "sample": "Giao việc theo mẻ, song song có giới hạn, giữ quyền-sở-hữu-gốc",
+    "sectionPayloadDigest": "eabad82f74d0335435cf2ade58ea75de2a3e0e79180bee618a16a5dbcdc5cac0",
+    "followingBlockDigest": "eabad82f74d0335435cf2ade58ea75de2a3e0e79180bee618a16a5dbcdc5cac0",
+    "identityFingerprint": "c603634871c479d1f25dd1cab81bc3086fbee163767a78da121584576c7ad676",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations"
+    ],
+    "text": "### Giao việc theo mẻ, song song có giới hạn, giữ quyền-sở-hữu-gốc",
+    "sectionText": "### Giao việc theo mẻ, song song có giới hạn, giữ quyền-sở-hữu-gốc\n\n- **Runs when:** ngay sau quét làm-rõ + quét chia-việc, và lặp lại mỗi khi một mẻ vừa dispatch xong (một hoặc nhiều việc trong mẻ tới kết cục cuối).\n- **What changes:** đọc lại TOÀN BỘ tập việc sẵn-sàng tươi; lọc theo quyền sở-hữu gốc — một việc chỉ lọt vào mẻ nếu gốc của nó CHƯA có chủ, hoặc đã thuộc về CHÍNH lượt chạy này (một chủ khác giành nhận cùng gốc bị từ chối, cùng khuôn kỳ-vọng-lệch của mọi cửa nhận việc khác — trên một máy chỉ một chủ tồn tại nên đường từ-chối này hiếm khi thật sự xảy ra, nhưng vẫn được kiểm mỗi lần); nhóm phần còn lại theo gốc, lấy tối đa N gốc, mỗi gốc lấy tối đa M con (trần hai tầng, Data Dictionary #6); mỗi việc trong mẻ được nhận (`todo→doing`) qua đúng MỘT cửa ghi tuần tự (xem RUL24 (một-người-ghi vẫn giữ nguyên dưới song song, qua một cửa ghi tuần tự)) — dù nhiều việc thi công song song, quyết-nhận và ghi-nhận của từng việc vẫn nối tiếp nhau, không bao giờ hai lượt nhận chen lẫn; việc bị từ chối nhận ở lại chờ mẻ sau, không mất.\n- **Side effects:** mỗi việc trong mẻ chạy vòng đời \"Một vòng --once\" ở trên, đồng thời với việc khác trong CÙNG mẻ, cho tới kết cục cuối của từng việc (đề xuất, đỗ, hoặc dừng).\n- **Afterwards:** mẻ xong (mọi việc trong mẻ đã tới kết cục) → đọc lại tập sẵn-sàng TƯƠI (việc vừa xong có thể mở khóa việc phụ thuộc, hoặc mở khóa chính gốc của nó nếu đó là con cuối cùng) rồi nạp mẻ kế tiếp — lặp tới khi KHÔNG còn việc đang chạy VÀ KHÔNG còn việc sẵn-sàng, vòng --once mới kết thúc thật sự."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Giao việc theo mẻ, song song có giới hạn, giữ quyền-sở-hữu-gốc",
+    "anchor": "giao-việc-theo-mẻ-song-song-có-giới-hạn-giữ-quyền-sở-hữu-gốc",
+    "githubAnchor": "giao-việc-theo-mẻ-song-song-có-giới-hạn-giữ-quyền-sở-hữu-gốc",
+    "stableAnchor": "h-b6a463c81565",
+    "startLine": 49,
+    "endLine": 49,
+    "textDigest": "1eb8d70495713021803680d977e3d8788012c662e03b0b01aaff56cdc3fb53ff",
+    "sample": "Giao việc theo mẻ, song song có giới hạn, giữ quyền-sở-hữu-gốc",
+    "sectionPayloadDigest": "eabad82f74d0335435cf2ade58ea75de2a3e0e79180bee618a16a5dbcdc5cac0",
+    "followingBlockDigest": "eabad82f74d0335435cf2ade58ea75de2a3e0e79180bee618a16a5dbcdc5cac0",
+    "identityFingerprint": "c603634871c479d1f25dd1cab81bc3086fbee163767a78da121584576c7ad676",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations"
+    ],
+    "text": "### Giao việc theo mẻ, song song có giới hạn, giữ quyền-sở-hữu-gốc",
+    "sectionText": "### Giao việc theo mẻ, song song có giới hạn, giữ quyền-sở-hữu-gốc\n\n- **Runs when:** ngay sau quét làm-rõ + quét chia-việc, và lặp lại mỗi khi một mẻ vừa dispatch xong (một hoặc nhiều việc trong mẻ tới kết cục cuối).\n- **What changes:** đọc lại TOÀN BỘ tập việc sẵn-sàng tươi; lọc theo quyền sở-hữu gốc — một việc chỉ lọt vào mẻ nếu gốc của nó CHƯA có chủ, hoặc đã thuộc về CHÍNH lượt chạy này (một chủ khác giành nhận cùng gốc bị từ chối, cùng khuôn kỳ-vọng-lệch của mọi cửa nhận việc khác — trên một máy chỉ một chủ tồn tại nên đường từ-chối này hiếm khi thật sự xảy ra, nhưng vẫn được kiểm mỗi lần); nhóm phần còn lại theo gốc, lấy tối đa N gốc, mỗi gốc lấy tối đa M con (trần hai tầng, Data Dictionary #6); mỗi việc trong mẻ được nhận (`todo→doing`) qua đúng MỘT cửa ghi tuần tự (xem RUL24 (một-người-ghi vẫn giữ nguyên dưới song song, qua một cửa ghi tuần tự)) — dù nhiều việc thi công song song, quyết-nhận và ghi-nhận của từng việc vẫn nối tiếp nhau, không bao giờ hai lượt nhận chen lẫn; việc bị từ chối nhận ở lại chờ mẻ sau, không mất.\n- **Side effects:** mỗi việc trong mẻ chạy vòng đời \"Một vòng --once\" ở trên, đồng thời với việc khác trong CÙNG mẻ, cho tới kết cục cuối của từng việc (đề xuất, đỗ, hoặc dừng).\n- **Afterwards:** mẻ xong (mọi việc trong mẻ đã tới kết cục) → đọc lại tập sẵn-sàng TƯƠI (việc vừa xong có thể mở khóa việc phụ thuộc, hoặc mở khóa chính gốc của nó nếu đó là con cuối cùng) rồi nạp mẻ kế tiếp — lặp tới khi KHÔNG còn việc đang chạy VÀ KHÔNG còn việc sẵn-sàng, vòng --once mới kết thúc thật sự."
+  }
+}
+```
+
+## claim_d54b53375cadadc43742330bb2152220
+
+Source digest (evidence JSON): 1ef8d8f218a0b847a8fb05775c530a20a0bf3df0004339a3bfeef40c4d8c9291
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_d54b53375cadadc43742330bb2152220",
+  "record": {
+    "claimId": "claim_d54b53375cadadc43742330bb2152220",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "unheaded-block-18",
+    "sourceLines": [
+      127,
+      130
+    ],
+    "sourceDigest": "eabad82f74d0335435cf2ade58ea75de2a3e0e79180bee618a16a5dbcdc5cac0",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "unheaded-block-6",
+    "targetDigest": "eabad82f74d0335435cf2ade58ea75de2a3e0e79180bee618a16a5dbcdc5cac0",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-18",
+    "githubAnchor": "unheaded-block-18",
+    "stableAnchor": "unheaded-block-18",
+    "title": "Unheaded block 18",
+    "startLine": 127,
+    "endLine": 130,
+    "textDigest": "eabad82f74d0335435cf2ade58ea75de2a3e0e79180bee618a16a5dbcdc5cac0",
+    "sample": "- **Runs when:** ngay sau quét làm-rõ + quét chia-việc, và lặp lại mỗi khi một mẻ vừa dispatch xong (một hoặc nhiều việc trong mẻ tới kết cục cuối).\n- **What changes:** đọc lại TOÀ",
+    "identityFingerprint": "bfd11ec71a0d74c661e6fead6168a3ad088957852997aa536849032693b87e99",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations",
+      "Giao việc theo mẻ, song song có giới hạn, giữ quyền-sở-hữu-gốc"
+    ],
+    "text": "- **Runs when:** ngay sau quét làm-rõ + quét chia-việc, và lặp lại mỗi khi một mẻ vừa dispatch xong (một hoặc nhiều việc trong mẻ tới kết cục cuối).\n- **What changes:** đọc lại TOÀN BỘ tập việc sẵn-sàng tươi; lọc theo quyền sở-hữu gốc — một việc chỉ lọt vào mẻ nếu gốc của nó CHƯA có chủ, hoặc đã thuộc về CHÍNH lượt chạy này (một chủ khác giành nhận cùng gốc bị từ chối, cùng khuôn kỳ-vọng-lệch của mọi cửa nhận việc khác — trên một máy chỉ một chủ tồn tại nên đường từ-chối này hiếm khi thật sự xảy ra, nhưng vẫn được kiểm mỗi lần); nhóm phần còn lại theo gốc, lấy tối đa N gốc, mỗi gốc lấy tối đa M con (trần hai tầng, Data Dictionary #6); mỗi việc trong mẻ được nhận (`todo→doing`) qua đúng MỘT cửa ghi tuần tự (xem RUL24 (một-người-ghi vẫn giữ nguyên dưới song song, qua một cửa ghi tuần tự)) — dù nhiều việc thi công song song, quyết-nhận và ghi-nhận của từng việc vẫn nối tiếp nhau, không bao giờ hai lượt nhận chen lẫn; việc bị từ chối nhận ở lại chờ mẻ sau, không mất.\n- **Side effects:** mỗi việc trong mẻ chạy vòng đời \"Một vòng --once\" ở trên, đồng thời với việc khác trong CÙNG mẻ, cho tới kết cục cuối của từng việc (đề xuất, đỗ, hoặc dừng).\n- **Afterwards:** mẻ xong (mọi việc trong mẻ đã tới kết cục) → đọc lại tập sẵn-sàng TƯƠI (việc vừa xong có thể mở khóa việc phụ thuộc, hoặc mở khóa chính gốc của nó nếu đó là con cuối cùng) rồi nạp mẻ kế tiếp — lặp tới khi KHÔNG còn việc đang chạy VÀ KHÔNG còn việc sẵn-sàng, vòng --once mới kết thúc thật sự."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-6",
+    "githubAnchor": "unheaded-block-6",
+    "stableAnchor": "unheaded-block-6",
+    "title": "Unheaded block 6",
+    "startLine": 51,
+    "endLine": 54,
+    "textDigest": "eabad82f74d0335435cf2ade58ea75de2a3e0e79180bee618a16a5dbcdc5cac0",
+    "sample": "- **Runs when:** ngay sau quét làm-rõ + quét chia-việc, và lặp lại mỗi khi một mẻ vừa dispatch xong (một hoặc nhiều việc trong mẻ tới kết cục cuối).\n- **What changes:** đọc lại TOÀ",
+    "identityFingerprint": "bfd11ec71a0d74c661e6fead6168a3ad088957852997aa536849032693b87e99",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations",
+      "Giao việc theo mẻ, song song có giới hạn, giữ quyền-sở-hữu-gốc"
+    ],
+    "text": "- **Runs when:** ngay sau quét làm-rõ + quét chia-việc, và lặp lại mỗi khi một mẻ vừa dispatch xong (một hoặc nhiều việc trong mẻ tới kết cục cuối).\n- **What changes:** đọc lại TOÀN BỘ tập việc sẵn-sàng tươi; lọc theo quyền sở-hữu gốc — một việc chỉ lọt vào mẻ nếu gốc của nó CHƯA có chủ, hoặc đã thuộc về CHÍNH lượt chạy này (một chủ khác giành nhận cùng gốc bị từ chối, cùng khuôn kỳ-vọng-lệch của mọi cửa nhận việc khác — trên một máy chỉ một chủ tồn tại nên đường từ-chối này hiếm khi thật sự xảy ra, nhưng vẫn được kiểm mỗi lần); nhóm phần còn lại theo gốc, lấy tối đa N gốc, mỗi gốc lấy tối đa M con (trần hai tầng, Data Dictionary #6); mỗi việc trong mẻ được nhận (`todo→doing`) qua đúng MỘT cửa ghi tuần tự (xem RUL24 (một-người-ghi vẫn giữ nguyên dưới song song, qua một cửa ghi tuần tự)) — dù nhiều việc thi công song song, quyết-nhận và ghi-nhận của từng việc vẫn nối tiếp nhau, không bao giờ hai lượt nhận chen lẫn; việc bị từ chối nhận ở lại chờ mẻ sau, không mất.\n- **Side effects:** mỗi việc trong mẻ chạy vòng đời \"Một vòng --once\" ở trên, đồng thời với việc khác trong CÙNG mẻ, cho tới kết cục cuối của từng việc (đề xuất, đỗ, hoặc dừng).\n- **Afterwards:** mẻ xong (mọi việc trong mẻ đã tới kết cục) → đọc lại tập sẵn-sàng TƯƠI (việc vừa xong có thể mở khóa việc phụ thuộc, hoặc mở khóa chính gốc của nó nếu đó là con cuối cùng) rồi nạp mẻ kế tiếp — lặp tới khi KHÔNG còn việc đang chạy VÀ KHÔNG còn việc sẵn-sàng, vòng --once mới kết thúc thật sự."
+  }
+}
+```
+
+## claim_d5ce63220d7ec853681b441183511c8d
+
+Source digest (evidence JSON): 6a86a167f14707d36eb28d730af778a80e46a2905aff353e27441f0fc8c4e388
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_d5ce63220d7ec853681b441183511c8d",
+  "record": {
+    "claimId": "claim_d5ce63220d7ec853681b441183511c8d",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "cây-nhánh-tích-hợp-con-nhập-vào-nhánh-của-gốc-chỉ-gốc-nhập-vào-cây-chính",
+    "sourceLines": [
+      132,
+      132
+    ],
+    "sourceDigest": "b07c69bd296947367e0db70b6e6d4533d2ae58f471b3f6080198fae6c35f0f4a",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "cây-nhánh-tích-hợp-con-nhập-vào-nhánh-của-gốc-chỉ-gốc-nhập-vào-cây-chính",
+    "targetDigest": "b07c69bd296947367e0db70b6e6d4533d2ae58f471b3f6080198fae6c35f0f4a",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Cây nhánh tích hợp — con nhập vào nhánh của gốc, chỉ gốc nhập vào cây chính",
+    "anchor": "cây-nhánh-tích-hợp-con-nhập-vào-nhánh-của-gốc-chỉ-gốc-nhập-vào-cây-chính",
+    "githubAnchor": "cây-nhánh-tích-hợp-con-nhập-vào-nhánh-của-gốc-chỉ-gốc-nhập-vào-cây-chính",
+    "stableAnchor": "h-3768299482d3",
+    "startLine": 132,
+    "endLine": 132,
+    "textDigest": "b07c69bd296947367e0db70b6e6d4533d2ae58f471b3f6080198fae6c35f0f4a",
+    "sample": "Cây nhánh tích hợp — con nhập vào nhánh của gốc, chỉ gốc nhập vào cây chính",
+    "sectionPayloadDigest": "1682c15966714eeded330aa91328a6d32c1085a505250c1f433be92ca10976d5",
+    "followingBlockDigest": "1682c15966714eeded330aa91328a6d32c1085a505250c1f433be92ca10976d5",
+    "identityFingerprint": "74e5263618b37ea599cdae3e235ea1c8fd89079c499f602e4731bc799292d677",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations"
+    ],
+    "text": "### Cây nhánh tích hợp — con nhập vào nhánh của gốc, chỉ gốc nhập vào cây chính",
+    "sectionText": "### Cây nhánh tích hợp — con nhập vào nhánh của gốc, chỉ gốc nhập vào cây chính\n\n- **Runs when:** mỗi lần một việc CON (có việc cha, xem spec Work-State \"Giai đoạn Chia-việc\") được dispatch hoặc đề xuất của nó được duyệt.\n- **What changes:** một việc GỐC (không việc cha, hoặc chính là đỉnh một cây) mở nhánh đề xuất riêng như mọi việc khác (Data Dictionary #2) — nhánh đó nay CŨNG đóng vai nhánh tích hợp của cả cây hậu duệ nó. Một việc CON mở worktree từ ĐỈNH nhánh của gốc nó (không phải từ cây chính) — kế thừa mọi việc anh em cùng gốc đã nhập trước nó. Đề xuất của một việc CON, khi qua cổng duyệt PR nội bộ, nhập vào NHÁNH CỦA GỐC — không bao giờ nhập thẳng vào cây chính. Một việc ĐỘC LẬP (không con, không cha) đi đúng đường cũ không đổi: đề xuất của nó nhập thẳng vào cây chính như trước.\n- **Afterwards:** chỉ khi TOÀN BỘ con của một gốc đã `done`, gốc mới tới lượt sẵn-sàng dispatch (cơ chế lineage sẵn có, xem spec Work-State) — verify của chính gốc lúc đó chạy trên nhánh của gốc (đã chứa mọi con đã nhập) như phép kiểm tích hợp cho cả cây; gốc đi tiếp đúng vòng đời và cổng duyệt như mọi việc khác, và CHỈ đề xuất của gốc mới nhập vào cây chính, đúng một lần cho cả tính năng. Bảo đảm nghiệp vụ: cây chính không bao giờ nhận một mảnh dở của một tính năng nhiều-việc — chỉ nhận nguyên vẹn khi toàn bộ cây đã xong (xem RUL25 (cây chính chỉ nhận nguyên một tính năng đã xong, không mảnh dở))."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Cây nhánh tích hợp — con nhập vào nhánh của gốc, chỉ gốc nhập vào cây chính",
+    "anchor": "cây-nhánh-tích-hợp-con-nhập-vào-nhánh-của-gốc-chỉ-gốc-nhập-vào-cây-chính",
+    "githubAnchor": "cây-nhánh-tích-hợp-con-nhập-vào-nhánh-của-gốc-chỉ-gốc-nhập-vào-cây-chính",
+    "stableAnchor": "h-6412681df187",
+    "startLine": 56,
+    "endLine": 56,
+    "textDigest": "b07c69bd296947367e0db70b6e6d4533d2ae58f471b3f6080198fae6c35f0f4a",
+    "sample": "Cây nhánh tích hợp — con nhập vào nhánh của gốc, chỉ gốc nhập vào cây chính",
+    "sectionPayloadDigest": "1682c15966714eeded330aa91328a6d32c1085a505250c1f433be92ca10976d5",
+    "followingBlockDigest": "1682c15966714eeded330aa91328a6d32c1085a505250c1f433be92ca10976d5",
+    "identityFingerprint": "74e5263618b37ea599cdae3e235ea1c8fd89079c499f602e4731bc799292d677",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations"
+    ],
+    "text": "### Cây nhánh tích hợp — con nhập vào nhánh của gốc, chỉ gốc nhập vào cây chính",
+    "sectionText": "### Cây nhánh tích hợp — con nhập vào nhánh của gốc, chỉ gốc nhập vào cây chính\n\n- **Runs when:** mỗi lần một việc CON (có việc cha, xem spec Work-State \"Giai đoạn Chia-việc\") được dispatch hoặc đề xuất của nó được duyệt.\n- **What changes:** một việc GỐC (không việc cha, hoặc chính là đỉnh một cây) mở nhánh đề xuất riêng như mọi việc khác (Data Dictionary #2) — nhánh đó nay CŨNG đóng vai nhánh tích hợp của cả cây hậu duệ nó. Một việc CON mở worktree từ ĐỈNH nhánh của gốc nó (không phải từ cây chính) — kế thừa mọi việc anh em cùng gốc đã nhập trước nó. Đề xuất của một việc CON, khi qua cổng duyệt PR nội bộ, nhập vào NHÁNH CỦA GỐC — không bao giờ nhập thẳng vào cây chính. Một việc ĐỘC LẬP (không con, không cha) đi đúng đường cũ không đổi: đề xuất của nó nhập thẳng vào cây chính như trước.\n- **Afterwards:** chỉ khi TOÀN BỘ con của một gốc đã `done`, gốc mới tới lượt sẵn-sàng dispatch (cơ chế lineage sẵn có, xem spec Work-State) — verify của chính gốc lúc đó chạy trên nhánh của gốc (đã chứa mọi con đã nhập) như phép kiểm tích hợp cho cả cây; gốc đi tiếp đúng vòng đời và cổng duyệt như mọi việc khác, và CHỈ đề xuất của gốc mới nhập vào cây chính, đúng một lần cho cả tính năng. Bảo đảm nghiệp vụ: cây chính không bao giờ nhận một mảnh dở của một tính năng nhiều-việc — chỉ nhận nguyên vẹn khi toàn bộ cây đã xong (xem RUL25 (cây chính chỉ nhận nguyên một tính năng đã xong, không mảnh dở))."
+  }
+}
+```
+
+## claim_f8757d828c667b842aebe376738018d8
+
+Source digest (evidence JSON): ed62db61c580156f2adec730a2ddf80fce4de30ae078afb54f230744e7349842
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_f8757d828c667b842aebe376738018d8",
+  "record": {
+    "claimId": "claim_f8757d828c667b842aebe376738018d8",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "unheaded-block-19",
+    "sourceLines": [
+      134,
+      136
+    ],
+    "sourceDigest": "1682c15966714eeded330aa91328a6d32c1085a505250c1f433be92ca10976d5",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "unheaded-block-7",
+    "targetDigest": "1682c15966714eeded330aa91328a6d32c1085a505250c1f433be92ca10976d5",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-19",
+    "githubAnchor": "unheaded-block-19",
+    "stableAnchor": "unheaded-block-19",
+    "title": "Unheaded block 19",
+    "startLine": 134,
+    "endLine": 136,
+    "textDigest": "1682c15966714eeded330aa91328a6d32c1085a505250c1f433be92ca10976d5",
+    "sample": "- **Runs when:** mỗi lần một việc CON (có việc cha, xem spec Work-State \"Giai đoạn Chia-việc\") được dispatch hoặc đề xuất của nó được duyệt.\n- **What changes:** một việc GỐC (không",
+    "identityFingerprint": "e1e16a02d11a1d9dc5b9092c2911df8eba7a9370a343006e8d9842216f9b9d37",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations",
+      "Cây nhánh tích hợp — con nhập vào nhánh của gốc, chỉ gốc nhập vào cây chính"
+    ],
+    "text": "- **Runs when:** mỗi lần một việc CON (có việc cha, xem spec Work-State \"Giai đoạn Chia-việc\") được dispatch hoặc đề xuất của nó được duyệt.\n- **What changes:** một việc GỐC (không việc cha, hoặc chính là đỉnh một cây) mở nhánh đề xuất riêng như mọi việc khác (Data Dictionary #2) — nhánh đó nay CŨNG đóng vai nhánh tích hợp của cả cây hậu duệ nó. Một việc CON mở worktree từ ĐỈNH nhánh của gốc nó (không phải từ cây chính) — kế thừa mọi việc anh em cùng gốc đã nhập trước nó. Đề xuất của một việc CON, khi qua cổng duyệt PR nội bộ, nhập vào NHÁNH CỦA GỐC — không bao giờ nhập thẳng vào cây chính. Một việc ĐỘC LẬP (không con, không cha) đi đúng đường cũ không đổi: đề xuất của nó nhập thẳng vào cây chính như trước.\n- **Afterwards:** chỉ khi TOÀN BỘ con của một gốc đã `done`, gốc mới tới lượt sẵn-sàng dispatch (cơ chế lineage sẵn có, xem spec Work-State) — verify của chính gốc lúc đó chạy trên nhánh của gốc (đã chứa mọi con đã nhập) như phép kiểm tích hợp cho cả cây; gốc đi tiếp đúng vòng đời và cổng duyệt như mọi việc khác, và CHỈ đề xuất của gốc mới nhập vào cây chính, đúng một lần cho cả tính năng. Bảo đảm nghiệp vụ: cây chính không bao giờ nhận một mảnh dở của một tính năng nhiều-việc — chỉ nhận nguyên vẹn khi toàn bộ cây đã xong (xem RUL25 (cây chính chỉ nhận nguyên một tính năng đã xong, không mảnh dở))."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-7",
+    "githubAnchor": "unheaded-block-7",
+    "stableAnchor": "unheaded-block-7",
+    "title": "Unheaded block 7",
+    "startLine": 58,
+    "endLine": 60,
+    "textDigest": "1682c15966714eeded330aa91328a6d32c1085a505250c1f433be92ca10976d5",
+    "sample": "- **Runs when:** mỗi lần một việc CON (có việc cha, xem spec Work-State \"Giai đoạn Chia-việc\") được dispatch hoặc đề xuất của nó được duyệt.\n- **What changes:** một việc GỐC (không",
+    "identityFingerprint": "e1e16a02d11a1d9dc5b9092c2911df8eba7a9370a343006e8d9842216f9b9d37",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations",
+      "Cây nhánh tích hợp — con nhập vào nhánh của gốc, chỉ gốc nhập vào cây chính"
+    ],
+    "text": "- **Runs when:** mỗi lần một việc CON (có việc cha, xem spec Work-State \"Giai đoạn Chia-việc\") được dispatch hoặc đề xuất của nó được duyệt.\n- **What changes:** một việc GỐC (không việc cha, hoặc chính là đỉnh một cây) mở nhánh đề xuất riêng như mọi việc khác (Data Dictionary #2) — nhánh đó nay CŨNG đóng vai nhánh tích hợp của cả cây hậu duệ nó. Một việc CON mở worktree từ ĐỈNH nhánh của gốc nó (không phải từ cây chính) — kế thừa mọi việc anh em cùng gốc đã nhập trước nó. Đề xuất của một việc CON, khi qua cổng duyệt PR nội bộ, nhập vào NHÁNH CỦA GỐC — không bao giờ nhập thẳng vào cây chính. Một việc ĐỘC LẬP (không con, không cha) đi đúng đường cũ không đổi: đề xuất của nó nhập thẳng vào cây chính như trước.\n- **Afterwards:** chỉ khi TOÀN BỘ con của một gốc đã `done`, gốc mới tới lượt sẵn-sàng dispatch (cơ chế lineage sẵn có, xem spec Work-State) — verify của chính gốc lúc đó chạy trên nhánh của gốc (đã chứa mọi con đã nhập) như phép kiểm tích hợp cho cả cây; gốc đi tiếp đúng vòng đời và cổng duyệt như mọi việc khác, và CHỈ đề xuất của gốc mới nhập vào cây chính, đúng một lần cho cả tính năng. Bảo đảm nghiệp vụ: cây chính không bao giờ nhận một mảnh dở của một tính năng nhiều-việc — chỉ nhận nguyên vẹn khi toàn bộ cây đã xong (xem RUL25 (cây chính chỉ nhận nguyên một tính năng đã xong, không mảnh dở))."
+  }
+}
+```
+
+## claim_d0ce89d8c38063d33b92edd554e0dc23
+
+Source digest (evidence JSON): 79b52de1b2e50abf1fdc4164e02443163ef408029c899ea21d22c3b175a8859b
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_d0ce89d8c38063d33b92edd554e0dc23",
+  "record": {
+    "claimId": "claim_d0ce89d8c38063d33b92edd554e0dc23",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "trôi-tích-hợp-đồng-bộ-lại-tại-gốccây-chính-integration-drift",
+    "sourceLines": [
+      138,
+      138
+    ],
+    "sourceDigest": "f679182359db641d3c0bd27210abb9c79ad9d7c3fbe8cb90156d47f64a99c907",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "trôi-tích-hợp-đồng-bộ-lại-tại-gốccây-chính-integration-drift",
+    "targetDigest": "f679182359db641d3c0bd27210abb9c79ad9d7c3fbe8cb90156d47f64a99c907",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Trôi tích hợp & đồng bộ lại tại gốc→cây chính (integration drift)",
+    "anchor": "trôi-tích-hợp-đồng-bộ-lại-tại-gốccây-chính-integration-drift",
+    "githubAnchor": "trôi-tích-hợp-đồng-bộ-lại-tại-gốccây-chính-integration-drift",
+    "stableAnchor": "h-e1d829ba6650",
+    "startLine": 138,
+    "endLine": 138,
+    "textDigest": "f679182359db641d3c0bd27210abb9c79ad9d7c3fbe8cb90156d47f64a99c907",
+    "sample": "Trôi tích hợp & đồng bộ lại tại gốc→cây chính (integration drift)",
+    "sectionPayloadDigest": "2cd7a5a94bb548f10371fe249f73337cd825d5e0c304561622c2b8c4ea23c4ac",
+    "followingBlockDigest": "2cd7a5a94bb548f10371fe249f73337cd825d5e0c304561622c2b8c4ea23c4ac",
+    "identityFingerprint": "f20c05ea201730eacc9aa40ba7d35dc9234d138b2b5ff5a556866ed7e0f9c3ef",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations"
+    ],
+    "text": "### Trôi tích hợp & đồng bộ lại tại gốc→cây chính (integration drift)",
+    "sectionText": "### Trôi tích hợp & đồng bộ lại tại gốc→cây chính (integration drift)\n\n- **Runs when:** cổng duyệt PR nội bộ (`approve`) xử lý đề xuất của một GỐC từng có con (đã đi qua cây nhánh tích hợp ở trên).\n- **What changes:** trước khi nhập vào cây chính, hệ thống kiểm CẢ HAI điều kiện: (a) nhập có xung đột văn bản không; (b) SAU khi nhập (nhưng CHƯA chốt), verify của chính gốc chạy lại trên cây đã nhập — đại diện cho \"cả tính năng cộng với mọi thứ khác đã vào cây chính từ lúc gốc bắt đầu vẫn đúng cùng nhau\", không chỉ \"nhập được không xung đột\". Xung đột văn bản HOẶC verify đỏ ở bước (b) đều bị coi ngang nhau — cả hai là TRÔI tích hợp: hủy sạch việc nhập (cây chính giữ nguyên, không bao giờ giữ một nhập xanh-mà-gãy), gốc đỗ lại mang lý do trôi-tích-hợp RIÊNG (phân biệt với lý do gãy-nhập thường của một việc không-con) cùng dấu vết chỗ cây chính đang đứng lúc đó.\n- **Afterwards:** gốc đỗ vì trôi tích hợp chờ người gọi đồng bộ lại (xem \"Đồng bộ lại một việc đỗ (catch-up)\" dưới); nhập sạch + verify xanh ở bước (b) → gốc `done`, tính năng hoàn tất trên cây chính."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Trôi tích hợp & đồng bộ lại tại gốc→cây chính (integration drift)",
+    "anchor": "trôi-tích-hợp-đồng-bộ-lại-tại-gốccây-chính-integration-drift",
+    "githubAnchor": "trôi-tích-hợp-đồng-bộ-lại-tại-gốccây-chính-integration-drift",
+    "stableAnchor": "h-58da9847bae8",
+    "startLine": 62,
+    "endLine": 62,
+    "textDigest": "f679182359db641d3c0bd27210abb9c79ad9d7c3fbe8cb90156d47f64a99c907",
+    "sample": "Trôi tích hợp & đồng bộ lại tại gốc→cây chính (integration drift)",
+    "sectionPayloadDigest": "2cd7a5a94bb548f10371fe249f73337cd825d5e0c304561622c2b8c4ea23c4ac",
+    "followingBlockDigest": "2cd7a5a94bb548f10371fe249f73337cd825d5e0c304561622c2b8c4ea23c4ac",
+    "identityFingerprint": "f20c05ea201730eacc9aa40ba7d35dc9234d138b2b5ff5a556866ed7e0f9c3ef",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations"
+    ],
+    "text": "### Trôi tích hợp & đồng bộ lại tại gốc→cây chính (integration drift)",
+    "sectionText": "### Trôi tích hợp & đồng bộ lại tại gốc→cây chính (integration drift)\n\n- **Runs when:** cổng duyệt PR nội bộ (`approve`) xử lý đề xuất của một GỐC từng có con (đã đi qua cây nhánh tích hợp ở trên).\n- **What changes:** trước khi nhập vào cây chính, hệ thống kiểm CẢ HAI điều kiện: (a) nhập có xung đột văn bản không; (b) SAU khi nhập (nhưng CHƯA chốt), verify của chính gốc chạy lại trên cây đã nhập — đại diện cho \"cả tính năng cộng với mọi thứ khác đã vào cây chính từ lúc gốc bắt đầu vẫn đúng cùng nhau\", không chỉ \"nhập được không xung đột\". Xung đột văn bản HOẶC verify đỏ ở bước (b) đều bị coi ngang nhau — cả hai là TRÔI tích hợp: hủy sạch việc nhập (cây chính giữ nguyên, không bao giờ giữ một nhập xanh-mà-gãy), gốc đỗ lại mang lý do trôi-tích-hợp RIÊNG (phân biệt với lý do gãy-nhập thường của một việc không-con) cùng dấu vết chỗ cây chính đang đứng lúc đó.\n- **Afterwards:** gốc đỗ vì trôi tích hợp chờ người gọi đồng bộ lại (xem \"Đồng bộ lại một việc đỗ (catch-up)\" dưới); nhập sạch + verify xanh ở bước (b) → gốc `done`, tính năng hoàn tất trên cây chính."
+  }
+}
+```
+
+## claim_ac7e9d06c339f6f69a94e21755c315d3
+
+Source digest (evidence JSON): d14e145033ab0458efbe5355729880d3b00dca44930c412e316801b607253bc0
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_ac7e9d06c339f6f69a94e21755c315d3",
+  "record": {
+    "claimId": "claim_ac7e9d06c339f6f69a94e21755c315d3",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "unheaded-block-20",
+    "sourceLines": [
+      140,
+      142
+    ],
+    "sourceDigest": "2cd7a5a94bb548f10371fe249f73337cd825d5e0c304561622c2b8c4ea23c4ac",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "unheaded-block-8",
+    "targetDigest": "2cd7a5a94bb548f10371fe249f73337cd825d5e0c304561622c2b8c4ea23c4ac",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-20",
+    "githubAnchor": "unheaded-block-20",
+    "stableAnchor": "unheaded-block-20",
+    "title": "Unheaded block 20",
+    "startLine": 140,
+    "endLine": 142,
+    "textDigest": "2cd7a5a94bb548f10371fe249f73337cd825d5e0c304561622c2b8c4ea23c4ac",
+    "sample": "- **Runs when:** cổng duyệt PR nội bộ (`approve`) xử lý đề xuất của một GỐC từng có con (đã đi qua cây nhánh tích hợp ở trên).\n- **What changes:** trước khi nhập vào cây chính, hệ ",
+    "identityFingerprint": "73dcd78fe3d87d6c5961b880ad3daa49919d9939ab765a70ba2a7b0644034549",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations",
+      "Trôi tích hợp & đồng bộ lại tại gốc→cây chính (integration drift)"
+    ],
+    "text": "- **Runs when:** cổng duyệt PR nội bộ (`approve`) xử lý đề xuất của một GỐC từng có con (đã đi qua cây nhánh tích hợp ở trên).\n- **What changes:** trước khi nhập vào cây chính, hệ thống kiểm CẢ HAI điều kiện: (a) nhập có xung đột văn bản không; (b) SAU khi nhập (nhưng CHƯA chốt), verify của chính gốc chạy lại trên cây đã nhập — đại diện cho \"cả tính năng cộng với mọi thứ khác đã vào cây chính từ lúc gốc bắt đầu vẫn đúng cùng nhau\", không chỉ \"nhập được không xung đột\". Xung đột văn bản HOẶC verify đỏ ở bước (b) đều bị coi ngang nhau — cả hai là TRÔI tích hợp: hủy sạch việc nhập (cây chính giữ nguyên, không bao giờ giữ một nhập xanh-mà-gãy), gốc đỗ lại mang lý do trôi-tích-hợp RIÊNG (phân biệt với lý do gãy-nhập thường của một việc không-con) cùng dấu vết chỗ cây chính đang đứng lúc đó.\n- **Afterwards:** gốc đỗ vì trôi tích hợp chờ người gọi đồng bộ lại (xem \"Đồng bộ lại một việc đỗ (catch-up)\" dưới); nhập sạch + verify xanh ở bước (b) → gốc `done`, tính năng hoàn tất trên cây chính."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-8",
+    "githubAnchor": "unheaded-block-8",
+    "stableAnchor": "unheaded-block-8",
+    "title": "Unheaded block 8",
+    "startLine": 64,
+    "endLine": 66,
+    "textDigest": "2cd7a5a94bb548f10371fe249f73337cd825d5e0c304561622c2b8c4ea23c4ac",
+    "sample": "- **Runs when:** cổng duyệt PR nội bộ (`approve`) xử lý đề xuất của một GỐC từng có con (đã đi qua cây nhánh tích hợp ở trên).\n- **What changes:** trước khi nhập vào cây chính, hệ ",
+    "identityFingerprint": "73dcd78fe3d87d6c5961b880ad3daa49919d9939ab765a70ba2a7b0644034549",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations",
+      "Trôi tích hợp & đồng bộ lại tại gốc→cây chính (integration drift)"
+    ],
+    "text": "- **Runs when:** cổng duyệt PR nội bộ (`approve`) xử lý đề xuất của một GỐC từng có con (đã đi qua cây nhánh tích hợp ở trên).\n- **What changes:** trước khi nhập vào cây chính, hệ thống kiểm CẢ HAI điều kiện: (a) nhập có xung đột văn bản không; (b) SAU khi nhập (nhưng CHƯA chốt), verify của chính gốc chạy lại trên cây đã nhập — đại diện cho \"cả tính năng cộng với mọi thứ khác đã vào cây chính từ lúc gốc bắt đầu vẫn đúng cùng nhau\", không chỉ \"nhập được không xung đột\". Xung đột văn bản HOẶC verify đỏ ở bước (b) đều bị coi ngang nhau — cả hai là TRÔI tích hợp: hủy sạch việc nhập (cây chính giữ nguyên, không bao giờ giữ một nhập xanh-mà-gãy), gốc đỗ lại mang lý do trôi-tích-hợp RIÊNG (phân biệt với lý do gãy-nhập thường của một việc không-con) cùng dấu vết chỗ cây chính đang đứng lúc đó.\n- **Afterwards:** gốc đỗ vì trôi tích hợp chờ người gọi đồng bộ lại (xem \"Đồng bộ lại một việc đỗ (catch-up)\" dưới); nhập sạch + verify xanh ở bước (b) → gốc `done`, tính năng hoàn tất trên cây chính."
+  }
+}
+```
+
+## claim_5ea4ea0c22d5aba5df29ff3a97b26a74
+
+Source digest (evidence JSON): 0570f65d083925863d364bf755f4e1732843b7e6ca5546ab06069224969f0ee9
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_5ea4ea0c22d5aba5df29ff3a97b26a74",
+  "record": {
+    "claimId": "claim_5ea4ea0c22d5aba5df29ff3a97b26a74",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "đồng-bộ-lại-một-việc-đỗ-catch-up",
+    "sourceLines": [
+      144,
+      144
+    ],
+    "sourceDigest": "4e3a82557e5d9e59e796afc95080c1f06626b9d2bd98f936593cfdc073ad57c7",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "đồng-bộ-lại-một-việc-đỗ-catch-up",
+    "targetDigest": "4e3a82557e5d9e59e796afc95080c1f06626b9d2bd98f936593cfdc073ad57c7",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; source unit shorter than 40 characters; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Đồng bộ lại một việc đỗ (catch-up)",
+    "anchor": "đồng-bộ-lại-một-việc-đỗ-catch-up",
+    "githubAnchor": "đồng-bộ-lại-một-việc-đỗ-catch-up",
+    "stableAnchor": "h-f15c032d51ea",
+    "startLine": 144,
+    "endLine": 144,
+    "textDigest": "4e3a82557e5d9e59e796afc95080c1f06626b9d2bd98f936593cfdc073ad57c7",
+    "sample": "Đồng bộ lại một việc đỗ (catch-up)",
+    "sectionPayloadDigest": "2861964793588c88c92db37e4409648327219d8d6f88dd4ea05c092ed8142e90",
+    "followingBlockDigest": "2861964793588c88c92db37e4409648327219d8d6f88dd4ea05c092ed8142e90",
+    "identityFingerprint": "ad63912373ef79c525c891f68cc51450a5943c0549bda8aa016cee92f586719e",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations"
+    ],
+    "text": "### Đồng bộ lại một việc đỗ (catch-up)",
+    "sectionText": "### Đồng bộ lại một việc đỗ (catch-up)\n\n- **Runs when:** người vận hành gọi `fgos catchup <id>` trên một việc đang `blocked` vì gãy nhập (xung đột, verify đỏ sau nhập, hoặc trôi tích hợp).\n- **Blocked when:** việc không tồn tại — `validation`; việc không ở `blocked` — `precondition`; lý do đỗ hiện tại không thuộc nhóm gãy-nhập (vd đỗ vì chạm trần chống-lặp, hoặc gặt-do-crash) — `validation`, đồng bộ-lại không giúp được những lý do đó, người phải cầm việc qua cửa pull để tự sửa tay; nhánh riêng của việc không còn tồn tại — `validation`.\n- **What changes:** hệ thống xác định ĐÍCH cần đồng bộ — nhánh của gốc nếu việc là con, cây chính nếu việc là gốc/độc lập — rồi kéo trạng thái MỚI NHẤT của đích vào nhánh riêng của việc (nhập, chưa chốt), chạy verify của chính việc trên kết quả TRƯỚC KHI chốt: nhập sạch + verify xanh → chốt, việc chuyển thẳng `blocked → sẵn sàng nộp lại` — KHÔNG đi qua `đang làm`, một bước CƠ HỌC không tính vào ngân sách chống-lặp của việc; còn xung đột → hủy sạch việc nhập vừa thử, việc giữ nguyên `blocked`, thông báo tên các tệp xung đột cho người tự xử lý; verify đỏ sau khi nhập sạch → cũng hủy sạch, việc giữ nguyên `blocked`, người phải tự điều tra vì sao đồng bộ xong mà verify vẫn gãy — cả hai đường thất bại này KHÔNG có cơ chế agent tự giải xung đột (đó là mở rộng sau, xem Open Gaps).\n- **Side effects:** không gì ngoài dấu vết trên nhánh riêng của chính việc đó (khi thành công) — cây chính/nhánh của gốc không bao giờ bị đụng bởi lệnh này.\n- **Afterwards:** đồng bộ thành công → việc actionable lại qua đúng cổng duyệt PR nội bộ như một đề xuất bình thường, không cần nộp lại từ đầu; đồng bộ thất bại → việc vẫn đỗ, người chọn giữa gọi lại `catchup` sau khi đích đổi tiếp, hoặc cầm việc qua cửa pull để tự làm-lại tay — đường làm-lại tay CÓ tính vào ngân sách chống-lặp (đi qua `đang làm` bình thường), phân biệt với đường cơ học ở trên (xem RUL28 (đồng bộ-lại sạch = cơ học không đếm; làm-lại tay = có đếm))."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Đồng bộ lại một việc đỗ (catch-up)",
+    "anchor": "đồng-bộ-lại-một-việc-đỗ-catch-up",
+    "githubAnchor": "đồng-bộ-lại-một-việc-đỗ-catch-up",
+    "stableAnchor": "h-136c9694d5c1",
+    "startLine": 68,
+    "endLine": 68,
+    "textDigest": "4e3a82557e5d9e59e796afc95080c1f06626b9d2bd98f936593cfdc073ad57c7",
+    "sample": "Đồng bộ lại một việc đỗ (catch-up)",
+    "sectionPayloadDigest": "2861964793588c88c92db37e4409648327219d8d6f88dd4ea05c092ed8142e90",
+    "followingBlockDigest": "2861964793588c88c92db37e4409648327219d8d6f88dd4ea05c092ed8142e90",
+    "identityFingerprint": "ad63912373ef79c525c891f68cc51450a5943c0549bda8aa016cee92f586719e",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations"
+    ],
+    "text": "### Đồng bộ lại một việc đỗ (catch-up)",
+    "sectionText": "### Đồng bộ lại một việc đỗ (catch-up)\n\n- **Runs when:** người vận hành gọi `fgos catchup <id>` trên một việc đang `blocked` vì gãy nhập (xung đột, verify đỏ sau nhập, hoặc trôi tích hợp).\n- **Blocked when:** việc không tồn tại — `validation`; việc không ở `blocked` — `precondition`; lý do đỗ hiện tại không thuộc nhóm gãy-nhập (vd đỗ vì chạm trần chống-lặp, hoặc gặt-do-crash) — `validation`, đồng bộ-lại không giúp được những lý do đó, người phải cầm việc qua cửa pull để tự sửa tay; nhánh riêng của việc không còn tồn tại — `validation`.\n- **What changes:** hệ thống xác định ĐÍCH cần đồng bộ — nhánh của gốc nếu việc là con, cây chính nếu việc là gốc/độc lập — rồi kéo trạng thái MỚI NHẤT của đích vào nhánh riêng của việc (nhập, chưa chốt), chạy verify của chính việc trên kết quả TRƯỚC KHI chốt: nhập sạch + verify xanh → chốt, việc chuyển thẳng `blocked → sẵn sàng nộp lại` — KHÔNG đi qua `đang làm`, một bước CƠ HỌC không tính vào ngân sách chống-lặp của việc; còn xung đột → hủy sạch việc nhập vừa thử, việc giữ nguyên `blocked`, thông báo tên các tệp xung đột cho người tự xử lý; verify đỏ sau khi nhập sạch → cũng hủy sạch, việc giữ nguyên `blocked`, người phải tự điều tra vì sao đồng bộ xong mà verify vẫn gãy — cả hai đường thất bại này KHÔNG có cơ chế agent tự giải xung đột (đó là mở rộng sau, xem Open Gaps).\n- **Side effects:** không gì ngoài dấu vết trên nhánh riêng của chính việc đó (khi thành công) — cây chính/nhánh của gốc không bao giờ bị đụng bởi lệnh này.\n- **Afterwards:** đồng bộ thành công → việc actionable lại qua đúng cổng duyệt PR nội bộ như một đề xuất bình thường, không cần nộp lại từ đầu; đồng bộ thất bại → việc vẫn đỗ, người chọn giữa gọi lại `catchup` sau khi đích đổi tiếp, hoặc cầm việc qua cửa pull để tự làm-lại tay — đường làm-lại tay CÓ tính vào ngân sách chống-lặp (đi qua `đang làm` bình thường), phân biệt với đường cơ học ở trên (xem RUL28 (đồng bộ-lại sạch = cơ học không đếm; làm-lại tay = có đếm))."
+  }
+}
+```
+
+## claim_04e7484d047dcd08a46c213814f64560
+
+Source digest (evidence JSON): 952a6988b75c09b18c20a71b8e511a5b4f3955aa95a7931ac1be2a896e29f347
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_04e7484d047dcd08a46c213814f64560",
+  "record": {
+    "claimId": "claim_04e7484d047dcd08a46c213814f64560",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "unheaded-block-21",
+    "sourceLines": [
+      146,
+      150
+    ],
+    "sourceDigest": "2861964793588c88c92db37e4409648327219d8d6f88dd4ea05c092ed8142e90",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "unheaded-block-9",
+    "targetDigest": "2861964793588c88c92db37e4409648327219d8d6f88dd4ea05c092ed8142e90",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-21",
+    "githubAnchor": "unheaded-block-21",
+    "stableAnchor": "unheaded-block-21",
+    "title": "Unheaded block 21",
+    "startLine": 146,
+    "endLine": 150,
+    "textDigest": "2861964793588c88c92db37e4409648327219d8d6f88dd4ea05c092ed8142e90",
+    "sample": "- **Runs when:** người vận hành gọi `fgos catchup <id>` trên một việc đang `blocked` vì gãy nhập (xung đột, verify đỏ sau nhập, hoặc trôi tích hợp).\n- **Blocked when:** việc không ",
+    "identityFingerprint": "f591f4b2e5205d555d0bb97afc6d3686f4124cf85d1496494461f8e4b6f8eb65",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations",
+      "Đồng bộ lại một việc đỗ (catch-up)"
+    ],
+    "text": "- **Runs when:** người vận hành gọi `fgos catchup <id>` trên một việc đang `blocked` vì gãy nhập (xung đột, verify đỏ sau nhập, hoặc trôi tích hợp).\n- **Blocked when:** việc không tồn tại — `validation`; việc không ở `blocked` — `precondition`; lý do đỗ hiện tại không thuộc nhóm gãy-nhập (vd đỗ vì chạm trần chống-lặp, hoặc gặt-do-crash) — `validation`, đồng bộ-lại không giúp được những lý do đó, người phải cầm việc qua cửa pull để tự sửa tay; nhánh riêng của việc không còn tồn tại — `validation`.\n- **What changes:** hệ thống xác định ĐÍCH cần đồng bộ — nhánh của gốc nếu việc là con, cây chính nếu việc là gốc/độc lập — rồi kéo trạng thái MỚI NHẤT của đích vào nhánh riêng của việc (nhập, chưa chốt), chạy verify của chính việc trên kết quả TRƯỚC KHI chốt: nhập sạch + verify xanh → chốt, việc chuyển thẳng `blocked → sẵn sàng nộp lại` — KHÔNG đi qua `đang làm`, một bước CƠ HỌC không tính vào ngân sách chống-lặp của việc; còn xung đột → hủy sạch việc nhập vừa thử, việc giữ nguyên `blocked`, thông báo tên các tệp xung đột cho người tự xử lý; verify đỏ sau khi nhập sạch → cũng hủy sạch, việc giữ nguyên `blocked`, người phải tự điều tra vì sao đồng bộ xong mà verify vẫn gãy — cả hai đường thất bại này KHÔNG có cơ chế agent tự giải xung đột (đó là mở rộng sau, xem Open Gaps).\n- **Side effects:** không gì ngoài dấu vết trên nhánh riêng của chính việc đó (khi thành công) — cây chính/nhánh của gốc không bao giờ bị đụng bởi lệnh này.\n- **Afterwards:** đồng bộ thành công → việc actionable lại qua đúng cổng duyệt PR nội bộ như một đề xuất bình thường, không cần nộp lại từ đầu; đồng bộ thất bại → việc vẫn đỗ, người chọn giữa gọi lại `catchup` sau khi đích đổi tiếp, hoặc cầm việc qua cửa pull để tự làm-lại tay — đường làm-lại tay CÓ tính vào ngân sách chống-lặp (đi qua `đang làm` bình thường), phân biệt với đường cơ học ở trên (xem RUL28 (đồng bộ-lại sạch = cơ học không đếm; làm-lại tay = có đếm))."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-9",
+    "githubAnchor": "unheaded-block-9",
+    "stableAnchor": "unheaded-block-9",
+    "title": "Unheaded block 9",
+    "startLine": 70,
+    "endLine": 74,
+    "textDigest": "2861964793588c88c92db37e4409648327219d8d6f88dd4ea05c092ed8142e90",
+    "sample": "- **Runs when:** người vận hành gọi `fgos catchup <id>` trên một việc đang `blocked` vì gãy nhập (xung đột, verify đỏ sau nhập, hoặc trôi tích hợp).\n- **Blocked when:** việc không ",
+    "identityFingerprint": "f591f4b2e5205d555d0bb97afc6d3686f4124cf85d1496494461f8e4b6f8eb65",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations",
+      "Đồng bộ lại một việc đỗ (catch-up)"
+    ],
+    "text": "- **Runs when:** người vận hành gọi `fgos catchup <id>` trên một việc đang `blocked` vì gãy nhập (xung đột, verify đỏ sau nhập, hoặc trôi tích hợp).\n- **Blocked when:** việc không tồn tại — `validation`; việc không ở `blocked` — `precondition`; lý do đỗ hiện tại không thuộc nhóm gãy-nhập (vd đỗ vì chạm trần chống-lặp, hoặc gặt-do-crash) — `validation`, đồng bộ-lại không giúp được những lý do đó, người phải cầm việc qua cửa pull để tự sửa tay; nhánh riêng của việc không còn tồn tại — `validation`.\n- **What changes:** hệ thống xác định ĐÍCH cần đồng bộ — nhánh của gốc nếu việc là con, cây chính nếu việc là gốc/độc lập — rồi kéo trạng thái MỚI NHẤT của đích vào nhánh riêng của việc (nhập, chưa chốt), chạy verify của chính việc trên kết quả TRƯỚC KHI chốt: nhập sạch + verify xanh → chốt, việc chuyển thẳng `blocked → sẵn sàng nộp lại` — KHÔNG đi qua `đang làm`, một bước CƠ HỌC không tính vào ngân sách chống-lặp của việc; còn xung đột → hủy sạch việc nhập vừa thử, việc giữ nguyên `blocked`, thông báo tên các tệp xung đột cho người tự xử lý; verify đỏ sau khi nhập sạch → cũng hủy sạch, việc giữ nguyên `blocked`, người phải tự điều tra vì sao đồng bộ xong mà verify vẫn gãy — cả hai đường thất bại này KHÔNG có cơ chế agent tự giải xung đột (đó là mở rộng sau, xem Open Gaps).\n- **Side effects:** không gì ngoài dấu vết trên nhánh riêng của chính việc đó (khi thành công) — cây chính/nhánh của gốc không bao giờ bị đụng bởi lệnh này.\n- **Afterwards:** đồng bộ thành công → việc actionable lại qua đúng cổng duyệt PR nội bộ như một đề xuất bình thường, không cần nộp lại từ đầu; đồng bộ thất bại → việc vẫn đỗ, người chọn giữa gọi lại `catchup` sau khi đích đổi tiếp, hoặc cầm việc qua cửa pull để tự làm-lại tay — đường làm-lại tay CÓ tính vào ngân sách chống-lặp (đi qua `đang làm` bình thường), phân biệt với đường cơ học ở trên (xem RUL28 (đồng bộ-lại sạch = cơ học không đếm; làm-lại tay = có đếm))."
+  }
+}
+```
+
+## claim_d7bebb83ab16f451d60767eb12068069
+
+Source digest (evidence JSON): 778f0975efe5791a82972773b954e670ba8060fe6ff3c24caced9a0aedfbebb9
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_d7bebb83ab16f451d60767eb12068069",
+  "record": {
+    "claimId": "claim_d7bebb83ab16f451d60767eb12068069",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "phát-hiện-trôi-sau-nhập-nhánh-postland-drift-notify-consumer",
+    "sourceLines": [
+      152,
+      152
+    ],
+    "sourceDigest": "63a5ca7c0ce10fbbc9b649d225f5bc08e2bb89e85b4078e0d37ffc9c95d1ca09",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "phát-hiện-trôi-sau-nhập-nhánh-postland-drift-notify-consumer",
+    "targetDigest": "63a5ca7c0ce10fbbc9b649d225f5bc08e2bb89e85b4078e0d37ffc9c95d1ca09",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Phát hiện trôi sau nhập nhánh (postLand drift & notify consumer)",
+    "anchor": "phát-hiện-trôi-sau-nhập-nhánh-postland-drift-notify-consumer",
+    "githubAnchor": "phát-hiện-trôi-sau-nhập-nhánh-postland-drift-notify-consumer",
+    "stableAnchor": "h-edb84b3720e7",
+    "startLine": 152,
+    "endLine": 152,
+    "textDigest": "63a5ca7c0ce10fbbc9b649d225f5bc08e2bb89e85b4078e0d37ffc9c95d1ca09",
+    "sample": "Phát hiện trôi sau nhập nhánh (postLand drift & notify consumer)",
+    "sectionPayloadDigest": "44f9e45556082f7848e074cfc44fc105411280a075798049bc83b2d2a0dbaa79",
+    "followingBlockDigest": "44f9e45556082f7848e074cfc44fc105411280a075798049bc83b2d2a0dbaa79",
+    "identityFingerprint": "d0dd68166424597092449c296424400b81c5279d5e211ca5bf726fbbecbccd3e",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations"
+    ],
+    "text": "### Phát hiện trôi sau nhập nhánh (postLand drift & notify consumer)",
+    "sectionText": "### Phát hiện trôi sau nhập nhánh (postLand drift & notify consumer)\n\n- **Runs when:** một việc vừa nhập (`outcome === 'merged'`) vào nhánh đích của nó (`classifyPostLandDrift`/`detectPostLandDrift`, tsk-2ypd), hoặc khi kiểm tra liveness/doctor/orient (tsk-1el).\n- **What changes:** cơ chế `postLand` (`detectPostLandDrift`, tsk-2ypd) tính toán danh sách các tệp thay đổi thực tế của nhánh vừa nhập và so sánh trùng lặp đường dẫn (real path overlap) với mọi nhánh con/gốc phụ thuộc đang mở chung đích. Khi có trùng lặp, kết quả được phân nhánh thành `notify` (nhánh có phiên sống) và `stale` (nhánh không phiên sống). Consumer phía `notify` (`postLandDrift`, `src/state/postland-drift.mjs`, tsk-1el) tính toán lại theo cơ chế recompute-on-read lũy thừa từ điểm phân nhánh (cumulative since fork): báo trực tiếp cho phiên sống sở hữu nhánh qua kiểm tra `fgos doctor` (`leaf-notify-drift`) và vòng lặp tự hành Orient (`fgos-coding-driving`). Nhánh `stale` được bảo vệ thụ động bởi cổng nhập catch-up.\n- **Afterwards:** phiên sống phát hiện trôi tích hợp sớm để tự điều chỉnh hoặc đồng bộ lại trước khi tới lượt nhập real-merge."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Phát hiện trôi sau nhập nhánh (postLand drift & notify consumer)",
+    "anchor": "phát-hiện-trôi-sau-nhập-nhánh-postland-drift-notify-consumer",
+    "githubAnchor": "phát-hiện-trôi-sau-nhập-nhánh-postland-drift-notify-consumer",
+    "stableAnchor": "h-6278779bf99d",
+    "startLine": 76,
+    "endLine": 76,
+    "textDigest": "63a5ca7c0ce10fbbc9b649d225f5bc08e2bb89e85b4078e0d37ffc9c95d1ca09",
+    "sample": "Phát hiện trôi sau nhập nhánh (postLand drift & notify consumer)",
+    "sectionPayloadDigest": "44f9e45556082f7848e074cfc44fc105411280a075798049bc83b2d2a0dbaa79",
+    "followingBlockDigest": "44f9e45556082f7848e074cfc44fc105411280a075798049bc83b2d2a0dbaa79",
+    "identityFingerprint": "d0dd68166424597092449c296424400b81c5279d5e211ca5bf726fbbecbccd3e",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations"
+    ],
+    "text": "### Phát hiện trôi sau nhập nhánh (postLand drift & notify consumer)",
+    "sectionText": "### Phát hiện trôi sau nhập nhánh (postLand drift & notify consumer)\n\n- **Runs when:** một việc vừa nhập (`outcome === 'merged'`) vào nhánh đích của nó (`classifyPostLandDrift`/`detectPostLandDrift`, tsk-2ypd), hoặc khi kiểm tra liveness/doctor/orient (tsk-1el).\n- **What changes:** cơ chế `postLand` (`detectPostLandDrift`, tsk-2ypd) tính toán danh sách các tệp thay đổi thực tế của nhánh vừa nhập và so sánh trùng lặp đường dẫn (real path overlap) với mọi nhánh con/gốc phụ thuộc đang mở chung đích. Khi có trùng lặp, kết quả được phân nhánh thành `notify` (nhánh có phiên sống) và `stale` (nhánh không phiên sống). Consumer phía `notify` (`postLandDrift`, `src/state/postland-drift.mjs`, tsk-1el) tính toán lại theo cơ chế recompute-on-read lũy thừa từ điểm phân nhánh (cumulative since fork): báo trực tiếp cho phiên sống sở hữu nhánh qua kiểm tra `fgos doctor` (`leaf-notify-drift`) và vòng lặp tự hành Orient (`fgos-coding-driving`). Nhánh `stale` được bảo vệ thụ động bởi cổng nhập catch-up.\n- **Afterwards:** phiên sống phát hiện trôi tích hợp sớm để tự điều chỉnh hoặc đồng bộ lại trước khi tới lượt nhập real-merge."
+  }
+}
+```
+
+## claim_ad43ca34ce5992c0847f446f83b41e21
+
+Source digest (evidence JSON): 21700b31e83d60a8302611e8e61b7b23e6f4ac2ed62f2b2d2fc1702a2a41a239
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_ad43ca34ce5992c0847f446f83b41e21",
+  "record": {
+    "claimId": "claim_ad43ca34ce5992c0847f446f83b41e21",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "unheaded-block-22",
+    "sourceLines": [
+      154,
+      156
+    ],
+    "sourceDigest": "44f9e45556082f7848e074cfc44fc105411280a075798049bc83b2d2a0dbaa79",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "unheaded-block-10",
+    "targetDigest": "44f9e45556082f7848e074cfc44fc105411280a075798049bc83b2d2a0dbaa79",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-22",
+    "githubAnchor": "unheaded-block-22",
+    "stableAnchor": "unheaded-block-22",
+    "title": "Unheaded block 22",
+    "startLine": 154,
+    "endLine": 156,
+    "textDigest": "44f9e45556082f7848e074cfc44fc105411280a075798049bc83b2d2a0dbaa79",
+    "sample": "- **Runs when:** một việc vừa nhập (`outcome === 'merged'`) vào nhánh đích của nó (`classifyPostLandDrift`/`detectPostLandDrift`, tsk-2ypd), hoặc khi kiểm tra liveness/doctor/orien",
+    "identityFingerprint": "fcf939b7e5574035de5c41e8ea9a980136fec65f8991fc0cf9030ee3fbc6dfe0",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations",
+      "Phát hiện trôi sau nhập nhánh (postLand drift & notify consumer)"
+    ],
+    "text": "- **Runs when:** một việc vừa nhập (`outcome === 'merged'`) vào nhánh đích của nó (`classifyPostLandDrift`/`detectPostLandDrift`, tsk-2ypd), hoặc khi kiểm tra liveness/doctor/orient (tsk-1el).\n- **What changes:** cơ chế `postLand` (`detectPostLandDrift`, tsk-2ypd) tính toán danh sách các tệp thay đổi thực tế của nhánh vừa nhập và so sánh trùng lặp đường dẫn (real path overlap) với mọi nhánh con/gốc phụ thuộc đang mở chung đích. Khi có trùng lặp, kết quả được phân nhánh thành `notify` (nhánh có phiên sống) và `stale` (nhánh không phiên sống). Consumer phía `notify` (`postLandDrift`, `src/state/postland-drift.mjs`, tsk-1el) tính toán lại theo cơ chế recompute-on-read lũy thừa từ điểm phân nhánh (cumulative since fork): báo trực tiếp cho phiên sống sở hữu nhánh qua kiểm tra `fgos doctor` (`leaf-notify-drift`) và vòng lặp tự hành Orient (`fgos-coding-driving`). Nhánh `stale` được bảo vệ thụ động bởi cổng nhập catch-up.\n- **Afterwards:** phiên sống phát hiện trôi tích hợp sớm để tự điều chỉnh hoặc đồng bộ lại trước khi tới lượt nhập real-merge."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-10",
+    "githubAnchor": "unheaded-block-10",
+    "stableAnchor": "unheaded-block-10",
+    "title": "Unheaded block 10",
+    "startLine": 78,
+    "endLine": 80,
+    "textDigest": "44f9e45556082f7848e074cfc44fc105411280a075798049bc83b2d2a0dbaa79",
+    "sample": "- **Runs when:** một việc vừa nhập (`outcome === 'merged'`) vào nhánh đích của nó (`classifyPostLandDrift`/`detectPostLandDrift`, tsk-2ypd), hoặc khi kiểm tra liveness/doctor/orien",
+    "identityFingerprint": "fcf939b7e5574035de5c41e8ea9a980136fec65f8991fc0cf9030ee3fbc6dfe0",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations",
+      "Phát hiện trôi sau nhập nhánh (postLand drift & notify consumer)"
+    ],
+    "text": "- **Runs when:** một việc vừa nhập (`outcome === 'merged'`) vào nhánh đích của nó (`classifyPostLandDrift`/`detectPostLandDrift`, tsk-2ypd), hoặc khi kiểm tra liveness/doctor/orient (tsk-1el).\n- **What changes:** cơ chế `postLand` (`detectPostLandDrift`, tsk-2ypd) tính toán danh sách các tệp thay đổi thực tế của nhánh vừa nhập và so sánh trùng lặp đường dẫn (real path overlap) với mọi nhánh con/gốc phụ thuộc đang mở chung đích. Khi có trùng lặp, kết quả được phân nhánh thành `notify` (nhánh có phiên sống) và `stale` (nhánh không phiên sống). Consumer phía `notify` (`postLandDrift`, `src/state/postland-drift.mjs`, tsk-1el) tính toán lại theo cơ chế recompute-on-read lũy thừa từ điểm phân nhánh (cumulative since fork): báo trực tiếp cho phiên sống sở hữu nhánh qua kiểm tra `fgos doctor` (`leaf-notify-drift`) và vòng lặp tự hành Orient (`fgos-coding-driving`). Nhánh `stale` được bảo vệ thụ động bởi cổng nhập catch-up.\n- **Afterwards:** phiên sống phát hiện trôi tích hợp sớm để tự điều chỉnh hoặc đồng bộ lại trước khi tới lượt nhập real-merge."
+  }
+}
+```
+
+## claim_c5db31e18a238a67423fa2b9fdde117e
+
+Source digest (evidence JSON): e87feac671c237e60ccc7b137506abe911ba4fa055e6655fb096b96b2924590e
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_c5db31e18a238a67423fa2b9fdde117e",
+  "record": {
+    "claimId": "claim_c5db31e18a238a67423fa2b9fdde117e",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "quét-nghiên-cứu-trước-dispatch-discovery-dispatch",
+    "sourceLines": [
+      158,
+      158
+    ],
+    "sourceDigest": "febf53ab7d2dd568234e3f01ee5d8b3fa2b43ca9f98d784d47e9d8aa63269df3",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "quét-nghiên-cứu-trước-dispatch-discovery-dispatch",
+    "targetDigest": "febf53ab7d2dd568234e3f01ee5d8b3fa2b43ca9f98d784d47e9d8aa63269df3",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Quét nghiên-cứu trước dispatch (discovery dispatch)",
+    "anchor": "quét-nghiên-cứu-trước-dispatch-discovery-dispatch",
+    "githubAnchor": "quét-nghiên-cứu-trước-dispatch-discovery-dispatch",
+    "stableAnchor": "h-66cad9149d08",
+    "startLine": 158,
+    "endLine": 158,
+    "textDigest": "febf53ab7d2dd568234e3f01ee5d8b3fa2b43ca9f98d784d47e9d8aa63269df3",
+    "sample": "Quét nghiên-cứu trước dispatch (discovery dispatch)",
+    "sectionPayloadDigest": "bf40c39bb8ee0dfb38922fe337c5912ad1328ef2e11a7b03328aaa36d841517f",
+    "followingBlockDigest": "bf40c39bb8ee0dfb38922fe337c5912ad1328ef2e11a7b03328aaa36d841517f",
+    "identityFingerprint": "38032bb3a4a19bae2416141346d2657c6ab6f7d4912feaff68a99da6a6d64ff1",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations"
+    ],
+    "text": "### Quét nghiên-cứu trước dispatch (discovery dispatch)",
+    "sectionText": "### Quét nghiên-cứu trước dispatch (discovery dispatch)\n\n- **Runs when:** mỗi lượt chạy, ngay sau gặt-lại, TRƯỚC khi giao bất kỳ việc\n  thi công (executing) nào.\n- **What changes:** mọi item ở stage `discovery` VÀ status `todo` được GIAO\n  cho một worker thật — cùng cỗ máy worktree-tạm + spawn mà một việc thi công\n  dùng, chỉ khác mẫu prompt: mẫu riêng của giai đoạn nghiên-cứu, trỏ tới đúng\n  skill mà sổ đăng ký domain ánh xạ cho stage đó (xem RUL52 (luật template theo domain `coding` khớp trước wildcard; domain lạ/vắng mặt fold về `coding`), spec Work-State\n  \"Mô hình domain\"). Đây là **pha máy-một-mình**: worker chỉ đọc và tra cứu,\n  rồi tự phát một phán quyết máy-đọc-được (đủ-rõ hay chưa, kèm câu hỏi khi\n  chưa, kèm đề xuất verify khi đã) trong chính output của nó; runner KHÔNG\n  BAO GIỜ tự phán thay — không còn lời gọi phán-đoán lồng nào ở bước này.\n  Chỉ item `todo` bị chạm: item đã có người/phiên cầm (`doing`) hoặc đang\n  `awaiting-human` (đã hỏi, chưa ai trả lời) KHÔNG BAO GIỜ bị quét lại — cùng\n  luật loại-trừ với dispatch thường (xem RUL6 (consumer rẽ nhánh theo mã thoát phạm trù, không bao giờ theo thông điệp) (work-state)/RUL15 (role trên mọi ngã-ngũ tự động của runner) (work-state)).\n  Stage `exploring` — nửa máy+người của vòng làm-rõ — KHÔNG nằm trong bất kỳ\n  quét nào của vòng tự hành: nó cần người quyết, nên runner để nguyên cho một\n  phiên sống cầm qua cửa pull.\n- **Side effects:** một lượt dispatch worker thật cho mỗi item quét được —\n  worktree tạm, bản ghi output cục bộ, dọn worktree trên mọi đường thoát —\n  y hệt một lượt thi công. Hai lưới an toàn giữ item đứng yên thay vì bị đẩy\n  tiếp bừa: worker chạy xong mà nhánh KHÔNG có commit nào → không được coi là\n  đã nghiên cứu, item nằm nguyên `discovery`/`todo` đợi lượt sau; output\n  không mang phán quyết đọc được (thiếu khối, hỏng hình) → engine giữ nguyên\n  item, không bao giờ tự coi \"không chắc\" là đủ rõ. Một lượt dispatch\n  nghiên-cứu gãy (hỏng-spawn/quá-giờ/hỏng-worktree) chỉ được ghi log rồi\n  sang item kế tiếp — không bao giờ làm sập cả lượt chạy.\n- **Phân loại kèm theo (tuỳ chọn):** khi phán quyết của worker có kèm\n  tier/kind/risk, runner áp thêm bằng đúng cửa sửa-trường sẵn có; một giá trị\n  ngoài từ vựng của domain bị từ chối, ghi log rồi bỏ — không bao giờ chặn\n  phán quyết đã ngã-ngũ ở trên.\n- **Afterwards:** phán quyết đủ rõ → item sang stage `planning` THẲNG, bỏ qua\n  `exploring` (mang verify thật khi item chưa có verify thật của riêng nó) —\n  CÙNG lượt chạy này, quét chia-việc bên dưới (xem \"Quét chia-việc trước\n  dispatch\") có thể nhặt được nó ngay; phán quyết chưa đủ rõ → item sang stage\n  `exploring` VÀ đậu `awaiting-human` mang câu hỏi, để người trả lời xong là\n  đã sẵn ở đúng chỗ cho một phiên làm-rõ có người, không phải quay lại\n  nghiên-cứu cho cùng một câu hỏi. Một đề xuất verify bị vòng kiểm độc lập\n  bắt lỗi cú pháp cũng đậu `awaiting-human` y như vậy. Đây là **lưới đỡ**: dù\n  phiên submit chết trước khi tự chạy vòng làm-rõ, lượt chạy tiếp theo của\n  vòng tự hành vẫn tự giao nghiên cứu — không item nào kẹt vô hình."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Quét nghiên-cứu trước dispatch (discovery dispatch)",
+    "anchor": "quét-nghiên-cứu-trước-dispatch-discovery-dispatch",
+    "githubAnchor": "quét-nghiên-cứu-trước-dispatch-discovery-dispatch",
+    "stableAnchor": "h-879e04dd07a7",
+    "startLine": 82,
+    "endLine": 82,
+    "textDigest": "febf53ab7d2dd568234e3f01ee5d8b3fa2b43ca9f98d784d47e9d8aa63269df3",
+    "sample": "Quét nghiên-cứu trước dispatch (discovery dispatch)",
+    "sectionPayloadDigest": "bf40c39bb8ee0dfb38922fe337c5912ad1328ef2e11a7b03328aaa36d841517f",
+    "followingBlockDigest": "bf40c39bb8ee0dfb38922fe337c5912ad1328ef2e11a7b03328aaa36d841517f",
+    "identityFingerprint": "38032bb3a4a19bae2416141346d2657c6ab6f7d4912feaff68a99da6a6d64ff1",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations"
+    ],
+    "text": "### Quét nghiên-cứu trước dispatch (discovery dispatch)",
+    "sectionText": "### Quét nghiên-cứu trước dispatch (discovery dispatch)\n\n- **Runs when:** mỗi lượt chạy, ngay sau gặt-lại, TRƯỚC khi giao bất kỳ việc\n  thi công (executing) nào.\n- **What changes:** mọi item ở stage `discovery` VÀ status `todo` được GIAO\n  cho một worker thật — cùng cỗ máy worktree-tạm + spawn mà một việc thi công\n  dùng, chỉ khác mẫu prompt: mẫu riêng của giai đoạn nghiên-cứu, trỏ tới đúng\n  skill mà sổ đăng ký domain ánh xạ cho stage đó (xem RUL52 (luật template theo domain `coding` khớp trước wildcard; domain lạ/vắng mặt fold về `coding`), spec Work-State\n  \"Mô hình domain\"). Đây là **pha máy-một-mình**: worker chỉ đọc và tra cứu,\n  rồi tự phát một phán quyết máy-đọc-được (đủ-rõ hay chưa, kèm câu hỏi khi\n  chưa, kèm đề xuất verify khi đã) trong chính output của nó; runner KHÔNG\n  BAO GIỜ tự phán thay — không còn lời gọi phán-đoán lồng nào ở bước này.\n  Chỉ item `todo` bị chạm: item đã có người/phiên cầm (`doing`) hoặc đang\n  `awaiting-human` (đã hỏi, chưa ai trả lời) KHÔNG BAO GIỜ bị quét lại — cùng\n  luật loại-trừ với dispatch thường (xem RUL6 (consumer rẽ nhánh theo mã thoát phạm trù, không bao giờ theo thông điệp) (work-state)/RUL15 (role trên mọi ngã-ngũ tự động của runner) (work-state)).\n  Stage `exploring` — nửa máy+người của vòng làm-rõ — KHÔNG nằm trong bất kỳ\n  quét nào của vòng tự hành: nó cần người quyết, nên runner để nguyên cho một\n  phiên sống cầm qua cửa pull.\n- **Side effects:** một lượt dispatch worker thật cho mỗi item quét được —\n  worktree tạm, bản ghi output cục bộ, dọn worktree trên mọi đường thoát —\n  y hệt một lượt thi công. Hai lưới an toàn giữ item đứng yên thay vì bị đẩy\n  tiếp bừa: worker chạy xong mà nhánh KHÔNG có commit nào → không được coi là\n  đã nghiên cứu, item nằm nguyên `discovery`/`todo` đợi lượt sau; output\n  không mang phán quyết đọc được (thiếu khối, hỏng hình) → engine giữ nguyên\n  item, không bao giờ tự coi \"không chắc\" là đủ rõ. Một lượt dispatch\n  nghiên-cứu gãy (hỏng-spawn/quá-giờ/hỏng-worktree) chỉ được ghi log rồi\n  sang item kế tiếp — không bao giờ làm sập cả lượt chạy.\n- **Phân loại kèm theo (tuỳ chọn):** khi phán quyết của worker có kèm\n  tier/kind/risk, runner áp thêm bằng đúng cửa sửa-trường sẵn có; một giá trị\n  ngoài từ vựng của domain bị từ chối, ghi log rồi bỏ — không bao giờ chặn\n  phán quyết đã ngã-ngũ ở trên.\n- **Afterwards:** phán quyết đủ rõ → item sang stage `planning` THẲNG, bỏ qua\n  `exploring` (mang verify thật khi item chưa có verify thật của riêng nó) —\n  CÙNG lượt chạy này, quét chia-việc bên dưới (xem \"Quét chia-việc trước\n  dispatch\") có thể nhặt được nó ngay; phán quyết chưa đủ rõ → item sang stage\n  `exploring` VÀ đậu `awaiting-human` mang câu hỏi, để người trả lời xong là\n  đã sẵn ở đúng chỗ cho một phiên làm-rõ có người, không phải quay lại\n  nghiên-cứu cho cùng một câu hỏi. Một đề xuất verify bị vòng kiểm độc lập\n  bắt lỗi cú pháp cũng đậu `awaiting-human` y như vậy. Đây là **lưới đỡ**: dù\n  phiên submit chết trước khi tự chạy vòng làm-rõ, lượt chạy tiếp theo của\n  vòng tự hành vẫn tự giao nghiên cứu — không item nào kẹt vô hình."
+  }
+}
+```
+
+## claim_b3358f454dabbbf74164665b3c96ce4a
+
+Source digest (evidence JSON): 74bfe2123579f2812bb2f3aa984dffc9c1c9802e5d75c673285adca068ad5f41
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_b3358f454dabbbf74164665b3c96ce4a",
+  "record": {
+    "claimId": "claim_b3358f454dabbbf74164665b3c96ce4a",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "unheaded-block-23",
+    "sourceLines": [
+      160,
+      198
+    ],
+    "sourceDigest": "bf40c39bb8ee0dfb38922fe337c5912ad1328ef2e11a7b03328aaa36d841517f",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "unheaded-block-11",
+    "targetDigest": "bf40c39bb8ee0dfb38922fe337c5912ad1328ef2e11a7b03328aaa36d841517f",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-23",
+    "githubAnchor": "unheaded-block-23",
+    "stableAnchor": "unheaded-block-23",
+    "title": "Unheaded block 23",
+    "startLine": 160,
+    "endLine": 198,
+    "textDigest": "bf40c39bb8ee0dfb38922fe337c5912ad1328ef2e11a7b03328aaa36d841517f",
+    "sample": "- **Runs when:** mỗi lượt chạy, ngay sau gặt-lại, TRƯỚC khi giao bất kỳ việc\n  thi công (executing) nào.\n- **What changes:** mọi item ở stage `discovery` VÀ status `todo` được GIAO",
+    "identityFingerprint": "ac5381994920a808fb3cff3f64b537a3d3557eb337ad5a5dc36f58269a6f037c",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations",
+      "Quét nghiên-cứu trước dispatch (discovery dispatch)"
+    ],
+    "text": "- **Runs when:** mỗi lượt chạy, ngay sau gặt-lại, TRƯỚC khi giao bất kỳ việc\n  thi công (executing) nào.\n- **What changes:** mọi item ở stage `discovery` VÀ status `todo` được GIAO\n  cho một worker thật — cùng cỗ máy worktree-tạm + spawn mà một việc thi công\n  dùng, chỉ khác mẫu prompt: mẫu riêng của giai đoạn nghiên-cứu, trỏ tới đúng\n  skill mà sổ đăng ký domain ánh xạ cho stage đó (xem RUL52 (luật template theo domain `coding` khớp trước wildcard; domain lạ/vắng mặt fold về `coding`), spec Work-State\n  \"Mô hình domain\"). Đây là **pha máy-một-mình**: worker chỉ đọc và tra cứu,\n  rồi tự phát một phán quyết máy-đọc-được (đủ-rõ hay chưa, kèm câu hỏi khi\n  chưa, kèm đề xuất verify khi đã) trong chính output của nó; runner KHÔNG\n  BAO GIỜ tự phán thay — không còn lời gọi phán-đoán lồng nào ở bước này.\n  Chỉ item `todo` bị chạm: item đã có người/phiên cầm (`doing`) hoặc đang\n  `awaiting-human` (đã hỏi, chưa ai trả lời) KHÔNG BAO GIỜ bị quét lại — cùng\n  luật loại-trừ với dispatch thường (xem RUL6 (consumer rẽ nhánh theo mã thoát phạm trù, không bao giờ theo thông điệp) (work-state)/RUL15 (role trên mọi ngã-ngũ tự động của runner) (work-state)).\n  Stage `exploring` — nửa máy+người của vòng làm-rõ — KHÔNG nằm trong bất kỳ\n  quét nào của vòng tự hành: nó cần người quyết, nên runner để nguyên cho một\n  phiên sống cầm qua cửa pull.\n- **Side effects:** một lượt dispatch worker thật cho mỗi item quét được —\n  worktree tạm, bản ghi output cục bộ, dọn worktree trên mọi đường thoát —\n  y hệt một lượt thi công. Hai lưới an toàn giữ item đứng yên thay vì bị đẩy\n  tiếp bừa: worker chạy xong mà nhánh KHÔNG có commit nào → không được coi là\n  đã nghiên cứu, item nằm nguyên `discovery`/`todo` đợi lượt sau; output\n  không mang phán quyết đọc được (thiếu khối, hỏng hình) → engine giữ nguyên\n  item, không bao giờ tự coi \"không chắc\" là đủ rõ. Một lượt dispatch\n  nghiên-cứu gãy (hỏng-spawn/quá-giờ/hỏng-worktree) chỉ được ghi log rồi\n  sang item kế tiếp — không bao giờ làm sập cả lượt chạy.\n- **Phân loại kèm theo (tuỳ chọn):** khi phán quyết của worker có kèm\n  tier/kind/risk, runner áp thêm bằng đúng cửa sửa-trường sẵn có; một giá trị\n  ngoài từ vựng của domain bị từ chối, ghi log rồi bỏ — không bao giờ chặn\n  phán quyết đã ngã-ngũ ở trên.\n- **Afterwards:** phán quyết đủ rõ → item sang stage `planning` THẲNG, bỏ qua\n  `exploring` (mang verify thật khi item chưa có verify thật của riêng nó) —\n  CÙNG lượt chạy này, quét chia-việc bên dưới (xem \"Quét chia-việc trước\n  dispatch\") có thể nhặt được nó ngay; phán quyết chưa đủ rõ → item sang stage\n  `exploring` VÀ đậu `awaiting-human` mang câu hỏi, để người trả lời xong là\n  đã sẵn ở đúng chỗ cho một phiên làm-rõ có người, không phải quay lại\n  nghiên-cứu cho cùng một câu hỏi. Một đề xuất verify bị vòng kiểm độc lập\n  bắt lỗi cú pháp cũng đậu `awaiting-human` y như vậy. Đây là **lưới đỡ**: dù\n  phiên submit chết trước khi tự chạy vòng làm-rõ, lượt chạy tiếp theo của\n  vòng tự hành vẫn tự giao nghiên cứu — không item nào kẹt vô hình."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-11",
+    "githubAnchor": "unheaded-block-11",
+    "stableAnchor": "unheaded-block-11",
+    "title": "Unheaded block 11",
+    "startLine": 84,
+    "endLine": 122,
+    "textDigest": "bf40c39bb8ee0dfb38922fe337c5912ad1328ef2e11a7b03328aaa36d841517f",
+    "sample": "- **Runs when:** mỗi lượt chạy, ngay sau gặt-lại, TRƯỚC khi giao bất kỳ việc\n  thi công (executing) nào.\n- **What changes:** mọi item ở stage `discovery` VÀ status `todo` được GIAO",
+    "identityFingerprint": "ac5381994920a808fb3cff3f64b537a3d3557eb337ad5a5dc36f58269a6f037c",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations",
+      "Quét nghiên-cứu trước dispatch (discovery dispatch)"
+    ],
+    "text": "- **Runs when:** mỗi lượt chạy, ngay sau gặt-lại, TRƯỚC khi giao bất kỳ việc\n  thi công (executing) nào.\n- **What changes:** mọi item ở stage `discovery` VÀ status `todo` được GIAO\n  cho một worker thật — cùng cỗ máy worktree-tạm + spawn mà một việc thi công\n  dùng, chỉ khác mẫu prompt: mẫu riêng của giai đoạn nghiên-cứu, trỏ tới đúng\n  skill mà sổ đăng ký domain ánh xạ cho stage đó (xem RUL52 (luật template theo domain `coding` khớp trước wildcard; domain lạ/vắng mặt fold về `coding`), spec Work-State\n  \"Mô hình domain\"). Đây là **pha máy-một-mình**: worker chỉ đọc và tra cứu,\n  rồi tự phát một phán quyết máy-đọc-được (đủ-rõ hay chưa, kèm câu hỏi khi\n  chưa, kèm đề xuất verify khi đã) trong chính output của nó; runner KHÔNG\n  BAO GIỜ tự phán thay — không còn lời gọi phán-đoán lồng nào ở bước này.\n  Chỉ item `todo` bị chạm: item đã có người/phiên cầm (`doing`) hoặc đang\n  `awaiting-human` (đã hỏi, chưa ai trả lời) KHÔNG BAO GIỜ bị quét lại — cùng\n  luật loại-trừ với dispatch thường (xem RUL6 (consumer rẽ nhánh theo mã thoát phạm trù, không bao giờ theo thông điệp) (work-state)/RUL15 (role trên mọi ngã-ngũ tự động của runner) (work-state)).\n  Stage `exploring` — nửa máy+người của vòng làm-rõ — KHÔNG nằm trong bất kỳ\n  quét nào của vòng tự hành: nó cần người quyết, nên runner để nguyên cho một\n  phiên sống cầm qua cửa pull.\n- **Side effects:** một lượt dispatch worker thật cho mỗi item quét được —\n  worktree tạm, bản ghi output cục bộ, dọn worktree trên mọi đường thoát —\n  y hệt một lượt thi công. Hai lưới an toàn giữ item đứng yên thay vì bị đẩy\n  tiếp bừa: worker chạy xong mà nhánh KHÔNG có commit nào → không được coi là\n  đã nghiên cứu, item nằm nguyên `discovery`/`todo` đợi lượt sau; output\n  không mang phán quyết đọc được (thiếu khối, hỏng hình) → engine giữ nguyên\n  item, không bao giờ tự coi \"không chắc\" là đủ rõ. Một lượt dispatch\n  nghiên-cứu gãy (hỏng-spawn/quá-giờ/hỏng-worktree) chỉ được ghi log rồi\n  sang item kế tiếp — không bao giờ làm sập cả lượt chạy.\n- **Phân loại kèm theo (tuỳ chọn):** khi phán quyết của worker có kèm\n  tier/kind/risk, runner áp thêm bằng đúng cửa sửa-trường sẵn có; một giá trị\n  ngoài từ vựng của domain bị từ chối, ghi log rồi bỏ — không bao giờ chặn\n  phán quyết đã ngã-ngũ ở trên.\n- **Afterwards:** phán quyết đủ rõ → item sang stage `planning` THẲNG, bỏ qua\n  `exploring` (mang verify thật khi item chưa có verify thật của riêng nó) —\n  CÙNG lượt chạy này, quét chia-việc bên dưới (xem \"Quét chia-việc trước\n  dispatch\") có thể nhặt được nó ngay; phán quyết chưa đủ rõ → item sang stage\n  `exploring` VÀ đậu `awaiting-human` mang câu hỏi, để người trả lời xong là\n  đã sẵn ở đúng chỗ cho một phiên làm-rõ có người, không phải quay lại\n  nghiên-cứu cho cùng một câu hỏi. Một đề xuất verify bị vòng kiểm độc lập\n  bắt lỗi cú pháp cũng đậu `awaiting-human` y như vậy. Đây là **lưới đỡ**: dù\n  phiên submit chết trước khi tự chạy vòng làm-rõ, lượt chạy tiếp theo của\n  vòng tự hành vẫn tự giao nghiên cứu — không item nào kẹt vô hình."
+  }
+}
+```
+
+## claim_9a9f59cf063a04999367545b2e268087
+
+Source digest (evidence JSON): 98e7cb673822fa3051dc92ad0afe5182967fbf5a6d22f3dc079ff3de8dfa9e52
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_9a9f59cf063a04999367545b2e268087",
+  "record": {
+    "claimId": "claim_9a9f59cf063a04999367545b2e268087",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "quét-chia-việc-trước-dispatch-plan-sweep",
+    "sourceLines": [
+      200,
+      200
+    ],
+    "sourceDigest": "3215d408d23e34915a62a6e096bfb1e26becd4798f8c9191a56eba8db488f637",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "quét-chia-việc-trước-dispatch-plan-sweep",
+    "targetDigest": "3215d408d23e34915a62a6e096bfb1e26becd4798f8c9191a56eba8db488f637",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Quét chia-việc trước dispatch (plan sweep)",
+    "anchor": "quét-chia-việc-trước-dispatch-plan-sweep",
+    "githubAnchor": "quét-chia-việc-trước-dispatch-plan-sweep",
+    "stableAnchor": "h-dda8a1dfda01",
+    "startLine": 200,
+    "endLine": 200,
+    "textDigest": "3215d408d23e34915a62a6e096bfb1e26becd4798f8c9191a56eba8db488f637",
+    "sample": "Quét chia-việc trước dispatch (plan sweep)",
+    "sectionPayloadDigest": "f71314541ac70b91a0be7639e6c789c54b70acf093ba12bdc0b3ef668b7577a8",
+    "followingBlockDigest": "f71314541ac70b91a0be7639e6c789c54b70acf093ba12bdc0b3ef668b7577a8",
+    "identityFingerprint": "91af7b9504b1b71034fad8f1d4b20d132fe85bcdd1ae9b251e7c3f6a3ab67a7a",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations"
+    ],
+    "text": "### Quét chia-việc trước dispatch (plan sweep)",
+    "sectionText": "### Quét chia-việc trước dispatch (plan sweep)\n\n- **Runs when:** mỗi lượt chạy, NGAY SAU quét nghiên-cứu (không phải một lượt\n  chạy riêng) và vẫn TRƯỚC khi giao bất kỳ việc thi công (executing) nào.\n  Đọc lại view TƯƠI sau quét nghiên-cứu — một item vừa được đẩy sang stage\n  `planning` trong CÙNG lượt chạy này vẫn bị quét chia-việc ngay, không phải\n  đợi lượt chạy sau.\n- **What changes:** mọi item đang ở **stage thỏa bước Chia-việc của domain\n  của chính nó** (per spec Work-State \"Mô hình domain\"; với `coding` đây là\n  `planning`) VÀ status `todo` (xem spec Work-State \"Giai đoạn Chia-việc\")\n  được chạy phán chia-việc — BẤT KỂ giá trị `mode` của item. CỘNG THÊM: item\n  còn nằm ở tên stage di sản `decompose` cũng được quét bằng ĐÚNG bước này —\n  đó là một **alias chỉ-để-rút-cạn**: không item mới nào còn được tạo ở tên\n  đó, nhưng những item mở từ trước lần đổi tên phải rút ra được, không bị bỏ\n  quên chỉ vì tên stage đã đổi (alias chỉ bật khi domain khai cả hai tên tách\n  bạch — hôm nay chỉ `coding`). Cùng luật domain như quét nghiên-cứu trên:\n  một domain không khai stage nào cho bước Chia-việc thì không item nào bị\n  quét ở đây (per 1cd895e1, 38160a70). Việc đang `awaiting-human` KHÔNG BAO\n  GIỜ bị quét lại — cùng luật loại-trừ với mọi dispatch khác (RUL6 (consumer rẽ nhánh theo mã thoát phạm trù, không bao giờ theo thông điệp)\n  (work-state)/RUL15 (role trên mọi ngã-ngũ tự động của runner) (work-state)).\n- **Side effects:** KHÔNG có lời gọi model nào ở bước này. Quét của runner\n  không mang theo phán quyết của người/phiên nào, nên nó chỉ đi một trong hai\n  đường: bản kế hoạch đã ghi của item tự khai một cỡ việc một-mảnh (không\n  chia được nữa) → item đi thẳng sang `executing`; mọi trường hợp còn lại →\n  runner không làm gì cả, item nằm nguyên chờ một phiên sống tự phán rồi gọi\n  verb chia-việc tay. Đây là fail-safe có chủ đích: sinh con là hành động GHI\n  thật, không bao giờ được đoán — khác quét nghiên-cứu, nơi worker tự phán\n  được vì phán quyết ở đó không ghi ra item mới nào (fail-safe, xem spec\n  Work-State RUL48 (cấu hình runner tự sinh tại đường mặc định khi vắng mặt — không bao giờ đòi người tạo tay trước) (work-state)).\n- **Afterwards:** item đi thẳng (không chia) hoặc vừa sinh đủ con qua một\n  phán quyết tay (gốc chuyển `planning → executing`) — CÙNG lượt chạy này,\n  vòng dispatch bên dưới có thể nhặt được gốc ngay nếu deps/lineage cũng đã\n  mở (gốc không có hậu duệ dang dở). **Claim-release (claim-lock §3b):** khi\n  một gốc chuyển sang `executing`, nếu một claim `pick` đang sống ở stage\n  `planning` (hoặc ở tên di sản `decompose`) được giữ — item ở\n  `status: doing` — item được đặt lại về `status: todo`, giải phóng claim để\n  phiên khác (hay cùng phiên) có thể gọi `pick <id>` lại ở stage `executing`\n  với workspace cùng một branch (claim-release lifecycle cho các stage đầu\n  vòng, per claim-lock §3a/§3c); item cần người quyết đậu ở `awaiting-human`\n  mang đề xuất chia, đợi lượt chạy sau (hoặc gọi tay `fgos plan`) khi đã có\n  câu trả lời. Đây cũng là một **lưới đỡ**, cùng tinh thần quét nghiên-cứu:\n  không item một-mảnh nào ở stage `planning` kẹt vô hình chỉ vì chưa ai gọi\n  `fgos plan` tay."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Quét chia-việc trước dispatch (plan sweep)",
+    "anchor": "quét-chia-việc-trước-dispatch-plan-sweep",
+    "githubAnchor": "quét-chia-việc-trước-dispatch-plan-sweep",
+    "stableAnchor": "h-b39d18249e23",
+    "startLine": 124,
+    "endLine": 124,
+    "textDigest": "3215d408d23e34915a62a6e096bfb1e26becd4798f8c9191a56eba8db488f637",
+    "sample": "Quét chia-việc trước dispatch (plan sweep)",
+    "sectionPayloadDigest": "f71314541ac70b91a0be7639e6c789c54b70acf093ba12bdc0b3ef668b7577a8",
+    "followingBlockDigest": "f71314541ac70b91a0be7639e6c789c54b70acf093ba12bdc0b3ef668b7577a8",
+    "identityFingerprint": "91af7b9504b1b71034fad8f1d4b20d132fe85bcdd1ae9b251e7c3f6a3ab67a7a",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations"
+    ],
+    "text": "### Quét chia-việc trước dispatch (plan sweep)",
+    "sectionText": "### Quét chia-việc trước dispatch (plan sweep)\n\n- **Runs when:** mỗi lượt chạy, NGAY SAU quét nghiên-cứu (không phải một lượt\n  chạy riêng) và vẫn TRƯỚC khi giao bất kỳ việc thi công (executing) nào.\n  Đọc lại view TƯƠI sau quét nghiên-cứu — một item vừa được đẩy sang stage\n  `planning` trong CÙNG lượt chạy này vẫn bị quét chia-việc ngay, không phải\n  đợi lượt chạy sau.\n- **What changes:** mọi item đang ở **stage thỏa bước Chia-việc của domain\n  của chính nó** (per spec Work-State \"Mô hình domain\"; với `coding` đây là\n  `planning`) VÀ status `todo` (xem spec Work-State \"Giai đoạn Chia-việc\")\n  được chạy phán chia-việc — BẤT KỂ giá trị `mode` của item. CỘNG THÊM: item\n  còn nằm ở tên stage di sản `decompose` cũng được quét bằng ĐÚNG bước này —\n  đó là một **alias chỉ-để-rút-cạn**: không item mới nào còn được tạo ở tên\n  đó, nhưng những item mở từ trước lần đổi tên phải rút ra được, không bị bỏ\n  quên chỉ vì tên stage đã đổi (alias chỉ bật khi domain khai cả hai tên tách\n  bạch — hôm nay chỉ `coding`). Cùng luật domain như quét nghiên-cứu trên:\n  một domain không khai stage nào cho bước Chia-việc thì không item nào bị\n  quét ở đây (per 1cd895e1, 38160a70). Việc đang `awaiting-human` KHÔNG BAO\n  GIỜ bị quét lại — cùng luật loại-trừ với mọi dispatch khác (RUL6 (consumer rẽ nhánh theo mã thoát phạm trù, không bao giờ theo thông điệp)\n  (work-state)/RUL15 (role trên mọi ngã-ngũ tự động của runner) (work-state)).\n- **Side effects:** KHÔNG có lời gọi model nào ở bước này. Quét của runner\n  không mang theo phán quyết của người/phiên nào, nên nó chỉ đi một trong hai\n  đường: bản kế hoạch đã ghi của item tự khai một cỡ việc một-mảnh (không\n  chia được nữa) → item đi thẳng sang `executing`; mọi trường hợp còn lại →\n  runner không làm gì cả, item nằm nguyên chờ một phiên sống tự phán rồi gọi\n  verb chia-việc tay. Đây là fail-safe có chủ đích: sinh con là hành động GHI\n  thật, không bao giờ được đoán — khác quét nghiên-cứu, nơi worker tự phán\n  được vì phán quyết ở đó không ghi ra item mới nào (fail-safe, xem spec\n  Work-State RUL48 (cấu hình runner tự sinh tại đường mặc định khi vắng mặt — không bao giờ đòi người tạo tay trước) (work-state)).\n- **Afterwards:** item đi thẳng (không chia) hoặc vừa sinh đủ con qua một\n  phán quyết tay (gốc chuyển `planning → executing`) — CÙNG lượt chạy này,\n  vòng dispatch bên dưới có thể nhặt được gốc ngay nếu deps/lineage cũng đã\n  mở (gốc không có hậu duệ dang dở). **Claim-release (claim-lock §3b):** khi\n  một gốc chuyển sang `executing`, nếu một claim `pick` đang sống ở stage\n  `planning` (hoặc ở tên di sản `decompose`) được giữ — item ở\n  `status: doing` — item được đặt lại về `status: todo`, giải phóng claim để\n  phiên khác (hay cùng phiên) có thể gọi `pick <id>` lại ở stage `executing`\n  với workspace cùng một branch (claim-release lifecycle cho các stage đầu\n  vòng, per claim-lock §3a/§3c); item cần người quyết đậu ở `awaiting-human`\n  mang đề xuất chia, đợi lượt chạy sau (hoặc gọi tay `fgos plan`) khi đã có\n  câu trả lời. Đây cũng là một **lưới đỡ**, cùng tinh thần quét nghiên-cứu:\n  không item một-mảnh nào ở stage `planning` kẹt vô hình chỉ vì chưa ai gọi\n  `fgos plan` tay."
+  }
+}
+```
+
+## claim_64a7409db3612a00cbd85bfb4ddce653
+
+Source digest (evidence JSON): 0234ad0eb96856a4ac1bb82b4c62a01bb6bf530a3061700cb84d33e3f435d1d2
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_64a7409db3612a00cbd85bfb4ddce653",
+  "record": {
+    "claimId": "claim_64a7409db3612a00cbd85bfb4ddce653",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "unheaded-block-24",
+    "sourceLines": [
+      202,
+      242
+    ],
+    "sourceDigest": "f71314541ac70b91a0be7639e6c789c54b70acf093ba12bdc0b3ef668b7577a8",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "unheaded-block-12",
+    "targetDigest": "f71314541ac70b91a0be7639e6c789c54b70acf093ba12bdc0b3ef668b7577a8",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-24",
+    "githubAnchor": "unheaded-block-24",
+    "stableAnchor": "unheaded-block-24",
+    "title": "Unheaded block 24",
+    "startLine": 202,
+    "endLine": 242,
+    "textDigest": "f71314541ac70b91a0be7639e6c789c54b70acf093ba12bdc0b3ef668b7577a8",
+    "sample": "- **Runs when:** mỗi lượt chạy, NGAY SAU quét nghiên-cứu (không phải một lượt\n  chạy riêng) và vẫn TRƯỚC khi giao bất kỳ việc thi công (executing) nào.\n  Đọc lại view TƯƠI sau quét",
+    "identityFingerprint": "d6deb644e17ccdff42e98d71d31e4093433d1cce82c5239a700e09f63cd89964",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations",
+      "Quét chia-việc trước dispatch (plan sweep)"
+    ],
+    "text": "- **Runs when:** mỗi lượt chạy, NGAY SAU quét nghiên-cứu (không phải một lượt\n  chạy riêng) và vẫn TRƯỚC khi giao bất kỳ việc thi công (executing) nào.\n  Đọc lại view TƯƠI sau quét nghiên-cứu — một item vừa được đẩy sang stage\n  `planning` trong CÙNG lượt chạy này vẫn bị quét chia-việc ngay, không phải\n  đợi lượt chạy sau.\n- **What changes:** mọi item đang ở **stage thỏa bước Chia-việc của domain\n  của chính nó** (per spec Work-State \"Mô hình domain\"; với `coding` đây là\n  `planning`) VÀ status `todo` (xem spec Work-State \"Giai đoạn Chia-việc\")\n  được chạy phán chia-việc — BẤT KỂ giá trị `mode` của item. CỘNG THÊM: item\n  còn nằm ở tên stage di sản `decompose` cũng được quét bằng ĐÚNG bước này —\n  đó là một **alias chỉ-để-rút-cạn**: không item mới nào còn được tạo ở tên\n  đó, nhưng những item mở từ trước lần đổi tên phải rút ra được, không bị bỏ\n  quên chỉ vì tên stage đã đổi (alias chỉ bật khi domain khai cả hai tên tách\n  bạch — hôm nay chỉ `coding`). Cùng luật domain như quét nghiên-cứu trên:\n  một domain không khai stage nào cho bước Chia-việc thì không item nào bị\n  quét ở đây (per 1cd895e1, 38160a70). Việc đang `awaiting-human` KHÔNG BAO\n  GIỜ bị quét lại — cùng luật loại-trừ với mọi dispatch khác (RUL6 (consumer rẽ nhánh theo mã thoát phạm trù, không bao giờ theo thông điệp)\n  (work-state)/RUL15 (role trên mọi ngã-ngũ tự động của runner) (work-state)).\n- **Side effects:** KHÔNG có lời gọi model nào ở bước này. Quét của runner\n  không mang theo phán quyết của người/phiên nào, nên nó chỉ đi một trong hai\n  đường: bản kế hoạch đã ghi của item tự khai một cỡ việc một-mảnh (không\n  chia được nữa) → item đi thẳng sang `executing`; mọi trường hợp còn lại →\n  runner không làm gì cả, item nằm nguyên chờ một phiên sống tự phán rồi gọi\n  verb chia-việc tay. Đây là fail-safe có chủ đích: sinh con là hành động GHI\n  thật, không bao giờ được đoán — khác quét nghiên-cứu, nơi worker tự phán\n  được vì phán quyết ở đó không ghi ra item mới nào (fail-safe, xem spec\n  Work-State RUL48 (cấu hình runner tự sinh tại đường mặc định khi vắng mặt — không bao giờ đòi người tạo tay trước) (work-state)).\n- **Afterwards:** item đi thẳng (không chia) hoặc vừa sinh đủ con qua một\n  phán quyết tay (gốc chuyển `planning → executing`) — CÙNG lượt chạy này,\n  vòng dispatch bên dưới có thể nhặt được gốc ngay nếu deps/lineage cũng đã\n  mở (gốc không có hậu duệ dang dở). **Claim-release (claim-lock §3b):** khi\n  một gốc chuyển sang `executing`, nếu một claim `pick` đang sống ở stage\n  `planning` (hoặc ở tên di sản `decompose`) được giữ — item ở\n  `status: doing` — item được đặt lại về `status: todo`, giải phóng claim để\n  phiên khác (hay cùng phiên) có thể gọi `pick <id>` lại ở stage `executing`\n  với workspace cùng một branch (claim-release lifecycle cho các stage đầu\n  vòng, per claim-lock §3a/§3c); item cần người quyết đậu ở `awaiting-human`\n  mang đề xuất chia, đợi lượt chạy sau (hoặc gọi tay `fgos plan`) khi đã có\n  câu trả lời. Đây cũng là một **lưới đỡ**, cùng tinh thần quét nghiên-cứu:\n  không item một-mảnh nào ở stage `planning` kẹt vô hình chỉ vì chưa ai gọi\n  `fgos plan` tay."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-12",
+    "githubAnchor": "unheaded-block-12",
+    "stableAnchor": "unheaded-block-12",
+    "title": "Unheaded block 12",
+    "startLine": 126,
+    "endLine": 166,
+    "textDigest": "f71314541ac70b91a0be7639e6c789c54b70acf093ba12bdc0b3ef668b7577a8",
+    "sample": "- **Runs when:** mỗi lượt chạy, NGAY SAU quét nghiên-cứu (không phải một lượt\n  chạy riêng) và vẫn TRƯỚC khi giao bất kỳ việc thi công (executing) nào.\n  Đọc lại view TƯƠI sau quét",
+    "identityFingerprint": "d6deb644e17ccdff42e98d71d31e4093433d1cce82c5239a700e09f63cd89964",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations",
+      "Quét chia-việc trước dispatch (plan sweep)"
+    ],
+    "text": "- **Runs when:** mỗi lượt chạy, NGAY SAU quét nghiên-cứu (không phải một lượt\n  chạy riêng) và vẫn TRƯỚC khi giao bất kỳ việc thi công (executing) nào.\n  Đọc lại view TƯƠI sau quét nghiên-cứu — một item vừa được đẩy sang stage\n  `planning` trong CÙNG lượt chạy này vẫn bị quét chia-việc ngay, không phải\n  đợi lượt chạy sau.\n- **What changes:** mọi item đang ở **stage thỏa bước Chia-việc của domain\n  của chính nó** (per spec Work-State \"Mô hình domain\"; với `coding` đây là\n  `planning`) VÀ status `todo` (xem spec Work-State \"Giai đoạn Chia-việc\")\n  được chạy phán chia-việc — BẤT KỂ giá trị `mode` của item. CỘNG THÊM: item\n  còn nằm ở tên stage di sản `decompose` cũng được quét bằng ĐÚNG bước này —\n  đó là một **alias chỉ-để-rút-cạn**: không item mới nào còn được tạo ở tên\n  đó, nhưng những item mở từ trước lần đổi tên phải rút ra được, không bị bỏ\n  quên chỉ vì tên stage đã đổi (alias chỉ bật khi domain khai cả hai tên tách\n  bạch — hôm nay chỉ `coding`). Cùng luật domain như quét nghiên-cứu trên:\n  một domain không khai stage nào cho bước Chia-việc thì không item nào bị\n  quét ở đây (per 1cd895e1, 38160a70). Việc đang `awaiting-human` KHÔNG BAO\n  GIỜ bị quét lại — cùng luật loại-trừ với mọi dispatch khác (RUL6 (consumer rẽ nhánh theo mã thoát phạm trù, không bao giờ theo thông điệp)\n  (work-state)/RUL15 (role trên mọi ngã-ngũ tự động của runner) (work-state)).\n- **Side effects:** KHÔNG có lời gọi model nào ở bước này. Quét của runner\n  không mang theo phán quyết của người/phiên nào, nên nó chỉ đi một trong hai\n  đường: bản kế hoạch đã ghi của item tự khai một cỡ việc một-mảnh (không\n  chia được nữa) → item đi thẳng sang `executing`; mọi trường hợp còn lại →\n  runner không làm gì cả, item nằm nguyên chờ một phiên sống tự phán rồi gọi\n  verb chia-việc tay. Đây là fail-safe có chủ đích: sinh con là hành động GHI\n  thật, không bao giờ được đoán — khác quét nghiên-cứu, nơi worker tự phán\n  được vì phán quyết ở đó không ghi ra item mới nào (fail-safe, xem spec\n  Work-State RUL48 (cấu hình runner tự sinh tại đường mặc định khi vắng mặt — không bao giờ đòi người tạo tay trước) (work-state)).\n- **Afterwards:** item đi thẳng (không chia) hoặc vừa sinh đủ con qua một\n  phán quyết tay (gốc chuyển `planning → executing`) — CÙNG lượt chạy này,\n  vòng dispatch bên dưới có thể nhặt được gốc ngay nếu deps/lineage cũng đã\n  mở (gốc không có hậu duệ dang dở). **Claim-release (claim-lock §3b):** khi\n  một gốc chuyển sang `executing`, nếu một claim `pick` đang sống ở stage\n  `planning` (hoặc ở tên di sản `decompose`) được giữ — item ở\n  `status: doing` — item được đặt lại về `status: todo`, giải phóng claim để\n  phiên khác (hay cùng phiên) có thể gọi `pick <id>` lại ở stage `executing`\n  với workspace cùng một branch (claim-release lifecycle cho các stage đầu\n  vòng, per claim-lock §3a/§3c); item cần người quyết đậu ở `awaiting-human`\n  mang đề xuất chia, đợi lượt chạy sau (hoặc gọi tay `fgos plan`) khi đã có\n  câu trả lời. Đây cũng là một **lưới đỡ**, cùng tinh thần quét nghiên-cứu:\n  không item một-mảnh nào ở stage `planning` kẹt vô hình chỉ vì chưa ai gọi\n  `fgos plan` tay."
+  }
+}
+```
+
+## claim_fffc060f9b1bff2243fcec0aa64de17d
+
+Source digest (evidence JSON): 75543a8251469d38c7ff90c10e207abceb97da3eb4dbd04fcb1d2d60daedd4be
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_fffc060f9b1bff2243fcec0aa64de17d",
+  "record": {
+    "claimId": "claim_fffc060f9b1bff2243fcec0aa64de17d",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "gặt-lại-lúc-khởi-động-reap-phục-hồi-sau-crash",
+    "sourceLines": [
+      244,
+      244
+    ],
+    "sourceDigest": "f8968e79fcc258ed272fbdd6f442233110f238edac79ca5b2c8261adf32785b2",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "gặt-lại-lúc-khởi-động-reap-phục-hồi-sau-crash",
+    "targetDigest": "f8968e79fcc258ed272fbdd6f442233110f238edac79ca5b2c8261adf32785b2",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Gặt-lại lúc khởi động (reap — phục hồi sau crash)",
+    "anchor": "gặt-lại-lúc-khởi-động-reap-phục-hồi-sau-crash",
+    "githubAnchor": "gặt-lại-lúc-khởi-động-reap-phục-hồi-sau-crash",
+    "stableAnchor": "h-5fe149fe77e8",
+    "startLine": 244,
+    "endLine": 244,
+    "textDigest": "f8968e79fcc258ed272fbdd6f442233110f238edac79ca5b2c8261adf32785b2",
+    "sample": "Gặt-lại lúc khởi động (reap — phục hồi sau crash)",
+    "sectionPayloadDigest": "a5e3c3bc36ebdee3e7e63dee2f46c705c0b3587568306f491e045ed9d401ce1b",
+    "followingBlockDigest": "a5e3c3bc36ebdee3e7e63dee2f46c705c0b3587568306f491e045ed9d401ce1b",
+    "identityFingerprint": "be77486e052e83807a62d0d68e279aed8e485d922ff696558017d72c20306e75",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations"
+    ],
+    "text": "### Gặt-lại lúc khởi động (reap — phục hồi sau crash)",
+    "sectionText": "### Gặt-lại lúc khởi động (reap — phục hồi sau crash)\n\n- **Runs when:** đầu MỌI lần chạy (`startupReap` trong `src/runner/loop.mjs`).\n- **What changes:** `startupReap` thực hiện hai lượt quét theo thứ tự:\n  1. **Lượt quét chính trên các bản ghi runtime claim (`readClaims`):** Duyệt qua mọi file claim runtime đang hoạt động (`.fgos/runtime/claims/*.json`). Các claim có `claimRole` (hoặc `actor`) là `human` hoặc `session` (claim từ cửa pull `take`/`pick` — xem spec Work-State) bị BỎ QUA hoàn toàn — người/phiên cầm vô thời hạn, gặt-lại không bao giờ giẫm lên claim đó. Với các claim runner còn lại (nghĩa là runner lần trước bị sập giữa chừng), gặt-lại giải quyết trực tiếp qua `settleClaim(..., finalStatus, role: 'runner')` chuyển thẳng từ `preClaimStatus` sang `finalStatus` (`awaiting-approval` nếu có commit + proof đạt, hoặc `blocked` kèm lý do gặt-do-crash nếu không đạt), giải phóng claim file mà KHÔNG ghi trạng thái trung gian bền `doing`.\n  2. **Lượt quét fallback trên các item mang trạng thái bền `status: 'doing'` không có claim runtime:** Duyệt các item còn mang trạng thái **bền** `doing` trong nhật ký sự kiện mà KHÔNG có file claim runtime tương ứng (dữ liệu di sản chưa migrate hoặc vết từ đường ghi cũ). Lượt quét này trực tiếp gọi `moveWork(..., expectedStatus: 'doing', ...)` chuyển trạng thái bền sang `awaiting-approval` hoặc `blocked`. Lượt quét này cũng bỏ qua nếu `claimRole` của item là `human` hoặc `session`.\n  Dọn dẹp nhánh/worktree theo nhánh của việc: nhánh bị worktree mồ côi giữ được đòi lại (dọn worktree cũ rồi mở lại); nhánh rỗng không commit → tỉa; nhánh có hàng → giữ cho người review.\n- **On failure:** lỗi worktree khi gặt → việc đó về `blocked` có lý do, bước gặt KHÔNG BAO GIỜ chết thô — chạy-lại-sau-crash an toàn tự thân (có test giết thật giữa chừng)."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Gặt-lại lúc khởi động (reap — phục hồi sau crash)",
+    "anchor": "gặt-lại-lúc-khởi-động-reap-phục-hồi-sau-crash",
+    "githubAnchor": "gặt-lại-lúc-khởi-động-reap-phục-hồi-sau-crash",
+    "stableAnchor": "h-92ae419fa203",
+    "startLine": 168,
+    "endLine": 168,
+    "textDigest": "f8968e79fcc258ed272fbdd6f442233110f238edac79ca5b2c8261adf32785b2",
+    "sample": "Gặt-lại lúc khởi động (reap — phục hồi sau crash)",
+    "sectionPayloadDigest": "a5e3c3bc36ebdee3e7e63dee2f46c705c0b3587568306f491e045ed9d401ce1b",
+    "followingBlockDigest": "a5e3c3bc36ebdee3e7e63dee2f46c705c0b3587568306f491e045ed9d401ce1b",
+    "identityFingerprint": "be77486e052e83807a62d0d68e279aed8e485d922ff696558017d72c20306e75",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations"
+    ],
+    "text": "### Gặt-lại lúc khởi động (reap — phục hồi sau crash)",
+    "sectionText": "### Gặt-lại lúc khởi động (reap — phục hồi sau crash)\n\n- **Runs when:** đầu MỌI lần chạy (`startupReap` trong `src/runner/loop.mjs`).\n- **What changes:** `startupReap` thực hiện hai lượt quét theo thứ tự:\n  1. **Lượt quét chính trên các bản ghi runtime claim (`readClaims`):** Duyệt qua mọi file claim runtime đang hoạt động (`.fgos/runtime/claims/*.json`). Các claim có `claimRole` (hoặc `actor`) là `human` hoặc `session` (claim từ cửa pull `take`/`pick` — xem spec Work-State) bị BỎ QUA hoàn toàn — người/phiên cầm vô thời hạn, gặt-lại không bao giờ giẫm lên claim đó. Với các claim runner còn lại (nghĩa là runner lần trước bị sập giữa chừng), gặt-lại giải quyết trực tiếp qua `settleClaim(..., finalStatus, role: 'runner')` chuyển thẳng từ `preClaimStatus` sang `finalStatus` (`awaiting-approval` nếu có commit + proof đạt, hoặc `blocked` kèm lý do gặt-do-crash nếu không đạt), giải phóng claim file mà KHÔNG ghi trạng thái trung gian bền `doing`.\n  2. **Lượt quét fallback trên các item mang trạng thái bền `status: 'doing'` không có claim runtime:** Duyệt các item còn mang trạng thái **bền** `doing` trong nhật ký sự kiện mà KHÔNG có file claim runtime tương ứng (dữ liệu di sản chưa migrate hoặc vết từ đường ghi cũ). Lượt quét này trực tiếp gọi `moveWork(..., expectedStatus: 'doing', ...)` chuyển trạng thái bền sang `awaiting-approval` hoặc `blocked`. Lượt quét này cũng bỏ qua nếu `claimRole` của item là `human` hoặc `session`.\n  Dọn dẹp nhánh/worktree theo nhánh của việc: nhánh bị worktree mồ côi giữ được đòi lại (dọn worktree cũ rồi mở lại); nhánh rỗng không commit → tỉa; nhánh có hàng → giữ cho người review.\n- **On failure:** lỗi worktree khi gặt → việc đó về `blocked` có lý do, bước gặt KHÔNG BAO GIỜ chết thô — chạy-lại-sau-crash an toàn tự thân (có test giết thật giữa chừng)."
+  }
+}
+```
+
+## claim_8f0931db9df3ad44820db32e72b1e829
+
+Source digest (evidence JSON): 146b91e4d3ecb83973c4ccf2b2e5a410a024ff1d0d42ec1ebf900f5e96d701a3
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_8f0931db9df3ad44820db32e72b1e829",
+  "record": {
+    "claimId": "claim_8f0931db9df3ad44820db32e72b1e829",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "unheaded-block-25",
+    "sourceLines": [
+      246,
+      251
+    ],
+    "sourceDigest": "a5e3c3bc36ebdee3e7e63dee2f46c705c0b3587568306f491e045ed9d401ce1b",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "unheaded-block-13",
+    "targetDigest": "a5e3c3bc36ebdee3e7e63dee2f46c705c0b3587568306f491e045ed9d401ce1b",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-25",
+    "githubAnchor": "unheaded-block-25",
+    "stableAnchor": "unheaded-block-25",
+    "title": "Unheaded block 25",
+    "startLine": 246,
+    "endLine": 251,
+    "textDigest": "a5e3c3bc36ebdee3e7e63dee2f46c705c0b3587568306f491e045ed9d401ce1b",
+    "sample": "- **Runs when:** đầu MỌI lần chạy (`startupReap` trong `src/runner/loop.mjs`).\n- **What changes:** `startupReap` thực hiện hai lượt quét theo thứ tự:\n  1. **Lượt quét chính trên cá",
+    "identityFingerprint": "5d75968bde54d2e3fbd1f30928aad449370de689ba897ac49fd7831b6c045f5c",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations",
+      "Gặt-lại lúc khởi động (reap — phục hồi sau crash)"
+    ],
+    "text": "- **Runs when:** đầu MỌI lần chạy (`startupReap` trong `src/runner/loop.mjs`).\n- **What changes:** `startupReap` thực hiện hai lượt quét theo thứ tự:\n  1. **Lượt quét chính trên các bản ghi runtime claim (`readClaims`):** Duyệt qua mọi file claim runtime đang hoạt động (`.fgos/runtime/claims/*.json`). Các claim có `claimRole` (hoặc `actor`) là `human` hoặc `session` (claim từ cửa pull `take`/`pick` — xem spec Work-State) bị BỎ QUA hoàn toàn — người/phiên cầm vô thời hạn, gặt-lại không bao giờ giẫm lên claim đó. Với các claim runner còn lại (nghĩa là runner lần trước bị sập giữa chừng), gặt-lại giải quyết trực tiếp qua `settleClaim(..., finalStatus, role: 'runner')` chuyển thẳng từ `preClaimStatus` sang `finalStatus` (`awaiting-approval` nếu có commit + proof đạt, hoặc `blocked` kèm lý do gặt-do-crash nếu không đạt), giải phóng claim file mà KHÔNG ghi trạng thái trung gian bền `doing`.\n  2. **Lượt quét fallback trên các item mang trạng thái bền `status: 'doing'` không có claim runtime:** Duyệt các item còn mang trạng thái **bền** `doing` trong nhật ký sự kiện mà KHÔNG có file claim runtime tương ứng (dữ liệu di sản chưa migrate hoặc vết từ đường ghi cũ). Lượt quét này trực tiếp gọi `moveWork(..., expectedStatus: 'doing', ...)` chuyển trạng thái bền sang `awaiting-approval` hoặc `blocked`. Lượt quét này cũng bỏ qua nếu `claimRole` của item là `human` hoặc `session`.\n  Dọn dẹp nhánh/worktree theo nhánh của việc: nhánh bị worktree mồ côi giữ được đòi lại (dọn worktree cũ rồi mở lại); nhánh rỗng không commit → tỉa; nhánh có hàng → giữ cho người review.\n- **On failure:** lỗi worktree khi gặt → việc đó về `blocked` có lý do, bước gặt KHÔNG BAO GIỜ chết thô — chạy-lại-sau-crash an toàn tự thân (có test giết thật giữa chừng)."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-13",
+    "githubAnchor": "unheaded-block-13",
+    "stableAnchor": "unheaded-block-13",
+    "title": "Unheaded block 13",
+    "startLine": 170,
+    "endLine": 175,
+    "textDigest": "a5e3c3bc36ebdee3e7e63dee2f46c705c0b3587568306f491e045ed9d401ce1b",
+    "sample": "- **Runs when:** đầu MỌI lần chạy (`startupReap` trong `src/runner/loop.mjs`).\n- **What changes:** `startupReap` thực hiện hai lượt quét theo thứ tự:\n  1. **Lượt quét chính trên cá",
+    "identityFingerprint": "5d75968bde54d2e3fbd1f30928aad449370de689ba897ac49fd7831b6c045f5c",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations",
+      "Gặt-lại lúc khởi động (reap — phục hồi sau crash)"
+    ],
+    "text": "- **Runs when:** đầu MỌI lần chạy (`startupReap` trong `src/runner/loop.mjs`).\n- **What changes:** `startupReap` thực hiện hai lượt quét theo thứ tự:\n  1. **Lượt quét chính trên các bản ghi runtime claim (`readClaims`):** Duyệt qua mọi file claim runtime đang hoạt động (`.fgos/runtime/claims/*.json`). Các claim có `claimRole` (hoặc `actor`) là `human` hoặc `session` (claim từ cửa pull `take`/`pick` — xem spec Work-State) bị BỎ QUA hoàn toàn — người/phiên cầm vô thời hạn, gặt-lại không bao giờ giẫm lên claim đó. Với các claim runner còn lại (nghĩa là runner lần trước bị sập giữa chừng), gặt-lại giải quyết trực tiếp qua `settleClaim(..., finalStatus, role: 'runner')` chuyển thẳng từ `preClaimStatus` sang `finalStatus` (`awaiting-approval` nếu có commit + proof đạt, hoặc `blocked` kèm lý do gặt-do-crash nếu không đạt), giải phóng claim file mà KHÔNG ghi trạng thái trung gian bền `doing`.\n  2. **Lượt quét fallback trên các item mang trạng thái bền `status: 'doing'` không có claim runtime:** Duyệt các item còn mang trạng thái **bền** `doing` trong nhật ký sự kiện mà KHÔNG có file claim runtime tương ứng (dữ liệu di sản chưa migrate hoặc vết từ đường ghi cũ). Lượt quét này trực tiếp gọi `moveWork(..., expectedStatus: 'doing', ...)` chuyển trạng thái bền sang `awaiting-approval` hoặc `blocked`. Lượt quét này cũng bỏ qua nếu `claimRole` của item là `human` hoặc `session`.\n  Dọn dẹp nhánh/worktree theo nhánh của việc: nhánh bị worktree mồ côi giữ được đòi lại (dọn worktree cũ rồi mở lại); nhánh rỗng không commit → tỉa; nhánh có hàng → giữ cho người review.\n- **On failure:** lỗi worktree khi gặt → việc đó về `blocked` có lý do, bước gặt KHÔNG BAO GIỜ chết thô — chạy-lại-sau-crash an toàn tự thân (có test giết thật giữa chừng)."
+  }
+}
+```
+
+## claim_16c6e5c390a57004df0eb20358a7ff8a
+
+Source digest (evidence JSON): 278d285f8e27c21f282f520daeade817a2893544b3649cf866d0355d60bdd895
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_16c6e5c390a57004df0eb20358a7ff8a",
+  "record": {
+    "claimId": "claim_16c6e5c390a57004df0eb20358a7ff8a",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "chấm-trượt-lỗi-giữa-vòng",
+    "sourceLines": [
+      253,
+      253
+    ],
+    "sourceDigest": "bb15a10898312c62d0812b80ea5a0afd1660bc44d3c3b690a48d0c121a031f47",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "chấm-trượt-lỗi-giữa-vòng",
+    "targetDigest": "bb15a10898312c62d0812b80ea5a0afd1660bc44d3c3b690a48d0c121a031f47",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; source unit shorter than 40 characters; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Chấm trượt / lỗi giữa vòng",
+    "anchor": "chấm-trượt-lỗi-giữa-vòng",
+    "githubAnchor": "chấm-trượt-lỗi-giữa-vòng",
+    "stableAnchor": "h-9cafe10c4771",
+    "startLine": 253,
+    "endLine": 253,
+    "textDigest": "bb15a10898312c62d0812b80ea5a0afd1660bc44d3c3b690a48d0c121a031f47",
+    "sample": "Chấm trượt / lỗi giữa vòng",
+    "sectionPayloadDigest": "98b77515ba652ac6051a457333f012b6dd5f521044eba33163935fc983cd8589",
+    "followingBlockDigest": "98b77515ba652ac6051a457333f012b6dd5f521044eba33163935fc983cd8589",
+    "identityFingerprint": "5f0a6d97c3b6c0018a9b3e7e459ed3b7ac2be3d4b484d02ca520392541bd3c12",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations"
+    ],
+    "text": "### Chấm trượt / lỗi giữa vòng",
+    "sectionText": "### Chấm trượt / lỗi giữa vòng\n\n- **What changes:** tra bảng phục hồi theo lớp lỗi — thử-lại (worktree mới, DÙNG LẠI nhánh cũ) → hết trần thì đỗ-lại (`doing→blocked` kèm lý do); lỗi tranh-chấp-ghi (kỳ vọng lệch vì người vận hành vừa ghi tay) → dọn dẹp rồi DỪNG sạch — không bao giờ giành ghi với người. Nhánh cũ reset về **baseline dispatch riêng của việc đó, chụp tại lần thử ĐẦU TIÊN** (không phải HEAD hiện tại của nhánh tại thời điểm thử-lại): một lần thử sau — dù sinh commit khác lần trước — không bao giờ mang commit của một lần thử ĐÃ THẤT BẠI đi tiếp, trong khi nội dung nhánh có từ trước lần thử đầu tiên (ví dụ một con đã merge trước đó) vẫn được giữ nguyên (fix STR1 #2, per review-260718-phase-2-routing-rerun / e2ccd0cd).\n- **Side effects:** worktree luôn được dọn trên mọi đường thoát (kể cả dừng); quá trần chống-lặp → việc bị `todo→blocked` lý do chống-lặp, rời hẳn frontier.\n- Khi việc bị đỗ-lại (`parked`, hết trần thử lại hoặc lỗi không thử lại được) hoặc bị dừng vì cầu dao (`halted`, chấm-trượt-liên-tiếp), runner **CŨNG ghi nửa THỰC TẾ** của bản ghi outcome — thất bại được học, không chỉ thành công. Nửa thực tế KHÔNG được ghi ở một lượt-thử-còn-thử-lại-được (chỉ ghi đúng một lần, ở kết cục CUỐI của việc).\n- **Cùng lúc đó, runner ghi thêm một bản ghi friction** (kênh 2 của capture 2 kênh, Phase 3 Slice 2, xem spec Work-State): runner tự quy tội — dịch lớp lỗi thành một trong **5 lớp friction** cơ học: hỏng-spawn/quá-giờ/hỏng-worktree → `environment` · chấm-trượt → `verification` · nhật-ký-hỏng/việc-kẹt-do-crash/tranh-chấp-ghi → `state` · đề-xuất-bị-trả → `context` · lớp lạ → `task-spec` (mặc định). Bảng dịch là dữ liệu tĩnh, không phán xét — tích lũy friction là bằng chứng để hiệu chỉnh sau này, không phải kết luận tại chỗ.\n- **Bổ chú (20260717, review-unreviewed-260717).** Ba lớp lỗi khoá-sự-kiện-bị-giữ/phiên-hỏng/nhập-gộp-hỏng (`lock-timeout`/`session-fail`/`merge-fail`) nay đều có mã thoát riêng trong bảng tra — một việc chạm một trong ba lớp này khiến `runOnce` dừng nhẹ đúng việc đó (`halted`, có kết quả cấu trúc) chứ không còn sập tung cả lượt chạy. Trước bản vá này, ba lớp lỗi trên vắng mặt khỏi bảng tra nên rơi vào nhánh sập-toàn-vòng (mọi việc khác trong lượt mất kết quả, mã thoát chung chung không phân biệt được với lỗi thật) — dù RUL7 (schema item mang đủ chất liệu trả lời sáu câu hỏi harness) vốn định nghĩa lớp lỗi lạ phải dừng nhẹ, không sập."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Chấm trượt / lỗi giữa vòng",
+    "anchor": "chấm-trượt-lỗi-giữa-vòng",
+    "githubAnchor": "chấm-trượt-lỗi-giữa-vòng",
+    "stableAnchor": "h-b329b80f5147",
+    "startLine": 177,
+    "endLine": 177,
+    "textDigest": "bb15a10898312c62d0812b80ea5a0afd1660bc44d3c3b690a48d0c121a031f47",
+    "sample": "Chấm trượt / lỗi giữa vòng",
+    "sectionPayloadDigest": "98b77515ba652ac6051a457333f012b6dd5f521044eba33163935fc983cd8589",
+    "followingBlockDigest": "98b77515ba652ac6051a457333f012b6dd5f521044eba33163935fc983cd8589",
+    "identityFingerprint": "5f0a6d97c3b6c0018a9b3e7e459ed3b7ac2be3d4b484d02ca520392541bd3c12",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations"
+    ],
+    "text": "### Chấm trượt / lỗi giữa vòng",
+    "sectionText": "### Chấm trượt / lỗi giữa vòng\n\n- **What changes:** tra bảng phục hồi theo lớp lỗi — thử-lại (worktree mới, DÙNG LẠI nhánh cũ) → hết trần thì đỗ-lại (`doing→blocked` kèm lý do); lỗi tranh-chấp-ghi (kỳ vọng lệch vì người vận hành vừa ghi tay) → dọn dẹp rồi DỪNG sạch — không bao giờ giành ghi với người. Nhánh cũ reset về **baseline dispatch riêng của việc đó, chụp tại lần thử ĐẦU TIÊN** (không phải HEAD hiện tại của nhánh tại thời điểm thử-lại): một lần thử sau — dù sinh commit khác lần trước — không bao giờ mang commit của một lần thử ĐÃ THẤT BẠI đi tiếp, trong khi nội dung nhánh có từ trước lần thử đầu tiên (ví dụ một con đã merge trước đó) vẫn được giữ nguyên (fix STR1 #2, per review-260718-phase-2-routing-rerun / e2ccd0cd).\n- **Side effects:** worktree luôn được dọn trên mọi đường thoát (kể cả dừng); quá trần chống-lặp → việc bị `todo→blocked` lý do chống-lặp, rời hẳn frontier.\n- Khi việc bị đỗ-lại (`parked`, hết trần thử lại hoặc lỗi không thử lại được) hoặc bị dừng vì cầu dao (`halted`, chấm-trượt-liên-tiếp), runner **CŨNG ghi nửa THỰC TẾ** của bản ghi outcome — thất bại được học, không chỉ thành công. Nửa thực tế KHÔNG được ghi ở một lượt-thử-còn-thử-lại-được (chỉ ghi đúng một lần, ở kết cục CUỐI của việc).\n- **Cùng lúc đó, runner ghi thêm một bản ghi friction** (kênh 2 của capture 2 kênh, Phase 3 Slice 2, xem spec Work-State): runner tự quy tội — dịch lớp lỗi thành một trong **5 lớp friction** cơ học: hỏng-spawn/quá-giờ/hỏng-worktree → `environment` · chấm-trượt → `verification` · nhật-ký-hỏng/việc-kẹt-do-crash/tranh-chấp-ghi → `state` · đề-xuất-bị-trả → `context` · lớp lạ → `task-spec` (mặc định). Bảng dịch là dữ liệu tĩnh, không phán xét — tích lũy friction là bằng chứng để hiệu chỉnh sau này, không phải kết luận tại chỗ.\n- **Bổ chú (20260717, review-unreviewed-260717).** Ba lớp lỗi khoá-sự-kiện-bị-giữ/phiên-hỏng/nhập-gộp-hỏng (`lock-timeout`/`session-fail`/`merge-fail`) nay đều có mã thoát riêng trong bảng tra — một việc chạm một trong ba lớp này khiến `runOnce` dừng nhẹ đúng việc đó (`halted`, có kết quả cấu trúc) chứ không còn sập tung cả lượt chạy. Trước bản vá này, ba lớp lỗi trên vắng mặt khỏi bảng tra nên rơi vào nhánh sập-toàn-vòng (mọi việc khác trong lượt mất kết quả, mã thoát chung chung không phân biệt được với lỗi thật) — dù RUL7 (schema item mang đủ chất liệu trả lời sáu câu hỏi harness) vốn định nghĩa lớp lỗi lạ phải dừng nhẹ, không sập."
+  }
+}
+```
+
+## claim_e7eba8f122fc187006897f7a13f17e81
+
+Source digest (evidence JSON): 313cb1633741eec94f28b88bd20e9f2f1a24bea4eea35ff702eb2cff004c8648
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_e7eba8f122fc187006897f7a13f17e81",
+  "record": {
+    "claimId": "claim_e7eba8f122fc187006897f7a13f17e81",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "unheaded-block-26",
+    "sourceLines": [
+      255,
+      259
+    ],
+    "sourceDigest": "98b77515ba652ac6051a457333f012b6dd5f521044eba33163935fc983cd8589",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "unheaded-block-14",
+    "targetDigest": "98b77515ba652ac6051a457333f012b6dd5f521044eba33163935fc983cd8589",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-26",
+    "githubAnchor": "unheaded-block-26",
+    "stableAnchor": "unheaded-block-26",
+    "title": "Unheaded block 26",
+    "startLine": 255,
+    "endLine": 259,
+    "textDigest": "98b77515ba652ac6051a457333f012b6dd5f521044eba33163935fc983cd8589",
+    "sample": "- **What changes:** tra bảng phục hồi theo lớp lỗi — thử-lại (worktree mới, DÙNG LẠI nhánh cũ) → hết trần thì đỗ-lại (`doing→blocked` kèm lý do); lỗi tranh-chấp-ghi (kỳ vọng lệch v",
+    "identityFingerprint": "80014ee605fb87da0e9d9ae573a81f050a2c93772fbf52f619b2a9f2730a5789",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations",
+      "Chấm trượt / lỗi giữa vòng"
+    ],
+    "text": "- **What changes:** tra bảng phục hồi theo lớp lỗi — thử-lại (worktree mới, DÙNG LẠI nhánh cũ) → hết trần thì đỗ-lại (`doing→blocked` kèm lý do); lỗi tranh-chấp-ghi (kỳ vọng lệch vì người vận hành vừa ghi tay) → dọn dẹp rồi DỪNG sạch — không bao giờ giành ghi với người. Nhánh cũ reset về **baseline dispatch riêng của việc đó, chụp tại lần thử ĐẦU TIÊN** (không phải HEAD hiện tại của nhánh tại thời điểm thử-lại): một lần thử sau — dù sinh commit khác lần trước — không bao giờ mang commit của một lần thử ĐÃ THẤT BẠI đi tiếp, trong khi nội dung nhánh có từ trước lần thử đầu tiên (ví dụ một con đã merge trước đó) vẫn được giữ nguyên (fix STR1 #2, per review-260718-phase-2-routing-rerun / e2ccd0cd).\n- **Side effects:** worktree luôn được dọn trên mọi đường thoát (kể cả dừng); quá trần chống-lặp → việc bị `todo→blocked` lý do chống-lặp, rời hẳn frontier.\n- Khi việc bị đỗ-lại (`parked`, hết trần thử lại hoặc lỗi không thử lại được) hoặc bị dừng vì cầu dao (`halted`, chấm-trượt-liên-tiếp), runner **CŨNG ghi nửa THỰC TẾ** của bản ghi outcome — thất bại được học, không chỉ thành công. Nửa thực tế KHÔNG được ghi ở một lượt-thử-còn-thử-lại-được (chỉ ghi đúng một lần, ở kết cục CUỐI của việc).\n- **Cùng lúc đó, runner ghi thêm một bản ghi friction** (kênh 2 của capture 2 kênh, Phase 3 Slice 2, xem spec Work-State): runner tự quy tội — dịch lớp lỗi thành một trong **5 lớp friction** cơ học: hỏng-spawn/quá-giờ/hỏng-worktree → `environment` · chấm-trượt → `verification` · nhật-ký-hỏng/việc-kẹt-do-crash/tranh-chấp-ghi → `state` · đề-xuất-bị-trả → `context` · lớp lạ → `task-spec` (mặc định). Bảng dịch là dữ liệu tĩnh, không phán xét — tích lũy friction là bằng chứng để hiệu chỉnh sau này, không phải kết luận tại chỗ.\n- **Bổ chú (20260717, review-unreviewed-260717).** Ba lớp lỗi khoá-sự-kiện-bị-giữ/phiên-hỏng/nhập-gộp-hỏng (`lock-timeout`/`session-fail`/`merge-fail`) nay đều có mã thoát riêng trong bảng tra — một việc chạm một trong ba lớp này khiến `runOnce` dừng nhẹ đúng việc đó (`halted`, có kết quả cấu trúc) chứ không còn sập tung cả lượt chạy. Trước bản vá này, ba lớp lỗi trên vắng mặt khỏi bảng tra nên rơi vào nhánh sập-toàn-vòng (mọi việc khác trong lượt mất kết quả, mã thoát chung chung không phân biệt được với lỗi thật) — dù RUL7 (schema item mang đủ chất liệu trả lời sáu câu hỏi harness) vốn định nghĩa lớp lỗi lạ phải dừng nhẹ, không sập."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-14",
+    "githubAnchor": "unheaded-block-14",
+    "stableAnchor": "unheaded-block-14",
+    "title": "Unheaded block 14",
+    "startLine": 179,
+    "endLine": 183,
+    "textDigest": "98b77515ba652ac6051a457333f012b6dd5f521044eba33163935fc983cd8589",
+    "sample": "- **What changes:** tra bảng phục hồi theo lớp lỗi — thử-lại (worktree mới, DÙNG LẠI nhánh cũ) → hết trần thì đỗ-lại (`doing→blocked` kèm lý do); lỗi tranh-chấp-ghi (kỳ vọng lệch v",
+    "identityFingerprint": "80014ee605fb87da0e9d9ae573a81f050a2c93772fbf52f619b2a9f2730a5789",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations",
+      "Chấm trượt / lỗi giữa vòng"
+    ],
+    "text": "- **What changes:** tra bảng phục hồi theo lớp lỗi — thử-lại (worktree mới, DÙNG LẠI nhánh cũ) → hết trần thì đỗ-lại (`doing→blocked` kèm lý do); lỗi tranh-chấp-ghi (kỳ vọng lệch vì người vận hành vừa ghi tay) → dọn dẹp rồi DỪNG sạch — không bao giờ giành ghi với người. Nhánh cũ reset về **baseline dispatch riêng của việc đó, chụp tại lần thử ĐẦU TIÊN** (không phải HEAD hiện tại của nhánh tại thời điểm thử-lại): một lần thử sau — dù sinh commit khác lần trước — không bao giờ mang commit của một lần thử ĐÃ THẤT BẠI đi tiếp, trong khi nội dung nhánh có từ trước lần thử đầu tiên (ví dụ một con đã merge trước đó) vẫn được giữ nguyên (fix STR1 #2, per review-260718-phase-2-routing-rerun / e2ccd0cd).\n- **Side effects:** worktree luôn được dọn trên mọi đường thoát (kể cả dừng); quá trần chống-lặp → việc bị `todo→blocked` lý do chống-lặp, rời hẳn frontier.\n- Khi việc bị đỗ-lại (`parked`, hết trần thử lại hoặc lỗi không thử lại được) hoặc bị dừng vì cầu dao (`halted`, chấm-trượt-liên-tiếp), runner **CŨNG ghi nửa THỰC TẾ** của bản ghi outcome — thất bại được học, không chỉ thành công. Nửa thực tế KHÔNG được ghi ở một lượt-thử-còn-thử-lại-được (chỉ ghi đúng một lần, ở kết cục CUỐI của việc).\n- **Cùng lúc đó, runner ghi thêm một bản ghi friction** (kênh 2 của capture 2 kênh, Phase 3 Slice 2, xem spec Work-State): runner tự quy tội — dịch lớp lỗi thành một trong **5 lớp friction** cơ học: hỏng-spawn/quá-giờ/hỏng-worktree → `environment` · chấm-trượt → `verification` · nhật-ký-hỏng/việc-kẹt-do-crash/tranh-chấp-ghi → `state` · đề-xuất-bị-trả → `context` · lớp lạ → `task-spec` (mặc định). Bảng dịch là dữ liệu tĩnh, không phán xét — tích lũy friction là bằng chứng để hiệu chỉnh sau này, không phải kết luận tại chỗ.\n- **Bổ chú (20260717, review-unreviewed-260717).** Ba lớp lỗi khoá-sự-kiện-bị-giữ/phiên-hỏng/nhập-gộp-hỏng (`lock-timeout`/`session-fail`/`merge-fail`) nay đều có mã thoát riêng trong bảng tra — một việc chạm một trong ba lớp này khiến `runOnce` dừng nhẹ đúng việc đó (`halted`, có kết quả cấu trúc) chứ không còn sập tung cả lượt chạy. Trước bản vá này, ba lớp lỗi trên vắng mặt khỏi bảng tra nên rơi vào nhánh sập-toàn-vòng (mọi việc khác trong lượt mất kết quả, mã thoát chung chung không phân biệt được với lỗi thật) — dù RUL7 (schema item mang đủ chất liệu trả lời sáu câu hỏi harness) vốn định nghĩa lớp lỗi lạ phải dừng nhẹ, không sập."
+  }
+}
+```
+
+## claim_db233a6e20d625b138b0e335d97a983a
+
+Source digest (evidence JSON): c16599b65f903255253fbfa17cc4a80a0e9a9ebbceda40d423072a47ab04c96e
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_db233a6e20d625b138b0e335d97a983a",
+  "record": {
+    "claimId": "claim_db233a6e20d625b138b0e335d97a983a",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "ghi-lại-output-của-trợ-lý-sau-mỗi-lượt-dispatch-persist-log",
+    "sourceLines": [
+      261,
+      261
+    ],
+    "sourceDigest": "833e1a2724e50109d3f7ab290cc9febae57b6ee66d9715aeda8a29d032804e13",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "ghi-lại-output-của-trợ-lý-sau-mỗi-lượt-dispatch-persist-log",
+    "targetDigest": "833e1a2724e50109d3f7ab290cc9febae57b6ee66d9715aeda8a29d032804e13",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Ghi lại output của trợ lý sau mỗi lượt dispatch (persist log)",
+    "anchor": "ghi-lại-output-của-trợ-lý-sau-mỗi-lượt-dispatch-persist-log",
+    "githubAnchor": "ghi-lại-output-của-trợ-lý-sau-mỗi-lượt-dispatch-persist-log",
+    "stableAnchor": "h-1aa9e6741b0e",
+    "startLine": 261,
+    "endLine": 261,
+    "textDigest": "833e1a2724e50109d3f7ab290cc9febae57b6ee66d9715aeda8a29d032804e13",
+    "sample": "Ghi lại output của trợ lý sau mỗi lượt dispatch (persist log)",
+    "sectionPayloadDigest": "006645de2529324c91a9ab890a9de5d81b744e1a65f474458c16ad90aa6e7b0c",
+    "followingBlockDigest": "006645de2529324c91a9ab890a9de5d81b744e1a65f474458c16ad90aa6e7b0c",
+    "identityFingerprint": "38043a1a63a2fdc19699399b7b0d94eef8055a49b1191ffff1e882d21c57ec41",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations"
+    ],
+    "text": "### Ghi lại output của trợ lý sau mỗi lượt dispatch (persist log)",
+    "sectionText": "### Ghi lại output của trợ lý sau mỗi lượt dispatch (persist log)\n\n- **Runs when:** ngay sau MỖI kết cục của một lượt dispatch cho một việc —\n  trợ lý chạy xong (dù sau đó goal-check đạt hay chấm-trượt), HOẶC dispatch\n  hỏng trước khi trợ lý kịp chạy xong (quá-giờ, hỏng-spawn kể cả tràn bộ\n  đệm, hoặc lỗi worktree không liên quan gì tới trợ lý).\n- **What changes:** output (stdout/stderr) của trợ lý cho lượt thử đó được\n  nối thêm thành một khối có dấu thời gian vào một bản ghi cục bộ riêng cho\n  việc đó (một file mỗi việc, gộp mọi lần thử theo thời gian — lần thử sau\n  KHÔNG đè lần thử trước). Khi dispatch hỏng TRƯỚC khi trợ lý kịp sinh ra\n  output (vd lỗi worktree), khối ghi lại chỉ mang loại lỗi + thông điệp —\n  KHÔNG throw vì thiếu output/tier/model.\n- **Side effects:** một khối mới nối vào bản ghi cục bộ của việc đó; bản ghi\n  này KHÔNG BAO GIỜ vào cây committed — không đổi nửa bảo đảm cốt lõi của\n  luật kỷ-luật-output cũ (xem RUL31 (kỷ-luật-output nới rộng: console + bản ghi cục bộ riêng-từng-việc, không bao giờ vào cây committed)).\n- **Afterwards:** người vận hành (hoặc một phiên agent khác) đọc lại được\n  đúng những gì trợ lý đã làm/nói cho một việc, ngay cả sau khi console đã\n  cuộn qua mất — kể cả cho những lượt thử KHÔNG BAO GIỜ tới `awaiting-approval`\n  (quá-giờ, hỏng-spawn). Kết quả goal-check (verify) KHÔNG nằm trong bản ghi\n  này — vẫn chỉ in console như trước, ngoài phạm vi thay đổi này."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Ghi lại output của trợ lý sau mỗi lượt dispatch (persist log)",
+    "anchor": "ghi-lại-output-của-trợ-lý-sau-mỗi-lượt-dispatch-persist-log",
+    "githubAnchor": "ghi-lại-output-của-trợ-lý-sau-mỗi-lượt-dispatch-persist-log",
+    "stableAnchor": "h-1188c96b5b6e",
+    "startLine": 185,
+    "endLine": 185,
+    "textDigest": "833e1a2724e50109d3f7ab290cc9febae57b6ee66d9715aeda8a29d032804e13",
+    "sample": "Ghi lại output của trợ lý sau mỗi lượt dispatch (persist log)",
+    "sectionPayloadDigest": "006645de2529324c91a9ab890a9de5d81b744e1a65f474458c16ad90aa6e7b0c",
+    "followingBlockDigest": "006645de2529324c91a9ab890a9de5d81b744e1a65f474458c16ad90aa6e7b0c",
+    "identityFingerprint": "38043a1a63a2fdc19699399b7b0d94eef8055a49b1191ffff1e882d21c57ec41",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations"
+    ],
+    "text": "### Ghi lại output của trợ lý sau mỗi lượt dispatch (persist log)",
+    "sectionText": "### Ghi lại output của trợ lý sau mỗi lượt dispatch (persist log)\n\n- **Runs when:** ngay sau MỖI kết cục của một lượt dispatch cho một việc —\n  trợ lý chạy xong (dù sau đó goal-check đạt hay chấm-trượt), HOẶC dispatch\n  hỏng trước khi trợ lý kịp chạy xong (quá-giờ, hỏng-spawn kể cả tràn bộ\n  đệm, hoặc lỗi worktree không liên quan gì tới trợ lý).\n- **What changes:** output (stdout/stderr) của trợ lý cho lượt thử đó được\n  nối thêm thành một khối có dấu thời gian vào một bản ghi cục bộ riêng cho\n  việc đó (một file mỗi việc, gộp mọi lần thử theo thời gian — lần thử sau\n  KHÔNG đè lần thử trước). Khi dispatch hỏng TRƯỚC khi trợ lý kịp sinh ra\n  output (vd lỗi worktree), khối ghi lại chỉ mang loại lỗi + thông điệp —\n  KHÔNG throw vì thiếu output/tier/model.\n- **Side effects:** một khối mới nối vào bản ghi cục bộ của việc đó; bản ghi\n  này KHÔNG BAO GIỜ vào cây committed — không đổi nửa bảo đảm cốt lõi của\n  luật kỷ-luật-output cũ (xem RUL31 (kỷ-luật-output nới rộng: console + bản ghi cục bộ riêng-từng-việc, không bao giờ vào cây committed)).\n- **Afterwards:** người vận hành (hoặc một phiên agent khác) đọc lại được\n  đúng những gì trợ lý đã làm/nói cho một việc, ngay cả sau khi console đã\n  cuộn qua mất — kể cả cho những lượt thử KHÔNG BAO GIỜ tới `awaiting-approval`\n  (quá-giờ, hỏng-spawn). Kết quả goal-check (verify) KHÔNG nằm trong bản ghi\n  này — vẫn chỉ in console như trước, ngoài phạm vi thay đổi này."
+  }
+}
+```
+
+## claim_722ee98ca7ed78df8a927a843f6ce944
+
+Source digest (evidence JSON): 8571895b9ef8f8aeef03948d3983f909b3dbb61bc28babd60b4980b5a620b54b
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_722ee98ca7ed78df8a927a843f6ce944",
+  "record": {
+    "claimId": "claim_722ee98ca7ed78df8a927a843f6ce944",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "unheaded-block-27",
+    "sourceLines": [
+      263,
+      280
+    ],
+    "sourceDigest": "006645de2529324c91a9ab890a9de5d81b744e1a65f474458c16ad90aa6e7b0c",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "unheaded-block-15",
+    "targetDigest": "006645de2529324c91a9ab890a9de5d81b744e1a65f474458c16ad90aa6e7b0c",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-27",
+    "githubAnchor": "unheaded-block-27",
+    "stableAnchor": "unheaded-block-27",
+    "title": "Unheaded block 27",
+    "startLine": 263,
+    "endLine": 280,
+    "textDigest": "006645de2529324c91a9ab890a9de5d81b744e1a65f474458c16ad90aa6e7b0c",
+    "sample": "- **Runs when:** ngay sau MỖI kết cục của một lượt dispatch cho một việc —\n  trợ lý chạy xong (dù sau đó goal-check đạt hay chấm-trượt), HOẶC dispatch\n  hỏng trước khi trợ lý kịp c",
+    "identityFingerprint": "6d25e01af60bed108fdf8d807cb86b58b3889e6b786a67068e33af8837676600",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations",
+      "Ghi lại output của trợ lý sau mỗi lượt dispatch (persist log)"
+    ],
+    "text": "- **Runs when:** ngay sau MỖI kết cục của một lượt dispatch cho một việc —\n  trợ lý chạy xong (dù sau đó goal-check đạt hay chấm-trượt), HOẶC dispatch\n  hỏng trước khi trợ lý kịp chạy xong (quá-giờ, hỏng-spawn kể cả tràn bộ\n  đệm, hoặc lỗi worktree không liên quan gì tới trợ lý).\n- **What changes:** output (stdout/stderr) của trợ lý cho lượt thử đó được\n  nối thêm thành một khối có dấu thời gian vào một bản ghi cục bộ riêng cho\n  việc đó (một file mỗi việc, gộp mọi lần thử theo thời gian — lần thử sau\n  KHÔNG đè lần thử trước). Khi dispatch hỏng TRƯỚC khi trợ lý kịp sinh ra\n  output (vd lỗi worktree), khối ghi lại chỉ mang loại lỗi + thông điệp —\n  KHÔNG throw vì thiếu output/tier/model.\n- **Side effects:** một khối mới nối vào bản ghi cục bộ của việc đó; bản ghi\n  này KHÔNG BAO GIỜ vào cây committed — không đổi nửa bảo đảm cốt lõi của\n  luật kỷ-luật-output cũ (xem RUL31 (kỷ-luật-output nới rộng: console + bản ghi cục bộ riêng-từng-việc, không bao giờ vào cây committed)).\n- **Afterwards:** người vận hành (hoặc một phiên agent khác) đọc lại được\n  đúng những gì trợ lý đã làm/nói cho một việc, ngay cả sau khi console đã\n  cuộn qua mất — kể cả cho những lượt thử KHÔNG BAO GIỜ tới `awaiting-approval`\n  (quá-giờ, hỏng-spawn). Kết quả goal-check (verify) KHÔNG nằm trong bản ghi\n  này — vẫn chỉ in console như trước, ngoài phạm vi thay đổi này."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-15",
+    "githubAnchor": "unheaded-block-15",
+    "stableAnchor": "unheaded-block-15",
+    "title": "Unheaded block 15",
+    "startLine": 187,
+    "endLine": 204,
+    "textDigest": "006645de2529324c91a9ab890a9de5d81b744e1a65f474458c16ad90aa6e7b0c",
+    "sample": "- **Runs when:** ngay sau MỖI kết cục của một lượt dispatch cho một việc —\n  trợ lý chạy xong (dù sau đó goal-check đạt hay chấm-trượt), HOẶC dispatch\n  hỏng trước khi trợ lý kịp c",
+    "identityFingerprint": "6d25e01af60bed108fdf8d807cb86b58b3889e6b786a67068e33af8837676600",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations",
+      "Ghi lại output của trợ lý sau mỗi lượt dispatch (persist log)"
+    ],
+    "text": "- **Runs when:** ngay sau MỖI kết cục của một lượt dispatch cho một việc —\n  trợ lý chạy xong (dù sau đó goal-check đạt hay chấm-trượt), HOẶC dispatch\n  hỏng trước khi trợ lý kịp chạy xong (quá-giờ, hỏng-spawn kể cả tràn bộ\n  đệm, hoặc lỗi worktree không liên quan gì tới trợ lý).\n- **What changes:** output (stdout/stderr) của trợ lý cho lượt thử đó được\n  nối thêm thành một khối có dấu thời gian vào một bản ghi cục bộ riêng cho\n  việc đó (một file mỗi việc, gộp mọi lần thử theo thời gian — lần thử sau\n  KHÔNG đè lần thử trước). Khi dispatch hỏng TRƯỚC khi trợ lý kịp sinh ra\n  output (vd lỗi worktree), khối ghi lại chỉ mang loại lỗi + thông điệp —\n  KHÔNG throw vì thiếu output/tier/model.\n- **Side effects:** một khối mới nối vào bản ghi cục bộ của việc đó; bản ghi\n  này KHÔNG BAO GIỜ vào cây committed — không đổi nửa bảo đảm cốt lõi của\n  luật kỷ-luật-output cũ (xem RUL31 (kỷ-luật-output nới rộng: console + bản ghi cục bộ riêng-từng-việc, không bao giờ vào cây committed)).\n- **Afterwards:** người vận hành (hoặc một phiên agent khác) đọc lại được\n  đúng những gì trợ lý đã làm/nói cho một việc, ngay cả sau khi console đã\n  cuộn qua mất — kể cả cho những lượt thử KHÔNG BAO GIỜ tới `awaiting-approval`\n  (quá-giờ, hỏng-spawn). Kết quả goal-check (verify) KHÔNG nằm trong bản ghi\n  này — vẫn chỉ in console như trước, ngoài phạm vi thay đổi này."
+  }
+}
+```
+
+## claim_a95c6485707d0b8601dbdc5ba80efe0a
+
+Source digest (evidence JSON): e121959af7794c9db6b537099fda7dd95c01c3b778d124bc878cdc62d10587f7
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_a95c6485707d0b8601dbdc5ba80efe0a",
+  "record": {
+    "claimId": "claim_a95c6485707d0b8601dbdc5ba80efe0a",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "xem-live-output-worker-khi-đang-chạy-live-tee-str39",
+    "sourceLines": [
+      282,
+      282
+    ],
+    "sourceDigest": "37a0ff733a372a145bbdcf0d7a280d305b15db67302cf433de74984c0d77d865",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "xem-live-output-worker-khi-đang-chạy-live-tee-str39",
+    "targetDigest": "37a0ff733a372a145bbdcf0d7a280d305b15db67302cf433de74984c0d77d865",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Xem live output worker khi đang chạy (live tee, STR39)",
+    "anchor": "xem-live-output-worker-khi-đang-chạy-live-tee-str39",
+    "githubAnchor": "xem-live-output-worker-khi-đang-chạy-live-tee-str39",
+    "stableAnchor": "h-6b55a660e9c1",
+    "startLine": 282,
+    "endLine": 282,
+    "textDigest": "37a0ff733a372a145bbdcf0d7a280d305b15db67302cf433de74984c0d77d865",
+    "sample": "Xem live output worker khi đang chạy (live tee, STR39)",
+    "sectionPayloadDigest": "7b0ff6649760ca0023741a463e320cbc43bf1616498e45df52803d2ed9377846",
+    "followingBlockDigest": "19eda00da959a4f1f56f5ae3dc701fcb18d4527e27d5c40e1f93759cd9d3d716",
+    "identityFingerprint": "f6286901f16f2475c8f942adde6fa1f2894da9e7f0e8915414aa47380392b318",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations"
+    ],
+    "text": "### Xem live output worker khi đang chạy (live tee, STR39)",
+    "sectionText": "### Xem live output worker khi đang chạy (live tee, STR39)\n\n- **Runs when:** ngay mỗi khi một chunk stdout/stderr của trợ lý ĐẾN —\n  trong lúc worker VẪN ĐANG CHẠY, không đợi lượt dispatch kết thúc (khác\n  với khối kết-cục cuối trên, chạy ĐÚNG MỘT LẦN sau khi worker đã xong).\n- **What changes:** chunk thô (không header/dấu thời gian, không bọc) được\n  nối thẳng vào CÙNG file `.fgos/logs/<id>.log` của chính việc đó — qua\n đúng cửa ghi worker-log.mjs (một-cửa, không mở cửa ghi thứ hai). Mỗi\n  việc chỉ ghi vào file của chính nó nên N việc dispatch song song không\n  bao giờ giẫm dòng nhau. Khối kết-cục cuối (trên) vẫn chạy nguyên vẹn sau\n  đó, không đổi — file cuối cùng mang cả live chunk lẫn khối tổng kết.\n- **Side effects:** không throw dù ghi hỏng hay callback ghi hỏng (cùng kỷ\n  luật never-throws với khối kết-cục cuối — quan sát không bao giờ được\n  phép làm gãy một dispatch thật).\n- **Afterwards:** người vận hành `tail -f .fgos/logs/<id>.log` trong lúc\n  việc đang `doing` thấy output đến theo thời gian thực, thay vì phải đợi\n  worker xong mới đọc được gì. Nền cho chiều-ra của STR38/STR40 (UI tail +\n  tmux pane).\n\n**Phần (b) — stream-json qua executor args (backlog STR39, KHÔNG CẦN CODE riêng):**\n`.fgos/config.json`'s `runner.executor.args` đã là một mẫu Host Adapter (Data\nDictionary #1) — thêm một cờ như `--output-format stream-json` vào đó (nếu\nCLI trợ lý hỗ trợ) chỉ đổi NỘI DUNG stdout trợ lý phát ra, không đổi đường đi\ncủa nó: dispatch.mjs vẫn tee từng chunk y hệt bất kể định dạng (JSON-lines\nhay text thường), worker-log.mjs vẫn là cửa ghi duy nhất. Không có nhánh code\nnào phân biệt định dạng output — vì không cần: đây thuần là cấu hình, không\nphải một tính năng runner phải hiểu."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Xem live output worker khi đang chạy (live tee, STR39)",
+    "anchor": "xem-live-output-worker-khi-đang-chạy-live-tee-str39",
+    "githubAnchor": "xem-live-output-worker-khi-đang-chạy-live-tee-str39",
+    "stableAnchor": "h-8d9b0bd0b1cd",
+    "startLine": 206,
+    "endLine": 206,
+    "textDigest": "37a0ff733a372a145bbdcf0d7a280d305b15db67302cf433de74984c0d77d865",
+    "sample": "Xem live output worker khi đang chạy (live tee, STR39)",
+    "sectionPayloadDigest": "7b0ff6649760ca0023741a463e320cbc43bf1616498e45df52803d2ed9377846",
+    "followingBlockDigest": "19eda00da959a4f1f56f5ae3dc701fcb18d4527e27d5c40e1f93759cd9d3d716",
+    "identityFingerprint": "f6286901f16f2475c8f942adde6fa1f2894da9e7f0e8915414aa47380392b318",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations"
+    ],
+    "text": "### Xem live output worker khi đang chạy (live tee, STR39)",
+    "sectionText": "### Xem live output worker khi đang chạy (live tee, STR39)\n\n- **Runs when:** ngay mỗi khi một chunk stdout/stderr của trợ lý ĐẾN —\n  trong lúc worker VẪN ĐANG CHẠY, không đợi lượt dispatch kết thúc (khác\n  với khối kết-cục cuối trên, chạy ĐÚNG MỘT LẦN sau khi worker đã xong).\n- **What changes:** chunk thô (không header/dấu thời gian, không bọc) được\n  nối thẳng vào CÙNG file `.fgos/logs/<id>.log` của chính việc đó — qua\n đúng cửa ghi worker-log.mjs (một-cửa, không mở cửa ghi thứ hai). Mỗi\n  việc chỉ ghi vào file của chính nó nên N việc dispatch song song không\n  bao giờ giẫm dòng nhau. Khối kết-cục cuối (trên) vẫn chạy nguyên vẹn sau\n  đó, không đổi — file cuối cùng mang cả live chunk lẫn khối tổng kết.\n- **Side effects:** không throw dù ghi hỏng hay callback ghi hỏng (cùng kỷ\n  luật never-throws với khối kết-cục cuối — quan sát không bao giờ được\n  phép làm gãy một dispatch thật).\n- **Afterwards:** người vận hành `tail -f .fgos/logs/<id>.log` trong lúc\n  việc đang `doing` thấy output đến theo thời gian thực, thay vì phải đợi\n  worker xong mới đọc được gì. Nền cho chiều-ra của STR38/STR40 (UI tail +\n  tmux pane).\n\n**Phần (b) — stream-json qua executor args (backlog STR39, KHÔNG CẦN CODE riêng):**\n`.fgos/config.json`'s `runner.executor.args` đã là một mẫu Host Adapter (Data\nDictionary #1) — thêm một cờ như `--output-format stream-json` vào đó (nếu\nCLI trợ lý hỗ trợ) chỉ đổi NỘI DUNG stdout trợ lý phát ra, không đổi đường đi\ncủa nó: dispatch.mjs vẫn tee từng chunk y hệt bất kể định dạng (JSON-lines\nhay text thường), worker-log.mjs vẫn là cửa ghi duy nhất. Không có nhánh code\nnào phân biệt định dạng output — vì không cần: đây thuần là cấu hình, không\nphải một tính năng runner phải hiểu."
+  }
+}
+```
+
+## claim_344b9a104297ed0fd462fe5ac4b73097
+
+Source digest (evidence JSON): a95fdc0fa1273e9ad21eddb5831b057e53f5f57bbd26d04918eeeee12202cdb2
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_344b9a104297ed0fd462fe5ac4b73097",
+  "record": {
+    "claimId": "claim_344b9a104297ed0fd462fe5ac4b73097",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "unheaded-block-28",
+    "sourceLines": [
+      284,
+      299
+    ],
+    "sourceDigest": "19eda00da959a4f1f56f5ae3dc701fcb18d4527e27d5c40e1f93759cd9d3d716",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "unheaded-block-16",
+    "targetDigest": "19eda00da959a4f1f56f5ae3dc701fcb18d4527e27d5c40e1f93759cd9d3d716",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-28",
+    "githubAnchor": "unheaded-block-28",
+    "stableAnchor": "unheaded-block-28",
+    "title": "Unheaded block 28",
+    "startLine": 284,
+    "endLine": 299,
+    "textDigest": "19eda00da959a4f1f56f5ae3dc701fcb18d4527e27d5c40e1f93759cd9d3d716",
+    "sample": "- **Runs when:** ngay mỗi khi một chunk stdout/stderr của trợ lý ĐẾN —\n  trong lúc worker VẪN ĐANG CHẠY, không đợi lượt dispatch kết thúc (khác\n  với khối kết-cục cuối trên, chạy Đ",
+    "identityFingerprint": "a7662e7a90060e6d3814aaadfa4fa3b1e75dd8ffc001facc3cc260acfd10674d",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations",
+      "Xem live output worker khi đang chạy (live tee, STR39)"
+    ],
+    "text": "- **Runs when:** ngay mỗi khi một chunk stdout/stderr của trợ lý ĐẾN —\n  trong lúc worker VẪN ĐANG CHẠY, không đợi lượt dispatch kết thúc (khác\n  với khối kết-cục cuối trên, chạy ĐÚNG MỘT LẦN sau khi worker đã xong).\n- **What changes:** chunk thô (không header/dấu thời gian, không bọc) được\n  nối thẳng vào CÙNG file `.fgos/logs/<id>.log` của chính việc đó — qua\n đúng cửa ghi worker-log.mjs (một-cửa, không mở cửa ghi thứ hai). Mỗi\n  việc chỉ ghi vào file của chính nó nên N việc dispatch song song không\n  bao giờ giẫm dòng nhau. Khối kết-cục cuối (trên) vẫn chạy nguyên vẹn sau\n  đó, không đổi — file cuối cùng mang cả live chunk lẫn khối tổng kết.\n- **Side effects:** không throw dù ghi hỏng hay callback ghi hỏng (cùng kỷ\n  luật never-throws với khối kết-cục cuối — quan sát không bao giờ được\n  phép làm gãy một dispatch thật).\n- **Afterwards:** người vận hành `tail -f .fgos/logs/<id>.log` trong lúc\n  việc đang `doing` thấy output đến theo thời gian thực, thay vì phải đợi\n  worker xong mới đọc được gì. Nền cho chiều-ra của STR38/STR40 (UI tail +\n  tmux pane)."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-16",
+    "githubAnchor": "unheaded-block-16",
+    "stableAnchor": "unheaded-block-16",
+    "title": "Unheaded block 16",
+    "startLine": 208,
+    "endLine": 223,
+    "textDigest": "19eda00da959a4f1f56f5ae3dc701fcb18d4527e27d5c40e1f93759cd9d3d716",
+    "sample": "- **Runs when:** ngay mỗi khi một chunk stdout/stderr của trợ lý ĐẾN —\n  trong lúc worker VẪN ĐANG CHẠY, không đợi lượt dispatch kết thúc (khác\n  với khối kết-cục cuối trên, chạy Đ",
+    "identityFingerprint": "a7662e7a90060e6d3814aaadfa4fa3b1e75dd8ffc001facc3cc260acfd10674d",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations",
+      "Xem live output worker khi đang chạy (live tee, STR39)"
+    ],
+    "text": "- **Runs when:** ngay mỗi khi một chunk stdout/stderr của trợ lý ĐẾN —\n  trong lúc worker VẪN ĐANG CHẠY, không đợi lượt dispatch kết thúc (khác\n  với khối kết-cục cuối trên, chạy ĐÚNG MỘT LẦN sau khi worker đã xong).\n- **What changes:** chunk thô (không header/dấu thời gian, không bọc) được\n  nối thẳng vào CÙNG file `.fgos/logs/<id>.log` của chính việc đó — qua\n đúng cửa ghi worker-log.mjs (một-cửa, không mở cửa ghi thứ hai). Mỗi\n  việc chỉ ghi vào file của chính nó nên N việc dispatch song song không\n  bao giờ giẫm dòng nhau. Khối kết-cục cuối (trên) vẫn chạy nguyên vẹn sau\n  đó, không đổi — file cuối cùng mang cả live chunk lẫn khối tổng kết.\n- **Side effects:** không throw dù ghi hỏng hay callback ghi hỏng (cùng kỷ\n  luật never-throws với khối kết-cục cuối — quan sát không bao giờ được\n  phép làm gãy một dispatch thật).\n- **Afterwards:** người vận hành `tail -f .fgos/logs/<id>.log` trong lúc\n  việc đang `doing` thấy output đến theo thời gian thực, thay vì phải đợi\n  worker xong mới đọc được gì. Nền cho chiều-ra của STR38/STR40 (UI tail +\n  tmux pane)."
+  }
+}
+```
+
+## claim_c989dc1877e144abd29d133c0a59efc9
+
+Source digest (evidence JSON): d258df41011b2c321e06a7e7b110e5ef871da3cc9a4404293cb76ebac0996201
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_c989dc1877e144abd29d133c0a59efc9",
+  "record": {
+    "claimId": "claim_c989dc1877e144abd29d133c0a59efc9",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "unheaded-block-29",
+    "sourceLines": [
+      301,
+      308
+    ],
+    "sourceDigest": "0a8a86fc6704a4bb9bd73ffe0841504d8517b26dc4cb74d8437009bd04be46ae",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "unheaded-block-17",
+    "targetDigest": "0a8a86fc6704a4bb9bd73ffe0841504d8517b26dc4cb74d8437009bd04be46ae",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-29",
+    "githubAnchor": "unheaded-block-29",
+    "stableAnchor": "unheaded-block-29",
+    "title": "Unheaded block 29",
+    "startLine": 301,
+    "endLine": 308,
+    "textDigest": "0a8a86fc6704a4bb9bd73ffe0841504d8517b26dc4cb74d8437009bd04be46ae",
+    "sample": "**Phần (b) — stream-json qua executor args (backlog STR39, KHÔNG CẦN CODE riêng):**\n`.fgos/config.json`'s `runner.executor.args` đã là một mẫu Host Adapter (Data\nDictionary #1) — t",
+    "identityFingerprint": "c4be4898f077431105d03330c855a32bde0e858d9252446508d9f294f7dd94d6",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations",
+      "Xem live output worker khi đang chạy (live tee, STR39)"
+    ],
+    "text": "**Phần (b) — stream-json qua executor args (backlog STR39, KHÔNG CẦN CODE riêng):**\n`.fgos/config.json`'s `runner.executor.args` đã là một mẫu Host Adapter (Data\nDictionary #1) — thêm một cờ như `--output-format stream-json` vào đó (nếu\nCLI trợ lý hỗ trợ) chỉ đổi NỘI DUNG stdout trợ lý phát ra, không đổi đường đi\ncủa nó: dispatch.mjs vẫn tee từng chunk y hệt bất kể định dạng (JSON-lines\nhay text thường), worker-log.mjs vẫn là cửa ghi duy nhất. Không có nhánh code\nnào phân biệt định dạng output — vì không cần: đây thuần là cấu hình, không\nphải một tính năng runner phải hiểu."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-17",
+    "githubAnchor": "unheaded-block-17",
+    "stableAnchor": "unheaded-block-17",
+    "title": "Unheaded block 17",
+    "startLine": 225,
+    "endLine": 232,
+    "textDigest": "0a8a86fc6704a4bb9bd73ffe0841504d8517b26dc4cb74d8437009bd04be46ae",
+    "sample": "**Phần (b) — stream-json qua executor args (backlog STR39, KHÔNG CẦN CODE riêng):**\n`.fgos/config.json`'s `runner.executor.args` đã là một mẫu Host Adapter (Data\nDictionary #1) — t",
+    "identityFingerprint": "c4be4898f077431105d03330c855a32bde0e858d9252446508d9f294f7dd94d6",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations",
+      "Xem live output worker khi đang chạy (live tee, STR39)"
+    ],
+    "text": "**Phần (b) — stream-json qua executor args (backlog STR39, KHÔNG CẦN CODE riêng):**\n`.fgos/config.json`'s `runner.executor.args` đã là một mẫu Host Adapter (Data\nDictionary #1) — thêm một cờ như `--output-format stream-json` vào đó (nếu\nCLI trợ lý hỗ trợ) chỉ đổi NỘI DUNG stdout trợ lý phát ra, không đổi đường đi\ncủa nó: dispatch.mjs vẫn tee từng chunk y hệt bất kể định dạng (JSON-lines\nhay text thường), worker-log.mjs vẫn là cửa ghi duy nhất. Không có nhánh code\nnào phân biệt định dạng output — vì không cần: đây thuần là cấu hình, không\nphải một tính năng runner phải hiểu."
+  }
+}
+```
+
+## claim_85a972e5144ff1c803aac5141be7f204
+
+Source digest (evidence JSON): 355819d2020bcae58e618296fa9c7806100a9ca2ccfe676c56792a9aaa7d5f9d
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_85a972e5144ff1c803aac5141be7f204",
+  "record": {
+    "claimId": "claim_85a972e5144ff1c803aac5141be7f204",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "ai-ngã-ngũ-role-trên-settlement-phase-3-s3-closeout",
+    "sourceLines": [
+      310,
+      310
+    ],
+    "sourceDigest": "8aaf79d96e8764fe3ddca86618ab2693738753c8e172dbe14fc86f3abe07df4e",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "ai-ngã-ngũ-role-trên-settlement-phase-3-s3-closeout",
+    "targetDigest": "8aaf79d96e8764fe3ddca86618ab2693738753c8e172dbe14fc86f3abe07df4e",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Ai ngã-ngũ — role trên settlement (Phase 3 S3-closeout)",
+    "anchor": "ai-ngã-ngũ-role-trên-settlement-phase-3-s3-closeout",
+    "githubAnchor": "ai-ngã-ngũ-role-trên-settlement-phase-3-s3-closeout",
+    "stableAnchor": "h-937b356df576",
+    "startLine": 310,
+    "endLine": 310,
+    "textDigest": "8aaf79d96e8764fe3ddca86618ab2693738753c8e172dbe14fc86f3abe07df4e",
+    "sample": "Ai ngã-ngũ — role trên settlement (Phase 3 S3-closeout)",
+    "sectionPayloadDigest": "715bb2a168264335864794eb0495210740d1cb0233eb79997a280da265c74082",
+    "followingBlockDigest": "7a42c3eb3aa1bd08033ac943c4fec8ea15d8c5126735b4c690ab4cdf3175e300",
+    "identityFingerprint": "ea80d12c37c8a04a8c31768388e7fde5ca6a79c7d26d1bd70ebf4eaa08b55c35",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations"
+    ],
+    "text": "### Ai ngã-ngũ — role trên settlement (Phase 3 S3-closeout)",
+    "sectionText": "### Ai ngã-ngũ — role trên settlement (Phase 3 S3-closeout)\n\nMỗi ngã-ngũ (kênh 1 của capture 2 kênh — xem spec Work-State \"Bản ghi\nsettlement\") mang thêm ai/cái gì đã ngã-ngũ nó:\n\n- **Runs when:** mọi ngã-ngũ mà chính runner tự ghi trong vòng dispatch của\n  nó — quét làm-rõ cho qua, quét chia-việc cho qua, nhận việc, đề xuất, đỗ.\n- **What changes:** ngã-ngũ đó mang `role` = **runner**. Ngã-ngũ do một\n  phiên đang sống tự gọi tay context-discovery mang `role` = **session**;\n  ngã-ngũ do người gọi qua một lệnh CLI (chuyển trạng thái tay, trả lời một\n  câu hỏi đang chờ) mang `role` = **human** — ba giá trị này phủ hết mọi\n  đường ngã-ngũ hiện có. Từ vựng `role` nói chung nay có thêm giá trị thứ tư,\n  `system` — cạnh do máy sinh ra như hệ quả của một verb, không do ai quyết\n định — nhưng dùng trên cạnh park nội bộ (per str46-io-contract), không\n  phải một điểm ngã-ngũ, nên không tính vào ba giá trị trên.\n- **Afterwards:** ai đọc lại nhật ký (qua `fgos metrics outcomes`) biết chính xác AI đã\n  đưa item qua từng ngã-ngũ của nó, không chỉ SỰ KIỆN gì đã xảy ra."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Ai ngã-ngũ — role trên settlement (Phase 3 S3-closeout)",
+    "anchor": "ai-ngã-ngũ-role-trên-settlement-phase-3-s3-closeout",
+    "githubAnchor": "ai-ngã-ngũ-role-trên-settlement-phase-3-s3-closeout",
+    "stableAnchor": "h-9f1bffdc8d08",
+    "startLine": 234,
+    "endLine": 234,
+    "textDigest": "8aaf79d96e8764fe3ddca86618ab2693738753c8e172dbe14fc86f3abe07df4e",
+    "sample": "Ai ngã-ngũ — role trên settlement (Phase 3 S3-closeout)",
+    "sectionPayloadDigest": "715bb2a168264335864794eb0495210740d1cb0233eb79997a280da265c74082",
+    "followingBlockDigest": "7a42c3eb3aa1bd08033ac943c4fec8ea15d8c5126735b4c690ab4cdf3175e300",
+    "identityFingerprint": "ea80d12c37c8a04a8c31768388e7fde5ca6a79c7d26d1bd70ebf4eaa08b55c35",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations"
+    ],
+    "text": "### Ai ngã-ngũ — role trên settlement (Phase 3 S3-closeout)",
+    "sectionText": "### Ai ngã-ngũ — role trên settlement (Phase 3 S3-closeout)\n\nMỗi ngã-ngũ (kênh 1 của capture 2 kênh — xem spec Work-State \"Bản ghi\nsettlement\") mang thêm ai/cái gì đã ngã-ngũ nó:\n\n- **Runs when:** mọi ngã-ngũ mà chính runner tự ghi trong vòng dispatch của\n  nó — quét làm-rõ cho qua, quét chia-việc cho qua, nhận việc, đề xuất, đỗ.\n- **What changes:** ngã-ngũ đó mang `role` = **runner**. Ngã-ngũ do một\n  phiên đang sống tự gọi tay context-discovery mang `role` = **session**;\n  ngã-ngũ do người gọi qua một lệnh CLI (chuyển trạng thái tay, trả lời một\n  câu hỏi đang chờ) mang `role` = **human** — ba giá trị này phủ hết mọi\n  đường ngã-ngũ hiện có. Từ vựng `role` nói chung nay có thêm giá trị thứ tư,\n  `system` — cạnh do máy sinh ra như hệ quả của một verb, không do ai quyết\n định — nhưng dùng trên cạnh park nội bộ (per str46-io-contract), không\n  phải một điểm ngã-ngũ, nên không tính vào ba giá trị trên.\n- **Afterwards:** ai đọc lại nhật ký (qua `fgos metrics outcomes`) biết chính xác AI đã\n  đưa item qua từng ngã-ngũ của nó, không chỉ SỰ KIỆN gì đã xảy ra."
+  }
+}
+```
+
+## claim_620028f486242c7a473bc79645c71e41
+
+Source digest (evidence JSON): d7a92447146160d8cb134a0d1b9a3f6079cb41faa590de28a378b92da835a49a
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_620028f486242c7a473bc79645c71e41",
+  "record": {
+    "claimId": "claim_620028f486242c7a473bc79645c71e41",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "unheaded-block-30",
+    "sourceLines": [
+      312,
+      313
+    ],
+    "sourceDigest": "7a42c3eb3aa1bd08033ac943c4fec8ea15d8c5126735b4c690ab4cdf3175e300",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "unheaded-block-18",
+    "targetDigest": "7a42c3eb3aa1bd08033ac943c4fec8ea15d8c5126735b4c690ab4cdf3175e300",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-30",
+    "githubAnchor": "unheaded-block-30",
+    "stableAnchor": "unheaded-block-30",
+    "title": "Unheaded block 30",
+    "startLine": 312,
+    "endLine": 313,
+    "textDigest": "7a42c3eb3aa1bd08033ac943c4fec8ea15d8c5126735b4c690ab4cdf3175e300",
+    "sample": "Mỗi ngã-ngũ (kênh 1 của capture 2 kênh — xem spec Work-State \"Bản ghi\nsettlement\") mang thêm ai/cái gì đã ngã-ngũ nó:",
+    "identityFingerprint": "28b71e4d9630ad1d2c17764bddafc079c1741b6f9790a6f164259018a1d37a46",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations",
+      "Ai ngã-ngũ — role trên settlement (Phase 3 S3-closeout)"
+    ],
+    "text": "Mỗi ngã-ngũ (kênh 1 của capture 2 kênh — xem spec Work-State \"Bản ghi\nsettlement\") mang thêm ai/cái gì đã ngã-ngũ nó:"
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-18",
+    "githubAnchor": "unheaded-block-18",
+    "stableAnchor": "unheaded-block-18",
+    "title": "Unheaded block 18",
+    "startLine": 236,
+    "endLine": 237,
+    "textDigest": "7a42c3eb3aa1bd08033ac943c4fec8ea15d8c5126735b4c690ab4cdf3175e300",
+    "sample": "Mỗi ngã-ngũ (kênh 1 của capture 2 kênh — xem spec Work-State \"Bản ghi\nsettlement\") mang thêm ai/cái gì đã ngã-ngũ nó:",
+    "identityFingerprint": "28b71e4d9630ad1d2c17764bddafc079c1741b6f9790a6f164259018a1d37a46",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations",
+      "Ai ngã-ngũ — role trên settlement (Phase 3 S3-closeout)"
+    ],
+    "text": "Mỗi ngã-ngũ (kênh 1 của capture 2 kênh — xem spec Work-State \"Bản ghi\nsettlement\") mang thêm ai/cái gì đã ngã-ngũ nó:"
+  }
+}
+```
+
+## claim_eb99a9f76e08b78ca828f756a151f24e
+
+Source digest (evidence JSON): e752a3a08cb503c010d45de3001f518c6dda29ac70a8732eca8b70f76b22808a
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_eb99a9f76e08b78ca828f756a151f24e",
+  "record": {
+    "claimId": "claim_eb99a9f76e08b78ca828f756a151f24e",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "unheaded-block-31",
+    "sourceLines": [
+      315,
+      326
+    ],
+    "sourceDigest": "f7a850e3632a4929a3ea118aa3369afc9f8ba52397cc7c07085de1621cfe1e81",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "unheaded-block-19",
+    "targetDigest": "f7a850e3632a4929a3ea118aa3369afc9f8ba52397cc7c07085de1621cfe1e81",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-31",
+    "githubAnchor": "unheaded-block-31",
+    "stableAnchor": "unheaded-block-31",
+    "title": "Unheaded block 31",
+    "startLine": 315,
+    "endLine": 326,
+    "textDigest": "f7a850e3632a4929a3ea118aa3369afc9f8ba52397cc7c07085de1621cfe1e81",
+    "sample": "- **Runs when:** mọi ngã-ngũ mà chính runner tự ghi trong vòng dispatch của\n  nó — quét làm-rõ cho qua, quét chia-việc cho qua, nhận việc, đề xuất, đỗ.\n- **What changes:** ngã-ngũ ",
+    "identityFingerprint": "65e8fedda6ecce4c6fba507206aad5ee7adeaca27c75f2ae299597d6ddf060a9",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations",
+      "Ai ngã-ngũ — role trên settlement (Phase 3 S3-closeout)"
+    ],
+    "text": "- **Runs when:** mọi ngã-ngũ mà chính runner tự ghi trong vòng dispatch của\n  nó — quét làm-rõ cho qua, quét chia-việc cho qua, nhận việc, đề xuất, đỗ.\n- **What changes:** ngã-ngũ đó mang `role` = **runner**. Ngã-ngũ do một\n  phiên đang sống tự gọi tay context-discovery mang `role` = **session**;\n  ngã-ngũ do người gọi qua một lệnh CLI (chuyển trạng thái tay, trả lời một\n  câu hỏi đang chờ) mang `role` = **human** — ba giá trị này phủ hết mọi\n  đường ngã-ngũ hiện có. Từ vựng `role` nói chung nay có thêm giá trị thứ tư,\n  `system` — cạnh do máy sinh ra như hệ quả của một verb, không do ai quyết\n định — nhưng dùng trên cạnh park nội bộ (per str46-io-contract), không\n  phải một điểm ngã-ngũ, nên không tính vào ba giá trị trên.\n- **Afterwards:** ai đọc lại nhật ký (qua `fgos metrics outcomes`) biết chính xác AI đã\n  đưa item qua từng ngã-ngũ của nó, không chỉ SỰ KIỆN gì đã xảy ra."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-19",
+    "githubAnchor": "unheaded-block-19",
+    "stableAnchor": "unheaded-block-19",
+    "title": "Unheaded block 19",
+    "startLine": 239,
+    "endLine": 250,
+    "textDigest": "f7a850e3632a4929a3ea118aa3369afc9f8ba52397cc7c07085de1621cfe1e81",
+    "sample": "- **Runs when:** mọi ngã-ngũ mà chính runner tự ghi trong vòng dispatch của\n  nó — quét làm-rõ cho qua, quét chia-việc cho qua, nhận việc, đề xuất, đỗ.\n- **What changes:** ngã-ngũ ",
+    "identityFingerprint": "65e8fedda6ecce4c6fba507206aad5ee7adeaca27c75f2ae299597d6ddf060a9",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations",
+      "Ai ngã-ngũ — role trên settlement (Phase 3 S3-closeout)"
+    ],
+    "text": "- **Runs when:** mọi ngã-ngũ mà chính runner tự ghi trong vòng dispatch của\n  nó — quét làm-rõ cho qua, quét chia-việc cho qua, nhận việc, đề xuất, đỗ.\n- **What changes:** ngã-ngũ đó mang `role` = **runner**. Ngã-ngũ do một\n  phiên đang sống tự gọi tay context-discovery mang `role` = **session**;\n  ngã-ngũ do người gọi qua một lệnh CLI (chuyển trạng thái tay, trả lời một\n  câu hỏi đang chờ) mang `role` = **human** — ba giá trị này phủ hết mọi\n  đường ngã-ngũ hiện có. Từ vựng `role` nói chung nay có thêm giá trị thứ tư,\n  `system` — cạnh do máy sinh ra như hệ quả của một verb, không do ai quyết\n định — nhưng dùng trên cạnh park nội bộ (per str46-io-contract), không\n  phải một điểm ngã-ngũ, nên không tính vào ba giá trị trên.\n- **Afterwards:** ai đọc lại nhật ký (qua `fgos metrics outcomes`) biết chính xác AI đã\n  đưa item qua từng ngã-ngũ của nó, không chỉ SỰ KIỆN gì đã xảy ra."
+  }
+}
+```
+
+## claim_755400b3a9eb9c30de416274e7640bad
+
+Source digest (evidence JSON): 557ab8bb11cb9d36f5344d0f9334321d7214986647852b625b9451b1a29ce7bf
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_755400b3a9eb9c30de416274e7640bad",
+  "record": {
+    "claimId": "claim_755400b3a9eb9c30de416274e7640bad",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "cổng-duyệt-pr-nội-bộ-approval-gate-reviewapprovereject",
+    "sourceLines": [
+      328,
+      328
+    ],
+    "sourceDigest": "82ff33c387aac2673e8aa51b5dfae092bc17fcfe90019aa50de38cdb2546ed97",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "cổng-duyệt-pr-nội-bộ-approval-gate-reviewapprovereject",
+    "targetDigest": "82ff33c387aac2673e8aa51b5dfae092bc17fcfe90019aa50de38cdb2546ed97",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Cổng duyệt PR nội bộ (approval gate) — review/approve/reject",
+    "anchor": "cổng-duyệt-pr-nội-bộ-approval-gate-reviewapprovereject",
+    "githubAnchor": "cổng-duyệt-pr-nội-bộ-approval-gate-reviewapprovereject",
+    "stableAnchor": "h-38682f5a66a1",
+    "startLine": 328,
+    "endLine": 328,
+    "textDigest": "82ff33c387aac2673e8aa51b5dfae092bc17fcfe90019aa50de38cdb2546ed97",
+    "sample": "Cổng duyệt PR nội bộ (approval gate) — review/approve/reject",
+    "sectionPayloadDigest": "d3f6599fd70008a3f66f95ac710bfd4063a7cc61c103c342e842693d46679edd",
+    "followingBlockDigest": "29df2322c782d0df2126efffc06edea0046e9d10ac26f5bbaf1aac3640aef75b",
+    "identityFingerprint": "b19a7b2356921c47a980b92d26ed85bca2451d0125923cf0f48a08234e8594c5",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations"
+    ],
+    "text": "### Cổng duyệt PR nội bộ (approval gate) — review/approve/reject",
+    "sectionText": "### Cổng duyệt PR nội bộ (approval gate) — review/approve/reject\n\nMỘT cổng duyệt duy nhất cho MỌI đề xuất `awaiting-approval`, bất kể nguồn (per \npr-lifecycle / 1359ab5e): một đề xuất do runner tự đề xuất (nhánh `fgw/<id>`\ncòn sống) và một đề xuất đến qua cửa pull `take`/`return` (dải commit\n`headAtTake→headAtReturn`, xem spec Work-State) đi qua CÙNG ba verb, cùng\nluật. Trước khi `review`/`approve` hành động, đề xuất được PHÂN LOẠI đúng một\ntrong ba nguồn: **runner** (nhánh `fgw/<id>` tồn tại — `git rev-parse\n--verify`), **pull** (không nhánh, nhưng mang cả `headAtTake` VÀ\n`headAtReturn`), hoặc **legacy** (không cả hai — đề xuất từ trước feature này,\nhoặc nhánh/dấu vết đã mất).\n\nSong song với phân loại NGUỒN ở trên, một đề xuất nguồn **runner** còn được phân\nbiệt theo TẦNG trong cây nhánh tích hợp (xem \"Cây nhánh tích hợp\" trên): một đề\nxuất **con** (có việc cha) so sánh/nhập với NHÁNH CỦA GỐC nó thay vì cây chính;\nmột đề xuất **gốc/độc lập** so sánh/nhập với cây chính như trước, không đổi. Một\nviệc con gãy nhập mang đúng lý do gãy-nhập sẵn có (`merge-conflict`/`verify-fail-\npost-merge`) như mọi nhập gãy khác; lý do trôi-tích-hợp riêng chỉ dành cho một\nGỐC từng có con gãy nhập vào CÂY CHÍNH (xem \"Trôi tích hợp & đồng bộ lại\" trên).\n\n- **Runs when:** người vận hành gọi `fgos review <id>` / `fgos approve <id>\n  [--timeout <ms>] [--acknowledge-iron-law]` / `fgos reject <id> --reason\n  \"...\"` trên một item đang `awaiting-approval`.\n- **Blocked when:** item không tồn tại — `validation`; item không ở\n  `awaiting-approval` — `precondition` (\"nothing to review/approve/reject\"); `reject`\n  thiếu `--reason` — `validation` (bắt buộc, cùng khuôn `awaiting-approval→todo`);\n  `approve --timeout` không phải số dương — `validation`; `approve` trên\n  nguồn `runner` khi working tree của main KHÔNG sạch — `validation` (phép\n  kiểm này loại trừ `.fgos/`: store sống mang cửa ghi riêng, tự mutate bởi\n  chính take/return/approve nên không bao giờ tính là bẩn — `isFgosOnlyStatusLine`,\n  `src/runner/merge.mjs`); `approve` trên nguồn `runner` **đang land lên trunk** (`resolveRoot(view,\n  id) === id`) khi phán Iron Law trả\n  `required: true` mà KHÔNG mang `--acknowledge-iron-law` **và\n  `ironLaw.level` là `ask`** — `validation`,\n  thông điệp nêu tên đúng cờ/module đã khớp (self-improve loop STR13 Slice 3,\nranh giới trunk + mức `ask`/`warn` per `0032` — xem \"Iron Law\"\n  dưới, RUL37 (Iron Law hỏi ở đúng một ranh giới — trunk — cho mọi đề xuất nguồn runner tới đó)/RUL64 (`ironLaw.level` — key config riêng của cổng Iron Law, fail-closed về `ask`)); chặn này chạy TRƯỚC cả bước kiểm cây sạch\n  ở trên, không git nào chạy, đề xuất giữ nguyên `awaiting-approval`. Một\n  leaf land vào `fgw/<root>` không đi qua chặn này chút nào, và ở mức\n  `warn` chặn này không bao giờ từ chối — nó cảnh báo, ghi bản ghi, rồi\n  merge tiếp. `approve` (KHÔNG\n  `--github`) khi `cwd` NẰM TRONG một worktree phiên đã đăng ký (khớp hoặc\n  lồng dưới một `worktreePath` trong `.fgos/sessions.json`) — `validation`,\n  áp CHUNG cho cả hai nguồn `runner` VÀ `pull`/`legacy`, từ chối TRƯỚC mọi\n  lệnh git và trước cả lần chạy `verify`/goal-check nào: đề xuất giữ nguyên\n  `awaiting-approval`, main không đụng tới, thông điệp nêu ĐÍCH DANH session-id `cwd`\n  đang lồng trong và bảo người gọi chạy `approve` từ cây chính, hoặc `fgos\n  session end <id>` trước (fgos-multi-session-checkout Epic 2 — xem \"Phiên\n  checkout đa-phiên\" dưới cho hai mối nguy riêng của mỗi nguồn). Ngay sau\n  chặn theo sổ đăng ký đó, `approve` (KHÔNG `--github`) còn chạy MỘT chặn cấu\n  trúc thứ hai, không dựa sổ đăng ký: `isMainWorktree(repoRoot)`\n  (`src/runner/merge.mjs`) so `git rev-parse --show-toplevel` của `cwd` với\n  thư mục cha của `git rev-parse --git-common-dir` (đã resolve tuyệt đối) —\n  bằng nhau nghĩa là cây chính, khác nhau nghĩa là MỘT worktree liên-kết bất\n  kỳ, dù đã đăng ký qua `fgos session start` hay một `git worktree add` tay\n  không bao giờ gọi qua verb đó (STR44 — sổ đăng ký ở trên chỉ bắt được\n  trường hợp đã đăng ký; chặn cấu trúc này bắt luôn worktree tay không đăng\n  ký, cùng nguy cơ false-verification hệt như worktree phiên: merge đáp vào\n  chính checkout của worktree đó thay vì cây chính, hoặc goal-check xác minh\n  đúng cây (có thể cũ/lệch) của worktree đó trong khi đề xuất vẫn báo\n  \"done\"/\"verified on main\"). Từ chối TRƯỚC mọi lệnh git và trước verify/\n  goal-check nào, cùng khuôn với chặn sổ đăng ký (đề xuất giữ `awaiting-approval`,\n  main không đụng tới); fail-open (coi là cây chính) khi `repoRoot` hoàn\n  toàn KHÔNG phải một repo git — giữ nguyên hành vi đề xuất `legacy` chạy\n  trên một thư mục không-git vẫn hoạt động như trước. **(Cập nhật,\n approve-worktree-guard-github-fix):** `approve --github` KHÔNG còn\n  được miễn CẢ HAI chặn định-danh-worktree này — chặn sổ đăng ký và chặn\n  cấu trúc đều dời lên chạy TRƯỚC nhánh `--github` (trước bất kỳ merge\n  GitHub hay ghi trạng thái nào), vì tính hợp lệ của MÔI TRƯỜNG gọi lệnh\n  (đây có đúng là worktree chính không) là điều kiện nền tảng hơn vận\n  chuyển nào được chọn. `approve --github` CHỈ còn miễn phép kiểm\n  cây-làm-việc-chính-phải-sạch (xem \"Cổng duyệt qua GitHub\" dưới) — phép\n  kiểm đó tồn tại riêng vì một merge CỤC BỘ làm bẩn cây làm việc, điều một\n  merge qua GitHub không hề gây ra. Phán Iron Law thì KHÔNG miễn: nó đã\n  được dời lên chạy trước cả nhánh `--github` (review-20260718-self-improve-loop\n  f01, xem RUL37 (Iron Law hỏi ở đúng một ranh giới — trunk — cho mọi đề xuất nguồn runner tới đó)), nên một root land lên trunk qua GitHub đi qua đúng cổng\n  ấy y như qua merge cục bộ. Không nhánh chặn nào ghi sự kiện.\n- **What changes:**\n  - `review <id>` — thuần đọc (không sự kiện nào): in diff theo nguồn —\n    `runner` → `git diff main...fgw/<id>`; `pull` → `git diff\n    headAtTake..headAtReturn` (dải NÀY có thể chứa commit của một phiên khác\n    chen giữa `take`..`return` trong môi trường nhiều-phiên — CHẤP NHẬN\n    degrade trung thực: in thêm một cảnh báo đếm số commit lạ trong dải,\n    không bao giờ giấu); `legacy` → in cảnh báo \"không có nguồn diff\", KHÔNG\n    BAO GIỜ nổ. Kèm một trace tóm tắt (outcome/friction hiện có của item, tái\n    dùng định dạng của `check` sẵn có — không formatter mới).\n  - `approve <id>` — nguồn `runner`: TRƯỚC MỌI thao tác git, khi và chỉ khi\n    lần merge này land lên trunk (`resolveRoot(view, id) === id`), chạy phán\n Iron Law (self-improve loop STR13 Slice 3, ranh giới trunk per\n    `0032` — xem \"Iron Law\" dưới) trên\n    diff của chính đề xuất; `required: true` thiếu `--acknowledge-iron-law` →\n    ở mức `ask` từ chối ngay (xem Blocked when), ở mức `warn` cảnh báo + ghi\n    một bản ghi `kind: engine` rồi đi tiếp (RUL64 (`ironLaw.level` — key config riêng của cổng Iron Law, fail-closed về `ask`)); còn lại (required: false,\n    hoặc required: true kèm cờ, hoặc merge target không phải trunk) đi tiếp\n    đúng đường merge dưới đây, không đổi. `git merge --no-commit --no-ff\n    fgw/<id>` staging-only vào main (spike \"nocommit-probe\", xem\n    `docs/history/pr-lifecycle/reports/validation-s1-gate.md`); **conflict**\n    → `git merge --abort` (main nguyên vẹn byte-for-byte, spike\n    \"merge-abort-probe\") + `awaiting-approval → blocked` (reason `merge-conflict`) +\n    một bản ghi friction lớp `state`; **staged sạch** → chạy `verify` CỦA\n    ITEM (goal-check) trên chính cây đã staged, CHƯA commit — xanh → `git\n    commit` (hoàn tất merge) rồi `awaiting-approval → done` mang **role `human`**\n (người chạy approve là ngã-ngũ, merge chỉ là hệ quả cơ học) + dọn\n    nhánh/worktree (best-effort); đỏ → `git merge --abort` (main nguyên vẹn)\n    + `awaiting-approval → blocked` (reason `verify-fail-post-merge`) + friction lớp\n    `verification`. Nguồn `pull`/`legacy` — KHÔNG có bước merge (code đã\n trên main): chạy thẳng `verify` của item trên main qua CÙNG hàm\n    `runGoalCheck` mà `return`/runner dùng — xanh → `done` role human; đỏ →\n    `blocked` (reason `verify-fail`) + friction `verification`.\n  - `reject <id> --reason` — `awaiting-approval → todo` mang `reason` + role human;\n KHÔNG BAO GIỜ chạy một lệnh git nào (\"không auto-revert\" — code của\n    một đề xuất pull-door đã trên main là lịch sử; `reject` chỉ là từ-chối\n    coi-là-xong, không đảo ngược lịch sử).\n- **Side effects:** `approve` nguồn `runner` chạy các tiến trình con git\n  (`merge --no-commit --no-ff`, `merge --abort` khi cần, `commit`) cộng một\n  lần chạy `verify` của item; `approve` nguồn `pull`/`legacy` chỉ chạy\n  `verify`; `review`/`reject` không có side effect ngoài đọc/ghi sự kiện\n  tương ứng.\n- **Afterwards:** merge sạch → item `done`, nhánh/worktree dọn, việc phụ\n  thuộc mở khóa như mọi `done` khác; merge/verify gãy → item `blocked` mang\n  reason cụ thể, đậu lại chờ người (không tự rebase, không halt cả vòng\n  runner); `reject` → item về `todo` mang reason, vào lại hàng chờ, chống-lặp\n  đếm bình thường như mọi lần trả về khác."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Cổng duyệt PR nội bộ (approval gate) — review/approve/reject",
+    "anchor": "cổng-duyệt-pr-nội-bộ-approval-gate-reviewapprovereject",
+    "githubAnchor": "cổng-duyệt-pr-nội-bộ-approval-gate-reviewapprovereject",
+    "stableAnchor": "h-c6e8e0b4b192",
+    "startLine": 252,
+    "endLine": 252,
+    "textDigest": "82ff33c387aac2673e8aa51b5dfae092bc17fcfe90019aa50de38cdb2546ed97",
+    "sample": "Cổng duyệt PR nội bộ (approval gate) — review/approve/reject",
+    "sectionPayloadDigest": "d3f6599fd70008a3f66f95ac710bfd4063a7cc61c103c342e842693d46679edd",
+    "followingBlockDigest": "29df2322c782d0df2126efffc06edea0046e9d10ac26f5bbaf1aac3640aef75b",
+    "identityFingerprint": "b19a7b2356921c47a980b92d26ed85bca2451d0125923cf0f48a08234e8594c5",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations"
+    ],
+    "text": "### Cổng duyệt PR nội bộ (approval gate) — review/approve/reject",
+    "sectionText": "### Cổng duyệt PR nội bộ (approval gate) — review/approve/reject\n\nMỘT cổng duyệt duy nhất cho MỌI đề xuất `awaiting-approval`, bất kể nguồn (per \npr-lifecycle / 1359ab5e): một đề xuất do runner tự đề xuất (nhánh `fgw/<id>`\ncòn sống) và một đề xuất đến qua cửa pull `take`/`return` (dải commit\n`headAtTake→headAtReturn`, xem spec Work-State) đi qua CÙNG ba verb, cùng\nluật. Trước khi `review`/`approve` hành động, đề xuất được PHÂN LOẠI đúng một\ntrong ba nguồn: **runner** (nhánh `fgw/<id>` tồn tại — `git rev-parse\n--verify`), **pull** (không nhánh, nhưng mang cả `headAtTake` VÀ\n`headAtReturn`), hoặc **legacy** (không cả hai — đề xuất từ trước feature này,\nhoặc nhánh/dấu vết đã mất).\n\nSong song với phân loại NGUỒN ở trên, một đề xuất nguồn **runner** còn được phân\nbiệt theo TẦNG trong cây nhánh tích hợp (xem \"Cây nhánh tích hợp\" trên): một đề\nxuất **con** (có việc cha) so sánh/nhập với NHÁNH CỦA GỐC nó thay vì cây chính;\nmột đề xuất **gốc/độc lập** so sánh/nhập với cây chính như trước, không đổi. Một\nviệc con gãy nhập mang đúng lý do gãy-nhập sẵn có (`merge-conflict`/`verify-fail-\npost-merge`) như mọi nhập gãy khác; lý do trôi-tích-hợp riêng chỉ dành cho một\nGỐC từng có con gãy nhập vào CÂY CHÍNH (xem \"Trôi tích hợp & đồng bộ lại\" trên).\n\n- **Runs when:** người vận hành gọi `fgos review <id>` / `fgos approve <id>\n  [--timeout <ms>] [--acknowledge-iron-law]` / `fgos reject <id> --reason\n  \"...\"` trên một item đang `awaiting-approval`.\n- **Blocked when:** item không tồn tại — `validation`; item không ở\n  `awaiting-approval` — `precondition` (\"nothing to review/approve/reject\"); `reject`\n  thiếu `--reason` — `validation` (bắt buộc, cùng khuôn `awaiting-approval→todo`);\n  `approve --timeout` không phải số dương — `validation`; `approve` trên\n  nguồn `runner` khi working tree của main KHÔNG sạch — `validation` (phép\n  kiểm này loại trừ `.fgos/`: store sống mang cửa ghi riêng, tự mutate bởi\n  chính take/return/approve nên không bao giờ tính là bẩn — `isFgosOnlyStatusLine`,\n  `src/runner/merge.mjs`); `approve` trên nguồn `runner` **đang land lên trunk** (`resolveRoot(view,\n  id) === id`) khi phán Iron Law trả\n  `required: true` mà KHÔNG mang `--acknowledge-iron-law` **và\n  `ironLaw.level` là `ask`** — `validation`,\n  thông điệp nêu tên đúng cờ/module đã khớp (self-improve loop STR13 Slice 3,\nranh giới trunk + mức `ask`/`warn` per `0032` — xem \"Iron Law\"\n  dưới, RUL37 (Iron Law hỏi ở đúng một ranh giới — trunk — cho mọi đề xuất nguồn runner tới đó)/RUL64 (`ironLaw.level` — key config riêng của cổng Iron Law, fail-closed về `ask`)); chặn này chạy TRƯỚC cả bước kiểm cây sạch\n  ở trên, không git nào chạy, đề xuất giữ nguyên `awaiting-approval`. Một\n  leaf land vào `fgw/<root>` không đi qua chặn này chút nào, và ở mức\n  `warn` chặn này không bao giờ từ chối — nó cảnh báo, ghi bản ghi, rồi\n  merge tiếp. `approve` (KHÔNG\n  `--github`) khi `cwd` NẰM TRONG một worktree phiên đã đăng ký (khớp hoặc\n  lồng dưới một `worktreePath` trong `.fgos/sessions.json`) — `validation`,\n  áp CHUNG cho cả hai nguồn `runner` VÀ `pull`/`legacy`, từ chối TRƯỚC mọi\n  lệnh git và trước cả lần chạy `verify`/goal-check nào: đề xuất giữ nguyên\n  `awaiting-approval`, main không đụng tới, thông điệp nêu ĐÍCH DANH session-id `cwd`\n  đang lồng trong và bảo người gọi chạy `approve` từ cây chính, hoặc `fgos\n  session end <id>` trước (fgos-multi-session-checkout Epic 2 — xem \"Phiên\n  checkout đa-phiên\" dưới cho hai mối nguy riêng của mỗi nguồn). Ngay sau\n  chặn theo sổ đăng ký đó, `approve` (KHÔNG `--github`) còn chạy MỘT chặn cấu\n  trúc thứ hai, không dựa sổ đăng ký: `isMainWorktree(repoRoot)`\n  (`src/runner/merge.mjs`) so `git rev-parse --show-toplevel` của `cwd` với\n  thư mục cha của `git rev-parse --git-common-dir` (đã resolve tuyệt đối) —\n  bằng nhau nghĩa là cây chính, khác nhau nghĩa là MỘT worktree liên-kết bất\n  kỳ, dù đã đăng ký qua `fgos session start` hay một `git worktree add` tay\n  không bao giờ gọi qua verb đó (STR44 — sổ đăng ký ở trên chỉ bắt được\n  trường hợp đã đăng ký; chặn cấu trúc này bắt luôn worktree tay không đăng\n  ký, cùng nguy cơ false-verification hệt như worktree phiên: merge đáp vào\n  chính checkout của worktree đó thay vì cây chính, hoặc goal-check xác minh\n  đúng cây (có thể cũ/lệch) của worktree đó trong khi đề xuất vẫn báo\n  \"done\"/\"verified on main\"). Từ chối TRƯỚC mọi lệnh git và trước verify/\n  goal-check nào, cùng khuôn với chặn sổ đăng ký (đề xuất giữ `awaiting-approval`,\n  main không đụng tới); fail-open (coi là cây chính) khi `repoRoot` hoàn\n  toàn KHÔNG phải một repo git — giữ nguyên hành vi đề xuất `legacy` chạy\n  trên một thư mục không-git vẫn hoạt động như trước. **(Cập nhật,\n approve-worktree-guard-github-fix):** `approve --github` KHÔNG còn\n  được miễn CẢ HAI chặn định-danh-worktree này — chặn sổ đăng ký và chặn\n  cấu trúc đều dời lên chạy TRƯỚC nhánh `--github` (trước bất kỳ merge\n  GitHub hay ghi trạng thái nào), vì tính hợp lệ của MÔI TRƯỜNG gọi lệnh\n  (đây có đúng là worktree chính không) là điều kiện nền tảng hơn vận\n  chuyển nào được chọn. `approve --github` CHỈ còn miễn phép kiểm\n  cây-làm-việc-chính-phải-sạch (xem \"Cổng duyệt qua GitHub\" dưới) — phép\n  kiểm đó tồn tại riêng vì một merge CỤC BỘ làm bẩn cây làm việc, điều một\n  merge qua GitHub không hề gây ra. Phán Iron Law thì KHÔNG miễn: nó đã\n  được dời lên chạy trước cả nhánh `--github` (review-20260718-self-improve-loop\n  f01, xem RUL37 (Iron Law hỏi ở đúng một ranh giới — trunk — cho mọi đề xuất nguồn runner tới đó)), nên một root land lên trunk qua GitHub đi qua đúng cổng\n  ấy y như qua merge cục bộ. Không nhánh chặn nào ghi sự kiện.\n- **What changes:**\n  - `review <id>` — thuần đọc (không sự kiện nào): in diff theo nguồn —\n    `runner` → `git diff main...fgw/<id>`; `pull` → `git diff\n    headAtTake..headAtReturn` (dải NÀY có thể chứa commit của một phiên khác\n    chen giữa `take`..`return` trong môi trường nhiều-phiên — CHẤP NHẬN\n    degrade trung thực: in thêm một cảnh báo đếm số commit lạ trong dải,\n    không bao giờ giấu); `legacy` → in cảnh báo \"không có nguồn diff\", KHÔNG\n    BAO GIỜ nổ. Kèm một trace tóm tắt (outcome/friction hiện có của item, tái\n    dùng định dạng của `check` sẵn có — không formatter mới).\n  - `approve <id>` — nguồn `runner`: TRƯỚC MỌI thao tác git, khi và chỉ khi\n    lần merge này land lên trunk (`resolveRoot(view, id) === id`), chạy phán\n Iron Law (self-improve loop STR13 Slice 3, ranh giới trunk per\n    `0032` — xem \"Iron Law\" dưới) trên\n    diff của chính đề xuất; `required: true` thiếu `--acknowledge-iron-law` →\n    ở mức `ask` từ chối ngay (xem Blocked when), ở mức `warn` cảnh báo + ghi\n    một bản ghi `kind: engine` rồi đi tiếp (RUL64 (`ironLaw.level` — key config riêng của cổng Iron Law, fail-closed về `ask`)); còn lại (required: false,\n    hoặc required: true kèm cờ, hoặc merge target không phải trunk) đi tiếp\n    đúng đường merge dưới đây, không đổi. `git merge --no-commit --no-ff\n    fgw/<id>` staging-only vào main (spike \"nocommit-probe\", xem\n    `docs/history/pr-lifecycle/reports/validation-s1-gate.md`); **conflict**\n    → `git merge --abort` (main nguyên vẹn byte-for-byte, spike\n    \"merge-abort-probe\") + `awaiting-approval → blocked` (reason `merge-conflict`) +\n    một bản ghi friction lớp `state`; **staged sạch** → chạy `verify` CỦA\n    ITEM (goal-check) trên chính cây đã staged, CHƯA commit — xanh → `git\n    commit` (hoàn tất merge) rồi `awaiting-approval → done` mang **role `human`**\n (người chạy approve là ngã-ngũ, merge chỉ là hệ quả cơ học) + dọn\n    nhánh/worktree (best-effort); đỏ → `git merge --abort` (main nguyên vẹn)\n    + `awaiting-approval → blocked` (reason `verify-fail-post-merge`) + friction lớp\n    `verification`. Nguồn `pull`/`legacy` — KHÔNG có bước merge (code đã\n trên main): chạy thẳng `verify` của item trên main qua CÙNG hàm\n    `runGoalCheck` mà `return`/runner dùng — xanh → `done` role human; đỏ →\n    `blocked` (reason `verify-fail`) + friction `verification`.\n  - `reject <id> --reason` — `awaiting-approval → todo` mang `reason` + role human;\n KHÔNG BAO GIỜ chạy một lệnh git nào (\"không auto-revert\" — code của\n    một đề xuất pull-door đã trên main là lịch sử; `reject` chỉ là từ-chối\n    coi-là-xong, không đảo ngược lịch sử).\n- **Side effects:** `approve` nguồn `runner` chạy các tiến trình con git\n  (`merge --no-commit --no-ff`, `merge --abort` khi cần, `commit`) cộng một\n  lần chạy `verify` của item; `approve` nguồn `pull`/`legacy` chỉ chạy\n  `verify`; `review`/`reject` không có side effect ngoài đọc/ghi sự kiện\n  tương ứng.\n- **Afterwards:** merge sạch → item `done`, nhánh/worktree dọn, việc phụ\n  thuộc mở khóa như mọi `done` khác; merge/verify gãy → item `blocked` mang\n  reason cụ thể, đậu lại chờ người (không tự rebase, không halt cả vòng\n  runner); `reject` → item về `todo` mang reason, vào lại hàng chờ, chống-lặp\n  đếm bình thường như mọi lần trả về khác."
+  }
+}
+```
+
+## claim_a455569255ad8333458d730b7f81d6e1
+
+Source digest (evidence JSON): c97443b8d6379b42897cfda8abe63f62a112cbbf22dbcb404d9d2e516c7f31be
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_a455569255ad8333458d730b7f81d6e1",
+  "record": {
+    "claimId": "claim_a455569255ad8333458d730b7f81d6e1",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "unheaded-block-32",
+    "sourceLines": [
+      330,
+      338
+    ],
+    "sourceDigest": "29df2322c782d0df2126efffc06edea0046e9d10ac26f5bbaf1aac3640aef75b",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "unheaded-block-20",
+    "targetDigest": "29df2322c782d0df2126efffc06edea0046e9d10ac26f5bbaf1aac3640aef75b",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-32",
+    "githubAnchor": "unheaded-block-32",
+    "stableAnchor": "unheaded-block-32",
+    "title": "Unheaded block 32",
+    "startLine": 330,
+    "endLine": 338,
+    "textDigest": "29df2322c782d0df2126efffc06edea0046e9d10ac26f5bbaf1aac3640aef75b",
+    "sample": "MỘT cổng duyệt duy nhất cho MỌI đề xuất `awaiting-approval`, bất kể nguồn (per \npr-lifecycle / 1359ab5e): một đề xuất do runner tự đề xuất (nhánh `fgw/<id>`\ncòn sống) và một đề xuấ",
+    "identityFingerprint": "f7bbb363b6f775f5d6d9bb262ff162dc5b176bb55eb056e4eadd2b4e4404940e",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations",
+      "Cổng duyệt PR nội bộ (approval gate) — review/approve/reject"
+    ],
+    "text": "MỘT cổng duyệt duy nhất cho MỌI đề xuất `awaiting-approval`, bất kể nguồn (per \npr-lifecycle / 1359ab5e): một đề xuất do runner tự đề xuất (nhánh `fgw/<id>`\ncòn sống) và một đề xuất đến qua cửa pull `take`/`return` (dải commit\n`headAtTake→headAtReturn`, xem spec Work-State) đi qua CÙNG ba verb, cùng\nluật. Trước khi `review`/`approve` hành động, đề xuất được PHÂN LOẠI đúng một\ntrong ba nguồn: **runner** (nhánh `fgw/<id>` tồn tại — `git rev-parse\n--verify`), **pull** (không nhánh, nhưng mang cả `headAtTake` VÀ\n`headAtReturn`), hoặc **legacy** (không cả hai — đề xuất từ trước feature này,\nhoặc nhánh/dấu vết đã mất)."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-20",
+    "githubAnchor": "unheaded-block-20",
+    "stableAnchor": "unheaded-block-20",
+    "title": "Unheaded block 20",
+    "startLine": 254,
+    "endLine": 262,
+    "textDigest": "29df2322c782d0df2126efffc06edea0046e9d10ac26f5bbaf1aac3640aef75b",
+    "sample": "MỘT cổng duyệt duy nhất cho MỌI đề xuất `awaiting-approval`, bất kể nguồn (per \npr-lifecycle / 1359ab5e): một đề xuất do runner tự đề xuất (nhánh `fgw/<id>`\ncòn sống) và một đề xuấ",
+    "identityFingerprint": "f7bbb363b6f775f5d6d9bb262ff162dc5b176bb55eb056e4eadd2b4e4404940e",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations",
+      "Cổng duyệt PR nội bộ (approval gate) — review/approve/reject"
+    ],
+    "text": "MỘT cổng duyệt duy nhất cho MỌI đề xuất `awaiting-approval`, bất kể nguồn (per \npr-lifecycle / 1359ab5e): một đề xuất do runner tự đề xuất (nhánh `fgw/<id>`\ncòn sống) và một đề xuất đến qua cửa pull `take`/`return` (dải commit\n`headAtTake→headAtReturn`, xem spec Work-State) đi qua CÙNG ba verb, cùng\nluật. Trước khi `review`/`approve` hành động, đề xuất được PHÂN LOẠI đúng một\ntrong ba nguồn: **runner** (nhánh `fgw/<id>` tồn tại — `git rev-parse\n--verify`), **pull** (không nhánh, nhưng mang cả `headAtTake` VÀ\n`headAtReturn`), hoặc **legacy** (không cả hai — đề xuất từ trước feature này,\nhoặc nhánh/dấu vết đã mất)."
+  }
+}
+```
+
+## claim_85d580fba9495eef054058ecb7746057
+
+Source digest (evidence JSON): 7d928ecc3699343fd682a985dde471f73eee79f10283847bf2cc410e10bb52e6
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_85d580fba9495eef054058ecb7746057",
+  "record": {
+    "claimId": "claim_85d580fba9495eef054058ecb7746057",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "unheaded-block-33",
+    "sourceLines": [
+      340,
+      346
+    ],
+    "sourceDigest": "5d45d0eb1c94a18613179f9932bdd7a51358e3472817ffcfdc5df54960bd2665",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "unheaded-block-21",
+    "targetDigest": "5d45d0eb1c94a18613179f9932bdd7a51358e3472817ffcfdc5df54960bd2665",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-33",
+    "githubAnchor": "unheaded-block-33",
+    "stableAnchor": "unheaded-block-33",
+    "title": "Unheaded block 33",
+    "startLine": 340,
+    "endLine": 346,
+    "textDigest": "5d45d0eb1c94a18613179f9932bdd7a51358e3472817ffcfdc5df54960bd2665",
+    "sample": "Song song với phân loại NGUỒN ở trên, một đề xuất nguồn **runner** còn được phân\nbiệt theo TẦNG trong cây nhánh tích hợp (xem \"Cây nhánh tích hợp\" trên): một đề\nxuất **con** (có vi",
+    "identityFingerprint": "a24207a34d370962f6a11f7eba11f0e6163856b0f32fbd24ae8395c850f7b5e2",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations",
+      "Cổng duyệt PR nội bộ (approval gate) — review/approve/reject"
+    ],
+    "text": "Song song với phân loại NGUỒN ở trên, một đề xuất nguồn **runner** còn được phân\nbiệt theo TẦNG trong cây nhánh tích hợp (xem \"Cây nhánh tích hợp\" trên): một đề\nxuất **con** (có việc cha) so sánh/nhập với NHÁNH CỦA GỐC nó thay vì cây chính;\nmột đề xuất **gốc/độc lập** so sánh/nhập với cây chính như trước, không đổi. Một\nviệc con gãy nhập mang đúng lý do gãy-nhập sẵn có (`merge-conflict`/`verify-fail-\npost-merge`) như mọi nhập gãy khác; lý do trôi-tích-hợp riêng chỉ dành cho một\nGỐC từng có con gãy nhập vào CÂY CHÍNH (xem \"Trôi tích hợp & đồng bộ lại\" trên)."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-21",
+    "githubAnchor": "unheaded-block-21",
+    "stableAnchor": "unheaded-block-21",
+    "title": "Unheaded block 21",
+    "startLine": 264,
+    "endLine": 270,
+    "textDigest": "5d45d0eb1c94a18613179f9932bdd7a51358e3472817ffcfdc5df54960bd2665",
+    "sample": "Song song với phân loại NGUỒN ở trên, một đề xuất nguồn **runner** còn được phân\nbiệt theo TẦNG trong cây nhánh tích hợp (xem \"Cây nhánh tích hợp\" trên): một đề\nxuất **con** (có vi",
+    "identityFingerprint": "a24207a34d370962f6a11f7eba11f0e6163856b0f32fbd24ae8395c850f7b5e2",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations",
+      "Cổng duyệt PR nội bộ (approval gate) — review/approve/reject"
+    ],
+    "text": "Song song với phân loại NGUỒN ở trên, một đề xuất nguồn **runner** còn được phân\nbiệt theo TẦNG trong cây nhánh tích hợp (xem \"Cây nhánh tích hợp\" trên): một đề\nxuất **con** (có việc cha) so sánh/nhập với NHÁNH CỦA GỐC nó thay vì cây chính;\nmột đề xuất **gốc/độc lập** so sánh/nhập với cây chính như trước, không đổi. Một\nviệc con gãy nhập mang đúng lý do gãy-nhập sẵn có (`merge-conflict`/`verify-fail-\npost-merge`) như mọi nhập gãy khác; lý do trôi-tích-hợp riêng chỉ dành cho một\nGỐC từng có con gãy nhập vào CÂY CHÍNH (xem \"Trôi tích hợp & đồng bộ lại\" trên)."
+  }
+}
+```
+
+## claim_aaca29487ce49fbc1cf3aed873d710a3
+
+Source digest (evidence JSON): 1961c2c9ad54c6721cb8eac16f355ef69b4634bea761e4f8989b50be30add825
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_aaca29487ce49fbc1cf3aed873d710a3",
+  "record": {
+    "claimId": "claim_aaca29487ce49fbc1cf3aed873d710a3",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "unheaded-block-34",
+    "sourceLines": [
+      348,
+      450
+    ],
+    "sourceDigest": "770b4294b4c56424a5352b5650768771989705930fb4577ed9eabe33e15e8759",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "unheaded-block-22",
+    "targetDigest": "770b4294b4c56424a5352b5650768771989705930fb4577ed9eabe33e15e8759",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-34",
+    "githubAnchor": "unheaded-block-34",
+    "stableAnchor": "unheaded-block-34",
+    "title": "Unheaded block 34",
+    "startLine": 348,
+    "endLine": 450,
+    "textDigest": "770b4294b4c56424a5352b5650768771989705930fb4577ed9eabe33e15e8759",
+    "sample": "- **Runs when:** người vận hành gọi `fgos review <id>` / `fgos approve <id>\n  [--timeout <ms>] [--acknowledge-iron-law]` / `fgos reject <id> --reason\n  \"...\"` trên một item đang `a",
+    "identityFingerprint": "18c15e13dffacdd6894cb1181c41e742324d4b26627a7346aa4baae20a4a34f2",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations",
+      "Cổng duyệt PR nội bộ (approval gate) — review/approve/reject"
+    ],
+    "text": "- **Runs when:** người vận hành gọi `fgos review <id>` / `fgos approve <id>\n  [--timeout <ms>] [--acknowledge-iron-law]` / `fgos reject <id> --reason\n  \"...\"` trên một item đang `awaiting-approval`.\n- **Blocked when:** item không tồn tại — `validation`; item không ở\n  `awaiting-approval` — `precondition` (\"nothing to review/approve/reject\"); `reject`\n  thiếu `--reason` — `validation` (bắt buộc, cùng khuôn `awaiting-approval→todo`);\n  `approve --timeout` không phải số dương — `validation`; `approve` trên\n  nguồn `runner` khi working tree của main KHÔNG sạch — `validation` (phép\n  kiểm này loại trừ `.fgos/`: store sống mang cửa ghi riêng, tự mutate bởi\n  chính take/return/approve nên không bao giờ tính là bẩn — `isFgosOnlyStatusLine`,\n  `src/runner/merge.mjs`); `approve` trên nguồn `runner` **đang land lên trunk** (`resolveRoot(view,\n  id) === id`) khi phán Iron Law trả\n  `required: true` mà KHÔNG mang `--acknowledge-iron-law` **và\n  `ironLaw.level` là `ask`** — `validation`,\n  thông điệp nêu tên đúng cờ/module đã khớp (self-improve loop STR13 Slice 3,\nranh giới trunk + mức `ask`/`warn` per `0032` — xem \"Iron Law\"\n  dưới, RUL37 (Iron Law hỏi ở đúng một ranh giới — trunk — cho mọi đề xuất nguồn runner tới đó)/RUL64 (`ironLaw.level` — key config riêng của cổng Iron Law, fail-closed về `ask`)); chặn này chạy TRƯỚC cả bước kiểm cây sạch\n  ở trên, không git nào chạy, đề xuất giữ nguyên `awaiting-approval`. Một\n  leaf land vào `fgw/<root>` không đi qua chặn này chút nào, và ở mức\n  `warn` chặn này không bao giờ từ chối — nó cảnh báo, ghi bản ghi, rồi\n  merge tiếp. `approve` (KHÔNG\n  `--github`) khi `cwd` NẰM TRONG một worktree phiên đã đăng ký (khớp hoặc\n  lồng dưới một `worktreePath` trong `.fgos/sessions.json`) — `validation`,\n  áp CHUNG cho cả hai nguồn `runner` VÀ `pull`/`legacy`, từ chối TRƯỚC mọi\n  lệnh git và trước cả lần chạy `verify`/goal-check nào: đề xuất giữ nguyên\n  `awaiting-approval`, main không đụng tới, thông điệp nêu ĐÍCH DANH session-id `cwd`\n  đang lồng trong và bảo người gọi chạy `approve` từ cây chính, hoặc `fgos\n  session end <id>` trước (fgos-multi-session-checkout Epic 2 — xem \"Phiên\n  checkout đa-phiên\" dưới cho hai mối nguy riêng của mỗi nguồn). Ngay sau\n  chặn theo sổ đăng ký đó, `approve` (KHÔNG `--github`) còn chạy MỘT chặn cấu\n  trúc thứ hai, không dựa sổ đăng ký: `isMainWorktree(repoRoot)`\n  (`src/runner/merge.mjs`) so `git rev-parse --show-toplevel` của `cwd` với\n  thư mục cha của `git rev-parse --git-common-dir` (đã resolve tuyệt đối) —\n  bằng nhau nghĩa là cây chính, khác nhau nghĩa là MỘT worktree liên-kết bất\n  kỳ, dù đã đăng ký qua `fgos session start` hay một `git worktree add` tay\n  không bao giờ gọi qua verb đó (STR44 — sổ đăng ký ở trên chỉ bắt được\n  trường hợp đã đăng ký; chặn cấu trúc này bắt luôn worktree tay không đăng\n  ký, cùng nguy cơ false-verification hệt như worktree phiên: merge đáp vào\n  chính checkout của worktree đó thay vì cây chính, hoặc goal-check xác minh\n  đúng cây (có thể cũ/lệch) của worktree đó trong khi đề xuất vẫn báo\n  \"done\"/\"verified on main\"). Từ chối TRƯỚC mọi lệnh git và trước verify/\n  goal-check nào, cùng khuôn với chặn sổ đăng ký (đề xuất giữ `awaiting-approval`,\n  main không đụng tới); fail-open (coi là cây chính) khi `repoRoot` hoàn\n  toàn KHÔNG phải một repo git — giữ nguyên hành vi đề xuất `legacy` chạy\n  trên một thư mục không-git vẫn hoạt động như trước. **(Cập nhật,\n approve-worktree-guard-github-fix):** `approve --github` KHÔNG còn\n  được miễn CẢ HAI chặn định-danh-worktree này — chặn sổ đăng ký và chặn\n  cấu trúc đều dời lên chạy TRƯỚC nhánh `--github` (trước bất kỳ merge\n  GitHub hay ghi trạng thái nào), vì tính hợp lệ của MÔI TRƯỜNG gọi lệnh\n  (đây có đúng là worktree chính không) là điều kiện nền tảng hơn vận\n  chuyển nào được chọn. `approve --github` CHỈ còn miễn phép kiểm\n  cây-làm-việc-chính-phải-sạch (xem \"Cổng duyệt qua GitHub\" dưới) — phép\n  kiểm đó tồn tại riêng vì một merge CỤC BỘ làm bẩn cây làm việc, điều một\n  merge qua GitHub không hề gây ra. Phán Iron Law thì KHÔNG miễn: nó đã\n  được dời lên chạy trước cả nhánh `--github` (review-20260718-self-improve-loop\n  f01, xem RUL37 (Iron Law hỏi ở đúng một ranh giới — trunk — cho mọi đề xuất nguồn runner tới đó)), nên một root land lên trunk qua GitHub đi qua đúng cổng\n  ấy y như qua merge cục bộ. Không nhánh chặn nào ghi sự kiện.\n- **What changes:**\n  - `review <id>` — thuần đọc (không sự kiện nào): in diff theo nguồn —\n    `runner` → `git diff main...fgw/<id>`; `pull` → `git diff\n    headAtTake..headAtReturn` (dải NÀY có thể chứa commit của một phiên khác\n    chen giữa `take`..`return` trong môi trường nhiều-phiên — CHẤP NHẬN\n    degrade trung thực: in thêm một cảnh báo đếm số commit lạ trong dải,\n    không bao giờ giấu); `legacy` → in cảnh báo \"không có nguồn diff\", KHÔNG\n    BAO GIỜ nổ. Kèm một trace tóm tắt (outcome/friction hiện có của item, tái\n    dùng định dạng của `check` sẵn có — không formatter mới).\n  - `approve <id>` — nguồn `runner`: TRƯỚC MỌI thao tác git, khi và chỉ khi\n    lần merge này land lên trunk (`resolveRoot(view, id) === id`), chạy phán\n Iron Law (self-improve loop STR13 Slice 3, ranh giới trunk per\n    `0032` — xem \"Iron Law\" dưới) trên\n    diff của chính đề xuất; `required: true` thiếu `--acknowledge-iron-law` →\n    ở mức `ask` từ chối ngay (xem Blocked when), ở mức `warn` cảnh báo + ghi\n    một bản ghi `kind: engine` rồi đi tiếp (RUL64 (`ironLaw.level` — key config riêng của cổng Iron Law, fail-closed về `ask`)); còn lại (required: false,\n    hoặc required: true kèm cờ, hoặc merge target không phải trunk) đi tiếp\n    đúng đường merge dưới đây, không đổi. `git merge --no-commit --no-ff\n    fgw/<id>` staging-only vào main (spike \"nocommit-probe\", xem\n    `docs/history/pr-lifecycle/reports/validation-s1-gate.md`); **conflict**\n    → `git merge --abort` (main nguyên vẹn byte-for-byte, spike\n    \"merge-abort-probe\") + `awaiting-approval → blocked` (reason `merge-conflict`) +\n    một bản ghi friction lớp `state`; **staged sạch** → chạy `verify` CỦA\n    ITEM (goal-check) trên chính cây đã staged, CHƯA commit — xanh → `git\n    commit` (hoàn tất merge) rồi `awaiting-approval → done` mang **role `human`**\n (người chạy approve là ngã-ngũ, merge chỉ là hệ quả cơ học) + dọn\n    nhánh/worktree (best-effort); đỏ → `git merge --abort` (main nguyên vẹn)\n    + `awaiting-approval → blocked` (reason `verify-fail-post-merge`) + friction lớp\n    `verification`. Nguồn `pull`/`legacy` — KHÔNG có bước merge (code đã\n trên main): chạy thẳng `verify` của item trên main qua CÙNG hàm\n    `runGoalCheck` mà `return`/runner dùng — xanh → `done` role human; đỏ →\n    `blocked` (reason `verify-fail`) + friction `verification`.\n  - `reject <id> --reason` — `awaiting-approval → todo` mang `reason` + role human;\n KHÔNG BAO GIỜ chạy một lệnh git nào (\"không auto-revert\" — code của\n    một đề xuất pull-door đã trên main là lịch sử; `reject` chỉ là từ-chối\n    coi-là-xong, không đảo ngược lịch sử).\n- **Side effects:** `approve` nguồn `runner` chạy các tiến trình con git\n  (`merge --no-commit --no-ff`, `merge --abort` khi cần, `commit`) cộng một\n  lần chạy `verify` của item; `approve` nguồn `pull`/`legacy` chỉ chạy\n  `verify`; `review`/`reject` không có side effect ngoài đọc/ghi sự kiện\n  tương ứng.\n- **Afterwards:** merge sạch → item `done`, nhánh/worktree dọn, việc phụ\n  thuộc mở khóa như mọi `done` khác; merge/verify gãy → item `blocked` mang\n  reason cụ thể, đậu lại chờ người (không tự rebase, không halt cả vòng\n  runner); `reject` → item về `todo` mang reason, vào lại hàng chờ, chống-lặp\n  đếm bình thường như mọi lần trả về khác."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-22",
+    "githubAnchor": "unheaded-block-22",
+    "stableAnchor": "unheaded-block-22",
+    "title": "Unheaded block 22",
+    "startLine": 272,
+    "endLine": 374,
+    "textDigest": "770b4294b4c56424a5352b5650768771989705930fb4577ed9eabe33e15e8759",
+    "sample": "- **Runs when:** người vận hành gọi `fgos review <id>` / `fgos approve <id>\n  [--timeout <ms>] [--acknowledge-iron-law]` / `fgos reject <id> --reason\n  \"...\"` trên một item đang `a",
+    "identityFingerprint": "18c15e13dffacdd6894cb1181c41e742324d4b26627a7346aa4baae20a4a34f2",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations",
+      "Cổng duyệt PR nội bộ (approval gate) — review/approve/reject"
+    ],
+    "text": "- **Runs when:** người vận hành gọi `fgos review <id>` / `fgos approve <id>\n  [--timeout <ms>] [--acknowledge-iron-law]` / `fgos reject <id> --reason\n  \"...\"` trên một item đang `awaiting-approval`.\n- **Blocked when:** item không tồn tại — `validation`; item không ở\n  `awaiting-approval` — `precondition` (\"nothing to review/approve/reject\"); `reject`\n  thiếu `--reason` — `validation` (bắt buộc, cùng khuôn `awaiting-approval→todo`);\n  `approve --timeout` không phải số dương — `validation`; `approve` trên\n  nguồn `runner` khi working tree của main KHÔNG sạch — `validation` (phép\n  kiểm này loại trừ `.fgos/`: store sống mang cửa ghi riêng, tự mutate bởi\n  chính take/return/approve nên không bao giờ tính là bẩn — `isFgosOnlyStatusLine`,\n  `src/runner/merge.mjs`); `approve` trên nguồn `runner` **đang land lên trunk** (`resolveRoot(view,\n  id) === id`) khi phán Iron Law trả\n  `required: true` mà KHÔNG mang `--acknowledge-iron-law` **và\n  `ironLaw.level` là `ask`** — `validation`,\n  thông điệp nêu tên đúng cờ/module đã khớp (self-improve loop STR13 Slice 3,\nranh giới trunk + mức `ask`/`warn` per `0032` — xem \"Iron Law\"\n  dưới, RUL37 (Iron Law hỏi ở đúng một ranh giới — trunk — cho mọi đề xuất nguồn runner tới đó)/RUL64 (`ironLaw.level` — key config riêng của cổng Iron Law, fail-closed về `ask`)); chặn này chạy TRƯỚC cả bước kiểm cây sạch\n  ở trên, không git nào chạy, đề xuất giữ nguyên `awaiting-approval`. Một\n  leaf land vào `fgw/<root>` không đi qua chặn này chút nào, và ở mức\n  `warn` chặn này không bao giờ từ chối — nó cảnh báo, ghi bản ghi, rồi\n  merge tiếp. `approve` (KHÔNG\n  `--github`) khi `cwd` NẰM TRONG một worktree phiên đã đăng ký (khớp hoặc\n  lồng dưới một `worktreePath` trong `.fgos/sessions.json`) — `validation`,\n  áp CHUNG cho cả hai nguồn `runner` VÀ `pull`/`legacy`, từ chối TRƯỚC mọi\n  lệnh git và trước cả lần chạy `verify`/goal-check nào: đề xuất giữ nguyên\n  `awaiting-approval`, main không đụng tới, thông điệp nêu ĐÍCH DANH session-id `cwd`\n  đang lồng trong và bảo người gọi chạy `approve` từ cây chính, hoặc `fgos\n  session end <id>` trước (fgos-multi-session-checkout Epic 2 — xem \"Phiên\n  checkout đa-phiên\" dưới cho hai mối nguy riêng của mỗi nguồn). Ngay sau\n  chặn theo sổ đăng ký đó, `approve` (KHÔNG `--github`) còn chạy MỘT chặn cấu\n  trúc thứ hai, không dựa sổ đăng ký: `isMainWorktree(repoRoot)`\n  (`src/runner/merge.mjs`) so `git rev-parse --show-toplevel` của `cwd` với\n  thư mục cha của `git rev-parse --git-common-dir` (đã resolve tuyệt đối) —\n  bằng nhau nghĩa là cây chính, khác nhau nghĩa là MỘT worktree liên-kết bất\n  kỳ, dù đã đăng ký qua `fgos session start` hay một `git worktree add` tay\n  không bao giờ gọi qua verb đó (STR44 — sổ đăng ký ở trên chỉ bắt được\n  trường hợp đã đăng ký; chặn cấu trúc này bắt luôn worktree tay không đăng\n  ký, cùng nguy cơ false-verification hệt như worktree phiên: merge đáp vào\n  chính checkout của worktree đó thay vì cây chính, hoặc goal-check xác minh\n  đúng cây (có thể cũ/lệch) của worktree đó trong khi đề xuất vẫn báo\n  \"done\"/\"verified on main\"). Từ chối TRƯỚC mọi lệnh git và trước verify/\n  goal-check nào, cùng khuôn với chặn sổ đăng ký (đề xuất giữ `awaiting-approval`,\n  main không đụng tới); fail-open (coi là cây chính) khi `repoRoot` hoàn\n  toàn KHÔNG phải một repo git — giữ nguyên hành vi đề xuất `legacy` chạy\n  trên một thư mục không-git vẫn hoạt động như trước. **(Cập nhật,\n approve-worktree-guard-github-fix):** `approve --github` KHÔNG còn\n  được miễn CẢ HAI chặn định-danh-worktree này — chặn sổ đăng ký và chặn\n  cấu trúc đều dời lên chạy TRƯỚC nhánh `--github` (trước bất kỳ merge\n  GitHub hay ghi trạng thái nào), vì tính hợp lệ của MÔI TRƯỜNG gọi lệnh\n  (đây có đúng là worktree chính không) là điều kiện nền tảng hơn vận\n  chuyển nào được chọn. `approve --github` CHỈ còn miễn phép kiểm\n  cây-làm-việc-chính-phải-sạch (xem \"Cổng duyệt qua GitHub\" dưới) — phép\n  kiểm đó tồn tại riêng vì một merge CỤC BỘ làm bẩn cây làm việc, điều một\n  merge qua GitHub không hề gây ra. Phán Iron Law thì KHÔNG miễn: nó đã\n  được dời lên chạy trước cả nhánh `--github` (review-20260718-self-improve-loop\n  f01, xem RUL37 (Iron Law hỏi ở đúng một ranh giới — trunk — cho mọi đề xuất nguồn runner tới đó)), nên một root land lên trunk qua GitHub đi qua đúng cổng\n  ấy y như qua merge cục bộ. Không nhánh chặn nào ghi sự kiện.\n- **What changes:**\n  - `review <id>` — thuần đọc (không sự kiện nào): in diff theo nguồn —\n    `runner` → `git diff main...fgw/<id>`; `pull` → `git diff\n    headAtTake..headAtReturn` (dải NÀY có thể chứa commit của một phiên khác\n    chen giữa `take`..`return` trong môi trường nhiều-phiên — CHẤP NHẬN\n    degrade trung thực: in thêm một cảnh báo đếm số commit lạ trong dải,\n    không bao giờ giấu); `legacy` → in cảnh báo \"không có nguồn diff\", KHÔNG\n    BAO GIỜ nổ. Kèm một trace tóm tắt (outcome/friction hiện có của item, tái\n    dùng định dạng của `check` sẵn có — không formatter mới).\n  - `approve <id>` — nguồn `runner`: TRƯỚC MỌI thao tác git, khi và chỉ khi\n    lần merge này land lên trunk (`resolveRoot(view, id) === id`), chạy phán\n Iron Law (self-improve loop STR13 Slice 3, ranh giới trunk per\n    `0032` — xem \"Iron Law\" dưới) trên\n    diff của chính đề xuất; `required: true` thiếu `--acknowledge-iron-law` →\n    ở mức `ask` từ chối ngay (xem Blocked when), ở mức `warn` cảnh báo + ghi\n    một bản ghi `kind: engine` rồi đi tiếp (RUL64 (`ironLaw.level` — key config riêng của cổng Iron Law, fail-closed về `ask`)); còn lại (required: false,\n    hoặc required: true kèm cờ, hoặc merge target không phải trunk) đi tiếp\n    đúng đường merge dưới đây, không đổi. `git merge --no-commit --no-ff\n    fgw/<id>` staging-only vào main (spike \"nocommit-probe\", xem\n    `docs/history/pr-lifecycle/reports/validation-s1-gate.md`); **conflict**\n    → `git merge --abort` (main nguyên vẹn byte-for-byte, spike\n    \"merge-abort-probe\") + `awaiting-approval → blocked` (reason `merge-conflict`) +\n    một bản ghi friction lớp `state`; **staged sạch** → chạy `verify` CỦA\n    ITEM (goal-check) trên chính cây đã staged, CHƯA commit — xanh → `git\n    commit` (hoàn tất merge) rồi `awaiting-approval → done` mang **role `human`**\n (người chạy approve là ngã-ngũ, merge chỉ là hệ quả cơ học) + dọn\n    nhánh/worktree (best-effort); đỏ → `git merge --abort` (main nguyên vẹn)\n    + `awaiting-approval → blocked` (reason `verify-fail-post-merge`) + friction lớp\n    `verification`. Nguồn `pull`/`legacy` — KHÔNG có bước merge (code đã\n trên main): chạy thẳng `verify` của item trên main qua CÙNG hàm\n    `runGoalCheck` mà `return`/runner dùng — xanh → `done` role human; đỏ →\n    `blocked` (reason `verify-fail`) + friction `verification`.\n  - `reject <id> --reason` — `awaiting-approval → todo` mang `reason` + role human;\n KHÔNG BAO GIỜ chạy một lệnh git nào (\"không auto-revert\" — code của\n    một đề xuất pull-door đã trên main là lịch sử; `reject` chỉ là từ-chối\n    coi-là-xong, không đảo ngược lịch sử).\n- **Side effects:** `approve` nguồn `runner` chạy các tiến trình con git\n  (`merge --no-commit --no-ff`, `merge --abort` khi cần, `commit`) cộng một\n  lần chạy `verify` của item; `approve` nguồn `pull`/`legacy` chỉ chạy\n  `verify`; `review`/`reject` không có side effect ngoài đọc/ghi sự kiện\n  tương ứng.\n- **Afterwards:** merge sạch → item `done`, nhánh/worktree dọn, việc phụ\n  thuộc mở khóa như mọi `done` khác; merge/verify gãy → item `blocked` mang\n  reason cụ thể, đậu lại chờ người (không tự rebase, không halt cả vòng\n  runner); `reject` → item về `todo` mang reason, vào lại hàng chờ, chống-lặp\n  đếm bình thường như mọi lần trả về khác."
+  }
+}
+```
+
+## claim_0e24592e02fa91f1606eceb21b3f8d06
+
+Source digest (evidence JSON): dc006b18557b01b0a540263ab08bbb285a1d2f28b3179564ca4d76751e7937fd
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_0e24592e02fa91f1606eceb21b3f8d06",
+  "record": {
+    "claimId": "claim_0e24592e02fa91f1606eceb21b3f8d06",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "cổng-duyệt-qua-github-github-transport-tuỳ-chọn-reviewapprove---github",
+    "sourceLines": [
+      452,
+      452
+    ],
+    "sourceDigest": "70f158b97d460c6cd790f466868963419ca1955f3543d63e9cc93154bcdb4c5f",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "cổng-duyệt-qua-github-github-transport-tuỳ-chọn-reviewapprove---github",
+    "targetDigest": "70f158b97d460c6cd790f466868963419ca1955f3543d63e9cc93154bcdb4c5f",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Cổng duyệt qua GitHub (GitHub transport, tuỳ chọn) — review/approve --github",
+    "anchor": "cổng-duyệt-qua-github-github-transport-tuỳ-chọn-reviewapprove---github",
+    "githubAnchor": "cổng-duyệt-qua-github-github-transport-tuỳ-chọn-reviewapprove---github",
+    "stableAnchor": "h-08e39ae28949",
+    "startLine": 452,
+    "endLine": 452,
+    "textDigest": "70f158b97d460c6cd790f466868963419ca1955f3543d63e9cc93154bcdb4c5f",
+    "sample": "Cổng duyệt qua GitHub (GitHub transport, tuỳ chọn) — review/approve --github",
+    "sectionPayloadDigest": "f03111c37f3e47cdb6f1b447c4b589f04c5ee410173fe630020be066364e3800",
+    "followingBlockDigest": "e82f96712a0c1cfc5158b93bc557a9443ec6df7a73d168271ab0633de02e4ebc",
+    "identityFingerprint": "373cf780474002509110d855bc0888f37f1095304480d40458c9606ffedd69a0",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations"
+    ],
+    "text": "### Cổng duyệt qua GitHub (GitHub transport, tuỳ chọn) — review/approve --github",
+    "sectionText": "### Cổng duyệt qua GitHub (GitHub transport, tuỳ chọn) — review/approve --github\n\nMột VẬN CHUYỂN thay thế của CHÍNH cổng duyệt PR nội bộ trên (github-adapter)\n— không phải một cổng thứ hai, không đổi luật FSM/role của cổng\ngốc: chỗ diễn ra việc xem-diff chuyển sang trang PR thật trên GitHub, và chỗ\nthực hiện merge chuyển sang API của GitHub thay vì `git merge` cục bộ. Chỉ áp\ndụng cho đề xuất **nguồn runner** (nhánh `fgw/<id>` còn sống) — nguồn\npull-door/legacy không có nhánh để mở PR. Tuỳ chọn và cộng thêm: hoàn\ntoàn không đụng đường duyệt cục bộ sẵn có — một đề xuất không bao giờ bị ép\nđi qua GitHub, người vận hành chọn mỗi lần gọi lệnh.\n\nViệc mở PR và việc merge PR là HAI bước tách rời, gọi qua hai verb khác nhau\n— không gộp một lệnh, vì một PR vừa mở chưa có lượt duyệt nào trên GitHub, gộp\nmột lệnh sẽ luôn gãy ngay lần dùng đầu tiên:\n\n- **Runs when:** người vận hành gọi `fgos review <id> --github` (mở PR) rồi\n  sau đó, sau khi đã tự duyệt/không-duyệt trên trang GitHub, gọi `fgos\n  approve <id> --github --pr <n>` (merge PR số `n` vừa mở). Bất cứ lúc nào\n  giữa hai bước đó, người vận hành cũng có thể gọi `fgos review <id> --github\n  --pr <n>` (CÙNG verb, thêm `--pr`) để hỏi thăm trạng thái sống của PR trên\n  GitHub mà không mở PR mới và không merge gì — đây là cơ chế phát hiện một\n PR bị đóng trên GitHub mà KHÔNG merge (github-adapter).\n- **Blocked when:** đề xuất không phải nguồn runner (source ∈ pull/legacy) —\n  từ chối `validation` ngay, không gọi GitHub, nêu rõ lý do \"không có nhánh\n để gắn PR\" — KHÔNG BAO GIỜ tự âm thầm quay về đường duyệt cục bộ (gãy\n  chuyển thẳng sang chặn/đỗ, không tự hạ cấp vận chuyển). `approve --github`\n  thiếu `--pr <n>` — `validation`, nêu rõ phải lấy số PR từ một lần `review\n  --github` trước đó. Phép kiểm nguồn chạy TRƯỚC phép kiểm `--pr` (một đề\n  xuất pull/legacy luôn nhận đúng thông điệp \"không phải nguồn runner\", không\n  bao giờ bị thông điệp \"thiếu --pr\" gây hiểu lầm). `approve --github` KHÔNG\n  đi qua phép kiểm cây-làm-việc-chính-phải-sạch của đường duyệt cục bộ —\n  phép kiểm đó tồn tại chỉ vì một merge CỤC BỘ làm bẩn cây làm việc; một\n  merge qua GitHub không đụng cây làm việc cục bộ chút nào. Phán Iron Law\n  KHÔNG nằm trong miễn trừ này (review-20260718-self-improve-loop f01, xem\n  RUL37 (Iron Law hỏi ở đúng một ranh giới — trunk — cho mọi đề xuất nguồn runner tới đó)): nó chạy TRƯỚC cả nhánh `--github`, nên một root land lên trunk qua\n  GitHub vẫn phải qua đúng cổng ấy.\n  `approve --github` VẪN chạy qua hai chặn định-danh-worktree của đường cục\n  bộ (sổ đăng ký phiên + chặn cấu trúc `isMainWorktree` — xem \"Cổng duyệt PR\n  nội bộ\" trên), TRƯỚC CẢ nhánh `--github`: dù merge diễn ra qua GitHub,\n  trạng thái `done` vẫn không được lạc vào một worktree khác trong khi GitHub\n  đã báo PR merged. Vì hai chặn này chạy trước phép kiểm nguồn của `--github`,\n  một đề xuất nguồn KHÔNG-runner gọi `approve --github` TỪ một worktree\n  liên-kết (đã đăng ký hay tay) nhận thông điệp từ-chối định-danh-worktree,\n  không phải thông điệp \"không phải nguồn runner\" ở trên — tính hợp lệ MÔI\n  TRƯỜNG (đây có phải cây chính không) được kiểm trước tính hợp lệ NGHIỆP VỤ\n  (nguồn của đề xuất có hợp với `--github` không), phòng-thủ-theo-chiều-sâu\n có chủ đích.\n- **What changes:**\n  - `review <id> --github` — đẩy nhánh của đề xuất lên remote gốc nếu nhánh\n    đó chưa từng được đẩy (thăm dò tồn tại trước, chỉ đẩy khi thật sự cần —\n    trường hợp bình thường của lần đầu), rồi mở một PR thật trên GitHub, đích\n    là nhánh trục của kho (đề xuất gốc/độc lập) hoặc nhánh của gốc (đề xuất\n    con, cùng khuôn tầng với đường cục bộ). Thành công → in số PR và hướng\n    dẫn bước kế tiếp (đi duyệt trên GitHub rồi gọi `approve --github --pr\n    <n>`); KHÔNG BAO GIỜ tự dựng đường dẫn PR (không đủ thông tin để dựng\n    đúng, chỉ nêu số PR). Gãy (GitHub không cho mở PR — vd chưa đăng nhập,\n    mất mạng) → in lý do, đề xuất giữ NGUYÊN `awaiting-approval`, không sự kiện nào\n    được ghi — `review` vẫn thuần-đọc trên trạng thái FSM y hệt đường cục bộ,\n    dù bên ngoài (GitHub) đã có tác dụng phụ thật (nhánh đã đẩy).\n - `review <id> --github --pr <n>` (github-adapter, phát hiện đóng-không-\n    merge) — KHÔNG mở PR mới; chỉ hỏi thăm trạng thái SỐNG của PR số `n` trên\n    GitHub, thuần đọc tuyệt đối (không sự kiện nào, không friction nào, dưới\n    MỌI kết cục — một PR bị đóng trên GitHub không tự nó là một hành động\n    duyệt hay từ chối). Phân loại CHỈ dựa trên hai trường tự-nó-đã-rõ-nghĩa —\n    \"đã đóng chưa\" (có/không) và \"đã merge lúc nào\" (có dấu thời gian hay\n    không) — KHÔNG BAO GIỜ dựa vào một chuỗi trạng thái tổng quát của GitHub,\n    vì lần chứng minh thật (S1) chưa từng quan sát chuỗi đó cho một PR đã đóng\n    hay đã merge. Ba kết quả: (1) còn mở → không có gì để làm, gợi ý gọi\n    `approve --github --pr <n>` khi đã sẵn sàng; (2) đã merge → chỉ mang tính\n    thông tin, KHÔNG tự đổi trạng thái cục bộ (bao trùm cả trường hợp một\n    người merge thẳng trên trang GitHub, bỏ qua `approve --github` — đối chiếu\n lại tình huống đó nằm ngoài phạm vi, giữ việc thực thi merge/verify ở\n    máy cục bộ); (3) đã đóng KHÔNG merge → nêu rõ số PR, hướng dẫn người vận\n    hành tự gọi `fgos reject <id> --reason \"...\"` nếu muốn đưa việc về lại\n hàng chờ — đây CHÍNH LÀ cơ chế phát hiện yêu cầu, nhưng bản thân phép\n    hỏi thăm này không bao giờ tự động gọi `reject` thay người.\n  - `approve <id> --github --pr <n>` — gọi merge của GitHub trên đúng PR số\n `n`. Sạch → `awaiting-approval → done` mang role `human` (người gọi approve\n    là ngã-ngũ, merge chỉ là hệ quả cơ học — CÙNG nguyên tắc dù merge diễn ra\n    ở đâu). Gãy (bất kỳ lý do nào — GitHub chưa cho phép merge vì thiếu lượt\n    duyệt, xung đột thật, mất xác thực, giới hạn tần suất, mất mạng, hay bất\n    kỳ lỗi nào khác của lời gọi) → `awaiting-approval → blocked` mang lý do cụ thể +\n    một bản ghi friction, CÙNG khuôn với đường cục bộ (`merge-conflict`/\n    `verify-fail-post-merge`) — không phải hai khuôn song song.\n- **Side effects:** `review --github` có thể đẩy một nhánh lên remote gốc\n  (tác dụng phụ ngoài repo cục bộ) và luôn gọi ra GitHub khi thành công lẫn\n  khi gãy; `approve --github` luôn gọi ra GitHub.\n- **Afterwards:** mở PR thành công → đề xuất vẫn `awaiting-approval`, chờ người tự\n  duyệt trên GitHub rồi quay lại gọi `approve --github`; merge PR thành công\n  → item `done` y hệt đường cục bộ, việc phụ thuộc mở khóa như mọi `done`\n  khác — nhưng KHÁC đường cục bộ ở một điểm: nhánh riêng của đề xuất (cả bản\n  cục bộ lẫn bản đã đẩy lên remote gốc) KHÔNG được dọn tự động sau khi merge\n  qua GitHub (giới hạn đã biết, xem Open Gaps); merge gãy → item `blocked`\n  mang lý do cụ thể, đậu lại chờ người, cùng luật \"không tự rebase, không\n  halt cả vòng runner\" như mọi lần đỗ khác."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Cổng duyệt qua GitHub (GitHub transport, tuỳ chọn) — review/approve --github",
+    "anchor": "cổng-duyệt-qua-github-github-transport-tuỳ-chọn-reviewapprove---github",
+    "githubAnchor": "cổng-duyệt-qua-github-github-transport-tuỳ-chọn-reviewapprove---github",
+    "stableAnchor": "h-9f3f867ae366",
+    "startLine": 376,
+    "endLine": 376,
+    "textDigest": "70f158b97d460c6cd790f466868963419ca1955f3543d63e9cc93154bcdb4c5f",
+    "sample": "Cổng duyệt qua GitHub (GitHub transport, tuỳ chọn) — review/approve --github",
+    "sectionPayloadDigest": "f03111c37f3e47cdb6f1b447c4b589f04c5ee410173fe630020be066364e3800",
+    "followingBlockDigest": "e82f96712a0c1cfc5158b93bc557a9443ec6df7a73d168271ab0633de02e4ebc",
+    "identityFingerprint": "373cf780474002509110d855bc0888f37f1095304480d40458c9606ffedd69a0",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations"
+    ],
+    "text": "### Cổng duyệt qua GitHub (GitHub transport, tuỳ chọn) — review/approve --github",
+    "sectionText": "### Cổng duyệt qua GitHub (GitHub transport, tuỳ chọn) — review/approve --github\n\nMột VẬN CHUYỂN thay thế của CHÍNH cổng duyệt PR nội bộ trên (github-adapter)\n— không phải một cổng thứ hai, không đổi luật FSM/role của cổng\ngốc: chỗ diễn ra việc xem-diff chuyển sang trang PR thật trên GitHub, và chỗ\nthực hiện merge chuyển sang API của GitHub thay vì `git merge` cục bộ. Chỉ áp\ndụng cho đề xuất **nguồn runner** (nhánh `fgw/<id>` còn sống) — nguồn\npull-door/legacy không có nhánh để mở PR. Tuỳ chọn và cộng thêm: hoàn\ntoàn không đụng đường duyệt cục bộ sẵn có — một đề xuất không bao giờ bị ép\nđi qua GitHub, người vận hành chọn mỗi lần gọi lệnh.\n\nViệc mở PR và việc merge PR là HAI bước tách rời, gọi qua hai verb khác nhau\n— không gộp một lệnh, vì một PR vừa mở chưa có lượt duyệt nào trên GitHub, gộp\nmột lệnh sẽ luôn gãy ngay lần dùng đầu tiên:\n\n- **Runs when:** người vận hành gọi `fgos review <id> --github` (mở PR) rồi\n  sau đó, sau khi đã tự duyệt/không-duyệt trên trang GitHub, gọi `fgos\n  approve <id> --github --pr <n>` (merge PR số `n` vừa mở). Bất cứ lúc nào\n  giữa hai bước đó, người vận hành cũng có thể gọi `fgos review <id> --github\n  --pr <n>` (CÙNG verb, thêm `--pr`) để hỏi thăm trạng thái sống của PR trên\n  GitHub mà không mở PR mới và không merge gì — đây là cơ chế phát hiện một\n PR bị đóng trên GitHub mà KHÔNG merge (github-adapter).\n- **Blocked when:** đề xuất không phải nguồn runner (source ∈ pull/legacy) —\n  từ chối `validation` ngay, không gọi GitHub, nêu rõ lý do \"không có nhánh\n để gắn PR\" — KHÔNG BAO GIỜ tự âm thầm quay về đường duyệt cục bộ (gãy\n  chuyển thẳng sang chặn/đỗ, không tự hạ cấp vận chuyển). `approve --github`\n  thiếu `--pr <n>` — `validation`, nêu rõ phải lấy số PR từ một lần `review\n  --github` trước đó. Phép kiểm nguồn chạy TRƯỚC phép kiểm `--pr` (một đề\n  xuất pull/legacy luôn nhận đúng thông điệp \"không phải nguồn runner\", không\n  bao giờ bị thông điệp \"thiếu --pr\" gây hiểu lầm). `approve --github` KHÔNG\n  đi qua phép kiểm cây-làm-việc-chính-phải-sạch của đường duyệt cục bộ —\n  phép kiểm đó tồn tại chỉ vì một merge CỤC BỘ làm bẩn cây làm việc; một\n  merge qua GitHub không đụng cây làm việc cục bộ chút nào. Phán Iron Law\n  KHÔNG nằm trong miễn trừ này (review-20260718-self-improve-loop f01, xem\n  RUL37 (Iron Law hỏi ở đúng một ranh giới — trunk — cho mọi đề xuất nguồn runner tới đó)): nó chạy TRƯỚC cả nhánh `--github`, nên một root land lên trunk qua\n  GitHub vẫn phải qua đúng cổng ấy.\n  `approve --github` VẪN chạy qua hai chặn định-danh-worktree của đường cục\n  bộ (sổ đăng ký phiên + chặn cấu trúc `isMainWorktree` — xem \"Cổng duyệt PR\n  nội bộ\" trên), TRƯỚC CẢ nhánh `--github`: dù merge diễn ra qua GitHub,\n  trạng thái `done` vẫn không được lạc vào một worktree khác trong khi GitHub\n  đã báo PR merged. Vì hai chặn này chạy trước phép kiểm nguồn của `--github`,\n  một đề xuất nguồn KHÔNG-runner gọi `approve --github` TỪ một worktree\n  liên-kết (đã đăng ký hay tay) nhận thông điệp từ-chối định-danh-worktree,\n  không phải thông điệp \"không phải nguồn runner\" ở trên — tính hợp lệ MÔI\n  TRƯỜNG (đây có phải cây chính không) được kiểm trước tính hợp lệ NGHIỆP VỤ\n  (nguồn của đề xuất có hợp với `--github` không), phòng-thủ-theo-chiều-sâu\n có chủ đích.\n- **What changes:**\n  - `review <id> --github` — đẩy nhánh của đề xuất lên remote gốc nếu nhánh\n    đó chưa từng được đẩy (thăm dò tồn tại trước, chỉ đẩy khi thật sự cần —\n    trường hợp bình thường của lần đầu), rồi mở một PR thật trên GitHub, đích\n    là nhánh trục của kho (đề xuất gốc/độc lập) hoặc nhánh của gốc (đề xuất\n    con, cùng khuôn tầng với đường cục bộ). Thành công → in số PR và hướng\n    dẫn bước kế tiếp (đi duyệt trên GitHub rồi gọi `approve --github --pr\n    <n>`); KHÔNG BAO GIỜ tự dựng đường dẫn PR (không đủ thông tin để dựng\n    đúng, chỉ nêu số PR). Gãy (GitHub không cho mở PR — vd chưa đăng nhập,\n    mất mạng) → in lý do, đề xuất giữ NGUYÊN `awaiting-approval`, không sự kiện nào\n    được ghi — `review` vẫn thuần-đọc trên trạng thái FSM y hệt đường cục bộ,\n    dù bên ngoài (GitHub) đã có tác dụng phụ thật (nhánh đã đẩy).\n - `review <id> --github --pr <n>` (github-adapter, phát hiện đóng-không-\n    merge) — KHÔNG mở PR mới; chỉ hỏi thăm trạng thái SỐNG của PR số `n` trên\n    GitHub, thuần đọc tuyệt đối (không sự kiện nào, không friction nào, dưới\n    MỌI kết cục — một PR bị đóng trên GitHub không tự nó là một hành động\n    duyệt hay từ chối). Phân loại CHỈ dựa trên hai trường tự-nó-đã-rõ-nghĩa —\n    \"đã đóng chưa\" (có/không) và \"đã merge lúc nào\" (có dấu thời gian hay\n    không) — KHÔNG BAO GIỜ dựa vào một chuỗi trạng thái tổng quát của GitHub,\n    vì lần chứng minh thật (S1) chưa từng quan sát chuỗi đó cho một PR đã đóng\n    hay đã merge. Ba kết quả: (1) còn mở → không có gì để làm, gợi ý gọi\n    `approve --github --pr <n>` khi đã sẵn sàng; (2) đã merge → chỉ mang tính\n    thông tin, KHÔNG tự đổi trạng thái cục bộ (bao trùm cả trường hợp một\n    người merge thẳng trên trang GitHub, bỏ qua `approve --github` — đối chiếu\n lại tình huống đó nằm ngoài phạm vi, giữ việc thực thi merge/verify ở\n    máy cục bộ); (3) đã đóng KHÔNG merge → nêu rõ số PR, hướng dẫn người vận\n    hành tự gọi `fgos reject <id> --reason \"...\"` nếu muốn đưa việc về lại\n hàng chờ — đây CHÍNH LÀ cơ chế phát hiện yêu cầu, nhưng bản thân phép\n    hỏi thăm này không bao giờ tự động gọi `reject` thay người.\n  - `approve <id> --github --pr <n>` — gọi merge của GitHub trên đúng PR số\n `n`. Sạch → `awaiting-approval → done` mang role `human` (người gọi approve\n    là ngã-ngũ, merge chỉ là hệ quả cơ học — CÙNG nguyên tắc dù merge diễn ra\n    ở đâu). Gãy (bất kỳ lý do nào — GitHub chưa cho phép merge vì thiếu lượt\n    duyệt, xung đột thật, mất xác thực, giới hạn tần suất, mất mạng, hay bất\n    kỳ lỗi nào khác của lời gọi) → `awaiting-approval → blocked` mang lý do cụ thể +\n    một bản ghi friction, CÙNG khuôn với đường cục bộ (`merge-conflict`/\n    `verify-fail-post-merge`) — không phải hai khuôn song song.\n- **Side effects:** `review --github` có thể đẩy một nhánh lên remote gốc\n  (tác dụng phụ ngoài repo cục bộ) và luôn gọi ra GitHub khi thành công lẫn\n  khi gãy; `approve --github` luôn gọi ra GitHub.\n- **Afterwards:** mở PR thành công → đề xuất vẫn `awaiting-approval`, chờ người tự\n  duyệt trên GitHub rồi quay lại gọi `approve --github`; merge PR thành công\n  → item `done` y hệt đường cục bộ, việc phụ thuộc mở khóa như mọi `done`\n  khác — nhưng KHÁC đường cục bộ ở một điểm: nhánh riêng của đề xuất (cả bản\n  cục bộ lẫn bản đã đẩy lên remote gốc) KHÔNG được dọn tự động sau khi merge\n  qua GitHub (giới hạn đã biết, xem Open Gaps); merge gãy → item `blocked`\n  mang lý do cụ thể, đậu lại chờ người, cùng luật \"không tự rebase, không\n  halt cả vòng runner\" như mọi lần đỗ khác."
+  }
+}
+```
+
+## claim_761058f5d54dac4d6a1710befd94522f
+
+Source digest (evidence JSON): 9f313fda766f50bdc7f41c491740de80a2e90a6a768cba2989b3ae0d5f212af9
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_761058f5d54dac4d6a1710befd94522f",
+  "record": {
+    "claimId": "claim_761058f5d54dac4d6a1710befd94522f",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "unheaded-block-35",
+    "sourceLines": [
+      454,
+      461
+    ],
+    "sourceDigest": "e82f96712a0c1cfc5158b93bc557a9443ec6df7a73d168271ab0633de02e4ebc",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "unheaded-block-23",
+    "targetDigest": "e82f96712a0c1cfc5158b93bc557a9443ec6df7a73d168271ab0633de02e4ebc",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-35",
+    "githubAnchor": "unheaded-block-35",
+    "stableAnchor": "unheaded-block-35",
+    "title": "Unheaded block 35",
+    "startLine": 454,
+    "endLine": 461,
+    "textDigest": "e82f96712a0c1cfc5158b93bc557a9443ec6df7a73d168271ab0633de02e4ebc",
+    "sample": "Một VẬN CHUYỂN thay thế của CHÍNH cổng duyệt PR nội bộ trên (github-adapter)\n— không phải một cổng thứ hai, không đổi luật FSM/role của cổng\ngốc: chỗ diễn ra việc xem-diff chuyển s",
+    "identityFingerprint": "9a4b4d59c67b8e0d108ed76277b247a8b03a54c76f3d41eede52b3f2700ba7a1",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations",
+      "Cổng duyệt qua GitHub (GitHub transport, tuỳ chọn) — review/approve --github"
+    ],
+    "text": "Một VẬN CHUYỂN thay thế của CHÍNH cổng duyệt PR nội bộ trên (github-adapter)\n— không phải một cổng thứ hai, không đổi luật FSM/role của cổng\ngốc: chỗ diễn ra việc xem-diff chuyển sang trang PR thật trên GitHub, và chỗ\nthực hiện merge chuyển sang API của GitHub thay vì `git merge` cục bộ. Chỉ áp\ndụng cho đề xuất **nguồn runner** (nhánh `fgw/<id>` còn sống) — nguồn\npull-door/legacy không có nhánh để mở PR. Tuỳ chọn và cộng thêm: hoàn\ntoàn không đụng đường duyệt cục bộ sẵn có — một đề xuất không bao giờ bị ép\nđi qua GitHub, người vận hành chọn mỗi lần gọi lệnh."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-23",
+    "githubAnchor": "unheaded-block-23",
+    "stableAnchor": "unheaded-block-23",
+    "title": "Unheaded block 23",
+    "startLine": 378,
+    "endLine": 385,
+    "textDigest": "e82f96712a0c1cfc5158b93bc557a9443ec6df7a73d168271ab0633de02e4ebc",
+    "sample": "Một VẬN CHUYỂN thay thế của CHÍNH cổng duyệt PR nội bộ trên (github-adapter)\n— không phải một cổng thứ hai, không đổi luật FSM/role của cổng\ngốc: chỗ diễn ra việc xem-diff chuyển s",
+    "identityFingerprint": "9a4b4d59c67b8e0d108ed76277b247a8b03a54c76f3d41eede52b3f2700ba7a1",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations",
+      "Cổng duyệt qua GitHub (GitHub transport, tuỳ chọn) — review/approve --github"
+    ],
+    "text": "Một VẬN CHUYỂN thay thế của CHÍNH cổng duyệt PR nội bộ trên (github-adapter)\n— không phải một cổng thứ hai, không đổi luật FSM/role của cổng\ngốc: chỗ diễn ra việc xem-diff chuyển sang trang PR thật trên GitHub, và chỗ\nthực hiện merge chuyển sang API của GitHub thay vì `git merge` cục bộ. Chỉ áp\ndụng cho đề xuất **nguồn runner** (nhánh `fgw/<id>` còn sống) — nguồn\npull-door/legacy không có nhánh để mở PR. Tuỳ chọn và cộng thêm: hoàn\ntoàn không đụng đường duyệt cục bộ sẵn có — một đề xuất không bao giờ bị ép\nđi qua GitHub, người vận hành chọn mỗi lần gọi lệnh."
+  }
+}
+```
+
+## claim_7665dc86e90a49ac7d7e5e3a3a58217c
+
+Source digest (evidence JSON): d237d190d4b96e5294fccc86474aa73abff6f61e5e567c4b5db509c26d1a2666
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_7665dc86e90a49ac7d7e5e3a3a58217c",
+  "record": {
+    "claimId": "claim_7665dc86e90a49ac7d7e5e3a3a58217c",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "unheaded-block-36",
+    "sourceLines": [
+      463,
+      465
+    ],
+    "sourceDigest": "01f1f9649291100a6e5d775f39594a80a8f5f3a5d9245ae6e41717ecbc044632",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "unheaded-block-24",
+    "targetDigest": "01f1f9649291100a6e5d775f39594a80a8f5f3a5d9245ae6e41717ecbc044632",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-36",
+    "githubAnchor": "unheaded-block-36",
+    "stableAnchor": "unheaded-block-36",
+    "title": "Unheaded block 36",
+    "startLine": 463,
+    "endLine": 465,
+    "textDigest": "01f1f9649291100a6e5d775f39594a80a8f5f3a5d9245ae6e41717ecbc044632",
+    "sample": "Việc mở PR và việc merge PR là HAI bước tách rời, gọi qua hai verb khác nhau\n— không gộp một lệnh, vì một PR vừa mở chưa có lượt duyệt nào trên GitHub, gộp\nmột lệnh sẽ luôn gãy nga",
+    "identityFingerprint": "c983d1d71e21c61ff88a6aa9e6593e9698afc878806500eabc1f546df81fee99",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations",
+      "Cổng duyệt qua GitHub (GitHub transport, tuỳ chọn) — review/approve --github"
+    ],
+    "text": "Việc mở PR và việc merge PR là HAI bước tách rời, gọi qua hai verb khác nhau\n— không gộp một lệnh, vì một PR vừa mở chưa có lượt duyệt nào trên GitHub, gộp\nmột lệnh sẽ luôn gãy ngay lần dùng đầu tiên:"
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-24",
+    "githubAnchor": "unheaded-block-24",
+    "stableAnchor": "unheaded-block-24",
+    "title": "Unheaded block 24",
+    "startLine": 387,
+    "endLine": 389,
+    "textDigest": "01f1f9649291100a6e5d775f39594a80a8f5f3a5d9245ae6e41717ecbc044632",
+    "sample": "Việc mở PR và việc merge PR là HAI bước tách rời, gọi qua hai verb khác nhau\n— không gộp một lệnh, vì một PR vừa mở chưa có lượt duyệt nào trên GitHub, gộp\nmột lệnh sẽ luôn gãy nga",
+    "identityFingerprint": "c983d1d71e21c61ff88a6aa9e6593e9698afc878806500eabc1f546df81fee99",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations",
+      "Cổng duyệt qua GitHub (GitHub transport, tuỳ chọn) — review/approve --github"
+    ],
+    "text": "Việc mở PR và việc merge PR là HAI bước tách rời, gọi qua hai verb khác nhau\n— không gộp một lệnh, vì một PR vừa mở chưa có lượt duyệt nào trên GitHub, gộp\nmột lệnh sẽ luôn gãy ngay lần dùng đầu tiên:"
+  }
+}
+```
+
+## claim_94b051a8a4f2f1c9d453e361d232401c
+
+Source digest (evidence JSON): 0552fd493e26f0e76df2a1bdd7a9f0c20469176a2b6c510df1575d51a58fe98c
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_94b051a8a4f2f1c9d453e361d232401c",
+  "record": {
+    "claimId": "claim_94b051a8a4f2f1c9d453e361d232401c",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "unheaded-block-37",
+    "sourceLines": [
+      467,
+      546
+    ],
+    "sourceDigest": "ea7e200ba1067ec378102ed507012b69c84addece633d3bf00a384a4c7078d9b",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "unheaded-block-25",
+    "targetDigest": "ea7e200ba1067ec378102ed507012b69c84addece633d3bf00a384a4c7078d9b",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-37",
+    "githubAnchor": "unheaded-block-37",
+    "stableAnchor": "unheaded-block-37",
+    "title": "Unheaded block 37",
+    "startLine": 467,
+    "endLine": 546,
+    "textDigest": "ea7e200ba1067ec378102ed507012b69c84addece633d3bf00a384a4c7078d9b",
+    "sample": "- **Runs when:** người vận hành gọi `fgos review <id> --github` (mở PR) rồi\n  sau đó, sau khi đã tự duyệt/không-duyệt trên trang GitHub, gọi `fgos\n  approve <id> --github --pr <n>`",
+    "identityFingerprint": "78a55643332d09d4107f65413f43d2b5ccc462a621c6a264c5fca71ceff5e8f6",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations",
+      "Cổng duyệt qua GitHub (GitHub transport, tuỳ chọn) — review/approve --github"
+    ],
+    "text": "- **Runs when:** người vận hành gọi `fgos review <id> --github` (mở PR) rồi\n  sau đó, sau khi đã tự duyệt/không-duyệt trên trang GitHub, gọi `fgos\n  approve <id> --github --pr <n>` (merge PR số `n` vừa mở). Bất cứ lúc nào\n  giữa hai bước đó, người vận hành cũng có thể gọi `fgos review <id> --github\n  --pr <n>` (CÙNG verb, thêm `--pr`) để hỏi thăm trạng thái sống của PR trên\n  GitHub mà không mở PR mới và không merge gì — đây là cơ chế phát hiện một\n PR bị đóng trên GitHub mà KHÔNG merge (github-adapter).\n- **Blocked when:** đề xuất không phải nguồn runner (source ∈ pull/legacy) —\n  từ chối `validation` ngay, không gọi GitHub, nêu rõ lý do \"không có nhánh\n để gắn PR\" — KHÔNG BAO GIỜ tự âm thầm quay về đường duyệt cục bộ (gãy\n  chuyển thẳng sang chặn/đỗ, không tự hạ cấp vận chuyển). `approve --github`\n  thiếu `--pr <n>` — `validation`, nêu rõ phải lấy số PR từ một lần `review\n  --github` trước đó. Phép kiểm nguồn chạy TRƯỚC phép kiểm `--pr` (một đề\n  xuất pull/legacy luôn nhận đúng thông điệp \"không phải nguồn runner\", không\n  bao giờ bị thông điệp \"thiếu --pr\" gây hiểu lầm). `approve --github` KHÔNG\n  đi qua phép kiểm cây-làm-việc-chính-phải-sạch của đường duyệt cục bộ —\n  phép kiểm đó tồn tại chỉ vì một merge CỤC BỘ làm bẩn cây làm việc; một\n  merge qua GitHub không đụng cây làm việc cục bộ chút nào. Phán Iron Law\n  KHÔNG nằm trong miễn trừ này (review-20260718-self-improve-loop f01, xem\n  RUL37 (Iron Law hỏi ở đúng một ranh giới — trunk — cho mọi đề xuất nguồn runner tới đó)): nó chạy TRƯỚC cả nhánh `--github`, nên một root land lên trunk qua\n  GitHub vẫn phải qua đúng cổng ấy.\n  `approve --github` VẪN chạy qua hai chặn định-danh-worktree của đường cục\n  bộ (sổ đăng ký phiên + chặn cấu trúc `isMainWorktree` — xem \"Cổng duyệt PR\n  nội bộ\" trên), TRƯỚC CẢ nhánh `--github`: dù merge diễn ra qua GitHub,\n  trạng thái `done` vẫn không được lạc vào một worktree khác trong khi GitHub\n  đã báo PR merged. Vì hai chặn này chạy trước phép kiểm nguồn của `--github`,\n  một đề xuất nguồn KHÔNG-runner gọi `approve --github` TỪ một worktree\n  liên-kết (đã đăng ký hay tay) nhận thông điệp từ-chối định-danh-worktree,\n  không phải thông điệp \"không phải nguồn runner\" ở trên — tính hợp lệ MÔI\n  TRƯỜNG (đây có phải cây chính không) được kiểm trước tính hợp lệ NGHIỆP VỤ\n  (nguồn của đề xuất có hợp với `--github` không), phòng-thủ-theo-chiều-sâu\n có chủ đích.\n- **What changes:**\n  - `review <id> --github` — đẩy nhánh của đề xuất lên remote gốc nếu nhánh\n    đó chưa từng được đẩy (thăm dò tồn tại trước, chỉ đẩy khi thật sự cần —\n    trường hợp bình thường của lần đầu), rồi mở một PR thật trên GitHub, đích\n    là nhánh trục của kho (đề xuất gốc/độc lập) hoặc nhánh của gốc (đề xuất\n    con, cùng khuôn tầng với đường cục bộ). Thành công → in số PR và hướng\n    dẫn bước kế tiếp (đi duyệt trên GitHub rồi gọi `approve --github --pr\n    <n>`); KHÔNG BAO GIỜ tự dựng đường dẫn PR (không đủ thông tin để dựng\n    đúng, chỉ nêu số PR). Gãy (GitHub không cho mở PR — vd chưa đăng nhập,\n    mất mạng) → in lý do, đề xuất giữ NGUYÊN `awaiting-approval`, không sự kiện nào\n    được ghi — `review` vẫn thuần-đọc trên trạng thái FSM y hệt đường cục bộ,\n    dù bên ngoài (GitHub) đã có tác dụng phụ thật (nhánh đã đẩy).\n - `review <id> --github --pr <n>` (github-adapter, phát hiện đóng-không-\n    merge) — KHÔNG mở PR mới; chỉ hỏi thăm trạng thái SỐNG của PR số `n` trên\n    GitHub, thuần đọc tuyệt đối (không sự kiện nào, không friction nào, dưới\n    MỌI kết cục — một PR bị đóng trên GitHub không tự nó là một hành động\n    duyệt hay từ chối). Phân loại CHỈ dựa trên hai trường tự-nó-đã-rõ-nghĩa —\n    \"đã đóng chưa\" (có/không) và \"đã merge lúc nào\" (có dấu thời gian hay\n    không) — KHÔNG BAO GIỜ dựa vào một chuỗi trạng thái tổng quát của GitHub,\n    vì lần chứng minh thật (S1) chưa từng quan sát chuỗi đó cho một PR đã đóng\n    hay đã merge. Ba kết quả: (1) còn mở → không có gì để làm, gợi ý gọi\n    `approve --github --pr <n>` khi đã sẵn sàng; (2) đã merge → chỉ mang tính\n    thông tin, KHÔNG tự đổi trạng thái cục bộ (bao trùm cả trường hợp một\n    người merge thẳng trên trang GitHub, bỏ qua `approve --github` — đối chiếu\n lại tình huống đó nằm ngoài phạm vi, giữ việc thực thi merge/verify ở\n    máy cục bộ); (3) đã đóng KHÔNG merge → nêu rõ số PR, hướng dẫn người vận\n    hành tự gọi `fgos reject <id> --reason \"...\"` nếu muốn đưa việc về lại\n hàng chờ — đây CHÍNH LÀ cơ chế phát hiện yêu cầu, nhưng bản thân phép\n    hỏi thăm này không bao giờ tự động gọi `reject` thay người.\n  - `approve <id> --github --pr <n>` — gọi merge của GitHub trên đúng PR số\n `n`. Sạch → `awaiting-approval → done` mang role `human` (người gọi approve\n    là ngã-ngũ, merge chỉ là hệ quả cơ học — CÙNG nguyên tắc dù merge diễn ra\n    ở đâu). Gãy (bất kỳ lý do nào — GitHub chưa cho phép merge vì thiếu lượt\n    duyệt, xung đột thật, mất xác thực, giới hạn tần suất, mất mạng, hay bất\n    kỳ lỗi nào khác của lời gọi) → `awaiting-approval → blocked` mang lý do cụ thể +\n    một bản ghi friction, CÙNG khuôn với đường cục bộ (`merge-conflict`/\n    `verify-fail-post-merge`) — không phải hai khuôn song song.\n- **Side effects:** `review --github` có thể đẩy một nhánh lên remote gốc\n  (tác dụng phụ ngoài repo cục bộ) và luôn gọi ra GitHub khi thành công lẫn\n  khi gãy; `approve --github` luôn gọi ra GitHub.\n- **Afterwards:** mở PR thành công → đề xuất vẫn `awaiting-approval`, chờ người tự\n  duyệt trên GitHub rồi quay lại gọi `approve --github`; merge PR thành công\n  → item `done` y hệt đường cục bộ, việc phụ thuộc mở khóa như mọi `done`\n  khác — nhưng KHÁC đường cục bộ ở một điểm: nhánh riêng của đề xuất (cả bản\n  cục bộ lẫn bản đã đẩy lên remote gốc) KHÔNG được dọn tự động sau khi merge\n  qua GitHub (giới hạn đã biết, xem Open Gaps); merge gãy → item `blocked`\n  mang lý do cụ thể, đậu lại chờ người, cùng luật \"không tự rebase, không\n  halt cả vòng runner\" như mọi lần đỗ khác."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-25",
+    "githubAnchor": "unheaded-block-25",
+    "stableAnchor": "unheaded-block-25",
+    "title": "Unheaded block 25",
+    "startLine": 391,
+    "endLine": 470,
+    "textDigest": "ea7e200ba1067ec378102ed507012b69c84addece633d3bf00a384a4c7078d9b",
+    "sample": "- **Runs when:** người vận hành gọi `fgos review <id> --github` (mở PR) rồi\n  sau đó, sau khi đã tự duyệt/không-duyệt trên trang GitHub, gọi `fgos\n  approve <id> --github --pr <n>`",
+    "identityFingerprint": "78a55643332d09d4107f65413f43d2b5ccc462a621c6a264c5fca71ceff5e8f6",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations",
+      "Cổng duyệt qua GitHub (GitHub transport, tuỳ chọn) — review/approve --github"
+    ],
+    "text": "- **Runs when:** người vận hành gọi `fgos review <id> --github` (mở PR) rồi\n  sau đó, sau khi đã tự duyệt/không-duyệt trên trang GitHub, gọi `fgos\n  approve <id> --github --pr <n>` (merge PR số `n` vừa mở). Bất cứ lúc nào\n  giữa hai bước đó, người vận hành cũng có thể gọi `fgos review <id> --github\n  --pr <n>` (CÙNG verb, thêm `--pr`) để hỏi thăm trạng thái sống của PR trên\n  GitHub mà không mở PR mới và không merge gì — đây là cơ chế phát hiện một\n PR bị đóng trên GitHub mà KHÔNG merge (github-adapter).\n- **Blocked when:** đề xuất không phải nguồn runner (source ∈ pull/legacy) —\n  từ chối `validation` ngay, không gọi GitHub, nêu rõ lý do \"không có nhánh\n để gắn PR\" — KHÔNG BAO GIỜ tự âm thầm quay về đường duyệt cục bộ (gãy\n  chuyển thẳng sang chặn/đỗ, không tự hạ cấp vận chuyển). `approve --github`\n  thiếu `--pr <n>` — `validation`, nêu rõ phải lấy số PR từ một lần `review\n  --github` trước đó. Phép kiểm nguồn chạy TRƯỚC phép kiểm `--pr` (một đề\n  xuất pull/legacy luôn nhận đúng thông điệp \"không phải nguồn runner\", không\n  bao giờ bị thông điệp \"thiếu --pr\" gây hiểu lầm). `approve --github` KHÔNG\n  đi qua phép kiểm cây-làm-việc-chính-phải-sạch của đường duyệt cục bộ —\n  phép kiểm đó tồn tại chỉ vì một merge CỤC BỘ làm bẩn cây làm việc; một\n  merge qua GitHub không đụng cây làm việc cục bộ chút nào. Phán Iron Law\n  KHÔNG nằm trong miễn trừ này (review-20260718-self-improve-loop f01, xem\n  RUL37 (Iron Law hỏi ở đúng một ranh giới — trunk — cho mọi đề xuất nguồn runner tới đó)): nó chạy TRƯỚC cả nhánh `--github`, nên một root land lên trunk qua\n  GitHub vẫn phải qua đúng cổng ấy.\n  `approve --github` VẪN chạy qua hai chặn định-danh-worktree của đường cục\n  bộ (sổ đăng ký phiên + chặn cấu trúc `isMainWorktree` — xem \"Cổng duyệt PR\n  nội bộ\" trên), TRƯỚC CẢ nhánh `--github`: dù merge diễn ra qua GitHub,\n  trạng thái `done` vẫn không được lạc vào một worktree khác trong khi GitHub\n  đã báo PR merged. Vì hai chặn này chạy trước phép kiểm nguồn của `--github`,\n  một đề xuất nguồn KHÔNG-runner gọi `approve --github` TỪ một worktree\n  liên-kết (đã đăng ký hay tay) nhận thông điệp từ-chối định-danh-worktree,\n  không phải thông điệp \"không phải nguồn runner\" ở trên — tính hợp lệ MÔI\n  TRƯỜNG (đây có phải cây chính không) được kiểm trước tính hợp lệ NGHIỆP VỤ\n  (nguồn của đề xuất có hợp với `--github` không), phòng-thủ-theo-chiều-sâu\n có chủ đích.\n- **What changes:**\n  - `review <id> --github` — đẩy nhánh của đề xuất lên remote gốc nếu nhánh\n    đó chưa từng được đẩy (thăm dò tồn tại trước, chỉ đẩy khi thật sự cần —\n    trường hợp bình thường của lần đầu), rồi mở một PR thật trên GitHub, đích\n    là nhánh trục của kho (đề xuất gốc/độc lập) hoặc nhánh của gốc (đề xuất\n    con, cùng khuôn tầng với đường cục bộ). Thành công → in số PR và hướng\n    dẫn bước kế tiếp (đi duyệt trên GitHub rồi gọi `approve --github --pr\n    <n>`); KHÔNG BAO GIỜ tự dựng đường dẫn PR (không đủ thông tin để dựng\n    đúng, chỉ nêu số PR). Gãy (GitHub không cho mở PR — vd chưa đăng nhập,\n    mất mạng) → in lý do, đề xuất giữ NGUYÊN `awaiting-approval`, không sự kiện nào\n    được ghi — `review` vẫn thuần-đọc trên trạng thái FSM y hệt đường cục bộ,\n    dù bên ngoài (GitHub) đã có tác dụng phụ thật (nhánh đã đẩy).\n - `review <id> --github --pr <n>` (github-adapter, phát hiện đóng-không-\n    merge) — KHÔNG mở PR mới; chỉ hỏi thăm trạng thái SỐNG của PR số `n` trên\n    GitHub, thuần đọc tuyệt đối (không sự kiện nào, không friction nào, dưới\n    MỌI kết cục — một PR bị đóng trên GitHub không tự nó là một hành động\n    duyệt hay từ chối). Phân loại CHỈ dựa trên hai trường tự-nó-đã-rõ-nghĩa —\n    \"đã đóng chưa\" (có/không) và \"đã merge lúc nào\" (có dấu thời gian hay\n    không) — KHÔNG BAO GIỜ dựa vào một chuỗi trạng thái tổng quát của GitHub,\n    vì lần chứng minh thật (S1) chưa từng quan sát chuỗi đó cho một PR đã đóng\n    hay đã merge. Ba kết quả: (1) còn mở → không có gì để làm, gợi ý gọi\n    `approve --github --pr <n>` khi đã sẵn sàng; (2) đã merge → chỉ mang tính\n    thông tin, KHÔNG tự đổi trạng thái cục bộ (bao trùm cả trường hợp một\n    người merge thẳng trên trang GitHub, bỏ qua `approve --github` — đối chiếu\n lại tình huống đó nằm ngoài phạm vi, giữ việc thực thi merge/verify ở\n    máy cục bộ); (3) đã đóng KHÔNG merge → nêu rõ số PR, hướng dẫn người vận\n    hành tự gọi `fgos reject <id> --reason \"...\"` nếu muốn đưa việc về lại\n hàng chờ — đây CHÍNH LÀ cơ chế phát hiện yêu cầu, nhưng bản thân phép\n    hỏi thăm này không bao giờ tự động gọi `reject` thay người.\n  - `approve <id> --github --pr <n>` — gọi merge của GitHub trên đúng PR số\n `n`. Sạch → `awaiting-approval → done` mang role `human` (người gọi approve\n    là ngã-ngũ, merge chỉ là hệ quả cơ học — CÙNG nguyên tắc dù merge diễn ra\n    ở đâu). Gãy (bất kỳ lý do nào — GitHub chưa cho phép merge vì thiếu lượt\n    duyệt, xung đột thật, mất xác thực, giới hạn tần suất, mất mạng, hay bất\n    kỳ lỗi nào khác của lời gọi) → `awaiting-approval → blocked` mang lý do cụ thể +\n    một bản ghi friction, CÙNG khuôn với đường cục bộ (`merge-conflict`/\n    `verify-fail-post-merge`) — không phải hai khuôn song song.\n- **Side effects:** `review --github` có thể đẩy một nhánh lên remote gốc\n  (tác dụng phụ ngoài repo cục bộ) và luôn gọi ra GitHub khi thành công lẫn\n  khi gãy; `approve --github` luôn gọi ra GitHub.\n- **Afterwards:** mở PR thành công → đề xuất vẫn `awaiting-approval`, chờ người tự\n  duyệt trên GitHub rồi quay lại gọi `approve --github`; merge PR thành công\n  → item `done` y hệt đường cục bộ, việc phụ thuộc mở khóa như mọi `done`\n  khác — nhưng KHÁC đường cục bộ ở một điểm: nhánh riêng của đề xuất (cả bản\n  cục bộ lẫn bản đã đẩy lên remote gốc) KHÔNG được dọn tự động sau khi merge\n  qua GitHub (giới hạn đã biết, xem Open Gaps); merge gãy → item `blocked`\n  mang lý do cụ thể, đậu lại chờ người, cùng luật \"không tự rebase, không\n  halt cả vòng runner\" như mọi lần đỗ khác."
+  }
+}
+```
+
+## claim_224b5f54d28b453f1e3feaced0468399
+
+Source digest (evidence JSON): 00e95da7cb73cfe5db37c146cc9f9fb5f08e008592419b22ef0056ff3ef7f3f0
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_224b5f54d28b453f1e3feaced0468399",
+  "record": {
+    "claimId": "claim_224b5f54d28b453f1e3feaced0468399",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "gate-a-xếp-hạng-candidate-bắc-cầu-sang-việc-thật-evolve",
+    "sourceLines": [
+      548,
+      548
+    ],
+    "sourceDigest": "52a283ef3e1356d53fc5ae6efb44c1c8c687858b70009ef970c11e151b896b6d",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "gate-a-xếp-hạng-candidate-bắc-cầu-sang-việc-thật-evolve",
+    "targetDigest": "52a283ef3e1356d53fc5ae6efb44c1c8c687858b70009ef970c11e151b896b6d",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)",
+    "anchor": "gate-a-xếp-hạng-candidate-bắc-cầu-sang-việc-thật-evolve",
+    "githubAnchor": "gate-a-xếp-hạng-candidate-bắc-cầu-sang-việc-thật-evolve",
+    "stableAnchor": "h-59eb618ecbe9",
+    "startLine": 548,
+    "endLine": 548,
+    "textDigest": "52a283ef3e1356d53fc5ae6efb44c1c8c687858b70009ef970c11e151b896b6d",
+    "sample": "Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)",
+    "sectionPayloadDigest": "dd58adb76fae55b69ea6dc49c9743620e6b6fe8be0eae95c478984d11898307f",
+    "followingBlockDigest": "c7182f609c029616bc8c23ef95b7fb69ade8fc943ebf7aba8f339003c4437459",
+    "identityFingerprint": "658f6029f4da8c4d862113cfac3432782b0067e44c01f27469047ebf6e3fa1b4",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations"
+    ],
+    "text": "### Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)",
+    "sectionText": "### Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)\n\nBước vào của vòng tự cải thiện (self-improve loop, STR13 — CONTEXT.md):\nfgOS xếp hạng chính friction chưa ngã-ngũ của nó thành\nmột danh sách candidate, người chọn đúng một hoặc dừng (Slice 1), rồi có thể\nbắc cầu candidate đã chọn sang một việc thật để runner thi công (Slice 3,\n`--submit`). Loop này chỉ nhắm vào chính `repo/src` của fgOS — không\nphải một tính năng mở cho host project ngoài — và chạy khi người gọi tay,\nkhông bao giờ là một nhánh tự động của vòng dispatch thường. Vòng khép\nkín đầy đủ: `evolve` (liệt kê) → `evolve --pick` (xem một candidate, đọc-thuần)\n→ `evolve --submit` (bắc cầu, HÀNH ĐỘNG GHI duy nhất của cả bề mặt evolve) →\nrunner dispatch việc mới như mọi việc khác → `review`/`approve` qua cổng duyệt\nPR nội bộ, với `approve` chạy thêm phán Iron Law (xem dưới) trước khi merge.\n\n- **Runs when:** người vận hành gọi `fgos evolve` (liệt kê), `fgos evolve\n  --pick <id>` (xem chi tiết một candidate), hoặc `fgos evolve --submit <id>`\n (bắc cầu candidate sang một việc thật) — không có input tương tác nào\n khác, không vòng lặp chờ trả lời (hai bước, không stdin).\n- **Blocked when:** `--pick <id>`/`--submit <id>` không khớp candidate nào\n đang mở — `validation`, thông điệp rõ ràng, KHÔNG BAO GIỜ hỏi lại (\n  \"input sai là lỗi sạch, không re-prompt\"), không việc nào được tạo ra cho\n  `--submit` khi không khớp; `--pick`/`--submit` mang cờ trần (không giá trị)\n  cũng bị từ chối cùng khuôn `validation` như mọi verb khác dùng\n  `requireField`.\n- **What changes:**\n  - `fgos evolve` (không `--pick`/`--submit`) và `fgos evolve --pick <id>` —\n ĐỌC-THUẦN TUYỆT ĐỐI, cùng request-class với `ready`/`list`/`check`:\n    đọc view qua `listWork(dir)` DUY NHẤT, không bao giờ\n    `rebuild`/`refreshView`/`initStore` (những cửa GHI view/log).\n    - `fgos evolve` — xếp hạng MỖI id còn friction chưa ngã-ngũ\n (`src/evolve/candidates.mjs`'s `rankCandidates`, tái dùng cơ học\n      `listUnsettledFrictionsByWork`/`WEIGHTS.frictionUnsettled` của\n      `entropy.mjs`, không tự định nghĩa lại \"chưa ngã-ngũ\" hay trọng số\n      riêng) rồi in TOÀN BỘ danh sách — mỗi dòng mang đủ id/score/\n      disposition/errorClass/layer/attempts/detail, không cắt bớt (cùng kỷ\n      luật \"mọi trường người cần để phán\" như phần friction của `check`).\n      Không friction chưa ngã-ngũ nào → một thông điệp trạng-thái-rỗng rõ\n      ràng, exit 0 — chưa khởi tạo `.fgos/` nếu nó chưa tồn tại, giữ đúng hợp\n      đồng đọc-thuần của `ready`/`list`.\n    - `fgos evolve --pick <id>` — xếp hạng lại CÙNG một view rồi tìm `id`\n      trong danh sách; khớp → in bản ghi friction đầy đủ của candidate đó,\n      TÁI DÙNG đúng formatter friction sẵn có của `check` (không viết\n      formatter mới); không khớp → lỗi `validation` sạch, không đổi trạng\n      thái. Chạy `fgos evolve` không mang `--pick`/`--submit` CHÍNH LÀ kết\n cục \"dừng\" của Gate A — không có input hủy/dừng riêng nào khác\n      cần xử lý.\n - `fgos evolve --submit <id>` (self-improve loop STR13 Slice 3) — HÀNH\n    ĐỘNG GHI DUY NHẤT của cả bề mặt evolve: xếp hạng lại CÙNG một view, tìm\n    `id`; khớp → soạn một mô tả người-đọc-được từ các trường của candidate\n    (id/disposition/errorClass/layer/attempts/detail — trường vắng mặt được\n    bỏ qua, không bao giờ in literal \"undefined\") rồi tạo đúng MỘT việc thật\n    qua CÙNG cửa `submitWork` mà `fgos submit` tự dùng (không logic tạo-việc\n    thứ hai) — `status: todo`, stage vào-vòng theo domain (stage đầu tiên\n    domain đó khai; với `coding` là `discovery`), `tier`/`risk` dẫn xuất\n    mechanically từ chính mô tả đó qua\n    `classify()` giống hệt một `submit` bình thường. `evolve --submit` không\n    mang cờ `--async`/`--unattended`/`--domain` riêng của nó (bề mặt cờ tối\n    thiểu, YAGNI) — luôn gọi `submitWork` với mặc định. Việc mới tạo ra đi\n    đúng vòng đời runner thường (quét nghiên-cứu → quét chia-việc → dispatch →\n    `awaiting-approval`) như mọi việc khác — Gate A không có cơ chế dispatch/wiring\n    riêng nào cho việc bắc cầu này.\n- **Side effects:** `evolve`/`evolve --pick` — không có: không sự kiện nào\n  vào nhật ký, không dòng nào vào `state.json`, không tiến trình con git nào.\n  `evolve --submit` — đúng MỘT sự kiện `work.add` mới (qua `submitWork`), y\n  hệt một `fgos submit` bình thường; không tiến trình con git nào (việc mới\n  chưa dispatch, chưa có nhánh).\n- **Afterwards:** `evolve`/`evolve --pick` — người vận hành thấy đúng\n  candidate mình cần để quyết định có bắc cầu hay không; không candidate nào\n  bị chọn tự động, không việc nào được tạo ra chỉ vì `evolve` chạy.\n  `evolve --submit` — việc mới nằm trong hàng chờ runner thường, sẵn sàng cho\n  quét làm-rõ/chia-việc/dispatch như mọi việc khác; khi đề xuất của nó tới\n  `awaiting-approval`, nó đi qua đúng cổng duyệt PR nội bộ ở trên — nếu diff của nó\n  chạm cờ/module Iron Law (xem dưới), `approve` từ chối cho tới khi người\n  vận hành xác nhận bằng `--acknowledge-iron-law`.\n  **Tương tác đã biết (chứng minh bằng e2e thật, STR13 Slice 3):** vì Iron\n  Law's phép thử từ khóa TÁI DÙNG đúng `HEAVY_KEYWORDS` mà `classify()` cũng\n dùng, một mô tả candidate chứa từ khóa rủi ro nặng — điều kiện tự\n  nhiên để một fix thật sự cần Iron Law — cũng khiến chính việc mới đó nhận\n  `risk: 'heavy'` ngay lúc `submitWork` chạy. Root mang `risk: 'heavy'` đi\n  đúng nhánh \"cần người quyết\" của quét chia-việc (xem \"Edge Cases Settled\"\n  dưới, mục risk `heavy`) — đậu `awaiting-human` TRƯỚC KHI kịp dispatch, dù\n  không phải vì thiếu rõ. Đây không phải bug — người vận hành cần một bước\n  thao tác thường (vd `fgos edit <id> --risk standard`, verb công khai đã có\n  từ work-item-verb-surface) giữa `evolve --submit` và khi item tới dispatch,\n  nếu muốn bỏ qua cửa chia-việc cho trường hợp này; `description` giữ\n  nguyên nên Iron Law's phép thử từ khóa tại `approve` vẫn chạy đúng như\n  thiết kế bất kể `risk` bị đổi sau đó."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)",
+    "anchor": "gate-a-xếp-hạng-candidate-bắc-cầu-sang-việc-thật-evolve",
+    "githubAnchor": "gate-a-xếp-hạng-candidate-bắc-cầu-sang-việc-thật-evolve",
+    "stableAnchor": "h-4a86330ddf64",
+    "startLine": 472,
+    "endLine": 472,
+    "textDigest": "52a283ef3e1356d53fc5ae6efb44c1c8c687858b70009ef970c11e151b896b6d",
+    "sample": "Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)",
+    "sectionPayloadDigest": "dd58adb76fae55b69ea6dc49c9743620e6b6fe8be0eae95c478984d11898307f",
+    "followingBlockDigest": "c7182f609c029616bc8c23ef95b7fb69ade8fc943ebf7aba8f339003c4437459",
+    "identityFingerprint": "658f6029f4da8c4d862113cfac3432782b0067e44c01f27469047ebf6e3fa1b4",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations"
+    ],
+    "text": "### Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)",
+    "sectionText": "### Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)\n\nBước vào của vòng tự cải thiện (self-improve loop, STR13 — CONTEXT.md):\nfgOS xếp hạng chính friction chưa ngã-ngũ của nó thành\nmột danh sách candidate, người chọn đúng một hoặc dừng (Slice 1), rồi có thể\nbắc cầu candidate đã chọn sang một việc thật để runner thi công (Slice 3,\n`--submit`). Loop này chỉ nhắm vào chính `repo/src` của fgOS — không\nphải một tính năng mở cho host project ngoài — và chạy khi người gọi tay,\nkhông bao giờ là một nhánh tự động của vòng dispatch thường. Vòng khép\nkín đầy đủ: `evolve` (liệt kê) → `evolve --pick` (xem một candidate, đọc-thuần)\n→ `evolve --submit` (bắc cầu, HÀNH ĐỘNG GHI duy nhất của cả bề mặt evolve) →\nrunner dispatch việc mới như mọi việc khác → `review`/`approve` qua cổng duyệt\nPR nội bộ, với `approve` chạy thêm phán Iron Law (xem dưới) trước khi merge.\n\n- **Runs when:** người vận hành gọi `fgos evolve` (liệt kê), `fgos evolve\n  --pick <id>` (xem chi tiết một candidate), hoặc `fgos evolve --submit <id>`\n (bắc cầu candidate sang một việc thật) — không có input tương tác nào\n khác, không vòng lặp chờ trả lời (hai bước, không stdin).\n- **Blocked when:** `--pick <id>`/`--submit <id>` không khớp candidate nào\n đang mở — `validation`, thông điệp rõ ràng, KHÔNG BAO GIỜ hỏi lại (\n  \"input sai là lỗi sạch, không re-prompt\"), không việc nào được tạo ra cho\n  `--submit` khi không khớp; `--pick`/`--submit` mang cờ trần (không giá trị)\n  cũng bị từ chối cùng khuôn `validation` như mọi verb khác dùng\n  `requireField`.\n- **What changes:**\n  - `fgos evolve` (không `--pick`/`--submit`) và `fgos evolve --pick <id>` —\n ĐỌC-THUẦN TUYỆT ĐỐI, cùng request-class với `ready`/`list`/`check`:\n    đọc view qua `listWork(dir)` DUY NHẤT, không bao giờ\n    `rebuild`/`refreshView`/`initStore` (những cửa GHI view/log).\n    - `fgos evolve` — xếp hạng MỖI id còn friction chưa ngã-ngũ\n (`src/evolve/candidates.mjs`'s `rankCandidates`, tái dùng cơ học\n      `listUnsettledFrictionsByWork`/`WEIGHTS.frictionUnsettled` của\n      `entropy.mjs`, không tự định nghĩa lại \"chưa ngã-ngũ\" hay trọng số\n      riêng) rồi in TOÀN BỘ danh sách — mỗi dòng mang đủ id/score/\n      disposition/errorClass/layer/attempts/detail, không cắt bớt (cùng kỷ\n      luật \"mọi trường người cần để phán\" như phần friction của `check`).\n      Không friction chưa ngã-ngũ nào → một thông điệp trạng-thái-rỗng rõ\n      ràng, exit 0 — chưa khởi tạo `.fgos/` nếu nó chưa tồn tại, giữ đúng hợp\n      đồng đọc-thuần của `ready`/`list`.\n    - `fgos evolve --pick <id>` — xếp hạng lại CÙNG một view rồi tìm `id`\n      trong danh sách; khớp → in bản ghi friction đầy đủ của candidate đó,\n      TÁI DÙNG đúng formatter friction sẵn có của `check` (không viết\n      formatter mới); không khớp → lỗi `validation` sạch, không đổi trạng\n      thái. Chạy `fgos evolve` không mang `--pick`/`--submit` CHÍNH LÀ kết\n cục \"dừng\" của Gate A — không có input hủy/dừng riêng nào khác\n      cần xử lý.\n - `fgos evolve --submit <id>` (self-improve loop STR13 Slice 3) — HÀNH\n    ĐỘNG GHI DUY NHẤT của cả bề mặt evolve: xếp hạng lại CÙNG một view, tìm\n    `id`; khớp → soạn một mô tả người-đọc-được từ các trường của candidate\n    (id/disposition/errorClass/layer/attempts/detail — trường vắng mặt được\n    bỏ qua, không bao giờ in literal \"undefined\") rồi tạo đúng MỘT việc thật\n    qua CÙNG cửa `submitWork` mà `fgos submit` tự dùng (không logic tạo-việc\n    thứ hai) — `status: todo`, stage vào-vòng theo domain (stage đầu tiên\n    domain đó khai; với `coding` là `discovery`), `tier`/`risk` dẫn xuất\n    mechanically từ chính mô tả đó qua\n    `classify()` giống hệt một `submit` bình thường. `evolve --submit` không\n    mang cờ `--async`/`--unattended`/`--domain` riêng của nó (bề mặt cờ tối\n    thiểu, YAGNI) — luôn gọi `submitWork` với mặc định. Việc mới tạo ra đi\n    đúng vòng đời runner thường (quét nghiên-cứu → quét chia-việc → dispatch →\n    `awaiting-approval`) như mọi việc khác — Gate A không có cơ chế dispatch/wiring\n    riêng nào cho việc bắc cầu này.\n- **Side effects:** `evolve`/`evolve --pick` — không có: không sự kiện nào\n  vào nhật ký, không dòng nào vào `state.json`, không tiến trình con git nào.\n  `evolve --submit` — đúng MỘT sự kiện `work.add` mới (qua `submitWork`), y\n  hệt một `fgos submit` bình thường; không tiến trình con git nào (việc mới\n  chưa dispatch, chưa có nhánh).\n- **Afterwards:** `evolve`/`evolve --pick` — người vận hành thấy đúng\n  candidate mình cần để quyết định có bắc cầu hay không; không candidate nào\n  bị chọn tự động, không việc nào được tạo ra chỉ vì `evolve` chạy.\n  `evolve --submit` — việc mới nằm trong hàng chờ runner thường, sẵn sàng cho\n  quét làm-rõ/chia-việc/dispatch như mọi việc khác; khi đề xuất của nó tới\n  `awaiting-approval`, nó đi qua đúng cổng duyệt PR nội bộ ở trên — nếu diff của nó\n  chạm cờ/module Iron Law (xem dưới), `approve` từ chối cho tới khi người\n  vận hành xác nhận bằng `--acknowledge-iron-law`.\n  **Tương tác đã biết (chứng minh bằng e2e thật, STR13 Slice 3):** vì Iron\n  Law's phép thử từ khóa TÁI DÙNG đúng `HEAVY_KEYWORDS` mà `classify()` cũng\n dùng, một mô tả candidate chứa từ khóa rủi ro nặng — điều kiện tự\n  nhiên để một fix thật sự cần Iron Law — cũng khiến chính việc mới đó nhận\n  `risk: 'heavy'` ngay lúc `submitWork` chạy. Root mang `risk: 'heavy'` đi\n  đúng nhánh \"cần người quyết\" của quét chia-việc (xem \"Edge Cases Settled\"\n  dưới, mục risk `heavy`) — đậu `awaiting-human` TRƯỚC KHI kịp dispatch, dù\n  không phải vì thiếu rõ. Đây không phải bug — người vận hành cần một bước\n  thao tác thường (vd `fgos edit <id> --risk standard`, verb công khai đã có\n  từ work-item-verb-surface) giữa `evolve --submit` và khi item tới dispatch,\n  nếu muốn bỏ qua cửa chia-việc cho trường hợp này; `description` giữ\n  nguyên nên Iron Law's phép thử từ khóa tại `approve` vẫn chạy đúng như\n  thiết kế bất kể `risk` bị đổi sau đó."
+  }
+}
+```
+
+## claim_979ec4a61acca9e1b6a0a3967b1d0c88
+
+Source digest (evidence JSON): 147eef33797470574f5368f17435bed82d134990f746623911251020ff6e802a
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_979ec4a61acca9e1b6a0a3967b1d0c88",
+  "record": {
+    "claimId": "claim_979ec4a61acca9e1b6a0a3967b1d0c88",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "unheaded-block-38",
+    "sourceLines": [
+      550,
+      560
+    ],
+    "sourceDigest": "c7182f609c029616bc8c23ef95b7fb69ade8fc943ebf7aba8f339003c4437459",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "unheaded-block-26",
+    "targetDigest": "c7182f609c029616bc8c23ef95b7fb69ade8fc943ebf7aba8f339003c4437459",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-38",
+    "githubAnchor": "unheaded-block-38",
+    "stableAnchor": "unheaded-block-38",
+    "title": "Unheaded block 38",
+    "startLine": 550,
+    "endLine": 560,
+    "textDigest": "c7182f609c029616bc8c23ef95b7fb69ade8fc943ebf7aba8f339003c4437459",
+    "sample": "Bước vào của vòng tự cải thiện (self-improve loop, STR13 — CONTEXT.md):\nfgOS xếp hạng chính friction chưa ngã-ngũ của nó thành\nmột danh sách candidate, người chọn đúng một hoặc dừn",
+    "identityFingerprint": "5c19ee6d921866ed46a3f9a75733d3ea03cdc16aec9116a52bce3c5c2f715f93",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations",
+      "Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)"
+    ],
+    "text": "Bước vào của vòng tự cải thiện (self-improve loop, STR13 — CONTEXT.md):\nfgOS xếp hạng chính friction chưa ngã-ngũ của nó thành\nmột danh sách candidate, người chọn đúng một hoặc dừng (Slice 1), rồi có thể\nbắc cầu candidate đã chọn sang một việc thật để runner thi công (Slice 3,\n`--submit`). Loop này chỉ nhắm vào chính `repo/src` của fgOS — không\nphải một tính năng mở cho host project ngoài — và chạy khi người gọi tay,\nkhông bao giờ là một nhánh tự động của vòng dispatch thường. Vòng khép\nkín đầy đủ: `evolve` (liệt kê) → `evolve --pick` (xem một candidate, đọc-thuần)\n→ `evolve --submit` (bắc cầu, HÀNH ĐỘNG GHI duy nhất của cả bề mặt evolve) →\nrunner dispatch việc mới như mọi việc khác → `review`/`approve` qua cổng duyệt\nPR nội bộ, với `approve` chạy thêm phán Iron Law (xem dưới) trước khi merge."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-26",
+    "githubAnchor": "unheaded-block-26",
+    "stableAnchor": "unheaded-block-26",
+    "title": "Unheaded block 26",
+    "startLine": 474,
+    "endLine": 484,
+    "textDigest": "c7182f609c029616bc8c23ef95b7fb69ade8fc943ebf7aba8f339003c4437459",
+    "sample": "Bước vào của vòng tự cải thiện (self-improve loop, STR13 — CONTEXT.md):\nfgOS xếp hạng chính friction chưa ngã-ngũ của nó thành\nmột danh sách candidate, người chọn đúng một hoặc dừn",
+    "identityFingerprint": "5c19ee6d921866ed46a3f9a75733d3ea03cdc16aec9116a52bce3c5c2f715f93",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations",
+      "Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)"
+    ],
+    "text": "Bước vào của vòng tự cải thiện (self-improve loop, STR13 — CONTEXT.md):\nfgOS xếp hạng chính friction chưa ngã-ngũ của nó thành\nmột danh sách candidate, người chọn đúng một hoặc dừng (Slice 1), rồi có thể\nbắc cầu candidate đã chọn sang một việc thật để runner thi công (Slice 3,\n`--submit`). Loop này chỉ nhắm vào chính `repo/src` của fgOS — không\nphải một tính năng mở cho host project ngoài — và chạy khi người gọi tay,\nkhông bao giờ là một nhánh tự động của vòng dispatch thường. Vòng khép\nkín đầy đủ: `evolve` (liệt kê) → `evolve --pick` (xem một candidate, đọc-thuần)\n→ `evolve --submit` (bắc cầu, HÀNH ĐỘNG GHI duy nhất của cả bề mặt evolve) →\nrunner dispatch việc mới như mọi việc khác → `review`/`approve` qua cổng duyệt\nPR nội bộ, với `approve` chạy thêm phán Iron Law (xem dưới) trước khi merge."
+  }
+}
+```
+
+## claim_d55d7b0f484d74f056db873f5466dca5
+
+Source digest (evidence JSON): 06d9255ec9655f8c4550a103b2f72b061dad182c5ef000bd6811cb3425f294af
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_d55d7b0f484d74f056db873f5466dca5",
+  "record": {
+    "claimId": "claim_d55d7b0f484d74f056db873f5466dca5",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "unheaded-block-39",
+    "sourceLines": [
+      562,
+      634
+    ],
+    "sourceDigest": "ec1fcc6bb48b6e8af04b6effa67ac90f4f27db4a2e5508cd7ce6cf5644946af9",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "unheaded-block-27",
+    "targetDigest": "ec1fcc6bb48b6e8af04b6effa67ac90f4f27db4a2e5508cd7ce6cf5644946af9",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-39",
+    "githubAnchor": "unheaded-block-39",
+    "stableAnchor": "unheaded-block-39",
+    "title": "Unheaded block 39",
+    "startLine": 562,
+    "endLine": 634,
+    "textDigest": "ec1fcc6bb48b6e8af04b6effa67ac90f4f27db4a2e5508cd7ce6cf5644946af9",
+    "sample": "- **Runs when:** người vận hành gọi `fgos evolve` (liệt kê), `fgos evolve\n  --pick <id>` (xem chi tiết một candidate), hoặc `fgos evolve --submit <id>`\n (bắc cầu candidate sang một",
+    "identityFingerprint": "2175421a2af402fa5d5fe6d6e0d6fdc8c29471149516720a39ba08d47ac390c7",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations",
+      "Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)"
+    ],
+    "text": "- **Runs when:** người vận hành gọi `fgos evolve` (liệt kê), `fgos evolve\n  --pick <id>` (xem chi tiết một candidate), hoặc `fgos evolve --submit <id>`\n (bắc cầu candidate sang một việc thật) — không có input tương tác nào\n khác, không vòng lặp chờ trả lời (hai bước, không stdin).\n- **Blocked when:** `--pick <id>`/`--submit <id>` không khớp candidate nào\n đang mở — `validation`, thông điệp rõ ràng, KHÔNG BAO GIỜ hỏi lại (\n  \"input sai là lỗi sạch, không re-prompt\"), không việc nào được tạo ra cho\n  `--submit` khi không khớp; `--pick`/`--submit` mang cờ trần (không giá trị)\n  cũng bị từ chối cùng khuôn `validation` như mọi verb khác dùng\n  `requireField`.\n- **What changes:**\n  - `fgos evolve` (không `--pick`/`--submit`) và `fgos evolve --pick <id>` —\n ĐỌC-THUẦN TUYỆT ĐỐI, cùng request-class với `ready`/`list`/`check`:\n    đọc view qua `listWork(dir)` DUY NHẤT, không bao giờ\n    `rebuild`/`refreshView`/`initStore` (những cửa GHI view/log).\n    - `fgos evolve` — xếp hạng MỖI id còn friction chưa ngã-ngũ\n (`src/evolve/candidates.mjs`'s `rankCandidates`, tái dùng cơ học\n      `listUnsettledFrictionsByWork`/`WEIGHTS.frictionUnsettled` của\n      `entropy.mjs`, không tự định nghĩa lại \"chưa ngã-ngũ\" hay trọng số\n      riêng) rồi in TOÀN BỘ danh sách — mỗi dòng mang đủ id/score/\n      disposition/errorClass/layer/attempts/detail, không cắt bớt (cùng kỷ\n      luật \"mọi trường người cần để phán\" như phần friction của `check`).\n      Không friction chưa ngã-ngũ nào → một thông điệp trạng-thái-rỗng rõ\n      ràng, exit 0 — chưa khởi tạo `.fgos/` nếu nó chưa tồn tại, giữ đúng hợp\n      đồng đọc-thuần của `ready`/`list`.\n    - `fgos evolve --pick <id>` — xếp hạng lại CÙNG một view rồi tìm `id`\n      trong danh sách; khớp → in bản ghi friction đầy đủ của candidate đó,\n      TÁI DÙNG đúng formatter friction sẵn có của `check` (không viết\n      formatter mới); không khớp → lỗi `validation` sạch, không đổi trạng\n      thái. Chạy `fgos evolve` không mang `--pick`/`--submit` CHÍNH LÀ kết\n cục \"dừng\" của Gate A — không có input hủy/dừng riêng nào khác\n      cần xử lý.\n - `fgos evolve --submit <id>` (self-improve loop STR13 Slice 3) — HÀNH\n    ĐỘNG GHI DUY NHẤT của cả bề mặt evolve: xếp hạng lại CÙNG một view, tìm\n    `id`; khớp → soạn một mô tả người-đọc-được từ các trường của candidate\n    (id/disposition/errorClass/layer/attempts/detail — trường vắng mặt được\n    bỏ qua, không bao giờ in literal \"undefined\") rồi tạo đúng MỘT việc thật\n    qua CÙNG cửa `submitWork` mà `fgos submit` tự dùng (không logic tạo-việc\n    thứ hai) — `status: todo`, stage vào-vòng theo domain (stage đầu tiên\n    domain đó khai; với `coding` là `discovery`), `tier`/`risk` dẫn xuất\n    mechanically từ chính mô tả đó qua\n    `classify()` giống hệt một `submit` bình thường. `evolve --submit` không\n    mang cờ `--async`/`--unattended`/`--domain` riêng của nó (bề mặt cờ tối\n    thiểu, YAGNI) — luôn gọi `submitWork` với mặc định. Việc mới tạo ra đi\n    đúng vòng đời runner thường (quét nghiên-cứu → quét chia-việc → dispatch →\n    `awaiting-approval`) như mọi việc khác — Gate A không có cơ chế dispatch/wiring\n    riêng nào cho việc bắc cầu này.\n- **Side effects:** `evolve`/`evolve --pick` — không có: không sự kiện nào\n  vào nhật ký, không dòng nào vào `state.json`, không tiến trình con git nào.\n  `evolve --submit` — đúng MỘT sự kiện `work.add` mới (qua `submitWork`), y\n  hệt một `fgos submit` bình thường; không tiến trình con git nào (việc mới\n  chưa dispatch, chưa có nhánh).\n- **Afterwards:** `evolve`/`evolve --pick` — người vận hành thấy đúng\n  candidate mình cần để quyết định có bắc cầu hay không; không candidate nào\n  bị chọn tự động, không việc nào được tạo ra chỉ vì `evolve` chạy.\n  `evolve --submit` — việc mới nằm trong hàng chờ runner thường, sẵn sàng cho\n  quét làm-rõ/chia-việc/dispatch như mọi việc khác; khi đề xuất của nó tới\n  `awaiting-approval`, nó đi qua đúng cổng duyệt PR nội bộ ở trên — nếu diff của nó\n  chạm cờ/module Iron Law (xem dưới), `approve` từ chối cho tới khi người\n  vận hành xác nhận bằng `--acknowledge-iron-law`.\n  **Tương tác đã biết (chứng minh bằng e2e thật, STR13 Slice 3):** vì Iron\n  Law's phép thử từ khóa TÁI DÙNG đúng `HEAVY_KEYWORDS` mà `classify()` cũng\n dùng, một mô tả candidate chứa từ khóa rủi ro nặng — điều kiện tự\n  nhiên để một fix thật sự cần Iron Law — cũng khiến chính việc mới đó nhận\n  `risk: 'heavy'` ngay lúc `submitWork` chạy. Root mang `risk: 'heavy'` đi\n  đúng nhánh \"cần người quyết\" của quét chia-việc (xem \"Edge Cases Settled\"\n  dưới, mục risk `heavy`) — đậu `awaiting-human` TRƯỚC KHI kịp dispatch, dù\n  không phải vì thiếu rõ. Đây không phải bug — người vận hành cần một bước\n  thao tác thường (vd `fgos edit <id> --risk standard`, verb công khai đã có\n  từ work-item-verb-surface) giữa `evolve --submit` và khi item tới dispatch,\n  nếu muốn bỏ qua cửa chia-việc cho trường hợp này; `description` giữ\n  nguyên nên Iron Law's phép thử từ khóa tại `approve` vẫn chạy đúng như\n  thiết kế bất kể `risk` bị đổi sau đó."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-27",
+    "githubAnchor": "unheaded-block-27",
+    "stableAnchor": "unheaded-block-27",
+    "title": "Unheaded block 27",
+    "startLine": 486,
+    "endLine": 558,
+    "textDigest": "ec1fcc6bb48b6e8af04b6effa67ac90f4f27db4a2e5508cd7ce6cf5644946af9",
+    "sample": "- **Runs when:** người vận hành gọi `fgos evolve` (liệt kê), `fgos evolve\n  --pick <id>` (xem chi tiết một candidate), hoặc `fgos evolve --submit <id>`\n (bắc cầu candidate sang một",
+    "identityFingerprint": "2175421a2af402fa5d5fe6d6e0d6fdc8c29471149516720a39ba08d47ac390c7",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations",
+      "Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)"
+    ],
+    "text": "- **Runs when:** người vận hành gọi `fgos evolve` (liệt kê), `fgos evolve\n  --pick <id>` (xem chi tiết một candidate), hoặc `fgos evolve --submit <id>`\n (bắc cầu candidate sang một việc thật) — không có input tương tác nào\n khác, không vòng lặp chờ trả lời (hai bước, không stdin).\n- **Blocked when:** `--pick <id>`/`--submit <id>` không khớp candidate nào\n đang mở — `validation`, thông điệp rõ ràng, KHÔNG BAO GIỜ hỏi lại (\n  \"input sai là lỗi sạch, không re-prompt\"), không việc nào được tạo ra cho\n  `--submit` khi không khớp; `--pick`/`--submit` mang cờ trần (không giá trị)\n  cũng bị từ chối cùng khuôn `validation` như mọi verb khác dùng\n  `requireField`.\n- **What changes:**\n  - `fgos evolve` (không `--pick`/`--submit`) và `fgos evolve --pick <id>` —\n ĐỌC-THUẦN TUYỆT ĐỐI, cùng request-class với `ready`/`list`/`check`:\n    đọc view qua `listWork(dir)` DUY NHẤT, không bao giờ\n    `rebuild`/`refreshView`/`initStore` (những cửa GHI view/log).\n    - `fgos evolve` — xếp hạng MỖI id còn friction chưa ngã-ngũ\n (`src/evolve/candidates.mjs`'s `rankCandidates`, tái dùng cơ học\n      `listUnsettledFrictionsByWork`/`WEIGHTS.frictionUnsettled` của\n      `entropy.mjs`, không tự định nghĩa lại \"chưa ngã-ngũ\" hay trọng số\n      riêng) rồi in TOÀN BỘ danh sách — mỗi dòng mang đủ id/score/\n      disposition/errorClass/layer/attempts/detail, không cắt bớt (cùng kỷ\n      luật \"mọi trường người cần để phán\" như phần friction của `check`).\n      Không friction chưa ngã-ngũ nào → một thông điệp trạng-thái-rỗng rõ\n      ràng, exit 0 — chưa khởi tạo `.fgos/` nếu nó chưa tồn tại, giữ đúng hợp\n      đồng đọc-thuần của `ready`/`list`.\n    - `fgos evolve --pick <id>` — xếp hạng lại CÙNG một view rồi tìm `id`\n      trong danh sách; khớp → in bản ghi friction đầy đủ của candidate đó,\n      TÁI DÙNG đúng formatter friction sẵn có của `check` (không viết\n      formatter mới); không khớp → lỗi `validation` sạch, không đổi trạng\n      thái. Chạy `fgos evolve` không mang `--pick`/`--submit` CHÍNH LÀ kết\n cục \"dừng\" của Gate A — không có input hủy/dừng riêng nào khác\n      cần xử lý.\n - `fgos evolve --submit <id>` (self-improve loop STR13 Slice 3) — HÀNH\n    ĐỘNG GHI DUY NHẤT của cả bề mặt evolve: xếp hạng lại CÙNG một view, tìm\n    `id`; khớp → soạn một mô tả người-đọc-được từ các trường của candidate\n    (id/disposition/errorClass/layer/attempts/detail — trường vắng mặt được\n    bỏ qua, không bao giờ in literal \"undefined\") rồi tạo đúng MỘT việc thật\n    qua CÙNG cửa `submitWork` mà `fgos submit` tự dùng (không logic tạo-việc\n    thứ hai) — `status: todo`, stage vào-vòng theo domain (stage đầu tiên\n    domain đó khai; với `coding` là `discovery`), `tier`/`risk` dẫn xuất\n    mechanically từ chính mô tả đó qua\n    `classify()` giống hệt một `submit` bình thường. `evolve --submit` không\n    mang cờ `--async`/`--unattended`/`--domain` riêng của nó (bề mặt cờ tối\n    thiểu, YAGNI) — luôn gọi `submitWork` với mặc định. Việc mới tạo ra đi\n    đúng vòng đời runner thường (quét nghiên-cứu → quét chia-việc → dispatch →\n    `awaiting-approval`) như mọi việc khác — Gate A không có cơ chế dispatch/wiring\n    riêng nào cho việc bắc cầu này.\n- **Side effects:** `evolve`/`evolve --pick` — không có: không sự kiện nào\n  vào nhật ký, không dòng nào vào `state.json`, không tiến trình con git nào.\n  `evolve --submit` — đúng MỘT sự kiện `work.add` mới (qua `submitWork`), y\n  hệt một `fgos submit` bình thường; không tiến trình con git nào (việc mới\n  chưa dispatch, chưa có nhánh).\n- **Afterwards:** `evolve`/`evolve --pick` — người vận hành thấy đúng\n  candidate mình cần để quyết định có bắc cầu hay không; không candidate nào\n  bị chọn tự động, không việc nào được tạo ra chỉ vì `evolve` chạy.\n  `evolve --submit` — việc mới nằm trong hàng chờ runner thường, sẵn sàng cho\n  quét làm-rõ/chia-việc/dispatch như mọi việc khác; khi đề xuất của nó tới\n  `awaiting-approval`, nó đi qua đúng cổng duyệt PR nội bộ ở trên — nếu diff của nó\n  chạm cờ/module Iron Law (xem dưới), `approve` từ chối cho tới khi người\n  vận hành xác nhận bằng `--acknowledge-iron-law`.\n  **Tương tác đã biết (chứng minh bằng e2e thật, STR13 Slice 3):** vì Iron\n  Law's phép thử từ khóa TÁI DÙNG đúng `HEAVY_KEYWORDS` mà `classify()` cũng\n dùng, một mô tả candidate chứa từ khóa rủi ro nặng — điều kiện tự\n  nhiên để một fix thật sự cần Iron Law — cũng khiến chính việc mới đó nhận\n  `risk: 'heavy'` ngay lúc `submitWork` chạy. Root mang `risk: 'heavy'` đi\n  đúng nhánh \"cần người quyết\" của quét chia-việc (xem \"Edge Cases Settled\"\n  dưới, mục risk `heavy`) — đậu `awaiting-human` TRƯỚC KHI kịp dispatch, dù\n  không phải vì thiếu rõ. Đây không phải bug — người vận hành cần một bước\n  thao tác thường (vd `fgos edit <id> --risk standard`, verb công khai đã có\n  từ work-item-verb-surface) giữa `evolve --submit` và khi item tới dispatch,\n  nếu muốn bỏ qua cửa chia-việc cho trường hợp này; `description` giữ\n  nguyên nên Iron Law's phép thử từ khóa tại `approve` vẫn chạy đúng như\n  thiết kế bất kể `risk` bị đổi sau đó."
+  }
+}
+```
+
+## claim_dae296f2a034494ca1e4b6115c184c73
+
+Source digest (evidence JSON): 77f7ac45cd92acdb4a1e6d16fc7f9c0cd92608ec26c2fe191400861aa583c4cb
+
+Target digest: none
+
+```json
+{
+  "entryId": "claim_dae296f2a034494ca1e4b6115c184c73",
+  "record": {
+    "claimId": "claim_dae296f2a034494ca1e4b6115c184c73",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceAnchor": "iron-law-phân-loại-rủi-ro-của-một-candidate-fix-self-improve-loop-str13-slice-23",
+    "sourceLines": [
+      636,
+      636
+    ],
+    "sourceDigest": "b5bd1aff8cdb056c9d10c357f80729d5c1cefd632d344242fc46a5441a8f0e23",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "iron-law-phân-loại-rủi-ro-của-một-candidate-fix-self-improve-loop-str13-slice-23",
+    "targetDigest": "b5bd1aff8cdb056c9d10c357f80729d5c1cefd632d344242fc46a5441a8f0e23",
+    "class": "Weak-exact",
+    "classReason": "ancestor headings differ; document exact share below one half",
+    "mandatoryDeep": false,
+    "fullSourceUnitContained": true
+  },
+  "fullSource": {
+    "path": "docs/specs/runner.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Iron Law — phân loại rủi ro của một candidate fix (self-improve loop STR13 Slice 2/3)",
+    "anchor": "iron-law-phân-loại-rủi-ro-của-một-candidate-fix-self-improve-loop-str13-slice-23",
+    "githubAnchor": "iron-law-phân-loại-rủi-ro-của-một-candidate-fix-self-improve-loop-str13-slice-23",
+    "stableAnchor": "h-b711c7cd747c",
+    "startLine": 636,
+    "endLine": 636,
+    "textDigest": "b5bd1aff8cdb056c9d10c357f80729d5c1cefd632d344242fc46a5441a8f0e23",
+    "sample": "Iron Law — phân loại rủi ro của một candidate fix (self-improve loop STR13 Slice 2/3)",
+    "sectionPayloadDigest": "4c92bd4112973e437d1b038df2903d89197fb7a7a3683c038303f3f7cf1e9d0b",
+    "followingBlockDigest": "2c9e543faa091cedca0350f00da07dba8d9fecefd433b7b1a1b6315b11fc6dfe",
+    "identityFingerprint": "475a0d7cbe52870ab9cd9d98043b8efcb83157c3d7bb2cd824e0948acb07daba",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Behaviors & Operations"
+    ],
+    "text": "### Iron Law — phân loại rủi ro của một candidate fix (self-improve loop STR13 Slice 2/3)",
+    "sectionText": "### Iron Law — phân loại rủi ro của một candidate fix (self-improve loop STR13 Slice 2/3)\n\nBước phán-rủi-ro của vòng tự cải thiện (CONTEXT.md): trước khi\nmột fix cho một candidate được phép BỎ QUA kỷ luật \"chứng minh bằng test đỏ\ntrước\" (failing-test-first), hệ tự hỏi hai câu — fix này có chạm module có\nNĂNG LỰC làm yếu chính kỷ luật gate/verify của hệ không, và mô tả của\nfix có mang từ khóa thuộc nhóm cờ rủi ro nặng không ? Trả lời CÓ ở BẤT KỲ\ncâu nào → Iron Law áp dụng, fix phải tự chứng minh bằng test đỏ trước khi\nđược coi là xong.\n\n- **Runs when:** gọi từ bên trong `approve` nguồn `runner` (Cổng duyệt PR nội\n  bộ, trên) và từ `sync-root`, ngay TRƯỚC bước kiểm cây sạch và trước mọi\n  thao tác git — mỗi\n  lần một đề xuất nguồn runner được duyệt (self-improve loop STR13 Slice 3),\nbất kể đề xuất đó tới từ `evolve --submit` hay từ `add`/`submit`\n thường (chung cho MỌI đề xuất nguồn runner, không riêng gì evolve).\n **Ranh giới trunk (per `0032`):** và CHỈ khi lần merge đó land lên\n  trunk. `approve` phân biệt bằng `resolveRoot(view, id) === id` (pre-check\n  thuần của `merge next` dùng cùng biểu thức); `sync-root` phân biệt bằng\n  `!item.parent`, một biểu thức KHÁC và cố ý không gộp chung, vì verb đó chỉ\n  land vào cha trực tiếp trong khi `resolveRoot` leo tới đỉnh lineage. Một\n  leaf merge vào `fgw/<root>` và một gốc có cha `sync-root` vào `fgw/<parent>`\n  đều đi thẳng, không gọi phép thử này lần nào — chỗ duy nhất còn chặn được\n  gì là chỗ diff thật sự sắp lên trunk.\n  **Ranh giới CHỦ Ý:** chỉ đề xuất nguồn `runner` mới đi qua phép thử này —\n  đề xuất nguồn `pull`/`legacy` (code đã do chính người tự tay commit thẳng\n  lên main qua cửa `take`/`return`, xem thang bền vững) không đi qua đường\n  này; đây là một ranh giới đã xác nhận có chủ đích, không phải một khoảng\n trống bị bỏ sót (xem RUL37 (Iron Law hỏi ở đúng một ranh giới — trunk — cho mọi đề xuất nguồn runner tới đó)).\n- **Blocked when:** không áp dụng — đây là hàm thuần, không có trạng thái để\n  chặn. (Điểm chặn thật, bằng KẾT QUẢ hàm thuần này, nằm ở `approve` — xem\n  \"Cổng duyệt PR nội bộ\" trên.)\n- **What changes:** không gì ở tầng trạng thái — đây là một phép TÍNH thuần\n  trên hai đầu vào (danh sách file candidate fix chạm tới, mô tả tùy chọn của\n  fix), trả lại một phán quyết CÓ/KHÔNG kèm bằng chứng (đúng cờ nào, đúng\n  module nào khớp) — không phải chỉ một boolean trơ.\n - Phép thử module (mở rộng): file chạm được CHUẨN HÓA path\n    (`./x` và `x` khớp như nhau; một `..`-traversal thoát khỏi thư mục được\n    bảo vệ đúng đắn KHÔNG khớp — chuẩn hóa chỉ gỡ bỏ khớp-thừa, không bao giờ\n    làm sót một khớp thật, review-20260717-self-improve-base-workflow finding\n    F1) rồi so vào danh sách minh họa — mọi file trong nhóm điều-phối-runner,\n    module tính-điểm-entropy, mọi file trong nhóm tự-cải-thiện (chính vòng\n    evolve), toàn bộ file điểm-vào CLI (thay đổi bất kỳ đâu trong đó bị coi\n    là chạm — cố ý rộng hơn thực tế, hướng AN TOÀN hơn là bỏ sót), module\n    lưu-trữ sự-kiện lõi, module máy-trạng-thái lõi. Kết quả trả về (`matchedModules`)\n    vẫn giữ NGUYÊN VĂN path gốc người gọi truyền vào (không phải bản đã chuẩn\n    hóa), để thông điệp từ chối nói đúng cái người gọi thấy. Danh sách này\n MINH HỌA, không đóng khung — module năng-lực-liên-quan khác ngoài\n danh sách vẫn có thể cần Iron Law theo phép thử năng lực gốc,\n    một giới hạn còn lại đã ghi nhận (xem Open Gaps). `filesChanged` chứa một\n    phần tử không phải string, hay `description` không phải string/vắng mặt,\n    đều bị từ chối bằng lỗi validation sạch (không crash thô).\n - Phép thử từ khóa (mở rộng): mô tả fix (nếu có cung cấp) được so\n    khớp không phân biệt hoa/thường với một bộ từ khóa rủi-ro-nặng dùng\n    CHUNG với bước phân loại submission lúc `fgos submit` (cùng một nguồn dữ\n    liệu, không hai danh sách lệch nhau theo thời gian) — bộ này phủ cả sáu\n    nhóm cờ đã khóa (bảo mật/xác thực, phân quyền, mất dữ liệu, kiểm toán,\n    hệ thống ngoài, bỏ kiểm tra). Mô tả VẮNG MẶT không bao giờ được coi là\n    \"an toàn\" — phán quyết vẫn tính đủ từ phép thử module.\n- **Side effects:** không có — hàm thuần tuyệt đối, không đọc/ghi gì ngoài\n  hai tham số truyền vào.\n- **Afterwards:** bên gọi nhận lại phán quyết kèm bằng chứng (đúng cờ/module\n  nào khớp); `required: true` thiếu `--acknowledge-iron-law` → hệ quả do\n  `ironLaw.level` quyết (RUL64 (`ironLaw.level` — key config riêng của cổng Iron Law, fail-closed về `ask`)): ở `ask` (mặc định) từ\n  chối ngay trong cùng lượt gọi, thông điệp nêu tên đúng cờ/module đã khớp,\n  không git nào chạy, đề xuất giữ nguyên `awaiting-approval`; ở `warn` in\n  cảnh báo ra stderr kèm đúng cờ/module đã khớp, ghi một bản ghi `decision`\n  mang `kind: engine` TRƯỚC lần merge nó cho phép, rồi đi tiếp;\n  `required: true` kèm cờ,\n  hoặc `required: false` — đi tiếp đúng đường merge/verify bình\n  thường ở \"Cổng duyệt PR nội bộ\" trên, không đổi hành vi. Một đề xuất bị\n  giữ ở mức `ask` ở NGUYÊN `awaiting-approval` và không nghẽn ứng viên khác:\n  vòng quét merge ghi nó vào danh sách rồi đi tiếp, trình gom một lượt ở\n cuối (per `0032`)."
+  },
+  "fullTarget": {
+    "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Iron Law — phân loại rủi ro của một candidate fix (self-improve loop STR13 Slice 2/3)",
+    "anchor": "iron-law-phân-loại-rủi-ro-của-một-candidate-fix-self-improve-loop-str13-slice-23",
+    "githubAnchor": "iron-law-phân-loại-rủi-ro-của-một-candidate-fix-self-improve-loop-str13-slice-23",
+    "stableAnchor": "h-271054e011ab",
+    "startLine": 560,
+    "endLine": 560,
+    "textDigest": "b5bd1aff8cdb056c9d10c357f80729d5c1cefd632d344242fc46a5441a8f0e23",
+    "sample": "Iron Law — phân loại rủi ro của một candidate fix (self-improve loop STR13 Slice 2/3)",
+    "sectionPayloadDigest": "4c92bd4112973e437d1b038df2903d89197fb7a7a3683c038303f3f7cf1e9d0b",
+    "followingBlockDigest": "2c9e543faa091cedca0350f00da07dba8d9fecefd433b7b1a1b6315b11fc6dfe",
+    "identityFingerprint": "475a0d7cbe52870ab9cd9d98043b8efcb83157c3d7bb2cd824e0948acb07daba",
+    "ancestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations"
+    ],
+    "text": "### Iron Law — phân loại rủi ro của một candidate fix (self-improve loop STR13 Slice 2/3)",
+    "sectionText": "### Iron Law — phân loại rủi ro của một candidate fix (self-improve loop STR13 Slice 2/3)\n\nBước phán-rủi-ro của vòng tự cải thiện (CONTEXT.md): trước khi\nmột fix cho một candidate được phép BỎ QUA kỷ luật \"chứng minh bằng test đỏ\ntrước\" (failing-test-first), hệ tự hỏi hai câu — fix này có chạm module có\nNĂNG LỰC làm yếu chính kỷ luật gate/verify của hệ không, và mô tả của\nfix có mang từ khóa thuộc nhóm cờ rủi ro nặng không ? Trả lời CÓ ở BẤT KỲ\ncâu nào → Iron Law áp dụng, fix phải tự chứng minh bằng test đỏ trước khi\nđược coi là xong.\n\n- **Runs when:** gọi từ bên trong `approve` nguồn `runner` (Cổng duyệt PR nội\n  bộ, trên) và từ `sync-root`, ngay TRƯỚC bước kiểm cây sạch và trước mọi\n  thao tác git — mỗi\n  lần một đề xuất nguồn runner được duyệt (self-improve loop STR13 Slice 3),\nbất kể đề xuất đó tới từ `evolve --submit` hay từ `add`/`submit`\n thường (chung cho MỌI đề xuất nguồn runner, không riêng gì evolve).\n **Ranh giới trunk (per `0032`):** và CHỈ khi lần merge đó land lên\n  trunk. `approve` phân biệt bằng `resolveRoot(view, id) === id` (pre-check\n  thuần của `merge next` dùng cùng biểu thức); `sync-root` phân biệt bằng\n  `!item.parent`, một biểu thức KHÁC và cố ý không gộp chung, vì verb đó chỉ\n  land vào cha trực tiếp trong khi `resolveRoot` leo tới đỉnh lineage. Một\n  leaf merge vào `fgw/<root>` và một gốc có cha `sync-root` vào `fgw/<parent>`\n  đều đi thẳng, không gọi phép thử này lần nào — chỗ duy nhất còn chặn được\n  gì là chỗ diff thật sự sắp lên trunk.\n  **Ranh giới CHỦ Ý:** chỉ đề xuất nguồn `runner` mới đi qua phép thử này —\n  đề xuất nguồn `pull`/`legacy` (code đã do chính người tự tay commit thẳng\n  lên main qua cửa `take`/`return`, xem thang bền vững) không đi qua đường\n  này; đây là một ranh giới đã xác nhận có chủ đích, không phải một khoảng\n trống bị bỏ sót (xem RUL37 (Iron Law hỏi ở đúng một ranh giới — trunk — cho mọi đề xuất nguồn runner tới đó)).\n- **Blocked when:** không áp dụng — đây là hàm thuần, không có trạng thái để\n  chặn. (Điểm chặn thật, bằng KẾT QUẢ hàm thuần này, nằm ở `approve` — xem\n  \"Cổng duyệt PR nội bộ\" trên.)\n- **What changes:** không gì ở tầng trạng thái — đây là một phép TÍNH thuần\n  trên hai đầu vào (danh sách file candidate fix chạm tới, mô tả tùy chọn của\n  fix), trả lại một phán quyết CÓ/KHÔNG kèm bằng chứng (đúng cờ nào, đúng\n  module nào khớp) — không phải chỉ một boolean trơ.\n - Phép thử module (mở rộng): file chạm được CHUẨN HÓA path\n    (`./x` và `x` khớp như nhau; một `..`-traversal thoát khỏi thư mục được\n    bảo vệ đúng đắn KHÔNG khớp — chuẩn hóa chỉ gỡ bỏ khớp-thừa, không bao giờ\n    làm sót một khớp thật, review-20260717-self-improve-base-workflow finding\n    F1) rồi so vào danh sách minh họa — mọi file trong nhóm điều-phối-runner,\n    module tính-điểm-entropy, mọi file trong nhóm tự-cải-thiện (chính vòng\n    evolve), toàn bộ file điểm-vào CLI (thay đổi bất kỳ đâu trong đó bị coi\n    là chạm — cố ý rộng hơn thực tế, hướng AN TOÀN hơn là bỏ sót), module\n    lưu-trữ sự-kiện lõi, module máy-trạng-thái lõi. Kết quả trả về (`matchedModules`)\n    vẫn giữ NGUYÊN VĂN path gốc người gọi truyền vào (không phải bản đã chuẩn\n    hóa), để thông điệp từ chối nói đúng cái người gọi thấy. Danh sách này\n MINH HỌA, không đóng khung — module năng-lực-liên-quan khác ngoài\n danh sách vẫn có thể cần Iron Law theo phép thử năng lực gốc,\n    một giới hạn còn lại đã ghi nhận (xem Open Gaps). `filesChanged` chứa một\n    phần tử không phải string, hay `description` không phải string/vắng mặt,\n    đều bị từ chối bằng lỗi validation sạch (không crash thô).\n - Phép thử từ khóa (mở rộng): mô tả fix (nếu có cung cấp) được so\n    khớp không phân biệt hoa/thường với một bộ từ khóa rủi-ro-nặng dùng\n    CHUNG với bước phân loại submission lúc `fgos submit` (cùng một nguồn dữ\n    liệu, không hai danh sách lệch nhau theo thời gian) — bộ này phủ cả sáu\n    nhóm cờ đã khóa (bảo mật/xác thực, phân quyền, mất dữ liệu, kiểm toán,\n    hệ thống ngoài, bỏ kiểm tra). Mô tả VẮNG MẶT không bao giờ được coi là\n    \"an toàn\" — phán quyết vẫn tính đủ từ phép thử module.\n- **Side effects:** không có — hàm thuần tuyệt đối, không đọc/ghi gì ngoài\n  hai tham số truyền vào.\n- **Afterwards:** bên gọi nhận lại phán quyết kèm bằng chứng (đúng cờ/module\n  nào khớp); `required: true` thiếu `--acknowledge-iron-law` → hệ quả do\n  `ironLaw.level` quyết (RUL64 (`ironLaw.level` — key config riêng của cổng Iron Law, fail-closed về `ask`)): ở `ask` (mặc định) từ\n  chối ngay trong cùng lượt gọi, thông điệp nêu tên đúng cờ/module đã khớp,\n  không git nào chạy, đề xuất giữ nguyên `awaiting-approval`; ở `warn` in\n  cảnh báo ra stderr kèm đúng cờ/module đã khớp, ghi một bản ghi `decision`\n  mang `kind: engine` TRƯỚC lần merge nó cho phép, rồi đi tiếp;\n  `required: true` kèm cờ,\n  hoặc `required: false` — đi tiếp đúng đường merge/verify bình\n  thường ở \"Cổng duyệt PR nội bộ\" trên, không đổi hành vi. Một đề xuất bị\n  giữ ở mức `ask` ở NGUYÊN `awaiting-approval` và không nghẽn ứng viên khác:\n  vòng quét merge ghi nó vào danh sách rồi đi tiếp, trình gom một lượt ở\n cuối (per `0032`)."
+  }
+}
+```

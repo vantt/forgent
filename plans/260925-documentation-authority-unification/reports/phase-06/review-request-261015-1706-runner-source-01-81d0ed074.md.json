@@ -1,0 +1,170 @@
+{
+  "version": 1,
+  "commit": "81d0ed0747014e976c0d29222439fd6e3592b468",
+  "shard": "s9-runner-01.json",
+  "authorSession": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+  "authorshipRequired": true,
+  "rows": [
+    {
+      "claimId": "claim_a5f8435c8d549e5b41a34cf3e1f3e351",
+      "sourceUnitDigest": "6995106e543166fec7e46573ed70ab54a171c1d87f545ef19ade28df2cd97866",
+      "targetUnitDigest": "6995106e543166fec7e46573ed70ab54a171c1d87f545ef19ade28df2cd97866",
+      "reviewAuthor": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+      "decision": {
+        "claimId": "claim_a5f8435c8d549e5b41a34cf3e1f3e351",
+        "sourceUnitDigest": "6995106e543166fec7e46573ed70ab54a171c1d87f545ef19ade28df2cd97866",
+        "targetOwner": "docs/platform/runner/spec.md",
+        "targetAnchor": "unheaded-block-1",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: document exact share below one half. Whole unheaded-preamble docs/specs/runner.md#unheaded-block-1 (lines 1–7) carried at docs/platform/runner/spec.md#unheaded-block-1. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetUnitDigest": "6995106e543166fec7e46573ed70ab54a171c1d87f545ef19ade28df2cd97866",
+        "targetAncestry": []
+      },
+      "source": {
+        "path": "docs/specs/runner.md",
+        "unitKind": "unheaded-preamble",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded preamble",
+        "startLine": 1,
+        "endLine": 7,
+        "textDigest": "6995106e543166fec7e46573ed70ab54a171c1d87f545ef19ade28df2cd97866",
+        "sample": "---\narea: runner\nupdated: 2026-08-12\nsources: [phase-2-routing, post-divorce-hardening, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-clo",
+        "identityFingerprint": "fe4c34528a024172a1282c3a71f53ab613607e336be2aa24fe56e134fea7fe68",
+        "ancestry": [],
+        "text": "---\narea: runner\nupdated: 2026-08-12\nsources: [phase-2-routing, post-divorce-hardening, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-closeout, stage-clarify, stage-decompose-s1, stage-decompose-s2, pr-lifecycle-s1, discovery-context, worker-execution, fan-out-parallel, human-rounds, worker-dispatch-log, self-improve-loop, base-workflow-model-s2, fgos-multi-session-checkout, github-adapter-s3, github-adapter-s4, work-graph-intelligence-s2b, work-graph-intelligence-s10, work-graph-intelligence-s11, fgos-sample-testbed, p50-workflow-induct, str68-discovery-judge-robustness, str76-runner-bootstrap, str86-runner-headless-git, str7-str8-priority-intent, str51-2-reclaim-self-mount-fix, mvp2-scope-test-infra, str46-io-contract-lat2, spec-docs-lifecycle-realignment]\ndecisions: [feed7428, 14396a5c, 1a80b4d3, 9a19eea5, 96a65365, a7c099af, 43f257ae, 44936500, e1218b22, 6f2cbc47, a30a3d3c, 1359ab5e, cfae0120, 22699c61, 04a6cd05, 396d9d9e, 2e92b7a5, f0c40acc, 5a6900b2, 8575f1a3, c8df2479, cb09d6fd, b1aa1bdc, caecb9d1, 9b141173, a3176299, 140eb8a4, 76b7a36b, 8d04bba3, 1cd895e1, 38160a70, c11322cb, 2ac16176, f8a3a5d9, 3d4ea29c, 3c8e5926, 342102b9, d4c59ba2, 644916a4, ef6ed305, a4fe4c2b, f69951df, 5208dfe9, 8cf7effe, 7bbe6315, a7c93ec8, cfdd808f, 31b5f045, 87536f3f, 38f7e0b8, ecfd0d1a, f176c18a, d3445024, cf3ee399, fa12fd97, a58a7563, 6e2776cc, 8b95f883]\ncoverage: full\n---"
+      },
+      "target": {
+        "path": "docs/platform/runner/spec.md",
+        "unitKind": "unheaded-preamble",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded preamble",
+        "startLine": 1,
+        "endLine": 7,
+        "textDigest": "6995106e543166fec7e46573ed70ab54a171c1d87f545ef19ade28df2cd97866",
+        "sample": "---\narea: runner\nupdated: 2026-08-12\nsources: [phase-2-routing, post-divorce-hardening, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-clo",
+        "identityFingerprint": "fe4c34528a024172a1282c3a71f53ab613607e336be2aa24fe56e134fea7fe68",
+        "ancestry": [],
+        "text": "---\narea: runner\nupdated: 2026-08-12\nsources: [phase-2-routing, post-divorce-hardening, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-closeout, stage-clarify, stage-decompose-s1, stage-decompose-s2, pr-lifecycle-s1, discovery-context, worker-execution, fan-out-parallel, human-rounds, worker-dispatch-log, self-improve-loop, base-workflow-model-s2, fgos-multi-session-checkout, github-adapter-s3, github-adapter-s4, work-graph-intelligence-s2b, work-graph-intelligence-s10, work-graph-intelligence-s11, fgos-sample-testbed, p50-workflow-induct, str68-discovery-judge-robustness, str76-runner-bootstrap, str86-runner-headless-git, str7-str8-priority-intent, str51-2-reclaim-self-mount-fix, mvp2-scope-test-infra, str46-io-contract-lat2, spec-docs-lifecycle-realignment]\ndecisions: [feed7428, 14396a5c, 1a80b4d3, 9a19eea5, 96a65365, a7c099af, 43f257ae, 44936500, e1218b22, 6f2cbc47, a30a3d3c, 1359ab5e, cfae0120, 22699c61, 04a6cd05, 396d9d9e, 2e92b7a5, f0c40acc, 5a6900b2, 8575f1a3, c8df2479, cb09d6fd, b1aa1bdc, caecb9d1, 9b141173, a3176299, 140eb8a4, 76b7a36b, 8d04bba3, 1cd895e1, 38160a70, c11322cb, 2ac16176, f8a3a5d9, 3d4ea29c, 3c8e5926, 342102b9, d4c59ba2, 644916a4, ef6ed305, a4fe4c2b, f69951df, 5208dfe9, 8cf7effe, 7bbe6315, a7c93ec8, cfdd808f, 31b5f045, 87536f3f, 38f7e0b8, ecfd0d1a, f176c18a, d3445024, cf3ee399, fa12fd97, a58a7563, 6e2776cc, 8b95f883]\ncoverage: full\n---"
+      },
+      "exactClass": "Weak-exact",
+      "exactClassReason": "document exact share below one half",
+      "nativeTargetClaimId": "claim_9e18cb6379ccc1a75eb0f38f5875e8b3",
+      "section": {
+        "startLine": 1,
+        "endLine": 8,
+        "target": "docs/platform/runner/spec.md",
+        "kind": "spec",
+        "anchor": "preamble",
+        "sha256": "c14ca155451cb36162e97f7679773a87663b889b40af06b1dbd1068ff769c411"
+      },
+      "mapAmendments": [],
+      "reboundAnchors": []
+    },
+    {
+      "claimId": "claim_d8ac30166d62dd668cf76d7dfb0a8170",
+      "sourceUnitDigest": "a86d867279b4935bdfdfe419a3121f088ead4fe51ea0a62fbfec1da3949cb54c",
+      "targetUnitDigest": "8e268a88fd1470f40fe63c54b8f819ebdf8fcc3c539d6ad3165f39bd064ac705",
+      "reviewAuthor": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+      "decision": {
+        "claimId": "claim_d8ac30166d62dd668cf76d7dfb0a8170",
+        "sourceUnitDigest": "a86d867279b4935bdfdfe419a3121f088ead4fe51ea0a62fbfec1da3949cb54c",
+        "targetOwner": "docs/platform/runner/spec.md",
+        "targetAnchor": "spec-runner-vòng-tự-hành",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Judgment: no target digest match. Whole heading docs/specs/runner.md#spec-runner-vòng-tự-hành (lines 9–9) carried at docs/platform/runner/spec.md#spec-runner-vòng-tự-hành. Original H1 and direct source payload remain verbatim; its section digest changes because P3 candidate metadata follows the H1. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetUnitDigest": "8e268a88fd1470f40fe63c54b8f819ebdf8fcc3c539d6ad3165f39bd064ac705",
+        "targetAncestry": []
+      },
+      "source": {
+        "path": "docs/specs/runner.md",
+        "unitKind": "heading",
+        "level": 1,
+        "title": "Spec: Runner (vòng tự hành)",
+        "anchor": "spec-runner-vòng-tự-hành",
+        "githubAnchor": "spec-runner-vòng-tự-hành",
+        "stableAnchor": "h-cf32145a0715",
+        "startLine": 9,
+        "endLine": 9,
+        "textDigest": "a86d867279b4935bdfdfe419a3121f088ead4fe51ea0a62fbfec1da3949cb54c",
+        "sample": "Spec: Runner (vòng tự hành)",
+        "sectionPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "followingBlockDigest": null,
+        "identityFingerprint": "3cd6fbc17111343773fbdc31c12203474377a0dd3fd697308c6eb7fdf0326213",
+        "ancestry": [],
+        "text": "# Spec: Runner (vòng tự hành)",
+        "sectionText": "# Spec: Runner (vòng tự hành)"
+      },
+      "target": {
+        "path": "docs/platform/runner/spec.md",
+        "unitKind": "heading",
+        "level": 1,
+        "title": "Spec: Runner (vòng tự hành)",
+        "anchor": "spec-runner-vòng-tự-hành",
+        "githubAnchor": "spec-runner-vòng-tự-hành",
+        "stableAnchor": "h-cf32145a0715",
+        "startLine": 9,
+        "endLine": 9,
+        "textDigest": "8e268a88fd1470f40fe63c54b8f819ebdf8fcc3c539d6ad3165f39bd064ac705",
+        "sample": "Spec: Runner (vòng tự hành)",
+        "sectionPayloadDigest": "7ee158f5f4676f98bc454e1789052a20f652633fd43164bc40d62f2fdbdea92b",
+        "followingBlockDigest": "2730bf6f8bfb9c582e083aed821d0f0994f072c3006dd26d87d5a3da152c0b9a",
+        "identityFingerprint": "48d038bf110590330c45f2aceba351e76709f5f6a06012a3875d6fe7cc31e7b9",
+        "ancestry": [],
+        "text": "# Spec: Runner (vòng tự hành)",
+        "sectionText": "# Spec: Runner (vòng tự hành)\n\n```txt\nDocument type: Specification\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve frozen-map runner content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; implementation truth not certified\nProvenance: docs/specs/runner.md at 63fa6f15266f45c881f610235e0be8d61ff07120; blob ddfa78cc7183cf1f7db8ee64d2339653a0aa0023\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing runner carriage, placement and conservation\nDo not use this for: Canonical behavior, source retirement or current truth proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/specs/runner.md\nSupersedes: None; legacy authority retained\nSuperseded by: None\n```\n\n> Added in candidate: Metadata and map-based placement scaffolding. The area introduction follows the frozen map into architecture/h-e53a3a9829a8.md. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim."
+      },
+      "exactClass": "Judgment",
+      "exactClassReason": "no target digest match",
+      "nativeTargetClaimId": "claim_000804c22dd42adbd92302318e8c6ca7",
+      "section": {
+        "startLine": 9,
+        "endLine": 10,
+        "target": "docs/platform/runner/spec.md",
+        "kind": "spec",
+        "anchor": "spec-runner-vòng-tự-hành",
+        "title": "Spec: Runner (vòng tự hành)",
+        "sha256": "6c15f0f84a96e4e338a9f5b3f0e24f875e66cbcd40f1705a85b1cbd477438395"
+      },
+      "mapAmendments": [],
+      "reboundAnchors": []
+    }
+  ],
+  "sensitivityControls": [],
+  "unmatchedCandidateUnits": [],
+  "unmatchedUnitsChannel": "candidate-unverified-runner.json, complete native strict-E set, separate non-source request",
+  "classes": {
+    "Unit-exact": [],
+    "Weak-exact": [
+      "claim_a5f8435c8d549e5b41a34cf3e1f3e351"
+    ],
+    "Judgment": [
+      "claim_d8ac30166d62dd668cf76d7dfb0a8170"
+    ]
+  },
+  "unequalDigestPairs": [
+    "claim_d8ac30166d62dd668cf76d7dfb0a8170"
+  ],
+  "mandatoryDeep": [
+    "claim_d8ac30166d62dd668cf76d7dfb0a8170"
+  ],
+  "minimumDeep": 2,
+  "sourceBlobs": {
+    "path": "docs/specs/runner.md",
+    "blob": "ddfa78cc7183cf1f7db8ee64d2339653a0aa0023",
+    "sha256": "de1b0a3453706016171b530fcdf8e8e646563af707982f042c997fa99b83c7fe"
+  },
+  "shardDigest": "de26feeaa57cfde916a78fdb423735da6335dbc35138e4ef545293c3bb50222b",
+  "target": "docs/platform/runner/spec.md",
+  "part": 1,
+  "parts": 1
+}

@@ -1,0 +1,1724 @@
+# Independent runner section liveness classification
+
+Content commit: 81d0ed0747014e976c0d29222439fd6e3592b468
+
+Author session: codex-session:unit-run-1792057868388-68b4a62c@2026-10-15
+
+Entries: **47**. Separate non-source channel; pending independent review. Source/candidate content is immutable at this pin. New proof/request bytes require the subsequent runner commit as the request pin; do not pretend these new artifacts existed at the content pin.
+
+A19: inspect every proposed protection class using full section text and declared lexical scan evidence. Lexical silence is not retirement; historical placement does not certify a subject retired. Read scan roots/exclusions/directReferences in step9-liveness.json and the committed scan script. Source blob remains unchanged at this content pin. This is not truth approval.
+
+Return Reviewer, Author session(s), Review mode: ordinary, content/request pins and one row per entryId in Claim | Verdict | Note | Source digest | Target digest. Evidence JSON digests below bind non-source accounting only and cannot apply source approval. No seed, sample or verdict supplied.
+
+## liveness-121
+
+Source digest (evidence JSON): 03a326c2b823292cda2408d93d64f5887c6b38a1531d4ed7c1486790a0150a46
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-121",
+  "record": {
+    "heading": "Quyết định",
+    "anchor": "quyết-định-10",
+    "startLine": 2712,
+    "endLine": 2759,
+    "sha256": "41c121baa472b3366a5a4e63acd0cb6025cd39e099fc8a6e6d5233f96e0cd818",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [],
+    "ruleReferences": [],
+    "implementationPaths": [
+      "src/state/status-fsm.mjs"
+    ],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "#### Quyết định\n\nRecord này supersede **đúng mệnh đề \"chặn cứng, luôn luôn, ở mọi ranh\ngiới merge\"** của ` self-improve-loop`. Bốn thay đổi, tất cả đã có\nthật trong code trước khi record này được viết:\n\n1. **Cổng chỉ chạy ở ranh giới trunk** (`CONTEXT.md`). Leaf → `fgw/<root>`\n   và `sync-root` vào nhánh cha đi thẳng, không hỏi. Discriminator **khác\n   nhau theo từng call site**, cố ý không gộp thành helper chung\n   (`plan.md` A1b): `approve` và pre-check của `merge next` dùng\n   `resolveRoot(view, id) === id`; `sync-root` dùng `!item.parent`, vì nó\n   chỉ land vào cha TRỰC TIẾP nên `resolveRoot` — vốn leo tới đỉnh lineage\n   — sẽ trả lời sai cho một gốc có cha mà cha lại có ông.\n2. **Hai mức, key config riêng** (`CONTEXT.md`). `ironLaw.level`:\n `ask` (mặc định) giữ nguyên hành vi từ chối cứng; `warn`\n   (opt-in) in cảnh báo, ghi một bản ghi, rồi merge tiếp. Key **riêng**,\n   không nhét vào `gateBypass` — floor của `gateBypass` được ghi trong\n   `docs/explanation/gate-bypass-design.md` là không bao giờ chạm Iron Law,\n   tái dùng từ vựng level của nó sẽ xoá đúng ranh giới ấy. Mọi giá trị\n   không phải đúng chữ `warn` — thiếu key, file hỏng, gõ sai — đều đọc\n   thành `ask`; mức dễ dãi là mức để một diff tự-sửa land mà không ai xem,\n   nên nó không bao giờ được là mặc định của một lỗi.\n3. **Người quyết định, agent thao tác** (`CONTEXT.md`). Người trả\n   lời duyệt trong chat là đủ; agent tự chạy `fgos approve <id>\n   --acknowledge-iron-law`, tự đọc exit code, tự sửa lỗi cơ học và tự\n   retry — không đẩy một dòng lệnh cho người gõ tay. Cái được giữ nguyên\n   là điều `docs/explanation/iron-law-evidence-contract-stays-human-gated.md`\n   bảo vệ: **một bên thứ hai độc lập thật sự nhìn vào bằng chứng**. Agent\n   trình `docs/history/<id>/iron-law-evidence.md` nguyên văn rồi hỏi; nó\n   không bao giờ tự thêm `--acknowledge-iron-law` trên thẩm quyền của\n   chính nó. Đổi là đổi ai gõ, không đổi ai quyết.\n4. **Item bị giữ không nghẽn item khác** (`CONTEXT.md`). `merge-loop`\n   đọc tín hiệu `skipped` / `every ready item is blocked` mà engine vốn đã\n   trả sẵn, ghi id vào một danh sách rồi **đi tiếp**, cuối vòng trình gom\n   một lượt kèm bằng chứng. Item ở nguyên `awaiting-approval` — không\n   `fgos ask`, không `awaiting-human`, không cạnh FSM mới.\n\nĐã cân nhắc và loại, ghi lại để không phải cãi lại:\n\n- **Field bypass trên workitem** — loại: biến một quyết định vận hành\n  thành một thuộc tính dữ liệu đi theo item mãi mãi.\n- **Thêm cạnh FSM `awaiting-approval → awaiting-human` cho ** — loại:\n  `src/state/status-fsm.mjs` nằm trong `MODULE_RULES` của chính Iron Law,\n  nên bản vá sẽ trip đúng cái cổng nó đi sửa; và engine đã có sẵn\n  `skipped`.\n- **Nới nửa từ-khoá của `classifyIronLaw`** — ra khỏi phạm vi, chuyển\n  sang `tsk-1js`. Chữ ký và hành vi `classifyIronLaw` giữ nguyên byte-for-byte.\n"
+}
+```
+
+## liveness-122
+
+Source digest (evidence JSON): a5f8bae93019d86c662ee755224e1bb5e2fa62b6494503572f226a150701d1e9
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-122",
+  "record": {
+    "heading": "Vì sao `supersedes:` trống",
+    "anchor": "vì-sao-supersedes-trống",
+    "startLine": 2760,
+    "endLine": 2769,
+    "sha256": "92304ab10213a2c42f59cb87b8ec8e07c26754b3ea24751297bd4768d20c0d20",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [
+      "RUL34",
+      "RUL37"
+    ],
+    "ruleReferences": [
+      {
+        "path": "docs/knowledge/why-the-iron-law-evidence-contract-gathers-proof-but-never-a/iron-law-evidence-contract-stays-human-gated.md",
+        "line": 37,
+        "text": "self-acknowledges. RUL34/RUL37 — a real human operator must type"
+      },
+      {
+        "path": "docs/knowledge/why-the-iron-law-evidence-contract-gathers-proof-but-never-a/iron-law-evidence-contract-stays-human-gated.md",
+        "line": 46,
+        "text": "shape Iron Law exists to prevent, since the whole point of RUL34/RUL37 is"
+      },
+      {
+        "path": "docs/specs/work-state.md",
+        "line": 63,
+        "text": "| 19 | branchHeadAtTake | Vị trí commit (HEAD) của CHÍNH NHÁNH đề xuất (`fgw/<id>`) tại đúng thời điểm `take` cầm một item `blocked` mang nhánh sống — cộng-thêm trên CÙNG sự kiện `work.move` đưa item `blocked→doing`; KHÔNG BAO GIỜ cùng mặt với `headAtTake` trên một item (RUL34 (branchHeadAtTake/branchHeadAtReturn — cặp marker nguồn-nhánh)) | mã commit (string), hoặc vắng mặt | no | vắng mặt (claim main-based, hoặc claim của runner) |"
+      },
+      {
+        "path": "docs/specs/work-state.md",
+        "line": 64,
+        "text": "| 20 | branchHeadAtReturn | Vị trí commit (HEAD) của CHÍNH NHÁNH tại đúng thời điểm `return` đo verify XANH trên một item nguồn-nhánh — cộng-thêm trên CÙNG sự kiện `work.move` đưa item `doing→awaiting-approval`; KHÔNG BAO GIỜ cùng mặt với `headAtReturn` trên một item (RUL34 (branchHeadAtTake/branchHeadAtReturn — cặp marker nguồn-nhánh)) | mã commit (string), hoặc vắng mặt | no | vắng mặt (return main-based, hoặc đề xuất của runner) |"
+      },
+      {
+        "path": "docs/specs/work-state.md",
+        "line": 74,
+        "text": "| — | Sự kiện (không hiển thị) | Đơn vị ghi của nhật ký; mỗi thao tác ghi đúng MỘT sự kiện, số thứ tự tăng dần + thời điểm + phiên bản schema `v` (hiện hành: 3; sự kiện di sản không có `v` vẫn đọc được) | `work.add` — khai item (luôn mang tier tường minh từ v2) · `work.move` — chuyển trạng thái (from/to; cạnh từ-chối `awaiting-approval→todo` VÀ cạnh gate-gãy `awaiting-approval→blocked` (per pr-lifecycle) đều mang `reason` bắt buộc; cạnh vào chờ mang `ask`, cạnh rời chờ mang `answer`; mọi ngã-ngũ có thể mang thêm `role` tùy chọn — xem \"Bản ghi settlement\" dưới; ngã-ngũ vào chặng đóng cũng tự mang thêm một bản ghi học — xem \"Bài học lúc đóng\" dưới; cạnh claim `todo→doing` qua cửa pull `take` mang thêm `headAtTake`, xem Data Dictionary #15 (hoặc `branchHeadAtTake` thay vào đó khi claim là nguồn-nhánh, cạnh `blocked→doing`, Data Dictionary #19); cạnh `doing→awaiting-approval` qua cửa pull `return` (verify xanh) mang thêm `headAtReturn`, xem Data Dictionary #16 (hoặc `branchHeadAtReturn` cho nguồn-nhánh, Data Dictionary #20, xem RUL34 (branchHeadAtTake/branchHeadAtReturn — cặp marker nguồn-nhánh))) · `decision` — quyết định kèm chữ · `work.outcome` — dự đoán HOẶC thực tế cho một item (mỗi nửa là một sự kiện riêng, cùng id; xem \"Bản ghi kết quả\" dưới) · `work.friction` — một lần thất bại tự-quy-tội tại park/halt (xem \"Bản ghi friction\" dưới) · `work.stage` — chuyển stage (from/to; có thể kèm `verify` khi rời `discovery`/`exploring` — xem \"Giai đoạn Soi-rõ\" dưới; ngã-ngũ đó cũng có thể mang `role` tùy chọn) · `work.discovery` — một lần context-discovery soi (xem \"Bản ghi cổng discovery\" dưới) | — | — |"
+      },
+      {
+        "path": "docs/specs/work-state.md",
+        "line": 1224,
+        "text": "- **RUL34 (`branchHeadAtTake`/`branchHeadAtReturn` — cặp marker nguồn-nhánh, luôn tách bạch với `headAtTake`/`headAtReturn`).** Cửa pull `take`/`return` trên một item `blocked` mang nhánh sống ghi CẶP marker riêng — `branchHeadAtTake` (HEAD của NHÁNH lúc `take`, Data Dictionary #19) trên cạnh `blocked→doing`, `branchHeadAtReturn` (HEAD của NHÁNH lúc `return` đo xanh, Data Dictionary #20) trên cạnh `doing→awaiting-approval` — mirror đúng cặp `headAtTake`/`headAtReturn` main-based nhưng KHÔNG BAO GIỜ cùng xuất hiện với cặp đó trên MỘT item: một claim nguồn-nhánh ghi `branchHeadAtTake` thay vì `headAtTake`, một return nguồn-nhánh ghi `branchHeadAtReturn` thay vì `headAtReturn` — trộn hai cặp cho cùng một đề xuất khiến `reviewDiff` của cổng duyệt dựng một dải vô nghĩa (cấm tuyệt đối, kiểm bằng test). `branchHeadAtTake` là discriminator DUY NHẤT `return` dùng để rẽ nhánh nguồn-nhánh — không dùng `classifySource` (nó ưu-tiên-nhánh và nhập nhằng với một pull-take main-based mà nhánh vẫn còn sót lại) (per human-rounds / 5a6900b2, xem spec Runner RUL30 (headAtReturn — đối xứng headAtTake, nguồn diff của một đề xuất pull-door))."
+      },
+      {
+        "path": "docs/specs/work-state.md",
+        "line": 1348,
+        "text": "- `src/state/replay.mjs` — fold events → view, thuần; case `work.outcome` gộp theo id vào `view.outcomes` (key lazy, cộng thêm không đè); case `work.friction` APPEND theo id vào `view.frictions` (key lazy, mảng — mỗi record một lần xảy ra, không gộp/không đè); case `work.move` mang `ask`/`answer` gộp theo id vào `view.gates` (key lazy có bảo vệ, cộng thêm không đè); case `work.move` mang `answer` hoặc `to==='done'` (VÀ sự kiện mang phiên bản schema — bảo vệ nhật ký di sản thật) APPEND một bản ghi settlement theo id vào `view.settlements` (key lazy, mảng, kind answer/close); case `work.move` với `to==='done'` mang thêm `learning` APPEND theo id vào `view.learnings` (key lazy, mảng); case `work.add` fold thêm `item.parent` khi payload mang (additive, key lazy); case `work.stage` set `item.stage` (và `item.verify` khi payload mang verify — một sự kiện làm cả hai) và, khi RỜI stage đầu chuỗi (guard theo cạnh ĐI, `from === 'discovery'`, không theo đích cụ thể — để retarget đích không làm câm settlement) VÀ bản ghi `work.discovery` gần nhất của item không mang `clear: false` (RUL27 (settlement clarify-pass theo cạnh RỜI stage đầu chuỗi, có điều kiện verdict)), APPEND một bản ghi settlement kind clarify-pass vào `view.settlements` (tên kind là nhãn di sản đã ghi vào nhật ký, không phải tên stage — xem RUL27 (settlement clarify-pass theo cạnh RỜI stage đầu chuỗi, có điều kiện verdict)); case `work.discovery` APPEND theo id vào `view.discovery` (key lazy, mảng, cùng khuôn `view.frictions`); case `work.move` đích `doing` fold thêm `role` payload thành `item.claimRole` và `headAtTake` payload thành `item.headAtTake` khi sự kiện mang chúng (additive, lazy — đây là cách `return`/gặt-lại của runner phân biệt claim của cửa pull với claim của runner, xem \"Cửa pull giao–nhận việc\" trên và spec Runner), cộng thêm `branchHeadAtTake` payload thành `item.branchHeadAtTake` trên CÙNG cạnh khi sự kiện mang nó (nguồn-nhánh, RUL34 (branchHeadAtTake/branchHeadAtReturn — cặp marker nguồn-nhánh)); case `work.move` đích `awaiting-approval` fold thêm `branchHeadAtReturn` payload thành `item.branchHeadAtReturn` khi sự kiện mang nó (mirror `headAtReturn` ở trên nhưng field riêng, không bao giờ cùng mặt trên một item, RUL34 (branchHeadAtTake/branchHeadAtReturn — cặp marker nguồn-nhánh)); case `work.move` mang `reason` (bất kỳ đích nào, không chỉ `awaiting-approval→todo`/`awaiting-approval→blocked`) fold thành `item.reason` — GHI ĐÈ mỗi lần (latest-wins, khác khuôn cộng-thêm-không-đè của outcome/friction/settlement/discovery ở trên, per worker-execution STR33 / 396d9d9e, xem RUL32 (reason mới nhất fold lên item, latest-wins) và spec Runner RUL23 (hợp đồng con — verify thật, không placeholder))"
+      },
+      {
+        "path": "docs/knowledge/why-merge-loop-self-diagnoses-only-verify-fail-post-merge-ne/merge-loop-self-diagnoses-verify-fail-post-merge.md",
+        "line": 59,
+        "text": "(RUL34/RUL37, lines 530-531 and 598-603) requires a real human operator to"
+      },
+      {
+        "path": "docs/knowledge/why-merge-loop-self-diagnoses-only-verify-fail-post-merge-ne/merge-loop-self-diagnoses-verify-fail-post-merge.md",
+        "line": 69,
+        "text": "> \"an Iron Law block always needs a real human operator (RUL34/RUL37,"
+      },
+      {
+        "path": "docs/knowledge/why-gate-bypass-is-shaped-the-way-it-is/gate-bypass-design.md",
+        "line": 83,
+        "text": "different purpose (Iron Law's hard-gate classification, RUL34) — not a"
+      },
+      {
+        "path": "docs/knowledge/how-to-recover-a-blocked-item-with-fgos-catchup-from-inside/recover-a-blocked-item-with-fgos-catchup-from-inside-its-own-worktree.md",
+        "line": 31,
+        "text": "`doing` (RUL33/RUL34, `docs/specs/work-state.md`). Calling `return` here"
+      },
+      {
+        "path": "docs/knowledge/why-the-decision-id-collision-auto-resolver-only-trusts-a-sh/merge-auto-resolves-decision-id-collision.md",
+        "line": 81,
+        "text": "approved (RUL34/RUL37, `docs/specs/runner.md`; CONTEXT.md D2, unchanged and"
+      },
+      {
+        "path": "docs/knowledge/tsk-3mv-feature-summary-teaching-merge-loop-to-self-resolve/merge-loop-self-resolve-feature-summary.md",
+        "line": 37,
+        "text": "human-operator requirement (RUL34/RUL37) was never touched, in either"
+      },
+      {
+        "path": "docs/knowledge/why-the-iron-law-gate-only-runs-at-the-trunk-merge-boundary/why-the-iron-law-gate-only-fires-at-the-trunk-boundary.md",
+        "line": 87,
+        "text": "(`RUL34`/`RUL37`) were updated to match, the superseded decision records"
+      }
+    ],
+    "implementationPaths": [
+      "scripts/check-decision-supersession.mjs"
+    ],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "#### Vì sao `supersedes:` trống\n\n` self-improve-loop` không phải record đánh số — chúng là quyết\nđịnh nội tuyến, trích dẫn trong `docs/specs/runner.md` (RUL34 (Iron Law áp dụng khi chạm cờ rủi ro hoặc module năng-lực — không cần cả hai), RUL37 (Iron Law hỏi ở đúng một ranh giới — trunk — cho mọi đề xuất nguồn runner tới đó),\nData Dictionary #10) và sống trong `view.decisions`. Không có file nào để\ngắn `superseded_by:` trỏ ngược, nên khuôn trỏ-ngược-bắt-buộc STR72\n(`scripts/check-decision-supersession.mjs`) không áp dụng được và\n`supersedes:` để trống có chủ đích, thay vì bịa một id không tồn tại.\nViệc supersede được ghi bằng văn, ở đây và tại chính RUL34 (Iron Law áp dụng khi chạm cờ rủi ro hoặc module năng-lực — không cần cả hai)/RUL37 (Iron Law hỏi ở đúng một ranh giới — trunk — cho mọi đề xuất nguồn runner tới đó).\n"
+}
+```
+
+## liveness-123
+
+Source digest (evidence JSON): 7d148bf2c1c31d0ea7f5ec17315013f616ea629bb0418ee3bc65ddf9616f5037
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-123",
+  "record": {
+    "heading": "Hệ quả",
+    "anchor": "hệ-quả-10",
+    "startLine": 2770,
+    "endLine": 2784,
+    "sha256": "58f4070b1111f1394a64a4f966a829534eb1916270115a4b94ea46489c4b07c4",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [
+      "RUL34",
+      "RUL37",
+      "RUL64"
+    ],
+    "ruleReferences": [
+      {
+        "path": "docs/knowledge/why-the-iron-law-evidence-contract-gathers-proof-but-never-a/iron-law-evidence-contract-stays-human-gated.md",
+        "line": 37,
+        "text": "self-acknowledges. RUL34/RUL37 — a real human operator must type"
+      },
+      {
+        "path": "docs/knowledge/why-the-iron-law-evidence-contract-gathers-proof-but-never-a/iron-law-evidence-contract-stays-human-gated.md",
+        "line": 46,
+        "text": "shape Iron Law exists to prevent, since the whole point of RUL34/RUL37 is"
+      },
+      {
+        "path": "docs/specs/work-state.md",
+        "line": 63,
+        "text": "| 19 | branchHeadAtTake | Vị trí commit (HEAD) của CHÍNH NHÁNH đề xuất (`fgw/<id>`) tại đúng thời điểm `take` cầm một item `blocked` mang nhánh sống — cộng-thêm trên CÙNG sự kiện `work.move` đưa item `blocked→doing`; KHÔNG BAO GIỜ cùng mặt với `headAtTake` trên một item (RUL34 (branchHeadAtTake/branchHeadAtReturn — cặp marker nguồn-nhánh)) | mã commit (string), hoặc vắng mặt | no | vắng mặt (claim main-based, hoặc claim của runner) |"
+      },
+      {
+        "path": "docs/specs/work-state.md",
+        "line": 64,
+        "text": "| 20 | branchHeadAtReturn | Vị trí commit (HEAD) của CHÍNH NHÁNH tại đúng thời điểm `return` đo verify XANH trên một item nguồn-nhánh — cộng-thêm trên CÙNG sự kiện `work.move` đưa item `doing→awaiting-approval`; KHÔNG BAO GIỜ cùng mặt với `headAtReturn` trên một item (RUL34 (branchHeadAtTake/branchHeadAtReturn — cặp marker nguồn-nhánh)) | mã commit (string), hoặc vắng mặt | no | vắng mặt (return main-based, hoặc đề xuất của runner) |"
+      },
+      {
+        "path": "docs/specs/work-state.md",
+        "line": 74,
+        "text": "| — | Sự kiện (không hiển thị) | Đơn vị ghi của nhật ký; mỗi thao tác ghi đúng MỘT sự kiện, số thứ tự tăng dần + thời điểm + phiên bản schema `v` (hiện hành: 3; sự kiện di sản không có `v` vẫn đọc được) | `work.add` — khai item (luôn mang tier tường minh từ v2) · `work.move` — chuyển trạng thái (from/to; cạnh từ-chối `awaiting-approval→todo` VÀ cạnh gate-gãy `awaiting-approval→blocked` (per pr-lifecycle) đều mang `reason` bắt buộc; cạnh vào chờ mang `ask`, cạnh rời chờ mang `answer`; mọi ngã-ngũ có thể mang thêm `role` tùy chọn — xem \"Bản ghi settlement\" dưới; ngã-ngũ vào chặng đóng cũng tự mang thêm một bản ghi học — xem \"Bài học lúc đóng\" dưới; cạnh claim `todo→doing` qua cửa pull `take` mang thêm `headAtTake`, xem Data Dictionary #15 (hoặc `branchHeadAtTake` thay vào đó khi claim là nguồn-nhánh, cạnh `blocked→doing`, Data Dictionary #19); cạnh `doing→awaiting-approval` qua cửa pull `return` (verify xanh) mang thêm `headAtReturn`, xem Data Dictionary #16 (hoặc `branchHeadAtReturn` cho nguồn-nhánh, Data Dictionary #20, xem RUL34 (branchHeadAtTake/branchHeadAtReturn — cặp marker nguồn-nhánh))) · `decision` — quyết định kèm chữ · `work.outcome` — dự đoán HOẶC thực tế cho một item (mỗi nửa là một sự kiện riêng, cùng id; xem \"Bản ghi kết quả\" dưới) · `work.friction` — một lần thất bại tự-quy-tội tại park/halt (xem \"Bản ghi friction\" dưới) · `work.stage` — chuyển stage (from/to; có thể kèm `verify` khi rời `discovery`/`exploring` — xem \"Giai đoạn Soi-rõ\" dưới; ngã-ngũ đó cũng có thể mang `role` tùy chọn) · `work.discovery` — một lần context-discovery soi (xem \"Bản ghi cổng discovery\" dưới) | — | — |"
+      },
+      {
+        "path": "docs/specs/work-state.md",
+        "line": 1224,
+        "text": "- **RUL34 (`branchHeadAtTake`/`branchHeadAtReturn` — cặp marker nguồn-nhánh, luôn tách bạch với `headAtTake`/`headAtReturn`).** Cửa pull `take`/`return` trên một item `blocked` mang nhánh sống ghi CẶP marker riêng — `branchHeadAtTake` (HEAD của NHÁNH lúc `take`, Data Dictionary #19) trên cạnh `blocked→doing`, `branchHeadAtReturn` (HEAD của NHÁNH lúc `return` đo xanh, Data Dictionary #20) trên cạnh `doing→awaiting-approval` — mirror đúng cặp `headAtTake`/`headAtReturn` main-based nhưng KHÔNG BAO GIỜ cùng xuất hiện với cặp đó trên MỘT item: một claim nguồn-nhánh ghi `branchHeadAtTake` thay vì `headAtTake`, một return nguồn-nhánh ghi `branchHeadAtReturn` thay vì `headAtReturn` — trộn hai cặp cho cùng một đề xuất khiến `reviewDiff` của cổng duyệt dựng một dải vô nghĩa (cấm tuyệt đối, kiểm bằng test). `branchHeadAtTake` là discriminator DUY NHẤT `return` dùng để rẽ nhánh nguồn-nhánh — không dùng `classifySource` (nó ưu-tiên-nhánh và nhập nhằng với một pull-take main-based mà nhánh vẫn còn sót lại) (per human-rounds / 5a6900b2, xem spec Runner RUL30 (headAtReturn — đối xứng headAtTake, nguồn diff của một đề xuất pull-door))."
+      },
+      {
+        "path": "docs/specs/work-state.md",
+        "line": 1242,
+        "text": "- **RUL64 (`holder` — trục thứ ba TRỰC GIAO status × stage, opt-in per-domain, chỉ đổi qua verb `handoff`).** `work.holder` (per tsk-2t9c) là trường tùy chọn giống `stage`/`domain` — vắng mặt trên MỌI item hiện có, và vẫn hợp lệ vắng mặt trên domain nào không khai `roleGraph` trong `DOMAINS` registry. Domain CÓ khai `roleGraph` ràng buộc `holder` phải là một trong `roleGraph.roles`; domain KHÔNG khai thì `holder` phải vắng mặt tuyệt đối — ghi `holder` lên item của domain không có roleGraph bị từ chối `validation`. `holder` KHÔNG nằm trong `EDITABLE_FIELDS` (`store.mjs`) — cùng loại trừ `stage`/`status`/`domain` đã có, đổi `holder` CHỈ qua verb `fgos handoff`/`fgos handoff-return`, không bao giờ qua `edit`. `fgos handoff <id> --to <role> --reason <advise|assist|review|consult>` tra hợp lệ qua `roleGraph.edges[stage]` of domain (một cặp `{from, to, reason, mode}`); route ngoài graph bị từ chối kèm DANH SÁCH edge hợp lệ trong message — \"chặn và dạy tại chỗ\", không chỉ một `false`. Loại `async` ghi event `work.handoff` (đổi `holder`, checkpoint đầy đủ); loại `sync` ghi event `work.call-summary` (KHÔNG đổi `holder`, bản ghi gọn) — bất biến: `holder` chỉ đổi qua handoff async, không bao giờ qua call-summary. `fgos handoff-return <id>` đóng call async đang mở gần nhất, trả bóng về đúng người mở nó (\"call = round-trip\") — KHÔNG tra lại `roleGraph` (hoàn tất một call đã được duyệt hợp lệ lúc mở không cần xét hợp lệ lần hai); độ sâu call lồng (`callstackCap`, mặc định 3 trong `roleGraph`) suy ra thuần từ việc phát lại log (`callThreads[id]`, ngăn xếp LIFO trên các entry `handoff` chưa `returning`), không bao giờ một biến đếm lưu trữ — biến đếm có thể trôi khỏi log, một phép phát lại thì không. Cả hai event type gấp vào khoá LAZY `view.callThreads[id]` (mirror khuôn `view.discovery`/`view.outcomes` sẵn có) — một log không có event nào trong hai loại này phát lại y hệt trước tính năng, không `callThreads` key, không `holder` field (per tsk-2t9c)."
+      },
+      {
+        "path": "docs/specs/work-state.md",
+        "line": 1348,
+        "text": "- `src/state/replay.mjs` — fold events → view, thuần; case `work.outcome` gộp theo id vào `view.outcomes` (key lazy, cộng thêm không đè); case `work.friction` APPEND theo id vào `view.frictions` (key lazy, mảng — mỗi record một lần xảy ra, không gộp/không đè); case `work.move` mang `ask`/`answer` gộp theo id vào `view.gates` (key lazy có bảo vệ, cộng thêm không đè); case `work.move` mang `answer` hoặc `to==='done'` (VÀ sự kiện mang phiên bản schema — bảo vệ nhật ký di sản thật) APPEND một bản ghi settlement theo id vào `view.settlements` (key lazy, mảng, kind answer/close); case `work.move` với `to==='done'` mang thêm `learning` APPEND theo id vào `view.learnings` (key lazy, mảng); case `work.add` fold thêm `item.parent` khi payload mang (additive, key lazy); case `work.stage` set `item.stage` (và `item.verify` khi payload mang verify — một sự kiện làm cả hai) và, khi RỜI stage đầu chuỗi (guard theo cạnh ĐI, `from === 'discovery'`, không theo đích cụ thể — để retarget đích không làm câm settlement) VÀ bản ghi `work.discovery` gần nhất của item không mang `clear: false` (RUL27 (settlement clarify-pass theo cạnh RỜI stage đầu chuỗi, có điều kiện verdict)), APPEND một bản ghi settlement kind clarify-pass vào `view.settlements` (tên kind là nhãn di sản đã ghi vào nhật ký, không phải tên stage — xem RUL27 (settlement clarify-pass theo cạnh RỜI stage đầu chuỗi, có điều kiện verdict)); case `work.discovery` APPEND theo id vào `view.discovery` (key lazy, mảng, cùng khuôn `view.frictions`); case `work.move` đích `doing` fold thêm `role` payload thành `item.claimRole` và `headAtTake` payload thành `item.headAtTake` khi sự kiện mang chúng (additive, lazy — đây là cách `return`/gặt-lại của runner phân biệt claim của cửa pull với claim của runner, xem \"Cửa pull giao–nhận việc\" trên và spec Runner), cộng thêm `branchHeadAtTake` payload thành `item.branchHeadAtTake` trên CÙNG cạnh khi sự kiện mang nó (nguồn-nhánh, RUL34 (branchHeadAtTake/branchHeadAtReturn — cặp marker nguồn-nhánh)); case `work.move` đích `awaiting-approval` fold thêm `branchHeadAtReturn` payload thành `item.branchHeadAtReturn` khi sự kiện mang nó (mirror `headAtReturn` ở trên nhưng field riêng, không bao giờ cùng mặt trên một item, RUL34 (branchHeadAtTake/branchHeadAtReturn — cặp marker nguồn-nhánh)); case `work.move` mang `reason` (bất kỳ đích nào, không chỉ `awaiting-approval→todo`/`awaiting-approval→blocked`) fold thành `item.reason` — GHI ĐÈ mỗi lần (latest-wins, khác khuôn cộng-thêm-không-đè của outcome/friction/settlement/discovery ở trên, per worker-execution STR33 / 396d9d9e, xem RUL32 (reason mới nhất fold lên item, latest-wins) và spec Runner RUL23 (hợp đồng con — verify thật, không placeholder))"
+      },
+      {
+        "path": "docs/knowledge/why-merge-loop-self-diagnoses-only-verify-fail-post-merge-ne/merge-loop-self-diagnoses-verify-fail-post-merge.md",
+        "line": 59,
+        "text": "(RUL34/RUL37, lines 530-531 and 598-603) requires a real human operator to"
+      },
+      {
+        "path": "docs/knowledge/why-merge-loop-self-diagnoses-only-verify-fail-post-merge-ne/merge-loop-self-diagnoses-verify-fail-post-merge.md",
+        "line": 69,
+        "text": "> \"an Iron Law block always needs a real human operator (RUL34/RUL37,"
+      },
+      {
+        "path": "docs/knowledge/why-gate-bypass-is-shaped-the-way-it-is/gate-bypass-design.md",
+        "line": 83,
+        "text": "different purpose (Iron Law's hard-gate classification, RUL34) — not a"
+      },
+      {
+        "path": "docs/knowledge/how-to-recover-a-blocked-item-with-fgos-catchup-from-inside/recover-a-blocked-item-with-fgos-catchup-from-inside-its-own-worktree.md",
+        "line": 31,
+        "text": "`doing` (RUL33/RUL34, `docs/specs/work-state.md`). Calling `return` here"
+      },
+      {
+        "path": "docs/knowledge/why-the-decision-id-collision-auto-resolver-only-trusts-a-sh/merge-auto-resolves-decision-id-collision.md",
+        "line": 81,
+        "text": "approved (RUL34/RUL37, `docs/specs/runner.md`; CONTEXT.md D2, unchanged and"
+      },
+      {
+        "path": "docs/knowledge/tsk-3mv-feature-summary-teaching-merge-loop-to-self-resolve/merge-loop-self-resolve-feature-summary.md",
+        "line": 37,
+        "text": "human-operator requirement (RUL34/RUL37) was never touched, in either"
+      },
+      {
+        "path": "docs/knowledge/why-the-iron-law-gate-only-runs-at-the-trunk-merge-boundary/why-the-iron-law-gate-only-fires-at-the-trunk-boundary.md",
+        "line": 87,
+        "text": "(`RUL34`/`RUL37`) were updated to match, the superseded decision records"
+      }
+    ],
+    "implementationPaths": [
+      "src/evolve/iron-law.mjs"
+    ],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "#### Hệ quả\n\n- `docs/specs/runner.md`: RUL34 (Iron Law áp dụng khi chạm cờ rủi ro hoặc module năng-lực — không cần cả hai) nói rõ phán quyết chỉ được TÍNH ở ranh giới\n  trunk và hệ quả của `required: true` do `ironLaw.level` quyết định;\n  RUL37 (Iron Law hỏi ở đúng một ranh giới — trunk — cho mọi đề xuất nguồn runner tới đó) viết lại theo bốn điểm trên; RUL64 (`ironLaw.level` — key config riêng của cổng Iron Law, fail-closed về `ask`) mới cho chính key\n  `ironLaw.level` (mặc định, fail-closed, đăng ký vào `fgos doctor`).\n- `.fgos/config.json` nhận `ironLaw.level` qua `fgos setup`/`fgos doctor\n  --fix`; thiếu key thì `doctor` báo, gate vẫn chạy ở `ask`.\n- `plugins/fgOS/skills/approve/SKILL.md` là bề mặt người dùng chạm vào cho\n  điểm 3; `merge-loop`/`merge-next` cho điểm 4.\n- Không đụng `src/evolve/iron-law.mjs` — phép phân loại không đổi, chỉ đổi\n  chỗ nó được gọi và chuyện gì xảy ra sau đó.\n\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ.\n"
+}
+```
+
+## liveness-124
+
+Source digest (evidence JSON): 178c36db9a59bfde25461933855c0d2916f868dde6f9a5a8cc1739493cdaa11c
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-124",
+  "record": {
+    "heading": "Tham chiếu",
+    "anchor": "tham-chiếu-3",
+    "startLine": 2785,
+    "endLine": 2794,
+    "sha256": "e5795ecf418dfae2c642093d1067920664fe10501060128dc940a1dca5415624",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [],
+    "ruleReferences": [],
+    "implementationPaths": [],
+    "missingCitedPaths": [
+      "docs/decisions/0030-them-release-con-nguoi-vao-thu-tu-uu-tien-san-pham.md"
+    ],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "#### Tham chiếu\n\n- `docs/history/iron-law-gate-human-ux/CONTEXT.md` — - đã khoá\n- `docs/history/iron-law-gate-human-ux/plan.md` — A1/A1b, bản đồ rủi ro\n- `docs/history/tsk-5t3-iron-law-evidence-contract/` — hợp đồng\n  `docs/history/<id>/iron-law-evidence.md`\n- `docs/explanation/iron-law-evidence-contract-stays-human-gated.md`\n- `docs/explanation/gate-bypass-design.md`\n- `0030` — `docs/decisions/0030-them-release-con-nguoi-vao-thu-tu-uu-tien-san-pham.md`\n"
+}
+```
+
+## liveness-125
+
+Source digest (evidence JSON): 346d7f11c41cf391be3e697faff255e3f498a8181513fc37a6dce55283e7ba2b
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-125",
+  "record": {
+    "heading": "0033 — Capacity cli-spawn-shaped thắng hasLiveTaskAccess, thu hẹp 0026 rule 2",
+    "anchor": "0033-capacity-cli-spawn-shaped-thắng-haslivetaskaccess-thu-hẹp-0026-rule-2",
+    "startLine": 2795,
+    "endLine": 2796,
+    "sha256": "64607b9887a6764585d3df6c5d0d71891169fb9c1900b4d9832ab7d7784d5846",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [],
+    "ruleReferences": [],
+    "implementationPaths": [],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "### 0033 — Capacity cli-spawn-shaped thắng hasLiveTaskAccess, thu hẹp 0026 rule 2\n"
+}
+```
+
+## liveness-126
+
+Source digest (evidence JSON): 0faf4497bbee2a599898c8703b69c105b0ca9f00944cc17be2e1c230c28ac04c
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-126",
+  "record": {
+    "heading": "Quyết định",
+    "anchor": "quyết-định-11",
+    "startLine": 2797,
+    "endLine": 2807,
+    "sha256": "a7d95b286b14c4efd8e32f51f766490f485c6a3dc57414fbd15c366ba588e0ee",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [],
+    "ruleReferences": [],
+    "implementationPaths": [],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "#### Quyết định\n\nMột capacity `kind:agent` **cli-spawn-shaped** — declares `command`/\n`adapter` của riêng nó, hoặc một entry `invocations[].via === \"cli\"` —\nLUÔN dispatch out-of-process khi đã được cấu hình cho job đó, bất kể\ncaller có `hasLiveTaskAccess:true` hay không. `0026` rule 2 (ưu tiên\nnative khi caller cùng provider và có Task tool sống) vẫn đúng nguyên vẹn\ncho capacity **agentType-shaped** (chỉ có `agentType`, không `command`\nriêng — ví dụ `judge-discovery`) — quyết định này KHÔNG đảo `0026`, chỉ\nthu hẹp phạm vi rule 2 xuống đúng nửa case còn hợp lý.\n"
+}
+```
+
+## liveness-127
+
+Source digest (evidence JSON): 0e894e8aa6e5799d7739c51afa84c9125c987b1d756d9db802dc723b3201ad22
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-127",
+  "record": {
+    "heading": "Người quyết",
+    "anchor": "người-quyết",
+    "startLine": 2808,
+    "endLine": 2816,
+    "sha256": "d896292e134285fd20439c218dd735e53a506832e33c44a619b01cbfefd6adbb",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [],
+    "ruleReferences": [],
+    "implementationPaths": [],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "#### Người quyết\n\nNgười dùng, trực tiếp, trong phiên làm việc 2026-08-16 (sau khi test\nsống capacity `fgos-coding-implement` → `agy`, thấy một session sống vẫn\nresolve `in-process` — tức KHÔNG bao giờ thật sự gọi `agy` — dù capacity\nđã cấu hình rõ ràng). Nguyên văn ý định: \"một soul sống sẽ chọn soul khác\nphù hợp để làm việc thay nó\" — tức cấu hình phải thắng, không phải mặc\nđịnh \"tự làm\" chỉ vì có Task tool.\n"
+}
+```
+
+## liveness-128
+
+Source digest (evidence JSON): 0ea5aa66a132c2a318789d76f173a1f695c4c38acaa80e897bfb906054659322
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-128",
+  "record": {
+    "heading": "Lý do 0026 rule 2 không áp dụng ở đây",
+    "anchor": "lý-do-0026-rule-2-không-áp-dụng-ở-đây",
+    "startLine": 2817,
+    "endLine": 2829,
+    "sha256": "3eb0c9e3d4b4753351abab724063190f33bb0ec79555361ffdf68b8e8a6f29f5",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [],
+    "ruleReferences": [],
+    "implementationPaths": [],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "#### Lý do 0026 rule 2 không áp dụng ở đây\n\nRule 2 tự nêu lý do của chính nó (trích 0026): *\"tránh lãng phí/sai lệch\nkhi soul mù re-derive 1 phán đoán soul sống đã làm rồi\"* — bug thật\n`tsk-1ni` (`judgeDiscovery` cli-spawn một judge mù dù caller đã tự đọc\nCONTEXT.md xong). Lý do này đúng khi target là MỘT PHIÊN BẢN KHÁC CỦA\nCHÍNH CALLER (native subagent, cùng provider, không có command riêng) —\nkhông đúng khi target là một BACKEND THẬT SỰ KHÁC đã được người vận hành\nđặt tên rõ ràng (`command: \"agy\"`). \"In-process\" trong case cli-spawn-\nshaped không phải \"dùng native thay vì spawn mù\" — nó là \"âm thầm bỏ qua\nhoàn toàn config, tự làm thay\". Đó không phải tối ưu hoá native-first,\nđó là bỏ qua một quyết định cấu hình.\n"
+}
+```
+
+## liveness-129
+
+Source digest (evidence JSON): c0d7a9ff91088eed830392e8a5af250a06e623458fd767db45111a35b21372ef
+
+Target digest: none
+
+````json
+{
+  "entryId": "liveness-129",
+  "record": {
+    "heading": "Cơ chế phân biệt (không phải heuristic mới)",
+    "anchor": "cơ-chế-phân-biệt-không-phải-heuristic-mới",
+    "startLine": 2830,
+    "endLine": 2845,
+    "sha256": "9e7bd678eaf1cf642347663fbeaa8000abab248d3895c8ffaffff4af5279abc0",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [],
+    "ruleReferences": [],
+    "implementationPaths": [
+      "src/runner/dispatch.mjs"
+    ],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "#### Cơ chế phân biệt (không phải heuristic mới)\n\n`resolveExecutorConfig` (`src/runner/dispatch.mjs`) đã sẵn có đúng phép\nthử này cho `resolvedViaAgentType`/`cliInvocation` — 2 hình dạng loại\ntrừ lẫn nhau. `decideCapacityDispatchMechanism` giờ dùng lại đúng phép\nthử đó trước khi hỏi `hasLiveTaskAccess`:\n\n```js\nconst isCliSpawnShaped = Boolean(\n  capacity && (capacity.command || capacity.adapter ||\n    (Array.isArray(capacity.invocations) && capacity.invocations.some((inv) => inv.via === 'cli'))),\n);\nif (isCliSpawnShaped) return 'out-of-process';\n// agentType-shaped, kind:'tool', hoặc chưa cấu hình -- giữ nguyên logic cũ\n```\n"
+}
+````
+
+## liveness-130
+
+Source digest (evidence JSON): 0cb7048229af9f05d8cbe7c93825db3f656a4eb5f0d771c253ce199346ab738b
+
+Target digest: none
+
+````json
+{
+  "entryId": "liveness-130",
+  "record": {
+    "heading": "Bằng chứng đã kiểm",
+    "anchor": "bằng-chứng-đã-kiểm",
+    "startLine": 2846,
+    "endLine": 2864,
+    "sha256": "fca0b97721c3d9043392ec2231944653618c32dea5dbb07ad41560ac2e9fc7c6",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [],
+    "ruleReferences": [],
+    "implementationPaths": [
+      "test/runner/dispatch.test.mjs"
+    ],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "#### Bằng chứng đã kiểm\n\n- `tsk-1m8` (item trước, 2026-08-16): live-proved cơ chế cli-spawn ra\n  `agy` hoạt động thật (real spawn, real output) khi capacity được cấu\n  hình — nhưng chỉ test qua `hasLiveTaskAccess:false` (headless). Session\n  sống thật sự hỏi `decide --work` với `hasLiveTaskAccess:true` vẫn nhận\n  `in-process` — đây chính là gap `0033` sửa.\n- Quét toàn bộ 28 chỗ `hasLiveTaskAccess: true` trong\n  `test/runner/dispatch.test.mjs` (`docs/history/tsk-pdg/RESEARCH.md`):\n  không có test nào dùng capacity cli-spawn-shaped + `hasLiveTaskAccess:\n  true` mong đợi `in-process` — 0 test hiện có bị gãy, xác nhận thật sau\n  khi sửa (`npm test`: 3459 pass / 0 fail).\n- Xác nhận sống trên config thật của chính repo này (`.fgos/config.json`,\n  capacity `fgos-coding-implement` → `agy`):\n  ```\n  trước 0033: decide('fgos-coding-implement', {hasLiveTaskAccess:true}) -> {\"mechanism\":\"in-process\"}\n  sau  0033: decide('fgos-coding-implement', {hasLiveTaskAccess:true}) -> {\"mechanism\":\"out-of-process\",\"configured\":true}\n  ```\n"
+}
+````
+
+## liveness-131
+
+Source digest (evidence JSON): cadc18faf90619e2f19b4adef55f8f7395404848f2aff3f6d521d833b6389abf
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-131",
+  "record": {
+    "heading": "Việc chưa quyết, để lại",
+    "anchor": "việc-chưa-quyết-để-lại",
+    "startLine": 2865,
+    "endLine": 2877,
+    "sha256": "b2b9a840717b9667b9115f2b6ded047c1a424ef136e7d653083bd4ca9a293623",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [],
+    "ruleReferences": [],
+    "implementationPaths": [],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "#### Việc chưa quyết, để lại\n\n- Có nên đổi tên/tài liệu hoá rõ hơn khái niệm \"cli-spawn-shaped\" thành\n  một field tường minh trên capacity (thay vì suy ra từ shape) không —\n  chưa cần, chưa có case thật đòi hỏi.\n- 6 skill (`fgos-coding-exploring`/`fgos-coding-planning`/\n  `fgos-coding-validating`/`fgos-coding-implement`/`fgos-fanout`/\n  `_shared/capacity-dispatch-fallback.md`) trích \"Native-First Dispatch\n  Doctrine rule 2\" làm lý do không tự dispatch Task tool tuỳ tiện — đã\n  đọc lại, không cái nào khẳng định sai sau `0033` (lý do của chúng là\n  \"đừng tự tạo sub-dispatch tuỳ tiện\", không phải \"hasLiveTaskAccess luôn\n  thắng\") — không sửa file nào trong số này.\n"
+}
+```
+
+## liveness-132
+
+Source digest (evidence JSON): db605991aedc99b1793cdf3e9b1feb0eccea1c9ab5ac1257542602ada38a87c1
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-132",
+  "record": {
+    "heading": "Tham chiếu",
+    "anchor": "tham-chiếu-4",
+    "startLine": 2878,
+    "endLine": 2883,
+    "sha256": "2ce25670f7c977c5d841e63281b2a83e27d8350f34858b685980fb8b6924bcbd",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [],
+    "ruleReferences": [],
+    "implementationPaths": [],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "#### Tham chiếu\n\n- `0026` — quyết định gốc, rule 2 bị thu hẹp\n- `docs/history/tsk-pdg/RESEARCH.md`, `plan.md` — bằng chứng đầy đủ\n- `docs/history/tsk-1m8/` — item trước, phát hiện gap này khi live-test\n"
+}
+```
+
+## liveness-133
+
+Source digest (evidence JSON): 1058f18ad03523e5bcd6ba06c8c8a96a0ea0cc1f8b510ddc58f7151c9bfe0fb5
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-133",
+  "record": {
+    "heading": "0034 — Đổi tên `capacity`/`capacities` thành `executor`/`executors`, chốt tách `capability`",
+    "anchor": "0034-đổi-tên-capacitycapacities-thành-executorexecutors-chốt-tách-capability",
+    "startLine": 2884,
+    "endLine": 2885,
+    "sha256": "f0200f15d5bfb86981ca50b7001465efb80cf7b60ec036fd9b1464a247a6a1e3",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [],
+    "ruleReferences": [],
+    "implementationPaths": [],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "### 0034 — Đổi tên `capacity`/`capacities` thành `executor`/`executors`, chốt tách `capability`\n"
+}
+```
+
+## liveness-134
+
+Source digest (evidence JSON): 107e273ab6705ea45be02d20019a16f107d4b2618d852a28ca9da2700fedb265
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-134",
+  "record": {
+    "heading": "Quyết định",
+    "anchor": "quyết-định-12",
+    "startLine": 2886,
+    "endLine": 2903,
+    "sha256": "f5300cfe3d5f5681010c1b9c214de61a2a2aecab1898fd0235fbd7a49b45d8fe",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [],
+    "ruleReferences": [],
+    "implementationPaths": [
+      "src/runner/dispatch.mjs"
+    ],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "#### Quyết định\n\n`runner.capacities.<id>` (danh mục backend cụ thể có thể thực thi công\nviệc — vd `agy`, `gitnexus`) đổi tên dứt điểm thành `runner.executors.<id>`\n— trên cả field config LẪN mọi identifier code liên quan trong `src/`.\nKhông giữ back-compat/alias cho tên cũ. `runner.capabilities.<name>` (một\npurpose/lời hứa trừu tượng, vd `fgos-coding-implement`) và `runner.executor`\n(số ít, cấu hình default toàn cục) giữ nguyên tên, không đổi.\n\n`executor` thắng phương án thay thế `backend` trên hai căn cứ: (1) kỹ\nthuật — `resolveExecutorConfig` (`src/runner/dispatch.mjs`) đã giải cả\nmột backend có tên LẪN default toàn cục thành cùng một shape mà chính code\ngọi là `executor` từ trước — đổi tên là hợp nhất một sự thật đã có sẵn\ntrong code, không phải chọn một từ mới tùy ý; (2) ngữ nghĩa — `capability`\n= một lời hứa hành vi (behavior-promise), executor = sự hiện thực hóa lời\nhứa đó (gốc động từ \"to execute\"); `backend` là danh từ tĩnh, không mang\nnghĩa hành động này.\n"
+}
+```
+
+## liveness-135
+
+Source digest (evidence JSON): 9790d3c521090c3520271ca7aabf9fc4d5fb3b5f63fe4570b1fcccef1aa76daa
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-135",
+  "record": {
+    "heading": "Chính thức hóa việc tách `capability`/`capacity` mà `0029` để ngỏ",
+    "anchor": "chính-thức-hóa-việc-tách-capabilitycapacity-mà-0029-để-ngỏ",
+    "startLine": 2904,
+    "endLine": 2916,
+    "sha256": "33baddf067d63f593e0785912fe594aeaa6eda99dcac48fa29d7ec228967cc08",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [],
+    "ruleReferences": [],
+    "implementationPaths": [],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "#### Chính thức hóa việc tách `capability`/`capacity` mà `0029` để ngỏ\n\n`0029` định nghĩa gốc: `capacity` = \"một năng lực có tên (behavior-\npromise / functional-helper)\" — tức lịch sử \"capacity\" từng gộp CẢ lời\nhứa (behavior-promise) LẪN đơn vị hiện thực (functional-helper) làm một,\nkhông phân biệt. `tsk-34n` (2026-08-16, trước record này) sau đó TÁCH khái\nniệm đó thành hai field riêng — `capability` (lời hứa/purpose) và\n`capacity` (backend cụ thể hiện thực nó, qua `for`/`prefer`) — nhưng chưa\nbao giờ chính thức sửa lại điều khoản gốc của `0029`. Record này ghi nhận rõ sự\ntách đó, thay vì để nó ngầm định: điều khoản gốc's \"behavior-promise\" nay là\n`capabilities.<name>`; điều khoản gốc's \"functional-helper\" nay là `executors.<id>`\n(đổi tên bởi chính record này).\n"
+}
+```
+
+## liveness-136
+
+Source digest (evidence JSON): f34e6f156d19afb17bae21f72a840770c9667d092ccc52ed2e8631e8690d1de3
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-136",
+  "record": {
+    "heading": "Phạm vi đổi tên",
+    "anchor": "phạm-vi-đổi-tên",
+    "startLine": 2917,
+    "endLine": 2938,
+    "sha256": "9735713f25bd54c1744af552907231abef9706bc1343ef8151863c29b0c9bb33",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [],
+    "ruleReferences": [],
+    "implementationPaths": [
+      "bin/fgos.mjs",
+      "scripts/dispatch-decide-hook.mjs",
+      "scripts/project-agents.mjs"
+    ],
+    "missingCitedPaths": [
+      "scripts/check-decision-codes.baseline.js"
+    ],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "#### Phạm vi đổi tên\n\n- `.fgos/config.json` (live, main checkout): `runner.capacities` →\n  `runner.executors`.\n- `src/` (7 file), `test/` (8 file), `bin/fgos.mjs`,\n  `scripts/dispatch-decide-hook.mjs`, `scripts/project-agents.mjs`,\n  `scripts/check-decision-codes.baseline.json`: mọi identifier/field\n  liên quan đổi tên đồng bộ (`resolveCapacityAndOverrides` →\n  `resolveExecutorAndOverrides`, `capacityId` → `executorId`, `cfg.\n  capacities` → `cfg.executors`, v.v.) — xác nhận `npm test` xanh toàn\n  bộ sau đổi tên (3477 pass / 0 fail / 5 skip).\n- **Không đổi**: `docs/history/*capacity*/` (~14 thư mục lịch sử, nội\n  dung ghi lại nguyên trạng dùng thuật ngữ đúng thời điểm được viết —\n  đổi tên riêng thư mục sẽ làm nội dung bên trong sai lệch với chính tên\n  thư mục nó nằm trong); nội dung của chính `0026`/`0029`/`0033` (giữ\n  nguyên chữ \"capacity\" trong văn bản gốc, không mở lại/supersede).\n- **Có đổi**: docs sống (`docs/explanation/`, `docs/how-to/`,\n  `docs/reference/`) và fragment skill dùng chung\n  `_shared/capacity-dispatch-fallback.md` → `_shared/executor-dispatch-\n  fallback.md` (cả nội dung lẫn tên file), vì cả hai mô tả hành vi hệ\n  thống HIỆN TẠI, không phải một bản ghi lịch sử.\n"
+}
+```
+
+## liveness-137
+
+Source digest (evidence JSON): 623cc93275bda7aeadc4431731745ffd219dab8427d3699820df9225ec97650b
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-137",
+  "record": {
+    "heading": "Một collision đã xử lý khi thực thi",
+    "anchor": "một-collision-đã-xử-lý-khi-thực-thi",
+    "startLine": 2939,
+    "endLine": 2951,
+    "sha256": "33e5446ea8e7ff0dc73687146087e19b1b7d21b2dac7e23a86be9fbfafa9317b",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [],
+    "ruleReferences": [],
+    "implementationPaths": [],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "#### Một collision đã xử lý khi thực thi\n\n`runner.executors` (số nhiều) trùng CHỮ với một field đã bị RÚT hoàn toàn\ntừ trước (`executors.<tier>`, rung override theo tier, rút tại `tsk-in1-2`,\n0 entry sống, chưa bao giờ được validate). Đây là trùng CHỮ, không\ntrùng Ý — field cũ đã chết hẳn từ trước record này (không xuất hiện ở bất\nkỳ config nào trên đĩa), record này tái dùng đúng chuỗi ký tự đó cho một\nkhái niệm thật, có validate, khác hẳn. Một test cũ (`test/runner/\ndispatch.test.mjs`) từng khẳng định field \"executors\" \"never validated,\ninert\" — đúng cho field CŨ, sai cho field MỚI record này tạo ra; test đã\nsửa lại để phản ánh đúng, cùng một dòng comment lịch sử giải thích rõ hai\n\"executors\" khác nhau qua thời gian, tránh nhầm lẫn cho người đọc sau.\n"
+}
+```
+
+## liveness-138
+
+Source digest (evidence JSON): 8e4a25d70b9af3377b8664708fe61c11d11b2f96315b361bf329061d59ee9baf
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-138",
+  "record": {
+    "heading": "Tham chiếu",
+    "anchor": "tham-chiếu-5",
+    "startLine": 2952,
+    "endLine": 2960,
+    "sha256": "6de20ec9eb8c877715e0ecc97f6caac5bac5a9e609f10c7a654cc4ad963d44a0",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [],
+    "ruleReferences": [],
+    "implementationPaths": [],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "#### Tham chiếu\n\n- `0029` — định nghĩa gốc, nay được chính thức hóa việc tách\n- `docs/history/capability-capacity-remodel/` — tsk-34n, lần đầu tách\n  capability/capacity trên thực tế (code), trước khi record này chốt tên\n- `docs/history/capacity-naming-rename/` — DISCUSSION.md/CONTEXT.md/\n  plan.md/iron-law-evidence.md của chính tsk-225, toàn bộ scout + bằng\n  chứng thật cho quyết định này\n"
+}
+```
+
+## liveness-139
+
+Source digest (evidence JSON): 9b2c351b7ee9e6293992fa5b51b84313add27d18939cc0164f548eb9976ef317
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-139",
+  "record": {
+    "heading": "Capability-aware dispatch activation (tsk-46f)",
+    "anchor": "capability-aware-dispatch-activation-tsk-46f",
+    "startLine": 2961,
+    "endLine": 2962,
+    "sha256": "8945d096f2445cbfd4704c17cafcabc8c364deaff01d8fff723f15eb4abb49b5",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [],
+    "ruleReferences": [],
+    "implementationPaths": [],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "### Capability-aware dispatch activation (tsk-46f)\n"
+}
+```
+
+## liveness-140
+
+Source digest (evidence JSON): ed84ae174def206b4d762b2f07b049f068cd71d580b3c29c3e35b80069da550a
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-140",
+  "record": {
+    "heading": "Quyết định",
+    "anchor": "quyết-định-13",
+    "startLine": 2963,
+    "endLine": 2968,
+    "sha256": "a86647a8469c4e8cec2029db747556909591fc8ce181585248a7cff4936afd08",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [],
+    "ruleReferences": [],
+    "implementationPaths": [
+      "src/runner/dispatch.mjs"
+    ],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "#### Quyết định\n\n1. **Primitive capability & catalog:** `code:implement` được đăng ký làm canonical domain-scoped capability cho coding implementation execution (`runner.capabilities[\"code:implement\"]`).\n2. **Decide-before-execute activation doctrine:** Agent chọn canonical capability từ catalog và hỏi `decide` trước khi thực hiện một execution unit (`node src/runner/dispatch.mjs decide --for code:implement [--has-live-task-access]`), chuyển dispatch identity khỏi định danh lifecycle-shaped `fgos-coding-implement`.\n3. **Planning capability awareness:** Planning (`plan.md`) ghi canonical dispatch capability cho từng executable unit độc lập, coi capability boundary làm tín hiệu split, không pin executor/provider/model.\n"
+}
+```
+
+## liveness-141
+
+Source digest (evidence JSON): 1eea0ff55e5e30a937b109ad3995732ccdca37bc15c29f88bdbef76bd75da84d
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-141",
+  "record": {
+    "heading": "Agent-coordination foundation — shared capability catalog & planning-awareness cluster (docs/history/agent-coordination-foundation/plan.md)",
+    "anchor": "agent-coordination-foundation-shared-capability-catalog-planning-awareness-cluster-docshistoryagent-coordination-foundationplanmd",
+    "startLine": 2969,
+    "endLine": 2970,
+    "sha256": "6dfe5b890b0e77747d818f5f1e5b6161db64454f74085a6615a06914b0f5635a",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [],
+    "ruleReferences": [],
+    "implementationPaths": [],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "### Agent-coordination foundation — shared capability catalog & planning-awareness cluster (docs/history/agent-coordination-foundation/plan.md)\n"
+}
+```
+
+## liveness-142
+
+Source digest (evidence JSON): bd0862203276a50a61f50d32371333ae2f7f8b8f9bd43982d81802fecb8d779b
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-142",
+  "record": {
+    "heading": "Quyết định",
+    "anchor": "quyết-định-14",
+    "startLine": 2971,
+    "endLine": 2981,
+    "sha256": "913e84d63ed59818555992bfc5c20c8a0994b3fe02df8458bfd94bbbf98cb8b9",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [],
+    "ruleReferences": [],
+    "implementationPaths": [
+      "core/skills/_shared/planning-capability-awareness.md",
+      "core/skills/_shared/executor-dispatch-fallback.md",
+      "core/skills/_shared/capability-catalog.md",
+      "core/skills/fgos-advise/references/request-kinds-and-routes.md",
+      "src/report/capability-plan-lint.mjs",
+      "src/runner/dispatch/cli.mjs"
+    ],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "#### Quyết định\n\n1. **Một shared awareness cluster, không phải hai chỗ rời rạc.** Global planning-awareness prose (`core/skills/_shared/planning-capability-awareness.md`) sống cạnh dispatch-awareness prose đã có (`core/skills/_shared/executor-dispatch-fallback.md`), cross-reference lẫn nhau, cùng đọc một catalog dùng chung (`core/skills/_shared/capability-catalog.md`). Domain planner (coding, và bất kỳ planning surface nào khác — kể cả track Work-independent qua `fgos-plan-loop`) đặc-biệt-hóa cluster này, không định nghĩa lại routing doctrine của nó.\n2. **Catalog phân biệt generic vs `domain:capability`**, không bao giờ ghi provider/model/tier/executor vào tên capability hay vào một plan. `prefer` là mối quan tâm config/execution-time (`resolveExecutorAndOverrides`), chưa từng là planning artifact.\n3. **Capability execution guidance:** một capability có thể được resolve tới agent executor HOẶC MCP/tool provider HOẶC adapter khác đã đăng ký (`EXECUTOR_KINDS = ['agent', 'tool']`; ví dụ sống: `impact-analysis` → `gitnexus`, `kind: \"tool\"`, `via: \"mcp\"`). `decide` không giả định mọi capability đều agent-shaped.\n4. **P2-runtime mở rộng theo tần suất quan sát được:** thêm `code:review`, `code:test`, `code:debug`, `code:refactor` vào `DEFAULT_CAPABILITY_SLOTS`, cùng khuôn mẫu không-pin-executor như `code:implement`. Không tạo capability `research` — `fgos-researching` là skill/workflow, không phải capability; research dùng capability cụ thể (ví dụ `impact-analysis`) khi thật sự cần dispatch, còn browser/web/repo-search vẫn là primitive tool call inline, không kích hoạt `decide`.\n5. **`decide-before-dispatch` là thuật ngữ lịch sử**, không phải một gate độc lập song song với `decide-before-execute`. Chỉ một điểm kích hoạt: ngay trước khi một execution unit thực thi.\n6. **Group cognition không đổi ranh giới đã có:** `fgos-advise` (trước đây `fgos-panel`) là surface natural-language chọn route theo loại yêu cầu, bảng kind→route nằm cùng skill tại `core/skills/fgos-advise/references/request-kinds-and-routes.md` (doc `docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md` chỉ còn trỏ tới đó); `fgos-group-thinking` vẫn là cổng pack mỏng nhận protocol id tường minh từ surface/operator trước `fgos coordination run/show`, điều phối nhiều research contribution nhưng không thay thế hay nhân bản `fgos-researching`. Preset không phải routing identity/capability mới, không định nghĩa protocol semantics, và không pin provider/model/executor/tier; per-actor override hợp lệ của team-cognition vẫn tách biệt khỏi capability annotation ở planning time.\n7. **P3 static harness (read-only, không guard):** `src/report/capability-plan-lint.mjs` lint plain text theo đúng convention `- unit: ... / capability: <name>` ví dụ trong `planning-capability-awareness.md` — check syntax hợp lệ, capability đã đăng ký (hoặc đánh dấu `unresolved` rõ ràng), và không có `executor`/`provider`/`model`/`tier` pin trong CHÍNH block đó (không quét toàn file, tránh false-positive trên văn xuôi nói về provider/model như một khái niệm). Không có plan.md nào trong repo dùng convention này chưa nên module chỉ là harness sẵn sàng, không được wire vào `fgos doctor` hay bất kỳ gate tự động nào — execution-boundary guard theo P3 vẫn chờ bằng chứng dogfood non-compliance thật.\n8. **P4 observability:** `logExecutorDispatch`/CLI `log` subcommand (`src/runner/dispatch/cli.mjs`) nhận thêm field optional `capability`/`mechanism`/`tier`/`fallbackReason`/`outcome` vào `executor.dispatch` event — additive, mọi caller cũ bỏ qua các field này vẫn ghi payload y hệt trước (null). `executor.dispatch` event là nơi ghi nhận kết quả và provenance của dispatch.\n"
+}
+```
+
+## liveness-143
+
+Source digest (evidence JSON): 26a59d859192e0c76b7f21e3874e0362046f754dc46a9674c57cecc434cd6eda
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-143",
+  "record": {
+    "heading": "0035 — Ranh giới tin cậy của cổng mutation-gate: caller trong-tiến-trình cùng lớp tin cậy với user, không phải kẻ tấn công",
+    "anchor": "0035-ranh-giới-tin-cậy-của-cổng-mutation-gate-caller-trong-tiến-trình-cùng-lớp-tin-cậy-với-user-không-phải-kẻ-tấn-công",
+    "startLine": 2982,
+    "endLine": 2983,
+    "sha256": "657db016b26431259062188ebd7ad2a5d376db138b8f41026b2fc9286e607b41",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [],
+    "ruleReferences": [],
+    "implementationPaths": [],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "### 0035 — Ranh giới tin cậy của cổng mutation-gate: caller trong-tiến-trình cùng lớp tin cậy với user, không phải kẻ tấn công\n"
+}
+```
+
+## liveness-144
+
+Source digest (evidence JSON): 62b8db127da03d4806891b19657722725953d0d3a9bdf828a975720da35d8d9b
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-144",
+  "record": {
+    "heading": "Quyết định",
+    "anchor": "quyết-định-15",
+    "startLine": 2984,
+    "endLine": 3013,
+    "sha256": "8f744927eb7fd2a54f332e52218ed9d3c21fb8a5a56fb7dcd65a4d807b175ab1",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [],
+    "ruleReferences": [],
+    "implementationPaths": [
+      "src/runner/dispatch/config.mjs",
+      "src/runner/worktree.mjs"
+    ],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "#### Quyết định\n\nMột caller có thể `import` trực tiếp module dispatch nội bộ của codebase\nnày (vd `buildAssignment`/`executeAssignment`, `src/runner/dispatch/**`)\nvà ghi file dưới `.fgos/` thuộc CÙNG lớp tin cậy với chính user đã gọi nó\n— không phải một lớp kẻ tấn công bên ngoài. Ba điều khoản đã chốt từ\ntrước (`docs/routing-handoff-contract.md`: containment chỉ là chỉ-dẫn +\nnhánh vứt-được, không phải sandbox, không chặn được một worker cố ý phá\nhoại; một work item phải xuất phát từ user thật; `.fgos/config.json`'s\n`runner` section là config THỰC THI ĐƯỢC — ai sửa được file này quyết\nđịnh runner spawn tiến trình gì với tham số gì), cộng với TRUSTED-CONFIG\nNOTE của `src/runner/dispatch/config.mjs` và SAME-USER TRUST INVARIANT\ncủa `src/runner/worktree.mjs`, đã xác nhận điều này từ trước khi cổng\n`mutation: 'mutating'` cho một Assignment inline tồn tại — mọi worker\nrunner này dispatch, kể cả worker \"read-only\", đã luôn chạy với\n`--permission-mode acceptEdits`; \"read-only\" chưa bao giờ là một ranh\ngiới cấp hệ điều hành, chỉ được chấm điểm/rollback sau khi worker chạy\nxong. Do đó, cổng re-verify `result.kind`/worktree-vs-main-checkout cho\nmột Assignment inline mutating (`assignment-runner.mjs`'s\n`assertInlineMutatingAssignmentAuthorized`) là mistake-proofing cho một\ncaller trong-tiến-trình cư xử đúng đắn nhưng vô ý (chặn tai nạn thực tế:\nquên gắn cờ `isReadOnlyMode: false`, hoặc dispatch mutating nhầm vào main\ncheckout) — KHÔNG phải authentication chống lại một caller trong-tiến-\ntrình cố ý phá hoại, vì caller đó đã ở lớp tin cậy kiến trúc này chấp\nnhận từ trước, giống hệt mọi worker khác. Phạm vi tấn công còn ý nghĩa\nvới cổng này là INPUT DỮ LIỆU mà thôi — request document, file\nFlowDefinition/CoordinationProtocol, cờ CLI, prompt của skill — không\nbao giờ là thực thi mã trong-tiến-trình hay ghi file `.fgos/` trực tiếp,\ncả hai đã nằm ngoài phạm vi theo chính quyết định kiến trúc này.\n"
+}
+```
+
+## liveness-145
+
+Source digest (evidence JSON): fb5a5b8458bf419b43a500038aa1cded207bb9e465ad8cbc46ffc7be1f2c54b2
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-145",
+  "record": {
+    "heading": "Confinement Authority — một cửa kiểm soát giam giữ runtime (executeThroughConfinement)",
+    "anchor": "confinement-authority-một-cửa-kiểm-soát-giam-giữ-runtime-executethroughconfinement",
+    "startLine": 3014,
+    "endLine": 3023,
+    "sha256": "ad2764b03063bfdc87d0ce1a019efc72393828f3b134f8c6f62118437077ce56",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [],
+    "ruleReferences": [],
+    "implementationPaths": [
+      "src/runner/dispatch/confinement/authority.mjs",
+      "test/architecture.test.mjs"
+    ],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "### Confinement Authority — một cửa kiểm soát giam giữ runtime (executeThroughConfinement)\n\nMọi lần dispatch đưa agent ra ngoài process (bao gồm `spawnWorker`, `executeExecutorCli`, `herdr-spawn`, và `fgos coordination run`) đều bắt buộc đi qua một cửa runtime Confinement Authority duy nhất (`src/runner/dispatch/confinement/authority.mjs: executeThroughConfinement`) trước khi bất kỳ executor adapter nào được phép spawn hoặc giao việc cho agent:\n\n1. **Một cửa runtime duy nhất:** Không adapter nào được gọi trực tiếp bởi production call site; kiểm tra AST/import (`test/architecture.test.mjs`) bảo đảm tính bất biến này.\n2. **Fail-closed:** Policy `mode: \"required\"` từ chối trước spawn (refuse) đối với mọi điều kiện thiếu backend (`confinement-backend-missing`), backend disabled (`confinement-backend-disabled`), control không hỗ trợ (`confinement-unsupported`), probe cũ/hỏng (`confinement-probe-failed`), grant không hợp lệ (`confinement-grant-invalid`), unsatisfied resource need (`confinement-need-unsatisfied`), hoặc plan mismatch (`confinement-plan-mismatch`).\n3. **Bypass pairing:** Mọi executor khai `permissionMode: \"bypass\"` bắt buộc phải đi kèm full confinement (`home: \"private\"`, `session: \"isolated\"`, `workspace: \"own\"`), được kiểm tra qua hàm dùng chung `evaluateBypassPairing` ở cả Authority lẫn `herdr-round.mjs`.\n4. **Attestation bền:** Mỗi dispatch sinh một bản ghi `confinement-attestation.v1` lưu kèm kết quả dispatch, minh bạch coverage theo 7 policy control axes (`hostWrite`, `hostRead`, `networkEgress`, `process`, `home`, `session`, `workspace`), 5 attestation channel cố định (`filesystem`, `inherited-fd`, `stdio`, `host-ipc`, `network` — không phải 7 control axes ở trên), và các write grant được cấp.\n5. **Strict mode:** `runner.confinement.strict` mặc định là `false` với cảnh báo sẵn sàng từ `fgos doctor` (`confinement-strict-readiness`). Khi bật `true`, mọi capability khai báo bắt buộc phải có policy hợp lệ hoặc explicit `unconfined`.\n"
+}
+```
+
+## liveness-146
+
+Source digest (evidence JSON): cc3d56c15cda2a9ec12ba579bcca5236ab9cfa98e1a2c7d7314409482e1d269f
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-146",
+  "record": {
+    "heading": "Đổi sang atomic CAS commit tree cho Merge Gate (D-ADR0042 (atomic CAS commit tree cho Merge Gate))",
+    "anchor": "đổi-sang-atomic-cas-commit-tree-cho-merge-gate-d-adr0042-atomic-cas-commit-tree-cho-merge-gate",
+    "startLine": 3024,
+    "endLine": 3032,
+    "sha256": "e0175d570b2a27159bafec66e3b35d2947551320b3ec67df98c4a6e0b4743efc",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [],
+    "ruleReferences": [],
+    "implementationPaths": [],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "### Đổi sang atomic CAS commit tree cho Merge Gate (D-ADR0042 (atomic CAS commit tree cho Merge Gate))\n\n- **Context**: \\`mergeRunnerItem\\` cũ sử dụng \\`git merge --no-commit\\` trực tiếp trên main checkout để kiểm tra và sau đó \\`git commit\\`. Điều này gây rủi ro làm bẩn working tree của main checkout và dễ lỗi nếu có tiến trình khác can thiệp.\n- **Decision**: Thay thế bằng cơ chế Git CAS (Compare-And-Swap) kết hợp isolated worktree cho luồng \\`root-into-main\\`. Sử dụng \\`git worktree add --detach\\` để tạo một worktree ẩn danh trỏ tới tip của trunk. Quá trình patch (\\`git merge --no-commit\\`) và test suite chạy hoàn toàn trong isolated worktree này. Nếu test pass, dùng \\`git write-tree\\` lấy tree, \\`git commit-tree\\` tạo commit với hai parent, và cập nhật ref atomically qua \\`git update-ref\\`.\n- **Consequences**:\n  - Merge + verify không chạm main checkout. Nhưng khi main checkout đang checkout chính trunk, `update-ref` dời nhánh đó rồi `read-tree -m -u HEAD` đồng bộ working tree — nên cổng clean-tree theo own-file-set (tsk-598: committed diff + `footprint`, bỏ qua `.fgos/` và path không liên quan) vẫn chạy trước merge; path trong own-file-set đang dirty → từ chối (exit 4, `not clean`), không dời ref. Lần kiểm đó chạy TRƯỚC worktree CAS mở ra (merge+verify có thể mất vài phút), nên kiểm lại lần hai dưới `main-checkout.lock`, ngay trước `update-ref` (`landCasMergeUnderLock`, cùng `ownFileSet`) — dính bẩn ở lần hai → `blocked` với lý do `main-checkout-dirty-mid-merge` (nằm trong tập lý do `catchup` chấp nhận thử lại, cùng hình dạng `lock-lost-mid-merge`), không `update-ref`.\n  - Khóa (lock) thời gian dài không còn cần thiết cho việc thao tác file, chỉ cần cho việc update-ref (nhưng update-ref đã có cơ chế CAS an toàn).\n  - Lỗi test hoặc timeout tự động dọn dẹp worktree mà không rò rỉ state vào nhánh chính.\n"
+}
+```
+
+## liveness-147
+
+Source digest (evidence JSON): caaebafb798bfc5d49df0194461f7126d199ac0abd399300611c527e271d4b42
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-147",
+  "record": {
+    "heading": "0043 — Vocabulary: bound-invocation-supervisor vs detached-run-supervisor",
+    "anchor": "0043-vocabulary-bound-invocation-supervisor-vs-detached-run-supervisor",
+    "startLine": 3033,
+    "endLine": 3034,
+    "sha256": "9a55985cfaf37f7adcad4b62a3382ca0a750d8abd6b1b9e67fec3b2bdd7fd5f9",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [],
+    "ruleReferences": [],
+    "implementationPaths": [],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "### 0043 — Vocabulary: bound-invocation-supervisor vs detached-run-supervisor\n"
+}
+```
+
+## liveness-148
+
+Source digest (evidence JSON): 1e2a8491222b2990d381e5d115715ba7385be4d8b92c376f533291f538868b93
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-148",
+  "record": {
+    "heading": "Bối cảnh",
+    "anchor": "bối-cảnh-13",
+    "startLine": 3035,
+    "endLine": 3054,
+    "sha256": "e611665eac7f13c26f215472c81fd018fc6c441b18beef052b5dd146f91982cf",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [],
+    "ruleReferences": [],
+    "implementationPaths": [
+      "apps/fgos/src/legacy_exec.rs"
+    ],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "#### Bối cảnh\n\nPhase 8's C4 investigation (reading `invocation_service.rs`,\n`operation_provider_router.rs`, `providers/external_process/{supervisor,\nadapter,registry}.rs`, `apps/fgos/src/legacy_exec.rs`, and\n`docs/platform/host-invocation-routing/architecture/invocation-kernel.md`)\nfound `supervisor.rs` (Rust, ~855 lines) and `cli-spawn-supervisor.mjs`\n(Node, ~1208 lines) look like duplicate \"supervisor\" implementations —\nboth do bounded capture, deadlines, crash mapping, cancellation grace — but\nthey answer different questions. `supervisor.rs` has zero detach/setsid/\nprocess-group logic anywhere (confirmed via source) and short default\ndeadlines (2-5s): a short RPC-shaped call bound to ONE invocation's own\nlifetime, never expected to outlive its caller. `cli-spawn-supervisor.mjs`\ndeliberately detaches (`startSupervisorProcess`'s own detached spawn,\nPGID-based kill, immutable receipt publication) so a long agent/executor\nrun survives the crash of whatever dispatched it. Zero live conflict\ntoday: the Rust mechanism has zero current consumers (`command-routes.json`\nconfirms `dispatch` is 100% `legacy-cli`; only 2 `native` routes exist,\nneither uses it).\n"
+}
+```
+
+## liveness-149
+
+Source digest (evidence JSON): 05c730ecc7904ecb4121497645ef740a19a0ff55bf5426f15b6ed4d45635f636
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-149",
+  "record": {
+    "heading": "Quyết định",
+    "anchor": "quyết-định-16",
+    "startLine": 3055,
+    "endLine": 3073,
+    "sha256": "520a894ff3e69fffb2f8f5865d4febffe6797cfdde1d2a9e1b458701e4d3da3a",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [],
+    "ruleReferences": [],
+    "implementationPaths": [],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "#### Quyết định\n\nName the two roles by the load-bearing axis — lifecycle/detachment — not\ncurrent content label (\"agent\" vs \"RPC\"), so the names stay correct if\neither mechanism's real use case shifts later:\n\n- **`detached-run-supervisor`** — `cli-spawn-supervisor.mjs`'s role: a\n  supervised run deliberately detached, must survive the crash of whatever\n  dispatched it.\n- **`bound-invocation-supervisor`** — `supervisor.rs`'s role (renamed\n  `BoundInvocationSupervisor`, module `providers::external_process::\n  bound_invocation_supervisor`): a supervised external-process call bound\n  to one invocation's own lifetime, never detached.\n\nRenamed both implementations to match: `cli-spawn-supervisor.mjs`'s\nadapter-specific exports (Node side, unit P8a) and `supervisor.rs`/\n`ExternalProcessSupervisor` → `bound_invocation_supervisor.rs`/\n`BoundInvocationSupervisor` (Rust side, unit P8b, this record).\n"
+}
+```
+
+## liveness-150
+
+Source digest (evidence JSON): fab77e828c804c07100c0ff38d706cf4498730eb17c4abccee0d49106a2fd266
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-150",
+  "record": {
+    "heading": "Hệ quả",
+    "anchor": "hệ-quả-11",
+    "startLine": 3074,
+    "endLine": 3087,
+    "sha256": "be8f536e511bd30b1453de7e522ed6f2bf739bd0dc776ac999f1f9a3a85f0c4d",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [],
+    "ruleReferences": [],
+    "implementationPaths": [],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "#### Hệ quả\n\n- A future reader comparing the two \"supervisor\" files judges them by\n  lifecycle ownership, not by guessing from a shared generic name.\n- `ExternalProcessConfig`/`Request`/`Outcome` and\n  `ExternalProcessProviderAdapter` keep their current names — they name the\n  wire protocol and the `OperationProvider` adapter, not the supervisor\n  role, so this rename doesn't touch them.\n- The day any operation (including `dispatch`) is routed `native` instead\n  of `legacy-cli`, `bound-invocation-supervisor` becomes a real second\n  invocation mechanism alongside `detached-run-supervisor` — this record is\n  the ownership boundary written down before that happens, not after.\n\n"
+}
+```
+
+## liveness-151
+
+Source digest (evidence JSON): e6fd854b4d2e96258298d8bb856bea9cdff74c2405c9502da52e5a765d2202e1
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-151",
+  "record": {
+    "heading": "0046 — Gom thang tier/rigor: 2 thang + 1 bảng, xoá mọi lớp chồng",
+    "anchor": "0046-gom-thang-tierrigor-2-thang-1-bảng-xoá-mọi-lớp-chồng",
+    "startLine": 3088,
+    "endLine": 3100,
+    "sha256": "a87949911adfec2d5b82107ef5e6e1979d0f4fb861be3eb5224a41095e0c90c9",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [],
+    "ruleReferences": [],
+    "implementationPaths": [],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "### 0046 — Gom thang tier/rigor: 2 thang + 1 bảng, xoá mọi lớp chồng\n\n- **Trạng thái:** Settled (Phase 1–4 hoàn tất, 2026-10-01)\n- **Bối cảnh:** Câu hỏi \"bước này dùng model mạnh tới đâu\" từng bị chồng chéo bởi 10 khái niệm (`size`/work tier, `runner.models`, `tier`/`minTier`, `modelPolicies`, `rigor`, `minRigor`, `mode`, `QUALITY_TIER_BRIDGE`, `DEFAULT_TIER_TO_POLICY`, `rigorOverrides`, PlacementPolicy shadow). Ba track trước làm theo kiểu additive + shadow, không xoá, dẫn đến tích tụ lớp chồng.\n- **Quyết định:**\n  1. Bên cầu chỉ dùng `rigor` (`low|standard|high|critical`); bên cung chỉ dùng `tier` (`nano|mini|standard|advanced|flagship|frontier`) qua `rigorToTier`.\n  2. Một resolver duy nhất: `resolveTierModel(cfg, tier, provider)`.\n  3. Xoá vĩnh viễn: `minTier`, `minRigor`, `QUALITY_TIER_BRIDGE`, `QUALITY_MODE_VALUES`, `DEFAULT_TIER_TO_POLICY`, `rigorOverrides`, `runner.models`, `capabilities.*.overrides`.\n  4. Sàn theo loại việc `capabilities.<cap>.rigor`, merge chỉ-nâng với provenance `rigorSource: capability`.\n  5. Tách `work.tier` thành `work.size` (độ lớn, không tới model) và `work.rigor` (tuỳ chọn, discovery phán); đường đọc duy nhất map event cũ `tier → size` và `risk: heavy` → `rigor: high`. Snapshot `state.json` mang `viewSchemaVersion: 2`.\n  6. Doctor checks (`tier-vocabulary-dead-keys`, `model-policy-tier-coverage`, `coordination-protocol-dead-vocabulary`) và dead vocabulary guard bảo vệ cấu trúc.\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ.\n"
+}
+```
+
+## liveness-152
+
+Source digest (evidence JSON): 531d662f84c6f71ab6b3c8ea3ca03efc1e341d9e260497eea6bf287198ceff57
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-152",
+  "record": {
+    "heading": "0047 — P1 Lõi thực thi: Unit, một bind(), một cửa chạy fgos run, 3 Pattern cộng tác, đóng 4 mối authority L5 [§1 ĐÃ BỊ THAY MỘT PHẦN bởi 0061]",
+    "anchor": "0047-p1-lõi-thực-thi-unit-một-bind-một-cửa-chạy-fgos-run-3-pattern-cộng-tác-đóng-4-mối-authority-l5-1-đã-bị-thay-một-phần-bởi-0061",
+    "startLine": 3101,
+    "endLine": 3113,
+    "sha256": "c2b3552248181ff4f224fdcd5dd3add11b568b5b0187cf8bf2846a707638d72d",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [],
+    "ruleReferences": [],
+    "implementationPaths": [
+      "src/runner/execution/unit.mjs",
+      "src/runner/execution/bind.mjs",
+      "src/runner/execution/run.mjs",
+      "src/runner/dispatch/resolve.mjs",
+      "src/runner/dispatch/assignment-policy.mjs"
+    ],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "### 0047 — P1 Lõi thực thi: Unit, một bind(), một cửa chạy fgos run, 3 Pattern cộng tác, đóng 4 mối authority L5 [§1 ĐÃ BỊ THAY MỘT PHẦN bởi 0061]\n\n- **Trạng thái:** Settled (Request-to-Run P1 Execution Core hoàn tất, 2026-10-01)\n- **Bối cảnh:** L5 trước P1 bị phân mảnh: \"ai làm\" bị quyết định ở nhiều nơi (coordination engine, `decide`, placement-policy, `assignment-policy.mjs`); \"chạy qua cửa nào\" có nhiều cửa ad-hoc; read-only bị chia rẽ giữa invocation `*-readonly` và tool gating; cổng ghi file phụ thuộc template stamp của engine.\n- **Quyết định:**\n  1. **Hợp đồng Unit (`src/runner/execution/unit.mjs`):** Hợp đồng dữ liệu duy nhất cho mọi đường vào. Phi hạ tầng (G2) — cấm chứa executor/provider/model/tier/invocation/actors/prefer/overrides.\n  2. **Một `bind()` duy nhất (`src/runner/execution/bind.mjs`):** Bảng 5 mức (Session -> Overrides -> Unit role/rigor -> Project taste -> Global taste), tái dùng `mechanism.mjs` theo D-ADR0033 (một cơ chế dispatch).\n  3. **Một cửa chạy `fgos run` (`src/runner/execution/run.mjs`):** Bọc `executeAssignment`, mặc định spawn qua pane herdr (G7), cli fallback. Có `fgos run record` cho producer inline với nonce một lần phát kèm chỉ dẫn và kiểm chứng `evidenceRefs`.\n  4. **3 Pattern cộng tác (`solo`, `reviewed`, `panel`):** Vòng lặp code nhỏ, thuần, không store mới (Q-B: trạng thái vòng lặp suy từ `history()` của Unit run). `findings` là outcome, không đánh `failed`.\n  5. **Cổng ghi file kiểm chứng được (supersede ADR-006 §6):** Assignment `mutating` được admit khi: (a) cwd là linked worktree và `realpath(cwd) == unit.json.worktree`, (b) `bind()` tính lại từ `unit.json` khớp deep-equal. Ngoại lệ có tên: engine protocol stamp giữ tới P4 phase 6. D-ADR0033 (một cơ chế dispatch) giữ nguyên.\n  6. **Xoá bỏ hoàn toàn:** Invocations `*-readonly`, `readOnlyRedirects`, `placement-policy.mjs`. `executors.*.for` và PolicyPatch `preferExecutor`/`preferPersona` vẫn được lớp dispatch đọc tại `src/runner/dispatch/resolve.mjs` (`resolveCapabilityDetailsFromHints`) và `src/runner/dispatch/assignment-policy.mjs`; không phải các trường đã xoá. Đường Execution Core chọn executor qua `bind()` với overrides và `capabilities.*.prefer` (`src/runner/execution/bind.mjs`). Posture read-only/ghi file là confinement OS do fgOS áp cho cả herdr lẫn cli (X-1). Quota limit `provider-limit` kích hoạt `bind().nextCandidate` mở pane mới giữ pane cũ (X-3).\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ.\n"
+}
+```
+
+## liveness-153
+
+Source digest (evidence JSON): 784f815f1898be2202b3e7e0484c7f309891976f52900a12a8f79797be3d4013
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-153",
+  "record": {
+    "heading": "0048 — P2 Plan chạy được: Unit cho mọi đường vào, driver mỏng fgos-run, bỏ DemandFacts/matcher",
+    "anchor": "0048-p2-plan-chạy-được-unit-cho-mọi-đường-vào-driver-mỏng-fgos-run-bỏ-demandfactsmatcher",
+    "startLine": 3114,
+    "endLine": 3124,
+    "sha256": "6810f12b744512c2545b7e737e8b11f6f329c86b87d016d684f6bedb1ba9a578",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [],
+    "ruleReferences": [],
+    "implementationPaths": [
+      "src/runner/execution/unit.mjs",
+      "src/workflow/runner.mjs"
+    ],
+    "missingCitedPaths": [
+      "src/runner/capability-match.mjs"
+    ],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "### 0048 — P2 Plan chạy được: Unit cho mọi đường vào, driver mỏng fgos-run, bỏ DemandFacts/matcher\n\n- **Trạng thái:** Settled (Request-to-Run P2 Runnable Plans hoàn tất, 2026-10-01)\n- **Bối cảnh:** Trước P2, việc phân rã và chọn capability/cơ chế bị phân mảnh bởi lớp prose L2 DemandFacts (8 fields) -> matcher -> `form` (`inline|protocol|facade`). Các facade `fgos-code-change`, `fgos-code-panel`, `fgos-plan-loop` tự lập lịch, tự chạy vòng lặp bằng prose, tạo ra nhiều sequencer chồng chéo và gắn chặt vào domain coding.\n- **Quyết định:**\n  1. **Unit là hợp đồng dữ liệu duy nhất (`src/runner/execution/unit.mjs`):** Mọi đường vào (prompt tự do, plan AgentKit, phase file) đều quy về Unit. `fgos plan-lint` kiểm chứng Unit trong phase file (`## Units`, `- unit:`), phát hiện sớm ghim hạ tầng (G2), trùng id, vòng phụ thuộc, và giao nhau `writes` không có `dependsOn`.\n  2. **Driver mỏng (`core/skills/fgos-run`):** Thay thế toàn bộ các facade cũ (`fgos-code-change`, `fgos-code-panel`, `fgos-plan-loop`, `fgos-capability-dispatching`). Driver không tự lập lịch, không tự merge mà giao trọn cho **Workflow runner** (`src/workflow/runner.mjs`, P3a).\n  3. **Cổng người thống nhất:** Authorize không parse từ prose plan. Phase chưa được duyệt sẽ dừng ở cổng người của Workflow run (`gate: { kind: \"human\" }`), owner trả lời qua `fgos workflow answer`. Mọi câu hỏi treo được gom thành một bộ duy nhất. Mọi cổng người mặc định là consent gate (`mode: \"consent\"`, fail-closed): chỉ nhả runner khi trả lời kèm `--approve`; trả lời không có `--approve` là lời làm rõ (clarification note) và gate giữ nguyên `parked`. Cổng nào chủ động khai `mode: \"input\"` thì câu trả lời nội dung là đủ để tiến bước.\n  4. **Xoá bỏ DemandFacts & matcher:** Xoá `src/runner/capability-match.mjs`, verb `fgos capability match`, các fragment `capability-matching.md`. L2 chỉ còn hiểu yêu cầu và viết Unit với `capability` (`domain:verb`).\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ.\n"
+}
+```
+
+## liveness-154
+
+Source digest (evidence JSON): 42b63218b586a229662f81b2b4bce1b04b736d8a67d613a5f1698f1b01c349d0
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-154",
+  "record": {
+    "heading": "0049 — P3b Work không còn stage: Work chỉ còn bản ghi/lifecycle, Workflow runner là sequencer duy nhất, đóng A4",
+    "anchor": "0049-p3b-work-không-còn-stage-work-chỉ-còn-bản-ghilifecycle-workflow-runner-là-sequencer-duy-nhất-đóng-a4",
+    "startLine": 3125,
+    "endLine": 3135,
+    "sha256": "cfb3e689ae92eb267239eca8e08dbd932fdcf4d6dbb11a8e4be0fcd1e653097a",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [],
+    "ruleReferences": [],
+    "implementationPaths": [],
+    "missingCitedPaths": [
+      "src/runner/definitions/workflow-adapter.mjs"
+    ],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "### 0049 — P3b Work không còn stage: Work chỉ còn bản ghi/lifecycle, Workflow runner là sequencer duy nhất, đóng A4\n\n- **Trạng thái:** Settled (Request-to-Run P3b hoàn tất, 2026-10-02)\n- **Bối cảnh:** Trước P3, Work mang trường `stage`, và dispatch đọc thẳng stage/workflow của Work (vi phạm A4). Điều này khiến logic tuần tự bước bị phân tán giữa `loop.mjs`, FSM stage, và prose của skill, đồng thời kéo dispatch phụ thuộc vào state.\n- **Quyết định:**\n  1. **Work không còn `stage`:** Work trở về đúng bản chất là bản ghi yêu cầu, bảng tiến độ và FSM trạng thái (status lifecycle). Thêm `workflowRunId?` để trỏ tới phiên chạy Workflow độc lập.\n  2. **Một đường đọc dữ liệu cũ:** Replay map các event `stage` lịch sử sang `workflowStep` mà không ghi đè dữ liệu cũ. Bump `viewSchemaVersion: 3` (Rust và Node đọc tương thích cả 2 và 3).\n  3. **Đóng ranh giới A4 (L5 không phụ thuộc L3):** Xoá sạch toàn bộ import `src/state/**` khỏi `src/runner/dispatch/**` và `src/runner/execution/**`. Xoá writer `dispatch-runs` và các reader cũ.\n  4. **Thu hồi adapter Workflow cũ:** Xoá `src/runner/definitions/workflow-adapter.mjs`, bỏ profile `Workflow` khỏi `FlowDefinition`, xoá doctor check `workflow-flow-definition-projects-cleanly`. Workflow runner (`src/workflow/**`) là sequencer duy nhất.\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ.\n"
+}
+```
+
+## liveness-155
+
+Source digest (evidence JSON): deb5f6c0dd537a73a0fdcdb97522ee014f217f4cf82e3290e91824e674d10224
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-155",
+  "record": {
+    "heading": "0050 — P6 Nối thật: herdr là transport mặc định, posture một đường, fallback quota qua pane mới",
+    "anchor": "0050-p6-nối-thật-herdr-là-transport-mặc-định-posture-một-đường-fallback-quota-qua-pane-mới",
+    "startLine": 3136,
+    "endLine": 3157,
+    "sha256": "27e67484d9d46c4943d055b36e07a9d06aa84c41e6ba5047f4c7c1cc12b95410",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [],
+    "ruleReferences": [],
+    "implementationPaths": [
+      "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/acceptance-herdr.md"
+    ],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "### 0050 — P6 Nối thật: herdr là transport mặc định, posture một đường, fallback quota qua pane mới\n\n- **Trạng thái:** Settled cho ca 1, 2, 3, 4, 6; ca 5 NOT RUN (xem bằng chứng)\n- **Bối cảnh:** Sau 0047, `bind().transport`, `resolvePosture` và `nextCandidate` tồn tại nhưng không ai gọi: mọi lần chạy thật là cli headless, posture tự dựng `bwrapArgs` riêng song song với driver confinement, `canApplyPosture` luôn `true`.\n- **Quyết định:**\n  1. **Transport do `bind()` quyết, `run.mjs` đọc.** herdr khi herdr có mặt trong session **và** executor có invocation `herdr-spawn` có id mà `canApplyPosture` chấp nhận; ngược lại cli (lý do ghi ở `provenance.transport.source`). Transport và invocation thật nằm trong `assignment.json` / `unit.json`, không chỉ ở giá trị trả về. Executor có CLI vẫn out-of-process (D-ADR0033 (một cơ chế dispatch, executor có CLI luôn chạy ngoài process)).\n  2. **Posture một đường.** `resolvePosture` chỉ ánh xạ posture -> `requirement` (policy built-in); `requirement` đi vào `buildConfinementRequest` -> Confinement Authority -> driver bwrap, cho cả pane herdr lẫn cli. Không còn `bwrapArgs` tự dựng trong `policies.mjs` (guard test). `resolvePostureInvocation` (`canApplyPosture` là dạng boolean của nó) là nơi duy nhất quyết: invocation khai `confinement.backend`, backend bật trong registry máy, executable chạy được; thiếu thì bind lọc candidate hoặc từ chối `posture-unavailable`, không chạy không confine. Nó cũng trả về invocation đã duyệt: khi `prefer` không nêu invocation, bind ghi đúng invocation cli thường đầu tiên mang được posture (không phải invocation cli đầu tiên của executor; `herdr-spawn` chỉ tính khi session ở trong herdr) vào binding, và `run.mjs` ghim đúng nó. Entry `prefer` nêu invocation thì giữ nguyên. Nên mọi invocation muốn được chọn phải khai `confinement`, và invocation của agent ghi state ngoài thư mục chỉ-đọc (codex, agy, pi) phải khai thêm `resourceBindings` private-home.\n  5. **Tra capability.** `bind()` tìm `capabilities[domain:verb]` trước, rồi `capabilities[verb]`, nhưng entry chỉ thắng khi có `prefer` dùng được: slot chỉ có `description` (loại `fgos setup` ghi) không che bare-verb có `prefer`. Không có `prefer` ở đâu cả thì headless bị từ chối `headless-no-executor`; `fgos doctor` (`workflow-capabilities-configured`) cảnh báo đúng capability đó. Mặc định headless chỉ chạy được với Workflow đã khai `prefer`, không phải mọi Workflow `fgos setup` đã ghi slot.\n  3. **Fallback quota.** `provider-limit` (herdr đọc màn hình qua detector của herdr, mặc định idle 5 phút nếu config không đặt `idleTimeoutMs`) -> `nextCandidate` đi tiếp `prefer[]` -> pane mới dưới assignment id `<unitRun>/<role>/<round>-fb<n>`; pane cũ giữ nguyên; `fallbackFrom` ghi lại; hết candidate thì outcome vẫn `provider-limit`. cli-spawn không có phát hiện limit nên headless không fallback (*cập nhật 2026-10-14:* nay có, qua câu hạn mức ở đuôi stderr, xem đoạn decision 0058 ở RUL65b). Pane idle (không `working`) quá 15 giây bị đọc màn hình để tìm credential chết (`AUTH_FAILURE_PATTERNS`, vd pi \"OAuth refresh failed ... invalid_grant\"): thấy thì cũng kết thúc `provider-limit` ngay, không chờ idle timeout, để walk sang candidate kế; classifier ghi quarantine `auth-token` kiểu `manual-clear` (tới khi người login lại và `fgos dispatch reconcile provider-capacity clear-quarantine`), không phải `quota-limit`. Quarantine quota dùng đúng thời gian reset provider ghi trên màn hình (\"Resets in 24m1s\", cả giờ/phút/giây), mặc định 1 giờ khi không ghi.\n  4. **Pane confine cho cả năm họ** (claude, claude qua OpenRouter, codex, agy, pi): mỗi agent giữ state trong private home dựng từ account được lease; công thức và lý do ở [confinement-authority.md §13.1](./confinement-authority.md), account inventory toàn máy ở RUL65b (trên).\n  - **Pane không nhận HOME riêng của worker.** Vòng herdr confine mở pane không kèm `HOME` private (launcher script tự `export` nó trước khi `exec`): shell của pane mà bắt đầu trong một home không có file khởi động thì zsh chạy trình hướng dẫn lần đầu và nuốt lệnh khởi chạy gõ ngay sau, nên vòng agy báo `foreground process ... does not match prepared command argv` dù argv không sai.\n  - **Prompt delivery trong pane herdr (`inline` mặc định, `file-pointer` tuỳ chọn).** Mặc định `herdr-spawn` gửi toàn bộ nội dung `brief-<round>.md` trực tiếp vào pane qua `herdr agent prompt` (bracketed paste) để người quan sát thấy trọn vẹn prompt trong TUI, đồng thời vẫn ghi `brief-<round>.md` xuống đĩa kèm dòng trỏ đường dẫn phục hồi sau compaction; `promptDelivery: \"file-pointer\"` (hoặc `FGOS_HERDR_PROMPT_DELIVERY=file-pointer`) giữ cơ chế gõ con trỏ một dòng. `confirmBriefSubmitted` nhận diện cả paste chip thu gọn (`[Pasted text #1 +N lines]`, `[paste #1 +N lines]`, `[Paste]`, `#1 … +N lines`, menu `Pasted N lines`) ở vùng composer cuối màn hình; `SHELL_MANAGED_ENV` giữ nguyên `TERM`/`HERDR_PANE_ID` của pane mới (không để `TERM=dumb` hay `HERDR_PANE_ID` của process gọi ghi đè), `workerBaseEnv` loại bỏ `OMPCODE`/`OMP_PROFILE`/`PI_PROFILE`/`PI_CONFIG_FILES` của phiên cha, và `executors.xai` có thêm invocation `omp-herdr-vantt` chạy `omp` trong pane `bwrap`.\n- **Bằng chứng:** [acceptance-herdr.md](../../plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/acceptance-herdr.md): ca 1 (Unit `reviewed`), 2 (reviewer bị chặn ghi repo, ghi được outbox), 3 (Workflow `architecture-advisory` 9 role trong pane, 4 họ provider), 4 (fallback, pane cũ giữ), 6 (headless cli cùng posture) Accepted; transport đọc từ `assignment.json`.\n- **Giới hạn đã biết:**\n  - Ca 5 (so cùng câu hỏi với engine cũ, tag `pre-engine-retirement`) **NOT RUN**: engine cũ cần Lead tự viết và authorize từng bước, nên \"Lead-active\" sẽ đo chính thao tác tay, không đo engine.\n  - Ca 4 dùng màn hình limit **giả** (executor `fake-limit`); `DEFAULT_USAGE_LIMIT_PATTERNS` chưa đo trên màn hình limit thật của claude/codex. *Cập nhật 2026-10-05:* câu chữ đo được đầu tiên là của codex, \"■ Selected model is at capacity. Please try a different model.\" (đã thêm vào mẫu mặc định). Ngoài ra, thang liveness chỉ đọc màn hình khi tiến độ dừng, mà `working` tính là tiến độ, nên pane vẫn báo `working` nhưng đang kẹt ở lỗi nhà cung cấp chạy tới trần 15 phút không fallback (thấy khi dogfood mdview). Nay vòng thăm dò đọc 15 dòng cuối của agent đang `working` mỗi 30 giây và kết luận `provider-limit` khi cùng một dòng bắt đầu bằng dấu lỗi của CLI (`■`) và nêu điều kiện (`WORKING_STALL_PATTERNS`, chỉ câu chữ đã đo) còn nằm đó sau một khoảng thăm dò đầy đủ; chữ thường nhắc tới capacity hay rate limit không bị đụng tới.\n  - **Trạng thái agent trong herdr (đo 2026-10-05, herdr 0.9.1-vantt.1).** herdr có đúng một nguồn trạng thái cho mỗi pane; fgos từng `pane report-agent --state working` lúc khởi động pane bị cô lập, nên fgos thành nguồn đó và `agent get` đứng yên ở `working` cả vòng (commit `2e9b53f6c` chỉ là đường vòng: đọc `agent explain` trước, hai lần gọi herdr mỗi nhịp thăm dò). Thí nghiệm trong pane thật: claude, codex, agy, pi chạy sau bwrap (không tách pid namespace) đều được herdr nhận ra không cần `HERDR_AGENT`, `agent get` khớp `agent explain`, và `agent prompt --wait` trả `done` sau ~2 giây; sau khi fgos báo `working`, `agent get` kẹt `working` còn `explain` nói `idle`, `agent prompt --wait` quá thời gian; `pane release-agent` trả lại quyền, trạng thái hồi phục sau vài giây. Nay fgos không báo trạng thái; chỉ khi herdr không nhận ra tiến trình là agent (sau 6 giây) mới báo, vì đó là cách duy nhất đánh địa chỉ nó (`ensureHerdrKnowsAgent`). Vòng thăm dò đọc `agent get`, chỉ hỏi `explain` khi `unknown`. Giới hạn: herdr chỉ biết `idle/working/blocked/done/unknown`, không biết lý do; manifest codex khớp ký tự xoay trong tiêu đề terminal là `working` (rule `osc_title_working`), nên pane codex kẹt ở lỗi nhà cung cấp vẫn là `working` và vẫn cần phần đọc màn hình ở trên. Mỗi vòng không bình thường để lại `herdr-diagnosis.json` (lời giải thích của chính herdr).\n  - **Agent kẹt ở prompt chỉ người trả lời được (đo 2026-10-05, codex \"Trust this folder?\").** herdr báo đúng `blocked` (luật `trust_directory`), thang liveness kết luận `blocked` kèm dòng màn hình, nhưng bước settle coi mọi lỗi mang lớp `worker-timeout` là timeout nên run ghi `execution-timeout` và Unit ra `execution-failure`. Nay `blocked` (như `provider-limit`) đi thẳng qua `adapterOutcome`: `failure.code = blocked`, `outcome.category = blocked`, Unit outcome `blocked`, pane giữ nguyên, thông báo nêu cách sửa (trả lời prompt hoặc cấp trust cho project trong home của agent). Không thêm mẫu màn hình vì detector của herdr đã nhận ra màn hình này; màn hình không đọc được vẫn không phải bằng chứng.\n  - Inventory account (`runner.providers.<provider>.accounts`) chỉ ở `~/.fgos/config.json` toàn máy; mỗi máy phải tự khai, `fgos setup` không tạo; `fgos doctor` (`confined-pane-accounts`) đọc inventory từ config toàn máy bất kể cwd (không cần project config) và chỉ ra pane thiếu entry; config toàn máy không đọc được thì check FAIL, nêu mã lỗi và đường dẫn.\n  - bind chọn invocation herdr **đầu tiên** của executor; executor nhiều account cần luật chọn tường minh về sau.\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ.\n"
+}
+```
+
+## liveness-156
+
+Source digest (evidence JSON): ceb3a05dd43c7b47136f1c6c7aee339fe9c86c5cb2f648e6e0ea997739852fbf
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-156",
+  "record": {
+    "heading": "0051 — Cổng ghi file đi theo chuỗi fallback; quyền git của invocation giữ lại cho Work loop",
+    "anchor": "0051-cổng-ghi-file-đi-theo-chuỗi-fallback-quyền-git-của-invocation-giữ-lại-cho-work-loop",
+    "startLine": 3158,
+    "endLine": 3167,
+    "sha256": "a8ddc6cba8fa5ea77634fc3d54fd8d9220d69e0c46b5345c8b4d9757b7f06e65",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [],
+    "ruleReferences": [],
+    "implementationPaths": [],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "### 0051 — Cổng ghi file đi theo chuỗi fallback; quyền git của invocation giữ lại cho Work loop\n\n- **Trạng thái:** Settled (2026-10-03)\n- **Bối cảnh:** 0050 cho `provider-limit` đi tiếp `prefer[]`, nhưng cổng ghi file của 0047 §5 tính lại `bind()` từ đầu pool nên một producer ghi file fallback sang candidate kế bị từ chối `binding mismatch`; chỉ vai read-only (không qua cổng) fallback được. Ngoài ra `allowedTools` của invocation claude/glm không confine vẫn cấp `Bash(git add:*)`/`Bash(git commit:*)` dù runner đã tự commit cho producer (`commit-unit-work.mjs`).\n- **Quyết định:**\n  1. **Cổng đi tiếp sau candidate đã chạm limit.** Với assignment `<unitRun>/<role>/<round>-fb<n>`, cổng tính lại `bind()` bỏ qua đến `candidateIndex` của attempt liền trước trong `unit.json`, **chỉ khi** attempt đó có outcome `provider-limit` (`fallbackSkipIndex`, `assignment-runner.mjs`). Giá trị đọc từ chuỗi attempt runner đã persist trước khi dispatch, không từ assignment; assignment không có trong chuỗi `<role>/<round>` của chính nó (id mượn từ vai hoặc vòng khác không tính), hoặc attempt trước không phải `provider-limit`, thì bind từ đầu pool như cũ → binding giả mạo vẫn bị từ chối. Mỗi attempt trong `unit.json` ghi thêm `skipCandidateIndex` và `candidateIndex`.\n  2. **Quyền git của invocation KHÔNG bỏ.** Các invocation `claude-cli`, `glm` và `runner.executor` mặc định (không confine) cũng là đường chạy của worker coding trong Work loop (`loop.mjs`), nơi worker tự commit trên nhánh item theo hợp đồng worker (Layer 2 rule 3) và loop không có bước commit của runner; bỏ grant sẽ làm worker không commit được (đã từng đo: tsk-1jt, tsk-1dsr). Invocation bwrap không cần grant vì git metadata đọc-only trong sandbox. Ngoại lệ có chủ này kết thúc khi Work loop chuyển sang runner commit.\n- **Giới hạn đã biết:** grant còn lại làm `provider-adapter` không đánh dấu invocation không confine là `applied-via-tool-gating`; producer không confine vẫn có thể tự `git add`/`git commit` (runner commit sau đó ghi `no-changes`, không lỗi).\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ.\n"
+}
+```
+
+## liveness-157
+
+Source digest (evidence JSON): b2e218861a0f7e9f783a7e6a2aa4fa1ee0d4ffdb48e2d7e13535eb25256e84e8
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-157",
+  "record": {
+    "heading": "0052 — Worker không bao giờ có quyền git: runner commit trên mọi đường (thay mục 2 của 0051) [ĐÃ BỊ THAY MỘT PHẦN bởi 0060]",
+    "anchor": "0052-worker-không-bao-giờ-có-quyền-git-runner-commit-trên-mọi-đường-thay-mục-2-của-0051-đã-bị-thay-một-phần-bởi-0060",
+    "startLine": 3168,
+    "endLine": 3180,
+    "sha256": "0a35b1ef5a778e638b674e7fe6b5cc0aee8fd3dcadb59e73b8516959eb56bb25",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [],
+    "ruleReferences": [],
+    "implementationPaths": [],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "### 0052 — Worker không bao giờ có quyền git: runner commit trên mọi đường (thay mục 2 của 0051) [ĐÃ BỊ THAY MỘT PHẦN bởi 0060]\n\n- **Trạng thái:** Settled (2026-10-04). Thay thế mục 2 của 0051 (\"quyền git của invocation KHÔNG bỏ\"); mục 1 của 0051 giữ nguyên.\n- **Bối cảnh:** 0051 giữ grant `git add`/`git commit` trên invocation không confine (`claude-cli`, `glm`, `runner.executor` mặc định) vì Work loop (`loop.mjs`) chưa có bước commit của runner — worker tự commit theo hợp đồng worker. Ngoại lệ có chủ đó kết thúc khi Work loop chuyển sang runner commit.\n- **Quyết định:**\n  1. **Runner commit trước goal-check.** Trong `loop.mjs`, sau khi worker trả về và trước `runGoalCheck`, runner gọi `commitUnitWork` (cùng hàm đường `fgos run` dùng: `git add -A` trừ `.fgos/`, identity của repo, rồi commit) trên worktree của item. Cây sạch → không commit (worker cũ vẫn tự commit, hoặc worker không đổi gì → goal-check xử lý như \"nhánh không có commit\", `verify-miss`). Commit lỗi → `worktree-fail` (hạ tầng, đi theo ma trận hồi phục), không nuốt. Quét nghiên-cứu (discovery) và `fanout-batch` (pick -> execute -> return) commit theo cùng luật; driver tương tác commit phần worker để lại ở bước Commit của skill `fgos-coding-implement`.\n  2. **Subject commit** là `summary` trong khối JSON Result của worker nếu có, ngược lại `<id>: <title>`. Bản ghi output cục bộ ghi `commit runner | self | none`.\n  3. **Bỏ mọi grant git.** Mặc định `runner.executor` và `.fgos/config.json` (`claude-cli`, `glm`) không còn `--allowedTools` chứa `git add`/`git commit`; hợp đồng worker (Layer 2 rule 3) và prompt template bảo worker sửa file rồi dừng, không commit. Self-check Iron Law trong template đọc file đổi từ cây làm việc (runner commit sau).\n  4. **Doctor** (`invocation-git-write-grants`) cảnh báo invocation/executor nào còn cấp `Bash(git add|commit)`; không tự xoá config của người dùng.\n- **Hướng sau (không làm ở đây):** cho Work loop chạy hẳn qua Workflow runner (khớp hướng P3) — lớn hơn nhiều, và `loop.mjs` bị đánh CRITICAL; chỉ thay điểm commit, giữ nguyên vòng lặp.\n- **Giới hạn đã biết:** `verifiedSha` do worker báo là tip của worker; sau runner commit tip đã đi qua nên `fgos return` chạy lại verify thay vì tin sha (an toàn, tốn thêm một lượt verify). Worker ở project khác dùng bản fgOS cũ vẫn tự commit được nếu config của họ còn grant — doctor chỉ ra.\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ.\n"
+}
+```
+
+## liveness-158
+
+Source digest (evidence JSON): 10d2b4781d30e3d8cfdc9cd75c29ce56e3dbe81173cc2fd4f6c4685c867f3635
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-158",
+  "record": {
+    "heading": "0053 — Một cơ chế truyền kết quả: đường dẫn report trong contextRefs, phân giải một lần",
+    "anchor": "0053-một-cơ-chế-truyền-kết-quả-đường-dẫn-report-trong-contextrefs-phân-giải-một-lần",
+    "startLine": 3181,
+    "endLine": 3192,
+    "sha256": "1dfc82f2402329a66b30755f6d8bdc67c693c1899e9bc1af7aedd9137538e73a",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [],
+    "ruleReferences": [],
+    "implementationPaths": [],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "### 0053 — Một cơ chế truyền kết quả: đường dẫn report trong contextRefs, phân giải một lần\n\n- **Trạng thái:** Settled (2026-10-05)\n- **Bối cảnh:** Có hai đường truyền kết quả. Giữa các vai trong một Unit run là đường dẫn trong `contextRefs`; giữa các bước Workflow là text nhúng vào objective, tối đa 6000 ký tự của report cuối mỗi unit, tìm report bằng tên file (`agent-report.md`) nên bỏ sót `report-N.md` của herdr, và chỉ giữ kết quả cuối nên một bước `panel` chỉ còn synthesizer. Ref `unit-run:<id>/<role>` được validate nhưng không bao giờ phân giải, worker nhận một chuỗi không phải đường dẫn. Store của Workflow không giữ unit run id nên không dựng được ref.\n- **Quyết định:**\n  1. **Một dạng:** đường dẫn tuyệt đối, chỉ đọc, tới report, trong `contextRefs`; không còn đường nhúng text. Xoá giới hạn 6000 ký tự, tìm report theo tên file và `role-input-refs.mjs`.\n  2. **Một chỗ phân giải** trong Execution Core (`handoff-refs.mjs`), lúc tạo Unit run, kết quả ghi vào `unit.json` (`resolvedInputs`). Report lấy từ `settleReports` (đã kiểm sha256), không đoán theo tên file.\n  3. **Workflow store ghi `unitRunId`** ngay khi Unit run được tạo (event `unit.started`, trước ghế đầu tiên) và lặp lại trên `unit.complete`; một unit đang `running` có id được runner tiếp tục bằng `resumeUnitRunId` (ghế đã settle không chạy lại, worktree đã ghi được dùng lại) thay vì tạo Unit run mới; bước sau thấy report của mọi vai của mọi bước phụ thuộc, như trước.\n  4. Không mở rộng quyền đọc của worker (xem \"Ranh giới tin cậy\" ở `docs/routing-handoff-contract.md`); không đổi ranh giới component.\n- **Giới hạn đã biết:** worker phải mở file; câu `Summary` giữ trong objective làm sàn khi một model bỏ qua ref. Câu trả lời của cổng người chưa tới unit sau.\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ.\n"
+}
+```
+
+## liveness-159
+
+Source digest (evidence JSON): 034232f9d7c33780222bb6fdf26cd4562a8568df47189b7e6c4325b1878af304
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-159",
+  "record": {
+    "heading": "0055 — Panel: khác họ provider giữa các ghế là ưu tiên mềm, `bind()` rải ghế theo thứ tự `prefer`; `reviewed` vẫn cứng",
+    "anchor": "0055-panel-khác-họ-provider-giữa-các-ghế-là-ưu-tiên-mềm-bind-rải-ghế-theo-thứ-tự-prefer-reviewed-vẫn-cứng",
+    "startLine": 3193,
+    "endLine": 3206,
+    "sha256": "1e1f8acff52c515f1af913dc2d65695e463abf7296e677c9aa33a607030ec6b6",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [],
+    "ruleReferences": [],
+    "implementationPaths": [],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "### 0055 — Panel: khác họ provider giữa các ghế là ưu tiên mềm, `bind()` rải ghế theo thứ tự `prefer`; `reviewed` vẫn cứng\n\n- **Trạng thái:** Settled (owner, 2026-10-11). Thay thế quy tắc \"mỗi ghế panel một họ provider khác nhau, thiếu thì từ chối\" của `independentOf` cho `panel` (đặt ở abe6f2b3c, Wave B; role name resolve về executor ở 5f915db15; synthesizer bắt buộc khác họ ở 9420cf603). Phần `reviewed` (producer ≠ checker) và ngoại lệ `acceptDependence` (override `origin: human-cli`) không đổi.\n- **Bối cảnh:** `panel.mjs` cho mỗi panelist `independentOf` = mọi panelist khác và cho synthesizer `independentOf` = mọi panelist; `bind()` từ chối ứng viên cùng họ trừ khi có waiver của người. Số ghế vì vậy bị chặn bởi số họ provider dùng được (5 ở máy này, đa số người dùng ít hơn) và pool thiếu họ thì synthesizer bị `policy-refusal` sau khi các panelist đã chạy và tốn tiền. Cùng họ giữa các ghế làm giảm độc lập nhưng không làm panel vô nghĩa; từ chối là hậu quả quá nặng so với lợi ích.\n- **Quyết định:**\n  1. **Ưu tiên mềm, không bao giờ từ chối.** `runRole` nhận thêm `preferIndependentOf` (tên vai) tách khỏi `independentOf` cứng. `panel.mjs` chỉ KHAI: mỗi panelist ưu tiên khác mọi panelist còn lại, synthesizer ưu tiên khác mọi panelist; không nêu executor/họ/tier. `independentOf` (cứng) vẫn do `reviewed` dùng.\n  2. **Lựa chọn ở `bind()`, một nơi.** `ask.preferIndependentOf` là `[{ role, executor }]` của các ghế ĐÃ bind (runner/dry-bind lấy từ `role-ledger.mjs`, hàm `seats`; mảng rỗng cho ghế đầu, vắng mặt khi vai không xin rải). `bind()` vẫn lọc governance, độc lập cứng, posture, blind như cũ rồi, trong số ứng viên còn lại, chọn họ có ÍT ghế đã dùng nhất (họ chưa ai dùng = 0), hoà thì theo thứ tự `prefer` của capability (thứ tự do owner tuyển, tái dùng). Đủ họ thì ghế rơi vào họ khác nhau theo thứ tự pool như trước; hết họ thì ghế dùng chung họ ít dùng nhất. Không có bảng sức mạnh họ, bảng persona→họ, registry hay khoá config mới.\n  3. **Thứ tự bind xác định.** Các panelist bind theo thứ tự liệt kê, đồng bộ trong cùng một tick (trong `runRole` không có `await` giữa `bind` và `noteRoleExecutor`), nên ghế k chỉ thấy các ghế liệt kê trước nó (cộng ghế mà lần chạy resume đã ghi); synthesizer bind sau khi mọi panelist xong. Thứ tự liệt kê = thứ tự ưu tiên: ghế đứng trước được chọn trước. Nhu cầu theo ghế (rigor/tier riêng từng ghế) chưa có kênh per-seat nên để việc sau; bước này chỉ dùng thứ tự ghế.\n  4. **Minh bạch.** Binding ghi `provenance.familySpread = { value: { family, sharedWith: [vai...] }, source }`, `source` là `prefer-independent-of:distinct-family` hoặc `prefer-independent-of:no-eligible-unused-family`. `unit-summary.read.v2` thêm khoá tuỳ chọn `sharedFamilies: [{ family, seats: [\"<vai>/<vòng>\", ...] }]`, chỉ có khi ≥2 ghế cuối cùng chung một họ (đối xứng, khác `sharedWith` chỉ nhìn về các ghế bind trước); thêm khoá tuỳ chọn nên giữ version 2, summary cũ giữ nguyên byte. Doctor `workflow-pools-satisfy-independence` chỉ còn fail với `reviewed`; panel thiếu họ được báo bằng ghi chú nêu ghế nào chung họ.\n- **Tái dùng / đổi:** tái dùng `role-ledger.mjs`, hợp đồng `ask`/provenance của `bind()`, thứ tự `prefer`, `unit-summary`; đổi cách `panel.mjs` khai ý định, và cách `bind()` xếp hạng ứng viên khi có `preferIndependentOf`. Không có cơ chế nào làm synthesizer cứng trở lại (không có mechanism sẵn).\n- **Ranh giới:** No component-boundary change. Quyền chọn executor/họ vẫn chỉ ở `bind()` (Execution Core); `panel.mjs` (Collaboration Patterns) chỉ khai ý định, workflow YAML vẫn từ chối executor/provider/model/tier/invocation/prefer/overrides.\n- **Giới hạn đã biết:** cổng ghi file tính lại `bind()` không mang `preferIndependentOf` (chỉ producer ghi file đi qua cổng, producer không xin rải). Một ghế `synthesizer` ghi file sẽ phải được xem lại nếu có.\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ.\n"
+}
+```
+
+## liveness-160
+
+Source digest (evidence JSON): 8450ae13e60bdeccd4309cd20fa701037a957d57fc30438be4f116e2e3b3b31d
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-160",
+  "record": {
+    "heading": "0056 — `--seats`: chuyên biệt hoá ghế panel bằng lens khi khởi động, không thêm workflow YAML hay registry",
+    "anchor": "0056---seats-chuyên-biệt-hoá-ghế-panel-bằng-lens-khi-khởi-động-không-thêm-workflow-yaml-hay-registry",
+    "startLine": 3207,
+    "endLine": 3221,
+    "sha256": "995a1eb1e5a452e19f685597ac1f0f2c248f4ebba17f5e86b4a3c02fb114fd0f",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [],
+    "ruleReferences": [],
+    "implementationPaths": [
+      "src/workflow/seats.mjs"
+    ],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "### 0056 — `--seats`: chuyên biệt hoá ghế panel bằng lens khi khởi động, không thêm workflow YAML hay registry\n\n- **Trạng thái:** Settled (owner, 2026-10-11), phạm vi giai đoạn 1: lens inline. Persona có tên (`@name`) là giai đoạn sau, hiện bị từ chối rõ ràng.\n- **Bối cảnh:** Các base thảo luận có panel chung (3 ghế mặc định không khác nhau) nên một câu hỏi theo miền (tài chính, nhân sự) không chỉ ra được góc nhìn cần có. Thêm một workflow YAML cho mỗi miền là ngôn ngữ workflow thứ hai; một file recipe là carrier mới cho thứ mà một cờ đã chứa được. Số ghế không còn bị chặn bởi số họ provider (decision 0055), nên số lens không cần trần ở schema.\n- **Quyết định:**\n  1. **Một cờ tuỳ chọn** `fgos workflow start <base> --seats \"a|b|c\"`, phản chiếu `--stance-options`. Chỉ phân tích cú pháp ở CLI; chuyên biệt hoá thuộc Workflow component (`src/workflow/seats.mjs`), thuần và xác định (không đồng hồ, ngẫu nhiên, model), chạy trong `prepareWorkflowRun` trước khi tạo run nên đầu vào sai không tạo run, không mở pane.\n  2. **Đủ điều kiện theo cấu trúc:** unit `panel` mà `roleTasks` không có khoá `panelist-N` và không có `params.role` tuỳ chỉnh. Base có panel được dựng riêng (`council-lite`, `architecture-advisory`) hoặc không có panel chung (`architecture-advisory-reopen`, plan dịch từ plan.md) bị từ chối kèm lý do. Không có danh sách cứng.\n  3. **Chỉ đổi trường ghế:** `params.members`, `roleTasks.panelist-1..N` (một câu hằng của runtime, lens là tiêu điểm phân tích, không phải danh tính hay chỉ thị), cộng chép tường minh `--context-ref` dùng chung vào template của mọi unit ở bước có `dependsOn` (vì ref cấp run chỉ tới bước gốc). Topology, gate, `blind`, nhiệm vụ checker, văn bản synthesizer giữ nguyên; revalidate bằng đúng validator. Delphi dùng cùng ánh xạ ghế ở cả hai vòng.\n  4. **Cấm trong bề mặt recipe:** số ghế riêng, vòng, blind, gate, critique, chọn synthesizer, steps/edges, `roleTasks` thô, provider/model/executor/tier/invocation/prefer/overrides/acceptDependence. Chọn base khác thay vì vá base.\n  5. **Preflight không từ chối vì họ provider:** dry-bind lại các unit panel đã mở rộng với `{pattern, params}` đầy đủ (wrapper của doctor bỏ `template.params` nên không dùng); ghế chung họ chỉ cảnh báo (`seatsPreflight`), chỉ từ chối khi một vai không có ứng viên nào. Doctor không cần đổi: không thêm mặc định cấu hình, biến môi trường hay file bắt buộc.\n  6. **Lưu và resume:** định nghĩa đã mở rộng nằm trong event `workflow.start` hiện có cùng bản ghi nguồn gốc `{seats, baseId, baseDigest, refs}`, projection phơi `seats`; status/resume đọc dữ liệu đã lưu, không mở rộng lại. `workflow resume --seats` khác giá trị đã lưu bị từ chối; không truyền thì giữ như cũ.\n- **Ranh giới:** No component-boundary change. Chọn executor/họ vẫn chỉ ở `bind()`; `panel.mjs` không đổi; Workflow component vẫn không biết executor.\n- **Giới hạn đã biết:** nội dung `--context-ref` được đọc lúc chạy, không đóng băng. Lens là văn bản do model viết: được chặn bằng độ dài, một dòng, không ngoặc nhọn và câu mẫu cố định, nhưng không biến nội dung tuỳ ý thành an toàn; recipe không cấp quyền. Persona có tên, thư mục `fgos/agents` và pin nội dung persona lúc start chưa làm.\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ.\n"
+}
+```
+
+## liveness-161
+
+Source digest (evidence JSON): f548e6cc2b58babaa58a4290becdae16d3fb6124581d04233d849bdf7a007e98
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-161",
+  "record": {
+    "heading": "0057 — `--seats @name`: persona có tên theo ba tầng tra cứu, ghim nội dung lúc start, gắn đúng một ghế",
+    "anchor": "0057---seats-name-persona-có-tên-theo-ba-tầng-tra-cứu-ghim-nội-dung-lúc-start-gắn-đúng-một-ghế",
+    "startLine": 3222,
+    "endLine": 3238,
+    "sha256": "1501c6cd81e65cd3cc19794ca0b2e8f6458edecc25b216c763e6e13696a7f886",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [
+      "RUL13"
+    ],
+    "ruleReferences": [
+      {
+        "path": "src/setup/registrations.mjs",
+        "line": 1269,
+        "text": "// lower one by whole-file replacement (RUL13). The customer's own tier is also checked for shape."
+      },
+      {
+        "path": "docs/specs/distribution.md",
+        "line": 69,
+        "text": "| 5f | Workspace customization folder | `fgos/` at the project root: tracked in the project's own git, written once as a skeleton at onboarding and never edited by fgOS afterwards. Holds the customer's own agent definitions (`fgos/agents/<name>.yaml`), which win over a definition of the same name in the installed set (RUL13 (customer customization lives in one tracked workspace folder)). Read by `--seats @name` (runner decision 0057); the `fgctl init` skeleton is not built yet | directory | no | absent — the installed set alone applies |"
+      },
+      {
+        "path": "docs/specs/distribution.md",
+        "line": 289,
+        "text": "- **RUL13 (customer customization lives in one tracked workspace folder; fgOS reads it first and never writes it; specified 2026-10-07; the lookup, the same-tier rule and the doctor check are built (runner decision 0057), the `fgctl init` skeleton and README are not).** A customer project that wants its own agent definitions (persona, role, decision boundary) puts them in `fgos/agents/<name>.yaml` at its project root. It is not `.fgos/`: that folder is runner state, ignored by git (`/.fgos/*`), every merge that stages a change under it is refused (`fgos-write-rejected`), and a fresh worktree has it stripped (ADR0020 (the runner strips .fgos/ from every fresh worktree)). It is not `.agents/` either: that is generated skill output which `fgos setup` and `npm run build:skills` rewrite. The first scope is `agents/` only; `workflows/`, `task-specs/` and `skills/` follow the same layout when a customer needs them, not before."
+      },
+      {
+        "path": "docs/specs/distribution.md",
+        "line": 379,
+        "text": "Specified by RUL13 (customer customization lives in one tracked workspace folder) but not built yet: the `fgctl init` skeleton and README, and routing the unit-level and capability-level `persona:` names through the same three-tier lookup (only `--seats @name` uses it today; those names are still read from `core/agents` of the working project in `renderPersonaSection`, `src/runner/dispatch/assignment.mjs`). How an extension declares its root is undefined: no extension loader exists, only the domain layer."
+      },
+      {
+        "path": "docs/specs/work-state.md",
+        "line": 237,
+        "text": "không sinh bản ghi cổng nào (tương thích ngược, cùng khuôn RUL11 (tiến hóa schema)/RUL13 (bản ghi outcome, cộng thêm không đè))."
+      },
+      {
+        "path": "docs/specs/work-state.md",
+        "line": 1203,
+        "text": "- **RUL13 (bản ghi outcome, cộng thêm không đè).** Dự đoán và thực tế của cùng một item là hai sự kiện outcome riêng, gộp theo id ở bản chiếu; nửa đến sau CỘNG THÊM vào nửa đã có, không bao giờ đè mất nửa trước (per phase-3-compound-learning / 1a80b4d3). Đây là một ca cụ thể của luật tiến hóa schema RUL11 (tiến hóa schema): cộng thêm, không migration, log cũ replay nguyên vẹn không sinh outcome nào."
+      },
+      {
+        "path": "docs/specs/work-state.md",
+        "line": 1218,
+        "text": "- **RUL28 (cửa pull take/return — mirror trung thực, không tin lời).** `take` mở đúng tập frontier runner dispatch-được (`readyWork`), không bao giờ mở một tập riêng (per stage-decompose / 43f257ae). `return` không bao giờ chuyển `doing → awaiting-approval` chỉ vì người gọi tự báo xong: nó tự đo working tree sạch + HEAD tiến so `headAtTake` (tiến bộ THẬT) + tự chạy `verify` thật của item, cùng khuôn \"không tin lời\" của RUL13 (bản ghi outcome, cộng thêm không đè); verify đỏ đi đúng đường `blocked` + friction như runner tự đỗ. Không sinh settlement ở `return` — settlement chỉ sinh ở cạnh `→done` (per stage-decompose), giữ đúng một nguồn sự thật cho \"đóng bộ\" (per 6f2cbc47, a30a3d3c)."
+      },
+      {
+        "path": "docs/knowledge/why-fgos-s-automatic-capture-records-the-what-but-not-the-wh/fgos-capture-points-and-the-why-gap.md",
+        "line": 24,
+        "text": "- **RUL13 outcome** (`src/runner/claim-port.mjs:150-160` predicted;"
+      }
+    ],
+    "implementationPaths": [
+      "src/runner/agent-definitions.mjs"
+    ],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "### 0057 — `--seats @name`: persona có tên theo ba tầng tra cứu, ghim nội dung lúc start, gắn đúng một ghế\n\n- **Trạng thái:** Settled (owner, 2026-10-11), giai đoạn 2 của 0056. Thực hiện phần \"lookup\" của RUL13 (customer customization lives in one tracked workspace folder) trong `docs/specs/distribution.md` cho persona.\n- **Bối cảnh:** Lens inline (0056) đủ cho góc nhìn tạm; một miền (tài chính, nhân sự) cần tư thế ổn định, có ranh giới quyết định, do khách hàng viết và dùng lại giữa các lần chạy. `renderPersonaSection` chỉ đọc `core/agents` của project đang chạy nên định nghĩa cài đặt không bao giờ tới project khác, và không có chỗ nào cho định nghĩa của khách.\n- **Quyết định:**\n  1. **Một chỗ tra cứu** `src/runner/agent-definitions.mjs` (infra, cạnh `agent-roster.mjs`): `fgos/agents/<name>.yaml` của project, rồi `domains/*/agents/`, rồi `core/agents/`. Tầng cao thay nguyên file tầng thấp, không trộn trường. Hai file cùng tên trong một tầng là lỗi (resolver và doctor); tên không có là lỗi liệt kê mọi thư mục đã tìm, không có fallback im lặng. Project không có thư mục `domains/` hoặc `core/agents/` riêng thì đọc của package đang chạy (vị trí code, không phải cwd hay PATH). Chỉ nhận `<name>.yaml` (`.yml` được báo là bị bỏ qua), tối đa 16 KiB, phải khai `name:` trùng tên file và `description:` không rỗng.\n  2. **Ghế có phạm vi vai.** Workflow runner phát override `{scope:{unit, role:\"panelist-N\"}, persona, personaPin, origin:\"workflow\"}` cho mỗi ghế có tên trên mọi unit `panel`, đứng TRƯỚC override persona cả unit; `bind()` không đổi (override khớp đầu tiên thắng, `scope.role` đã được khớp). Synthesizer và checker không khớp scope nên không nhận persona của ghế; ghế lens vẫn nhận persona cả unit.\n  3. **Ghim lúc start.** Tên được resolve trong `resolveStart` trước khi tạo run (từ chối tên sai, trùng, hoặc file sai hình dạng mà không tạo run, không mở pane). Nội dung file và SHA-256 nằm trong event `workflow.start` hiện có, `seats.personas`, và projection phơi ra; resume và bước sau chỉ đọc bản ghim.\n  4. **Đường vận chuyển chung.** Bản ghim đi qua hợp đồng assignment sẵn có: `run.mjs` chép nó vào `assignment.policy.personaPin` (khớp theo vai và tên), `assignment-runner` đưa vào `options.persona.pinnedText`, `renderPersonaSection` dùng nó thay cho việc đọc file. Cùng một parser và một renderer; không có cơ chế thứ hai, `bind()` không đổi chấm điểm.\n  5. **Trộn lens và tên.** `--seats \"@a|lens|@b\"` giữ thứ tự; ghế tên không có lens task nên giữ objective của unit làm task; `{objective}` trong văn bản persona giữ nguyên chữ (không đi qua mẫu của pattern); cùng một persona hai lần bị từ chối như trùng ghế.\n  6. **Doctor.** `agent-type-names-unique` đổi từ \"duy nhất toàn cục\" sang \"duy nhất trong từng tầng\" (RUL13 (customer customization lives in one tracked workspace folder) thay quy tắc cũ), thêm tầng `fgos/agents`, báo định nghĩa của khách thay file nào của tầng dưới, kiểm hình dạng và báo file `.yml`. Không thêm mặc định cấu hình, biến môi trường hay file bắt buộc (thư mục `fgos/agents` là tuỳ chọn, chỉ đọc), nên không có đăng ký config-default.\n- **Không làm:** trường refs theo ghế, công cụ soạn persona, nội dung persona của miền, handle tri thức cài đặt, đổi chấm điểm của `bind()`, hợp nhất trường giữa các tầng.\n- **Tái dùng / thiếu:** tái dùng `parseSimplePersonaYaml` và `renderPersonaSection` (chỉ thêm nguồn văn bản đã ghim), ghép override và `scope.role` của `bind()`, đường `workflow.start` + projection của `seats`, registry doctor, thứ tự ba tầng của khám phá workflow/giao thức. Thiếu trước đó: chính chỗ tra cứu (RUL13 (customer customization lives in one tracked workspace folder) chỉ có văn bản), tầng workspace, ghim.\n- **Ranh giới:** No component-boundary change. Tra cứu file định nghĩa là hạ tầng dùng chung của Execution Core (`src/runner`), không phải chính sách của Workflow runner; Workflow component chỉ gọi nó và chọn ghế; chọn executor/họ/tier vẫn chỉ ở `bind()`; pattern vẫn chỉ khai ý định; workflow YAML vẫn không mang persona của ghế.\n- **Giới hạn đã biết:** persona tên chỉ dùng được ở ghế panel của base có panel chung. Persona của unit (`persona:` trong template) và persona của capability vẫn đọc `core/agents` của project đang chạy lúc dispatch, chưa qua ba tầng. Nội dung ghim nằm trong event log và projection (tối đa 16 KiB mỗi persona).\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ.\n"
+}
+```
+
+## liveness-162
+
+Source digest (evidence JSON): bd44a9b45e6eb8a6723ac9c2cec6f792b361a930889e8b913186a50eb7b63eab
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-162",
+  "record": {
+    "heading": "0058 — Provider failure fails over inside Execution Core: another account of the same provider first, then the next candidate",
+    "anchor": "0058-provider-failure-fails-over-inside-execution-core-another-account-of-the-same-provider-first-then-the-next-candidate",
+    "startLine": 3239,
+    "endLine": 3254,
+    "sha256": "1b5648834f3342974749e7accd29217e9cbcd4f7cf83bd1ed42de4ea522c0f6f",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [],
+    "ruleReferences": [],
+    "implementationPaths": [],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "### 0058 — Provider failure fails over inside Execution Core: another account of the same provider first, then the next candidate\n\n- **Status:** Settled (owner, 2026-10-11). Extends item 3 of 0050 (\"a `provider-limit` only walks to the next candidate\") and the soft family spread of 0055.\n- **Context:** A synthesizer bound to `deepseek` (pi, provider openrouter) exited with code 1 and stderr `No API key found for openrouter.`. The run settled as `nonzero-process-exit` with outcome `execution-failure`, so no fallback ran and the whole unit failed although other accounts and other providers could serve it. Dry-bind (preflight) cannot know whether a login works, and a credential probe at preflight would be a second mechanism that goes stale; the runtime is where a dead login becomes visible.\n- **Decision:**\n  1. **Classify the exit.** A non-zero, non-timeout exit with no valid worker claim whose last five stderr lines hold a dead-credential wording from the shared `AUTH_FAILURE_PATTERNS` (now including the anchored `No API key found for <provider>`) settles as `provider-limit` with `failure.cause: credential`. The capacity classifier then quarantines the leased account as `auth-token` (`manual-clear`), exactly as for the pane wordings. The pane liveness ladder reads the same list line by line, so a line that only quotes the wording inside other text does not match.\n  2. **Rotate the account first.** When a round ends `provider-limit`, `run.mjs` asks `account-rotation.mjs` whether the executor's provider (the lease's own provider bucket) still has a usable account: listed in the inventory, not quarantined (read through `inspectProviderCapacity`, no second ranking). If so, and fewer retries than the provider has accounts were spent on this candidate, the same binding runs again as attempt `-fb<n>` (`retrySameCandidate`), and the lease ranks the next account. A provider with one account, no inventory, or nothing left skips straight to step 3. The budget is derived from the recorded attempts, so a resumed run does not reset it.\n  3. **Then another provider.** `nextCandidate` walks the capability pool as before, with two additions made in `bind()`, the single authority: a small `excludeFamilies` argument (families whose login failed in this unit and that a seat walked away from; rebuilt from the recorded attempts by `credentialFaultFamilies`), and the sibling-seat spread read again at walk time, so a seat that falls back still prefers a family its siblings did not use. Spread never refuses; an exclusion can, and then the walk ends as `fallbackExhausted`.\n  4. **A seat fails only when both are used up.** The seat keeps its role through the retries, the role ledger records every executor it ran, `unit-summary` lists each attempt and derives `sharedFamilies` from the final binding as before. An exhausted seat returns `provider-limit` with `fallbackExhausted` (plus `accountRotations` when any retry ran).\n  5. **Provenance (additive).** `fallbackFrom.kind` is `account-rotation` (with `provider`, `accountsHealthy`) or `next-candidate`; each attempt in `unit.json` may carry `failureCause: credential`; `unit-summary.read.v2` documents the optional keys without a version change. Both rotation and walk attempts count as fallback attempts in metrics.\n  6. **Write gate.** The mutating-assignment gate recomputes `bind()` from the recorded attempt chain. A rotation retry now resumes the walk where the attempt it retries did, and the gate applies the same family exclusion (only walks made no later than the attempt's own `boundAt`), so a writing seat passes the gate on a retry or a walk instead of being refused with a binding mismatch.\n- **Reused / changed:** reused the account inventory, lease ranking, quarantine and fault classifier (`provider-capacity.mjs`), `nextCandidate`, the `-fb<n>` assignment ids and `skipCandidateIndex` chain, `role-ledger.mjs`, and `AUTH_FAILURE_PATTERNS`. Added `account-rotation.mjs`, `retrySameCandidate`, `excludeFamilies`, the settlement mapping of a credential exit, and `runUnit` forwarding `providerCapacityRuntimeDir` to the dispatch it already makes. No recipe, workflow or pattern field, no retry-count knob, no credential probe, no change to `bind()` scoring.\n- **Boundary:** No component-boundary change. Account and executor choice stay in Execution Core (`bind()`, `run.mjs`, the lease); patterns and workflows still declare intent only and never name executors, providers or accounts.\n- **Known limits / follow-ups:** the write gate still recomputes `bind()` without `preferIndependentOf` (open since 0055), so a writing synthesizer that falls back by spread preference can still be refused there; this change does not make that case worse. A dead login with no account inventory for its provider has nothing to rotate or quarantine: the seat walks to the next candidate each time it is bound and is only protected within one unit. Preflight stays blind to credentials by design; failover is the runtime answer to what dry-bind cannot see.\nSuperseding this decision needs a new record; do not edit it in place.\n"
+}
+```
+
+## liveness-163
+
+Source digest (evidence JSON): 5cf5f0e2d515fff5314415368305a140ed1780ee4bcfc6d2526013262cc1609f
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-163",
+  "record": {
+    "heading": "0059 — A domain persona pack is a folder; what a seat can name, what it pinned and who ran it are each stated by one read",
+    "anchor": "0059-a-domain-persona-pack-is-a-folder-what-a-seat-can-name-what-it-pinned-and-who-ran-it-are-each-stated-by-one-read",
+    "startLine": 3255,
+    "endLine": 3269,
+    "sha256": "acb0c232cb11ccc54c5b8038ce50e48a41ad9da5182d94d73f06a9044be8ed64",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [],
+    "ruleReferences": [],
+    "implementationPaths": [],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "### 0059 — A domain persona pack is a folder; what a seat can name, what it pinned and who ran it are each stated by one read\n\n- **Status:** Settled (owner, 2026-10-12). Builds on 0057 (named persona seats) and 0058 (provider failover).\n- **Context:** A domain pack (the first is the go-to-market personas in `domains/marketing/agents/`) must be extendable by a person or company without a manifest, and `fgos-advise` must find its personas without a hardcoded list. Three gaps remained after 0057: an installed persona could not be listed from a consumer project, a project's own `domains/` folder hides every shipped domain persona it lacks without any message, and the persona renderer reads only `description`, `persona.voice|style|archetype` and `decision_boundary.can_decide|must_escalate` and drops anything else silently. A seat also reads its context documents live, so the run could not say what it had been given, and a failover could send the persona and documents to a provider nobody named.\n- **Decision:**\n  1. **A pack is a folder, no manifest.** `domains/<domain>/agents/<name>.yaml` ships personas; a person or company adds or replaces one in `fgos/agents/<name>.yaml` (whole-file replacement, as 0057) and keeps its own knowledge in `fgos/knowledge/<domain>/*.md`, passed with `--context-ref`. A persona carries posture and a decision boundary, never facts or numbers. Shipped personas without a domain expert's sign-off say so in their `description`.\n  2. **`fgos agents list` is the one listing.** It reads the same tiers as the seat lookup (`agent-definitions.mjs`) and prints name, tier, source file, one-line description, lower files it shadows, shape problems, render warnings, and `masked`: installed definitions that the project's own `domains/` or `core/agents/` hides. `fgos-advise` uses it instead of listing folders, so installed personas are visible from a consumer project and no persona name or domain word is written in the skill.\n  3. **`fgos doctor` warns, not fails.** `agent-type-names-unique` adds the render warnings of `fgos/agents` files and the masked installed names to its message; it still fails only on duplicates, a wrong `name:`, a missing `description:` or an ignored `.yml` file.\n  4. **A start states what it pinned.** A `--seats` start records `seats.refDigests` (`{ ref, sha256, bytes }`, or `unreadable`) for plain-path context refs and prints `seatsEcho`: persona names, tiers and sources, plus the ref count and total bytes. The digest is taken at start; seats read refs live, so it shows a later change and is not proof of what a seat read. The persona text itself stays pinned as in 0057.\n  5. **Status says who ran each seat.** For a seated run `fgos workflow status` adds `seatProviders`: per unit and role the persona, executor, invocation, provider family, model, outcome and, after a failover, where it moved from (the 0058 `fallbackFrom`). Context documents may reach several external providers, and this is the place that shows which.\n- **Reused / changed:** reused `scanAgentTiers`, `agentShapeProblem`, the 0057 pinned persona text, the 0058 `fallbackFrom` record and the existing doctor check. Added `agent-listing.mjs`, `ref-digests.mjs`, `seat-providers.mjs`, the `agents` verb and the start and status fields above. No manifest, no `extends:` or field merge, no new persona key, no routing of knowledge per seat, no change to `bind()`.\n- **Boundary:** No component-boundary change. Persona and seat choice stay with `bind()` and the Workflow runner; the new modules only read.\n- **Known limits / follow-ups:** nothing enforces that company knowledge stays out of external providers (a convention and the echo, not a control); a fail-closed internal-only mode needs a decision on which providers count as internal. `masked` covers `domains/` and `core/agents/` only. Persona descriptions in the marketing pack have no expert review. Additive layering of expertise on one persona, per-seat evidence routing and installed knowledge handles are not built.\nSuperseding this decision needs a new record; do not edit it in place.\n"
+}
+```
+
+## liveness-164
+
+Source digest (evidence JSON): 5766146a0eaa4b48329c433722def4046ecae0a7c44fed25342ef0d603835957
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-164",
+  "record": {
+    "heading": "0060 — Runner commit theo `writes` của Unit: một matcher, preflight index, resume chỉ commit, brief ghi file nói rõ phạm vi (thay mục 1-2 của 0052)",
+    "anchor": "0060-runner-commit-theo-writes-của-unit-một-matcher-preflight-index-resume-chỉ-commit-brief-ghi-file-nói-rõ-phạm-vi-thay-mục-1-2-của-0052",
+    "startLine": 3270,
+    "endLine": 3285,
+    "sha256": "aace8a739fb38c60dc8bb733fd3e65217037a7ec1f48d7d076316cdfca30282e",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [
+      "RUL84",
+      "RUL85",
+      "RUL86",
+      "RUL87",
+      "RUL83"
+    ],
+    "ruleReferences": [
+      {
+        "path": "docs/specs/reading-map.md",
+        "line": 42,
+        "text": "- `src/runner/execution/` (`unit.mjs`, `bind.mjs`, `run.mjs`, `patterns/`) — Execution Core (Request-to-Run P1/P2/P4): Unit (hợp đồng dữ liệu duy nhất), `bind()` (chọn executor 5 mức), `fgos run` (cửa chạy mới, herdr mặc định), CollaborationPattern (`solo`, `reviewed`, `panel` + presets `consult`, `research-fan-out`, `rfc`, `code-change`); `src/runner/dispatch/write-scope.mjs` — matcher duy nhất của phạm vi ghi Unit (RUL84 (one write-scope matcher)), dùng cho runner commit, settlement và Workflow; spec: `docs/specs/runner.md`"
+      }
+    ],
+    "implementationPaths": [
+      "src/runner/dispatch/write-scope.mjs"
+    ],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "### 0060 — Runner commit theo `writes` của Unit: một matcher, preflight index, resume chỉ commit, brief ghi file nói rõ phạm vi (thay mục 1-2 của 0052)\n\n- **Trạng thái:** Settled (2026-10-14). Thay mục 1 (\"runner commit `git add -A` trừ `.fgos/`\") và mục 2 (subject commit) của 0052; mục 3-4 của 0052 (bỏ mọi grant git, doctor `invocation-git-write-grants`) giữ nguyên.\n- **Bối cảnh:** Runner commit mọi thứ trong worktree trừ `.fgos/`, nên một agent sửa lan ra ngoài việc được giao vẫn được commit, và file người đang sửa dở trong cùng worktree bị cuốn theo. `writes` của Unit đã có nhưng không ai đọc lúc commit; settlement, Workflow và commit mỗi nơi tự hiểu path theo cách riêng (git pathspec, so chuỗi). Commit lỗi sau khi agent đã pass thì `--resume` chạy lại agent. Worker không được dặn rằng runner commit, nên có lượt tự `git commit` hoặc ghi ra ngoài rồi bị gán sai.\n- **Quyết định:**\n  1. **Một matcher** (`src/runner/dispatch/write-scope.mjs`, RUL84 (one write-scope matcher)): chuẩn hoá `writes` về một cách viết, chỉ `*`/`**` là glob, `.fgos/` không bao giờ trong scope; commit, settlement và Workflow đều hỏi qua `matchesWriteScope`. `runner.generatedPaths` nở scope sang cây render khi Unit chạm nguồn sinh; scope đã nở lưu ở `unit.json#writeScope` lúc tạo, resume không tính lại.\n  2. **Commit theo scope** (RUL85 (the runner commits only the write scope)): runner chỉ commit path thay đổi nằm trong `writeScope`; path ngoài scope không bao giờ được commit và được báo ở `commit.outOfScope`; file bẩn sẵn trong scope (`preExistingInScope`) không bao giờ được runner commit. Subject giữ dòng đầu conventional của `summary`, nếu không thì `chore(<unitId>): …`, cho mọi caller kể cả tầng Work.\n  3. **Preflight index:** index có thay đổi staged trước khi spawn producer mutating → `policy-refusal` / `foreign-staged-index`, không mở pane hay tiến trình worker. Bước commit kiểm lại (`staged-set-mismatch`, `committed-set-mismatch`) và gỡ đúng phần mình đã stage khi lỗi.\n  4. **Ranh giới tin cậy của git runner:** gitdir từ repo chính, hooksPath tương đối phân giải theo main checkout, fsmonitor tắt, `GIT_*` của caller bị bỏ, worktree ngoài repo chính → `untrusted-worktree`.\n  5. **Resume chỉ commit** (RUL86 (resume after a failed runner commit only commits)): round mà agent đã pass nhưng commit `failed` được resume bằng một lần commit, không bao giờ spawn agent lần hai; không còn file trong scope thì `work-missing`. Commit lạc còn trên nhánh chặn resume, gỡ bằng `git reset HEAD~1` chứ không `git revert`. Resume bị từ chối khi một dispatch còn sống giữ khoá worktree.\n  6. **Brief ghi file và `needsWrites`** (RUL87 (a writing seat is told its scope)): seat mutating của unit run được brief liệt kê scope, rằng runner commit còn worker không `git add`/`git commit`, và rằng cần ghi ngoài scope thì khai `needsWrites` (field tuỳ chọn của `agent-result-claim` v2, không đổi version). `coverageMatched` của settlement đọc scope qua cùng matcher, nghĩa \"nằm trong scope đã khai\", không phải bằng chứng tác giả (RUL83 (a snapshot names what changed, never who) giữ nguyên).\n- **Tái dùng / thiếu:** tái dùng `commitUnitWork`, chính sách attribution của RUL83 (a snapshot names what changed, never who), hợp đồng claim v2, `unit.json`. Thiếu trước đó: matcher dùng chung, preflight index, đường resume chỉ commit, dòng scope trong brief.\n- **Ranh giới:** No component-boundary change. `write-scope.mjs` là module lá tầng kernel của Execution Core; Workflow chỉ gọi nó.\n- **Giới hạn đã biết:** file bẩn sẵn trong scope rồi bị agent sửa tiếp thì không được báo. Brief mới chỉ áp cho unit run; đường Work giữ brief cũ.\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ.\n"
+}
+```
+
+## liveness-165
+
+Source digest (evidence JSON): aa1a6dbc2a521b6a141d078f3b2273d706d5994ecd451eb1d1566a29551d8171
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-165",
+  "record": {
+    "heading": "0061 — Unit ad-hoc được `prefer`/`persona` mềm; one-liner `fgos run \"<prompt>\"`; `workflow start --units`/`--effort`; unit ghi nối nhánh (thay một phần mục 1 của 0047)",
+    "anchor": "0061-unit-ad-hoc-được-preferpersona-mềm-one-liner-fgos-run-workflow-start---units--effort-unit-ghi-nối-nhánh-thay-một-phần-mục-1-của-0047",
+    "startLine": 3286,
+    "endLine": 3299,
+    "sha256": "1fb4a1bbcfd6d84ce03c0f4fb99ea5dc90c7a3409526f7f65e4bbb53d6bacea2",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [
+      "RUL77",
+      "RUL88",
+      "RUL89"
+    ],
+    "ruleReferences": [
+      {
+        "path": "docs/specs/reading-map.md",
+        "line": 41,
+        "text": "- `src/workflow/` (`definition.mjs`, `runner.mjs`, `step-fsm.mjs`, `units-source.mjs`) + `core/workflows/*.yaml` — Workflow engine (Request-to-Run P3a/P4): DAG steps, human gates, dependency scheduling, runner integration; `units-source.mjs` dịch units file của `fgos workflow start --units` thành Workflow tạm (RUL89 (workflow start --units)); spec: `docs/specs/runner.md`"
+      }
+    ],
+    "implementationPaths": [],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "### 0061 — Unit ad-hoc được `prefer`/`persona` mềm; one-liner `fgos run \"<prompt>\"`; `workflow start --units`/`--effort`; unit ghi nối nhánh (thay một phần mục 1 của 0047)\n\n- **Trạng thái:** Settled (2026-10-14). Thay một phần mục 1 của 0047: Unit nay được mang `prefer` và `persona`; executor, provider, model, tier, invocation, actors, overrides vẫn bị cấm (G2). Các mục khác của 0047 giữ nguyên.\n- **Bối cảnh:** Việc một lần cần ba đường khác nhau tuỳ có ghi file và có cần provider cụ thể hay không (RUL77 (posture belongs to the capability)): `execute <agent> --for`, Workflow unit `writes: []`, hay `execute --contract --executor`; không đường nào vừa sandbox read-only vừa giữ được provider đã chọn. Doctrine dạy `fgos workflow start --units` khi cờ đó chưa có. RUL77 (posture belongs to the capability) để ngỏ \"gợi ý provider mềm\" vì nó đổi `bind()`. Persona của unit chỉ đọc `core/agents` của project đang chạy, nên persona tầng workspace render ra tên trần.\n- **Quyết định:**\n  1. **`prefer`/`persona` mềm trên Unit ad-hoc** (RUL88 (ad-hoc Unit prefer and persona, the one-liner)): `bind()` thử `unit.prefer` trước rồi tới `capability.prefer`, qua cùng mọi bộ lọc và failover vào pool; provenance ghi `unit-prefer`; `--override` executor vẫn ghim. Persona: override > `unit.persona` > locked > capability; xung đột locked/unit bị từ chối. Persona của unit được resolve qua ba tầng và ghim text vào `unit.json` lúc unit run bắt đầu. Preset và plan vẫn không ghim provider; chỉ nguồn `units-file` được mang `prefer`.\n  2. **One-liner** `fgos run \"<prompt>\" [--provider] [--persona] [--writes --worktree] [--capability] [--rigor] [--effort]`: dựng một Unit `adhoc-*`, read-only khi không có `--writes`; `--writes` cần linked worktree; cờ sai bị từ chối trước khi có unit run.\n  3. **`fgos workflow start --units <file>`** (RUL89 (workflow start --units)): danh sách Unit chạy như một Workflow tạm, mỗi Unit một step; `--effort <level>` áp cho mọi unit và giữ qua resume; không đi cùng `--seats`.\n  4. **Unit ghi nối nhánh:** unit ghi đứng trên đúng một unit ghi khác bắt đầu từ nhánh của unit đó; ≥2 thì từ chối lúc start; không tự merge, `workflow status` liệt kê `writeBranches`. Unit ghi ngoài scope ra `findings`; step integrate gặp unit như vậy thì fail, không merge gì. Unit ghi không có worktree riêng thì fail, không chạy trong checkout dùng chung.\n- **Tái dùng / thiếu:** tái dùng `bind()` (thêm nguồn ứng viên, không đổi chấm điểm), failover của 0058, rải họ của 0055, tra cứu ba tầng của 0057, override `reasoningEffort` của `fgos run --effort`, `contextRefs` của 0053. Thiếu trước đó: nguồn `unit-prefer`, bộ dựng Unit từ prompt, loader units file, nối nhánh giữa unit ghi.\n- **Ranh giới:** No component-boundary change. Chọn executor vẫn chỉ ở `bind()`; Workflow component chỉ dịch units file thành step và chọn base của worktree.\n- **Giới hạn đã biết:** unit ghi sau step integrate vẫn bắt đầu từ HEAD của main checkout. `dispatch decide` không có gợi ý mềm. Failover có `prefer` qua herdr-spawn chưa đo được trên provider-limit thật.\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ.\n"
+}
+```
+
+## liveness-166
+
+Source digest (evidence JSON): f6bf08e7a451888c2bbcb9a059935f5b63ad025870c53817b5bbd4fd35c330d2
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-166",
+  "record": {
+    "heading": "0062 — Xoá cửa thô; dispatch là tầng thấp; fanout về tầng Work (thay phần purpose door của RUL68 (2 tầng dispatch) và phần \"mỗi cửa một lane posture\" của RUL77 (posture belongs to the capability))",
+    "anchor": "0062-xoá-cửa-thô-dispatch-là-tầng-thấp-fanout-về-tầng-work-thay-phần-purpose-door-của-rul68-2-tầng-dispatch-và-phần-mỗi-cửa-một-lane-posture-của-rul77-posture-belongs-to-the-capability",
+    "startLine": 3300,
+    "endLine": 3319,
+    "sha256": "680a6f9c71077a8eed163aa46b4863a9f32f2c1059d5a32dd95847fde18388d6",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [
+      "RUL68",
+      "RUL77",
+      "RUL90",
+      "RUL81",
+      "RUL82",
+      "RUL83",
+      "RUL85"
+    ],
+    "ruleReferences": [],
+    "implementationPaths": [
+      "src/runner/fanout-batch.mjs",
+      "test/docs/run-doors-doctrine.test.mjs",
+      "test/architecture.test.mjs"
+    ],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "### 0062 — Xoá cửa thô; dispatch là tầng thấp; fanout về tầng Work (thay phần purpose door của RUL68 (2 tầng dispatch) và phần \"mỗi cửa một lane posture\" của RUL77 (posture belongs to the capability))\n\n- **Trạng thái:** Settled (2026-10-14). Thay phần purpose door của RUL68 (2 tầng dispatch): `executeExecutorCli` không còn cửa CLI nào, là bước transport của Assignment (caller còn lại `fanout-batch.mjs` nằm trong `R3_PENDING_WORK_CALLERS` tới khi fanout chạy qua `runUnit`); tầng Assignment có lease/fallback giữ nguyên. Thay phần \"each door carries one posture lane\" của RUL77 (posture belongs to the capability); phần \"agent executor không khai `for`, `for` của nó inert\" giữ nguyên.\n- **Bối cảnh:** Sau M1 đã có hai cửa trên một `runUnit` (one-liner `fgos run \"<prompt>\"`, `fgos workflow start --units`; 0060, 0061), nhưng cửa thô vẫn sống: `dispatch execute` theo executor id, dạng `--contract` và dạng `--assignment`, cùng `dispatch log` và `dispatch fanout-batch`. Mỗi cửa mang một lane posture riêng (RUL77 (posture belongs to the capability)), nên doctrine dạy ba đường cho cùng một việc, và việc đọc qua `--contract` giữ provider nhưng không sandbox. P3 phase 5 đã định xoá `dispatch execute <executor>` (`ad9a23a9f`) nhưng tiêu chí xong không kiểm việc đó nên bị bỏ dở. Owner quyết xoá (quyết định 4 của owner, đầu vào của hội đồng mở lại r4).\n- **Quyết định:**\n  1. **Xoá cửa thô** (RUL90 (the raw dispatch doors are removed)): `dispatch execute` (theo executor id, `--contract`, `--assignment`), `dispatch log`, `dispatch fanout-batch` và module `dispatch-log.mjs`. Gọi `dispatch execute` (mọi dạng) hoặc `dispatch log` trả lỗi `validation` gồm một câu chỉ đường, đặt ở một chỗ trong `bin` và tới được caller dạng `returnResult`: `execute` → `fgos run \"<prompt>\" [--provider <executor>] [--capability <c>] [--writes …]` hoặc `fgos run --unit` (chỉ ghi `--provider` khi executor là kind `agent`, vì `fgos run` từ chối kind khác; executor kind `tool` được bảo gọi thẳng tool; capability `--for` đã đăng ký được giữ; thông điệp BLOCKED của hook dựng cùng cách qua `runDoorHint`); `--assignment` → `fgos run --unit` hoặc Workflow; `dispatch log` → provenance nằm ở `.fgos/assignments/<unitRunId>/`.\n  2. **Dispatch là tầng thấp:** `fgos dispatch` chỉ còn `decide`, `inspect`, `reconcile`, `probe-account`. `dispatch.mjs` không import tầng Work; `decide --work` nhận resolver Work tiêm từ `bin` (tham số `resolveWork` sẵn có), nên chỉ chạy qua `fgos dispatch decide --work`.\n  3. **Posture lấy từ `writes` + capability, không từ cửa:** Unit không có `writes` chạy read-only có sandbox và lease account; có `writes` thì mutating trong linked worktree, runner commit theo scope (0060). Capability có required confinement vẫn áp. Provider cụ thể là `prefer` mềm (0061), không còn cửa nào ghim provider ngoài `--override` của người.\n  4. **Fanout về tầng Work, không thêm verb:** lối vào `node src/runner/fanout-batch.mjs \"<ids>\" [--has-live-task-access]`, khoá output ổn định `fired`, `mechanismChanged`, `unavailable`, `deferred` (cộng `slotsFull: true` khi hết slot). Bảng route Rust không đổi. Phần ruột chuyển sang `runUnit` khi cắt Work; shape của từng phần tử `fired` chốt ở bước đó.\n  5. **Guard khoá việc xoá:** guard import mở rộng tới `dispatch.mjs` và `src/workflow/**`, không allowlist; guard import đi bắc cầu qua import tương đối (re-export cách nhiều bước vẫn tính), đọc cả `require()` và `import()` literal; guard call-site quét `src`, `bin`, `scripts`, `domains`, `core`, ghi đích danh file được gọi `executeAssignment`, `executeExecutorCli`, `commitUnitWork`, `executeThroughConfinement` (import alias, destructure, namespace đều tính là gọi; `export *` từ module nhà của chúng bị từ chối); caller tầng Work chưa chuyển nằm trong `R3_PENDING_WORK_CALLERS` và phải về rỗng khi cắt Work xong.\n  6. **Doctrine một nguồn:** `AGENTS.md` và mọi skill (nguồn `core/skills`, `domains/**`, render `.agents/skills`, `plugins/fgOS/skills`, `.claude/skills`) dạy `fgos run`; `test/docs/run-doors-doctrine.test.mjs` từ chối mọi bề mặt còn dạy `dispatch execute`/`log`/`fanout-batch`, `--contract` hay `decide --work` qua `node`.\n- **RUL81 (`--contract` có sandbox, chỉ trên nhánh `fix/dispatch-followups`) chưa từng vào main.** Nó chỉ có trên nhánh `fix/dispatch-followups` (`af132275b`: `--contract` cộng `--for <capability confined>`, `contractPostureBinding`); owner bỏ merge nhánh đó (r4 quyết định 4), lane gom đánh lại hai quy tắc của lane ghi thành RUL82 (`RunResult.confinement` names the backend that ran) và RUL83 (a snapshot names what changed, never who), để trống số 81. 0062 không thay quy tắc nào mang số đó.\n- **Dissent giữ lại (hội đồng r4):**\n  - *Đo trước khi dựng cửa ngắn* (panelist-2: doctrine trước, đo, chỉ dựng khi cần; framing, panelist-1, panelist-3 muốn dựng ngay): owner bác bằng quyết định 4 cùng bằng chứng nhu cầu 19 lượt, **không bị bác bỏ về lý**. Rủi ro còn lại: không có số đếm caller ngoài repo của `dispatch execute <executor>` và `--assignment`; giảm thiểu bằng lỗi chỉ đường.\n  - *Hình dạng confinement cho việc chỉ ghi docs* vẫn để mở: framing/panelist-1 muốn posture thứ ba có tên qua `bind()`; panelist-2 muốn allowlist theo capability, fail closed lúc ghi; panelist-3 muốn không bwrap subpath, dùng worktree + kiểm scope. RUL85 (the runner commits only the write scope) chỉ hiện thực biến thể quan sát-rồi-commit của panelist-3; chưa phương án nào được chứng minh.\n- **Tái dùng / thiếu:** tái dùng `runUnit`, `prefer` mềm của 0061, commit theo scope của 0060, test call-site sẵn có ở `test/architecture.test.mjs`, tham số `resolveWork` của `decide`. Thiếu trước đó: guard khoá việc xoá `dispatch execute <executor>` (lý do P3 phase 5 bỏ dở), lối vào `node` cho fanout, test doctrine chặn cửa cũ.\n- **Ranh giới:** Component-boundary change: dispatch mất cửa thực thi và không còn phụ thuộc tầng Work; Work chỉ còn là bên dùng `runUnit`/dispatch.\n- **Giới hạn đã biết:** caller ngoài repo gọi cửa đã xoá chỉ nhận lỗi chỉ đường (owner chấp nhận). Project khác giữ bản render dạy cửa cũ tới khi activate release mới và chạy `fgos setup`. Tài liệu người dùng (`docs/how-to`, `docs/reference`, how-to trong `docs/knowledge`) đã chuyển sang `fgos run`; tài liệu giải thích và bản ghi lịch sử (`docs/explanation`, why-* trong `docs/knowledge`, `docs/{platform,architect}/agent-coordination`) giữ nguyên lệnh cũ kèm ghi chú cửa đã xoá; `docs/history/**` và `plans/**` không sửa. Fanout và vòng loop chưa đi qua `runUnit`, nên `R3_PENDING_WORK_CALLERS` chưa rỗng.\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ.\n"
+}
+```
+
+## liveness-167
+
+Source digest (evidence JSON): 7da4080dcad796d4386f16114e6dceeb5a8bdd6880425eaaf0869cd7616e7de7
+
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-167",
+  "record": {
+    "heading": "0063 — Work chỉ là bên dùng: dispatch nhận input generic (thay phần đầu vào còn lại của RUL73 (dispatch does not know Work).2)",
+    "anchor": "0063-work-chỉ-là-bên-dùng-dispatch-nhận-input-generic-thay-phần-đầu-vào-còn-lại-của-rul73-dispatch-does-not-know-work2",
+    "startLine": 3320,
+    "endLine": 3336,
+    "sha256": "70f57bd89f4edcd36a511b59fb483f32e83bab34237824f38003007676c9cddf",
+    "classification": "historical-or-decision-carriage",
+    "directReferenceCount": 349,
+    "sectionAnchorReferences": [],
+    "ruleIds": [
+      "RUL73",
+      "RUL95",
+      "RUL90",
+      "RUL93",
+      "RUL94"
+    ],
+    "ruleReferences": [
+      {
+        "path": "docs/specs/reading-map.md",
+        "line": 38,
+        "text": "- `src/runner/` + `bin/fgos-runner.mjs` — vòng tự hành (loop/dispatch/worktree/recovery/anti-loop/write-queue/root-affinity); `loop.mjs`'s `runWatch` + `write-queue.mjs`'s `onCommit` — chế độ `--watch` bền, tín hiệu-cơ-học + nghỉ dự phòng, ghép `runOnce` không đổi làm hộp đen (str7-str8-priority-intent, spec: docs/specs/runner.md §RUL53 (`--watch` — vòng cầm-giao bền, dừng chỉ khi có tín hiệu tường minh)); loop giao việc theo mẻ song song có giới hạn hai tầng (cấu hình `parallel` trong `.fgos/config.json`'s `runner` section, theo tsk-5vf), giữ quyền-sở-hữu-gốc trong một lượt chạy, quét làm-rõ rồi quét chia-việc trước mọi dispatch thi công; gặt-lại bỏ qua claim của cửa pull (`claimRole` human/session); `dispatch.mjs`'s executor là port có tên CTR009 v2 (`EXECUTOR_ADAPTERS`, per-tier qua config's `executors`, STR41), `ensureRunnerConfigForDir` tự sinh cấu hình mặc định tại `.fgos/config.json` khi vắng mặt (không áp dụng cho `--config` tường minh, str76-runner-bootstrap; tsk-5hv xoá hẳn fallback về file flat legacy cũ); worker của loop và fan-out chạy như một Unit run qua `runUnit` (`work-dispatch.mjs`'s `spawnWorker`), `fgos-runner` không còn `--config` (spec: docs/specs/runner.md §RUL93 (the runner loop's worker and the fan-out batch run as one Unit run each)) và prompt worker được tách sang `prompt-templates.mjs` + `prompt-templates/*.txt` (chọn template qua bảng cơ học kind/tier/domain, substitution `{placeholder}` thuần, log dispatch kèm tên+hash template, STR49); `goal-check.mjs` — hàm goal-check dùng chung giữa vòng tự hành và verb `return`; `write-queue.mjs` — cửa ghi tuần tự giữ một-người-ghi dưới song song; `root-affinity.mjs` — quyền-sở-hữu-gốc, giữ mọi con của một gốc chung một chủ trong một lượt chạy; `resolveRepoRoot` nay còn xác nhận HEAD repo resolve được trước khi runner claim bất kỳ item nào (fail-fast, str86-runner-headless-git D ecfd0d1a); config: `.fgos/config.json`'s `runner` section (tự sinh khi vắng mặt tại đường mặc định, nguồn config duy nhất kể từ tsk-5hv); spec: docs/specs/runner.md"
+      }
+    ],
+    "implementationPaths": [
+      "src/state/store.mjs"
+    ],
+    "missingCitedPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+  },
+  "fullSectionText": "### 0063 — Work chỉ là bên dùng: dispatch nhận input generic (thay phần đầu vào còn lại của RUL73 (dispatch does not know Work).2)\n\n- **Trạng thái:** Settled (2026-10-14). Thay phần đầu vào còn lại của RUL73 (dispatch does not know Work).2: dispatch thôi nhận object Work (`work`, `workItem`) hay `workExecutorId` rời; RUL95 (dispatch takes generic inputs only). Đóng danh sách `R3_PENDING_WORK_CALLERS` của RUL90 (the raw dispatch doors are removed) và câu để ngỏ về `import()` không literal ở đó.\n- **Bối cảnh:** Sau RUL93 (the runner loop's worker and the fan-out batch run as one Unit run each) và RUL94 (a Work driver step runs as a Unit), không caller production nào còn gọi thẳng cửa chạy của dispatch, nhưng dispatch vẫn giữ các tham số Work: `buildAssignment({work})` tự suy `contextRefs` từ `docsRef`/`refs`; policy đọc `work.rigor`/`work.risk`/`work.domain`; `compileDispatchPlan` nhận `workItem` (fan-out còn truyền cả object item); `executeExecutorCli({work})` cho chạy executor chưa đăng ký khi có item đi kèm; `assignment.mjs` tự dò và `import()` harness của domain ở `domains/<d>/harness/` — guard import không thấy đường này (R4b của lane cắt cửa). Một caller truyền `work` vào dispatch bị bỏ qua trong im lặng, nên rigor của item có thể mất mà không ai biết. Thêm nữa, từ RUL94 (a Work driver step runs as a Unit), seat của bước driver mang `domain` mà policy không đọc, nên sàn `<domain>:review` bị mất.\n- **Quyết định:**\n  1. Rigor và domain là trường của chính assignment (`assignment.rigor`, `assignment.domain`). Tầng Work gộp `rigor` và `risk: heavy` của item thành một rigor (`workRigorFor`); luật đơn điệu ở lại dispatch: nguồn tường minh đầu tiên được chọn, nguồn sau chỉ nâng, sàn capability và luật tier giữ nguyên.\n  2. `decide --work` và fan-out nhận hint `{workExecutorId, agentType, rigor?, domain?}` từ tầng Work (`workDispatchHint`); khoá `--work` trong API là `workId`. `workDispatchContext` chỉ trả `capabilityHints`, `agentType`.\n  3. Các cửa dispatch từ chối `work`/`workItem`/`workExecutorId` thay vì bỏ qua.\n  4. Harness của domain chỉ tầng Work được nạp (`domainHarnessFor`, chỉ domain đã đăng ký, ở bước đã khai); caller truyền vào `buildAssignment` inline qua `options.domainHarness`; dispatch vẫn kiểm lại contract sau seam. Hiện chưa có đường production nào dựng assignment inline cho một Work item (trước đây cũng không: caller inline duy nhất là `probe-account`), nên seam chỉ chạy trong test; giữ lại vì ADR-007 là quyết định riêng, bỏ seam phải supersede ADR đó.\n  5. Guard ngữ nghĩa: không định danh/thuộc tính `work`, `workItem`, `docsRef` (giải mã escape trước), không chuỗi đúng bằng các tên đó ngoài chỗ được ghim, không `resolveContentRoot(` trong tập canh gác; `src/state/**` tính là tầng Work (một cạnh `StoreError` được ghim); thư mục canh gác chỉ chứa `.mjs` thường; lexer chung coi `/` sau `}` đóng khối là regex; không nạp code theo tên tính lúc chạy (`import()`/`require()` không literal, `createRequire`, `eval`, `Function(...)`, `module`/`vm`/`worker_threads`) ngoài các lần nạp được ghim từng cái trong allowlist đích danh có lý do. Guard call-site so bằng equality với danh sách caller tuyệt đối; `R3_PENDING_WORK_CALLERS` đã xoá.\n- **Cổng R3 đã đạt:** `rg -n R3_PENDING_WORK_CALLERS test` ra 0; guard call-site tuyệt đối, guard import, guard ngữ nghĩa và guard nạp động xanh trên nhánh `feat/rununit-guard` (commit `fc9cc6fb9`); trên `src/` của main các guard mới đỏ đúng các dòng trong kiểm kê (47 dòng Work-shaped ở `assignment.mjs`, `assignment-policy.mjs`, `assignment-runner.mjs`, `cli.mjs`, `plan.mjs`, cộng `assignment.mjs:99` nạp harness theo đường tính). Bằng chứng chạy: `plans/261014-1400-two-doors-one-rununit/reports/lane-guard-*.md`.\n- **Tái dùng / thiếu:** tái dùng `workRigorFor` (RUL93 (the runner loop's worker and the fan-out batch run as one Unit run each)), `executorIdForWork`, `lexSource` của test, guard import bắc cầu và guard call-site của 0062. Thiếu trước đó: hint generic cho `decide --work`, cách truyền harness từ caller, guard ngữ nghĩa, guard nạp động.\n- **Ranh giới:** Component-boundary change: dispatch không còn nhận dữ liệu Work dưới bất kỳ dạng nào; harness domain chuyển từ dispatch sang tầng Work.\n- **Lệch so với thiết kế R3 đã duyệt (mục 5):** hint không mang `capabilityHints`/`stage` vì không bên nào ở `decide` đọc chúng (YAGNI); provenance rigor ghi scope `assignment` (trường chung của assignment) thay cho `work-hint`.\n- **Giới hạn đã biết:** guard đọc văn bản, không có parser JS (repo chỉ có dependency `yaml`): tên dựng lúc chạy (`opts[k]`, `'wo' + 'rk'`), input lồng (`options.work`, `assignment.work`; không ai đọc) và code ngoài tập canh gác tự với vào nội bộ dispatch không bị bắt. `StoreError` nằm trong `src/state/store.mjs` nên module runner dùng chung vẫn nạp store; tách nó là việc riêng. Assignment cũ trên đĩa không có `rigor` ở cấp ngoài; assignment declared cũ thì luôn có `domain`, nên nếu config khai rigor cho capability `<domain>:review`, sàn đó nay áp cho chúng (chỉ nâng; registry mặc định không khai). Rigor sai định dạng trên item cũ (trước khi store kiểm) được hint chuyển nguyên cho dispatch tự xét, như khi dispatch còn đọc field của item.\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ.\n"
+}
+```

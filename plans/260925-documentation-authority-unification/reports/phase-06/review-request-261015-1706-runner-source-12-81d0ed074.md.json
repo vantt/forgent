@@ -1,0 +1,327 @@
+{
+  "version": 1,
+  "commit": "81d0ed0747014e976c0d29222439fd6e3592b468",
+  "shard": "s9-runner-01.json",
+  "authorSession": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+  "authorshipRequired": true,
+  "rows": [
+    {
+      "claimId": "claim_faf7be822c2140f22e6d5a5882f84595",
+      "sourceUnitDigest": "b0767ddee6872a0d1e26fae94c0bcca47ba8db1743e511050e4d859694c4fc02",
+      "targetUnitDigest": "b0767ddee6872a0d1e26fae94c0bcca47ba8db1743e511050e4d859694c4fc02",
+      "reviewAuthor": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+      "decision": {
+        "claimId": "claim_faf7be822c2140f22e6d5a5882f84595",
+        "sourceUnitDigest": "b0767ddee6872a0d1e26fae94c0bcca47ba8db1743e511050e4d859694c4fc02",
+        "targetOwner": "docs/platform/runner/subcomponents/h-2e032393add1/spec.md",
+        "targetAnchor": "open-gaps",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ; source unit shorter than 40 characters; document exact share below one half. Whole heading docs/specs/runner.md#open-gaps (lines 1175–1175) carried at docs/platform/runner/subcomponents/h-2e032393add1/spec.md#open-gaps. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetUnitDigest": "b0767ddee6872a0d1e26fae94c0bcca47ba8db1743e511050e4d859694c4fc02",
+        "targetAncestry": [
+          "Added in candidate: Runner Open Gaps"
+        ]
+      },
+      "source": {
+        "path": "docs/specs/runner.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Open Gaps",
+        "anchor": "open-gaps",
+        "githubAnchor": "open-gaps",
+        "stableAnchor": "h-c68039f795e2",
+        "startLine": 1175,
+        "endLine": 1175,
+        "textDigest": "b0767ddee6872a0d1e26fae94c0bcca47ba8db1743e511050e4d859694c4fc02",
+        "sample": "Open Gaps",
+        "sectionPayloadDigest": "08d9d6761f077c9b297b4b85f14bc8a5e7e82f4d1b1e8d92163cdd31be1faf8b",
+        "followingBlockDigest": "d18835d06937f979c98f008115c46b322ad995e2a465a6cdad4099bae761ebee",
+        "identityFingerprint": "2280073fa005eebc4e43877a34776003ce5a25ee422be3233f8327a8dd8438a5",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)"
+        ],
+        "text": "## Open Gaps",
+        "sectionText": "## Open Gaps\n\n- Cầu dao (breaker, Data Dictionary #5) trơ trong `--once`: `maxRetries` mặc định 2 luôn nhỏ hơn trần cầu dao 3, nên một việc không bao giờ tự kéo cầu dao trong một lượt `--once` đơn — chỉ đỗ qua đường trần thử-lại thường. Cần một cầu dao dùng chung xuyên lượt (hoặc hạ trần) mới làm cầu dao có tác dụng thật ở chế độ này; ghi nhận là biết-nhưng-chưa-sửa (review-debt-runner-2, không đổi hành vi).\n- Nhiều lượt `check` chạy đồng thời trên cùng một kho chưa có cơ chế khóa/chống-tranh-chấp cho dòng lịch sử xu hướng (khác với nhật ký sự kiện chính, vốn đã có CAS) — cùng tinh thần ngưỡng-chưa-tới của RUL10 (diễn tập không chạm log thật) (work-state), mở lại khi ghi đồng thời thành tải chính.\n- Tên nhánh trục (trunk) của cổng duyệt hiện là literal `\"main\"` (`merge.mjs`) — một host project dùng tên nhánh trục khác (vd `master`) sẽ gãy `approve`/`review`; đề xuất là tự phát hiện trunk lúc init/config thay vì literal (friction filed khi viết e2e cell pr-lifecycle-3, layer task-spec, severity P3 — xem `.bee/backlog.jsonl`).\n- Chưa có escalation tự động khi một việc trải qua NHIỀU vòng người liên tiếp mà vẫn chưa hội tụ (vd item nổi lên \"cần bàn sâu\" sau N vòng người) — RUL29 (cổng chống-lặp reset theo can thiệp người cuối cùng của chính việc) chỉ mở lại ngân sách theo can thiệp người, không giới hạn tổng số vòng người; escalation dạng đó cần intent-scoring và deferred có chủ đích (human-rounds, xem `docs/backlog.md` STR8).\n- Nhiều tiến trình/máy ghi trạng thái thật cùng lúc (đa-writer, đa-máy) chưa được dựng — quyền-sở-hữu-gốc hôm nay chỉ sống trong bộ nhớ của MỘT lượt chạy, không bền qua tiến trình/máy khác; một lượt chạy thứ hai trên máy khác không biết gì về chủ của lượt thứ nhất (deferred, backlog STR27).\n- Nạp mẻ mới hôm nay là chờ-mẻ-trước-xong-rồi-đọc-lại (poll khi một việc trong mẻ hoàn tất), không phải phản ứng tức thời theo tín hiệu bên ngoài; và vòng chạy vẫn kết thúc khi hết việc (không sống liên tục chờ việc mới) — cả hai là ranh giới có chủ đích với một cơ chế phản ứng-theo-tín-hiệu-liên-tục rộng hơn (deferred, backlog STR8).\n- Chưa có ưu tiên nhập khi nhiều gốc cùng cạnh tranh cây chính — một gốc thua một lần đồng bộ-lại rồi thua lại lần sau (do gốc khác vào trước liên tục) không có cơ chế được ưu tiên hơn ở lần thử kế tiếp (deferred, backlog STR7).\n- Khi đồng bộ-lại gặp xung đột thật, không có agent nào tự giải xung đột rồi đưa người duyệt lại — người luôn phải tự đọc và sửa tay (deferred lên một tầng cao hơn, backlog STR19).\n- Chưa dự đoán trước những việc con nào của cùng một gốc khả năng chạm cùng chỗ để xếp chúng chạy nối tiếp thay vì song song — hai con cùng gốc chạm cùng chỗ vẫn ĐÚNG (một con catch-up/làm-lại), chỉ không phải TỐI ƯU (giảm việc-song-song-phí là một cải tiến hiệu năng hoãn lại, không phải một lưới đúng-sai, deferred, backlog STR16).\n- Một cây nhiều hơn hai tầng (gốc-của-gốc, cháu) hôm nay chưa từng được tạo ra bởi hệ thống (phán chia-việc chỉ sinh con ở đúng một tầng dưới gốc) — cơ chế cây nhánh tích hợp phân giải MỌI con về nhánh của ĐỈNH cây (không phải nhánh của cha trực tiếp), điều này chỉ tương đương với \"con nhập vào nhánh cha\" khi cây đúng hai tầng; một cây sâu hơn hai tầng, nếu tương lai sinh ra được, sẽ cần xác nhận lại điều này còn đúng hay không — chưa kiểm chứng vì chưa có dữ liệu thật để thử.\n- Cổng duyệt PR nội bộ do người gọi tay không có khóa chống hai lần gọi cùng lúc trên cùng một gốc (vd người duyệt hai việc con cùng gốc gần như đồng thời, hoặc người duyệt trong khi chính vòng tự hành đang dispatch gốc đó) — rủi ro thấp dưới một người vận hành, một cửa ghi tuần tự chỉ bảo vệ phần ghi trạng thái chứ không khóa riêng thao tác nhập của cổng duyệt tay; chưa xảy ra thật, ghi nhận như một giả định chưa kiểm.\n- Danh sách module của phép thử Iron Law (Data Dictionary #10) vẫn là danh sách MINH HỌA, không đóng khung — có thể còn module năng-lực-liên-quan khác (vd các module domain/kernel khác trong `src/state/`, `src/runner/`) chưa được liệt kê mà lẽ ra đủ tư cách theo phép thử năng lực gốc; mở lại khi vận hành thật (wiring đã live, RUL37 (Iron Law hỏi ở đúng một ranh giới — trunk — cho mọi đề xuất nguồn runner tới đó)) cho thấy một trường hợp bỏ sót thật.\n- Merge qua GitHub (`approve --github`) không dọn nhánh sau khi xong — nhánh cục bộ `fgw/<id>` VÀ bản đã đẩy lên remote gốc đều còn nguyên, khác với merge cục bộ (tự dọn cả hai, xem RUL21 (merge sạch → done tự động; gãy → hủy sạch merge dở + blocked có lý do)) — không có cơ chế dọn nhánh đã merge phía-server hôm nay; chấp nhận biết-nhưng-chưa-sửa cho slice này (github-adapter S3).\n- `approve --github` chưa phân biệt được lý do gãy \"PR chưa đủ lượt duyệt trên GitHub\" (một trạng thái BÌNH THƯỜNG, đang chờ người, không phải lỗi) khỏi mọi lý do gãy KHÁC (xác thực, mạng, xung đột thật) — hôm nay cả hai đều đi cùng một đường `blocked`+friction; tách riêng cần bằng chứng thật từ một PR bị chặn duyệt thật (chưa có), không đoán (github-adapter S3, cùng kỷ luật \"không đoán giá trị enum chưa chứng minh\" như S2's quyết định bỏ outcome `conflict` riêng).\n- Một đề xuất CON (có việc cha) gọi `review --github` chỉ đẩy nhánh của CHÍNH NÓ lên remote gốc, không đẩy nhánh của GỐC nó — nên `gh pr create` thật trên GitHub sẽ gãy vì nhánh đích (`base`) không tồn tại trên remote cho một đề xuất con; vận chuyển GitHub hôm nay chỉ dùng được thật cho đề xuất gốc/độc lập, ngữ nghĩa GitHub cho con cần một slice riêng (github-adapter S3, giới hạn đã biết trước khi build).\n- Lời gọi phán-đoán bên dưới engine (quyết đủ-rõ/chưa-đủ-rõ) có thể trả về văn bản không máy-đọc-được thay vì phán quyết đúng khuôn khi được gọi TỪ BÊN TRONG một phiên trợ lý khác đang chạy (lồng phiên) — engine fail-safe đúng thiết kế (đậu cổng chờ-người, không bao giờ coi không chắc là pass). **Nguyên nhân gốc xác nhận 2026-07-22 (`claude -p` thật, không đoán):** không phải lỗi định dạng — model con ĐÔI KHI từ chối một prompt-chỉ-đòi-JSON vì đọc như prompt-injection (exit code vẫn 0), tính chất XÁC SUẤT chứ không tất định. Thử thêm một câu mào đầu \"hợp thức hoá\" lời gọi — PHẢN TÁC DỤNG, model đọc chính khung đó như dấu hiệu injection rõ hơn (bằng chứng thật, gỡ bỏ). Giải pháp còn lại: tăng số lần thử lại từ 1 lên 2 (3 lượt tổng) — giảm xác suất gặp phải, KHÔNG loại trừ hoàn toàn (`docs/backlog.md` STR68, đóng lại 2026-07-22).\n\n- Khóa hoạt động cây chính (STR65) suy danh tính từ một tiến trình tổ tiên gần khi\n  không có biến môi trường phiên trợ lý — suy đoán tốt-nhất cho terminal người gõ\n  tay, KHÔNG tuyệt đối: hai terminal người khác nhau chia sẻ cùng một tiến trình cha\n  đủ gần (vd cùng phiên tmux/sshd) vẫn có thể đọc ra cùng một danh tính và không bị\n  chặn dù đang thực sự đồng thời hoạt động. Cả 3 sự cố STR65 có SHA cụ thể trước đây\n  đều là phiên trợ lý (có biến môi trường riêng, không rơi vào giới hạn này) — giới\n  hạn chỉ áp dụng cho trường hợp chưa quan sát được thật (terminal-đối-terminal).\n  Vá trọn cần một danh tính phiên bền hơn cho terminal tay gõ (deferred, backlog\n  STR84 nhắm khác lớp — enforcement phía bee-core — không trực tiếp vá gap này).\n\n- ~~**`return` không nhận ra hoàn tất của một `fgw/<id>` sinh ra từ lượt `take`/`pick` ĐẦU TIÊN (không phải tái claim một item `blocked`).**~~ RUL30 (cửa người-hoàn-tất một đề xuất nguồn-nhánh bị đỗ — mở rộng take/return, không verb mới)/RUL34 (Iron Law áp dụng khi chạm cờ rủi ro hoặc module năng-lực — không cần cả hai)'s discriminator nguồn-nhánh (`branchHeadAtTake`) trước đây chỉ được ghi trên cạnh `blocked→doing` (tái claim một đề xuất đã đỗ) — một lượt `pick` đầu tiên trên `todo→doing` chỉ ghi `headAtTake` (main-based), dù `pick` cũng dựng CÙNG worktree + nhánh `fgw/<id>` như đường tái claim. Vì `branchHeadAtTake` vắng mặt, `return` không rẽ vào nhánh nguồn-nhánh (RUL30 (cửa người-hoàn-tất một đề xuất nguồn-nhánh bị đỗ — mở rộng take/return, không verb mới)) — nó chỉ đo `changedFilesSince` trên checkout CHÍNH, nơi không có gì đổi (việc thật nằm trên `fgw/<id>`) → từ chối \"không có thay đổi\", việc kẹt ở `doing`/`awaiting-human` dù verify xanh + đã commit thật trên nhánh riêng. Tái hiện thật (không suy đoán): `/fgOS:pick` một item `todo`, verify xanh 23/23, commit thật trên `fgw/tsk-57u` — `return` vẫn từ chối (docs/history/mvp2-scope-test-infra/reports/case-1-interactive.md, forgent workshop). **Đóng 2026-07-28:** `pick`'s nhánh claim ĐẦU TIÊN (`todo→doing`) nay ghi `branchHeadAtTake` (giá trị = HEAD hiện tại của repo lúc claim — đúng bằng điểm gốc `createWorktree` fork nhánh mới ra), cùng khuôn với nhánh tái-claim `blocked→doing` — không còn ghi `headAtTake` cho bất kỳ claim nào của `pick`; `take` (verb thuần, không dựng worktree) không đổi, vẫn dùng `headAtTake` đúng như trước.\n- **`fgos-runner` không có cách tự-scope vào một thư mục/dự án con — luôn resolve repo root qua `git rev-parse --show-toplevel` từ `cwd`, không cờ/biến môi trường ghi đè.** `parseArgs` chỉ nhận `--once`/`--watch`/`--poll-ms`/`--dry-run` (`bin/fgos-runner.mjs`; `--config` đã bỏ, RUL93 (the runner loop's worker and the fan-out batch run as one Unit run each)). Với một dự án con KHÔNG tự có `.git` riêng (vd một fixture/testbed sống bên trong một repo lớn hơn), `git rev-parse --show-toplevel` luôn thoát ra repo cha — runner claim/dispatch trên `.fgos/` của repo CHA, không phải của dự án con, dù các verb `fgos.mjs` khác (`submit`/`pick`/...) đã cô lập đúng qua `process.cwd()` trực tiếp. Tái hiện thật: `git -C <thư-mục-con> rev-parse --show-toplevel` thoát ra repo cha; không có config nào ở thư mục con mà runner tự nhận (docs/history/mvp2-scope-test-infra/reports/case-2-headless.md, forgent workshop). Việc: thêm một cờ/biến môi trường ghi đè root (vd `--root`/`FGOS_ROOT`) song song với cách các verb `fgos.mjs` đã cô lập, giữ `git rev-parse --show-toplevel` làm mặc định khi vắng cờ (`docs/backlog.md` PBI p-2a39f940)."
+      },
+      "target": {
+        "path": "docs/platform/runner/subcomponents/h-2e032393add1/spec.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Open Gaps",
+        "anchor": "open-gaps",
+        "githubAnchor": "open-gaps",
+        "stableAnchor": "h-8e899fb516fd",
+        "startLine": 25,
+        "endLine": 25,
+        "textDigest": "b0767ddee6872a0d1e26fae94c0bcca47ba8db1743e511050e4d859694c4fc02",
+        "sample": "Open Gaps",
+        "sectionPayloadDigest": "08d9d6761f077c9b297b4b85f14bc8a5e7e82f4d1b1e8d92163cdd31be1faf8b",
+        "followingBlockDigest": "d18835d06937f979c98f008115c46b322ad995e2a465a6cdad4099bae761ebee",
+        "identityFingerprint": "2280073fa005eebc4e43877a34776003ce5a25ee422be3233f8327a8dd8438a5",
+        "ancestry": [
+          "Added in candidate: Runner Open Gaps"
+        ],
+        "text": "## Open Gaps",
+        "sectionText": "## Open Gaps\n\n- Cầu dao (breaker, Data Dictionary #5) trơ trong `--once`: `maxRetries` mặc định 2 luôn nhỏ hơn trần cầu dao 3, nên một việc không bao giờ tự kéo cầu dao trong một lượt `--once` đơn — chỉ đỗ qua đường trần thử-lại thường. Cần một cầu dao dùng chung xuyên lượt (hoặc hạ trần) mới làm cầu dao có tác dụng thật ở chế độ này; ghi nhận là biết-nhưng-chưa-sửa (review-debt-runner-2, không đổi hành vi).\n- Nhiều lượt `check` chạy đồng thời trên cùng một kho chưa có cơ chế khóa/chống-tranh-chấp cho dòng lịch sử xu hướng (khác với nhật ký sự kiện chính, vốn đã có CAS) — cùng tinh thần ngưỡng-chưa-tới của RUL10 (diễn tập không chạm log thật) (work-state), mở lại khi ghi đồng thời thành tải chính.\n- Tên nhánh trục (trunk) của cổng duyệt hiện là literal `\"main\"` (`merge.mjs`) — một host project dùng tên nhánh trục khác (vd `master`) sẽ gãy `approve`/`review`; đề xuất là tự phát hiện trunk lúc init/config thay vì literal (friction filed khi viết e2e cell pr-lifecycle-3, layer task-spec, severity P3 — xem `.bee/backlog.jsonl`).\n- Chưa có escalation tự động khi một việc trải qua NHIỀU vòng người liên tiếp mà vẫn chưa hội tụ (vd item nổi lên \"cần bàn sâu\" sau N vòng người) — RUL29 (cổng chống-lặp reset theo can thiệp người cuối cùng của chính việc) chỉ mở lại ngân sách theo can thiệp người, không giới hạn tổng số vòng người; escalation dạng đó cần intent-scoring và deferred có chủ đích (human-rounds, xem `docs/backlog.md` STR8).\n- Nhiều tiến trình/máy ghi trạng thái thật cùng lúc (đa-writer, đa-máy) chưa được dựng — quyền-sở-hữu-gốc hôm nay chỉ sống trong bộ nhớ của MỘT lượt chạy, không bền qua tiến trình/máy khác; một lượt chạy thứ hai trên máy khác không biết gì về chủ của lượt thứ nhất (deferred, backlog STR27).\n- Nạp mẻ mới hôm nay là chờ-mẻ-trước-xong-rồi-đọc-lại (poll khi một việc trong mẻ hoàn tất), không phải phản ứng tức thời theo tín hiệu bên ngoài; và vòng chạy vẫn kết thúc khi hết việc (không sống liên tục chờ việc mới) — cả hai là ranh giới có chủ đích với một cơ chế phản ứng-theo-tín-hiệu-liên-tục rộng hơn (deferred, backlog STR8).\n- Chưa có ưu tiên nhập khi nhiều gốc cùng cạnh tranh cây chính — một gốc thua một lần đồng bộ-lại rồi thua lại lần sau (do gốc khác vào trước liên tục) không có cơ chế được ưu tiên hơn ở lần thử kế tiếp (deferred, backlog STR7).\n- Khi đồng bộ-lại gặp xung đột thật, không có agent nào tự giải xung đột rồi đưa người duyệt lại — người luôn phải tự đọc và sửa tay (deferred lên một tầng cao hơn, backlog STR19).\n- Chưa dự đoán trước những việc con nào của cùng một gốc khả năng chạm cùng chỗ để xếp chúng chạy nối tiếp thay vì song song — hai con cùng gốc chạm cùng chỗ vẫn ĐÚNG (một con catch-up/làm-lại), chỉ không phải TỐI ƯU (giảm việc-song-song-phí là một cải tiến hiệu năng hoãn lại, không phải một lưới đúng-sai, deferred, backlog STR16).\n- Một cây nhiều hơn hai tầng (gốc-của-gốc, cháu) hôm nay chưa từng được tạo ra bởi hệ thống (phán chia-việc chỉ sinh con ở đúng một tầng dưới gốc) — cơ chế cây nhánh tích hợp phân giải MỌI con về nhánh của ĐỈNH cây (không phải nhánh của cha trực tiếp), điều này chỉ tương đương với \"con nhập vào nhánh cha\" khi cây đúng hai tầng; một cây sâu hơn hai tầng, nếu tương lai sinh ra được, sẽ cần xác nhận lại điều này còn đúng hay không — chưa kiểm chứng vì chưa có dữ liệu thật để thử.\n- Cổng duyệt PR nội bộ do người gọi tay không có khóa chống hai lần gọi cùng lúc trên cùng một gốc (vd người duyệt hai việc con cùng gốc gần như đồng thời, hoặc người duyệt trong khi chính vòng tự hành đang dispatch gốc đó) — rủi ro thấp dưới một người vận hành, một cửa ghi tuần tự chỉ bảo vệ phần ghi trạng thái chứ không khóa riêng thao tác nhập của cổng duyệt tay; chưa xảy ra thật, ghi nhận như một giả định chưa kiểm.\n- Danh sách module của phép thử Iron Law (Data Dictionary #10) vẫn là danh sách MINH HỌA, không đóng khung — có thể còn module năng-lực-liên-quan khác (vd các module domain/kernel khác trong `src/state/`, `src/runner/`) chưa được liệt kê mà lẽ ra đủ tư cách theo phép thử năng lực gốc; mở lại khi vận hành thật (wiring đã live, RUL37 (Iron Law hỏi ở đúng một ranh giới — trunk — cho mọi đề xuất nguồn runner tới đó)) cho thấy một trường hợp bỏ sót thật.\n- Merge qua GitHub (`approve --github`) không dọn nhánh sau khi xong — nhánh cục bộ `fgw/<id>` VÀ bản đã đẩy lên remote gốc đều còn nguyên, khác với merge cục bộ (tự dọn cả hai, xem RUL21 (merge sạch → done tự động; gãy → hủy sạch merge dở + blocked có lý do)) — không có cơ chế dọn nhánh đã merge phía-server hôm nay; chấp nhận biết-nhưng-chưa-sửa cho slice này (github-adapter S3).\n- `approve --github` chưa phân biệt được lý do gãy \"PR chưa đủ lượt duyệt trên GitHub\" (một trạng thái BÌNH THƯỜNG, đang chờ người, không phải lỗi) khỏi mọi lý do gãy KHÁC (xác thực, mạng, xung đột thật) — hôm nay cả hai đều đi cùng một đường `blocked`+friction; tách riêng cần bằng chứng thật từ một PR bị chặn duyệt thật (chưa có), không đoán (github-adapter S3, cùng kỷ luật \"không đoán giá trị enum chưa chứng minh\" như S2's quyết định bỏ outcome `conflict` riêng).\n- Một đề xuất CON (có việc cha) gọi `review --github` chỉ đẩy nhánh của CHÍNH NÓ lên remote gốc, không đẩy nhánh của GỐC nó — nên `gh pr create` thật trên GitHub sẽ gãy vì nhánh đích (`base`) không tồn tại trên remote cho một đề xuất con; vận chuyển GitHub hôm nay chỉ dùng được thật cho đề xuất gốc/độc lập, ngữ nghĩa GitHub cho con cần một slice riêng (github-adapter S3, giới hạn đã biết trước khi build).\n- Lời gọi phán-đoán bên dưới engine (quyết đủ-rõ/chưa-đủ-rõ) có thể trả về văn bản không máy-đọc-được thay vì phán quyết đúng khuôn khi được gọi TỪ BÊN TRONG một phiên trợ lý khác đang chạy (lồng phiên) — engine fail-safe đúng thiết kế (đậu cổng chờ-người, không bao giờ coi không chắc là pass). **Nguyên nhân gốc xác nhận 2026-07-22 (`claude -p` thật, không đoán):** không phải lỗi định dạng — model con ĐÔI KHI từ chối một prompt-chỉ-đòi-JSON vì đọc như prompt-injection (exit code vẫn 0), tính chất XÁC SUẤT chứ không tất định. Thử thêm một câu mào đầu \"hợp thức hoá\" lời gọi — PHẢN TÁC DỤNG, model đọc chính khung đó như dấu hiệu injection rõ hơn (bằng chứng thật, gỡ bỏ). Giải pháp còn lại: tăng số lần thử lại từ 1 lên 2 (3 lượt tổng) — giảm xác suất gặp phải, KHÔNG loại trừ hoàn toàn (`docs/backlog.md` STR68, đóng lại 2026-07-22).\n\n- Khóa hoạt động cây chính (STR65) suy danh tính từ một tiến trình tổ tiên gần khi\n  không có biến môi trường phiên trợ lý — suy đoán tốt-nhất cho terminal người gõ\n  tay, KHÔNG tuyệt đối: hai terminal người khác nhau chia sẻ cùng một tiến trình cha\n  đủ gần (vd cùng phiên tmux/sshd) vẫn có thể đọc ra cùng một danh tính và không bị\n  chặn dù đang thực sự đồng thời hoạt động. Cả 3 sự cố STR65 có SHA cụ thể trước đây\n  đều là phiên trợ lý (có biến môi trường riêng, không rơi vào giới hạn này) — giới\n  hạn chỉ áp dụng cho trường hợp chưa quan sát được thật (terminal-đối-terminal).\n  Vá trọn cần một danh tính phiên bền hơn cho terminal tay gõ (deferred, backlog\n  STR84 nhắm khác lớp — enforcement phía bee-core — không trực tiếp vá gap này).\n\n- ~~**`return` không nhận ra hoàn tất của một `fgw/<id>` sinh ra từ lượt `take`/`pick` ĐẦU TIÊN (không phải tái claim một item `blocked`).**~~ RUL30 (cửa người-hoàn-tất một đề xuất nguồn-nhánh bị đỗ — mở rộng take/return, không verb mới)/RUL34 (Iron Law áp dụng khi chạm cờ rủi ro hoặc module năng-lực — không cần cả hai)'s discriminator nguồn-nhánh (`branchHeadAtTake`) trước đây chỉ được ghi trên cạnh `blocked→doing` (tái claim một đề xuất đã đỗ) — một lượt `pick` đầu tiên trên `todo→doing` chỉ ghi `headAtTake` (main-based), dù `pick` cũng dựng CÙNG worktree + nhánh `fgw/<id>` như đường tái claim. Vì `branchHeadAtTake` vắng mặt, `return` không rẽ vào nhánh nguồn-nhánh (RUL30 (cửa người-hoàn-tất một đề xuất nguồn-nhánh bị đỗ — mở rộng take/return, không verb mới)) — nó chỉ đo `changedFilesSince` trên checkout CHÍNH, nơi không có gì đổi (việc thật nằm trên `fgw/<id>`) → từ chối \"không có thay đổi\", việc kẹt ở `doing`/`awaiting-human` dù verify xanh + đã commit thật trên nhánh riêng. Tái hiện thật (không suy đoán): `/fgOS:pick` một item `todo`, verify xanh 23/23, commit thật trên `fgw/tsk-57u` — `return` vẫn từ chối (docs/history/mvp2-scope-test-infra/reports/case-1-interactive.md, forgent workshop). **Đóng 2026-07-28:** `pick`'s nhánh claim ĐẦU TIÊN (`todo→doing`) nay ghi `branchHeadAtTake` (giá trị = HEAD hiện tại của repo lúc claim — đúng bằng điểm gốc `createWorktree` fork nhánh mới ra), cùng khuôn với nhánh tái-claim `blocked→doing` — không còn ghi `headAtTake` cho bất kỳ claim nào của `pick`; `take` (verb thuần, không dựng worktree) không đổi, vẫn dùng `headAtTake` đúng như trước.\n- **`fgos-runner` không có cách tự-scope vào một thư mục/dự án con — luôn resolve repo root qua `git rev-parse --show-toplevel` từ `cwd`, không cờ/biến môi trường ghi đè.** `parseArgs` chỉ nhận `--once`/`--watch`/`--poll-ms`/`--dry-run` (`bin/fgos-runner.mjs`; `--config` đã bỏ, RUL93 (the runner loop's worker and the fan-out batch run as one Unit run each)). Với một dự án con KHÔNG tự có `.git` riêng (vd một fixture/testbed sống bên trong một repo lớn hơn), `git rev-parse --show-toplevel` luôn thoát ra repo cha — runner claim/dispatch trên `.fgos/` của repo CHA, không phải của dự án con, dù các verb `fgos.mjs` khác (`submit`/`pick`/...) đã cô lập đúng qua `process.cwd()` trực tiếp. Tái hiện thật: `git -C <thư-mục-con> rev-parse --show-toplevel` thoát ra repo cha; không có config nào ở thư mục con mà runner tự nhận (docs/history/mvp2-scope-test-infra/reports/case-2-headless.md, forgent workshop). Việc: thêm một cờ/biến môi trường ghi đè root (vd `--root`/`FGOS_ROOT`) song song với cách các verb `fgos.mjs` đã cô lập, giữ `git rev-parse --show-toplevel` làm mặc định khi vắng cờ (`docs/backlog.md` PBI p-2a39f940)."
+      },
+      "exactClass": "Weak-exact",
+      "exactClassReason": "ancestor headings differ; source unit shorter than 40 characters; document exact share below one half",
+      "nativeTargetClaimId": "claim_a1c9aea472d4c3e840e426ec5ca772f7",
+      "section": {
+        "startLine": 1175,
+        "endLine": 1206,
+        "target": "docs/platform/runner/subcomponents/h-2e032393add1/spec.md",
+        "kind": "spec",
+        "anchor": "open-gaps",
+        "title": "Open Gaps",
+        "sha256": "54b609cc55ffbe9929f6024539fbd799b3e2d9067d276ebed3ebc0035aef8fbc"
+      },
+      "mapAmendments": [],
+      "reboundAnchors": []
+    },
+    {
+      "claimId": "claim_5c6238369ac0200472ee37488cd0e09a",
+      "sourceUnitDigest": "d18835d06937f979c98f008115c46b322ad995e2a465a6cdad4099bae761ebee",
+      "targetUnitDigest": "d18835d06937f979c98f008115c46b322ad995e2a465a6cdad4099bae761ebee",
+      "reviewAuthor": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+      "decision": {
+        "claimId": "claim_5c6238369ac0200472ee37488cd0e09a",
+        "sourceUnitDigest": "d18835d06937f979c98f008115c46b322ad995e2a465a6cdad4099bae761ebee",
+        "targetOwner": "docs/platform/runner/subcomponents/h-2e032393add1/spec.md",
+        "targetAnchor": "unheaded-block-3",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-98 (lines 1177–1192) carried at docs/platform/runner/subcomponents/h-2e032393add1/spec.md#unheaded-block-3. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetUnitDigest": "d18835d06937f979c98f008115c46b322ad995e2a465a6cdad4099bae761ebee",
+        "targetAncestry": [
+          "Added in candidate: Runner Open Gaps",
+          "Open Gaps"
+        ]
+      },
+      "source": {
+        "path": "docs/specs/runner.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-98",
+        "githubAnchor": "unheaded-block-98",
+        "stableAnchor": "unheaded-block-98",
+        "title": "Unheaded block 98",
+        "startLine": 1177,
+        "endLine": 1192,
+        "textDigest": "d18835d06937f979c98f008115c46b322ad995e2a465a6cdad4099bae761ebee",
+        "sample": "- Cầu dao (breaker, Data Dictionary #5) trơ trong `--once`: `maxRetries` mặc định 2 luôn nhỏ hơn trần cầu dao 3, nên một việc không bao giờ tự kéo cầu dao trong một lượt `--once` đ",
+        "identityFingerprint": "10b4f1e74c06660521c3288acba6e816c33426aabef25599aa4ff376d510c619",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Open Gaps"
+        ],
+        "text": "- Cầu dao (breaker, Data Dictionary #5) trơ trong `--once`: `maxRetries` mặc định 2 luôn nhỏ hơn trần cầu dao 3, nên một việc không bao giờ tự kéo cầu dao trong một lượt `--once` đơn — chỉ đỗ qua đường trần thử-lại thường. Cần một cầu dao dùng chung xuyên lượt (hoặc hạ trần) mới làm cầu dao có tác dụng thật ở chế độ này; ghi nhận là biết-nhưng-chưa-sửa (review-debt-runner-2, không đổi hành vi).\n- Nhiều lượt `check` chạy đồng thời trên cùng một kho chưa có cơ chế khóa/chống-tranh-chấp cho dòng lịch sử xu hướng (khác với nhật ký sự kiện chính, vốn đã có CAS) — cùng tinh thần ngưỡng-chưa-tới của RUL10 (diễn tập không chạm log thật) (work-state), mở lại khi ghi đồng thời thành tải chính.\n- Tên nhánh trục (trunk) của cổng duyệt hiện là literal `\"main\"` (`merge.mjs`) — một host project dùng tên nhánh trục khác (vd `master`) sẽ gãy `approve`/`review`; đề xuất là tự phát hiện trunk lúc init/config thay vì literal (friction filed khi viết e2e cell pr-lifecycle-3, layer task-spec, severity P3 — xem `.bee/backlog.jsonl`).\n- Chưa có escalation tự động khi một việc trải qua NHIỀU vòng người liên tiếp mà vẫn chưa hội tụ (vd item nổi lên \"cần bàn sâu\" sau N vòng người) — RUL29 (cổng chống-lặp reset theo can thiệp người cuối cùng của chính việc) chỉ mở lại ngân sách theo can thiệp người, không giới hạn tổng số vòng người; escalation dạng đó cần intent-scoring và deferred có chủ đích (human-rounds, xem `docs/backlog.md` STR8).\n- Nhiều tiến trình/máy ghi trạng thái thật cùng lúc (đa-writer, đa-máy) chưa được dựng — quyền-sở-hữu-gốc hôm nay chỉ sống trong bộ nhớ của MỘT lượt chạy, không bền qua tiến trình/máy khác; một lượt chạy thứ hai trên máy khác không biết gì về chủ của lượt thứ nhất (deferred, backlog STR27).\n- Nạp mẻ mới hôm nay là chờ-mẻ-trước-xong-rồi-đọc-lại (poll khi một việc trong mẻ hoàn tất), không phải phản ứng tức thời theo tín hiệu bên ngoài; và vòng chạy vẫn kết thúc khi hết việc (không sống liên tục chờ việc mới) — cả hai là ranh giới có chủ đích với một cơ chế phản ứng-theo-tín-hiệu-liên-tục rộng hơn (deferred, backlog STR8).\n- Chưa có ưu tiên nhập khi nhiều gốc cùng cạnh tranh cây chính — một gốc thua một lần đồng bộ-lại rồi thua lại lần sau (do gốc khác vào trước liên tục) không có cơ chế được ưu tiên hơn ở lần thử kế tiếp (deferred, backlog STR7).\n- Khi đồng bộ-lại gặp xung đột thật, không có agent nào tự giải xung đột rồi đưa người duyệt lại — người luôn phải tự đọc và sửa tay (deferred lên một tầng cao hơn, backlog STR19).\n- Chưa dự đoán trước những việc con nào của cùng một gốc khả năng chạm cùng chỗ để xếp chúng chạy nối tiếp thay vì song song — hai con cùng gốc chạm cùng chỗ vẫn ĐÚNG (một con catch-up/làm-lại), chỉ không phải TỐI ƯU (giảm việc-song-song-phí là một cải tiến hiệu năng hoãn lại, không phải một lưới đúng-sai, deferred, backlog STR16).\n- Một cây nhiều hơn hai tầng (gốc-của-gốc, cháu) hôm nay chưa từng được tạo ra bởi hệ thống (phán chia-việc chỉ sinh con ở đúng một tầng dưới gốc) — cơ chế cây nhánh tích hợp phân giải MỌI con về nhánh của ĐỈNH cây (không phải nhánh của cha trực tiếp), điều này chỉ tương đương với \"con nhập vào nhánh cha\" khi cây đúng hai tầng; một cây sâu hơn hai tầng, nếu tương lai sinh ra được, sẽ cần xác nhận lại điều này còn đúng hay không — chưa kiểm chứng vì chưa có dữ liệu thật để thử.\n- Cổng duyệt PR nội bộ do người gọi tay không có khóa chống hai lần gọi cùng lúc trên cùng một gốc (vd người duyệt hai việc con cùng gốc gần như đồng thời, hoặc người duyệt trong khi chính vòng tự hành đang dispatch gốc đó) — rủi ro thấp dưới một người vận hành, một cửa ghi tuần tự chỉ bảo vệ phần ghi trạng thái chứ không khóa riêng thao tác nhập của cổng duyệt tay; chưa xảy ra thật, ghi nhận như một giả định chưa kiểm.\n- Danh sách module của phép thử Iron Law (Data Dictionary #10) vẫn là danh sách MINH HỌA, không đóng khung — có thể còn module năng-lực-liên-quan khác (vd các module domain/kernel khác trong `src/state/`, `src/runner/`) chưa được liệt kê mà lẽ ra đủ tư cách theo phép thử năng lực gốc; mở lại khi vận hành thật (wiring đã live, RUL37 (Iron Law hỏi ở đúng một ranh giới — trunk — cho mọi đề xuất nguồn runner tới đó)) cho thấy một trường hợp bỏ sót thật.\n- Merge qua GitHub (`approve --github`) không dọn nhánh sau khi xong — nhánh cục bộ `fgw/<id>` VÀ bản đã đẩy lên remote gốc đều còn nguyên, khác với merge cục bộ (tự dọn cả hai, xem RUL21 (merge sạch → done tự động; gãy → hủy sạch merge dở + blocked có lý do)) — không có cơ chế dọn nhánh đã merge phía-server hôm nay; chấp nhận biết-nhưng-chưa-sửa cho slice này (github-adapter S3).\n- `approve --github` chưa phân biệt được lý do gãy \"PR chưa đủ lượt duyệt trên GitHub\" (một trạng thái BÌNH THƯỜNG, đang chờ người, không phải lỗi) khỏi mọi lý do gãy KHÁC (xác thực, mạng, xung đột thật) — hôm nay cả hai đều đi cùng một đường `blocked`+friction; tách riêng cần bằng chứng thật từ một PR bị chặn duyệt thật (chưa có), không đoán (github-adapter S3, cùng kỷ luật \"không đoán giá trị enum chưa chứng minh\" như S2's quyết định bỏ outcome `conflict` riêng).\n- Một đề xuất CON (có việc cha) gọi `review --github` chỉ đẩy nhánh của CHÍNH NÓ lên remote gốc, không đẩy nhánh của GỐC nó — nên `gh pr create` thật trên GitHub sẽ gãy vì nhánh đích (`base`) không tồn tại trên remote cho một đề xuất con; vận chuyển GitHub hôm nay chỉ dùng được thật cho đề xuất gốc/độc lập, ngữ nghĩa GitHub cho con cần một slice riêng (github-adapter S3, giới hạn đã biết trước khi build).\n- Lời gọi phán-đoán bên dưới engine (quyết đủ-rõ/chưa-đủ-rõ) có thể trả về văn bản không máy-đọc-được thay vì phán quyết đúng khuôn khi được gọi TỪ BÊN TRONG một phiên trợ lý khác đang chạy (lồng phiên) — engine fail-safe đúng thiết kế (đậu cổng chờ-người, không bao giờ coi không chắc là pass). **Nguyên nhân gốc xác nhận 2026-07-22 (`claude -p` thật, không đoán):** không phải lỗi định dạng — model con ĐÔI KHI từ chối một prompt-chỉ-đòi-JSON vì đọc như prompt-injection (exit code vẫn 0), tính chất XÁC SUẤT chứ không tất định. Thử thêm một câu mào đầu \"hợp thức hoá\" lời gọi — PHẢN TÁC DỤNG, model đọc chính khung đó như dấu hiệu injection rõ hơn (bằng chứng thật, gỡ bỏ). Giải pháp còn lại: tăng số lần thử lại từ 1 lên 2 (3 lượt tổng) — giảm xác suất gặp phải, KHÔNG loại trừ hoàn toàn (`docs/backlog.md` STR68, đóng lại 2026-07-22)."
+      },
+      "target": {
+        "path": "docs/platform/runner/subcomponents/h-2e032393add1/spec.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 27,
+        "endLine": 42,
+        "textDigest": "d18835d06937f979c98f008115c46b322ad995e2a465a6cdad4099bae761ebee",
+        "sample": "- Cầu dao (breaker, Data Dictionary #5) trơ trong `--once`: `maxRetries` mặc định 2 luôn nhỏ hơn trần cầu dao 3, nên một việc không bao giờ tự kéo cầu dao trong một lượt `--once` đ",
+        "identityFingerprint": "10b4f1e74c06660521c3288acba6e816c33426aabef25599aa4ff376d510c619",
+        "ancestry": [
+          "Added in candidate: Runner Open Gaps",
+          "Open Gaps"
+        ],
+        "text": "- Cầu dao (breaker, Data Dictionary #5) trơ trong `--once`: `maxRetries` mặc định 2 luôn nhỏ hơn trần cầu dao 3, nên một việc không bao giờ tự kéo cầu dao trong một lượt `--once` đơn — chỉ đỗ qua đường trần thử-lại thường. Cần một cầu dao dùng chung xuyên lượt (hoặc hạ trần) mới làm cầu dao có tác dụng thật ở chế độ này; ghi nhận là biết-nhưng-chưa-sửa (review-debt-runner-2, không đổi hành vi).\n- Nhiều lượt `check` chạy đồng thời trên cùng một kho chưa có cơ chế khóa/chống-tranh-chấp cho dòng lịch sử xu hướng (khác với nhật ký sự kiện chính, vốn đã có CAS) — cùng tinh thần ngưỡng-chưa-tới của RUL10 (diễn tập không chạm log thật) (work-state), mở lại khi ghi đồng thời thành tải chính.\n- Tên nhánh trục (trunk) của cổng duyệt hiện là literal `\"main\"` (`merge.mjs`) — một host project dùng tên nhánh trục khác (vd `master`) sẽ gãy `approve`/`review`; đề xuất là tự phát hiện trunk lúc init/config thay vì literal (friction filed khi viết e2e cell pr-lifecycle-3, layer task-spec, severity P3 — xem `.bee/backlog.jsonl`).\n- Chưa có escalation tự động khi một việc trải qua NHIỀU vòng người liên tiếp mà vẫn chưa hội tụ (vd item nổi lên \"cần bàn sâu\" sau N vòng người) — RUL29 (cổng chống-lặp reset theo can thiệp người cuối cùng của chính việc) chỉ mở lại ngân sách theo can thiệp người, không giới hạn tổng số vòng người; escalation dạng đó cần intent-scoring và deferred có chủ đích (human-rounds, xem `docs/backlog.md` STR8).\n- Nhiều tiến trình/máy ghi trạng thái thật cùng lúc (đa-writer, đa-máy) chưa được dựng — quyền-sở-hữu-gốc hôm nay chỉ sống trong bộ nhớ của MỘT lượt chạy, không bền qua tiến trình/máy khác; một lượt chạy thứ hai trên máy khác không biết gì về chủ của lượt thứ nhất (deferred, backlog STR27).\n- Nạp mẻ mới hôm nay là chờ-mẻ-trước-xong-rồi-đọc-lại (poll khi một việc trong mẻ hoàn tất), không phải phản ứng tức thời theo tín hiệu bên ngoài; và vòng chạy vẫn kết thúc khi hết việc (không sống liên tục chờ việc mới) — cả hai là ranh giới có chủ đích với một cơ chế phản ứng-theo-tín-hiệu-liên-tục rộng hơn (deferred, backlog STR8).\n- Chưa có ưu tiên nhập khi nhiều gốc cùng cạnh tranh cây chính — một gốc thua một lần đồng bộ-lại rồi thua lại lần sau (do gốc khác vào trước liên tục) không có cơ chế được ưu tiên hơn ở lần thử kế tiếp (deferred, backlog STR7).\n- Khi đồng bộ-lại gặp xung đột thật, không có agent nào tự giải xung đột rồi đưa người duyệt lại — người luôn phải tự đọc và sửa tay (deferred lên một tầng cao hơn, backlog STR19).\n- Chưa dự đoán trước những việc con nào của cùng một gốc khả năng chạm cùng chỗ để xếp chúng chạy nối tiếp thay vì song song — hai con cùng gốc chạm cùng chỗ vẫn ĐÚNG (một con catch-up/làm-lại), chỉ không phải TỐI ƯU (giảm việc-song-song-phí là một cải tiến hiệu năng hoãn lại, không phải một lưới đúng-sai, deferred, backlog STR16).\n- Một cây nhiều hơn hai tầng (gốc-của-gốc, cháu) hôm nay chưa từng được tạo ra bởi hệ thống (phán chia-việc chỉ sinh con ở đúng một tầng dưới gốc) — cơ chế cây nhánh tích hợp phân giải MỌI con về nhánh của ĐỈNH cây (không phải nhánh của cha trực tiếp), điều này chỉ tương đương với \"con nhập vào nhánh cha\" khi cây đúng hai tầng; một cây sâu hơn hai tầng, nếu tương lai sinh ra được, sẽ cần xác nhận lại điều này còn đúng hay không — chưa kiểm chứng vì chưa có dữ liệu thật để thử.\n- Cổng duyệt PR nội bộ do người gọi tay không có khóa chống hai lần gọi cùng lúc trên cùng một gốc (vd người duyệt hai việc con cùng gốc gần như đồng thời, hoặc người duyệt trong khi chính vòng tự hành đang dispatch gốc đó) — rủi ro thấp dưới một người vận hành, một cửa ghi tuần tự chỉ bảo vệ phần ghi trạng thái chứ không khóa riêng thao tác nhập của cổng duyệt tay; chưa xảy ra thật, ghi nhận như một giả định chưa kiểm.\n- Danh sách module của phép thử Iron Law (Data Dictionary #10) vẫn là danh sách MINH HỌA, không đóng khung — có thể còn module năng-lực-liên-quan khác (vd các module domain/kernel khác trong `src/state/`, `src/runner/`) chưa được liệt kê mà lẽ ra đủ tư cách theo phép thử năng lực gốc; mở lại khi vận hành thật (wiring đã live, RUL37 (Iron Law hỏi ở đúng một ranh giới — trunk — cho mọi đề xuất nguồn runner tới đó)) cho thấy một trường hợp bỏ sót thật.\n- Merge qua GitHub (`approve --github`) không dọn nhánh sau khi xong — nhánh cục bộ `fgw/<id>` VÀ bản đã đẩy lên remote gốc đều còn nguyên, khác với merge cục bộ (tự dọn cả hai, xem RUL21 (merge sạch → done tự động; gãy → hủy sạch merge dở + blocked có lý do)) — không có cơ chế dọn nhánh đã merge phía-server hôm nay; chấp nhận biết-nhưng-chưa-sửa cho slice này (github-adapter S3).\n- `approve --github` chưa phân biệt được lý do gãy \"PR chưa đủ lượt duyệt trên GitHub\" (một trạng thái BÌNH THƯỜNG, đang chờ người, không phải lỗi) khỏi mọi lý do gãy KHÁC (xác thực, mạng, xung đột thật) — hôm nay cả hai đều đi cùng một đường `blocked`+friction; tách riêng cần bằng chứng thật từ một PR bị chặn duyệt thật (chưa có), không đoán (github-adapter S3, cùng kỷ luật \"không đoán giá trị enum chưa chứng minh\" như S2's quyết định bỏ outcome `conflict` riêng).\n- Một đề xuất CON (có việc cha) gọi `review --github` chỉ đẩy nhánh của CHÍNH NÓ lên remote gốc, không đẩy nhánh của GỐC nó — nên `gh pr create` thật trên GitHub sẽ gãy vì nhánh đích (`base`) không tồn tại trên remote cho một đề xuất con; vận chuyển GitHub hôm nay chỉ dùng được thật cho đề xuất gốc/độc lập, ngữ nghĩa GitHub cho con cần một slice riêng (github-adapter S3, giới hạn đã biết trước khi build).\n- Lời gọi phán-đoán bên dưới engine (quyết đủ-rõ/chưa-đủ-rõ) có thể trả về văn bản không máy-đọc-được thay vì phán quyết đúng khuôn khi được gọi TỪ BÊN TRONG một phiên trợ lý khác đang chạy (lồng phiên) — engine fail-safe đúng thiết kế (đậu cổng chờ-người, không bao giờ coi không chắc là pass). **Nguyên nhân gốc xác nhận 2026-07-22 (`claude -p` thật, không đoán):** không phải lỗi định dạng — model con ĐÔI KHI từ chối một prompt-chỉ-đòi-JSON vì đọc như prompt-injection (exit code vẫn 0), tính chất XÁC SUẤT chứ không tất định. Thử thêm một câu mào đầu \"hợp thức hoá\" lời gọi — PHẢN TÁC DỤNG, model đọc chính khung đó như dấu hiệu injection rõ hơn (bằng chứng thật, gỡ bỏ). Giải pháp còn lại: tăng số lần thử lại từ 1 lên 2 (3 lượt tổng) — giảm xác suất gặp phải, KHÔNG loại trừ hoàn toàn (`docs/backlog.md` STR68, đóng lại 2026-07-22)."
+      },
+      "exactClass": "Weak-exact",
+      "exactClassReason": "ancestor headings differ; document exact share below one half",
+      "nativeTargetClaimId": "claim_1d00d9a671ff7b2e5310aac9cf7926b8",
+      "section": {
+        "startLine": 1175,
+        "endLine": 1206,
+        "target": "docs/platform/runner/subcomponents/h-2e032393add1/spec.md",
+        "kind": "spec",
+        "anchor": "open-gaps",
+        "title": "Open Gaps",
+        "sha256": "54b609cc55ffbe9929f6024539fbd799b3e2d9067d276ebed3ebc0035aef8fbc"
+      },
+      "mapAmendments": [],
+      "reboundAnchors": []
+    },
+    {
+      "claimId": "claim_199e9de005d19f4b2d061005d959b3ed",
+      "sourceUnitDigest": "197a395073121e8ebc1dc71f8efdabbb4a02ddff6c28689ba1711e008b226e34",
+      "targetUnitDigest": "197a395073121e8ebc1dc71f8efdabbb4a02ddff6c28689ba1711e008b226e34",
+      "reviewAuthor": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+      "decision": {
+        "claimId": "claim_199e9de005d19f4b2d061005d959b3ed",
+        "sourceUnitDigest": "197a395073121e8ebc1dc71f8efdabbb4a02ddff6c28689ba1711e008b226e34",
+        "targetOwner": "docs/platform/runner/subcomponents/h-2e032393add1/spec.md",
+        "targetAnchor": "unheaded-block-4",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-99 (lines 1194–1202) carried at docs/platform/runner/subcomponents/h-2e032393add1/spec.md#unheaded-block-4. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetUnitDigest": "197a395073121e8ebc1dc71f8efdabbb4a02ddff6c28689ba1711e008b226e34",
+        "targetAncestry": [
+          "Added in candidate: Runner Open Gaps",
+          "Open Gaps"
+        ]
+      },
+      "source": {
+        "path": "docs/specs/runner.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-99",
+        "githubAnchor": "unheaded-block-99",
+        "stableAnchor": "unheaded-block-99",
+        "title": "Unheaded block 99",
+        "startLine": 1194,
+        "endLine": 1202,
+        "textDigest": "197a395073121e8ebc1dc71f8efdabbb4a02ddff6c28689ba1711e008b226e34",
+        "sample": "- Khóa hoạt động cây chính (STR65) suy danh tính từ một tiến trình tổ tiên gần khi\n  không có biến môi trường phiên trợ lý — suy đoán tốt-nhất cho terminal người gõ\n  tay, KHÔNG tu",
+        "identityFingerprint": "50583a5a78aac154a82170b04b790f9e8ed132dd7135a398a6f75360db5e4527",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Open Gaps"
+        ],
+        "text": "- Khóa hoạt động cây chính (STR65) suy danh tính từ một tiến trình tổ tiên gần khi\n  không có biến môi trường phiên trợ lý — suy đoán tốt-nhất cho terminal người gõ\n  tay, KHÔNG tuyệt đối: hai terminal người khác nhau chia sẻ cùng một tiến trình cha\n  đủ gần (vd cùng phiên tmux/sshd) vẫn có thể đọc ra cùng một danh tính và không bị\n  chặn dù đang thực sự đồng thời hoạt động. Cả 3 sự cố STR65 có SHA cụ thể trước đây\n  đều là phiên trợ lý (có biến môi trường riêng, không rơi vào giới hạn này) — giới\n  hạn chỉ áp dụng cho trường hợp chưa quan sát được thật (terminal-đối-terminal).\n  Vá trọn cần một danh tính phiên bền hơn cho terminal tay gõ (deferred, backlog\n  STR84 nhắm khác lớp — enforcement phía bee-core — không trực tiếp vá gap này)."
+      },
+      "target": {
+        "path": "docs/platform/runner/subcomponents/h-2e032393add1/spec.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 44,
+        "endLine": 52,
+        "textDigest": "197a395073121e8ebc1dc71f8efdabbb4a02ddff6c28689ba1711e008b226e34",
+        "sample": "- Khóa hoạt động cây chính (STR65) suy danh tính từ một tiến trình tổ tiên gần khi\n  không có biến môi trường phiên trợ lý — suy đoán tốt-nhất cho terminal người gõ\n  tay, KHÔNG tu",
+        "identityFingerprint": "50583a5a78aac154a82170b04b790f9e8ed132dd7135a398a6f75360db5e4527",
+        "ancestry": [
+          "Added in candidate: Runner Open Gaps",
+          "Open Gaps"
+        ],
+        "text": "- Khóa hoạt động cây chính (STR65) suy danh tính từ một tiến trình tổ tiên gần khi\n  không có biến môi trường phiên trợ lý — suy đoán tốt-nhất cho terminal người gõ\n  tay, KHÔNG tuyệt đối: hai terminal người khác nhau chia sẻ cùng một tiến trình cha\n  đủ gần (vd cùng phiên tmux/sshd) vẫn có thể đọc ra cùng một danh tính và không bị\n  chặn dù đang thực sự đồng thời hoạt động. Cả 3 sự cố STR65 có SHA cụ thể trước đây\n  đều là phiên trợ lý (có biến môi trường riêng, không rơi vào giới hạn này) — giới\n  hạn chỉ áp dụng cho trường hợp chưa quan sát được thật (terminal-đối-terminal).\n  Vá trọn cần một danh tính phiên bền hơn cho terminal tay gõ (deferred, backlog\n  STR84 nhắm khác lớp — enforcement phía bee-core — không trực tiếp vá gap này)."
+      },
+      "exactClass": "Weak-exact",
+      "exactClassReason": "ancestor headings differ; document exact share below one half",
+      "nativeTargetClaimId": "claim_bddc365c4d3947adf45f137f179409c5",
+      "section": {
+        "startLine": 1175,
+        "endLine": 1206,
+        "target": "docs/platform/runner/subcomponents/h-2e032393add1/spec.md",
+        "kind": "spec",
+        "anchor": "open-gaps",
+        "title": "Open Gaps",
+        "sha256": "54b609cc55ffbe9929f6024539fbd799b3e2d9067d276ebed3ebc0035aef8fbc"
+      },
+      "mapAmendments": [],
+      "reboundAnchors": []
+    },
+    {
+      "claimId": "claim_2bb6c6025afdbad3c1a26762f903bcd2",
+      "sourceUnitDigest": "33397038e11c79d2866f7ccc09b04d90f18eb593080a2bc3a9f2a2a39ec95136",
+      "targetUnitDigest": "33397038e11c79d2866f7ccc09b04d90f18eb593080a2bc3a9f2a2a39ec95136",
+      "reviewAuthor": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+      "decision": {
+        "claimId": "claim_2bb6c6025afdbad3c1a26762f903bcd2",
+        "sourceUnitDigest": "33397038e11c79d2866f7ccc09b04d90f18eb593080a2bc3a9f2a2a39ec95136",
+        "targetOwner": "docs/platform/runner/subcomponents/h-2e032393add1/spec.md",
+        "targetAnchor": "unheaded-block-5",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-100 (lines 1204–1205) carried at docs/platform/runner/subcomponents/h-2e032393add1/spec.md#unheaded-block-5. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetUnitDigest": "33397038e11c79d2866f7ccc09b04d90f18eb593080a2bc3a9f2a2a39ec95136",
+        "targetAncestry": [
+          "Added in candidate: Runner Open Gaps",
+          "Open Gaps"
+        ]
+      },
+      "source": {
+        "path": "docs/specs/runner.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-100",
+        "githubAnchor": "unheaded-block-100",
+        "stableAnchor": "unheaded-block-100",
+        "title": "Unheaded block 100",
+        "startLine": 1204,
+        "endLine": 1205,
+        "textDigest": "33397038e11c79d2866f7ccc09b04d90f18eb593080a2bc3a9f2a2a39ec95136",
+        "sample": "- ~~**`return` không nhận ra hoàn tất của một `fgw/<id>` sinh ra từ lượt `take`/`pick` ĐẦU TIÊN (không phải tái claim một item `blocked`).**~~ RUL30 (cửa người-hoàn-tất một đề xuất",
+        "identityFingerprint": "afc5b521cbd1a55de5c0007674d3527a8e1964b7da3505c01983c87ab0461f10",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Open Gaps"
+        ],
+        "text": "- ~~**`return` không nhận ra hoàn tất của một `fgw/<id>` sinh ra từ lượt `take`/`pick` ĐẦU TIÊN (không phải tái claim một item `blocked`).**~~ RUL30 (cửa người-hoàn-tất một đề xuất nguồn-nhánh bị đỗ — mở rộng take/return, không verb mới)/RUL34 (Iron Law áp dụng khi chạm cờ rủi ro hoặc module năng-lực — không cần cả hai)'s discriminator nguồn-nhánh (`branchHeadAtTake`) trước đây chỉ được ghi trên cạnh `blocked→doing` (tái claim một đề xuất đã đỗ) — một lượt `pick` đầu tiên trên `todo→doing` chỉ ghi `headAtTake` (main-based), dù `pick` cũng dựng CÙNG worktree + nhánh `fgw/<id>` như đường tái claim. Vì `branchHeadAtTake` vắng mặt, `return` không rẽ vào nhánh nguồn-nhánh (RUL30 (cửa người-hoàn-tất một đề xuất nguồn-nhánh bị đỗ — mở rộng take/return, không verb mới)) — nó chỉ đo `changedFilesSince` trên checkout CHÍNH, nơi không có gì đổi (việc thật nằm trên `fgw/<id>`) → từ chối \"không có thay đổi\", việc kẹt ở `doing`/`awaiting-human` dù verify xanh + đã commit thật trên nhánh riêng. Tái hiện thật (không suy đoán): `/fgOS:pick` một item `todo`, verify xanh 23/23, commit thật trên `fgw/tsk-57u` — `return` vẫn từ chối (docs/history/mvp2-scope-test-infra/reports/case-1-interactive.md, forgent workshop). **Đóng 2026-07-28:** `pick`'s nhánh claim ĐẦU TIÊN (`todo→doing`) nay ghi `branchHeadAtTake` (giá trị = HEAD hiện tại của repo lúc claim — đúng bằng điểm gốc `createWorktree` fork nhánh mới ra), cùng khuôn với nhánh tái-claim `blocked→doing` — không còn ghi `headAtTake` cho bất kỳ claim nào của `pick`; `take` (verb thuần, không dựng worktree) không đổi, vẫn dùng `headAtTake` đúng như trước.\n- **`fgos-runner` không có cách tự-scope vào một thư mục/dự án con — luôn resolve repo root qua `git rev-parse --show-toplevel` từ `cwd`, không cờ/biến môi trường ghi đè.** `parseArgs` chỉ nhận `--once`/`--watch`/`--poll-ms`/`--dry-run` (`bin/fgos-runner.mjs`; `--config` đã bỏ, RUL93 (the runner loop's worker and the fan-out batch run as one Unit run each)). Với một dự án con KHÔNG tự có `.git` riêng (vd một fixture/testbed sống bên trong một repo lớn hơn), `git rev-parse --show-toplevel` luôn thoát ra repo cha — runner claim/dispatch trên `.fgos/` của repo CHA, không phải của dự án con, dù các verb `fgos.mjs` khác (`submit`/`pick`/...) đã cô lập đúng qua `process.cwd()` trực tiếp. Tái hiện thật: `git -C <thư-mục-con> rev-parse --show-toplevel` thoát ra repo cha; không có config nào ở thư mục con mà runner tự nhận (docs/history/mvp2-scope-test-infra/reports/case-2-headless.md, forgent workshop). Việc: thêm một cờ/biến môi trường ghi đè root (vd `--root`/`FGOS_ROOT`) song song với cách các verb `fgos.mjs` đã cô lập, giữ `git rev-parse --show-toplevel` làm mặc định khi vắng cờ (`docs/backlog.md` PBI p-2a39f940)."
+      },
+      "target": {
+        "path": "docs/platform/runner/subcomponents/h-2e032393add1/spec.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 54,
+        "endLine": 55,
+        "textDigest": "33397038e11c79d2866f7ccc09b04d90f18eb593080a2bc3a9f2a2a39ec95136",
+        "sample": "- ~~**`return` không nhận ra hoàn tất của một `fgw/<id>` sinh ra từ lượt `take`/`pick` ĐẦU TIÊN (không phải tái claim một item `blocked`).**~~ RUL30 (cửa người-hoàn-tất một đề xuất",
+        "identityFingerprint": "afc5b521cbd1a55de5c0007674d3527a8e1964b7da3505c01983c87ab0461f10",
+        "ancestry": [
+          "Added in candidate: Runner Open Gaps",
+          "Open Gaps"
+        ],
+        "text": "- ~~**`return` không nhận ra hoàn tất của một `fgw/<id>` sinh ra từ lượt `take`/`pick` ĐẦU TIÊN (không phải tái claim một item `blocked`).**~~ RUL30 (cửa người-hoàn-tất một đề xuất nguồn-nhánh bị đỗ — mở rộng take/return, không verb mới)/RUL34 (Iron Law áp dụng khi chạm cờ rủi ro hoặc module năng-lực — không cần cả hai)'s discriminator nguồn-nhánh (`branchHeadAtTake`) trước đây chỉ được ghi trên cạnh `blocked→doing` (tái claim một đề xuất đã đỗ) — một lượt `pick` đầu tiên trên `todo→doing` chỉ ghi `headAtTake` (main-based), dù `pick` cũng dựng CÙNG worktree + nhánh `fgw/<id>` như đường tái claim. Vì `branchHeadAtTake` vắng mặt, `return` không rẽ vào nhánh nguồn-nhánh (RUL30 (cửa người-hoàn-tất một đề xuất nguồn-nhánh bị đỗ — mở rộng take/return, không verb mới)) — nó chỉ đo `changedFilesSince` trên checkout CHÍNH, nơi không có gì đổi (việc thật nằm trên `fgw/<id>`) → từ chối \"không có thay đổi\", việc kẹt ở `doing`/`awaiting-human` dù verify xanh + đã commit thật trên nhánh riêng. Tái hiện thật (không suy đoán): `/fgOS:pick` một item `todo`, verify xanh 23/23, commit thật trên `fgw/tsk-57u` — `return` vẫn từ chối (docs/history/mvp2-scope-test-infra/reports/case-1-interactive.md, forgent workshop). **Đóng 2026-07-28:** `pick`'s nhánh claim ĐẦU TIÊN (`todo→doing`) nay ghi `branchHeadAtTake` (giá trị = HEAD hiện tại của repo lúc claim — đúng bằng điểm gốc `createWorktree` fork nhánh mới ra), cùng khuôn với nhánh tái-claim `blocked→doing` — không còn ghi `headAtTake` cho bất kỳ claim nào của `pick`; `take` (verb thuần, không dựng worktree) không đổi, vẫn dùng `headAtTake` đúng như trước.\n- **`fgos-runner` không có cách tự-scope vào một thư mục/dự án con — luôn resolve repo root qua `git rev-parse --show-toplevel` từ `cwd`, không cờ/biến môi trường ghi đè.** `parseArgs` chỉ nhận `--once`/`--watch`/`--poll-ms`/`--dry-run` (`bin/fgos-runner.mjs`; `--config` đã bỏ, RUL93 (the runner loop's worker and the fan-out batch run as one Unit run each)). Với một dự án con KHÔNG tự có `.git` riêng (vd một fixture/testbed sống bên trong một repo lớn hơn), `git rev-parse --show-toplevel` luôn thoát ra repo cha — runner claim/dispatch trên `.fgos/` của repo CHA, không phải của dự án con, dù các verb `fgos.mjs` khác (`submit`/`pick`/...) đã cô lập đúng qua `process.cwd()` trực tiếp. Tái hiện thật: `git -C <thư-mục-con> rev-parse --show-toplevel` thoát ra repo cha; không có config nào ở thư mục con mà runner tự nhận (docs/history/mvp2-scope-test-infra/reports/case-2-headless.md, forgent workshop). Việc: thêm một cờ/biến môi trường ghi đè root (vd `--root`/`FGOS_ROOT`) song song với cách các verb `fgos.mjs` đã cô lập, giữ `git rev-parse --show-toplevel` làm mặc định khi vắng cờ (`docs/backlog.md` PBI p-2a39f940)."
+      },
+      "exactClass": "Weak-exact",
+      "exactClassReason": "ancestor headings differ; document exact share below one half",
+      "nativeTargetClaimId": "claim_beee9a8831d93e1da915cc394ebb7a69",
+      "section": {
+        "startLine": 1175,
+        "endLine": 1206,
+        "target": "docs/platform/runner/subcomponents/h-2e032393add1/spec.md",
+        "kind": "spec",
+        "anchor": "open-gaps",
+        "title": "Open Gaps",
+        "sha256": "54b609cc55ffbe9929f6024539fbd799b3e2d9067d276ebed3ebc0035aef8fbc"
+      },
+      "mapAmendments": [],
+      "reboundAnchors": []
+    }
+  ],
+  "sensitivityControls": [],
+  "unmatchedCandidateUnits": [],
+  "unmatchedUnitsChannel": "candidate-unverified-runner.json, complete native strict-E set, separate non-source request",
+  "classes": {
+    "Unit-exact": [],
+    "Weak-exact": [
+      "claim_faf7be822c2140f22e6d5a5882f84595",
+      "claim_5c6238369ac0200472ee37488cd0e09a",
+      "claim_199e9de005d19f4b2d061005d959b3ed",
+      "claim_2bb6c6025afdbad3c1a26762f903bcd2"
+    ],
+    "Judgment": []
+  },
+  "unequalDigestPairs": [],
+  "mandatoryDeep": [],
+  "minimumDeep": 4,
+  "sourceBlobs": {
+    "path": "docs/specs/runner.md",
+    "blob": "ddfa78cc7183cf1f7db8ee64d2339653a0aa0023",
+    "sha256": "de1b0a3453706016171b530fcdf8e8e646563af707982f042c997fa99b83c7fe"
+  },
+  "shardDigest": "de26feeaa57cfde916a78fdb423735da6335dbc35138e4ef545293c3bb50222b",
+  "target": "docs/platform/runner/subcomponents/h-2e032393add1/spec.md",
+  "part": 1,
+  "parts": 1
+}

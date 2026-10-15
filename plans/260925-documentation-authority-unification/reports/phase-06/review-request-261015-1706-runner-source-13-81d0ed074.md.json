@@ -1,0 +1,181 @@
+{
+  "version": 1,
+  "commit": "81d0ed0747014e976c0d29222439fd6e3592b468",
+  "shard": "s9-runner-01.json",
+  "authorSession": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+  "authorshipRequired": true,
+  "rows": [
+    {
+      "claimId": "claim_cc1865a79db0c03c59f4bf30c7a0a97b",
+      "sourceUnitDigest": "e3d926d43e2e72f2211f195fb007e887cc2dfd1d97f6819f80e5bf203d4dfd1b",
+      "targetUnitDigest": "e3d926d43e2e72f2211f195fb007e887cc2dfd1d97f6819f80e5bf203d4dfd1b",
+      "reviewAuthor": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+      "decision": {
+        "claimId": "claim_cc1865a79db0c03c59f4bf30c7a0a97b",
+        "sourceUnitDigest": "e3d926d43e2e72f2211f195fb007e887cc2dfd1d97f6819f80e5bf203d4dfd1b",
+        "targetOwner": "docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md",
+        "targetAnchor": "visuals",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ; source unit shorter than 40 characters; document exact share below one half. Whole heading docs/specs/runner.md#visuals (lines 1207–1207) carried at docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md#visuals. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetUnitDigest": "e3d926d43e2e72f2211f195fb007e887cc2dfd1d97f6819f80e5bf203d4dfd1b",
+        "targetAncestry": [
+          "Added in candidate: Runner Visuals"
+        ]
+      },
+      "source": {
+        "path": "docs/specs/runner.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Visuals",
+        "anchor": "visuals",
+        "githubAnchor": "visuals",
+        "stableAnchor": "h-528ad5e6614d",
+        "startLine": 1207,
+        "endLine": 1207,
+        "textDigest": "e3d926d43e2e72f2211f195fb007e887cc2dfd1d97f6819f80e5bf203d4dfd1b",
+        "sample": "Visuals",
+        "sectionPayloadDigest": "b0a0db080dad061ca93e63826e562c4710807db8e6f2c8ca50dc291fc0b69e09",
+        "followingBlockDigest": "b0a0db080dad061ca93e63826e562c4710807db8e6f2c8ca50dc291fc0b69e09",
+        "identityFingerprint": "3cf5aa3db8be606ab7429b1d6caeb6407c4eaa8d57e43c757c99c3cadec08c8e",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)"
+        ],
+        "text": "## Visuals",
+        "sectionText": "## Visuals\n\nNot applicable — không có màn hình."
+      },
+      "target": {
+        "path": "docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Visuals",
+        "anchor": "visuals",
+        "githubAnchor": "visuals",
+        "stableAnchor": "h-c05343c08e6e",
+        "startLine": 25,
+        "endLine": 25,
+        "textDigest": "e3d926d43e2e72f2211f195fb007e887cc2dfd1d97f6819f80e5bf203d4dfd1b",
+        "sample": "Visuals",
+        "sectionPayloadDigest": "b0a0db080dad061ca93e63826e562c4710807db8e6f2c8ca50dc291fc0b69e09",
+        "followingBlockDigest": "b0a0db080dad061ca93e63826e562c4710807db8e6f2c8ca50dc291fc0b69e09",
+        "identityFingerprint": "3cf5aa3db8be606ab7429b1d6caeb6407c4eaa8d57e43c757c99c3cadec08c8e",
+        "ancestry": [
+          "Added in candidate: Runner Visuals"
+        ],
+        "text": "## Visuals",
+        "sectionText": "## Visuals\n\nNot applicable — không có màn hình."
+      },
+      "exactClass": "Weak-exact",
+      "exactClassReason": "ancestor headings differ; source unit shorter than 40 characters; document exact share below one half",
+      "nativeTargetClaimId": "claim_2bb6af7ccacdd5c0900aed796c3f3eb8",
+      "section": {
+        "startLine": 1207,
+        "endLine": 1210,
+        "target": "docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md",
+        "kind": "spec",
+        "anchor": "visuals",
+        "title": "Visuals",
+        "sha256": "50b03ac951ab0f241ba07614e2ad8d5015128cfe9227c8b1d5765ff362041fca"
+      },
+      "mapAmendments": [],
+      "reboundAnchors": []
+    },
+    {
+      "claimId": "claim_a76db7b113608c6dc589a0acf1050c58",
+      "sourceUnitDigest": "b0a0db080dad061ca93e63826e562c4710807db8e6f2c8ca50dc291fc0b69e09",
+      "targetUnitDigest": "b0a0db080dad061ca93e63826e562c4710807db8e6f2c8ca50dc291fc0b69e09",
+      "reviewAuthor": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+      "decision": {
+        "claimId": "claim_a76db7b113608c6dc589a0acf1050c58",
+        "sourceUnitDigest": "b0a0db080dad061ca93e63826e562c4710807db8e6f2c8ca50dc291fc0b69e09",
+        "targetOwner": "docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md",
+        "targetAnchor": "unheaded-block-3",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ; source unit shorter than 40 characters; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-101 (lines 1209–1209) carried at docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md#unheaded-block-3. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetUnitDigest": "b0a0db080dad061ca93e63826e562c4710807db8e6f2c8ca50dc291fc0b69e09",
+        "targetAncestry": [
+          "Added in candidate: Runner Visuals",
+          "Visuals"
+        ]
+      },
+      "source": {
+        "path": "docs/specs/runner.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-101",
+        "githubAnchor": "unheaded-block-101",
+        "stableAnchor": "unheaded-block-101",
+        "title": "Unheaded block 101",
+        "startLine": 1209,
+        "endLine": 1209,
+        "textDigest": "b0a0db080dad061ca93e63826e562c4710807db8e6f2c8ca50dc291fc0b69e09",
+        "sample": "Not applicable — không có màn hình.",
+        "identityFingerprint": "f6251153c43eae2013ad6534b977f8c1d6f69f7ecddfcd49472c4b3a1ae6f6ef",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Visuals"
+        ],
+        "text": "Not applicable — không có màn hình."
+      },
+      "target": {
+        "path": "docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 27,
+        "endLine": 27,
+        "textDigest": "b0a0db080dad061ca93e63826e562c4710807db8e6f2c8ca50dc291fc0b69e09",
+        "sample": "Not applicable — không có màn hình.",
+        "identityFingerprint": "f6251153c43eae2013ad6534b977f8c1d6f69f7ecddfcd49472c4b3a1ae6f6ef",
+        "ancestry": [
+          "Added in candidate: Runner Visuals",
+          "Visuals"
+        ],
+        "text": "Not applicable — không có màn hình."
+      },
+      "exactClass": "Weak-exact",
+      "exactClassReason": "ancestor headings differ; source unit shorter than 40 characters; document exact share below one half",
+      "nativeTargetClaimId": "claim_efeaaf73e181214562f2b994e2ec7c5e",
+      "section": {
+        "startLine": 1207,
+        "endLine": 1210,
+        "target": "docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md",
+        "kind": "spec",
+        "anchor": "visuals",
+        "title": "Visuals",
+        "sha256": "50b03ac951ab0f241ba07614e2ad8d5015128cfe9227c8b1d5765ff362041fca"
+      },
+      "mapAmendments": [],
+      "reboundAnchors": []
+    }
+  ],
+  "sensitivityControls": [],
+  "unmatchedCandidateUnits": [],
+  "unmatchedUnitsChannel": "candidate-unverified-runner.json, complete native strict-E set, separate non-source request",
+  "classes": {
+    "Unit-exact": [],
+    "Weak-exact": [
+      "claim_cc1865a79db0c03c59f4bf30c7a0a97b",
+      "claim_a76db7b113608c6dc589a0acf1050c58"
+    ],
+    "Judgment": []
+  },
+  "unequalDigestPairs": [],
+  "mandatoryDeep": [],
+  "minimumDeep": 2,
+  "sourceBlobs": {
+    "path": "docs/specs/runner.md",
+    "blob": "ddfa78cc7183cf1f7db8ee64d2339653a0aa0023",
+    "sha256": "de1b0a3453706016171b530fcdf8e8e646563af707982f042c997fa99b83c7fe"
+  },
+  "shardDigest": "de26feeaa57cfde916a78fdb423735da6335dbc35138e4ef545293c3bb50222b",
+  "target": "docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md",
+  "part": 1,
+  "parts": 1
+}

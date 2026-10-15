@@ -1,0 +1,645 @@
+{
+  "version": 1,
+  "commit": "81d0ed0747014e976c0d29222439fd6e3592b468",
+  "shard": "s9-runner-01.json",
+  "authorSession": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+  "authorshipRequired": true,
+  "rows": [
+    {
+      "claimId": "claim_db73c791da40554dda8dacd8405de722",
+      "sourceUnitDigest": "5ed555b20633e3d02aab26557fd2c1a144c2cac1cc1da5e7048986c280cfa1e0",
+      "targetUnitDigest": "5ed555b20633e3d02aab26557fd2c1a144c2cac1cc1da5e7048986c280cfa1e0",
+      "reviewAuthor": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+      "decision": {
+        "claimId": "claim_db73c791da40554dda8dacd8405de722",
+        "sourceUnitDigest": "5ed555b20633e3d02aab26557fd2c1a144c2cac1cc1da5e7048986c280cfa1e0",
+        "targetOwner": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+        "targetAnchor": "dispatch-runtime-inspection",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ; source unit shorter than 40 characters; document exact share below one half. Whole heading docs/specs/runner.md#dispatch-runtime-inspection (lines 11–11) carried at docs/platform/runner/architecture/h-e53a3a9829a8.md#dispatch-runtime-inspection. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetUnitDigest": "5ed555b20633e3d02aab26557fd2c1a144c2cac1cc1da5e7048986c280cfa1e0",
+        "targetAncestry": [
+          "Added in candidate: Runner Dispatch runtime inspection"
+        ]
+      },
+      "source": {
+        "path": "docs/specs/runner.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Dispatch runtime inspection",
+        "anchor": "dispatch-runtime-inspection",
+        "githubAnchor": "dispatch-runtime-inspection",
+        "stableAnchor": "h-e53a3a9829a8",
+        "startLine": 11,
+        "endLine": 11,
+        "textDigest": "5ed555b20633e3d02aab26557fd2c1a144c2cac1cc1da5e7048986c280cfa1e0",
+        "sample": "Dispatch runtime inspection",
+        "sectionPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "followingBlockDigest": null,
+        "identityFingerprint": "9a24ee1d82af3d99156bcfe3ac67bcb1a87b727554ffbc85b060fcf4f0a996be",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)"
+        ],
+        "text": "## Dispatch runtime inspection",
+        "sectionText": "## Dispatch runtime inspection"
+      },
+      "target": {
+        "path": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Dispatch runtime inspection",
+        "anchor": "dispatch-runtime-inspection",
+        "githubAnchor": "dispatch-runtime-inspection",
+        "stableAnchor": "h-f4169c104d8f",
+        "startLine": 25,
+        "endLine": 25,
+        "textDigest": "5ed555b20633e3d02aab26557fd2c1a144c2cac1cc1da5e7048986c280cfa1e0",
+        "sample": "Dispatch runtime inspection",
+        "sectionPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "followingBlockDigest": null,
+        "identityFingerprint": "9a24ee1d82af3d99156bcfe3ac67bcb1a87b727554ffbc85b060fcf4f0a996be",
+        "ancestry": [
+          "Added in candidate: Runner Dispatch runtime inspection"
+        ],
+        "text": "## Dispatch runtime inspection",
+        "sectionText": "## Dispatch runtime inspection"
+      },
+      "exactClass": "Weak-exact",
+      "exactClassReason": "ancestor headings differ; source unit shorter than 40 characters; document exact share below one half",
+      "nativeTargetClaimId": "claim_28cbb729c214f85b54649d426ee75a39",
+      "section": {
+        "startLine": 11,
+        "endLine": 12,
+        "target": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+        "kind": "architecture",
+        "anchor": "dispatch-runtime-inspection",
+        "title": "Dispatch runtime inspection",
+        "sha256": "b0a10107d66a1fb00857c4dcc2a4476291f84854e01bec49a845c051b2f31374"
+      },
+      "mapAmendments": [],
+      "reboundAnchors": []
+    },
+    {
+      "claimId": "claim_383a6485c1aaed79a640a59463183fe8",
+      "sourceUnitDigest": "16c2b3dace9daab9a6d90e29bd7f00fbad2c313cbedb0e28ed031664fa81b255",
+      "targetUnitDigest": "16c2b3dace9daab9a6d90e29bd7f00fbad2c313cbedb0e28ed031664fa81b255",
+      "reviewAuthor": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+      "decision": {
+        "claimId": "claim_383a6485c1aaed79a640a59463183fe8",
+        "sourceUnitDigest": "16c2b3dace9daab9a6d90e29bd7f00fbad2c313cbedb0e28ed031664fa81b255",
+        "targetOwner": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+        "targetAnchor": "guard-reconciliation",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ; source unit shorter than 40 characters; document exact share below one half. Whole heading docs/specs/runner.md#guard-reconciliation (lines 13–13) carried at docs/platform/runner/architecture/h-e53a3a9829a8.md#guard-reconciliation. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetUnitDigest": "16c2b3dace9daab9a6d90e29bd7f00fbad2c313cbedb0e28ed031664fa81b255",
+        "targetAncestry": [
+          "Added in candidate: Runner Dispatch runtime inspection",
+          "Dispatch runtime inspection"
+        ]
+      },
+      "source": {
+        "path": "docs/specs/runner.md",
+        "unitKind": "heading",
+        "level": 3,
+        "title": "Guard reconciliation",
+        "anchor": "guard-reconciliation",
+        "githubAnchor": "guard-reconciliation",
+        "stableAnchor": "h-735ab6cd1aca",
+        "startLine": 13,
+        "endLine": 13,
+        "textDigest": "16c2b3dace9daab9a6d90e29bd7f00fbad2c313cbedb0e28ed031664fa81b255",
+        "sample": "Guard reconciliation",
+        "sectionPayloadDigest": "ed35e434b12069d79f031d12e990b5c40a430577ba8b4bc8905f2748e4f6d4af",
+        "followingBlockDigest": "52b140cfe4f41a03526182348d228ca206a88dade16f7969fe3852284677c39a",
+        "identityFingerprint": "14be3d5558678d5393fd902d9dfff1e943d20edb8b2b4b8b265d2f5c391a6910",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Dispatch runtime inspection"
+        ],
+        "text": "### Guard reconciliation",
+        "sectionText": "### Guard reconciliation\n\n`fgos dispatch reconcile` is the separate Dispatch-owned write door for local\nguard/projection repair. Its plan/apply protocol binds the action key, snapshot\ndigest, resource incarnation, and expiry; apply re-reads under a local lock.\nIt never recovers, signals, retries, relaunches, resumes, reassigns, admits,\ncancels, or takes over a Run.\n\nFour actions are supported: `clear-cwd-lock` (default; removes a cwd dispatch\nlock after proving its holder's exact PID/start-time incarnation is dead),\n`collect-result --run <runId>` (links an already-written, already-valid\n`result.json` through its owning Assignment, reusing\n`dispatch.runtime.inspect`'s own owner and admission-ledger current-Run views\nso the two operations can never disagree about ownership or currency; a\nCoordinationSession-owned Run is refused, since linking its result is that\nsession's own driver-authored write), `clear-assignment-claim --assignment\n<id>` (removes a dead-holder `dispatch.claim` once no admitted-but-\nunmaterialized launch, unsettled Run, or uncollected result is still pending\nfor that Assignment; also refused on a CoordinationSession-owned claim), and\n`repair-projection --run <runId>` (additively patches a stale\n`run.json.status` back to `settled` once an already-validated terminal\nRunResult proves the Run finished, reusing `dispatch.runtime.inspect`'s own\nRunResult interpretation so it can never disagree with inspection or\ncollect-result about whether a Run settled).\n\n`fgos dispatch inspect` projects Dispatch-owned `dispatch.runtime.inspect` as a\nread-only operation. It accepts exactly one selector: `--run`, `--assignment`,\nor `--cwd`. Resolution, duplicate detection, current-run derivation, and any\nrecovery ownership hint happen inside Dispatch; the CLI only passes the typed\npayload. Inspection never executes, forwards, or authorizes recovery.\n\nAssignment and workspace projections fail closed: every materialized Run must\nbe unambiguous and corroborated by its Assignment admission ledger before an\ninspection is ownership-complete or exposes a recovery hint. A duplicate\nmaterialization of a current admitted run is conflicting, returns every\ncandidate location, and selects no single Run.\n\nThe reader returns mutable `RunObservation` facts and the immutable terminal\n`RunResult` when present. A RunObservation never settles a Run; `result.json`\nremains the only terminal Run truth.\n\nVòng lặp tự hành của forgent: tự lấy việc sẵn-sàng từ work-state, giao cho một trợ lý thông minh chạy nền trong không gian cô lập, tự chấm kết quả bằng proof của chính việc đó, rồi ghi lại thành **đề xuất chờ duyệt**. Người dùng: người vận hành repo (khởi động vòng, duyệt đề xuất). Nguyên tắc sống còn: trong vòng dispatch, chỉ runner được ghi trạng thái; worker chỉ để lại commit trên nhánh riêng."
+      },
+      "target": {
+        "path": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+        "unitKind": "heading",
+        "level": 3,
+        "title": "Guard reconciliation",
+        "anchor": "guard-reconciliation",
+        "githubAnchor": "guard-reconciliation",
+        "stableAnchor": "h-e11e1ccab816",
+        "startLine": 27,
+        "endLine": 27,
+        "textDigest": "16c2b3dace9daab9a6d90e29bd7f00fbad2c313cbedb0e28ed031664fa81b255",
+        "sample": "Guard reconciliation",
+        "sectionPayloadDigest": "ed35e434b12069d79f031d12e990b5c40a430577ba8b4bc8905f2748e4f6d4af",
+        "followingBlockDigest": "52b140cfe4f41a03526182348d228ca206a88dade16f7969fe3852284677c39a",
+        "identityFingerprint": "14be3d5558678d5393fd902d9dfff1e943d20edb8b2b4b8b265d2f5c391a6910",
+        "ancestry": [
+          "Added in candidate: Runner Dispatch runtime inspection",
+          "Dispatch runtime inspection"
+        ],
+        "text": "### Guard reconciliation",
+        "sectionText": "### Guard reconciliation\n\n`fgos dispatch reconcile` is the separate Dispatch-owned write door for local\nguard/projection repair. Its plan/apply protocol binds the action key, snapshot\ndigest, resource incarnation, and expiry; apply re-reads under a local lock.\nIt never recovers, signals, retries, relaunches, resumes, reassigns, admits,\ncancels, or takes over a Run.\n\nFour actions are supported: `clear-cwd-lock` (default; removes a cwd dispatch\nlock after proving its holder's exact PID/start-time incarnation is dead),\n`collect-result --run <runId>` (links an already-written, already-valid\n`result.json` through its owning Assignment, reusing\n`dispatch.runtime.inspect`'s own owner and admission-ledger current-Run views\nso the two operations can never disagree about ownership or currency; a\nCoordinationSession-owned Run is refused, since linking its result is that\nsession's own driver-authored write), `clear-assignment-claim --assignment\n<id>` (removes a dead-holder `dispatch.claim` once no admitted-but-\nunmaterialized launch, unsettled Run, or uncollected result is still pending\nfor that Assignment; also refused on a CoordinationSession-owned claim), and\n`repair-projection --run <runId>` (additively patches a stale\n`run.json.status` back to `settled` once an already-validated terminal\nRunResult proves the Run finished, reusing `dispatch.runtime.inspect`'s own\nRunResult interpretation so it can never disagree with inspection or\ncollect-result about whether a Run settled).\n\n`fgos dispatch inspect` projects Dispatch-owned `dispatch.runtime.inspect` as a\nread-only operation. It accepts exactly one selector: `--run`, `--assignment`,\nor `--cwd`. Resolution, duplicate detection, current-run derivation, and any\nrecovery ownership hint happen inside Dispatch; the CLI only passes the typed\npayload. Inspection never executes, forwards, or authorizes recovery.\n\nAssignment and workspace projections fail closed: every materialized Run must\nbe unambiguous and corroborated by its Assignment admission ledger before an\ninspection is ownership-complete or exposes a recovery hint. A duplicate\nmaterialization of a current admitted run is conflicting, returns every\ncandidate location, and selects no single Run.\n\nThe reader returns mutable `RunObservation` facts and the immutable terminal\n`RunResult` when present. A RunObservation never settles a Run; `result.json`\nremains the only terminal Run truth.\n\nVòng lặp tự hành của forgent: tự lấy việc sẵn-sàng từ work-state, giao cho một trợ lý thông minh chạy nền trong không gian cô lập, tự chấm kết quả bằng proof của chính việc đó, rồi ghi lại thành **đề xuất chờ duyệt**. Người dùng: người vận hành repo (khởi động vòng, duyệt đề xuất). Nguyên tắc sống còn: trong vòng dispatch, chỉ runner được ghi trạng thái; worker chỉ để lại commit trên nhánh riêng."
+      },
+      "exactClass": "Weak-exact",
+      "exactClassReason": "ancestor headings differ; source unit shorter than 40 characters; document exact share below one half",
+      "nativeTargetClaimId": "claim_69091a1d4d01091f1bbbfd55bf4ff688",
+      "section": {
+        "startLine": 13,
+        "endLine": 55,
+        "target": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+        "kind": "architecture",
+        "anchor": "guard-reconciliation",
+        "title": "Guard reconciliation",
+        "sha256": "a6d4647b0e2206701c9b810fb17183037ccaf810be2efee8ef1e39a2258a9afa"
+      },
+      "mapAmendments": [],
+      "reboundAnchors": []
+    },
+    {
+      "claimId": "claim_9a0635bb67690683a0a7465eadae82af",
+      "sourceUnitDigest": "52b140cfe4f41a03526182348d228ca206a88dade16f7969fe3852284677c39a",
+      "targetUnitDigest": "52b140cfe4f41a03526182348d228ca206a88dade16f7969fe3852284677c39a",
+      "reviewAuthor": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+      "decision": {
+        "claimId": "claim_9a0635bb67690683a0a7465eadae82af",
+        "sourceUnitDigest": "52b140cfe4f41a03526182348d228ca206a88dade16f7969fe3852284677c39a",
+        "targetOwner": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+        "targetAnchor": "unheaded-block-3",
+        "claimKind": "contract",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-2 (lines 15–19) carried at docs/platform/runner/architecture/h-e53a3a9829a8.md#unheaded-block-3. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetUnitDigest": "52b140cfe4f41a03526182348d228ca206a88dade16f7969fe3852284677c39a",
+        "targetAncestry": [
+          "Added in candidate: Runner Dispatch runtime inspection",
+          "Dispatch runtime inspection",
+          "Guard reconciliation"
+        ]
+      },
+      "source": {
+        "path": "docs/specs/runner.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-2",
+        "githubAnchor": "unheaded-block-2",
+        "stableAnchor": "unheaded-block-2",
+        "title": "Unheaded block 2",
+        "startLine": 15,
+        "endLine": 19,
+        "textDigest": "52b140cfe4f41a03526182348d228ca206a88dade16f7969fe3852284677c39a",
+        "sample": "`fgos dispatch reconcile` is the separate Dispatch-owned write door for local\nguard/projection repair. Its plan/apply protocol binds the action key, snapshot\ndigest, resource incar",
+        "identityFingerprint": "4bb553a2a2521737b286030a8f9b1bd002fb14abf546716be0abf89f30001c98",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Dispatch runtime inspection",
+          "Guard reconciliation"
+        ],
+        "text": "`fgos dispatch reconcile` is the separate Dispatch-owned write door for local\nguard/projection repair. Its plan/apply protocol binds the action key, snapshot\ndigest, resource incarnation, and expiry; apply re-reads under a local lock.\nIt never recovers, signals, retries, relaunches, resumes, reassigns, admits,\ncancels, or takes over a Run."
+      },
+      "target": {
+        "path": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 29,
+        "endLine": 33,
+        "textDigest": "52b140cfe4f41a03526182348d228ca206a88dade16f7969fe3852284677c39a",
+        "sample": "`fgos dispatch reconcile` is the separate Dispatch-owned write door for local\nguard/projection repair. Its plan/apply protocol binds the action key, snapshot\ndigest, resource incar",
+        "identityFingerprint": "4bb553a2a2521737b286030a8f9b1bd002fb14abf546716be0abf89f30001c98",
+        "ancestry": [
+          "Added in candidate: Runner Dispatch runtime inspection",
+          "Dispatch runtime inspection",
+          "Guard reconciliation"
+        ],
+        "text": "`fgos dispatch reconcile` is the separate Dispatch-owned write door for local\nguard/projection repair. Its plan/apply protocol binds the action key, snapshot\ndigest, resource incarnation, and expiry; apply re-reads under a local lock.\nIt never recovers, signals, retries, relaunches, resumes, reassigns, admits,\ncancels, or takes over a Run."
+      },
+      "exactClass": "Weak-exact",
+      "exactClassReason": "ancestor headings differ; document exact share below one half",
+      "nativeTargetClaimId": "claim_02304fbea6604d69e65614acd179103e",
+      "section": {
+        "startLine": 13,
+        "endLine": 55,
+        "target": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+        "kind": "architecture",
+        "anchor": "guard-reconciliation",
+        "title": "Guard reconciliation",
+        "sha256": "a6d4647b0e2206701c9b810fb17183037ccaf810be2efee8ef1e39a2258a9afa"
+      },
+      "mapAmendments": [],
+      "reboundAnchors": []
+    },
+    {
+      "claimId": "claim_cdf8c5562fb083bbdccf7d8c03decb7a",
+      "sourceUnitDigest": "026046f0b0c9dff4fa16ad675837105849db185678d8263e091270e599c0ba72",
+      "targetUnitDigest": "026046f0b0c9dff4fa16ad675837105849db185678d8263e091270e599c0ba72",
+      "reviewAuthor": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+      "decision": {
+        "claimId": "claim_cdf8c5562fb083bbdccf7d8c03decb7a",
+        "sourceUnitDigest": "026046f0b0c9dff4fa16ad675837105849db185678d8263e091270e599c0ba72",
+        "targetOwner": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+        "targetAnchor": "unheaded-block-4",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-3 (lines 21–36) carried at docs/platform/runner/architecture/h-e53a3a9829a8.md#unheaded-block-4. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetUnitDigest": "026046f0b0c9dff4fa16ad675837105849db185678d8263e091270e599c0ba72",
+        "targetAncestry": [
+          "Added in candidate: Runner Dispatch runtime inspection",
+          "Dispatch runtime inspection",
+          "Guard reconciliation"
+        ]
+      },
+      "source": {
+        "path": "docs/specs/runner.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 21,
+        "endLine": 36,
+        "textDigest": "026046f0b0c9dff4fa16ad675837105849db185678d8263e091270e599c0ba72",
+        "sample": "Four actions are supported: `clear-cwd-lock` (default; removes a cwd dispatch\nlock after proving its holder's exact PID/start-time incarnation is dead),\n`collect-result --run <runI",
+        "identityFingerprint": "f910f6f75425fbbf4aecc27f405fe0cdaa51e0abdd7fa033a81dee99cdd5e11a",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Dispatch runtime inspection",
+          "Guard reconciliation"
+        ],
+        "text": "Four actions are supported: `clear-cwd-lock` (default; removes a cwd dispatch\nlock after proving its holder's exact PID/start-time incarnation is dead),\n`collect-result --run <runId>` (links an already-written, already-valid\n`result.json` through its owning Assignment, reusing\n`dispatch.runtime.inspect`'s own owner and admission-ledger current-Run views\nso the two operations can never disagree about ownership or currency; a\nCoordinationSession-owned Run is refused, since linking its result is that\nsession's own driver-authored write), `clear-assignment-claim --assignment\n<id>` (removes a dead-holder `dispatch.claim` once no admitted-but-\nunmaterialized launch, unsettled Run, or uncollected result is still pending\nfor that Assignment; also refused on a CoordinationSession-owned claim), and\n`repair-projection --run <runId>` (additively patches a stale\n`run.json.status` back to `settled` once an already-validated terminal\nRunResult proves the Run finished, reusing `dispatch.runtime.inspect`'s own\nRunResult interpretation so it can never disagree with inspection or\ncollect-result about whether a Run settled)."
+      },
+      "target": {
+        "path": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 35,
+        "endLine": 50,
+        "textDigest": "026046f0b0c9dff4fa16ad675837105849db185678d8263e091270e599c0ba72",
+        "sample": "Four actions are supported: `clear-cwd-lock` (default; removes a cwd dispatch\nlock after proving its holder's exact PID/start-time incarnation is dead),\n`collect-result --run <runI",
+        "identityFingerprint": "f910f6f75425fbbf4aecc27f405fe0cdaa51e0abdd7fa033a81dee99cdd5e11a",
+        "ancestry": [
+          "Added in candidate: Runner Dispatch runtime inspection",
+          "Dispatch runtime inspection",
+          "Guard reconciliation"
+        ],
+        "text": "Four actions are supported: `clear-cwd-lock` (default; removes a cwd dispatch\nlock after proving its holder's exact PID/start-time incarnation is dead),\n`collect-result --run <runId>` (links an already-written, already-valid\n`result.json` through its owning Assignment, reusing\n`dispatch.runtime.inspect`'s own owner and admission-ledger current-Run views\nso the two operations can never disagree about ownership or currency; a\nCoordinationSession-owned Run is refused, since linking its result is that\nsession's own driver-authored write), `clear-assignment-claim --assignment\n<id>` (removes a dead-holder `dispatch.claim` once no admitted-but-\nunmaterialized launch, unsettled Run, or uncollected result is still pending\nfor that Assignment; also refused on a CoordinationSession-owned claim), and\n`repair-projection --run <runId>` (additively patches a stale\n`run.json.status` back to `settled` once an already-validated terminal\nRunResult proves the Run finished, reusing `dispatch.runtime.inspect`'s own\nRunResult interpretation so it can never disagree with inspection or\ncollect-result about whether a Run settled)."
+      },
+      "exactClass": "Weak-exact",
+      "exactClassReason": "ancestor headings differ; document exact share below one half",
+      "nativeTargetClaimId": "claim_c20521328b4482dda2762c0b3711c8cf",
+      "section": {
+        "startLine": 13,
+        "endLine": 55,
+        "target": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+        "kind": "architecture",
+        "anchor": "guard-reconciliation",
+        "title": "Guard reconciliation",
+        "sha256": "a6d4647b0e2206701c9b810fb17183037ccaf810be2efee8ef1e39a2258a9afa"
+      },
+      "mapAmendments": [],
+      "reboundAnchors": []
+    },
+    {
+      "claimId": "claim_5d9ba2698cc42766513d2f6892f4456c",
+      "sourceUnitDigest": "8e07eb62e2a93097b82a4428a8f5bb3a2880bff4992130393b9b7783c4cccdc1",
+      "targetUnitDigest": "8e07eb62e2a93097b82a4428a8f5bb3a2880bff4992130393b9b7783c4cccdc1",
+      "reviewAuthor": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+      "decision": {
+        "claimId": "claim_5d9ba2698cc42766513d2f6892f4456c",
+        "sourceUnitDigest": "8e07eb62e2a93097b82a4428a8f5bb3a2880bff4992130393b9b7783c4cccdc1",
+        "targetOwner": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+        "targetAnchor": "unheaded-block-5",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-4 (lines 38–42) carried at docs/platform/runner/architecture/h-e53a3a9829a8.md#unheaded-block-5. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetUnitDigest": "8e07eb62e2a93097b82a4428a8f5bb3a2880bff4992130393b9b7783c4cccdc1",
+        "targetAncestry": [
+          "Added in candidate: Runner Dispatch runtime inspection",
+          "Dispatch runtime inspection",
+          "Guard reconciliation"
+        ]
+      },
+      "source": {
+        "path": "docs/specs/runner.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 38,
+        "endLine": 42,
+        "textDigest": "8e07eb62e2a93097b82a4428a8f5bb3a2880bff4992130393b9b7783c4cccdc1",
+        "sample": "`fgos dispatch inspect` projects Dispatch-owned `dispatch.runtime.inspect` as a\nread-only operation. It accepts exactly one selector: `--run`, `--assignment`,\nor `--cwd`. Resolutio",
+        "identityFingerprint": "024145d2f796b93b5dc642008b8ffed4acd42aa394432e131b441c03be46e162",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Dispatch runtime inspection",
+          "Guard reconciliation"
+        ],
+        "text": "`fgos dispatch inspect` projects Dispatch-owned `dispatch.runtime.inspect` as a\nread-only operation. It accepts exactly one selector: `--run`, `--assignment`,\nor `--cwd`. Resolution, duplicate detection, current-run derivation, and any\nrecovery ownership hint happen inside Dispatch; the CLI only passes the typed\npayload. Inspection never executes, forwards, or authorizes recovery."
+      },
+      "target": {
+        "path": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 52,
+        "endLine": 56,
+        "textDigest": "8e07eb62e2a93097b82a4428a8f5bb3a2880bff4992130393b9b7783c4cccdc1",
+        "sample": "`fgos dispatch inspect` projects Dispatch-owned `dispatch.runtime.inspect` as a\nread-only operation. It accepts exactly one selector: `--run`, `--assignment`,\nor `--cwd`. Resolutio",
+        "identityFingerprint": "024145d2f796b93b5dc642008b8ffed4acd42aa394432e131b441c03be46e162",
+        "ancestry": [
+          "Added in candidate: Runner Dispatch runtime inspection",
+          "Dispatch runtime inspection",
+          "Guard reconciliation"
+        ],
+        "text": "`fgos dispatch inspect` projects Dispatch-owned `dispatch.runtime.inspect` as a\nread-only operation. It accepts exactly one selector: `--run`, `--assignment`,\nor `--cwd`. Resolution, duplicate detection, current-run derivation, and any\nrecovery ownership hint happen inside Dispatch; the CLI only passes the typed\npayload. Inspection never executes, forwards, or authorizes recovery."
+      },
+      "exactClass": "Weak-exact",
+      "exactClassReason": "ancestor headings differ; document exact share below one half",
+      "nativeTargetClaimId": "claim_27a31faac28d1e92e2b7329b49a6f59c",
+      "section": {
+        "startLine": 13,
+        "endLine": 55,
+        "target": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+        "kind": "architecture",
+        "anchor": "guard-reconciliation",
+        "title": "Guard reconciliation",
+        "sha256": "a6d4647b0e2206701c9b810fb17183037ccaf810be2efee8ef1e39a2258a9afa"
+      },
+      "mapAmendments": [],
+      "reboundAnchors": []
+    },
+    {
+      "claimId": "claim_a48d3e36ff3950e3637e7a0945d8a26a",
+      "sourceUnitDigest": "0eced0ecaa6ff9b75497aef41ccbf40df3e5435c41dd06de86afdc82047ce5c9",
+      "targetUnitDigest": "0eced0ecaa6ff9b75497aef41ccbf40df3e5435c41dd06de86afdc82047ce5c9",
+      "reviewAuthor": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+      "decision": {
+        "claimId": "claim_a48d3e36ff3950e3637e7a0945d8a26a",
+        "sourceUnitDigest": "0eced0ecaa6ff9b75497aef41ccbf40df3e5435c41dd06de86afdc82047ce5c9",
+        "targetOwner": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+        "targetAnchor": "unheaded-block-6",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-5 (lines 44–48) carried at docs/platform/runner/architecture/h-e53a3a9829a8.md#unheaded-block-6. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetUnitDigest": "0eced0ecaa6ff9b75497aef41ccbf40df3e5435c41dd06de86afdc82047ce5c9",
+        "targetAncestry": [
+          "Added in candidate: Runner Dispatch runtime inspection",
+          "Dispatch runtime inspection",
+          "Guard reconciliation"
+        ]
+      },
+      "source": {
+        "path": "docs/specs/runner.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 44,
+        "endLine": 48,
+        "textDigest": "0eced0ecaa6ff9b75497aef41ccbf40df3e5435c41dd06de86afdc82047ce5c9",
+        "sample": "Assignment and workspace projections fail closed: every materialized Run must\nbe unambiguous and corroborated by its Assignment admission ledger before an\ninspection is ownership-c",
+        "identityFingerprint": "9ad94fae2d9fb6d5c3609c1b51dbc5d609dbf3296ef9741370ce69e1b634ee10",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Dispatch runtime inspection",
+          "Guard reconciliation"
+        ],
+        "text": "Assignment and workspace projections fail closed: every materialized Run must\nbe unambiguous and corroborated by its Assignment admission ledger before an\ninspection is ownership-complete or exposes a recovery hint. A duplicate\nmaterialization of a current admitted run is conflicting, returns every\ncandidate location, and selects no single Run."
+      },
+      "target": {
+        "path": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 58,
+        "endLine": 62,
+        "textDigest": "0eced0ecaa6ff9b75497aef41ccbf40df3e5435c41dd06de86afdc82047ce5c9",
+        "sample": "Assignment and workspace projections fail closed: every materialized Run must\nbe unambiguous and corroborated by its Assignment admission ledger before an\ninspection is ownership-c",
+        "identityFingerprint": "9ad94fae2d9fb6d5c3609c1b51dbc5d609dbf3296ef9741370ce69e1b634ee10",
+        "ancestry": [
+          "Added in candidate: Runner Dispatch runtime inspection",
+          "Dispatch runtime inspection",
+          "Guard reconciliation"
+        ],
+        "text": "Assignment and workspace projections fail closed: every materialized Run must\nbe unambiguous and corroborated by its Assignment admission ledger before an\ninspection is ownership-complete or exposes a recovery hint. A duplicate\nmaterialization of a current admitted run is conflicting, returns every\ncandidate location, and selects no single Run."
+      },
+      "exactClass": "Weak-exact",
+      "exactClassReason": "ancestor headings differ; document exact share below one half",
+      "nativeTargetClaimId": "claim_5b9333498763f7cac1221c578c60285f",
+      "section": {
+        "startLine": 13,
+        "endLine": 55,
+        "target": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+        "kind": "architecture",
+        "anchor": "guard-reconciliation",
+        "title": "Guard reconciliation",
+        "sha256": "a6d4647b0e2206701c9b810fb17183037ccaf810be2efee8ef1e39a2258a9afa"
+      },
+      "mapAmendments": [],
+      "reboundAnchors": []
+    },
+    {
+      "claimId": "claim_6dba9226798857c2c2eedd1837fc382b",
+      "sourceUnitDigest": "c46300ac8ef4f83a196a65ab08fc44def29be98df645c8321a7b0a310d05a8de",
+      "targetUnitDigest": "c46300ac8ef4f83a196a65ab08fc44def29be98df645c8321a7b0a310d05a8de",
+      "reviewAuthor": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+      "decision": {
+        "claimId": "claim_6dba9226798857c2c2eedd1837fc382b",
+        "sourceUnitDigest": "c46300ac8ef4f83a196a65ab08fc44def29be98df645c8321a7b0a310d05a8de",
+        "targetOwner": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+        "targetAnchor": "unheaded-block-7",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-6 (lines 50–52) carried at docs/platform/runner/architecture/h-e53a3a9829a8.md#unheaded-block-7. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetUnitDigest": "c46300ac8ef4f83a196a65ab08fc44def29be98df645c8321a7b0a310d05a8de",
+        "targetAncestry": [
+          "Added in candidate: Runner Dispatch runtime inspection",
+          "Dispatch runtime inspection",
+          "Guard reconciliation"
+        ]
+      },
+      "source": {
+        "path": "docs/specs/runner.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 50,
+        "endLine": 52,
+        "textDigest": "c46300ac8ef4f83a196a65ab08fc44def29be98df645c8321a7b0a310d05a8de",
+        "sample": "The reader returns mutable `RunObservation` facts and the immutable terminal\n`RunResult` when present. A RunObservation never settles a Run; `result.json`\nremains the only terminal",
+        "identityFingerprint": "58ca623c36a04faf272a5851259cafba41dae30793aecfa75660195bb1dd5b0a",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Dispatch runtime inspection",
+          "Guard reconciliation"
+        ],
+        "text": "The reader returns mutable `RunObservation` facts and the immutable terminal\n`RunResult` when present. A RunObservation never settles a Run; `result.json`\nremains the only terminal Run truth."
+      },
+      "target": {
+        "path": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 64,
+        "endLine": 66,
+        "textDigest": "c46300ac8ef4f83a196a65ab08fc44def29be98df645c8321a7b0a310d05a8de",
+        "sample": "The reader returns mutable `RunObservation` facts and the immutable terminal\n`RunResult` when present. A RunObservation never settles a Run; `result.json`\nremains the only terminal",
+        "identityFingerprint": "58ca623c36a04faf272a5851259cafba41dae30793aecfa75660195bb1dd5b0a",
+        "ancestry": [
+          "Added in candidate: Runner Dispatch runtime inspection",
+          "Dispatch runtime inspection",
+          "Guard reconciliation"
+        ],
+        "text": "The reader returns mutable `RunObservation` facts and the immutable terminal\n`RunResult` when present. A RunObservation never settles a Run; `result.json`\nremains the only terminal Run truth."
+      },
+      "exactClass": "Weak-exact",
+      "exactClassReason": "ancestor headings differ; document exact share below one half",
+      "nativeTargetClaimId": "claim_b5647b6932a61d0bd6c6124141f4cbde",
+      "section": {
+        "startLine": 13,
+        "endLine": 55,
+        "target": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+        "kind": "architecture",
+        "anchor": "guard-reconciliation",
+        "title": "Guard reconciliation",
+        "sha256": "a6d4647b0e2206701c9b810fb17183037ccaf810be2efee8ef1e39a2258a9afa"
+      },
+      "mapAmendments": [],
+      "reboundAnchors": []
+    },
+    {
+      "claimId": "claim_2073b7160c35c63c611d02087866ddec",
+      "sourceUnitDigest": "a0ac201ce63ad313f1e8cd2584ab6ffc111a74a4b25a96f24c3a1c939b4ddeb2",
+      "targetUnitDigest": "a0ac201ce63ad313f1e8cd2584ab6ffc111a74a4b25a96f24c3a1c939b4ddeb2",
+      "reviewAuthor": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+      "decision": {
+        "claimId": "claim_2073b7160c35c63c611d02087866ddec",
+        "sourceUnitDigest": "a0ac201ce63ad313f1e8cd2584ab6ffc111a74a4b25a96f24c3a1c939b4ddeb2",
+        "targetOwner": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+        "targetAnchor": "unheaded-block-8",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-7 (lines 54–54) carried at docs/platform/runner/architecture/h-e53a3a9829a8.md#unheaded-block-8. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetUnitDigest": "a0ac201ce63ad313f1e8cd2584ab6ffc111a74a4b25a96f24c3a1c939b4ddeb2",
+        "targetAncestry": [
+          "Added in candidate: Runner Dispatch runtime inspection",
+          "Dispatch runtime inspection",
+          "Guard reconciliation"
+        ]
+      },
+      "source": {
+        "path": "docs/specs/runner.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 54,
+        "endLine": 54,
+        "textDigest": "a0ac201ce63ad313f1e8cd2584ab6ffc111a74a4b25a96f24c3a1c939b4ddeb2",
+        "sample": "Vòng lặp tự hành của forgent: tự lấy việc sẵn-sàng từ work-state, giao cho một trợ lý thông minh chạy nền trong không gian cô lập, tự chấm kết quả bằng proof của chính việc đó, rồi",
+        "identityFingerprint": "a1b513ff6ce1f32f899c7824e2c7e6eec64e4799fdb78e9ebac3fc8f95e25734",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Dispatch runtime inspection",
+          "Guard reconciliation"
+        ],
+        "text": "Vòng lặp tự hành của forgent: tự lấy việc sẵn-sàng từ work-state, giao cho một trợ lý thông minh chạy nền trong không gian cô lập, tự chấm kết quả bằng proof của chính việc đó, rồi ghi lại thành **đề xuất chờ duyệt**. Người dùng: người vận hành repo (khởi động vòng, duyệt đề xuất). Nguyên tắc sống còn: trong vòng dispatch, chỉ runner được ghi trạng thái; worker chỉ để lại commit trên nhánh riêng."
+      },
+      "target": {
+        "path": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-8",
+        "githubAnchor": "unheaded-block-8",
+        "stableAnchor": "unheaded-block-8",
+        "title": "Unheaded block 8",
+        "startLine": 68,
+        "endLine": 68,
+        "textDigest": "a0ac201ce63ad313f1e8cd2584ab6ffc111a74a4b25a96f24c3a1c939b4ddeb2",
+        "sample": "Vòng lặp tự hành của forgent: tự lấy việc sẵn-sàng từ work-state, giao cho một trợ lý thông minh chạy nền trong không gian cô lập, tự chấm kết quả bằng proof của chính việc đó, rồi",
+        "identityFingerprint": "a1b513ff6ce1f32f899c7824e2c7e6eec64e4799fdb78e9ebac3fc8f95e25734",
+        "ancestry": [
+          "Added in candidate: Runner Dispatch runtime inspection",
+          "Dispatch runtime inspection",
+          "Guard reconciliation"
+        ],
+        "text": "Vòng lặp tự hành của forgent: tự lấy việc sẵn-sàng từ work-state, giao cho một trợ lý thông minh chạy nền trong không gian cô lập, tự chấm kết quả bằng proof của chính việc đó, rồi ghi lại thành **đề xuất chờ duyệt**. Người dùng: người vận hành repo (khởi động vòng, duyệt đề xuất). Nguyên tắc sống còn: trong vòng dispatch, chỉ runner được ghi trạng thái; worker chỉ để lại commit trên nhánh riêng."
+      },
+      "exactClass": "Weak-exact",
+      "exactClassReason": "ancestor headings differ; document exact share below one half",
+      "nativeTargetClaimId": "claim_dc52230892585f740b4920d9a6eaa267",
+      "section": {
+        "startLine": 13,
+        "endLine": 55,
+        "target": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+        "kind": "architecture",
+        "anchor": "guard-reconciliation",
+        "title": "Guard reconciliation",
+        "sha256": "a6d4647b0e2206701c9b810fb17183037ccaf810be2efee8ef1e39a2258a9afa"
+      },
+      "mapAmendments": [],
+      "reboundAnchors": []
+    }
+  ],
+  "sensitivityControls": [],
+  "unmatchedCandidateUnits": [],
+  "unmatchedUnitsChannel": "candidate-unverified-runner.json, complete native strict-E set, separate non-source request",
+  "classes": {
+    "Unit-exact": [],
+    "Weak-exact": [
+      "claim_db73c791da40554dda8dacd8405de722",
+      "claim_383a6485c1aaed79a640a59463183fe8",
+      "claim_9a0635bb67690683a0a7465eadae82af",
+      "claim_cdf8c5562fb083bbdccf7d8c03decb7a",
+      "claim_5d9ba2698cc42766513d2f6892f4456c",
+      "claim_a48d3e36ff3950e3637e7a0945d8a26a",
+      "claim_6dba9226798857c2c2eedd1837fc382b",
+      "claim_2073b7160c35c63c611d02087866ddec"
+    ],
+    "Judgment": []
+  },
+  "unequalDigestPairs": [],
+  "mandatoryDeep": [],
+  "minimumDeep": 8,
+  "sourceBlobs": {
+    "path": "docs/specs/runner.md",
+    "blob": "ddfa78cc7183cf1f7db8ee64d2339653a0aa0023",
+    "sha256": "de1b0a3453706016171b530fcdf8e8e646563af707982f042c997fa99b83c7fe"
+  },
+  "shardDigest": "de26feeaa57cfde916a78fdb423735da6335dbc35138e4ef545293c3bb50222b",
+  "target": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+  "part": 1,
+  "parts": 1
+}

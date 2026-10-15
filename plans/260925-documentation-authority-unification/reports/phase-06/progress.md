@@ -1,3 +1,29 @@
+# Runner native proof complete — bounded independent review pending
+
+Assignment `unit-run-1792058627406-f75a7ed8/producer/1`. Content pin **81d0ed0747014e976c0d29222439fd6e3592b468**. Exactly one background sync **1349.35s**; 4484 files / 91324 active units; known IDs **98470 → 99020**, zero loss. Compact persistence once: **61883121 bytes**, SHA256 `dbf89fc898e1107d69bd60ad2f277fde74562732edf79d3a74b2ce1bd63e2b16`. Native active registry/inventory/applied tuples equal.
+
+D/strict E ran with the runner source scope against both prior registries together and each separately. **D zero fatal; strict E remains open**: claims-not-reviewed 495; registry-gaps-without-disposition 28; candidate-blocks-unreferenced 63. Native candidate list **63**, full five-field equality across all three E outputs and committed file status; 119 referenced known-risk carriage bindings kept separate. [Native proof](step9-native-verification.json), [sync log](step9-native-sync.log).
+
+**23 bounded source requests / 495 entries**, 494 Weak-exact and 1 Judgment, all pending; complete shown text/digests, unequal pair, map additions and rebound marks. **34 requests total** including triage/map14, liveness167, candidate63, predecessor/generation33, truth population181, owner queue1 and report1. Every path/count is in [request index](review-request-261015-1706-runner-native-index.md) and [Step 9 report](step-09-report.md). Reviewer selects all seeds/draws/verdicts; A36 per-pack minimum plus unequal pairs, batch floor 75 Weak-exact plus sole Judgment.
+
+All **32 historical source gaps** have exact full historical witnesses (85 distinct revisions), bounded current candidates and full verbatim residual retention with SHA256; no disposition, identity graft or approval authored. Native E has 28 missing dispositions; four prior reviewed dispositions are overlaid but all four target digests drifted and remain pending A22 rebind/re-review. No old verdict approves new carriage. [Accounting](step9-predecessor-accounting.json), [residual binding](step9-predecessor-residual-binding.json). Tests **44/44 pass**, zero skip/fail/cancel/todo; diff check and scoped mutation/packet audit pass. No docs or decision content changed.
+
+Blockers: independent review/application, gap dispositions, current truth, final main sync/re-decisions, fresh readers, red-team, six carried links/rebinds and existing Rings/A34/Step 10/cutover obligations. **Step 8 one-row request untouched** and independent. No new owner-direction question, closure or promotion. Writes only this plan, scratch `/tmp/fgos-work`; mandatory outbox exception; runner commits.
+
+---
+
+# Runner native proof recovery in progress
+
+One registry carry-forward completed at `81d0ed074`; staged compact registry is intact and not yet persisted. First full native inventory generation reached monolithic cache serialization, then exited 137; cache was truncated and failed deserialization. No proof is claimed from it. Recovering with read-only native inventory regeneration against the same staged registry (no second registry sync), bounded scratch cache shards and explicit GC. Both failure and recovery are retained in step9-native-sync.log. The final proof will disclose invocation counts and total duration. Step 8 request, docs and decision bytes untouched.
+
+---
+
+# Runner native sync and review packaging in progress
+
+Assignment `unit-run-1792058627406-f75a7ed8/producer/1`. Content pin **81d0ed0747014e976c0d29222439fd6e3592b468** verified as HEAD. One background native sync with dedicated log; compact persistence once with known-ID preservation, scoped D/strict E against both priors and separately, native tuple proof, then bounded A36 requests. No seed or verdict selected. Step 8 one-row request untouched. Writes only this plan; runner commits.
+
+---
+
 # Runner carriage authored — committed native sync and bounded reviews next
 
 Assignment `unit-run-1792057868388-68b4a62c/producer/1`; state **authoring**. **SYNC / input HEAD `63fa6f15266f45c881f610235e0be8d61ff07120`** (Lead merge, docs unchanged since af0057e13). Source runner blob HEAD/sync `ddfa78cc7183cf1f7db8ee64d2339653a0aa0023`, map pin `473a009662f22fb5d745e6ae151136da324d0d5e`. Immutable candidate commit will be this turn's runner commit; do not use input HEAD as new-content proof. This checkpoint supersedes earlier current counts; older entries remain historical. B0 and other batches' green pins remain unchanged below. This is an author checkpoint, not a new full-native-green pin.

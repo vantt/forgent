@@ -1,0 +1,1329 @@
+{
+  "contentCommit": "81d0ed0747014e976c0d29222439fd6e3592b468",
+  "authorSession": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+  "packagingSession": "codex-session:unit-run-1792058627406-f75a7ed8@2026-10-15",
+  "channel": "liveness",
+  "count": 60,
+  "entries": [
+    {
+      "entryId": "liveness-061",
+      "record": {
+        "heading": "0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence",
+        "anchor": "0021-wire-main-checkout-lock-hook-qua-fgos-doctorsetup-không-epoch-fence",
+        "startLine": 1795,
+        "endLine": 1796,
+        "sha256": "41b12704ea92b44aa89b0b8d45612b20418695a30573843caa6fcbd732d5dd7a",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "### 0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence\n"
+    },
+    {
+      "entryId": "liveness-062",
+      "record": {
+        "heading": "Bối cảnh",
+        "anchor": "bối-cảnh-3",
+        "startLine": 1797,
+        "endLine": 1823,
+        "sha256": "fe1bfe4945a53cfd6bccc97edc3b0a70a5c01ffd61dd60ba710958eeb021846d",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [
+          "src/runner/main-checkout-lock.mjs",
+          "test/e2e/main-checkout-lock-hook.test.mjs"
+        ],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "#### Bối cảnh\n\n`tsk-3w8` tái hiện thật (2026-07-28, dogfood tsk-veg): `approve`'s bước cuối\n(`mergeRunnerItem`'s `git commit --no-edit`, merge.mjs) fail khi 1 session\nkhác commit lên main CÙNG LÚC (`.git/index` clobbering — đúng lớp lỗi\n`str65-worktree-isolation-enforcement` đặt tên). Code merge vẫn landed đúng\nlên main; chỉ bước ghi `work.move(to:'done')` sau đó rớt, item ở lại\n`proposed` dù thực tế đã xong.\n\nTrước khi chọn hướng sửa, phát hiện qua đọc code (không đoán): cơ chế giải\nđúng bài này ĐÃ CÓ SẴN, viết bởi 1 phiên khác (nhánh `str46`/`str65`/`str88`,\nhợp nhất vào main qua `git pull` cùng ngày) — `src/runner/main-checkout-lock.mjs`\n(primitive khóa) + `.githooks/pre-commit` (hook thật, acquire khóa đó cho MỌI\n`git commit` trên checkout, bất kỳ actor nào — người, agent, CI, không riêng\nverb nào của fgOS). `test/e2e/main-checkout-lock-hook.test.mjs` xanh 7/7,\n`git commit` subprocess thật, tranh chấp identity thật. Hook này, MỘT KHI\nACTIVE, đã bảo vệ đúng bước `approve`'s `git commit --no-edit` mà `tsk-3w8`\nnêu — không cần code application-level mới.\n\nNhưng hook KHÔNG active mặc định. Từng được wire tự động qua npm `prepare`\n(`str65-worktree-isolation-enforcement-6`), rồi bị GỠ CHỦ Ý\n(`str88-fgos-pnpm-lifecycle-1`, vì pnpm 10+ chặn `prepare` cho dependency\ngit-hosted), thay bằng bước tay `npm run setup:hooks` — có ghi ở README\nnhưng `fgos setup`/`fgos doctor` chưa từng đọc/ghi tới, và không ai tự động\nhoá lại. Không có decision record nào giải thích lý do hoãn — chỉ 1 commit\nmessage ngắn.\n"
+    },
+    {
+      "entryId": "liveness-063",
+      "record": {
+        "heading": "Quyết định",
+        "anchor": "quyết-định-3",
+        "startLine": 1824,
+        "endLine": 1847,
+        "sha256": "7e83fecba3318c175f86f2ae8c86de21cabd286acccfe7a249ee49c8fbf3686b",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [
+          "src/setup/git-hooks.mjs",
+          "scripts/install-git-hooks.mjs",
+          "bin/fgos.mjs"
+        ],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "#### Quyết định\n\nChọn **wire hook có sẵn vào `fgos doctor` (đọc) + `fgos setup` (ghi)** —\nKHÔNG viết app-level lock-wrap riêng trong `approve`, KHÔNG xây\n`epoch-fence-merge-gate` (CAS subsystem mới, nguồn repository-harness, ghi\ntrong `porting-log.md` là \"Closes tsk-3w8\"):\n\n- `src/setup/git-hooks.mjs` (mới, layer `infra`) — `installGitHooks(repoRoot)`\n  (ghi, **fill-only**: không bao giờ ghi đè `core.hooksPath` đã trỏ nơi khác,\n  giống đúng nguyên tắc 2 side-effect kia của `setup` — `insertSourceLine`\n  chỉ append, `mergeConfigDefaults` không bao giờ đụng key user đã có) và\n  `mainCheckoutHookWired(cwd)` (đọc, dùng bởi cả doctor lẫn setup's report).\n- `fgos doctor` thêm check thứ 4: `main-checkout-hook-wired`.\n- `fgos setup` gọi `installGitHooks`, trả thêm `hooksWired` +\n  `hooksSkippedExisting` (giá trị custom cũ nếu có, để không âm thầm mất\n  thông tin khi từ chối ghi đè).\n- `scripts/install-git-hooks.mjs` (giữ cho `npm run setup:hooks`) trở thành\n  shim mỏng, re-export từ `src/setup/git-hooks.mjs` — logic thật phải nằm ở\n  `src/setup/` vì `scripts/` không nằm trong `package.json`'s `files` (không\n  ship theo npm package) và không nằm trong phạm vi\n  `docs/architecture-manifest.json`'s import-direction check (chỉ quét\n  `src/`+`bin/`) — `bin/fgos.mjs` import thẳng từ `scripts/` từng làm vỡ cả 2\n  (test kiến trúc + e2e `npm pack -> npm install -g`).\n"
+    },
+    {
+      "entryId": "liveness-064",
+      "record": {
+        "heading": "Vì sao không app-level lock-wrap trong `approve`",
+        "anchor": "vì-sao-không-app-level-lock-wrap-trong-approve",
+        "startLine": 1848,
+        "endLine": 1853,
+        "sha256": "d0f9db9ac1a9c73e5b42a3e8e12bc58d8b286d36685cc051e2977761cb676cd0",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "##### Vì sao không app-level lock-wrap trong `approve`\n\nVá sai chỗ: ca lỗi thật là 1 session KHÁC không hề gọi qua `approve` — nó tự\n`git commit` tay. Khóa chỉ đặt trong `approve` vô dụng với chính thủ phạm.\nHook giải đúng gốc vì chặn ở TẦNG GIT, mọi commit, không riêng 1 verb.\n"
+    },
+    {
+      "entryId": "liveness-065",
+      "record": {
+        "heading": "Vì sao không epoch-fence-merge-gate",
+        "anchor": "vì-sao-không-epoch-fence-merge-gate",
+        "startLine": 1854,
+        "endLine": 1860,
+        "sha256": "37d268b053e0d4348ac2c52988bbee718bbf835d6fd284ae5b615f064f43e9f8",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "##### Vì sao không epoch-fence-merge-gate\n\nXây subsystem mới (F2 theo phân loại distill) để giải lại bài hook ĐÃ GIẢI —\nngược YAGNI. Chỉ đáng nếu sau này có bằng chứng mutex (khóa-độc-quyền) không\nđủ — cần nhiều writer chạy song song thật, không chỉ chặn-nhau. Chưa có bằng\nchứng đó.\n"
+    },
+    {
+      "entryId": "liveness-066",
+      "record": {
+        "heading": "Hệ quả",
+        "anchor": "hệ-quả-3",
+        "startLine": 1861,
+        "endLine": 1878,
+        "sha256": "d122c6f8ae802121f98229109a4c7974dadd2fde5ca758dd9ed3afa9f595a41b",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "#### Hệ quả\n\n- **Đây là fix khả-tiếp-cận (reachability), không phải enforcement tự\n  động** — tự đánh giá trung thực, không phóng đại: một checkout clone mới\n  KHÔNG BAO GIỜ chạy `fgos setup`/`fgos doctor`/`npm run setup:hooks` (CI\n  chạy `git commit` trần, hoặc agent không gọi 2 verb đó) vẫn hở y như trước\n  quyết định này. Việc này thêm đường kích hoạt thứ 2 (không phụ thuộc npm\n  lifecycle) + cách PHÁT HIỆN khoảng hở (`fgos doctor`), không bắt buộc kích\n  hoạt.\n- Việc còn mở, chưa làm trong quyết định này: có cần ép `fgos setup`/`doctor`\n  chạy bắt buộc ở CI hay một trigger không tùy-chọn khác để đóng nốt khoảng\n  hở đó hay không — để dành thành item riêng nếu ca thật (agent/CI commit\n  không qua 2 verb này) xảy ra thường xuyên.\n- Dogfood thật trên chính checkout này: `fgos setup` đã chạy, xác nhận\n  `git config --get core.hooksPath` = `.githooks`, `fgos doctor` báo xanh.\n\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ.\n"
+    },
+    {
+      "entryId": "liveness-067",
+      "record": {
+        "heading": "0022 — Khảo sát choke-point fgOS (quyết định lặp/lệch xuyên CLI/runner/skill)",
+        "anchor": "0022-khảo-sát-choke-point-fgos-quyết-định-lặplệch-xuyên-clirunnerskill",
+        "startLine": 1879,
+        "endLine": 1880,
+        "sha256": "d5209185e141dbd077908cb6f9c76da33c52f31e0406477654f5cd671acab3ef",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "### 0022 — Khảo sát choke-point fgOS (quyết định lặp/lệch xuyên CLI/runner/skill)\n"
+    },
+    {
+      "entryId": "liveness-068",
+      "record": {
+        "heading": "Bối cảnh",
+        "anchor": "bối-cảnh-4",
+        "startLine": 1881,
+        "endLine": 1890,
+        "sha256": "4b0118261cc006e2d89fbfc27a6389467a191f24aefd864124a0825ef1ee5816",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "#### Bối cảnh\n\n`tsk-53f` xác nhận 1 case cụ thể: claim + worktree-isolation (`take`/`pick`\nvs runner) từng có 3 đường claim độc lập, đã hợp nhất qua `claim-port.mjs`\n. `tsk-1ab` là khảo sát rộng hơn: những loại quyết định NÀO KHÁC trong\nfgOS đang bị nhiều flow (CLI verb, runner loop, skill) tự implement riêng,\ndẫn tới hành vi lệch nhau cho CÙNG một câu hỏi quyết định. Mỗi candidate\ndưới đây được xác nhận bằng cách đọc trực tiếp từng call site — không suy\ndiễn từ tên/hình dạng giống nhau (yêu cầu (2) của item).\n"
+    },
+    {
+      "entryId": "liveness-069",
+      "record": {
+        "heading": "Candidates",
+        "anchor": "candidates",
+        "startLine": 1891,
+        "endLine": 1892,
+        "sha256": "ed768022fab94f54fb388a92c9a9b68bc1e2920ec33f84b9266d24a43336f704",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "#### Candidates\n"
+    },
+    {
+      "entryId": "liveness-070",
+      "record": {
+        "heading": "Xác nhận THẬT (choke-point có bằng chứng cụ thể)",
+        "anchor": "xác-nhận-thật-choke-point-có-bằng-chứng-cụ-thể",
+        "startLine": 1893,
+        "endLine": 1894,
+        "sha256": "09670050fe3f59a1c3c20c7d38dff27b1c97f0ef6648a6299619d1445b39bad5",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "##### Xác nhận THẬT (choke-point có bằng chứng cụ thể)\n"
+    },
+    {
+      "entryId": "liveness-071",
+      "record": {
+        "heading": "1. `take` vs `pick` — 2 định nghĩa khác nhau cho \"item này claim được không\"",
+        "anchor": "1-take-vs-pick-2-định-nghĩa-khác-nhau-cho-item-này-claim-được-không",
+        "startLine": 1895,
+        "endLine": 1945,
+        "sha256": "88e27f8a58d241e35f27508261cf23b7ea7f5ffd9479acd084dd66f58ad1c803",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [
+          "bin/fgos.mjs",
+          "src/state/frontier.mjs",
+          "test/cli/take-pick-claim-eligibility.test.mjs"
+        ],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "###### 1. `take` vs `pick` — 2 định nghĩa khác nhau cho \"item này claim được không\"\n\nCả hai đều delegate phần ghi state cho cùng `claimWork` (`claim-port.mjs`,\nđã hợp nhất đúng theo tsk-53f) — NHƯNG mỗi verb tự gác một lớp kiểm tra\nđiều kiện claim RIÊNG, ngay trước khi gọi `claimWork`, và hai lớp gác đó\ntrả lời khác nhau cho cùng 1 input (id đang ở stage `clarify`/`decompose`,\nstatus `todo`, chưa vào frontier):\n\n- `take --id <id>` (`bin/fgos.mjs:1233-1237`): chặn cứng — nếu\n  `status === 'todo'` và id không nằm trong `readyWork()` (frontier, tức\n  chưa tới stage `executing`), ném lỗi `\"is todo but not in the frontier\n  yet (stage/deps/lineage)\"`.\n- `pick --id <id>` (`bin/fgos.mjs:1272-1285`): KHÔNG có kiểm tra\n  frontier/stage — chỉ cần id tồn tại. Comment ngay tại chỗ\n  (`bin/fgos.mjs:1263-1268`) xác nhận đây là chủ ý: \"the frontier-membership\n  guard removed below was a hard check at THIS verb layer, never an FSM\n  law\" — nới lỏng để clarify/decompose claim qua được cửa pick.\n\nHệ quả đã xác nhận thật, không suy đoán:\n- `plugins/fgOS/skills/fgos-routing/SKILL.md` (bản trong worktree này) tự\n  hướng dẫn dùng đúng `fgos take --role session [--id <id>]` để claim một\n  item còn ở `clarify`/`decompose` — lệnh này BỊ REJECT bởi chính guard ở\n  trên, vì `take` chưa từng được nới lỏng như `pick`.\n- `plugins/fgOS/skills/cook/SKILL.md:36-39` đã tự phát hiện đúng lỗi này\n  qua test thật (\"Verified empirically against this repo... rejected\"),\n  ghi thành \"Known gap (flagged, not guessed around)\" — nhưng chỉ vá ở\n  tầng cook's own flow, không sửa `fgos-routing`, và tự nhận \"reconciling\n  fgos-routing itself is a separate, out-of-scope fix\".\n- Phiên làm việc khảo sát item NÀY (tsk-1ab) tự confirm thêm 1 lần nữa:\n  `pick tsk-1ab` thành công thật khi item còn stage `clarify` (log claim\n  seq 518 (renumbered by tsk-n4i-1; was 502), `\"from\":\"todo\",\"to\":\"doing\"`),\n  đúng khớp phân tích code trên.\n\n3 nguồn (code, cook's known-gap note, phiên này) đồng nhất — đây là\nchoke-point rõ nhất tìm được: 1 câu hỏi quyết định (\"id này claim được\nchưa\"), 2 verb code trả lời khác nhau, và tài liệu skill chính thức\n(`fgos-routing`) đang hướng dẫn sai theo nhánh `take` bị chặn.\n\n**Đã sửa** (item `choke-point-take-vs-pick-claim-eligibility`): đồng bộ\nguard giữa `take`/`pick` cho nhánh `--id` tường minh, KHÔNG nới `take`'s\nno-`--id` default (\"take mirrors runner dispatch\" giữ nguyên cho nhánh\nđó). `take`'s explicit-`--id` branch (`bin/fgos.mjs`) giờ gọi\n`isDepsAndLineageReady` (`src/state/frontier.mjs`, factored từ `frontier`'s\nown deps+lineage clause, trừ stage clause) thay vì `readyWork(dir).some(...)`\n— dep-chưa-xong và open-descendant vẫn chặn claim y như cũ (test cũ\n`pull-dep-blocked` vẫn xanh), chỉ riêng stage `clarify`/`decompose` không\ncòn chặn nữa, khớp đúng hành vi `pick` đã có từ trước. `fgos-routing`'s\nprose (\"claim it specifically with `--id <id>`\" dùng `take --role session\n[--id <id>]`) giờ ĐÚNG với hành vi thật, không cần sửa. Regression:\n`test/cli/take-pick-claim-eligibility.test.mjs`.\n"
+    },
+    {
+      "entryId": "liveness-072",
+      "record": {
+        "heading": "2. Kiểm tra working-tree sạch — 2 định nghĩa độc lập cho `return` và `approve`",
+        "anchor": "2-kiểm-tra-working-tree-sạch-2-định-nghĩa-độc-lập-cho-return-và-approve",
+        "startLine": 1946,
+        "endLine": 1968,
+        "sha256": "c94629f5fc8672f5077aa32fe31935844640a233fa4a4c10b09b956d5a071b5f",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [
+          "bin/fgos.mjs",
+          "src/runner/merge.mjs"
+        ],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "###### 2. Kiểm tra working-tree sạch — 2 định nghĩa độc lập cho `return` và `approve`\n\nXác nhận lại tsk-63j với citation mới (file đã đổi dòng từ lúc ghi):\n\n- `bin/fgos.mjs:98` định nghĩa `isWorkingTreeClean(cwd)` riêng cho `return`\n  (gọi tại `bin/fgos.mjs:1428`) — chạy `git status --porcelain -- .`, chỉ\n  soi subtree của `cwd`.\n- `src/runner/merge.mjs:133` định nghĩa `isWorkingTreeClean(repoRoot)`\n  riêng cho `approve` (import alias `isMainTreeClean` tại\n  `bin/fgos.mjs:33`, gọi tại `bin/fgos.mjs:1714`) — chạy\n  `git status --porcelain` không pathspec, soi TOÀN repo.\n\nCả hai dùng chung 1 helper loại trừ (`isFgosOnlyStatusLine`) nhưng hàm gác\nchính thì viết riêng 2 lần, với khác biệt phạm vi thật (subtree vs\nwhole-repo) — không phải trùng tên ngẫu nhiên, là 2 implementation thật.\n\n**Đã sửa** (item `choke-point-workingtree-clean-duplication`, commit\n`3dad0c2`): hợp nhất về 1 hàm `isWorkingTreeClean(repoRoot, ownFileSet,\n{ scope })` trong `src/runner/merge.mjs`, `scope` nhận `'subtree'` (return)\nhoặc `'whole-repo'` (approve, mặc định) — cùng 1 lần tính `prefix`, cùng 1\nlần loại trừ `.fgos/`. `bin/fgos.mjs`'s own `isWorkingTreeClean(cwd,\nownFileSet)` giờ chỉ delegate sang hàm trên với `scope: 'subtree'`.\n"
+    },
+    {
+      "entryId": "liveness-073",
+      "record": {
+        "heading": "3. `createWorktree` — 6 call site, mỗi nơi tự xử lý baseRef/cleanup riêng",
+        "anchor": "3-createworktree-6-call-site-mỗi-nơi-tự-xử-lý-baserefcleanup-riêng",
+        "startLine": 1969,
+        "endLine": 1990,
+        "sha256": "7f3eb806794e138c7f0f17d7e6638d65a9bf658a2500484e171918b9e23d157a",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [
+          "plans/reports/choke-point-investigation-260728-1717-claim-worktree-report.md",
+          "bin/fgos.mjs",
+          "src/runner/loop.mjs",
+          "src/runner/worktree.mjs"
+        ],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "###### 3. `createWorktree` — 6 call site, mỗi nơi tự xử lý baseRef/cleanup riêng\n\nRe-verify tsk-53f's finding từ đầu theo —\nxác nhận vẫn đúng 6 call site, line number đã trôi so với report cũ\n(`plans/reports/choke-point-investigation-260728-1717-claim-worktree-report.md`,\ntự nó là bằng chứng cho luận điểm của item này: tài liệu tĩnh trôi khỏi\ncode rất nhanh trong repo này):\n\n| Ngữ cảnh | File:Line hôm nay | baseRef | Cleanup khi lỗi |\n|---|---|---|---|\n| `pick` | `bin/fgos.mjs` qua `claim-port.mjs:170` | HEAD hiện tại hoặc root branch (đã sửa theo baseRef truyền vào) | không có `finally`/cleanup tại call site này |\n| `approve` (leaf merge, ephemeral) | `bin/fgos.mjs:1735` | root branch | có |\n| `review` (ephemeral) | `bin/fgos.mjs:1994` | item branch | có |\n| Runner `startupReap` | `src/runner/loop.mjs:398` | mặc định (không truyền `baseRef`) | có (`finally`) |\n| Runner dispatch — LEAF | `src/runner/loop.mjs:679` | `branchNameFor(rootId)` | có |\n| Runner dispatch — ROOT | `src/runner/loop.mjs:681` | mặc định | có |\n\n`createWorktree` bản thân đã là 1 hàm dùng chung (`src/runner/worktree.mjs`)\n— phần LẶP không nằm ở việc tạo worktree, mà ở việc MỖI call site tự quyết\n`baseRef` nào truyền vào và tự viết cleanup riêng thay vì có 1 wrapper\nchung theo \"loại thao tác\" (claim-isolate / merge-ephemeral / runner-dispatch).\n"
+    },
+    {
+      "entryId": "liveness-074",
+      "record": {
+        "heading": "Đã kiểm tra, KHÔNG phải choke-point (loại khỏi danh sách, có bằng chứng)",
+        "anchor": "đã-kiểm-tra-không-phải-choke-point-loại-khỏi-danh-sách-có-bằng-chứng",
+        "startLine": 1991,
+        "endLine": 2014,
+        "sha256": "a0702cac2ae41c4d7c854aab00593c99f42750d039ccab15e34f578651258d79",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [
+          "src/runner/goal-check.mjs",
+          "bin/fgos.mjs",
+          "src/runner/loop.mjs",
+          "src/runner/merge.mjs",
+          "src/state/store.mjs",
+          "src/state/events.mjs"
+        ],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "##### Đã kiểm tra, KHÔNG phải choke-point (loại khỏi danh sách, có bằng chứng)\n\nYêu cầu (2) của item đòi xác nhận thật, không chỉ giống bề ngoài — 3\ncandidate sau nằm trong 4 gợi ý gốc của description nhưng khi đọc code thì\nĐÃ hợp nhất đúng, không lặp:\n\n- **Verify run + timeout**: 1 hàm dùng chung duy nhất,\n  `runGoalCheck` (`src/runner/goal-check.mjs:20`) — gọi từ cả 8 nơi cần\n  chạy verify (`bin/fgos.mjs:1391,1440,1886,2036`, `src/runner/loop.mjs:399,727`,\n  `src/runner/merge.mjs:335`). Không có implementation thứ 2.\n- **`docType` validation**: 1 hàm dùng chung duy nhất,\n  `assertValidDocType` (`src/state/store.mjs:619`), gọi từ `bin/fgos.mjs:842`\n  và nội bộ `store.mjs` (`addOutcome`, 2 chỗ). Comment tại\n  `bin/fgos.mjs:808` tự xác nhận: \"the single `DIATAXIS_DOC_TYPES` set\".\n- **`docsRef` validation**: 1 helper dùng chung, `optionalField`\n  (`bin/fgos.mjs:172`), gọi 3 lần (`add`/`submit`/`edit`) với message lỗi\n  khác nhau theo verb — khác message, không khác LOGIC kiểm tra, nên\n  không tính là lặp thật.\n- **Ghi `.fgos/events.jsonl`/`state.json` ở tầng thấp**: đã có 1 cửa ghi\n  duy nhất có khóa, `withEventsLock`/`appendEventLocked`\n  (`src/state/events.mjs`, dùng bởi mọi hàm ghi trong `store.mjs`) — tầng\n  append-event tự nó KHÔNG hở, đúng như comment `store.mjs:24` tự nhận\n  (\"single-write-door scope stays exactly events.jsonl + state.json\").\n"
+    },
+    {
+      "entryId": "liveness-075",
+      "record": {
+        "heading": "Ghi chú liên quan — không phải finding mới của item này",
+        "anchor": "ghi-chú-liên-quan-không-phải-finding-mới-của-item-này",
+        "startLine": 2015,
+        "endLine": 2031,
+        "sha256": "90b79f04a838822f978dc635624ff753553d8acdcd08842ea2affd05f83c7557",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [
+          "src/runner/claim-port.mjs"
+        ],
+        "missingCitedPaths": [
+          "docs/decisions/0021-wire-main-checkout-hook-qua-doctor-setup.md"
+        ],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "##### Ghi chú liên quan — không phải finding mới của item này\n\n`main-checkout-lock.mjs` (2 export `acquireMainCheckoutLock`/\n`releaseMainCheckoutLock`) từng bị tsk-53f's report gọi là \"dead code,\nimported by NOTHING\" — claim đó nay ĐÃ SAI: `src/runner/claim-port.mjs:12,73`\nimport và gọi thật (wired post tsk-53f). Đào sâu hơn lộ ra đây là 1\ncơ chế RIÊNG với mục đích khác — khóa claim-identity tại thời điểm claim,\nkhông phải khóa git-commit — và cơ chế bảo vệ git-commit race (vụ `tsk-3w8`,\n`approve`'s `git commit --no-edit` xung đột) đã được quyết định RIÊNG,\nKHÔNG qua app-level lock mà qua `.githooks/pre-commit` (mọi actor, mọi\ncommit) — xem `docs/decisions/0021-wire-main-checkout-hook-qua-doctor-setup.md`,\nđã accepted, có nêu rõ khoảng hở còn mở (hook không active mặc định) và\nđã tự đóng thành 1 câu hỏi để dành cho item riêng nếu có bằng chứng thật.\nKhông liệt lại thành candidate riêng của tsk-1ab vì đã có quyết định +\ntheo dõi sẵn — trích dẫn ở đây để không đọc nhầm 2 cơ chế cùng tên\n\"main-checkout-lock\" là một.\n"
+    },
+    {
+      "entryId": "liveness-076",
+      "record": {
+        "heading": "Ranked priority",
+        "anchor": "ranked-priority",
+        "startLine": 2032,
+        "endLine": 2044,
+        "sha256": "2a8121a562efa93866f5d27b59fcc98d58111253a700876651651fb908eab31d",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "#### Ranked priority\n\n1 bảng phẳng duy nhất — sort theo rủi ro lệch hành vi trước, tần suất\ngọi làm tie-break. Chỉ xếp hạng 3 candidate đã XÁC NHẬN THẬT ở trên (mục\n\"Đã kiểm tra, KHÔNG phải choke-point\" không vào bảng này vì không phải\nviệc cần hợp nhất).\n\n| Hạng | Choke-point | Rủi ro lệch hành vi | Tần suất | Vì sao |\n|---|---|---|---|---|\n| 1 | `take` vs `pick` claim-eligibility (#1) | **Cao** — không chỉ khác hành vi ngầm, mà khiến lệnh do chính `fgos-routing` hướng dẫn literal bị CLI reject cứng, giữa chừng 1 session | Rất cao — `fgos-routing` được nạp \"at the start of every fgOS work session\" (chính mô tả skill), nên bất kỳ session nào theo đúng ví dụ prose sẽ dính | Sửa 1 lần (đồng bộ guard giữa `take`/`pick`, hoặc sửa lại prose `fgos-routing` theo hành vi thật của `pick`) chặn đứng lỗi lặp lại ở mọi session tương lai |\n| 2 | `isWorkingTreeClean` trùng lặp (`return` vs `approve`, #2) | Trung bình — 2 phạm vi khác nhau thật (subtree vs whole-repo) có thể khiến `return` coi là sạch trong khi `approve` sau đó lại thấy bẩn (hoặc ngược lại), lệch kỳ vọng giữa 2 verb lõi | Cao — mọi lần `return` và mọi lần `approve` đều chạy qua 1 trong 2 hàm này | Hợp nhất về 1 hàm nhận tham số phạm vi (subtree/whole-repo) thay vì 2 định nghĩa riêng, để đảm bảo cùng logic loại trừ + cùng cách tính prefix |\n| 3 | `createWorktree` 6 call site tự quyết baseRef/cleanup (#3) | Trung bình-thấp — mỗi nơi đã tự đúng theo ngữ cảnh riêng (baseRef hợp lý theo leaf/root, hầu hết đã có cleanup), rủi ro chủ yếu là worktree mồ côi khi cleanup thiếu (site `pick`), không phải state sai | Cao — 6 call site trải khắp `pick`/`approve`/`review`/runner dispatch, chạy thường xuyên | Thêm 1 wrapper theo \"loại thao tác\" (claim-isolate / merge-ephemeral / runner-dispatch) bọc `createWorktree` + cleanup thống nhất, thay vì sửa lẻ từng site |\n"
+    },
+    {
+      "entryId": "liveness-077",
+      "record": {
+        "heading": "No fixes applied",
+        "anchor": "no-fixes-applied",
+        "startLine": 2045,
+        "endLine": 2052,
+        "sha256": "db8d6f6dba85cafa0a95641ba99b1f5ad1c9a7dc7d7eccc5fda24feff0675a43",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "#### No fixes applied\n\nĐúng yêu cầu (4) của item: khảo sát này KHÔNG tự sửa bất kỳ choke-point\nnào ở trên. Mỗi dòng trong bảng xếp hạng, nếu được chọn để sửa, trở thành\n1 item riêng sau này (như cách finding của `tsk-53f` đã tách thành item\nđộc lập) — không nằm trong phạm vi thi công của `tsk-1ab`/`tsk-1ab-1`/\n`tsk-1ab-2`.\n"
+    },
+    {
+      "entryId": "liveness-078",
+      "record": {
+        "heading": "0023 — Thứ tự ưu tiên sản phẩm: ship faster > DoD (result + docs) > hoàn thiện sau ngưỡng",
+        "anchor": "0023-thứ-tự-ưu-tiên-sản-phẩm-ship-faster-dod-result-docs-hoàn-thiện-sau-ngưỡng",
+        "startLine": 2053,
+        "endLine": 2054,
+        "sha256": "52b671e0623e11328a7cf2d4e8f8a451b8b1b69388d19dfb67d0ccea50258f1f",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "### 0023 — Thứ tự ưu tiên sản phẩm: ship faster > DoD (result + docs) > hoàn thiện sau ngưỡng\n"
+    },
+    {
+      "entryId": "liveness-079",
+      "record": {
+        "heading": "Bối cảnh",
+        "anchor": "bối-cảnh-5",
+        "startLine": 2055,
+        "endLine": 2075,
+        "sha256": "4c8700833f3e3dfa5ca547b3698c6382c661b820c40c79a4903e9be8eead9d64",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [
+          "bin/fgos.mjs"
+        ],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "#### Bối cảnh\n\nUser nêu định hướng ưu tiên cho dự án (session `b0010842-aafa-4cf1-9a8a-\n6c7f0022d4c7`, 2026-07-28), bản gốc:\n\n1. Ship faster — phải nhanh trước hết.\n2. Better docs — thời AI, làm nhanh mà không có docs thì người khó tham gia\n   vào tiến trình đảm bảo better result.\n3. Better/stable result.\n\nPhản biện: docs không nên đứng thành 1 bậc ưu tiên riêng tách khỏi result —\n\"on-eyes\" (người đọc-hiểu để tham gia được) cần 2 trụ đồng thời, không phải\nxếp tầng: **legibility** (docs) và **verifiability** (kiểm được đúng-sai\nthật, không dựa lời khai — result đã verify cho được, docs không cho được).\nTách\nriêng khiến \"ship nhanh + docs tốt nhưng result chưa verify\" đọc như đã đạt\nbậc 2, dù chưa đủ tin. Gộp lại thành 1 mệnh đề CoS bắt buộc — **DoD** — đúng\nkiểu STR73 đã đòi hỏi cho mọi mệnh đề CoS khác (evidence-link bắt buộc, không\nchỉ cho feature-closed). Hạ tầng đối chiếu doc↔source đã có sẵn một phần:\n`fgos doc-sources <docPath>` (`bin/fgos.mjs:1149`).\n"
+    },
+    {
+      "entryId": "liveness-080",
+      "record": {
+        "heading": "Quyết định",
+        "anchor": "quyết-định-4",
+        "startLine": 2076,
+        "endLine": 2086,
+        "sha256": "30fd1210aebe7f916f5be2c3cf7bb31382935973c9019b00330481c9ac96a908",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "#### Quyết định\n\nThứ tự ưu tiên sản phẩm, 3 bậc:\n\n1. **Ship faster** — tốc độ đi trước.\n2. **DoD** — result đã verify VÀ docs evidence-linked, cùng một gate (không\n   phải 2 bậc riêng: docs không đứng trước hay sau result, mà là điều kiện\n   kèm result để tính \"xong\").\n3. **Hoàn thiện sau ngưỡng** (post-threshold polish) — làm result tốt hơn\n   mức tối thiểu DoD đã đủ tin, KHÔNG phải mở rộng tính năng/phạm vi.\n"
+    },
+    {
+      "entryId": "liveness-081",
+      "record": {
+        "heading": "Hệ quả",
+        "anchor": "hệ-quả-4",
+        "startLine": 2087,
+        "endLine": 2094,
+        "sha256": "62f62c0a26457b2b4656bf1b60929a9bbcdd8f3492e7cf5e663a89195e421619",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "#### Hệ quả\n\n- Việc chỉ được coi \"xong\" (đủ điều kiện đóng) khi qua bậc 2 — result verify\n  + docs evidence-linked cùng lúc; thiếu 1 trong 2 không tính là DoD.\n- Bậc 3 (polish) chỉ bắt đầu SAU khi bậc 2 đã qua cho đúng lát cắt đó — không\n  trộn lẫn polish vào trong khi DoD còn treo, và polish không được mở rộng\n  scope/tính năng mới (khác biệt với feature work thật).\n"
+    },
+    {
+      "entryId": "liveness-082",
+      "record": {
+        "heading": "0025 — Thứ tự ưu tiên sản phẩm (chi tiết hoá 0023), nạp always-loaded qua AGENTS.md",
+        "anchor": "0025-thứ-tự-ưu-tiên-sản-phẩm-chi-tiết-hoá-0023-nạp-always-loaded-qua-agentsmd",
+        "startLine": 2095,
+        "endLine": 2096,
+        "sha256": "e8fa1154dd83f01b8b5075e1840c0493183900973819da81ab0b6b58235d9343",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "### 0025 — Thứ tự ưu tiên sản phẩm (chi tiết hoá 0023), nạp always-loaded qua AGENTS.md\n"
+    },
+    {
+      "entryId": "liveness-083",
+      "record": {
+        "heading": "Bối cảnh",
+        "anchor": "bối-cảnh-6",
+        "startLine": 2097,
+        "endLine": 2114,
+        "sha256": "c509afd3f72c2e66b6fab1d3e090670d46408e017fd807241987df0c82dab7a6",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "#### Bối cảnh\n\n`0023` đặt 3 bậc ưu tiên nhưng bậc 1 (\"ship faster\") không nói rõ tốc độ gì\n— chỉ code, hay cả luồng làm việc người-agent. User chốt lại nguyên văn 3\nmục (2026-07-30) — ghi đúng, không diễn giải lại:\n\n1. **Ship Faster**: giao nhanh hơn, không đoán mò, giảm friction/better-dev-ux,\n   ít chờ đợi.\n2. **DoD**: reproducibly verifiable result + evidence-linked documentation.\n3. **Polish Sau DoD**: hoàn thiện sau ngưỡng, không mở scope.\n\nUser hỏi thêm: đưa quyết định này lên đầu, luôn nạp cho mọi agent. Áp\nplacement test của `0008`'s họ hàng luật L8 (`docs/platform-foundations.md`):\n\"rule này có cần hold khi không workflow nào đang chạy không?\" — có (thứ tự\nưu tiên áp dụng MỌI lúc, không riêng 1 workflow) → phải nằm standing sheet\n(`AGENTS.md`, nạp mọi turn qua `CLAUDE.md`'s `@AGENTS.md`), không phải nằm\nriêng `docs/decisions/` (nạp theo nhu cầu, dễ bị bỏ qua).\n"
+    },
+    {
+      "entryId": "liveness-084",
+      "record": {
+        "heading": "Quyết định",
+        "anchor": "quyết-định-5",
+        "startLine": 2115,
+        "endLine": 2124,
+        "sha256": "654f3391dfd791db5ab7646cad2d866cbaed9d9b155b98ae08fa2c0faca95b7c",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "#### Quyết định\n\nNguyên văn 3 mục trên là quyết định — không đổi từ ngữ. Thứ tự CỐ ĐỊNH,\nbậc dưới không được ghi đè bậc trên.\n\nĐặt pointer ngắn (3 dòng) vào `AGENTS.md` ngay đầu file, trước \"Before\ntouching code\" — always-loaded, mọi agent thấy trước khi chạm code bất kỳ\nviệc gì. Toàn văn bối cảnh/hệ quả vẫn ở record này (`docs/decisions/0025`);\n`AGENTS.md` chỉ giữ 3 dòng + link, không lặp lại lý lẽ.\n"
+    },
+    {
+      "entryId": "liveness-085",
+      "record": {
+        "heading": "Hệ quả",
+        "anchor": "hệ-quả-5",
+        "startLine": 2125,
+        "endLine": 2134,
+        "sha256": "e15a60b150c87e0e65abe6f64599de35dfadb8de01269d44c95e60b0d73db800",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "#### Hệ quả\n\n- `0023` không sửa tại chỗ, chỉ nhận `superseded_by: 0025`.\n- `AGENTS.md` có thêm section priority-order — mọi agent mở repo đọc được\n  ngay, không cần biết tới `docs/decisions/` mới thấy.\n- L8's rule 3 (anchor-suite: mỗi doctrine rule cần cụm từ assert tự động)\n  CHƯA làm ở record này — chưa có check tự động xác nhận `AGENTS.md` còn\n  giữ đúng 3 mục theo thời gian. Treo lại, không phải phạm vi yêu cầu hiện\n  tại.\n"
+    },
+    {
+      "entryId": "liveness-086",
+      "record": {
+        "heading": "Làm rõ phạm vi \"ai\" ship faster (bổ sung 2026-08-05)",
+        "anchor": "làm-rõ-phạm-vi-ai-ship-faster-bổ-sung-2026-08-05",
+        "startLine": 2135,
+        "endLine": 2166,
+        "sha256": "899a7783e63d685524c8ae8a520b8aa50468c57d97e9459b0e6ce8448c7d605a",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "#### Làm rõ phạm vi \"ai\" ship faster (bổ sung 2026-08-05)\n\nBối cảnh gốc ở trên đã tự nêu câu hỏi (\"chỉ code, hay cả luồng làm việc\nngười-agent\") nhưng quyết định lúc đó chỉ chốt NGUYÊN VĂN 3 mục, không trả\nlời câu hỏi \"ship faster — CỦA AI\". Một phiên làm việc thật (`tsk-66o`, \n— mức miễn-kiểm cho `frozen-judge` khi item không khai footprint) hiểu sai\nthành \"ship faster = fgOS tự triển khai tính năng rẻ/nhanh hơn\", khuyến\nnghị theo hướng đó — SAI. User chốt lại tường minh:\n\n> \"ship faster nghĩa là các project sử dụng tool này để ship phải ship\n> được faster (không loại trừ fgos) tuy nhiên nếu tập trung ship fgos\n> nhanh hơn mà làm các sản phẩm dùng nó không faster được là không đúng.\"\n\n**Nguyên văn 3 mục ở \"Quyết định\" KHÔNG đổi.** Làm rõ thêm, không diễn\ngiải lại chữ:\n\n- \"Ship Faster\" đo tốc độ ship của **project ĐANG DÙNG fgOS** để ship sản\n  phẩm của họ (agent + người vận hành fgOS trên một repo thật) — KHÔNG\n  phải tốc độ tự thân team fgOS build/ship một tính năng của chính fgOS.\n- fgOS không bị loại trừ — khi chính fgOS là \"project đang ship\" (dogfood,\n  như repo này), tiêu chí vẫn áp y hệt cho NGƯỜI DÙNG fgOS-trên-fgOS.\n- Khi một lựa chọn thiết kế làm fgOS rẻ/nhanh hơn để tự triển khai NHƯNG\n  khiến agent/dev đang dùng fgOS trên project thật chậm hơn (noise đọc\n  advisory, chờ gate, friction thao tác) — **chọn cái giúp project dùng\n  fgOS nhanh hơn**, không phải cái làm fgOS rẻ hơn để build. Chi phí xây\n  dựng của chính fgOS nằm ở bậc \"Effort to port\"/F-score khi cân nhắc\n  triển khai, không phải ở tiêu chí Ship Faster này.\n\nPlacement test giữ nguyên như bản gốc (standing sheet, `AGENTS.md`, mọi\nagent thấy trước khi chạm code) — làm rõ này áp dụng ngay khi đọc, không\ncần đợi review threshold riêng.\n"
+    },
+    {
+      "entryId": "liveness-087",
+      "record": {
+        "heading": "0026 — Native-First Dispatch Doctrine: launcher/rootTask/capacity",
+        "anchor": "0026-native-first-dispatch-doctrine-launcherroottaskcapacity",
+        "startLine": 2167,
+        "endLine": 2173,
+        "sha256": "b00459437d4f48aa9540f568dfe1c9753d76b1b211ebcf7875ae154151527c83",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "### 0026 — Native-First Dispatch Doctrine: launcher/rootTask/capacity\n\n**Pinned term: \"Native-First Dispatch Doctrine\"** — dùng tên này khi\ntham chiếu tới toàn bộ vision trong quyết định này (vocabulary\nlauncher/rootTask/subTask/capacity + 4 quy tắc chọn native vs\ncli/spawn dispatch bên dưới), thay vì lặp lại toàn bộ nội dung.\n"
+    },
+    {
+      "entryId": "liveness-088",
+      "record": {
+        "heading": "Bối cảnh",
+        "anchor": "bối-cảnh-7",
+        "startLine": 2174,
+        "endLine": 2185,
+        "sha256": "9dc299f9f0233dce1496573959feb1379777e3f6bdd9cf923c31f22680867781",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "#### Bối cảnh\n\nTrong lúc thi công `tsk-3sw` (capacity `agentType` field) và `tsk-53h`\n(generalize cli-dispatch-for-cheap-cross-provider-tasks), và trong lúc\ntruy ra gap thật của `tsk-1ni` (`judgeDiscovery`/`judgeDecompose` luôn\ncli/spawn 1 judge mù, kể cả khi caller đã là 1 soul sống cùng provider),\nngười dùng phát biểu 1 tầm nhìn tổng quát hơn cho toàn bộ cơ chế dispatch\n— vượt ra ngoài phạm vi hẹp của 2 item đó. Quyết định này CHỐT tầm nhìn\nđó thành văn bản chính thức (đặt tên **Native-First Dispatch Doctrine**),\nlàm định hướng chung cho mọi item sau này đụng tới dispatch (không tự nó\nimplement gì).\n"
+    },
+    {
+      "entryId": "liveness-089",
+      "record": {
+        "heading": "Đơn vị vận hành (vocabulary, chốt dùng xuyên suốt từ đây)",
+        "anchor": "đơn-vị-vận-hành-vocabulary-chốt-dùng-xuyên-suốt-từ-đây",
+        "startLine": 2186,
+        "endLine": 2241,
+        "sha256": "23f0b7ba04088f5758926e3a18ed13f65371751483a7507fb56b826c0f0eca0f",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [
+          "bin/fgos-runner.mjs"
+        ],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "#### Đơn vị vận hành (vocabulary, chốt dùng xuyên suốt từ đây)\n\n- **launcher** — tiến trình/cơ chế QUYẾT ĐỊNH kích hoạt 1 rootTask,\n  qua HOẶC 1 agent-terminal (tương tác) HOẶC 1 headless/non-interactive\n  agent process (spawn/cli). Là 1 VAI TRÒ, không phải 1 phần mềm cụ thể\n  duy nhất — nhiều cơ chế khác nhau đều đóng vai này:\n  - Người dùng tự tay mở 1 session Claude Code/Codex/agy tương tác —\n    chính người dùng là launcher.\n  - `/fgOS:pick`, `/fgOS:merge-loop`, `/fgOS:discover-loop`,\n    `/fgOS:cleanup-loop`, `/fgOS:retro-loop` — các skill lặp, chạy BÊN\n    TRONG 1 session tương tác đang sống, lần lượt kích hoạt/đưa nhiều\n    rootTask qua vòng đời của chúng.\n  - `fgos-runner` (`bin/fgos-runner.mjs`/`loop.mjs`) — launcher\n    HEADLESS, không cần người ngồi terminal — hình dung là tương lai khi\n    không cần thao tác tay nhiều nữa, tự claim + spawn worker headless\n    cho từng rootTask.\n  - `herdr-dashboard` (quản lý pane/tab terminal) — hạ tầng để đứng 1\n    agent-terminal lên (tìm/mở pane), CÓ THỂ được 1 launcher dùng để\n    đứng rootTask lên, và tự nó cũng có thể được bọc thành 1 launcher\n    (ví dụ 1 automation dùng herdr mở N pane, mỗi pane chạy 1 rootTask).\n  - **Vai trò launcher KHÔNG CẦN soul** — logic chọn \"item nào tiếp\n    theo\" (FIFO picker, frontier, priority ranking...) giữ THUẦN CƠ HỌC,\n đúng tinh thần \"trí tuệ không cầm picker\" (`fgos-routing`'s own \n    stance) đã có sẵn trong repo. Soul chỉ vào cuộc SAU KHI launcher\n    đã quyết định kích hoạt rootTask nào.\n\n- **rootTask** — công việc gốc đang làm, được bao bọc/vận hành bởi 1\n  agent-terminal (tương tác) hoặc 1 headless agent process. Vai trò này\n  có tính ĐỆ QUY/fractal, không cố định ở 1 tầng: bất kỳ ai đang là \"host\"\n  thực thi cho 1 việc, tại thời điểm nó tự kích hoạt việc con bên dưới,\n  chính nó lại đóng vai rootTask cho những việc con đó (khớp\n  `tsk-53h`'s nesting rule đã pin: 1 `claude` bị spawn qua cli/spawn, một\n  khi đã chạy, chính nó lại là 1 Claude Code agent loop thật, có thể tiếp\n  tục dispatch xuống 1 tầng nữa).\n\n- **subTask** — KHÔNG phải 1 phạm trù riêng, ĐÚNG bản chất chỉ là 1\n  **rootTask** khác, được kích hoạt đệ quy bởi rootTask hiện tại (khớp\n  đúng tính đệ quy/fractal đã nói ở trên — \"subTask\" chỉ là tên gọi\n  tương đối, nhìn từ góc của bên kích hoạt).\n\n- **capacity** — KHÁC bản chất với subTask: là 1 đơn vị functional/helper\n  hẹp (judge-discovery, submit-assist-classify) — không tự mang vòng đời\n  1 rootTask đầy đủ.\n\n  **subTask và capacity KHÔNG gộp thành 1 khái niệm** (đính chính lại\n  phát biểu ban đầu) — chúng khác nhau thật về bản chất (1 bên là\n  rootTask đệ quy, 1 bên là helper). Cái GIỐNG NHAU, và là điều đáng nói,\n  là **CƠ CHẾ DISPATCH/LAUNCH**: quyết định \"kích hoạt bằng gì\" (native\n  hay cli/spawn, theo 4 quy tắc dưới) áp dụng Y HỆT cho cả 2 — bên kích\n  hoạt không cần quan tâm target là 1 rootTask-con hay 1 helper, chỉ cần\n  biết: có cần soul không, cùng provider không, có cơ chế native tương\n  ứng không, config có ép cli/spawn không. Từ góc nhìn cơ chế dispatch\n  (không phải góc nhìn khái niệm), coi cả 2 là \"đối tượng bị kích hoạt\"\n  chung 1 quyết định là hợp lý — nhưng đó là hợp nhất Ở TẦNG CƠ CHẾ, chưa\n  từng có ý gộp bản chất 2 khái niệm làm một.\n"
+    },
+    {
+      "entryId": "liveness-090",
+      "record": {
+        "heading": "Quy tắc chọn cơ chế dispatch (áp dụng y hệt cho subTask lẫn capacity)",
+        "anchor": "quy-tắc-chọn-cơ-chế-dispatch-áp-dụng-y-hệt-cho-subtask-lẫn-capacity",
+        "startLine": 2242,
+        "endLine": 2278,
+        "sha256": "9beb96b74f128fa9142c690ecc20ac7a8dd34696f0ec46ed58b458530038c193",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "#### Quy tắc chọn cơ chế dispatch (áp dụng y hệt cho subTask lẫn capacity)\n\n1. **Target thuần cơ học** (không cần suy luận/soul) → luôn cli/spawn.\n   Hiển nhiên, không có lựa chọn khác, không tranh cãi.\n\n2. **Target cần soul, CÙNG provider với rootTask đang chạy** → ưu tiên\n   cơ chế NATIVE của chính provider đó (Claude: Task/SubAgent/Team; agy:\n   `--agent` + cơ chế subagent nội bộ của riêng nó — xác nhận thật qua\n   changelog agy: \"subagent_info payload for delegated subagents...\n   nested subagents (grandchild and deeper)\" — agy có khái niệm\n   native-subagent-trong-session y hệt Claude, không chỉ mỗi CLI flag\n   `--agent`). Đây là **native dispatch** — tên tổng quát hoá của\n   \"task-dispatch\" (`tsk-53h`) ra khỏi phạm vi riêng Claude, cho MỌI\n   provider có cơ chế in-process của riêng nó.\n\n   **Thu hẹp bởi `0033` (2026-08-16):** quy tắc 2 chỉ còn đúng cho\n   capacity **agentType-shaped** (chỉ có `agentType`, không có `command`/\n   `invocations` riêng — honoring nó `in-process` CHÍNH LÀ honoring cấu\n   hình). Một capacity **cli-spawn-shaped** (có `command`/`invocations`\n   riêng, ví dụ `agy`) giờ LUÔN cli/spawn khi đã cấu hình, kể cả khi\n   caller cùng provider và có sẵn native mechanism — quyết định người\n   dùng trực tiếp, xem `0033` cho lý do đầy đủ.\n\n3. **Target cần soul, KHÁC provider với rootTask đang chạy** → bắt buộc\n   cli/spawn (**cli/spawn dispatch** — tên giữ nguyên nghĩa \"cli-dispatch\"\n   cũ). Không có ngoại lệ hôm nay — chưa provider nào hỗ trợ native\n   cross-provider (Claude's Task tool chỉ chọn được model Claude, không\n   gọi được binary khác — đã xác nhận qua `--model`/`--agent` help text\n   lẫn `tsk-53h`'s locked fact).\n\n4. **Ngoại lệ hợp lệ, không phải bug:** config có thể ép 1 target cùng\n   provider vẫn phải cli/spawn, cho mục đích riêng (ví dụ: cách ly tài\n   nguyên, cần chạy trong worktree/cwd khác, cần 1 tiến trình độc lập\n   hoàn toàn không chia sẻ context). `tsk-3sw`'s `agentType` field\n   (headless-runner spawn `claude --agent <name>`) CHÍNH LÀ case này —\n   hợp lệ, không sai, không bị tầm nhìn này phủ nhận.\n"
+    },
+    {
+      "entryId": "liveness-091",
+      "record": {
+        "heading": "Lớp còn thiếu — LLM đủ thông minh để tự nhận ra khi nào dùng nhánh nào (Đã hoàn thành 4/5 pha; Pha 5 hoãn/YAGNI)",
+        "anchor": "lớp-còn-thiếu-llm-đủ-thông-minh-để-tự-nhận-ra-khi-nào-dùng-nhánh-nào-đã-hoàn-thành-45-pha-pha-5-hoãnyagni",
+        "startLine": 2279,
+        "endLine": 2288,
+        "sha256": "f222a3f24efa5a16bef2d5149c6af6c80d8bcc75db1d82b9f14c5029346e4a94",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [
+          "src/runner/dispatch/mechanism.mjs"
+        ],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "#### Lớp còn thiếu — LLM đủ thông minh để tự nhận ra khi nào dùng nhánh nào (Đã hoàn thành 4/5 pha; Pha 5 hoãn/YAGNI)\n\nHiện nay 4 trong 5 pha triển khai doctrine (`tsk-1ni`, `tsk-27y`, `tsk-53h`, `tsk-3ik`) đã HOÀN THÀNH, và Pha 5 (`tsk-6db`, mở rộng native detection sang `agy`) được hoãn lại có chủ đích (deferred/YAGNI, chưa có consumer thật) — không phải gap chưa được giải quyết.\n\nBối cảnh lịch sử và bằng chứng ban đầu (`tsk-1ni`): `judgeDiscovery`/`judgeDecompose` — 1 capacity cần soul (helper functional, không phải subTask) — trước đây LUÔN cli/spawn 1 `claude -p` con, dù caller (chính session đang gọi `fgos discover`) đã là 1 soul sống, CÙNG provider, đã có sẵn context tốt hơn (đã đọc CONTEXT.md, đã tự Socratic xong). Đúng lẽ ra phải rơi vào nhánh 2 (native — tự suy luận tiếp, không cần spawn gì cả) nhưng lại rơi vào nhánh 3/4 một cách âm thầm, sai — không phải vì thiếu khái niệm kiến trúc, mà vì thiếu cơ chế PHÁT HIỆN \"tôi đang được gọi từ 1 soul sống cùng provider hay không\" trước khi quyết định.\n\nTầm nhìn ban đầu cho rằng lớp thiếu này cần LÀ MỘT PHÁN ĐOÁN CỦA LLM (không thuần cơ học) vì tín hiệu quyết định không chỉ là 1 biến môi trường boolean (`CLAUDECODE` có mặt hay không) — còn phải cân nhắc: capacity này có thật sự cần soul không, có tồn tại cơ chế native tương ứng không, config có ép cli/spawn không, và (khi native khả dụng) có đáng dùng native hay vẫn nên cli/spawn vì lý do cô lập/tài nguyên.\n\n**Bản thu hẹp có chủ đích trong thực tế:** Những gì đã được ship (`tsk-53h` / `tsk-3ik`) là một bản thu hẹp có chủ đích (deliberate narrowing) của tầm nhìn 4 yếu tố phán đoán LLM ban đầu: 3 yếu tố được giải quyết cơ học ở thời điểm cấu hình (config-time: shape/kind agent vs tool, config ép cli-spawn), và yếu tố runtime duy nhất còn lại (\"liệu tôi có đang là 1 soul sống có quyền truy cập Task tool hay không\") được thu gọn thành cờ tự khai báo `--has-live-task-access` do caller truyền trực tiếp (không bao giờ tự dò tìm hay đoán mò). Bằng chứng mã nguồn: `src/runner/dispatch/mechanism.mjs:42` (`decideDispatchMechanism`) và `src/runner/dispatch/mechanism.mjs:82` (`decideExecutorDispatchMechanism`).\n"
+    },
+    {
+      "entryId": "liveness-092",
+      "record": {
+        "heading": "Quan hệ với việc đã khoá — không mâu thuẫn, chỉ hẹp hơn",
+        "anchor": "quan-hệ-với-việc-đã-khoá-không-mâu-thuẫn-chỉ-hẹp-hơn",
+        "startLine": 2289,
+        "endLine": 2301,
+        "sha256": "c99096deae66cee45c8f78f7e714841950252c77eae581df361948b02becb3dd",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "#### Quan hệ với việc đã khoá — không mâu thuẫn, chỉ hẹp hơn\n\n- `tsk-3sw` (agentType, Claude-only, build qua cli/spawn) — là 1 mảnh\n  ghép ĐÚNG của quy tắc 4 (ngoại lệ hợp lệ) + phần thật cần cho mọi\n  nhánh khác cũng vậy (cli/spawn primitive vẫn cần tồn tại, dùng chung\n  cho case cơ học/cross-provider/config-ép). Không bị supersede.\n- `tsk-53h`'s nesting rule + bằng chứng đa-provider (Claude/agy/Codex 3\n  shape khác nhau) — ĐÚNG NỀN TẢNG quy tắc 2/3 ở trên dựa vào, không đổi.\n- Cả 2 item đó và gap `tsk-1ni` đều chỉ là MẢNH GHÉP hẹp (cơ chế\n  `capabilities.<id>` config riêng của fgOS) của bức tranh rộng hơn tầm\n  nhìn này vẽ ra (gộp cả việc tự gọi Task tool ngoài cơ chế\n  `capabilities.<id>`, gộp cả khái niệm launcher tường minh).\n"
+    },
+    {
+      "entryId": "liveness-093",
+      "record": {
+        "heading": "Ranh giới quan sát được (observability) — tránh ngộ nhận",
+        "anchor": "ranh-giới-quan-sát-được-observability-tránh-ngộ-nhận",
+        "startLine": 2302,
+        "endLine": 2315,
+        "sha256": "0d669555d399516349bffd6c514dbff4ed4d9d5baaa3df8ad95b8820cbc340e2",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "#### Ranh giới quan sát được (observability) — tránh ngộ nhận\n\nƯu tiên native (quy tắc 2) có 2 lý do ĐỘC LẬP, không phải 1: (a) tránh\nlãng phí/sai lệch khi soul mù re-derive 1 phán đoán soul sống đã làm rồi\n(đúng bug `tsk-1ni`) — lý do này ĐÚNG ở CẢ launcher tương tác lẫn\nheadless; (b) quan sát được trực tiếp (agent-terminal tương tác cho thấy\npane/subagent sống) — lý do này CHỈ đúng khi launcher đang tương tác.\nKhi rootTask tự nó chạy headless (spawn bởi `fgos-runner`), dùng native\nbên trong nó (nested Task) VẪN tránh được lãng phí (a) nhưng KHÔNG cho\nquan sát sống (b) — vẫn chỉ ghi lại post-hoc, có điều kiện, qua\nscout-notes.md (đã trace thật trong buổi thảo luận này). Không đánh đồng\n\"dùng native\" với \"quan sát được\" — 2 lợi ích tách biệt, chỉ trùng nhau\nkhi launcher vốn đã tương tác.\n"
+    },
+    {
+      "entryId": "liveness-094",
+      "record": {
+        "heading": "Việc chưa quyết, để lại cho item build lớp quyết định thật (Đã hoàn tất qua `dispatch.mjs decide` & Pha 1-4; Pha 5 hoãn)",
+        "anchor": "việc-chưa-quyết-để-lại-cho-item-build-lớp-quyết-định-thật-đã-hoàn-tất-qua-dispatchmjs-decide-pha-1-4-pha-5-hoãn",
+        "startLine": 2316,
+        "endLine": 2321,
+        "sha256": "f39e4606bd6612839b98addef3629613bedae4c492c2c03c3e5dddb37f99e7b2",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [
+          "src/runner/dispatch/mechanism.mjs"
+        ],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "#### Việc chưa quyết, để lại cho item build lớp quyết định thật (Đã hoàn tất qua `dispatch.mjs decide` & Pha 1-4; Pha 5 hoãn)\n\n- Tín hiệu phát hiện \"launcher hiện tại có phải soul sống cùng provider không\": Caller tự khai báo qua cờ `--has-live-task-access` khi gọi `dispatch.mjs decide` (Pha 3/4). Pha 5 mở rộng sang `agy` hoãn lại (YAGNI).\n- Cơ chế tường minh áp CÙNG 1 quyết định dispatch cho cả subTask lẫn capacity trong code thật: `dispatch.mjs decide` đã hợp nhất qua 1 entry point duy nhất (Pha 4, `tsk-3ik`).\n- Địa điểm đặt lớp quyết định native-vs-cli/spawn: Nằm ở helper `decideDispatchMechanism` / `decideExecutorDispatchMechanism` (`src/runner/dispatch/mechanism.mjs`), được gọi bởi `dispatch.mjs decide`.\n"
+    },
+    {
+      "entryId": "liveness-095",
+      "record": {
+        "heading": "Kế hoạch triển khai (5 pha, đã file thành work item, deps thật)",
+        "anchor": "kế-hoạch-triển-khai-5-pha-đã-file-thành-work-item-deps-thật",
+        "startLine": 2322,
+        "endLine": 2331,
+        "sha256": "f25aa05e80d9cadb79f086302656f2c3aa6799793cbda29f5d48fd75ec0e0e0b",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "#### Kế hoạch triển khai (5 pha, đã file thành work item, deps thật)\n\n| Pha | Item | Phụ thuộc | Song song được với | Trạng thái |\n|---|---|---|---|---|\n| 1 | `tsk-1ni` — fix `repoRoot` (state-root/content-root lẫn nhau) + verify-overwrite | không | Pha 3 (`tsk-53h`, khác file) | Done |\n| 2 | `tsk-27y` — protocol caller tự khai verdict cho `fgos discover`/`fgos plan` | không (chỉ overlap footprint với Pha 1, không phải dep logic) | Pha 3 (`tsk-53h`, khác file) | Done |\n| 3 | `tsk-53h` — shared helper phát hiện native-vs-cli/spawn cho skill-facing capacity | `tsk-3sw` (đã done) | Pha 1, Pha 2 (khác file, không overlap) | Done |\n| 4 | `tsk-3ik` — hợp nhất `capabilities.<id>` config dispatch với lời gọi Task tool trực tiếp | `tsk-27y` + `tsk-53h` | không (chờ cả 2 xong) | Done |\n| 5 | `tsk-6db` — mở rộng native detection sang `agy` (deferred, YAGNI, chưa consumer thật) | `tsk-53h` | Pha 2, Pha 4 (concern khác nhau) | Hoãn / Deferred (YAGNI) |\n"
+    },
+    {
+      "entryId": "liveness-096",
+      "record": {
+        "heading": "Tham chiếu",
+        "anchor": "tham-chiếu",
+        "startLine": 2332,
+        "endLine": 2340,
+        "sha256": "dc7d37a559902c2ebc8bd7b79325f4ff6521e4c423270b37dfb00352264f880b",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "#### Tham chiếu\n\n- `tsk-3sw` — `docs/history/agent-executor-capacity-kind-task-resolution/CONTEXT.md`\n- `tsk-53h` — `docs/history/agent-executor-generalized-capacity-helper/CONTEXT.md`\n- `tsk-1ni` — gap `readLockedContext`/verify-overwrite, bằng chứng sống\n  cho lớp quyết định còn thiếu\n- `tsk-27y`, `tsk-3ik`, `tsk-6db` — Pha 2/4/5 của kế hoạch triển khai trên\n- `docs/explanation/agent-executor-capacity-aware-dispatch.md`\n"
+    },
+    {
+      "entryId": "liveness-097",
+      "record": {
+        "heading": "0028 — Đổi tên pinned term `orchestrator` thành `launcher`",
+        "anchor": "0028-đổi-tên-pinned-term-orchestrator-thành-launcher",
+        "startLine": 2341,
+        "endLine": 2342,
+        "sha256": "2b50b14364c5294a833a09c4452537859f0fa3e99f2fe39a15ef52a3d33c9256",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "### 0028 — Đổi tên pinned term `orchestrator` thành `launcher`\n"
+    },
+    {
+      "entryId": "liveness-098",
+      "record": {
+        "heading": "Bối cảnh",
+        "anchor": "bối-cảnh-8",
+        "startLine": 2343,
+        "endLine": 2361,
+        "sha256": "65aa5578534b6afb1a017cdcb1dce388b3fadd840e0447458439668b52ebfdb8",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "#### Bối cảnh\n\n`0026` đặt tên **orchestrator** cho vai trò: tiến trình/cơ chế QUYẾT ĐỊNH\nkích hoạt 1 rootTask, đứng nó lên, rồi bước ra hoàn toàn — logic chọn \"item\nnào tiếp theo\" giữ THUẦN CƠ HỌC, không cần soul; soul chỉ vào cuộc SAU KHI\nvai trò này đã quyết định kích hoạt rootTask nào (`0026`'s chính văn: \"Vai\ntrò orchestrator KHÔNG CẦN soul\").\n\nTên này sai nghĩa ngành: \"orchestrator\" trong ngành (Airflow, Temporal,\nKubernetes) chỉ định 1 tiến trình điều phối NHIỀU đơn vị theo thời gian,\nduy trì liên hệ liên tục trong lúc chạy (dependency graph, retry, giám sát,\nfan-in). Vai trò `0026` mô tả làm NGƯỢC LẠI: chọn đúng 1 item bằng logic cơ\nhọc, đứng nó lên, rồi bước ra hoàn toàn — không điều phối gì thêm sau đó.\nGọi vai trò này là \"orchestrator\" là hứa quá: người đọc đi tìm logic điều\nphối vốn không tồn tại trong vai trò này.\n\nNgười dùng chốt tên thay thế là **launcher** (2026-08-08), sau khi so sánh\n4 ứng viên: launcher/invoker/activator/commander.\n"
+    },
+    {
+      "entryId": "liveness-099",
+      "record": {
+        "heading": "Quyết định",
+        "anchor": "quyết-định-6",
+        "startLine": 2362,
+        "endLine": 2383,
+        "sha256": "d0488777204edbda4f9de53b9c6ede99b7ef30d3c4a067b3bff73c1f050d64b1",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "#### Quyết định\n\nĐổi pinned term `orchestrator` → `launcher` xuyên suốt prose fgOS tự sở\nhữu (decision doc, `docs/history/*`, `docs/how-to/*`, comment trong\n`src/runner/*.mjs`, và mọi chỗ khác dùng từ này theo đúng nghĩa vai trò\n`0026` mô tả — kiểm từng chỗ, không đổi hàng loạt mù). KHÔNG đổi:\n`herdr-dashboard/src/**/*.rs`'s `PaneOrchestrator` (khái niệm Rust khác hẳn —\ntrait mở/focus terminal pane, dùng từ đúng, giữ nguyên), `docs/distillery/**`\n(trích dẫn verbatim từ nguồn upstream), `plans/reports/**` (bản ghi lịch\nsử, không sửa ngược).\n\nRecord này chỉ supersede TÊN GỌI của `0026`, không phải thiết kế/logic của\nvai trò đó — 4 quy tắc chọn cơ chế dispatch, khái niệm rootTask/subTask/\ncapacity, và kế hoạch triển khai 5 pha trong `0026` giữ nguyên, chỉ đổi\nnhãn \"orchestrator\" thành \"launcher\" mọi nơi nó xuất hiện.\n\nTừ \"orchestrator\" sau khi giải phóng được ĐỂ DÀNH cho mục đích khác, CHƯA\ngán nghĩa trong record này — ứng viên đã bàn (chưa chốt): tầng điều phối\nN đơn vị chạy đồng thời + hợp nhất kết quả (`fgos-fanout`,\n`fgos-runner --watch`). Một item sau này claim nghĩa mới cho từ này, nếu\ncần.\n"
+    },
+    {
+      "entryId": "liveness-100",
+      "record": {
+        "heading": "Hệ quả",
+        "anchor": "hệ-quả-6",
+        "startLine": 2384,
+        "endLine": 2402,
+        "sha256": "3cd7fcd03d1a4ce5ce6e11459904b1960c44543b6e86807eb35430c058a0310b",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [
+          "test/docs/launcher-vocabulary-guard.test.mjs"
+        ],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "#### Hệ quả\n\n- `0026` không sửa tại chỗ — vẫn đúng nguyên văn lịch sử của phần thiết kế\n  (4 quy tắc dispatch, rootTask/subTask/capacity, kế hoạch 5 pha), chỉ đổi\n  từ \"orchestrator\" thành \"launcher\" trong chính văn của nó (đây là phần\n  ĐANG được rename, không phải phần bị đóng băng — khác với trường hợp\n  `0006`/`0024` nơi `0006` giữ nguyên 100% chữ nghĩa cũ). `0026` nhận thêm\n  `superseded_by: 0028` trong frontmatter, đúng khuôn STR72 trỏ-ngược-bắt-buộc.\n- 6 skill (`.claude/skills/` + mirror `.agents/skills/`, 12 file) đang trỏ\n  tới `docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-\n  cli-spawn.md` bằng đường dẫn — **filename của `0026` không đổi**, nên 12\n  file này không cần sửa gì (đường dẫn vẫn đúng, chỉ nội dung 0026 trỏ tới\n  đã đổi từ vựng bên trong).\n- Test guard (`test/docs/launcher-vocabulary-guard.test.mjs`) chống tái\n  phạm: fail khi \"orchestrator\" xuất hiện trong prose fgOS tự sở hữu ngoài\n  allowlist trên.\n\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ.\n"
+    },
+    {
+      "entryId": "liveness-101",
+      "record": {
+        "heading": "0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị",
+        "anchor": "0029-sửa-ba-mệnh-đề-từ-vựng-dispatch-của-0026-bỏ-roottasksubtask-capacity-là-năng-lực-có-tên-t1-hai-giá-trị",
+        "startLine": 2403,
+        "endLine": 2404,
+        "sha256": "df3e4cb594872691c1a72e21342b8b66705ad9560f212ae40543ef178c254d09",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "### 0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị\n"
+    },
+    {
+      "entryId": "liveness-102",
+      "record": {
+        "heading": "Bối cảnh",
+        "anchor": "bối-cảnh-9",
+        "startLine": 2405,
+        "endLine": 2415,
+        "sha256": "18a49710398e2ca3a994d25b210af2d0484a0e55953b1e6af7feb0ebf0f05a5b",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "#### Bối cảnh\n\nPhiên `tsk-5td` (`fgos-coding-shaping`, `docs/history/dispatch-concept-\nboundary/DISCUSSION.md`) khoá lại ranh giới khái niệm tầng dispatch sau khi\ngom bài học gather-work vs execution-work của bee, và chốt ba quyết định\ncùng chạm đúng **một** mục định nghĩa của `0026` — mục \"Đơn vị\nvận hành (vocabulary, chốt dùng xuyên suốt từ đây)\". Tiền lệ: `0028` đã\nsupersede `0026` một lần cho việc đổi tên `orchestrator`→`launcher`. Vì cả\nba quyết định lần này cũng sửa đúng mục đó, gộp chung **một** record thay vì\nba.\n"
+    },
+    {
+      "entryId": "liveness-103",
+      "record": {
+        "heading": "Quyết định",
+        "anchor": "quyết-định-7",
+        "startLine": 2416,
+        "endLine": 2417,
+        "sha256": "4c17a12b3ff416c57144d17b49b2da8b100fbea7d3f777acbb927d2eccf0c4fc",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "#### Quyết định\n"
+    },
+    {
+      "entryId": "liveness-104",
+      "record": {
+        "heading": "— bỏ `rootTask`/`subTask` khỏi từ vựng dispatch",
+        "anchor": "bỏ-roottasksubtask-khỏi-từ-vựng-dispatch",
+        "startLine": 2418,
+        "endLine": 2434,
+        "sha256": "48c3988ddcffaa00d8f57d87b43e03d40aa2ffda8a914b7c73d43e9cce02c8ca",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "##### — bỏ `rootTask`/`subTask` khỏi từ vựng dispatch\n\n`0026` viết: *\"**rootTask** — công việc gốc đang làm... **Vai trò này** có\ntính ĐỆ QUY/fractal\"* và *\"**subTask** — KHÔNG phải 1 phạm trù riêng, ĐÚNG\nbản chất chỉ là 1 **rootTask** khác... 'subTask' chỉ là tên gọi **tương\nđối**, nhìn từ góc của bên kích hoạt\"*.\n\nSửa: bỏ cả hai chữ khỏi từ vựng dispatch. `0026` tự khai `rootTask` là một\n**vai trò**, không phải một lớp phân loại — một item nằm backlog là `work`;\nmột launcher đứng nó lên thì cùng dòng, cùng id, state không đổi một byte mà\nchỉ đổi tên gọi. Thay `rootTask` bằng **`work`** (T2, `tsk-*`) mang **vai\ntrò** T1 khi được kích hoạt. `subTask` đội hai nghĩa khác tập, tách theo\nđúng nghĩa: (a) work con sinh ra bởi decompose — đã có tên và đã có field\nlưu (`work.parent`, `0012`'s cạnh parent-child) → gọi là **child work**; (b)\ntarget của một lần dispatch đệ quy, thoáng qua, không lưu — chỉ là một\n`work`/exec-packet khác, không cần tên riêng.\n"
+    },
+    {
+      "entryId": "liveness-105",
+      "record": {
+        "heading": "— `capacity` = một năng lực có tên (behavior-promise / functional-helper)",
+        "anchor": "capacity-một-năng-lực-có-tên-behavior-promise-functional-helper",
+        "startLine": 2435,
+        "endLine": 2452,
+        "sha256": "880d41ed893102de67eaa805a0ec9e3948f37396e7bbf970a89a390cfd9c85ca",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "##### — `capacity` = một năng lực có tên (behavior-promise / functional-helper)\n\n`0026` viết: *\"**capacity** — KHÁC bản chất với subTask: là 1 đơn vị\nfunctional/helper hẹp (judge-discovery, submit-assist-classify) — không tự\nmang vòng đời 1 rootTask đầy đủ\"*.\n\nSửa: bản chất **giữ nguyên** — vẫn là đơn vị functional/helper hẹp — nhưng\nnâng thành cặp **behavior-promise / functional-helper**: behavior-promise\ntrả lời nó **hứa** gì (`digest` hay `verdict`), functional-helper trả lời nó\n**là** gì (hẹp, không authority, phục vụ mục tiêu người khác). Một mình\nfunctional-helper thì hụt hợp đồng — lý do `0026` từng trôi sang tiêu chí\ncấu trúc \"không tự mang vòng đời rootTask đầy đủ\"; một mình behavior-promise\nthì không phân biệt được với tool (tool cũng hứa hành vi). **Tiêu chí phân\nđịnh** đổi từ cấu trúc (\"không mang vòng đời rootTask đầy đủ\") sang\n**authority + state effects**. `capacities.<id>` (config) là **bản khai**\ncủa một capacity, không phải bản thân capacity đó — cùng quan hệ giữa\n`gitnexus` và dòng registry mô tả nó.\n"
+    },
+    {
+      "entryId": "liveness-106",
+      "record": {
+        "heading": "— T1 (vai trò bên gọi) hai giá trị: `launcher`/`driver`; `orchestrator` = tầng hợp thành T0",
+        "anchor": "t1-vai-trò-bên-gọi-hai-giá-trị-launcherdriver-orchestrator-tầng-hợp-thành-t0",
+        "startLine": 2453,
+        "endLine": 2472,
+        "sha256": "b3f8fba335194c0acfdddc3f632aa1fad529d7321a8ffd60bc56d0f1facd1e15",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "##### — T1 (vai trò bên gọi) hai giá trị: `launcher`/`driver`; `orchestrator` = tầng hợp thành T0\n\n`0026` chưa từng liệt kê rõ T1 có bao nhiêu giá trị — chỉ định nghĩa\n`launcher`. `0028` chỉ đổi TÊN vai trò đó (`orchestrator`→`launcher`), chưa\ntừng đụng tới SỐ giá trị; `tsk-2cw` (đã `cleanup`) tự ghi mục đích thứ hai\ntrong tiêu đề của nó — *\"giải phóng từ orchestrator để dành cho MỤC ĐÍCH\nKHÁC\"* — rồi để trống, không nói mục đích đó là gì.\n\nSửa: điền vào đúng chỗ trống đó. `0028` đã lập luận sẵn hai tính chất **độc\nlập** của vai trò bên gọi: **arity** (1 đơn vị hay N đơn vị) và\n**engagement** (bước ra hẳn — \"buông\" — hay giữ liên hệ liên tục — \"ở\nlại\"). Xếp thành lưới 2×2: (1, buông) = `launcher`; (1, ở lại) = `driver`;\n(N, ở lại) = **`orchestrator`** — không phải ô thứ ba của T1 mà là **tầng\nhợp thành T0**: N lần dấn thân con (mỗi lần là một `driver`) rồi hợp nhất\nkết quả (bằng chứng sống: `fgos-fanout` spawn N Agent, mỗi Agent chạy\n`/fgOS:pick` end-to-end — mỗi cái là một `driver`, tổng thể là T0); (N,\nbuông) = trống **có lý do** — buông N đơn vị cùng lúc thì không còn ai hợp\nnhất kết quả, đó chỉ là `launcher` chạy N lần, không phải một vai trò mới.\n⇒ **T1 chỉ có hai giá trị.**\n"
+    },
+    {
+      "entryId": "liveness-107",
+      "record": {
+        "heading": "Hệ quả",
+        "anchor": "hệ-quả-7",
+        "startLine": 2473,
+        "endLine": 2491,
+        "sha256": "675cde8f1a2ce4c27b71a911d0307c342805977dbc4d0befe8b776e08babf725",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [
+          "src/runner/dispatch.mjs"
+        ],
+        "missingCitedPaths": [
+          "docs/decisions/0000-index.md"
+        ],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "#### Hệ quả\n\n- `0026` **không sửa tại chỗ nội dung** — chỉ frontmatter thay đổi: dòng\n  `superseded_by: 0028` thành `superseded_by: [0028, 0029]`. `0028` và\n  `0029` supersede hai phần **không chồng lấn** của `0026` (`0028` = tên gọi\n  \"orchestrator\"→\"launcher\"; `0029` = ba mệnh đề định nghĩa\n  `rootTask`/`subTask`/`capacity`/T1 ở trên), nên cả hai đều cần được trích\n  từ record cũ — một `superseded_by` dạng danh sách, không phải ghi đè.\n- `docs/decisions/0000-index.md`'s dòng của `0026` nhận thêm ghi chú trỏ tới\n  `0029` bên cạnh ghi chú `0028` đã có sẵn.\n- Không sửa code trong record này. `rg -n \"rootTask|subTask\" src/ bin/` vẫn\n  còn 2 hit ở `src/runner/dispatch.mjs:649,654` — prose trong docstring mô\n  tả cơ chế dispatch còn sống, không phải định danh, và nằm ngoài phạm vi\n  record này; dọn lại prose đó (nếu cần) là việc của một item khác.\n- Điền vào đúng chỗ trống `tsk-2cw` để lại — mục đích thứ hai của\n  \"orchestrator\" sau khi giải phóng tên gọi chính là tầng hợp thành T0.\n\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ.\n"
+    },
+    {
+      "entryId": "liveness-108",
+      "record": {
+        "heading": "Tham chiếu",
+        "anchor": "tham-chiếu-1",
+        "startLine": 2492,
+        "endLine": 2504,
+        "sha256": "a6b38cbc7b9678306ad9f1cfde694f2677ae93e24f34b24cd05c998358da0b05",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [
+          "docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md",
+          "docs/decisions/0028-doi-ten-orchestrator-thanh-launcher.md"
+        ],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "#### Tham chiếu\n\n- `tsk-5td` —, (`fgos show tsk-5td`; `tsk-5td` còn `status:\n  doing` trên nhánh riêng `fgw/tsk-5td` tại thời điểm record này được viết,\n  nên các quyết định trên chỉ đọc được qua `.fgos` event log dùng chung,\n  không qua file `CONTEXT.md` trên nhánh đó)\n- `docs/history/dispatch-concept-boundary/DISCUSSION.md` §6.3 (T2 · CẦU),\n  §6.4 (T3 · NĂNG LỰC CÓ TÊN — `capacity`), §6.7 (T0 và T1 — vai trò bên\n  gọi), §7.1 (Decision doc supersede `0026`)\n- `0026` — `docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md`\n- `0028` — `docs/decisions/0028-doi-ten-orchestrator-thanh-launcher.md`\n- `0012` — cạnh parent-child (`work.parent`), nền cho \"child work\"\n"
+    },
+    {
+      "entryId": "liveness-109",
+      "record": {
+        "heading": "0030 — Thêm bậc ưu tiên #2 \"Release con người\" vào thứ tự ưu tiên sản phẩm",
+        "anchor": "0030-thêm-bậc-ưu-tiên-2-release-con-người-vào-thứ-tự-ưu-tiên-sản-phẩm",
+        "startLine": 2505,
+        "endLine": 2506,
+        "sha256": "4b8f8fcbc5eb3f2c875d481c105799b9d8b333b73611856bac368507a58259b6",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "### 0030 — Thêm bậc ưu tiên #2 \"Release con người\" vào thứ tự ưu tiên sản phẩm\n"
+    },
+    {
+      "entryId": "liveness-110",
+      "record": {
+        "heading": "Bối cảnh",
+        "anchor": "bối-cảnh-10",
+        "startLine": 2507,
+        "endLine": 2535,
+        "sha256": "ecd0ce302bd5aa2463d76f6139b6dfcfe06f0aa49548f759ff038c118273b7a8",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "#### Bối cảnh\n\n`0025` chốt 3 bậc ưu tiên sản phẩm (Ship Faster > DoD > Polish Sau DoD),\nnạp always-loaded qua `AGENTS.md`. Trong lúc điều tra `tsk-4b2` (2 stage\n`discovery`/`exploring` không thể tới được về mặt cấu trúc), phiên làm\nviệc liên tục đề xuất gộp các bước nhỏ lại cho gọn (vd gộp bước phân loại\n`tier`/`kind`/`risk` vào stage `discovery`) — user chặn lại, chỉ ra một\nbậc ưu tiên đã phát biểu nhiều lần từ những phiên làm việc đầu tiên\n(\"từ những ngày đầu\", đặc biệt xuyên suốt 3 ngày cuối tuần thảo luận\nkhái niệm launcher/dispatch/capacity dẫn tới `0026`/`0028`/\n`0029`) nhưng chưa từng được ghi thành quyết định sản phẩm đứng riêng —\nkhiến câu hỏi \"có nên gộp không\" cứ lặp lại ở nhiều phiên khác nhau.\n\nUser chốt lại nguyên văn (2026-08-10):\n\n> \"số 1 của chúng ta là Ship Faster, cần phải thêm số 2 là `Release con\n> người`. Giải phóng con người khỏi việc ngồi canh và chờ trả lời. Hệ\n> thống tự phán đoán tự vận hành ở mức cao nhất có thể và khi thật sự cần\n> người sẽ hỏi người, và vì thế nó sẽ thiết kế để collect thành bộ để hỏi\n> nhằm mỗi lần con người quay lại là có thể trả lời nhiều nhất những câu\n> hỏi và đi, sau đó sẽ quay lại chứ không cần ngồi canh. Vì thế mà hệ\n> thống cần có cách hoạt động và tích lũy câu hỏi: chuyện gì làm được thì\n> làm, không rõ thì bỏ qua làm mảnh việc khác, tích lũy đủ nhiều câu hỏi\n> đợi con người quay lại — chứ không phải câu đó stuck và có những việc\n> khác của cùng item có thể giải quyết được trước thì lại không giải\n> quyết mà ngồi chờ câu trả lời. Vì vậy cần chia nhỏ tiến trình,\n> process/stages/skills thật nhỏ và mịn.\"\n> — real conversation, phiên `tsk-4b2`, 2026-08-10\n"
+    },
+    {
+      "entryId": "liveness-111",
+      "record": {
+        "heading": "Quyết định",
+        "anchor": "quyết-định-8",
+        "startLine": 2536,
+        "endLine": 2561,
+        "sha256": "383dc5c3482b2643ad131a7e526c9f20114c44a3f81618b2e9f2672819909fb1",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "#### Quyết định\n\nThứ tự ưu tiên sản phẩm, mở rộng từ 3 lên **4 bậc cố định** — bậc dưới\nkhông được ghi đè bậc trên:\n\n1. **Ship Faster** — giao nhanh hơn, không đoán mò, giảm\n   friction/better-dev-ux, ít chờ đợi. (nguyên văn `0025`, không đổi)\n2. **Release con người** — giải phóng con người khỏi việc ngồi canh chờ\n   trả lời. Hệ thống tự phán đoán, tự vận hành ở mức cao nhất có thể; chỉ\n   hỏi người khi thật sự cần, và khi hỏi thì **collect thành bộ** — để mỗi\n   lần con người quay lại có thể trả lời nhiều nhất số câu hỏi đang treo\n   rồi đi tiếp, không phải ngồi canh từng câu một. Hệ quả kỹ thuật bắt\n   buộc: một câu hỏi treo **không được** làm nghẽn toàn bộ item khi còn\n   phần việc khác của CÙNG item có thể tiến tới mà không cần câu trả lời\n   đó — process/stage/skill vì vậy phải chia **nhỏ và mịn**, mỗi mảnh tiến\n   hoặc park độc lập, thay vì gộp thành đơn vị to, thô.\n3. **DoD** — reproducibly verifiable result + evidence-linked\n   documentation. (nguyên văn `0025`, không đổi, lùi từ bậc 2 xuống bậc 3)\n4. **Polish Sau DoD** — hoàn thiện sau ngưỡng, không mở scope. (nguyên văn\n   `0025`, không đổi, lùi từ bậc 3 xuống bậc 4)\n\nPlacement test giữ nguyên như `0025` đã áp (họ hàng luật L8,\n`docs/platform-foundations.md`): thứ tự ưu tiên áp dụng MỌI lúc, không\nriêng 1 workflow → phải nằm standing sheet (`AGENTS.md`, always-loaded),\nkhông phải chỉ nằm `docs/decisions/`.\n"
+    },
+    {
+      "entryId": "liveness-112",
+      "record": {
+        "heading": "Hệ quả",
+        "anchor": "hệ-quả-8",
+        "startLine": 2562,
+        "endLine": 2576,
+        "sha256": "0317505db8113cf3740cf0c37c9bec765b8985d3d6cf64a9753d9a2a57201415",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "#### Hệ quả\n\n- `0025` không sửa tại chỗ, chỉ nhận `superseded_by: 0030` (đúng khuôn\n  STR72 trỏ-ngược-bắt-buộc, cùng cách `0023` → `0025` đã làm).\n- `AGENTS.md`'s pointer 4 dòng cập nhật theo thứ tự mới, trỏ `docs/decisions/0030`.\n- Bậc 2 mới này là căn cứ trực tiếp để `tsk-4b2` (wiring `discovery`/\n  `exploring`) thiết kế theo hướng stage/skill chia nhỏ, mỗi mảnh\n  park/tiến độc lập — không gộp bước phân loại `tier`/`kind`/`risk` vào\n  `discovery` dù gộp có vẻ gọn hơn (YAGNI/DRY thuần code không áp được ở\n  đây — bậc 2 này ghi đè trực tiếp bản năng \"gộp cho gọn\" khi thiết kế\n  stage/skill của fgOS).\n- Chưa làm ở record này (treo lại, không phải phạm vi hiện tại): một check\n  tự động xác nhận `AGENTS.md` còn giữ đúng 4 mục theo thời gian (L8 rule\n  3, cùng khoảng trống `0025` đã treo cho bậc cũ).\n"
+    },
+    {
+      "entryId": "liveness-113",
+      "record": {
+        "heading": "0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới",
+        "anchor": "0031-bỏ-guard-cấm-từ-orchestrator-sau-khi-0029-đã-gán-nghĩa-mới",
+        "startLine": 2577,
+        "endLine": 2578,
+        "sha256": "7f442d9827fdfb9660154db0074bc6ffc9afce39957f1cc41b5e66c8e8294161",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "### 0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới\n"
+    },
+    {
+      "entryId": "liveness-114",
+      "record": {
+        "heading": "Bối cảnh",
+        "anchor": "bối-cảnh-11",
+        "startLine": 2579,
+        "endLine": 2607,
+        "sha256": "1e81c7b828722713bd626999a7f34263e05645d631cfb88c7236cf083ab743e5",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "#### Bối cảnh\n\n`0028` đổi tên pinned term `orchestrator` → `launcher` cho vai trò `0026` mô\ntả (chọn 1 item, đứng nó lên, bước ra hẳn), vì tên cũ sai nghĩa ngành. Cùng\nrecord đó ghi rõ từ vừa giải phóng:\n\n> Từ \"orchestrator\" sau khi giải phóng được ĐỂ DÀNH cho mục đích khác,\n> **CHƯA gán nghĩa trong record này** — ứng viên đã bàn (chưa chốt): tầng\n> điều phối N đơn vị chạy đồng thời + hợp nhất kết quả.\n\nVà dựng một anti-recidivism guard (`test/docs/launcher-vocabulary-guard.\ntest.mjs`) fail khi từ đó xuất hiện trong prose fgOS tự sở hữu ngoài\nallowlist. Guard đó đúng **trong đúng cửa sổ thời gian ấy**: từ chưa có\nnghĩa mới, nên mọi lần nó tái xuất đều là tái phạm nghĩa cũ.\n\nCửa sổ ấy đã đóng. `0029` điền vào đúng chỗ trống `0028` để lại:\n\n> Xếp thành lưới 2×2: (1, buông) = `launcher`; (1, ở lại) = `driver`;\n> (N, ở lại) = **`orchestrator`** — không phải ô thứ ba của T1 mà là **tầng\n> hợp thành T0** [...] Điền vào đúng chỗ trống `tsk-2cw` để lại — mục đích\n> thứ hai của \"orchestrator\" sau khi giải phóng tên gọi chính là tầng hợp\n> thành T0.\n\nTừ thời điểm `0029` được chấp nhận, `orchestrator` là **từ vựng fgOS hợp lệ,\nđã được định nghĩa chính thức**, chỉ tầng hợp thành T0 (N đơn vị, ở lại) —\nđúng thứ `/fgOS:retro-loop`, `/fgOS:merge-loop`, `/fgOS:discover-loop`,\n`/fgOS:cleanup-loop` và `fgos-fanout` đang làm. Guard của `0028` vẫn chặn nó,\nnên nó đang cấm fgOS dùng chính từ vựng fgOS vừa chốt.\n"
+    },
+    {
+      "entryId": "liveness-115",
+      "record": {
+        "heading": "Quyết định",
+        "anchor": "quyết-định-9",
+        "startLine": 2608,
+        "endLine": 2641,
+        "sha256": "376fdb783c36aa3a796f484e4f8c15bd0ae9619e6673ea464816878f712c5dd4",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [
+          "test/docs/launcher-vocabulary-guard.test.mjs",
+          "docs/decisions/0000-index.md"
+        ],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "#### Quyết định\n\nBỏ hẳn guard cấm từ `orchestrator`: xoá\n`test/docs/launcher-vocabulary-guard.test.mjs` và toàn bộ cơ chế allowlist\nđi kèm.\n\nBa lý do, theo thứ tự sức nặng:\n\n1. **Guard mâu thuẫn với `0029`.** Nó chặn một từ mà một decision record\n   sau nó đã định nghĩa chính thức. Giữ nguyên nghĩa là để một record cũ\n   phủ quyết một record mới hơn — ngược hẳn khuôn supersede của repo này.\n\n2. **Guard là `grep` mức-từ, không phân biệt được nghĩa.** Giá trị còn lại\n   duy nhất của nó là bắt người dùng `orchestrator` theo nghĩa CŨ (vai\n   1-item). Một phép so khớp chuỗi không làm nổi việc đó: nó chặn nghĩa mới\n   hợp lệ y hệt cách nó chặn nghĩa cũ sai. Không có cách thu hẹp nào giữ\n   được phần giá trị thật.\n\n3. **Chi phí bảo trì đã vượt giá trị, có bằng chứng đếm được.**\n   `ALLOWED_FILES_ENTRIES` đã phình lên 28 entry, mỗi entry một lý do\n   hand-written riêng, cộng 3 cơ chế miễn trừ theo pattern\n   (`FROZEN_FILENAMES`, `FROZEN_PHRASES`, `IRON_LAW_EVIDENCE_META_CITATION`).\n   Ít nhất bốn item đã sinh ra **chỉ để vá allowlist này** (`tsk-2au`,\n   `tsk-2lg`, `tsk-2uo`, `tsk-4cx`). Chính `docs/decisions/0000-index.md`\n   phải viết vòng vo *\"tên gọi ban đầu của `0026`\"* ở hai dòng thay vì gọi\n   thẳng tên — guard đang bóp méo văn của chính fgOS.\n\nRecord này chỉ supersede **mệnh đề guard** trong \"Hệ quả\" của `0028`. Phần\nchính của `0028` — việc đổi tên vai trò `0026` từ `orchestrator` thành\n`launcher` — **giữ nguyên hiệu lực**: `launcher` vẫn là tên đúng cho vai (1\nđơn vị, buông), và không chỗ nào được quay về dùng `orchestrator` cho nghĩa\nđó. Cùng khuôn supersede-từng-phần mà `0028` và `0029` đã dùng với `0026`\n(hai phần không chồng lấn).\n"
+    },
+    {
+      "entryId": "liveness-116",
+      "record": {
+        "heading": "Từ vựng sau record này",
+        "anchor": "từ-vựng-sau-record-này",
+        "startLine": 2642,
+        "endLine": 2650,
+        "sha256": "543d06c6d6ad835d8a4abe8da27efee1e8bad29c27dcb3ba254d50487fe75552",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "#### Từ vựng sau record này\n\nLưới 2×2 của `0029` là từ vựng hiện hành, dùng thẳng, không cần né:\n\n| | buông (bước ra hẳn) | ở lại (giữ liên hệ) |\n|---|---|---|\n| **1 đơn vị** | `launcher` | `driver` |\n| **N đơn vị** | trống có lý do | `orchestrator` (tầng hợp thành T0) |\n"
+    },
+    {
+      "entryId": "liveness-117",
+      "record": {
+        "heading": "Hệ quả",
+        "anchor": "hệ-quả-9",
+        "startLine": 2651,
+        "endLine": 2672,
+        "sha256": "171e4d6182690960bdc5b982faccc97ac640dbd7f38f62a5b563a5fc01ba42eb",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [
+          "test/docs/launcher-vocabulary-guard.test.mjs",
+          "scripts/check-decision-codes.baseline.js",
+          "docs/decisions/0000-index.md"
+        ],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "#### Hệ quả\n\n- Xoá `test/docs/launcher-vocabulary-guard.test.mjs`.\n- Xoá entry của file đó khỏi `scripts/check-decision-codes.baseline.json`\n  (baseline chỉ chặn phát hiện MỚI, nên entry cũ vô hại — bỏ đi để không\n  còn dữ liệu chết trỏ tới một file không tồn tại).\n- Xoá `docs/how-to/allowlist-a-historical-mention-in-launcher-vocabulary-\n  guard.md` và dòng của nó trong `docs/enduser-docs-index.json`: how-to đó\n  hướng dẫn dùng một cơ chế không còn tồn tại.\n- `0028` nhận `superseded_by: [0031]` trong frontmatter, đúng khuôn STR72\n  trỏ-ngược-bắt-buộc; `docs/decisions/0000-index.md` nhận dòng của `0031`\n  và ghi chú trên dòng `0028`.\n- Không đụng: `herdr-dashboard/src/**/*.rs`'s `PaneOrchestrator` (khái niệm\n  Rust khác hẳn), `docs/distillery/**` (trích verbatim upstream),\n  `plans/reports/**` (bản ghi lịch sử). Ba nhóm này vốn đã nằm ngoài phạm\n  vi guard và không đổi gì.\n- Không sửa ngược prose cũ. Những chỗ đang né từ (ví dụ hai dòng vòng vo\n  trong `0000-index.md`) được phép viết thẳng lại khi có item chạm vào\n  chúng — không phải việc của record này.\n\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ.\n"
+    },
+    {
+      "entryId": "liveness-118",
+      "record": {
+        "heading": "Tham chiếu",
+        "anchor": "tham-chiếu-2",
+        "startLine": 2673,
+        "endLine": 2678,
+        "sha256": "7a7c5d9afe2736b493592e2edab20bc4ffcf09803be687abbec67e2243f04030",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [
+          "docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md",
+          "docs/decisions/0028-doi-ten-orchestrator-thanh-launcher.md",
+          "docs/decisions/0029-sua-dinh-nghia-roottask-subtask-capacity-t1-cua-0026.md"
+        ],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "#### Tham chiếu\n\n- `0026` — `docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md`\n- `0028` — `docs/decisions/0028-doi-ten-orchestrator-thanh-launcher.md`\n- `0029` — `docs/decisions/0029-sua-dinh-nghia-roottask-subtask-capacity-t1-cua-0026.md`\n"
+    },
+    {
+      "entryId": "liveness-119",
+      "record": {
+        "heading": "0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người",
+        "anchor": "0032-cổng-iron-law-chỉ-hỏi-ở-ranh-giới-trunk-thêm-mức-warn-agent-gõ-lệnh-thay-người",
+        "startLine": 2679,
+        "endLine": 2680,
+        "sha256": "3aa5c331e90fe1d1619f1d1b8436dae47c14ae2b24ac9638ffe101cc3d4ee453",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "### 0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người\n"
+    },
+    {
+      "entryId": "liveness-120",
+      "record": {
+        "heading": "Bối cảnh",
+        "anchor": "bối-cảnh-12",
+        "startLine": 2681,
+        "endLine": 2711,
+        "sha256": "af3402e254d875e37427d2edf94d421764f23e76247a20305dfd60e8b28253ef",
+        "classification": "historical-or-decision-carriage",
+        "directReferenceCount": 349,
+        "sectionAnchorReferences": [],
+        "ruleIds": [],
+        "ruleReferences": [],
+        "implementationPaths": [
+          "src/evolve/iron-law.mjs"
+        ],
+        "missingCitedPaths": [],
+        "retired": false,
+        "retirementEligible": false,
+        "reason": "A19 conservative preservation: document citations, rule consumers and cited extant paths protect live content. A section without a lexical hit has no proved retired subject. Decision/history placement is not a retirement or truth judgment. Independent section triage and current-content truth sample remain pending."
+      },
+      "fullSectionText": "#### Bối cảnh\n\nCổng Iron Law (`classifyIronLaw`, `src/evolve/iron-law.mjs`) hỏi một câu\nđáng hỏi: diff đang chờ merge này có NĂNG LỰC làm yếu chính kỷ luật\ngate/verify của hệ không? Câu hỏi giữ nguyên giá trị. Cách nó hỏi thì\nkhông.\n\n` self-improve-loop` — hai quyết định nội tuyến, chỉ tồn tại dưới\ndạng trích dẫn trong `docs/specs/runner.md` và trong `view.decisions` của\nnhật ký sự kiện, không phải một record đánh số dưới `docs/decisions/` —\nkhoá cổng ở đúng một hình dạng: chạy trên MỌI đề xuất nguồn `runner`, và\n`required: true` mà thiếu `--acknowledge-iron-law` thì **từ chối cứng,\nkhông có mức nào khác**. Ba hệ quả đo được, ghi trong\n`docs/history/iron-law-gate-human-ux/DISCUSSION.md`:\n\n1. **Hỏi ở chỗ không có gì để mất.** Một leaf merge vào `fgw/<root>` không\n   đụng tới trunk, nhưng vẫn phải trả lời câu hỏi \"diff này có thể làm yếu\n   gate không\" y như một root land thẳng lên main. Cùng một diff bị hỏi\n   nhiều lần trên đường đi lên, và lần hỏi cuối — lần duy nhất thật sự\n   chặn được gì — chìm giữa những lần hỏi vô hại.\n2. **Không có nấc nào giữa \"chặn cứng\" và \"gỡ hẳn\".** Một người muốn xem\n   cổng bắt gì mà chưa muốn nó chặn thì không có lựa chọn nào ngoài việc\n   không dùng.\n3. **Câu hỏi treo nghẽn cả hàng.** `merge-loop` gặp một item bị Iron Law\n   giữ thì dừng cả vòng, dù những item còn lại phía sau không liên quan gì\n   — ngược thẳng bậc ưu tiên #2 \"Release con người\" (`0030`): một câu hỏi\n   treo không được nghẽn phần việc khác còn tiến được.\n\nIron Law **không** nằm trong `docs/platform-foundations.md` (đã kiểm bằng\ngrep, không khớp) — nên đây là sửa spec, không phải đổi một luật khoá.\n"
+    }
+  ]
+}

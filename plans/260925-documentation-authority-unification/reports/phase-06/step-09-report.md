@@ -1,3 +1,86 @@
+# Runner committed native proof and bounded review requests — pending independent review
+
+Content/decision commit **81d0ed0747014e976c0d29222439fd6e3592b468** (Step 9 runner carriage). This checkpoint supersedes the author-only native-proof deferrals below. Source `docs/specs/runner.md`, all candidate docs, frozen-map amendment and decision shard bytes remain unchanged. New proof/request/report artifacts must additionally be pinned to the subsequent runner commit when reviewed; this content pin is not substituted for their new bytes. No Step 8 one-row request touched; no seed, draw, truth judgment or review verdict chosen.
+
+## Native sync, preservation and exact proof
+
+Exactly **one background native registry sync**, dedicated [log](step9-native-sync.log), completed in **1349.35 seconds**. 4484 files / 91324 active claims. Known identities **98470 → 99020**, **zero known-ID loss**; 550 added units, 0 new gaps and 0 newly retired rows. Compact registry persisted **once**: **61883121 bytes**, SHA256 `dbf89fc898e1107d69bd60ad2f277fde74562732edf79d3a74b2ce1bd63e2b16`. The initial native generation exited 137 during monolithic scratch serialization; the truncated cache failed deserialization and was discarded. Recovery reused the exact staged carried registry, reran only read-only native inventory generation and saved every enumerable field in bounded scratch shards. There was **one carry-forward, two read-only inventory generation attempts, one persistence**; no second registry sync. Total duration above includes recovery; the recovery generation took **617.102 seconds**. Failure/recovery logs and helper source are retained. Complete enumerable native cache is scratch-only. [Sync proof](step9-native-sync-proof.json).
+
+Native inventory, active registry and applied identity/path/anchor/unitDigest tuples are equal. [Full native verification](step9-native-verification.json) embeds exact helper sources and commands for reproduction. Full production `checkInventory` D and strict E use one source scope `docs/specs/runner.md`, both prior registries together and each separately; full inventory coverage is retained, no checker shortcut or narrowed fake inventory.
+
+| Prior registries | D fatal | Strict E fatal | E open groups |
+|---|---:|---:|---|
+| both | 0 | 3 | claims-not-reviewed: 495; registry-gaps-without-disposition: 28; candidate-blocks-unreferenced: 63 |
+| identity | 0 | 3 | claims-not-reviewed: 495; registry-gaps-without-disposition: 28; candidate-blocks-unreferenced: 63 |
+| phase02 | 0 | 3 | claims-not-reviewed: 495; registry-gaps-without-disposition: 28; candidate-blocks-unreferenced: 63 |
+
+**Strict E is not green.** Pending source claims, historical gaps and candidate reverse units are explicit open data; no closure acceptance is fabricated. Raw outputs: [D both](step9-native-D-both.json), [D identity](step9-native-D-identity.json), [D phase02](step9-native-D-phase02.json), [E both](step9-native-E-both.json), [E identity](step9-native-E-identity.json), [E phase02](step9-native-E-phase02.json).
+
+[candidate-unverified-runner.json](candidate-unverified-runner.json) is now **native**, derived from strict E: **63 reverse entries**, full **claimId/path/anchor/unitDigest/fileStatus** equality against all three strict E outputs; Candidate/Canonical No and native authority status verified from committed bytes. Full shown text and shown-text SHA256 retained. The provisional fast list had 62: native adds the existing unchanged `docs/platform/runner/contracts/routing-handoff.md#unheaded-block-1`, absent from the fast overlay inventory; none of the prior 62 path/anchor/digest tuples disappeared. Its **119 known-risk carriage bindings** are a separate referenced-source channel, now bound to real native target IDs; stale carried sentences remain truth-unverified. This list gives no truth, classification or promotion approval.
+
+## Predecessor accounting and review boundaries
+
+All **32 pre-existing runner predecessor gaps** retain their IDs and now have exact historical unit witnesses (full digests, ancestry, text and immutable blob/commit) found across **85 distinct source revisions**. [Accounting](step9-predecessor-accounting.json) shows bounded live contextual candidates using complete ancestry, normalizing revised decision titles by numeric ID, plus native tuples and unchanged source-carriage decisions. These are candidates for independent reconciliation, not selected successors. Every full predecessor is conservatively retained verbatim in [accounting-261015-1706-runner-predecessor-residuals-81d0ed074.md](accounting-261015-1706-runner-predecessor-residuals-81d0ed074.md), **32 entries**, file SHA256 `77346a00682159f863b00adb1c5ed324f7ea4a48ad762404d2f18c9ebf3deba8`; [binding](step9-predecessor-residual-binding.json). No legal disposition, partial-carry acceptance, inherited approval or registry identity graft was authored. **Native strict E reports 28 gaps without disposition**. The full decision set overlays four pre-existing reviewed registryGaps dispositions from earlier batches; the fast runner-only overlay missed them. All four stored target digests now differ from the actual current units at their stored anchors. Original decisions, full committed review reports, exact old target witnesses and current native-at-anchor tuples are retained in accounting. These four are separate pending A22 rebind/re-review obligations; their old verdicts never approve this runner carriage, and no decision content was changed. A22/A34 independent whole-unit successor/remainder judgments and any later exact source/primary-target/residual-file SHA256 approval remain owed. Runner is maintained authority; the separate generation entry records that no generated-output disposition applies.
+
+All **495 source rows** are packaged once with full source and target shown text (including full heading direct-section payload), unchanged complete decision, full 64-hex digests, ancestry, actual native target identity and complete diff. **0 Unit-exact / 494 Weak-exact / 1 Judgment**, all pending. Exactly **one unequal-digest pair**, the H1 metadata insertion, is marked mandatory. The **11 map-amendment rows** and **two rebound-anchor receipts** are explicitly marked in affected source entries and the separate triage/map request.
+
+**23 source requests**, maximum **70 entries** each, grouped by target file and contiguous sections. Business Rules, Behaviors and decision-history each span multiple packs; no individual unit is truncated. A36 reviewer draws independently: at least 15% Weak-exact/Judgment per pack, minimum 10 or all if fewer, plus every unequal pair; batch floor 75 Weak-exact plus the sole Judgment (per-pack minima may exceed this). More than 3% deep rework triggers full-pack reading. The reviewer supplies every seed, selected ID and verdict.
+
+Separate non-source channels cover triage/map (14), liveness (167), native candidate list (63), predecessor/generation (33), the complete current-truth pool (181, reviewer draws 30 globally), owner queue (1) and report/native accounting (1). Historical/decision placement does not exclude current assertions from truth scrutiny. A28 >10% false requires owner direction; full truth at promotion remains owed.
+
+## Every pending request
+
+Index: [review-request-261015-1706-runner-native-index.md](review-request-261015-1706-runner-native-index.md); [machine index and binding proof](step9-review-package-index.json). **34 requests**. Each path/count below is exact; non-source evidence-digest verdicts cannot apply source approvals.
+
+| Request path (relative to this report) | Channel | Entries |
+|---|---|---:|
+| [review-request-261015-1706-runner-source-01-81d0ed074.md](review-request-261015-1706-runner-source-01-81d0ed074.md) | source | 2 |
+| [review-request-261015-1706-runner-source-02-81d0ed074.md](review-request-261015-1706-runner-source-02-81d0ed074.md) | source | 8 |
+| [review-request-261015-1706-runner-source-03-81d0ed074.md](review-request-261015-1706-runner-source-03-81d0ed074.md) | source | 2 |
+| [review-request-261015-1706-runner-source-04-81d0ed074.md](review-request-261015-1706-runner-source-04-81d0ed074.md) | source | 8 |
+| [review-request-261015-1706-runner-source-05-81d0ed074.md](review-request-261015-1706-runner-source-05-81d0ed074.md) | source | 30 |
+| [review-request-261015-1706-runner-source-06-81d0ed074.md](review-request-261015-1706-runner-source-06-81d0ed074.md) | source | 29 |
+| [review-request-261015-1706-runner-source-07-81d0ed074.md](review-request-261015-1706-runner-source-07-81d0ed074.md) | source | 12 |
+| [review-request-261015-1706-runner-source-08-81d0ed074.md](review-request-261015-1706-runner-source-08-81d0ed074.md) | source | 2 |
+| [review-request-261015-1706-runner-source-09-81d0ed074.md](review-request-261015-1706-runner-source-09-81d0ed074.md) | source | 20 |
+| [review-request-261015-1706-runner-source-10-81d0ed074.md](review-request-261015-1706-runner-source-10-81d0ed074.md) | source | 15 |
+| [review-request-261015-1706-runner-source-11-81d0ed074.md](review-request-261015-1706-runner-source-11-81d0ed074.md) | source | 4 |
+| [review-request-261015-1706-runner-source-12-81d0ed074.md](review-request-261015-1706-runner-source-12-81d0ed074.md) | source | 4 |
+| [review-request-261015-1706-runner-source-13-81d0ed074.md](review-request-261015-1706-runner-source-13-81d0ed074.md) | source | 2 |
+| [review-request-261015-1706-runner-source-14-81d0ed074.md](review-request-261015-1706-runner-source-14-81d0ed074.md) | source | 2 |
+| [review-request-261015-1706-runner-source-15-81d0ed074.md](review-request-261015-1706-runner-source-15-81d0ed074.md) | source | 5 |
+| [review-request-261015-1706-runner-source-16-81d0ed074.md](review-request-261015-1706-runner-source-16-81d0ed074.md) | source | 8 |
+| [review-request-261015-1706-runner-source-17-81d0ed074.md](review-request-261015-1706-runner-source-17-81d0ed074.md) | source | 5 |
+| [review-request-261015-1706-runner-source-18-81d0ed074.md](review-request-261015-1706-runner-source-18-81d0ed074.md) | source | 28 |
+| [review-request-261015-1706-runner-source-19-81d0ed074.md](review-request-261015-1706-runner-source-19-81d0ed074.md) | source | 66 |
+| [review-request-261015-1706-runner-source-20-81d0ed074.md](review-request-261015-1706-runner-source-20-81d0ed074.md) | source | 70 |
+| [review-request-261015-1706-runner-source-21-81d0ed074.md](review-request-261015-1706-runner-source-21-81d0ed074.md) | source | 70 |
+| [review-request-261015-1706-runner-source-22-81d0ed074.md](review-request-261015-1706-runner-source-22-81d0ed074.md) | source | 69 |
+| [review-request-261015-1706-runner-source-23-81d0ed074.md](review-request-261015-1706-runner-source-23-81d0ed074.md) | source | 34 |
+| [review-request-261015-1706-runner-triage-map-81d0ed074.md](review-request-261015-1706-runner-triage-map-81d0ed074.md) | triage-map | 14 |
+| [review-request-261015-1706-runner-liveness-01-81d0ed074.md](review-request-261015-1706-runner-liveness-01-81d0ed074.md) | liveness | 60 |
+| [review-request-261015-1706-runner-liveness-02-81d0ed074.md](review-request-261015-1706-runner-liveness-02-81d0ed074.md) | liveness | 60 |
+| [review-request-261015-1706-runner-liveness-03-81d0ed074.md](review-request-261015-1706-runner-liveness-03-81d0ed074.md) | liveness | 47 |
+| [review-request-261015-1706-runner-candidate-list-81d0ed074.md](review-request-261015-1706-runner-candidate-list-81d0ed074.md) | candidate-list | 63 |
+| [review-request-261015-1706-runner-predecessor-generation-81d0ed074.md](review-request-261015-1706-runner-predecessor-generation-81d0ed074.md) | predecessor-generation | 33 |
+| [review-request-261015-1706-runner-truth-population-01-81d0ed074.md](review-request-261015-1706-runner-truth-population-01-81d0ed074.md) | truth-population | 65 |
+| [review-request-261015-1706-runner-truth-population-02-81d0ed074.md](review-request-261015-1706-runner-truth-population-02-81d0ed074.md) | truth-population | 65 |
+| [review-request-261015-1706-runner-truth-population-03-81d0ed074.md](review-request-261015-1706-runner-truth-population-03-81d0ed074.md) | truth-population | 51 |
+| [review-request-261015-1706-runner-owner-queue-81d0ed074.md](review-request-261015-1706-runner-owner-queue-81d0ed074.md) | owner-queue | 1 |
+| [review-request-261015-1706-runner-report-81d0ed074.md](review-request-261015-1706-runner-report-81d0ed074.md) | report | 1 |
+
+## Verification and remaining dependencies
+
+Tests **44/44 pass**, zero fail/skip/cancel/todo: `env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/scripts/doc-decision-conservation.test.mjs test/scripts/doc-decision-review.test.mjs test/scripts/doc-review-format.test.mjs`; [raw tests](step9-native-tests.log). Packet hashes, exactly-once coverage, source/target/decision/native tuple equality, complete classes and request counts mechanically checked. `git diff --check` passes; [scope and mutation audit](step9-native-mutation-audit.json). Full npm suite is not claimed for this evidence-only packaging turn.
+
+Blockers to Step 9 closure: all independent source/non-source reviews and committed ordinary application, 32 gap dispositions/remainder accounting, current truth review, P6 final main sync/re-decisions, fresh readers (key first; three scenarios/two independent readers), red-team with zero unresolved High/Critical, six carried link repoints followed by rebind/re-review, and existing Rings/A34/Step 10/navigation/consumer/alias/cutover obligations. Step 8 one-row review proceeds independently and remains untouched. No new owner-direction question; the dependencies above remain open. No source retirement, candidate promotion or step closure is claimed.
+
+Writes confined to this plan; no docs or decision-content change, gate/checker/vocabulary/extractor/baseline edit, .fgos workspace access, secrets, lifecycle verb, git add/commit or git write. Scratch only `/tmp/fgos-work`; mandatory result outbox is the explicit exception. Runner owns commit. Naming came from checkout `target/release/fgos convention name --json`; installed shim and debug binary could not route it. MDView MCP is unavailable in this session; no external preview state written under this boundary.
+
+---
+
+## Historical author checkpoint (superseded above)
+
 # Runner carriage author checkpoint — draft, review not started
 
 State: **authoring** (P1–P4 author pass complete; committed native proof and review packaging next). Input HEAD and SYNC: `63fa6f15266f45c881f610235e0be8d61ff07120`, Lead main merge; docs unchanged since `af0057e13`. Source `docs/specs/runner.md` is untouched. Current HEAD / sync blob: `ddfa78cc7183cf1f7db8ee64d2339653a0aa0023`; frozen map blob: `473a009662f22fb5d745e6ae151136da324d0d5e`. [Source pins and full digest drift](step9-source-blobs.json). Runner owns commit; no git write by the worker.

@@ -1,0 +1,400 @@
+{
+  "version": 1,
+  "commit": "81d0ed0747014e976c0d29222439fd6e3592b468",
+  "shard": "s9-runner-01.json",
+  "authorSession": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+  "authorshipRequired": true,
+  "rows": [
+    {
+      "claimId": "claim_39d792588a8be9f5c525406f7692f77c",
+      "sourceUnitDigest": "e3b9637386370205add50577674190f948eb94fefd4b56a1ffa35cff7f701478",
+      "targetUnitDigest": "e3b9637386370205add50577674190f948eb94fefd4b56a1ffa35cff7f701478",
+      "reviewAuthor": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+      "decision": {
+        "claimId": "claim_39d792588a8be9f5c525406f7692f77c",
+        "sourceUnitDigest": "e3b9637386370205add50577674190f948eb94fefd4b56a1ffa35cff7f701478",
+        "targetOwner": "docs/platform/runner/decisions/h-aabefc85f0c9.md",
+        "targetAnchor": "coordinationsession-lịch-sử-đã-thu-hồi-per-p4-thay-bằng-collaborationpattern-workflow-runner",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole heading docs/specs/runner.md#coordinationsession-lịch-sử-đã-thu-hồi-per-p4-thay-bằng-collaborationpattern-workflow-runner (lines 1362–1362) carried at docs/platform/runner/decisions/h-aabefc85f0c9.md#coordinationsession-lịch-sử-đã-thu-hồi-per-p4-thay-bằng-collaborationpattern-workflow-runner. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetUnitDigest": "e3b9637386370205add50577674190f948eb94fefd4b56a1ffa35cff7f701478",
+        "targetAncestry": [
+          "Added in candidate: Runner CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)"
+        ]
+      },
+      "source": {
+        "path": "docs/specs/runner.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)",
+        "anchor": "coordinationsession-lịch-sử-đã-thu-hồi-per-p4-thay-bằng-collaborationpattern-workflow-runner",
+        "githubAnchor": "coordinationsession-lịch-sử-đã-thu-hồi-per-p4-thay-bằng-collaborationpattern-workflow-runner",
+        "stableAnchor": "h-f04c03f4e30b",
+        "startLine": 1362,
+        "endLine": 1362,
+        "textDigest": "e3b9637386370205add50577674190f948eb94fefd4b56a1ffa35cff7f701478",
+        "sample": "CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)",
+        "sectionPayloadDigest": "cbb0ce122fda9b7995f58b76c78162fb4681f3ddc079ec203a4c8de6d5913576",
+        "followingBlockDigest": "3e87ab95090ec039048f7985c02181ec1b1b5c6337fcd23410d76a3c76473d1c",
+        "identityFingerprint": "cb4326b5b120ecb0c5fcf0d43169a33cef676274b7d354703593dc6b45347b75",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)"
+        ],
+        "text": "## CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)",
+        "sectionText": "## CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)\n\n> **Ghi chú chuyển tiếp (2026-10-02):** Engine coordination và khái niệm `CoordinationSession`/`CoordinationProtocol`/`FlowDefinition` đã được thu hồi ở P4. Mọi lần chạy độc lập quy về **Unit run** qua Pattern cộng tác (`CollaborationPattern`: `solo`, `reviewed`, `panel` + preset) hoặc **Workflow run** (`src/workflow/**`). Mục dưới đây giữ bối cảnh thiết kế lịch sử của Step 08.\n\nĐây là mô tả tầm SPEC (BA-grade, WHAT chứ không phải code) của ranh giới\n`CoordinationSession` đã được chốt ở Phase 00 của track `step-08-standalone-\ncoordination` — canonical đầy đủ (schema, ADR, ví dụ) sống ở\n`docs/architect/agent-coordination/`; mục này chỉ tóm lược đủ để một phiên\nsession engine + quorum/retry/cancellation + hard-budget/security hardening\nđều đã có thật tại `src/runner/coordination/{schema,store,replay,\nsession-engine}.mjs` (test: `test/runner/coordination-*.test.mjs`) —\nstore/schema/events/direct cutover từ `mission-lite.mjs` cũ (đã xoá). Phase\n06 R5-R7 (cell P06.2): `aggregateBounds` enforcement nay ĐỒNG NHẤT trên mọi\nđường dispatch (trước đó, đường agent-led `dispatchPrimaryTask`/\n`proposeConsult` không forward 3 cap concurrency-sensitive nào và không\nchạy check wall-time/task-depth — tìm thấy và vá thật, không phải giả định);\n`coordinationId` nay bị chặn ký tự an toàn (alnum/underscore/hyphen), đóng\nmột lỗ path-traversal thật (một `coordinationId` chứa `../` từng tạo được\nthư mục THẬT ngoài `.fgos/coordination/sessions/`); `linkResult` nay từ\nchối một `runId` không đúng quy ước của chính `assignmentId` nó gắn vào,\nngay tại thời điểm ghi (đóng một lỗ foreign-evidence thật, dù lỗ đó chưa\ntừng dẫn tới false-success vì đọc lại luôn fail-closed). Phase 06 R8 (đóng\nđộc lập bởi Reviewer+Red-Team cho toàn ma trận recovery/budget R1-R7) là\nbước tiếp theo của Coordinator sau cell P06.2, chưa phải việc của Doer.\n\n**CoordinationSession là gì.** Một lần điều phối agent có biên (bounded) —\nobjective, actor, budget, task/Assignment runtime khi cần, kết quả tổng hợp —\ncó thể chạy ĐỘC LẬP với Work (`workId: null`, không Stage, không TaskSpec,\nkhông protocol) hoặc tham chiếu Work chỉ như context đọc-thôi. Nó là ROOT\nthực thi/phục hồi của V1 — nghĩa là một phiên bị crash/resume tra cứu tiến độ\nqua đúng bản ghi này, không qua đâu khác. CoordinationSession sở hữu tiến độ\nđiều phối, KHÔNG BAO GIỜ sở hữu vòng đời Work (bất biến cũ vẫn giữ nguyên,\nxem `docs/architect/agent-coordination/architecture/work-integration.md`).\nChi tiết schema: `docs/architect/agent-coordination/contracts/coordination-session.md`;\nquyết định nền: `docs/architect/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md`.\n\n**Recheck-discharge quorum fix (2026-09-18).** `closeSessionByQuorum`'s\nmulti-operation-per-actor path (P10-KERNEL-FIX) trước đây chấm một gating\noperation bắt buộc (`review-candidate`/`red-team-candidate`) là `failed`\nVĨNH VIỄN một khi verdict là `findings` — dù fix-round sau đó\n(`reviewer-recheck`/`red-team-recheck`) đã pass sạch, vì hai operation id\nkhác nhau nên `resolveBindingOutcome` không bao giờ liên hệ được. `close.json`\nvì vậy refuse mãi với `missing required actor(s)` cho MỌI cell từng có dù\nchỉ 1 finding ở first-pass — phát hiện thật khi chạy `fgos-code-panel` lần\nđầu tới bước close (`code-panel--r3-p1-remote-projector-presenter`). Sửa:\nPattern cộng tác binding thêm field `rechecks: <operationId>` (`definitions/\nschema.mjs`, khai trên `reviewer-recheck`/`red-team-recheck` trong\n`standalone-master-coordination-loop.yaml`); `session-engine.mjs`'s\n`resolveRecheckDischarge` cho một recheck ĐÃ declare, cùng actor, dispatch\nSAU `result-linked` của attempt failed, VÀ đã có `driver-disposition-recorded`\nnhắm đúng assignment failed đó, mới được discharge slot — không suy luận\ntheo role/graph-adjacency/naming, không parse nội dung disposition. Test:\n`test/runner/coordination-recheck-discharge.test.mjs`."
+      },
+      "target": {
+        "path": "docs/platform/runner/decisions/h-aabefc85f0c9.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)",
+        "anchor": "coordinationsession-lịch-sử-đã-thu-hồi-per-p4-thay-bằng-collaborationpattern-workflow-runner",
+        "githubAnchor": "coordinationsession-lịch-sử-đã-thu-hồi-per-p4-thay-bằng-collaborationpattern-workflow-runner",
+        "stableAnchor": "h-2fc83d43c402",
+        "startLine": 25,
+        "endLine": 25,
+        "textDigest": "e3b9637386370205add50577674190f948eb94fefd4b56a1ffa35cff7f701478",
+        "sample": "CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)",
+        "sectionPayloadDigest": "cbb0ce122fda9b7995f58b76c78162fb4681f3ddc079ec203a4c8de6d5913576",
+        "followingBlockDigest": "3e87ab95090ec039048f7985c02181ec1b1b5c6337fcd23410d76a3c76473d1c",
+        "identityFingerprint": "cb4326b5b120ecb0c5fcf0d43169a33cef676274b7d354703593dc6b45347b75",
+        "ancestry": [
+          "Added in candidate: Runner CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)"
+        ],
+        "text": "## CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)",
+        "sectionText": "## CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)\n\n> **Ghi chú chuyển tiếp (2026-10-02):** Engine coordination và khái niệm `CoordinationSession`/`CoordinationProtocol`/`FlowDefinition` đã được thu hồi ở P4. Mọi lần chạy độc lập quy về **Unit run** qua Pattern cộng tác (`CollaborationPattern`: `solo`, `reviewed`, `panel` + preset) hoặc **Workflow run** (`src/workflow/**`). Mục dưới đây giữ bối cảnh thiết kế lịch sử của Step 08.\n\nĐây là mô tả tầm SPEC (BA-grade, WHAT chứ không phải code) của ranh giới\n`CoordinationSession` đã được chốt ở Phase 00 của track `step-08-standalone-\ncoordination` — canonical đầy đủ (schema, ADR, ví dụ) sống ở\n`docs/architect/agent-coordination/`; mục này chỉ tóm lược đủ để một phiên\nsession engine + quorum/retry/cancellation + hard-budget/security hardening\nđều đã có thật tại `src/runner/coordination/{schema,store,replay,\nsession-engine}.mjs` (test: `test/runner/coordination-*.test.mjs`) —\nstore/schema/events/direct cutover từ `mission-lite.mjs` cũ (đã xoá). Phase\n06 R5-R7 (cell P06.2): `aggregateBounds` enforcement nay ĐỒNG NHẤT trên mọi\nđường dispatch (trước đó, đường agent-led `dispatchPrimaryTask`/\n`proposeConsult` không forward 3 cap concurrency-sensitive nào và không\nchạy check wall-time/task-depth — tìm thấy và vá thật, không phải giả định);\n`coordinationId` nay bị chặn ký tự an toàn (alnum/underscore/hyphen), đóng\nmột lỗ path-traversal thật (một `coordinationId` chứa `../` từng tạo được\nthư mục THẬT ngoài `.fgos/coordination/sessions/`); `linkResult` nay từ\nchối một `runId` không đúng quy ước của chính `assignmentId` nó gắn vào,\nngay tại thời điểm ghi (đóng một lỗ foreign-evidence thật, dù lỗ đó chưa\ntừng dẫn tới false-success vì đọc lại luôn fail-closed). Phase 06 R8 (đóng\nđộc lập bởi Reviewer+Red-Team cho toàn ma trận recovery/budget R1-R7) là\nbước tiếp theo của Coordinator sau cell P06.2, chưa phải việc của Doer.\n\n**CoordinationSession là gì.** Một lần điều phối agent có biên (bounded) —\nobjective, actor, budget, task/Assignment runtime khi cần, kết quả tổng hợp —\ncó thể chạy ĐỘC LẬP với Work (`workId: null`, không Stage, không TaskSpec,\nkhông protocol) hoặc tham chiếu Work chỉ như context đọc-thôi. Nó là ROOT\nthực thi/phục hồi của V1 — nghĩa là một phiên bị crash/resume tra cứu tiến độ\nqua đúng bản ghi này, không qua đâu khác. CoordinationSession sở hữu tiến độ\nđiều phối, KHÔNG BAO GIỜ sở hữu vòng đời Work (bất biến cũ vẫn giữ nguyên,\nxem `docs/architect/agent-coordination/architecture/work-integration.md`).\nChi tiết schema: `docs/architect/agent-coordination/contracts/coordination-session.md`;\nquyết định nền: `docs/architect/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md`.\n\n**Recheck-discharge quorum fix (2026-09-18).** `closeSessionByQuorum`'s\nmulti-operation-per-actor path (P10-KERNEL-FIX) trước đây chấm một gating\noperation bắt buộc (`review-candidate`/`red-team-candidate`) là `failed`\nVĨNH VIỄN một khi verdict là `findings` — dù fix-round sau đó\n(`reviewer-recheck`/`red-team-recheck`) đã pass sạch, vì hai operation id\nkhác nhau nên `resolveBindingOutcome` không bao giờ liên hệ được. `close.json`\nvì vậy refuse mãi với `missing required actor(s)` cho MỌI cell từng có dù\nchỉ 1 finding ở first-pass — phát hiện thật khi chạy `fgos-code-panel` lần\nđầu tới bước close (`code-panel--r3-p1-remote-projector-presenter`). Sửa:\nPattern cộng tác binding thêm field `rechecks: <operationId>` (`definitions/\nschema.mjs`, khai trên `reviewer-recheck`/`red-team-recheck` trong\n`standalone-master-coordination-loop.yaml`); `session-engine.mjs`'s\n`resolveRecheckDischarge` cho một recheck ĐÃ declare, cùng actor, dispatch\nSAU `result-linked` của attempt failed, VÀ đã có `driver-disposition-recorded`\nnhắm đúng assignment failed đó, mới được discharge slot — không suy luận\ntheo role/graph-adjacency/naming, không parse nội dung disposition. Test:\n`test/runner/coordination-recheck-discharge.test.mjs`."
+      },
+      "exactClass": "Weak-exact",
+      "exactClassReason": "ancestor headings differ; document exact share below one half",
+      "nativeTargetClaimId": "claim_3abf96a1803f0bce6ad231974a83d034",
+      "section": {
+        "startLine": 1362,
+        "endLine": 1415,
+        "target": "docs/platform/runner/decisions/h-aabefc85f0c9.md",
+        "kind": "decision",
+        "anchor": "coordinationsession-lịch-sử-đã-thu-hồi-per-p4-thay-bằng-collaborationpattern-workflow-runner",
+        "title": "CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)",
+        "sha256": "3597ba83f5099eab7dcd106488db5057912ef17fb8d1398268f4f818fd552caa"
+      },
+      "mapAmendments": [],
+      "reboundAnchors": []
+    },
+    {
+      "claimId": "claim_edb87e31d0f69ae2f7df349f4cb9ee45",
+      "sourceUnitDigest": "3e87ab95090ec039048f7985c02181ec1b1b5c6337fcd23410d76a3c76473d1c",
+      "targetUnitDigest": "3e87ab95090ec039048f7985c02181ec1b1b5c6337fcd23410d76a3c76473d1c",
+      "reviewAuthor": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+      "decision": {
+        "claimId": "claim_edb87e31d0f69ae2f7df349f4cb9ee45",
+        "sourceUnitDigest": "3e87ab95090ec039048f7985c02181ec1b1b5c6337fcd23410d76a3c76473d1c",
+        "targetOwner": "docs/platform/runner/decisions/h-aabefc85f0c9.md",
+        "targetAnchor": "unheaded-block-3",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-113 (lines 1364–1364) carried at docs/platform/runner/decisions/h-aabefc85f0c9.md#unheaded-block-3. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetUnitDigest": "3e87ab95090ec039048f7985c02181ec1b1b5c6337fcd23410d76a3c76473d1c",
+        "targetAncestry": [
+          "Added in candidate: Runner CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)",
+          "CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)"
+        ]
+      },
+      "source": {
+        "path": "docs/specs/runner.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-113",
+        "githubAnchor": "unheaded-block-113",
+        "stableAnchor": "unheaded-block-113",
+        "title": "Unheaded block 113",
+        "startLine": 1364,
+        "endLine": 1364,
+        "textDigest": "3e87ab95090ec039048f7985c02181ec1b1b5c6337fcd23410d76a3c76473d1c",
+        "sample": "> **Ghi chú chuyển tiếp (2026-10-02):** Engine coordination và khái niệm `CoordinationSession`/`CoordinationProtocol`/`FlowDefinition` đã được thu hồi ở P4. Mọi lần chạy độc lập qu",
+        "identityFingerprint": "71532c15900d28f1c89e393808ee960c8144a533326ff233f233bcb49edae502",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)",
+          "CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)"
+        ],
+        "text": "> **Ghi chú chuyển tiếp (2026-10-02):** Engine coordination và khái niệm `CoordinationSession`/`CoordinationProtocol`/`FlowDefinition` đã được thu hồi ở P4. Mọi lần chạy độc lập quy về **Unit run** qua Pattern cộng tác (`CollaborationPattern`: `solo`, `reviewed`, `panel` + preset) hoặc **Workflow run** (`src/workflow/**`). Mục dưới đây giữ bối cảnh thiết kế lịch sử của Step 08."
+      },
+      "target": {
+        "path": "docs/platform/runner/decisions/h-aabefc85f0c9.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 27,
+        "endLine": 27,
+        "textDigest": "3e87ab95090ec039048f7985c02181ec1b1b5c6337fcd23410d76a3c76473d1c",
+        "sample": "> **Ghi chú chuyển tiếp (2026-10-02):** Engine coordination và khái niệm `CoordinationSession`/`CoordinationProtocol`/`FlowDefinition` đã được thu hồi ở P4. Mọi lần chạy độc lập qu",
+        "identityFingerprint": "71532c15900d28f1c89e393808ee960c8144a533326ff233f233bcb49edae502",
+        "ancestry": [
+          "Added in candidate: Runner CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)",
+          "CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)"
+        ],
+        "text": "> **Ghi chú chuyển tiếp (2026-10-02):** Engine coordination và khái niệm `CoordinationSession`/`CoordinationProtocol`/`FlowDefinition` đã được thu hồi ở P4. Mọi lần chạy độc lập quy về **Unit run** qua Pattern cộng tác (`CollaborationPattern`: `solo`, `reviewed`, `panel` + preset) hoặc **Workflow run** (`src/workflow/**`). Mục dưới đây giữ bối cảnh thiết kế lịch sử của Step 08."
+      },
+      "exactClass": "Weak-exact",
+      "exactClassReason": "ancestor headings differ; document exact share below one half",
+      "nativeTargetClaimId": "claim_661dbefedc4d7f41f7419944e86e42c0",
+      "section": {
+        "startLine": 1362,
+        "endLine": 1415,
+        "target": "docs/platform/runner/decisions/h-aabefc85f0c9.md",
+        "kind": "decision",
+        "anchor": "coordinationsession-lịch-sử-đã-thu-hồi-per-p4-thay-bằng-collaborationpattern-workflow-runner",
+        "title": "CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)",
+        "sha256": "3597ba83f5099eab7dcd106488db5057912ef17fb8d1398268f4f818fd552caa"
+      },
+      "mapAmendments": [],
+      "reboundAnchors": []
+    },
+    {
+      "claimId": "claim_ba3f27a8e3fd4763efcfdbd1858b5789",
+      "sourceUnitDigest": "fd8ce1aa63a5c152cadc1044080acf480f824b655a1b835583c6d875192e5700",
+      "targetUnitDigest": "fd8ce1aa63a5c152cadc1044080acf480f824b655a1b835583c6d875192e5700",
+      "reviewAuthor": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+      "decision": {
+        "claimId": "claim_ba3f27a8e3fd4763efcfdbd1858b5789",
+        "sourceUnitDigest": "fd8ce1aa63a5c152cadc1044080acf480f824b655a1b835583c6d875192e5700",
+        "targetOwner": "docs/platform/runner/decisions/h-aabefc85f0c9.md",
+        "targetAnchor": "unheaded-block-4",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-114 (lines 1366–1385) carried at docs/platform/runner/decisions/h-aabefc85f0c9.md#unheaded-block-4. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetUnitDigest": "fd8ce1aa63a5c152cadc1044080acf480f824b655a1b835583c6d875192e5700",
+        "targetAncestry": [
+          "Added in candidate: Runner CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)",
+          "CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)"
+        ]
+      },
+      "source": {
+        "path": "docs/specs/runner.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-114",
+        "githubAnchor": "unheaded-block-114",
+        "stableAnchor": "unheaded-block-114",
+        "title": "Unheaded block 114",
+        "startLine": 1366,
+        "endLine": 1385,
+        "textDigest": "fd8ce1aa63a5c152cadc1044080acf480f824b655a1b835583c6d875192e5700",
+        "sample": "Đây là mô tả tầm SPEC (BA-grade, WHAT chứ không phải code) của ranh giới\n`CoordinationSession` đã được chốt ở Phase 00 của track `step-08-standalone-\ncoordination` — canonical đầy ",
+        "identityFingerprint": "bd66103d7e4331df7ca20b266ac2ae912f305ba173e2e5706cb774beb4a8bdf4",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)",
+          "CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)"
+        ],
+        "text": "Đây là mô tả tầm SPEC (BA-grade, WHAT chứ không phải code) của ranh giới\n`CoordinationSession` đã được chốt ở Phase 00 của track `step-08-standalone-\ncoordination` — canonical đầy đủ (schema, ADR, ví dụ) sống ở\n`docs/architect/agent-coordination/`; mục này chỉ tóm lược đủ để một phiên\nsession engine + quorum/retry/cancellation + hard-budget/security hardening\nđều đã có thật tại `src/runner/coordination/{schema,store,replay,\nsession-engine}.mjs` (test: `test/runner/coordination-*.test.mjs`) —\nstore/schema/events/direct cutover từ `mission-lite.mjs` cũ (đã xoá). Phase\n06 R5-R7 (cell P06.2): `aggregateBounds` enforcement nay ĐỒNG NHẤT trên mọi\nđường dispatch (trước đó, đường agent-led `dispatchPrimaryTask`/\n`proposeConsult` không forward 3 cap concurrency-sensitive nào và không\nchạy check wall-time/task-depth — tìm thấy và vá thật, không phải giả định);\n`coordinationId` nay bị chặn ký tự an toàn (alnum/underscore/hyphen), đóng\nmột lỗ path-traversal thật (một `coordinationId` chứa `../` từng tạo được\nthư mục THẬT ngoài `.fgos/coordination/sessions/`); `linkResult` nay từ\nchối một `runId` không đúng quy ước của chính `assignmentId` nó gắn vào,\nngay tại thời điểm ghi (đóng một lỗ foreign-evidence thật, dù lỗ đó chưa\ntừng dẫn tới false-success vì đọc lại luôn fail-closed). Phase 06 R8 (đóng\nđộc lập bởi Reviewer+Red-Team cho toàn ma trận recovery/budget R1-R7) là\nbước tiếp theo của Coordinator sau cell P06.2, chưa phải việc của Doer."
+      },
+      "target": {
+        "path": "docs/platform/runner/decisions/h-aabefc85f0c9.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 29,
+        "endLine": 48,
+        "textDigest": "fd8ce1aa63a5c152cadc1044080acf480f824b655a1b835583c6d875192e5700",
+        "sample": "Đây là mô tả tầm SPEC (BA-grade, WHAT chứ không phải code) của ranh giới\n`CoordinationSession` đã được chốt ở Phase 00 của track `step-08-standalone-\ncoordination` — canonical đầy ",
+        "identityFingerprint": "bd66103d7e4331df7ca20b266ac2ae912f305ba173e2e5706cb774beb4a8bdf4",
+        "ancestry": [
+          "Added in candidate: Runner CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)",
+          "CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)"
+        ],
+        "text": "Đây là mô tả tầm SPEC (BA-grade, WHAT chứ không phải code) của ranh giới\n`CoordinationSession` đã được chốt ở Phase 00 của track `step-08-standalone-\ncoordination` — canonical đầy đủ (schema, ADR, ví dụ) sống ở\n`docs/architect/agent-coordination/`; mục này chỉ tóm lược đủ để một phiên\nsession engine + quorum/retry/cancellation + hard-budget/security hardening\nđều đã có thật tại `src/runner/coordination/{schema,store,replay,\nsession-engine}.mjs` (test: `test/runner/coordination-*.test.mjs`) —\nstore/schema/events/direct cutover từ `mission-lite.mjs` cũ (đã xoá). Phase\n06 R5-R7 (cell P06.2): `aggregateBounds` enforcement nay ĐỒNG NHẤT trên mọi\nđường dispatch (trước đó, đường agent-led `dispatchPrimaryTask`/\n`proposeConsult` không forward 3 cap concurrency-sensitive nào và không\nchạy check wall-time/task-depth — tìm thấy và vá thật, không phải giả định);\n`coordinationId` nay bị chặn ký tự an toàn (alnum/underscore/hyphen), đóng\nmột lỗ path-traversal thật (một `coordinationId` chứa `../` từng tạo được\nthư mục THẬT ngoài `.fgos/coordination/sessions/`); `linkResult` nay từ\nchối một `runId` không đúng quy ước của chính `assignmentId` nó gắn vào,\nngay tại thời điểm ghi (đóng một lỗ foreign-evidence thật, dù lỗ đó chưa\ntừng dẫn tới false-success vì đọc lại luôn fail-closed). Phase 06 R8 (đóng\nđộc lập bởi Reviewer+Red-Team cho toàn ma trận recovery/budget R1-R7) là\nbước tiếp theo của Coordinator sau cell P06.2, chưa phải việc của Doer."
+      },
+      "exactClass": "Weak-exact",
+      "exactClassReason": "ancestor headings differ; document exact share below one half",
+      "nativeTargetClaimId": "claim_92c2718f0152f2122a994a6cfd78c554",
+      "section": {
+        "startLine": 1362,
+        "endLine": 1415,
+        "target": "docs/platform/runner/decisions/h-aabefc85f0c9.md",
+        "kind": "decision",
+        "anchor": "coordinationsession-lịch-sử-đã-thu-hồi-per-p4-thay-bằng-collaborationpattern-workflow-runner",
+        "title": "CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)",
+        "sha256": "3597ba83f5099eab7dcd106488db5057912ef17fb8d1398268f4f818fd552caa"
+      },
+      "mapAmendments": [],
+      "reboundAnchors": []
+    },
+    {
+      "claimId": "claim_49b0591431ed2d1e033a6b960a760e1f",
+      "sourceUnitDigest": "c24373f085777c3f0f463c6073f22f2a495fefcc4ace8c4825dc1607beafee2a",
+      "targetUnitDigest": "c24373f085777c3f0f463c6073f22f2a495fefcc4ace8c4825dc1607beafee2a",
+      "reviewAuthor": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+      "decision": {
+        "claimId": "claim_49b0591431ed2d1e033a6b960a760e1f",
+        "sourceUnitDigest": "c24373f085777c3f0f463c6073f22f2a495fefcc4ace8c4825dc1607beafee2a",
+        "targetOwner": "docs/platform/runner/decisions/h-aabefc85f0c9.md",
+        "targetAnchor": "unheaded-block-5",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-115 (lines 1387–1396) carried at docs/platform/runner/decisions/h-aabefc85f0c9.md#unheaded-block-5. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetUnitDigest": "c24373f085777c3f0f463c6073f22f2a495fefcc4ace8c4825dc1607beafee2a",
+        "targetAncestry": [
+          "Added in candidate: Runner CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)",
+          "CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)"
+        ]
+      },
+      "source": {
+        "path": "docs/specs/runner.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-115",
+        "githubAnchor": "unheaded-block-115",
+        "stableAnchor": "unheaded-block-115",
+        "title": "Unheaded block 115",
+        "startLine": 1387,
+        "endLine": 1396,
+        "textDigest": "c24373f085777c3f0f463c6073f22f2a495fefcc4ace8c4825dc1607beafee2a",
+        "sample": "**CoordinationSession là gì.** Một lần điều phối agent có biên (bounded) —\nobjective, actor, budget, task/Assignment runtime khi cần, kết quả tổng hợp —\ncó thể chạy ĐỘC LẬP với Wor",
+        "identityFingerprint": "0a819119087fae8b2bbaed04e873dd4e6fb2595ca32fd81b0d1060e4ef48b216",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)",
+          "CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)"
+        ],
+        "text": "**CoordinationSession là gì.** Một lần điều phối agent có biên (bounded) —\nobjective, actor, budget, task/Assignment runtime khi cần, kết quả tổng hợp —\ncó thể chạy ĐỘC LẬP với Work (`workId: null`, không Stage, không TaskSpec,\nkhông protocol) hoặc tham chiếu Work chỉ như context đọc-thôi. Nó là ROOT\nthực thi/phục hồi của V1 — nghĩa là một phiên bị crash/resume tra cứu tiến độ\nqua đúng bản ghi này, không qua đâu khác. CoordinationSession sở hữu tiến độ\nđiều phối, KHÔNG BAO GIỜ sở hữu vòng đời Work (bất biến cũ vẫn giữ nguyên,\nxem `docs/architect/agent-coordination/architecture/work-integration.md`).\nChi tiết schema: `docs/architect/agent-coordination/contracts/coordination-session.md`;\nquyết định nền: `docs/architect/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md`."
+      },
+      "target": {
+        "path": "docs/platform/runner/decisions/h-aabefc85f0c9.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 50,
+        "endLine": 59,
+        "textDigest": "c24373f085777c3f0f463c6073f22f2a495fefcc4ace8c4825dc1607beafee2a",
+        "sample": "**CoordinationSession là gì.** Một lần điều phối agent có biên (bounded) —\nobjective, actor, budget, task/Assignment runtime khi cần, kết quả tổng hợp —\ncó thể chạy ĐỘC LẬP với Wor",
+        "identityFingerprint": "0a819119087fae8b2bbaed04e873dd4e6fb2595ca32fd81b0d1060e4ef48b216",
+        "ancestry": [
+          "Added in candidate: Runner CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)",
+          "CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)"
+        ],
+        "text": "**CoordinationSession là gì.** Một lần điều phối agent có biên (bounded) —\nobjective, actor, budget, task/Assignment runtime khi cần, kết quả tổng hợp —\ncó thể chạy ĐỘC LẬP với Work (`workId: null`, không Stage, không TaskSpec,\nkhông protocol) hoặc tham chiếu Work chỉ như context đọc-thôi. Nó là ROOT\nthực thi/phục hồi của V1 — nghĩa là một phiên bị crash/resume tra cứu tiến độ\nqua đúng bản ghi này, không qua đâu khác. CoordinationSession sở hữu tiến độ\nđiều phối, KHÔNG BAO GIỜ sở hữu vòng đời Work (bất biến cũ vẫn giữ nguyên,\nxem `docs/architect/agent-coordination/architecture/work-integration.md`).\nChi tiết schema: `docs/architect/agent-coordination/contracts/coordination-session.md`;\nquyết định nền: `docs/architect/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md`."
+      },
+      "exactClass": "Weak-exact",
+      "exactClassReason": "ancestor headings differ; document exact share below one half",
+      "nativeTargetClaimId": "claim_860198a9342d0f5e462db248462fbe9f",
+      "section": {
+        "startLine": 1362,
+        "endLine": 1415,
+        "target": "docs/platform/runner/decisions/h-aabefc85f0c9.md",
+        "kind": "decision",
+        "anchor": "coordinationsession-lịch-sử-đã-thu-hồi-per-p4-thay-bằng-collaborationpattern-workflow-runner",
+        "title": "CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)",
+        "sha256": "3597ba83f5099eab7dcd106488db5057912ef17fb8d1398268f4f818fd552caa"
+      },
+      "mapAmendments": [],
+      "reboundAnchors": []
+    },
+    {
+      "claimId": "claim_f572736a09f2e9266fa2f6b26ffb72ea",
+      "sourceUnitDigest": "4ed88ac3a8b8a5561c875bb1d64928264a79047338e413aade84047c7fe6da6a",
+      "targetUnitDigest": "4ed88ac3a8b8a5561c875bb1d64928264a79047338e413aade84047c7fe6da6a",
+      "reviewAuthor": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+      "decision": {
+        "claimId": "claim_f572736a09f2e9266fa2f6b26ffb72ea",
+        "sourceUnitDigest": "4ed88ac3a8b8a5561c875bb1d64928264a79047338e413aade84047c7fe6da6a",
+        "targetOwner": "docs/platform/runner/decisions/h-aabefc85f0c9.md",
+        "targetAnchor": "unheaded-block-6",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-116 (lines 1398–1414) carried at docs/platform/runner/decisions/h-aabefc85f0c9.md#unheaded-block-6. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetUnitDigest": "4ed88ac3a8b8a5561c875bb1d64928264a79047338e413aade84047c7fe6da6a",
+        "targetAncestry": [
+          "Added in candidate: Runner CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)",
+          "CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)"
+        ]
+      },
+      "source": {
+        "path": "docs/specs/runner.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-116",
+        "githubAnchor": "unheaded-block-116",
+        "stableAnchor": "unheaded-block-116",
+        "title": "Unheaded block 116",
+        "startLine": 1398,
+        "endLine": 1414,
+        "textDigest": "4ed88ac3a8b8a5561c875bb1d64928264a79047338e413aade84047c7fe6da6a",
+        "sample": "**Recheck-discharge quorum fix (2026-09-18).** `closeSessionByQuorum`'s\nmulti-operation-per-actor path (P10-KERNEL-FIX) trước đây chấm một gating\noperation bắt buộc (`review-candid",
+        "identityFingerprint": "f3f073bbef1505fd8dee84fee9bb76fa13e56f12e648c8dabf9ca39fcd0cbec5",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)",
+          "CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)"
+        ],
+        "text": "**Recheck-discharge quorum fix (2026-09-18).** `closeSessionByQuorum`'s\nmulti-operation-per-actor path (P10-KERNEL-FIX) trước đây chấm một gating\noperation bắt buộc (`review-candidate`/`red-team-candidate`) là `failed`\nVĨNH VIỄN một khi verdict là `findings` — dù fix-round sau đó\n(`reviewer-recheck`/`red-team-recheck`) đã pass sạch, vì hai operation id\nkhác nhau nên `resolveBindingOutcome` không bao giờ liên hệ được. `close.json`\nvì vậy refuse mãi với `missing required actor(s)` cho MỌI cell từng có dù\nchỉ 1 finding ở first-pass — phát hiện thật khi chạy `fgos-code-panel` lần\nđầu tới bước close (`code-panel--r3-p1-remote-projector-presenter`). Sửa:\nPattern cộng tác binding thêm field `rechecks: <operationId>` (`definitions/\nschema.mjs`, khai trên `reviewer-recheck`/`red-team-recheck` trong\n`standalone-master-coordination-loop.yaml`); `session-engine.mjs`'s\n`resolveRecheckDischarge` cho một recheck ĐÃ declare, cùng actor, dispatch\nSAU `result-linked` của attempt failed, VÀ đã có `driver-disposition-recorded`\nnhắm đúng assignment failed đó, mới được discharge slot — không suy luận\ntheo role/graph-adjacency/naming, không parse nội dung disposition. Test:\n`test/runner/coordination-recheck-discharge.test.mjs`."
+      },
+      "target": {
+        "path": "docs/platform/runner/decisions/h-aabefc85f0c9.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 61,
+        "endLine": 77,
+        "textDigest": "4ed88ac3a8b8a5561c875bb1d64928264a79047338e413aade84047c7fe6da6a",
+        "sample": "**Recheck-discharge quorum fix (2026-09-18).** `closeSessionByQuorum`'s\nmulti-operation-per-actor path (P10-KERNEL-FIX) trước đây chấm một gating\noperation bắt buộc (`review-candid",
+        "identityFingerprint": "f3f073bbef1505fd8dee84fee9bb76fa13e56f12e648c8dabf9ca39fcd0cbec5",
+        "ancestry": [
+          "Added in candidate: Runner CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)",
+          "CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)"
+        ],
+        "text": "**Recheck-discharge quorum fix (2026-09-18).** `closeSessionByQuorum`'s\nmulti-operation-per-actor path (P10-KERNEL-FIX) trước đây chấm một gating\noperation bắt buộc (`review-candidate`/`red-team-candidate`) là `failed`\nVĨNH VIỄN một khi verdict là `findings` — dù fix-round sau đó\n(`reviewer-recheck`/`red-team-recheck`) đã pass sạch, vì hai operation id\nkhác nhau nên `resolveBindingOutcome` không bao giờ liên hệ được. `close.json`\nvì vậy refuse mãi với `missing required actor(s)` cho MỌI cell từng có dù\nchỉ 1 finding ở first-pass — phát hiện thật khi chạy `fgos-code-panel` lần\nđầu tới bước close (`code-panel--r3-p1-remote-projector-presenter`). Sửa:\nPattern cộng tác binding thêm field `rechecks: <operationId>` (`definitions/\nschema.mjs`, khai trên `reviewer-recheck`/`red-team-recheck` trong\n`standalone-master-coordination-loop.yaml`); `session-engine.mjs`'s\n`resolveRecheckDischarge` cho một recheck ĐÃ declare, cùng actor, dispatch\nSAU `result-linked` của attempt failed, VÀ đã có `driver-disposition-recorded`\nnhắm đúng assignment failed đó, mới được discharge slot — không suy luận\ntheo role/graph-adjacency/naming, không parse nội dung disposition. Test:\n`test/runner/coordination-recheck-discharge.test.mjs`."
+      },
+      "exactClass": "Weak-exact",
+      "exactClassReason": "ancestor headings differ; document exact share below one half",
+      "nativeTargetClaimId": "claim_4e051e5d0329aa5bc803f0312e228974",
+      "section": {
+        "startLine": 1362,
+        "endLine": 1415,
+        "target": "docs/platform/runner/decisions/h-aabefc85f0c9.md",
+        "kind": "decision",
+        "anchor": "coordinationsession-lịch-sử-đã-thu-hồi-per-p4-thay-bằng-collaborationpattern-workflow-runner",
+        "title": "CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)",
+        "sha256": "3597ba83f5099eab7dcd106488db5057912ef17fb8d1398268f4f818fd552caa"
+      },
+      "mapAmendments": [],
+      "reboundAnchors": []
+    }
+  ],
+  "sensitivityControls": [],
+  "unmatchedCandidateUnits": [],
+  "unmatchedUnitsChannel": "candidate-unverified-runner.json, complete native strict-E set, separate non-source request",
+  "classes": {
+    "Unit-exact": [],
+    "Weak-exact": [
+      "claim_39d792588a8be9f5c525406f7692f77c",
+      "claim_edb87e31d0f69ae2f7df349f4cb9ee45",
+      "claim_ba3f27a8e3fd4763efcfdbd1858b5789",
+      "claim_49b0591431ed2d1e033a6b960a760e1f",
+      "claim_f572736a09f2e9266fa2f6b26ffb72ea"
+    ],
+    "Judgment": []
+  },
+  "unequalDigestPairs": [],
+  "mandatoryDeep": [],
+  "minimumDeep": 5,
+  "sourceBlobs": {
+    "path": "docs/specs/runner.md",
+    "blob": "ddfa78cc7183cf1f7db8ee64d2339653a0aa0023",
+    "sha256": "de1b0a3453706016171b530fcdf8e8e646563af707982f042c997fa99b83c7fe"
+  },
+  "shardDigest": "de26feeaa57cfde916a78fdb423735da6335dbc35138e4ef545293c3bb50222b",
+  "target": "docs/platform/runner/decisions/h-aabefc85f0c9.md",
+  "part": 1,
+  "parts": 1
+}

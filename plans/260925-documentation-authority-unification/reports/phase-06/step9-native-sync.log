@@ -1,0 +1,44 @@
+START 2026-10-15T10:04:38.274Z 98470
+CARRIED 2026-10-15T10:04:42.191Z 91324
+RECOVERY start; native sync not repeated 2026-10-15T10:15:36.172Z {
+  rss: 354119680,
+  heapTotal: 187744256,
+  heapUsed: 153610872,
+  external: 187853386,
+  arrayBuffers: 143787
+}
+node:v8:469
+  return der.readValue();
+             ^
+
+Error: Unable to deserialize cloned data.
+    at Object.deserialize (node:v8:469:14)
+    at file:///tmp/fgos-work/step9-native-recover.mjs:5:53
+    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)
+    at async node:internal/modules/esm/loader:643:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+
+Node.js v24.18.0
+RECOVERY start; native sync not repeated 2026-10-15T10:16:51.084Z {
+  rss: 356524032,
+  heapTotal: 189259776,
+  heapUsed: 154358400,
+  external: 188043084,
+  arrayBuffers: 143787
+}
+READ-ONLY native inventory regeneration; carried registry reused
+NATIVE GENERATION complete 4484 91324 {
+  rss: 3418456064,
+  heapTotal: 2772656128,
+  heapUsed: 2211396520,
+  external: 34506931,
+  arrayBuffers: 143787
+}
+SHARDED CACHE complete 19 {
+  rss: 3423195136,
+  heapTotal: 2317217792,
+  heapUsed: 1782250608,
+  external: 34506931,
+  arrayBuffers: 143787
+}
+DONE {"contentCommit":"81d0ed0747014e976c0d29222439fd6e3592b468","syncSeconds":1349.35,"readOnlyRecoveryGenerationSeconds":617.102,"syncStart":"2026-10-15T10:04:38.274Z","nativeCacheWrittenAt":"2026-10-15T10:27:07.624Z","recoveryCompletedAt":"2026-10-15T10:27:07.624Z","items":4484,"claims":91324,"knownBefore":98470,"knownAfter":99020,"zeroKnownIDLoss":true,"activeTupleEquality":true,"persistenceCount":1,"compact":true,"registryBytes":61883121,"registrySHA256":"dbf89fc898e1107d69bd60ad2f277fde74562732edf79d3a74b2ce1bd63e2b16","newUnits":550,"newGaps":0,"newRetired":0,"recovery":{"originalExitCode":137,"stage":"Full native generation returned but monolithic scratch cache write was truncated; no registry persistence occurred","cacheBytes":1764427994,"shardedCacheComplete":true,"registryCarryForwardInvocations":1,"nativeGenerateInventoryInvocations":2,"secondNativeSync":false,"meaning":"One registry carry-forward only, reused unchanged. First native inventory scratch serialization was truncated on exit 137; read-only generateInventory rerun once with the same carried registry, complete enumerable output saved in bounded shards. Registry persisted once after native tuple validation. No checker bypass or narrow overlay."}}

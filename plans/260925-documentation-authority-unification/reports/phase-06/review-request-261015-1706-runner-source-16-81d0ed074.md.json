@@ -1,0 +1,619 @@
+{
+  "version": 1,
+  "commit": "81d0ed0747014e976c0d29222439fd6e3592b468",
+  "shard": "s9-runner-01.json",
+  "authorSession": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+  "authorshipRequired": true,
+  "rows": [
+    {
+      "claimId": "claim_ef6c4ace21b84e2eeb9de2ad200e5cfb",
+      "sourceUnitDigest": "0f54c4919dedb58d73fc7cf55e8d217fb054b04f36911b7990b6e9a78a361713",
+      "targetUnitDigest": "0f54c4919dedb58d73fc7cf55e8d217fb054b04f36911b7990b6e9a78a361713",
+      "reviewAuthor": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+      "decision": {
+        "claimId": "claim_ef6c4ace21b84e2eeb9de2ad200e5cfb",
+        "sourceUnitDigest": "0f54c4919dedb58d73fc7cf55e8d217fb054b04f36911b7990b6e9a78a361713",
+        "targetOwner": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+        "targetAnchor": "executorprofile-invocation-target-vocabulary-phase-06-executor-policy-dispatch-seams-identitysupports-made-real-config-phase-c-executor-profile-schema-migration",
+        "claimKind": "contract",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole heading docs/specs/runner.md#executorprofile-invocation-target-vocabulary-phase-06-executor-policy-dispatch-seams-identitysupports-made-real-config-phase-c-executor-profile-schema-migration (lines 1297–1297) carried at docs/platform/runner/contracts/h-b3eb60fb4d2b.md#executorprofile-invocation-target-vocabulary-phase-06-executor-policy-dispatch-seams-identitysupports-made-real-config-phase-c-executor-profile-schema-migration. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetUnitDigest": "0f54c4919dedb58d73fc7cf55e8d217fb054b04f36911b7990b6e9a78a361713",
+        "targetAncestry": [
+          "Added in candidate: Runner ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)"
+        ]
+      },
+      "source": {
+        "path": "docs/specs/runner.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)",
+        "anchor": "executorprofile-invocation-target-vocabulary-phase-06-executor-policy-dispatch-seams-identitysupports-made-real-config-phase-c-executor-profile-schema-migration",
+        "githubAnchor": "executorprofile-invocation-target-vocabulary-phase-06-executor-policy-dispatch-seams-identitysupports-made-real-config-phase-c-executor-profile-schema-migration",
+        "stableAnchor": "h-4ef48982cf13",
+        "startLine": 1297,
+        "endLine": 1297,
+        "textDigest": "0f54c4919dedb58d73fc7cf55e8d217fb054b04f36911b7990b6e9a78a361713",
+        "sample": "ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)",
+        "sectionPayloadDigest": "aea3a6d905b6af3c3d360f9a989966b4143afdae45142c383a4f7e7a9e04b889",
+        "followingBlockDigest": "5fde748feccce5cce2990f23d3f2b681442d6ec366063c45ca96204a3458fbcf",
+        "identityFingerprint": "764556b3e23e33200f818ae19c69af1dff4d0bfc30c95e0c2c61e340d13e4eaf",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)"
+        ],
+        "text": "## ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)",
+        "sectionText": "## ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)\n\nTarget vocabulary from design.md §3.7 of\n`plans/260915-executor-policy-dispatch-seams/design.md` — documented here so\nconfig/doctor warnings (`executor-profile-warnings` check,\n`src/setup/executor-profile-warnings.mjs`) have a named migration target to\npoint at. The **Invocation** half of this vocabulary was already real config\nbefore this section existed (`executors.<id>.invocations[]`, each entry's\nown `via`/`command`/`args`/`adapter` — `src/runner/dispatch/config.mjs`'s\n`validateInvocationShape`). Phase C (`plans/260917-executor-profile-schema-migration/plan.md`)\nmade the **ExecutorProfile** half real too: `executors.<id>.identity`\n(all four fields required together when declared) and `executors.<id>.supports`\n(each field independently optional) are now validated, additive config\nfields (`validateExecutorIdentityShape`/`validateExecutorSupportsShape`,\nsame file) that survive `resolveExecutorAndOverrides` unchanged. Neither\nfield has a real consumer yet — no resolution/dispatch/PlacementPolicy code\nreads `identity`/`supports` for any decision — this is metadata a later\nphase can build on, not a behavior change. `claude` is the one real\nexecutor declaring both today (`.fgos/config.json`), proving the shape end\nto end; every other `runner.executors.<id>` entry stays exactly as it was,\nand legacy executor ids remain fully accepted. **No executor-id\nconsolidation or config-shape retirement has happened** (that is Phase E,\nnot started) — this section still describes the fuller target the\nvocabulary is headed toward, not a completed migration.\n\n**ExecutorProfile** answers \"which principal/backend/trust boundary is\nthis?\" — a stable runtime boundary, never a policy choice:\n\n| Field | Answers | Must NOT be derived from |\n|---|---|---|\n| `identity.principalRef` | which account/credential family | a concrete rotating account id (Provider Capacity Rotator's own scope, `plans/260916-account-rotator/`) |\n| `identity.runtimeBackendRef` | which CLI/runtime this is | model, quality tier, reasoning effort |\n| `identity.trustDomain` | how privileged this principal is | persona/role/business case |\n| `identity.egressClass` | what it may reach over the network | visibility (visible/headless) alone |\n\n**Invocation** answers \"how is this profile actually used for one dispatch?\":\nadapter (`cli-spawn`/`herdr-spawn`/mcp/api), prompt delivery (argv vs\nfile-pointer), visible/headless mode, confinement backend/envelope, resource\nbindings, provider adapter id. Confinement is normally an invocation\nenvelope, not identity — it only becomes identity when it changes principal,\nbackend trust, or egress boundary materially (the same rule design.md's\nProviderAdapter section already states for the shadow-mode Phase 01 module,\n`src/runner/dispatch/provider-adapter.mjs`).\n\nMigration targets a legacy config entry maps onto once every executor\nconsolidates onto this vocabulary (Phase D/E of\n`plans/260917-executor-profile-schema-migration/plan.md`, not yet — the\n`identity`/`supports` fields being real config, above, is not the same as\nthis consolidation happening):\n\n| Legacy pattern | Target |\n|---|---|\n| policy-shaped flag hardcoded in `executors.<id>` args (`--model`, `--effort`, `--allowedTools`, `--permission-mode`, Codex `-s`, …) | `ProviderAdapter` runtime option (design.md §3.5) |\n| role/persona baked into an executor id (`claude-reviewer`) | a compatibility alias patch (Phase 03, `LEGACY_EXECUTOR_ALIASES` in `src/runner/dispatch/assignment-policy.mjs`) carrying `personaRef`/`toolIntent`/`reasoningEffort` |\n| legacy model overrides on an executor | `runner.modelPolicies.<provider>` tier entry |\n| adapter choice encoded as a separate executor id | an `invocation` on one `ExecutorProfile` |\n| bwrap/confinement encoded as a separate executor id | an invocation's confinement envelope, unless trust/egress genuinely differs |\n| account pool / credential home env on an executor (e.g. the retired `FGOS_CODEX_CREDENTIAL_HOMES`) | Provider Capacity Rotator's global `runner.providers.<provider>.accounts` inventory (`plans/260916-account-rotator/`) |\n\nA later migration (Phase E) can map `claude` + `claude-reviewer` +\n`claude-reviewer-herdr` and similar id families into one `ExecutorProfile`\nwith multiple invocations, but that consolidation has not happened —\n`fgos doctor`'s `executor-profile-warnings` check makes the gap between\ncurrent config and this target vocabulary machine-visible in the meantime."
+      },
+      "target": {
+        "path": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)",
+        "anchor": "executorprofile-invocation-target-vocabulary-phase-06-executor-policy-dispatch-seams-identitysupports-made-real-config-phase-c-executor-profile-schema-migration",
+        "githubAnchor": "executorprofile-invocation-target-vocabulary-phase-06-executor-policy-dispatch-seams-identitysupports-made-real-config-phase-c-executor-profile-schema-migration",
+        "stableAnchor": "h-fad79a74f6be",
+        "startLine": 25,
+        "endLine": 25,
+        "textDigest": "0f54c4919dedb58d73fc7cf55e8d217fb054b04f36911b7990b6e9a78a361713",
+        "sample": "ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)",
+        "sectionPayloadDigest": "aea3a6d905b6af3c3d360f9a989966b4143afdae45142c383a4f7e7a9e04b889",
+        "followingBlockDigest": "5fde748feccce5cce2990f23d3f2b681442d6ec366063c45ca96204a3458fbcf",
+        "identityFingerprint": "764556b3e23e33200f818ae19c69af1dff4d0bfc30c95e0c2c61e340d13e4eaf",
+        "ancestry": [
+          "Added in candidate: Runner ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)"
+        ],
+        "text": "## ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)",
+        "sectionText": "## ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)\n\nTarget vocabulary from design.md §3.7 of\n`plans/260915-executor-policy-dispatch-seams/design.md` — documented here so\nconfig/doctor warnings (`executor-profile-warnings` check,\n`src/setup/executor-profile-warnings.mjs`) have a named migration target to\npoint at. The **Invocation** half of this vocabulary was already real config\nbefore this section existed (`executors.<id>.invocations[]`, each entry's\nown `via`/`command`/`args`/`adapter` — `src/runner/dispatch/config.mjs`'s\n`validateInvocationShape`). Phase C (`plans/260917-executor-profile-schema-migration/plan.md`)\nmade the **ExecutorProfile** half real too: `executors.<id>.identity`\n(all four fields required together when declared) and `executors.<id>.supports`\n(each field independently optional) are now validated, additive config\nfields (`validateExecutorIdentityShape`/`validateExecutorSupportsShape`,\nsame file) that survive `resolveExecutorAndOverrides` unchanged. Neither\nfield has a real consumer yet — no resolution/dispatch/PlacementPolicy code\nreads `identity`/`supports` for any decision — this is metadata a later\nphase can build on, not a behavior change. `claude` is the one real\nexecutor declaring both today (`.fgos/config.json`), proving the shape end\nto end; every other `runner.executors.<id>` entry stays exactly as it was,\nand legacy executor ids remain fully accepted. **No executor-id\nconsolidation or config-shape retirement has happened** (that is Phase E,\nnot started) — this section still describes the fuller target the\nvocabulary is headed toward, not a completed migration.\n\n**ExecutorProfile** answers \"which principal/backend/trust boundary is\nthis?\" — a stable runtime boundary, never a policy choice:\n\n| Field | Answers | Must NOT be derived from |\n|---|---|---|\n| `identity.principalRef` | which account/credential family | a concrete rotating account id (Provider Capacity Rotator's own scope, `plans/260916-account-rotator/`) |\n| `identity.runtimeBackendRef` | which CLI/runtime this is | model, quality tier, reasoning effort |\n| `identity.trustDomain` | how privileged this principal is | persona/role/business case |\n| `identity.egressClass` | what it may reach over the network | visibility (visible/headless) alone |\n\n**Invocation** answers \"how is this profile actually used for one dispatch?\":\nadapter (`cli-spawn`/`herdr-spawn`/mcp/api), prompt delivery (argv vs\nfile-pointer), visible/headless mode, confinement backend/envelope, resource\nbindings, provider adapter id. Confinement is normally an invocation\nenvelope, not identity — it only becomes identity when it changes principal,\nbackend trust, or egress boundary materially (the same rule design.md's\nProviderAdapter section already states for the shadow-mode Phase 01 module,\n`src/runner/dispatch/provider-adapter.mjs`).\n\nMigration targets a legacy config entry maps onto once every executor\nconsolidates onto this vocabulary (Phase D/E of\n`plans/260917-executor-profile-schema-migration/plan.md`, not yet — the\n`identity`/`supports` fields being real config, above, is not the same as\nthis consolidation happening):\n\n| Legacy pattern | Target |\n|---|---|\n| policy-shaped flag hardcoded in `executors.<id>` args (`--model`, `--effort`, `--allowedTools`, `--permission-mode`, Codex `-s`, …) | `ProviderAdapter` runtime option (design.md §3.5) |\n| role/persona baked into an executor id (`claude-reviewer`) | a compatibility alias patch (Phase 03, `LEGACY_EXECUTOR_ALIASES` in `src/runner/dispatch/assignment-policy.mjs`) carrying `personaRef`/`toolIntent`/`reasoningEffort` |\n| legacy model overrides on an executor | `runner.modelPolicies.<provider>` tier entry |\n| adapter choice encoded as a separate executor id | an `invocation` on one `ExecutorProfile` |\n| bwrap/confinement encoded as a separate executor id | an invocation's confinement envelope, unless trust/egress genuinely differs |\n| account pool / credential home env on an executor (e.g. the retired `FGOS_CODEX_CREDENTIAL_HOMES`) | Provider Capacity Rotator's global `runner.providers.<provider>.accounts` inventory (`plans/260916-account-rotator/`) |\n\nA later migration (Phase E) can map `claude` + `claude-reviewer` +\n`claude-reviewer-herdr` and similar id families into one `ExecutorProfile`\nwith multiple invocations, but that consolidation has not happened —\n`fgos doctor`'s `executor-profile-warnings` check makes the gap between\ncurrent config and this target vocabulary machine-visible in the meantime."
+      },
+      "exactClass": "Weak-exact",
+      "exactClassReason": "ancestor headings differ; document exact share below one half",
+      "nativeTargetClaimId": "claim_11e48676b08b7ffd0ebb5039374fc720",
+      "section": {
+        "startLine": 1297,
+        "endLine": 1361,
+        "target": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+        "kind": "contract",
+        "anchor": "executorprofile-invocation-target-vocabulary-phase-06-executor-policy-dispatch-seams-identitysupports-made-real-config-phase-c-executor-profile-schema-migration",
+        "title": "ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)",
+        "sha256": "8cc699a51885f814eb47ca5c0dd90879a054805c102cc61c36ab26fc69d753f4"
+      },
+      "mapAmendments": [],
+      "reboundAnchors": []
+    },
+    {
+      "claimId": "claim_66d031f3f3d5009c11d96357e48d985a",
+      "sourceUnitDigest": "5fde748feccce5cce2990f23d3f2b681442d6ec366063c45ca96204a3458fbcf",
+      "targetUnitDigest": "5fde748feccce5cce2990f23d3f2b681442d6ec366063c45ca96204a3458fbcf",
+      "reviewAuthor": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+      "decision": {
+        "claimId": "claim_66d031f3f3d5009c11d96357e48d985a",
+        "sourceUnitDigest": "5fde748feccce5cce2990f23d3f2b681442d6ec366063c45ca96204a3458fbcf",
+        "targetOwner": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+        "targetAnchor": "unheaded-block-3",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-106 (lines 1299–1320) carried at docs/platform/runner/contracts/h-b3eb60fb4d2b.md#unheaded-block-3. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetUnitDigest": "5fde748feccce5cce2990f23d3f2b681442d6ec366063c45ca96204a3458fbcf",
+        "targetAncestry": [
+          "Added in candidate: Runner ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)",
+          "ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)"
+        ]
+      },
+      "source": {
+        "path": "docs/specs/runner.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-106",
+        "githubAnchor": "unheaded-block-106",
+        "stableAnchor": "unheaded-block-106",
+        "title": "Unheaded block 106",
+        "startLine": 1299,
+        "endLine": 1320,
+        "textDigest": "5fde748feccce5cce2990f23d3f2b681442d6ec366063c45ca96204a3458fbcf",
+        "sample": "Target vocabulary from design.md §3.7 of\n`plans/260915-executor-policy-dispatch-seams/design.md` — documented here so\nconfig/doctor warnings (`executor-profile-warnings` check,\n`sr",
+        "identityFingerprint": "b4e3507a3e93c7ff348c98dcf0c00cf587aed8b79525e62b154288ace9078f77",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)",
+          "ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)"
+        ],
+        "text": "Target vocabulary from design.md §3.7 of\n`plans/260915-executor-policy-dispatch-seams/design.md` — documented here so\nconfig/doctor warnings (`executor-profile-warnings` check,\n`src/setup/executor-profile-warnings.mjs`) have a named migration target to\npoint at. The **Invocation** half of this vocabulary was already real config\nbefore this section existed (`executors.<id>.invocations[]`, each entry's\nown `via`/`command`/`args`/`adapter` — `src/runner/dispatch/config.mjs`'s\n`validateInvocationShape`). Phase C (`plans/260917-executor-profile-schema-migration/plan.md`)\nmade the **ExecutorProfile** half real too: `executors.<id>.identity`\n(all four fields required together when declared) and `executors.<id>.supports`\n(each field independently optional) are now validated, additive config\nfields (`validateExecutorIdentityShape`/`validateExecutorSupportsShape`,\nsame file) that survive `resolveExecutorAndOverrides` unchanged. Neither\nfield has a real consumer yet — no resolution/dispatch/PlacementPolicy code\nreads `identity`/`supports` for any decision — this is metadata a later\nphase can build on, not a behavior change. `claude` is the one real\nexecutor declaring both today (`.fgos/config.json`), proving the shape end\nto end; every other `runner.executors.<id>` entry stays exactly as it was,\nand legacy executor ids remain fully accepted. **No executor-id\nconsolidation or config-shape retirement has happened** (that is Phase E,\nnot started) — this section still describes the fuller target the\nvocabulary is headed toward, not a completed migration."
+      },
+      "target": {
+        "path": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 27,
+        "endLine": 48,
+        "textDigest": "5fde748feccce5cce2990f23d3f2b681442d6ec366063c45ca96204a3458fbcf",
+        "sample": "Target vocabulary from design.md §3.7 of\n`plans/260915-executor-policy-dispatch-seams/design.md` — documented here so\nconfig/doctor warnings (`executor-profile-warnings` check,\n`sr",
+        "identityFingerprint": "b4e3507a3e93c7ff348c98dcf0c00cf587aed8b79525e62b154288ace9078f77",
+        "ancestry": [
+          "Added in candidate: Runner ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)",
+          "ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)"
+        ],
+        "text": "Target vocabulary from design.md §3.7 of\n`plans/260915-executor-policy-dispatch-seams/design.md` — documented here so\nconfig/doctor warnings (`executor-profile-warnings` check,\n`src/setup/executor-profile-warnings.mjs`) have a named migration target to\npoint at. The **Invocation** half of this vocabulary was already real config\nbefore this section existed (`executors.<id>.invocations[]`, each entry's\nown `via`/`command`/`args`/`adapter` — `src/runner/dispatch/config.mjs`'s\n`validateInvocationShape`). Phase C (`plans/260917-executor-profile-schema-migration/plan.md`)\nmade the **ExecutorProfile** half real too: `executors.<id>.identity`\n(all four fields required together when declared) and `executors.<id>.supports`\n(each field independently optional) are now validated, additive config\nfields (`validateExecutorIdentityShape`/`validateExecutorSupportsShape`,\nsame file) that survive `resolveExecutorAndOverrides` unchanged. Neither\nfield has a real consumer yet — no resolution/dispatch/PlacementPolicy code\nreads `identity`/`supports` for any decision — this is metadata a later\nphase can build on, not a behavior change. `claude` is the one real\nexecutor declaring both today (`.fgos/config.json`), proving the shape end\nto end; every other `runner.executors.<id>` entry stays exactly as it was,\nand legacy executor ids remain fully accepted. **No executor-id\nconsolidation or config-shape retirement has happened** (that is Phase E,\nnot started) — this section still describes the fuller target the\nvocabulary is headed toward, not a completed migration."
+      },
+      "exactClass": "Weak-exact",
+      "exactClassReason": "ancestor headings differ; document exact share below one half",
+      "nativeTargetClaimId": "claim_f1e4c309467523897e0a16ee8ba9619d",
+      "section": {
+        "startLine": 1297,
+        "endLine": 1361,
+        "target": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+        "kind": "contract",
+        "anchor": "executorprofile-invocation-target-vocabulary-phase-06-executor-policy-dispatch-seams-identitysupports-made-real-config-phase-c-executor-profile-schema-migration",
+        "title": "ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)",
+        "sha256": "8cc699a51885f814eb47ca5c0dd90879a054805c102cc61c36ab26fc69d753f4"
+      },
+      "mapAmendments": [],
+      "reboundAnchors": []
+    },
+    {
+      "claimId": "claim_95d2ecdb9d54c1d56116b65a9df0c04d",
+      "sourceUnitDigest": "a1e669c10b27c418810291736bbd23a74f0b8a1519cb89bd800b657e59eb921a",
+      "targetUnitDigest": "a1e669c10b27c418810291736bbd23a74f0b8a1519cb89bd800b657e59eb921a",
+      "reviewAuthor": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+      "decision": {
+        "claimId": "claim_95d2ecdb9d54c1d56116b65a9df0c04d",
+        "sourceUnitDigest": "a1e669c10b27c418810291736bbd23a74f0b8a1519cb89bd800b657e59eb921a",
+        "targetOwner": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+        "targetAnchor": "unheaded-block-4",
+        "claimKind": "contract",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-107 (lines 1322–1323) carried at docs/platform/runner/contracts/h-b3eb60fb4d2b.md#unheaded-block-4. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetUnitDigest": "a1e669c10b27c418810291736bbd23a74f0b8a1519cb89bd800b657e59eb921a",
+        "targetAncestry": [
+          "Added in candidate: Runner ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)",
+          "ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)"
+        ]
+      },
+      "source": {
+        "path": "docs/specs/runner.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-107",
+        "githubAnchor": "unheaded-block-107",
+        "stableAnchor": "unheaded-block-107",
+        "title": "Unheaded block 107",
+        "startLine": 1322,
+        "endLine": 1323,
+        "textDigest": "a1e669c10b27c418810291736bbd23a74f0b8a1519cb89bd800b657e59eb921a",
+        "sample": "**ExecutorProfile** answers \"which principal/backend/trust boundary is\nthis?\" — a stable runtime boundary, never a policy choice:",
+        "identityFingerprint": "25eb8e78d849d10f69212718a4d4fdad77bad0ec41140a8e017da0d9345a855a",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)",
+          "ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)"
+        ],
+        "text": "**ExecutorProfile** answers \"which principal/backend/trust boundary is\nthis?\" — a stable runtime boundary, never a policy choice:"
+      },
+      "target": {
+        "path": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 50,
+        "endLine": 51,
+        "textDigest": "a1e669c10b27c418810291736bbd23a74f0b8a1519cb89bd800b657e59eb921a",
+        "sample": "**ExecutorProfile** answers \"which principal/backend/trust boundary is\nthis?\" — a stable runtime boundary, never a policy choice:",
+        "identityFingerprint": "25eb8e78d849d10f69212718a4d4fdad77bad0ec41140a8e017da0d9345a855a",
+        "ancestry": [
+          "Added in candidate: Runner ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)",
+          "ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)"
+        ],
+        "text": "**ExecutorProfile** answers \"which principal/backend/trust boundary is\nthis?\" — a stable runtime boundary, never a policy choice:"
+      },
+      "exactClass": "Weak-exact",
+      "exactClassReason": "ancestor headings differ; document exact share below one half",
+      "nativeTargetClaimId": "claim_7dbe4219d38532d1dd336463c5e91174",
+      "section": {
+        "startLine": 1297,
+        "endLine": 1361,
+        "target": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+        "kind": "contract",
+        "anchor": "executorprofile-invocation-target-vocabulary-phase-06-executor-policy-dispatch-seams-identitysupports-made-real-config-phase-c-executor-profile-schema-migration",
+        "title": "ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)",
+        "sha256": "8cc699a51885f814eb47ca5c0dd90879a054805c102cc61c36ab26fc69d753f4"
+      },
+      "mapAmendments": [],
+      "reboundAnchors": []
+    },
+    {
+      "claimId": "claim_cb3c65b7e70173d58c23d44f7dfe0199",
+      "sourceUnitDigest": "8b4bfaca15661a77c17a4085af210b9fd239a810c76d1c086f4978b30249c2ef",
+      "targetUnitDigest": "8b4bfaca15661a77c17a4085af210b9fd239a810c76d1c086f4978b30249c2ef",
+      "reviewAuthor": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+      "decision": {
+        "claimId": "claim_cb3c65b7e70173d58c23d44f7dfe0199",
+        "sourceUnitDigest": "8b4bfaca15661a77c17a4085af210b9fd239a810c76d1c086f4978b30249c2ef",
+        "targetOwner": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+        "targetAnchor": "unheaded-block-5",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-108 (lines 1325–1330) carried at docs/platform/runner/contracts/h-b3eb60fb4d2b.md#unheaded-block-5. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetUnitDigest": "8b4bfaca15661a77c17a4085af210b9fd239a810c76d1c086f4978b30249c2ef",
+        "targetAncestry": [
+          "Added in candidate: Runner ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)",
+          "ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)"
+        ]
+      },
+      "source": {
+        "path": "docs/specs/runner.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-108",
+        "githubAnchor": "unheaded-block-108",
+        "stableAnchor": "unheaded-block-108",
+        "title": "Unheaded block 108",
+        "startLine": 1325,
+        "endLine": 1330,
+        "textDigest": "8b4bfaca15661a77c17a4085af210b9fd239a810c76d1c086f4978b30249c2ef",
+        "sample": "| Field | Answers | Must NOT be derived from |\n|---|---|---|\n| `identity.principalRef` | which account/credential family | a concrete rotating account id (Provider Capacity Rotator",
+        "identityFingerprint": "922a86c0ec04660d7d8b27935db82dee0cd956d4b3fa87923a8b07c90105b096",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)",
+          "ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)"
+        ],
+        "text": "| Field | Answers | Must NOT be derived from |\n|---|---|---|\n| `identity.principalRef` | which account/credential family | a concrete rotating account id (Provider Capacity Rotator's own scope, `plans/260916-account-rotator/`) |\n| `identity.runtimeBackendRef` | which CLI/runtime this is | model, quality tier, reasoning effort |\n| `identity.trustDomain` | how privileged this principal is | persona/role/business case |\n| `identity.egressClass` | what it may reach over the network | visibility (visible/headless) alone |"
+      },
+      "target": {
+        "path": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 53,
+        "endLine": 58,
+        "textDigest": "8b4bfaca15661a77c17a4085af210b9fd239a810c76d1c086f4978b30249c2ef",
+        "sample": "| Field | Answers | Must NOT be derived from |\n|---|---|---|\n| `identity.principalRef` | which account/credential family | a concrete rotating account id (Provider Capacity Rotator",
+        "identityFingerprint": "922a86c0ec04660d7d8b27935db82dee0cd956d4b3fa87923a8b07c90105b096",
+        "ancestry": [
+          "Added in candidate: Runner ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)",
+          "ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)"
+        ],
+        "text": "| Field | Answers | Must NOT be derived from |\n|---|---|---|\n| `identity.principalRef` | which account/credential family | a concrete rotating account id (Provider Capacity Rotator's own scope, `plans/260916-account-rotator/`) |\n| `identity.runtimeBackendRef` | which CLI/runtime this is | model, quality tier, reasoning effort |\n| `identity.trustDomain` | how privileged this principal is | persona/role/business case |\n| `identity.egressClass` | what it may reach over the network | visibility (visible/headless) alone |"
+      },
+      "exactClass": "Weak-exact",
+      "exactClassReason": "ancestor headings differ; document exact share below one half",
+      "nativeTargetClaimId": "claim_5daa6a9da3f29df9be6c1b8c4eb9f9aa",
+      "section": {
+        "startLine": 1297,
+        "endLine": 1361,
+        "target": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+        "kind": "contract",
+        "anchor": "executorprofile-invocation-target-vocabulary-phase-06-executor-policy-dispatch-seams-identitysupports-made-real-config-phase-c-executor-profile-schema-migration",
+        "title": "ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)",
+        "sha256": "8cc699a51885f814eb47ca5c0dd90879a054805c102cc61c36ab26fc69d753f4"
+      },
+      "mapAmendments": [],
+      "reboundAnchors": []
+    },
+    {
+      "claimId": "claim_b8467c061279966217c968d3b0e21419",
+      "sourceUnitDigest": "770f4acda1f192cd4b53aaf5f746e4952661815dd5222849df64c42cf039e297",
+      "targetUnitDigest": "770f4acda1f192cd4b53aaf5f746e4952661815dd5222849df64c42cf039e297",
+      "reviewAuthor": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+      "decision": {
+        "claimId": "claim_b8467c061279966217c968d3b0e21419",
+        "sourceUnitDigest": "770f4acda1f192cd4b53aaf5f746e4952661815dd5222849df64c42cf039e297",
+        "targetOwner": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+        "targetAnchor": "unheaded-block-6",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-109 (lines 1332–1339) carried at docs/platform/runner/contracts/h-b3eb60fb4d2b.md#unheaded-block-6. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetUnitDigest": "770f4acda1f192cd4b53aaf5f746e4952661815dd5222849df64c42cf039e297",
+        "targetAncestry": [
+          "Added in candidate: Runner ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)",
+          "ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)"
+        ]
+      },
+      "source": {
+        "path": "docs/specs/runner.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-109",
+        "githubAnchor": "unheaded-block-109",
+        "stableAnchor": "unheaded-block-109",
+        "title": "Unheaded block 109",
+        "startLine": 1332,
+        "endLine": 1339,
+        "textDigest": "770f4acda1f192cd4b53aaf5f746e4952661815dd5222849df64c42cf039e297",
+        "sample": "**Invocation** answers \"how is this profile actually used for one dispatch?\":\nadapter (`cli-spawn`/`herdr-spawn`/mcp/api), prompt delivery (argv vs\nfile-pointer), visible/headless ",
+        "identityFingerprint": "1b16fe98303c1962d78c4bba82e8f29b2813e916c31209b191548fac3657bbd1",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)",
+          "ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)"
+        ],
+        "text": "**Invocation** answers \"how is this profile actually used for one dispatch?\":\nadapter (`cli-spawn`/`herdr-spawn`/mcp/api), prompt delivery (argv vs\nfile-pointer), visible/headless mode, confinement backend/envelope, resource\nbindings, provider adapter id. Confinement is normally an invocation\nenvelope, not identity — it only becomes identity when it changes principal,\nbackend trust, or egress boundary materially (the same rule design.md's\nProviderAdapter section already states for the shadow-mode Phase 01 module,\n`src/runner/dispatch/provider-adapter.mjs`)."
+      },
+      "target": {
+        "path": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 60,
+        "endLine": 67,
+        "textDigest": "770f4acda1f192cd4b53aaf5f746e4952661815dd5222849df64c42cf039e297",
+        "sample": "**Invocation** answers \"how is this profile actually used for one dispatch?\":\nadapter (`cli-spawn`/`herdr-spawn`/mcp/api), prompt delivery (argv vs\nfile-pointer), visible/headless ",
+        "identityFingerprint": "1b16fe98303c1962d78c4bba82e8f29b2813e916c31209b191548fac3657bbd1",
+        "ancestry": [
+          "Added in candidate: Runner ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)",
+          "ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)"
+        ],
+        "text": "**Invocation** answers \"how is this profile actually used for one dispatch?\":\nadapter (`cli-spawn`/`herdr-spawn`/mcp/api), prompt delivery (argv vs\nfile-pointer), visible/headless mode, confinement backend/envelope, resource\nbindings, provider adapter id. Confinement is normally an invocation\nenvelope, not identity — it only becomes identity when it changes principal,\nbackend trust, or egress boundary materially (the same rule design.md's\nProviderAdapter section already states for the shadow-mode Phase 01 module,\n`src/runner/dispatch/provider-adapter.mjs`)."
+      },
+      "exactClass": "Weak-exact",
+      "exactClassReason": "ancestor headings differ; document exact share below one half",
+      "nativeTargetClaimId": "claim_262fc1bca43a504fec7b1c035328b022",
+      "section": {
+        "startLine": 1297,
+        "endLine": 1361,
+        "target": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+        "kind": "contract",
+        "anchor": "executorprofile-invocation-target-vocabulary-phase-06-executor-policy-dispatch-seams-identitysupports-made-real-config-phase-c-executor-profile-schema-migration",
+        "title": "ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)",
+        "sha256": "8cc699a51885f814eb47ca5c0dd90879a054805c102cc61c36ab26fc69d753f4"
+      },
+      "mapAmendments": [],
+      "reboundAnchors": []
+    },
+    {
+      "claimId": "claim_d29be3d33893c060220d82b135fcb7c0",
+      "sourceUnitDigest": "dfa2fbd2381337a7bc8440220851e83137d4ebf9014eb9e18bc6d9161a615964",
+      "targetUnitDigest": "dfa2fbd2381337a7bc8440220851e83137d4ebf9014eb9e18bc6d9161a615964",
+      "reviewAuthor": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+      "decision": {
+        "claimId": "claim_d29be3d33893c060220d82b135fcb7c0",
+        "sourceUnitDigest": "dfa2fbd2381337a7bc8440220851e83137d4ebf9014eb9e18bc6d9161a615964",
+        "targetOwner": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+        "targetAnchor": "unheaded-block-7",
+        "claimKind": "contract",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-110 (lines 1341–1345) carried at docs/platform/runner/contracts/h-b3eb60fb4d2b.md#unheaded-block-7. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetUnitDigest": "dfa2fbd2381337a7bc8440220851e83137d4ebf9014eb9e18bc6d9161a615964",
+        "targetAncestry": [
+          "Added in candidate: Runner ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)",
+          "ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)"
+        ]
+      },
+      "source": {
+        "path": "docs/specs/runner.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-110",
+        "githubAnchor": "unheaded-block-110",
+        "stableAnchor": "unheaded-block-110",
+        "title": "Unheaded block 110",
+        "startLine": 1341,
+        "endLine": 1345,
+        "textDigest": "dfa2fbd2381337a7bc8440220851e83137d4ebf9014eb9e18bc6d9161a615964",
+        "sample": "Migration targets a legacy config entry maps onto once every executor\nconsolidates onto this vocabulary (Phase D/E of\n`plans/260917-executor-profile-schema-migration/plan.md`, not ",
+        "identityFingerprint": "3114a2dd897bba1142f55edbeaf017fbbc3c472664e23bca34949ad27dba2f80",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)",
+          "ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)"
+        ],
+        "text": "Migration targets a legacy config entry maps onto once every executor\nconsolidates onto this vocabulary (Phase D/E of\n`plans/260917-executor-profile-schema-migration/plan.md`, not yet — the\n`identity`/`supports` fields being real config, above, is not the same as\nthis consolidation happening):"
+      },
+      "target": {
+        "path": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 69,
+        "endLine": 73,
+        "textDigest": "dfa2fbd2381337a7bc8440220851e83137d4ebf9014eb9e18bc6d9161a615964",
+        "sample": "Migration targets a legacy config entry maps onto once every executor\nconsolidates onto this vocabulary (Phase D/E of\n`plans/260917-executor-profile-schema-migration/plan.md`, not ",
+        "identityFingerprint": "3114a2dd897bba1142f55edbeaf017fbbc3c472664e23bca34949ad27dba2f80",
+        "ancestry": [
+          "Added in candidate: Runner ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)",
+          "ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)"
+        ],
+        "text": "Migration targets a legacy config entry maps onto once every executor\nconsolidates onto this vocabulary (Phase D/E of\n`plans/260917-executor-profile-schema-migration/plan.md`, not yet — the\n`identity`/`supports` fields being real config, above, is not the same as\nthis consolidation happening):"
+      },
+      "exactClass": "Weak-exact",
+      "exactClassReason": "ancestor headings differ; document exact share below one half",
+      "nativeTargetClaimId": "claim_81324337002b28be819370d2e4c48274",
+      "section": {
+        "startLine": 1297,
+        "endLine": 1361,
+        "target": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+        "kind": "contract",
+        "anchor": "executorprofile-invocation-target-vocabulary-phase-06-executor-policy-dispatch-seams-identitysupports-made-real-config-phase-c-executor-profile-schema-migration",
+        "title": "ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)",
+        "sha256": "8cc699a51885f814eb47ca5c0dd90879a054805c102cc61c36ab26fc69d753f4"
+      },
+      "mapAmendments": [],
+      "reboundAnchors": []
+    },
+    {
+      "claimId": "claim_2811db1449ad8dc4655f8531d5c5701e",
+      "sourceUnitDigest": "fc05b724a8cf91d0a56fcedb8c1f936f8771e44e77ae345055e5525b8bdf6bc5",
+      "targetUnitDigest": "fc05b724a8cf91d0a56fcedb8c1f936f8771e44e77ae345055e5525b8bdf6bc5",
+      "reviewAuthor": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+      "decision": {
+        "claimId": "claim_2811db1449ad8dc4655f8531d5c5701e",
+        "sourceUnitDigest": "fc05b724a8cf91d0a56fcedb8c1f936f8771e44e77ae345055e5525b8bdf6bc5",
+        "targetOwner": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+        "targetAnchor": "unheaded-block-8",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-111 (lines 1347–1354) carried at docs/platform/runner/contracts/h-b3eb60fb4d2b.md#unheaded-block-8. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetUnitDigest": "fc05b724a8cf91d0a56fcedb8c1f936f8771e44e77ae345055e5525b8bdf6bc5",
+        "targetAncestry": [
+          "Added in candidate: Runner ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)",
+          "ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)"
+        ]
+      },
+      "source": {
+        "path": "docs/specs/runner.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-111",
+        "githubAnchor": "unheaded-block-111",
+        "stableAnchor": "unheaded-block-111",
+        "title": "Unheaded block 111",
+        "startLine": 1347,
+        "endLine": 1354,
+        "textDigest": "fc05b724a8cf91d0a56fcedb8c1f936f8771e44e77ae345055e5525b8bdf6bc5",
+        "sample": "| Legacy pattern | Target |\n|---|---|\n| policy-shaped flag hardcoded in `executors.<id>` args (`--model`, `--effort`, `--allowedTools`, `--permission-mode`, Codex `-s`, …) | `Provi",
+        "identityFingerprint": "de2a7caf54eb8f36f63d7d92cf2c4370f65d59c51280f6c3e1b32934dca2bde4",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)",
+          "ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)"
+        ],
+        "text": "| Legacy pattern | Target |\n|---|---|\n| policy-shaped flag hardcoded in `executors.<id>` args (`--model`, `--effort`, `--allowedTools`, `--permission-mode`, Codex `-s`, …) | `ProviderAdapter` runtime option (design.md §3.5) |\n| role/persona baked into an executor id (`claude-reviewer`) | a compatibility alias patch (Phase 03, `LEGACY_EXECUTOR_ALIASES` in `src/runner/dispatch/assignment-policy.mjs`) carrying `personaRef`/`toolIntent`/`reasoningEffort` |\n| legacy model overrides on an executor | `runner.modelPolicies.<provider>` tier entry |\n| adapter choice encoded as a separate executor id | an `invocation` on one `ExecutorProfile` |\n| bwrap/confinement encoded as a separate executor id | an invocation's confinement envelope, unless trust/egress genuinely differs |\n| account pool / credential home env on an executor (e.g. the retired `FGOS_CODEX_CREDENTIAL_HOMES`) | Provider Capacity Rotator's global `runner.providers.<provider>.accounts` inventory (`plans/260916-account-rotator/`) |"
+      },
+      "target": {
+        "path": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-8",
+        "githubAnchor": "unheaded-block-8",
+        "stableAnchor": "unheaded-block-8",
+        "title": "Unheaded block 8",
+        "startLine": 75,
+        "endLine": 82,
+        "textDigest": "fc05b724a8cf91d0a56fcedb8c1f936f8771e44e77ae345055e5525b8bdf6bc5",
+        "sample": "| Legacy pattern | Target |\n|---|---|\n| policy-shaped flag hardcoded in `executors.<id>` args (`--model`, `--effort`, `--allowedTools`, `--permission-mode`, Codex `-s`, …) | `Provi",
+        "identityFingerprint": "de2a7caf54eb8f36f63d7d92cf2c4370f65d59c51280f6c3e1b32934dca2bde4",
+        "ancestry": [
+          "Added in candidate: Runner ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)",
+          "ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)"
+        ],
+        "text": "| Legacy pattern | Target |\n|---|---|\n| policy-shaped flag hardcoded in `executors.<id>` args (`--model`, `--effort`, `--allowedTools`, `--permission-mode`, Codex `-s`, …) | `ProviderAdapter` runtime option (design.md §3.5) |\n| role/persona baked into an executor id (`claude-reviewer`) | a compatibility alias patch (Phase 03, `LEGACY_EXECUTOR_ALIASES` in `src/runner/dispatch/assignment-policy.mjs`) carrying `personaRef`/`toolIntent`/`reasoningEffort` |\n| legacy model overrides on an executor | `runner.modelPolicies.<provider>` tier entry |\n| adapter choice encoded as a separate executor id | an `invocation` on one `ExecutorProfile` |\n| bwrap/confinement encoded as a separate executor id | an invocation's confinement envelope, unless trust/egress genuinely differs |\n| account pool / credential home env on an executor (e.g. the retired `FGOS_CODEX_CREDENTIAL_HOMES`) | Provider Capacity Rotator's global `runner.providers.<provider>.accounts` inventory (`plans/260916-account-rotator/`) |"
+      },
+      "exactClass": "Weak-exact",
+      "exactClassReason": "ancestor headings differ; document exact share below one half",
+      "nativeTargetClaimId": "claim_8cb585efea1f1cc6e6e491cc1699702e",
+      "section": {
+        "startLine": 1297,
+        "endLine": 1361,
+        "target": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+        "kind": "contract",
+        "anchor": "executorprofile-invocation-target-vocabulary-phase-06-executor-policy-dispatch-seams-identitysupports-made-real-config-phase-c-executor-profile-schema-migration",
+        "title": "ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)",
+        "sha256": "8cc699a51885f814eb47ca5c0dd90879a054805c102cc61c36ab26fc69d753f4"
+      },
+      "mapAmendments": [],
+      "reboundAnchors": []
+    },
+    {
+      "claimId": "claim_5f91b173c863af29efb4d8af8c734b4c",
+      "sourceUnitDigest": "8effb31b306362d3a2022b786937e6f66411717f00e1e3679117d7fa3cdf6e4d",
+      "targetUnitDigest": "8effb31b306362d3a2022b786937e6f66411717f00e1e3679117d7fa3cdf6e4d",
+      "reviewAuthor": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+      "decision": {
+        "claimId": "claim_5f91b173c863af29efb4d8af8c734b4c",
+        "sourceUnitDigest": "8effb31b306362d3a2022b786937e6f66411717f00e1e3679117d7fa3cdf6e4d",
+        "targetOwner": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+        "targetAnchor": "unheaded-block-9",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-112 (lines 1356–1360) carried at docs/platform/runner/contracts/h-b3eb60fb4d2b.md#unheaded-block-9. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetUnitDigest": "8effb31b306362d3a2022b786937e6f66411717f00e1e3679117d7fa3cdf6e4d",
+        "targetAncestry": [
+          "Added in candidate: Runner ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)",
+          "ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)"
+        ]
+      },
+      "source": {
+        "path": "docs/specs/runner.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-112",
+        "githubAnchor": "unheaded-block-112",
+        "stableAnchor": "unheaded-block-112",
+        "title": "Unheaded block 112",
+        "startLine": 1356,
+        "endLine": 1360,
+        "textDigest": "8effb31b306362d3a2022b786937e6f66411717f00e1e3679117d7fa3cdf6e4d",
+        "sample": "A later migration (Phase E) can map `claude` + `claude-reviewer` +\n`claude-reviewer-herdr` and similar id families into one `ExecutorProfile`\nwith multiple invocations, but that co",
+        "identityFingerprint": "6bc6daccf92f0aed6a4d9324be87e7d28a1ebec48f2fea6f85ab2cb7871f7a6b",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)",
+          "ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)"
+        ],
+        "text": "A later migration (Phase E) can map `claude` + `claude-reviewer` +\n`claude-reviewer-herdr` and similar id families into one `ExecutorProfile`\nwith multiple invocations, but that consolidation has not happened —\n`fgos doctor`'s `executor-profile-warnings` check makes the gap between\ncurrent config and this target vocabulary machine-visible in the meantime."
+      },
+      "target": {
+        "path": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-9",
+        "githubAnchor": "unheaded-block-9",
+        "stableAnchor": "unheaded-block-9",
+        "title": "Unheaded block 9",
+        "startLine": 84,
+        "endLine": 88,
+        "textDigest": "8effb31b306362d3a2022b786937e6f66411717f00e1e3679117d7fa3cdf6e4d",
+        "sample": "A later migration (Phase E) can map `claude` + `claude-reviewer` +\n`claude-reviewer-herdr` and similar id families into one `ExecutorProfile`\nwith multiple invocations, but that co",
+        "identityFingerprint": "6bc6daccf92f0aed6a4d9324be87e7d28a1ebec48f2fea6f85ab2cb7871f7a6b",
+        "ancestry": [
+          "Added in candidate: Runner ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)",
+          "ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)"
+        ],
+        "text": "A later migration (Phase E) can map `claude` + `claude-reviewer` +\n`claude-reviewer-herdr` and similar id families into one `ExecutorProfile`\nwith multiple invocations, but that consolidation has not happened —\n`fgos doctor`'s `executor-profile-warnings` check makes the gap between\ncurrent config and this target vocabulary machine-visible in the meantime."
+      },
+      "exactClass": "Weak-exact",
+      "exactClassReason": "ancestor headings differ; document exact share below one half",
+      "nativeTargetClaimId": "claim_9813f6e4e9a87964c55786e36424572e",
+      "section": {
+        "startLine": 1297,
+        "endLine": 1361,
+        "target": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+        "kind": "contract",
+        "anchor": "executorprofile-invocation-target-vocabulary-phase-06-executor-policy-dispatch-seams-identitysupports-made-real-config-phase-c-executor-profile-schema-migration",
+        "title": "ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)",
+        "sha256": "8cc699a51885f814eb47ca5c0dd90879a054805c102cc61c36ab26fc69d753f4"
+      },
+      "mapAmendments": [],
+      "reboundAnchors": []
+    }
+  ],
+  "sensitivityControls": [],
+  "unmatchedCandidateUnits": [],
+  "unmatchedUnitsChannel": "candidate-unverified-runner.json, complete native strict-E set, separate non-source request",
+  "classes": {
+    "Unit-exact": [],
+    "Weak-exact": [
+      "claim_ef6c4ace21b84e2eeb9de2ad200e5cfb",
+      "claim_66d031f3f3d5009c11d96357e48d985a",
+      "claim_95d2ecdb9d54c1d56116b65a9df0c04d",
+      "claim_cb3c65b7e70173d58c23d44f7dfe0199",
+      "claim_b8467c061279966217c968d3b0e21419",
+      "claim_d29be3d33893c060220d82b135fcb7c0",
+      "claim_2811db1449ad8dc4655f8531d5c5701e",
+      "claim_5f91b173c863af29efb4d8af8c734b4c"
+    ],
+    "Judgment": []
+  },
+  "unequalDigestPairs": [],
+  "mandatoryDeep": [],
+  "minimumDeep": 8,
+  "sourceBlobs": {
+    "path": "docs/specs/runner.md",
+    "blob": "ddfa78cc7183cf1f7db8ee64d2339653a0aa0023",
+    "sha256": "de1b0a3453706016171b530fcdf8e8e646563af707982f042c997fa99b83c7fe"
+  },
+  "shardDigest": "de26feeaa57cfde916a78fdb423735da6335dbc35138e4ef545293c3bb50222b",
+  "target": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+  "part": 1,
+  "parts": 1
+}

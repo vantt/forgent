@@ -1,0 +1,181 @@
+{
+  "version": 1,
+  "commit": "81d0ed0747014e976c0d29222439fd6e3592b468",
+  "shard": "s9-runner-01.json",
+  "authorSession": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+  "authorshipRequired": true,
+  "rows": [
+    {
+      "claimId": "claim_0686418ae7571d82eade8059c698709d",
+      "sourceUnitDigest": "3f682e32dc04d19e654abc927f8a3570f8ed866f17711e4ff18302e2840461e7",
+      "targetUnitDigest": "3f682e32dc04d19e654abc927f8a3570f8ed866f17711e4ff18302e2840461e7",
+      "reviewAuthor": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+      "decision": {
+        "claimId": "claim_0686418ae7571d82eade8059c698709d",
+        "sourceUnitDigest": "3f682e32dc04d19e654abc927f8a3570f8ed866f17711e4ff18302e2840461e7",
+        "targetOwner": "docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md",
+        "targetAnchor": "actors-access",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ; source unit shorter than 40 characters; document exact share below one half. Whole heading docs/specs/runner.md#actors-access (lines 941–941) carried at docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md#actors-access. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetUnitDigest": "3f682e32dc04d19e654abc927f8a3570f8ed866f17711e4ff18302e2840461e7",
+        "targetAncestry": [
+          "Added in candidate: Runner Actors & Access"
+        ]
+      },
+      "source": {
+        "path": "docs/specs/runner.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Actors & Access",
+        "anchor": "actors-access",
+        "githubAnchor": "actors-access",
+        "stableAnchor": "h-f523951802a0",
+        "startLine": 941,
+        "endLine": 941,
+        "textDigest": "3f682e32dc04d19e654abc927f8a3570f8ed866f17711e4ff18302e2840461e7",
+        "sample": "Actors & Access",
+        "sectionPayloadDigest": "81c2724820c499b40d0e4d2964c798263c2ad99a479582176a95ee13b7f4d24e",
+        "followingBlockDigest": "81c2724820c499b40d0e4d2964c798263c2ad99a479582176a95ee13b7f4d24e",
+        "identityFingerprint": "a0680db8ef16c4e5ca63c167e2d8ac92af767c88273b736924d8bf5f2d424838",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)"
+        ],
+        "text": "## Actors & Access",
+        "sectionText": "## Actors & Access\n\n| Capability | Người vận hành | Runner | Worker (trợ lý nền) |\n|---|---|---|---|\n| Khởi động vòng / duyệt đề xuất (merge → done) | ✓ | — | — |\n| Ghi trạng thái trong vòng dispatch | — (ngoài vòng vẫn ghi tay được) | ✓ duy nhất, qua một cửa | — CẤM (bằng chỉ dẫn) |\n| Commit trong worktree/nhánh riêng | — | — | ✓ |\n| Sửa cây làm việc chính | ✓ | — | — CẤM (bằng chỉ dẫn + kết quả chỉ là đề xuất) |\n| Đồng bộ lại một việc đỗ vì gãy nhập (`catchup`) | ✓ | — | — |\n| Xếp hạng/xem candidate tự cải thiện (Gate A, `evolve`) | ✓ | — | — |"
+      },
+      "target": {
+        "path": "docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Actors & Access",
+        "anchor": "actors-access",
+        "githubAnchor": "actors-access",
+        "stableAnchor": "h-cf58d496a2ac",
+        "startLine": 25,
+        "endLine": 25,
+        "textDigest": "3f682e32dc04d19e654abc927f8a3570f8ed866f17711e4ff18302e2840461e7",
+        "sample": "Actors & Access",
+        "sectionPayloadDigest": "81c2724820c499b40d0e4d2964c798263c2ad99a479582176a95ee13b7f4d24e",
+        "followingBlockDigest": "81c2724820c499b40d0e4d2964c798263c2ad99a479582176a95ee13b7f4d24e",
+        "identityFingerprint": "a0680db8ef16c4e5ca63c167e2d8ac92af767c88273b736924d8bf5f2d424838",
+        "ancestry": [
+          "Added in candidate: Runner Actors & Access"
+        ],
+        "text": "## Actors & Access",
+        "sectionText": "## Actors & Access\n\n| Capability | Người vận hành | Runner | Worker (trợ lý nền) |\n|---|---|---|---|\n| Khởi động vòng / duyệt đề xuất (merge → done) | ✓ | — | — |\n| Ghi trạng thái trong vòng dispatch | — (ngoài vòng vẫn ghi tay được) | ✓ duy nhất, qua một cửa | — CẤM (bằng chỉ dẫn) |\n| Commit trong worktree/nhánh riêng | — | — | ✓ |\n| Sửa cây làm việc chính | ✓ | — | — CẤM (bằng chỉ dẫn + kết quả chỉ là đề xuất) |\n| Đồng bộ lại một việc đỗ vì gãy nhập (`catchup`) | ✓ | — | — |\n| Xếp hạng/xem candidate tự cải thiện (Gate A, `evolve`) | ✓ | — | — |"
+      },
+      "exactClass": "Weak-exact",
+      "exactClassReason": "ancestor headings differ; source unit shorter than 40 characters; document exact share below one half",
+      "nativeTargetClaimId": "claim_e0860568f118f2e80e6cd1bff6b0a62f",
+      "section": {
+        "startLine": 941,
+        "endLine": 951,
+        "target": "docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md",
+        "kind": "spec",
+        "anchor": "actors-access",
+        "title": "Actors & Access",
+        "sha256": "4957b72977b35952899995f791f6af567579eb436793d9c2fd995c2e643022c1"
+      },
+      "mapAmendments": [],
+      "reboundAnchors": []
+    },
+    {
+      "claimId": "claim_add6d13e14df87ad5d5bd46cc5bb98d4",
+      "sourceUnitDigest": "81c2724820c499b40d0e4d2964c798263c2ad99a479582176a95ee13b7f4d24e",
+      "targetUnitDigest": "81c2724820c499b40d0e4d2964c798263c2ad99a479582176a95ee13b7f4d24e",
+      "reviewAuthor": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+      "decision": {
+        "claimId": "claim_add6d13e14df87ad5d5bd46cc5bb98d4",
+        "sourceUnitDigest": "81c2724820c499b40d0e4d2964c798263c2ad99a479582176a95ee13b7f4d24e",
+        "targetOwner": "docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md",
+        "targetAnchor": "unheaded-block-3",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-60 (lines 943–950) carried at docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md#unheaded-block-3. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetUnitDigest": "81c2724820c499b40d0e4d2964c798263c2ad99a479582176a95ee13b7f4d24e",
+        "targetAncestry": [
+          "Added in candidate: Runner Actors & Access",
+          "Actors & Access"
+        ]
+      },
+      "source": {
+        "path": "docs/specs/runner.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-60",
+        "githubAnchor": "unheaded-block-60",
+        "stableAnchor": "unheaded-block-60",
+        "title": "Unheaded block 60",
+        "startLine": 943,
+        "endLine": 950,
+        "textDigest": "81c2724820c499b40d0e4d2964c798263c2ad99a479582176a95ee13b7f4d24e",
+        "sample": "| Capability | Người vận hành | Runner | Worker (trợ lý nền) |\n|---|---|---|---|\n| Khởi động vòng / duyệt đề xuất (merge → done) | ✓ | — | — |\n| Ghi trạng thái trong vòng dispatch ",
+        "identityFingerprint": "d7dd5553565fd93a878028ca191e996e6aea93072d29fcd6d5beb074826f6667",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Actors & Access"
+        ],
+        "text": "| Capability | Người vận hành | Runner | Worker (trợ lý nền) |\n|---|---|---|---|\n| Khởi động vòng / duyệt đề xuất (merge → done) | ✓ | — | — |\n| Ghi trạng thái trong vòng dispatch | — (ngoài vòng vẫn ghi tay được) | ✓ duy nhất, qua một cửa | — CẤM (bằng chỉ dẫn) |\n| Commit trong worktree/nhánh riêng | — | — | ✓ |\n| Sửa cây làm việc chính | ✓ | — | — CẤM (bằng chỉ dẫn + kết quả chỉ là đề xuất) |\n| Đồng bộ lại một việc đỗ vì gãy nhập (`catchup`) | ✓ | — | — |\n| Xếp hạng/xem candidate tự cải thiện (Gate A, `evolve`) | ✓ | — | — |"
+      },
+      "target": {
+        "path": "docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 27,
+        "endLine": 34,
+        "textDigest": "81c2724820c499b40d0e4d2964c798263c2ad99a479582176a95ee13b7f4d24e",
+        "sample": "| Capability | Người vận hành | Runner | Worker (trợ lý nền) |\n|---|---|---|---|\n| Khởi động vòng / duyệt đề xuất (merge → done) | ✓ | — | — |\n| Ghi trạng thái trong vòng dispatch ",
+        "identityFingerprint": "d7dd5553565fd93a878028ca191e996e6aea93072d29fcd6d5beb074826f6667",
+        "ancestry": [
+          "Added in candidate: Runner Actors & Access",
+          "Actors & Access"
+        ],
+        "text": "| Capability | Người vận hành | Runner | Worker (trợ lý nền) |\n|---|---|---|---|\n| Khởi động vòng / duyệt đề xuất (merge → done) | ✓ | — | — |\n| Ghi trạng thái trong vòng dispatch | — (ngoài vòng vẫn ghi tay được) | ✓ duy nhất, qua một cửa | — CẤM (bằng chỉ dẫn) |\n| Commit trong worktree/nhánh riêng | — | — | ✓ |\n| Sửa cây làm việc chính | ✓ | — | — CẤM (bằng chỉ dẫn + kết quả chỉ là đề xuất) |\n| Đồng bộ lại một việc đỗ vì gãy nhập (`catchup`) | ✓ | — | — |\n| Xếp hạng/xem candidate tự cải thiện (Gate A, `evolve`) | ✓ | — | — |"
+      },
+      "exactClass": "Weak-exact",
+      "exactClassReason": "ancestor headings differ; document exact share below one half",
+      "nativeTargetClaimId": "claim_b2486d52447903c938bf6c29d28a7691",
+      "section": {
+        "startLine": 941,
+        "endLine": 951,
+        "target": "docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md",
+        "kind": "spec",
+        "anchor": "actors-access",
+        "title": "Actors & Access",
+        "sha256": "4957b72977b35952899995f791f6af567579eb436793d9c2fd995c2e643022c1"
+      },
+      "mapAmendments": [],
+      "reboundAnchors": []
+    }
+  ],
+  "sensitivityControls": [],
+  "unmatchedCandidateUnits": [],
+  "unmatchedUnitsChannel": "candidate-unverified-runner.json, complete native strict-E set, separate non-source request",
+  "classes": {
+    "Unit-exact": [],
+    "Weak-exact": [
+      "claim_0686418ae7571d82eade8059c698709d",
+      "claim_add6d13e14df87ad5d5bd46cc5bb98d4"
+    ],
+    "Judgment": []
+  },
+  "unequalDigestPairs": [],
+  "mandatoryDeep": [],
+  "minimumDeep": 2,
+  "sourceBlobs": {
+    "path": "docs/specs/runner.md",
+    "blob": "ddfa78cc7183cf1f7db8ee64d2339653a0aa0023",
+    "sha256": "de1b0a3453706016171b530fcdf8e8e646563af707982f042c997fa99b83c7fe"
+  },
+  "shardDigest": "de26feeaa57cfde916a78fdb423735da6335dbc35138e4ef545293c3bb50222b",
+  "target": "docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md",
+  "part": 1,
+  "parts": 1
+}

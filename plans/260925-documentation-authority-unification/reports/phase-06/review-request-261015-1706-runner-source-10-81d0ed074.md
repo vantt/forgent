@@ -1,0 +1,1123 @@
+# Independent bounded runner source review
+
+Content commit: 81d0ed0747014e976c0d29222439fd6e3592b468
+
+Author session: codex-session:unit-run-1792057868388-68b4a62c@2026-10-15
+
+Entries: **15**. Target: `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md`; part 2/2. Shard: `plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json`; SHA256 `de26feeaa57cfde916a78fdb423735da6335dbc35138e4ef545293c3bb50222b`. Sidecar SHA256 `5cb690330f171bd603cf3eb46d2e36dd2d2123b41cb0535b4ef66dfe8fbd9be9`.
+
+Read review-brief.md, owner-answers.md A19/A22/A28/A34/A36 and the frozen runner map. Ordinary conservation review only; no truth, promotion or retirement approval. Mechanically verify every digest, anchor, ancestry, native identity, one owner and shard/pack equality. Reviewer independently selects and records seeds and IDs, reads both directions with the full diff, and labels every own note deep or mechanical. More than 3% deep rework requires full-pack deep reading. Return Reviewer, Author session(s), Review mode: ordinary, content/request/shard pins and one five-column Claim | Verdict | Note | Source digest | Target digest row per entry; full 64-hex digests, literal none for absent target, ok/rework/hold. No producer verdict, draw or seed is supplied. Consolidate source packs by the original shard before ordinary application.
+
+A36: reviewer-drawn minimum **10/15** Weak-exact/Judgment entries for this pack, plus every unequal-digest pair. Complete batch: 494 Weak-exact and 1 Judgment; at least 75 Weak-exact plus the sole Judgment overall (per-pack minima can require more). No Unit-exact population exists. Full direct-section text is shown for headings; large single sections may span consecutive block packs, without truncating any unit. Map additions and both rebound anchors are explicitly marked on every affected section row.
+
+```json
+{
+  "classes": {
+    "Unit-exact": [],
+    "Weak-exact": [
+      "claim_09fe57dbaeb0a17c5739022624d762b0",
+      "claim_351a5dd71d4e41f657bc7dcea54178e4",
+      "claim_fb55febb5bc5be5f90f21d93523055e1",
+      "claim_199d5707b6de165732420f953d4bd3ea",
+      "claim_10cfde78f2f5f157606323194b7a1977",
+      "claim_8a863a1a9b4ed08f849613e746954b15",
+      "claim_a472c36653a127781a392af83727e4ec",
+      "claim_5b3d3f409ba7d6d15eb28a227df2b0a6",
+      "claim_04e787baa36de9d79134180195b31e0a",
+      "claim_bc77641441df2a97542ae8a615b69712",
+      "claim_14da24bed0920b9efb22bbe4bbe0bbdc",
+      "claim_64aee8ce4865f829a4973768d686f2c0",
+      "claim_895d9828a8b49f8148389d63d32cc0e5",
+      "claim_3d6994569b50320e7c89c047d3b4a8d6",
+      "claim_64858c3adb9ca1d1eae38e1c9bc63e10"
+    ],
+    "Judgment": []
+  },
+  "unequalDigestPairs": [],
+  "mapAmendmentIDs": [],
+  "reboundAnchorIDs": []
+}
+```
+
+## claim_09fe57dbaeb0a17c5739022624d762b0
+
+Source digest: dabfa056f96ebc67b7f00b89c2121512c823a1dc5d3ba843d49617f18575ea5b
+
+Target digest: dabfa056f96ebc67b7f00b89c2121512c823a1dc5d3ba843d49617f18575ea5b
+
+```json
+{
+  "sourcePath": "docs/specs/runner.md",
+  "sourceAnchor": "unheaded-block-80",
+  "sourceLines": [
+    1054,
+    1054
+  ],
+  "sourceAncestry": [
+    "Spec: Runner (vòng tự hành)",
+    "Business Rules"
+  ],
+  "targetPath": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+  "targetAnchor": "unheaded-block-22",
+  "targetAncestry": [
+    "Added in candidate: Runner Business Rules",
+    "Business Rules"
+  ],
+  "nativeTargetClaimId": "claim_bbb7d99d2328bf8ad2a9dbe4d489563e",
+  "class": "Weak-exact",
+  "classReason": "ancestor headings differ; document exact share below one half",
+  "section": "business-rules",
+  "mapAmendments": [],
+  "reboundAnchors": [],
+  "decision": {
+    "claimId": "claim_09fe57dbaeb0a17c5739022624d762b0",
+    "sourceUnitDigest": "dabfa056f96ebc67b7f00b89c2121512c823a1dc5d3ba843d49617f18575ea5b",
+    "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+    "targetAnchor": "unheaded-block-22",
+    "claimKind": "specification",
+    "disposition": "move",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+    "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-80 (lines 1054–1054) carried at docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#unheaded-block-22. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+    "targetUnitDigest": "dabfa056f96ebc67b7f00b89c2121512c823a1dc5d3ba843d49617f18575ea5b",
+    "targetAncestry": [
+      "Added in candidate: Runner Business Rules",
+      "Business Rules"
+    ]
+  }
+}
+```
+
+### Full source unit
+
+```text
+Fallback (Provider Capacity, tầng 1) từng chọn invocation MẶC ĐỊNH của candidate fallback một cách mù — khi 1 executor mang nhiều invocation khác `confinement` (executor-id-consolidation), phép chọn mù đó có thể lặng lẽ hạ cấp 1 primary có confinement xuống 1 fallback KHÔNG confinement. `selectConfinedInvocationId` (`resolve.mjs`) đóng gap này: kiểm CẤU TRÚC thuần ("candidate có invocation nào khai confinement không"), không bao giờ kiểm ngữ nghĩa policy (việc đó vẫn thuộc Confinement Authority, `confinement/authority.mjs`, không đụng tới) — primary có confinement mà fallback không tìm được invocation nào có confinement thì bị refuse thẳng, không âm thầm dispatch hở. Phạm vi CHỈ áp cho đường fallback provider-capacity; đường redirect read-only (RUL trên/Phase D) là cơ chế khác, không đụng tới ở đây. `opPolicy.fallbackExecutors` giữ nguyên `string[]` — không mở rộng thành `{executor, invocation}` (việc đó phải chạm 8+ file ở tầng khai báo Workflow/Operation, không cần thiết khi bản check cấu trúc trên đã đóng đúng gap thật).
+```
+
+### Full target unit
+
+```text
+Fallback (Provider Capacity, tầng 1) từng chọn invocation MẶC ĐỊNH của candidate fallback một cách mù — khi 1 executor mang nhiều invocation khác `confinement` (executor-id-consolidation), phép chọn mù đó có thể lặng lẽ hạ cấp 1 primary có confinement xuống 1 fallback KHÔNG confinement. `selectConfinedInvocationId` (`resolve.mjs`) đóng gap này: kiểm CẤU TRÚC thuần ("candidate có invocation nào khai confinement không"), không bao giờ kiểm ngữ nghĩa policy (việc đó vẫn thuộc Confinement Authority, `confinement/authority.mjs`, không đụng tới) — primary có confinement mà fallback không tìm được invocation nào có confinement thì bị refuse thẳng, không âm thầm dispatch hở. Phạm vi CHỈ áp cho đường fallback provider-capacity; đường redirect read-only (RUL trên/Phase D) là cơ chế khác, không đụng tới ở đây. `opPolicy.fallbackExecutors` giữ nguyên `string[]` — không mở rộng thành `{executor, invocation}` (việc đó phải chạm 8+ file ở tầng khai báo Workflow/Operation, không cần thiết khi bản check cấu trúc trên đã đóng đúng gap thật).
+```
+
+### Full diff
+
+```diff
+No text difference.
+```
+
+## claim_351a5dd71d4e41f657bc7dcea54178e4
+
+Source digest: 661c9e16abe9ed411801ccbaec1066f2cabe3fbc6dc11197bda2def6cbed3df7
+
+Target digest: 661c9e16abe9ed411801ccbaec1066f2cabe3fbc6dc11197bda2def6cbed3df7
+
+```json
+{
+  "sourcePath": "docs/specs/runner.md",
+  "sourceAnchor": "unheaded-block-81",
+  "sourceLines": [
+    1056,
+    1056
+  ],
+  "sourceAncestry": [
+    "Spec: Runner (vòng tự hành)",
+    "Business Rules"
+  ],
+  "targetPath": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+  "targetAnchor": "unheaded-block-23",
+  "targetAncestry": [
+    "Added in candidate: Runner Business Rules",
+    "Business Rules"
+  ],
+  "nativeTargetClaimId": "claim_c8c79d10c83fa832ef37667197e0c9c6",
+  "class": "Weak-exact",
+  "classReason": "ancestor headings differ; document exact share below one half",
+  "section": "business-rules",
+  "mapAmendments": [],
+  "reboundAnchors": [],
+  "decision": {
+    "claimId": "claim_351a5dd71d4e41f657bc7dcea54178e4",
+    "sourceUnitDigest": "661c9e16abe9ed411801ccbaec1066f2cabe3fbc6dc11197bda2def6cbed3df7",
+    "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+    "targetAnchor": "unheaded-block-23",
+    "claimKind": "specification",
+    "disposition": "move",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+    "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-81 (lines 1056–1056) carried at docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#unheaded-block-23. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+    "targetUnitDigest": "661c9e16abe9ed411801ccbaec1066f2cabe3fbc6dc11197bda2def6cbed3df7",
+    "targetAncestry": [
+      "Added in candidate: Runner Business Rules",
+      "Business Rules"
+    ]
+  }
+}
+```
+
+### Full source unit
+
+```text
+`execute --for <purpose>` (cửa CLI/con người duy nhất vào purpose door không lease/fallback) đã RÚT hẳn, xác nhận 0 live caller thật (chỉ có 1 proof sweep lịch sử của Confinement Authority, không phải traffic sản xuất) — `execute --for` (không kèm executor) giờ refuse thẳng — RUL76 (`execute <id> --for <capability>`: caller nêu posture) mở lại riêng dạng `execute <id> --for <capability>` để mang posture sang phase 2 — chỉ tên đúng pattern 2 phase mà mọi caller thật đã dùng: `decide --for <purpose>` giải purpose ra executor id thật trước, rồi `execute <id đó>` mới dispatch theo vị trí. `decide --for` và tham số `for` riêng của `executeExecutorCli` (dùng bởi `spawnWorker` và caller lập trình khác, không phải flag CLI) không đổi.
+```
+
+### Full target unit
+
+```text
+`execute --for <purpose>` (cửa CLI/con người duy nhất vào purpose door không lease/fallback) đã RÚT hẳn, xác nhận 0 live caller thật (chỉ có 1 proof sweep lịch sử của Confinement Authority, không phải traffic sản xuất) — `execute --for` (không kèm executor) giờ refuse thẳng — RUL76 (`execute <id> --for <capability>`: caller nêu posture) mở lại riêng dạng `execute <id> --for <capability>` để mang posture sang phase 2 — chỉ tên đúng pattern 2 phase mà mọi caller thật đã dùng: `decide --for <purpose>` giải purpose ra executor id thật trước, rồi `execute <id đó>` mới dispatch theo vị trí. `decide --for` và tham số `for` riêng của `executeExecutorCli` (dùng bởi `spawnWorker` và caller lập trình khác, không phải flag CLI) không đổi.
+```
+
+### Full diff
+
+```diff
+No text difference.
+```
+
+## claim_fb55febb5bc5be5f90f21d93523055e1
+
+Source digest: fef782263b93aca70fc0c02f3a9bff5c262449b40ab0481084893764d805ef52
+
+Target digest: fef782263b93aca70fc0c02f3a9bff5c262449b40ab0481084893764d805ef52
+
+```json
+{
+  "sourcePath": "docs/specs/runner.md",
+  "sourceAnchor": "unheaded-block-82",
+  "sourceLines": [
+    1058,
+    1058
+  ],
+  "sourceAncestry": [
+    "Spec: Runner (vòng tự hành)",
+    "Business Rules"
+  ],
+  "targetPath": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+  "targetAnchor": "unheaded-block-24",
+  "targetAncestry": [
+    "Added in candidate: Runner Business Rules",
+    "Business Rules"
+  ],
+  "nativeTargetClaimId": "claim_99f35fae1ea15cb8b871d3e62fe1cac0",
+  "class": "Weak-exact",
+  "classReason": "ancestor headings differ; document exact share below one half",
+  "section": "business-rules",
+  "mapAmendments": [],
+  "reboundAnchors": [],
+  "decision": {
+    "claimId": "claim_fb55febb5bc5be5f90f21d93523055e1",
+    "sourceUnitDigest": "fef782263b93aca70fc0c02f3a9bff5c262449b40ab0481084893764d805ef52",
+    "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+    "targetAnchor": "unheaded-block-24",
+    "claimKind": "specification",
+    "disposition": "move",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+    "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-82 (lines 1058–1058) carried at docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#unheaded-block-24. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+    "targetUnitDigest": "fef782263b93aca70fc0c02f3a9bff5c262449b40ab0481084893764d805ef52",
+    "targetAncestry": [
+      "Added in candidate: Runner Business Rules",
+      "Business Rules"
+    ]
+  }
+}
+```
+
+### Full source unit
+
+```text
+Việc GỘP THẬT `spawnWorker` vào lease/fallback của `executeAssignment` (tức xoá hẳn tầng purpose door) KHÔNG làm ở đây — quyết định có chủ đích, không phải nợ kỹ thuật: purpose door là 1 primitive dispatch CỐ Ý không phụ thuộc Work item tồn tại. Work item, tới nay, chủ yếu là khái niệm QUẢN LÝ LIFECYCLE (hiện trên board), xếp lớp TRÊN dispatch, không phải điều kiện tiên quyết để dispatch được. Khi nào việc gắn Work-item lifecycle vào dispatch thật sự được xây, đó mới là điểm đúng để gộp `spawnWorker` vào `executeAssignment` — không phải trước đó.
+```
+
+### Full target unit
+
+```text
+Việc GỘP THẬT `spawnWorker` vào lease/fallback của `executeAssignment` (tức xoá hẳn tầng purpose door) KHÔNG làm ở đây — quyết định có chủ đích, không phải nợ kỹ thuật: purpose door là 1 primitive dispatch CỐ Ý không phụ thuộc Work item tồn tại. Work item, tới nay, chủ yếu là khái niệm QUẢN LÝ LIFECYCLE (hiện trên board), xếp lớp TRÊN dispatch, không phải điều kiện tiên quyết để dispatch được. Khi nào việc gắn Work-item lifecycle vào dispatch thật sự được xây, đó mới là điểm đúng để gộp `spawnWorker` vào `executeAssignment` — không phải trước đó.
+```
+
+### Full diff
+
+```diff
+No text difference.
+```
+
+## claim_199d5707b6de165732420f953d4bd3ea
+
+Source digest: 664070226174bdf66d7b160f7863e3cda7847d270050c87088d7b5385e5be7f1
+
+Target digest: 664070226174bdf66d7b160f7863e3cda7847d270050c87088d7b5385e5be7f1
+
+```json
+{
+  "sourcePath": "docs/specs/runner.md",
+  "sourceAnchor": "unheaded-block-83",
+  "sourceLines": [
+    1060,
+    1060
+  ],
+  "sourceAncestry": [
+    "Spec: Runner (vòng tự hành)",
+    "Business Rules"
+  ],
+  "targetPath": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+  "targetAnchor": "unheaded-block-25",
+  "targetAncestry": [
+    "Added in candidate: Runner Business Rules",
+    "Business Rules"
+  ],
+  "nativeTargetClaimId": "claim_be3bb89e737145aca27f3a52f62d9826",
+  "class": "Weak-exact",
+  "classReason": "ancestor headings differ; document exact share below one half",
+  "section": "business-rules",
+  "mapAmendments": [],
+  "reboundAnchors": [],
+  "decision": {
+    "claimId": "claim_199d5707b6de165732420f953d4bd3ea",
+    "sourceUnitDigest": "664070226174bdf66d7b160f7863e3cda7847d270050c87088d7b5385e5be7f1",
+    "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+    "targetAnchor": "unheaded-block-25",
+    "claimKind": "specification",
+    "disposition": "move",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+    "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-83 (lines 1060–1060) carried at docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#unheaded-block-25. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+    "targetUnitDigest": "664070226174bdf66d7b160f7863e3cda7847d270050c87088d7b5385e5be7f1",
+    "targetAncestry": [
+      "Added in candidate: Runner Business Rules",
+      "Business Rules"
+    ]
+  }
+}
+```
+
+### Full source unit
+
+```text
+- **RUL69 (vocab modelTier 6 mức thay 5 mức cũ; [ĐÃ BỊ THAY MỘT PHẦN bởi gom thang tier/rigor 2026-09-30 — xem RUL72 bên dưới]).** `MODEL_POLICY_TIERS`/`MIN_TIER_VALUES` đổi từ `lightweight|standard|creative|analytical|critical` (5 giá trị) sang `nano|mini|standard|advanced|flagship|frontier` (6 giá trị, khớp `plans/260916-account-rotator/design.md`'s "Tier vocabulary" — target architecture đã note trước đó là CHƯA implement, giờ implement thật). Mapping: `lightweight→nano, standard→standard, creative→advanced, analytical→flagship, critical→frontier` — lossless, giữ nguyên mọi model thật trong `.fgos/config.json` lẫn `~/.fgos/config.json` (chỉ đổi tên slot). `critical→frontier` (không phải `critical→flagship`) là điểm duy nhất lệch tên nhưng bảo đảm không model nào bị hạ cấp ngầm.
+```
+
+### Full target unit
+
+```text
+- **RUL69 (vocab modelTier 6 mức thay 5 mức cũ; [ĐÃ BỊ THAY MỘT PHẦN bởi gom thang tier/rigor 2026-09-30 — xem RUL72 bên dưới]).** `MODEL_POLICY_TIERS`/`MIN_TIER_VALUES` đổi từ `lightweight|standard|creative|analytical|critical` (5 giá trị) sang `nano|mini|standard|advanced|flagship|frontier` (6 giá trị, khớp `plans/260916-account-rotator/design.md`'s "Tier vocabulary" — target architecture đã note trước đó là CHƯA implement, giờ implement thật). Mapping: `lightweight→nano, standard→standard, creative→advanced, analytical→flagship, critical→frontier` — lossless, giữ nguyên mọi model thật trong `.fgos/config.json` lẫn `~/.fgos/config.json` (chỉ đổi tên slot). `critical→frontier` (không phải `critical→flagship`) là điểm duy nhất lệch tên nhưng bảo đảm không model nào bị hạ cấp ngầm.
+```
+
+### Full diff
+
+```diff
+No text difference.
+```
+
+## claim_10cfde78f2f5f157606323194b7a1977
+
+Source digest: fdd02dd09d4babc94db9f2d89b1782ba10c597d3aea983a7bc73c828b46e3210
+
+Target digest: fdd02dd09d4babc94db9f2d89b1782ba10c597d3aea983a7bc73c828b46e3210
+
+```json
+{
+  "sourcePath": "docs/specs/runner.md",
+  "sourceAnchor": "unheaded-block-84",
+  "sourceLines": [
+    1062,
+    1062
+  ],
+  "sourceAncestry": [
+    "Spec: Runner (vòng tự hành)",
+    "Business Rules"
+  ],
+  "targetPath": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+  "targetAnchor": "unheaded-block-26",
+  "targetAncestry": [
+    "Added in candidate: Runner Business Rules",
+    "Business Rules"
+  ],
+  "nativeTargetClaimId": "claim_ffaea87e4cdad72fed700a2337db6395",
+  "class": "Weak-exact",
+  "classReason": "ancestor headings differ; document exact share below one half",
+  "section": "business-rules",
+  "mapAmendments": [],
+  "reboundAnchors": [],
+  "decision": {
+    "claimId": "claim_10cfde78f2f5f157606323194b7a1977",
+    "sourceUnitDigest": "fdd02dd09d4babc94db9f2d89b1782ba10c597d3aea983a7bc73c828b46e3210",
+    "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+    "targetAnchor": "unheaded-block-26",
+    "claimKind": "contract",
+    "disposition": "move",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+    "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-84 (lines 1062–1062) carried at docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#unheaded-block-26. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+    "targetUnitDigest": "fdd02dd09d4babc94db9f2d89b1782ba10c597d3aea983a7bc73c828b46e3210",
+    "targetAncestry": [
+      "Added in candidate: Runner Business Rules",
+      "Business Rules"
+    ]
+  }
+}
+```
+
+### Full source unit
+
+```text
+Blast radius thật rộng hơn 1 scan ban đầu tưởng: ngoài `MODEL_POLICY_TIERS`/`DEFAULT_TIER_TO_POLICY`/`TIER_STRENGTH`/`QUALITY_TIER_BRIDGE` (src), còn có `core/coordination-protocols/*.yaml`'s `policy.minTier` (11 file, protocol ĐANG LOAD thật — miss ban đầu vì agent scan không quét `core/`), `core/skills/fgos-architecture-panel/SKILL.md`'s bảng role→tier, và ~28 file test dùng chung 1 boilerplate `modelPolicies`/`models` fixture với tên tier cũ làm KEY không dấu ngoặc (miss ban đầu vì regex chỉ khớp string literal có ngoặc, bỏ sót unquoted object key). Bẫy thật cần phân biệt: `MIN_RIGOR_VALUES` (`low|standard|high|critical`) và `QUALITY_MODE_VALUES` (`balanced|creative|analytical|adversarial`) TÁI DÙNG một số chữ giống modelTier cũ cho 2 trục KHÁC hẳn (rigor/mode, Phase 04 quality bridge) — 2 vocab này KHÔNG đổi theo migration này; `QUALITY_TIER_BRIDGE`'s object KEY đổi theo modelTier mới nhưng giá trị `{minRigor, mode}` bên trong giữ nguyên chữ cũ (vd `frontier: {minRigor:'critical', mode:'analytical'}` — 'critical'/'analytical' ở đây là rigor/mode, không phải tier).
+```
+
+### Full target unit
+
+```text
+Blast radius thật rộng hơn 1 scan ban đầu tưởng: ngoài `MODEL_POLICY_TIERS`/`DEFAULT_TIER_TO_POLICY`/`TIER_STRENGTH`/`QUALITY_TIER_BRIDGE` (src), còn có `core/coordination-protocols/*.yaml`'s `policy.minTier` (11 file, protocol ĐANG LOAD thật — miss ban đầu vì agent scan không quét `core/`), `core/skills/fgos-architecture-panel/SKILL.md`'s bảng role→tier, và ~28 file test dùng chung 1 boilerplate `modelPolicies`/`models` fixture với tên tier cũ làm KEY không dấu ngoặc (miss ban đầu vì regex chỉ khớp string literal có ngoặc, bỏ sót unquoted object key). Bẫy thật cần phân biệt: `MIN_RIGOR_VALUES` (`low|standard|high|critical`) và `QUALITY_MODE_VALUES` (`balanced|creative|analytical|adversarial`) TÁI DÙNG một số chữ giống modelTier cũ cho 2 trục KHÁC hẳn (rigor/mode, Phase 04 quality bridge) — 2 vocab này KHÔNG đổi theo migration này; `QUALITY_TIER_BRIDGE`'s object KEY đổi theo modelTier mới nhưng giá trị `{minRigor, mode}` bên trong giữ nguyên chữ cũ (vd `frontier: {minRigor:'critical', mode:'analytical'}` — 'critical'/'analytical' ở đây là rigor/mode, không phải tier).
+```
+
+### Full diff
+
+```diff
+No text difference.
+```
+
+## claim_8a863a1a9b4ed08f849613e746954b15
+
+Source digest: e2e3f68c98e1a0b77e60fb60ae4c967a2978d7420743cfb35617fa559f3b4736
+
+Target digest: e2e3f68c98e1a0b77e60fb60ae4c967a2978d7420743cfb35617fa559f3b4736
+
+```json
+{
+  "sourcePath": "docs/specs/runner.md",
+  "sourceAnchor": "unheaded-block-85",
+  "sourceLines": [
+    1064,
+    1064
+  ],
+  "sourceAncestry": [
+    "Spec: Runner (vòng tự hành)",
+    "Business Rules"
+  ],
+  "targetPath": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+  "targetAnchor": "unheaded-block-27",
+  "targetAncestry": [
+    "Added in candidate: Runner Business Rules",
+    "Business Rules"
+  ],
+  "nativeTargetClaimId": "claim_256fdb9c3c030c5abbe66a8bf623548e",
+  "class": "Weak-exact",
+  "classReason": "ancestor headings differ; document exact share below one half",
+  "section": "business-rules",
+  "mapAmendments": [],
+  "reboundAnchors": [],
+  "decision": {
+    "claimId": "claim_8a863a1a9b4ed08f849613e746954b15",
+    "sourceUnitDigest": "e2e3f68c98e1a0b77e60fb60ae4c967a2978d7420743cfb35617fa559f3b4736",
+    "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+    "targetAnchor": "unheaded-block-27",
+    "claimKind": "contract",
+    "disposition": "move",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+    "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-85 (lines 1064–1064) carried at docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#unheaded-block-27. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+    "targetUnitDigest": "e2e3f68c98e1a0b77e60fb60ae4c967a2978d7420743cfb35617fa559f3b4736",
+    "targetAncestry": [
+      "Added in candidate: Runner Business Rules",
+      "Business Rules"
+    ]
+  }
+}
+```
+
+### Full source unit
+
+```text
+`actors[].fallbackExecutors` (mới, `ACTOR_ALLOWED_KEYS` schema.mjs + `actorPolicyFields` run.mjs): KHÔNG xây cơ chế retry mới. Provider Capacity Rotator + `attemptProviderCapacityFallback` (account-rotator track) đã có sẵn, đã test kỹ, và `dispatchDeclaredOperation`'s PolicyPatch stack đã carry `fallbackExecutors` từ lâu (session-engine.mjs) — cái duy nhất thiếu là actor-level request field chưa được đọc vào `cliPolicy`. Nối xong, `code-panel`'s 3 role (doer/fixer, reviewer, red-team) khai `fallbackExecutors` thật, cùng modelTier khác provider. Giới hạn đã biết, không phải bug: `runCoordinationUseCase` không forward `providerCapacityRuntimeDir` xuống `executeAssignment`, nên không test hermetic được 1 refusal-thật qua đường coordination (mặc định trỏ …
+```
+
+### Full target unit
+
+```text
+`actors[].fallbackExecutors` (mới, `ACTOR_ALLOWED_KEYS` schema.mjs + `actorPolicyFields` run.mjs): KHÔNG xây cơ chế retry mới. Provider Capacity Rotator + `attemptProviderCapacityFallback` (account-rotator track) đã có sẵn, đã test kỹ, và `dispatchDeclaredOperation`'s PolicyPatch stack đã carry `fallbackExecutors` từ lâu (session-engine.mjs) — cái duy nhất thiếu là actor-level request field chưa được đọc vào `cliPolicy`. Nối xong, `code-panel`'s 3 role (doer/fixer, reviewer, red-team) khai `fallbackExecutors` thật, cùng modelTier khác provider. Giới hạn đã biết, không phải bug: `runCoordinationUseCase` không forward `providerCapacityRuntimeDir` xuống `executeAssignment`, nên không test hermetic được 1 refusal-thật qua đường coordination (mặc định trỏ …
+```
+
+### Full diff
+
+```diff
+No text difference.
+```
+
+## claim_a472c36653a127781a392af83727e4ec
+
+Source digest: 6c4f41f1d6eaf299c82a57c52903a0392774a6c09ef6c9b3626e94c4ebbe24ef
+
+Target digest: 6c4f41f1d6eaf299c82a57c52903a0392774a6c09ef6c9b3626e94c4ebbe24ef
+
+```json
+{
+  "sourcePath": "docs/specs/runner.md",
+  "sourceAnchor": "unheaded-block-86",
+  "sourceLines": [
+    1066,
+    1066
+  ],
+  "sourceAncestry": [
+    "Spec: Runner (vòng tự hành)",
+    "Business Rules"
+  ],
+  "targetPath": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+  "targetAnchor": "unheaded-block-28",
+  "targetAncestry": [
+    "Added in candidate: Runner Business Rules",
+    "Business Rules"
+  ],
+  "nativeTargetClaimId": "claim_1d96cf6470fdddad0f371122dd716ebf",
+  "class": "Weak-exact",
+  "classReason": "ancestor headings differ; document exact share below one half",
+  "section": "business-rules",
+  "mapAmendments": [],
+  "reboundAnchors": [],
+  "decision": {
+    "claimId": "claim_a472c36653a127781a392af83727e4ec",
+    "sourceUnitDigest": "6c4f41f1d6eaf299c82a57c52903a0392774a6c09ef6c9b3626e94c4ebbe24ef",
+    "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+    "targetAnchor": "unheaded-block-28",
+    "claimKind": "specification",
+    "disposition": "move",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+    "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-86 (lines 1066–1066) carried at docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#unheaded-block-28. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+    "targetUnitDigest": "6c4f41f1d6eaf299c82a57c52903a0392774a6c09ef6c9b3626e94c4ebbe24ef",
+    "targetAncestry": [
+      "Added in candidate: Runner Business Rules",
+      "Business Rules"
+    ]
+  }
+}
+```
+
+### Full source unit
+
+```text
+- **RUL70 (executor id đặt theo `providerModel`, không theo CLI binary; gộp `pi`+`codex` thành executor `openai` vì cùng provider, khác binary; executor-provider-naming, 2026-09-17).** Trước item này, executor id trộn lẫn 2 quy ước — có id theo binary (`codex`, `pi`, `agy`), có id theo alias tuỳ ý (`pi-grok`) — trong khi tầng invocation (`bin`+`account`+`via`) đã đủ sức phân biệt CÁCH gọi, và tầng executor chỉ nên trả lời câu hỏi PROVIDER nào (`providerModel`, khoá tra `modelPolicies`, và neo governance `allowCrossProvider`/`for`). Từ item này: executor id = tên provider thật (`claude`, `gemini`, `xai`, `openai`), không phải tên binary hay account. `agy`→`gemini`, `pi-grok`→`xai` là đổi tên 1-1 (không đụng `rigorOverrides`/`for`/invocation nào). `codex` (executor cũ, chỉ chạy binary `codex`) và `pi` (executor cũ, chỉ chạy binary `pi`, đã có sẵn invocation `pi-cli-tetnu`/`pi-cli-fgovn` nhắm cùng tài khoản OpenAI qua `~/.pi/accounts/{tetnu,fgovn}`) GỘP thành một executor `openai` duy nhất — hợp lệ vì `command` là field CẤP INVOCATION, không phải cấp executor (`resolve.mjs`: mỗi invocation tự khai `command` riêng), nên 2 binary khác nhau nằm chung 1 executor entry không xung đột kỹ thuật. `providerModel: "openai-codex"` (cả ở `.fgos/config.json` lẫn `modelPolicies` key lẫn `PI_EXECUTOR_DEFAULT`'s seed) đổi thành `"openai"` — Codex là TÊN SẢN PHẨM CLI của OpenAI, không phải một provider khác OpenAI, nên giữ `openai-codex` như 1 provider riêng là sai danh xưng, không phải một khoảng cách kỹ thuật cần giữ.
+```
+
+### Full target unit
+
+```text
+- **RUL70 (executor id đặt theo `providerModel`, không theo CLI binary; gộp `pi`+`codex` thành executor `openai` vì cùng provider, khác binary; executor-provider-naming, 2026-09-17).** Trước item này, executor id trộn lẫn 2 quy ước — có id theo binary (`codex`, `pi`, `agy`), có id theo alias tuỳ ý (`pi-grok`) — trong khi tầng invocation (`bin`+`account`+`via`) đã đủ sức phân biệt CÁCH gọi, và tầng executor chỉ nên trả lời câu hỏi PROVIDER nào (`providerModel`, khoá tra `modelPolicies`, và neo governance `allowCrossProvider`/`for`). Từ item này: executor id = tên provider thật (`claude`, `gemini`, `xai`, `openai`), không phải tên binary hay account. `agy`→`gemini`, `pi-grok`→`xai` là đổi tên 1-1 (không đụng `rigorOverrides`/`for`/invocation nào). `codex` (executor cũ, chỉ chạy binary `codex`) và `pi` (executor cũ, chỉ chạy binary `pi`, đã có sẵn invocation `pi-cli-tetnu`/`pi-cli-fgovn` nhắm cùng tài khoản OpenAI qua `~/.pi/accounts/{tetnu,fgovn}`) GỘP thành một executor `openai` duy nhất — hợp lệ vì `command` là field CẤP INVOCATION, không phải cấp executor (`resolve.mjs`: mỗi invocation tự khai `command` riêng), nên 2 binary khác nhau nằm chung 1 executor entry không xung đột kỹ thuật. `providerModel: "openai-codex"` (cả ở `.fgos/config.json` lẫn `modelPolicies` key lẫn `PI_EXECUTOR_DEFAULT`'s seed) đổi thành `"openai"` — Codex là TÊN SẢN PHẨM CLI của OpenAI, không phải một provider khác OpenAI, nên giữ `openai-codex` như 1 provider riêng là sai danh xưng, không phải một khoảng cách kỹ thuật cần giữ.
+```
+
+### Full diff
+
+```diff
+No text difference.
+```
+
+## claim_5b3d3f409ba7d6d15eb28a227df2b0a6
+
+Source digest: aa8e537d64a0a67662bd138928a623ee2840cb8ee03432a160379aa3313952d4
+
+Target digest: aa8e537d64a0a67662bd138928a623ee2840cb8ee03432a160379aa3313952d4
+
+```json
+{
+  "sourcePath": "docs/specs/runner.md",
+  "sourceAnchor": "unheaded-block-87",
+  "sourceLines": [
+    1068,
+    1068
+  ],
+  "sourceAncestry": [
+    "Spec: Runner (vòng tự hành)",
+    "Business Rules"
+  ],
+  "targetPath": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+  "targetAnchor": "unheaded-block-29",
+  "targetAncestry": [
+    "Added in candidate: Runner Business Rules",
+    "Business Rules"
+  ],
+  "nativeTargetClaimId": "claim_eb06b3e5e6de8f5e124596d78d3fb235",
+  "class": "Weak-exact",
+  "classReason": "ancestor headings differ; document exact share below one half",
+  "section": "business-rules",
+  "mapAmendments": [],
+  "reboundAnchors": [],
+  "decision": {
+    "claimId": "claim_5b3d3f409ba7d6d15eb28a227df2b0a6",
+    "sourceUnitDigest": "aa8e537d64a0a67662bd138928a623ee2840cb8ee03432a160379aa3313952d4",
+    "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+    "targetAnchor": "unheaded-block-29",
+    "claimKind": "specification",
+    "disposition": "move",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+    "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-87 (lines 1068–1068) carried at docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#unheaded-block-29. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+    "targetUnitDigest": "aa8e537d64a0a67662bd138928a623ee2840cb8ee03432a160379aa3313952d4",
+    "targetAncestry": [
+      "Added in candidate: Runner Business Rules",
+      "Business Rules"
+    ]
+  }
+}
+```
+
+### Full source unit
+
+```text
+Không có instance nào của 2 executor cũ mang `rigorOverrides` LỆCH nhau một cách CHỦ Ý tại thời điểm gộp (`pi`'s `{light/standard/heavy→nano}` chỉ là default còn lại từ proof-test lịch sử, chưa từng là quyết định cost-policy thật; `codex` không có `rigorOverrides` nào) — nên gộp ở đây an toàn, `rigorOverrides` bị DROP hẳn khỏi executor `openai` hợp nhất thay vì giữ lại 1 trong 2 giá trị cũ một cách tuỳ tiện. Đây không phải quy tắc chung "gộp 2 binary luôn an toàn": nếu 2 executor cũ MANG `rigorOverrides`/`for` khác nhau thật sự (một cái ưu tiên chi phí thấp, một cái ưu tiên chất lượng cao, trên CÙNG một bảng `modelPolicies.<providerModel>`), gộp chung sẽ ÂM THẦM ghi đè policy tier-lookup của 1 trong 2 — muốn giữ khác biệt đó thì tách executor bằng hậu tố (`openai-1`/`openai-2`), không bao giờ nhét vào 1 executor rồi hy vọng field nào đó "thắng" đúng ý.
+```
+
+### Full target unit
+
+```text
+Không có instance nào của 2 executor cũ mang `rigorOverrides` LỆCH nhau một cách CHỦ Ý tại thời điểm gộp (`pi`'s `{light/standard/heavy→nano}` chỉ là default còn lại từ proof-test lịch sử, chưa từng là quyết định cost-policy thật; `codex` không có `rigorOverrides` nào) — nên gộp ở đây an toàn, `rigorOverrides` bị DROP hẳn khỏi executor `openai` hợp nhất thay vì giữ lại 1 trong 2 giá trị cũ một cách tuỳ tiện. Đây không phải quy tắc chung "gộp 2 binary luôn an toàn": nếu 2 executor cũ MANG `rigorOverrides`/`for` khác nhau thật sự (một cái ưu tiên chi phí thấp, một cái ưu tiên chất lượng cao, trên CÙNG một bảng `modelPolicies.<providerModel>`), gộp chung sẽ ÂM THẦM ghi đè policy tier-lookup của 1 trong 2 — muốn giữ khác biệt đó thì tách executor bằng hậu tố (`openai-1`/`openai-2`), không bao giờ nhét vào 1 executor rồi hy vọng field nào đó "thắng" đúng ý.
+```
+
+### Full diff
+
+```diff
+No text difference.
+```
+
+## claim_04e787baa36de9d79134180195b31e0a
+
+Source digest: 94c19660f25bea5e4e23bbd94b090561405b7c00c8ceb2ac227eda3bcb50204a
+
+Target digest: 94c19660f25bea5e4e23bbd94b090561405b7c00c8ceb2ac227eda3bcb50204a
+
+```json
+{
+  "sourcePath": "docs/specs/runner.md",
+  "sourceAnchor": "unheaded-block-88",
+  "sourceLines": [
+    1070,
+    1070
+  ],
+  "sourceAncestry": [
+    "Spec: Runner (vòng tự hành)",
+    "Business Rules"
+  ],
+  "targetPath": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+  "targetAnchor": "unheaded-block-30",
+  "targetAncestry": [
+    "Added in candidate: Runner Business Rules",
+    "Business Rules"
+  ],
+  "nativeTargetClaimId": "claim_6f36aa60f8c6e8d796d9b6dce13eee22",
+  "class": "Weak-exact",
+  "classReason": "ancestor headings differ; document exact share below one half",
+  "section": "business-rules",
+  "mapAmendments": [],
+  "reboundAnchors": [],
+  "decision": {
+    "claimId": "claim_04e787baa36de9d79134180195b31e0a",
+    "sourceUnitDigest": "94c19660f25bea5e4e23bbd94b090561405b7c00c8ceb2ac227eda3bcb50204a",
+    "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+    "targetAnchor": "unheaded-block-30",
+    "claimKind": "specification",
+    "disposition": "move",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+    "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-88 (lines 1070–1070) carried at docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#unheaded-block-30. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+    "targetUnitDigest": "94c19660f25bea5e4e23bbd94b090561405b7c00c8ceb2ac227eda3bcb50204a",
+    "targetAncestry": [
+      "Added in candidate: Runner Business Rules",
+      "Business Rules"
+    ]
+  }
+}
+```
+
+### Full source unit
+
+```text
+`pi`'s CLI args bỏ hẳn cờ `--provider` (test thật xác nhận: account dir `~/.pi/accounts/<name>` vốn chỉ chứa credential của ĐÚNG 1 provider, nên `pi` tự suy ra provider từ chính account dir đang dùng, không cần cờ) — đổi độc lập với việc gộp executor, không phải hệ quả của nó. `normalizeProviderFamily` (`provider-adapter.mjs`, khoá governance/egress family theo `command` — hardcode `cmd==='codex'→'openai-codex'`, `cmd==='pi'→'pi'`) hoàn toàn không đụng bởi rename này: family đó khoá theo BINARY thật đang chạy, độc lập tuyệt đối với executor id/`providerModel` trong config.
+```
+
+### Full target unit
+
+```text
+`pi`'s CLI args bỏ hẳn cờ `--provider` (test thật xác nhận: account dir `~/.pi/accounts/<name>` vốn chỉ chứa credential của ĐÚNG 1 provider, nên `pi` tự suy ra provider từ chính account dir đang dùng, không cần cờ) — đổi độc lập với việc gộp executor, không phải hệ quả của nó. `normalizeProviderFamily` (`provider-adapter.mjs`, khoá governance/egress family theo `command` — hardcode `cmd==='codex'→'openai-codex'`, `cmd==='pi'→'pi'`) hoàn toàn không đụng bởi rename này: family đó khoá theo BINARY thật đang chạy, độc lập tuyệt đối với executor id/`providerModel` trong config.
+```
+
+### Full diff
+
+```diff
+No text difference.
+```
+
+## claim_bc77641441df2a97542ae8a615b69712
+
+Source digest: bf5b2e3380001d243e07b0bd5108bd51b3c10fcac27312f02e7b3838f828fd53
+
+Target digest: bf5b2e3380001d243e07b0bd5108bd51b3c10fcac27312f02e7b3838f828fd53
+
+```json
+{
+  "sourcePath": "docs/specs/runner.md",
+  "sourceAnchor": "unheaded-block-89",
+  "sourceLines": [
+    1072,
+    1079
+  ],
+  "sourceAncestry": [
+    "Spec: Runner (vòng tự hành)",
+    "Business Rules"
+  ],
+  "targetPath": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+  "targetAnchor": "unheaded-block-31",
+  "targetAncestry": [
+    "Added in candidate: Runner Business Rules",
+    "Business Rules"
+  ],
+  "nativeTargetClaimId": "claim_2fb2df494aae10fb2634fa1cfbcdcf67",
+  "class": "Weak-exact",
+  "classReason": "ancestor headings differ; document exact share below one half",
+  "section": "business-rules",
+  "mapAmendments": [],
+  "reboundAnchors": [],
+  "decision": {
+    "claimId": "claim_bc77641441df2a97542ae8a615b69712",
+    "sourceUnitDigest": "bf5b2e3380001d243e07b0bd5108bd51b3c10fcac27312f02e7b3838f828fd53",
+    "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+    "targetAnchor": "unheaded-block-31",
+    "claimKind": "specification",
+    "disposition": "move",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+    "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-89 (lines 1072–1079) carried at docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#unheaded-block-31. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+    "targetUnitDigest": "bf5b2e3380001d243e07b0bd5108bd51b3c10fcac27312f02e7b3838f828fd53",
+    "targetAncestry": [
+      "Added in candidate: Runner Business Rules",
+      "Business Rules"
+    ]
+  }
+}
+```
+
+### Full source unit
+
+```text
+- **RUL72 (Gom thang tier/rigor: 2 thang + 1 bảng, xoá mọi lớp chồng; tier-rigor-vocabulary-consolidation, 2026-09-30).**
+  Thay thế RUL69 (vocab modelTier 6 mức thay 5 mức cũ) về cơ chế map model và chuẩn hoá từ vựng toàn repo:
+  1. Bên cầu (việc cần gì): từ duy nhất là `rigor = low | standard | high | critical` (thay thế `minTier`, `minRigor`, `mode`). `rigor` gộp chỉ-nâng qua các scope (Workflow/Unit → Operation → Actor → Assignment → CLI), rồi gộp sàn theo loại việc `capabilities.<cap>.rigor`.
+  2. Bên cung (khẩu vị owner): ánh xạ qua đúng một bảng config bắt buộc `runner.rigorToTier[rigor] → tier` (`nano|mini|standard|advanced|flagship|frontier`), sau đó chọn model tại `runner.modelPolicies[provider][tier]`.
+  3. Override tường minh: `--tier` / `actors[].tier` là kênh placement tường minh (chỉ-nâng, có provenance `tierSource`); definition/operation dùng `tier` bị từ chối.
+  4. Work: tách `work.tier` thành `work.size` (độ lớn, không bao giờ tới model) và `work.rigor` (tuỳ chọn, discovery phán). Item cũ có `risk: heavy` và chưa có `rigor` được đọc thành `rigor: high` ở đường đọc duy nhất.
+  5. Sàn theo loại việc `capabilities.<cap>.rigor` là sàn duy nhất theo loại việc, có hiệu lực ở cả đường coordination lẫn Work. Khối `capabilities.*.overrides` bị xoá hoàn toàn.
+  6. Xoá vĩnh viễn không lặp lại: `minTier`, `minRigor`, `QUALITY_TIER_BRIDGE`, `QUALITY_MODE_VALUES`, `DEFAULT_TIER_TO_POLICY`, `rigorOverrides`, `runner.models`, `capabilities.*.overrides`. Test guard tự động chặn chúng quay lại.
+```
+
+### Full target unit
+
+```text
+- **RUL72 (Gom thang tier/rigor: 2 thang + 1 bảng, xoá mọi lớp chồng; tier-rigor-vocabulary-consolidation, 2026-09-30).**
+  Thay thế RUL69 (vocab modelTier 6 mức thay 5 mức cũ) về cơ chế map model và chuẩn hoá từ vựng toàn repo:
+  1. Bên cầu (việc cần gì): từ duy nhất là `rigor = low | standard | high | critical` (thay thế `minTier`, `minRigor`, `mode`). `rigor` gộp chỉ-nâng qua các scope (Workflow/Unit → Operation → Actor → Assignment → CLI), rồi gộp sàn theo loại việc `capabilities.<cap>.rigor`.
+  2. Bên cung (khẩu vị owner): ánh xạ qua đúng một bảng config bắt buộc `runner.rigorToTier[rigor] → tier` (`nano|mini|standard|advanced|flagship|frontier`), sau đó chọn model tại `runner.modelPolicies[provider][tier]`.
+  3. Override tường minh: `--tier` / `actors[].tier` là kênh placement tường minh (chỉ-nâng, có provenance `tierSource`); definition/operation dùng `tier` bị từ chối.
+  4. Work: tách `work.tier` thành `work.size` (độ lớn, không bao giờ tới model) và `work.rigor` (tuỳ chọn, discovery phán). Item cũ có `risk: heavy` và chưa có `rigor` được đọc thành `rigor: high` ở đường đọc duy nhất.
+  5. Sàn theo loại việc `capabilities.<cap>.rigor` là sàn duy nhất theo loại việc, có hiệu lực ở cả đường coordination lẫn Work. Khối `capabilities.*.overrides` bị xoá hoàn toàn.
+  6. Xoá vĩnh viễn không lặp lại: `minTier`, `minRigor`, `QUALITY_TIER_BRIDGE`, `QUALITY_MODE_VALUES`, `DEFAULT_TIER_TO_POLICY`, `rigorOverrides`, `runner.models`, `capabilities.*.overrides`. Test guard tự động chặn chúng quay lại.
+```
+
+### Full diff
+
+```diff
+No text difference.
+```
+
+## claim_14da24bed0920b9efb22bbe4bbe0bbdc
+
+Source digest: 8b0b585d72e6e964b858670c69a32f7c2983b02b8fd11c3fbceda65fc93daee0
+
+Target digest: 8b0b585d72e6e964b858670c69a32f7c2983b02b8fd11c3fbceda65fc93daee0
+
+```json
+{
+  "sourcePath": "docs/specs/runner.md",
+  "sourceAnchor": "unheaded-block-90",
+  "sourceLines": [
+    1081,
+    1085
+  ],
+  "sourceAncestry": [
+    "Spec: Runner (vòng tự hành)",
+    "Business Rules"
+  ],
+  "targetPath": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+  "targetAnchor": "unheaded-block-32",
+  "targetAncestry": [
+    "Added in candidate: Runner Business Rules",
+    "Business Rules"
+  ],
+  "nativeTargetClaimId": "claim_4e85df7ebcc73076ffa3619c907bdb66",
+  "class": "Weak-exact",
+  "classReason": "ancestor headings differ; document exact share below one half",
+  "section": "business-rules",
+  "mapAmendments": [],
+  "reboundAnchors": [],
+  "decision": {
+    "claimId": "claim_14da24bed0920b9efb22bbe4bbe0bbdc",
+    "sourceUnitDigest": "8b0b585d72e6e964b858670c69a32f7c2983b02b8fd11c3fbceda65fc93daee0",
+    "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+    "targetAnchor": "unheaded-block-32",
+    "claimKind": "specification",
+    "disposition": "move",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+    "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-90 (lines 1081–1085) carried at docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#unheaded-block-32. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+    "targetUnitDigest": "8b0b585d72e6e964b858670c69a32f7c2983b02b8fd11c3fbceda65fc93daee0",
+    "targetAncestry": [
+      "Added in candidate: Runner Business Rules",
+      "Business Rules"
+    ]
+  }
+}
+```
+
+### Full source unit
+
+```text
+- **RUL73 (dispatch KHÔNG biết Work, domain hay bước — tầng Work tra rồi truyền vào; Work không còn `stage`).** `src/runner/dispatch/**` và `src/runner/execution/**` không import `src/state/**`, `src/workflow/**` hay bất kỳ module tầng Work (`work-compat`, `work-dispatch`, `operation-choice`, `loop`, `claim-port`, `prompt-templates`, `intake/`, `verbs/`), và không chứa literal tên domain/bước (guard `test/architecture.test.mjs`, tên đọc từ `domains/*/` trên đĩa). Cụ thể:
+  1. Operation/taskSpec/skill của một bước đến từ định nghĩa Workflow (`domains/<d>/workflows/*.yaml`, `steps[].operations`/`skill`), tầng Work đọc qua `src/state/domain-registry.mjs` rồi đưa vào `buildAssignment({ domain, stage, operation, operations })`. Dispatch kiểm `operation ∈ operations` (lỗi `unknown operation ... for stage ...`), ghi danh sách hợp lệ vào `provenance.declared.legalOperations`; `executeAssignment` từ chối một Assignment declared không mang danh sách đó hoặc có `operation` ngoài danh sách (và `dispatch: human-only`). Trường `stage` trên Assignment hiện chỉ còn là nhãn mờ của bước (đổi tên theo đợt thuật ngữ).
+  2. [Phần đầu vào còn lại ĐÃ BỊ THAY bởi RUL95 (dispatch takes generic inputs only) — `work`/`workItem`/`workExecutorId` thôi là đầu vào của dispatch; `decide --work` nhận hint; `workDispatchContext` không còn trả `work`] Mọi thứ Work-aware chuyển ra tầng Work: `src/runner/operation-choice.mjs` (chọn operation cho bước hiện tại, trước ở `dispatch/`), `src/runner/work-dispatch.mjs` (`spawnWorker`, `resolveAgentTypeForWork`, `resolveWorkForDispatch`, `workDispatchContext`), `src/runner/work-compat.mjs` (`executorIdForWork`, `buildPrompt`, `workCapabilityHints`). Dispatch nhận đầu vào đã phân giải: `workExecutorId` (plan), `capabilityHints`/`agentType` (`executeExecutorCli`/`executeAssignment`), và hook `resolveWork` cho `decide --work` — `dispatch/cli.mjs` không còn bộ đọc event Work riêng, không còn bản chép đồ thị stage.
+  3. Work mang `workflowStep` (id bước trong Workflow của domain); `src/state/workflow-stage-graphs.mjs`, `src/state/stage-fsm.mjs` đã xoá — `domain-registry.mjs` (phần vòng đời Work của domain + tra Workflow) và `step-fsm.mjs` (cạnh chuyển bước = `transitions` của Workflow) thay thế. Chi tiết dữ liệu cũ: spec Work-State, "Work không còn `stage`".
+  4. Cổng mutating của một unit-run: Assignment mutating phải mang `binding` do `bind()` sinh ra, khớp bản `bind()` tính lại từ `unit.json`, và không được ghim executor khác (`policy.preferExecutor`) — thiếu/khác → từ chối trước khi spawn.
+```
+
+### Full target unit
+
+```text
+- **RUL73 (dispatch KHÔNG biết Work, domain hay bước — tầng Work tra rồi truyền vào; Work không còn `stage`).** `src/runner/dispatch/**` và `src/runner/execution/**` không import `src/state/**`, `src/workflow/**` hay bất kỳ module tầng Work (`work-compat`, `work-dispatch`, `operation-choice`, `loop`, `claim-port`, `prompt-templates`, `intake/`, `verbs/`), và không chứa literal tên domain/bước (guard `test/architecture.test.mjs`, tên đọc từ `domains/*/` trên đĩa). Cụ thể:
+  1. Operation/taskSpec/skill của một bước đến từ định nghĩa Workflow (`domains/<d>/workflows/*.yaml`, `steps[].operations`/`skill`), tầng Work đọc qua `src/state/domain-registry.mjs` rồi đưa vào `buildAssignment({ domain, stage, operation, operations })`. Dispatch kiểm `operation ∈ operations` (lỗi `unknown operation ... for stage ...`), ghi danh sách hợp lệ vào `provenance.declared.legalOperations`; `executeAssignment` từ chối một Assignment declared không mang danh sách đó hoặc có `operation` ngoài danh sách (và `dispatch: human-only`). Trường `stage` trên Assignment hiện chỉ còn là nhãn mờ của bước (đổi tên theo đợt thuật ngữ).
+  2. [Phần đầu vào còn lại ĐÃ BỊ THAY bởi RUL95 (dispatch takes generic inputs only) — `work`/`workItem`/`workExecutorId` thôi là đầu vào của dispatch; `decide --work` nhận hint; `workDispatchContext` không còn trả `work`] Mọi thứ Work-aware chuyển ra tầng Work: `src/runner/operation-choice.mjs` (chọn operation cho bước hiện tại, trước ở `dispatch/`), `src/runner/work-dispatch.mjs` (`spawnWorker`, `resolveAgentTypeForWork`, `resolveWorkForDispatch`, `workDispatchContext`), `src/runner/work-compat.mjs` (`executorIdForWork`, `buildPrompt`, `workCapabilityHints`). Dispatch nhận đầu vào đã phân giải: `workExecutorId` (plan), `capabilityHints`/`agentType` (`executeExecutorCli`/`executeAssignment`), và hook `resolveWork` cho `decide --work` — `dispatch/cli.mjs` không còn bộ đọc event Work riêng, không còn bản chép đồ thị stage.
+  3. Work mang `workflowStep` (id bước trong Workflow của domain); `src/state/workflow-stage-graphs.mjs`, `src/state/stage-fsm.mjs` đã xoá — `domain-registry.mjs` (phần vòng đời Work của domain + tra Workflow) và `step-fsm.mjs` (cạnh chuyển bước = `transitions` của Workflow) thay thế. Chi tiết dữ liệu cũ: spec Work-State, "Work không còn `stage`".
+  4. Cổng mutating của một unit-run: Assignment mutating phải mang `binding` do `bind()` sinh ra, khớp bản `bind()` tính lại từ `unit.json`, và không được ghim executor khác (`policy.preferExecutor`) — thiếu/khác → từ chối trước khi spawn.
+```
+
+### Full diff
+
+```diff
+No text difference.
+```
+
+## claim_64aee8ce4865f829a4973768d686f2c0
+
+Source digest: bad7d014e1ab88fac6cd985b2e8d263704e8d91272d283a0e3935be1eaffb802
+
+Target digest: bad7d014e1ab88fac6cd985b2e8d263704e8d91272d283a0e3935be1eaffb802
+
+```json
+{
+  "sourcePath": "docs/specs/runner.md",
+  "sourceAnchor": "unheaded-block-91",
+  "sourceLines": [
+    1087,
+    1087
+  ],
+  "sourceAncestry": [
+    "Spec: Runner (vòng tự hành)",
+    "Business Rules"
+  ],
+  "targetPath": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+  "targetAnchor": "unheaded-block-33",
+  "targetAncestry": [
+    "Added in candidate: Runner Business Rules",
+    "Business Rules"
+  ],
+  "nativeTargetClaimId": "claim_ba70ecf5658dd691b9405dbae98b9b91",
+  "class": "Weak-exact",
+  "classReason": "ancestor headings differ; document exact share below one half",
+  "section": "business-rules",
+  "mapAmendments": [],
+  "reboundAnchors": [],
+  "decision": {
+    "claimId": "claim_64aee8ce4865f829a4973768d686f2c0",
+    "sourceUnitDigest": "bad7d014e1ab88fac6cd985b2e8d263704e8d91272d283a0e3935be1eaffb802",
+    "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+    "targetAnchor": "unheaded-block-33",
+    "claimKind": "specification",
+    "disposition": "move",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+    "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-91 (lines 1087–1087) carried at docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#unheaded-block-33. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+    "targetUnitDigest": "bad7d014e1ab88fac6cd985b2e8d263704e8d91272d283a0e3935be1eaffb802",
+    "targetAncestry": [
+      "Added in candidate: Runner Business Rules",
+      "Business Rules"
+    ]
+  }
+}
+```
+
+### Full source unit
+
+```text
+- **RUL74 (lazy-probe unlock: an account locked for a dead login unlocks itself after one real call that succeeds).** An account quarantined as `auth-token` has no end time: the owner logs in again by hand and fgOS cannot see it. Instead of waiting for a person to run the clear command, a dispatch that finds **no usable account of the provider** makes one real, cheap call per such account (Codex: `codex exec`; an omp profile, a `home-files` source that lists `agent.db`: `omp -p`; a pi account directory, one that lists `auth.json`: `pi -p`; omp is tested before pi), against the account's own home, not a copy, because the owner uses that home and a renewal belongs there. A call that answers clears the lock (audited as `fgos provider-capacity probe`) and the dispatch goes on; one that does not keeps the lock and records the attempt, and no new call is made for that account within a 30 minute cooldown, however many dispatches ask. Only `auth-token` locks are probed: a quota limit ends by itself and any other manual lock is a person's decision. The call is never made while another account of the provider is usable, runs outside the state lock but inside the account lock of RUL75 (so a renewal made by fgOS cannot overlap it; an account whose lock stays busy past two minutes counts as a failed attempt), stops at the first account that answers, and a failure to probe never blocks the dispatch. A credential layout fgOS cannot name (the agy homes of Gemini) has no call, so that account stays locked for a person. The probe is passed to the dispatch by its callers; a caller that passes none changes nothing.
+```
+
+### Full target unit
+
+```text
+- **RUL74 (lazy-probe unlock: an account locked for a dead login unlocks itself after one real call that succeeds).** An account quarantined as `auth-token` has no end time: the owner logs in again by hand and fgOS cannot see it. Instead of waiting for a person to run the clear command, a dispatch that finds **no usable account of the provider** makes one real, cheap call per such account (Codex: `codex exec`; an omp profile, a `home-files` source that lists `agent.db`: `omp -p`; a pi account directory, one that lists `auth.json`: `pi -p`; omp is tested before pi), against the account's own home, not a copy, because the owner uses that home and a renewal belongs there. A call that answers clears the lock (audited as `fgos provider-capacity probe`) and the dispatch goes on; one that does not keeps the lock and records the attempt, and no new call is made for that account within a 30 minute cooldown, however many dispatches ask. Only `auth-token` locks are probed: a quota limit ends by itself and any other manual lock is a person's decision. The call is never made while another account of the provider is usable, runs outside the state lock but inside the account lock of RUL75 (so a renewal made by fgOS cannot overlap it; an account whose lock stays busy past two minutes counts as a failed attempt), stops at the first account that answers, and a failure to probe never blocks the dispatch. A credential layout fgOS cannot name (the agy homes of Gemini) has no call, so that account stays locked for a person. The probe is passed to the dispatch by its callers; a caller that passes none changes nothing.
+```
+
+### Full diff
+
+```diff
+No text difference.
+```
+
+## claim_895d9828a8b49f8148389d63d32cc0e5
+
+Source digest: 372be8b09ba377f713ebcbf0cb224ce126c1a066d2a4188ce414ba65daad83a9
+
+Target digest: 372be8b09ba377f713ebcbf0cb224ce126c1a066d2a4188ce414ba65daad83a9
+
+```json
+{
+  "sourcePath": "docs/specs/runner.md",
+  "sourceAnchor": "unheaded-block-92",
+  "sourceLines": [
+    1089,
+    1089
+  ],
+  "sourceAncestry": [
+    "Spec: Runner (vòng tự hành)",
+    "Business Rules"
+  ],
+  "targetPath": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+  "targetAnchor": "unheaded-block-34",
+  "targetAncestry": [
+    "Added in candidate: Runner Business Rules",
+    "Business Rules"
+  ],
+  "nativeTargetClaimId": "claim_228a35ffb1ee836d2cc751662e2f073e",
+  "class": "Weak-exact",
+  "classReason": "ancestor headings differ; document exact share below one half",
+  "section": "business-rules",
+  "mapAmendments": [],
+  "reboundAnchors": [],
+  "decision": {
+    "claimId": "claim_895d9828a8b49f8148389d63d32cc0e5",
+    "sourceUnitDigest": "372be8b09ba377f713ebcbf0cb224ce126c1a066d2a4188ce414ba65daad83a9",
+    "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+    "targetAnchor": "unheaded-block-34",
+    "claimKind": "specification",
+    "disposition": "move",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+    "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-92 (lines 1089–1089) carried at docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#unheaded-block-34. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+    "targetUnitDigest": "372be8b09ba377f713ebcbf0cb224ce126c1a066d2a4188ce414ba65daad83a9",
+    "targetAncestry": [
+      "Added in candidate: Runner Business Rules",
+      "Business Rules"
+    ]
+  }
+}
+```
+
+### Full source unit
+
+```text
+- **RUL75 (a rotating provider login is renewed once at the source, in a copy fgOS holds, and a login renewed inside a private home is written back).** Dispatch copies an account's login into a private home that is thrown away. pi, omp and Codex logins carry a single-use refresh token (measured for each), so a renewal that happens inside such a copy uses up the source's token on the provider's side and the new pair is lost with the home; the next renewal anywhere is refused (`invalid_grant`, the account is quarantined `auth-token`). Opt-in (the same shape as the lazy probe): a caller passes `providerCredentialRenew` (`createCredentialRenewal()`, `src/runner/dispatch/provider-credential-renewal.mjs`) to `executeAssignment`, and only then do the two halves below run; without it provisioning and removal are as before. `agent.db` is copied as a consistent SQLite snapshot (`VACUUM INTO`, write-ahead log included) whether or not a dispatch opted in, and the unlock probe knows the omp layout regardless.
+```
+
+### Full target unit
+
+```text
+- **RUL75 (a rotating provider login is renewed once at the source, in a copy fgOS holds, and a login renewed inside a private home is written back).** Dispatch copies an account's login into a private home that is thrown away. pi, omp and Codex logins carry a single-use refresh token (measured for each), so a renewal that happens inside such a copy uses up the source's token on the provider's side and the new pair is lost with the home; the next renewal anywhere is refused (`invalid_grant`, the account is quarantined `auth-token`). Opt-in (the same shape as the lazy probe): a caller passes `providerCredentialRenew` (`createCredentialRenewal()`, `src/runner/dispatch/provider-credential-renewal.mjs`) to `executeAssignment`, and only then do the two halves below run; without it provisioning and removal are as before. `agent.db` is copied as a consistent SQLite snapshot (`VACUUM INTO`, write-ahead log included) whether or not a dispatch opted in, and the unlock probe knows the omp layout regardless.
+```
+
+### Full diff
+
+```diff
+No text difference.
+```
+
+## claim_3d6994569b50320e7c89c047d3b4a8d6
+
+Source digest: 9029936d54618ff2f26567776f163e84f88d1811fa762e647806bcdbd89e86f8
+
+Target digest: 9029936d54618ff2f26567776f163e84f88d1811fa762e647806bcdbd89e86f8
+
+```json
+{
+  "sourcePath": "docs/specs/runner.md",
+  "sourceAnchor": "unheaded-block-93",
+  "sourceLines": [
+    1091,
+    1091
+  ],
+  "sourceAncestry": [
+    "Spec: Runner (vòng tự hành)",
+    "Business Rules"
+  ],
+  "targetPath": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+  "targetAnchor": "unheaded-block-35",
+  "targetAncestry": [
+    "Added in candidate: Runner Business Rules",
+    "Business Rules"
+  ],
+  "nativeTargetClaimId": "claim_0f096f3f6834dc0fb037eaaa2448975f",
+  "class": "Weak-exact",
+  "classReason": "ancestor headings differ; document exact share below one half",
+  "section": "business-rules",
+  "mapAmendments": [],
+  "reboundAnchors": [],
+  "decision": {
+    "claimId": "claim_3d6994569b50320e7c89c047d3b4a8d6",
+    "sourceUnitDigest": "9029936d54618ff2f26567776f163e84f88d1811fa762e647806bcdbd89e86f8",
+    "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+    "targetAnchor": "unheaded-block-35",
+    "claimKind": "specification",
+    "disposition": "move",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+    "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-93 (lines 1091–1091) carried at docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#unheaded-block-35. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+    "targetUnitDigest": "9029936d54618ff2f26567776f163e84f88d1811fa762e647806bcdbd89e86f8",
+    "targetAncestry": [
+      "Added in candidate: Runner Business Rules",
+      "Business Rules"
+    ]
+  }
+}
+```
+
+### Full source unit
+
+```text
+- **RUL76 (`execute <executorId> --for <capability>`: the caller states the posture; [ĐÃ BỊ THAY bởi RUL77 (posture thuộc capability; agent executor không khai `for`) — chốt "executor phải khai capability" đã bỏ]; partly reverses the `execute --for` retirement of RUL68 (2 tầng dispatch; `execute --for` đã rút), 2026-10-13).** `execute <id>` with no purpose infers the capability from the executor's own `for` list, a required-confinement capability first (`resolveCapabilityDetailsFromHints`). RUL70 (executor id theo `providerModel`; gộp `pi`+`codex` thành `openai`) merged `codex` (`for: [code:review, code:debug]`, both `host-write-denied`) and `pi` (no `for`, the writing invocations) into `openai`, so every `execute openai` became write-denied, whatever the work: a documentation task died with `Read-only file system` when Codex tried to refresh its login under bwrap. That rule itself says executors whose `for` differ should not be merged into one entry; the merge kept the codex `for` without noticing pi had none. Instead of splitting the executor, the two-phase `decide`-then-`execute` pattern now carries the purpose to phase two: `execute <id> --for <capability>` runs under that capability's posture. It is accepted only when the executor declares the capability in `for` or the capability's `prefer` names the executor (otherwise `capability-not-served`, before spawning), so config still says which postures an executor accepts; without `--for` the strictest-first inference stays the fail-closed default. `execute --for` with no executor, or combined with `--assignment`/`--contract`, is still refused. `openai.for` gains `execute`, so writing work goes `execute openai --for execute`, which takes the first `cli` invocation (`codex-cli-bypass-fgovn`, unconfined). `--timeout-ms`/`--idle-timeout-ms` override `runner.timeoutMs`/`runner.idleTimeoutMs` per call. Config for a dispatch whose `--cwd` is a worktree with its own `.fgos/config.json` is read from that worktree (5a42bc376, intended), so a branch behind main also resolves older model tiers.
+```
+
+### Full target unit
+
+```text
+- **RUL76 (`execute <executorId> --for <capability>`: the caller states the posture; [ĐÃ BỊ THAY bởi RUL77 (posture thuộc capability; agent executor không khai `for`) — chốt "executor phải khai capability" đã bỏ]; partly reverses the `execute --for` retirement of RUL68 (2 tầng dispatch; `execute --for` đã rút), 2026-10-13).** `execute <id>` with no purpose infers the capability from the executor's own `for` list, a required-confinement capability first (`resolveCapabilityDetailsFromHints`). RUL70 (executor id theo `providerModel`; gộp `pi`+`codex` thành `openai`) merged `codex` (`for: [code:review, code:debug]`, both `host-write-denied`) and `pi` (no `for`, the writing invocations) into `openai`, so every `execute openai` became write-denied, whatever the work: a documentation task died with `Read-only file system` when Codex tried to refresh its login under bwrap. That rule itself says executors whose `for` differ should not be merged into one entry; the merge kept the codex `for` without noticing pi had none. Instead of splitting the executor, the two-phase `decide`-then-`execute` pattern now carries the purpose to phase two: `execute <id> --for <capability>` runs under that capability's posture. It is accepted only when the executor declares the capability in `for` or the capability's `prefer` names the executor (otherwise `capability-not-served`, before spawning), so config still says which postures an executor accepts; without `--for` the strictest-first inference stays the fail-closed default. `execute --for` with no executor, or combined with `--assignment`/`--contract`, is still refused. `openai.for` gains `execute`, so writing work goes `execute openai --for execute`, which takes the first `cli` invocation (`codex-cli-bypass-fgovn`, unconfined). `--timeout-ms`/`--idle-timeout-ms` override `runner.timeoutMs`/`runner.idleTimeoutMs` per call. Config for a dispatch whose `--cwd` is a worktree with its own `.fgos/config.json` is read from that worktree (5a42bc376, intended), so a branch behind main also resolves older model tiers.
+```
+
+### Full diff
+
+```diff
+No text difference.
+```
+
+## claim_64858c3adb9ca1d1eae38e1c9bc63e10
+
+Source digest: 3b974a9c1a82356e256e9b6923c80104f778651f67447179efdc0ffbf09ac485
+
+Target digest: 3b974a9c1a82356e256e9b6923c80104f778651f67447179efdc0ffbf09ac485
+
+```json
+{
+  "sourcePath": "docs/specs/runner.md",
+  "sourceAnchor": "unheaded-block-94",
+  "sourceLines": [
+    1093,
+    1121
+  ],
+  "sourceAncestry": [
+    "Spec: Runner (vòng tự hành)",
+    "Business Rules"
+  ],
+  "targetPath": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+  "targetAnchor": "unheaded-block-36",
+  "targetAncestry": [
+    "Added in candidate: Runner Business Rules",
+    "Business Rules"
+  ],
+  "nativeTargetClaimId": "claim_aa4b6a050fe5ab30d813b08a3ca2e665",
+  "class": "Weak-exact",
+  "classReason": "ancestor headings differ; document exact share below one half",
+  "section": "business-rules",
+  "mapAmendments": [],
+  "reboundAnchors": [],
+  "decision": {
+    "claimId": "claim_64858c3adb9ca1d1eae38e1c9bc63e10",
+    "sourceUnitDigest": "3b974a9c1a82356e256e9b6923c80104f778651f67447179efdc0ffbf09ac485",
+    "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+    "targetAnchor": "unheaded-block-36",
+    "claimKind": "decision",
+    "disposition": "move",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+    "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-94 (lines 1093–1121) carried at docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#unheaded-block-36. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+    "targetUnitDigest": "3b974a9c1a82356e256e9b6923c80104f778651f67447179efdc0ffbf09ac485",
+    "targetAncestry": [
+      "Added in candidate: Runner Business Rules",
+      "Business Rules"
+    ]
+  }
+}
+```
+
+### Full source unit
+
+```text
+- **RUL77 ([ĐÃ BỊ THAY phần "each door carries one posture lane" bởi RUL90 (the raw dispatch doors are removed), decision 0062 — posture now comes from the Unit's `writes` plus the capability; "an agent executor declares no `for`" stands] posture belongs to the capability, an agent executor declares no `for`, and each door carries one posture lane; supersedes RUL76 (`execute <id> --for <capability>` with a "must declare" gate), 2026-10-13).** An agent executor can do any kind of work, so no `for` list describes it, and a list on one was read as the posture of every dispatch to it (`docs/specs/confinement-authority.md` already said a direct executor call must carry a capability anchor and never infer the minimum from `executor.for`). `resolveCapabilityDetailsFromHints` reads `for` from tool executors only; on an agent executor it is inert (config still loads, so projects and worktrees that carry one keep dispatching) and `fgos doctor` names it under `executor-profile-warnings` (`executor.<id>.agent-for-inert`); the agent executors' `for` lists are gone from this repo's `.fgos/config.json` (`decide --for` routing unchanged: it reads `capabilities.<name>.prefer`). The CLI door `execute <agent>` refuses before spawning when no `--for` is given (`capability-required`, listing the writing capabilities and the read-only door); programmatic callers (Assignment, Work) pass their own capability hints and are unchanged. `execute <agent> --for <capability>` runs the invocation that capability `prefer`s for that executor, else the first plain cli invocation with no sandbox backend, instead of always the first cli invocation. That door leases no provider account, so it carries writing work only: a capability with required confinement is refused (`posture-needs-assignment`). Read-only work runs sandboxed as a Workflow unit with `writes: []` (`fgos workflow start --units`), which binds the read-only posture and leases the account (the architecture-advisory seats ran that way: `confined-bwrap`, login provisioned); `execute --contract <file> --executor <id>` keeps a named provider and leases its account but runs unconfined, read-only by instruction only (measured: `execute openai --for code:review` on the bare door ran `codex-cli-bwrap` confined and got 401 with no login; the same read through `--contract --executor openai` answered, on `cli-spawn` with `confinement: null`). A sandboxed read-only door that also keeps a named provider does not exist yet. The calling agent answers Q1 (does it write? does a provider matter?) from prose doctrine in `core/skills/_shared/capability-matching.md`, with no classifier or workflow generator. Decided after an `architecture-advisory` run (`wf-run-1791875339761-10315b91`: framing and shaping with three blind seats and a synthesizer completed; critique was blocked by a Codex trust prompt, so no reviewed synthesis exists). Not built: a soft provider hint on `decide` (`--prefer`, the synthesizer's recommendation) — naming the executor on `execute` already lets a caller pick a provider, and the hint would change `bind()`, shared with Workflow binding; revisit when a caller needs "this provider if it can, else any". Since 2026-10-14 (RUL88 (ad-hoc Unit prefer and persona, the one-liner), decision 0061) that hint exists on the Unit, not on `decide`: `fgos run "<prompt>" --provider <id>` and an ad-hoc Unit's `prefer` try the provider first and fail over into the pool, and a read-only one-liner is the sandboxed read-only door that keeps a preferred provider.
+  1. **Account lock.** One lock per provider account under `<runtime dir>/account-locks/<provider>/<account>/`, separate from the state lock, in the same append-only generation format. A waiter waits with timers, never by blocking the event loop (panel seats share a process and may share an account); a caller that must not wait (a removal) tries once. The holder records the pid of the renewal child it started: a dead holder with a live child keeps the lock, so a second renewal never redeems the same refresh token.
+  2. **Refresh-ahead.** After the final account selection (the executor-fallback lease included) and before a confined private home is built from it, when the login has less than the window left, fgOS renews it once. The window is `max(60 minutes, probe timeout + 5 minutes)`. Only the entry of the dispatched provider counts, for the window and for "was it renewed" (Codex: its single entry; pi: the key equal to the provider id or starting with `<provider>-`; omp: the row `provider` likewise; a lone oauth entry of another provider is not used; zero or several matches skip the renewal as `entry-unidentified`), so an abandoned login of another provider never makes every dispatch renew, and only that entry is made due and applied. Under the account lock it applies any leftover copy first, re-reads the source, and skips for 30 minutes after a failed renewal; then it builds a scratch home under the account directory (mode 0700, the listed files only), makes only that copy look due, runs the layout's probe call on it (wrapped in coreutils `timeout --kill-after=5`, so the child ends on its own even if the runner dies and the account lock does not outlive it unbounded; the runner's own timer stays; the lazy-probe unlock call, an account locked for a dead login, is wrapped the same way), and applies the renewed entry to the real store. The real store is never made to look expired, so the owner's own CLI does not renew because of this, a failed or hung call leaves it untouched, and a scratch copy left by a dead runner is applied (if newer) by the next lock holder and then removed. Where each layout keeps its expiry: pi `auth.json` `<provider>.expires` (ms; seconds below 1e12), `type: oauth` entries only; omp `agent.db` table `auth_credentials`, `data.expires` (ms), rows `credential_type = 'oauth'` and no `disabled_cause`; Codex `auth.json`, due at the earlier of the access token's `exp` claim and `last_refresh` plus 8 days (`TOKEN_REFRESH_INTERVAL`, `should_refresh_proactively` in `codex-rs/login/src/auth/manager.rs` of openai/codex; the same file renews at five minutes before `exp` when the token can be read). A layout that cannot be read (an API key, agy, no `node:sqlite`) is left as it was.
+  3. **Apply (compare-before-write).** Shared by refresh-ahead and write-back, always under the account lock: only an entry whose expiry is strictly later than the source's and whose refresh token differs from the source's replaces it (compared in memory, never printed; a copy that still holds the source's refresh token renewed nothing), and for a fresh renewal the new expiry must also be in the future, while a copy staged earlier (a pane's home, a pending or leftover copy) is applied even if its access token has expired since, because its refresh token is the newer one and the source's is already spent, only that entry changes (other pi providers, other omp rows and columns, other Codex fields stay as they were), a copy that cannot be read, has an unexpected shape, or has no refresh token where the source's entry has one never touches the source. A copy is deleted only when the source was read successfully and proves the copy is not newer (same refresh token, or an expiry not strictly later), or when the copy is proven malformed (corrupt JSON, or it parses to no usable entry, or it has no store file); when the source is unreadable or half-written, the entry cannot be identified at apply time, or the copy cannot be read for a reason that may pass (`node:sqlite` unavailable, a database that will not open), the copy is kept (a fresh scratch copy moves to `pending/`) and the result is `apply-deferred`, never `applied` or `not-renewed`. An operating-system read error on a copy file (permissions, I/O) is reported as `unreadable-file` and keeps the copy (`apply-deferred`); only a store file that is not there (`missing-file`) is proven empty. pi and Codex files are replaced through a temp file and a rename, recomputed when the source changed in between; the omp store is changed by a row update in one transaction, never by replacing the file the owner's omp may hold open.
+  4. **Write-back at removal.** When a dispatch opted in, the private home's ownership marker records `credentialWriteBack` (provider, account, source home, layout, runtime dir; names and paths only). One removal function serves the driver cleanup, the finalizer of a settled dispatch and the orphan reaper: before deleting a home whose marker asks for it, a login in the home that is newer than the source's is staged under `pending/` (atomic rename) and applied under the account lock, tried once without waiting; when the lock is busy, or nothing proves the copy is not newer (the source is unreadable, its entry cannot be identified, or the copy cannot be read for a reason that may pass, such as `node:sqlite` being unavailable: an omp store is then staged as plain files, write-ahead log included), it stays pending and the next refresh-ahead (or removal) applies it once it can be identified, even if the source still looks fresh, because the source's own refresh token may already be spent; a refresh-ahead that skips because the entry is unidentified applies the pending copies too, so the ones that have become identifiable clear. Pending copies are limited to five per login store (per account for a single-store account, per `stores/<cli>` for a per-CLI one), but only redundant ones are ever dropped: after the pending copies were applied, under the account lock, a copy whose logins are identical to another pending copy's (compared in memory by entry key, refresh token and expiry, or by the bytes of the store files and of a non-empty write-ahead log or rollback journal when a copy cannot be parsed; never printed) is dropped, oldest first, while the account is over the limit, and the newest of each identical group stays; a drop writes one stderr line `credential-pending-dropped` with a count only. A copy that cannot be shown redundant, or obsolete by the source, is never dropped to make room, so an account can stay over the limit, and the doctor check reports it. A staged copy and the pending directory are synced to disk before the home goes. A copy a probe left half-written (pi rewrites its store in place; omp commits row updates in a database transaction) is kept under `torn/` for hand recovery, never applied or dropped automatically, and reported by the doctor check at any age. This covers the probe's scratch copy only: a scratch home a dead runner left, and a pane home whose store was cut off, are still removed when their JSON cannot be read. A pane home whose store files are byte for byte the source's, with no non-empty write-ahead log or rollback journal on either side (a login renewed before a checkpoint sits only there; a zero-byte or missing one counts as none, the shared-memory index counts for nothing, and one that cannot be read, other than as missing, is never taken for none), renewed nothing and is not staged, parsable or not. If staging itself fails, the private home and its marker are kept (the removal reports failure, one stderr line with a fixed code and no path or value) so a later removal, the reaper's included, retries; only a copy proven malformed, or one the source was read to prove not newer, lets the home go. Each failed attempt is counted in the marker (`credentialKept`: attempts, first time, time of the last counted attempt; failures less than 15 minutes after the last counted one are not counted again, so a transient fault does not use the budget up); the marker is rewritten through a temp file and a rename, and a marker that is present but unreadable stops the removal. After five attempts the home is held: no further removal attempt and no deletion by age, however old. A held home is re-checked, under the account lock, when that account is next renewed (the temp roots searched are the same as doctor's: the default one plus each registered backend's own `tempRoot`; a home under a backend's separate `privateHomeRoot` is in none of them, so no check, repair, reaper or renewal sees it, and it is never deleted either) and by `fgos doctor --fix`, and only a home of the lock's own runtime directory: it is removed only when the source is readable and proves its login is not newer, or when that login can now be staged beside the source (and is applied); otherwise it stays held. A marker file that is no recognisable marker at all (not JSON, not an object, no contract name) stops any removal of its home. The finalizer compares the ownership marker's digest without `credentialKept` (a failed driver cleanup adds it after the digest was taken) and carries on with the dispatch's other resources past a home that cannot go (the dispatch is recorded as retained, with the home's reason). The doctor check `credential-copies-retained` reports, by provider and account, held homes (a failure, naming the home directory), homes still being retried and pending or scratch copies older than a day (warnings), with counts, ages and never a value; the check deletes nothing. Any other write-back problem is reported on stderr by a fixed code and never stops the removal.
+  5. **Known exposure.** Refresh-ahead can spend the refresh token that a pane started just outside the window still holds: that pane's own renewal is then refused, no worse than before this rule, and write-back cannot rescue it because its renewal failed. A run that copied the login with more than the window left and runs longer than that remainder is the case.
+  6. **No value in any output.** Results, events, markers, cooldown and lock records, stderr and reports carry fixed codes (`unreadable-json`, `unexpected-shape`, `sqlite-unavailable`, ...) and fingerprints at most, never a token or a parser message (which quotes nearby input).
+- **RUL78 (a confined pane reads its folder trust from the leased account's own store, 2026-10-13).** A herdr pane with a private home carries the login of the account the capacity layer leased (RUL65b), but the folder-trust seed (`seedWorkspaceTrust`, `trustStorePaths` in `src/runner/dispatch/herdr-round.mjs`) derived the trust decision from the store of the account the invocation's static env names (`codex-herdr-fgovn`: `CODEX_HOME=${HOME}/.codex-fgovn`). When the two accounts differ and the static one was never asked about the repo, the seed refused (`untrusted-root`) and Codex stopped at "Trust this folder?" (measured 2026-10-13 14:24, run `unit-run-1791876207053-efe6686b/reviewer/1/runs/01`: the leased `tetcu72` trusts `/home/vantt/projects/forgentX`, `~/.codex-fgovn/config.toml` did not; reproduced read-only with a scratch static home: the main-branch code blocked on herdr rule `trust_directory`, the fixed code settled confined). Now the leased credential source travels with the dispatch (`executeThroughConfinement` adapter option `trustAccountSource` -> herdr-spawn adapter -> the round), and for a round with its own private home the decision is read from that account's store: a `codex-home` source's `config.toml`, a `home-files` source's agy settings. A declared `trustStore.path` still wins; a round without a private home still reads the invocation's home, because that is what its CLI reads. Codex hook trust, seeded from the same root, follows. The "trust vanishing" of 2026-10-07 (another Codex session rewriting an account `config.toml`) is a separate cause this does not remove: it still bites when the leased account's own entry is lost. Not proven: whether Codex 0.160 honours trust given to an ancestor directory (`/home/vantt/projects`); the seed still requires the repo root itself.
+- **RUL79 (`fgos dispatch probe-account`: one account, every CLI, at the same moment, diagnostic only, 2026-10-13).** A dispatch failure on one CLI does not say whether the account (dead login, quota) or the CLI (trust prompt, sandbox, version bug) is at fault. `fgos dispatch probe-account --provider <p> --account <a> [--executor <id>] [--invocation <id,...>] [--timeout-ms <ms>]` (`src/runner/dispatch/provider-account-probe.mjs`) starts every invocation that runs as the account at once through the Assignment door a Workflow unit uses (read-only posture binding, invocation pinned by `cliOverride`, inventory narrowed to the one account so the lease cannot pick another and a quarantine still refuses, RUL75 (a rotating login is renewed once at the source and written back from a private home) renewal opt-in), with a trivial prompt, and reports per CLI an outcome class (`ok`, `blocked-trust-prompt`, `auth`, `quota`, `sandbox`, `timeout`, `other`), the evidence line, the assignment, run directory and pane, plus a verdict (`healthy`; `account-fault` when every CLI failed with `auth`/`quota`; `cli-fault` when one answered; `mixed`; `no-confined-cli` when no probed invocation declares a sandbox). The verdict reads only the rows whose invocation declares its own sandbox (`confined: true`, each row's `inVerdict`): the read-only posture makes the door confine every round (`resolvePosture` returns a required `host-write-denied` requirement), and an invocation that declares no sandbox binds no private home either, so its CLI meets its own login directory (`CODEX_HOME`, `PI_CODING_AGENT_DIR`) mounted read-only and stops on `EROFS` before it answers. That row is still run and reported (outcome `sandbox`, truthfully: a read-only dispatch pinned to that invocation fails the same way), but it says nothing about the account or the CLI (2026-10-13: tetcu72, fgovn and tetnu answered on every sandboxed invocation while `pi-cli-<account>` and `codex-cli-bypass-fgovn` died on `EROFS` under `local-bwrap-v1`, and the verdict read `cli-fault`). An invocation runs as the account when it is confined with a private home whose CLI the account's credential layout logs in (`lease`), when its credential env names the account home (`env`), or when its id ends with `-<account>` (`name`, the config's `<bin>-<mode>-<account>` convention). It closes the panes the rounds left open and removes the private homes kept for them; it picks and schedules nothing. First real run (openai/tetcu72): both Codex invocations `ok` (cli-spawn under bwrap and the herdr pane), both pi invocations `sandbox` (`EROFS` on `~/.pi/accounts/openai-tetcu72/settings.json.lock`: under the read-only posture pi cannot write its own account directory, which it does before answering; outside confinement the same pi account answered), verdict `cli-fault`.
+- **RUL80 (an account is chosen first, then a CLI: one login store per CLI, quota and locks per account, 2026-10-13).** One provider account may be used through several CLIs (Codex, pi, omp), and each CLI keeps its own login store, so an account declared with a single `credentialSource` gave every confined CLI the one store (openai `tetcu72` declared its Codex home, so its confined pi invocations got a Codex login and pi failed on its own directory, RUL79 (`fgos dispatch probe-account`: one account, every CLI, at the same moment)). An account in the machine-global inventory now declares exactly one of `credentialSource` (one store, used for every CLI, unchanged; other projects use it) or `credentialSources` (`{ <cli>: <source> }`, the key is the basename of an invocation's `command`: `codex`, `pi`, `omp`, `agy`; each source has the same `kind`/`home`/`files` shape). Every reader takes the store of the CLI actually dispatched: the confinement request (`buildConfinementRequest`) resolves `providerCapacity.credentialSource` from the invocation's command, so private-home provisioning, the write-back marker and the folder-trust seed (RUL78 (a confined pane reads its folder trust from the leased account's own store)) see that store, and a CLI the leased account has no store for is refused before the worker starts (`credential-provisioning`). The lease does not know the invocation unless it is pinned (`cliOverride.preferInvocation`, as Workflow units and the account probe pin it): a pinned lease only picks an account that has a store for the pinned CLI (`provider-capacity.no-account-for-cli` when none has); an unpinned lease picks among all accounts as before. Refresh-ahead (RUL75 (a rotating login is renewed once at the source and written back from a private home)) runs before the invocation is settled, so for a per-CLI account it renews the store of each CLI the executor may still launch (the pinned one only, when pinned); the lazy unlock probe (RUL74 (an account locked for a dead login unlocks itself after one real call)) calls through the store of the first such CLI. Renewal copies of a per-CLI store wait under `account-locks/<provider>/<account>/stores/<cli>/` (`pending/`, scratch homes, cooldown), never beside another store's copies, and the marker records the store; the account lock stays one per account, and `credential-copies-retained` reads both places. A copy left where the account's current layout does not read (the account directory after the account moved to one store per CLI, `stores/<cli>` after it went back to one store or dropped that CLI, or an account the inventory no longer lists) is never applied, moved to the new layout or dropped: when the machine-global inventory was read, the check fails on it at any age (a torn copy and an over-limit pending directory there included) and names that directory for hand recovery; when the global config cannot be read or is refused by the validator, the check fails instead, names the reason (an error class and the config path, never the parser's own text), lists every retained copy at any age and promises nothing about a dispatch, since a dispatch could not run on that config either. Quota, leases, quarantine and rotation stay per account: no account is split into pseudo-accounts per CLI. The account probe (RUL79 (`fgos dispatch probe-account`: one account, every CLI, at the same moment)) leases an account into each confined CLI it has a store for. `confined-pane-accounts` in `fgos doctor` checks each pane against the store of its own CLI. An fgos release from before this rule refuses an inventory that uses `credentialSources` (unknown account key), so the inventory is changed only after the release that reads it is active. The same store directory also holds `torn/` (a login store a probe left half-written, kept for hand recovery and never applied or dropped), and a crash during staging can leave `pending/.tmp-<pid>-<id>`: `credential-copies-retained` reports it once its writer process is gone and it has not changed for ten minutes, and `fgos doctor --fix` removes one only after claiming it by rename (so a writer that is still running loses its own rename and keeps its home) and only when it is empty, has the same files as a copy the store keeps in `pending/` or `torn/` (the shared-memory index aside), or, under the account lock, the source login of the account shows it is no newer or it is malformed; never by age, and any other stays for hand recovery. A staging in a store the account's layout no longer reads is reported once with the stranded copies and is never touched. The doctor check and fix also read the `tempRoot` and `privateHomeRoot` a registered backend declares (absolute, without duplicates) for kept homes; the orphan reaper, the dispatch retries and the root-mode tightening stay on the default temp root, since they delete and re-mode what they find. Nothing retries a kept home under a scan-only root by itself, so doctor treats one as held at once (a failure naming the path) and `--fix` settles it by the same rule as any held home. Not built: per-CLI stores for an unconfined invocation, which keeps naming its store through its own env.
+- **RUL82 (`RunResult.confinement` names the backend that ran, 2026-10-14).** The field was always `null`: settlement compared the requested mode with `'confined'`, a mode that does not exist (`CONFINEMENT_MODES` is `required`/`preferred`/`unconfined`), and the Assignment's confinement requirement never reached settlement. It now comes from `ranConfinementBackend` (`settlement.mjs`): the prepared-invocation record the Confinement Authority published for the launch (`protected/prepared-invocation/<launchCommandId>.json`, backend type, `none` → `null`), else the attestation the dispatch returned with outcome `enforced`. A requested posture is never evidence of what ran. The field is backend provenance only and attributes no write to the run.
+- **RUL83 (a snapshot names what changed, never who: correlated write evidence is a warning, 2026-10-14).** Four paths refused a round on a before/after snapshot alone: the CLI/Work doors' `strayWriteError` (repo root dirty paths outside the workspace, 819a61e55), settlement's `read-only-mutation` (`computeChangedFiles` includes every file of every commit that moved the cwd's HEAD during the run), the normalizer's fallback `mutated-dirty-before-files`/`read-only-mutation`, and the read-back evidence floor (`deriveEvidenceFloor`). All four were measured refusing work another session caused: a Doer round (2026-10-14 09:30-10:01) for three reports written into main; two critique reviewers of one panel for files the caller and other lanes wrote; a read-only framing seat (`wf-run-1791954133905-844903ed`) for five reports another session committed to main at 12:03:38. Settlement now decides through one policy, `evaluateAttributionPolicy` (`evidence-attribution.mjs`, previously without a production caller): post-run changes and changed pre-existing dirt are `correlated`, reported in `RunResult.warnings` (`read-only-mutation-correlated`, `mutated-dirty-before-correlated`, `outside-write-scope-correlated`: code, level, basis, paths), and the run is accepted; only `proven` writes (a run-bound written-path observer's attestation within its coverage) are refused (`read-only-mutation`, `outside-write-scope`). No such observer exists yet; building one is its own decision. The CLI/Work doors put `stray-write-correlated` (with `repoRoot` and paths) on the dispatch result's `warnings` and print it on stderr. Accepted residual risk: a worker that really writes into the main checkout, the agy incident, is now flagged rather than refused. `rollbackReadOnlyMutations` (a `git reset --soft` plus deletion in the run's cwd, never called) is removed: run against a shared checkout it would undo another session's commit. Decided by the one-door council (`plans/261014-1033-dispatch-operator-improvements/reports/council-261014-1231-dispatch-one-door-conclusion.md`, step 2, finding RT2-3). Work, the consumer, still does not advance on such a result: a read-only result carrying `read-only-mutation-correlated` or `mutated-dirty-before-correlated` (or, read back from disk, a non-empty `evidence.changedFiles`/`mutatedDirtyBeforeFiles`, since stored warnings are as writable as any other field) stops with its own reason `assignment-<operation>-correlated-mutation` (at planning: `validation-correlated-mutation-do-not-advance-work`), never folded into no-evidence; a round that failed on its own terms (non-zero exit, a timeout settles as 124; a policy refusal, a proven write among them; a provider, resource or contract failure) keeps `assignment-<operation>-failed`. A stored result read back without its assignment takes its mutation from its operation and recorded `role`, never from a field of its own. The executor CLI door's `stray-write-correlated` (the main checkout changed while an isolated round ran) is kept in `result.json` beside settlement's own warnings but does not stop Work: it cannot have changed the round's own checkout, and on a busy main checkout nearly every round would carry it. Dispatch keeps the warning and does not refuse the round (`src/runner/operation-choice.mjs` `hasReadOnlyCorrelatedMutation`; Lead decision B in `plans/261014-1400-two-doors-one-rununit/phase-00-land-finished-lanes.md`).
+- **RUL84 (one write-scope matcher: a Unit's `writes` has one spelling, and every "is this path in scope" question goes through `matchesWriteScope`, 2026-10-14; decision 0060).** `writes` entries are normalized once (`./`, `//`, a trailing `/` and `/.` collapse; duplicates dropped, first-seen order kept) and refused when they are `.`, empty, absolute, hold a `..` segment, a `\` or NUL, start with `:` (git pathspec magic) or glue `**` to other characters. Only `*` (inside one segment) and `**` (a whole segment, zero or more segments) are globs; every other character, `[ ] { } ! ?` included, is literal. A plain entry covers the path and everything beneath it; a glob entry must match the whole path; nothing under `.fgos/` is ever in scope, not even for `**`. One leaf module, `src/runner/dispatch/write-scope.mjs` (`canonicalizeWrites`, `expandGenerated`, `matchesWriteScope`, `partitionPaths`), answers for the runner commit, settlement coverage and the Workflow out-of-scope check; git never interprets a scope. Workflow definitions use the same normalizer, and a `writes` that is not an array (YAML `writes:` left empty is `null`) is refused instead of read as `[]`. Config key `runner.generatedPaths: [{ from, also }]` (default `[]`, doctor `runner-generated-paths`): a Unit whose `writes` overlaps a generated source (`from`, e.g. `core/skills/**`) also gets that source's render trees (`also`). The widened scope is stored once in `unit.json#writeScope` when the unit run is created, never recomputed on resume, and is the `writes` of every assignment of that Unit.
+- **RUL85 (the runner commits only the Unit's write scope, and refuses to start a writing Unit over a foreign staged index, 2026-10-14; decision 0060, replaces items 1-2 of 0052).** After a passing round the runner stages and commits only the changed paths inside `writeScope`; a path outside it is never committed, and one the agent changed is reported in `commit.outOfScope`. A file already dirty in scope at launch is recorded on the attempt as `preExistingInScope` and never committed by the runner (bounded promise: a file dirty before the round and edited again is not reported). Before a mutating producer is spawned, a non-empty index refuses the round as `policy-refusal` / `foreign-staged-index`, with no pane or worker started. The commit step checks the index again: the staged set must equal the in-scope set (`staged-set-mismatch`) and the committed set must equal that set (`committed-set-mismatch`; the commit stays on the branch); a failure after staging takes back exactly what the runner staged. The subject keeps the first line of the worker's `summary` when it is a conventional subject, else `chore(<unitId>): …`, for every caller including the Work layer. Trust boundary: the runner's git reads nothing a worker can write — the gitdir comes from the main repo, a relative `core.hooksPath` resolves against the main checkout, fsmonitor is off, the caller's `GIT_*` variables are dropped, a worktree outside the main repo is `untrusted-worktree`, and a confined caller passes `repoRoot`. Record shape: `results[i].commit` and `unit.json` `bindings['<role>/<round>'][i].commit` are `{ status, sha?, subject?, files?, outOfScope, preExistingInScope, needsWrites?, reason?, error? }`; a mutating attempt carries `preExistingInScope`; `unit-summary.mjs` is unchanged.
+- **RUL86 (`fgos run --resume` after a failed runner commit only commits, and never runs beside a live dispatch, 2026-10-14; decision 0060).** A round whose agent passed but whose commit `failed` is resumed commit-only, whatever the reason (`git-error` such as a refusing hook included, and a stray commit the owner already took off the branch), except `committed-set-mismatch` while that commit is still on the branch: the agent is never spawned twice, and a commit-only resume with no in-scope file left fails with commit reason `work-missing` (outcome `execution-failure`), never `pass`. A stray commit still on the branch blocks the resume; it is taken off with `git reset HEAD~1` (files kept), not `git revert`, because after a revert the sha is still an ancestor of HEAD. A resume is refused while a live process holds the worktree's dispatch lock (`.fgos/dispatch--<cwd>.lock`, composite `pid:acquiredAtMs:rand` holder, `EPERM` counts as alive), so a second worker is never launched into the same worktree (the earlier guard read a lock name no dispatch writes and never refused).
+- **RUL87 (a unit run's writing seat is told its scope and that the runner commits; coverage reads the declared scope, 2026-10-14; decision 0060).** The brief of a mutating seat in a unit run (assignment `kind: unit-run`, `mutation: mutating`, any role) lists the widened `writes` (`unit.json#writeScope`), says the worker never runs `git add`/`git commit` even when the task asks (the runner commits in-scope files after a passing round), that the first line of `summary` is the commit subject, and that a path needed outside the scope is declared in `needsWrites` instead of written; the result files are the exception. Read-only briefs and the Work path are unchanged. Claim `agent-result-claim` v2 takes an optional `needsWrites` (repo-relative paths): a request only, it never invalidates a claim, does not bump the version, and is kept in `RunResult.agentClaim`. In settlement, for a mutating assignment with `writes`, `attribution[].coverageMatched` and the `outside-write-scope-correlated` warning read the scope through `matchesWriteScope`; `coverageMatched` means "inside the declared scope", not authorship, so the level stays `correlated` without an attestation (RUL83 (a snapshot names what changed, never who)). A read-only seat gets no scope; pre-existing dirt stays `excluded`.
+- **RUL88 (an ad-hoc Unit may prefer an executor and name a persona; `fgos run "<prompt>"` builds one, 2026-10-14; decision 0061).** A Unit may carry `prefer` (executor ids, or `{ executor, invocation? }`; shape-checked only) and `persona` (non-empty string). G2 still refuses executor, provider, model, tier, invocation, actors and overrides on a Unit, and presets and plans still refuse `prefer`. In `bind()`, without an override executor the pool is `unit.prefer` then `capability.prefer`; each candidate carries its own source (`unit-prefer` / `capability:<key>`) and provenance takes the chosen one's; duplicates are dropped by executor+invocation and a bare unit id covers every capability entry of that executor (so failover never returns to it); an unregistered id is skipped with `unknown-executor`; every filter applies to every candidate, spread ranks before pool order, and an `--override` executor still pins. Persona order: override > `unit.persona` (source `unit`) > locked > capability; a locked/unit conflict refuses with `locked-persona`. A unit persona is resolved through the persona tiers (`fgos/agents`, `domains/*/agents`, `core/agents`) once, when the unit run starts, and its text is pinned in `unit.json#personaPin` for every role that binds that name, so a workspace-only persona renders its text, not its bare name. `fgos run "<prompt>"` is the one-liner: id `adhoc-<ascii slug>-<hex>`, objective = prompt, `--provider <id>[,<id>...]` → `prefer`, `--persona`, `--writes` (needs a linked worktree; omitted = read-only), `--capability` (default `execute`), `--rigor`, `--effort`, `--override`; a wrong provider or persona, an empty `--writes`, prompt-only flags without a prompt, or writes from the main checkout are refused before any unit run exists. This builds the "soft provider hint" RUL77 (posture belongs to the capability) left unbuilt on the Unit; `dispatch decide` still has none.
+- **RUL89 (`fgos workflow start --units <file>` runs a list of Units as a one-off Workflow, 2026-10-14; decision 0061).** The units file (YAML/JSON, `{ id?, title?, units }` or a list of Units, `src/workflow/units-source.mjs`) becomes one step per Unit, `dependsOn` becomes step dependencies, a Unit id must be a safe branch-name segment, and the workflow id is `units/<id|basename>`. The `units-file` source is passed by the loader to the validator, never read from the data, and is the only source whose unit templates may carry `prefer`. `--seats` is refused with `--units`. `--effort <level>` (`low|medium|high|max`, otherwise refused before a run exists) becomes an override `{ reasoningEffort, origin: 'human-cli' }` for every unit, stored in `workflow.start` and reused on resume. A unit template's `persona` travels on the Unit (provenance `unit`); persona overrides remain only for `--seats` seats. A writing unit that stands on exactly one writing ancestor (directly or through read-only units; an integrate step cuts the path) starts its worktree from that unit's branch sha; a file with a writing unit standing on two or more writing units is refused at start; nothing is merged automatically and `workflow status` lists `writeBranches` (branch, worktree, base). A unit that wrote outside its scope (reported by its commit, or found in its branch diff outside `writeScope`) ends `findings` (`out-of-scope-writes`); a unit standing on that branch inherits only the out-of-scope paths the branch carries; an integrate step whose dependency is flagged fails and merges nothing. A writing unit that gets no worktree of its own (base branch gone, worktree creation failed) fails and never runs in the shared checkout. Residual: a writing unit after an integrate step still starts from the main checkout's HEAD, not the integrate target.
+- **RUL90 (the raw dispatch doors are removed; dispatch is the lower layer and fanout belongs to the Work layer, 2026-10-14; decision 0062, replaces the purpose-door part of RUL68 (2 tầng dispatch) and the one-posture-lane-per-door part of RUL77 (posture belongs to the capability)).** Work is executed through two doors only, `fgos run` (`"<prompt>"`, `--unit`, `--resume`) and `fgos workflow start`, both on `runUnit`. `dispatch execute` (executor id, `--contract`, `--assignment`), `dispatch log` and `dispatch fanout-batch` are gone, with `src/runner/dispatch-log.mjs`; calling `dispatch execute` (any form) or `dispatch log` returns a `validation` error with one sentence naming the replacement (`fgos run "<prompt>" [--provider <executor>] [--capability <c>] [--writes …]` or `fgos run --unit`, where `--provider` is named only for an agent executor — `fgos run` refuses any other kind — the `--for` capability is kept when it is registered, and a tool executor's caller is told to call that tool directly; the dispatch-decide hook's BLOCKED message is built the same way, by `runDoorHint`; `fgos run --unit` or a Workflow for `--assignment`; provenance under `.fgos/assignments/<unitRunId>/` for `dispatch log`), from one place in `bin`, also for `returnResult` callers. `executeExecutorCli` has no CLI door left: it is the transport step of an Assignment (`assignment-runner.mjs`), and its one other caller, `fanout-batch.mjs`, is listed in `R3_PENDING_WORK_CALLERS` until fanout runs on `runUnit`; `fgos dispatch` keeps `decide`, `inspect`, `reconcile` and `probe-account`. `src/runner/dispatch.mjs` imports nothing from the Work layer: `decide --work` gets its Work resolver injected from `bin`, so it runs only as `fgos dispatch decide --work`. A Unit's posture comes from its `writes` (none: read-only, sandboxed; some: mutating, in a linked worktree) plus the capability's required confinement, never from which door was used. Fanout adds no verb: `node src/runner/fanout-batch.mjs "<ids>" [--has-live-task-access]` prints `fired`, `mechanismChanged`, `unavailable`, `deferred` (plus `slotsFull: true` when no slot was free); its body moves onto `runUnit` with the Work-layer cut. An import guard (`test/architecture.test.mjs`) keeps `dispatch.mjs` and `src/workflow/**` free of Work imports, following relative imports transitively (a re-export one or more hops away counts) and reading `require()` and literal `import()`; a call-site guard over `src`, `bin`, `scripts`, `domains` and `core` names the files allowed to call `executeAssignment`, `executeExecutorCli`, `commitUnitWork` and `executeThroughConfinement` (an aliased, destructured or namespace use counts as a call; `export *` from their home modules is refused), with Work-layer callers not yet on `runUnit` listed in `R3_PENDING_WORK_CALLERS`, compared by equality so the list can only shrink. An `import()` with a non-literal specifier is not yet seen by the import guard (left to the dispatch-generic-inputs phase). [Closed by RUL95 (dispatch takes generic inputs only): a computed `import()`/`require()`, `createRequire`, `node:module` and `eval` are refused in the guarded files outside a named allowlist; `R3_PENDING_WORK_CALLERS` is empty and deleted.] The doctrine test `test/docs/run-doors-doctrine.test.mjs` refuses `AGENTS.md`, any skill source or any render that still teaches a removed door.
+- **RUL91 (a person may pin the provider account of a unit run; the pin is hard and never bypasses the lease, 2026-10-14).** `fgos run --account <id>`, or an `account` key on an `--override` object (one shape; a Unit carries no account), pins a provider account (`src/runner/execution/account-pin.mjs`). `bind()` pins it on each seat its override reaches whose bound executor's provider (normalized as the lease does) lists it in `providers.<provider>.accounts`: `binding.account = { provider, id }`, `provenance.account = { value, source: override:<origin> }`. A seat on another provider (a checker must use another family), an executor without an account list, and a tool or inline binding bind unpinned with `provenance.account.skipped { reason, detail }`; the pin never chooses the executor (pair it with `--provider`); a malformed id is refused (`account-pin-invalid`), and an inherited object key is never an account id. Before the unit run exists the seats are dry-bound as the run would bind them (`simulateUnitBindings` with the run's overrides): a pin no seat takes, or a quarantined account (the message names `until` and the reason code), is refused. A pinned seat is dispatched with the inventory narrowed to its account (`configPinnedToAccount`, as RUL79 (`fgos dispatch probe-account`: one account, every CLI) does), so the lease, quarantine and governance apply unchanged. A provider limit on a pinned seat ends it (`fallbackExhausted.reason: account-pinned`, `retryStopped` on the attempt): no account rotation, no executor failover. `--account` is refused with `--resume`; a resumed run keeps its bindings' account and is refused while that account is quarantined. Left open: the login store per CLI (RUL80 (an account is chosen first, then a CLI)) is checked only by the lease at dispatch, after the unit run exists; `capacityProviderOf` derives the provider from the executor entry and can differ from the lease's for an executor that declares no `providerModel` (every configured executor declares one); `fgos workflow start` has no `--account`.
+- **RUL92 (a writing seat is not run again over its own partial writes after a provider limit, 2026-10-14).** At every launch of a seat that writes (a resumed launch included), the runner records the worktree's HEAD and the content of every path `git status` sees as changed (`writeBaseline` on the attempt, `src/runner/execution/partial-writes.mjs`; `.fgos/` left out, a symlink by its target, an unreadable file by size and mtime). When the seat stops on a provider limit and the worktree differs (a write, rename, delete, a further change to a file already dirty, a moved HEAD), it is not rotated to another account nor walked to another candidate: the seat ends `provider-limit` with `fallbackExhausted: { reason: partial-writes, paths, headMoved }` and `retryStopped` on the attempt, for a person to keep, finish or undo the changes and resume. This check runs before the pinned stop of RUL91 (a person may pin the provider account of a unit run), so a pinned seat still names what it changed (`accountPinned`). A read-only seat records no baseline and rotates as before (its sandbox keeps the worktree; a concurrent `verify` write never stops it), as does a writing seat that left the worktree as it was; a baseline git could not take stops the retry. Not seen: gitignored paths, `.fgos/` inside the worktree, changes inside a nested repository or a dirty submodule, a mode-only change to a file already dirty; none of them reaches the runner's commit, which takes only the write scope.
+- **RUL93 (the runner loop's worker and the fan-out batch run as one Unit run each, 2026-10-14; ends the `spawnWorker` purpose door of RUL68 (2 tầng dispatch) and the `R3_PENDING_WORK_CALLERS` entries of RUL90 (the raw dispatch doors are removed) for `loop.mjs`, `work-dispatch.mjs` and `fanout-batch.mjs`).** `spawnWorker` (`src/runner/work-dispatch.mjs`) builds the item's Unit with `workUnitFor` and runs it through `runUnit` in the item's worktree, with `session { headless: true, herdrPresent: false }` (the loop never opens a pane, even when the runner itself runs inside herdr); `fanout-batch.mjs` does the same per candidate after `pick`, then `fgos return` on `pass` (no `--worker-verified-sha`: return judges the Unit run's commit) or `return --to blocked` otherwise, reporting each `fired` entry as `{id, unitRunId, outcome, commit}`. The worker runs confined and never commits; the Unit run commits a passing round inside its `writes` (`['**']` for a step), and the loop reads `commit` (`runner`, `none`, or `self` when HEAD moved without a runner commit) instead of committing itself. A step Unit names its capability as its domain's Workflow units do, `<domain>:<verb>` (`coding:discover`), except the coding executing step, which keeps `code:implement`; `bind()` falls back to the bare verb, and `fgos doctor`'s `workflow-capabilities-configured` also names `code:implement` (`RUNNER_LOOP_CAPABILITY_USES`). The worker config is the repo's `.fgos/config.json` (snapshotted into `unit.json`): `fgos-runner` has no `--config` any more. Outcomes map onto the recovery matrix (`src/runner/recovery.mjs`): a failed runner commit, or an index staged before launch, is `worktree-fail`; a timeout `worker-timeout`; a command that cannot start `worker-spawn-fail`; every candidate at its provider limit `provider-limit` (park); a refusal before any worker started `no-executor` (park, the message names `runner.capabilities["<cap>"].prefer`), so one capability without a runnable pool never halts the runner; a round that ran, did not pass and left uncommitted files `worker-failed` (retry), so goal-check never judges files that are not on the branch; a round that did not pass and left nothing resolves with `commit: none` and goal-check decides on the branch as it stands. A round that stopped over its own partial writes (RUL92 (a writing seat is not run again over its own partial writes after a provider limit)) or whose runner commit failed keeps its worktree: the loop notes `{unitRunId, worktree}` under `.fgos/runtime/runner-resume/<id>.json`, and the item's next attempt (a retry, or a later dispatch once the item is back at `todo`) resumes that same Unit run there, so a failed commit is committed again without spawning the agent; the note is checked against `unit.json` (same Unit id, worktree still checked out on `fgw/<id>`) and dropped once the run no longer needs it. The Unit's rigor comes from the operation, then the item's `rigor`, with `risk: heavy` read as `high` only when no `rigor` is declared; bind's floor raises `low` to `standard`. The item's `refs` and `docsRef` enter the Unit only as safe repo-relative paths (others are dropped with a warning that reaches the loop log), and its `prefer` names the step's executor only when that executor is registered. The executor dispatch event carries `unitRunId`; the item log names the run the moment it exists and where its output is captured (`protected/capture/` while it runs, `stdout.log` once it settles), since a Unit run streams nothing back; a write into the main checkout during the round reaches the loop log as a `stray-write-correlated` warning. A pane run's `stdout.log` holds the settled report's text, so a worker run in a pane must put its `fgos-verdict`/`fgos-discovered` fences in its report; the loop reads the first non-empty of report, `stdout.log` and claim summary, never several. The startup reap keeps a 0-commit `fgw/` branch that a killed round still has checked out, with its uncommitted work, instead of failing on the branch delete. Not done: the loop does not resume a Unit run left `running` by a killed runner (the run id is in the item log; `fgos run --resume <unitRunId>`); a worker detached from a killed runner may outlive it; a commit subject falls back to `producer changes` when the worker wrote no claim.
+- **RUL94 (a Work driver step runs as a Unit: the step's declared operation, pinned inputs, and a verdict bound to their bytes, 2026-10-14; ends the `operation-choice.mjs` entry of `R3_PENDING_WORK_CALLERS` from RUL90 (the raw dispatch doors are removed)).** A driver step of a work item (`fgos plan <id> --validate`, the runner loop's validate-plan and secondary operations) is built by `workUnitFor` and run through `runUnit`, never by `executeAssignment` (`src/runner/operation-choice.mjs`). `runUnit` takes `declared: {workId, domain, workflow, stage, operation, operations}` (the step's operation objects), `pinInputs` (absolute paths) and `runnerConfig` (the config the caller resolved, snapshotted instead of `.fgos/config.json`, so one step reads one config); `declared` and `pinInputs` are kept in `unit.json` and a resume reads them, and the pattern, from there. Refused before the unit directory exists: an operation the step does not declare, a `human-only` one, a stamped mutation that disagrees with the unit's `writes` (read-only exactly when it writes nothing), and any pattern that does not resolve to `solo`. Only the producer seat carries the operation: its assignment has the operation's role and normalizer stamp (`mutation`, `evidence`, `resultKind`, `onAdvance`, built by `declaredOperationFields` in `src/runner/dispatch/assignment.mjs`, shared with `buildAssignment`), the seat name stays in `provenance.role`, and `policy.rigor` is the unit's rigor. At launch the dispatch hashes each pin into `inputDigests[{path, root, rel, sha256}]` in `run.json` and `result.json`; a pin is read only when its real path lies in the main checkout or a worktree git lists (not one that became a symlink), against the innermost such root, else its `sha256` is `null` and nothing is read. The verdict walker (`findLatestAssignmentRunResult`) reads flat and nested layouts through `listAssignmentRuns`, filters by `operation`, takes only a unit run's producer seat, and compares the current `plan.md` by `rel` and digest; a pinned digest decides alone (no mtime pre-filter), so a plan merged byte for byte into another checkout still matches, and `planContentHash` is only read on results from before this rule. The driver hands the producer's own RunResult and seat assignment to `interpretAssignmentRunResult`, stops on a unit with no result or whose runner commit failed (`unit-commit-failed`), and never turns an item ref naming another run's output (`unit-run:`, `gate-answer:`) into an input. The worker is confined (`session: {headless: true, herdrPresent: false}`): a read-only operation cannot write the checkout, and a machine with no confinement backend stops the step (`unit-refused-posture-unavailable`). A unit with `rigor: low` is raised to `standard` by bind's floor. Not done here: a pin resolved through `process.cwd()` first (`resolveContentRoot`) can differ from the plan in the item worktree a secondary operation runs in.
+- **RUL95 (dispatch takes generic inputs only; Work is a consumer, 2026-10-14; decision 0063, replaces the input part of RUL73 (dispatch does not know Work).2 and closes the `R3_PENDING_WORK_CALLERS` list of RUL90 (the raw dispatch doors are removed)).** `src/runner/dispatch/**`, `src/runner/execution/**`, `src/runner/dispatch.mjs` and `src/workflow/**` never handle a Work item. Rigor and domain are the assignment's own fields: `resolveAssignmentDispatchPolicy` reads `assignment.rigor` where it read `work.rigor`/`work.risk` (first explicit source may pick it, after an operation rigor it only raises, the capability floor and tier rules are unchanged; provenance scope `assignment`) and `assignment.domain` for the `<domain>:review` capability floor, so a declared Unit step (whose seat carries `domain`) gets that floor again. The Work layer folds an item's `rigor` and `risk: heavy` into one rigor (`workRigorFor`). `decide --work` gets a hint from the Work layer, `workDispatchHint`/`resolveWorkForDispatch` → `{workExecutorId, agentType, rigor?, domain?}`, passed to `compileDispatchPlan({workId, workHint})`; fan-out uses the same hint. `workDispatchContext` returns only `{capabilityHints, agentType}`. `buildAssignment`, `resolveAssignmentDispatchPolicy`, `compileDispatchPlan`, `decideExecutorCli`, `executeExecutorCli` and `executeAssignment` refuse a `work`, `workItem` or `workExecutorId` input (`RunnerConfigError` "takes no Work item") instead of ignoring it; `decideExecutorCli` and `compileDispatchPlan` name the `--work` selector `workId`. `executeExecutorCli` no longer runs an unregistered executor id because a Work item rode along (`executor-not-found`). A domain's contract harness (ADR-007) is loaded only by the Work layer (`domainHarnessFor(work, {domain})`, only for a registered domain at a declared step; `loadHarnessModule` treats a module that fails to import as no harness), and a caller hands it to the inline `buildAssignment` as `options.domainHarness`; dispatch still re-validates the enriched contract and records `domain-harness-seam`. No production path builds an inline assignment for a Work item today (none did before either: the only inline caller is `probe-account`), so the seam runs only in tests. The guard (`test/architecture.test.mjs`) refuses, outside comments and other string text, any identifier or property named `work`, `workItem` or `docsRef` (identifier escapes such as `\u0077ork` are decoded first), any string that is exactly one of those names (a computed or quoted key, `Reflect.get(o, 'work')`, a key comparison; only the pinned uses are allowed: the `--work` selector's type in `plan.mjs` and the refused option names in `assignment-policy.mjs`), and any `resolveContentRoot(` call in the guarded files; `src/state/**` counts as Work layer for the transitive import guard, except one pinned edge (`worktree.mjs` takes only `StoreError` from `src/state/store.mjs`); imports are read with optional whitespace, comments blanked, `?query` dropped, and absolute paths and `file:` URLs resolved; the guarded folders may hold only plain `.mjs` files (no `.js`/`.cjs`/TypeScript source, no symlink); the shared source lexer treats a slash after a block's closing brace as a regular expression, so its quotes cannot hide the code after it; it also refuses an `import()`/`require()` whose specifier is not one plain literal, `createRequire`, `eval`, `Function(...)` (with or without `new`) and an import of `module`, `vm` or `worker_threads` (with or without `node:`), except the loads pinned one by one in a named allowlist entry with its reason (`provider-credential-renewal.mjs`: `createRequire` for `node:sqlite`); one more load in an allowlisted file fails too. The call-site guard also counts a string that is exactly a door's name (`d['executeAssignment'](a)`) and an escaped name as a use, and compares each run door with exactly its named callers (`executeAssignment`: `execution/run.mjs`, `dispatch/cli.mjs`; `executeExecutorCli`: `dispatch/assignment-runner.mjs`; `commitUnitWork`: `execution/run.mjs`; `executeThroughConfinement`: `dispatch/cli.mjs`), both ways. Not covered: a name built at run time (`opts[k]`, `opts['wo' + 'rk']`, `globalThis['ev' + 'al']`), nested inputs (`options.work`, `assignment.work`; nothing reads them), and code outside the guarded files that reaches into dispatch's internals.
+- **RUL96 (one run may take its own timeout, from 1m to 4h; its private home and worktree lock last as long, 2026-10-15).** A unit run's seats are dispatched with `runner.timeoutMs` unless the run asks for its own: `fgos run --timeout <dur>` (a whole number and one unit, `ms|s|m|h`: `90m`, `5400s`), a `timeoutMs` key on an `--override` object (`--timeout` adds it to every override that names none, and an unscoped one when none is unscoped, as `--effort` does), or a Unit's `timeoutMs` (whole milliseconds; a units file and a Workflow unit template carry it too, a template's value is checked when the definition loads). `bind()` resolves override, then unit, into `binding.timeoutMs` with `provenance.timeoutMs { value, source: override:<origin> | unit | none }`; a value outside the range is a refused binding (`run-timeout`), and an override's value is checked before the unit run exists. The value lives in `unit.json` (`overrides`, `unit`, and every recorded binding), so a resume dispatches with it and `--timeout` is refused with `--resume`; `runUnit` hands it to `executeAssignment` (`opts.timeoutMs ?? cfg.timeoutMs`), which already threads it to the worker kill, the pane poll and the dispatch lock. Range (`src/runner/dispatch/run-timeout.mjs`): the 1m floor keeps a typo (`90s` for `90m`) from killing a turn at once; the 4h ceiling, four times the heaviest turn seen, bounds how long a hung worker holds its worktree's lock and a copy of an account login, and `runner.timeoutMs` above it is refused when the config loads, so the default obeys it too. The confinement reaper keeps a home whose dispatcher pid is alive and has no pane until `createdAt + max(maxAgeMs, min(marker.timeoutMs, 4h) + 10m)` (the bwrap driver records the dispatch's `timeoutMs` in the ownership marker; a marker without one keeps the 1h rule; a dead dispatcher's home goes at once, a pane-retained home is unchanged), so a pane-less run longer than an hour is no longer reaped mid-turn. The per-worktree dispatch lock (`.fgos/dispatch--<cwd>.lock`, composite `pid:acquiredAtMs:rand` holder) records the `ttlMs` its holder took and keeps it across renewals; a contender judges a live composite holder by the longer of its own ttl and the holder's, so a dispatch with a shorter timeout never takes the lock of a longer run that renews only every third of its own timeout; the recorded ttl is honoured only up to the 4h ceiling. Other lock identities are judged as before. Residual: a holder killed without releasing whose pid was reused reads as live (no process start time is recorded), so it now blocks the worktree for up to its own ttl (at most 4h) instead of the contender's; `fgos dispatch reconcile` clears such a lock by hand. `--override` passed with `--resume` is ignored, as for every override key (the run keeps `unit.json#overrides`).
+- **RUL97 (a Unit may sync a base ref first: the runner merges it, the worker only edits the conflicted files, 2026-10-15).** A Unit may carry `syncBase` (a branch, tag or commit name: letters, digits, `.`, `_`, `/`, `-`, not starting with `-` or `/`, no `..`); it needs `writes` and a linked worktree, and `fgos run --sync <ref>` sets it (with a prompt: sync, then the task; without one: a sync-only Unit, `syncOnly: true`, whose objective is `Merge <ref> into this branch.`). The ref is resolved to a commit once, before the unit run exists (a ref naming no commit, or a run from the main checkout, leaves nothing behind), and `unit.json#sync` keeps `{ ref, sha, status, head?, conflicts?, mergeStaged?, commit? }`; a resume merges that sha, never the ref again. Before any seat runs, the runner merges it with the trusted git of RUL85 (the runner commits only the Unit's write scope) — `merge --no-commit --no-ff`, rerere and autostash off — in `src/runner/execution/commit-unit-work.mjs` (`startSyncMerge`, `finishSyncMerge`, `syncMergeState`), orchestrated by `src/runner/execution/unit-sync.mjs`: already in the branch is `up-to-date`; a clean merge is committed by the runner as `chore(sync): merge <ref>` (status `merged`; a commit that is not the merge of `sha` over `head` holding exactly what the merge staged — a hook added a file — fails `committed-set-mismatch` as `execution-failure`, stays on the branch, and the resume is refused until a person takes it off) and the Unit goes on to its pattern, or passes at once when sync-only; a sync never brings the base side of `.fgos/` in: every `.fgos/**` path the merge staged or left conflicted, clean or not, is put back to the branch side (HEAD), a path the base deleted is kept and a path only the base has is not taken — ADR0020 (a worker branch never commits `.fgos/`), the side `fgos-write-rejected` at approve resolves to the target for a `.fgos/` path the branch left unchanged, on every branch, not only `fgw/*`; any other conflict leaves the merge open (status `conflicted`), puts the conflicted paths the scope does not already cover in scope only while the merge is open (`sync.scopeAdded`, read by the effective scope only while `sync.status === 'conflicted'`; `writeScope` itself stays as declared, so a later round cannot write them), and appends a `## Merge to finish` section to the writing seat's brief naming them and telling it never to run git. A refused start leaves no merge open and ends the run: `merge-in-progress` (a merge someone else opened), `foreign-staged-index`, `merge-refused` (git would not start, e.g. a dirty file it would overwrite), `hook-refused` (the pre-commit hook of the main checkout's hooks path refused the clean merge commit; told apart from a git failure by running that hook once more as git runs it, and its words are the detail), `unscopable-conflict-path` (a conflicted path the scope normalizer of RUL84 (one write-scope matcher) would read differently — `*`, a leading `:`, `\`, surrounding whitespace — or holding a control character, since it is also printed into the brief; the merge is aborted) as `policy-refusal`, and `git-error` as `execution-failure`. While the merge is open, the preflight of a writing seat counts only the open MERGE_HEAD equal to `sync.sha` over `sync.head` as the run's own: its conflicted and merge-staged paths are neither a foreign index nor `preExistingInScope`; any other open merge refuses a writing seat (`merge-in-progress`) and `commitUnitWork` never commits over one. After a passing round the runner concludes the merge before the round's own commit: a conflicted file that still holds a line opening with seven or more `<`, `|` or `>` (a larger `conflict-marker-size` included; a file holding a NUL byte is read as binary and not checked) fails the commit `conflict-markers` with `paths`, stages nothing and keeps the merge, so `fgos run --resume` only commits once a person removed them (RUL86 (`fgos run --resume` after a failed runner commit only commits)); otherwise it stages the conflicted paths, refuses an index holding anything the merge did not stage (`staged-set-mismatch`, taking back what it staged itself, e.g. a conflicted file the worker turned into a directory), commits with MERGE_HEAD as second parent (a refusing pre-commit hook fails it `hook-refused` with the hook's words and keeps the merge; each `fgos run --resume` tries the commit once, never in a loop), checks parents and committed set (`committed-set-mismatch`), and then commits the rest of the round inside the scope as usual. The round's `commit` carries the merge's own record under `sync`; `runUnit` returns `sync` beside `outcome`; a sync-only unit that needed no worker returns one result `{ role: 'sync', round: 0, commit }` (no `verify`, as for `solo`). A round that did not pass keeps the merge open; a resume checks it first: still open, it runs the seat again over it; concluded by hand (its sha in the branch), it is `merged`; aborted, or HEAD moved, the resume is refused and names the merge. A run that died between starting git and recording the result adopts its own open merge on resume; a first start never adopts one. A resumed sync-only run that was `up-to-date` or `merged` passes again without a worker. Settlement: the writing seat over an open merge carries `assignment.syncConflicts`; those files, dirty at launch, changed during the turn and inside its scope, count as its evidence (`evidence.editedSyncConflicts`), so a seat that only resolves conflicts is not scored `verdict-inconclusive`. Any other file dirty at launch that a seat rewrites still is no evidence, with or without a sync. A units file (`fgos workflow start --units`) naming `syncBase` is refused: a workflow unit's worktree starts from its dependency's branch, and a sync there is not built. Not done: an inline producer over an open merge (inline rounds have no runner commit), a modify/delete conflict whose worker deletes the file is concluded as a deletion.
+- **RUL98 (`fgos workflow start` kế thừa và phân bổ `--timeout <dur>` và `--account <id>` cho từng Unit, 2026-10-15).** Workflow run hỗ trợ cờ `--timeout <dur>` (chuỗi thời lượng hợp lệ `1m`..`4h`, phân tích ra `timeoutMs`) và `--account <id>` (ghim tài khoản nhà cung cấp) giống cơ chế của `--effort`. Cả hai giá trị được lưu bền vững trong payload của sự kiện `workflow.start` và được tái tạo khi `resume`. Về thứ tự ưu tiên timeout: cờ `--timeout` của `fgos run` THẮNG `unit.timeoutMs` của Unit (RUL96 (one run may take its own timeout, from 1m to 4h): override thắng unit), trong khi `--timeout` của `fgos workflow start` NHƯỜNG cho `unit.timeoutMs` tự khai của Unit. Về account: `--account` của workflow chỉ ghim cho các seat thuộc provider sở hữu account đó; các Unit không có seat nào khớp sẽ chạy bình thường không ghim và không làm hỏng workflow; `--account` không tồn tại trong bất kỳ `runner.providers.*.accounts` nào sẽ bị từ chối ngay lúc start trước khi tạo run.
+- **RUL99 (Bảng mã thoát riêng biệt cho kết cục thực thi của `fgos run` và `fgos workflow start|resume|answer --foreground`, 2026-10-15).** Các outcome kết thúc không phải `pass` của `fgos run` và `fgos workflow start|resume|answer --foreground` chuyển sang sử dụng bảng exit code xác định: `pass` = 0, `policy-refusal` = 4 (validation), `provider-limit` = 10, `execution-failure` = 11, `partial-writes` = 12, `blocked` = 13, `findings` = 14. Các lệnh chỉ-đọc như `fgos workflow status` luôn trả về mã thoát 0 bất kể outcome của workflow run. Lệnh `fgos workflow start` ở chế độ detached vẫn trả về mã 0 khi tiến trình daemon được khởi chạy thành công. Định dạng envelope JSON stdout `fgos.v1` giữ nguyên vẹn 100%.
+- **RUL100 (Doctor check `executor-posture-coverage` chẩn đoán posture readiness của các executor, 2026-10-15).** Check doctor `executor-posture-coverage` kiểm tra tĩnh khả năng áp dụng posture cho các core capabilities (`execute`, `code:implement`) và mọi capability khai báo pool agent (`prefer`). Quá trình kiểm tra chạy hoàn toàn khô qua `bind()`, không spawn tiến trình, không tạo pane herdr, không kích hoạt sandbox. Khi một capability có executor thiếu sandbox bwrap, check báo lỗi `posture-unavailable` (`passed: false`). Khi một capability thiếu pool (`headless-no-executor` / `no-candidate`), check chỉ phát cảnh báo (`passed: true`, tiền tố `warning:`) hướng dẫn khai báo `runner.capabilities.<cap>.prefer`.
+```
+
+### Full target unit
+
+```text
+- **RUL77 ([ĐÃ BỊ THAY phần "each door carries one posture lane" bởi RUL90 (the raw dispatch doors are removed), decision 0062 — posture now comes from the Unit's `writes` plus the capability; "an agent executor declares no `for`" stands] posture belongs to the capability, an agent executor declares no `for`, and each door carries one posture lane; supersedes RUL76 (`execute <id> --for <capability>` with a "must declare" gate), 2026-10-13).** An agent executor can do any kind of work, so no `for` list describes it, and a list on one was read as the posture of every dispatch to it (`docs/specs/confinement-authority.md` already said a direct executor call must carry a capability anchor and never infer the minimum from `executor.for`). `resolveCapabilityDetailsFromHints` reads `for` from tool executors only; on an agent executor it is inert (config still loads, so projects and worktrees that carry one keep dispatching) and `fgos doctor` names it under `executor-profile-warnings` (`executor.<id>.agent-for-inert`); the agent executors' `for` lists are gone from this repo's `.fgos/config.json` (`decide --for` routing unchanged: it reads `capabilities.<name>.prefer`). The CLI door `execute <agent>` refuses before spawning when no `--for` is given (`capability-required`, listing the writing capabilities and the read-only door); programmatic callers (Assignment, Work) pass their own capability hints and are unchanged. `execute <agent> --for <capability>` runs the invocation that capability `prefer`s for that executor, else the first plain cli invocation with no sandbox backend, instead of always the first cli invocation. That door leases no provider account, so it carries writing work only: a capability with required confinement is refused (`posture-needs-assignment`). Read-only work runs sandboxed as a Workflow unit with `writes: []` (`fgos workflow start --units`), which binds the read-only posture and leases the account (the architecture-advisory seats ran that way: `confined-bwrap`, login provisioned); `execute --contract <file> --executor <id>` keeps a named provider and leases its account but runs unconfined, read-only by instruction only (measured: `execute openai --for code:review` on the bare door ran `codex-cli-bwrap` confined and got 401 with no login; the same read through `--contract --executor openai` answered, on `cli-spawn` with `confinement: null`). A sandboxed read-only door that also keeps a named provider does not exist yet. The calling agent answers Q1 (does it write? does a provider matter?) from prose doctrine in `core/skills/_shared/capability-matching.md`, with no classifier or workflow generator. Decided after an `architecture-advisory` run (`wf-run-1791875339761-10315b91`: framing and shaping with three blind seats and a synthesizer completed; critique was blocked by a Codex trust prompt, so no reviewed synthesis exists). Not built: a soft provider hint on `decide` (`--prefer`, the synthesizer's recommendation) — naming the executor on `execute` already lets a caller pick a provider, and the hint would change `bind()`, shared with Workflow binding; revisit when a caller needs "this provider if it can, else any". Since 2026-10-14 (RUL88 (ad-hoc Unit prefer and persona, the one-liner), decision 0061) that hint exists on the Unit, not on `decide`: `fgos run "<prompt>" --provider <id>` and an ad-hoc Unit's `prefer` try the provider first and fail over into the pool, and a read-only one-liner is the sandboxed read-only door that keeps a preferred provider.
+  1. **Account lock.** One lock per provider account under `<runtime dir>/account-locks/<provider>/<account>/`, separate from the state lock, in the same append-only generation format. A waiter waits with timers, never by blocking the event loop (panel seats share a process and may share an account); a caller that must not wait (a removal) tries once. The holder records the pid of the renewal child it started: a dead holder with a live child keeps the lock, so a second renewal never redeems the same refresh token.
+  2. **Refresh-ahead.** After the final account selection (the executor-fallback lease included) and before a confined private home is built from it, when the login has less than the window left, fgOS renews it once. The window is `max(60 minutes, probe timeout + 5 minutes)`. Only the entry of the dispatched provider counts, for the window and for "was it renewed" (Codex: its single entry; pi: the key equal to the provider id or starting with `<provider>-`; omp: the row `provider` likewise; a lone oauth entry of another provider is not used; zero or several matches skip the renewal as `entry-unidentified`), so an abandoned login of another provider never makes every dispatch renew, and only that entry is made due and applied. Under the account lock it applies any leftover copy first, re-reads the source, and skips for 30 minutes after a failed renewal; then it builds a scratch home under the account directory (mode 0700, the listed files only), makes only that copy look due, runs the layout's probe call on it (wrapped in coreutils `timeout --kill-after=5`, so the child ends on its own even if the runner dies and the account lock does not outlive it unbounded; the runner's own timer stays; the lazy-probe unlock call, an account locked for a dead login, is wrapped the same way), and applies the renewed entry to the real store. The real store is never made to look expired, so the owner's own CLI does not renew because of this, a failed or hung call leaves it untouched, and a scratch copy left by a dead runner is applied (if newer) by the next lock holder and then removed. Where each layout keeps its expiry: pi `auth.json` `<provider>.expires` (ms; seconds below 1e12), `type: oauth` entries only; omp `agent.db` table `auth_credentials`, `data.expires` (ms), rows `credential_type = 'oauth'` and no `disabled_cause`; Codex `auth.json`, due at the earlier of the access token's `exp` claim and `last_refresh` plus 8 days (`TOKEN_REFRESH_INTERVAL`, `should_refresh_proactively` in `codex-rs/login/src/auth/manager.rs` of openai/codex; the same file renews at five minutes before `exp` when the token can be read). A layout that cannot be read (an API key, agy, no `node:sqlite`) is left as it was.
+  3. **Apply (compare-before-write).** Shared by refresh-ahead and write-back, always under the account lock: only an entry whose expiry is strictly later than the source's and whose refresh token differs from the source's replaces it (compared in memory, never printed; a copy that still holds the source's refresh token renewed nothing), and for a fresh renewal the new expiry must also be in the future, while a copy staged earlier (a pane's home, a pending or leftover copy) is applied even if its access token has expired since, because its refresh token is the newer one and the source's is already spent, only that entry changes (other pi providers, other omp rows and columns, other Codex fields stay as they were), a copy that cannot be read, has an unexpected shape, or has no refresh token where the source's entry has one never touches the source. A copy is deleted only when the source was read successfully and proves the copy is not newer (same refresh token, or an expiry not strictly later), or when the copy is proven malformed (corrupt JSON, or it parses to no usable entry, or it has no store file); when the source is unreadable or half-written, the entry cannot be identified at apply time, or the copy cannot be read for a reason that may pass (`node:sqlite` unavailable, a database that will not open), the copy is kept (a fresh scratch copy moves to `pending/`) and the result is `apply-deferred`, never `applied` or `not-renewed`. An operating-system read error on a copy file (permissions, I/O) is reported as `unreadable-file` and keeps the copy (`apply-deferred`); only a store file that is not there (`missing-file`) is proven empty. pi and Codex files are replaced through a temp file and a rename, recomputed when the source changed in between; the omp store is changed by a row update in one transaction, never by replacing the file the owner's omp may hold open.
+  4. **Write-back at removal.** When a dispatch opted in, the private home's ownership marker records `credentialWriteBack` (provider, account, source home, layout, runtime dir; names and paths only). One removal function serves the driver cleanup, the finalizer of a settled dispatch and the orphan reaper: before deleting a home whose marker asks for it, a login in the home that is newer than the source's is staged under `pending/` (atomic rename) and applied under the account lock, tried once without waiting; when the lock is busy, or nothing proves the copy is not newer (the source is unreadable, its entry cannot be identified, or the copy cannot be read for a reason that may pass, such as `node:sqlite` being unavailable: an omp store is then staged as plain files, write-ahead log included), it stays pending and the next refresh-ahead (or removal) applies it once it can be identified, even if the source still looks fresh, because the source's own refresh token may already be spent; a refresh-ahead that skips because the entry is unidentified applies the pending copies too, so the ones that have become identifiable clear. Pending copies are limited to five per login store (per account for a single-store account, per `stores/<cli>` for a per-CLI one), but only redundant ones are ever dropped: after the pending copies were applied, under the account lock, a copy whose logins are identical to another pending copy's (compared in memory by entry key, refresh token and expiry, or by the bytes of the store files and of a non-empty write-ahead log or rollback journal when a copy cannot be parsed; never printed) is dropped, oldest first, while the account is over the limit, and the newest of each identical group stays; a drop writes one stderr line `credential-pending-dropped` with a count only. A copy that cannot be shown redundant, or obsolete by the source, is never dropped to make room, so an account can stay over the limit, and the doctor check reports it. A staged copy and the pending directory are synced to disk before the home goes. A copy a probe left half-written (pi rewrites its store in place; omp commits row updates in a database transaction) is kept under `torn/` for hand recovery, never applied or dropped automatically, and reported by the doctor check at any age. This covers the probe's scratch copy only: a scratch home a dead runner left, and a pane home whose store was cut off, are still removed when their JSON cannot be read. A pane home whose store files are byte for byte the source's, with no non-empty write-ahead log or rollback journal on either side (a login renewed before a checkpoint sits only there; a zero-byte or missing one counts as none, the shared-memory index counts for nothing, and one that cannot be read, other than as missing, is never taken for none), renewed nothing and is not staged, parsable or not. If staging itself fails, the private home and its marker are kept (the removal reports failure, one stderr line with a fixed code and no path or value) so a later removal, the reaper's included, retries; only a copy proven malformed, or one the source was read to prove not newer, lets the home go. Each failed attempt is counted in the marker (`credentialKept`: attempts, first time, time of the last counted attempt; failures less than 15 minutes after the last counted one are not counted again, so a transient fault does not use the budget up); the marker is rewritten through a temp file and a rename, and a marker that is present but unreadable stops the removal. After five attempts the home is held: no further removal attempt and no deletion by age, however old. A held home is re-checked, under the account lock, when that account is next renewed (the temp roots searched are the same as doctor's: the default one plus each registered backend's own `tempRoot`; a home under a backend's separate `privateHomeRoot` is in none of them, so no check, repair, reaper or renewal sees it, and it is never deleted either) and by `fgos doctor --fix`, and only a home of the lock's own runtime directory: it is removed only when the source is readable and proves its login is not newer, or when that login can now be staged beside the source (and is applied); otherwise it stays held. A marker file that is no recognisable marker at all (not JSON, not an object, no contract name) stops any removal of its home. The finalizer compares the ownership marker's digest without `credentialKept` (a failed driver cleanup adds it after the digest was taken) and carries on with the dispatch's other resources past a home that cannot go (the dispatch is recorded as retained, with the home's reason). The doctor check `credential-copies-retained` reports, by provider and account, held homes (a failure, naming the home directory), homes still being retried and pending or scratch copies older than a day (warnings), with counts, ages and never a value; the check deletes nothing. Any other write-back problem is reported on stderr by a fixed code and never stops the removal.
+  5. **Known exposure.** Refresh-ahead can spend the refresh token that a pane started just outside the window still holds: that pane's own renewal is then refused, no worse than before this rule, and write-back cannot rescue it because its renewal failed. A run that copied the login with more than the window left and runs longer than that remainder is the case.
+  6. **No value in any output.** Results, events, markers, cooldown and lock records, stderr and reports carry fixed codes (`unreadable-json`, `unexpected-shape`, `sqlite-unavailable`, ...) and fingerprints at most, never a token or a parser message (which quotes nearby input).
+- **RUL78 (a confined pane reads its folder trust from the leased account's own store, 2026-10-13).** A herdr pane with a private home carries the login of the account the capacity layer leased (RUL65b), but the folder-trust seed (`seedWorkspaceTrust`, `trustStorePaths` in `src/runner/dispatch/herdr-round.mjs`) derived the trust decision from the store of the account the invocation's static env names (`codex-herdr-fgovn`: `CODEX_HOME=${HOME}/.codex-fgovn`). When the two accounts differ and the static one was never asked about the repo, the seed refused (`untrusted-root`) and Codex stopped at "Trust this folder?" (measured 2026-10-13 14:24, run `unit-run-1791876207053-efe6686b/reviewer/1/runs/01`: the leased `tetcu72` trusts `/home/vantt/projects/forgentX`, `~/.codex-fgovn/config.toml` did not; reproduced read-only with a scratch static home: the main-branch code blocked on herdr rule `trust_directory`, the fixed code settled confined). Now the leased credential source travels with the dispatch (`executeThroughConfinement` adapter option `trustAccountSource` -> herdr-spawn adapter -> the round), and for a round with its own private home the decision is read from that account's store: a `codex-home` source's `config.toml`, a `home-files` source's agy settings. A declared `trustStore.path` still wins; a round without a private home still reads the invocation's home, because that is what its CLI reads. Codex hook trust, seeded from the same root, follows. The "trust vanishing" of 2026-10-07 (another Codex session rewriting an account `config.toml`) is a separate cause this does not remove: it still bites when the leased account's own entry is lost. Not proven: whether Codex 0.160 honours trust given to an ancestor directory (`/home/vantt/projects`); the seed still requires the repo root itself.
+- **RUL79 (`fgos dispatch probe-account`: one account, every CLI, at the same moment, diagnostic only, 2026-10-13).** A dispatch failure on one CLI does not say whether the account (dead login, quota) or the CLI (trust prompt, sandbox, version bug) is at fault. `fgos dispatch probe-account --provider <p> --account <a> [--executor <id>] [--invocation <id,...>] [--timeout-ms <ms>]` (`src/runner/dispatch/provider-account-probe.mjs`) starts every invocation that runs as the account at once through the Assignment door a Workflow unit uses (read-only posture binding, invocation pinned by `cliOverride`, inventory narrowed to the one account so the lease cannot pick another and a quarantine still refuses, RUL75 (a rotating login is renewed once at the source and written back from a private home) renewal opt-in), with a trivial prompt, and reports per CLI an outcome class (`ok`, `blocked-trust-prompt`, `auth`, `quota`, `sandbox`, `timeout`, `other`), the evidence line, the assignment, run directory and pane, plus a verdict (`healthy`; `account-fault` when every CLI failed with `auth`/`quota`; `cli-fault` when one answered; `mixed`; `no-confined-cli` when no probed invocation declares a sandbox). The verdict reads only the rows whose invocation declares its own sandbox (`confined: true`, each row's `inVerdict`): the read-only posture makes the door confine every round (`resolvePosture` returns a required `host-write-denied` requirement), and an invocation that declares no sandbox binds no private home either, so its CLI meets its own login directory (`CODEX_HOME`, `PI_CODING_AGENT_DIR`) mounted read-only and stops on `EROFS` before it answers. That row is still run and reported (outcome `sandbox`, truthfully: a read-only dispatch pinned to that invocation fails the same way), but it says nothing about the account or the CLI (2026-10-13: tetcu72, fgovn and tetnu answered on every sandboxed invocation while `pi-cli-<account>` and `codex-cli-bypass-fgovn` died on `EROFS` under `local-bwrap-v1`, and the verdict read `cli-fault`). An invocation runs as the account when it is confined with a private home whose CLI the account's credential layout logs in (`lease`), when its credential env names the account home (`env`), or when its id ends with `-<account>` (`name`, the config's `<bin>-<mode>-<account>` convention). It closes the panes the rounds left open and removes the private homes kept for them; it picks and schedules nothing. First real run (openai/tetcu72): both Codex invocations `ok` (cli-spawn under bwrap and the herdr pane), both pi invocations `sandbox` (`EROFS` on `~/.pi/accounts/openai-tetcu72/settings.json.lock`: under the read-only posture pi cannot write its own account directory, which it does before answering; outside confinement the same pi account answered), verdict `cli-fault`.
+- **RUL80 (an account is chosen first, then a CLI: one login store per CLI, quota and locks per account, 2026-10-13).** One provider account may be used through several CLIs (Codex, pi, omp), and each CLI keeps its own login store, so an account declared with a single `credentialSource` gave every confined CLI the one store (openai `tetcu72` declared its Codex home, so its confined pi invocations got a Codex login and pi failed on its own directory, RUL79 (`fgos dispatch probe-account`: one account, every CLI, at the same moment)). An account in the machine-global inventory now declares exactly one of `credentialSource` (one store, used for every CLI, unchanged; other projects use it) or `credentialSources` (`{ <cli>: <source> }`, the key is the basename of an invocation's `command`: `codex`, `pi`, `omp`, `agy`; each source has the same `kind`/`home`/`files` shape). Every reader takes the store of the CLI actually dispatched: the confinement request (`buildConfinementRequest`) resolves `providerCapacity.credentialSource` from the invocation's command, so private-home provisioning, the write-back marker and the folder-trust seed (RUL78 (a confined pane reads its folder trust from the leased account's own store)) see that store, and a CLI the leased account has no store for is refused before the worker starts (`credential-provisioning`). The lease does not know the invocation unless it is pinned (`cliOverride.preferInvocation`, as Workflow units and the account probe pin it): a pinned lease only picks an account that has a store for the pinned CLI (`provider-capacity.no-account-for-cli` when none has); an unpinned lease picks among all accounts as before. Refresh-ahead (RUL75 (a rotating login is renewed once at the source and written back from a private home)) runs before the invocation is settled, so for a per-CLI account it renews the store of each CLI the executor may still launch (the pinned one only, when pinned); the lazy unlock probe (RUL74 (an account locked for a dead login unlocks itself after one real call)) calls through the store of the first such CLI. Renewal copies of a per-CLI store wait under `account-locks/<provider>/<account>/stores/<cli>/` (`pending/`, scratch homes, cooldown), never beside another store's copies, and the marker records the store; the account lock stays one per account, and `credential-copies-retained` reads both places. A copy left where the account's current layout does not read (the account directory after the account moved to one store per CLI, `stores/<cli>` after it went back to one store or dropped that CLI, or an account the inventory no longer lists) is never applied, moved to the new layout or dropped: when the machine-global inventory was read, the check fails on it at any age (a torn copy and an over-limit pending directory there included) and names that directory for hand recovery; when the global config cannot be read or is refused by the validator, the check fails instead, names the reason (an error class and the config path, never the parser's own text), lists every retained copy at any age and promises nothing about a dispatch, since a dispatch could not run on that config either. Quota, leases, quarantine and rotation stay per account: no account is split into pseudo-accounts per CLI. The account probe (RUL79 (`fgos dispatch probe-account`: one account, every CLI, at the same moment)) leases an account into each confined CLI it has a store for. `confined-pane-accounts` in `fgos doctor` checks each pane against the store of its own CLI. An fgos release from before this rule refuses an inventory that uses `credentialSources` (unknown account key), so the inventory is changed only after the release that reads it is active. The same store directory also holds `torn/` (a login store a probe left half-written, kept for hand recovery and never applied or dropped), and a crash during staging can leave `pending/.tmp-<pid>-<id>`: `credential-copies-retained` reports it once its writer process is gone and it has not changed for ten minutes, and `fgos doctor --fix` removes one only after claiming it by rename (so a writer that is still running loses its own rename and keeps its home) and only when it is empty, has the same files as a copy the store keeps in `pending/` or `torn/` (the shared-memory index aside), or, under the account lock, the source login of the account shows it is no newer or it is malformed; never by age, and any other stays for hand recovery. A staging in a store the account's layout no longer reads is reported once with the stranded copies and is never touched. The doctor check and fix also read the `tempRoot` and `privateHomeRoot` a registered backend declares (absolute, without duplicates) for kept homes; the orphan reaper, the dispatch retries and the root-mode tightening stay on the default temp root, since they delete and re-mode what they find. Nothing retries a kept home under a scan-only root by itself, so doctor treats one as held at once (a failure naming the path) and `--fix` settles it by the same rule as any held home. Not built: per-CLI stores for an unconfined invocation, which keeps naming its store through its own env.
+- **RUL82 (`RunResult.confinement` names the backend that ran, 2026-10-14).** The field was always `null`: settlement compared the requested mode with `'confined'`, a mode that does not exist (`CONFINEMENT_MODES` is `required`/`preferred`/`unconfined`), and the Assignment's confinement requirement never reached settlement. It now comes from `ranConfinementBackend` (`settlement.mjs`): the prepared-invocation record the Confinement Authority published for the launch (`protected/prepared-invocation/<launchCommandId>.json`, backend type, `none` → `null`), else the attestation the dispatch returned with outcome `enforced`. A requested posture is never evidence of what ran. The field is backend provenance only and attributes no write to the run.
+- **RUL83 (a snapshot names what changed, never who: correlated write evidence is a warning, 2026-10-14).** Four paths refused a round on a before/after snapshot alone: the CLI/Work doors' `strayWriteError` (repo root dirty paths outside the workspace, 819a61e55), settlement's `read-only-mutation` (`computeChangedFiles` includes every file of every commit that moved the cwd's HEAD during the run), the normalizer's fallback `mutated-dirty-before-files`/`read-only-mutation`, and the read-back evidence floor (`deriveEvidenceFloor`). All four were measured refusing work another session caused: a Doer round (2026-10-14 09:30-10:01) for three reports written into main; two critique reviewers of one panel for files the caller and other lanes wrote; a read-only framing seat (`wf-run-1791954133905-844903ed`) for five reports another session committed to main at 12:03:38. Settlement now decides through one policy, `evaluateAttributionPolicy` (`evidence-attribution.mjs`, previously without a production caller): post-run changes and changed pre-existing dirt are `correlated`, reported in `RunResult.warnings` (`read-only-mutation-correlated`, `mutated-dirty-before-correlated`, `outside-write-scope-correlated`: code, level, basis, paths), and the run is accepted; only `proven` writes (a run-bound written-path observer's attestation within its coverage) are refused (`read-only-mutation`, `outside-write-scope`). No such observer exists yet; building one is its own decision. The CLI/Work doors put `stray-write-correlated` (with `repoRoot` and paths) on the dispatch result's `warnings` and print it on stderr. Accepted residual risk: a worker that really writes into the main checkout, the agy incident, is now flagged rather than refused. `rollbackReadOnlyMutations` (a `git reset --soft` plus deletion in the run's cwd, never called) is removed: run against a shared checkout it would undo another session's commit. Decided by the one-door council (`plans/261014-1033-dispatch-operator-improvements/reports/council-261014-1231-dispatch-one-door-conclusion.md`, step 2, finding RT2-3). Work, the consumer, still does not advance on such a result: a read-only result carrying `read-only-mutation-correlated` or `mutated-dirty-before-correlated` (or, read back from disk, a non-empty `evidence.changedFiles`/`mutatedDirtyBeforeFiles`, since stored warnings are as writable as any other field) stops with its own reason `assignment-<operation>-correlated-mutation` (at planning: `validation-correlated-mutation-do-not-advance-work`), never folded into no-evidence; a round that failed on its own terms (non-zero exit, a timeout settles as 124; a policy refusal, a proven write among them; a provider, resource or contract failure) keeps `assignment-<operation>-failed`. A stored result read back without its assignment takes its mutation from its operation and recorded `role`, never from a field of its own. The executor CLI door's `stray-write-correlated` (the main checkout changed while an isolated round ran) is kept in `result.json` beside settlement's own warnings but does not stop Work: it cannot have changed the round's own checkout, and on a busy main checkout nearly every round would carry it. Dispatch keeps the warning and does not refuse the round (`src/runner/operation-choice.mjs` `hasReadOnlyCorrelatedMutation`; Lead decision B in `plans/261014-1400-two-doors-one-rununit/phase-00-land-finished-lanes.md`).
+- **RUL84 (one write-scope matcher: a Unit's `writes` has one spelling, and every "is this path in scope" question goes through `matchesWriteScope`, 2026-10-14; decision 0060).** `writes` entries are normalized once (`./`, `//`, a trailing `/` and `/.` collapse; duplicates dropped, first-seen order kept) and refused when they are `.`, empty, absolute, hold a `..` segment, a `\` or NUL, start with `:` (git pathspec magic) or glue `**` to other characters. Only `*` (inside one segment) and `**` (a whole segment, zero or more segments) are globs; every other character, `[ ] { } ! ?` included, is literal. A plain entry covers the path and everything beneath it; a glob entry must match the whole path; nothing under `.fgos/` is ever in scope, not even for `**`. One leaf module, `src/runner/dispatch/write-scope.mjs` (`canonicalizeWrites`, `expandGenerated`, `matchesWriteScope`, `partitionPaths`), answers for the runner commit, settlement coverage and the Workflow out-of-scope check; git never interprets a scope. Workflow definitions use the same normalizer, and a `writes` that is not an array (YAML `writes:` left empty is `null`) is refused instead of read as `[]`. Config key `runner.generatedPaths: [{ from, also }]` (default `[]`, doctor `runner-generated-paths`): a Unit whose `writes` overlaps a generated source (`from`, e.g. `core/skills/**`) also gets that source's render trees (`also`). The widened scope is stored once in `unit.json#writeScope` when the unit run is created, never recomputed on resume, and is the `writes` of every assignment of that Unit.
+- **RUL85 (the runner commits only the Unit's write scope, and refuses to start a writing Unit over a foreign staged index, 2026-10-14; decision 0060, replaces items 1-2 of 0052).** After a passing round the runner stages and commits only the changed paths inside `writeScope`; a path outside it is never committed, and one the agent changed is reported in `commit.outOfScope`. A file already dirty in scope at launch is recorded on the attempt as `preExistingInScope` and never committed by the runner (bounded promise: a file dirty before the round and edited again is not reported). Before a mutating producer is spawned, a non-empty index refuses the round as `policy-refusal` / `foreign-staged-index`, with no pane or worker started. The commit step checks the index again: the staged set must equal the in-scope set (`staged-set-mismatch`) and the committed set must equal that set (`committed-set-mismatch`; the commit stays on the branch); a failure after staging takes back exactly what the runner staged. The subject keeps the first line of the worker's `summary` when it is a conventional subject, else `chore(<unitId>): …`, for every caller including the Work layer. Trust boundary: the runner's git reads nothing a worker can write — the gitdir comes from the main repo, a relative `core.hooksPath` resolves against the main checkout, fsmonitor is off, the caller's `GIT_*` variables are dropped, a worktree outside the main repo is `untrusted-worktree`, and a confined caller passes `repoRoot`. Record shape: `results[i].commit` and `unit.json` `bindings['<role>/<round>'][i].commit` are `{ status, sha?, subject?, files?, outOfScope, preExistingInScope, needsWrites?, reason?, error? }`; a mutating attempt carries `preExistingInScope`; `unit-summary.mjs` is unchanged.
+- **RUL86 (`fgos run --resume` after a failed runner commit only commits, and never runs beside a live dispatch, 2026-10-14; decision 0060).** A round whose agent passed but whose commit `failed` is resumed commit-only, whatever the reason (`git-error` such as a refusing hook included, and a stray commit the owner already took off the branch), except `committed-set-mismatch` while that commit is still on the branch: the agent is never spawned twice, and a commit-only resume with no in-scope file left fails with commit reason `work-missing` (outcome `execution-failure`), never `pass`. A stray commit still on the branch blocks the resume; it is taken off with `git reset HEAD~1` (files kept), not `git revert`, because after a revert the sha is still an ancestor of HEAD. A resume is refused while a live process holds the worktree's dispatch lock (`.fgos/dispatch--<cwd>.lock`, composite `pid:acquiredAtMs:rand` holder, `EPERM` counts as alive), so a second worker is never launched into the same worktree (the earlier guard read a lock name no dispatch writes and never refused).
+- **RUL87 (a unit run's writing seat is told its scope and that the runner commits; coverage reads the declared scope, 2026-10-14; decision 0060).** The brief of a mutating seat in a unit run (assignment `kind: unit-run`, `mutation: mutating`, any role) lists the widened `writes` (`unit.json#writeScope`), says the worker never runs `git add`/`git commit` even when the task asks (the runner commits in-scope files after a passing round), that the first line of `summary` is the commit subject, and that a path needed outside the scope is declared in `needsWrites` instead of written; the result files are the exception. Read-only briefs and the Work path are unchanged. Claim `agent-result-claim` v2 takes an optional `needsWrites` (repo-relative paths): a request only, it never invalidates a claim, does not bump the version, and is kept in `RunResult.agentClaim`. In settlement, for a mutating assignment with `writes`, `attribution[].coverageMatched` and the `outside-write-scope-correlated` warning read the scope through `matchesWriteScope`; `coverageMatched` means "inside the declared scope", not authorship, so the level stays `correlated` without an attestation (RUL83 (a snapshot names what changed, never who)). A read-only seat gets no scope; pre-existing dirt stays `excluded`.
+- **RUL88 (an ad-hoc Unit may prefer an executor and name a persona; `fgos run "<prompt>"` builds one, 2026-10-14; decision 0061).** A Unit may carry `prefer` (executor ids, or `{ executor, invocation? }`; shape-checked only) and `persona` (non-empty string). G2 still refuses executor, provider, model, tier, invocation, actors and overrides on a Unit, and presets and plans still refuse `prefer`. In `bind()`, without an override executor the pool is `unit.prefer` then `capability.prefer`; each candidate carries its own source (`unit-prefer` / `capability:<key>`) and provenance takes the chosen one's; duplicates are dropped by executor+invocation and a bare unit id covers every capability entry of that executor (so failover never returns to it); an unregistered id is skipped with `unknown-executor`; every filter applies to every candidate, spread ranks before pool order, and an `--override` executor still pins. Persona order: override > `unit.persona` (source `unit`) > locked > capability; a locked/unit conflict refuses with `locked-persona`. A unit persona is resolved through the persona tiers (`fgos/agents`, `domains/*/agents`, `core/agents`) once, when the unit run starts, and its text is pinned in `unit.json#personaPin` for every role that binds that name, so a workspace-only persona renders its text, not its bare name. `fgos run "<prompt>"` is the one-liner: id `adhoc-<ascii slug>-<hex>`, objective = prompt, `--provider <id>[,<id>...]` → `prefer`, `--persona`, `--writes` (needs a linked worktree; omitted = read-only), `--capability` (default `execute`), `--rigor`, `--effort`, `--override`; a wrong provider or persona, an empty `--writes`, prompt-only flags without a prompt, or writes from the main checkout are refused before any unit run exists. This builds the "soft provider hint" RUL77 (posture belongs to the capability) left unbuilt on the Unit; `dispatch decide` still has none.
+- **RUL89 (`fgos workflow start --units <file>` runs a list of Units as a one-off Workflow, 2026-10-14; decision 0061).** The units file (YAML/JSON, `{ id?, title?, units }` or a list of Units, `src/workflow/units-source.mjs`) becomes one step per Unit, `dependsOn` becomes step dependencies, a Unit id must be a safe branch-name segment, and the workflow id is `units/<id|basename>`. The `units-file` source is passed by the loader to the validator, never read from the data, and is the only source whose unit templates may carry `prefer`. `--seats` is refused with `--units`. `--effort <level>` (`low|medium|high|max`, otherwise refused before a run exists) becomes an override `{ reasoningEffort, origin: 'human-cli' }` for every unit, stored in `workflow.start` and reused on resume. A unit template's `persona` travels on the Unit (provenance `unit`); persona overrides remain only for `--seats` seats. A writing unit that stands on exactly one writing ancestor (directly or through read-only units; an integrate step cuts the path) starts its worktree from that unit's branch sha; a file with a writing unit standing on two or more writing units is refused at start; nothing is merged automatically and `workflow status` lists `writeBranches` (branch, worktree, base). A unit that wrote outside its scope (reported by its commit, or found in its branch diff outside `writeScope`) ends `findings` (`out-of-scope-writes`); a unit standing on that branch inherits only the out-of-scope paths the branch carries; an integrate step whose dependency is flagged fails and merges nothing. A writing unit that gets no worktree of its own (base branch gone, worktree creation failed) fails and never runs in the shared checkout. Residual: a writing unit after an integrate step still starts from the main checkout's HEAD, not the integrate target.
+- **RUL90 (the raw dispatch doors are removed; dispatch is the lower layer and fanout belongs to the Work layer, 2026-10-14; decision 0062, replaces the purpose-door part of RUL68 (2 tầng dispatch) and the one-posture-lane-per-door part of RUL77 (posture belongs to the capability)).** Work is executed through two doors only, `fgos run` (`"<prompt>"`, `--unit`, `--resume`) and `fgos workflow start`, both on `runUnit`. `dispatch execute` (executor id, `--contract`, `--assignment`), `dispatch log` and `dispatch fanout-batch` are gone, with `src/runner/dispatch-log.mjs`; calling `dispatch execute` (any form) or `dispatch log` returns a `validation` error with one sentence naming the replacement (`fgos run "<prompt>" [--provider <executor>] [--capability <c>] [--writes …]` or `fgos run --unit`, where `--provider` is named only for an agent executor — `fgos run` refuses any other kind — the `--for` capability is kept when it is registered, and a tool executor's caller is told to call that tool directly; the dispatch-decide hook's BLOCKED message is built the same way, by `runDoorHint`; `fgos run --unit` or a Workflow for `--assignment`; provenance under `.fgos/assignments/<unitRunId>/` for `dispatch log`), from one place in `bin`, also for `returnResult` callers. `executeExecutorCli` has no CLI door left: it is the transport step of an Assignment (`assignment-runner.mjs`), and its one other caller, `fanout-batch.mjs`, is listed in `R3_PENDING_WORK_CALLERS` until fanout runs on `runUnit`; `fgos dispatch` keeps `decide`, `inspect`, `reconcile` and `probe-account`. `src/runner/dispatch.mjs` imports nothing from the Work layer: `decide --work` gets its Work resolver injected from `bin`, so it runs only as `fgos dispatch decide --work`. A Unit's posture comes from its `writes` (none: read-only, sandboxed; some: mutating, in a linked worktree) plus the capability's required confinement, never from which door was used. Fanout adds no verb: `node src/runner/fanout-batch.mjs "<ids>" [--has-live-task-access]` prints `fired`, `mechanismChanged`, `unavailable`, `deferred` (plus `slotsFull: true` when no slot was free); its body moves onto `runUnit` with the Work-layer cut. An import guard (`test/architecture.test.mjs`) keeps `dispatch.mjs` and `src/workflow/**` free of Work imports, following relative imports transitively (a re-export one or more hops away counts) and reading `require()` and literal `import()`; a call-site guard over `src`, `bin`, `scripts`, `domains` and `core` names the files allowed to call `executeAssignment`, `executeExecutorCli`, `commitUnitWork` and `executeThroughConfinement` (an aliased, destructured or namespace use counts as a call; `export *` from their home modules is refused), with Work-layer callers not yet on `runUnit` listed in `R3_PENDING_WORK_CALLERS`, compared by equality so the list can only shrink. An `import()` with a non-literal specifier is not yet seen by the import guard (left to the dispatch-generic-inputs phase). [Closed by RUL95 (dispatch takes generic inputs only): a computed `import()`/`require()`, `createRequire`, `node:module` and `eval` are refused in the guarded files outside a named allowlist; `R3_PENDING_WORK_CALLERS` is empty and deleted.] The doctrine test `test/docs/run-doors-doctrine.test.mjs` refuses `AGENTS.md`, any skill source or any render that still teaches a removed door.
+- **RUL91 (a person may pin the provider account of a unit run; the pin is hard and never bypasses the lease, 2026-10-14).** `fgos run --account <id>`, or an `account` key on an `--override` object (one shape; a Unit carries no account), pins a provider account (`src/runner/execution/account-pin.mjs`). `bind()` pins it on each seat its override reaches whose bound executor's provider (normalized as the lease does) lists it in `providers.<provider>.accounts`: `binding.account = { provider, id }`, `provenance.account = { value, source: override:<origin> }`. A seat on another provider (a checker must use another family), an executor without an account list, and a tool or inline binding bind unpinned with `provenance.account.skipped { reason, detail }`; the pin never chooses the executor (pair it with `--provider`); a malformed id is refused (`account-pin-invalid`), and an inherited object key is never an account id. Before the unit run exists the seats are dry-bound as the run would bind them (`simulateUnitBindings` with the run's overrides): a pin no seat takes, or a quarantined account (the message names `until` and the reason code), is refused. A pinned seat is dispatched with the inventory narrowed to its account (`configPinnedToAccount`, as RUL79 (`fgos dispatch probe-account`: one account, every CLI) does), so the lease, quarantine and governance apply unchanged. A provider limit on a pinned seat ends it (`fallbackExhausted.reason: account-pinned`, `retryStopped` on the attempt): no account rotation, no executor failover. `--account` is refused with `--resume`; a resumed run keeps its bindings' account and is refused while that account is quarantined. Left open: the login store per CLI (RUL80 (an account is chosen first, then a CLI)) is checked only by the lease at dispatch, after the unit run exists; `capacityProviderOf` derives the provider from the executor entry and can differ from the lease's for an executor that declares no `providerModel` (every configured executor declares one); `fgos workflow start` has no `--account`.
+- **RUL92 (a writing seat is not run again over its own partial writes after a provider limit, 2026-10-14).** At every launch of a seat that writes (a resumed launch included), the runner records the worktree's HEAD and the content of every path `git status` sees as changed (`writeBaseline` on the attempt, `src/runner/execution/partial-writes.mjs`; `.fgos/` left out, a symlink by its target, an unreadable file by size and mtime). When the seat stops on a provider limit and the worktree differs (a write, rename, delete, a further change to a file already dirty, a moved HEAD), it is not rotated to another account nor walked to another candidate: the seat ends `provider-limit` with `fallbackExhausted: { reason: partial-writes, paths, headMoved }` and `retryStopped` on the attempt, for a person to keep, finish or undo the changes and resume. This check runs before the pinned stop of RUL91 (a person may pin the provider account of a unit run), so a pinned seat still names what it changed (`accountPinned`). A read-only seat records no baseline and rotates as before (its sandbox keeps the worktree; a concurrent `verify` write never stops it), as does a writing seat that left the worktree as it was; a baseline git could not take stops the retry. Not seen: gitignored paths, `.fgos/` inside the worktree, changes inside a nested repository or a dirty submodule, a mode-only change to a file already dirty; none of them reaches the runner's commit, which takes only the write scope.
+- **RUL93 (the runner loop's worker and the fan-out batch run as one Unit run each, 2026-10-14; ends the `spawnWorker` purpose door of RUL68 (2 tầng dispatch) and the `R3_PENDING_WORK_CALLERS` entries of RUL90 (the raw dispatch doors are removed) for `loop.mjs`, `work-dispatch.mjs` and `fanout-batch.mjs`).** `spawnWorker` (`src/runner/work-dispatch.mjs`) builds the item's Unit with `workUnitFor` and runs it through `runUnit` in the item's worktree, with `session { headless: true, herdrPresent: false }` (the loop never opens a pane, even when the runner itself runs inside herdr); `fanout-batch.mjs` does the same per candidate after `pick`, then `fgos return` on `pass` (no `--worker-verified-sha`: return judges the Unit run's commit) or `return --to blocked` otherwise, reporting each `fired` entry as `{id, unitRunId, outcome, commit}`. The worker runs confined and never commits; the Unit run commits a passing round inside its `writes` (`['**']` for a step), and the loop reads `commit` (`runner`, `none`, or `self` when HEAD moved without a runner commit) instead of committing itself. A step Unit names its capability as its domain's Workflow units do, `<domain>:<verb>` (`coding:discover`), except the coding executing step, which keeps `code:implement`; `bind()` falls back to the bare verb, and `fgos doctor`'s `workflow-capabilities-configured` also names `code:implement` (`RUNNER_LOOP_CAPABILITY_USES`). The worker config is the repo's `.fgos/config.json` (snapshotted into `unit.json`): `fgos-runner` has no `--config` any more. Outcomes map onto the recovery matrix (`src/runner/recovery.mjs`): a failed runner commit, or an index staged before launch, is `worktree-fail`; a timeout `worker-timeout`; a command that cannot start `worker-spawn-fail`; every candidate at its provider limit `provider-limit` (park); a refusal before any worker started `no-executor` (park, the message names `runner.capabilities["<cap>"].prefer`), so one capability without a runnable pool never halts the runner; a round that ran, did not pass and left uncommitted files `worker-failed` (retry), so goal-check never judges files that are not on the branch; a round that did not pass and left nothing resolves with `commit: none` and goal-check decides on the branch as it stands. A round that stopped over its own partial writes (RUL92 (a writing seat is not run again over its own partial writes after a provider limit)) or whose runner commit failed keeps its worktree: the loop notes `{unitRunId, worktree}` under `.fgos/runtime/runner-resume/<id>.json`, and the item's next attempt (a retry, or a later dispatch once the item is back at `todo`) resumes that same Unit run there, so a failed commit is committed again without spawning the agent; the note is checked against `unit.json` (same Unit id, worktree still checked out on `fgw/<id>`) and dropped once the run no longer needs it. The Unit's rigor comes from the operation, then the item's `rigor`, with `risk: heavy` read as `high` only when no `rigor` is declared; bind's floor raises `low` to `standard`. The item's `refs` and `docsRef` enter the Unit only as safe repo-relative paths (others are dropped with a warning that reaches the loop log), and its `prefer` names the step's executor only when that executor is registered. The executor dispatch event carries `unitRunId`; the item log names the run the moment it exists and where its output is captured (`protected/capture/` while it runs, `stdout.log` once it settles), since a Unit run streams nothing back; a write into the main checkout during the round reaches the loop log as a `stray-write-correlated` warning. A pane run's `stdout.log` holds the settled report's text, so a worker run in a pane must put its `fgos-verdict`/`fgos-discovered` fences in its report; the loop reads the first non-empty of report, `stdout.log` and claim summary, never several. The startup reap keeps a 0-commit `fgw/` branch that a killed round still has checked out, with its uncommitted work, instead of failing on the branch delete. Not done: the loop does not resume a Unit run left `running` by a killed runner (the run id is in the item log; `fgos run --resume <unitRunId>`); a worker detached from a killed runner may outlive it; a commit subject falls back to `producer changes` when the worker wrote no claim.
+- **RUL94 (a Work driver step runs as a Unit: the step's declared operation, pinned inputs, and a verdict bound to their bytes, 2026-10-14; ends the `operation-choice.mjs` entry of `R3_PENDING_WORK_CALLERS` from RUL90 (the raw dispatch doors are removed)).** A driver step of a work item (`fgos plan <id> --validate`, the runner loop's validate-plan and secondary operations) is built by `workUnitFor` and run through `runUnit`, never by `executeAssignment` (`src/runner/operation-choice.mjs`). `runUnit` takes `declared: {workId, domain, workflow, stage, operation, operations}` (the step's operation objects), `pinInputs` (absolute paths) and `runnerConfig` (the config the caller resolved, snapshotted instead of `.fgos/config.json`, so one step reads one config); `declared` and `pinInputs` are kept in `unit.json` and a resume reads them, and the pattern, from there. Refused before the unit directory exists: an operation the step does not declare, a `human-only` one, a stamped mutation that disagrees with the unit's `writes` (read-only exactly when it writes nothing), and any pattern that does not resolve to `solo`. Only the producer seat carries the operation: its assignment has the operation's role and normalizer stamp (`mutation`, `evidence`, `resultKind`, `onAdvance`, built by `declaredOperationFields` in `src/runner/dispatch/assignment.mjs`, shared with `buildAssignment`), the seat name stays in `provenance.role`, and `policy.rigor` is the unit's rigor. At launch the dispatch hashes each pin into `inputDigests[{path, root, rel, sha256}]` in `run.json` and `result.json`; a pin is read only when its real path lies in the main checkout or a worktree git lists (not one that became a symlink), against the innermost such root, else its `sha256` is `null` and nothing is read. The verdict walker (`findLatestAssignmentRunResult`) reads flat and nested layouts through `listAssignmentRuns`, filters by `operation`, takes only a unit run's producer seat, and compares the current `plan.md` by `rel` and digest; a pinned digest decides alone (no mtime pre-filter), so a plan merged byte for byte into another checkout still matches, and `planContentHash` is only read on results from before this rule. The driver hands the producer's own RunResult and seat assignment to `interpretAssignmentRunResult`, stops on a unit with no result or whose runner commit failed (`unit-commit-failed`), and never turns an item ref naming another run's output (`unit-run:`, `gate-answer:`) into an input. The worker is confined (`session: {headless: true, herdrPresent: false}`): a read-only operation cannot write the checkout, and a machine with no confinement backend stops the step (`unit-refused-posture-unavailable`). A unit with `rigor: low` is raised to `standard` by bind's floor. Not done here: a pin resolved through `process.cwd()` first (`resolveContentRoot`) can differ from the plan in the item worktree a secondary operation runs in.
+- **RUL95 (dispatch takes generic inputs only; Work is a consumer, 2026-10-14; decision 0063, replaces the input part of RUL73 (dispatch does not know Work).2 and closes the `R3_PENDING_WORK_CALLERS` list of RUL90 (the raw dispatch doors are removed)).** `src/runner/dispatch/**`, `src/runner/execution/**`, `src/runner/dispatch.mjs` and `src/workflow/**` never handle a Work item. Rigor and domain are the assignment's own fields: `resolveAssignmentDispatchPolicy` reads `assignment.rigor` where it read `work.rigor`/`work.risk` (first explicit source may pick it, after an operation rigor it only raises, the capability floor and tier rules are unchanged; provenance scope `assignment`) and `assignment.domain` for the `<domain>:review` capability floor, so a declared Unit step (whose seat carries `domain`) gets that floor again. The Work layer folds an item's `rigor` and `risk: heavy` into one rigor (`workRigorFor`). `decide --work` gets a hint from the Work layer, `workDispatchHint`/`resolveWorkForDispatch` → `{workExecutorId, agentType, rigor?, domain?}`, passed to `compileDispatchPlan({workId, workHint})`; fan-out uses the same hint. `workDispatchContext` returns only `{capabilityHints, agentType}`. `buildAssignment`, `resolveAssignmentDispatchPolicy`, `compileDispatchPlan`, `decideExecutorCli`, `executeExecutorCli` and `executeAssignment` refuse a `work`, `workItem` or `workExecutorId` input (`RunnerConfigError` "takes no Work item") instead of ignoring it; `decideExecutorCli` and `compileDispatchPlan` name the `--work` selector `workId`. `executeExecutorCli` no longer runs an unregistered executor id because a Work item rode along (`executor-not-found`). A domain's contract harness (ADR-007) is loaded only by the Work layer (`domainHarnessFor(work, {domain})`, only for a registered domain at a declared step; `loadHarnessModule` treats a module that fails to import as no harness), and a caller hands it to the inline `buildAssignment` as `options.domainHarness`; dispatch still re-validates the enriched contract and records `domain-harness-seam`. No production path builds an inline assignment for a Work item today (none did before either: the only inline caller is `probe-account`), so the seam runs only in tests. The guard (`test/architecture.test.mjs`) refuses, outside comments and other string text, any identifier or property named `work`, `workItem` or `docsRef` (identifier escapes such as `\u0077ork` are decoded first), any string that is exactly one of those names (a computed or quoted key, `Reflect.get(o, 'work')`, a key comparison; only the pinned uses are allowed: the `--work` selector's type in `plan.mjs` and the refused option names in `assignment-policy.mjs`), and any `resolveContentRoot(` call in the guarded files; `src/state/**` counts as Work layer for the transitive import guard, except one pinned edge (`worktree.mjs` takes only `StoreError` from `src/state/store.mjs`); imports are read with optional whitespace, comments blanked, `?query` dropped, and absolute paths and `file:` URLs resolved; the guarded folders may hold only plain `.mjs` files (no `.js`/`.cjs`/TypeScript source, no symlink); the shared source lexer treats a slash after a block's closing brace as a regular expression, so its quotes cannot hide the code after it; it also refuses an `import()`/`require()` whose specifier is not one plain literal, `createRequire`, `eval`, `Function(...)` (with or without `new`) and an import of `module`, `vm` or `worker_threads` (with or without `node:`), except the loads pinned one by one in a named allowlist entry with its reason (`provider-credential-renewal.mjs`: `createRequire` for `node:sqlite`); one more load in an allowlisted file fails too. The call-site guard also counts a string that is exactly a door's name (`d['executeAssignment'](a)`) and an escaped name as a use, and compares each run door with exactly its named callers (`executeAssignment`: `execution/run.mjs`, `dispatch/cli.mjs`; `executeExecutorCli`: `dispatch/assignment-runner.mjs`; `commitUnitWork`: `execution/run.mjs`; `executeThroughConfinement`: `dispatch/cli.mjs`), both ways. Not covered: a name built at run time (`opts[k]`, `opts['wo' + 'rk']`, `globalThis['ev' + 'al']`), nested inputs (`options.work`, `assignment.work`; nothing reads them), and code outside the guarded files that reaches into dispatch's internals.
+- **RUL96 (one run may take its own timeout, from 1m to 4h; its private home and worktree lock last as long, 2026-10-15).** A unit run's seats are dispatched with `runner.timeoutMs` unless the run asks for its own: `fgos run --timeout <dur>` (a whole number and one unit, `ms|s|m|h`: `90m`, `5400s`), a `timeoutMs` key on an `--override` object (`--timeout` adds it to every override that names none, and an unscoped one when none is unscoped, as `--effort` does), or a Unit's `timeoutMs` (whole milliseconds; a units file and a Workflow unit template carry it too, a template's value is checked when the definition loads). `bind()` resolves override, then unit, into `binding.timeoutMs` with `provenance.timeoutMs { value, source: override:<origin> | unit | none }`; a value outside the range is a refused binding (`run-timeout`), and an override's value is checked before the unit run exists. The value lives in `unit.json` (`overrides`, `unit`, and every recorded binding), so a resume dispatches with it and `--timeout` is refused with `--resume`; `runUnit` hands it to `executeAssignment` (`opts.timeoutMs ?? cfg.timeoutMs`), which already threads it to the worker kill, the pane poll and the dispatch lock. Range (`src/runner/dispatch/run-timeout.mjs`): the 1m floor keeps a typo (`90s` for `90m`) from killing a turn at once; the 4h ceiling, four times the heaviest turn seen, bounds how long a hung worker holds its worktree's lock and a copy of an account login, and `runner.timeoutMs` above it is refused when the config loads, so the default obeys it too. The confinement reaper keeps a home whose dispatcher pid is alive and has no pane until `createdAt + max(maxAgeMs, min(marker.timeoutMs, 4h) + 10m)` (the bwrap driver records the dispatch's `timeoutMs` in the ownership marker; a marker without one keeps the 1h rule; a dead dispatcher's home goes at once, a pane-retained home is unchanged), so a pane-less run longer than an hour is no longer reaped mid-turn. The per-worktree dispatch lock (`.fgos/dispatch--<cwd>.lock`, composite `pid:acquiredAtMs:rand` holder) records the `ttlMs` its holder took and keeps it across renewals; a contender judges a live composite holder by the longer of its own ttl and the holder's, so a dispatch with a shorter timeout never takes the lock of a longer run that renews only every third of its own timeout; the recorded ttl is honoured only up to the 4h ceiling. Other lock identities are judged as before. Residual: a holder killed without releasing whose pid was reused reads as live (no process start time is recorded), so it now blocks the worktree for up to its own ttl (at most 4h) instead of the contender's; `fgos dispatch reconcile` clears such a lock by hand. `--override` passed with `--resume` is ignored, as for every override key (the run keeps `unit.json#overrides`).
+- **RUL97 (a Unit may sync a base ref first: the runner merges it, the worker only edits the conflicted files, 2026-10-15).** A Unit may carry `syncBase` (a branch, tag or commit name: letters, digits, `.`, `_`, `/`, `-`, not starting with `-` or `/`, no `..`); it needs `writes` and a linked worktree, and `fgos run --sync <ref>` sets it (with a prompt: sync, then the task; without one: a sync-only Unit, `syncOnly: true`, whose objective is `Merge <ref> into this branch.`). The ref is resolved to a commit once, before the unit run exists (a ref naming no commit, or a run from the main checkout, leaves nothing behind), and `unit.json#sync` keeps `{ ref, sha, status, head?, conflicts?, mergeStaged?, commit? }`; a resume merges that sha, never the ref again. Before any seat runs, the runner merges it with the trusted git of RUL85 (the runner commits only the Unit's write scope) — `merge --no-commit --no-ff`, rerere and autostash off — in `src/runner/execution/commit-unit-work.mjs` (`startSyncMerge`, `finishSyncMerge`, `syncMergeState`), orchestrated by `src/runner/execution/unit-sync.mjs`: already in the branch is `up-to-date`; a clean merge is committed by the runner as `chore(sync): merge <ref>` (status `merged`; a commit that is not the merge of `sha` over `head` holding exactly what the merge staged — a hook added a file — fails `committed-set-mismatch` as `execution-failure`, stays on the branch, and the resume is refused until a person takes it off) and the Unit goes on to its pattern, or passes at once when sync-only; a sync never brings the base side of `.fgos/` in: every `.fgos/**` path the merge staged or left conflicted, clean or not, is put back to the branch side (HEAD), a path the base deleted is kept and a path only the base has is not taken — ADR0020 (a worker branch never commits `.fgos/`), the side `fgos-write-rejected` at approve resolves to the target for a `.fgos/` path the branch left unchanged, on every branch, not only `fgw/*`; any other conflict leaves the merge open (status `conflicted`), puts the conflicted paths the scope does not already cover in scope only while the merge is open (`sync.scopeAdded`, read by the effective scope only while `sync.status === 'conflicted'`; `writeScope` itself stays as declared, so a later round cannot write them), and appends a `## Merge to finish` section to the writing seat's brief naming them and telling it never to run git. A refused start leaves no merge open and ends the run: `merge-in-progress` (a merge someone else opened), `foreign-staged-index`, `merge-refused` (git would not start, e.g. a dirty file it would overwrite), `hook-refused` (the pre-commit hook of the main checkout's hooks path refused the clean merge commit; told apart from a git failure by running that hook once more as git runs it, and its words are the detail), `unscopable-conflict-path` (a conflicted path the scope normalizer of RUL84 (one write-scope matcher) would read differently — `*`, a leading `:`, `\`, surrounding whitespace — or holding a control character, since it is also printed into the brief; the merge is aborted) as `policy-refusal`, and `git-error` as `execution-failure`. While the merge is open, the preflight of a writing seat counts only the open MERGE_HEAD equal to `sync.sha` over `sync.head` as the run's own: its conflicted and merge-staged paths are neither a foreign index nor `preExistingInScope`; any other open merge refuses a writing seat (`merge-in-progress`) and `commitUnitWork` never commits over one. After a passing round the runner concludes the merge before the round's own commit: a conflicted file that still holds a line opening with seven or more `<`, `|` or `>` (a larger `conflict-marker-size` included; a file holding a NUL byte is read as binary and not checked) fails the commit `conflict-markers` with `paths`, stages nothing and keeps the merge, so `fgos run --resume` only commits once a person removed them (RUL86 (`fgos run --resume` after a failed runner commit only commits)); otherwise it stages the conflicted paths, refuses an index holding anything the merge did not stage (`staged-set-mismatch`, taking back what it staged itself, e.g. a conflicted file the worker turned into a directory), commits with MERGE_HEAD as second parent (a refusing pre-commit hook fails it `hook-refused` with the hook's words and keeps the merge; each `fgos run --resume` tries the commit once, never in a loop), checks parents and committed set (`committed-set-mismatch`), and then commits the rest of the round inside the scope as usual. The round's `commit` carries the merge's own record under `sync`; `runUnit` returns `sync` beside `outcome`; a sync-only unit that needed no worker returns one result `{ role: 'sync', round: 0, commit }` (no `verify`, as for `solo`). A round that did not pass keeps the merge open; a resume checks it first: still open, it runs the seat again over it; concluded by hand (its sha in the branch), it is `merged`; aborted, or HEAD moved, the resume is refused and names the merge. A run that died between starting git and recording the result adopts its own open merge on resume; a first start never adopts one. A resumed sync-only run that was `up-to-date` or `merged` passes again without a worker. Settlement: the writing seat over an open merge carries `assignment.syncConflicts`; those files, dirty at launch, changed during the turn and inside its scope, count as its evidence (`evidence.editedSyncConflicts`), so a seat that only resolves conflicts is not scored `verdict-inconclusive`. Any other file dirty at launch that a seat rewrites still is no evidence, with or without a sync. A units file (`fgos workflow start --units`) naming `syncBase` is refused: a workflow unit's worktree starts from its dependency's branch, and a sync there is not built. Not done: an inline producer over an open merge (inline rounds have no runner commit), a modify/delete conflict whose worker deletes the file is concluded as a deletion.
+- **RUL98 (`fgos workflow start` kế thừa và phân bổ `--timeout <dur>` và `--account <id>` cho từng Unit, 2026-10-15).** Workflow run hỗ trợ cờ `--timeout <dur>` (chuỗi thời lượng hợp lệ `1m`..`4h`, phân tích ra `timeoutMs`) và `--account <id>` (ghim tài khoản nhà cung cấp) giống cơ chế của `--effort`. Cả hai giá trị được lưu bền vững trong payload của sự kiện `workflow.start` và được tái tạo khi `resume`. Về thứ tự ưu tiên timeout: cờ `--timeout` của `fgos run` THẮNG `unit.timeoutMs` của Unit (RUL96 (one run may take its own timeout, from 1m to 4h): override thắng unit), trong khi `--timeout` của `fgos workflow start` NHƯỜNG cho `unit.timeoutMs` tự khai của Unit. Về account: `--account` của workflow chỉ ghim cho các seat thuộc provider sở hữu account đó; các Unit không có seat nào khớp sẽ chạy bình thường không ghim và không làm hỏng workflow; `--account` không tồn tại trong bất kỳ `runner.providers.*.accounts` nào sẽ bị từ chối ngay lúc start trước khi tạo run.
+- **RUL99 (Bảng mã thoát riêng biệt cho kết cục thực thi của `fgos run` và `fgos workflow start|resume|answer --foreground`, 2026-10-15).** Các outcome kết thúc không phải `pass` của `fgos run` và `fgos workflow start|resume|answer --foreground` chuyển sang sử dụng bảng exit code xác định: `pass` = 0, `policy-refusal` = 4 (validation), `provider-limit` = 10, `execution-failure` = 11, `partial-writes` = 12, `blocked` = 13, `findings` = 14. Các lệnh chỉ-đọc như `fgos workflow status` luôn trả về mã thoát 0 bất kể outcome của workflow run. Lệnh `fgos workflow start` ở chế độ detached vẫn trả về mã 0 khi tiến trình daemon được khởi chạy thành công. Định dạng envelope JSON stdout `fgos.v1` giữ nguyên vẹn 100%.
+- **RUL100 (Doctor check `executor-posture-coverage` chẩn đoán posture readiness của các executor, 2026-10-15).** Check doctor `executor-posture-coverage` kiểm tra tĩnh khả năng áp dụng posture cho các core capabilities (`execute`, `code:implement`) và mọi capability khai báo pool agent (`prefer`). Quá trình kiểm tra chạy hoàn toàn khô qua `bind()`, không spawn tiến trình, không tạo pane herdr, không kích hoạt sandbox. Khi một capability có executor thiếu sandbox bwrap, check báo lỗi `posture-unavailable` (`passed: false`). Khi một capability thiếu pool (`headless-no-executor` / `no-candidate`), check chỉ phát cảnh báo (`passed: true`, tiền tố `warning:`) hướng dẫn khai báo `runner.capabilities.<cap>.prefer`.
+```
+
+### Full diff
+
+```diff
+No text difference.
+```
