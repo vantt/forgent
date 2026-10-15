@@ -4518,12 +4518,7 @@
       "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "targetAnchor": "61-shape",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "targetUnitDigest": "eccd334eee40b5d3dea247a74c141453af4ff788f6bee3e9d9c8d08bd5000343",
-      "targetAncestry": [
-        "Dispatch Control Plane Redesign",
-        "6. DispatchPlan"
-      ],
+      "reviewStatus": "reviewed",
       "priorReview": {
         "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
         "reviewedAt": "2026-10-10",
@@ -4533,7 +4528,18 @@
         "reviewNote": "LEG:proposals/dispatch-control-plane-redesign.md#unheaded-block-38 -> proposals/dispatch-control-plane-redesign.md#61-shape (supersede): Old illustrative JSON (target, handback, execution, egress.allowed) is correctly retired; the replacement field list equals the object returned at plan.mjs:444-461."
       },
       "amendedBy": "codex-session:42@2026-10-15",
-      "rebindingReason": "A22 consequence of the authorized A19 path/line-number correction; current target bytes or section payload changed."
+      "rebindingReason": "A22 consequence of the authorized A19 path/line-number correction; current target bytes or section payload changed.",
+      "reviewNote": "deep: supersede of the old illustrative DispatchPlan JSON (target, handback, execution, egress.allowed) by 6.1 Shape; the target changed only plan.mjs:444-461 to 455-472 (word diff vs base), and src/runner/dispatch/plan.mjs 455-472 at HEAD is the return object whose 17 fields equal the sentence; target digest eccd334e recomputes at dfff, anchor ok; row is pending, the 2026-10-10 ok sits only under priorReview, no approval carried, rationale unchanged and true",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-bounded-rereview.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "eccd334eee40b5d3dea247a74c141453af4ff788f6bee3e9d9c8d08bd5000343",
+      "targetAncestry": [
+        "Dispatch Control Plane Redesign",
+        "6. DispatchPlan"
+      ],
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4"
     },
     {
       "claimId": "claim_28c4a9baff6ea75b287aa8dba3ed8328",
@@ -4620,12 +4626,7 @@
       "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "targetAnchor": "63-mechanism",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "targetUnitDigest": "be2f8b6fb6fddd1a9fdcbbcaf100e5d07acacec79f314e563786eb6034c4dbba",
-      "targetAncestry": [
-        "Dispatch Control Plane Redesign",
-        "6. DispatchPlan"
-      ],
+      "reviewStatus": "reviewed",
       "priorReview": {
         "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
         "reviewedAt": "2026-10-10",
@@ -4635,7 +4636,18 @@
         "reviewNote": "LEG:proposals/dispatch-control-plane-redesign.md#unheaded-block-45 -> proposals/dispatch-control-plane-redesign.md#63-mechanism (supersede): Old handback sentence retired: plan.mjs returns top-level agentType/mcpTool (lines 453-454) and no handback key."
       },
       "amendedBy": "codex-session:42@2026-10-15",
-      "rebindingReason": "A22 consequence of the authorized A19 path/line-number correction; current target bytes or section payload changed."
+      "rebindingReason": "A22 consequence of the authorized A19 path/line-number correction; current target bytes or section payload changed.",
+      "reviewNote": "deep: supersede of the stale handback prose block by 6.3 Mechanism; the only target change is the cite plan.mjs:453-454 to 464-465, which are exactly the agentType and mcpTool spread lines at HEAD; target digest be2f8b6f recomputes, anchor ok; pending with the old verdict only in priorReview, no approval carry",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-bounded-rereview.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "be2f8b6fb6fddd1a9fdcbbcaf100e5d07acacec79f314e563786eb6034c4dbba",
+      "targetAncestry": [
+        "Dispatch Control Plane Redesign",
+        "6. DispatchPlan"
+      ],
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4"
     },
     {
       "claimId": "claim_cfd58d692d355e1d05a0babd4fbb2183",
@@ -4646,12 +4658,7 @@
       "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "targetAnchor": "63-mechanism",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "targetUnitDigest": "be2f8b6fb6fddd1a9fdcbbcaf100e5d07acacec79f314e563786eb6034c4dbba",
-      "targetAncestry": [
-        "Dispatch Control Plane Redesign",
-        "6. DispatchPlan"
-      ],
+      "reviewStatus": "reviewed",
       "priorReview": {
         "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
         "reviewedAt": "2026-10-10",
@@ -4661,7 +4668,18 @@
         "reviewNote": "LEG:proposals/dispatch-control-plane-redesign.md#unheaded-block-46 -> proposals/dispatch-control-plane-redesign.md#63-mechanism (supersede): Old native-task handback JSON is retired in favor of top-level agentType in the returned plan (plan.mjs:453), which the current text states."
       },
       "amendedBy": "codex-session:42@2026-10-15",
-      "rebindingReason": "A22 consequence of the authorized A19 path/line-number correction; current target bytes or section payload changed."
+      "rebindingReason": "A22 consequence of the authorized A19 path/line-number correction; current target bytes or section payload changed.",
+      "reviewNote": "deep: supersede of the old handback JSON example (block 46, digest 54aa679c) by 6.3 Mechanism; 6.3 says native capability fields are top-level agentType or mcpTool (plan.mjs:464-465), the old handback object is gone from the return object; target digest be2f8b6f recomputed, rebind pending without carried approval",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-bounded-rereview.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "be2f8b6fb6fddd1a9fdcbbcaf100e5d07acacec79f314e563786eb6034c4dbba",
+      "targetAncestry": [
+        "Dispatch Control Plane Redesign",
+        "6. DispatchPlan"
+      ],
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4"
     },
     {
       "claimId": "claim_3213e2828273933006676b06c204ef11",
@@ -4672,12 +4690,7 @@
       "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "targetAnchor": "63-mechanism",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "targetUnitDigest": "be2f8b6fb6fddd1a9fdcbbcaf100e5d07acacec79f314e563786eb6034c4dbba",
-      "targetAncestry": [
-        "Dispatch Control Plane Redesign",
-        "6. DispatchPlan"
-      ],
+      "reviewStatus": "reviewed",
       "priorReview": {
         "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
         "reviewedAt": "2026-10-10",
@@ -4687,7 +4700,18 @@
         "reviewNote": "LEG:proposals/dispatch-control-plane-redesign.md#unheaded-block-47 -> proposals/dispatch-control-plane-redesign.md#63-mechanism (supersede): Old mcp-tool handback JSON is retired in favor of top-level mcpTool (plan.mjs:454); cli.mjs decide output also reports mcpTool directly."
       },
       "amendedBy": "codex-session:42@2026-10-15",
-      "rebindingReason": "A22 consequence of the authorized A19 path/line-number correction; current target bytes or section payload changed."
+      "rebindingReason": "A22 consequence of the authorized A19 path/line-number correction; current target bytes or section payload changed.",
+      "reviewNote": "deep: supersede of the mcp-tool handback JSON (or: block, digest 9a8358da) by 6.3 Mechanism whose rebased cite 464-465 holds the mcpTool line; relation unchanged, target digest be2f8b6f recomputed at dfff, priorReview preserved and status pending",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-bounded-rereview.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "be2f8b6fb6fddd1a9fdcbbcaf100e5d07acacec79f314e563786eb6034c4dbba",
+      "targetAncestry": [
+        "Dispatch Control Plane Redesign",
+        "6. DispatchPlan"
+      ],
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4"
     },
     {
       "claimId": "claim_f42a735dabf1e5292e44aec3a483fd4d",
@@ -7826,14 +7850,9 @@
       "targetAnchor": "61-shape",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The current successor at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#61-shape supersedes the stale current-state claim shown at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#61-shape before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval.",
-      "targetUnitDigest": "eccd334eee40b5d3dea247a74c141453af4ff788f6bee3e9d9c8d08bd5000343",
-      "targetAncestry": [
-        "Dispatch Control Plane Redesign",
-        "6. DispatchPlan"
-      ],
       "priorReview": {
         "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
         "reviewedAt": "2026-10-10",
@@ -7843,7 +7862,18 @@
         "reviewNote": "LEG:proposals/dispatch-control-plane-redesign.md#61-shape -> proposals/dispatch-control-plane-redesign.md#61-shape (supersede): Section 6.1 heading and illustrative JSON retired for the real compiled-field list that matches plan.mjs:444-461."
       },
       "amendedBy": "codex-session:42@2026-10-15",
-      "rebindingReason": "A22 consequence of the authorized A19 path/line-number correction; current target bytes or section payload changed."
+      "rebindingReason": "A22 consequence of the authorized A19 path/line-number correction; current target bytes or section payload changed.",
+      "reviewNote": "deep: old 6.1 Shape section (digest 6d5f21de, with the stale JSON) superseded by the corrected 6.1 Shape (eccd334e); 444-461 to 455-472 is the only byte change in the target and matches the code, pending, no approval carry, anchor 61-shape exists",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-bounded-rereview.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "eccd334eee40b5d3dea247a74c141453af4ff788f6bee3e9d9c8d08bd5000343",
+      "targetAncestry": [
+        "Dispatch Control Plane Redesign",
+        "6. DispatchPlan"
+      ],
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4"
     },
     {
       "claimId": "claim_724c421fcb01a0bb978e646aed6b6406",
@@ -7897,14 +7927,9 @@
       "targetAnchor": "63-mechanism",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The current successor at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#63-mechanism supersedes the stale current-state claim shown at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#63-mechanism before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval.",
-      "targetUnitDigest": "be2f8b6fb6fddd1a9fdcbbcaf100e5d07acacec79f314e563786eb6034c4dbba",
-      "targetAncestry": [
-        "Dispatch Control Plane Redesign",
-        "6. DispatchPlan"
-      ],
       "priorReview": {
         "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
         "reviewedAt": "2026-10-10",
@@ -7914,7 +7939,18 @@
         "reviewNote": "LEG:proposals/dispatch-control-plane-redesign.md#63-mechanism -> proposals/dispatch-control-plane-redesign.md#63-mechanism (supersede): Section 6.3 allowed mechanisms equal the values returned by mechanism.mjs (unavailable, in-process, out-of-process)."
       },
       "amendedBy": "codex-session:42@2026-10-15",
-      "rebindingReason": "A22 consequence of the authorized A19 path/line-number correction; current target bytes or section payload changed."
+      "rebindingReason": "A22 consequence of the authorized A19 path/line-number correction; current target bytes or section payload changed.",
+      "reviewNote": "deep: old 6.3 Mechanism section (24440cdc) superseded by the corrected 6.3 Mechanism (be2f8b6f); only the line cite 453-454 became 464-465 and equals the spread lines for agentType and mcpTool at HEAD; pending, approval kept only under priorReview",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-bounded-rereview.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "be2f8b6fb6fddd1a9fdcbbcaf100e5d07acacec79f314e563786eb6034c4dbba",
+      "targetAncestry": [
+        "Dispatch Control Plane Redesign",
+        "6. DispatchPlan"
+      ],
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4"
     },
     {
       "claimId": "claim_ac0e0f88f9216a73d6ad12574b830345",

@@ -1156,16 +1156,11 @@
       "sourceUnitDigest": "543e5632daf001e968418bbeae1311abb85e2a5e966ce473669e6ad635b74a1e",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:39@2026-10-15",
       "targetOwner": "docs/platform/system-overview/spec.md",
       "targetAnchor": "unheaded-block-6",
       "rationale": "A31 historical predecessor superseded by native successor claim_49dc8dc05b31bcfc5cfd0d7c44c8395e. All ten historical lines are byte-identical to the current unit prefix; Commit 6c82c8df0 added the final convention line as proposed; 209824610 changed only its status from proposed to implemented. Current target carries the full successor verbatim. No identity graft or anchor-only match.",
-      "targetUnitDigest": "b5b8e930c4f4411020e3a8559798e1703e8b6e984487ef0d83b318c3c9a7f781",
-      "targetAncestry": [
-        "Spec: System Overview",
-        "Area Map"
-      ],
       "priorReview": {
         "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
         "reviewedAt": "2026-10-15",
@@ -1175,7 +1170,18 @@
         "reviewNote": "deep: gap claim_0cc5fd49 (543e5632) moved to registryGaps and superseded to native successor claim_49dc8dc0 (b5b8e930, present in registry); the ten historical lines are a byte prefix of the current unit and docs/platform/system-overview/spec.md unheaded-block-6 is byte-identical to the current docs/specs unit. Nit, non-blocking: the rationale says main commit 209824610 adds the convention line, but git log -S shows 6c82c8df0 added it as proposed and 209824610 only changed the status word to implemented; the unit conclusion is unaffected"
       },
       "amendedBy": "codex-session:42@2026-10-15",
-      "rebindingReason": "Lead wording correction of the prior-art provenance; successor text/digest and relation unchanged."
+      "rebindingReason": "Lead wording correction of the prior-art provenance; successor text/digest and relation unchanged.",
+      "reviewNote": "deep: rationale fix verified: git shows 6c82c8df0 added the convention line as proposed and 209824610 only changed the status word to implemented (my earlier nit); the ten historical lines are a byte prefix of the successor unit and the target is byte-identical to docs/specs/system-overview.md; priorReview retained, now pending, no approval carry; the capital C after a semicolon in the rationale is a cosmetic nit",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-bounded-rereview.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "b5b8e930c4f4411020e3a8559798e1703e8b6e984487ef0d83b318c3c9a7f781",
+      "targetAncestry": [
+        "Spec: System Overview",
+        "Area Map"
+      ],
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4"
     }
   ]
 }

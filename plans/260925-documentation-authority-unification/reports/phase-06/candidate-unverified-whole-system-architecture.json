@@ -25,10 +25,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: heading section architecture-map of architecture-map.md; native tuple and shown digest ef63545ee3a205a1 equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: heading section architecture-map of architecture-map.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest ef63545ee3a205a1 equal the request, sidecar and committed bytes; architecture-map.md declares Design status Draft (architecture), not promoted; before and current records identical."
     },
     {
       "claimId": "claim_7b42d1f1ec85abb92f9124fa12ff86e0",
@@ -39,10 +39,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: file metadata fence unheaded-block-1 of architecture-map.md; native tuple and shown digest 23c5433eab71eb0b equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: text block unheaded-block-1 of architecture-map.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 23c5433eab71eb0b equal the request, sidecar and committed bytes; architecture-map.md declares Design status Draft (architecture), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_0cac3815f330102dda880aa4a9cee9a9",
@@ -53,10 +53,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "deep: heading section 1-purpose of architecture-map.md; native tuple and shown digest d00255e629bebfe1 equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "deep: heading section 1-purpose of architecture-map.md read in full (244 chars); architecture-map.md declares Design status Draft (architecture), not promoted; native tuple and shown digest d00255e629bebfe1 equal the request, sidecar and committed bytes at the request commit; before and current records identical so no new text since the earlier accepted review."
     },
     {
       "claimId": "claim_26777b895aa016631ca689bd4f87afc7",
@@ -67,10 +67,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "deep: text block unheaded-block-2 of architecture-map.md; native tuple and shown digest 68716afb3dda001c equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: text block unheaded-block-2 of architecture-map.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 68716afb3dda001c equal the request, sidecar and committed bytes; architecture-map.md declares Design status Draft (architecture), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_5d0c6632450568243317dd086a5853bf",
@@ -81,10 +81,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: text block unheaded-block-3 of architecture-map.md; native tuple and shown digest afc142aea3205ebe equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: text block unheaded-block-3 of architecture-map.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest afc142aea3205ebe equal the request, sidecar and committed bytes; architecture-map.md declares Design status Draft (architecture), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_9b2a0e0128ac38f2400fdd8239a9a75d",
@@ -95,10 +95,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: heading section 2-reading-model of architecture-map.md; native tuple and shown digest 8c0d5d2d0be2b041 equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: heading section 2-reading-model of architecture-map.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 8c0d5d2d0be2b041 equal the request, sidecar and committed bytes; architecture-map.md declares Design status Draft (architecture), not promoted; before and current records identical."
     },
     {
       "claimId": "claim_99b07c1da9ac5d14a39dfde1c2750131",
@@ -109,10 +109,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: text block unheaded-block-4 of architecture-map.md; native tuple and shown digest 241aac718cd28f3b equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: text block unheaded-block-4 of architecture-map.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 241aac718cd28f3b equal the request, sidecar and committed bytes; architecture-map.md declares Design status Draft (architecture), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_5663da2b2b3c94add15ab1ba5b75917d",
@@ -123,10 +123,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: text block unheaded-block-5 of architecture-map.md; native tuple and shown digest 5b19cb31509d7bb8 equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "deep: text block unheaded-block-5 of architecture-map.md read in full (224 chars); architecture-map.md declares Design status Draft (architecture), not promoted; native tuple and shown digest 5b19cb31509d7bb8 equal the request, sidecar and committed bytes at the request commit; before and current records identical so no new text since the earlier accepted review. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_ee2fe1fcb299bfa19c57700b45be1766",
@@ -137,10 +137,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: text block unheaded-block-6 of architecture-map.md; native tuple and shown digest a03df4ba27384009 equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "deep: text block unheaded-block-6 of architecture-map.md read in full (78 chars); architecture-map.md declares Design status Draft (architecture), not promoted; native tuple and shown digest a03df4ba27384009 equal the request, sidecar and committed bytes at the request commit; before and current records identical so no new text since the earlier accepted review. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_4bbe5a740067198320d036fdd8743e7c",
@@ -151,10 +151,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: table block unheaded-block-7 of architecture-map.md; native tuple and shown digest e3d1ba266d00910d equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: text block unheaded-block-7 of architecture-map.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest e3d1ba266d00910d equal the request, sidecar and committed bytes; architecture-map.md declares Design status Draft (architecture), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_08b63da9e9f152cd8f66e576898d1d37",
@@ -165,10 +165,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: heading section 3-current-shape of architecture-map.md; native tuple and shown digest 7c18f9e4ce7c447f equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: heading section 3-current-shape of architecture-map.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 7c18f9e4ce7c447f equal the request, sidecar and committed bytes; architecture-map.md declares Design status Draft (architecture), not promoted; before and current records identical."
     },
     {
       "claimId": "claim_1704754baa11baa361c23479e876c7b9",
@@ -179,10 +179,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: text block unheaded-block-8 of architecture-map.md; native tuple and shown digest d357c0787f40103f equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: text block unheaded-block-8 of architecture-map.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest d357c0787f40103f equal the request, sidecar and committed bytes; architecture-map.md declares Design status Draft (architecture), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_eb7750bfa1cf3ed6959126bb83345f40",
@@ -193,10 +193,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "deep: file metadata fence unheaded-block-9 of architecture-map.md; native tuple and shown digest 86c7ae350779393f equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list. Hand-recomputed unit digest from committed text matches."
+      "reviewNote": "deep: text block unheaded-block-9 of architecture-map.md read in full (189 chars); architecture-map.md declares Design status Draft (architecture), not promoted; native tuple and shown digest 86c7ae350779393f equal the request, sidecar and committed bytes at the request commit; before and current records identical so no new text since the earlier accepted review. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_412840f35b9e3f874c394dd8b85cf297",
@@ -207,10 +207,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: text block unheaded-block-10 of architecture-map.md; native tuple and shown digest 3f49089a112019f9 equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: text block unheaded-block-10 of architecture-map.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 3f49089a112019f9 equal the request, sidecar and committed bytes; architecture-map.md declares Design status Draft (architecture), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_e6c17a2321df4b31d36ae8f830f011d9",
@@ -221,10 +221,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: heading section 4-change-rule of architecture-map.md; native tuple and shown digest 4cb2091f1cc3103a equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: heading section 4-change-rule of architecture-map.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 4cb2091f1cc3103a equal the request, sidecar and committed bytes; architecture-map.md declares Design status Draft (architecture), not promoted; before and current records identical."
     },
     {
       "claimId": "claim_8490c1969dc4668c7875c3360295da0b",
@@ -235,10 +235,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: text block unheaded-block-11 of architecture-map.md; native tuple and shown digest 78466155eac7663b equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list. Hand-recomputed unit digest from committed text matches."
+      "reviewNote": "mechanical: text block unheaded-block-11 of architecture-map.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 78466155eac7663b equal the request, sidecar and committed bytes; architecture-map.md declares Design status Draft (architecture), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_d63ead69be42bc59fd0ba597b9c56f73",
@@ -249,10 +249,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: text block unheaded-block-12 of architecture-map.md; native tuple and shown digest 42579709d7a41387 equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list. Hand-recomputed unit digest from committed text matches."
+      "reviewNote": "mechanical: text block unheaded-block-12 of architecture-map.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 42579709d7a41387 equal the request, sidecar and committed bytes; architecture-map.md declares Design status Draft (architecture), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_87bee0710bd078c1fbd49e651c3e3280",
@@ -263,10 +263,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: heading section 5-legacy-source of architecture-map.md; native tuple and shown digest 89f81f3d6bf600ae equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: heading section 5-legacy-source of architecture-map.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 89f81f3d6bf600ae equal the request, sidecar and committed bytes; architecture-map.md declares Design status Draft (architecture), not promoted; before and current records identical."
     },
     {
       "claimId": "claim_9733e00101a0e8571c2b13b1b7659902",
@@ -277,10 +277,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: text block unheaded-block-13 of architecture-map.md; native tuple and shown digest 2bf6a602063a8016 equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: text block unheaded-block-13 of architecture-map.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 2bf6a602063a8016 equal the request, sidecar and committed bytes; architecture-map.md declares Design status Draft (architecture), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_bdeec56f775d4bbd0bab5b121cb21184",
@@ -291,10 +291,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "deep: labelled carriage heading added-in-candidate-architecture-map-source-carriage of architecture-map.md; native tuple and shown digest 9dcfa2c4a9847f2e equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list. Hand-recomputed unit digest from committed text matches."
+      "reviewNote": "deep: heading section added-in-candidate-architecture-map-source-carriage of architecture-map.md read in full (369 chars); architecture-map.md declares Design status Draft (architecture), not promoted; native tuple and shown digest 9dcfa2c4a9847f2e equal the request, sidecar and committed bytes at the request commit; before and current records identical so no new text since the earlier accepted review. The unit carries its own Added in candidate or carriage label."
     },
     {
       "claimId": "claim_7807bb743d35f824e666aea198deb475",
@@ -305,10 +305,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: text block unheaded-block-14 of architecture-map.md; native tuple and shown digest ff0cebcb42c0dda1 equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "deep: text block unheaded-block-14 of architecture-map.md read in full (312 chars); architecture-map.md declares Design status Draft (architecture), not promoted; native tuple and shown digest ff0cebcb42c0dda1 equal the request, sidecar and committed bytes at the request commit; before and current records identical so no new text since the earlier accepted review. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_b3accab399a342e74cfc9f0a80322ab0",
@@ -319,10 +319,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: heading section component-boundary of component-boundary.md; native tuple and shown digest 73669c7b54d0ed4e equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: heading section component-boundary of component-boundary.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 73669c7b54d0ed4e equal the request, sidecar and committed bytes; component-boundary.md declares Design status Draft (architecture), not promoted; before and current records identical."
     },
     {
       "claimId": "claim_84a933eabe0c7693f8286447605b07dc",
@@ -333,10 +333,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: file metadata fence unheaded-block-1 of component-boundary.md; native tuple and shown digest 4440935e581cf481 equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: text block unheaded-block-1 of component-boundary.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 4440935e581cf481 equal the request, sidecar and committed bytes; component-boundary.md declares Design status Draft (architecture), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_d75dabab4a879f6c66f46958eaf99ef5",
@@ -347,10 +347,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "deep: heading section 1-purpose of component-boundary.md; native tuple and shown digest f1dcd9c0533a14d7 equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: heading section 1-purpose of component-boundary.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest f1dcd9c0533a14d7 equal the request, sidecar and committed bytes; component-boundary.md declares Design status Draft (architecture), not promoted; before and current records identical."
     },
     {
       "claimId": "claim_1f96489735bc11e76a941f7c0bba2bad",
@@ -361,10 +361,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: text block unheaded-block-2 of component-boundary.md; native tuple and shown digest 00dd08421918b12e equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: text block unheaded-block-2 of component-boundary.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 00dd08421918b12e equal the request, sidecar and committed bytes; component-boundary.md declares Design status Draft (architecture), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_6b0bb16dca9de7dfe5721722a0a798a3",
@@ -375,10 +375,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: text block unheaded-block-3 of component-boundary.md; native tuple and shown digest 86fae76e86657b80 equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: text block unheaded-block-3 of component-boundary.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 86fae76e86657b80 equal the request, sidecar and committed bytes; component-boundary.md declares Design status Draft (architecture), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_8f18b63b71b7d9431414d08beedc3921",
@@ -389,10 +389,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: heading section 2-current-source-during-migration of component-boundary.md; native tuple and shown digest c52cd37a0cbba0cd equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: heading section 2-current-source-during-migration of component-boundary.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest c52cd37a0cbba0cd equal the request, sidecar and committed bytes; component-boundary.md declares Design status Draft (architecture), not promoted; before and current records identical."
     },
     {
       "claimId": "claim_88b807df35d765018f92641351a46283",
@@ -403,10 +403,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "deep: text block unheaded-block-4 of component-boundary.md; native tuple and shown digest 5a4f9608c6c88b21 equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: text block unheaded-block-4 of component-boundary.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 5a4f9608c6c88b21 equal the request, sidecar and committed bytes; component-boundary.md declares Design status Draft (architecture), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_aacc38bae14d6ddc021cc4278795f5af",
@@ -417,10 +417,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: table block unheaded-block-5 of component-boundary.md; native tuple and shown digest ef970220b2a0deaa equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list. Hand-recomputed unit digest from committed text matches."
+      "reviewNote": "mechanical: text block unheaded-block-5 of component-boundary.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest ef970220b2a0deaa equal the request, sidecar and committed bytes; component-boundary.md declares Design status Draft (architecture), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_98c0bcbf807cefc91820028ca5a3ea76",
@@ -431,10 +431,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: text block unheaded-block-6 of component-boundary.md; native tuple and shown digest 146d21b69eac577a equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: text block unheaded-block-6 of component-boundary.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 146d21b69eac577a equal the request, sidecar and committed bytes; component-boundary.md declares Design status Draft (architecture), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_2c77e24af387b57a9c1c75101fac6e73",
@@ -445,10 +445,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "deep: heading section 3-update-rule of component-boundary.md; native tuple and shown digest b4bac5dd44dad2e0 equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: heading section 3-update-rule of component-boundary.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest b4bac5dd44dad2e0 equal the request, sidecar and committed bytes; component-boundary.md declares Design status Draft (architecture), not promoted; before and current records identical."
     },
     {
       "claimId": "claim_87aa008d95f5575a18f9c8a84d86f74d",
@@ -459,10 +459,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: text block unheaded-block-7 of component-boundary.md; native tuple and shown digest 931c4d6895bd0c98 equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: text block unheaded-block-7 of component-boundary.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 931c4d6895bd0c98 equal the request, sidecar and committed bytes; component-boundary.md declares Design status Draft (architecture), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_f1d9a8653090838260a111f47381ee1a",
@@ -473,10 +473,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: text block unheaded-block-8 of component-boundary.md; native tuple and shown digest a9dc381fff40284c equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: text block unheaded-block-8 of component-boundary.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest a9dc381fff40284c equal the request, sidecar and committed bytes; component-boundary.md declares Design status Draft (architecture), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_4c287afb27181ca336afd0459b6df321",
@@ -487,10 +487,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: text block unheaded-block-9 of component-boundary.md; native tuple and shown digest 0de4043eee48d409 equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: text block unheaded-block-9 of component-boundary.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 0de4043eee48d409 equal the request, sidecar and committed bytes; component-boundary.md declares Design status Draft (architecture), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_60b200d89cba5da6157ee4c3b7311a2e",
@@ -501,10 +501,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "deep: heading section 4-current-high-level-components of component-boundary.md; native tuple and shown digest 43f73c70cebffac0 equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: heading section 4-current-high-level-components of component-boundary.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 43f73c70cebffac0 equal the request, sidecar and committed bytes; component-boundary.md declares Design status Draft (architecture), not promoted; before and current records identical."
     },
     {
       "claimId": "claim_4b3482e666dba2d9678b4f8bf0fefcea",
@@ -515,10 +515,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: text block unheaded-block-10 of component-boundary.md; native tuple and shown digest 36c91b4a266f2cce equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: text block unheaded-block-10 of component-boundary.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 36c91b4a266f2cce equal the request, sidecar and committed bytes; component-boundary.md declares Design status Draft (architecture), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_281124881201e09f11dbb099caeee81c",
@@ -529,10 +529,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "deep: table block unheaded-block-11 of component-boundary.md; native tuple and shown digest 6bea55eabbf3ca71 equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "deep: text block unheaded-block-11 of component-boundary.md read in full (4555 chars); component-boundary.md declares Design status Draft (architecture), not promoted; native tuple and shown digest 6bea55eabbf3ca71 equal the request, sidecar and committed bytes at the request commit; before and current records identical so no new text since the earlier accepted review. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_04ad87d13e4de217b79136140dab35f4",
@@ -543,10 +543,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "deep: heading section 5-how-to-change of component-boundary.md; native tuple and shown digest 00dbe00629193358 equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "deep: heading section 5-how-to-change of component-boundary.md read in full (375 chars); component-boundary.md declares Design status Draft (architecture), not promoted; native tuple and shown digest 00dbe00629193358 equal the request, sidecar and committed bytes at the request commit; before and current records identical so no new text since the earlier accepted review."
     },
     {
       "claimId": "claim_494478c0f174c1316cb79499ecd22da7",
@@ -557,10 +557,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "deep: text block unheaded-block-12 of component-boundary.md; native tuple and shown digest 345cb600b2af33bf equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "deep: text block unheaded-block-12 of component-boundary.md read in full (354 chars); component-boundary.md declares Design status Draft (architecture), not promoted; native tuple and shown digest 345cb600b2af33bf equal the request, sidecar and committed bytes at the request commit; before and current records identical so no new text since the earlier accepted review. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_5d3c632ef3e6b7631307307d54682e71",
@@ -571,10 +571,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: heading section 6-related-files of component-boundary.md; native tuple and shown digest c2ef85b2529e7d94 equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: heading section 6-related-files of component-boundary.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest c2ef85b2529e7d94 equal the request, sidecar and committed bytes; component-boundary.md declares Design status Draft (architecture), not promoted; before and current records identical."
     },
     {
       "claimId": "claim_088901bb1c7d69b87da383ddce95fe18",
@@ -585,10 +585,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: table block unheaded-block-13 of component-boundary.md; native tuple and shown digest dd9bdd0cd63e539a equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: text block unheaded-block-13 of component-boundary.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest dd9bdd0cd63e539a equal the request, sidecar and committed bytes; component-boundary.md declares Design status Draft (architecture), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_568f01ef849f421829301c6915bb229a",
@@ -599,10 +599,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "deep: labelled carriage heading added-in-candidate-component-boundary-advisory-source-carriage of component-boundary.md; native tuple and shown digest 0a60bb8cbdac5f47 equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list. Hand-recomputed unit digest from committed text matches."
+      "reviewNote": "mechanical: heading section added-in-candidate-component-boundary-advisory-source-carriage of component-boundary.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 0a60bb8cbdac5f47 equal the request, sidecar and committed bytes; component-boundary.md declares Design status Draft (architecture), not promoted; before and current records identical."
     },
     {
       "claimId": "claim_07791d764c90e9fb064d1f2d24405532",
@@ -613,10 +613,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: text block unheaded-block-14 of component-boundary.md; native tuple and shown digest 5c900dfeaf4d2838 equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: text block unheaded-block-14 of component-boundary.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 5c900dfeaf4d2838 equal the request, sidecar and committed bytes; component-boundary.md declares Design status Draft (architecture), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_a1b1028d7f59d5c4abc36be529d775ce",
@@ -627,10 +627,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: labelled carriage heading added-in-candidate-readme-source-carriage of component-boundary.md; native tuple and shown digest 16b7a83892f39d57 equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: heading section added-in-candidate-readme-source-carriage of component-boundary.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 16b7a83892f39d57 equal the request, sidecar and committed bytes; component-boundary.md declares Design status Draft (architecture), not promoted; before and current records identical."
     },
     {
       "claimId": "claim_9f9d5f8014b5411013ef1423cdddc32f",
@@ -641,10 +641,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: text block unheaded-block-159 of component-boundary.md; native tuple and shown digest c6fa906e1372bdc8 equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: text block unheaded-block-159 of component-boundary.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest c6fa906e1372bdc8 equal the request, sidecar and committed bytes; component-boundary.md declares Design status Draft (architecture), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_779a50ced8b8ee88dfc0a5c0d13ea897",
@@ -655,10 +655,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: labelled carriage heading added-in-candidate-repo-layout-vision-source-carriage of component-boundary.md; native tuple and shown digest 104093e8a381cc82 equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: heading section added-in-candidate-repo-layout-vision-source-carriage of component-boundary.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 104093e8a381cc82 equal the request, sidecar and committed bytes; component-boundary.md declares Design status Draft (architecture), not promoted; before and current records identical."
     },
     {
       "claimId": "claim_2ca8344b20f24a67a8414f3d6ac78158",
@@ -669,10 +669,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: text block unheaded-block-200 of component-boundary.md; native tuple and shown digest 8d6eec3640a155c7 equal the pack, sidecar and HEAD bytes. file declares Design status Draft (Canonical: Yes, after review, switchboard route candidate) and has 0 deleted lines versus the pin 69dd3ee7f, so the unit is source text carried unchanged; tuple identical to the previous 79-row list."
+      "reviewNote": "deep: text block unheaded-block-200 of component-boundary.md read in full (343 chars); component-boundary.md declares Design status Draft (architecture), not promoted; native tuple and shown digest 8d6eec3640a155c7 equal the request, sidecar and committed bytes at the request commit; before and current records identical so no new text since the earlier accepted review. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_a5bea09289d356820c12b650f473b9a5",
@@ -683,10 +683,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: file metadata fence unheaded-block-1 of system-architecture/architecture/architecture-intent.md; native tuple and shown digest 29832c476e0e8af9 equal the pack, sidecar and HEAD bytes. file declares Design status Candidate and Canonical for Nothing until promotion; the unit is a labelled migration header, not a semantic claim; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: text block unheaded-block-1 of system-architecture/architecture/architecture-intent.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 29832c476e0e8af9 equal the request, sidecar and committed bytes; system-architecture/architecture/architecture-intent.md declares Design status Candidate (architecture), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_ac1a0faff59618ebf38ccf8e6000fd40",
@@ -697,10 +697,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: labelled Added-in-candidate block unheaded-block-2 of system-architecture/architecture/architecture-intent.md; native tuple and shown digest d271d4fcfcf426a2 equal the pack, sidecar and HEAD bytes. file declares Design status Candidate and Canonical for Nothing until promotion; the unit is a labelled migration header, not a semantic claim; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: text block unheaded-block-2 of system-architecture/architecture/architecture-intent.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest d271d4fcfcf426a2 equal the request, sidecar and committed bytes; system-architecture/architecture/architecture-intent.md declares Design status Candidate (architecture), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_6cd449ef115de0465d810e5dfccc2bc7",
@@ -711,10 +711,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: file metadata fence unheaded-block-1 of system-architecture/architecture/roadmap.md; native tuple and shown digest 76468776b88732bb equal the pack, sidecar and HEAD bytes. file declares Design status Candidate and Canonical for Nothing until promotion; the unit is a labelled migration header, not a semantic claim; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: text block unheaded-block-1 of system-architecture/architecture/roadmap.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 76468776b88732bb equal the request, sidecar and committed bytes; system-architecture/architecture/roadmap.md declares Design status Candidate (architecture), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_d63d7990151f2781a8a4da339c62ac64",
@@ -725,10 +725,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "deep: labelled Added-in-candidate block unheaded-block-2 of system-architecture/architecture/roadmap.md; native tuple and shown digest d271d4fcfcf426a2 equal the pack, sidecar and HEAD bytes. file declares Design status Candidate and Canonical for Nothing until promotion; the unit is a labelled migration header, not a semantic claim; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: text block unheaded-block-2 of system-architecture/architecture/roadmap.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest d271d4fcfcf426a2 equal the request, sidecar and committed bytes; system-architecture/architecture/roadmap.md declares Design status Candidate (architecture), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_3194ec35382127f6edde53d0697a232d",
@@ -739,10 +739,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: file metadata fence unheaded-block-1 of system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md; native tuple and shown digest c0c113ba85ee7b2d equal the pack, sidecar and HEAD bytes. file declares Design status Candidate and Canonical for Nothing until promotion; the unit is a labelled migration header, not a semantic claim; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: text block unheaded-block-1 of system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest c0c113ba85ee7b2d equal the request, sidecar and committed bytes; system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md declares Design status Candidate (architecture), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_3a39f4a6f5622e7db7a9913956c9aa6e",
@@ -753,10 +753,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: labelled Added-in-candidate block unheaded-block-2 of system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md; native tuple and shown digest d271d4fcfcf426a2 equal the pack, sidecar and HEAD bytes. file declares Design status Candidate and Canonical for Nothing until promotion; the unit is a labelled migration header, not a semantic claim; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: text block unheaded-block-2 of system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest d271d4fcfcf426a2 equal the request, sidecar and committed bytes; system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md declares Design status Candidate (architecture), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_1200f05152a6a9b464b6c12bc17f21db",
@@ -767,10 +767,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: file metadata fence unheaded-block-1 of system-architecture/architecture/workspace-topology-audit.md; native tuple and shown digest b851e6ad89a3503b equal the pack, sidecar and HEAD bytes. file declares Design status Candidate and Canonical for Nothing until promotion; the unit is a labelled migration header, not a semantic claim; tuple identical to the previous 79-row list. Hand-recomputed unit digest from committed text matches."
+      "reviewNote": "mechanical: text block unheaded-block-1 of system-architecture/architecture/workspace-topology-audit.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest b851e6ad89a3503b equal the request, sidecar and committed bytes; system-architecture/architecture/workspace-topology-audit.md declares Design status Candidate (architecture), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_b5f698f6088c010eec3a5fa77d0e9e61",
@@ -781,10 +781,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: labelled Added-in-candidate block unheaded-block-2 of system-architecture/architecture/workspace-topology-audit.md; native tuple and shown digest d271d4fcfcf426a2 equal the pack, sidecar and HEAD bytes. file declares Design status Candidate and Canonical for Nothing until promotion; the unit is a labelled migration header, not a semantic claim; tuple identical to the previous 79-row list."
+      "reviewNote": "deep: text block unheaded-block-2 of system-architecture/architecture/workspace-topology-audit.md read in full (291 chars); system-architecture/architecture/workspace-topology-audit.md declares Design status Candidate (architecture), not promoted; native tuple and shown digest d271d4fcfcf426a2 equal the request, sidecar and committed bytes at the request commit; before and current records identical so no new text since the earlier accepted review. The unit carries its own Added in candidate or carriage label. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_638ffba5b4214918a4123ad8ac2def28",
@@ -795,10 +795,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: file metadata fence unheaded-block-1 of system-architecture/architecture/workspace-topology-roadmap.md; native tuple and shown digest 120fffc25f8269b4 equal the pack, sidecar and HEAD bytes. file declares Design status Candidate and Canonical for Nothing until promotion; the unit is a labelled migration header, not a semantic claim; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: text block unheaded-block-1 of system-architecture/architecture/workspace-topology-roadmap.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 120fffc25f8269b4 equal the request, sidecar and committed bytes; system-architecture/architecture/workspace-topology-roadmap.md declares Design status Candidate (architecture), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_faf6a192a58c297957a66b34b5e395d7",
@@ -809,10 +809,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: labelled Added-in-candidate block unheaded-block-2 of system-architecture/architecture/workspace-topology-roadmap.md; native tuple and shown digest d271d4fcfcf426a2 equal the pack, sidecar and HEAD bytes. file declares Design status Candidate and Canonical for Nothing until promotion; the unit is a labelled migration header, not a semantic claim; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: text block unheaded-block-2 of system-architecture/architecture/workspace-topology-roadmap.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest d271d4fcfcf426a2 equal the request, sidecar and committed bytes; system-architecture/architecture/workspace-topology-roadmap.md declares Design status Candidate (architecture), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_ba08d1a48089f77718d81c9b2c825202",
@@ -823,10 +823,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "mechanical: file metadata fence unheaded-block-1 of system-architecture/architecture/workspace-topology.md; native tuple and shown digest e44eb7add5cc37f5 equal the pack, sidecar and HEAD bytes. file declares Design status Candidate and Canonical for Nothing until promotion; the unit is a labelled migration header, not a semantic claim; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: text block unheaded-block-1 of system-architecture/architecture/workspace-topology.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest e44eb7add5cc37f5 equal the request, sidecar and committed bytes; system-architecture/architecture/workspace-topology.md declares Design status Candidate (architecture), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_411decb502d39d43876c5d7da7e1cf7f",
@@ -837,10 +837,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "deep: labelled Added-in-candidate block unheaded-block-2 of system-architecture/architecture/workspace-topology.md; native tuple and shown digest d271d4fcfcf426a2 equal the pack, sidecar and HEAD bytes. file declares Design status Candidate and Canonical for Nothing until promotion; the unit is a labelled migration header, not a semantic claim; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: text block unheaded-block-2 of system-architecture/architecture/workspace-topology.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest d271d4fcfcf426a2 equal the request, sidecar and committed bytes; system-architecture/architecture/workspace-topology.md declares Design status Candidate (architecture), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_cb9bec6c6a80cc775721132cb7569f54",
@@ -852,9 +852,9 @@
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
       "reviewMode": "ordinary",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
-      "reviewNote": "deep: heading section architect-readme-source-carriage of system-architecture/history/architect-readme.md; native tuple and shown digest a7422f57dfaad386 equal the pack, sidecar and HEAD bytes. New native allocation in the new history file. File declares Document type History and Design status Candidate, Canonical for Nothing; carried body equals blob 454d688de0 of docs/architect/README.md with only heading depth +1 and link destinations rebased."
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
+      "reviewNote": "mechanical: heading section architect-readme-source-carriage of system-architecture/history/architect-readme.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest a7422f57dfaad386 equal the request, sidecar and committed bytes; system-architecture/history/architect-readme.md declares Design status Candidate (history), non-canonical history carrier, not promoted; before and current records identical."
     },
     {
       "claimId": "claim_61cd2622fa0c5c1b7c18ea39e2f85579",
@@ -866,9 +866,9 @@
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
       "reviewMode": "ordinary",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
-      "reviewNote": "deep: file metadata fence unheaded-block-1 of system-architecture/history/architect-readme.md; native tuple and shown digest 1d36d1e33d5a609a equal the pack, sidecar and HEAD bytes. New native allocation in the new history file. File declares Document type History and Design status Candidate, Canonical for Nothing; carried body equals blob 454d688de0 of docs/architect/README.md with only heading depth +1 and link destinations rebased."
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
+      "reviewNote": "mechanical: text block unheaded-block-1 of system-architecture/history/architect-readme.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 1d36d1e33d5a609a equal the request, sidecar and committed bytes; system-architecture/history/architect-readme.md declares Design status Candidate (history), non-canonical history carrier, not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_4ea489ceb9de68fc157a43c0496640a8",
@@ -880,9 +880,9 @@
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
       "reviewMode": "ordinary",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
-      "reviewNote": "deep: labelled Added-in-candidate block unheaded-block-2 of system-architecture/history/architect-readme.md; native tuple and shown digest 96eb59d9375ec91f equal the pack, sidecar and HEAD bytes. New native allocation in the new history file. File declares Document type History and Design status Candidate, Canonical for Nothing; carried body equals blob 454d688de0 of docs/architect/README.md with only heading depth +1 and link destinations rebased."
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
+      "reviewNote": "deep: text block unheaded-block-2 of system-architecture/history/architect-readme.md read in full (136 chars); system-architecture/history/architect-readme.md declares Design status Candidate (history), non-canonical history carrier, not promoted; native tuple and shown digest 96eb59d9375ec91f equal the request, sidecar and committed bytes at the request commit; before and current records identical so no new text since the earlier accepted review. The unit carries its own Added in candidate or carriage label. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_e88d54e093c0cbc64cf8a291109760aa",
@@ -894,9 +894,9 @@
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
       "reviewMode": "ordinary",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
-      "reviewNote": "deep: labelled carriage heading added-in-candidate-readme-source-carriage of system-architecture/history/architect-readme.md; native tuple and shown digest 846f9c1d0f178e73 equal the pack, sidecar and HEAD bytes. Same ID and digest as the old README unit, relocated from docs/platform/README.md to this history carrier (path change only). File declares Document type History and Design status Candidate, Canonical for Nothing; carried body equals blob 454d688de0 of docs/architect/README.md with only heading depth +1 and link destinations rebased."
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
+      "reviewNote": "mechanical: heading section added-in-candidate-readme-source-carriage of system-architecture/history/architect-readme.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 846f9c1d0f178e73 equal the request, sidecar and committed bytes; system-architecture/history/architect-readme.md declares Design status Candidate (history), non-canonical history carrier, not promoted; before and current records identical."
     },
     {
       "claimId": "claim_fdf5951f6ac14750049b17bc79477f9c",
@@ -908,9 +908,9 @@
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
       "reviewMode": "ordinary",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
-      "reviewNote": "deep: text block unheaded-block-3 of system-architecture/history/architect-readme.md; native tuple and shown digest 921a04d4bd874a25 equal the pack, sidecar and HEAD bytes. Same ID and digest as old README unit-block-10, relocated here as unheaded-block-3 (anchor and path change only). File declares Document type History and Design status Candidate, Canonical for Nothing; carried body equals blob 454d688de0 of docs/architect/README.md with only heading depth +1 and link destinations rebased. Hand-recomputed unit digest from committed text matches."
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
+      "reviewNote": "mechanical: text block unheaded-block-3 of system-architecture/history/architect-readme.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 921a04d4bd874a25 equal the request, sidecar and committed bytes; system-architecture/history/architect-readme.md declares Design status Candidate (history), non-canonical history carrier, not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_0dc85618100636a09598f0d426315ac8",
@@ -921,10 +921,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "deep: file metadata fence unheaded-block-1 of system-overview/spec.md; native tuple and shown digest 7149b336edba9024 equal the pack, sidecar and HEAD bytes. file declares Design status Candidate and Canonical for Nothing until promotion; unit is labelled Added in candidate and the frontmatter matches the pinned source verbatim; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: text block unheaded-block-1 of system-overview/spec.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 7149b336edba9024 equal the request, sidecar and committed bytes; system-overview/spec.md declares Design status Candidate (spec), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_bb7cef766e9e315e8d571c2439266591",
@@ -935,10 +935,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-02.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "deep: labelled Added-in-candidate block unheaded-block-2 of system-overview/spec.md; native tuple and shown digest d271d4fcfcf426a2 equal the pack, sidecar and HEAD bytes. file declares Design status Candidate and Canonical for Nothing until promotion; unit is labelled Added in candidate and the frontmatter matches the pinned source verbatim; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: text block unheaded-block-2 of system-overview/spec.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest d271d4fcfcf426a2 equal the request, sidecar and committed bytes; system-overview/spec.md declares Design status Candidate (spec), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_ac724d4356d7b0991556746868bdf769",
@@ -949,10 +949,10 @@
       "reviewStatus": "reviewed",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0625-whole-system-rereview-candidates-02.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
-      "reviewNote": "deep: labelled Added-in-candidate block unheaded-block-3 of system-overview/spec.md; native tuple and shown digest c14e6d885d8ddd0d equal the pack, sidecar and HEAD bytes. file declares Design status Candidate and Canonical for Nothing until promotion; unit is labelled Added in candidate and the frontmatter matches the pinned source verbatim; tuple identical to the previous 79-row list."
+      "reviewNote": "mechanical: text block unheaded-block-3 of system-overview/spec.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest c14e6d885d8ddd0d equal the request, sidecar and committed bytes; system-overview/spec.md declares Design status Candidate (spec), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     }
   ],
   "count": 67,
@@ -971,16 +971,13 @@
     "currentFullTupleEquality": true
   },
   "nativeEquality": {
-    "contentCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
+    "contentCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
     "fullTupleEquality": true,
     "eligibleTupleEquality": true,
     "nativeReverseCount": 67,
     "candidateUnverifiedCount": 67,
-    "pendingCanonicalReceiptCount": 0,
-    "separatePortalProtocolReceipts": 15,
-    "portalReceiptsOutsideScopedReverse": true,
-    "partitionTupleEquality": true,
-    "meaning": "Full five-field native tuple equality; no truth approval. Fifteen portal protocol receipts remain separate obligations outside the whole-system reverse namespace after the file-level target moved to History."
+    "nativeSync": false,
+    "meaning": "Fresh comparison from persisted registry; metadata application only."
   },
   "portalCorrection": {
     "reportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
@@ -1238,5 +1235,15 @@
       }
     },
     "meaning": "Historical metadata at input pin, superseded by the current native proof only; no review or truth acceptance."
+  },
+  "listReview": {
+    "reviewStatus": "reviewed",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-15",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+    "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
+    "meaning": "Accepted committed pre-application list membership and eligibility only; metadata additions below are current verification, not code-truth approval.",
+    "reviewNote": "deep: list file has 67 rows, count 67, previousCount 82, all status candidate-unverified and each row equal to the native strict E reverse tuple against both prior registries (67 of 67, 0 missing, 0 extra), to the request tuples and to the sidecar rows; none is in docs/platform/README.md (the 15 removed portal rows are listed under portalCorrection and removedCanonicalRows and are separately receipted); this applies the author action I required in my earlier review of the 82-row list.",
+    "shownListDigest": "c168d7a2f331586328a70710ed647360923b3f0d73f94f9957faa2b6d6f08e80"
   }
 }

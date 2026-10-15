@@ -11812,9 +11812,9 @@
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
       "reviewMode": "ordinary",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
-      "reviewNote": "deep: contextual exception for the two identical Outside hard / Inside soft diagrams; follows the established group shape (digest, representativeClaimId, kind document-or-section-scoped-repetition, reason, sourceUnits with source, owner, ancestry, text); a scan of docs at HEAD finds exactly two sources with this digest (docs/architect/architecture-intent.md block 8, system-vision block 8) and each pairs to its own different owner, matching the decision rows (blocks 10 of the two documents) and local ancestry; source and target text identical; still pending, no waiver"
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-bounded-rereview.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
+      "reviewNote": "mechanical: retained accepted exception group (Outside hard and Inside soft diagram, two sources); only review fields changed in the committed group, equal to my 36d79ddcc verdict; the reason text still says pending contextual review although the status is reviewed (cosmetic, same as accepted)"
     },
     {
       "digest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
@@ -11884,9 +11884,9 @@
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
       "reviewMode": "ordinary",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
-      "reviewNote": "deep: contextual exception for the closing decision sentence in four contexts; same established shape; the scan finds exactly four sources in this batch scope (architecture-map blocks 77 and 83, system-overview blocks 25 and 34), each paired positionally to its own owner (platform architecture-map blocks 91 and 97, system-overview blocks 28 and 37) with local decision ancestry 0015, 0017, 0016, 0018 equal on both sides, matching the decision rows. Other occurrences of this digest belong to the other areas and are not part of this group"
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-bounded-rereview.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
+      "reviewNote": "mechanical: retained accepted exception group (closing decision sentence, four contexts); only review metadata changed, note and pin equal my 36d79ddcc verdict, four sources and owners unchanged"
     }
   ]
 }

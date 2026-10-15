@@ -4,7 +4,7 @@
   "authorization": "A28 + A31; existing accepted list plus four interim machine-repin-review tuples; native equality verified at dfff335d3; formal classification acceptance still pending",
   "authoredCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
   "meaning": "Conservation-only candidate-unverified units, exactly the native scoped strict E reverse-open set after committed evidence-only re-pin review. The 134 actually changed-code receipts remain unverified; truth is sampled under A28 and checked in full at promotion.",
-  "count": 572,
+  "count": 570,
   "rows": [
     {
       "claimId": "claim_934febe56562f8195a08b9f82f9fcce5",
@@ -3929,9 +3929,9 @@
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
       "reviewMode": "ordinary",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
-      "reviewNote": "mechanical: optional fileStatus authorityStatus corrected from unrouted to candidate; unit digest recomputes, committed list row equals the proposal, before equals the list at 48da12f2b, and 455 sibling rows already carry candidate. priorEligibilityReview is an empty object (the old row had no review), so the meaning text overstates; harmless"
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-bounded-rereview.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
+      "reviewNote": "mechanical: retained accepted candidate-unverified metadata change (documentation-governance.md); unit digest recomputes from the file at dfff (extractor), the list row equals the pack, review note and pin equal my 36d79ddcc verdict"
     },
     {
       "claimId": "claim_b44cc3f8193df5feb28069a3fa147a1c",
@@ -3957,9 +3957,9 @@
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
       "reviewMode": "ordinary",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
-      "reviewNote": "mechanical: optional fileStatus authorityStatus corrected from unrouted to candidate; unit digest recomputes, committed list row equals the proposal, before equals the list at 48da12f2b, and 455 sibling rows already carry candidate. priorEligibilityReview is an empty object (the old row had no review), so the meaning text overstates; harmless"
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-bounded-rereview.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
+      "reviewNote": "mechanical: retained accepted candidate-unverified metadata change (documentation-standardization-plan.md); unit digest recomputes from the file at dfff (extractor), the list row equals the pack, review note and pin equal my 36d79ddcc verdict"
     },
     {
       "claimId": "claim_b4ad8770e6fd15133e9a922314b617c3",
@@ -4356,9 +4356,9 @@
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
       "reviewMode": "ordinary",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0607-whole-system-rereview-01.md",
-      "reviewReportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
-      "reviewNote": "mechanical: optional fileStatus authorityStatus corrected from unrouted to candidate; unit digest recomputes, committed list row equals the proposal, before equals the list at 48da12f2b, and 455 sibling rows already carry candidate. priorEligibilityReview is an empty object (the old row had no review), so the meaning text overstates; harmless"
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-bounded-rereview.md",
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
+      "reviewNote": "mechanical: retained accepted candidate-unverified metadata change (stage-operation-taskspec-skill-relationship.svg); unit digest recomputes from the file at dfff (sha256 of the svg bytes), the list row equals the pack, review note and pin equal my 36d79ddcc verdict"
     },
     {
       "claimId": "claim_548badb8fc185af4559913e767e31c6f",
@@ -7003,20 +7003,6 @@
       }
     },
     {
-      "claimId": "claim_fa99f4d5cfcd0ea169efdf450e007955",
-      "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
-      "anchor": "unheaded-block-40",
-      "unitDigest": "008c98d9c6445268a4d6e33133ec0871b7c7a23a48e51369cad11c0b20caa857",
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_ad38a91ec63db8a175d99078bcf6e158",
-      "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
-      "anchor": "unheaded-block-43",
-      "unitDigest": "4097ad349f818789dbce9534ea72cb57d15de4064f1996e24c34588a47c75d9e",
-      "status": "candidate-unverified"
-    },
-    {
       "claimId": "claim_17840b1a73bbd8e2b8a87ed9a3a29b97",
       "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "anchor": "unheaded-block-45",
@@ -9528,7 +9514,7 @@
       "status": "candidate-unverified"
     }
   ],
-  "previousCount": 568,
+  "previousCount": 572,
   "nativeRebinding": {
     "fullNativeTupleEquality": true,
     "knownIDsPreserved": true,
@@ -9558,16 +9544,13 @@
     "nativeEquality": "Full current candidate-list tuple equality proved at dfff335d3. This historical ordinary machine assessment does not supply the separate committed Class-column receipt acceptance."
   },
   "nativeEquality": {
-    "contentCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
+    "contentCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
     "fullTupleEquality": true,
     "eligibleTupleEquality": true,
-    "nativeReverseCount": 572,
-    "candidateUnverifiedCount": 572,
-    "pendingCanonicalReceiptCount": 0,
-    "separatePortalProtocolReceipts": 0,
-    "portalReceiptsOutsideScopedReverse": false,
-    "partitionTupleEquality": true,
-    "meaning": "Full five-field native tuple equality; no truth approval. Fifteen portal protocol receipts remain separate obligations outside the whole-system reverse namespace after the file-level target moved to History."
+    "nativeReverseCount": 570,
+    "candidateUnverifiedCount": 570,
+    "nativeSync": false,
+    "meaning": "Fresh comparison from persisted registry; metadata application only."
   },
   "previousNativeVerificationMetadata": {
     "contentCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
@@ -9608,5 +9591,25 @@
       "authorization": "A28 + A31; existing accepted list plus four interim machine-repin-review tuples; native equality owed next turn"
     },
     "meaning": "Historical metadata at input pin, superseded by the current native proof only; no review or truth acceptance."
+  },
+  "classificationAcceptance": {
+    "reportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
+    "removedRows": [
+      {
+        "claimId": "claim_fa99f4d5cfcd0ea169efdf450e007955",
+        "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+        "anchor": "unheaded-block-40",
+        "unitDigest": "008c98d9c6445268a4d6e33133ec0871b7c7a23a48e51369cad11c0b20caa857",
+        "status": "candidate-unverified"
+      },
+      {
+        "claimId": "claim_ad38a91ec63db8a175d99078bcf6e158",
+        "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+        "anchor": "unheaded-block-43",
+        "unitDigest": "4097ad349f818789dbce9534ea72cb57d15de4064f1996e24c34588a47c75d9e",
+        "status": "candidate-unverified"
+      }
+    ],
+    "reason": "Exact live IDs accepted by committed seven-column classification report; historical predecessor approvals do not close successor IDs."
   }
 }

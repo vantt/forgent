@@ -13,7 +13,13 @@
       "rationale": "Complete docs/architect/README.md source carriage into the non-canonical History carrier. Heading levels shift by two and relative link prefixes rebase; every link resolves to the same physical destination. No source retirement or promotion.",
       "targets": [
         "docs/platform/system-architecture/history/architect-readme.md"
-      ]
+      ],
+      "reviewAssessment": {
+        "reportPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-bounded-rereview.md",
+        "reportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
+        "reviewer": "reviewer:claude-session:a4954387@2026-10-14",
+        "meaning": "Accepted complete carriage metadata checked in Scope and method; no separate file verdict invented."
+      }
     }
   ],
   "claims": [
@@ -24,15 +30,10 @@
       "targetAnchor": "architect-level-design",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:39@2026-10-15",
       "rationale": "Carry the complete source unit into docs/platform/system-architecture/history/architect-readme.md#architect-level-design, the non-canonical History carrier. The whole docs/architect/README.md snapshot is preserved with heading levels shifted by two and relative link prefixes rebased; every link resolves to the same physical destination. All source clauses, qualifications, obligations, exceptions, open gaps and planned/unbuilt statements remain. No remainder, source retirement, promotion or code-truth approval. The committed ordinary verdict accepted carriage; this corrected rationale is pending independent re-review.",
       "targetKind": "history",
-      "targetUnitDigest": "6728116d72d8078b550b06129599d2d346837494e530c0e658b4272acd3cbff3",
-      "targetAncestry": [
-        "Architect README Source Carriage",
-        "Added in candidate: README source carriage"
-      ],
       "priorReview": {
         "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
         "reviewedAt": "2026-10-15",
@@ -42,7 +43,18 @@
         "reviewNote": "deep: heading Architect-Level Design moved to the non-canonical history carrier; the carrier docs/platform/system-architecture/history/architect-readme.md exists, the anchor passes list-doc-anchors, targetAncestry equals the real ancestry of the target unit, target digest recomputed. Whole legacy README (blob 454d688d at 69dd3ee7f) transformed with only heading level plus 2 and link prefix ../ to ../../../architect/ gives a zero-line diff against the carrier body, so nothing lost and nothing unlabelled added beyond the labelled header. Wording nit, non-blocking: the first half of the rationale still says the carriage lands in docs/platform/README.md lines 95; the appended correction sentence is the true statement"
       },
       "amendedBy": "codex-session:42@2026-10-15",
-      "rebindingReason": "A22 / Lead wording correction: remove the obsolete canonical-portal destination; preserve the accepted carriage verdict as priorReview."
+      "rebindingReason": "A22 / Lead wording correction: remove the obsolete canonical-portal destination; preserve the accepted carriage verdict as priorReview.",
+      "reviewNote": "deep: heading Architect-Level Design to history carrier; corrected rationale is true (carrier exists, anchor ok, heading levels +2, relative prefix ../ to ../../../architect/ resolves to the same 15 destinations, whole carriage equals docs/architect/README.md blob 454d688d after that transform); target digest 6728116d and ancestry recompute; pending, priorReview holds my earlier ok, no approval carry",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-bounded-rereview.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "6728116d72d8078b550b06129599d2d346837494e530c0e658b4272acd3cbff3",
+      "targetAncestry": [
+        "Architect README Source Carriage",
+        "Added in candidate: README source carriage"
+      ],
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4"
     },
     {
       "claimId": "claim_2896a30027e0e6b1d5790748308d08e6",
@@ -51,16 +63,10 @@
       "targetAnchor": "unheaded-block-4",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:39@2026-10-15",
       "rationale": "Carry the complete source unit into docs/platform/system-architecture/history/architect-readme.md#unheaded-block-4, the non-canonical History carrier. The whole docs/architect/README.md snapshot is preserved with heading levels shifted by two and relative link prefixes rebased; every link resolves to the same physical destination. All source clauses, qualifications, obligations, exceptions, open gaps and planned/unbuilt statements remain. No remainder, source retirement, promotion or code-truth approval. The committed ordinary verdict accepted carriage; this corrected rationale is pending independent re-review.",
       "targetKind": "history",
-      "targetUnitDigest": "8db83e4e0a0c4f7f4b3997f5fd63ce1cd27d444871eaf2c50254af5de942ccc0",
-      "targetAncestry": [
-        "Architect README Source Carriage",
-        "Added in candidate: README source carriage",
-        "Architect-Level Design"
-      ],
       "priorReview": {
         "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
         "reviewedAt": "2026-10-15",
@@ -70,7 +76,19 @@
         "reviewNote": "deep: metadata/body block 1 (Weak-exact, digest equal 8db83e4e) moved to the history carrier; the carrier docs/platform/system-architecture/history/architect-readme.md exists, the anchor passes list-doc-anchors, targetAncestry equals the real ancestry of the target unit; covered by the zero-diff transform of the whole legacy README (heading shift and link rebasing only), so no word lost; the old canonical-portal location no longer exists (portal diff against 69dd3ee7f is the one corrected line only); stale first-half wording in the rationale is overridden by its appended correction"
       },
       "amendedBy": "codex-session:42@2026-10-15",
-      "rebindingReason": "A22 / Lead wording correction: remove the obsolete canonical-portal destination; preserve the accepted carriage verdict as priorReview."
+      "rebindingReason": "A22 / Lead wording correction: remove the obsolete canonical-portal destination; preserve the accepted carriage verdict as priorReview.",
+      "reviewNote": "deep: README block 1 (Document type metadata lines, digest 8db83e4e equal both sides) to history block 4; old text still named docs/platform/README.md, new rationale names the history carrier and is true; digests and ancestry recompute, pending without carried approval",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-bounded-rereview.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "8db83e4e0a0c4f7f4b3997f5fd63ce1cd27d444871eaf2c50254af5de942ccc0",
+      "targetAncestry": [
+        "Architect README Source Carriage",
+        "Added in candidate: README source carriage",
+        "Architect-Level Design"
+      ],
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4"
     },
     {
       "claimId": "claim_50a65e67f2ed6c8391a0e104b46640cb",
@@ -79,16 +97,10 @@
       "targetAnchor": "unheaded-block-5",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:39@2026-10-15",
       "rationale": "Carry the complete source unit into docs/platform/system-architecture/history/architect-readme.md#unheaded-block-5, the non-canonical History carrier. The whole docs/architect/README.md snapshot is preserved with heading levels shifted by two and relative link prefixes rebased; every link resolves to the same physical destination. All source clauses, qualifications, obligations, exceptions, open gaps and planned/unbuilt statements remain. No remainder, source retirement, promotion or code-truth approval. The committed ordinary verdict accepted carriage; this corrected rationale is pending independent re-review.",
       "targetKind": "history",
-      "targetUnitDigest": "31b31117fa644b51192ab7299a40420fdbf64307c77cf118bfed3f7b98a8d327",
-      "targetAncestry": [
-        "Architect README Source Carriage",
-        "Added in candidate: README source carriage",
-        "Architect-Level Design"
-      ],
       "priorReview": {
         "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
         "reviewedAt": "2026-10-15",
@@ -98,7 +110,19 @@
         "reviewNote": "deep: body block 2 (Weak-exact, digest equal 31b31117) moved to the history carrier; the carrier docs/platform/system-architecture/history/architect-readme.md exists, the anchor passes list-doc-anchors, targetAncestry equals the real ancestry of the target unit; covered by the zero-diff transform of the whole legacy README (heading shift and link rebasing only), so no word lost; the old canonical-portal location no longer exists (portal diff against 69dd3ee7f is the one corrected line only); stale first-half wording in the rationale is overridden by its appended correction"
       },
       "amendedBy": "codex-session:42@2026-10-15",
-      "rebindingReason": "A22 / Lead wording correction: remove the obsolete canonical-portal destination; preserve the accepted carriage verdict as priorReview."
+      "rebindingReason": "A22 / Lead wording correction: remove the obsolete canonical-portal destination; preserve the accepted carriage verdict as priorReview.",
+      "reviewNote": "deep: README block 2 (scope paragraph, 31b31117 equal both sides) to history block 5; wording now matches the physical carrier, no word lost or added, ancestry equals the real heading chain, pending, no approval carry",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-bounded-rereview.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "31b31117fa644b51192ab7299a40420fdbf64307c77cf118bfed3f7b98a8d327",
+      "targetAncestry": [
+        "Architect README Source Carriage",
+        "Added in candidate: README source carriage",
+        "Architect-Level Design"
+      ],
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4"
     },
     {
       "claimId": "claim_e27539fb720c07fc732d6c0b8ac106c6",
@@ -107,16 +131,10 @@
       "targetAnchor": "cross-area-intentions",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:39@2026-10-15",
       "rationale": "Carry the complete source unit into docs/platform/system-architecture/history/architect-readme.md#cross-area-intentions, the non-canonical History carrier. The whole docs/architect/README.md snapshot is preserved with heading levels shifted by two and relative link prefixes rebased; every link resolves to the same physical destination. All source clauses, qualifications, obligations, exceptions, open gaps and planned/unbuilt statements remain. No remainder, source retirement, promotion or code-truth approval. The committed ordinary verdict accepted carriage; this corrected rationale is pending independent re-review.",
       "targetKind": "history",
-      "targetUnitDigest": "a069d8e7d1bafae2d58599146d3913ce15fdbfebcf046a800002803dcfbd5da3",
-      "targetAncestry": [
-        "Architect README Source Carriage",
-        "Added in candidate: README source carriage",
-        "Architect-Level Design"
-      ],
       "priorReview": {
         "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
         "reviewedAt": "2026-10-15",
@@ -126,7 +144,19 @@
         "reviewNote": "deep: heading Cross-Area Intentions (a069d8e7) moved to the history carrier; the carrier docs/platform/system-architecture/history/architect-readme.md exists, the anchor passes list-doc-anchors, targetAncestry equals the real ancestry of the target unit; covered by the zero-diff transform of the whole legacy README (heading shift and link rebasing only), so no word lost; the old canonical-portal location no longer exists (portal diff against 69dd3ee7f is the one corrected line only); stale first-half wording in the rationale is overridden by its appended correction"
       },
       "amendedBy": "codex-session:42@2026-10-15",
-      "rebindingReason": "A22 / Lead wording correction: remove the obsolete canonical-portal destination; preserve the accepted carriage verdict as priorReview."
+      "rebindingReason": "A22 / Lead wording correction: remove the obsolete canonical-portal destination; preserve the accepted carriage verdict as priorReview.",
+      "reviewNote": "deep: heading Cross-Area Intentions (4fd24b96 to a069d8e7) to history; heading level 2 to 4 and the rest of the section equal after transform; the stale first half (carry into docs/platform/README.md) is gone and the new rationale is true; anchor ok, pending",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-bounded-rereview.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "a069d8e7d1bafae2d58599146d3913ce15fdbfebcf046a800002803dcfbd5da3",
+      "targetAncestry": [
+        "Architect README Source Carriage",
+        "Added in candidate: README source carriage",
+        "Architect-Level Design"
+      ],
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4"
     },
     {
       "claimId": "claim_8e07597a0163d64f1d5ca3ab8ad7b02a",
@@ -135,17 +165,10 @@
       "targetAnchor": "unheaded-block-6",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:39@2026-10-15",
       "rationale": "Carry the complete source unit into docs/platform/system-architecture/history/architect-readme.md#unheaded-block-6, the non-canonical History carrier. The whole docs/architect/README.md snapshot is preserved with heading levels shifted by two and relative link prefixes rebased; every link resolves to the same physical destination. All source clauses, qualifications, obligations, exceptions, open gaps and planned/unbuilt statements remain. No remainder, source retirement, promotion or code-truth approval. The committed ordinary verdict accepted carriage; this corrected rationale is pending independent re-review.",
       "targetKind": "history",
-      "targetUnitDigest": "629194b5f11905f78295536eddb5dce3c4e0350a674f37024c68bc3924d62aa9",
-      "targetAncestry": [
-        "Architect README Source Carriage",
-        "Added in candidate: README source carriage",
-        "Architect-Level Design",
-        "Cross-Area Intentions"
-      ],
       "priorReview": {
         "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
         "reviewedAt": "2026-10-15",
@@ -155,7 +178,20 @@
         "reviewNote": "deep: link list block (629194b5; links rebased only) moved to the history carrier; the carrier docs/platform/system-architecture/history/architect-readme.md exists, the anchor passes list-doc-anchors, targetAncestry equals the real ancestry of the target unit; covered by the zero-diff transform of the whole legacy README (heading shift and link rebasing only), so no word lost; the old canonical-portal location no longer exists (portal diff against 69dd3ee7f is the one corrected line only); stale first-half wording in the rationale is overridden by its appended correction"
       },
       "amendedBy": "codex-session:42@2026-10-15",
-      "rebindingReason": "A22 / Lead wording correction: remove the obsolete canonical-portal destination; preserve the accepted carriage verdict as priorReview."
+      "rebindingReason": "A22 / Lead wording correction: remove the obsolete canonical-portal destination; preserve the accepted carriage verdict as priorReview.",
+      "reviewNote": "deep: the six-bullet roadmap and topology link list (e10db7d9 to 629194b5) to history block 6; only the link prefix changed, all six destinations resolve to the same docs/architect files; rationale true, pending, no approval carry",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-bounded-rereview.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "629194b5f11905f78295536eddb5dce3c4e0350a674f37024c68bc3924d62aa9",
+      "targetAncestry": [
+        "Architect README Source Carriage",
+        "Added in candidate: README source carriage",
+        "Architect-Level Design",
+        "Cross-Area Intentions"
+      ],
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4"
     },
     {
       "claimId": "claim_75dee385e5e27c6f5cf816ce81da66f3",
@@ -164,16 +200,10 @@
       "targetAnchor": "area-portals",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:39@2026-10-15",
       "rationale": "Carry the complete source unit into docs/platform/system-architecture/history/architect-readme.md#area-portals, the non-canonical History carrier. The whole docs/architect/README.md snapshot is preserved with heading levels shifted by two and relative link prefixes rebased; every link resolves to the same physical destination. All source clauses, qualifications, obligations, exceptions, open gaps and planned/unbuilt statements remain. No remainder, source retirement, promotion or code-truth approval. The committed ordinary verdict accepted carriage; this corrected rationale is pending independent re-review.",
       "targetKind": "history",
-      "targetUnitDigest": "36d5138696cb501946db7a42eb96e4b6ebc6a84393182cdb9ecc79598e108dad",
-      "targetAncestry": [
-        "Architect README Source Carriage",
-        "Added in candidate: README source carriage",
-        "Architect-Level Design"
-      ],
       "priorReview": {
         "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
         "reviewedAt": "2026-10-15",
@@ -183,7 +213,19 @@
         "reviewNote": "deep: heading Area Portals (36d51386) moved to the history carrier; the carrier docs/platform/system-architecture/history/architect-readme.md exists, the anchor passes list-doc-anchors, targetAncestry equals the real ancestry of the target unit; covered by the zero-diff transform of the whole legacy README (heading shift and link rebasing only), so no word lost; the old canonical-portal location no longer exists (portal diff against 69dd3ee7f is the one corrected line only); stale first-half wording in the rationale is overridden by its appended correction"
       },
       "amendedBy": "codex-session:42@2026-10-15",
-      "rebindingReason": "A22 / Lead wording correction: remove the obsolete canonical-portal destination; preserve the accepted carriage verdict as priorReview."
+      "rebindingReason": "A22 / Lead wording correction: remove the obsolete canonical-portal destination; preserve the accepted carriage verdict as priorReview.",
+      "reviewNote": "deep: heading Area Portals (f237948c to 36d51386) to history; heading shifted +2, text equal after normalization; the old canonical portal destination was removed from the rationale; target digest and anchor recompute, pending",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-bounded-rereview.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "36d5138696cb501946db7a42eb96e4b6ebc6a84393182cdb9ecc79598e108dad",
+      "targetAncestry": [
+        "Architect README Source Carriage",
+        "Added in candidate: README source carriage",
+        "Architect-Level Design"
+      ],
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4"
     },
     {
       "claimId": "claim_6729755c0a3b1b48ae5fa04ad0b634ef",
@@ -192,17 +234,10 @@
       "targetAnchor": "unheaded-block-7",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:39@2026-10-15",
       "rationale": "Carry the complete source unit into docs/platform/system-architecture/history/architect-readme.md#unheaded-block-7, the non-canonical History carrier. The whole docs/architect/README.md snapshot is preserved with heading levels shifted by two and relative link prefixes rebased; every link resolves to the same physical destination. All source clauses, qualifications, obligations, exceptions, open gaps and planned/unbuilt statements remain. No remainder, source retirement, promotion or code-truth approval. The committed ordinary verdict accepted carriage; this corrected rationale is pending independent re-review.",
       "targetKind": "history",
-      "targetUnitDigest": "3ef5c06f1dd123cb5fe25f8e992b9345f62474f8f1e3546ac6ccbad0cd3f2307",
-      "targetAncestry": [
-        "Architect README Source Carriage",
-        "Added in candidate: README source carriage",
-        "Architect-Level Design",
-        "Area Portals"
-      ],
       "priorReview": {
         "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
         "reviewedAt": "2026-10-15",
@@ -212,7 +247,20 @@
         "reviewNote": "deep: Area Portals link list (3ef5c06f; links rebased only) moved to the history carrier; the carrier docs/platform/system-architecture/history/architect-readme.md exists, the anchor passes list-doc-anchors, targetAncestry equals the real ancestry of the target unit; covered by the zero-diff transform of the whole legacy README (heading shift and link rebasing only), so no word lost; the old canonical-portal location no longer exists (portal diff against 69dd3ee7f is the one corrected line only); stale first-half wording in the rationale is overridden by its appended correction"
       },
       "amendedBy": "codex-session:42@2026-10-15",
-      "rebindingReason": "A22 / Lead wording correction: remove the obsolete canonical-portal destination; preserve the accepted carriage verdict as priorReview."
+      "rebindingReason": "A22 / Lead wording correction: remove the obsolete canonical-portal destination; preserve the accepted carriage verdict as priorReview.",
+      "reviewNote": "deep: five area-portal links (9e7c255c to 3ef5c06f) to history block 7, prefix rebase only, the five physical destinations identical; rationale now truthful about the carrier, pending, no approval carry",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-bounded-rereview.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "3ef5c06f1dd123cb5fe25f8e992b9345f62474f8f1e3546ac6ccbad0cd3f2307",
+      "targetAncestry": [
+        "Architect README Source Carriage",
+        "Added in candidate: README source carriage",
+        "Architect-Level Design",
+        "Area Portals"
+      ],
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4"
     },
     {
       "claimId": "claim_51a26e783af2c2a7ff8150886092366b",
@@ -221,16 +269,10 @@
       "targetAnchor": "cross-area-proposals",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:39@2026-10-15",
       "rationale": "Carry the complete source unit into docs/platform/system-architecture/history/architect-readme.md#cross-area-proposals, the non-canonical History carrier. The whole docs/architect/README.md snapshot is preserved with heading levels shifted by two and relative link prefixes rebased; every link resolves to the same physical destination. All source clauses, qualifications, obligations, exceptions, open gaps and planned/unbuilt statements remain. No remainder, source retirement, promotion or code-truth approval. The committed ordinary verdict accepted carriage; this corrected rationale is pending independent re-review.",
       "targetKind": "history",
-      "targetUnitDigest": "1494a58620d914348f840a29a4eb07ae9f5425d5ceb65838adfa85cdd41e4373",
-      "targetAncestry": [
-        "Architect README Source Carriage",
-        "Added in candidate: README source carriage",
-        "Architect-Level Design"
-      ],
       "priorReview": {
         "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
         "reviewedAt": "2026-10-15",
@@ -240,7 +282,19 @@
         "reviewNote": "deep: heading Cross-Area Proposals (1494a586) moved to the history carrier; the carrier docs/platform/system-architecture/history/architect-readme.md exists, the anchor passes list-doc-anchors, targetAncestry equals the real ancestry of the target unit; covered by the zero-diff transform of the whole legacy README (heading shift and link rebasing only), so no word lost; the old canonical-portal location no longer exists (portal diff against 69dd3ee7f is the one corrected line only); stale first-half wording in the rationale is overridden by its appended correction"
       },
       "amendedBy": "codex-session:42@2026-10-15",
-      "rebindingReason": "A22 / Lead wording correction: remove the obsolete canonical-portal destination; preserve the accepted carriage verdict as priorReview."
+      "rebindingReason": "A22 / Lead wording correction: remove the obsolete canonical-portal destination; preserve the accepted carriage verdict as priorReview.",
+      "reviewNote": "deep: heading Cross-Area Proposals (c18a4e13 to 1494a586) to history; level +2 only, whole-file transform proof zero diff; corrected rationale true, anchor ok, pending",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-bounded-rereview.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "1494a58620d914348f840a29a4eb07ae9f5425d5ceb65838adfa85cdd41e4373",
+      "targetAncestry": [
+        "Architect README Source Carriage",
+        "Added in candidate: README source carriage",
+        "Architect-Level Design"
+      ],
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4"
     },
     {
       "claimId": "claim_9ef07c1714bdc408ccfcafaa152e41f9",
@@ -249,17 +303,10 @@
       "targetAnchor": "unheaded-block-8",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:39@2026-10-15",
       "rationale": "Carry the complete source unit into docs/platform/system-architecture/history/architect-readme.md#unheaded-block-8, the non-canonical History carrier. The whole docs/architect/README.md snapshot is preserved with heading levels shifted by two and relative link prefixes rebased; every link resolves to the same physical destination. All source clauses, qualifications, obligations, exceptions, open gaps and planned/unbuilt statements remain. No remainder, source retirement, promotion or code-truth approval. The committed ordinary verdict accepted carriage; this corrected rationale is pending independent re-review.",
       "targetKind": "history",
-      "targetUnitDigest": "f8c82a36be72cd1b00ecaff0949242a2e37644ceb4d0250020b0ce8c03cb7356",
-      "targetAncestry": [
-        "Architect README Source Carriage",
-        "Added in candidate: README source carriage",
-        "Architect-Level Design",
-        "Cross-Area Proposals"
-      ],
       "priorReview": {
         "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
         "reviewedAt": "2026-10-15",
@@ -269,7 +316,20 @@
         "reviewNote": "deep: Cross-Area Proposals block (f8c82a36; links rebased only) moved to the history carrier; the carrier docs/platform/system-architecture/history/architect-readme.md exists, the anchor passes list-doc-anchors, targetAncestry equals the real ancestry of the target unit; covered by the zero-diff transform of the whole legacy README (heading shift and link rebasing only), so no word lost; the old canonical-portal location no longer exists (portal diff against 69dd3ee7f is the one corrected line only); stale first-half wording in the rationale is overridden by its appended correction"
       },
       "amendedBy": "codex-session:42@2026-10-15",
-      "rebindingReason": "A22 / Lead wording correction: remove the obsolete canonical-portal destination; preserve the accepted carriage verdict as priorReview."
+      "rebindingReason": "A22 / Lead wording correction: remove the obsolete canonical-portal destination; preserve the accepted carriage verdict as priorReview.",
+      "reviewNote": "deep: proposals link paragraph (cc271694 to f8c82a36) to history block 8; the single link and the not accepted design sentence are kept verbatim with the rebased prefix; pending, no approval carry",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-bounded-rereview.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "f8c82a36be72cd1b00ecaff0949242a2e37644ceb4d0250020b0ce8c03cb7356",
+      "targetAncestry": [
+        "Architect README Source Carriage",
+        "Added in candidate: README source carriage",
+        "Architect-Level Design",
+        "Cross-Area Proposals"
+      ],
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4"
     },
     {
       "claimId": "claim_966fde97560d95682b95eaf79ad687e6",
@@ -278,16 +338,10 @@
       "targetAnchor": "other-architecture-drafts",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:39@2026-10-15",
       "rationale": "Carry the complete source unit into docs/platform/system-architecture/history/architect-readme.md#other-architecture-drafts, the non-canonical History carrier. The whole docs/architect/README.md snapshot is preserved with heading levels shifted by two and relative link prefixes rebased; every link resolves to the same physical destination. All source clauses, qualifications, obligations, exceptions, open gaps and planned/unbuilt statements remain. No remainder, source retirement, promotion or code-truth approval. The committed ordinary verdict accepted carriage; this corrected rationale is pending independent re-review.",
       "targetKind": "history",
-      "targetUnitDigest": "befc35d5a223fafe89b10a251d2679533dc323ff9ab31b3bbaf96e95e3353c8c",
-      "targetAncestry": [
-        "Architect README Source Carriage",
-        "Added in candidate: README source carriage",
-        "Architect-Level Design"
-      ],
       "priorReview": {
         "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
         "reviewedAt": "2026-10-15",
@@ -297,7 +351,19 @@
         "reviewNote": "deep: heading Other Architecture Drafts (befc35d5) moved to the history carrier; the carrier docs/platform/system-architecture/history/architect-readme.md exists, the anchor passes list-doc-anchors, targetAncestry equals the real ancestry of the target unit; covered by the zero-diff transform of the whole legacy README (heading shift and link rebasing only), so no word lost; the old canonical-portal location no longer exists (portal diff against 69dd3ee7f is the one corrected line only); stale first-half wording in the rationale is overridden by its appended correction"
       },
       "amendedBy": "codex-session:42@2026-10-15",
-      "rebindingReason": "A22 / Lead wording correction: remove the obsolete canonical-portal destination; preserve the accepted carriage verdict as priorReview."
+      "rebindingReason": "A22 / Lead wording correction: remove the obsolete canonical-portal destination; preserve the accepted carriage verdict as priorReview.",
+      "reviewNote": "deep: heading Other Architecture Drafts (03967938 to befc35d5) to history; shift +2 only, text equal after normalization; rationale corrected and true; pending",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-bounded-rereview.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "befc35d5a223fafe89b10a251d2679533dc323ff9ab31b3bbaf96e95e3353c8c",
+      "targetAncestry": [
+        "Architect README Source Carriage",
+        "Added in candidate: README source carriage",
+        "Architect-Level Design"
+      ],
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4"
     },
     {
       "claimId": "claim_f42e391a572ab02fa51adb4e64446f0e",
@@ -306,17 +372,10 @@
       "targetAnchor": "unheaded-block-9",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:39@2026-10-15",
       "rationale": "Carry the complete source unit into docs/platform/system-architecture/history/architect-readme.md#unheaded-block-9, the non-canonical History carrier. The whole docs/architect/README.md snapshot is preserved with heading levels shifted by two and relative link prefixes rebased; every link resolves to the same physical destination. All source clauses, qualifications, obligations, exceptions, open gaps and planned/unbuilt statements remain. No remainder, source retirement, promotion or code-truth approval. The committed ordinary verdict accepted carriage; this corrected rationale is pending independent re-review.",
       "targetKind": "history",
-      "targetUnitDigest": "48810a1a605c1eefb6eea33cd3d2b56b445fd2c698e2709ab9dc91d2c6da616b",
-      "targetAncestry": [
-        "Architect README Source Carriage",
-        "Added in candidate: README source carriage",
-        "Architect-Level Design",
-        "Other Architecture Drafts"
-      ],
       "priorReview": {
         "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
         "reviewedAt": "2026-10-15",
@@ -326,7 +385,20 @@
         "reviewNote": "deep: Other Architecture Drafts link list (48810a1a; links rebased only) moved to the history carrier; the carrier docs/platform/system-architecture/history/architect-readme.md exists, the anchor passes list-doc-anchors, targetAncestry equals the real ancestry of the target unit; covered by the zero-diff transform of the whole legacy README (heading shift and link rebasing only), so no word lost; the old canonical-portal location no longer exists (portal diff against 69dd3ee7f is the one corrected line only); stale first-half wording in the rationale is overridden by its appended correction"
       },
       "amendedBy": "codex-session:42@2026-10-15",
-      "rebindingReason": "A22 / Lead wording correction: remove the obsolete canonical-portal destination; preserve the accepted carriage verdict as priorReview."
+      "rebindingReason": "A22 / Lead wording correction: remove the obsolete canonical-portal destination; preserve the accepted carriage verdict as priorReview.",
+      "reviewNote": "deep: three draft links (bb699555 to 48810a1a) to history block 9; prefix rebase only, three destinations unchanged; rationale and ancestry (Other Architecture Drafts) correct, pending without carried approval",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-bounded-rereview.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "48810a1a605c1eefb6eea33cd3d2b56b445fd2c698e2709ab9dc91d2c6da616b",
+      "targetAncestry": [
+        "Architect README Source Carriage",
+        "Added in candidate: README source carriage",
+        "Architect-Level Design",
+        "Other Architecture Drafts"
+      ],
+      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4"
     }
   ]
 }

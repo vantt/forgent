@@ -10401,16 +10401,13 @@
     }
   ],
   "nativeEquality": {
-    "contentCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
+    "contentCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
     "fullTupleEquality": true,
     "eligibleTupleEquality": true,
     "nativeReverseCount": 694,
     "candidateUnverifiedCount": 694,
-    "pendingCanonicalReceiptCount": 0,
-    "separatePortalProtocolReceipts": 0,
-    "portalReceiptsOutsideScopedReverse": false,
-    "partitionTupleEquality": true,
-    "meaning": "Full five-field native tuple equality; no truth approval. Fifteen portal protocol receipts remain separate obligations outside the whole-system reverse namespace after the file-level target moved to History."
+    "nativeSync": false,
+    "meaning": "Fresh comparison from persisted registry; metadata application only."
   },
   "previousNativeVerificationMetadata": {
     "contentCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",

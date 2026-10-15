@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "shard": "s6-whole-system-portal-evidence-rework.json",
+  "authorSession": "codex-session:unit-run-1792026600994-509241c8@2026-10-15",
+  "authorshipRequired": true,
+  "sources": [],
+  "claims": [],
+  "candidateClassifications": [
+    {
+      "claimId": "claim_1898cdafa7835d675526173d39eb5cd2",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal-evidence-rework.json",
+      "reviewStatus": "pending",
+      "pendingReceiptCommit": "Bind actual runner settlement commit before independent review.",
+      "predecessorClaimId": "claim_1898cdafa7835d675526173d39eb5cd2"
+    },
+    {
+      "claimId": "claim_51d4658b154804b82dbce0587b17efc0",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal-evidence-rework.json",
+      "reviewStatus": "pending",
+      "pendingReceiptCommit": "Bind actual runner settlement commit before independent review.",
+      "predecessorClaimId": "claim_ec78621ff44b9fe7fa47ce85bd84bfa6"
+    }
+  ]
+}

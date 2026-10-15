@@ -1,3 +1,28 @@
+# Step 6 conservation and review complete except two re-issued receipts
+
+Date: 2026-10-15. Assignment: unit-run-1792026600994-509241c8/producer/1. Lead report/content commit: `5f0403a0055a9cb50f9975cb74777fba3828eff4`. Actual runner output/receipt artifact commit is pending settlement; no SHA invented.
+
+Applied every ok verdict from all four committed Lead reports. The unchanged applier accepted 35 pending source/gap/retired rows; seven prior valid acceptances remain as Lead's no-action verdicts require. All 54 ordinary verdicts, 68 candidate eligibility verdicts and 17 formal classification acceptances are accounted for with their separate semantics and committed pins. Agent classifications use a dedicated shard matching the receipt author. Two historical Agent IDs receive only their actual historical acceptance; no approval carries to native successors, which remain on the candidate-unverified list.
+
+Exactly two portal receipts are re-issued pending: claim_1898cdafa7835d675526173d39eb5cd2 and live successor claim_51d4658b154804b82dbce0587b17efc0 (predecessor claim_ec78621ff44b9fe7fa47ce85bd84bfa6). Content class is retained because these units assert implementation/scope facts; repaired evidence uses accepted code-prefix citations and command inputs with real current outputs, and archive/package data witnesses. Full current shown text and digests are unchanged. Bind the actual new artifact commit after runner settlement, then independently review; no current receipt commit or approval is fabricated.
+
+Fresh inventory from persisted registry only, no full native sync: 4,412 files / 88,224 claims. Both-prior D passes with zero fatal findings. Both-prior whole-system strict E has exactly two reviewed identical-unit groups and 67 accepted candidate-unverified tuples, zero claims-not-reviewed, no unexpected category/ID. Exact identical-group owner membership and all four full reverse tuple equalities pass: root 830, Agent 570, Packaging 694, whole 67. Agent drops exactly the two accepted live classification units. Every known native tuple/active tuple is preserved; registry mutation is review metadata only. Existing closure-allowed data remain three Rings holds, Agent's 342 identical groups, Packaging's one partial-carry residual/two groups, whole's two reviewed groups and the candidate lists. New review data remain only the two pending portal receipts. This is not global cutover or strict E green.
+
+Relevant tests: 149/149 pass with env -u CLAUDE_CODE_SESSION_ID. All receipt/report bindings, full text/digests, protected docs/production bytes, and write scope validate. No docs/checker/gate/vocabulary/extractor/baseline edits, git write, native sync or author-produced sensitivity pack. MDView preview unavailable: database read-only (SQLite error 8), no repair attempted.
+
+Step 6 conservation and review are complete except the two re-issued receipts. Remaining closure items:
+
+- Reviewer-selected 30-unit current-content truth sample.
+- Independent red-team, zero open Critical/High unless owner-accepted.
+- Reviewer-selected stratified 50-block sample, seed/populations recorded.
+- Committed fresh-reader key and two independent fresh readers.
+- Checkpoint review with reviewer-held passing sensitivity pack/key.
+- Batch/effort report with counts, residuals, owner queue and component-boundary statement.
+
+Preserve Rings holds, A34 residuals, owner queue and all truth/navigation/promotion/consumer/alias/native-gap/cutover obligations. No Step 7 or promotion. No new owner question or needsWrites. Evidence: [verification](verification-261015-0811-accepted-verdicts-reissued-receipts.md), [machine proof](verification-261015-0811-accepted-verdicts-reissued-receipts.md.json), [pending receipt request](review-request-261015-0812-portal-evidence-rework.md). Older entries below remain historical.
+
+---
+
 # Authorized runner ratchet accounting — D and ratchet green
 
 Date: 2026-10-15. Assignment: unit-run-1792024590072-c2532282/producer/1. Starting/source commit: `acc0de1cd5be556acd4d2f4a6103542809ae8707`. Output commit: subsequent runner settlement, not yet known.
