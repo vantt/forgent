@@ -1,11 +1,13 @@
 ---
 title: "Intent, owner challenges and preserved capability contract"
-status: pending
+status: done
 dependencies: []
 requiresReview: true
 ---
 
 # Phase 01 — Hiểu vì sao làm, không dựng lại engine
+
+> **Status done (2026-10-11):** Intent, preservation matrix and owner challenges are written (reports/). The owner then narrowed the scope to bounded path M (merge a91a1925e, 2026-10-08); see `plans/reports/advisory-m-owner-decisions-and-parked-questions-261008.md`.
 
 ## Context links
 

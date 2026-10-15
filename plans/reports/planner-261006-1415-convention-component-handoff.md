@@ -2,20 +2,20 @@
 
 Ngày 2026-10-06. Người lập: planner. Plan status: Proposed — not authorized for execution.
 
-Plan: [plans/261006-1415-fgos-convention-component/plan.md](../261006-1415-fgos-convention-component/plan.md)
+Plan: [plans/261006-1415-fgos-convention-component/plan.md](../../archive/plans/261006-1415-fgos-convention-component/plan.md)
 
 ## Plan gồm gì
 
 | Phase | Nội dung | Gộp/xoá |
 |---|---|---|
-| [00](../261006-1415-fgos-convention-component/phase-00-spec.md) | Spec `docs/specs/convention.md` (không code), Q1-Q12, kết quả component-boundary: **có đổi**, thêm một hàng | — |
-| [01](../261006-1415-fgos-convention-component/phase-01-shared-civil-time.md) | Helper ngày dân sự trong `fgos-host-runtime` | 4 bản thuật toán ngày → 1 |
-| [02](../261006-1415-fgos-convention-component/phase-02-convention-crate.md) | Crate `fgos-convention`, rules/golden JSON, `cargo test` với đồng hồ ghim | không thêm bản thời gian thứ năm |
-| [03](../261006-1415-fgos-convention-component/phase-03-route-wiring.md) | Catalog, composition root, projector, annotation, registry, sinh lại `command-routes.json`, test | nhánh subcommand mã cứng `main.rs:158-160` → bảng |
-| [04](../261006-1415-fgos-convention-component/phase-04-node-client.md) | Client Node mỏng; `invokeHost` nhận `unknown verb` là host cũ | không có cài đặt Node thứ hai (grep làm bằng chứng) |
-| [05](../261006-1415-fgos-convention-component/phase-05-enforcement.md) | Pre-commit (chỉ file mới thêm) + doctor `convention-conformance` (degraded, không failed) | 2 thư mục journal → 1 |
-| [06](../261006-1415-fgos-convention-component/phase-06-agents-line.md) | Một dòng `AGENTS.md`, sau phase AGENTS.md của Plan A | tên do brief tự dựng → lệnh |
-| [07](../261006-1415-fgos-convention-component/phase-07-docs-changelog.md) | Spec implemented, maps, CHANGELOG, ghi chú di chuyển caller | — |
+| [00](../../archive/plans/261006-1415-fgos-convention-component/phase-00-spec.md) | Spec `docs/specs/convention.md` (không code), Q1-Q12, kết quả component-boundary: **có đổi**, thêm một hàng | — |
+| [01](../../archive/plans/261006-1415-fgos-convention-component/phase-01-shared-civil-time.md) | Helper ngày dân sự trong `fgos-host-runtime` | 4 bản thuật toán ngày → 1 |
+| [02](../../archive/plans/261006-1415-fgos-convention-component/phase-02-convention-crate.md) | Crate `fgos-convention`, rules/golden JSON, `cargo test` với đồng hồ ghim | không thêm bản thời gian thứ năm |
+| [03](../../archive/plans/261006-1415-fgos-convention-component/phase-03-route-wiring.md) | Catalog, composition root, projector, annotation, registry, sinh lại `command-routes.json`, test | nhánh subcommand mã cứng `main.rs:158-160` → bảng |
+| [04](../../archive/plans/261006-1415-fgos-convention-component/phase-04-node-client.md) | Client Node mỏng; `invokeHost` nhận `unknown verb` là host cũ | không có cài đặt Node thứ hai (grep làm bằng chứng) |
+| [05](../../archive/plans/261006-1415-fgos-convention-component/phase-05-enforcement.md) | Pre-commit (chỉ file mới thêm) + doctor `convention-conformance` (degraded, không failed) | 2 thư mục journal → 1 |
+| [06](../../archive/plans/261006-1415-fgos-convention-component/phase-06-agents-line.md) | Một dòng `AGENTS.md`, sau phase AGENTS.md của Plan A | tên do brief tự dựng → lệnh |
+| [07](../../archive/plans/261006-1415-fgos-convention-component/phase-07-docs-changelog.md) | Spec implemented, maps, CHANGELOG, ghi chú di chuyển caller | — |
 
 Phụ thuộc Plan A: vòng dev/kích hoạt release (chỉ cho kiểm tay qua cửa `fgos` thật; test dùng `target/debug/fgos`), phase AGENTS.md (trước 06), guard pre-commit và check doctor (trước 05). Thư mục của Plan A chưa có lúc lập plan nên đường dẫn là UNVERIFIED.
 

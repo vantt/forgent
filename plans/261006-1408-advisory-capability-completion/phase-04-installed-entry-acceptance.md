@@ -1,11 +1,13 @@
 ---
 title: "Regenerate, stage and prove the installed advisory entry"
-status: pending
+status: partial
 dependencies: [3]
 requiresReview: true
 ---
 
 # Phase 04 — Regenerate, stage and prove the installed advisory entry
+
+> **Status partial (2026-10-11):** Installed entry activated; one live run on mcp-skill-hub passed 2026-10-09 (1 start, 5 Units, 14 assignments) and the owner accepted the advice. NOT done: all preservation rows, the shared-writer full `npm test` close, and an independent-topic quality rating.
 
 Proposed verification, NOT RUN during planning. Phase 02 must already pass early core-feasibility/confinement proof before Phase 03 source cutover. This phase owns regeneration/staging and repeats through the actual entry; it is not the first point where core blockers are discovered. It completes this advisory plan, not a gate on independent original single-door phases.
 

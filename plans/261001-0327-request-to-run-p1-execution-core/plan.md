@@ -1,7 +1,7 @@
 ---
 title: "P1 Lõi thực thi: Unit, một bind(), một cửa chạy (herdr mặc định), 3 Pattern cộng tác"
 description: "Đóng mối authority L5: 'ai làm' một chỗ (bind), 'chạy qua cửa nào' một cửa (pane herdr mặc định, cli fallback), read-only một posture confinement OS; lõi mới không phụ thuộc L3. Gộp plan read-only X."
-status: partial
+status: done
 priority: P1
 effort: "~10–12d"
 tags: [dispatch, execution-core, bind, collaboration-pattern, read-only, herdr, observe]
@@ -127,6 +127,9 @@ Sóng B: 2 ∥ 3 ∥ 4 (file mới/khác nhau; dùng hợp đồng ở trên). S
 <!-- slug: request-to-run-p1-execution-core -->
 
 ## Trạng thái thật (2026-10-02, vòng sửa chung)
+
+> **Closed (2026-10-11):** all gaps listed below were closed by [P6](../261002-1339-request-to-run-p6-herdr-posture-quota/plan.md) (merge `af019e638`): `bind().transport` is used in `src/runner/execution/run.mjs`, `resolvePosture` has callers in `assignment-runner.mjs` and `bind.mjs`, `canApplyPosture` reflects the real backend. Quota fallback was proven only with a fake limit screen; a real limit screen is still unmeasured (P6 states this). The text below is the 2026-10-02 snapshot.
+
 
 Đã đạt: Unit, `bind()`, `fgos run` với solo/reviewed/panel chạy thật (xem [acceptance-case-1](reports/acceptance-case-1.md)), gate mutating fail-closed, ép checker/panelist khác họ provider (`test/runner/execution/run.test.mjs`), dò herdr trong `runUnit`.
 Chưa đạt (không còn ghi done): transport herdr trong `fgos run` (`bind().transport` không có nơi dùng), posture confinement một hàm cho herdr+cli (`resolvePosture` không có caller, `canApplyPosture` luôn true), quota fallback thử thật, doctor check "≥2 họ provider áp được posture". Spike khả thi: [spike-herdr-bwrap](reports/spike-herdr-bwrap.md) PASS (claude, `-p`; REPL tương tác NOT RUN).

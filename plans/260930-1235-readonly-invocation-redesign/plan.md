@@ -1,18 +1,20 @@
 ---
 title: "Thiết kế lại read-only dispatch: xoá readOnlyRedirects đúng cách"
 description: "Follow-on của tier/rigor consolidation. Phase read-only cũ (D4/D14/D16) bị red team 2026-09-30 chứng minh không chạy được; cần brainstorm thiết kế lại trước khi viết phase."
-status: pending
+status: done
 priority: P1
 effort: "TBD (sau brainstorm)"
 tags: [dispatch, security, read-only, quota]
 created: 2026-09-30
-blockedBy: [260930-0445-tier-rigor-vocabulary-consolidation]
+blockedBy: []
 blocks: []
 ---
 
 # Thiết kế lại read-only dispatch
 
 ## Trạng thái
+
+**Done (2026-10-11): delivered by request-to-run P1 phase 06 and P6 (merge `af019e638`).** `placement-policy.mjs` and `readOnlyRedirects` are gone from `src` (removed in `cfd670c43`); `resolvePosture` is called from `assignment-runner.mjs` and `bind.mjs`; read-only is one confinement posture. The only remaining mention is historical text in `docs/specs/runner.md`. The blocker (tier-rigor consolidation) is `done`.
 
 **Gộp vào plan `bind()` của track request-to-run (owner 2026-10-01).** Plan này không lập phase riêng. Mục tiêu và 9 ràng buộc bên dưới là đầu vào bắt buộc cho phase read-only của plan `bind()`. Đích đổi so với bản gốc: read-only là một **posture** do `bind()` áp (confinement resolve một chỗ lúc spawn, cho primary + fallback + resume), fallback theo quota cũng chọn qua `bind()`, mọi lệch có provenance (G6 "không đổi người lặng lẽ"). Scope thu hẹp: không vá `executeExecutorCli`/`runDispatchCli` (ràng buộc 8) vì track đó xoá đường `dispatch-runs`/`execute` thường. Nguồn: `plans/reports/synthesis-260930-1229-request-to-run-brainstorm.md` §6b (trên `main`).
 
