@@ -3,6 +3,7 @@
 // Bộ đồ nghề dùng chung nằm ở ./helpers/fgos-cli-harness.mjs.
 import { test } from 'node:test';
 import { resolveWriterIdentity } from '../../src/util/session-identity.mjs';
+import { writeBeacon, beaconPath } from '../../src/runner/main-checkout-activity.mjs';
 import {
   ADD_BAD_FLAG_CASES,
   DEFAULT_TTL_MS,
@@ -266,7 +267,7 @@ test('done is terminal via the real CLI: moving out of done is refused as precon
   assert.equal(stateView(cwd).work['terminal-item'].status, 'done');
 });
 
-test('cleanup (to blocked branch) releases main-checkout lock held by caller session (tsk-5zv)', () => {
+test('cleanup (to blocked branch) clears the commit-activity beacon of the caller session (tsk-5zv)', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'cleanup-lock-blocked');
   // tsk-40m: blocked stands in for the retired todo->doing edge.
@@ -276,17 +277,18 @@ test('cleanup (to blocked branch) releases main-checkout lock held by caller ses
   run(cwd, ['move', 'cleanup-lock-blocked', '--to', 'cleanup']);
 
   const sessionId = 'session-cleanup-lock-blocked';
-  const lockPath = mainCheckoutLockPath(cwd);
-  fs.writeFileSync(lockPath, JSON.stringify({ pid: sessionId, ts: Date.now() }));
-  assert.equal(fs.existsSync(lockPath), true);
+  const fgosDir = path.dirname(mainCheckoutLockPath(cwd));
+  const beacon = beaconPath(fgosDir);
+  writeBeacon(fgosDir, { writer: { id: sessionId }, windowMs: 60_000 });
+  assert.equal(fs.existsSync(beacon), true);
 
   const result = run(cwd, ['cleanup', 'cleanup-lock-blocked'], { FGOS_SESSION_ID: sessionId });
   assert.equal(result.status, 0, result.stderr);
   assert.equal(envelopeData(result.stdout).to, 'blocked');
-  assert.equal(fs.existsSync(lockPath), false, 'cleanup -> blocked must release the session lock early');
+  assert.equal(fs.existsSync(beacon), false, 'cleanup -> blocked must clear the session beacon early');
 });
 
-test('cleanup (to done branch) releases main-checkout lock held by caller session (tsk-5zv)', () => {
+test('cleanup (to done branch) clears the commit-activity beacon of the caller session (tsk-5zv)', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   writeCleanupTtlConfig(cwd, 0);
@@ -304,17 +306,17 @@ test('cleanup (to done branch) releases main-checkout lock held by caller sessio
   run(cwd, ['move', 'cleanup-lock-done', '--to', 'cleanup']);
 
   const sessionId = 'session-cleanup-lock-done';
-  const lockPath = mainCheckoutLockPath(cwd);
-  fs.writeFileSync(lockPath, JSON.stringify({ pid: sessionId, ts: Date.now() }));
-  assert.equal(fs.existsSync(lockPath), true);
+  const beacon = beaconPath(dir);
+  writeBeacon(dir, { writer: { id: sessionId }, windowMs: 60_000 });
+  assert.equal(fs.existsSync(beacon), true);
 
   const result = run(cwd, ['cleanup', 'cleanup-lock-done'], { FGOS_SESSION_ID: sessionId });
   assert.equal(result.status, 0, result.stderr);
   assert.equal(envelopeData(result.stdout).to, 'done');
-  assert.equal(fs.existsSync(lockPath), false, 'cleanup -> done must release the session lock early');
+  assert.equal(fs.existsSync(beacon), false, 'cleanup -> done must clear the session beacon early');
 });
 
-test('compound releases main-checkout lock held by caller session (tsk-5zv)', () => {
+test('compound clears the commit-activity beacon of the caller session (tsk-5zv)', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   addOk(cwd, 'compound-lock-item');
@@ -329,13 +331,13 @@ test('compound releases main-checkout lock held by caller session (tsk-5zv)', ()
   gitAtCwd(cwd, ['commit', '-q', '-m', 'add doc']);
 
   const sessionId = 'session-compound-lock-item';
-  const lockPath = mainCheckoutLockPath(cwd);
-  fs.writeFileSync(lockPath, JSON.stringify({ pid: sessionId, ts: Date.now() }));
-  assert.equal(fs.existsSync(lockPath), true);
+  const fgosDir = path.join(cwd, '.fgos');
+  writeBeacon(fgosDir, { writer: { id: sessionId }, windowMs: 60_000 });
+  assert.equal(fs.existsSync(beaconPath(fgosDir)), true);
 
   const result = run(cwd, ['compound', 'compound-lock-item', '--doc-type', 'how-to', '--doc-path', 'docs/how-to/compound-lock-item.md'], { FGOS_SESSION_ID: sessionId });
   assert.equal(result.status, 0, result.stderr);
-  assert.equal(fs.existsSync(lockPath), false, 'compound must release the session lock early after addOutcome');
+  assert.equal(fs.existsSync(beaconPath(fgosDir)), false, 'compound must clear the session beacon early after addOutcome');
 });
 
 

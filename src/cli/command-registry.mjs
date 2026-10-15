@@ -1992,7 +1992,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'lock-status',
     invoke: 'fgos lock-status',
-    description: 'Read-only report on .fgos/main-checkout.lock: whether it is free, live (genuinely held), stale (reclaimable), or ambiguous (corrupt/undecidable), plus holder identity, lock age, and remaining TTL. Never creates, refreshes, or deletes the lock file.',
+    description: 'Read-only report on .fgos/main-checkout.lock: whether it is free, live (genuinely held), stale (reclaimable), or ambiguous (corrupt/undecidable), plus holder identity, lock age, and remaining TTL, and separately the pre-commit hook\'s commit-activity beacon (.fgos/runtime/main-checkout-activity.json). Never creates, refreshes, or deletes either file.',
     parameters: {
       type: 'object',
       properties: {},

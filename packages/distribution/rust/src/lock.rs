@@ -3,8 +3,13 @@
 //! Reuses the liveness rules from `src/runner/main-checkout-lock.mjs` per R5:
 //! - Missing lock file: free.
 //! - Unparseable or invalid record: ambiguous (lock-ambiguous).
-//! - Numeric pid: alive via OS process-existence probe (kill 0, EPERM = alive).
-//! - String identity: judged by ts freshness against DEFAULT_TTL_MS.
+//! - A JSON object with a `v` field: a newer lock protocol (lock-unsupported, fail-closed).
+//! - Numeric pid: alive via OS process-existence probe (kill 0, EPERM = alive), and the record
+//!   within its own ttl.
+//! - String identity: judged by ts freshness against its own ttl.
+//! - The ttl is the record's own `ttlMs`; a record without one was left by an older release and
+//!   gets its writer's old window: HOOK_TTL_MS for a session-id string (the pre-commit hook),
+//!   DEFAULT_TTL_MS for a pid (claim, land, merge). See `recordTtlMs` in the Node module.
 //!
 //! Cites:
 //! - DEFAULT_TTL_MS confirmed = 3 * 60 * 1000 ms at `src/runner/main-checkout-lock.mjs:110`.
@@ -19,6 +24,14 @@ use std::time::{SystemTime, UNIX_EPOCH};
 /// must be updated to match.
 pub const DEFAULT_TTL_MS: u64 = 3 * 60 * 1000;
 
+/// HOOK_TTL_MS = 20 * 1000 ms in `src/runner/main-checkout-lock.mjs`: the window a legacy
+/// session-id record (no `ttlMs`, written by an older pre-commit hook) counts for.
+pub const HOOK_TTL_MS: u64 = 20 * 1000;
+
+/// RUN_TIMEOUT_MAX_MS = 4 h in `src/runner/dispatch/run-timeout.mjs`: no recorded ttl is honoured
+/// beyond it.
+pub const RUN_TIMEOUT_MAX_MS: u64 = 4 * 3600 * 1000;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum LockHolderIdentity {
     Numeric(i64),
@@ -29,12 +42,28 @@ pub enum LockHolderIdentity {
 pub struct LockRecord {
     pub identity: LockHolderIdentity,
     pub ts: u64,
+    /// The ttl the holder recorded for itself; `None` for a record left by an older release.
+    pub ttl_ms: Option<u64>,
+}
+
+impl LockRecord {
+    /// The staleness window a reader applies: the holder's own recorded ttl (held to
+    /// RUN_TIMEOUT_MAX_MS), else the window its writer used before ttls were recorded.
+    pub fn effective_ttl_ms(&self) -> u64 {
+        match (self.ttl_ms, &self.identity) {
+            (Some(ttl), _) => ttl.min(RUN_TIMEOUT_MAX_MS),
+            (None, LockHolderIdentity::Numeric(_)) => DEFAULT_TTL_MS,
+            (None, LockHolderIdentity::String(_)) => HOOK_TTL_MS,
+        }
+    }
 }
 
 #[derive(Debug, thiserror::Error)]
 pub enum MainCheckoutLockError {
     #[error("lock-ambiguous: .fgos/main-checkout.lock has unparseable or ambiguous record")]
     Ambiguous,
+    #[error("lock-unsupported: .fgos/main-checkout.lock was written by a newer fgOS lock protocol than this release understands; upgrade fgOS on this machine (never delete the lock by hand)")]
+    Unsupported,
     #[error("lock-held: .fgos/main-checkout.lock is held by process {0}")]
     HeldNumeric(i64),
     #[error("lock-held: .fgos/main-checkout.lock is held by session \"{0}\"")]
@@ -129,7 +158,22 @@ pub fn parse_lock_content(raw: &str) -> Option<LockRecord> {
         _ => return None,
     };
 
-    Some(LockRecord { identity, ts })
+    let ttl_ms = obj.get("ttlMs").and_then(|v| v.as_u64()).filter(|t| *t > 0);
+
+    Some(LockRecord {
+        identity,
+        ts,
+        ttl_ms,
+    })
+}
+
+/// True when `raw` is a JSON object carrying a `v` field: a record from a versioned lock protocol,
+/// never the unversioned format this release reads.
+pub fn is_unsupported_schema(raw: &str) -> bool {
+    serde_json::from_str::<serde_json::Value>(raw)
+        .ok()
+        .and_then(|v| v.as_object().map(|o| o.contains_key("v")))
+        .unwrap_or(false)
 }
 
 /// Performs a read-only liveness check on `.fgos/main-checkout.lock` under `workspace_root`.
@@ -141,6 +185,9 @@ pub fn check_main_checkout_lock(workspace_root: &Path) -> Result<(), MainCheckou
     }
 
     let raw = std::fs::read_to_string(&lock_path)?;
+    if is_unsupported_schema(&raw) {
+        return Err(MainCheckoutLockError::Unsupported);
+    }
     let record = match parse_lock_content(&raw) {
         Some(r) => r,
         None => return Err(MainCheckoutLockError::Ambiguous),
@@ -151,10 +198,11 @@ pub fn check_main_checkout_lock(workspace_root: &Path) -> Result<(), MainCheckou
         .unwrap_or_default()
         .as_millis() as u64;
 
+    let ttl_ms = record.effective_ttl_ms();
     match record.identity {
         LockHolderIdentity::Numeric(pid) => {
             let lock_age = now.saturating_sub(record.ts);
-            let within_ttl = lock_age <= DEFAULT_TTL_MS;
+            let within_ttl = lock_age <= ttl_ms;
             let pid_i32 = i32::try_from(pid).ok();
             let pid_live = pid_i32.map(is_pid_alive).unwrap_or(false);
             if pid_live && within_ttl {
@@ -166,7 +214,7 @@ pub fn check_main_checkout_lock(workspace_root: &Path) -> Result<(), MainCheckou
         }
         LockHolderIdentity::String(session_id) => {
             let lock_age = now.saturating_sub(record.ts);
-            if lock_age <= DEFAULT_TTL_MS {
+            if lock_age <= ttl_ms {
                 Err(MainCheckoutLockError::HeldString(session_id))
             } else {
                 // ttl expired is stale -> free
@@ -211,6 +259,86 @@ mod tests {
         assert!(parse_lock_content(r#"{"pid": "", "ts": 100}"#).is_none());
         assert!(parse_lock_content(r#"{"pid": 123, "ts": 0}"#).is_none());
         assert!(parse_lock_content(r#"{"pid": 123}"#).is_none());
+    }
+
+    fn now_ms() -> u64 {
+        SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_millis() as u64
+    }
+
+    fn with_lock<F: FnOnce(&Path)>(name: &str, raw: &str, f: F) {
+        let temp = std::env::temp_dir().join(format!("{}_{}", name, std::process::id()));
+        let fgos_dir = temp.join(".fgos");
+        let _ = std::fs::create_dir_all(&fgos_dir);
+        std::fs::write(fgos_dir.join("main-checkout.lock"), raw).unwrap();
+        f(&temp);
+        let _ = std::fs::remove_dir_all(&temp);
+    }
+
+    #[test]
+    fn test_parse_records_ttl_ms() {
+        let raw = r#"{"pid": 12345, "ts": 1700000000000, "ttlMs": 5000}"#;
+        assert_eq!(parse_lock_content(raw).unwrap().ttl_ms, Some(5000));
+    }
+
+    #[test]
+    fn test_legacy_string_record_counts_for_hook_window_only() {
+        // An older pre-commit hook's record: session id, no ttlMs, 25 s old.
+        let raw = format!(
+            r#"{{"pid": "session-old-hook", "ts": {}}}"#,
+            now_ms() - 25_000
+        );
+        with_lock("test_lock_legacy_string_expired", &raw, |root| {
+            assert!(check_main_checkout_lock(root).is_ok());
+        });
+        let raw = format!(
+            r#"{{"pid": "session-old-hook", "ts": {}}}"#,
+            now_ms() - 5_000
+        );
+        with_lock("test_lock_legacy_string_fresh", &raw, |root| {
+            assert!(matches!(
+                check_main_checkout_lock(root),
+                Err(MainCheckoutLockError::HeldString(_))
+            ));
+        });
+    }
+
+    #[test]
+    fn test_record_ttl_is_honoured_not_the_default() {
+        // A live holder whose own ttl (1 s) has passed is free although DEFAULT_TTL_MS has not.
+        let raw = format!(
+            r#"{{"pid": {}, "ts": {}, "ttlMs": 1000}}"#,
+            std::process::id(),
+            now_ms() - 5_000
+        );
+        with_lock("test_lock_record_ttl_short", &raw, |root| {
+            assert!(check_main_checkout_lock(root).is_ok());
+        });
+        // A live holder that recorded a longer ttl than DEFAULT_TTL_MS is still held past it.
+        let raw = format!(
+            r#"{{"pid": {}, "ts": {}, "ttlMs": 600000}}"#,
+            std::process::id(),
+            now_ms() - DEFAULT_TTL_MS - 5_000
+        );
+        with_lock("test_lock_record_ttl_long", &raw, |root| {
+            assert!(matches!(
+                check_main_checkout_lock(root),
+                Err(MainCheckoutLockError::HeldNumeric(_))
+            ));
+        });
+    }
+
+    #[test]
+    fn test_unknown_schema_record_is_refused() {
+        let raw = format!(r#"{{"v": 2, "kind": "mutex", "acquiredAt": {}}}"#, now_ms());
+        with_lock("test_lock_unknown_schema", &raw, |root| {
+            assert!(matches!(
+                check_main_checkout_lock(root),
+                Err(MainCheckoutLockError::Unsupported)
+            ));
+        });
     }
 
     #[test]

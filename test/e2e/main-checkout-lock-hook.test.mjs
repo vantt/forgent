@@ -29,6 +29,7 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REAL_HOOK = path.resolve(__dirname, '../../.githooks/pre-commit');
 const REAL_LOCK_MODULE = path.resolve(__dirname, '../../src/runner/main-checkout-lock.mjs');
+const REAL_ACTIVITY_MODULE = path.resolve(__dirname, '../../src/runner/main-checkout-activity.mjs');
 const REAL_PROCESS_IDENTITY_MODULE = path.resolve(__dirname, '../../src/runner/dispatch/process-identity.mjs');
 // The lock module also reads the run-timeout ceiling from this import-free leaf.
 const REAL_RUN_TIMEOUT_MODULE = path.resolve(__dirname, '../../src/runner/dispatch/run-timeout.mjs');
@@ -57,6 +58,7 @@ function initTempRepoWithHook() {
   fs.mkdirSync(utilDir, { recursive: true });
   fs.copyFileSync(REAL_HOOK, path.join(hooksDir, 'pre-commit'));
   fs.copyFileSync(REAL_LOCK_MODULE, path.join(runnerDir, 'main-checkout-lock.mjs'));
+  fs.copyFileSync(REAL_ACTIVITY_MODULE, path.join(runnerDir, 'main-checkout-activity.mjs'));
   fs.copyFileSync(REAL_PROCESS_IDENTITY_MODULE, path.join(dispatchDir, 'process-identity.mjs'));
   fs.copyFileSync(REAL_RUN_TIMEOUT_MODULE, path.join(dispatchDir, 'run-timeout.mjs'));
   fs.copyFileSync(REAL_IDENTITY_MODULE, path.join(utilDir, 'session-identity.mjs'));
@@ -95,6 +97,7 @@ function initTempRepoWithDetachedWorktree() {
   fs.mkdirSync(utilDir, { recursive: true });
   fs.copyFileSync(REAL_HOOK, path.join(hooksDir, 'pre-commit'));
   fs.copyFileSync(REAL_LOCK_MODULE, path.join(runnerDir, 'main-checkout-lock.mjs'));
+  fs.copyFileSync(REAL_ACTIVITY_MODULE, path.join(runnerDir, 'main-checkout-activity.mjs'));
   fs.copyFileSync(REAL_PROCESS_IDENTITY_MODULE, path.join(dispatchDir, 'process-identity.mjs'));
   fs.copyFileSync(REAL_RUN_TIMEOUT_MODULE, path.join(dispatchDir, 'run-timeout.mjs'));
   fs.copyFileSync(REAL_IDENTITY_MODULE, path.join(utilDir, 'session-identity.mjs'));
@@ -140,6 +143,7 @@ function initTempRepoWithFgwWorktree(branchName) {
   fs.mkdirSync(utilDir, { recursive: true });
   fs.copyFileSync(REAL_HOOK, path.join(hooksDir, 'pre-commit'));
   fs.copyFileSync(REAL_LOCK_MODULE, path.join(runnerDir, 'main-checkout-lock.mjs'));
+  fs.copyFileSync(REAL_ACTIVITY_MODULE, path.join(runnerDir, 'main-checkout-activity.mjs'));
   fs.copyFileSync(REAL_PROCESS_IDENTITY_MODULE, path.join(dispatchDir, 'process-identity.mjs'));
   fs.copyFileSync(REAL_RUN_TIMEOUT_MODULE, path.join(dispatchDir, 'run-timeout.mjs'));
   fs.copyFileSync(REAL_IDENTITY_MODULE, path.join(utilDir, 'session-identity.mjs'));
@@ -333,16 +337,18 @@ test('fgos unlock clears a corrupt lock left behind by a refused commit, and the
 // inherits the worktree's GIT_DIR and incorrectly returns the hooks dir
 // itself as "toplevel" instead of walking up to the real worktree root.
 
-test('a commit inside a real detached git worktree writes the lock at the worktree\'s own .fgos, not under its hooks directory', () => {
+test('a commit inside a real detached git worktree writes the activity beacon at the worktree\'s own .fgos, not under its hooks directory', () => {
   const worktreeRoot = initTempRepoWithDetachedWorktree();
 
   const result = commitAsSession(worktreeRoot, { FGOS_SESSION_ID: 'session-worktree' });
 
   assert.equal(result.status, 0, result.stderr);
   assert.equal(
-    fs.existsSync(path.join(worktreeRoot, '.fgos', 'main-checkout.lock')),
+    fs.existsSync(path.join(worktreeRoot, '.fgos', 'runtime', 'main-checkout-activity.json')),
     true,
   );
+  // The hook never writes the main-checkout mutex itself.
+  assert.equal(fs.existsSync(path.join(worktreeRoot, '.fgos', 'main-checkout.lock')), false);
   assert.equal(
     fs.existsSync(path.join(worktreeRoot, '.githooks', '.fgos')),
     false,
@@ -350,13 +356,12 @@ test('a commit inside a real detached git worktree writes the lock at the worktr
 });
 
 // --- truth 7: the { id, source } identity shape still yields a usable token -
-// resolveWriterIdentity now returns { id, source }; a hook that kept
-// destructuring the old key would silently pass `undefined` into the lock,
-// write a token-less record, read it back as AMBIGUOUS, and refuse every
-// later commit. Asserting on the recorded token, not just the exit status,
+// resolveWriterIdentity returns { id, source }; a hook that destructured the
+// wrong key would write a token-less beacon and never recognize its own
+// session again. Asserting on the recorded writer, not just the exit status,
 // is what makes that failure mode visible here.
 
-test('a commit still succeeds after the identity shape change, and the lock records a usable token', () => {
+test('a commit still succeeds after the identity shape change, and the beacon records a usable writer', () => {
   const repoRoot = initTempRepoWithHook();
   const before = commitCount(repoRoot);
 
@@ -364,13 +369,15 @@ test('a commit still succeeds after the identity shape change, and the lock reco
   assert.equal(first.status, 0, first.stderr);
   assert.equal(commitCount(repoRoot), before + 1);
 
-  const lock = JSON.parse(
-    fs.readFileSync(path.join(repoRoot, '.fgos', 'main-checkout.lock'), 'utf8'),
+  const beacon = JSON.parse(
+    fs.readFileSync(path.join(repoRoot, '.fgos', 'runtime', 'main-checkout-activity.json'), 'utf8'),
   );
-  assert.equal(lock.pid, 'session-shape');
+  assert.equal(beacon.writer.id, 'session-shape');
+  assert.equal(beacon.kind, 'beacon');
+  assert.equal(typeof beacon.windowMs, 'number');
 
-  // Same session again: self-recognition still refreshes its own lock, which
-  // only works because the token above is the real identity, not undefined.
+  // Same session again: the beacon recognizes its own writer, which only
+  // works because the writer above is the real identity, not undefined.
   const second = commitAsSession(repoRoot, { FGOS_SESSION_ID: 'session-shape' });
   assert.equal(second.status, 0, second.stderr);
   assert.equal(commitCount(repoRoot), before + 2);

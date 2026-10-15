@@ -15,7 +15,7 @@ import { foldEvents } from '../state/replay.mjs';
 import { isResolvedStatus, resolveRoot } from '../state/frontier.mjs';
 import { getDomain, stepForPhase, effectiveStep } from '../state/domain-registry.mjs';
 import { visitCount } from './anti-loop.mjs';
-import { acquireMainCheckoutLock, forceReclaimAmbiguousLock, HELD, AMBIGUOUS, DEFAULT_TTL_MS, formatLockDurationMs, HOLDER_PID_ENV_VAR } from './main-checkout-lock.mjs';
+import { acquireMainCheckoutLock, forceReclaimAmbiguousLock, HELD, AMBIGUOUS, DEFAULT_TTL_MS, formatLockDurationMs, lockRefusalDetail } from './main-checkout-lock.mjs';
 import { createClaimWorktree, branchNameFor, branchExists } from './worktree.mjs';
 import { lastActivityAt, isReclaimEligible } from './claim-liveness.mjs';
 import { hasWorkerSlotRoom } from '../state/worker-slots.mjs';
@@ -108,13 +108,10 @@ export class ClaimError extends Error {
  * @returns {Object} claim result with worktree info if isolated
  */
 export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = process.cwd(), worktreeDir, skipOutcome = false } = {}) {
-  // Acquire main-checkout-lock before any state mutation. ttlMs is required
-  // here (tsk-3w8 follow-up): the pre-commit hook (.githooks/pre-commit,
-  // now wired via fgos setup/doctor) writes a STRING-identity record per
-  // commit and never releases it -- relying entirely on ttlMs-based
-  // staleness. Omitting ttlMs here (the original tsk-53f wiring did) makes
-  // that record read as AMBIGUOUS forever once the hook is active,
-  // permanently deadlocking every take/pick after the very first commit.
+  // Acquire main-checkout-lock before any state mutation. ttlMs is the
+  // window this claim records for itself; a contender judges it by that.
+  // The pre-commit hook no longer writes this lock (it leaves a beacon in
+  // its own file), so a commit on main never blocks a claim here.
   let lockResult = acquireMainCheckoutLock(dir, { identity: process.pid, ttlMs: DEFAULT_TTL_MS, releaseOnExit: true });
   if (lockResult.status === AMBIGUOUS) {
     // tsk-2l8: AMBIGUOUS means the lock file's content is unparseable, not
@@ -137,8 +134,10 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
       : ', no TTL window known';
     throw new ClaimError(
       'lock-held',
-      `claimWork: main checkout locked by pid ${lockResult.holderPid} (held ${formatLockDurationMs(lockResult.lockAgeMs)}${ttlPart})`,
-      { remainingTtlMs: lockResult.remainingTtlMs, holderPid: lockResult.holderPid, lockAgeMs: lockResult.lockAgeMs },
+      lockResult.reason
+        ? `claimWork: main checkout lock refused${lockRefusalDetail(lockResult)}`
+        : `claimWork: main checkout locked by pid ${lockResult.holderPid} (held ${formatLockDurationMs(lockResult.lockAgeMs)}${ttlPart})`,
+      { remainingTtlMs: lockResult.remainingTtlMs, holderPid: lockResult.holderPid, lockAgeMs: lockResult.lockAgeMs, ...(lockResult.reason ? { reason: lockResult.reason } : {}) },
     );
   }
   if (lockResult.status === AMBIGUOUS) {
@@ -158,14 +157,11 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
     // no longer passes one at all, letting the checks do their own real
     // multi-file discovery from disk.
     const rawEvents = readRawEvents(dir);
-    // commitEnv (tsk-32v): this call runs right after acquiring
-    // main-checkout-lock above (identity: process.pid) -- without threading
-    // that same identity into the periodic checkpoint's own git commit,
-    // .githooks/pre-commit's own lock re-check sees a foreign identity and
-    // refuses it, silently leaving .fgos/events.jsonl staged-but-uncommitted
-    // (the same self-collision confirmed live in merge.mjs's own two call
-    // sites).
-    runOpportunisticMainCheckoutChecks(dir, repoRoot, { commitEnv: { [HOLDER_PID_ENV_VAR]: String(process.pid) } });
+    // mainLockHolder: this call already holds main-checkout.lock (identity
+    // process.pid, acquired above), so the checkpoint commits under that
+    // same hold instead of acquiring the mutex again; its git commit carries
+    // the pid so .githooks/pre-commit recognizes fgOS's own commit (tsk-32v).
+    runOpportunisticMainCheckoutChecks(dir, repoRoot, { mainLockHolder: process.pid });
     const durableView = foldEvents(rawEvents);
     const claims = readClaims(dir);
     const view = buildEffectiveView(durableView, claims);

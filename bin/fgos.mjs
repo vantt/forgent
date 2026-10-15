@@ -105,14 +105,15 @@ import { withLockRetry } from '../src/runner/lock-wait.mjs';
 import {
   acquireMainCheckoutLock,
   releaseMainCheckoutLock,
-  releaseMainCheckoutLockIfOwn,
   forceReclaimAmbiguousLock,
   inspectMainCheckoutLock,
   ACQUIRED,
   HELD,
   DEFAULT_TTL_MS,
   formatLockDurationMs,
+  lockRefusalDetail,
 } from '../src/runner/main-checkout-lock.mjs';
+import { clearBeaconIfOwn, readBeacon } from '../src/runner/main-checkout-activity.mjs';
 import { resolveWriterIdentity } from '../src/util/session-identity.mjs';
 import { createSession, endSession, listSessions, reclaimOrphanedSessions, isSessionWorktree, SessionError } from '../src/runner/session.mjs';
 import { startGateway, stopGateway, gatewayStatus, GatewayControlError } from '../src/runner/gateway-control.mjs';
@@ -1405,7 +1406,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       if (assessment.failed.length > 0) {
         const reason = [...assessment.notReadyYet, ...assessment.failed].join('; ');
         const { event } = moveWork(dir, { id, to: 'blocked', expectedStatus: 'cleanup', reason, role: 'system' });
-        releaseMainCheckoutLockIfOwn(dir, resolveWriterIdentity(dir).id);
+        clearBeaconIfOwn(dir, resolveWriterIdentity(dir).id);
         return { id, to: 'blocked', reason, seq: event.seq };
       }
 
@@ -1422,7 +1423,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         }
       }
       const { event } = moveWork(dir, { id, to: 'done', expectedStatus: 'cleanup', role: 'human' });
-      releaseMainCheckoutLockIfOwn(dir, resolveWriterIdentity(dir).id);
+      clearBeaconIfOwn(dir, resolveWriterIdentity(dir).id);
       return { id, to: 'done', seq: event.seq, cleanupWarnings };
     }
 
@@ -1792,7 +1793,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         }
       }
       const { event } = addOutcome(dir, { id, docType, ...(docPath !== undefined ? { docPath } : {}) });
-      releaseMainCheckoutLockIfOwn(dir, resolveWriterIdentity(dir).id);
+      clearBeaconIfOwn(dir, resolveWriterIdentity(dir).id);
       return { id, docType, docPath: docPath ?? null, status: item.status, seq: event.seq };
     }
 
@@ -3555,15 +3556,14 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         const { event } = settleClaim(dir, { id, claimId: activeClaim?.claimId, finalStatus: 'awaiting-approval', headAtReturn: head });
         addOutcome(dir, { id, actual: { outcome: 'awaiting-approval', passed: true, attempts: 1, errorClass: null, aheadCount } });
         // tsk-45z D1/D2: this session's own commits (landed straight on the
-        // main checkout, not a branch/worktree) may still hold
-        // main-checkout.lock, refreshed by .githooks/pre-commit on each one
-        // and never released until TTL expiry. This point — verify green,
-        // item settling to `proposed` — is the state-machine's own signal
-        // that this session is done with the checkout, so release early
-        // instead of leaving the next writer to wait out the TTL.
-        // Identity-checked (never a blind unlink, D2): only removes the
-        // lock if it is still recorded under this session's own identity.
-        releaseMainCheckoutLockIfOwn(dir, resolveWriterIdentity(dir).id);
+        // main checkout, not a branch/worktree) leave the activity beacon
+        // .githooks/pre-commit writes on each one. This point — verify
+        // green, item settling to `proposed` — is the state-machine's own
+        // signal that this session is done with the checkout, so clear the
+        // beacon early instead of leaving another session's commit to wait
+        // out its window. Writer-checked (never a blind unlink, D2): only
+        // removes a beacon this session's own identity wrote.
+        clearBeaconIfOwn(dir, resolveWriterIdentity(dir).id);
         return { id, from: 'doing', to: 'awaiting-approval', source: 'main', aheadCount, passed: true, seq: event.seq, output: check.output, frozenJudgeHits: frozenJudge, footprintDiffHits: footprintDiff };
       }
 
@@ -3589,11 +3589,11 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           detail: hint ? `${detail}\n${hint}` : detail,
         });
       }
-      // Same early-release as the passing branch above (tsk-45z D1/D2) — a
+      // Same early beacon clear as the passing branch above (tsk-45z D1/D2) — a
       // failed verify still means this session is done touching the main
       // checkout; the item settling to `blocked` is just as much "done with
       // the checkout" as settling to `proposed`.
-      releaseMainCheckoutLockIfOwn(dir, resolveWriterIdentity(dir).id);
+      clearBeaconIfOwn(dir, resolveWriterIdentity(dir).id);
       return { id, from: 'doing', to: 'blocked', source: 'main', aheadCount, passed: false, timedOut: check.timedOut, exitStatus: check.status, output: check.output };
     }
 
@@ -4242,6 +4242,9 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // D5 fail-closed).
     case 'unlock': {
       const lockResult = acquireMainCheckoutLock(dir, { identity: process.pid, ttlMs: DEFAULT_TTL_MS });
+      if (lockResult.status === HELD && lockResult.reason) {
+        throw new StoreError('lock-timeout', `unlock: refusing to clear the main checkout lock${lockRefusalDetail(lockResult)}.`);
+      }
       if (lockResult.status === HELD) {
         const ttlPart = lockResult.remainingTtlMs != null
           ? `, expires in ${formatLockDurationMs(lockResult.remainingTtlMs)}`
@@ -4270,14 +4273,28 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     }
 
     case 'lock-status': {
-      const status = inspectMainCheckoutLock(dir, { ttlMs: DEFAULT_TTL_MS });
+      const status = inspectMainCheckoutLock(dir);
+      // The commit-activity beacon is reported on its own: it is a hint the
+      // pre-commit hook reads, never a lock claim/land/approve wait on.
+      const beacon = readBeacon(dir);
+      const activity = beacon.status === 'ok'
+        ? {
+          status: 'present',
+          writer: beacon.record.writer.id,
+          ageMs: Date.now() - beacon.record.writtenAt,
+          windowMs: beacon.record.windowMs,
+          active: Date.now() - beacon.record.writtenAt <= beacon.record.windowMs,
+        }
+        : { status: beacon.status };
       return {
         outcome: status.outcome,
+        ...(status.reason ? { reason: status.reason } : {}),
         holderPid: status.holderPid ?? null,
         lockAgeMs: status.lockAgeMs ?? null,
         remainingTtlMs: status.remainingTtlMs ?? null,
         lockAge: status.lockAgeMs != null ? formatLockDurationMs(status.lockAgeMs) : null,
         remainingTtl: status.remainingTtlMs != null ? formatLockDurationMs(status.remainingTtlMs) : null,
+        activity,
       };
     }
 

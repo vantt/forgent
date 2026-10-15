@@ -32,6 +32,7 @@ import { acquireMainCheckoutLock, releaseMainCheckoutLock } from '../../src/runn
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REAL_HOOK = path.resolve(__dirname, '../../.githooks/pre-commit');
 const REAL_LOCK_MODULE = path.resolve(__dirname, '../../src/runner/main-checkout-lock.mjs');
+const REAL_ACTIVITY_MODULE = path.resolve(__dirname, '../../src/runner/main-checkout-activity.mjs');
 const REAL_PROCESS_IDENTITY_MODULE = path.resolve(__dirname, '../../src/runner/dispatch/process-identity.mjs');
 // The lock module also reads the run-timeout ceiling from this import-free leaf.
 const REAL_RUN_TIMEOUT_MODULE = path.resolve(__dirname, '../../src/runner/dispatch/run-timeout.mjs');
@@ -74,6 +75,7 @@ function initSharedAbsoluteHooksPathFixture() {
   fs.mkdirSync(utilDir, { recursive: true });
   fs.copyFileSync(REAL_HOOK, path.join(hooksDir, 'pre-commit'));
   fs.copyFileSync(REAL_LOCK_MODULE, path.join(runnerDir, 'main-checkout-lock.mjs'));
+  fs.copyFileSync(REAL_ACTIVITY_MODULE, path.join(runnerDir, 'main-checkout-activity.mjs'));
   fs.copyFileSync(REAL_PROCESS_IDENTITY_MODULE, path.join(dispatchDir, 'process-identity.mjs'));
   fs.copyFileSync(REAL_RUN_TIMEOUT_MODULE, path.join(dispatchDir, 'run-timeout.mjs'));
   fs.copyFileSync(REAL_IDENTITY_MODULE, path.join(utilDir, 'session-identity.mjs'));

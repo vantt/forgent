@@ -21,6 +21,8 @@ import {
   AMBIGUOUS,
   DEFAULT_TTL_MS,
   HOOK_TTL_MS,
+  UNSUPPORTED_PROTOCOL,
+  lockRefusalDetail,
 } from '../../src/runner/main-checkout-lock.mjs';
 import {
   isProcessAlive,
@@ -128,13 +130,13 @@ test('inspectMainCheckoutLock reports "free" for a missing lock file, and never 
   assert.equal(fs.existsSync(lockPathFor(dir)), false);
 });
 
-test('inspectMainCheckoutLock reports "live" for a live holder within ttlMs, without mutating the file', () => {
+test('inspectMainCheckoutLock reports "live" for a live holder within its recorded ttl, without mutating the file', () => {
   const { dir } = setup();
   fs.mkdirSync(dir, { recursive: true });
   const freshTs = Date.now() - 500;
-  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: process.pid, ts: freshTs }));
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: process.pid, ts: freshTs, ttlMs: 60_000 }));
 
-  const res = inspectMainCheckoutLock(dir, { ttlMs: 60_000 });
+  const res = inspectMainCheckoutLock(dir);
 
   assert.equal(res.outcome, 'live');
   assert.equal(res.holderPid, process.pid);
@@ -170,15 +172,16 @@ test('inspectMainCheckoutLock reports "ambiguous" for unparseable content, with 
   assert.equal(res.lockAgeMs, undefined);
 });
 
-test('inspectMainCheckoutLock reports "ambiguous" with a known age for a string identity with no ttlMs supplied', () => {
+test('inspectMainCheckoutLock judges a legacy session-id record (no ttlMs, left by an older hook) by the 20 s hook window, whatever ttl the reader passes', () => {
   const { dir } = setup();
   fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: 'session-holder', ts: Date.now() }));
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: 'session-holder', ts: Date.now() - 5_000 }));
+  const fresh = inspectMainCheckoutLock(dir, { ttlMs: DEFAULT_TTL_MS });
+  assert.equal(fresh.outcome, 'live');
+  assert.equal(fresh.ttlMs, HOOK_TTL_MS);
 
-  const res = inspectMainCheckoutLock(dir);
-
-  assert.equal(res.outcome, 'ambiguous');
-  assert.ok(res.lockAgeMs >= 0 && res.lockAgeMs < 5000);
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: 'session-holder', ts: Date.now() - HOOK_TTL_MS - 1_000 }));
+  assert.equal(inspectMainCheckoutLock(dir, { ttlMs: DEFAULT_TTL_MS }).outcome, 'stale');
 });
 
 // --- acquire when free ------------------------------------------------------
@@ -229,49 +232,54 @@ test('reclaims a lock held by a dead pid', () => {
 
 // --- stale: ttlMs expiry while pid is alive ----------------------------------
 
-test('reclaims a lock held by a live pid whose last-touched timestamp exceeds ttlMs', () => {
+test('reclaims a lock held by a live pid whose last-touched timestamp exceeds the ttl it recorded', () => {
   const { dir } = setup();
   fs.mkdirSync(dir, { recursive: true });
   const staleTs = Date.now() - 10_000;
   // holder pid is THIS test process -- guaranteed alive -- but its
-  // timestamp is old enough to exceed the ttlMs supplied below.
-  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: process.pid, ts: staleTs }));
-
-  const res = acquireMainCheckoutLock(dir, { identity: process.pid + 1, ttlMs: 1000 });
-
-  assert.equal(res.status, ACQUIRED);
-});
-
-test('does NOT reclaim a lock held by a live pid whose timestamp is within ttlMs', () => {
-  const { dir } = setup();
-  fs.mkdirSync(dir, { recursive: true });
-  const freshTs = Date.now() - 500;
-  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: process.pid, ts: freshTs }));
+  // timestamp is older than the ttl it recorded for itself.
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: process.pid, ts: staleTs, ttlMs: 1000 }));
 
   const res = acquireMainCheckoutLock(dir, { identity: process.pid + 1, ttlMs: 60_000 });
 
-  assert.equal(res.status, HELD);
-  assert.equal(res.holderPid, process.pid);
-  // tsk-5z2: age/remaining-TTL now ride along on HELD so a caller doesn't
-  // have to hand-compute them from the raw file.
-  assert.ok(res.lockAgeMs >= 500 && res.lockAgeMs < 60_000, `lockAgeMs ${res.lockAgeMs} should be ~500ms`);
-  assert.ok(res.remainingTtlMs > 0 && res.remainingTtlMs <= 60_000, `remainingTtlMs ${res.remainingTtlMs} should be close to but under 60000`);
+  assert.equal(res.status, ACQUIRED, 'the holder\'s own 1 s ttl decides, not the contender\'s 60 s');
 });
 
-test('falls back to pure PID-liveness when ttlMs is omitted (old timestamp, live pid, still held)', () => {
+test('does NOT reclaim a lock held by a live pid whose timestamp is within the ttl it recorded, whatever ttl the contender takes', () => {
   const { dir } = setup();
   fs.mkdirSync(dir, { recursive: true });
-  const veryOldTs = Date.now() - 10_000_000;
-  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: process.pid, ts: veryOldTs }));
+  const freshTs = Date.now() - 5_000;
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: process.pid, ts: freshTs, ttlMs: 60_000 }));
 
-  const res = acquireMainCheckoutLock(dir, { identity: process.pid + 1 });
+  const res = acquireMainCheckoutLock(dir, { identity: process.pid + 1, ttlMs: 1000 });
 
-  assert.equal(res.status, HELD);
+  assert.equal(res.status, HELD, 'a contender with a shorter ttl of its own must not take the lock');
   assert.equal(res.holderPid, process.pid);
-  // tsk-5z2: age is still knowable without a ttlMs; remaining-TTL is not --
-  // no staleness window was supplied, so it must be null, never fabricated.
-  assert.ok(res.lockAgeMs >= 10_000_000, `lockAgeMs ${res.lockAgeMs} should reflect the ~10,000,000ms-old timestamp`);
-  assert.equal(res.remainingTtlMs, null);
+  // tsk-5z2: age/remaining-TTL ride along on HELD, from the holder's own ttl.
+  assert.ok(res.lockAgeMs >= 5_000 && res.lockAgeMs < 60_000, `lockAgeMs ${res.lockAgeMs} should be ~5000ms`);
+  assert.ok(res.remainingTtlMs > 0 && res.remainingTtlMs <= 55_000, `remainingTtlMs ${res.remainingTtlMs} should come from the holder's 60000`);
+});
+
+test('a legacy numeric record (no ttlMs) counts for DEFAULT_TTL_MS, the window its claim/land/merge writer used', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: process.pid, ts: Date.now() - 10_000 }));
+
+  const held = acquireMainCheckoutLock(dir, { identity: process.pid + 1, ttlMs: 1000 });
+  assert.equal(held.status, HELD);
+  assert.ok(held.remainingTtlMs > DEFAULT_TTL_MS - 15_000 && held.remainingTtlMs <= DEFAULT_TTL_MS - 10_000);
+
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: process.pid, ts: Date.now() - DEFAULT_TTL_MS - 1_000 }));
+  assert.equal(acquireMainCheckoutLock(dir, { identity: process.pid + 1 }).status, ACQUIRED);
+});
+
+test('every writer records the ttl it took, whatever its identity shape', () => {
+  const { dir } = setup();
+  assert.equal(acquireMainCheckoutLock(dir, { identity: process.pid, ttlMs: 12_345 }).status, ACQUIRED);
+  assert.equal(JSON.parse(fs.readFileSync(lockPathFor(dir), 'utf8')).ttlMs, 12_345);
+  releaseMainCheckoutLock(dir);
+  assert.equal(acquireMainCheckoutLock(dir, { identity: 'session-x', ttlMs: 6_789 }).status, ACQUIRED);
+  assert.equal(JSON.parse(fs.readFileSync(lockPathFor(dir), 'utf8')).ttlMs, 6_789);
 });
 
 // --- ambiguous: corrupt/unparseable content ----------------------------------
@@ -292,10 +300,10 @@ test('reports AMBIGUOUS for an unparseable (non-JSON) lock file, never free or h
   assert.equal(fs.readFileSync(lockPathFor(dir), 'utf8'), 'not json at all {{{');
 });
 
-test('reports AMBIGUOUS for a lock file whose pid field is not a usable number', () => {
+test('reports AMBIGUOUS for a lock file whose pid field is not a usable identity', () => {
   const { dir } = setup();
   fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: 'not-a-pid', ts: Date.now() }));
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: -4, ts: Date.now() }));
 
   const res = acquireMainCheckoutLock(dir, { identity: process.pid });
 
@@ -458,30 +466,27 @@ test('renewMainCheckoutLockIfOwn works for a numeric (pid) identity too, not jus
 });
 
 // --- the core race, proven with a controlled clock (tsk-4l8 RESEARCH.md) ---
-// A live holder's lock, aged past a contender's own ttlMs, is judged HELD
-// (not stale) by that contender ONLY because the holder heartbeated in
-// between — this is the exact mechanism the item's own investigation found
-// missing (main-checkout-lock.mjs's `held = pidLive && withinTtl` is
-// evaluated against the CONTENDER's ttlMs, not the holder's own).
+// A live holder's lock, aged past its own recorded ttl, is judged HELD (not
+// stale) ONLY because the holder heartbeated in between.
 
-test('a live holder that never renews gets reclaimed by a contender once its ttlMs elapses (the bug, reproduced without the fix)', () => {
+test('a live holder that never renews gets reclaimed by a contender once its own ttl elapses (the bug, reproduced without the fix)', () => {
   const { dir } = setup();
   fs.mkdirSync(dir, { recursive: true });
   const shortTtl = 1000;
   const staleTs = Date.now() - 10_000; // far older than shortTtl, never renewed
-  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: process.pid, ts: staleTs }));
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: process.pid, ts: staleTs, ttlMs: shortTtl }));
 
   const contender = acquireMainCheckoutLock(dir, { identity: process.pid + 1, ttlMs: shortTtl });
 
-  assert.equal(contender.status, ACQUIRED, 'without a heartbeat, a still-live holder\'s lock reads as free once its age exceeds the contender\'s own ttlMs');
+  assert.equal(contender.status, ACQUIRED, 'without a heartbeat, a still-live holder\'s lock reads as free once its age exceeds its own ttl');
 });
 
-test('a live holder that renews on a heartbeat is judged still HELD by a contender using the same short ttlMs (the fix)', () => {
+test('a live holder that renews on a heartbeat is judged still HELD by a contender (the fix)', () => {
   const { dir } = setup();
   fs.mkdirSync(dir, { recursive: true });
   const shortTtl = 1000;
   const staleTs = Date.now() - 10_000; // would be stale under shortTtl if untouched
-  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: process.pid, ts: staleTs }));
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: process.pid, ts: staleTs, ttlMs: shortTtl }));
 
   // The holder's own heartbeat tick, exactly what merge.mjs's interval calls:
   const renew = renewMainCheckoutLockIfOwn(dir, process.pid);
@@ -583,14 +588,97 @@ test('a dispatch-lock holder\'s recorded ttl is honoured only up to the run-time
   assert.equal(contender.status, ACQUIRED);
 });
 
-test('acquireMainCheckoutLock still fails closed (AMBIGUOUS) for a non-composite string identity with no ttlMs supplied -- the S2 fix only special-cases the dispatch lock\'s own pid-embedded shape', () => {
+test('a live dispatch-lock holder that took a SHORTER ttl than a contender is free once its own ttl elapses (readers never use their own ttl)', () => {
   const { dir } = setup();
   fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: 'session-holder-opaque-id', ts: Date.now() }));
+  const lockFile = dispatchLockFile('/some/worktree');
+  const identity = `${process.pid}:${Date.now()}:shortholder`;
+  fs.writeFileSync(path.join(dir, lockFile), JSON.stringify({ pid: identity, ts: Date.now() - 2 * 60000, ttlMs: 60000 }));
 
-  const contender = acquireMainCheckoutLock(dir, { identity: 'contender-session' });
+  const contender = acquireMainCheckoutLock(dir, { identity: `${process.pid}:${Date.now()}:longcontender`, ttlMs: 4 * 3600000, lockFile });
+  assert.equal(contender.status, ACQUIRED);
+});
 
-  assert.equal(contender.status, AMBIGUOUS, 'an opaque (non-composite) string identity with no ttlMs is still undecidable, D5 fail-closed, unchanged from before this fix');
+test('a legacy dispatch composite record (no ttlMs) is held up to the run-timeout ceiling while its pid lives', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  const lockFile = dispatchLockFile('/some/worktree');
+  fs.writeFileSync(path.join(dir, lockFile), JSON.stringify({ pid: `${process.pid}:${Date.now()}:legacy`, ts: Date.now() - 60 * 60000 }));
+
+  const contender = acquireMainCheckoutLock(dir, { identity: `${process.pid}:${Date.now()}:next`, ttlMs: 15 * 60000, lockFile });
+  assert.equal(contender.status, HELD);
+});
+
+test('a merge-slot holder (numeric pid) is judged by the ttl it recorded, like the main lock', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  const lockFile = mergeSlotLockFile('main');
+  assert.equal(acquireMainCheckoutLock(dir, { identity: process.pid, ttlMs: DEFAULT_TTL_MS, lockFile, now: Date.now() - 60_000 }).status, ACQUIRED);
+  assert.equal(JSON.parse(fs.readFileSync(path.join(dir, lockFile), 'utf8')).ttlMs, DEFAULT_TTL_MS);
+  assert.equal(acquireMainCheckoutLock(dir, { identity: process.pid + 1, ttlMs: 1000, lockFile }).status, HELD);
+  fs.writeFileSync(path.join(dir, lockFile), JSON.stringify({ pid: process.pid, ts: Date.now() - 60_000, ttlMs: 30_000 }));
+  assert.equal(acquireMainCheckoutLock(dir, { identity: process.pid + 1, ttlMs: DEFAULT_TTL_MS, lockFile }).status, ACQUIRED);
+});
+
+test('a legacy session-id record (no ttlMs, left by an older pre-commit hook) blocks for at most HOOK_TTL_MS, never DEFAULT_TTL_MS', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: 'session-holder-opaque-id', ts: Date.now() - 5_000 }));
+  const held = acquireMainCheckoutLock(dir, { identity: process.pid, ttlMs: DEFAULT_TTL_MS });
+  assert.equal(held.status, HELD);
+  assert.ok(held.remainingTtlMs <= HOOK_TTL_MS - 5_000, `remainingTtlMs ${held.remainingTtlMs} must come from the 20 s hook window`);
+
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: 'session-holder-opaque-id', ts: Date.now() - HOOK_TTL_MS - 1_000 }));
+  assert.equal(acquireMainCheckoutLock(dir, { identity: process.pid, ttlMs: DEFAULT_TTL_MS }).status, ACQUIRED);
+});
+
+// --- unsupported lock protocol: refused fail-closed, never reclaimed -------
+
+const V2_RECORD = JSON.stringify({ v: 2, kind: 'mutex', token: 't', owner: { pid: 1 }, acquiredAt: Date.now() - 24 * 3600000, ttlMs: 1 });
+
+test('a record from a newer lock protocol (a `v` field) is HELD with the unsupported-protocol reason, and never touched, however old', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(lockPathFor(dir), V2_RECORD);
+
+  const res = acquireMainCheckoutLock(dir, { identity: process.pid, ttlMs: DEFAULT_TTL_MS });
+  assert.equal(res.status, HELD);
+  assert.equal(res.reason, UNSUPPORTED_PROTOCOL);
+  assert.match(lockRefusalDetail(res), /upgrade fgOS/);
+  assert.equal(fs.readFileSync(lockPathFor(dir), 'utf8'), V2_RECORD);
+
+  assert.equal(forceReclaimAmbiguousLock(dir).status, UNSUPPORTED_PROTOCOL);
+  assert.equal(releaseMainCheckoutLockIfOwn(dir, process.pid).status, 'ambiguous');
+  assert.equal(renewMainCheckoutLockIfOwn(dir, process.pid).status, 'ambiguous');
+  const inspected = inspectMainCheckoutLock(dir);
+  assert.equal(inspected.outcome, 'live');
+  assert.equal(inspected.reason, UNSUPPORTED_PROTOCOL);
+  assert.equal(fs.readFileSync(lockPathFor(dir), 'utf8'), V2_RECORD, 'no primitive may remove or rewrite it');
+});
+
+test('the protocol marker is re-read after acquire: a marker naming another protocol releases the v1 hold and refuses', () => {
+  const { dir } = setup();
+  const markerDir = path.join(dir, 'runtime', 'locks', 'main-checkout');
+  fs.mkdirSync(markerDir, { recursive: true });
+
+  fs.writeFileSync(path.join(markerDir, 'protocol.json'), JSON.stringify({ writer: 1 }));
+  const v1 = acquireMainCheckoutLock(dir, { identity: process.pid, ttlMs: DEFAULT_TTL_MS });
+  assert.equal(v1.status, ACQUIRED, 'marker 1 is this protocol');
+  v1.release();
+
+  fs.writeFileSync(path.join(markerDir, 'protocol.json'), JSON.stringify({ writer: 2 }));
+  const refused = acquireMainCheckoutLock(dir, { identity: process.pid, ttlMs: DEFAULT_TTL_MS });
+  assert.equal(refused.status, HELD);
+  assert.equal(refused.reason, UNSUPPORTED_PROTOCOL);
+  assert.equal(fs.existsSync(lockPathFor(dir)), false, 'the v1 record written by the acquire is released again');
+
+  fs.writeFileSync(path.join(markerDir, 'protocol.json'), 'not json');
+  assert.equal(acquireMainCheckoutLock(dir, { identity: process.pid, ttlMs: DEFAULT_TTL_MS }).reason, UNSUPPORTED_PROTOCOL, 'an unreadable marker fails closed');
+
+  // Each lock file has its own marker: a merge slot is unaffected by the main lock's.
+  const slot = acquireMainCheckoutLock(dir, { identity: process.pid, ttlMs: DEFAULT_TTL_MS, lockFile: mergeSlotLockFile('main') });
+  assert.equal(slot.status, ACQUIRED);
+  slot.release();
 });
 
 // --- crash-safety: exit/SIGINT/SIGTERM release the lock automatically ------
@@ -705,31 +793,28 @@ test('a different string identity is held within ttlMs of its last refresh', () 
   assert.equal(res.holderPid, 'session-holder');
 });
 
-test('a different string identity is reclaimed once ttlMs has elapsed since its last refresh', () => {
+test('a different string identity is reclaimed once its recorded ttl has elapsed since its last refresh', () => {
   const { dir } = setup();
   fs.mkdirSync(dir, { recursive: true });
   const staleTs = Date.now() - 10_000;
-  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: 'session-holder', ts: staleTs }));
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: 'session-holder', ts: staleTs, ttlMs: 1000 }));
 
-  const res = acquireMainCheckoutLock(dir, { identity: 'session-other', ttlMs: 1000 });
+  const res = acquireMainCheckoutLock(dir, { identity: 'session-other', ttlMs: 60_000 });
 
   assert.equal(res.status, ACQUIRED);
   const record = JSON.parse(fs.readFileSync(lockPathFor(dir), 'utf8'));
   assert.equal(record.pid, 'session-other');
 });
 
-test('checking a different string identity lock with no ttlMs supplied is AMBIGUOUS, never silently free or held', () => {
+test('a contender passing no ttlMs still judges a fresh string-identity record as HELD by the record\'s own window, never AMBIGUOUS', () => {
   const { dir } = setup();
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: 'session-holder', ts: Date.now() }));
 
   const res = acquireMainCheckoutLock(dir, { identity: 'session-other' });
 
-  assert.equal(res.status, AMBIGUOUS);
-  // tsk-5z2: the record itself parsed fine (only held-ness is undecidable
-  // without a ttlMs), so age is real and known even though this is AMBIGUOUS.
+  assert.equal(res.status, HELD);
   assert.ok(res.lockAgeMs >= 0 && res.lockAgeMs < 5000, `lockAgeMs ${res.lockAgeMs} should be small (record.ts was just now)`);
-  // untouched -- neither reclaimed nor treated as held
   const record = JSON.parse(fs.readFileSync(lockPathFor(dir), 'utf8'));
   assert.equal(record.pid, 'session-holder');
 });

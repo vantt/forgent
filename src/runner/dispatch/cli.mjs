@@ -64,6 +64,7 @@ import {
   HELD,
   AMBIGUOUS,
   formatLockDurationMs,
+  lockRefusalDetail,
 } from '../main-checkout-lock.mjs';
 import { checkoutDirtyPaths } from '../worktree.mjs';
 
@@ -736,7 +737,7 @@ export async function executeExecutorCli(
     const ageStr = formatLockDurationMs(lockRes.lockAgeMs);
     throw new DispatchError(
       'dispatch-in-flight',
-      `dispatch for cwd "${cwd}" is already in flight (held for ${ageStr}).`,
+      `dispatch for cwd "${cwd}" is already in flight (held for ${ageStr})${lockRefusalDetail(lockRes)}.`,
       { cwd, lockAgeMs: lockRes.lockAgeMs, remainingTtlMs: lockRes.remainingTtlMs, holderPid: lockRes.holderPid },
     );
   }
