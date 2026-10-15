@@ -110,7 +110,7 @@ Các phép đo S5, S7, S8 rẻ, chạy được ngay để biến "hoãn" thành
 | **Khi nào làm Rust** (OQ1) | (a) Node trước, Rust khi có trigger · (b) crate identity ngay · (c) hai crate + bản Node song song · (d) hai nền Rust, một nguồn identity, Node chỉ gọi sang | (a), **không bao giờ (c)** | **(d) thu hẹp**: S6 đã đạt có điều kiện, và hiện đã có hai bản Rust tự tính identity/lock lệch với Node, tức "Rust sau" nghĩa là chấp nhận hai sự thật. Chi tiết ở [thiết kế nền](design-261015-1755-lock-and-identity-foundation-lead-design.md) |
 | **Giữ credential khi không hỏi được pane** (OQ2): herdr không trả lời, credential đã quá hạn | (a) quá hạn thì xoá · (b) giữ tới khi chắc chắn pane đã đóng · (c) xoá nhưng liệt kê để người xử lý | (a) | **Đã quyết (anh, 2026-10-15): (a) quá hạn thì xoá.** Sau cách vá 2.1, chỉ áp dụng khi controller đã chết hoặc đã quá hạn; không lan sang run đang chạy |
 | **Một tab xuyên các bước nối tiếp** (ALT-TAB1) | có / không | — | **Đã quyết (anh, 2026-10-15): không làm.** Bước nối tiếp mở tab mới cùng nhãn. Xem lại chỉ khi dùng thực tế thấy phiền |
-| **Mời thêm chuyên môn ngoài** (gate `close`) | herdr nội bộ, process/PTY Linux, chính sách credential, tích hợp Rust/Node, thu hồi tài nguyên đồng thời | Hội đồng chỉ liệt kê | Không bắt buộc. Có giá trị nhất là người hiểu thu hồi tài nguyên đồng thời, khi viết S2 |
+| **Mời thêm chuyên môn ngoài** (gate `close`) | herdr nội bộ, process/PTY Linux, chính sách credential, tích hợp Rust/Node, thu hồi tài nguyên đồng thời | Hội đồng chỉ liệt kê | **Đã quyết (anh, 2026-10-15): `[]`, không mời ai.** Hai run đã đóng |
 
 ## 6. Bước tiếp theo đề nghị
 
@@ -141,5 +141,5 @@ Các phép đo S5, S7, S8 rẻ, chạy được ngay để biến "hoãn" thành
 | Kết luận tổng hợp cuối (JSON đầy đủ) | `.fgos/assignments/unit-run-1792057330846-367abcd4/producer/2/runs/01/outbox/report-1.md` |
 | Bản giải thích tiếng Việt của lượt mở lại | `.fgos/assignments/unit-run-1792060497202-2aed6723/producer/1/runs/01/outbox/report-1.md` |
 | Lượt đầu (tổng hợp, ba thiết kế, phản biện) | `.fgos/assignments/unit-run-1792053135431-be87d799/`, `unit-run-1792051281308-0c298779/`, `unit-run-1792052454167-c5b9e16c/` |
-| Hai workflow run | `wf-run-1792050915567-d978f530` (lượt đầu), `wf-run-1792057330643-71c4907b` (mở lại); cả hai đang dừng ở gate `close` |
+| Hai workflow run | `wf-run-1792050915567-d978f530` (lượt đầu), `wf-run-1792057330643-71c4907b` (mở lại); cả hai **đã đóng** (anh trả lời gate `close`: "[]: không mời ai, đóng run", 2026-10-15) |
 | Report đi kèm | [S6](spike-s6-261015-1638-rust-identity-call-latency-pre-commit-hook.md), [Rust-first](proposal-261015-1715-rust-first-component-hook-identity-lock.md), [kiểm kê lock](research-261015-1731-lock-inventory-and-standardization.md), [thiết kế nền lock + identity](design-261015-1755-lock-and-identity-foundation-lead-design.md) |
