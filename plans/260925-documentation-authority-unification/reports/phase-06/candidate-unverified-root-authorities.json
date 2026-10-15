@@ -12793,7 +12793,7 @@
     "countUnchanged": 830
   },
   "nativeEquality": {
-    "contentCommit": "26f5f6119e3ee61631797d49f2938c5f164424a5",
+    "contentCommit": "b80e8c16c94cb04c80cc4e858933a9b2a04ddc60",
     "fullFiveFieldTupleEquality": true,
     "tupleFields": [
       "claimId",
@@ -12828,9 +12828,8 @@
     "meaning": "Historical metadata at input pin, superseded by the current native proof only; no review or truth acceptance."
   },
   "previousNativeEquality": {
-    "contentCommit": "7854cff84d8bcb67075d4f9c09cd0b6d04808ff4",
-    "fullTupleEquality": true,
-    "nativeSync": true,
+    "contentCommit": "26f5f6119e3ee61631797d49f2938c5f164424a5",
+    "fullFiveFieldTupleEquality": true,
     "tupleFields": [
       "claimId",
       "path",
@@ -12840,7 +12839,7 @@
     ],
     "tupleSHA256": "dec5b4a2c3e5629ec0eb858785f741c2cb54ea5fa59121beff766c9786c3b6d8",
     "count": 846,
-    "meaning": "Exact current native reverse population. Eligibility only; no truth approval. Prior review metadata is historical."
+    "allThreePriors": true
   },
   "previousNativeListAtContentPin": {
     "contentCommit": "7854cff84d8bcb67075d4f9c09cd0b6d04808ff4",
@@ -18669,12 +18668,12 @@
       }
     ]
   },
-  "contentCommit": "26f5f6119e3ee61631797d49f2938c5f164424a5",
+  "contentCommit": "b80e8c16c94cb04c80cc4e858933a9b2a04ddc60",
   "runnerDedupe": {
     "claimId": "claim_fecee46f6c7c699047ffdb436bfdebe1",
     "owner": "root-authorities",
     "exactlyOneOwner": true,
-    "runnerContentCommit": "26f5f6119e3ee61631797d49f2938c5f164424a5",
+    "runnerContentCommit": "b80e8c16c94cb04c80cc4e858933a9b2a04ddc60",
     "reviewStatus": "pending bounded accounting re-review; no truth approval"
   }
 }

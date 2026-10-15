@@ -1,3 +1,22 @@
+# Runner native package complete — one bounded re-review pending
+
+Assignment `unit-run-1792067456433-d25e183b/producer/1`; content **b80e8c16c**. **L9-15 applied:** 16 footer predecessor IDs now pending supersedes to the complete eight-member contextual identical-unit group; identical text conserved within eight decisions, ambiguity accepted because identity cannot be split. All **28 dispositions = 19 supersede / 9 partial-carry**, pending independent review. No identity graft or verdict inferred.
+
+**One background native sync 1760.688s**, compact persistence once, **4484 files / 91331 active units**, known IDs **99062 → 99090**, zero loss; **28 new candidate IDs / 28 preserved predecessor gaps**, all 495 source IDs retained. **D 0 fatal** with both priors together and each. **Strict E open only 11 claims-partial-carry / 44 claims-not-reviewed / 63 candidate-blocks-unreferenced**; no undisposed source gaps or structural fatal. Native registry/inventory/applied tuples equal. **Five-field native lists: runner 62 / root 846 / union 908 unique**, lossless ownership partition. [Native verification](runner-b80e-native-verification.json), [list equality](runner-b80e-candidate-list-equality.json).
+
+**ONE bounded request, 270 entries**: [request](review-request-runner-bounded-rereview-b80e8c16c.md), same-path JSON sidecar, [index](runner-b80e-review-package-index.json). All 44 rebound source rows + two partial-carries; every changed row/entry at b80e8c16c and this turn, 73 truth/edit ranges with code evidence, 28 dispositions incl. 16 L9-15, 14-item cutover queue, code-defect item, rationale hygiene and all native accounting. Full before/after/direct-section text and digests; A34 file/row/source/primary-target hashes; **all truth corrections and all 11 partial-carries deep** under A36. No seeds/draws/verdicts chosen. Tests **75/75 pass**, env -u CLAUDE_CODE_SESSION_ID, no skip/fail/cancel/todo.
+
+**Step 9 closes when this re-review is applied under existing closure rules.** Review/A34 acceptance, Rings, 14 historical cutover revalidations (five absent digests), final-main re-decisions, fresh-reader distinction, aliases/consumers and cutover obligations persist. No new owner-direction blocker, closure, promotion, retirement, main sync or Step 10 transition. Writes only this plan and mandatory external outbox; docs/protected tools unchanged, no CLI/git writes; runner commits. [Current report and L9-15](step-09-report.md).
+
+
+---
+
+# Runner L9-15 native refresh and bounded re-review in progress
+
+Assignment `unit-run-1792067456433-d25e183b/producer/1`; content pin **b80e8c16c**. Applying the 16 contextual footer predecessor dispositions as pending supersedes under Lead L9-15, followed by one background native registry sync, compact persistence once, D/strict E against both priors together and each, native/list equality and one bounded re-review covering all changed entries. Step 9 closes when this re-review is applied under existing closure rules. No seeds or verdicts chosen; docs bytes/protected tools unchanged; runner owns commit.
+
+---
+
 # Runner follow-up authored — native sync and one bounded review next
 
 Assignment `unit-run-1792066534402-cb278bf5/producer/1`. Both 1803 re-reviews read; **271 ok receipts applied with verbatim Notes**, including **43 source ok via ordinary applicator** and eight contextual duplicate-group entries. Subsequent corrections/hygiene reopen **44 current source rows**, **451 reviewed** retained; **28 changed candidate units** fully accounted; classes **446 Weak-exact / 49 Judgment**. ExecutorProfile, live tee, residual evolve/engine claims labelled against code; front-matter evidence fixed; truth-42 commit **120af6b3d**. Historical decision bodies unchanged.

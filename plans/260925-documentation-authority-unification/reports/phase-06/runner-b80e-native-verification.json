@@ -1,0 +1,953 @@
+{
+  "contentCommit": "b80e8c16c94cb04c80cc4e858933a9b2a04ddc60",
+  "scope": [
+    "docs/specs/runner.md"
+  ],
+  "runs": [
+    {
+      "label": "both",
+      "check": "D",
+      "scope": [
+        "docs/specs/runner.md"
+      ],
+      "previousRegistries": [
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json"
+      ],
+      "seconds": 73.513,
+      "file": "runner-b80e-native-D-both.json",
+      "fatal": 0,
+      "fatalTypes": [],
+      "open": [
+        {
+          "type": "claims-partial-carry",
+          "count": 11
+        },
+        {
+          "type": "claims-not-reviewed",
+          "count": 44
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 63
+        }
+      ]
+    },
+    {
+      "label": "both",
+      "check": "E",
+      "scope": [
+        "docs/specs/runner.md"
+      ],
+      "previousRegistries": [
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json"
+      ],
+      "seconds": 77.081,
+      "file": "runner-b80e-native-E-both.json",
+      "fatal": 3,
+      "fatalTypes": [
+        "claims-partial-carry",
+        "claims-not-reviewed",
+        "candidate-blocks-unreferenced"
+      ],
+      "open": [
+        {
+          "type": "claims-partial-carry",
+          "count": 11
+        },
+        {
+          "type": "claims-not-reviewed",
+          "count": 44
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 63
+        }
+      ]
+    },
+    {
+      "label": "identity",
+      "check": "D",
+      "scope": [
+        "docs/specs/runner.md"
+      ],
+      "previousRegistries": [
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json"
+      ],
+      "seconds": 79.556,
+      "file": "runner-b80e-native-D-identity.json",
+      "fatal": 0,
+      "fatalTypes": [],
+      "open": [
+        {
+          "type": "claims-partial-carry",
+          "count": 11
+        },
+        {
+          "type": "claims-not-reviewed",
+          "count": 44
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 63
+        }
+      ]
+    },
+    {
+      "label": "identity",
+      "check": "E",
+      "scope": [
+        "docs/specs/runner.md"
+      ],
+      "previousRegistries": [
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json"
+      ],
+      "seconds": 80.282,
+      "file": "runner-b80e-native-E-identity.json",
+      "fatal": 3,
+      "fatalTypes": [
+        "claims-partial-carry",
+        "claims-not-reviewed",
+        "candidate-blocks-unreferenced"
+      ],
+      "open": [
+        {
+          "type": "claims-partial-carry",
+          "count": 11
+        },
+        {
+          "type": "claims-not-reviewed",
+          "count": 44
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 63
+        }
+      ]
+    },
+    {
+      "label": "phase02",
+      "check": "D",
+      "scope": [
+        "docs/specs/runner.md"
+      ],
+      "previousRegistries": [
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json"
+      ],
+      "seconds": 80.223,
+      "file": "runner-b80e-native-D-phase02.json",
+      "fatal": 0,
+      "fatalTypes": [],
+      "open": [
+        {
+          "type": "claims-partial-carry",
+          "count": 11
+        },
+        {
+          "type": "claims-not-reviewed",
+          "count": 44
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 63
+        }
+      ]
+    },
+    {
+      "label": "phase02",
+      "check": "E",
+      "scope": [
+        "docs/specs/runner.md"
+      ],
+      "previousRegistries": [
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json"
+      ],
+      "seconds": 80.438,
+      "file": "runner-b80e-native-E-phase02.json",
+      "fatal": 3,
+      "fatalTypes": [
+        "claims-partial-carry",
+        "claims-not-reviewed",
+        "candidate-blocks-unreferenced"
+      ],
+      "open": [
+        {
+          "type": "claims-partial-carry",
+          "count": 11
+        },
+        {
+          "type": "claims-not-reviewed",
+          "count": 44
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 63
+        }
+      ]
+    }
+  ],
+  "activeRegistryInventoryAppliedTupleEquality": true,
+  "nativeActiveCount": 91331,
+  "reverseFiveFieldEqualityAcrossAllPriors": true,
+  "rawRunnerReverseCount": 63,
+  "runnerOwnedCount": 62,
+  "rootOwnedCount": 846,
+  "strictGreen": false,
+  "registry": {
+    "contentCommit": "b80e8c16c94cb04c80cc4e858933a9b2a04ddc60",
+    "syncSeconds": 1760.688,
+    "items": 4484,
+    "claims": 91331,
+    "knownBefore": 99062,
+    "knownAfter": 99090,
+    "zeroKnownIDLoss": true,
+    "activeTupleEquality": true,
+    "persistenceCount": 1,
+    "compact": true,
+    "registryBytes": 61903464,
+    "registrySHA256": "d2675a26883ff1f81e86e6d107d76f315602ada5253d98d3c849c9a8fff09772",
+    "carryForward": {
+      "fromCommit": "26f5f6119e3ee61631797d49f2938c5f164424a5",
+      "toCommit": "b80e8c16c94cb04c80cc4e858933a9b2a04ddc60",
+      "oldUnits": 91331,
+      "newUnits": 91331,
+      "kept": 90906,
+      "paired": 374,
+      "moved": 0,
+      "editedKept": 23,
+      "added": 28,
+      "gaps": 28,
+      "retired": 0,
+      "retiredDocuments": 0
+    },
+    "newUnits": [
+      {
+        "sourcePath": "docs/platform/runner/architecture/h-69197b459754.md",
+        "unitDigest": "c00663b66b2ffa0d12deeb67d462aaf90a6bb36eeaee36cc2d8212ef0ab006a0",
+        "identityFingerprint": "c00663b66b2ffa0d12deeb67d462aaf90a6bb36eeaee36cc2d8212ef0ab006a0",
+        "claimId": "claim_00979b2133872c9d6b6eb7018037dc5f",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "9692b088293b18cb07095cd72ca57ee2e65ef7d0c62c106630bc633dfd8252aa",
+        "claimKind": "architecture",
+        "status": "future",
+        "origin": "added-since-26f5f6119e3ee61631797d49f2938c5f164424a5"
+      },
+      {
+        "sourcePath": "docs/platform/runner/architecture/h-69197b459754.md",
+        "unitDigest": "ba9825401a7e105f135178ff3f46f886ba58a199927ef650e97c21e3c77208ed",
+        "identityFingerprint": "ba9825401a7e105f135178ff3f46f886ba58a199927ef650e97c21e3c77208ed",
+        "claimId": "claim_c5459e062a5652ee6629dfd6710efb23",
+        "sourceAnchor": "unheaded-block-26",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "fa12380ba45b60a32c819272d07b996412a915e0e5bae3a091799807c78d882b",
+        "claimKind": "architecture",
+        "status": "future",
+        "origin": "added-since-26f5f6119e3ee61631797d49f2938c5f164424a5"
+      },
+      {
+        "sourcePath": "docs/platform/runner/architecture/h-69197b459754.md",
+        "unitDigest": "1b84cd81d0bc64e0544c43be735643cc15b430fca595573a37f4f0951b070e85",
+        "identityFingerprint": "1b84cd81d0bc64e0544c43be735643cc15b430fca595573a37f4f0951b070e85",
+        "claimId": "claim_dbad6c8c741c31cc78d608a06b68a74b",
+        "sourceAnchor": "unheaded-block-27",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "5c2cca94cc507e1f552e5a5a6b298bd81f7c9d5b4bd3abd8fbe9e1c2d24db498",
+        "claimKind": "architecture",
+        "status": "future",
+        "origin": "added-since-26f5f6119e3ee61631797d49f2938c5f164424a5"
+      },
+      {
+        "sourcePath": "docs/platform/runner/architecture/h-7af1f0242611.md",
+        "unitDigest": "59e83a81794a4fc33bb356b8d364c6705d2b73a47079513fc1d497e671ffa75b",
+        "identityFingerprint": "59e83a81794a4fc33bb356b8d364c6705d2b73a47079513fc1d497e671ffa75b",
+        "claimId": "claim_2ce8a999a5886a7df66d675eebb4689e",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "08d4b94f0979bf31da860754ab18439533827f7055f90d52c0437fd44a620b7f",
+        "claimKind": "architecture",
+        "status": "future",
+        "origin": "added-since-26f5f6119e3ee61631797d49f2938c5f164424a5"
+      },
+      {
+        "sourcePath": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+        "unitDigest": "b5a1a6c12df133b5eb2df946b8a177196283f11515acda55483447f01f7d2a94",
+        "identityFingerprint": "b5a1a6c12df133b5eb2df946b8a177196283f11515acda55483447f01f7d2a94",
+        "claimId": "claim_318171578e2f6dd331c803e2643a9d42",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "3db3eace69d66b9db10acd161095412858c1e5c3a7ba506bb6d3d902a0a8f0e1",
+        "claimKind": "architecture",
+        "status": "future",
+        "origin": "added-since-26f5f6119e3ee61631797d49f2938c5f164424a5"
+      },
+      {
+        "sourcePath": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+        "unitDigest": "148ec8206e403a8c1cbf3ba948635201efe7b9be4b1782130c036c4f9622d963",
+        "identityFingerprint": "148ec8206e403a8c1cbf3ba948635201efe7b9be4b1782130c036c4f9622d963",
+        "claimId": "claim_ece1f0fac2737a898df62341d8dc4586",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "665dc5c48848ca1151923d851782a5254d7f9f5f54c310ffa5dcfd99b47e52d4",
+        "claimKind": "contract",
+        "status": "future",
+        "origin": "added-since-26f5f6119e3ee61631797d49f2938c5f164424a5"
+      },
+      {
+        "sourcePath": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+        "unitDigest": "a7ca53e5767830a0a9f9903fc9c8af0680be53013cf4efef7c075fcea80020f6",
+        "identityFingerprint": "a7ca53e5767830a0a9f9903fc9c8af0680be53013cf4efef7c075fcea80020f6",
+        "claimId": "claim_94dbc30d0c40f58f5c12bcc9cd4cff4a",
+        "sourceAnchor": "unheaded-block-3",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "c334d72c0b9610f0ff55a4b5ac0a2c9166facd2a7900b447f1959e0efb3276e4",
+        "claimKind": "contract",
+        "status": "future",
+        "origin": "added-since-26f5f6119e3ee61631797d49f2938c5f164424a5"
+      },
+      {
+        "sourcePath": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+        "unitDigest": "4cb09965a3a2f64fa124980890010c55dac410f83469fc1308988553227a167f",
+        "identityFingerprint": "4cb09965a3a2f64fa124980890010c55dac410f83469fc1308988553227a167f",
+        "claimId": "claim_55665ec645c89d97f768271014692f5b",
+        "sourceAnchor": "unheaded-block-7",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "0ff401fc6d61831531fb616b1635f9043c166874573071e17cc04f368e9ad183",
+        "claimKind": "contract",
+        "status": "future",
+        "origin": "added-since-26f5f6119e3ee61631797d49f2938c5f164424a5"
+      },
+      {
+        "sourcePath": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+        "unitDigest": "fa3d03a7559a1d64c2e0f597dd7dd07e446a8df1163768de76878725cea71a24",
+        "identityFingerprint": "fa3d03a7559a1d64c2e0f597dd7dd07e446a8df1163768de76878725cea71a24",
+        "claimId": "claim_ca4fc7e593079a4ae4ccf0c20924c5ca",
+        "sourceAnchor": "unheaded-block-8",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "7b630b89fdcb48025ba14f021bdc19bec3eed03ffedf4ac24af141562f7675e3",
+        "claimKind": "contract",
+        "status": "future",
+        "origin": "added-since-26f5f6119e3ee61631797d49f2938c5f164424a5"
+      },
+      {
+        "sourcePath": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+        "unitDigest": "ff8c039a69ddf32860b7fa0195219c1e697c5be270408a8ed436afaefef2f8cb",
+        "identityFingerprint": "ff8c039a69ddf32860b7fa0195219c1e697c5be270408a8ed436afaefef2f8cb",
+        "claimId": "claim_4be9b468677624b5b4eb01cae1ccfb3a",
+        "sourceAnchor": "unheaded-block-9",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "f4886338571ebec2a610be75ec1eabd41578febbffae0c17605e3bc94ecc744c",
+        "claimKind": "contract",
+        "status": "future",
+        "origin": "added-since-26f5f6119e3ee61631797d49f2938c5f164424a5"
+      },
+      {
+        "sourcePath": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "unitDigest": "2f37412668eeb88ba8433203b7924b157bf677266e599c54366a47ab55577326",
+        "identityFingerprint": "2f37412668eeb88ba8433203b7924b157bf677266e599c54366a47ab55577326",
+        "claimId": "claim_98ebe3a997b0c8659ea9f7324520ee5d",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "12a5df8d364b96c50c0dc7f473107fb827c25f59b0e1d6cf8bbc7c9f71957412",
+        "claimKind": "decision",
+        "status": "future",
+        "origin": "added-since-26f5f6119e3ee61631797d49f2938c5f164424a5"
+      },
+      {
+        "sourcePath": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+        "unitDigest": "c61fb41f26c2721a401e2333348650c9a3cb5f0b2583e4d1c55c01f50b3cf0ae",
+        "identityFingerprint": "c61fb41f26c2721a401e2333348650c9a3cb5f0b2583e4d1c55c01f50b3cf0ae",
+        "claimId": "claim_a387dce8309b9101d241f4e2b5c034cc",
+        "sourceAnchor": "unheaded-block-17",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "637ef875f1e436e19b19e1f85ee124b2ac8a67dced524e9ef926c92b84cfc556",
+        "claimKind": "procedure",
+        "status": "future",
+        "origin": "added-since-26f5f6119e3ee61631797d49f2938c5f164424a5"
+      },
+      {
+        "sourcePath": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+        "unitDigest": "bb571bdc5b2a0787d758c81f5782fa0bba43083bd0b064b5e9bf7674462ed15d",
+        "identityFingerprint": "bb571bdc5b2a0787d758c81f5782fa0bba43083bd0b064b5e9bf7674462ed15d",
+        "claimId": "claim_12b5a84382034e873673bfc9cb09734c",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "25e5d283f7df610fc091c31b8ef48b747a8f5fa54530ff8b1b84a92da3887d09",
+        "claimKind": "procedure",
+        "status": "future",
+        "origin": "added-since-26f5f6119e3ee61631797d49f2938c5f164424a5"
+      },
+      {
+        "sourcePath": "docs/platform/runner/spec.md",
+        "unitDigest": "fa34deef005780f31f1778e4ec59f037a1d7d8d61cdcb46afdb81e0e32534426",
+        "identityFingerprint": "fa34deef005780f31f1778e4ec59f037a1d7d8d61cdcb46afdb81e0e32534426",
+        "claimId": "claim_9c37d9f06b524182af8f0fe018737bc4",
+        "sourceAnchor": "unheaded-block-3",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "f165c37c8b921704385baeacb8dd91a6e3794288001f30607450d6ace8a8e8be",
+        "claimKind": "architecture",
+        "status": "future",
+        "origin": "added-since-26f5f6119e3ee61631797d49f2938c5f164424a5"
+      },
+      {
+        "sourcePath": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+        "unitDigest": "d1d92a2377719e5c0475b3c57371fdff7900c303cf3b4d3357c85311e96f9305",
+        "identityFingerprint": "d1d92a2377719e5c0475b3c57371fdff7900c303cf3b4d3357c85311e96f9305",
+        "claimId": "claim_627a7f295417294df079e134ba56e5dc",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "f6ebf9aecded46a4d82e7c957c2438b2bb1a1f52b0435da7ed966f169b7751e9",
+        "claimKind": "specification",
+        "status": "future",
+        "origin": "added-since-26f5f6119e3ee61631797d49f2938c5f164424a5"
+      },
+      {
+        "sourcePath": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+        "unitDigest": "1ca7543acf072f31c19fca298603e9aeddadef1e14335d8744fad52589b50a53",
+        "identityFingerprint": "1ca7543acf072f31c19fca298603e9aeddadef1e14335d8744fad52589b50a53",
+        "claimId": "claim_e0fc704182450d959f8452cc09da5f20",
+        "sourceAnchor": "unheaded-block-3",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "fb31e222bd67854fd1f83cc81922b2000b03d972159a7c2b390a993e38177894",
+        "claimKind": "specification",
+        "status": "future",
+        "origin": "added-since-26f5f6119e3ee61631797d49f2938c5f164424a5"
+      },
+      {
+        "sourcePath": "docs/platform/runner/subcomponents/h-2e032393add1/spec.md",
+        "unitDigest": "c482c5330e81c50f5d80b8d58bd9c2eebbc58d892e5e06e3655fc64fa1665f68",
+        "identityFingerprint": "c482c5330e81c50f5d80b8d58bd9c2eebbc58d892e5e06e3655fc64fa1665f68",
+        "claimId": "claim_bcdfcfd769b67cc8d386c5b14ae945fa",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "13c91586e8ae44e1a25768df346bfbb4103777b4e07b144b476bcc4742b1a2c4",
+        "claimKind": "specification",
+        "status": "future",
+        "origin": "added-since-26f5f6119e3ee61631797d49f2938c5f164424a5"
+      },
+      {
+        "sourcePath": "docs/platform/runner/subcomponents/h-37aced3896a8/spec.md",
+        "unitDigest": "148ec8206e403a8c1cbf3ba948635201efe7b9be4b1782130c036c4f9622d963",
+        "identityFingerprint": "148ec8206e403a8c1cbf3ba948635201efe7b9be4b1782130c036c4f9622d963",
+        "claimId": "claim_ff1dd8f688456a46d10fc4233633942d",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "665dc5c48848ca1151923d851782a5254d7f9f5f54c310ffa5dcfd99b47e52d4",
+        "claimKind": "specification",
+        "status": "future",
+        "origin": "added-since-26f5f6119e3ee61631797d49f2938c5f164424a5"
+      },
+      {
+        "sourcePath": "docs/platform/runner/subcomponents/h-37aced3896a8/spec.md",
+        "unitDigest": "c90b5f330d6dd254af65accfda05eb8fa2c3454d7951cd3e3819469389e1848a",
+        "identityFingerprint": "c90b5f330d6dd254af65accfda05eb8fa2c3454d7951cd3e3819469389e1848a",
+        "claimId": "claim_8e43ff23542c1a2386d7ce3d2bf5e30d",
+        "sourceAnchor": "unheaded-block-5",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "2e0561425f15bad2d92bbd21e6b7f837523159beb3b8de7fe250e67cbed1a27c",
+        "claimKind": "specification",
+        "status": "future",
+        "origin": "added-since-26f5f6119e3ee61631797d49f2938c5f164424a5"
+      },
+      {
+        "sourcePath": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "unitDigest": "cf50db0bd51f6cecffa3767869a8d7c6bb8fe7381b6ca14550b9268561eddc57",
+        "identityFingerprint": "cf50db0bd51f6cecffa3767869a8d7c6bb8fe7381b6ca14550b9268561eddc57",
+        "claimId": "claim_ca6391a6e6e26d90cc730e9aa4a0589d",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "19b6d38d9d7cdee37e83f09d2d4ded70473428086500858f01fa82582a410341",
+        "claimKind": "specification",
+        "status": "future",
+        "origin": "added-since-26f5f6119e3ee61631797d49f2938c5f164424a5"
+      },
+      {
+        "sourcePath": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "unitDigest": "c658e805cfbfa9d030f1e24b149a42f08f4d01e3aa0f7c7f241fc19994f91b84",
+        "identityFingerprint": "c658e805cfbfa9d030f1e24b149a42f08f4d01e3aa0f7c7f241fc19994f91b84",
+        "claimId": "claim_dec918179cfa98a017d4d11032363ce5",
+        "sourceAnchor": "unheaded-block-5",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "b8280518ac1d2f020be1040eb91e63467e9626fed7f82749f70fc0c534403893",
+        "claimKind": "specification",
+        "status": "future",
+        "origin": "added-since-26f5f6119e3ee61631797d49f2938c5f164424a5"
+      },
+      {
+        "sourcePath": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "unitDigest": "1b0cd4b653a9ad09108c91a642bbcded01ae07c6dc8d93c63d7d47f506f80bc1",
+        "identityFingerprint": "1b0cd4b653a9ad09108c91a642bbcded01ae07c6dc8d93c63d7d47f506f80bc1",
+        "claimId": "claim_269b5b46a1d24b6c588976d6f30efac7",
+        "sourceAnchor": "unheaded-block-6",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "b7889c4d1e65be6918b7184594b540b8ead2d8d13d4266f8e0101a6af2375aba",
+        "claimKind": "specification",
+        "status": "future",
+        "origin": "added-since-26f5f6119e3ee61631797d49f2938c5f164424a5"
+      },
+      {
+        "sourcePath": "docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md",
+        "unitDigest": "148ec8206e403a8c1cbf3ba948635201efe7b9be4b1782130c036c4f9622d963",
+        "identityFingerprint": "148ec8206e403a8c1cbf3ba948635201efe7b9be4b1782130c036c4f9622d963",
+        "claimId": "claim_21930f408ce181183b3713dabe2f684e",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "665dc5c48848ca1151923d851782a5254d7f9f5f54c310ffa5dcfd99b47e52d4",
+        "claimKind": "specification",
+        "status": "future",
+        "origin": "added-since-26f5f6119e3ee61631797d49f2938c5f164424a5"
+      },
+      {
+        "sourcePath": "docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md",
+        "unitDigest": "fd967629a032b84c19ae2dba33efd3e0e1ab99101d1b65feed38c468ee745e71",
+        "identityFingerprint": "fd967629a032b84c19ae2dba33efd3e0e1ab99101d1b65feed38c468ee745e71",
+        "claimId": "claim_5c067230bc1c324d3691dc880edb2578",
+        "sourceAnchor": "unheaded-block-3",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "69f0927ed54ab08aa5fc1e9f43beca35a3ad76e034a98945ea39674b4dc4cb2f",
+        "claimKind": "specification",
+        "status": "future",
+        "origin": "added-since-26f5f6119e3ee61631797d49f2938c5f164424a5"
+      },
+      {
+        "sourcePath": "docs/platform/runner/subcomponents/h-ce5b9771a26a/spec.md",
+        "unitDigest": "72890494ad1b330ec72e266fdbfe7a828fb2eeb69a7a9e24aa1af081dbd539f4",
+        "identityFingerprint": "72890494ad1b330ec72e266fdbfe7a828fb2eeb69a7a9e24aa1af081dbd539f4",
+        "claimId": "claim_792117ae3e90dcc79bb2522f59773b89",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "f88931593c55ac2afc6ae60cd52a96dda07aa2b673d169b001205b302ef544b4",
+        "claimKind": "specification",
+        "status": "future",
+        "origin": "added-since-26f5f6119e3ee61631797d49f2938c5f164424a5"
+      },
+      {
+        "sourcePath": "docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md",
+        "unitDigest": "148ec8206e403a8c1cbf3ba948635201efe7b9be4b1782130c036c4f9622d963",
+        "identityFingerprint": "148ec8206e403a8c1cbf3ba948635201efe7b9be4b1782130c036c4f9622d963",
+        "claimId": "claim_c77e863c3b0f6ae347d38a34cc8b1d06",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "665dc5c48848ca1151923d851782a5254d7f9f5f54c310ffa5dcfd99b47e52d4",
+        "claimKind": "specification",
+        "status": "future",
+        "origin": "added-since-26f5f6119e3ee61631797d49f2938c5f164424a5"
+      },
+      {
+        "sourcePath": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+        "unitDigest": "e632b7b484db16a9cc0c30263c5f46b3416fbbca676fcc99cd78f1b7090b68fe",
+        "identityFingerprint": "e632b7b484db16a9cc0c30263c5f46b3416fbbca676fcc99cd78f1b7090b68fe",
+        "claimId": "claim_61244b0a84842a2771f7cdb493ebb699",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "ae0e268fad727f5deda17cf43d013aa1710f5cea2506fdd844809c3c8e98511f",
+        "claimKind": "specification",
+        "status": "future",
+        "origin": "added-since-26f5f6119e3ee61631797d49f2938c5f164424a5"
+      },
+      {
+        "sourcePath": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+        "unitDigest": "67f4421d53f1e22cd3832782bc8b8f3cfbb0b55cdaacec581ce310e271816bc1",
+        "identityFingerprint": "67f4421d53f1e22cd3832782bc8b8f3cfbb0b55cdaacec581ce310e271816bc1",
+        "claimId": "claim_857f0f9f3a194b5b3c9f94320a0b4d67",
+        "sourceAnchor": "unheaded-block-3",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "63a11d09197b4754933539dc36fa029c17b386dd35b6b32aa2e4dc3ae2da399b",
+        "claimKind": "specification",
+        "status": "future",
+        "origin": "added-since-26f5f6119e3ee61631797d49f2938c5f164424a5"
+      }
+    ],
+    "newGaps": [
+      {
+        "sourcePath": "docs/platform/runner/architecture/h-69197b459754.md",
+        "unitDigest": "cc1fb307caeaed6096c7720d938c4f95fd5598f1c14c5b2426d1ec73f5222956",
+        "identityFingerprint": "cc1fb307caeaed6096c7720d938c4f95fd5598f1c14c5b2426d1ec73f5222956",
+        "claimId": "claim_402c67504d85360a3c302ec4bd0b36f8",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "afdcc70dbdf7e1b68a36cbd6b77105a3b34f755e399fa7a7973fe5d189759024",
+        "claimKind": "architecture",
+        "status": "future",
+        "origin": "added-since-81d0ed0747014e976c0d29222439fd6e3592b468",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-2 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/runner/architecture/h-69197b459754.md",
+        "unitDigest": "2c8b50bec235486988e05c2b4314e043084c2bf816b2f2bc1f9e81bfc5654251",
+        "identityFingerprint": "2c8b50bec235486988e05c2b4314e043084c2bf816b2f2bc1f9e81bfc5654251",
+        "claimId": "claim_ec6018ca38e14168f4e76b4edda5fb4e",
+        "sourceAnchor": "unheaded-block-26",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "dceb2f2607dd441fb5cb8dbd9b126189c6d98f50e1978cdf010b77032b352e85",
+        "claimKind": "architecture",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-26 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/runner/architecture/h-69197b459754.md",
+        "unitDigest": "3d4b6c2be0d46d08f2987f6684ba1492a8d6ea3be19aac110afd81d2a4b2694b",
+        "identityFingerprint": "3d4b6c2be0d46d08f2987f6684ba1492a8d6ea3be19aac110afd81d2a4b2694b",
+        "claimId": "claim_0e06b68eb7039beaad3e5f5c7a3bd4ac",
+        "sourceAnchor": "unheaded-block-27",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "ff375152abfe9a2c14b52258ea20eac7a8626c8c59ec1c27f1e7819fa8421457",
+        "claimKind": "architecture",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-27 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/runner/architecture/h-7af1f0242611.md",
+        "unitDigest": "486e2662b1dce8c5b1e33615d2c1f45f3a96203b5252ce8809c6eba26c525d7a",
+        "identityFingerprint": "486e2662b1dce8c5b1e33615d2c1f45f3a96203b5252ce8809c6eba26c525d7a",
+        "claimId": "claim_76d002b3dbeb785e9559579959af3377",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "9da9bcc76bc76956e634af3c85fd1b118ed4fd9d68d5aa69e908dcb552c0b890",
+        "claimKind": "architecture",
+        "status": "future",
+        "origin": "added-since-81d0ed0747014e976c0d29222439fd6e3592b468",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-2 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+        "unitDigest": "cb56c8d051618ffbfc9412bc324829ccfeb9c70242594bdadff0ed25babea466",
+        "identityFingerprint": "cb56c8d051618ffbfc9412bc324829ccfeb9c70242594bdadff0ed25babea466",
+        "claimId": "claim_6db9fcda9f7e1ffb80586641d2606ae5",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "84546f2c20181a173d1a54c3f40841709e9759c605891f226849ce8bdbe14f9e",
+        "claimKind": "architecture",
+        "status": "future",
+        "origin": "added-since-81d0ed0747014e976c0d29222439fd6e3592b468",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-2 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+        "unitDigest": "9fa0155811fc0e302c75c26ece1c5518c9404760191897c1f71ee9b29dbb12b8",
+        "identityFingerprint": "9fa0155811fc0e302c75c26ece1c5518c9404760191897c1f71ee9b29dbb12b8",
+        "claimId": "claim_59711e037dea1dfd34303ae5a58f932f",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "e7ce04bde149d71aaeeaa5e11376aef97254251762c25855601d09c2a34ddc94",
+        "claimKind": "contract",
+        "status": "future",
+        "origin": "added-since-81d0ed0747014e976c0d29222439fd6e3592b468",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-2 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+        "unitDigest": "b4e3507a3e93c7ff348c98dcf0c00cf587aed8b79525e62b154288ace9078f77",
+        "identityFingerprint": "b4e3507a3e93c7ff348c98dcf0c00cf587aed8b79525e62b154288ace9078f77",
+        "claimId": "claim_f1e4c309467523897e0a16ee8ba9619d",
+        "sourceAnchor": "unheaded-block-3",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "5fde748feccce5cce2990f23d3f2b681442d6ec366063c45ca96204a3458fbcf",
+        "claimKind": "contract",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-3 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+        "unitDigest": "3114a2dd897bba1142f55edbeaf017fbbc3c472664e23bca34949ad27dba2f80",
+        "identityFingerprint": "3114a2dd897bba1142f55edbeaf017fbbc3c472664e23bca34949ad27dba2f80",
+        "claimId": "claim_81324337002b28be819370d2e4c48274",
+        "sourceAnchor": "unheaded-block-7",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "dfa2fbd2381337a7bc8440220851e83137d4ebf9014eb9e18bc6d9161a615964",
+        "claimKind": "contract",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-7 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+        "unitDigest": "de2a7caf54eb8f36f63d7d92cf2c4370f65d59c51280f6c3e1b32934dca2bde4",
+        "identityFingerprint": "de2a7caf54eb8f36f63d7d92cf2c4370f65d59c51280f6c3e1b32934dca2bde4",
+        "claimId": "claim_8cb585efea1f1cc6e6e491cc1699702e",
+        "sourceAnchor": "unheaded-block-8",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "fc05b724a8cf91d0a56fcedb8c1f936f8771e44e77ae345055e5525b8bdf6bc5",
+        "claimKind": "contract",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-8 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+        "unitDigest": "6bc6daccf92f0aed6a4d9324be87e7d28a1ebec48f2fea6f85ab2cb7871f7a6b",
+        "identityFingerprint": "6bc6daccf92f0aed6a4d9324be87e7d28a1ebec48f2fea6f85ab2cb7871f7a6b",
+        "claimId": "claim_9813f6e4e9a87964c55786e36424572e",
+        "sourceAnchor": "unheaded-block-9",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "8effb31b306362d3a2022b786937e6f66411717f00e1e3679117d7fa3cdf6e4d",
+        "claimKind": "contract",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-9 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "unitDigest": "c83f987f547224c167df3bc02e4279b998f88e32b0fe40423c2337063e8b5503",
+        "identityFingerprint": "c83f987f547224c167df3bc02e4279b998f88e32b0fe40423c2337063e8b5503",
+        "claimId": "claim_f422f916cb0bf672b9cbbcd606db80c3",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "975a5c93a18cfc1f8d109b6f18c8f71ced525d11c69f96dcb84b4eecc6cccab6",
+        "claimKind": "decision",
+        "status": "future",
+        "origin": "added-since-81d0ed0747014e976c0d29222439fd6e3592b468",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-2 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+        "unitDigest": "c4be4898f077431105d03330c855a32bde0e858d9252446508d9f294f7dd94d6",
+        "identityFingerprint": "c4be4898f077431105d03330c855a32bde0e858d9252446508d9f294f7dd94d6",
+        "claimId": "claim_3ce8d3628693f90fc67588604fc4d0ae",
+        "sourceAnchor": "unheaded-block-17",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "0a8a86fc6704a4bb9bd73ffe0841504d8517b26dc4cb74d8437009bd04be46ae",
+        "claimKind": "procedure",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-17 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+        "unitDigest": "896ede09d2ff02567f39507b94a27a34f02dd4cbab2548a8b1760c0270a2ba02",
+        "identityFingerprint": "896ede09d2ff02567f39507b94a27a34f02dd4cbab2548a8b1760c0270a2ba02",
+        "claimId": "claim_c1794577b56452c92d31a9032d43f13a",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "c605fe1f984894646aeab8f24dc4648e4438ef349329343163b66fe4d55b3941",
+        "claimKind": "procedure",
+        "status": "future",
+        "origin": "added-since-81d0ed0747014e976c0d29222439fd6e3592b468",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-2 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/runner/spec.md",
+        "unitDigest": "52b4d23023346d71358b520c4173af89c8ad88f1657960f93c07f812f19e753b",
+        "identityFingerprint": "52b4d23023346d71358b520c4173af89c8ad88f1657960f93c07f812f19e753b",
+        "claimId": "claim_a26fab4d087508024f378ab4f06376de",
+        "sourceAnchor": "unheaded-block-3",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "095a95d4a43a6c25cb89add9758dd488193630fd6acad5a86e944e65fbf89251",
+        "claimKind": "architecture",
+        "status": "future",
+        "origin": "added-since-81d0ed0747014e976c0d29222439fd6e3592b468",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-3 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+        "unitDigest": "883875d0fc69f378a511a8c6ea0df9c0481a3815e1116ec23809609efaa75e29",
+        "identityFingerprint": "883875d0fc69f378a511a8c6ea0df9c0481a3815e1116ec23809609efaa75e29",
+        "claimId": "claim_4042a487be1420af2d968219f85c5569",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "12afe71586a21c7df7b4e1368d025a7ade7f746c924589f56f5c545efc2194e3",
+        "claimKind": "specification",
+        "status": "future",
+        "origin": "added-since-81d0ed0747014e976c0d29222439fd6e3592b468",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-2 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+        "unitDigest": "d770d5d9af2c788a5118a6562081b8b61d53570e78ffcb41d43606cfaa579fbc",
+        "identityFingerprint": "d770d5d9af2c788a5118a6562081b8b61d53570e78ffcb41d43606cfaa579fbc",
+        "claimId": "claim_5c508c810223f2399b13915f88555d2a",
+        "sourceAnchor": "unheaded-block-3",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "a3e29728a505f34ade664b6bead066e4320ffa07023e211bbc95574e21a5b53b",
+        "claimKind": "specification",
+        "status": "future",
+        "origin": "added-since-81d0ed0747014e976c0d29222439fd6e3592b468",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-3 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/runner/subcomponents/h-2e032393add1/spec.md",
+        "unitDigest": "23cb9db673b8a38a59cf3d5f4588ef7298a4dcd3cbe892677201d986621e6c78",
+        "identityFingerprint": "23cb9db673b8a38a59cf3d5f4588ef7298a4dcd3cbe892677201d986621e6c78",
+        "claimId": "claim_df9bb8c65a63baf3cda6c0db904ea89a",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "64d6757c0b7b5ada58be0d7aaad95388b2345f6c9ce9d0dcd7b18ec3d2e806e6",
+        "claimKind": "specification",
+        "status": "future",
+        "origin": "added-since-81d0ed0747014e976c0d29222439fd6e3592b468",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-2 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/runner/subcomponents/h-37aced3896a8/spec.md",
+        "unitDigest": "9fa0155811fc0e302c75c26ece1c5518c9404760191897c1f71ee9b29dbb12b8",
+        "identityFingerprint": "9fa0155811fc0e302c75c26ece1c5518c9404760191897c1f71ee9b29dbb12b8",
+        "claimId": "claim_8d3d4c9864a4bba02b9bfae99772b16b",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "e7ce04bde149d71aaeeaa5e11376aef97254251762c25855601d09c2a34ddc94",
+        "claimKind": "specification",
+        "status": "future",
+        "origin": "added-since-81d0ed0747014e976c0d29222439fd6e3592b468",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-2 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/runner/subcomponents/h-37aced3896a8/spec.md",
+        "unitDigest": "b77ca619b6112fe10d0141e73306d99709b9d9c11ea52b83d24e7ced81b3aba5",
+        "identityFingerprint": "b77ca619b6112fe10d0141e73306d99709b9d9c11ea52b83d24e7ced81b3aba5",
+        "claimId": "claim_dd5b888c742b9db163a7bb19d2fe31ef",
+        "sourceAnchor": "unheaded-block-5",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "153dc43f02108c3b79c7f21ae6c9814edbf96f84e14c4988eb6c802a90f6e073",
+        "claimKind": "specification",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-5 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "unitDigest": "e3abdc0eca5e1a201132f4bb712b1cdd7bc0f0ecb6043c29ccf166db1ccf2fda",
+        "identityFingerprint": "e3abdc0eca5e1a201132f4bb712b1cdd7bc0f0ecb6043c29ccf166db1ccf2fda",
+        "claimId": "claim_e9b68f8601da77a4fa8a8b5c44c452dd",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "ae342758588a4f31d8bfb6d8d2c6d912a8501b041245cbfa52e2f3bce8916bf3",
+        "claimKind": "specification",
+        "status": "future",
+        "origin": "added-since-81d0ed0747014e976c0d29222439fd6e3592b468",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-2 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "unitDigest": "f2e4a1a0dc3b4b08305c442612003413471eeaed5d63b72d0b87ffda23b16fb2",
+        "identityFingerprint": "f2e4a1a0dc3b4b08305c442612003413471eeaed5d63b72d0b87ffda23b16fb2",
+        "claimId": "claim_77ebf5dfdac295c7b030ff467b2ca31d",
+        "sourceAnchor": "unheaded-block-5",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "c60f41f6b57f862e13f7d0f9d2813b90da9822cd05e4f9df5612ca6b5b7e672d",
+        "claimKind": "specification",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-5 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "unitDigest": "e45aa64335fa733cb4c6806f9e927a2b0133cf43bb44462780f7aa4008207d3d",
+        "identityFingerprint": "e45aa64335fa733cb4c6806f9e927a2b0133cf43bb44462780f7aa4008207d3d",
+        "claimId": "claim_113cead01727fed050b99bf682375f56",
+        "sourceAnchor": "unheaded-block-6",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "a887e766b249d14101e5359838cc0150d1ba01b7178c3bde49ee080066ade0ce",
+        "claimKind": "specification",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-6 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md",
+        "unitDigest": "9fa0155811fc0e302c75c26ece1c5518c9404760191897c1f71ee9b29dbb12b8",
+        "identityFingerprint": "9fa0155811fc0e302c75c26ece1c5518c9404760191897c1f71ee9b29dbb12b8",
+        "claimId": "claim_b9757bf357a4ab755863a9eba71d36f5",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "e7ce04bde149d71aaeeaa5e11376aef97254251762c25855601d09c2a34ddc94",
+        "claimKind": "specification",
+        "status": "future",
+        "origin": "added-since-81d0ed0747014e976c0d29222439fd6e3592b468",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-2 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md",
+        "unitDigest": "d7dd5553565fd93a878028ca191e996e6aea93072d29fcd6d5beb074826f6667",
+        "identityFingerprint": "d7dd5553565fd93a878028ca191e996e6aea93072d29fcd6d5beb074826f6667",
+        "claimId": "claim_b2486d52447903c938bf6c29d28a7691",
+        "sourceAnchor": "unheaded-block-3",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "81c2724820c499b40d0e4d2964c798263c2ad99a479582176a95ee13b7f4d24e",
+        "claimKind": "specification",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-3 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/runner/subcomponents/h-ce5b9771a26a/spec.md",
+        "unitDigest": "58de9d1e4af73b8fb9d435a91b1736ba02f76d4366c1c92dcec5ddbb2a9bbe07",
+        "identityFingerprint": "58de9d1e4af73b8fb9d435a91b1736ba02f76d4366c1c92dcec5ddbb2a9bbe07",
+        "claimId": "claim_4016ee4724e3aeb2b4c4ffecf0b4be4d",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "2c32a6554efb07f8fa18ae444d76717650a45d72c198563f123de04550645cee",
+        "claimKind": "specification",
+        "status": "future",
+        "origin": "added-since-81d0ed0747014e976c0d29222439fd6e3592b468",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-2 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md",
+        "unitDigest": "9fa0155811fc0e302c75c26ece1c5518c9404760191897c1f71ee9b29dbb12b8",
+        "identityFingerprint": "9fa0155811fc0e302c75c26ece1c5518c9404760191897c1f71ee9b29dbb12b8",
+        "claimId": "claim_89e23b48adf0741d229e0f3501b0209e",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "e7ce04bde149d71aaeeaa5e11376aef97254251762c25855601d09c2a34ddc94",
+        "claimKind": "specification",
+        "status": "future",
+        "origin": "added-since-81d0ed0747014e976c0d29222439fd6e3592b468",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-2 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+        "unitDigest": "ae65060e863f6748fb7d1661102dcf8027e5e0d4601ae8a38933624db9e9e683",
+        "identityFingerprint": "ae65060e863f6748fb7d1661102dcf8027e5e0d4601ae8a38933624db9e9e683",
+        "claimId": "claim_9824e58661fb19d46865b853068a114b",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "eb834d486d3ef390293a114a64ebfb5824ac982e5d3bf897e151cb35c216f173",
+        "claimKind": "specification",
+        "status": "future",
+        "origin": "added-since-81d0ed0747014e976c0d29222439fd6e3592b468",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-2 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+        "unitDigest": "f6072db6fc9b40da1a59b79e174fa80cf9fc18f5e095972b07c8d02260acbe00",
+        "identityFingerprint": "f6072db6fc9b40da1a59b79e174fa80cf9fc18f5e095972b07c8d02260acbe00",
+        "claimId": "claim_a23985473cb924b225a829e142758ec1",
+        "sourceAnchor": "unheaded-block-3",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "46f08b8189a7af531472a7ed1ca9521e50949943c566b9fa08fc87d55fa25472",
+        "claimKind": "specification",
+        "status": "future",
+        "origin": "added-since-81d0ed0747014e976c0d29222439fd6e3592b468",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-3 is not a stable heading anchor"
+      }
+    ],
+    "newRetired": []
+  },
+  "candidateListProof": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-candidate-list-equality.json",
+  "reproduction": {
+    "syncHelperSource": "import {save} from './runner-cache.mjs';\nimport fs from 'node:fs';import v8 from 'node:v8';import assert from 'node:assert/strict';import crypto from 'node:crypto';\nconst root=process.cwd(),P='plans/260925-documentation-authority-unification/',R=P+'reports/phase-06/',pin='b80e8c16c94cb04c80cc4e858933a9b2a04ddc60',read=f=>JSON.parse(fs.readFileSync(f));\nconst gen=await import(root+'/scripts/generate-doc-inventory.mjs');\nconst start=Date.now(),old=read(R+'working-identity-registry.json'),known=r=>['units','retiredUnits','identityGaps'].flatMap(k=>r[k]||[]),before=known(old);console.log('START',new Date().toISOString(),before.length);\nconst registry=gen.carryForwardIdentityRegistryRepoWide(root,{commit:pin,identityRegistryPath:R+'working-identity-registry.json'});\nconst ids=new Set(known(registry).map(u=>u.claimId));assert(before.every(u=>ids.has(u.claimId)));const bytes=JSON.stringify(registry)+'\\n';assert(Buffer.byteLength(bytes)<90000000);fs.writeFileSync('/tmp/fgos-work/runner-b80e-registry.json',bytes);\nconsole.log('CARRIED',new Date().toISOString(),registry.units.length);\nconst inv=gen.generateInventory(root,{commit:pin,identityRegistryPath:'/tmp/fgos-work/runner-b80e-registry.json'});save(inv);\nconst tuple=u=>JSON.stringify([u.claimId,u.sourcePath,u.sourceAnchor,u.sourceUnitDigest]);assert.deepEqual(inv.claimLedger.map(tuple).sort(),registry.units.map(tuple).sort());\nfs.writeFileSync(R+'working-identity-registry.json',bytes);\nconst oldIDs=new Set(before.map(u=>u.claimId)),oldLive=new Set(old.units.map(u=>u.claimId));\nconst proof={contentCommit:pin,syncSeconds:(Date.now()-start)/1000,items:inv.items.length,claims:inv.claimLedger.length,knownBefore:before.length,knownAfter:known(registry).length,zeroKnownIDLoss:true,activeTupleEquality:true,persistenceCount:1,compact:true,registryBytes:Buffer.byteLength(bytes),registrySHA256:crypto.createHash('sha256').update(bytes).digest('hex'),carryForward:registry.carryForward,newUnits:registry.units.filter(u=>!oldIDs.has(u.claimId)),newGaps:registry.identityGaps.filter(u=>oldLive.has(u.claimId)),newRetired:registry.retiredUnits.filter(u=>oldLive.has(u.claimId))};fs.writeFileSync(R+'runner-b80e-native-sync-proof.json',JSON.stringify(proof,null,2)+'\\n');console.log('DONE',JSON.stringify({...proof,newUnits:proof.newUnits.length,newGaps:proof.newGaps.length,newRetired:proof.newRetired.length}));\n",
+    "cacheHelperSource": "import fs from 'node:fs';import v8 from 'node:v8';import crypto from 'node:crypto';import assert from 'node:assert/strict';\nconst dir='/tmp/fgos-work/runner-b80e-cache/';\nexport function save(inv){fs.mkdirSync(dir,{recursive:true});const manifest={version:1,commit:inv.commit,fields:[]};let n=0;for(const [key,value]of Object.entries(inv)){const chunks=[];const values=Array.isArray(value)?Array.from({length:Math.ceil(value.length/256)},(_,i)=>value.slice(i*256,(i+1)*256)):[value];for(const part of values){const file=String(n++)+'.bin';let bytes=v8.serialize(part);fs.writeFileSync(dir+file,bytes);chunks.push({file,bytes:bytes.length,sha256:crypto.createHash('sha256').update(bytes).digest('hex')});bytes=null;if(chunks.length%8===0)global.gc?.();}manifest.fields.push({key,array:Array.isArray(value),length:Array.isArray(value)?value.length:null,chunks});global.gc?.();}fs.writeFileSync(dir+'manifest.json',JSON.stringify(manifest));return manifest;}\nexport function load(fields=null){const manifest=JSON.parse(fs.readFileSync(dir+'manifest.json')),inv={};for(const f of manifest.fields){if(fields&&!fields.includes(f.key))continue;if(f.array)inv[f.key]=[];for(const c of f.chunks){let bytes=fs.readFileSync(dir+c.file);assert.equal(bytes.length,c.bytes);assert.equal(crypto.createHash('sha256').update(bytes).digest('hex'),c.sha256);const part=v8.deserialize(bytes);bytes=null;if(f.array)inv[f.key].push(...part);else inv[f.key]=part;if(Number(c.file.split('.')[0])%2048===0)global.gc?.();}if(f.array)assert.equal(inv[f.key].length,f.length);global.gc?.();}return inv;}\n",
+    "checkHelperSource": "import {load} from './runner-cache.mjs';import fs from 'node:fs';import assert from 'node:assert/strict';import crypto from 'node:crypto';import {execFileSync as exec} from 'node:child_process';\nconst root=process.cwd(),P='plans/260925-documentation-authority-unification/',R=P+'reports/phase-06/',pin='b80e8c16c94cb04c80cc4e858933a9b2a04ddc60',read=f=>JSON.parse(fs.readFileSync(f)),sha=s=>crypto.createHash('sha256').update(s).digest('hex'),write=(f,j)=>fs.writeFileSync(R+f,JSON.stringify(j,null,2)+'\\n'),key=u=>JSON.stringify([u.claimId,u.path,u.anchor,u.unitDigest,u.fileStatus]);\nconst g=await import(root+'/scripts/check-doc-inventory-gates.mjs'),inv=load(),bytes=fs.readFileSync(R+'working-identity-registry.json'),registry=JSON.parse(bytes),vocabulary=read(P+'claim-and-disposition-vocabulary.json'),droppedClaimsRegister=read(P+'dropped-claims-register.json'),decisions=[...g.loadDecisionShards(P+'pilot/decisions'),...g.loadDecisionShards(P+'ledger/decisions')],ratchetResult=g.loadRatchetResult(root),scope=['docs/specs/runner.md'],priors=[P+'reports/identity-registry.json',P+'reports/phase-02-identity-registry.json'].map(label=>({label,registry:read(label)})),runs=[];\nfor(const [label,previousRegistries] of [['both',priors],['identity',[priors[0]]],['phase02',[priors[1]]]])for(const strict of [false,true]){global.gc?.();const t=Date.now();console.log('START',label,strict?'E':'D',new Date().toISOString());const result=g.checkInventory({repoRoot:root,inventory:inv,vocabulary,identityRegistry:registry,droppedClaimsRegister,previousRegistries,ratchetResult,strict,headCommit:pin,registryBytes:bytes,missingInputs:[],decisions,scope});const file='runner-b80e-native-'+(strict?'E':'D')+'-'+label+'.json';write(file,result);runs.push({label,check:strict?'E':'D',scope,previousRegistries:previousRegistries.map(x=>x.label),seconds:(Date.now()-t)/1000,file,fatal:result.fatalFindings.length,fatalTypes:result.fatalFindings.map(f=>f.type),open:result.conservationOpen.map(x=>({type:x.type,count:x.count}))});console.log('DONE',JSON.stringify(runs.at(-1)));}\nconst units=g.buildConservationUnitLookup(root,pin),applied=g.applyDecisions(inv,decisions,{vocabulary,targetAnchorsOf:g.buildTargetAnchorLookup(root,pin),targetUnitDigestOf:g.buildTargetUnitDigestLookup(root,pin),unitsOf:units,registry,repoRoot:root}),tuple=u=>JSON.stringify([u.claimId,u.sourcePath,u.sourceAnchor,u.sourceUnitDigest]);assert.deepEqual(inv.claimLedger.map(tuple).sort(),registry.units.map(tuple).sort());assert.deepEqual(applied.inventory.claimLedger.map(tuple).sort(),inv.claimLedger.map(tuple).sort());\nconst constitution=read(P+'minimum-constitution.json'),meta=await import(root+'/scripts/check-doc-constitution.mjs');\nconst fullStatus=p=>{const text=body(p),header=meta.headerBlock(text)||'',fields=Object.fromEntries([...header.matchAll(/^([A-Za-z][A-Za-z ]*):\\s*([^\\n]*)$/gm)].map(m=>[m[1],m[2].trim()])),kind=meta.classifyPath(p,constitution,{header}).kind,kindCanonical=constitution.documentKinds.find(k=>k.id===kind)?.canonical??false,designStatus=fields['Design status']||null,canonicalHeader=fields.Canonical||null,canonical=/^yes$/i.test(canonicalHeader||'');assert(!canonical);assert(['Candidate','Draft'].includes(designStatus)||kind==='history');assert.equal(items.get(p)?.authorityStatus,'candidate');return {kind,kindCanonical,designStatus,canonical,canonicalHeader,authorityStatus:'candidate'};};\nconst items=new Map(inv.items.map(i=>[i.path,i])),bodies=new Map(),body=p=>{if(!bodies.has(p))bodies.set(p,exec('git',['show',pin+':'+p],{encoding:'utf8',maxBuffer:8e6}));return bodies.get(p);},status=p=>{const text=body(p);assert.equal(text.match(/^Design status:\\s*(.+)$/m)?.[1]?.trim(),'Candidate');assert(text.includes('Canonical: No'));assert.equal(items.get(p)?.authorityStatus,'candidate');return 'Candidate';};\nconst duplicate='claim_fecee46f6c7c699047ffdb436bfdebe1',rootOld=read(R+'candidate-unverified-root-authorities.json'),runnerOld=read(R+'candidate-unverified-runner.json');\nconst raw=read(R+'runner-b80e-native-E-both.json').explicitOpenFindings.unreferencedCandidateRows;for(const label of ['identity','phase02'])assert.deepEqual(raw,read(R+'runner-b80e-native-E-'+label+'.json').explicitOpenFindings.unreferencedCandidateRows);\nconst runnerRows=raw.filter(r=>r.claimId!==duplicate).map(r=>{const u=units(r.path).find(u=>u.anchor===r.anchor);assert.equal(u.textDigest,r.unitDigest);return {...r,fileStatus:status(r.path),shownText:u.sectionText||u.text,shownTextDigest:sha(u.sectionText||u.text),reviewStatus:'pending'};});\nconst rootChecks=[];for(const [label,previousRegistries]of [['both',priors],['identity',[priors[0]]],['phase02',[priors[1]]]]){const c=g.checkConservation({inventory:applied.inventory,registry:applied.registry,previousRegistries,vocabulary,droppedClaimsRegister,ratchetResult,scope:rootOld.scope,decisions,repoRoot:root});rootChecks.push({label,invariant:c.invariant,open:c.open,rows:c.unreferencedCandidateRows});}write('runner-b80e-root-native-reverse.json',{contentCommit:pin,scope:rootOld.scope,runs:rootChecks});assert.deepEqual(rootChecks[0].rows,rootChecks[1].rows);assert.deepEqual(rootChecks[0].rows,rootChecks[2].rows);\nconst runnerIDs=new Set(runnerRows.map(r=>r.claimId)),rootPartition=rootChecks[0].rows.filter(r=>!runnerIDs.has(r.claimId));\nconst rootRows=rootPartition.map(r=>{const prior=rootOld.rows.find(x=>x.claimId===r.claimId),u=units(r.path).find(u=>u.anchor===r.anchor);assert.equal(u.textDigest,r.unitDigest);return {...(prior||{}),...r,fileStatus:fullStatus(r.path),status:'candidate-unverified'};});\nassert.equal(rootRows.filter(x=>x.claimId===duplicate).length,1);assert(!runnerRows.some(x=>x.claimId===duplicate));const combined=[...runnerRows,...rootRows];const expectedUnion=new Set([...raw,...rootChecks[0].rows].map(r=>JSON.stringify([r.claimId,r.path,r.anchor,r.unitDigest])));assert.deepEqual([...expectedUnion].sort(),combined.map(r=>JSON.stringify([r.claimId,r.path,r.anchor,r.unitDigest])).sort());assert.equal(new Set(combined.map(r=>r.claimId)).size,combined.length);\nconst rootNormalized=rootPartition.map(r=>({...r,fileStatus:rootRows.find(x=>x.claimId===r.claimId).fileStatus}));assert.deepEqual(rootRows.map(key).sort(),rootNormalized.map(key).sort());assert.deepEqual(runnerRows.map(key).sort(),raw.filter(r=>r.claimId!==duplicate).map(r=>({...r,fileStatus:status(r.path)})).map(key).sort());\nconst deltas=(old,rows)=>({before:old.rows.length,after:rows.length,added:rows.filter(r=>!old.rows.some(x=>key(x)===key(r))),removed:old.rows.filter(r=>!rows.some(x=>key(x)===key(r)))}),rootDelta=deltas(rootOld,rootRows),runnerDelta=deltas(runnerOld,runnerRows),eq=rows=>({contentCommit:pin,fullFiveFieldTupleEquality:true,tupleFields:['claimId','path','anchor','unitDigest','fileStatus'],tupleSHA256:sha(rows.map(key).sort().join('\\n')),count:rows.length,allThreePriors:true});\nwrite('candidate-unverified-runner.json',{...runnerOld,version:3,native:true,contentCommit:pin,status:'candidate-unverified; current native reverse rows after root-owned duplicate exclusion; pending bounded re-review, no truth/promotion approval',count:runnerRows.length,rows:runnerRows,overlayCaveat:'The earlier conservative working overlay is historical. This list now binds the complete native inventory and all existing decision shards; full five-field ownership partition is in runner-b80e-candidate-list-equality.json.',nativeEquality:eq(runnerRows),ownership:{...runnerOld.ownership,excludedFromRunnerCount:raw.filter(r=>r.claimId===duplicate).length,rawRunnerReverseCount:raw.length},knownRiskCarriageBindings:{...runnerOld.knownRiskCarriageBindings,nativeCandidateIdentityVerified:true,rows:runnerOld.knownRiskCarriageBindings.rows.map(r=>{const n=registry.units.find(u=>u.sourcePath===r.targetOwner&&u.sourceAnchor===r.targetAnchor&&u.sourceUnitDigest===(r.targetDigest||r.targetUnitDigest));assert(n);return {...r,nativeTargetClaimId:n.claimId};})},currentDecisionSections:runnerOld.currentDecisionSections,pendingAccountingReview:true,next:'Apply bounded re-review, resolve predecessor dispositions; Lead syncs main and starts Step 10 after Step 9 closure.'});\nwrite('candidate-unverified-root-authorities.json',{...rootOld,contentCommit:pin,count:rootRows.length,rows:rootRows,previousNativeEquality:rootOld.nativeEquality,nativeEquality:eq(rootRows),runnerDedupe:{claimId:duplicate,owner:'root-authorities',exactlyOneOwner:true,runnerContentCommit:pin,reviewStatus:'pending bounded accounting re-review; no truth approval'}});\nwrite('runner-b80e-candidate-list-equality.json',{contentCommit:pin,tupleFields:['claimId','path','anchor','unitDigest','fileStatus'],runner:eq(runnerRows),root:eq(rootRows),rootDelta,runnerDelta,ownershipPartition:{rawRootReverseCount:rootChecks[0].rows.length,runnerOwnedExcludedFromRoot:rootChecks[0].rows.filter(r=>runnerIDs.has(r.claimId)).map(r=>r.claimId),rootOwnedExcludedFromRunner:raw.filter(r=>r.claimId===duplicate).map(r=>r.claimId),rule:'Runner owns its new candidate scaffolding; root owns previously placed routing-handoff metadata. Source-scope native reverse sets overlap through the runner namespace. Lists partition their native union; no row is discarded.'},rootChecks:rootChecks.map(({rows,...c})=>({...c,reverseCount:rows.length})),duplicate:{claimId:duplicate,rootCount:1,runnerCount:0},union:{count:combined.length,unique:true,tupleSHA256:sha(combined.map(key).sort().join('\\n'))},meaning:'All five fields from native reverse rows plus committed actual file status; root-owned duplicate excluded once from runner scope; runner-owned namespace rows excluded once from root scope. Full deltas pending review; no classification or truth approval.'});\nconst proof={contentCommit:pin,scope,runs,activeRegistryInventoryAppliedTupleEquality:true,nativeActiveCount:registry.units.length,reverseFiveFieldEqualityAcrossAllPriors:true,rawRunnerReverseCount:raw.length,runnerOwnedCount:runnerRows.length,rootOwnedCount:rootRows.length,strictGreen:false,registry:read(R+'runner-b80e-native-sync-proof.json'),candidateListProof:R+'runner-b80e-candidate-list-equality.json',reproduction:{syncHelperSource:fs.readFileSync('/tmp/fgos-work/runner-b80e-sync.mjs','utf8'),cacheHelperSource:fs.readFileSync('/tmp/fgos-work/runner-cache.mjs','utf8'),checkHelperSource:fs.readFileSync('/tmp/fgos-work/runner-b80e-checks.mjs','utf8')}};write('runner-b80e-native-verification.json',proof);console.log('COMPLETE',JSON.stringify({runs,raw:raw.length,runner:runnerRows.length,root:rootRows.length,rootAdded:rootDelta.added.length,rootRemoved:rootDelta.removed.length}));\n"
+  }
+}
