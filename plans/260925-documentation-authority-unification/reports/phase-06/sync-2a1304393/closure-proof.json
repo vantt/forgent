@@ -1,0 +1,237 @@
+{
+  "pin": "72020200c31f413a225999146472269da07d1d9b",
+  "completedAt": "2026-10-15T03:13:55.800Z",
+  "environment": {
+    "node": "v24.18.0",
+    "execArgv": [
+      "--max-old-space-size=11000"
+    ],
+    "CLAUDE_CODE_SESSION_ID": null
+  },
+  "registrySHA256": "1ec13215600551ffdb9cb2f3a6e1260fdbd0cf0e829171d95f42309221384d02",
+  "registryUnchanged": true,
+  "noCarryForward": true,
+  "noFullNativeSync": true,
+  "inventory": {
+    "files": 4412,
+    "claims": 88224,
+    "activeTupleEquality": true
+  },
+  "sourcePopulation": 826,
+  "reviewedSources": 826,
+  "candidateEligibilityReviewed": 67,
+  "summary": [
+    {
+      "check": "D",
+      "priors": "both",
+      "fatal": 0,
+      "fatalTypes": [],
+      "open": [
+        {
+          "type": "files-unknown-blocking",
+          "count": 1153
+        },
+        {
+          "type": "claims-unknown-blocking",
+          "count": 22445
+        },
+        {
+          "type": "claims-partial-carry",
+          "count": 14
+        },
+        {
+          "type": "claims-not-reviewed",
+          "count": 22672
+        },
+        {
+          "type": "claims-without-own-rationale",
+          "count": 22445
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "count": 352
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "count": 464
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 2187
+        }
+      ]
+    },
+    {
+      "check": "E",
+      "priors": "both",
+      "fatal": 2,
+      "fatalTypes": [
+        "identical-units-multiple-owners",
+        "candidate-blocks-unreferenced"
+      ],
+      "open": [
+        {
+          "type": "identical-units-multiple-owners",
+          "count": 2
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 67
+        }
+      ]
+    },
+    {
+      "check": "D",
+      "priors": "identity",
+      "fatal": 0,
+      "fatalTypes": [],
+      "open": [
+        {
+          "type": "files-unknown-blocking",
+          "count": 1153
+        },
+        {
+          "type": "claims-unknown-blocking",
+          "count": 22445
+        },
+        {
+          "type": "claims-partial-carry",
+          "count": 14
+        },
+        {
+          "type": "claims-not-reviewed",
+          "count": 22672
+        },
+        {
+          "type": "claims-without-own-rationale",
+          "count": 22445
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "count": 352
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "count": 464
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 2187
+        }
+      ]
+    },
+    {
+      "check": "E",
+      "priors": "identity",
+      "fatal": 2,
+      "fatalTypes": [
+        "identical-units-multiple-owners",
+        "candidate-blocks-unreferenced"
+      ],
+      "open": [
+        {
+          "type": "identical-units-multiple-owners",
+          "count": 2
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 67
+        }
+      ]
+    },
+    {
+      "check": "D",
+      "priors": "phase02",
+      "fatal": 0,
+      "fatalTypes": [],
+      "open": [
+        {
+          "type": "files-unknown-blocking",
+          "count": 1153
+        },
+        {
+          "type": "claims-unknown-blocking",
+          "count": 22445
+        },
+        {
+          "type": "claims-partial-carry",
+          "count": 14
+        },
+        {
+          "type": "claims-not-reviewed",
+          "count": 22672
+        },
+        {
+          "type": "claims-without-own-rationale",
+          "count": 22445
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "count": 352
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "count": 464
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 2187
+        }
+      ]
+    },
+    {
+      "check": "E",
+      "priors": "phase02",
+      "fatal": 2,
+      "fatalTypes": [
+        "identical-units-multiple-owners",
+        "candidate-blocks-unreferenced"
+      ],
+      "open": [
+        {
+          "type": "identical-units-multiple-owners",
+          "count": 2
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 67
+        }
+      ]
+    }
+  ],
+  "exactReverseTupleEquality": true,
+  "exactExceptionMembersAndOwners": [
+    {
+      "digest": "6a940230eb3172ac0cd44665b6d492a11ff8d99fe92c0f3b5c5eff8ae521ae54",
+      "owners": [
+        "docs/platform/system-architecture/architecture/architecture-intent.md",
+        "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md"
+      ]
+    },
+    {
+      "digest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "owners": [
+        "docs/platform/architecture-map.md",
+        "docs/platform/system-overview/spec.md"
+      ]
+    }
+  ],
+  "checkpoint": {
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-6-checkpoint.md",
+    "reviewReportCommit": "1bca2617ba7b661bf6f97314b4841a32bbd206f8",
+    "reviewer": "reviewer:claude-session:a4954387@2026-10-15",
+    "reviewPackCommit": "798b08e252415d16558d15ee8c7df0482c4bad1e",
+    "reviewPackId": "5a6f4dc3394d474bc0b8be973f2867fe0624f0245de5047abf1fec23d2d25bf4",
+    "seedScoreId": "4597c38331133472514a4200d476fd966b07304107b9249a798b0a4427546802",
+    "packArtifactCommit": "9d24726ede74c0c2e1c24167c1848f3a4458dfc1",
+    "population": 824,
+    "gateFormatValidated": 824,
+    "mutationsCaught": 6,
+    "controlsFalseFlags": 0,
+    "independence": "R6-1 open, awaiting owner ruling; shared session identity explicitly disclosed",
+    "meaning": "Committed checkpoint proof bound and gate-format validated on a read-only view; prior valid row approvals are retained."
+  },
+  "ordinaryVerdicts": 7,
+  "acceptedReceiptReferences": 2,
+  "strictEGreen": false
+}

@@ -1,3 +1,28 @@
+# Step 6 closed pending owner ruling on R6-1
+
+Date: 2026-10-15. Assignment: `unit-run-1792032761966-a8a1dcd4/producer/1`. Input tree: `72020200c31f413a225999146472269da07d1d9b`; actual output commit is runner settlement, pending, no SHA invented. Read progress first, wrote it early and finalized it here. This entry supersedes the historical closure requirements below.
+
+Applied **all 7 ordinary ok verdicts**, with separate source/eligibility/predecessor/stale-ref semantics, and recorded **2 accepted portal receipts** in candidateClassifications exactly under review-brief, using actual report commit `395835a0a7f9cf2034cffb302cfbf8cdb08d2f71` and receipt artifact `ec08072e26949676703446c99a1229abc6793901`. Two source rows used the unchanged ordinary applier; **826/826 sources reviewed**. All **67/67 eligibility rows reviewed**, still candidate-unverified for truth. Stale refs remain pending with their history and replacements; no successor approval carry. Obsolete native-sync wording is corrected using the existing persisted proof.
+
+Checkpoint [review-6-checkpoint.md](review-6-checkpoint.md), committed at `1bca2617ba7b661bf6f97314b4841a32bbd206f8`, is bound to the actual Pack commit/id/Seed score in [application accounting](sync-2a1304393/closure-application.json); unchanged checkpoint gate-format validation passes for all 824 bindings without replacing prior source approvals. Sensitivity **6/6 caught, 0/24 false flags**, exact draw **0/100 defects**, recompute **0/83 defects**. **R6-1 is the remaining Step 6 closure blocker, waiting for the owner**: shared reviewer identity `a4954387` needs owner acceptance or a different-session checkpoint. No ruling is fabricated or duplicate question asked. R6-2's independent reproduction is in the committed checkpoint, not attributed to this producer.
+
+Fresh D/E from the persisted registry only, **no full native sync or carry-forward**: against both priors together and each separately, **D 0 fatal**, strict **E exactly 2 reviewed contextual identical-unit groups + 67 candidate-unverified tuples**, no other open category or unexpected fatal. Exact member/owner equality and every five-field reverse tuple pass. Strict E remains open; no global cutover. Inventory **4,412 files / 88,224 claims**; active native tuple equality; registry byte-identical **60,277,528 bytes**, SHA256 `1ec13215600551ffdb9cb2f3a6e1260fdbd0cf0e829171d95f42309221384d02`. [Final proof](sync-2a1304393/closure-proof.json), [log](sync-2a1304393/closure-check.log), [preservation](sync-2a1304393/closure-preservation.json), [final verification](sync-2a1304393/closure-final-verification.json), [full report](step-06-report.md).
+
+Known remaining work is preserved in [owner-queue.md](owner-queue.md): the **six additional section-11 table rows still describing the retired engine** owe full truth review at promotion, like A35's known-stale-content note without extending A35 authorization; CTR010 collision and four missing roadmap/topology switchboard routes remain with binding/navigation owners. Keep R6-3/R6-6 notes, Rings holds, A34 residuals, all truth/promotion/navigation/consumer/alias/native-gap/cutover obligations, sample/reader/effort limits and owner token reporting. No component-boundary change.
+
+## First Step 7 actions — handoff only
+
+Read **“### Step 7. Proposals and redesigns”** in the phase file, Q3 owner delegation, the frozen area map, minimum constitution and review-brief before starting. Step 7 is the **largest step** and has its **own red-team** under the shared review rules.
+
+1. Build the **27-file triage table**: kind, status, evidence that the proposal is still live, historical, or already carried elsewhere. Do not pre-place with a tool.
+2. Place each file by constitution kind, **text verbatim**, within Q3 delegation. Use `archive-with-reason` only within that delegation; every `delete-as-obsolete` goes to the owner queue.
+3. Budget at the **per-row rate**; the old 2.1-million estimate is withdrawn. The roughly 8-million red-team estimate is **UNPROVEN**; measure actual rows/effort and retain the owner token-total checkpoint.
+4. Submit independent ordinary reviews, run scoped **E**, and complete Step 7's own hostile review of its diff with **zero open Critical/High unless owner-accepted**. Review-brief/owner amendments govern sensitivity requirements; do not invent a per-batch seeded pack.
+
+No Step 7 files, decisions or content are authored here; Step 6's owner ruling remains pending. Tests **39/39 pass**, with `env -u CLAUDE_CODE_SESSION_ID`. All written repo files remain inside this plan; docs/gates/checkers/vocabulary/extractor/baselines/frozen inputs and registry bytes are unchanged. No git write, lifecycle verb, secret read or workspace `.fgos/` access; only required external result claim is excepted. No needsWrites. MDView preview unavailable within scope.
+
+---
+
 # Native registry proof complete — independent reviews requested
 
 Content pin: `2a1304393b9b284ad9566b6542ba78554f54b100`. Assignment: `unit-run-1792029127447-efadb3b1/producer/1`. Date: 2026-10-15. Read progress first; wrote it early and before finishing. Output artifact commit remains actual runner settlement, not invented. Step 6 **open**.

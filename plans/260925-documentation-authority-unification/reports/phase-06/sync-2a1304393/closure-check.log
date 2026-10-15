@@ -1,0 +1,16 @@
+2026-10-15T02:54:55.546Z Generate from persisted registry, no carry 72020200c31f413a225999146472269da07d1d9b 1ec13215600551ffdb9cb2f3a6e1260fdbd0cf0e829171d95f42309221384d02
+2026-10-15T03:03:48.087Z Inventory 4412 88224
+2026-10-15T03:03:49.150Z Applied seven observations/verdicts and two receipts; checkpoint bound
+2026-10-15T03:03:50.155Z Check D both
+2026-10-15T03:05:25.967Z {"check":"D","priors":"both","fatal":0,"fatalTypes":[],"open":[{"type":"files-unknown-blocking","count":1153},{"type":"claims-unknown-blocking","count":22445},{"type":"claims-partial-carry","count":14},{"type":"claims-not-reviewed","count":22672},{"type":"claims-without-own-rationale","count":22445},{"type":"identical-units-multiple-owners","count":352},{"type":"registry-gaps-without-disposition","count":464},{"type":"candidate-blocks-unreferenced","count":2187}]}
+2026-10-15T03:05:25.967Z Check E both
+2026-10-15T03:07:08.764Z {"check":"E","priors":"both","fatal":2,"fatalTypes":["identical-units-multiple-owners","candidate-blocks-unreferenced"],"open":[{"type":"identical-units-multiple-owners","count":2},{"type":"candidate-blocks-unreferenced","count":67}]}
+2026-10-15T03:07:08.765Z Check D identity
+2026-10-15T03:08:49.931Z {"check":"D","priors":"identity","fatal":0,"fatalTypes":[],"open":[{"type":"files-unknown-blocking","count":1153},{"type":"claims-unknown-blocking","count":22445},{"type":"claims-partial-carry","count":14},{"type":"claims-not-reviewed","count":22672},{"type":"claims-without-own-rationale","count":22445},{"type":"identical-units-multiple-owners","count":352},{"type":"registry-gaps-without-disposition","count":464},{"type":"candidate-blocks-unreferenced","count":2187}]}
+2026-10-15T03:08:49.931Z Check E identity
+2026-10-15T03:10:27.895Z {"check":"E","priors":"identity","fatal":2,"fatalTypes":["identical-units-multiple-owners","candidate-blocks-unreferenced"],"open":[{"type":"identical-units-multiple-owners","count":2},{"type":"candidate-blocks-unreferenced","count":67}]}
+2026-10-15T03:10:27.895Z Check D phase02
+2026-10-15T03:12:08.529Z {"check":"D","priors":"phase02","fatal":0,"fatalTypes":[],"open":[{"type":"files-unknown-blocking","count":1153},{"type":"claims-unknown-blocking","count":22445},{"type":"claims-partial-carry","count":14},{"type":"claims-not-reviewed","count":22672},{"type":"claims-without-own-rationale","count":22445},{"type":"identical-units-multiple-owners","count":352},{"type":"registry-gaps-without-disposition","count":464},{"type":"candidate-blocks-unreferenced","count":2187}]}
+2026-10-15T03:12:08.529Z Check E phase02
+2026-10-15T03:13:55.559Z {"check":"E","priors":"phase02","fatal":2,"fatalTypes":["identical-units-multiple-owners","candidate-blocks-unreferenced"],"open":[{"type":"identical-units-multiple-owners","count":2},{"type":"candidate-blocks-unreferenced","count":67}]}
+2026-10-15T03:13:55.827Z Complete

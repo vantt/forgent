@@ -9,18 +9,28 @@
     {
       "claimId": "claim_1898cdafa7835d675526173d39eb5cd2",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal-evidence-rework.json",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "predecessorClaimId": "claim_1898cdafa7835d675526173d39eb5cd2",
       "receiptCommit": "ec08072e26949676703446c99a1229abc6793901",
-      "receiptBinding": "Actual committed re-issued artifact; independent classification review pending; no approval carry."
+      "receiptBinding": "Actual committed re-issued artifact; independent classification review pending; no approval carry.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-2a1304393-portal-receipts.md",
+      "reviewReportCommit": "395835a0a7f9cf2034cffb302cfbf8cdb08d2f71",
+      "reviewNote": "deep: Area Registry section including its table is true and current at HEAD; shown text and digest equal the live unit, evidence commands replay byte for byte, all link targets and the archived knowledge-registry plan exist, convention operations and rule shapes match the convention row, content class is right because the rows assert implemented and proposed status, not only routes"
     },
     {
       "claimId": "claim_51d4658b154804b82dbce0587b17efc0",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal-evidence-rework.json",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "predecessorClaimId": "claim_ec78621ff44b9fe7fa47ce85bd84bfa6",
       "receiptCommit": "ec08072e26949676703446c99a1229abc6793901",
-      "receiptBinding": "Actual committed re-issued artifact; independent classification review pending; no approval carry."
+      "receiptBinding": "Actual committed re-issued artifact; independent classification review pending; no approval carry.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-2a1304393-portal-receipts.md",
+      "reviewReportCommit": "395835a0a7f9cf2034cffb302cfbf8cdb08d2f71",
+      "reviewNote": "deep: table block is bound to the live successor ID, not the old gap ID claim_ec78621f; same section text and evidence as the heading receipt, the archive path in the documentation-system row is current and the old plan path is absent, no unbuilt mechanism is called built"
     }
   ]
 }

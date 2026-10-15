@@ -1,0 +1,50 @@
+✔ review pack contains full source and target units and reverse unmatched candidate blocks (2.454071ms)
+✔ seeded review uses six real text mutations and scores missed defects and false flags (9.736511ms)
+✔ review application binds current digest and keeps rework and hold pending without inventing approval (3.905952ms)
+✔ valid source digest prefixes survive pack and review application with full seen-text bindings (2.142593ms)
+✔ verdict table names the reviewer and requires an explicit verdict and own note for each row (0.610266ms)
+✔ unknown dispositions remain blocking after a hold verdict and pass decision validation (1.946189ms)
+✔ unknown dispositions remain blocking after a rework verdict and pass decision validation (0.956808ms)
+✔ the same reviewer session on another date is still the author session (0.20176ms)
+✔ pre-reviewed hand rows without committed evidence are rejected instead of skipped (0.253972ms)
+✔ a public seeded pack does not expose its replay inputs or retain original mutated digests (1.535312ms)
+✔ review application requires a passing sensitivity result for the exact shown pack (1.600814ms)
+✔ approval cannot attach to target text or heading ancestry changed after the pack (1.824406ms)
+✔ approved rows retain the seen unit binding and their own report across review rounds (1.456592ms)
+✔ sensitivity controls must belong to the bound batch even when the sensitivity score passes (1.400903ms)
+✔ reviewers receive full text and a unified diff in Markdown with safely nested fences (92.014691ms)
+✔ the public seeded Markdown can be scored without exposing the seed or private selection key (214.762291ms)
+✔ script-proven carries supply batch sensitivity controls without reopening accepted decisions (230.164143ms)
+✔ a new shard cannot claim legacy compatibility by deleting author fields (53.872107ms)
+✔ ordinary committed reviews approve seen text without a sensitivity pack and retain their report pin (169.681646ms)
+▶ ordinary reviews cannot approve a changed digest, an unauthored row or their own session
+  ✔ target-digest (77.06684ms)
+  ✔ source-digest (68.910508ms)
+  ✔ authoredBy (67.704192ms)
+  ✔ authorSession (70.096919ms)
+  ✔ same-session (72.082298ms)
+✔ ordinary reviews cannot approve a changed digest, an unauthored row or their own session (356.662233ms)
+▶ checkpoint reports cannot use the ordinary channel to omit sensitivity proof
+  ✔ checkpoint 3 (151.09629ms)
+  ✔ checkpoint 6 (147.844015ms)
+  ✔ checkpoint 10 (150.904263ms)
+✔ checkpoint reports cannot use the ordinary channel to omit sensitivity proof (450.315176ms)
+✔ the review lint accepts a well-formed ordinary report before application and writes nothing (72.697033ms)
+✔ the review lint uses the recorded target digest of an applied shard without an inventory (106.057064ms)
+▶ the review lint names the line and claim of each malformed verdict row
+  ✔ source-digest-not-64-hex (68.806549ms)
+  ✔ wrong-cell-count (72.909763ms)
+  ✔ non-bare-first-cell (70.384172ms)
+  ✔ target-digest-mismatch (78.133105ms)
+  ✔ source-digest-mismatch (70.305565ms)
+  ✔ bad-verdict (73.004683ms)
+✔ the review lint names the line and claim of each malformed verdict row (434.348392ms)
+✔ the review lint allows labelled non-claim rows but reports unknown claims and missing headers (212.930894ms)
+ℹ tests 39
+ℹ suites 0
+ℹ pass 39
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2453.111425

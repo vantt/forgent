@@ -1,0 +1,42 @@
+{
+  "writeScopePass": true,
+  "trackedFiles": [
+    "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-classifications.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-architecture-intent.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-portal-evidence-rework.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-whole-system-architecture.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
+    "plans/260925-documentation-authority-unification/reports/phase-06/progress.md",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step-06-report.md"
+  ],
+  "newFiles": [
+    "plans/260925-documentation-authority-unification/reports/phase-06/sync-2a1304393/closure-D-both.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/sync-2a1304393/closure-D-identity.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/sync-2a1304393/closure-D-phase02.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/sync-2a1304393/closure-E-both.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/sync-2a1304393/closure-E-identity.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/sync-2a1304393/closure-E-phase02.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/sync-2a1304393/closure-application.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/sync-2a1304393/closure-check.log",
+    "plans/260925-documentation-authority-unification/reports/phase-06/sync-2a1304393/closure-check.mjs",
+    "plans/260925-documentation-authority-unification/reports/phase-06/sync-2a1304393/closure-preservation.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/sync-2a1304393/closure-proof.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/sync-2a1304393/closure-tests.log"
+  ],
+  "gitDiffCheckPass": true,
+  "changedJsonParses": true,
+  "protectedDocsProductionGatesTestsUnchanged": true,
+  "registryUnchanged": true,
+  "checkpointHeadersMatchCommittedScore": true,
+  "ordinaryVerdictsAccounted": 7,
+  "formalReceiptsAccepted": 2,
+  "sourceReviewed": 826,
+  "allSixDERunsPassExpectedComparison": true,
+  "temporaryInventoryCacheRemoved": true,
+  "tests": {
+    "pass": 39,
+    "fail": 0,
+    "CLAUDE_CODE_SESSION_ID": "unset"
+  },
+  "remainingClosureBlocker": "R6-1 awaits owner ruling"
+}

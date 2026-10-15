@@ -1,0 +1,115 @@
+{
+  "pin": "72020200c31f413a225999146472269da07d1d9b",
+  "ordinaryVerdicts": [
+    {
+      "claimId": "claim_7a46ef41a328177fdcf07014a1a7b6b8",
+      "channel": "source ordinary application",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-2a1304393-bounded.md",
+      "reviewReportCommit": "395835a0a7f9cf2034cffb302cfbf8cdb08d2f71"
+    },
+    {
+      "claimId": "claim_c70f25eac4a54d44efef50283846611f",
+      "channel": "source ordinary application",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-2a1304393-bounded.md",
+      "reviewReportCommit": "395835a0a7f9cf2034cffb302cfbf8cdb08d2f71"
+    },
+    {
+      "claimId": "claim_cb9bec6c6a80cc775721132cb7569f54",
+      "channel": "candidate eligibility",
+      "reviewStatus": "reviewed",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-2a1304393-bounded.md",
+      "reviewReportCommit": "395835a0a7f9cf2034cffb302cfbf8cdb08d2f71",
+      "reviewNote": "deep: candidate-unverified row for the history heading; only the two metadata lines inside the fence differ from before, the history file is a non-canonical Candidate carrier, row is pending with priorReview and the new digest 1918b66f matches the extractor at 2a1304393"
+    },
+    {
+      "claimId": "claim_941da7b33ebfd98dc51d04f415175671",
+      "channel": "candidate eligibility",
+      "reviewStatus": "reviewed",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-2a1304393-bounded.md",
+      "reviewReportCommit": "395835a0a7f9cf2034cffb302cfbf8cdb08d2f71",
+      "reviewNote": "deep: native successor ID for history block 1 exists in the working registry (status future, digest 3a1a1314), list row pending with priorReview and no approval identity; the added Supersedes and Superseded by lines are the R6-8 header fields and nothing else changed in the block"
+    },
+    {
+      "claimId": "claim_61cd2622fa0c5c1b7c18ea39e2f85579",
+      "channel": "preserved predecessor observation",
+      "reviewStatus": "reviewed",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-2a1304393-bounded.md",
+      "reviewReportCommit": "395835a0a7f9cf2034cffb302cfbf8cdb08d2f71",
+      "reviewNote": "deep: the request still lists the old ID for history block 1; at HEAD it is correctly an identity gap preserved in the working registry and the list row moved to claim_941da7b3 with this ID in priorReview and priorNativeIdentity, so nothing is grafted; unit digest 3a1a1314 recomputed by hand over lines 3-20"
+    },
+    {
+      "claimId": "claim_de1bde6579325220fa5ddea79b9cd77f",
+      "channel": "stale ref pending-disposition observation",
+      "reviewStatus": "reviewed",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-2a1304393-bounded.md",
+      "reviewReportCommit": "395835a0a7f9cf2034cffb302cfbf8cdb08d2f71",
+      "reviewNote": "deep: receipt ref for dispatch-control-plane-redesign block 39 is pending, keeps the 4df9e88c review as priorReview and points to the repin receipt claim_366503bd at dfff335d3, which fixes R6-5 as the red-team asked; the old plan.mjs:444-461 citation no longer exists in the target so no reviewed ref points at gone text"
+    },
+    {
+      "claimId": "claim_56af2fc53f516253db192a78f0dddc70",
+      "channel": "stale ref pending-disposition observation",
+      "reviewStatus": "reviewed",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-2a1304393-bounded.md",
+      "reviewReportCommit": "395835a0a7f9cf2034cffb302cfbf8cdb08d2f71",
+      "reviewNote": "deep: receipt ref for block 47 handled the same way, pending with priorReview and replacement claim_c5395a2e (plan.mjs:453-454 became 464-465), no successor approval carried"
+    }
+  ],
+  "receiptRefs": [
+    {
+      "claimId": "claim_1898cdafa7835d675526173d39eb5cd2",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal-evidence-rework.json",
+      "reviewStatus": "reviewed",
+      "predecessorClaimId": "claim_1898cdafa7835d675526173d39eb5cd2",
+      "receiptCommit": "ec08072e26949676703446c99a1229abc6793901",
+      "receiptBinding": "Actual committed re-issued artifact; independent classification review pending; no approval carry.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-2a1304393-portal-receipts.md",
+      "reviewReportCommit": "395835a0a7f9cf2034cffb302cfbf8cdb08d2f71",
+      "reviewNote": "deep: Area Registry section including its table is true and current at HEAD; shown text and digest equal the live unit, evidence commands replay byte for byte, all link targets and the archived knowledge-registry plan exist, convention operations and rule shapes match the convention row, content class is right because the rows assert implemented and proposed status, not only routes"
+    },
+    {
+      "claimId": "claim_51d4658b154804b82dbce0587b17efc0",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal-evidence-rework.json",
+      "reviewStatus": "reviewed",
+      "predecessorClaimId": "claim_ec78621ff44b9fe7fa47ce85bd84bfa6",
+      "receiptCommit": "ec08072e26949676703446c99a1229abc6793901",
+      "receiptBinding": "Actual committed re-issued artifact; independent classification review pending; no approval carry.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-2a1304393-portal-receipts.md",
+      "reviewReportCommit": "395835a0a7f9cf2034cffb302cfbf8cdb08d2f71",
+      "reviewNote": "deep: table block is bound to the live successor ID, not the old gap ID claim_ec78621f; same section text and evidence as the heading receipt, the archive path in the documentation-system row is current and the old plan path is absent, no unbuilt mechanism is called built"
+    }
+  ],
+  "checkpoint": {
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-6-checkpoint.md",
+    "reviewReportCommit": "1bca2617ba7b661bf6f97314b4841a32bbd206f8",
+    "reviewer": "reviewer:claude-session:a4954387@2026-10-15",
+    "reviewPackCommit": "798b08e252415d16558d15ee8c7df0482c4bad1e",
+    "reviewPackId": "5a6f4dc3394d474bc0b8be973f2867fe0624f0245de5047abf1fec23d2d25bf4",
+    "seedScoreId": "4597c38331133472514a4200d476fd966b07304107b9249a798b0a4427546802",
+    "packArtifactCommit": "9d24726ede74c0c2e1c24167c1848f3a4458dfc1",
+    "population": 824,
+    "gateFormatValidated": 824,
+    "mutationsCaught": 6,
+    "controlsFalseFlags": 0,
+    "independence": "R6-1 open, awaiting owner ruling; shared session identity explicitly disclosed",
+    "meaning": "Committed checkpoint proof bound and gate-format validated on a read-only view; prior valid row approvals are retained."
+  }
+}

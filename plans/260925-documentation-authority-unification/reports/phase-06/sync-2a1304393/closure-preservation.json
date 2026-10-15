@@ -1,0 +1,12 @@
+{
+  "inputCommit": "72020200c31f413a225999146472269da07d1d9b",
+  "sourceRowsChangedOnlyReviewMetadata": [
+    "claim_7a46ef41a328177fdcf07014a1a7b6b8",
+    "claim_c70f25eac4a54d44efef50283846611f"
+  ],
+  "staleReferencesRetainPendingAndPriorHistory": 2,
+  "candidateFullFiveFieldTuplesUnchanged": 67,
+  "candidateEligibilityReviewed": 67,
+  "registryUnchangedSHA256": "1ec13215600551ffdb9cb2f3a6e1260fdbd0cf0e829171d95f42309221384d02",
+  "decisionProseUnchanged": true
+}

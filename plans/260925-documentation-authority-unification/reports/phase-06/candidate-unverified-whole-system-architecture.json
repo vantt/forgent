@@ -848,7 +848,7 @@
       "anchor": "architect-readme-source-carriage",
       "unitDigest": "1918b66f54a462fa3d1611abefac357f4866d38afba8c6ef6e2051a57c2da12c",
       "status": "candidate-unverified",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "priorReview": {
         "claimId": "claim_cb9bec6c6a80cc775721132cb7569f54",
         "path": "docs/platform/system-architecture/history/architect-readme.md",
@@ -864,7 +864,13 @@
         "reviewNote": "mechanical: heading section architect-readme-source-carriage of system-architecture/history/architect-readme.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest a7422f57dfaad386 equal the request, sidecar and committed bytes; system-architecture/history/architect-readme.md declares Design status Candidate (history), non-canonical history carrier, not promoted; before and current records identical."
       },
       "amendedBy": "codex-session:unit-run-1792028685519-ebec4fbb@2026-10-15",
-      "rebindingReason": "R6-8 header completion / A22 local digest rebind only. Current native identity and list equality require next sync; no identity is allocated or approval carried."
+      "rebindingReason": "R6-8 header completion reconciled by committed native sync at 2a1304393; current tuple independently accepted by bounded review. Candidate-unverified remains open for promotion truth review.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-2a1304393-bounded.md",
+      "reviewReportCommit": "395835a0a7f9cf2034cffb302cfbf8cdb08d2f71",
+      "reviewNote": "deep: candidate-unverified row for the history heading; only the two metadata lines inside the fence differ from before, the history file is a non-canonical Candidate carrier, row is pending with priorReview and the new digest 1918b66f matches the extractor at 2a1304393"
     },
     {
       "claimId": "claim_941da7b33ebfd98dc51d04f415175671",
@@ -872,7 +878,7 @@
       "anchor": "unheaded-block-1",
       "unitDigest": "3a1a1314891f35aa67ccdf4fec0c5415cbb568f5e4d6a1a6eb97a690e51e3c0b",
       "status": "candidate-unverified",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "priorReview": {
         "claimId": "claim_61cd2622fa0c5c1b7c18ea39e2f85579",
         "path": "docs/platform/system-architecture/history/architect-readme.md",
@@ -888,14 +894,30 @@
         "reviewNote": "mechanical: text block unheaded-block-1 of system-architecture/history/architect-readme.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 1d36d1e33d5a609a equal the request, sidecar and committed bytes; system-architecture/history/architect-readme.md declares Design status Candidate (history), non-canonical history carrier, not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
       },
       "amendedBy": "codex-session:unit-run-1792028685519-ebec4fbb@2026-10-15",
-      "rebindingReason": "R6-8 header completion / A22 local digest rebind only. Current native identity and list equality require next sync; no identity is allocated or approval carried.",
+      "rebindingReason": "R6-8 header completion reconciled by committed native sync at 2a1304393; current tuple independently accepted by bounded review. Candidate-unverified remains open for promotion truth review.",
       "priorNativeIdentity": {
         "claimId": "claim_61cd2622fa0c5c1b7c18ea39e2f85579",
         "path": "docs/platform/system-architecture/history/architect-readme.md",
         "anchor": "unheaded-block-1",
         "unitDigest": "1d36d1e33d5a609ac2d610bc7608684ececb4120b29215e9b56e1d04d066e3cd",
-        "meaning": "Preserved predecessor is an actual native identity gap, not a live identity or approval."
-      }
+        "meaning": "Preserved predecessor is an actual native identity gap, not a live identity or approval.",
+        "boundedReview": {
+          "reviewStatus": "reviewed",
+          "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+          "reviewedAt": "2026-10-15",
+          "reviewMode": "ordinary",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-2a1304393-bounded.md",
+          "reviewReportCommit": "395835a0a7f9cf2034cffb302cfbf8cdb08d2f71",
+          "reviewNote": "deep: the request still lists the old ID for history block 1; at HEAD it is correctly an identity gap preserved in the working registry and the list row moved to claim_941da7b3 with this ID in priorReview and priorNativeIdentity, so nothing is grafted; unit digest 3a1a1314 recomputed by hand over lines 3-20",
+          "meaning": "Accepted observation of preserved predecessor gap and actual successor; no live identity or classification approval."
+        }
+      },
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-2a1304393-bounded.md",
+      "reviewReportCommit": "395835a0a7f9cf2034cffb302cfbf8cdb08d2f71",
+      "reviewNote": "deep: native successor ID for history block 1 exists in the working registry (status future, digest 3a1a1314), list row pending with priorReview and no approval identity; the added Supersedes and Superseded by lines are the R6-8 header fields and nothing else changed in the block"
     },
     {
       "claimId": "claim_4ea489ceb9de68fc157a43c0496640a8",
@@ -986,13 +1008,14 @@
   "previousCount": 82,
   "authoredCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
   "nativeRebinding": {
-    "status": "pending-native-sync",
-    "fullNativeTupleEquality": false,
-    "currentFullTupleEquality": false,
-    "partitionTupleEquality": false,
+    "status": "reconciled",
+    "contentCommit": "2a1304393b9b284ad9566b6542ba78554f54b100",
+    "fullNativeTupleEquality": true,
+    "currentFullTupleEquality": true,
     "knownIDsPreserved": true,
     "noApprovalCarry": true,
-    "meaning": "R6-8: two wrapper tuples locally rebound; native identity/gap reconciliation owed. Earlier complete verification retained in previousNativeVerificationMetadata.beforeClosureCorrection."
+    "evidence": "plans/260925-documentation-authority-unification/reports/phase-06/sync-2a1304393/final-proof.json",
+    "meaning": "Prior pending-native-sync wording is superseded by the persisted full native equality proof. Eligibility approval is separate from content truth."
   },
   "nativeEquality": {
     "contentCommit": "2a1304393b9b284ad9566b6542ba78554f54b100",
@@ -1301,5 +1324,14 @@
   "previousNativeEquality": {
     "status": "pending-native-sync",
     "reason": "R6-8 changed two history-wrapper tuples; prior equality is historical."
+  },
+  "previousNativeRebinding": {
+    "status": "pending-native-sync",
+    "fullNativeTupleEquality": false,
+    "currentFullTupleEquality": false,
+    "partitionTupleEquality": false,
+    "knownIDsPreserved": true,
+    "noApprovalCarry": true,
+    "meaning": "R6-8: two wrapper tuples locally rebound; native identity/gap reconciliation owed. Earlier complete verification retained in previousNativeVerificationMetadata.beforeClosureCorrection."
   }
 }

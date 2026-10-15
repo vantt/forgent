@@ -1544,13 +1544,9 @@
       "targetAnchor": "11-current-system-fit-and-conflicts",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:37@2026-10-15",
       "rationale": "The heading text and ancestry are unchanged; its section payload changes only by the three authorized retired-engine qualifications in unheaded-block-61. Carry the complete heading; A22 digest consequence pending independent review. No source retirement, promotion or truth approval.",
-      "targetUnitDigest": "46269aecc47b5e4332545a798e6ff5941dddb956a2854c28a36d1f78e38eefdb",
-      "targetAncestry": [
-        "Architecture Intent"
-      ],
       "priorReview": {
         "claimId": "claim_7a46ef41a328177fdcf07014a1a7b6b8",
         "sourceUnitDigest": "03fd6abc56c13bf09ccf7e76efb7ebc0f4749a170b6a783cfea0c2769708e09c",
@@ -1573,7 +1569,17 @@
         "reviewReportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930"
       },
       "amendedBy": "codex-session:unit-run-1792028685519-ebec4fbb@2026-10-15",
-      "rebindingReason": "A19 authorized retired-engine qualification; A22 actual target digest rebind, independent review pending. Native consequences deferred to next sync."
+      "rebindingReason": "A19 authorized retired-engine qualification; A22 actual target digest rebind, independent review pending. Native consequences deferred to next sync.",
+      "reviewNote": "deep: heading 11 keeps its text and ancestry; its section digest changed only because block 61 changed (word diff shows exactly lines 415/419/423); disposition move is right for a heading whose own line is unchanged; row is pending with priorReview, no approval carried, target digest 46269aec recomputed by extractor and anchor check passes",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-2a1304393-bounded.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "46269aecc47b5e4332545a798e6ff5941dddb956a2854c28a36d1f78e38eefdb",
+      "targetAncestry": [
+        "Architecture Intent"
+      ],
+      "reviewReportCommit": "395835a0a7f9cf2034cffb302cfbf8cdb08d2f71"
     },
     {
       "claimId": "claim_0695c3372c09aa0acfee179437772bdc",
@@ -1604,14 +1610,9 @@
       "targetAnchor": "unheaded-block-61",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:37@2026-10-15",
       "rationale": "A19 truth correction supersedes only the three false present-tense sentences with explicit retired-engine qualifications. All other source clauses, conflicts and obligations are retained byte-for-byte. Original source remains unchanged. Evidence: step-06-report.md, authorized corrections section; independent A22 review pending, no approval carry.",
-      "targetUnitDigest": "ea09318ffc9d78390e907d8a3315328cfffa4ccab17e96085ca822c373e41520",
-      "targetAncestry": [
-        "Architecture Intent",
-        "11. Current System Fit And Conflicts"
-      ],
       "priorReview": {
         "claimId": "claim_c70f25eac4a54d44efef50283846611f",
         "sourceUnitDigest": "bc122fa9bf3e6e08e05d6e56a77bc3024ea43fc8c9592061233120b1757f7b72",
@@ -1635,7 +1636,18 @@
         "reviewReportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930"
       },
       "amendedBy": "codex-session:unit-run-1792028685519-ebec4fbb@2026-10-15",
-      "rebindingReason": "A19 authorized retired-engine qualification; A22 actual target digest rebind, independent review pending. Native consequences deferred to next sync."
+      "rebindingReason": "A19 authorized retired-engine qualification; A22 actual target digest rebind, independent review pending. Native consequences deferred to next sync.",
+      "reviewNote": "deep: block 61 equals legacy block 59 except the three authorized sentences, each true against code (SessionActor edges, retrySessionTask, completion.mode all gone at HEAD and present at 13f7f01fd with file:line); supersede fits the vocabulary (whole unit reworded, none dropped); rationale says what happened; hand sha256 of lines 413-423 equals ea09318f",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-2a1304393-bounded.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "ea09318ffc9d78390e907d8a3315328cfffa4ccab17e96085ca822c373e41520",
+      "targetAncestry": [
+        "Architecture Intent",
+        "11. Current System Fit And Conflicts"
+      ],
+      "reviewReportCommit": "395835a0a7f9cf2034cffb302cfbf8cdb08d2f71"
     },
     {
       "claimId": "claim_d0168f188b22ce2596a186be875b1fb8",
@@ -3241,5 +3253,6 @@
       ],
       "reviewReportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930"
     }
-  ]
+  ],
+  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-2a1304393-bounded.md"
 }

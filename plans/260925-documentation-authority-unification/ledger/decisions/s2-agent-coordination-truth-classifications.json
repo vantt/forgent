@@ -4108,6 +4108,16 @@
         "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-step6-repin.json",
         "claimId": "claim_366503bd4dadea43469f1586f4f25f60",
         "receiptCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452"
+      },
+      "boundedReview": {
+        "reviewStatus": "reviewed",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-2a1304393-bounded.md",
+        "reviewReportCommit": "395835a0a7f9cf2034cffb302cfbf8cdb08d2f71",
+        "reviewNote": "deep: receipt ref for dispatch-control-plane-redesign block 39 is pending, keeps the 4df9e88c review as priorReview and points to the repin receipt claim_366503bd at dfff335d3, which fixes R6-5 as the red-team asked; the old plan.mjs:444-461 citation no longer exists in the target so no reviewed ref points at gone text",
+        "meaning": "Accepted pending disposition and replacement reference only. This is not a classification receipt verdict; original ref remains pending."
       }
     },
     {
@@ -4171,6 +4181,16 @@
         "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-step6-repin.json",
         "claimId": "claim_c5395a2e8480ce44d27f2873c02b8746",
         "receiptCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452"
+      },
+      "boundedReview": {
+        "reviewStatus": "reviewed",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-2a1304393-bounded.md",
+        "reviewReportCommit": "395835a0a7f9cf2034cffb302cfbf8cdb08d2f71",
+        "reviewNote": "deep: receipt ref for block 47 handled the same way, pending with priorReview and replacement claim_c5395a2e (plan.mjs:453-454 became 464-465), no successor approval carried",
+        "meaning": "Accepted pending disposition and replacement reference only. This is not a classification receipt verdict; original ref remains pending."
       }
     },
     {

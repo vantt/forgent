@@ -1,5 +1,70 @@
 # Whole-system architecture batch report
 
+## Current closure — 2026-10-15
+
+**Step 6: closed pending owner ruling on R6-1.** Assignment: `unit-run-1792032761966-a8a1dcd4/producer/1`. Input tree: `72020200c31f413a225999146472269da07d1d9b`. The runner supplies the actual output commit after settlement; no output SHA is invented. This section supersedes all freshness and next-action statements in the historical reports below, preserving their evidence and limitations.
+
+### Accepted verdicts and receipts
+
+Applied all **seven ordinary ok verdicts** in [the bounded review](review-261015-2a1304393-bounded.md), pinned to `395835a0a7f9cf2034cffb302cfbf8cdb08d2f71`:
+
+- Two source rows applied through unchanged `applyReviewVerdicts` ordinary mode; shown source/target digests and committed independent report validated. All **826/826** whole-system source rows are now reviewed (825 move / 1 supersede); decision prose and prior reviews are unchanged.
+- Two live history candidate bindings accepted for eligibility, with the real native successor preserved. All **67/67** list rows are reviewed for eligibility; their `candidate-unverified` content status remains open.
+- The old history ID's verdict is recorded against its preserved predecessor observation, without grafting identity or carrying approval to a successor.
+- Two stale receipt refs retain **pending**, complete prior history and their actual replacement references. Their ordinary ok notes accept that repair; they are not Class-column classification approvals.
+
+Recorded the **two accepted portal receipts** in `s6-whole-system-portal-evidence-rework.json`'s `candidateClassifications`, exactly under the review-brief receipt contract: actual receipt artifact `ec08072e26949676703446c99a1229abc6793901`, independent reviewer, date, verbatim notes, [formal Class/Evidence review](review-261015-2a1304393-portal-receipts.md) and actual report commit `395835a0a7f9cf2034cffb302cfbf8cdb08d2f71`. The classification is `candidate-native-content`; no historical acceptance is extended to another ID.
+
+[Application accounting](sync-2a1304393/closure-application.json) distinguishes all seven verdict channels from the two receipt acceptances. The list's obsolete pending-native-sync metadata is corrected from the already-persisted native proof; all five tuple fields remain unchanged.
+
+### Checkpoint binding and limits
+
+[Checkpoint report](review-6-checkpoint.md), committed at `1bca2617ba7b661bf6f97314b4841a32bbd206f8`, covers **824 reviewed bindings**; the two then-pending source rows are closed by the separate ordinary report above. Its actual header bindings are:
+
+| Binding | Value |
+|---|---|
+| Pack commit | `798b08e252415d16558d15ee8c7df0482c4bad1e` |
+| Pack id | `5a6f4dc3394d474bc0b8be973f2867fe0624f0245de5047abf1fec23d2d25bf4` |
+| Seed score | `4597c38331133472514a4200d476fd966b07304107b9249a798b0a4427546802` |
+| Reviewer-held pack artifact commit | `9d24726ede74c0c2e1c24167c1848f3a4458dfc1` |
+
+Sensitivity **6/6 caught, 0/24 false flags**, exact spot check **0/100 defects**, recompute **0/83 defects**. The proof records the checkpoint bindings and validates all 824 against the unchanged gate's checkpoint report format on a read-only view. Existing valid source approvals are retained; no rows are manually flipped or reapproved, and no producer-authored pack, key or verdict is introduced.
+
+**R6-1 remains open, waiting for the owner.** The checkpoint discloses that fresh context still shares typed session identity `a4954387` with ordinary reviews, truth/block draws, reader scoring and red-team. This producer neither accepts that identity nor resolves independence. A different-session checkpoint or explicit owner acceptance is required. This is the remaining Step 6 closure blocker.
+
+R6-2 is resolved by the committed reviewer's independent in-memory inventory and D/E reproduction, against both priors together and each separately. The new producer run below confirms the post-application state; it is not described as independent review. The checkpoint's stated sensitivity limitation (diff-reading rather than full semantic judgment), reader isolation **UNPROVEN**, partial=correct scoring, sample coverage and effort/token limitations all remain.
+
+### Persisted-registry D / strict E
+
+Reproduction: `env -u CLAUDE_CODE_SESSION_ID node --max-old-space-size=11000 plans/260925-documentation-authority-unification/reports/phase-06/sync-2a1304393/closure-check.mjs`. [Log](sync-2a1304393/closure-check.log), [proof](sync-2a1304393/closure-proof.json), and all six raw D/E outputs are retained beside the replay helper. It calls unchanged exported generator, applier and gate APIs.
+
+| Prior registry selection | D fatal | Strict E open groups | Strict E candidate tuples |
+|---|---:|---:|---:|
+| Both prior registries together | 0 | 2 | 67 |
+| `reports/identity-registry.json` | 0 | 2 | 67 |
+| `reports/phase-02-identity-registry.json` | 0 | 2 | 67 |
+
+E contains **only** `identical-units-multiple-owners: 2` and `candidate-blocks-unreferenced: 67`; no pending source, new category or unexpected fatal finding. The two strict fatal categories are exactly those expected open categories. Exact reviewed exception **member ID/source/target tuples and owner sets** match; all **67 five-field claim-ID/path/anchor/unit-digest/status tuples** equal each E reverse output. This is measured allowed open data, **not strict E green or global cutover**.
+
+Inventory generated from the persisted registry: **4,412 files / 88,224 claims**, full active native tuple equality. **No carry-forward or full native registry sync** was run. Registry is byte-identical, **60,277,528 bytes**, SHA256 `1ec13215600551ffdb9cb2f3a6e1260fdbd0cf0e829171d95f42309221384d02`; known IDs/gaps are preserved. Temporary inventory cache was removed. [Preservation proof](sync-2a1304393/closure-preservation.json) confirms source decisions changed only review metadata, stale refs retain pending/history, candidate tuples are unchanged and decision prose is unchanged.
+
+### Remaining promotion and owner work
+
+- **Six more stale table rows:** the bounded reviewer observes graph shape, round counting, context visibility, driver authority, mutation and Declared operation dispatch in `architecture-intent.md` section 11 / `unheaded-block-61` still describe the retired coordination engine as current. Full truth check is owed at promotion, like the known-stale-content handling in A35 item 2. A35 itself is work-state scoped; this observation grants no additional prose-edit authorization. The three authorized A19 corrections remain the only sentence changes.
+- **CTR010 collision and missing routes:** exact paths, evidence and binding/navigation owners remain in [owner-queue.md](owner-queue.md). The queue now also names R6-1 and the six stale rows. No renumbering or route repair is attempted here.
+- R6-3's legacy README line-59 numbering and R6-6's 47 route-versus-header eligibility cases remain disclosed. R6-4/5/7/8 bounded fixes are independently accepted; source/ref/native consequences are accounted above. No owner waiver or promotion follows from eligibility acceptance.
+- Preserve Rings holds, A34 residuals and full digests, dropped-001 Plan C, F6 timing, global native gaps, changed-code receipt obligations, full current-truth/promotion review, reading-map and instruction singleton reconciliation, header/alias/consumer/navigation/cutover work and owner effort/token reporting.
+
+**No component-boundary change.** No docs bytes, gates, checkers, vocabulary, extractor, baselines, frozen inputs or receipt artifacts are changed. No git write, lifecycle mutation, secret read, workspace `.fgos/` access or Step 7 implementation. Required external result claim is the sole out-of-scope artifact exception; no needsWrites. Review-format/applier tests: **39/39 pass**, `env -u CLAUDE_CODE_SESSION_ID`, zero failures/cancel/skip/todo. [Final scope, artifact and score-binding verification](sync-2a1304393/closure-final-verification.json) passes, including whitespace and JSON checks. Markdown preview is unavailable within the assigned write scope (no MDView MCP exposed; CLI requires external state writes).
+
+Step 7's first actions, scope and own red-team are recorded at the top of [progress.md](progress.md). Work remains pending the owner ruling; this is a handoff, not Step 7 execution.
+
+---
+
+# Historical Step 6 reports
+
+# Whole-system architecture batch report
+
 ## Native refresh and independent review handoff at `2a1304393b9b284ad9566b6542ba78554f54b100`
 
 Date: 2026-10-15. Assignment: `unit-run-1792029127447-efadb3b1/producer/1`. Actual output artifact commit is runner settlement, not yet known. This section supersedes the stale-registry/current-certification statements in the preceding correction-state report retained below; it does not supersede its content decisions or limitations. Step 6 remains **open**.
