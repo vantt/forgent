@@ -1030,8 +1030,8 @@ export function refuseBriefIntoUnreadyPane({ client, round, readiness }) {
     { readiness, ...(readiness === 'blocked' ? { outcome: 'blocked' } : {}), ...(screenLine ? { screen: screenLine } : {}) });
 }
 
-/** Collapsed paste markers and modal paste menus rendered in agent TUI composers. */
-const PASTE_CHIP_RE = /(\[paste #\d+(?: [^\]]+)?\]|\[Pasted text #\d+(?: [^\]]+)?\]|\[Paste\]|#\d+\s*(?:…|\.\.\.)\s*\+\d+\s*lines|Pasted \d+ lines)/i;
+/** Collapsed paste markers, modal paste menus and attachment chips (omp's `📄 #N`) rendered in agent TUI composers. */
+const PASTE_CHIP_RE = /(\[paste #\d+(?: [^\]]+)?\]|\[Pasted text #\d+(?: [^\]]+)?\]|\[Paste\]|#\d+\s*(?:…|\.\.\.)\s*\+\d+\s*lines|Pasted \d+ lines|📄\s*#\d+)/iu;
 
 /** Active working indicators on the visible bottom lines of an unruled/partially-ruled TUI. */
 const VISIBLE_WORKING_TAIL_RE = /(?:──\s*[⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏]\s*Working|\bWorking(?:…|\.\.\.)|\besc to (?:interrupt|cancel)\b)/i;

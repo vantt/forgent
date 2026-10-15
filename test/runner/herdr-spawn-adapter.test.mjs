@@ -1367,3 +1367,16 @@ test('buildLauncherScriptContent and workerBaseEnv preserve pane terminal/sessio
   assert.doesNotMatch(script, /export TERM=/, 'caller TERM=dumb must not clobber the pane terminal type');
   assert.doesNotMatch(script, /export HERDR_PANE_ID=/, 'caller pane id must not clobber the worker pane id');
 });
+
+test('isDraftStillInComposer sees an omp attachment chip left in the composer as an unsent brief', () => {
+  const brief = 'Read the brief file and do the task.';
+  // omp 18.11 folds a long paste into numbered attachment chips under the composer.
+  const ompScreen = [
+    ' π > ◑ Gemini 3.8 Flash > 🌳 repo > ⑂ main > (sub) ▶─1%─',
+    '╰─ 📄 #1',
+  ].join('\n');
+  assert.equal(isDraftStillInComposer({ message: brief, promptText: '', visibleScreen: ompScreen }), true);
+  assert.equal(isDraftStillInComposer({ message: brief, promptText: '📄 #1 📄 #2', visibleScreen: '' }), true);
+  // A turn already running shows no chip in the composer.
+  assert.equal(isDraftStillInComposer({ message: brief, promptText: '', visibleScreen: ' ⠴ 4s > ◑ Gemini 3.8 Flash\n╰─' }), false);
+});
