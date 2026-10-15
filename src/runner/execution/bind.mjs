@@ -281,7 +281,9 @@ export function bind(ask, ctx, { skipCandidateIndex = -1, excludeFamilies = [] }
       // pool order breaks ties because a later candidate must be strictly better to replace it.
       const use = spreadRequested ? (familyUse.get(providerFamily.toLowerCase()) ?? 0) : 0;
       if (!chosenCandidate || use < chosenFamilyUse) {
-        chosenCandidate = { ...cand, invocation: approved.invocation };
+        // `namedInvocation` keeps what the candidate itself named, before posture approval
+        // filled in an invocation for a bare executor id.
+        chosenCandidate = { ...cand, invocation: approved.invocation, namedInvocation: cand.invocation ?? null };
         chosenCandidateIndex = poolIndex;
         chosenFamilyUse = use;
       }
@@ -330,7 +332,7 @@ export function bind(ask, ctx, { skipCandidateIndex = -1, excludeFamilies = [] }
   let transportSource = 'default-cli';
   const herdrInvocation = findHerdrInvocation(executorEntry);
   const namedInvocation = chosenCandidate.override?.invocation
-    || (chosenCandidate.source === 'unit-prefer' && chosenCandidate.invocation);
+    || (chosenCandidate.source === 'unit-prefer' && chosenCandidate.namedInvocation);
   if (namedInvocation) {
     transportSource = chosenCandidate.override?.invocation ? 'override-pinned-invocation' : 'unit-prefer-pinned-invocation';
     const pinned = executorEntry?.invocations?.find((inv) => inv?.id === invocation);

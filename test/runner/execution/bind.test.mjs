@@ -822,6 +822,24 @@ test('bind: a run timeout comes from an override, else the unit, else nothing (t
   assert.equal(refused.refused?.reason, 'run-timeout');
 });
 
+test('bind: a bare executor in a unit prefer takes the herdr transport even when a confined cli invocation is listed first', () => {
+  const config = twoInvocationConfig();
+  const [plain, herdrInv, confined] = config.executors.duo.invocations;
+  config.executors.duo.invocations = [plain, confined, herdrInv];
+  const herdr = { headless: true, herdrPresent: true };
+  const bare = bind(preferAsk({ capability: 'docs:write', prefer: ['duo'] }), { runnerConfig: config, session: herdr });
+  assert.equal(bare.invocation, 'duo-herdr');
+  assert.equal(bare.transport, 'herdr');
+  assert.equal(bare.provenance.transport.source, 'herdr-invocation-present');
+  // The capability pool binds the same way.
+  const pool = bind(preferAsk({ capability: 'docs:write' }), { runnerConfig: config, session: herdr });
+  assert.equal(pool.invocation, 'duo-herdr');
+  // An invocation the unit names is still kept.
+  const pinned = bind(preferAsk({ capability: 'docs:write', prefer: [{ executor: 'duo', invocation: 'duo-confined' }] }), { runnerConfig: config, session: herdr });
+  assert.equal(pinned.invocation, 'duo-confined');
+  assert.equal(pinned.transport, 'cli');
+});
+
 test('bind: a unit rigor of low selects the nano tier when the capability declares no rigor floor', () => {
   const result = bind(
     { unit: { id: 'u1', capability: 'docs:write', writes: ['docs/a.md'], rigor: 'low' }, role: 'producer', independentOf: [] },
