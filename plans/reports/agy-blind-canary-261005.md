@@ -33,3 +33,13 @@ The blind check (`blind-steps-use-proven-pools`) found two more pairs reachable 
 | xai / cli | pi-cli-bwrap-vantt | pass: nonce from `inputs/1-producer-r1.md`; source path ENOENT; 1 entry visible in `.fgos/assignments` |
 
 Both pairs were added to `BLIND_PROVEN_PAIRS`. After that, with the six discussion capabilities given the same five-family pool as `architecture:shape` and the `tetnu` agy account given confined invocations, the check passes with 6 blind units.
+
+## Addendum: deepseek/herdr (2026-10-15)
+
+`deepseek` gained a confined herdr invocation, `pi-herdr-openrouter` (same pi account as `pi-cli-bwrap-openrouter`, shape copied from `glm-herdr`), so the architecture panel's DeepSeek seat runs in a visible pane. The same unit B ran on it, pinned with `--override '{"scope":{},"executor":"deepseek","invocation":"pi-herdr-openrouter"}'`.
+
+| Pair | Invocation | Result |
+|---|---|---|
+| deepseek / herdr | pi-herdr-openrouter | pass: nonce `HX-7f3a91c2d4` read from `inputs/1-producer-r1.md`; source path "No such file or directory"; `ls .fgos/assignments` listed only its own run. Evidence `unit-run-1792050408368-80727dca` |
+
+`BLIND_PROVEN_PAIRS` gains `deepseek/herdr` (bwrap).

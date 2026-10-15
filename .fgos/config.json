@@ -209,9 +209,6 @@
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude-herdr"
-          },
-          {
             "executor": "openai"
           },
           {
@@ -221,18 +218,18 @@
             "executor": "xai"
           },
           {
-            "executor": "glm",
-            "invocation": "pi-cli-bwrap-openrouter"
+            "executor": "deepseek"
+          },
+          {
+            "executor": "claude-herdr"
           }
-        ]
+        ],
+        "rigor": "high"
       },
       "architecture:shape": {
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude-herdr"
-          },
-          {
             "executor": "openai"
           },
           {
@@ -242,18 +239,18 @@
             "executor": "xai"
           },
           {
-            "executor": "glm",
-            "invocation": "pi-cli-bwrap-openrouter"
+            "executor": "deepseek"
+          },
+          {
+            "executor": "claude-herdr"
           }
-        ]
+        ],
+        "rigor": "high"
       },
       "architecture:critique": {
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude-herdr"
-          },
-          {
             "executor": "openai"
           },
           {
@@ -263,18 +260,18 @@
             "executor": "xai"
           },
           {
-            "executor": "glm",
-            "invocation": "pi-cli-bwrap-openrouter"
+            "executor": "deepseek"
+          },
+          {
+            "executor": "claude-herdr"
           }
-        ]
+        ],
+        "rigor": "high"
       },
       "architecture:synthesize": {
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude-herdr"
-          },
-          {
             "executor": "openai"
           },
           {
@@ -284,18 +281,18 @@
             "executor": "xai"
           },
           {
-            "executor": "glm",
-            "invocation": "pi-cli-bwrap-openrouter"
+            "executor": "deepseek"
+          },
+          {
+            "executor": "claude-herdr"
           }
-        ]
+        ],
+        "rigor": "high"
       },
       "architecture:explain": {
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude-herdr"
-          },
-          {
             "executor": "openai"
           },
           {
@@ -305,10 +302,13 @@
             "executor": "xai"
           },
           {
-            "executor": "glm",
-            "invocation": "pi-cli-bwrap-openrouter"
+            "executor": "deepseek"
+          },
+          {
+            "executor": "claude-herdr"
           }
-        ]
+        ],
+        "rigor": "high"
       },
       "business:frame": {
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
@@ -1354,7 +1354,7 @@
       },
       "deepseek": {
         "kind": "agent",
-        "description": "DeepSeek provider via pi CLI, OpenRouter gateway account. --provider omitted -- account dir has a single provider (openrouter). Same account dir also serves other OpenRouter-hosted models (e.g. glm-cli's z-ai route uses a different account/mechanism); --model alone selects deepseek/* here.",
+        "description": "DeepSeek provider via pi CLI, OpenRouter gateway account. --provider omitted -- account dir has a single provider (openrouter). Same account dir also serves other OpenRouter-hosted models (e.g. glm-cli's z-ai route uses a different account/mechanism); --model alone selects deepseek/* here. pi-herdr-openrouter runs the same pi account in a confined herdr pane.",
         "allowCrossProvider": true,
         "providerModel": "deepseek",
         "invocations": [
@@ -1401,6 +1401,41 @@
             ],
             "confinement": {
               "backend": "bwrap"
+            },
+            "env": {
+              "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/openrouter",
+              "OPENROUTER_API_KEY": "${GLM_OPENROUTER_API_KEY}"
+            },
+            "resourceBindings": [
+              {
+                "resource": "private-home",
+                "target": {
+                  "kind": "env",
+                  "name": "PI_CODING_AGENT_DIR"
+                }
+              }
+            ]
+          },
+          {
+            "id": "pi-herdr-openrouter",
+            "via": "cli",
+            "adapter": "herdr-spawn",
+            "confinement": {
+              "backend": "bwrap"
+            },
+            "command": "pi",
+            "args": [
+              "--model",
+              "{model}",
+              "--thinking",
+              "medium",
+              "--tools",
+              "read,write,edit,bash,grep,find,ls",
+              "--approve"
+            ],
+            "interactiveMode": {
+              "exitCommand": "/quit",
+              "kind": "pi"
             },
             "env": {
               "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/openrouter",
@@ -1507,8 +1542,8 @@
         "nano": "gemini-3.8-flash-low",
         "standard": "gemini-3.8-flash-medium",
         "advanced": "gemini-3.8-flash-high",
-        "flagship": "gemini-3.1-pro-low",
-        "frontier": "gemini-3.1-pro-high"
+        "flagship": "gemini-4-argon-high",
+        "frontier": "gemini-4-argon-high"
       },
       "openai": {
         "nano": "gpt-5.6-luna",
