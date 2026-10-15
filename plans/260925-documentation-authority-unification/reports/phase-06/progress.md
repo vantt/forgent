@@ -1,3 +1,15 @@
+# Authorized runner ratchet accounting — D and ratchet green
+
+Date: 2026-10-15. Assignment: unit-run-1792024590072-c2532282/producer/1. Starting/source commit: `acc0de1cd5be556acd4d2f4a6103542809ae8707`. Output commit: subsequent runner settlement, not yet known.
+
+Explicit assignment authorization extends this turn's write scope to the existing `docs/specs/runner.md` exception only. Applied the exact expectedDigest and appended rationale from verification-261015-0710-native-sync-bounded-rereview.md.json, naming upstream merge `69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539`. Preserved every other field and entry byte-for-byte. Current and imported runner bytes match the new digest. This is A31 merge-pin accounting only; content/conservation acceptance remains Step 9's obligation.
+
+Ratchet: exit 0, zero violations; 995 files checked, 26 accounted edits, one accounted new file. Existing ratchet tests: 28/28 pass, with `env -u CLAUDE_CODE_SESSION_ID`. Fresh inventory generation at `acc0de1cd5be556acd4d2f4a6103542809ae8707` completed from the persisted working registry, without native refresh or registry mutation. D checked both prior registries together (`reports/identity-registry.json` and `reports/phase-02-identity-registry.json`): exit 0, zero fatal, clean=true. Verification completed at 2026-10-15T00:47:33.629Z. The working registry SHA256 remains `b315a9d88f81d15f284c1f7fd949332cb09de1010e505487d032753cccec89b3`. The former external runner-ratchet blocker is resolved; no blocker or needsWrites remains for this assignment. E was not rerun, and its recorded open obligations are unchanged. Full raw D/ratchet results and reproduction source are appended under `authorizedRatchetAccountingFollowup` in [the machine proof](verification-261015-0710-native-sync-bounded-rereview.md.json). Earlier entries below remain historical.
+
+Step 6 remains open. Preserve the bounded re-review, formal classification receipts, Rings holds, A34 residuals, owner queue and all truth/navigation/promotion/consumer/alias/native-gap/cutover obligations below. No new content approval or closure is implied. No git write, source/checker/gate/script change, workspace `.fgos/` access or secret read. Only the required external assignment claim is the `.fgos/` write exception.
+
+---
+
 # Native registry persisted — bounded re-review ready; external D blocker remains
 
 Date: 2026-10-15. Executor: codex-session:43@2026-10-15. Assignment: unit-run-1792022850970-b0cc0000/producer/1. Session counter: 43. Step 6: ready-for-review, not closed. Content/receipt pin: `dfff335d3f620b49403e4e4b2f70cedee5ca0452`. Actual output/proof artifact commit: runner settlement pending; no invented SHA. B0: `dbe5c432852837ea01e6025b35868bcb7271495d`. SYNC: `69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539`. Last D-green source remains `f0d4d030b06d36e3e9f55f7a1e3e5df623cc9860`; ancestry verified; current D is red.

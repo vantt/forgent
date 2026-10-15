@@ -40,3 +40,18 @@ Validation: unchanged review/conservation tests **74/74**, env -u CLAUDE_CODE_SE
 MDView preview is unavailable within the declared write scope: MCP is absent and CLI registration would write its external database. No out-of-scope registration/repair attempted.
 
 Full commands, source helpers, both-prior raw results, exact membership/tuple/status checks, native witnesses and logs: [verification-261015-0710-native-sync-bounded-rereview.md.json](verification-261015-0710-native-sync-bounded-rereview.md.json).
+
+
+## Authorized runner ratchet accounting follow-up — 2026-10-15
+
+Assignment: `unit-run-1792024590072-c2532282/producer/1`. Source commit: `acc0de1cd5be556acd4d2f4a6103542809ae8707`. Output commit: subsequent runner settlement, not yet known. This follow-up supersedes the external ratchet blocker recorded above; earlier results are historical.
+
+Applied exactly the proposed existing `docs/specs/runner.md` exception update under A31 and this assignment's explicit scope. `expectedDigest` is now `dcad9c1729e181668f15130635114ed452dd89ba55dd359a8ab416ac6914d564`; rationale is append-only and names upstream merge `69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539`. Every other field, entry and byte is unchanged. Source and imported merge bytes match. No checker, gate, script, baseline or runner source changed. This accounting gives no content/truth acceptance; runner conservation remains Step 9's obligation.
+
+Fresh inventory was generated at the source commit directly from the persisted working registry, without native refresh or registry mutation. D checked both prior registries together (`reports/identity-registry.json` and `reports/phase-02-identity-registry.json`): **exit 0, zero fatal, clean=true**. Completed at `2026-10-15T00:47:33.629Z`. Registry SHA256 remains `b315a9d88f81d15f284c1f7fd949332cb09de1010e505487d032753cccec89b3`.
+
+Ratchet: **exit 0, zero findings**, 995 legacy files checked, 26 accounted edits, one accounted new file. Existing ratchet tests: **28/28 pass**, zero failed/skipped, using `env -u CLAUDE_CODE_SESSION_ID`. No full-suite claim. Diff whitespace and exact two-replacement preservation checks pass.
+
+No blocker or needsWrites remains for this assignment. E was not rerun; all prior scoped open data, independent review/classification obligations, Rings holds, A34 residuals, owner queue and Step 6 closure requirements remain unchanged. No Step 6 closure or content approval claimed. No git write, workspace `.fgos/` access or secret read; the required external assignment claim is the sole authorized exception. MDView MCP is unavailable, and CLI registration would write outside scope; no registration or repair attempted.
+
+Full fresh D result, ratchet result, exact entry preservation hashes, test command/results and executable reproduction source are in `authorizedRatchetAccountingFollowup` in [the machine proof](verification-261015-0710-native-sync-bounded-rereview.md.json).
