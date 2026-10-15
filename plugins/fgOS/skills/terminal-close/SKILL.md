@@ -32,7 +32,9 @@ no `fgos` CLI verb and no one-door-write path. Full decision record:
 
    The script always exits `0` — it is a silent no-op whenever the
    session isn't inside a herdr-managed pane, `herdr` isn't installed, or
-   the pane id isn't available. Never treat a non-zero exit or stderr
+   the pane id isn't available. Like `/fgOS:terminal`, it refuses, with one
+   line on stderr, a pane herdr no longer knows or a pane whose shell is not
+   an ancestor of the caller -- it never closes another session's pane. Never treat a non-zero exit or stderr
    output from it as a reason to stop or retry; if it somehow does exit
    non-zero, ignore it and continue exactly as if it had succeeded
    silently — this skill is decoration, never a gate on the caller's own

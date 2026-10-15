@@ -3,6 +3,7 @@
 // Bộ đồ nghề dùng chung nằm ở ./helpers/fgos-cli-harness.mjs.
 import { test } from 'node:test';
 import { appendEvent } from '../../src/state/events.mjs';
+import { writeBeacon, beaconPath } from '../../src/runner/main-checkout-activity.mjs';
 import {
   ADD_BAD_FLAG_CASES,
   DEFAULT_TTL_MS,
@@ -120,54 +121,57 @@ test('return happy path: verify passes -> doing to proposed, actual outcome reco
 });
 
 
-test('return (verify passes, main-source): a live main-checkout.lock recorded under THIS session\'s own identity is released early, instead of waiting out the TTL (tsk-45z D1/D2)', () => {
+test('return (verify passes, main-source): the commit-activity beacon THIS session\'s own commits left is cleared early, instead of waiting out its window (tsk-45z D1/D2)', () => {
   const cwd = initGitCwdFast();
   const sessionId = 'tsk-45z-test-session-ok';
   addOk(cwd, 'pull-return-releases-own-lock', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'pull-return-releases-own-lock'], { FGOS_SESSION_ID: sessionId }).status, 0);
   commitFile(cwd, 'proof.txt');
 
-  const lockPath = path.join(cwd, '.fgos', 'main-checkout.lock');
-  fs.writeFileSync(lockPath, JSON.stringify({ pid: sessionId, ts: Date.now() }));
+  const fgosDir = path.join(cwd, '.fgos');
+  writeBeacon(fgosDir, { writer: { id: sessionId }, windowMs: 60_000 });
 
   const result = run(cwd, ['return', 'pull-return-releases-own-lock'], { FGOS_SESSION_ID: sessionId });
   assert.equal(result.status, 0, `return failed: ${result.stderr}`);
   assert.equal(envelopeData(result.stdout).to, 'awaiting-approval');
-  assert.equal(fs.existsSync(lockPath), false, 'return must release its own live lock once verify passes and the item settles to proposed');
+  assert.equal(fs.existsSync(beaconPath(fgosDir)), false, 'return must clear its own beacon once verify passes and the item settles to proposed');
 });
 
 
-test('return (verify FAILS, main-source): a live own-identity lock is released too — settling to blocked is just as much "done with the checkout" as proposed (tsk-45z D1/D2)', () => {
+test('return (verify FAILS, main-source): the own beacon is cleared too — settling to blocked is just as much "done with the checkout" as proposed (tsk-45z D1/D2)', () => {
   const cwd = initGitCwdFast();
   const sessionId = 'tsk-45z-test-session-blocked';
   addOk(cwd, 'pull-return-own-lock-blocked', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'pull-return-own-lock-blocked'], { FGOS_SESSION_ID: sessionId }).status, 0);
   commitFile(cwd, 'wrong-file.txt'); // advances HEAD, never satisfies verify
 
-  const lockPath = path.join(cwd, '.fgos', 'main-checkout.lock');
-  fs.writeFileSync(lockPath, JSON.stringify({ pid: sessionId, ts: Date.now() }));
+  const fgosDir = path.join(cwd, '.fgos');
+  writeBeacon(fgosDir, { writer: { id: sessionId }, windowMs: 60_000 });
 
   const result = run(cwd, ['return', 'pull-return-own-lock-blocked'], { FGOS_SESSION_ID: sessionId });
   assert.equal(result.status, 0, `return should exit 0 for a defined blocked outcome: ${result.stderr}`);
   assert.equal(envelopeData(result.stdout).to, 'blocked');
-  assert.equal(fs.existsSync(lockPath), false, 'return must release its own live lock even when verify fails and the item settles to blocked');
+  assert.equal(fs.existsSync(beaconPath(fgosDir)), false, 'return must clear its own beacon even when verify fails and the item settles to blocked');
 });
 
 
-test('return (main-source) never touches a DIFFERENT session\'s live lock — never a blind unlink (tsk-45z D2)', () => {
+test('return (main-source) never touches a DIFFERENT session\'s beacon, nor main-checkout.lock — never a blind unlink (tsk-45z D2)', () => {
   const cwd = initGitCwdFast();
   addOk(cwd, 'pull-return-other-untouched', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'pull-return-other-untouched'], { FGOS_SESSION_ID: 'tsk-45z-this-session' }).status, 0);
   commitFile(cwd, 'proof.txt');
 
-  const lockPath = path.join(cwd, '.fgos', 'main-checkout.lock');
-  fs.writeFileSync(lockPath, JSON.stringify({ pid: 'tsk-45z-a-different-live-session', ts: Date.now() }));
+  const fgosDir = path.join(cwd, '.fgos');
+  writeBeacon(fgosDir, { writer: { id: 'tsk-45z-a-different-live-session' }, windowMs: 60_000 });
+  // The main-checkout mutex is never released by writer id any more, even a record naming this session.
+  const lockPath = path.join(fgosDir, 'main-checkout.lock');
+  fs.writeFileSync(lockPath, JSON.stringify({ pid: 'tsk-45z-this-session', ts: Date.now() }));
 
   const result = run(cwd, ['return', 'pull-return-other-untouched'], { FGOS_SESSION_ID: 'tsk-45z-this-session' });
   assert.equal(result.status, 0, `return failed: ${result.stderr}`);
   assert.equal(envelopeData(result.stdout).to, 'awaiting-approval');
-  assert.equal(fs.existsSync(lockPath), true, 'a different session\'s live lock must survive this return untouched');
-  assert.equal(JSON.parse(fs.readFileSync(lockPath, 'utf8')).pid, 'tsk-45z-a-different-live-session');
+  assert.equal(JSON.parse(fs.readFileSync(beaconPath(fgosDir), 'utf8')).writer.id, 'tsk-45z-a-different-live-session', 'a different session\'s beacon must survive this return untouched');
+  assert.equal(fs.existsSync(lockPath), true, 'return never releases main-checkout.lock by writer id');
 });
 
 

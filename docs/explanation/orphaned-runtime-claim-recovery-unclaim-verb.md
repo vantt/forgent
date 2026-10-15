@@ -58,7 +58,12 @@ already-tested primitives rather than adding new mechanism:
   because the claim usually belongs to another (dead) session and a plain
   release is refused for any writer but the claim's own. When the operator
   is a different writer, the result adds `admin: {reason, ownerWriterId,
-  releasedByWriterId}`.
+  releasedByWriterId}`, and the release is also appended to the event log
+  as a `decision` (`source: unclaim`, `kind: engine`) whose `admin` field
+  carries the same three values plus `claimId` (and `itemId` when the item
+  is unknown, since such a decision cannot carry an `id`). The stale-claim
+  reclaim in `pick` adds the same `admin` field to the decision it already
+  writes.
 
 This is additive and composes existing primitives (`releaseClaim`,
 `rebuildViewFromDir`, `isReclaimEligible`) rather than duplicating any of

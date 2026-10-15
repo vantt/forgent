@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // .githooks/pre-commit -- git-native hard block for the STR65 main-checkout
-// activity lock (D2/D3, str65-worktree-isolation-enforcement), plus a
+// commit-activity beacon (D2/D3, str65-worktree-isolation-enforcement), plus a
 // staged-`.fgos/`-deletion guard (tsk-56u) that runs unconditionally. Fires
 // for ANY `git commit` against this checkout, regardless of actor (human
 // terminal, agent session, or CI) -- not only writes made through fgOS's
@@ -26,7 +26,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
-import { acquireMainCheckoutLock, HELD, AMBIGUOUS, HOOK_TTL_MS, HOLDER_PID_ENV_VAR } from '../src/runner/main-checkout-lock.mjs';
+import { inspectMainCheckoutLock, HOOK_TTL_MS, HOLDER_PID_ENV_VAR, UNSUPPORTED_PROTOCOL, UNSUPPORTED_PROTOCOL_MESSAGE } from '../src/runner/main-checkout-lock.mjs';
+import { readBeacon, judgeBeacon, writeBeacon } from '../src/runner/main-checkout-activity.mjs';
 import { resolveWriterIdentity } from '../src/util/session-identity.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -94,39 +95,51 @@ function rootFileRefusal(committingToplevel) {
   }
 }
 
-// HOOK_TTL_MS (tsk-1d9) is this hook's own default -- shorter than
-// claim-port.mjs's/merge.mjs's shared DEFAULT_TTL_MS (main-checkout-
-// lock.mjs), which stays sized for mergeRunnerItem's much longer verify
-// hold. See main-checkout-lock.mjs's own HOOK_TTL_MS doc comment for the
-// full rationale and accepted tradeoff.
+// HOOK_TTL_MS (tsk-1d9) is the default activity window this hook writes
+// into its beacon (overridable via FGOS_MAIN_CHECKOUT_LOCK_TTL_MS). See
+// main-checkout-lock.mjs's own HOOK_TTL_MS doc comment for the rationale.
 function resolveTtlMs() {
   const raw = process.env.FGOS_MAIN_CHECKOUT_LOCK_TTL_MS;
   if (raw === undefined) return HOOK_TTL_MS;
   const parsed = Number(raw);
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : HOOK_TTL_MS;
+  return Number.isSafeInteger(parsed) && parsed > 0 ? parsed : HOOK_TTL_MS;
 }
 
-// resolveIdentity (tsk-70l): when HOLDER_PID_ENV_VAR is set to a valid
-// positive integer, this commit is a child of the process that set it --
-// merge.mjs's own root->main path (mergeRunnerItem), scoped to the one
-// `execFileSync` call that spawns this exact commit. Using ITS pid as
-// this acquire call's own identity lets main-checkout-lock.mjs's
-// existing self-recognition equality check (D6) match it against the
-// record that parent process already wrote there, with zero change to
-// that check's own logic -- this hook still cannot share its parent's
-// pid outright (a child process always gets its own), so it borrows the
-// parent's instead of trying to be recognized as itself. Anything else
-// (absent, unparseable, non-positive) falls back to this hook's own
-// resolveWriterIdentity() exactly as before this item -- a bare
-// `git commit` unrelated to any `fgos approve` never sets this var at
-// all, so that case is untouched.
-function resolveIdentity(fgosDir) {
+// fgosGrantPid (tsk-70l): an fgOS writer holding .fgos/main-checkout.lock
+// (claim's checkpoint, the checkpoint under a merge slot, the root->main
+// merge commit) spawns its `git commit` with HOLDER_PID_ENV_VAR set to the
+// pid it holds that lock under. The commit is fgOS's own only when the
+// lock's live record is held by exactly that pid; the variable alone (a
+// stale env, a typo, a hand-set value) proves nothing. Returns that pid, or
+// null for an ordinary commit.
+function fgosGrantPid(mainLock) {
   const raw = process.env[HOLDER_PID_ENV_VAR];
-  if (raw !== undefined) {
-    const parsed = Number(raw);
-    if (Number.isInteger(parsed) && parsed > 0) return parsed;
+  if (raw === undefined) return null;
+  const parsed = Number(raw);
+  if (!Number.isInteger(parsed) || parsed <= 0) return null;
+  return mainLock.outcome === 'live' && mainLock.holderPid === parsed ? parsed : null;
+}
+
+// mainLockRefusal: a one-time, never-waiting read of the main-checkout
+// mutex. Git already holds index.lock while this hook runs, and a land
+// takes the mutex before git's index.lock, so waiting here could deadlock
+// with it; this is an early check, not exclusion. Refuses when a live fgOS
+// writer (numeric pid) holds the mutex, when the record belongs to a lock
+// protocol this release does not speak, or when it is unreadable (D5
+// fail-closed). A session-id record left by an older hook is a commit
+// hint, not a writer, and is ignored here.
+function mainLockRefusal(mainLock) {
+  if (mainLock.outcome === 'ambiguous') {
+    return 'commit refused: the main-checkout lock file could not be read -- refusing to commit, per fail-closed policy. Run "fgos unlock" to clear a corrupt lock.';
   }
-  return resolveWriterIdentity(fgosDir).id;
+  if (mainLock.outcome !== 'live') return null;
+  if (mainLock.reason === UNSUPPORTED_PROTOCOL) {
+    return `commit refused: ${UNSUPPORTED_PROTOCOL_MESSAGE}.`;
+  }
+  if (typeof mainLock.holderPid === 'number') {
+    return 'commit refused: fgOS is writing the main checkout right now (a claim, checkpoint or land) -- retry in a moment.';
+  }
+  return null;
 }
 
 function refuse(message) {
@@ -468,21 +481,6 @@ async function main() {
     return;
   }
 
-  const fgosDir = path.join(repoRoot, '.fgos');
-  const id = resolveIdentity(fgosDir);
-  const ttlMs = resolveTtlMs();
-
-  const result = acquireMainCheckoutLock(fgosDir, { identity: id, ttlMs });
-
-  if (result.status === HELD) {
-    refuse('commit refused: another session appears to be actively working in this checkout.');
-    return;
-  }
-  if (result.status === AMBIGUOUS) {
-    refuse('commit refused: the main-checkout lock file could not be read -- refusing to commit, per fail-closed policy.');
-    return;
-  }
-
   const fgwBranch = currentFgwBranchIfMainCheckout(repoRoot);
   if (fgwBranch) {
     refuse(`commit refused: main checkout is on branch ${fgwBranch} -- checkout back to the default branch and use "fgos pick <id>" for item work.`);
@@ -498,6 +496,46 @@ async function main() {
     const paths = fgosRegressed.regressedPaths.map((r) => r.path).join(', ');
     refuse(`commit refused: this commit stages a modification under ".fgos/" (${paths}) whose line count is lower than HEAD -- .fgos/ files must not regress in content on main, main is left unchanged. See docs/how-to/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);
     return;
+  }
+
+  const fgosDir = path.join(repoRoot, '.fgos');
+  const mainLock = inspectMainCheckoutLock(fgosDir);
+  if (fgosGrantPid(mainLock) !== null) {
+    // fgOS's own commit under the mutex it holds: it neither checks nor
+    // writes the activity beacon.
+    process.exit(0);
+    return;
+  }
+
+  const lockRefusal = mainLockRefusal(mainLock);
+  if (lockRefusal) {
+    refuse(lockRefusal);
+    return;
+  }
+
+  // Commit-activity beacon (main-checkout-activity.mjs): a different
+  // session's commit inside its window is refused; the same session, an
+  // elapsed window or no beacon passes. A corrupt beacon is only a hint and
+  // fails open. This file never touches .fgos/main-checkout.lock, so a
+  // commit never blocks a claim, land or `fgctl init`.
+  const writer = resolveWriterIdentity(fgosDir);
+  const now = Date.now();
+  const verdict = judgeBeacon(readBeacon(fgosDir), writer.id, now);
+  if (verdict.decision === 'refuse') {
+    refuse(`commit refused: another session committed in this checkout ${Math.round(verdict.ageMs / 1000)}s ago and appears to be actively working here (its activity window ends in ${Math.ceil(verdict.remainingMs / 1000)}s).`);
+    return;
+  }
+  if (verdict.reason === 'corrupt') {
+    process.stderr.write('warning: the main-checkout activity beacon could not be read; overwriting it.\n');
+  }
+
+  // Written last, after every refusal above, so a refused commit never
+  // leaves a beacon behind. Git may still fail the commit after this hook;
+  // the beacon then stays lit for its window and only delays other writers.
+  try {
+    writeBeacon(fgosDir, { writer, windowMs: resolveTtlMs(), now });
+  } catch (error) {
+    process.stderr.write(`warning: could not write the main-checkout activity beacon (${error.message}).\n`);
   }
 
   process.exit(0);

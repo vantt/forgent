@@ -18,6 +18,7 @@ import {
 } from "../../src/state/events-jsonl-truncation-guard.mjs";
 import { recordMainCheckoutGuardWarning } from "../../src/state/main-checkout-guard-warnings.mjs";
 import { resolveFgosFile, FGOS_FILE } from "../../src/state/fgos-file-registry.mjs";
+import { acquiringMainCheckoutWriter } from "../../src/runner/main-checkout-lock.mjs";
 
 delete process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS;
 
@@ -301,14 +302,35 @@ test("runOpportunisticMainCheckoutChecks D2: commits stale-and-dirty events.json
   fs.appendFileSync(logPath, `${ev(2, "2026-01-01T00:01:00.000Z", "append")}\n`);
 
   // Run check with gap < 3600s (e.g. at commitTime + 100s) -> should NOT commit
-  runOpportunisticMainCheckoutChecks(fgosDir, repoRoot, { nowSec: commitTime + 100, fallbackIntervalSec: 3600 });
+  runOpportunisticMainCheckoutChecks(fgosDir, repoRoot, { mainCheckoutWriter: acquiringMainCheckoutWriter(fgosDir), nowSec: commitTime + 100, fallbackIntervalSec: 3600 });
   let logOut = execFileSync("git", ["log", "-1", "--format=%s"], { cwd: repoRoot, encoding: "utf8" }).trim();
   assert.equal(logOut, "init events", "must not commit when gap is under threshold");
 
   // Run check with gap >= 3600s (e.g. at commitTime + 4000s) -> SHOULD commit
-  runOpportunisticMainCheckoutChecks(fgosDir, repoRoot, { nowSec: commitTime + 4000, fallbackIntervalSec: 3600 });
+  runOpportunisticMainCheckoutChecks(fgosDir, repoRoot, { mainCheckoutWriter: acquiringMainCheckoutWriter(fgosDir), nowSec: commitTime + 4000, fallbackIntervalSec: 3600 });
   logOut = execFileSync("git", ["log", "-1", "--format=%s"], { cwd: repoRoot, encoding: "utf8" }).trim();
   assert.equal(logOut, "chore(.fgos): fallback events checkpoint", "must commit fallback checkpoint when stale and dirty");
+
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+});
+
+test("runOpportunisticMainCheckoutChecks D2: never commits without a main-checkout writer, and commits nothing while the writer finds the mutex held", () => {
+  const repoRoot = mkTempDir("truncguard-d2-nowriter-test-");
+  execFileSync("git", ["init", "-q"], { cwd: repoRoot });
+  execFileSync("git", ["config", "user.email", "test@example.com"], { cwd: repoRoot });
+  execFileSync("git", ["config", "user.name", "Test"], { cwd: repoRoot });
+  const fgosDir = path.join(repoRoot, ".fgos");
+  fs.mkdirSync(fgosDir, { recursive: true });
+  fs.writeFileSync(path.join(fgosDir, "events.jsonl"), raw([ev(1, "2026-01-01T00:00:00.000Z", "init")]), "utf8");
+  const due = { nowSec: Math.floor(Date.now() / 1000) + 10, fallbackIntervalSec: 0 };
+
+  runOpportunisticMainCheckoutChecks(fgosDir, repoRoot, due);
+  assert.throws(() => execFileSync("git", ["rev-parse", "HEAD"], { cwd: repoRoot, stdio: "ignore" }), "no writer: no commit at all");
+
+  const skipped = [];
+  runOpportunisticMainCheckoutChecks(fgosDir, repoRoot, { ...due, mainCheckoutWriter: () => skipped.push("held elsewhere") });
+  assert.deepEqual(skipped, ["held elsewhere"]);
+  assert.equal(execFileSync("git", ["diff", "--cached", "--name-only"], { cwd: repoRoot, encoding: "utf8" }).trim(), "", "nothing staged when the writer skips the transaction");
 
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });
@@ -343,7 +365,7 @@ test("runOpportunisticMainCheckoutChecks D1: refuses fallback auto-commit when a
   fs.writeFileSync(logPath, raw(regressedLines), "utf8");
 
   // Run opportunistic checks with fallbackIntervalSec 100s
-  runOpportunisticMainCheckoutChecks(fgosDir, repoRoot, { nowSec: commitTime + 1000, fallbackIntervalSec: 100 });
+  runOpportunisticMainCheckoutChecks(fgosDir, repoRoot, { mainCheckoutWriter: acquiringMainCheckoutWriter(fgosDir), nowSec: commitTime + 1000, fallbackIntervalSec: 100 });
 
   // Verify: auto-commit MUST be refused despite time threshold met, because break was flagged
   const logOut = execFileSync("git", ["log", "-1", "--format=%s"], { cwd: repoRoot, encoding: "utf8" }).trim();
@@ -378,12 +400,12 @@ test("runOpportunisticMainCheckoutChecks D2: reads fallbackIntervalSec from .fgo
   fs.appendFileSync(logPath, `${ev(2, "2026-01-01T00:01:00.000Z", "e2")}\n`);
 
   // Time gap 100s < 500s -> should NOT commit
-  runOpportunisticMainCheckoutChecks(fgosDir, repoRoot, { nowSec: commitTime + 100 });
+  runOpportunisticMainCheckoutChecks(fgosDir, repoRoot, { mainCheckoutWriter: acquiringMainCheckoutWriter(fgosDir), nowSec: commitTime + 100 });
   let logOut = execFileSync("git", ["log", "-1", "--format=%s"], { cwd: repoRoot, encoding: "utf8" }).trim();
   assert.equal(logOut, "init events");
 
   // Time gap 600s >= 500s -> SHOULD commit
-  runOpportunisticMainCheckoutChecks(fgosDir, repoRoot, { nowSec: commitTime + 600 });
+  runOpportunisticMainCheckoutChecks(fgosDir, repoRoot, { mainCheckoutWriter: acquiringMainCheckoutWriter(fgosDir), nowSec: commitTime + 600 });
   logOut = execFileSync("git", ["log", "-1", "--format=%s"], { cwd: repoRoot, encoding: "utf8" }).trim();
   assert.equal(logOut, "chore(.fgos): fallback events checkpoint", "must commit based on fallbackIntervalSec configured in .fgos/config.json");
 
@@ -483,7 +505,7 @@ test("runOpportunisticMainCheckoutChecks D2 checkpoints BOTH baseline-0 and .fgo
     `${ev(2, "2026-01-01T00:01:00.000Z", "e2")}\n${ev(3, "2026-01-01T00:01:01.000Z", "e3")}\n${ev(4, "2026-01-01T00:01:02.000Z", "e4")}\n`,
   );
 
-  runOpportunisticMainCheckoutChecks(fgosDir, repoRoot, { nowSec: commitTime + 4000, fallbackIntervalSec: 3600 });
+  runOpportunisticMainCheckoutChecks(fgosDir, repoRoot, { mainCheckoutWriter: acquiringMainCheckoutWriter(fgosDir), nowSec: commitTime + 4000, fallbackIntervalSec: 3600 });
   const logOut = execFileSync("git", ["log", "-1", "--format=%s"], { cwd: repoRoot, encoding: "utf8" }).trim();
   assert.equal(logOut, "chore(.fgos): fallback events checkpoint", "must commit when fallback interval is met");
 
@@ -518,7 +540,7 @@ test("FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 opts out of opportunistic checks compl
   const prevEnv = process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS;
   try {
     process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS = "1";
-    runOpportunisticMainCheckoutChecks(fgosDir, repoRoot, { nowSec: commitTime + 4000, fallbackIntervalSec: 3600 });
+    runOpportunisticMainCheckoutChecks(fgosDir, repoRoot, { mainCheckoutWriter: acquiringMainCheckoutWriter(fgosDir), nowSec: commitTime + 4000, fallbackIntervalSec: 3600 });
     const logOut = execFileSync("git", ["log", "-1", "--format=%s"], { cwd: repoRoot, encoding: "utf8" }).trim();
     assert.equal(logOut, "init events", "must not commit when FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 is set");
   } finally {

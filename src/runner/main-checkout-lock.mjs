@@ -24,15 +24,17 @@
 //      has to fail closed on an unreadable signal rather than silently
 //      treat it as free. A MISSING lock file is NOT ambiguous — that's the
 //      ordinary free/acquire-succeeds case, same as the lineage.
-//   2. An optional `ttlMs` supplements liveness: a lock recorded under a
-//      numeric identity is only "fresh" (still held) when its holder pid is
-//      alive AND its last-touched timestamp is within `ttlMs` (omitting
-//      `ttlMs` falls back to pure PID-liveness, same as the lineage). A
-//      lock recorded under a STRING identity has no process to probe, so
-//      its held-ness is judged purely by `ttlMs` freshness — and since a
-//      string identity's staleness is undecidable without a window,
-//      checking a different string-identity lock with no `ttlMs` supplied
-//      is AMBIGUOUS (D5: fail closed), never silently free or held.
+//   2. Every holder records the `ttlMs` it took, and a contender judges the
+//      record by that recorded ttl, never by its own: a lock recorded under
+//      a numeric identity is only "fresh" (still held) when its holder pid
+//      is alive AND its last-touched timestamp is within the recorded ttl.
+//      A lock recorded under a STRING identity has no process to probe, so
+//      its held-ness is judged purely by ttl freshness. A record without a
+//      ttl (left by an older release) gets its writer's old window
+//      (recordTtlMs): the pre-commit hook's session-id records count for
+//      HOOK_TTL_MS, numeric ones for DEFAULT_TTL_MS. A record carrying a
+//      `v` field belongs to a lock protocol this release does not speak and
+//      is HELD, never reclaimed (UNSUPPORTED_PROTOCOL).
 //   3. SELF-RECOGNITION (D6): when an existing lock's recorded identity
 //      strictly equals (===) the caller's OWN supplied identity, the acquire
 //      always succeeds as a refresh (fresh timestamp, same identity),
@@ -111,8 +113,13 @@ export function formatLockDurationMs(ms) {
 // default back up.
 export const DEFAULT_TTL_MS = 3 * 60 * 1000;
 
-// HOOK_TTL_MS (tsk-1d9): `.githooks/pre-commit`'s own default hold time,
-// separate from DEFAULT_TTL_MS above. The hook never releases on exit by
+// HOOK_TTL_MS (tsk-1d9): `.githooks/pre-commit`'s own default activity
+// window. The hook no longer writes this lock at all: it writes a beacon to
+// its own file (main-checkout-activity.mjs) with this window, so a commit
+// never blocks claim, land or `fgctl init`. This constant is also the
+// window a legacy session-id record (no ttlMs, left by an older hook) gets
+// from every reader of this lock (recordTtlMs). History, separate from
+// DEFAULT_TTL_MS above: The hook never releases on exit by
 // design (self-recognition, D6 above) -- TTL is its only clearing
 // mechanism -- but DEFAULT_TTL_MS's 3-minute window was sized for a
 // DIFFERENT consumer's needs (mergeRunnerItem's long verify hold,
@@ -132,21 +139,28 @@ export const DEFAULT_TTL_MS = 3 * 60 * 1000;
 // thinner, not eliminated.
 export const HOOK_TTL_MS = 20 * 1000;
 
-// HOLDER_PID_ENV_VAR (tsk-70l): the env var merge.mjs's root->main path
-// (mergeRunnerItem's non-targetSlot branch) sets, scoped to the one
-// `execFileSync` call that spawns the `git commit` triggering
-// `.githooks/pre-commit` -- carrying that process's own pid, the same
-// numeric identity it acquired this lock under (D6 self-recognition
-// above needs a caller's OWN identity to literally equal the record's
-// identity to recognize a refresh; a child process can never share its
-// parent's pid, so it cannot self-recognize on its own). The hook reads
-// this var when present and uses its value AS ITS OWN identity for this
-// one acquire call, letting the existing self-recognition equality
-// check above match it against the record the parent wrote -- with zero
-// change to that check's own logic. Absent (a bare `git commit`
-// unrelated to any `fgos approve`), the hook falls back to its own
-// `resolveWriterIdentity()` exactly as before this item.
+// HOLDER_PID_ENV_VAR (tsk-70l): the env var an fgOS writer that holds this
+// lock (claim's checkpoint, the checkpoint under a merge slot, the
+// root->main merge commit) sets, scoped to the one `execFileSync` call that
+// spawns its `git commit` -- carrying the pid it holds this lock under. The
+// pre-commit hook treats the commit as fgOS's own only when this lock's
+// live record is held by exactly that pid: it then skips the activity
+// beacon and the early "fgOS is writing main" refusal. Absent, unparseable
+// or not matching the record, the commit is an ordinary one.
 export const HOLDER_PID_ENV_VAR = 'FGOS_MAIN_LOCK_HOLDER_PID';
+
+// UNSUPPORTED_PROTOCOL: the reason a HELD result carries when the record (a
+// JSON object with a `v` field: unversioned records are this release's only
+// format) or the resource's protocol marker was written by a lock protocol
+// this release does not speak. Fail-closed: such a record is never
+// reclaimed, refreshed or released here, whatever its age or liveness.
+export const UNSUPPORTED_PROTOCOL = 'unsupported-protocol';
+export const UNSUPPORTED_PROTOCOL_MESSAGE = 'the lock was written by a newer fgOS lock protocol than this release understands; upgrade fgOS on this machine (never delete the lock by hand)';
+
+// The protocol marker this release speaks for every lock in this module.
+// `<dir>/runtime/locks/<lock name>/protocol.json` absent, or `{writer: 1}`,
+// means this protocol; any other content is refused after acquire.
+export const LOCK_PROTOCOL_VERSION = 1;
 
 export const ACQUIRED = 'acquired';
 // tsk-64hk S2 fix (dispatch-engine-liveness-hardening Phase 3): was
@@ -200,12 +214,25 @@ function isUsableIdentity(value) {
   return Number.isInteger(value) && value > 0;
 }
 
+/** True when `raw` is a JSON object carrying a `v` field: a record from a
+ * versioned lock protocol, never this module's unversioned format. */
+function isUnsupportedSchema(raw) {
+  try {
+    const parsed = JSON.parse(raw);
+    return Boolean(parsed) && typeof parsed === 'object' && !Array.isArray(parsed) && Object.hasOwn(parsed, 'v');
+  } catch {
+    return false;
+  }
+}
+
 /** Parses lock file content written by this module: `{"pid": <identity>,
- * "ts": <int>}`, where `pid` may be a positive integer OR a non-empty
- * string (the on-disk field name stays literally `pid` even though its
- * value may now be an opaque string identity). Returns null when the
+ * "ts": <int>, "ttlMs"?: <int>}`, where `pid` may be a positive integer OR a
+ * non-empty string (the on-disk field name stays literally `pid` even though
+ * its value may now be an opaque string identity). Returns null when the
  * content isn't a well-formed record — the caller treats null as
- * AMBIGUOUS, never as free or stale. */
+ * AMBIGUOUS, never as free or stale. A record carrying `v` is never a
+ * record of this format, even when it also has `pid`/`ts`: it parses to
+ * null, so release/renew (and their re-reads) never touch it. */
 function parseLockContent(raw) {
   let parsed;
   try {
@@ -213,18 +240,87 @@ function parseLockContent(raw) {
   } catch {
     return null;
   }
-  if (!parsed || typeof parsed !== 'object') return null;
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return null;
+  if (Object.hasOwn(parsed, 'v')) return null;
   const { pid, ts, ttlMs } = parsed;
   if (!isUsableIdentity(pid)) return null;
   if (!Number.isInteger(ts) || ts <= 0) return null;
   return { pid, ts, ...(Number.isSafeInteger(ttlMs) && ttlMs > 0 ? { ttlMs } : {}) };
 }
 
-/** The lock record a holder writes. A dispatch-lock (composite pid) holder also records the ttlMs it
- * took: its run timeout, which can be longer than a contender's, and it renews only every ttl/3. */
+/** The lock record a holder writes. Every holder records the ttlMs it took, and contenders judge the
+ * record by that ttl, never by their own: a holder knows how long it needs and how often it renews. */
 function lockRecord(identity, ts, ttlMs) {
-  const ownTtl = parseCompositePidIdentity(identity) !== null && Number.isSafeInteger(ttlMs) && ttlMs > 0 ? { ttlMs } : {};
+  const ownTtl = Number.isSafeInteger(ttlMs) && ttlMs > 0 ? { ttlMs } : {};
   return JSON.stringify({ pid: identity, ts, ...ownTtl });
+}
+
+/**
+ * The staleness window a contender applies to `record`: the ttl its holder recorded, held to the
+ * run-timeout ceiling (a holder killed without releasing whose pid was reused reads as live, and no
+ * record may block longer than one run may take). A record without ttlMs was left by a release
+ * before every writer recorded one; it gets the window its writer used:
+ *   - a non-composite string identity was only ever written by the pre-commit hook: HOOK_TTL_MS;
+ *   - a numeric pid was written by claim, land, merge or a merge slot: DEFAULT_TTL_MS;
+ *   - a dispatch composite identity ran under a run timeout: the run-timeout ceiling.
+ */
+function recordTtlMs(record) {
+  if (record.ttlMs !== undefined) return Math.min(record.ttlMs, RUN_TIMEOUT_MAX_MS);
+  if (typeof record.pid === 'number') return DEFAULT_TTL_MS;
+  return parseCompositePidIdentity(record.pid) !== null ? RUN_TIMEOUT_MAX_MS : HOOK_TTL_MS;
+}
+
+/**
+ * Whether a different identity's parsed `record` still holds the lock at `now`. A numeric holder is
+ * held while its pid is alive and the record is within its own ttl; a dispatch composite identity
+ * whose embedded pid is confirmed dead is free at once (S2 fix); any other string identity has no
+ * process to probe and is judged by ttl alone. Returns `{held, ttlMs}`.
+ */
+function judgeRecord(record, now) {
+  const ttlMs = recordTtlMs(record);
+  const withinTtl = now - record.ts <= ttlMs;
+  if (typeof record.pid === 'number') {
+    return { held: isPidAlive(record.pid) && withinTtl, ttlMs };
+  }
+  // No processStartTime is recorded alongside a composite identity, so a live pid cannot yet be told
+  // apart from a different process that reused it (resolveHolderLiveness's legacy-record fallback:
+  // alive + no processStartTime -> 'held'); the ttl above bounds that case.
+  const composite = parseCompositePidIdentity(record.pid);
+  if (composite !== null && resolveHolderLivenessByIdentity({ pid: composite.pid }, isPidAlive(composite.pid)) === 'dead') {
+    return { held: false, ttlMs };
+  }
+  return { held: withinTtl, ttlMs };
+}
+
+function protocolMarkerPath(dir, lockFile) {
+  return path.join(dir, 'runtime', 'locks', lockFile.replace(/\.lock$/, ''), 'protocol.json');
+}
+
+/** Whether the resource's protocol marker (absent = this protocol) still names this release's
+ * protocol. Read after every acquire, so a marker raised while this caller waited is seen. */
+function protocolMarkerIsSupported(dir, lockFile) {
+  let raw;
+  try {
+    raw = fs.readFileSync(protocolMarkerPath(dir, lockFile), 'utf8');
+  } catch (err) {
+    if (err.code === 'ENOENT') return true;
+    throw err;
+  }
+  try {
+    return JSON.parse(raw)?.writer === LOCK_PROTOCOL_VERSION;
+  } catch {
+    return false;
+  }
+}
+
+function unsupportedHeld(lockPath, extra = {}) {
+  return { status: HELD, reason: UNSUPPORTED_PROTOCOL, detail: UNSUPPORTED_PROTOCOL_MESSAGE, holderPid: null, lockAgeMs: null, remainingTtlMs: null, lockPath, ...extra };
+}
+
+/** One-line refusal detail a caller appends to its own HELD message: empty for an ordinary holder,
+ * the upgrade explanation for an unsupported protocol. */
+export function lockRefusalDetail(res) {
+  return res?.reason === UNSUPPORTED_PROTOCOL ? ` -- ${UNSUPPORTED_PROTOCOL_MESSAGE}` : '';
 }
 
 /** Publishes `content` under `lockPath` as a brand-new file, atomically and
@@ -266,11 +362,11 @@ function writeAtomicReplace(lockPath, content) {
 /**
  * One attempt at the wx-atomic-create lock, mirroring the three sibling
  * locks' single-attempt primitive for the create/EEXIST/liveness/reclaim
- * shape — diverging only where `parseLockContent` returns null (AMBIGUOUS),
- * where the recorded identity matches the caller's own (self-recognition,
- * always ACQUIRED unless `allowSelfRecognition` is false), and where a
- * string-identity holder is judged by `ttlMs` freshness alone (never a
- * liveness probe).
+ * shape — diverging only where the record belongs to an unsupported
+ * protocol (HELD, never touched), where `parseLockContent` returns null
+ * (AMBIGUOUS), where the recorded identity matches the caller's own
+ * (self-recognition, always ACQUIRED unless `allowSelfRecognition` is
+ * false), and where a holder is judged by the ttl its own record carries.
  */
 function tryAcquireOnce(lockPath, identity, now, ttlMs, allowSelfRecognition = true) {
   try {
@@ -287,6 +383,8 @@ function tryAcquireOnce(lockPath, identity, now, ttlMs, allowSelfRecognition = t
     if (err.code === 'ENOENT') return { status: 'retry' }; // released in between — retry create
     throw err;
   }
+
+  if (isUnsupportedSchema(raw)) return unsupportedHeld(lockPath);
 
   const record = parseLockContent(raw);
   if (record === null) {
@@ -308,57 +406,17 @@ function tryAcquireOnce(lockPath, identity, now, ttlMs, allowSelfRecognition = t
     return { status: ACQUIRED };
   }
 
-  let held;
-  let effectiveTtlMs = ttlMs;
-  if (typeof record.pid === 'number') {
-    // Different numeric identity: unchanged pidLive-AND-ttlMs logic.
-    const pidLive = isPidAlive(record.pid);
-    const withinTtl = typeof ttlMs !== 'number' || now - record.ts <= ttlMs;
-    held = pidLive && withinTtl;
-  } else {
-    // Different string identity: no process to probe generically, so
-    // held-ness defaults to pure ttlMs freshness. EXCEPTION (S2 fix,
-    // dispatch-engine-liveness-hardening Phase 3): when the string parses as
-    // the per-cwd dispatch lock's own composite pid identity
-    // (parseCompositePidIdentity), route its embedded pid through Phase 1's
-    // judge (resolveHolderLiveness) instead -- a confirmed-dead pid is
-    // reclaimed immediately, never blocked for the remainder of ttlMs. No
-    // processStartTime is recorded alongside this identity, so a live pid
-    // cannot yet be distinguished from a DIFFERENT process that reused the
-    // same pid after the original holder exited (resolveHolderLiveness's own
-    // documented "legacy holder record" fallback: alive + no processStartTime
-    // -> 'held') -- an existing gap, not a regression, left exactly as wide
-    // as it already was before this fix. Any OTHER string identity (the
-    // pre-commit hook's/claim-port.mjs's opaque session id) never matches
-    // this shape and keeps the original ttlMs-only, fail-closed (D5)
-    // behavior below unchanged.
-    const composite = parseCompositePidIdentity(record.pid);
-    const knownDead = composite !== null
-      && resolveHolderLivenessByIdentity({ pid: composite.pid }, isPidAlive(composite.pid)) === 'dead';
-    if (knownDead) {
-      held = false;
-    } else if (typeof ttlMs !== 'number') {
-      // Record parsed fine, so age is real even though held-ness itself is
-      // undecidable (D5 fail-closed) — surface what's actually known,
-      // never a fabricated remaining-TTL with no ttlMs to compute it from.
-      return { status: AMBIGUOUS, lockAgeMs: now - record.ts };
-    } else {
-      // A live dispatch-lock holder is judged by the longer of its own ttl and the contender's: it
-      // renews every ttl/3 of its own run timeout, which may be longer than the contender's.
-      // Held to the run-timeout ceiling: a holder killed without releasing, whose pid was reused,
-      // reads as live, and no record may block a worktree longer than one run may take.
-      if (composite !== null && record.ttlMs !== undefined) effectiveTtlMs = Math.max(ttlMs, Math.min(record.ttlMs, RUN_TIMEOUT_MAX_MS));
-      held = now - record.ts <= effectiveTtlMs;
-    }
-  }
-
+  // A different identity is judged by the ttl its own record carries
+  // (judgeRecord), never by this contender's `ttlMs`, which only says what
+  // this caller writes when it acquires.
+  const { held, ttlMs: holderTtlMs } = judgeRecord(record, now);
   if (held) {
     const lockAgeMs = now - record.ts;
     return {
       status: HELD,
       holderPid: record.pid,
       lockAgeMs,
-      remainingTtlMs: typeof effectiveTtlMs === 'number' ? Math.max(0, effectiveTtlMs - lockAgeMs) : null,
+      remainingTtlMs: Math.max(0, holderTtlMs - lockAgeMs),
     };
   }
 
@@ -399,46 +457,50 @@ function tryAcquireOnce(lockPath, identity, now, ttlMs, allowSelfRecognition = t
  * JSON field holding it is still named `pid`.
  *
  * Returns `{ status, holderPid?, lockAgeMs?, remainingTtlMs?, lockPath,
- * release? }` where `status` is one of ACQUIRED / HELD / AMBIGUOUS. `HELD`
- * always carries `lockAgeMs` (time since the recorded holder last touched
- * the lock); `remainingTtlMs` is `null` when no `ttlMs` was supplied (no
- * staleness window to compute it from — never fabricated). An `AMBIGUOUS`
- * from a parsed-but-undecidable string-identity record (no `ttlMs`
- * supplied) also carries `lockAgeMs`; an `AMBIGUOUS` from genuinely
- * unparseable content carries neither (no record to read a timestamp from).
+ * release?, reason?, detail? }` where `status` is one of ACQUIRED / HELD /
+ * AMBIGUOUS. `HELD` from a readable record carries `lockAgeMs` (time since
+ * the recorded holder last touched the lock) and `remainingTtlMs` (from the
+ * holder's own recorded ttl). `HELD` with `reason: UNSUPPORTED_PROTOCOL`
+ * means the record or the resource's protocol marker belongs to a lock
+ * protocol this release does not speak; nothing was written and the caller
+ * must refuse. `AMBIGUOUS` means unparseable content and carries no age.
  * Never throws for a stale/corrupt/missing lock — only for unexpected fs
  * errors.
  *
- * `ttlMs` is optional and caller-supplied only (no production default picked
- * here, per this cell's scope) — when present, a live-pid holder whose
- * last-touched timestamp exceeds `ttlMs` is treated as stale, same as a dead
- * pid. For a different string-identity holder, `ttlMs` is the ONLY
- * staleness signal (no liveness probe exists) — omitting it is AMBIGUOUS,
- * not stale.
+ * `ttlMs` is the window this caller records when it acquires: contenders
+ * judge the record by that recorded ttl, never by their own. A record
+ * without one (left by an older release) gets its writer's old window:
+ * HOOK_TTL_MS for a session-id string, DEFAULT_TTL_MS for a pid (see
+ * recordTtlMs).
  *
  * `releaseOnExit` (tsk-45z point 2, opt-in, default false): when true,
  * registers `exit`/`SIGINT`/`SIGTERM` listeners that release the lock the
- * moment THIS process ends, instead of leaving it for `ttlMs` to expire.
- * This must stay OPT-IN, never the unconditional default: `.githooks/
- * pre-commit` acquires/refreshes this lock on every commit and, BY DESIGN,
- * never releases it itself — the lock is meant to linger past that short
- * hook process's own `process.exit(0)`, with TTL as the only intended
- * clearing mechanism (a session may commit several times in a row; an
- * unconditional release-on-exit there would clear the lock between two
- * commits of the SAME session, reopening the exact STR65 race this lock
- * exists to prevent — the one thing this item's own scope explicitly rules
- * out). Only a caller whose own job is genuinely OVER once its process
- * exits — `claimWork`, `mergeRunnerItem` — should pass `releaseOnExit:
- * true`. `once` + explicit removal on `release()` keeps this from
- * accumulating listeners across repeated acquire/release cycles in the
- * same process.
+ * moment THIS process ends, instead of leaving it for its ttl to expire.
+ * Only a caller whose own job is genuinely OVER once its process exits —
+ * `claimWork`, `mergeRunnerItem`, the checkpoint under a merge slot — should
+ * pass `releaseOnExit: true`. `once` + explicit removal on `release()` keeps
+ * this from accumulating listeners across repeated acquire/release cycles
+ * in the same process.
  */
 export function acquireMainCheckoutLock(dir, { identity = process.pid, ttlMs, now = Date.now(), releaseOnExit = false, lockFile = LOCK_FILE, allowSelfRecognition = true } = {}) {
   fs.mkdirSync(dir, { recursive: true });
   const lockPath = path.join(dir, lockFile);
 
+  // One marker decision for every door (acquire, inspect, reclaim, unlock,
+  // the hook, the Rust reader): checked before anything is written or
+  // judged, and again after acquiring (below).
+  if (!protocolMarkerIsSupported(dir, lockFile)) return unsupportedHeld(lockPath);
+
   for (let attempt = 0; attempt < 2; attempt += 1) {
     const res = tryAcquireOnce(lockPath, identity, now, ttlMs, allowSelfRecognition);
+    if (res.status === ACQUIRED && !protocolMarkerIsSupported(dir, lockFile)) {
+      // The resource moved to another lock protocol while this caller was
+      // acquiring: this protocol's critical section is closed. No code for
+      // the other protocol exists in this release, so refuse (fail-closed)
+      // instead of entering it or redirecting to code that does not exist.
+      releaseMainCheckoutLockIfOwn(dir, identity, { lockFile });
+      return unsupportedHeld(lockPath);
+    }
     if (res.status === ACQUIRED) {
       let released = false;
       const release = () => {
@@ -483,6 +545,7 @@ export function acquireMainCheckoutLock(dir, { identity = process.pid, ttlMs, no
         lockAgeMs: res.lockAgeMs,
         remainingTtlMs: res.remainingTtlMs,
         lockPath,
+        ...(res.reason ? { reason: res.reason, detail: res.detail } : {}),
       };
     }
     if (res.status === AMBIGUOUS) {
@@ -498,11 +561,59 @@ export function acquireMainCheckoutLock(dir, { identity = process.pid, ttlMs, no
   return { status: HELD, holderPid: null, lockAgeMs: null, remainingTtlMs: null, lockPath };
 }
 
+/**
+ * Main-checkout writers for the `.fgos` checkpoint
+ * (`runOpportunisticMainCheckoutChecks`'s `mainCheckoutWriter`): each runs a
+ * transaction `txn(commitEnv)` -- add -> commit -> reset-on-error -- inside
+ * this mutex, with `commitEnv` carrying HOLDER_PID_ENV_VAR so the pre-commit
+ * hook recognizes fgOS's own commit.
+ *
+ * heldMainCheckoutWriter: the caller already holds the mutex as
+ * `holderPid` (claim, a merge without a target slot); nothing is acquired
+ * again, so there is no nested acquire and no identity-based re-entry.
+ */
+export function heldMainCheckoutWriter(holderPid) {
+  return (txn) => txn({ [HOLDER_PID_ENV_VAR]: String(holderPid) });
+}
+
+/**
+ * acquiringMainCheckoutWriter: the caller does not hold the mutex (the
+ * merge-slot path). Acquires it as this process for the transaction only
+ * and releases it right after, so a checkpoint commit never interleaves
+ * with a land. When someone else holds it the transaction is skipped: the
+ * checkpoint is opportunistic and the next caller retries it.
+ * `allowSelfRecognition: false`: another operation of THIS process (a merge
+ * awaiting its verify) may hold the mutex under the same pid. Recognizing
+ * that record as our own would let this transaction run inside that
+ * operation's hold and then release it from under it; a same-pid holder is
+ * a different holder here, so the checkpoint skips instead.
+ */
+export function acquiringMainCheckoutWriter(dir) {
+  return (txn) => {
+    const lock = acquireMainCheckoutLock(dir, { identity: process.pid, ttlMs: DEFAULT_TTL_MS, releaseOnExit: true, allowSelfRecognition: false });
+    if (lock.status !== ACQUIRED) return;
+    try {
+      txn({ [HOLDER_PID_ENV_VAR]: String(process.pid) });
+    } finally {
+      lock.release();
+    }
+  };
+}
+
 /** Removes `.fgos/main-checkout.lock` under `dir` if present. Idempotent — a
  * caller releasing a lock already reclaimed/removed by someone else is not
- * an error. */
+ * an error. A record of an unsupported lock protocol is never removed
+ * (returns UNSUPPORTED_PROTOCOL instead). */
 export function releaseMainCheckoutLock(dir, { lockFile = LOCK_FILE } = {}) {
   const lockPath = path.join(dir, lockFile);
+  let raw;
+  try {
+    raw = fs.readFileSync(lockPath, 'utf8');
+  } catch (err) {
+    if (err.code === 'ENOENT') return undefined;
+    throw err;
+  }
+  if (isUnsupportedSchema(raw)) return UNSUPPORTED_PROTOCOL;
   try {
     fs.unlinkSync(lockPath);
   } catch (err) {
@@ -640,22 +751,25 @@ export function renewMainCheckoutLockIfOwn(dir, identity, { now = Date.now(), lo
  * for the `fgos lock-status` verb, so a caller can check before a failed
  * `take`/`pick`/`merge`/`unlock` without side effects.
  *
- * Returns `{ outcome, holderPid?, lockAgeMs?, remainingTtlMs? }` where
- * `outcome` is one of:
+ * Returns `{ outcome, holderPid?, lockAgeMs?, remainingTtlMs?, ttlMs?,
+ * reason? }` where `outcome` is one of:
  *   - 'free'      -- no lock file present
- *   - 'live'      -- held by a holder that would currently be judged HELD
- *     by `acquireMainCheckoutLock` (live pid within ttlMs, or a
- *     string identity within ttlMs)
+ *   - 'live'      -- held by a holder that `acquireMainCheckoutLock` would
+ *     currently judge HELD (same judgeRecord, by the record's own ttl);
+ *     `reason: UNSUPPORTED_PROTOCOL` when the record belongs to a lock
+ *     protocol this release does not speak (never free, never reclaimable)
  *   - 'stale'     -- a parseable record exists but its holder is
- *     reclaimable (dead pid, or ttlMs-expired) -- `acquireMainCheckoutLock`
- *     would succeed against it
- *   - 'ambiguous' -- unparseable content, or a string-identity record with
- *     no `ttlMs` supplied (D5 fail-closed, same as the acquire path)
- * `lockAgeMs`/`remainingTtlMs` follow the same never-fabricate rule as
- * `acquireMainCheckoutLock`'s own HELD/AMBIGUOUS shape.
+ *     reclaimable (dead pid, or past its recorded ttl) --
+ *     `acquireMainCheckoutLock` would succeed against it
+ *   - 'ambiguous' -- unparseable content (D5 fail-closed)
+ * The `ttlMs` option is accepted and ignored: a record is judged by its own.
  */
-export function inspectMainCheckoutLock(dir, { ttlMs, now = Date.now(), lockFile = LOCK_FILE } = {}) {
+export function inspectMainCheckoutLock(dir, { now = Date.now(), lockFile = LOCK_FILE } = {}) {
   const lockPath = path.join(dir, lockFile);
+
+  // Marker first: a resource moved to another protocol is never "free",
+  // whether or not this protocol's file exists.
+  if (!protocolMarkerIsSupported(dir, lockFile)) return { outcome: 'live', reason: UNSUPPORTED_PROTOCOL, holderPid: null };
 
   let raw;
   try {
@@ -665,29 +779,21 @@ export function inspectMainCheckoutLock(dir, { ttlMs, now = Date.now(), lockFile
     throw err;
   }
 
+  if (isUnsupportedSchema(raw)) return { outcome: 'live', reason: UNSUPPORTED_PROTOCOL, holderPid: null };
+
   const record = parseLockContent(raw);
   if (record === null) {
     return { outcome: 'ambiguous' };
   }
 
   const lockAgeMs = now - record.ts;
-  let live;
-  if (typeof record.pid === 'number') {
-    const pidLive = isPidAlive(record.pid);
-    const withinTtl = typeof ttlMs !== 'number' || lockAgeMs <= ttlMs;
-    live = pidLive && withinTtl;
-  } else {
-    if (typeof ttlMs !== 'number') {
-      return { outcome: 'ambiguous', lockAgeMs };
-    }
-    live = lockAgeMs <= ttlMs;
-  }
-
+  const { held, ttlMs } = judgeRecord(record, now);
   return {
-    outcome: live ? 'live' : 'stale',
+    outcome: held ? 'live' : 'stale',
     holderPid: record.pid,
     lockAgeMs,
-    remainingTtlMs: typeof ttlMs === 'number' ? Math.max(0, ttlMs - lockAgeMs) : null,
+    ttlMs,
+    remainingTtlMs: Math.max(0, ttlMs - lockAgeMs),
   };
 }
 
@@ -712,9 +818,14 @@ export function inspectMainCheckoutLock(dir, { ttlMs, now = Date.now(), lockFile
  *     valid record between the caller's own read and this call; untouched
  *   - 'reclaimed'         -- content still unparseable on the second read;
  *     removed
+ *   - UNSUPPORTED_PROTOCOL -- the resource's protocol marker, or the record
+ *     itself, belongs to a lock protocol this release does not speak;
+ *     nothing is removed, whatever its age or content
  */
 export function forceReclaimAmbiguousLock(dir, { lockFile = LOCK_FILE } = {}) {
   const lockPath = path.join(dir, lockFile);
+
+  if (!protocolMarkerIsSupported(dir, lockFile)) return { status: UNSUPPORTED_PROTOCOL };
 
   let raw;
   try {
@@ -723,6 +834,8 @@ export function forceReclaimAmbiguousLock(dir, { lockFile = LOCK_FILE } = {}) {
     if (err.code === 'ENOENT') return { status: 'already-clear' };
     throw err;
   }
+
+  if (isUnsupportedSchema(raw)) return { status: UNSUPPORTED_PROTOCOL };
 
   if (parseLockContent(raw) !== null) {
     return { status: 'no-longer-ambiguous' };

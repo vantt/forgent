@@ -91,6 +91,7 @@ import {
   HELD,
   AMBIGUOUS,
   formatLockDurationMs,
+  lockRefusalDetail,
 } from '../main-checkout-lock.mjs';
 import { reconcileHerdrSpawnRun, isHerdrSpawnRunStillWorking } from './herdr-reconcile.mjs';
 import { prepareConfinementForLaunch, finalizeConfinementResources, bindingForPrepared } from './confinement/authority.mjs';
@@ -2226,7 +2227,7 @@ export async function executeAssignment(assignment, opts = {}) {
       if (cwdLockAcquired.status === HELD) {
         throw new DispatchError(
           'dispatch-in-flight',
-          `dispatch for cwd "${cwd}" is already in flight (held for ${formatLockDurationMs(cwdLockAcquired.lockAgeMs)}).`,
+          `dispatch for cwd "${cwd}" is already in flight (held for ${formatLockDurationMs(cwdLockAcquired.lockAgeMs)})${lockRefusalDetail(cwdLockAcquired)}.`,
           { cwd, lockAgeMs: cwdLockAcquired.lockAgeMs, remainingTtlMs: cwdLockAcquired.remainingTtlMs, holderPid: cwdLockAcquired.holderPid },
         );
       }

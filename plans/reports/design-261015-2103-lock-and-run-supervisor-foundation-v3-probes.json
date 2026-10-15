@@ -1,0 +1,764 @@
+{
+ "about": "Probe bundle for design-261015-2103-lock-and-run-supervisor-foundation-v3.md. Model probes, not tests of the planned crates. Write each entry of files to a fresh temp dir and run as in Appendix A. Never run against a real .fgos directory.",
+ "machine": {
+  "os": "Linux 6.8 x86_64, 16 cores",
+  "node": "v24.18.0",
+  "python": "3.10.12",
+  "standIns": "util-linux flock for the Rust lock helper; python for the Rust supervisor and gate"
+ },
+ "repoHead": "2c2114d06",
+ "sourceSha256": {
+  "src/runner/main-checkout-lock.mjs": "357187dfd26d76155c3d1dc0c4fc6ec3122a0ed69849c803cf38ef53bfa83ede",
+  "src/state/events.mjs": "523af5d56c895370027568a8714c93a772e708e1f9651f158deaf3b906508098",
+  "src/runner/dispatch/run-lock.mjs": "4fe905899159baa52755203570a56efd376deb5262cbd6d0ee0a88cfd1c287e6",
+  "src/runner/dispatch/process-identity.mjs": "b225265e60c972b9134a74ff68e5e996c317944bfb9fb80b9405aad38851695d"
+ },
+ "authorship": "p3*, p4*, p5*, p6* written by the previous lead in the same scratch directory and re-run by this lead (p6 fixed: --input-type=module); the rest written by this lead.",
+ "files": {
+  "probe-kernel-lock.mjs": "// Probe the v3 lock primitive: a kernel lock (flock) on an open file\n// description that the Node process owns. A short helper locks the INHERITED\n// description and exits (util-linux `flock` stands in for the planned Rust\n// internal route); the lock stays with Node's fd. Release = close(fd).\n// Holder death = the kernel drops it. Borrow = the child inherits the same\n// description at spawn (no spawn->bind window). Temp dirs only.\n// Run: node probe-kernel-lock.mjs\nimport fs from 'node:fs';\nimport path from 'node:path';\nimport os from 'node:os';\nimport { spawn, spawnSync, execFileSync } from 'node:child_process';\nimport { fileURLToPath } from 'node:url';\n\nconst HERE = path.dirname(fileURLToPath(import.meta.url));\nconst ME = fileURLToPath(import.meta.url);\nconst sleepMs = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);\nconst waitFile = (f, ms = 20000) => { const end = Date.now() + ms; while (!fs.existsSync(f)) { if (Date.now() > end) throw new Error(`timeout ${f}`); sleepMs(5); } };\n\n/** Lock the description behind `fd` (non-blocking unless wait). */\nexport function lockFd(fd, { wait = false, timeoutMs = 5000 } = {}) {\n  const r = spawnSync('flock', wait ? ['3'] : ['-n', '3'], { stdio: ['ignore', 'ignore', 'pipe', fd], timeout: timeoutMs, killSignal: 'SIGKILL' });\n  return r.status === 0 ? 'acquired' : r.signal ? 'timeout' : 'held';\n}\nconst strangerCanLock = (file) => spawnSync('flock', ['-n', file, 'true']).status === 0;\n\nconst role = process.argv[2];\nif (role === 'stress-worker') {\n  const [file, csDir, iters] = [process.argv[3], process.argv[4], Number(process.argv[5])];\n  let violations = 0, acquired = 0;\n  for (let i = 0; i < iters; i++) {\n    const fd = fs.openSync(file, 'r+');\n    if (lockFd(fd, { wait: true, timeoutMs: 8000 }) !== 'acquired') { fs.closeSync(fd); fs.writeFileSync(path.join(csDir, `..`, `stuck-${process.pid}`), ''); process.exit(2); }\n    acquired++;\n    const others = fs.readdirSync(csDir).filter((n) => n !== `${process.pid}`);\n    // A witness left by a killed holder is retired by the killer before the kill completes.\n    if (others.length) violations++;\n    fs.writeFileSync(path.join(csDir, `${process.pid}`), '');\n    sleepMs(Math.floor(Math.random() * 3));\n    fs.rmSync(path.join(csDir, `${process.pid}`), { force: true });\n    fs.closeSync(fd);\n  }\n  fs.writeFileSync(path.join(csDir, '..', `done-${process.pid}.json`), JSON.stringify({ acquired, violations }));\n  process.exit(0);\n}\nif (role === 'holder') {\n  const fd = fs.openSync(process.argv[3], 'r+');\n  lockFd(fd); fs.writeFileSync(process.argv[4], ''); sleepMs(60000);\n}\nif (role === 'owner-spawns-git') {\n  // Acquire, spawn git commit with the description at fd 3, then wait to be killed.\n  const [file, repo, out] = process.argv.slice(3);\n  const fd = fs.openSync(file, 'r+');\n  if (lockFd(fd) !== 'acquired') throw new Error('owner: not acquired');\n  const st = fs.fstatSync(fd);\n  const git = spawn('git', ['-C', repo, 'commit', '-q', '-m', 'probe', '--', 'f.txt'], { stdio: ['ignore', 'ignore', 'inherit', fd], env: { ...process.env, FGOS_LOCK_FD: '3', EXPECT_DEVINO: `${st.dev}:${st.ino}`, PROBE_OUT: out }, detached: true });\n  fs.writeFileSync(path.join(out, 'git-pid'), String(git.pid));\n  sleepMs(60000);\n}\n\nif (!role) {\n  const report = [];\n  const root = fs.mkdtempSync(path.join(HERE, 'run-kl-'));\n  const file = path.join(root, 'main.lock'); fs.writeFileSync(file, '');\n\n  { // 1. Node holds after the helper exits; release = close\n    const fd = fs.openSync(file, 'r+');\n    const a = lockFd(fd);\n    const strangerWhileHeld = strangerCanLock(file);\n    fs.closeSync(fd);\n    report.push({ case: 'node holds the lock after the helper exits; close releases', helper: a, strangerWhileHeld, strangerAfterClose: strangerCanLock(file) });\n  }\n  { // 2. two transactions in one process conflict (no re-entry by pid)\n    const f1 = fs.openSync(file, 'r+'); const f2 = fs.openSync(file, 'r+');\n    const r1 = lockFd(f1); const r2 = lockFd(f2); fs.closeSync(f1); const r3 = lockFd(f2); fs.closeSync(f2);\n    report.push({ case: 'same process, two transactions (two descriptions)', first: r1, secondWhileFirstHeld: r2, secondAfterFirstClosed: r3 });\n  }\n  { // 3. holder SIGKILL releases\n    const flag = path.join(root, 'held');\n    const h = spawn(process.execPath, [ME, 'holder', file, flag], { stdio: 'inherit' });\n    waitFile(flag);\n    const before = strangerCanLock(file);\n    h.kill('SIGKILL'); await new Promise((r) => h.on('exit', r));\n    report.push({ case: 'holder SIGKILL', strangerBeforeKill: before, strangerAfterKill: strangerCanLock(file) });\n  }\n  { // 4. helper timeout (B8): kill + reap the helper, close our fd -> definitely not held by us\n    const blockerFlag = path.join(root, 'blocker');\n    const b = spawn(process.execPath, [ME, 'holder', file, blockerFlag], { stdio: 'inherit' });\n    waitFile(blockerFlag);\n    const fd = fs.openSync(file, 'r+');\n    const t0 = Date.now(); const r = lockFd(fd, { wait: true, timeoutMs: 300 }); const ms = Date.now() - t0;\n    fs.closeSync(fd); // outcome after a timeout is never \"pending\": we close, so we hold nothing\n    b.kill('SIGKILL'); await new Promise((res) => b.on('exit', res));\n    report.push({ case: 'helper timeout -> SIGKILL + reap (spawnSync) -> close', result: r, returnedAfterMs: ms, freeAfterBlockerDied: strangerCanLock(file) });\n  }\n  { // 5. borrow through a real git pre-commit hook; owner SIGKILLed right after spawn\n    const repo = path.join(root, 'repo'); const out = path.join(root, 'git-out'); fs.mkdirSync(out);\n    execFileSync('git', ['init', '-q', repo]);\n    execFileSync('git', ['-C', repo, 'config', 'user.email', 'p@x']); execFileSync('git', ['-C', repo, 'config', 'user.name', 'p']);\n    fs.writeFileSync(path.join(repo, 'f.txt'), 'x'); execFileSync('git', ['-C', repo, 'add', 'f.txt']);\n    const hook = path.join(repo, '.git', 'hooks', 'pre-commit');\n    fs.writeFileSync(hook, `#!/bin/sh\ndevino=$(stat -L -c %d:%i /proc/self/fd/3 2>/dev/null)\nif [ \"$devino\" = \"$EXPECT_DEVINO\" ] && flock -n 3; then echo borrower > \"$PROBE_OUT/hook\"; else echo refused > \"$PROBE_OUT/hook\"; exit 1; fi\ntouch \"$PROBE_OUT/hook-waiting\"\nwhile [ ! -f \"$PROBE_OUT/hook-go\" ]; do sleep 0.05; done\n`); fs.chmodSync(hook, 0o755);\n    const owner = spawn(process.execPath, [ME, 'owner-spawns-git', file, repo, out], { stdio: 'inherit' });\n    waitFile(path.join(out, 'git-pid'));\n    owner.kill('SIGKILL'); await new Promise((r) => owner.on('exit', r)); // owner dies before anything else\n    waitFile(path.join(out, 'hook-waiting'));\n    const contenderWhileGitRuns = strangerCanLock(file);\n    const st = fs.statSync(file);\n    // a sibling with the same env but its own (new) description of the file\n    const sib = spawnSync('sh', ['-c', `devino=$(stat -L -c %d:%i /proc/self/fd/3); if [ \"$devino\" = \"${st.dev}:${st.ino}\" ] && flock -n 3; then echo borrower; else echo refused; fi`], { stdio: ['ignore', 'pipe', 'inherit', fs.openSync(file, 'r')], env: { ...process.env, FGOS_LOCK_FD: '3' } }).stdout.toString().trim();\n    fs.writeFileSync(path.join(out, 'hook-go'), '');\n    const gitPid = Number(fs.readFileSync(path.join(out, 'git-pid'), 'utf8'));\n    for (let i = 0; i < 200; i++) { try { process.kill(gitPid, 0); sleepMs(20); } catch { break; } }\n    const committed = execFileSync('git', ['-C', repo, 'log', '--oneline']).toString().trim().length > 0;\n    report.push({ case: 'borrow through real git hook; owner SIGKILL right after spawn', hookBorrowCheck: fs.readFileSync(path.join(out, 'hook'), 'utf8').trim(), contenderWhileGitRuns, siblingWithEnvButOwnDescription: sib, gitCommitted: committed, contenderAfterGitExit: strangerCanLock(file) });\n  }\n  { // 6. stress with SIGKILLs of holders\n    const sfile = path.join(root, 'stress.lock'); fs.writeFileSync(sfile, '');\n    const csDir = path.join(root, 'cs'); fs.mkdirSync(csDir);\n    const live = new Set();\n    let kills = 0, spawned = 0;\n    const start = (n) => { const k = spawn(process.execPath, [ME, 'stress-worker', sfile, csDir, String(n)], { stdio: 'inherit' }); spawned++; live.add(k); k.on('exit', (code, sig) => { live.delete(k); if (sig === 'SIGKILL') start(30); }); };\n    for (let i = 0; i < 8; i++) start(100);\n    const killer = setInterval(() => {\n      const inside = fs.readdirSync(csDir);\n      if (!inside.length || kills >= 25) return;\n      const pid = Number(inside[0]);\n      try { process.kill(pid, 'SIGSTOP'); fs.rmSync(path.join(csDir, inside[0]), { force: true }); process.kill(pid, 'SIGKILL'); kills++; } catch {}\n    }, 60);\n    const t0 = Date.now();\n    while (live.size || kills < 25 && Date.now() - t0 < 1000) { await new Promise((r) => setTimeout(r, 50)); if (!live.size) break; }\n    clearInterval(killer);\n    const dones = fs.readdirSync(root).filter((n) => n.startsWith('done-')).map((n) => JSON.parse(fs.readFileSync(path.join(root, n), 'utf8')));\n    report.push({ case: 'stress 8 procs x 100 (+30 per replacement), holders SIGKILLed inside the critical section and replaced', kills, workersSpawned: spawned, survivorsFinished: dones.length, acquisitions: dones.reduce((a, d) => a + d.acquired, 0), csViolations: dones.reduce((a, d) => a + d.violations, 0), stuck: fs.readdirSync(root).filter((n) => n.startsWith('stuck-')).length, elapsedMs: Date.now() - t0 });\n  }\n  { // 7. cost of acquire through a helper exec (util-linux flock as the stand-in)\n    const ts = [];\n    for (let i = 0; i < 300; i++) { const fd = fs.openSync(file, 'r+'); const t0 = process.hrtime.bigint(); lockFd(fd); ts.push(Number(process.hrtime.bigint() - t0) / 1e6); fs.closeSync(fd); }\n    ts.sort((a, b) => a - b); const q = (p) => +ts[Math.floor(p * (ts.length - 1))].toFixed(2);\n    report.push({ case: 'acquire cost via helper exec (ms)', n: 300, p50: q(0.5), p95: q(0.95), p99: q(0.99) });\n  }\n  fs.writeFileSync(path.join(HERE, 'probe-kernel-lock-results.json'), JSON.stringify({ node: process.version, cpus: os.cpus().length, load: os.loadavg()[0], report }, null, 1));\n  for (const r of report) console.log(JSON.stringify(r));\n}\n",
+  "probe-hot-reclaim.mjs": "// Probe the interim Node hot-path mutex (events.lock): keep today's link/unlink\n// fast path, but reclaim a dead holder's record only while holding a kernel\n// \"reclaim\" lock (flock via helper exec, util-linux stand-in). Record = {pid,\n// startTime, boot}. A1 schedule: R1 judged X dead and re-read it, then pauses\n// right before unlink; R2 reclaims meanwhile. Run: node probe-hot-reclaim.mjs\nimport fs from 'node:fs';\nimport path from 'node:path';\nimport { spawn, spawnSync } from 'node:child_process';\nimport { fileURLToPath } from 'node:url';\nimport { startTimeOf, currentBoot, judgeOwner, self } from './era-ledger.mjs';\n\nconst HERE = path.dirname(fileURLToPath(import.meta.url));\nconst ME = fileURLToPath(import.meta.url);\nconst sleepMs = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);\nconst waitFile = (f, ms = 20000) => { const end = Date.now() + ms; while (!fs.existsSync(f)) { if (Date.now() > end) throw new Error(`timeout ${f}`); sleepMs(2); } };\n\nfunction lockFd(fd) { return spawnSync('flock', ['-n', '3'], { stdio: ['ignore', 'ignore', 'ignore', fd] }).status === 0; }\n\n/** One attempt: 'acquired' | 'held'. */\nexport function hotTryAcquire(lockPath, { reclaimLock = true, beforeUnlink } = {}) {\n  const tmp = `${lockPath}.tmp-${process.pid}-${Math.random().toString(36).slice(2)}`;\n  fs.writeFileSync(tmp, JSON.stringify({ ...self(), boot: currentBoot() }));\n  try { fs.linkSync(tmp, lockPath); return 'acquired'; } catch (e) { if (e.code !== 'EEXIST') throw e; } finally { fs.unlinkSync(tmp); }\n  let raw; try { raw = fs.readFileSync(lockPath, 'utf8'); } catch (e) { if (e.code === 'ENOENT') return 'retry'; throw e; }\n  let rec = null; try { rec = JSON.parse(raw); } catch {}\n  const dead = (r) => r && (r.boot !== currentBoot() || judgeOwner(r) === 'dead');\n  if (!dead(rec)) return 'held'; // alive, unknown or unreadable: never reclaimed\n  let rfd = null;\n  if (reclaimLock) { rfd = fs.openSync(`${lockPath}.reclaim`, fs.constants.O_RDWR | fs.constants.O_CREAT); if (!lockFd(rfd)) { fs.closeSync(rfd); return 'held'; } }\n  try {\n    let cur; try { cur = fs.readFileSync(lockPath, 'utf8'); } catch (e) { if (e.code === 'ENOENT') return 'retry'; throw e; }\n    if (cur !== raw) return 'retry';\n    beforeUnlink?.();\n    fs.unlinkSync(lockPath);\n    return 'retry';\n  } finally { if (rfd !== null) fs.closeSync(rfd); }\n}\nexport function hotAcquire(lockPath, opts = {}) {\n  for (let i = 0; i < 100000; i++) { const r = hotTryAcquire(lockPath, opts); if (r === 'acquired') return true; sleepMs(r === 'retry' ? 0 : 1); }\n  return false;\n}\n\nconst role = process.argv[2];\nif (role === 'deadholder') { const [lp] = process.argv.slice(3); fs.writeFileSync(lp, JSON.stringify({ ...self(), boot: currentBoot() })); process.exit(0); }\nif (role === 'R1') {\n  const [lp, work, useLock] = process.argv.slice(3);\n  const opts = { reclaimLock: useLock === '1', beforeUnlink: () => { if (!fs.existsSync(path.join(work, 'R1-go'))) { fs.writeFileSync(path.join(work, 'R1-paused'), ''); waitFile(path.join(work, 'R1-go')); } } };\n  let r; do { r = hotTryAcquire(lp, opts); } while (r === 'retry');\n  const others = r === 'acquired' ? fs.readdirSync(path.join(work, 'cs')).length : null;\n  if (r === 'acquired') fs.writeFileSync(path.join(work, 'cs', 'R1'), '');\n  fs.writeFileSync(path.join(work, 'R1.json'), JSON.stringify({ result: r, othersInsideOnEntry: others }));\n  process.exit(0);\n}\nif (role === 'R2') {\n  const [lp, work, useLock] = process.argv.slice(3);\n  const ok = hotAcquire(lp, { reclaimLock: useLock === '1' });\n  fs.writeFileSync(path.join(work, 'cs', 'R2'), '');\n  fs.writeFileSync(path.join(work, 'R2-inside'), String(ok));\n  waitFile(path.join(work, 'R2-leave'));\n  fs.rmSync(path.join(work, 'cs', 'R2')); fs.unlinkSync(lp); process.exit(0);\n}\nif (role === 'stress') {\n  const [lp, work, iters, useLock] = process.argv.slice(3);\n  let v = 0, n = 0;\n  for (let i = 0; i < Number(iters); i++) {\n    hotAcquire(lp, { reclaimLock: useLock === '1', beforeUnlink: () => { if (Math.random() < 0.2) sleepMs(3); } }); n++;\n    if (fs.readdirSync(path.join(work, 'cs')).filter((x) => x !== String(process.pid)).length) v++;\n    fs.writeFileSync(path.join(work, 'cs', String(process.pid)), '');\n    sleepMs(Math.floor(Math.random() * 2));\n    fs.rmSync(path.join(work, 'cs', String(process.pid)), { force: true });\n    fs.unlinkSync(lp);\n  }\n  fs.writeFileSync(path.join(work, `done-${process.pid}.json`), JSON.stringify({ n, v }));\n  process.exit(0);\n}\n\nif (!role) {\n  const report = [];\n  const done = (cp) => new Promise((r) => cp.on('exit', r));\n  for (const useLock of ['0', '1']) {\n    const work = fs.mkdtempSync(path.join(HERE, `run-hot-a1-${useLock}-`)); fs.mkdirSync(path.join(work, 'cs'));\n    const lp = path.join(work, 'events.lock');\n    await done(spawn(process.execPath, [ME, 'deadholder', lp], { stdio: 'inherit' })); // X: holder died inside\n    const R1 = spawn(process.execPath, [ME, 'R1', lp, work, useLock], { stdio: 'inherit' });\n    waitFile(path.join(work, 'R1-paused'));\n    const R2 = spawn(process.execPath, [ME, 'R2', lp, work, useLock], { stdio: 'inherit' });\n    const t0 = Date.now(); while (!fs.existsSync(path.join(work, 'R2-inside')) && Date.now() - t0 < 1500) sleepMs(5);\n    const r2InsideWhileR1Paused = fs.existsSync(path.join(work, 'R2-inside'));\n    fs.writeFileSync(path.join(work, 'R1-go'), '');\n    await done(R1);\n    fs.writeFileSync(path.join(work, 'R2-leave'), '');\n    if (!r2InsideWhileR1Paused) { /* R2 may enter only after R1 left */ }\n    await new Promise((r) => setTimeout(r, 300));\n    const r1 = JSON.parse(fs.readFileSync(path.join(work, 'R1.json'), 'utf8'));\n    report.push({ case: `A1 schedule on events.lock, reclaim under kernel lock = ${useLock === '1'}`, r2EnteredWhileR1PausedBeforeUnlink: r2InsideWhileR1Paused, R1: r1, twoHolders: r1.result === 'acquired' && r1.othersInsideOnEntry > 0 });\n    R2.kill('SIGKILL');\n  }\n  for (const useLock of ['0', '1']) {\n    const work = fs.mkdtempSync(path.join(HERE, `run-hot-stress-${useLock}-`)); fs.mkdirSync(path.join(work, 'cs'));\n    const lp = path.join(work, 'events.lock');\n    const kids = [];\n    let kills = 0;\n    const startKid = (n) => { const k = spawn(process.execPath, [ME, 'stress', lp, work, String(n), useLock], { stdio: 'inherit' }); kids.push(k); return k; };\n    for (let i = 0; i < 8; i++) startKid(150);\n    const killer = setInterval(() => { // kill a holder inside the CS now and then, replace it\n      if (kills >= 20) return; const inside = fs.readdirSync(path.join(work, 'cs')); if (!inside.length) return;\n      const pid = Number(inside[0]); try { process.kill(pid, 'SIGSTOP'); fs.rmSync(path.join(work, 'cs', inside[0]), { force: true }); process.kill(pid, 'SIGKILL'); kills++; startKid(40); } catch {}\n    }, 50);\n    const t0 = Date.now();\n    while (kids.some((k) => k.exitCode === null && k.signalCode === null) && Date.now() - t0 < 60000) await new Promise((r) => setTimeout(r, 50));\n    clearInterval(killer);\n    const ds = fs.readdirSync(work).filter((f) => f.startsWith('done-')).map((f) => JSON.parse(fs.readFileSync(path.join(work, f), 'utf8')));\n    report.push({ case: `stress 8 procs, ${kills} holders SIGKILLed in CS, reclaim under kernel lock = ${useLock === '1'}`, acquisitions: ds.reduce((a, d) => a + d.n, 0), csViolations: ds.reduce((a, d) => a + d.v, 0), finishedWorkers: ds.length, elapsedMs: Date.now() - t0 });\n  }\n  fs.writeFileSync(path.join(HERE, 'probe-hot-reclaim-results.json'), JSON.stringify(report, null, 1));\n  for (const r of report) console.log(JSON.stringify(r));\n}\n",
+  "probe-tombstone.mjs": "// Probe B2 (physical launch floor): a directory \"tombstone\" at a v1 lock path.\n// Runs the REAL v1 lock code (main HEAD, and the W1' branch copy) against it:\n// acquire, inspect, release, releaseIfOwn, forceReclaim. Every call must fail\n// closed (throw or report held/ambiguous) and leave the tombstone in place.\n// Run: node probe-tombstone.mjs\nimport fs from 'node:fs';\nimport path from 'node:path';\nimport { fileURLToPath } from 'node:url';\nconst HERE = path.dirname(fileURLToPath(import.meta.url));\nconst variants = {\n  'main-HEAD': '/home/vantt/projects/forgentX/src/runner/main-checkout-lock.mjs',\n  'W1-branch': path.join(HERE, 'v1-w1/src/runner/main-checkout-lock.mjs'),\n};\nconst out = [];\nfor (const [name, mod] of Object.entries(variants)) {\n  const m = await import(mod);\n  const dir = fs.mkdtempSync(path.join(HERE, `run-tomb-${name}-`));\n  const lockPath = path.join(dir, 'main-checkout.lock');\n  fs.mkdirSync(lockPath); fs.writeFileSync(path.join(lockPath, 'TOMBSTONE'), JSON.stringify({ v: 3, movedTo: 'runtime/locks/main-checkout/' }));\n  const call = (label, fn) => { try { const r = fn(); out.push({ variant: name, call: label, returned: r?.status ?? r }); } catch (e) { out.push({ variant: name, call: label, threw: e.code || e.message }); } };\n  call('acquire(pid)', () => m.acquireMainCheckoutLock(dir, { identity: process.pid, ttlMs: 1000 }));\n  call('acquire(session string)', () => m.acquireMainCheckoutLock(dir, { identity: 'sess-x', ttlMs: 1000 }));\n  if (m.inspectMainCheckoutLock) call('inspect', () => m.inspectMainCheckoutLock(dir));\n  call('release', () => m.releaseMainCheckoutLock(dir));\n  call('releaseIfOwn', () => m.releaseMainCheckoutLockIfOwn(dir, process.pid));\n  call('forceReclaimAmbiguous', () => m.forceReclaimAmbiguousLock(dir));\n  out.push({ variant: name, tombstoneStillThere: fs.statSync(lockPath).isDirectory() && fs.existsSync(path.join(lockPath, 'TOMBSTONE')) });\n}\nfs.writeFileSync(path.join(HERE, 'probe-tombstone-results.json'), JSON.stringify(out, null, 1));\nfor (const o of out) console.log(JSON.stringify(o));\n",
+  "probe-tombstone-events.mjs": "// Same tombstone check for the hot-path events.lock (real withEventsLock).\nimport fs from 'node:fs';\nimport path from 'node:path';\nimport { fileURLToPath } from 'node:url';\nconst HERE = path.dirname(fileURLToPath(import.meta.url));\nconst { withEventsLock } = await import('/home/vantt/projects/forgentX/src/state/events.mjs');\nconst dir = fs.mkdtempSync(path.join(HERE, 'run-tomb-events-'));\nfs.mkdirSync(path.join(dir, 'events.lock')); fs.writeFileSync(path.join(dir, 'events.lock', 'TOMBSTONE'), '{}');\nconst t0 = Date.now(); let res;\ntry { withEventsLock(path.join(dir, 'events.jsonl'), () => { res = 'ENTERED-CRITICAL-SECTION'; }); } catch (e) { res = { threw: e.code || e.message.slice(0, 120) }; }\nconst out = { call: 'withEventsLock with tombstone at events.lock', result: res, ms: Date.now() - t0, tombstoneStillThere: fs.existsSync(path.join(dir, 'events.lock', 'TOMBSTONE')) };\nfs.writeFileSync(path.join(HERE, 'probe-tombstone-events-results.json'), JSON.stringify(out, null, 1));\nconsole.log(JSON.stringify(out));\n",
+  "probe_terminal_gate_fd_passing.py": "#!/usr/bin/env python3\n\"\"\"Probe: terminal launch mode. The gate does not descend from the supervisor\n(herdr starts it inside a pane), so it cannot inherit the attempt lock. It\nconnects to the supervisor's per-attempt unix socket and receives the lock\ndescription by SCM_RIGHTS together with GO. Cases:\n  1. supervisor SIGKILL after handing over: the lock stays held by the gate\n     until the worker ends; a stranger cannot take it meanwhile.\n  2. gate started after the supervisor died: connect refused, no worker runs.\n  3. supervisor SIGKILL while the gate waits for GO: EOF, no worker runs.\nStand-ins: python for the Rust supervisor/gate, `setsid` for the herdr pane.\nRun: python3 probe_terminal_gate_fd_passing.py\n\"\"\"\nimport fcntl, json, os, signal, socket, subprocess, sys, tempfile, time\n\nHERE = os.path.dirname(os.path.abspath(__file__))\n\ndef stranger_can_lock(path):\n    fd = os.open(path, os.O_RDONLY)\n    try:\n        fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB); return True\n    except BlockingIOError:\n        return False\n    finally:\n        os.close(fd)\n\ndef wait_file(p, s=20):\n    end = time.time() + s\n    while not os.path.exists(p):\n        if time.time() > end: raise TimeoutError(p)\n        time.sleep(0.01)\n\nif len(sys.argv) > 1 and sys.argv[1] == \"supervisor\":\n    d, mode = sys.argv[2], sys.argv[3]\n    fd = os.open(os.path.join(d, \"attempt.lock\"), os.O_RDWR | os.O_CREAT)\n    fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)\n    srv = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)\n    os.chdir(d); srv.bind(\"attempt.sock\"); srv.listen(1)  # sun_path limit (~107 bytes): bind relative\n    open(os.path.join(d, \"sup-ready\"), \"w\").write(str(os.getpid()))\n    conn, _ = srv.accept()\n    if mode == \"hold-before-go\":\n        open(os.path.join(d, \"sup-accepted\"), \"w\").write(\"\")\n        time.sleep(60)\n    socket.send_fds(conn, [b\"GO\"], [fd])\n    open(os.path.join(d, \"sup-sent-go\"), \"w\").write(\"\")\n    time.sleep(60)\n\nif len(sys.argv) > 1 and sys.argv[1] == \"gate\":\n    d, work_s = sys.argv[2], float(sys.argv[3])\n    s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)\n    try:\n        os.chdir(d); s.connect(\"attempt.sock\")\n    except OSError as e:\n        open(os.path.join(d, \"gate-exit.json\"), \"w\").write(json.dumps({\"ran\": False, \"why\": f\"connect:{e.errno}\"})); sys.exit(3)\n    msg, fds, _f, _a = socket.recv_fds(s, 16, 4)\n    if msg != b\"GO\" or not fds:\n        open(os.path.join(d, \"gate-exit.json\"), \"w\").write(json.dumps({\"ran\": False, \"why\": \"eof-before-go\"})); sys.exit(3)\n    lock_fd = fds[0]\n    t0 = time.time()\n    w = subprocess.run([\"sh\", \"-c\", f\"sleep {work_s}; echo done >> {d}/worker.log\"])\n    open(os.path.join(d, \"gate-exit.json\"), \"w\").write(json.dumps({\"ran\": True, \"exit\": w.returncode, \"heldLockFd\": lock_fd, \"seconds\": round(time.time() - t0, 2)}))\n    sys.exit(0)\n\ndef case(name, sup_mode, kill_sup_at, start_gate_after_kill=False):\n    d = tempfile.mkdtemp(prefix=f\"run-term-{name}-\", dir=HERE)\n    sup = subprocess.Popen([sys.executable, __file__, \"supervisor\", d, sup_mode])\n    wait_file(os.path.join(d, \"sup-ready\"))\n    res = {\"case\": name}\n    if start_gate_after_kill:\n        sup.send_signal(signal.SIGKILL); sup.wait()\n    gate = subprocess.Popen([\"setsid\", sys.executable, __file__, \"gate\", d, \"1.2\"])  # not a descendant of the supervisor\n    if not start_gate_after_kill:\n        wait_file(os.path.join(d, kill_sup_at))\n        sup.send_signal(signal.SIGKILL); sup.wait()\n        time.sleep(0.2)\n        res[\"strangerCanLockAfterSupervisorDeath\"] = stranger_can_lock(os.path.join(d, \"attempt.lock\"))\n    gate.wait()\n    res[\"gateExit\"] = json.load(open(os.path.join(d, \"gate-exit.json\")))\n    res[\"workerRan\"] = os.path.exists(os.path.join(d, \"worker.log\"))\n    res[\"strangerCanLockAfterGateExit\"] = stranger_can_lock(os.path.join(d, \"attempt.lock\"))\n    return res\n\nif len(sys.argv) == 1:\n    out = [\n        case(\"handover-then-supervisor-dies\", \"go\", \"sup-sent-go\"),\n        case(\"gate-starts-after-supervisor-died\", \"go\", None, start_gate_after_kill=True),\n        case(\"supervisor-dies-while-gate-waits-for-go\", \"hold-before-go\", \"sup-accepted\"),\n    ]\n    json.dump(out, open(os.path.join(HERE, \"probe-terminal-gate-results.json\"), \"w\"), indent=1)\n    for o in out: print(json.dumps(o))\n",
+  "p3_gate.py": "#!/usr/bin/env python3\n\"\"\"P3 gate: the attempt process root a pane (or a cli spawn) runs instead of\nthe agent. Connects to the supervisor's socket, receives the attempt lock\ndescription (SCM_RIGHTS) and GO, becomes a child subreaper, starts the worker\nwith the lock fd close-on-exec (the worker never holds it), waits, kills any\ndescendant left behind, reports, exits. EOF before GO: exit without running\nanything. Stand-in for the Rust `fgos gate`. argv: sock sigdir worker...\n\"\"\"\nimport ctypes, os, signal, socket, sys, time, json\n\nsock_path, sigdir, worker = sys.argv[1], sys.argv[2], sys.argv[3:]\nif sock_path.startswith('@'):\n    sock_path = '\\0' + sock_path[1:]\nlibc = ctypes.CDLL(None, use_errno=True)\nPR_SET_CHILD_SUBREAPER, PR_SET_PDEATHSIG = 36, 1\n\ns = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)\ns.connect(sock_path)\ns.sendall(json.dumps({\"gatePid\": os.getpid()}).encode() + b\"\\n\")\nmsg, fds, _flags, _addr = socket.recv_fds(s, 1024, 4)\nif not msg or not msg.startswith(b\"GO\"):\n    open(os.path.join(sigdir, \"gate-eof-before-go\"), \"w\").write(str(os.getpid()))\n    sys.exit(3)\nlock_fd = fds[0]\nos.set_inheritable(lock_fd, False)          # held by the gate only\nlibc.prctl(PR_SET_CHILD_SUBREAPER, 1, 0, 0, 0)\npid = os.fork()\nif pid == 0:\n    libc.prctl(PR_SET_PDEATHSIG, signal.SIGKILL, 0, 0, 0)\n    os.execvp(worker[0], worker)\nopen(os.path.join(sigdir, \"worker-started\"), \"w\").write(str(pid))\n_, status = os.waitpid(pid, 0)\n# reap/kill every descendant still alive (a ghost daemon the worker left)\nkilled = []\nfor sig in (signal.SIGTERM, signal.SIGKILL):\n    try:\n        kids = [int(p) for p in open(f\"/proc/{os.getpid()}/task/{os.getpid()}/children\").read().split()]\n    except Exception:\n        kids = []\n    for k in kids:\n        try:\n            os.kill(k, sig); killed.append(k)\n        except ProcessLookupError:\n            pass\n    time.sleep(0.1)\n    while True:\n        try:\n            if os.waitpid(-1, os.WNOHANG) == (0, 0):\n                break\n        except ChildProcessError:\n            break\nopen(os.path.join(sigdir, \"gate-exit.json\"), \"w\").write(json.dumps({\"workerStatus\": status, \"descendantsKilled\": sorted(set(killed))}))\ntry:\n    s.sendall(json.dumps({\"exit\": status}).encode() + b\"\\n\")\nexcept Exception:\n    pass\n",
+  "p3_gate_probe.py": "#!/usr/bin/env python3\n\"\"\"P3 probe (B3 for a worker that is NOT our descendant, e.g. a herdr pane).\nA 'pane server' (separate session, not a child of the supervisor) starts the\ngate. Case A: supervisor sends GO + lock fd, then is SIGKILLed while the worker\nruns: the lock stays held by the gate; the worker leaves a ghost daemon; when\nthe worker exits the gate kills the ghost and the lock frees. Case B: the\nsupervisor dies before GO: the gate exits, the worker never runs.\n\"\"\"\nimport fcntl, json, os, signal, socket, subprocess, sys, tempfile, time\n\nhere = os.path.dirname(os.path.abspath(__file__))\nroot = tempfile.mkdtemp(prefix=\"p3-\", dir=here)\nGATE = os.path.join(here, \"p3_gate.py\")\n\ndef stranger_can_lock(path):\n    return subprocess.run([\"flock\", \"-n\", path, \"true\"]).returncode == 0\n\ndef alive(pid):\n    try:\n        os.kill(pid, 0)\n    except ProcessLookupError:\n        return False\n    st = open(f\"/proc/{pid}/stat\").read().split(\")\")[-1].split()[0]\n    return st != \"Z\"\n\ndef wait_file(p, t=10):\n    end = time.time() + t\n    while not os.path.exists(p):\n        if time.time() > end:\n            raise SystemExit(f\"timeout {p}\")\n        time.sleep(0.01)\n\nSUP = r'''\nimport fcntl, json, os, socket, sys, time\nlock_path, sock_path, sigdir, mode = sys.argv[1:5]\nsock_path = sock_path.replace('@', '\\0', 1) if sock_path.startswith('@') else sock_path\nfd = os.open(lock_path, os.O_RDONLY | os.O_CREAT)\nfcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)        # supervisor owns the attempt\nsrv = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM); srv.bind(sock_path); srv.listen(1)\nopen(os.path.join(sigdir, \"sup-ready\"), \"w\").write(str(os.getpid()))\nc, _ = srv.accept(); c.recv(1024)                     # gate says hello (its pid)\nif mode == \"die-before-go\":\n    open(os.path.join(sigdir, \"sup-will-die\"), \"w\").write(\"1\")\n    time.sleep(3600)\nsocket.send_fds(c, [b\"GO\"], [fd])\nopen(os.path.join(sigdir, \"sup-sent-go\"), \"w\").write(\"1\")\ntime.sleep(3600)\n'''\n\ndef case(name, mode, worker_cmd):\n    d = os.path.join(root, name); os.makedirs(d)\n    lock, sock = os.path.join(d, \"attempt.lock\"), \"@fgos-p3-\" + name + \"-\" + str(os.getpid())\n    sup = subprocess.Popen([sys.executable, \"-c\", SUP, lock, sock, d, mode])\n    wait_file(os.path.join(d, \"sup-ready\"))\n    # the \"pane server\": a separate session starts the gate (not our descendant chain)\n    pane = subprocess.Popen([sys.executable, GATE, sock, d] + worker_cmd, start_new_session=True)\n    out = {\"case\": name}\n    if mode == \"die-before-go\":\n        wait_file(os.path.join(d, \"sup-will-die\"))\n        sup.kill(); sup.wait()\n        pane.wait(timeout=10)\n        out[\"gateExitCode\"] = pane.returncode\n        out[\"workerEverStarted\"] = os.path.exists(os.path.join(d, \"worker-started\"))\n        out[\"lockFreeAfter\"] = stranger_can_lock(lock)\n        return out\n    wait_file(os.path.join(d, \"worker-started\"))\n    sup.kill(); sup.wait()                            # supervisor dies after GO\n    time.sleep(0.2)\n    out[\"lockHeldAfterSupervisorDeath\"] = not stranger_can_lock(lock)\n    wait_file(os.path.join(d, \"ghost.pid\"))\n    ghost = int(open(os.path.join(d, \"ghost.pid\")).read())\n    out[\"ghostAliveWhileWorkerRuns\"] = alive(ghost)\n    pane.wait(timeout=30)\n    out[\"gateExit\"] = json.load(open(os.path.join(d, \"gate-exit.json\")))\n    time.sleep(0.2)\n    out[\"ghostAliveAfterGateExit\"] = alive(ghost)\n    out[\"lockFreeAfterGateExit\"] = stranger_can_lock(lock)\n    return out\n\nghost_dir_placeholder = \"{D}\"\nresults = []\nd = os.path.join(root, \"A-supervisor-dies-after-go\")\n# worker: starts a ghost daemon (setsid, sleeps long), writes its pid, works 1.5 s, exits\nworker = [\"sh\", \"-c\", f\"setsid sleep 300 & echo $! > {d}/ghost.pid; sleep 1.5; exit 0\"]\nresults.append(case(\"A-supervisor-dies-after-go\", \"normal\", worker))\nresults.append(case(\"B-supervisor-dies-before-go\", \"die-before-go\", [\"sh\", \"-c\", \"touch should-never-run\"]))\nprint(json.dumps({\"root\": root, \"results\": results}, indent=2))\njson.dump({\"root\": root, \"results\": results}, open(os.path.join(here, \"p3-results.json\"), \"w\"), indent=2)\n",
+  "p4-controller-crash-probe.mjs": "// P4: controller-crash simulation of the supervisor protocol (T8 schedules).\n// Every case SIGKILLs the controller right after it launched the supervisor.\nimport fs from 'node:fs';\nimport path from 'node:path';\nimport { spawn, spawnSync } from 'node:child_process';\nimport { fileURLToPath } from 'node:url';\n\nconst here = path.dirname(fileURLToPath(import.meta.url));\nconst root = fs.mkdtempSync(path.join(here, 'p4-'));\nconst sleep = (ms) => new Promise((r) => setTimeout(r, ms));\nconst waitFile = async (p, ms = 20000) => { const end = Date.now() + ms; while (!fs.existsSync(p)) { if (Date.now() > end) throw new Error(`timeout ${p}`); await sleep(10); } };\nconst lockFree = (d) => spawnSync('flock', ['-n', path.join(d, 'attempt.lock'), 'true']).status === 0;\nconst readJ = (p) => (fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf8')) : null);\nconst adopt = (d) => JSON.parse(spawnSync(process.execPath, [path.join(here, 'p4-adopt.mjs'), d], { encoding: 'utf8' }).stdout);\nconst alive = (pid) => { try { process.kill(pid, 0); return !fs.readFileSync(`/proc/${pid}/stat`, 'utf8').split(') ')[1].startsWith('Z'); } catch { return false; } };\n\nasync function launch(name, c) {\n  const d = path.join(root, name);\n  const ctl = spawn(process.execPath, [path.join(here, 'p4-controller.mjs'), d, JSON.stringify(c)], { stdio: 'ignore' });\n  await waitFile(path.join(d, 'controller-ready'));\n  ctl.kill('SIGKILL');\n  await new Promise((r) => ctl.on('exit', r));\n  return d;\n}\nconst worker = (d, ms, writeResult = true) => ['sh', '-c', `sleep ${ms / 1000}; ${writeResult ? `echo '{\"claim\":\"done\"}' > ${d}/outbox/result-1.json;` : ''} echo out`];\nconst summary = (d) => ({\n  receipt: readJ(path.join(d, 'receipt.json')),\n  result: readJ(path.join(d, 'result.json')),\n  homeRemoved: !fs.existsSync(path.join(d, 'home')),\n  attemptLockFree: lockFree(d),\n  controlGenerations: fs.readdirSync(path.join(d, 'control', 'generations')).filter((f) => f.endsWith('.json')).length,\n});\nconst results = [];\n\n{ // A: controller dies; supervisor finishes, settles, releases\n  const d0 = path.join(root, 'A-controller-dies');\n  const d = await launch('A-controller-dies', { worker: worker(d0, 1500), deadlineMs: 10000, hardCeilingMs: 20000 });\n  await waitFile(path.join(d, 'release.exit'));\n  await sleep(200);\n  results.push({ case: 'A controller SIGKILL, supervisor settles', ...summary(d), adoptAfter: adopt(d) });\n}\n{ // B: controller dies, then supervisor dies while the worker runs; adopter keeps, then adopts without rerun\n  const d0 = path.join(root, 'B-supervisor-dies');\n  const d = await launch('B-supervisor-dies', { worker: worker(d0, 2500), deadlineMs: 10000, hardCeilingMs: 20000 });\n  await waitFile(path.join(d, 'supervisor-binding.json'));\n  await sleep(300);\n  const supPid = Number(fs.readFileSync(path.join(d, 'supervisor.pid'), 'utf8'));\n  process.kill(supPid, 'SIGKILL');\n  await sleep(100);\n  const adoptWhileWorkerRuns = adopt(d);\n  const homeKeptWhileWorkerRuns = fs.existsSync(path.join(d, 'home'));\n  await waitFile(path.join(d, 'gate-exit.json'));\n  await sleep(200);\n  const adoptAfterWorkerDone = adopt(d);\n  results.push({ case: 'B supervisor SIGKILL mid-run, adopt later', adoptWhileWorkerRuns, homeKeptWhileWorkerRuns, adoptAfterWorkerDone, ...summary(d), workerRanOnce: fs.readFileSync(path.join(d, 'stdout.log'), 'utf8').trim().split('\\n').length === 1 });\n}\n{ // C: controller dies; soft deadline enforced by the supervisor\n  const d0 = path.join(root, 'C-deadline');\n  const t0 = Date.now();\n  const d = await launch('C-deadline', { worker: worker(d0, 30000, false), deadlineMs: 1000, hardCeilingMs: 20000 });\n  await waitFile(path.join(d, 'release.exit'));\n  await sleep(200);\n  results.push({ case: 'C deadline after controller death', elapsedMs: Date.now() - t0, ...summary(d) });\n}\n{ // D: controller and supervisor dead; the gate's hard ceiling still stops the worker\n  const d0 = path.join(root, 'D-hard-ceiling');\n  const t0 = Date.now();\n  const d = await launch('D-hard-ceiling', { worker: worker(d0, 30000, false), deadlineMs: 20000, hardCeilingMs: 2500 });\n  await waitFile(path.join(d, 'supervisor-binding.json'));\n  process.kill(Number(fs.readFileSync(path.join(d, 'supervisor.pid'), 'utf8')), 'SIGKILL');\n  await waitFile(path.join(d, 'gate-exit.json'));\n  await sleep(200);\n  const workerPid = readJ(path.join(d, 'gate-exit.json')).workerPid;\n  const adopted = adopt(d);\n  results.push({ case: 'D supervisor dead, gate hard ceiling', elapsedMs: Date.now() - t0, workerAliveAfter: alive(workerPid), adopted, ...summary(d) });\n}\n{ // E: two adopters race on a free attempt lock: one adopts, the other is kept out\n  const d0 = path.join(root, 'E-two-adopters');\n  const d = await launch('E-two-adopters', { worker: worker(d0, 800), deadlineMs: 10000, hardCeilingMs: 20000 });\n  await waitFile(path.join(d, 'supervisor-binding.json'));\n  process.kill(Number(fs.readFileSync(path.join(d, 'supervisor.pid'), 'utf8')), 'SIGKILL');\n  await waitFile(path.join(d, 'gate-exit.json'));\n  await sleep(200);\n  const run = () => new Promise((r) => { const p = spawn(process.execPath, [path.join(here, 'p4-adopt.mjs'), d], { stdio: ['ignore', 'pipe', 'ignore'] }); let s = ''; p.stdout.on('data', (x) => (s += x)); p.on('exit', () => r(JSON.parse(s))); });\n  const [x, y] = await Promise.all([run(), run()]);\n  results.push({ case: 'E two adopters race', adopters: [x, y], settleRefusals: fs.readdirSync(d).filter((f) => f.startsWith('settle-refused')).length, ...summary(d) });\n}\nconst out = { root, results };\nfs.writeFileSync(path.join(here, 'p4-results.json'), JSON.stringify(out, null, 2));\nconsole.log(JSON.stringify(out, null, 2));\n",
+  "p4-controller.mjs": "// P4 controller (stand-in for `fgos run` / executeAssignment). Admission:\n// acquire the attempt lock on its own description (helper flock on fd 3),\n// acquire run control (production acquireRunControl), write the immutable\n// envelope + 0600 token file, spawn the supervisor detached with the SAME\n// description at fd 3 (no IPC, no pipes), then just watch files.\n// argv: attemptDir caseJson\nimport fs from 'node:fs';\nimport path from 'node:path';\nimport { spawn, spawnSync } from 'node:child_process';\nimport { acquireRunControl, buildRunControlHolder } from '/home/vantt/projects/forgentX/src/runner/dispatch/run-lock.mjs';\n\nconst [d, caseJson] = process.argv.slice(2);\nconst c = JSON.parse(caseJson);\nconst here = path.dirname(new URL(import.meta.url).pathname);\nfs.mkdirSync(d, { recursive: true });\nconst lockFd = fs.openSync(path.join(d, 'attempt.lock'), fs.constants.O_RDONLY | fs.constants.O_CREAT);\nconst a = spawnSync('flock', ['-n', '3'], { stdio: ['ignore', 'ignore', 'ignore', lockFd] });\nif (a.status !== 0) { console.error('attempt lock held'); process.exit(7); }\nconst control = acquireRunControl(d, { holder: buildRunControlHolder(`ctl:${process.pid}`), purpose: 'worker-spawn' });\nfs.writeFileSync(path.join(d, 'control-token.json'), JSON.stringify({ controlEpoch: control.controlEpoch, controlToken: control.controlToken }), { mode: 0o600 });\nfs.mkdirSync(path.join(d, 'home'));\nfs.writeFileSync(path.join(d, 'home', 'credential'), 'secret');\nconst envelope = {\n  gate: path.join(here, 'p4_gate.py'),\n  worker: c.worker,\n  deadlineMs: c.deadlineMs,\n  hardCeilingMs: c.hardCeilingMs,\n  settle: [process.execPath, path.join(here, 'p4-settle.mjs'), d, path.join(d, 'control-token.json')],\n  release: ['sh', '-c', `rm -rf ${JSON.stringify(path.join(d, 'home'))}`],\n};\nfs.writeFileSync(path.join(d, 'envelope.json'), JSON.stringify(envelope));\nconst sup = spawn('python3', [path.join(here, 'p4_supervisor.py'), d], { detached: true, stdio: ['ignore', 'ignore', 'ignore', lockFd] });\nfs.writeFileSync(path.join(d, 'supervisor.pid'), String(sup.pid));\nsup.unref();\nfs.writeFileSync(path.join(d, 'controller-ready'), String(process.pid));\n// keep watching (would print live output by tailing stdout.log)\nsetInterval(() => { if (fs.existsSync(path.join(d, 'result.json'))) process.exit(0); }, 50);\n",
+  "p4-adopt.mjs": "// P4 adopter (stand-in for `fgos run --resume` / the reaper sweep). The only\n// question it asks: is the attempt lock held? Held -> somebody of the attempt\n// is alive (supervisor, gate or worker): keep everything. Free -> nobody is:\n// acquire it, take run control (old holder provably dead), publish an adopted\n// receipt from the evidence on disk (gate exit report, worker outbox) instead\n// of rerunning, settle through the same CAS, release. argv: attemptDir\nimport fs from 'node:fs';\nimport path from 'node:path';\nimport { spawnSync } from 'node:child_process';\nimport { acquireRunControl, buildRunControlHolder } from '/home/vantt/projects/forgentX/src/runner/dispatch/run-lock.mjs';\n\nconst d = process.argv[2];\nconst here = path.dirname(new URL(import.meta.url).pathname);\nconst lockFd = fs.openSync(path.join(d, 'attempt.lock'), 'r');\nconst a = spawnSync('flock', ['-n', '3'], { stdio: ['ignore', 'ignore', 'ignore', lockFd] });\nif (a.status !== 0) {\n  fs.closeSync(lockFd);\n  console.log(JSON.stringify({ adopt: 'kept', reason: 'attempt-lock-held' }));\n  process.exit(0);\n}\nif (fs.existsSync(path.join(d, 'result.json'))) {\n  console.log(JSON.stringify({ adopt: 'nothing-to-do', reason: 'already-settled' }));\n  process.exit(0);\n}\nconst control = acquireRunControl(d, { holder: buildRunControlHolder(`adopt:${process.pid}`), purpose: 'adopt' });\nif (control.status !== 'acquired') { console.log(JSON.stringify({ adopt: 'refused', control })); process.exit(0); }\nfs.writeFileSync(path.join(d, 'adopt-token.json'), JSON.stringify({ controlEpoch: control.controlEpoch, controlToken: control.controlToken }), { mode: 0o600 });\nconst gx = fs.existsSync(path.join(d, 'gate-exit.json')) ? JSON.parse(fs.readFileSync(path.join(d, 'gate-exit.json'), 'utf8')) : null;\nconst receipt = {\n  by: 'adopter',\n  kind: !gx ? 'worker-state-unknown' : gx.stoppedBy === 'hard-ceiling' ? 'timeout' : gx.exitCode === 0 ? 'exited' : 'failed',\n  gateExit: gx,\n  workerResultPresent: fs.existsSync(path.join(d, 'outbox', 'result-1.json')),\n};\nconst tmp = path.join(d, `receipt.tmp${process.pid}`);\nfs.writeFileSync(tmp, JSON.stringify(receipt));\nlet published = true;\ntry { fs.linkSync(tmp, path.join(d, 'receipt.json')); } catch { published = false; }\nfs.unlinkSync(tmp);\nconst settle = spawnSync(process.execPath, [path.join(here, 'p4-settle.mjs'), d, path.join(d, 'adopt-token.json')], { stdio: ['ignore', 'ignore', 'ignore', lockFd] });\nspawnSync('sh', ['-c', `rm -rf ${JSON.stringify(path.join(d, 'home'))}`]);\nconsole.log(JSON.stringify({ adopt: 'adopted', receiptPublishedByAdopter: published, settleExit: settle.status, controlEpoch: control.controlEpoch }));\n",
+  "p4-settle.mjs": "// P4 settle step (stand-in for the Node `settleRunOutcome` door run as a\n// supervisor child). Reads the receipt, writes result.json only through the\n// production run-control CAS (settleRunControl, read-only import), so a second\n// settler is refused. argv: attemptDir tokenFile\nimport fs from 'node:fs';\nimport path from 'node:path';\nimport { settleRunControl } from '/home/vantt/projects/forgentX/src/runner/dispatch/run-lock.mjs';\n\nconst [d, tokenFile] = process.argv.slice(2);\nconst { controlEpoch, controlToken } = JSON.parse(fs.readFileSync(tokenFile, 'utf8'));\nconst receipt = JSON.parse(fs.readFileSync(path.join(d, 'receipt.json'), 'utf8'));\nconst cas = settleRunControl(d, { controlEpoch, controlToken });\nif (cas.status !== 'settled') {\n  fs.writeFileSync(path.join(d, `settle-refused-${process.pid}.json`), JSON.stringify(cas));\n  process.exit(2);\n}\nconst outbox = path.join(d, 'outbox', 'result-1.json');\nconst result = {\n  status: receipt.kind === 'timeout' ? 'timeout' : receipt.workerResultPresent ? 'pass' : 'failed',\n  receiptBy: receipt.by,\n  workerClaim: fs.existsSync(outbox) ? JSON.parse(fs.readFileSync(outbox, 'utf8')) : null,\n  settledEpoch: cas.controlEpoch,\n};\nfs.writeFileSync(path.join(d, 'result.json'), JSON.stringify(result));\n",
+  "p4_gate.py": "#!/usr/bin/env python3\n\"\"\"P4 gate (stand-in for the Rust `fgos gate`): the attempt's process root.\nHolds the attempt lock description (inherited fd, close-on-exec for the\nworker), child subreaper, hard ceiling independent of the supervisor, tree\nkill on exit or SIGTERM, exit report published once.\nargv: --fd N --ceiling-ms MS --report PATH --stdout P --stderr P -- worker...\n\"\"\"\nimport ctypes, json, os, signal, sys, time\n\na = sys.argv[1:]\nsep = a.index(\"--\")\nopts = dict(zip(a[:sep:2], a[1:sep:2]))\nworker = a[sep + 1:]\nlock_fd = int(opts[\"--fd\"])\nceiling_s = int(opts[\"--ceiling-ms\"]) / 1000\nreport = opts[\"--report\"]\nlibc = ctypes.CDLL(None, use_errno=True)\nlibc.prctl(36, 1, 0, 0, 0)                       # PR_SET_CHILD_SUBREAPER\nos.set_inheritable(lock_fd, False)\n\nout = os.open(opts[\"--stdout\"], os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o600)\nerr = os.open(opts[\"--stderr\"], os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o600)\npid = os.fork()\nif pid == 0:\n    libc.prctl(1, signal.SIGKILL, 0, 0, 0)       # PR_SET_PDEATHSIG\n    os.setpgid(0, 0)\n    os.dup2(out, 1); os.dup2(err, 2)             # capture to files, never a pipe to the supervisor\n    os.execvp(worker[0], worker)\n\nstop = {\"why\": None}\ndef on_term(_s, _f):\n    stop[\"why\"] = \"stopped\"\nsignal.signal(signal.SIGTERM, on_term)\n\nstart = time.monotonic()\nstatus = None\nwhile status is None:\n    if stop[\"why\"] is None and time.monotonic() - start > ceiling_s:\n        stop[\"why\"] = \"hard-ceiling\"\n    if stop[\"why\"]:\n        try: os.killpg(pid, signal.SIGTERM)\n        except ProcessLookupError: pass\n    try:\n        p, st = os.waitpid(pid, os.WNOHANG)\n        if p == pid:\n            status = st\n    except ChildProcessError:\n        status = -1\n    time.sleep(0.02)\n\nkilled = []\nfor sig in (signal.SIGTERM, signal.SIGKILL):\n    try:\n        kids = [int(x) for x in open(f\"/proc/{os.getpid()}/task/{os.getpid()}/children\").read().split()]\n    except Exception:\n        kids = []\n    for k in kids:\n        try: os.kill(k, sig); killed.append(k)\n        except ProcessLookupError: pass\n    time.sleep(0.05)\n    while True:\n        try:\n            if os.waitpid(-1, os.WNOHANG) == (0, 0): break\n        except ChildProcessError: break\n\nrec = {\"workerPid\": pid, \"waitStatus\": status, \"exitCode\": os.waitstatus_to_exitcode(status) if status >= 0 else None,\n       \"stoppedBy\": stop[\"why\"], \"descendantsKilled\": sorted(set(killed))}\ntmp = report + f\".tmp{os.getpid()}\"\nopen(tmp, \"w\").write(json.dumps(rec))\ntry: os.link(tmp, report)                         # published once\nexcept FileExistsError: pass\nos.unlink(tmp)\n",
+  "p4_supervisor.py": "#!/usr/bin/env python3\n\"\"\"P4 run supervisor (stand-in for the Rust `fgos supervise`). Owns one attempt.\nInherits the attempt lock description at fd 3 from whoever launched it (no\nIPC, no pipe to the controller). Reads the immutable envelope, publishes its\nbinding, heartbeats (display only), starts the gate, enforces the soft\ndeadline, publishes the receipt once, then runs the prepared settle and\nrelease steps as its own children (they inherit the lock), then exits; the\nlock frees when the last holder closes it.\nargv: attemptDir\n\"\"\"\nimport json, os, signal, subprocess, sys, time\n\nd = sys.argv[1]\nenv = json.load(open(os.path.join(d, \"envelope.json\")))\nLOCK_FD = 3\nos.set_inheritable(LOCK_FD, True)\n\ndef publish_once(path, rec):\n    tmp = path + f\".tmp{os.getpid()}\"\n    open(tmp, \"w\").write(json.dumps(rec))\n    try:\n        os.link(tmp, path); ok = True\n    except FileExistsError:\n        ok = False\n    os.unlink(tmp)\n    return ok\n\ndef start_time(pid):\n    return open(f\"/proc/{pid}/stat\").read().rsplit(\")\", 1)[1].split()[19]\n\npublish_once(os.path.join(d, \"supervisor-binding.json\"),\n             {\"pid\": os.getpid(), \"startTime\": start_time(os.getpid()),\n              \"bootId\": open(\"/proc/sys/kernel/random/boot_id\").read().strip()})\nhb = os.path.join(d, \"heartbeat\")\nos.makedirs(os.path.join(d, \"outbox\"), exist_ok=True)\ngate = subprocess.Popen(\n    [sys.executable, env[\"gate\"], \"--fd\", str(LOCK_FD), \"--ceiling-ms\", str(env[\"hardCeilingMs\"]),\n     \"--report\", os.path.join(d, \"gate-exit.json\"),\n     \"--stdout\", os.path.join(d, \"stdout.log\"), \"--stderr\", os.path.join(d, \"stderr.log\"), \"--\"] + env[\"worker\"],\n    pass_fds=(LOCK_FD,))\ndeadline = time.monotonic() + env[\"deadlineMs\"] / 1000\nkind = None\nwhile gate.poll() is None:\n    open(hb, \"w\").write(str(time.time()))\n    if kind is None and time.monotonic() > deadline:\n        kind = \"timeout\"\n        gate.send_signal(signal.SIGTERM)          # soft deadline: ask the process root to stop the tree\n    time.sleep(0.05)\ngx = json.load(open(os.path.join(d, \"gate-exit.json\")))\nresult_file = os.path.join(d, \"outbox\", \"result-1.json\")\nreceipt = {\"by\": \"supervisor\", \"kind\": kind or (\"exited\" if gx[\"exitCode\"] == 0 else \"failed\"),\n           \"gateExit\": gx, \"workerResultPresent\": os.path.exists(result_file)}\npublish_once(os.path.join(d, \"receipt.json\"), receipt)\nfor step in (\"settle\", \"release\"):                # prepared steps, children inherit the lock\n    r = subprocess.run(env[step], pass_fds=(LOCK_FD,))\n    open(os.path.join(d, f\"{step}.exit\"), \"w\").write(str(r.returncode))\n",
+  "p5-kernel-lock-stress-and-ledger-no-gc.mjs": "// P5a: stress the kernel-lock mutex from Node: 8 processes x 120 acquisitions,\n// acquire = open + helper flock on the inherited description (blocking, 5 s cap),\n// release = close. A killer SIGKILLs random holders INSIDE the critical section.\n// Witness: another process's witness file in the CS directory = violation. A\n// killed holder is SIGSTOPped, its witness retired, then SIGKILLed (exact). Stuck = a\n// worker that never gets the lock after holders died.\n// P5b: the B1 schedule against the run-control ledger WITHOUT GC (production\n// publishNextGeneration): the paused contender's stale link hits EEXIST and it\n// re-decides; no hole can exist, so no post-check is needed.\nimport fs from 'node:fs';\nimport path from 'node:path';\nimport { spawn } from 'node:child_process';\nimport { fileURLToPath } from 'node:url';\nimport { publishNextGeneration, publishMarkerOnce, currentGeneration } from '/home/vantt/projects/forgentX/src/runner/dispatch/run-lock.mjs';\n\nconst here = path.dirname(fileURLToPath(import.meta.url));\nconst root = fs.mkdtempSync(path.join(here, 'p5-'));\nconst lockFile = path.join(root, 'lock');\nconst cs = path.join(root, 'cs');\nfs.mkdirSync(cs);\nfs.writeFileSync(lockFile, '');\nconst W = 8, N = 120;\nconst WORKER = `\nconst fs=require('fs'),path=require('path');const {spawnSync}=require('child_process');\nconst [lock,cs,n,out]=process.argv.slice(1);let v=0,a=0,t=0;\nconst liveOthers=()=>fs.readdirSync(cs).filter(f=>!f.startsWith(process.pid+'-')).length;\nfor(let i=0;i<+n;i++){\n  const fd=fs.openSync(lock,'r');\n  const r=spawnSync('flock',['-w','5','3'],{stdio:['ignore','ignore','ignore',fd]});\n  if(r.status!==0){t++;fs.closeSync(fd);continue;}\n  a++;const tag=path.join(cs,process.pid+'-'+i);fs.writeFileSync(tag,'');\n  if(liveOthers()>0)v++;\n  const e=Date.now()+Math.random()*3;while(Date.now()<e){}\n  if(liveOthers()>0)v++;\n  fs.unlinkSync(tag);fs.closeSync(fd);\n  fs.writeFileSync(out,JSON.stringify({a,v,t}));\n}\nfs.writeFileSync(out,JSON.stringify({a,v,t,done:true}));`;\n\nconst procs = new Map();\nlet spawned = 0;\nfunction start(i) {\n  const out = path.join(root, `w${i}-${spawned++}.json`);\n  const p = spawn(process.execPath, ['-e', WORKER, lockFile, cs, String(N), out], { stdio: 'ignore' });\n  procs.set(p.pid, { p, i, out });\n  p.on('exit', () => procs.delete(p.pid));\n}\nfor (let i = 0; i < W; i++) start(i);\nlet kills = 0, killsInsideCs = 0;\nconst t0 = Date.now();\nwhile (procs.size > 0 && Date.now() - t0 < 120000) {\n  await new Promise((r) => setTimeout(r, 40 + Math.random() * 60));\n  const inside = fs.readdirSync(cs);\n  if (inside.length && kills < 25) {\n    const pid = Number(inside[0].split('-')[0]);\n    const entry = procs.get(pid);\n    if (entry) {\n      // Exact witness: freeze the victim (it runs no more user code but still\n      // holds the lock), retire its witness file, then kill it.\n      entry.p.kill('SIGSTOP');\n      await new Promise((r) => setTimeout(r, 5));\n      for (const f of fs.readdirSync(cs)) if (f.startsWith(`${pid}-`)) { try { fs.renameSync(path.join(cs, f), path.join(root, `retired-${f}`)); } catch {} }\n      entry.p.kill('SIGKILL'); kills++; killsInsideCs++;\n      await new Promise((r) => entry.p.on('exit', r));\n      start(entry.i);\n    }\n  }\n}\nconst outs = fs.readdirSync(root).filter((f) => /^w\\d+-\\d+\\.json$/.test(f)).map((f) => { try { return JSON.parse(fs.readFileSync(path.join(root, f), 'utf8')); } catch { return { a: 0, v: 0, t: 0 }; } });\nconst stress = {\n  case: `kernel-lock stress ${W} procs x ${N}, ${kills} SIGKILLs of holders inside the CS`,\n  acquisitions: outs.reduce((s, o) => s + o.a, 0),\n  csViolations: outs.reduce((s, o) => s + o.v, 0),\n  timeoutsWaiting5s: outs.reduce((s, o) => s + o.t, 0),\n  elapsedMs: Date.now() - t0,\n  allWorkersFinished: procs.size === 0,\n};\n\n// P5b: B1 schedule, ledger without GC\nconst gens = path.join(root, 'control', 'generations');\nconst rel = path.join(root, 'control', 'releases');\nconst g1 = publishNextGeneration(gens, () => ({ record: { holder: 'A1' } }));\npublishMarkerOnce(path.join(rel, '1.release'), {});\n// C decides \"1 released -> I publish 2\" and is paused before link: emulate by\n// capturing its decision, letting A(2), B(3) proceed, then retrying C's link.\nlet cTried = 0;\nconst a2 = publishNextGeneration(gens, () => ({ record: { holder: 'A2' } }));\nconst b3 = publishNextGeneration(gens, () => ({ record: { holder: 'B3' } }));\n// No GC: generations 1 and 2 still exist. C resumes with its stale target 2.\nlet cOutcome;\ntry { fs.linkSync(path.join(gens, '0000000003.json'), path.join(gens, '0000000002.json')); cOutcome = 'linked'; } catch (e) { cOutcome = e.code; }\nconst cRedecide = publishNextGeneration(gens, ({ current }) => { cTried++; return current.record.holder === 'B3' ? { stop: true, status: 'held', epoch: current.epoch } : { record: { holder: 'C' } }; });\nconst ledger = { case: 'B1 schedule on the run-control ledger without GC', staleLinkTo2: cOutcome, redecidedAgainst: currentGeneration(gens).epoch, cOutcome: cRedecide.status, generationsOnDisk: fs.readdirSync(gens).length, epochs: [g1.epoch, a2.epoch, b3.epoch] };\n\nconst out = { root, results: [stress, ledger] };\nfs.writeFileSync(path.join(here, 'p5-results.json'), JSON.stringify(out, null, 2));\nconsole.log(JSON.stringify(out, null, 2));\n",
+  "p6-quiescent-raise.mjs": "// P6 (B2): round 2's schedule against the quiescent raise rule. A v1 holder\n// (production acquireMainCheckoutLock, TTL 60 ms) is paused past its TTL inside\n// its critical section. Round-2 raiser (takes v1 by TTL, raises marker) vs v3\n// raiser rule: refuse unless (a) no other fgOS process is running for this\n// workspace (cmdline scan) and (b) the v1 lock file does not exist at all; the\n// raiser then creates it exclusively (link) and holds it while writing the marker.\nimport fs from 'node:fs';\nimport path from 'node:path';\nimport { spawn } from 'node:child_process';\nimport { fileURLToPath } from 'node:url';\nimport { acquireMainCheckoutLock, ACQUIRED } from '/home/vantt/projects/forgentX/src/runner/main-checkout-lock.mjs';\n\nconst here = path.dirname(fileURLToPath(import.meta.url));\nconst root = fs.mkdtempSync(path.join(here, 'p6-'));\nconst fgos = path.join(root, '.fgos');\nfs.mkdirSync(fgos);\nconst TAG = `fgos-p6-workspace-${process.pid}`;\nconst v1 = path.join(fgos, 'main-checkout.lock');\n// the holder: a process that \"runs fgOS for this workspace\" (TAG in argv), holds v1, then is paused\nconst holder = spawn(process.execPath, ['--input-type=module', '-e', `\n  const { acquireMainCheckoutLock } = await import('/home/vantt/projects/forgentX/src/runner/main-checkout-lock.mjs');\n  const r = acquireMainCheckoutLock(${JSON.stringify(fgos)}, { identity: process.pid, ttlMs: 60 });\n  (await import('node:fs')).default.writeFileSync(${JSON.stringify(path.join(root, 'held'))}, r.status);\n  setInterval(()=>{}, 1000);`, TAG], { stdio: 'ignore' });\nwhile (!fs.existsSync(path.join(root, 'held'))) await new Promise((r) => setTimeout(r, 5));\nholder.kill('SIGSTOP');                       // paused inside its critical section\nawait new Promise((r) => setTimeout(r, 100)); // past its TTL\n\nfunction otherWorkspaceProcesses() {\n  return fs.readdirSync('/proc').filter((p) => /^\\d+$/.test(p) && Number(p) !== process.pid).filter((p) => {\n    try { return fs.readFileSync(`/proc/${p}/cmdline`, 'utf8').includes(TAG); } catch { return false; }\n  });\n}\n// round-2 raiser: acquire v1 (TTL takeover allowed by production v1), raise\nconst r2 = acquireMainCheckoutLock(fgos, { identity: process.pid + 1, ttlMs: 60 });\nconst round2 = { raiserV1Status: r2.status, wouldRaiseWhileHolderInCs: r2.status === ACQUIRED };\nif (r2.status === ACQUIRED) r2.release?.();\n\n// v3 quiescent raise\nconst others = otherWorkspaceProcesses();\nconst v1Exists = fs.existsSync(v1);\nconst v3 = { otherFgosProcesses: others.length, v1FilePresent: v1Exists, decision: others.length === 0 && !v1Exists ? 'raise' : 'refuse' };\n\nholder.kill('SIGKILL');\nconst out = { root, case: 'v1 holder paused past TTL inside its CS during upgrade', round2RaiserRule: round2, v3QuiescentRaiseRule: v3 };\nfs.writeFileSync(path.join(here, 'p6-results.json'), JSON.stringify(out, null, 2));\nconsole.log(JSON.stringify(out, null, 2));\n",
+  "era-ledger.mjs": "// Model of the v3 holder-lock protocol (\"era ledger\"). Probe code, not an\n// implementation. Writes only under the lockDir a probe passes in.\n//\n// Layout:\n//   <lockDir>/current                 {\"era\": \"<name>\"}; created by link-if-absent,\n//                                     replaced by rename only by the current holder\n//   <lockDir>/eras/<era>/gen/<epoch>  one generation per acquire; NEVER deleted\n//                                     while its era is reachable from `current`\n//   <lockDir>/eras/<era>/rel/<epoch>  one-shot release marker\n// Era name: <firstEpoch10>-<bootIdHex>-<rand>. The boot of every record in an\n// era is the era's boot (no mtime anywhere).\n//\n// Acquire linearizes at a successful link of gen/<max+1> in era e, confirmed\n// by a post-check that `current` still names e. GC = the holder moves the\n// ledger to a new era (copy of its own record), swaps `current`, then deletes\n// the old era. A stale contender can only link into an unreachable era (post\n// check fails) or into a deleted one (ENOENT).\nimport fs from 'node:fs';\nimport path from 'node:path';\nimport crypto from 'node:crypto';\n\nexport function currentBoot() {\n  if (process.env.PROBE_BOOT_ID) return process.env.PROBE_BOOT_ID;\n  try { return fs.readFileSync('/proc/sys/kernel/random/boot_id', 'utf8').trim().replace(/-/g, ''); } catch { return 'unknown'; }\n}\nexport function startTimeOf(pid) {\n  try {\n    const s = fs.readFileSync(`/proc/${pid}/stat`, 'utf8');\n    return s.slice(s.lastIndexOf(')') + 2).split(' ')[19] || null;\n  } catch { return null; }\n}\nfunction kill0(pid) { try { process.kill(pid, 0); return true; } catch (e) { return e.code === 'EPERM'; } }\n\n/** alive | dead | unknown. Never reads mtime. */\nexport function judgeOwner(owner) {\n  if (!owner || !Number.isInteger(owner.pid)) return 'unknown';\n  if (!kill0(owner.pid)) return 'dead';\n  const st = startTimeOf(owner.pid);\n  if (st === null || !owner.startTime) return 'unknown';\n  return st === owner.startTime ? 'alive' : 'dead';\n}\nexport function self() { return { pid: process.pid, startTime: startTimeOf(process.pid) }; }\n\nconst pad = (n) => String(n).padStart(10, '0');\nconst GEN_RE = /^(\\d{10})$/;\nconst eraBoot = (era) => era.split('-')[1];\nconst eraFirst = (era) => Number(era.split('-')[0]);\n\nfunction readPointer(lockDir) {\n  try { return JSON.parse(fs.readFileSync(path.join(lockDir, 'current'), 'utf8')).era; }\n  catch (e) { if (e.code === 'ENOENT') return null; throw e; }\n}\nfunction writeFileFsync(p, content) {\n  const fd = fs.openSync(p, 'w'); try { fs.writeSync(fd, content); fs.fsyncSync(fd); } finally { fs.closeSync(fd); }\n}\nfunction newEraName(firstEpoch) { return `${pad(firstEpoch)}-${currentBoot()}-${crypto.randomBytes(4).toString('hex')}`; }\n\nfunction bootstrap(lockDir) {\n  const era = newEraName(0);\n  fs.mkdirSync(path.join(lockDir, 'eras', era, 'gen'), { recursive: true });\n  fs.mkdirSync(path.join(lockDir, 'eras', era, 'rel'), { recursive: true });\n  const tmp = path.join(lockDir, `.ptr-${process.pid}-${crypto.randomBytes(4).toString('hex')}`);\n  writeFileFsync(tmp, JSON.stringify({ era }));\n  try { fs.linkSync(tmp, path.join(lockDir, 'current')); }\n  catch (e) { if (e.code !== 'EEXIST') throw e; fs.rmSync(path.join(lockDir, 'eras', era), { recursive: true, force: true }); }\n  fs.unlinkSync(tmp);\n}\n\n/** Name-based max of a reachable era. Null for an era with no generations. */\nfunction maxEpochByName(genDir) {\n  const names = fs.readdirSync(genDir); // throws ENOENT when the era was deleted\n  let max = null;\n  for (const n of names) { const m = GEN_RE.exec(n); if (m && (max === null || Number(m[1]) > max)) max = Number(m[1]); }\n  return max;\n}\n\n/**\n * One acquire attempt loop. Returns {status:'acquired', handle} or\n * {status:'held', reason}. Hooks let probes pause at the dangerous gaps.\n */\nexport function tryAcquire(lockDir, { owner = self(), compactEvery = 64, hooks = {}, stats = {}, extraHeld = null } = {}) {\n  fs.mkdirSync(path.join(lockDir, 'eras'), { recursive: true });\n  for (let loops = 0; loops < 10000; loops++) {\n    let era = readPointer(lockDir);\n    if (era === null) { bootstrap(lockDir); continue; }\n    hooks.afterPointer?.({ era });\n    const eraDir = path.join(lockDir, 'eras', era);\n    let max;\n    try { max = maxEpochByName(path.join(eraDir, 'gen')); }\n    catch (e) { if (e.code === 'ENOENT') { stats.eraGone = (stats.eraGone || 0) + 1; continue; } throw e; }\n    const bootDead = eraBoot(era) !== 'unknown' && eraBoot(era) !== currentBoot();\n    if (max !== null && !bootDead) {\n      let rec;\n      try { rec = fs.readFileSync(path.join(eraDir, 'gen', pad(max)), 'utf8'); }\n      catch (e) { if (e.code === 'ENOENT') { stats.eraGone = (stats.eraGone || 0) + 1; continue; } throw e; }\n      let parsed = null; try { parsed = JSON.parse(rec); } catch {}\n      if (parsed === null) return { status: 'held', reason: 'unknown-record' };\n      const released = fs.existsSync(path.join(eraDir, 'rel', pad(max)));\n      if (!released) {\n        const verdict = judgeOwner(parsed.owner);\n        if (verdict !== 'dead') return { status: 'held', reason: verdict, holder: parsed.owner };\n        // Generation stays held while a bound borrower of it is alive.\n        if (extraHeld?.(parsed)) return { status: 'held', reason: 'borrower-alive' };\n      }\n    }\n    const next = (max ?? eraFirst(era)) + 1;\n    hooks.beforeLink?.({ era, next });\n    const token = crypto.randomUUID();\n    const tmp = path.join(lockDir, `.tmp-${process.pid}-${crypto.randomBytes(4).toString('hex')}`);\n    fs.writeFileSync(tmp, JSON.stringify({ v: 3, epoch: next, token, owner }));\n    try { fs.linkSync(tmp, path.join(eraDir, 'gen', pad(next))); }\n    catch (e) {\n      fs.unlinkSync(tmp);\n      if (e.code === 'EEXIST' || e.code === 'ENOENT') { stats.lostLink = (stats.lostLink || 0) + 1; continue; }\n      throw e;\n    }\n    fs.unlinkSync(tmp);\n    hooks.beforePostCheck?.({ era, next });\n    if (process.env.PROBE_NO_POSTCHECK !== '1' && readPointer(lockDir) !== era) { stats.unreachableLink = (stats.unreachableLink || 0) + 1; continue; }\n    const handle = { lockDir, era, epoch: next, token, owner };\n    if (bootDead || next - eraFirst(era) >= compactEvery) compact(handle, stats);\n    return { status: 'acquired', handle };\n  }\n  throw new Error('acquire loop bound');\n}\n\n/** Holder-only: move the ledger to a fresh era holding a copy of our record. */\nfunction compact(handle, stats) {\n  const { lockDir, era: oldEra, epoch } = handle;\n  const era = newEraName(epoch);\n  const eraDir = path.join(lockDir, 'eras', era);\n  fs.mkdirSync(eraDir); // exclusive: a fresh, unique name\n  fs.mkdirSync(path.join(eraDir, 'gen'));\n  fs.mkdirSync(path.join(eraDir, 'rel'));\n  fs.copyFileSync(path.join(lockDir, 'eras', oldEra, 'gen', pad(epoch)), path.join(eraDir, 'gen', pad(epoch)));\n  const tmp = path.join(lockDir, `.ptr-${process.pid}-${crypto.randomBytes(4).toString('hex')}`);\n  writeFileFsync(tmp, JSON.stringify({ era }));\n  fs.renameSync(tmp, path.join(lockDir, 'current'));\n  handle.era = era;\n  stats.compactions = (stats.compactions || 0) + 1;\n  // Delete every era other than the one we just made current.\n  if (process.env.PROBE_KEEP_OLD_ERAS === '1') return;\n  for (const name of fs.readdirSync(path.join(lockDir, 'eras'))) {\n    if (name !== era) { try { fs.rmSync(path.join(lockDir, 'eras', name), { recursive: true, force: true }); } catch {} }\n  }\n}\n\nexport function release(handle) {\n  const p = path.join(handle.lockDir, 'eras', handle.era, 'rel', pad(handle.epoch));\n  const tmp = `${p}.tmp-${process.pid}`;\n  fs.writeFileSync(tmp, '{}');\n  try { fs.linkSync(tmp, p); } catch (e) { if (e.code !== 'EEXIST') throw e; }\n  fs.unlinkSync(tmp);\n}\n\nexport function sleepMs(ms) { Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms); }\n",
+  "probe-era-ledger.mjs": "// Probe B1 + B7 against the era-ledger model: paused contenders vs GC (era\n// compaction), stress with aggressive compaction, boot-era death, corrupt\n// record, mtime ignored. Run: node probe-era-ledger.mjs\nimport fs from 'node:fs';\nimport path from 'node:path';\nimport os from 'node:os';\nimport { spawn } from 'node:child_process';\nimport { fileURLToPath } from 'node:url';\nimport { tryAcquire, release, sleepMs } from './era-ledger.mjs';\n\nconst HERE = path.dirname(fileURLToPath(import.meta.url));\nconst ME = fileURLToPath(import.meta.url);\nconst waitFile = (f, ms = 20000) => { const end = Date.now() + ms; while (!fs.existsSync(f)) { if (Date.now() > end) throw new Error(`timeout ${f}`); sleepMs(5); } };\n\n// ---------- child roles ----------\nconst role = process.argv[2];\nif (role) {\n  const [lockDir, work] = [process.argv[3], process.argv[4]];\n  const out = (o) => fs.writeFileSync(path.join(work, `${role}-${process.pid}.json`), JSON.stringify(o));\n  const csEnter = (tag) => { const d = path.join(work, 'cs'); fs.mkdirSync(d, { recursive: true }); const others = fs.readdirSync(d).length; fs.writeFileSync(path.join(d, `${tag}-${process.pid}`), ''); return others; };\n  const csLeave = (tag) => fs.rmSync(path.join(work, 'cs', `${tag}-${process.pid}`), { force: true });\n  if (role === 'paused-contender') {\n    // Decides, then waits at the barrier before link (the A1/B1 gap).\n    const stats = {};\n    const r = tryAcquire(lockDir, { compactEvery: 2, stats, hooks: { beforeLink: () => { fs.writeFileSync(path.join(work, 'C-decided'), ''); waitFile(path.join(work, 'C-go')); } } });\n    const others = r.status === 'acquired' ? csEnter('C') : null;\n    out({ status: r.status, reason: r.reason, epoch: r.handle?.epoch, othersInsideOnEntry: others, stats });\n    if (r.status === 'acquired') { sleepMs(300); csLeave('C'); release(r.handle); }\n    process.exit(0);\n  }\n  if (role === 'stale-pointer-contender') {\n    // Reads `current`, then waits before reading the era (holder compacts and dies meanwhile).\n    const r = tryAcquire(lockDir, { compactEvery: 64, hooks: { afterPointer: () => { if (!fs.existsSync(path.join(work, 'C-go'))) { fs.writeFileSync(path.join(work, 'C-read-pointer'), ''); waitFile(path.join(work, 'C-go')); } } } });\n    const others = r.status === 'acquired' ? csEnter('C') : null;\n    out({ status: r.status, reason: r.reason, era: r.handle?.era, epoch: r.handle?.epoch, othersInsideOnEntry: others });\n    if (r.status === 'acquired') { sleepMs(200); csLeave('C'); release(r.handle); }\n    process.exit(0);\n  }\n  if (role === 'cycler') {\n    // Acquire/release a few times so compaction moves and deletes eras.\n    const n = Number(process.argv[5]);\n    for (let i = 0; i < n; i++) { let r; do { r = tryAcquire(lockDir, { compactEvery: 2 }); if (r.status !== 'acquired') sleepMs(2); } while (r.status !== 'acquired'); release(r.handle); }\n    process.exit(0);\n  }\n  if (role === 'holder') {\n    // Acquire and stay inside until told to leave.\n    let r; do { r = tryAcquire(lockDir, { compactEvery: 2 }); if (r.status !== 'acquired') sleepMs(2); } while (r.status !== 'acquired');\n    const others = csEnter('D');\n    fs.writeFileSync(path.join(work, 'D-inside'), JSON.stringify({ epoch: r.handle.epoch, others }));\n    waitFile(path.join(work, 'D-leave'));\n    csLeave('D'); release(r.handle); process.exit(0);\n  }\n  if (role === 'post-check-paused') {\n    // Wins the link, then pauses before the post-check while another tries.\n    const r = tryAcquire(lockDir, { compactEvery: 2, hooks: { beforePostCheck: () => { fs.writeFileSync(path.join(work, 'P-linked'), ''); waitFile(path.join(work, 'P-go')); } } });\n    const others = r.status === 'acquired' ? csEnter('P') : null;\n    out({ status: r.status, epoch: r.handle?.epoch, othersInsideOnEntry: others });\n    if (r.status === 'acquired') { sleepMs(200); csLeave('P'); release(r.handle); }\n    process.exit(0);\n  }\n  if (role === 'try-once') {\n    const r = tryAcquire(lockDir, { compactEvery: 2 });\n    out({ status: r.status, reason: r.reason, epoch: r.handle?.epoch });\n    if (r.status === 'acquired') release(r.handle);\n    process.exit(0);\n  }\n  if (role === 'stress') {\n    const iters = Number(process.argv[5]);\n    let violations = 0, acquired = 0; const stats = {};\n    const jitter = () => { if (Math.random() < 0.3) sleepMs(Math.floor(Math.random() * 4)); };\n    for (let i = 0; i < iters; i++) {\n      let r;\n      for (;;) { r = tryAcquire(lockDir, { compactEvery: 3, stats, hooks: { beforeLink: jitter, beforePostCheck: jitter } }); if (r.status === 'acquired') break; sleepMs(1); }\n      acquired++;\n      if (csEnter('S') > 0) violations++;\n      if (Math.random() < 0.5) sleepMs(1);\n      csLeave('S'); release(r.handle);\n    }\n    out({ acquired, violations, stats });\n    process.exit(0);\n  }\n  if (role === 'sleeper') { // a live process to serve as an owner\n    fs.writeFileSync(path.join(work, `sleeper-${process.pid}`), ''); sleepMs(30000); process.exit(0);\n  }\n}\n\n// ---------- driver ----------\nfunction child(roleName, lockDir, work, extra = [], env = {}) {\n  return spawn(process.execPath, [ME, roleName, lockDir, work, ...extra], { stdio: 'inherit', env: { ...process.env, ...env } });\n}\nconst done = (cp) => new Promise((r) => cp.on('exit', r));\nfunction fresh(name) { const d = fs.mkdtempSync(path.join(HERE, `run-${name}-`)); fs.mkdirSync(path.join(d, 'lock')); return [path.join(d, 'lock'), d]; }\nfunction results(work, prefix) { return fs.readdirSync(work).filter((f) => f.startsWith(prefix) && f.endsWith('.json')).map((f) => JSON.parse(fs.readFileSync(path.join(work, f), 'utf8'))); }\n\nconst report = [];\nasync function caseB1(keepOldEras) {\n  const [lock, work] = fresh(`b1-keep${keepOldEras}`);\n  const env = keepOldEras ? { PROBE_KEEP_OLD_ERAS: '1' } : {};\n  // 1 acquire/release so the paused contender sees a released max.\n  await done(child('cycler', lock, work, ['1'], env));\n  const C = child('paused-contender', lock, work, [], env);\n  waitFile(path.join(work, 'C-decided'));\n  await done(child('cycler', lock, work, ['5'], env)); // compaction moves current era away\n  const D = child('holder', lock, work, [], env);\n  waitFile(path.join(work, 'D-inside'));\n  fs.writeFileSync(path.join(work, 'C-go'), '');\n  const cDone = done(C);\n  await cDone;\n  const c = results(work, 'paused-contender')[0];\n  const d = JSON.parse(fs.readFileSync(path.join(work, 'D-inside'), 'utf8'));\n  fs.writeFileSync(path.join(work, 'D-leave'), ''); await done(D);\n  report.push({ case: `B1 paused contender across era compaction, keepOldEras=${keepOldEras}`, C: c, D: d, twoHolders: c.status === 'acquired' });\n}\nasync function caseHolderCompactsThenDies() {\n  // Deterministic version of the B1 class for eras: a stale contender read\n  // `current` = era0; the holder of era0's max moves the ledger to era1 and\n  // dies; a fresh contender D takes epoch 2 in era1; C then links epoch 2 into\n  // the now-unreachable era0. Only the post-check stops C.\n  const [lock, work] = fresh('compact-die');\n  const S = child('sleeper', lock, work); await new Promise((r) => setTimeout(r, 300));\n  const m = await import('./era-ledger.mjs');\n  const st = m.startTimeOf(S.pid);\n  const r = m.tryAcquire(lock, { owner: { pid: S.pid, startTime: st }, compactEvery: 64 }); // epoch 1 in era0, owner = sleeper\n  const era0 = r.handle.era;\n  const C = child('stale-pointer-contender', lock, work, [], { PROBE_KEEP_OLD_ERAS: '1' });\n  waitFile(path.join(work, 'C-read-pointer'));\n  // Holder-side compaction (copy + pointer swap), keeping era0 on disk, then the holder dies.\n  const era1 = `0000000001-${m.currentBoot()}-feedbeef`;\n  fs.mkdirSync(path.join(lock, 'eras', era1, 'gen'), { recursive: true }); fs.mkdirSync(path.join(lock, 'eras', era1, 'rel'));\n  fs.copyFileSync(path.join(lock, 'eras', era0, 'gen', '0000000001'), path.join(lock, 'eras', era1, 'gen', '0000000001'));\n  fs.writeFileSync(path.join(lock, '.ptr'), JSON.stringify({ era: era1 })); fs.renameSync(path.join(lock, '.ptr'), path.join(lock, 'current'));\n  S.kill('SIGKILL'); await done(S);\n  const D = child('holder', lock, work, [], { PROBE_KEEP_OLD_ERAS: '1' });\n  waitFile(path.join(work, 'D-inside'));\n  fs.writeFileSync(path.join(work, 'C-go'), ''); await done(C);\n  const c = results(work, 'stale-pointer-contender')[0];\n  const d = JSON.parse(fs.readFileSync(path.join(work, 'D-inside'), 'utf8'));\n  fs.writeFileSync(path.join(work, 'D-leave'), ''); await done(D);\n  report.push({ case: 'holder compacts to era1 then dies; stale contender links into era0 while D holds era1', era0, era1, C: c, D: d, twoHolders: c.status === 'acquired' });\n}\nasync function casePostCheckPause() {\n  const [lock, work] = fresh('postcheck');\n  const P = child('post-check-paused', lock, work);\n  waitFile(path.join(work, 'P-linked'));\n  await done(child('try-once', lock, work));\n  const other = results(work, 'try-once')[0];\n  fs.writeFileSync(path.join(work, 'P-go'), ''); await done(P);\n  report.push({ case: 'winner paused between link and post-check; another contender tries', other, P: results(work, 'post-check-paused')[0] });\n}\nasync function caseStress(procs, iters) {\n  const [lock, work] = fresh('stress');\n  const t0 = Date.now();\n  await Promise.all(Array.from({ length: procs }, () => done(child('stress', lock, work, [String(iters)]))));\n  const rs = results(work, 'stress');\n  const sum = (k) => rs.reduce((a, r) => a + (r[k] || 0), 0);\n  const st = (k) => rs.reduce((a, r) => a + (r.stats[k] || 0), 0);\n  const eras = fs.readdirSync(path.join(lock, 'eras'));\n  report.push({ case: `stress ${procs} procs x ${iters}, compaction every 3, jitter before link and before post-check`, acquired: sum('acquired'), csViolations: sum('violations'), compactions: st('compactions'), linksIntoDeletedOrTakenSlot: st('lostLink'), linksIntoUnreachableEra: st('unreachableLink'), eraGoneRestarts: st('eraGone'), erasLeftOnDisk: eras.length, elapsedMs: Date.now() - t0 });\n}\nasync function caseBootEra() {\n  const [lock, work] = fresh('boot');\n  const S = child('sleeper', lock, work); await new Promise((r) => setTimeout(r, 300));\n  const sleeperPid = S.pid;\n  // Owner record from \"boot A\" naming a LIVE pid (models pid reuse after reboot).\n  const r1 = await new Promise((res) => { const cp = spawn(process.execPath, ['-e', `\n    import('${path.join(HERE, 'era-ledger.mjs')}').then(m=>{ const fs=require('fs');\n      const st=m.startTimeOf(${sleeperPid});\n      const r=m.tryAcquire('${lock}',{owner:{pid:${sleeperPid},startTime:st},compactEvery:64});\n      fs.writeFileSync('${work}/boot-A.json', JSON.stringify({status:r.status, era:r.handle&&r.handle.era})); });`], { stdio: 'inherit', env: { ...process.env, PROBE_BOOT_ID: 'aaaa' } }); cp.on('exit', res); });\n  const sameBoot = await new Promise((res) => { const cp = child('try-once', lock, work, [], { PROBE_BOOT_ID: 'aaaa' }); cp.on('exit', res); });\n  const sb = results(work, 'try-once')[0]; for (const f of fs.readdirSync(work)) if (f.startsWith('try-once')) fs.rmSync(path.join(work, f));\n  await done(child('try-once', lock, work, [], { PROBE_BOOT_ID: 'bbbb' }));\n  const nb = results(work, 'try-once')[0];\n  const erasAfter = fs.readdirSync(path.join(lock, 'eras'));\n  S.kill('SIGKILL');\n  report.push({ case: 'boot era: live-pid owner recorded in boot A; contender in boot A vs boot B', bootA: JSON.parse(fs.readFileSync(path.join(work, 'boot-A.json'), 'utf8')), contenderSameBoot: sb, contenderNewBoot: nb, erasAfterNewBoot: erasAfter });\n  void r1; void sameBoot;\n}\nasync function caseCorruptAndMtime() {\n  const [lock, work] = fresh('corrupt');\n  const S = child('sleeper', lock, work); await new Promise((r) => setTimeout(r, 300));\n  const st = (await import('./era-ledger.mjs')).startTimeOf(S.pid);\n  const r = tryAcquire(lock, { owner: { pid: S.pid, startTime: st } });\n  const genFile = path.join(lock, 'eras', r.handle.era, 'gen', String(r.handle.epoch).padStart(10, '0'));\n  fs.utimesSync(genFile, new Date('2000-01-01'), new Date('2000-01-01')); // ancient mtime, live owner\n  await done(child('try-once', lock, work));\n  const oldMtime = results(work, 'try-once')[0]; for (const f of fs.readdirSync(work)) if (f.startsWith('try-once')) fs.rmSync(path.join(work, f));\n  fs.writeFileSync(genFile, '\\u0000\\u0000garbage'); // corrupt record in the current boot's era\n  await done(child('try-once', lock, work));\n  const corrupt = results(work, 'try-once')[0];\n  S.kill('SIGKILL');\n  report.push({ case: 'live owner with year-2000 mtime, then corrupt record in current-boot era', liveOwnerOldMtime: oldMtime, corruptRecord: corrupt });\n}\nasync function caseDeadOwner() {\n  const [lock, work] = fresh('dead');\n  const S = child('sleeper', lock, work); await new Promise((r) => setTimeout(r, 300));\n  const st = (await import('./era-ledger.mjs')).startTimeOf(S.pid);\n  tryAcquire(lock, { owner: { pid: S.pid, startTime: st } });\n  S.kill('SIGKILL'); await done(S);\n  await done(child('try-once', lock, work));\n  report.push({ case: 'owner SIGKILLed while holding', contender: results(work, 'try-once')[0] });\n}\n\nawait caseHolderCompactsThenDies();\nif (process.env.PROBE_NO_POSTCHECK === '1') { fs.writeFileSync(path.join(HERE, 'probe-era-ledger-negative-results.json'), JSON.stringify(report, null, 1)); console.log(JSON.stringify(report)); process.exit(0); }\nawait caseB1(false);\nawait caseB1(true);\nawait casePostCheckPause();\nawait caseDeadOwner();\nawait caseBootEra();\nawait caseCorruptAndMtime();\nfor (let i = 0; i < 3; i++) await caseStress(6, 60);\nawait caseStress(12, 80);\nif (process.env.PROBE_NO_POSTCHECK === '1') report.forEach((r) => { r.case = `[NEGATIVE CONTROL: post-check disabled] ${r.case}`; });\nfs.writeFileSync(path.join(HERE, process.env.PROBE_NO_POSTCHECK === '1' ? 'probe-era-ledger-negative-results.json' : 'probe-era-ledger-results.json'), JSON.stringify({ node: process.version, cpus: os.cpus().length, load: os.loadavg()[0], report }, null, 1));\nfor (const r of report) console.log(JSON.stringify(r));\n",
+  "probe-grant-gate.mjs": "// Probe B3: spawn -> bind -> GO handshake for a borrowed lock. The holder\n// spawns its child behind a gate (blocked on a pipe), publishes the full\n// binding tuple, then sends GO. Holder death before GO => the child sees EOF\n// and exits without a side effect. Contrast: the v2 order (child runs at\n// once, binding published after). Run: node probe-grant-gate.mjs\nimport fs from 'node:fs';\nimport path from 'node:path';\nimport { spawn } from 'node:child_process';\nimport { fileURLToPath } from 'node:url';\nimport { tryAcquire, release, sleepMs, startTimeOf, currentBoot } from './era-ledger.mjs';\n\nconst HERE = path.dirname(fileURLToPath(import.meta.url));\nconst ME = fileURLToPath(import.meta.url);\nconst waitFile = (f, ms = 20000) => { const end = Date.now() + ms; while (!fs.existsSync(f)) { if (Date.now() > end) throw new Error(`timeout ${f}`); sleepMs(5); } };\nconst now = () => Number(process.hrtime.bigint() / 1000n); // µs, monotonic, shared clock source on one host\nconst kill0 = (pid) => { try { process.kill(pid, 0); return true; } catch (e) { return e.code === 'EPERM'; } };\nconst tupleAlive = (b) => b && kill0(b.pid) && startTimeOf(b.pid) === b.startTime;\n\n/** Receiver check (what a hook does): the borrower must be my direct parent,\n *  by full tuple, not by pid. */\nexport function acceptBorrow(bound, parentPid, { pidOnly = false } = {}) {\n  if (!bound) return false;\n  if (bound.pid !== parentPid) return false;\n  if (pidOnly) return true;\n  return bound.boot === currentBoot() && startTimeOf(parentPid) === bound.startTime;\n}\n\nconst role = process.argv[2];\nif (role) {\n  const [lockDir, work] = [process.argv[3], process.argv[4]];\n  const sidefx = (tag) => { for (let i = 0; i < 12; i++) { fs.appendFileSync(path.join(work, 'sidefx.log'), `${now()} ${tag}\\n`); sleepMs(50); } };\n  if (role === 'owner') {\n    const mode = process.argv[5]; // gated | ungated\n    const r = tryAcquire(lockDir); if (r.status !== 'acquired') throw new Error('owner could not acquire');\n    fs.writeFileSync(path.join(work, 'owner-epoch'), String(r.handle.epoch));\n    const kid = mode === 'gated'\n      ? spawn(process.execPath, [ME, 'gate', lockDir, work], { stdio: ['ignore', 'inherit', 'inherit', 'pipe'] })\n      : spawn(process.execPath, [ME, 'ungated-child', lockDir, work], { stdio: 'inherit' });\n    // Child pid is known now; the gated child cannot act yet.\n    sleepMs(100); // give the scheduler time to run the child before we bind (the B3 window)\n    fs.writeFileSync(path.join(work, 'owner-spawned'), String(kid.pid));\n    waitFile(path.join(work, 'owner-may-bind'));\n    const bound = { epoch: r.handle.epoch, pid: kid.pid, startTime: startTimeOf(kid.pid), boot: currentBoot() };\n    fs.writeFileSync(path.join(work, 'bound.json.tmp'), JSON.stringify(bound)); fs.renameSync(path.join(work, 'bound.json.tmp'), path.join(work, 'bound.json'));\n    if (mode === 'gated') kid.stdio[3].write('GO\\n');\n    fs.writeFileSync(path.join(work, 'owner-sent-go'), '');\n    waitFile(path.join(work, 'never')); // stays until killed\n  }\n  if (role === 'gate') {\n    const buf = Buffer.alloc(8); let n = 0;\n    try { n = fs.readSync(3, buf, 0, 8, null); } catch { n = 0; }\n    if (n === 0) { fs.writeFileSync(path.join(work, 'gate-eof-exit'), String(now())); process.exit(125); }\n    // A hook-like receiver started by this child checks its parent by tuple.\n    const bound = JSON.parse(fs.readFileSync(path.join(work, 'bound.json'), 'utf8'));\n    fs.writeFileSync(path.join(work, 'gate-receiver-check.json'), JSON.stringify({ acceptedAsMyChild: acceptBorrow(bound, process.pid) }));\n    sidefx('gated-child');\n    process.exit(0);\n  }\n  if (role === 'ungated-child') { sidefx('ungated-child'); process.exit(0); }\n  if (role === 'contender') {\n    // Generation is free only if owner dead AND bound borrower (if any) dead.\n    const extraHeld = () => { try { return tupleAlive(JSON.parse(fs.readFileSync(path.join(work, 'bound.json'), 'utf8'))); } catch { return false; } };\n    for (;;) {\n      const r = tryAcquire(lockDir, { extraHeld });\n      if (r.status === 'acquired') { fs.writeFileSync(path.join(work, 'contender.json'), JSON.stringify({ acquiredAtUs: now(), epoch: r.handle.epoch })); release(r.handle); process.exit(0); }\n      sleepMs(20);\n    }\n  }\n}\n\nfunction fresh(name) { const d = fs.mkdtempSync(path.join(HERE, `run-grant-${name}-`)); fs.mkdirSync(path.join(d, 'lock')); return [path.join(d, 'lock'), d]; }\nconst done = (cp) => new Promise((r) => cp.on('exit', (code, sig) => r({ code, sig })));\nfunction sideEffects(work) { try { return fs.readFileSync(path.join(work, 'sidefx.log'), 'utf8').trim().split('\\n').filter(Boolean).map((l) => Number(l.split(' ')[0])); } catch { return []; } }\n\nasync function scenario(name, mode, killAt) {\n  const [lock, work] = fresh(name);\n  const O = spawn(process.execPath, [ME, 'owner', lock, work, mode], { stdio: 'inherit' });\n  waitFile(path.join(work, 'owner-spawned'));\n  const childPid = Number(fs.readFileSync(path.join(work, 'owner-spawned'), 'utf8'));\n  if (killAt === 'before-bind') { O.kill('SIGKILL'); await done(O); }\n  else { fs.writeFileSync(path.join(work, 'owner-may-bind'), ''); waitFile(path.join(work, 'owner-sent-go')); O.kill('SIGKILL'); await done(O); }\n  const C = spawn(process.execPath, [ME, 'contender', lock, work], { stdio: 'inherit' });\n  await done(C);\n  // wait for the child to finish\n  for (let i = 0; i < 200 && kill0(childPid); i++) sleepMs(20);\n  const c = JSON.parse(fs.readFileSync(path.join(work, 'contender.json'), 'utf8'));\n  const fx = sideEffects(work);\n  const overlap = fx.filter((t) => t > c.acquiredAtUs).length;\n  return {\n    case: name, mode, ownerKilled: killAt,\n    childExitedOnEofWithoutSideEffect: fs.existsSync(path.join(work, 'gate-eof-exit')),\n    sideEffectsTotal: fx.length,\n    sideEffectsAfterContenderAcquired: overlap,\n    exclusionHeld: overlap === 0,\n    receiverCheck: fs.existsSync(path.join(work, 'gate-receiver-check.json')) ? JSON.parse(fs.readFileSync(path.join(work, 'gate-receiver-check.json'), 'utf8')) : null,\n  };\n}\n\nconst report = [];\nreport.push(await scenario('v2-order-owner-dies-before-bind', 'ungated', 'before-bind'));\nreport.push(await scenario('v3-gate-owner-dies-before-bind', 'gated', 'before-bind'));\nreport.push(await scenario('v3-gate-owner-dies-after-go', 'gated', 'after-go'));\n// Tuple vs pid-only on a recycled-pid record: parent pid right, startTime wrong.\nconst fakeBound = { pid: process.pid, startTime: 'not-my-start-time', boot: currentBoot() };\nreport.push({ case: 'receiver check with matching pid but different start time (models pid reuse)', pidOnlyAccepts: acceptBorrow(fakeBound, process.pid, { pidOnly: true }), fullTupleAccepts: acceptBorrow(fakeBound, process.pid) });\nfs.writeFileSync(path.join(HERE, 'probe-grant-gate-results.json'), JSON.stringify(report, null, 1));\nfor (const r of report) console.log(JSON.stringify(r));\n",
+  "probe-supervisor-crash.mjs": "// Probe F: controller-crash simulation of the v3 run-supervisor protocol.\n// Model only (Node), real processes and real kill -9:\n//   controller -> spawns supervisor detached (setsid, stdio to files, NO IPC)\n//   supervisor -> owns cwd lease + run control (era ledger), home marker,\n//                 deadline, heartbeat, receipt; launches worker behind a gate\n//   gate       -> waits for GO (pipe), runs worker, kills it if the supervisor dies\n//   adopt      -> the upper-layer door (resume / sweep): settles from a receipt,\n//                 or marks the attempt abandoned when the supervisor is dead\n//   reaper     -> keeps the home iff its owner (the supervisor) is alive|unknown\n// Run: node probe-supervisor-crash.mjs\nimport fs from 'node:fs';\nimport path from 'node:path';\nimport { spawn } from 'node:child_process';\nimport { fileURLToPath } from 'node:url';\nimport { tryAcquire, release, sleepMs, startTimeOf, currentBoot, judgeOwner, self } from './era-ledger.mjs';\n\nconst HERE = path.dirname(fileURLToPath(import.meta.url));\nconst ME = fileURLToPath(import.meta.url);\nconst T = () => Date.now();\nconst waitFile = (f, ms = 20000) => { const end = Date.now() + ms; while (!fs.existsSync(f)) { if (Date.now() > end) throw new Error(`timeout ${f}`); sleepMs(5); } };\nconst readJson = (f) => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch { return null; } };\nconst publishOnce = (f, obj) => { const tmp = `${f}.tmp-${process.pid}`; fs.writeFileSync(tmp, JSON.stringify(obj)); try { fs.linkSync(tmp, f); return true; } catch (e) { if (e.code !== 'EEXIST') throw e; return false; } finally { fs.unlinkSync(tmp); } };\nconst kill0 = (pid) => { try { process.kill(pid, 0); return true; } catch (e) { return e.code === 'EPERM'; } };\n\nconst role = process.argv[2];\nconst A = process.argv[3]; // attempt dir\nconst P = (...x) => path.join(A, ...x);\n\nif (role === 'supervisor') {\n  const env = readJson(P('envelope.json'));\n  // 1. attempt-scoped locks, owned by the supervisor (not the controller)\n  const cwdLease = tryAcquire(P('locks', 'cwd'));\n  if (cwdLease.status !== 'acquired') { publishOnce(P('receipt.json'), { outcome: 'not-started', cause: 'cwd-held' }); process.exit(0); }\n  const control = tryAcquire(P('locks', 'run-control'));\n  // 2. binding = handshake the controller waits for\n  publishOnce(P('supervisor-binding.json'), { ...self(), boot: currentBoot(), at: T() });\n  // 3. home owned by the supervisor\n  fs.mkdirSync(P('home'), { recursive: true });\n  fs.writeFileSync(P('home', 'marker.json'), JSON.stringify({ owner: { ...self(), boot: currentBoot() } }));\n  // 4. gate + GO\n  const gate = spawn(process.execPath, [ME, 'gate', A], { stdio: ['ignore', 'ignore', 'ignore', 'pipe'], detached: true });\n  if (env.pauseBeforeGo) { fs.writeFileSync(P('sup-before-go'), ''); waitFile(P('never'), 60000); }\n  publishOnce(P('worker-binding.json'), { pid: gate.pid, startTime: startTimeOf(gate.pid), boot: currentBoot() });\n  gate.stdio[3].write('GO\\n');\n  // 5. heartbeat (display only) + deadline\n  const hb = setInterval(() => fs.writeFileSync(P('heartbeat'), String(T())), 100);\n  let cause = 'exit';\n  const deadline = setTimeout(() => { cause = 'deadline'; try { process.kill(-gate.pid, 'SIGTERM'); } catch {} }, env.deadlineMs);\n  gate.on('exit', (code, sig) => {\n    clearTimeout(deadline); clearInterval(hb);\n    publishOnce(P('receipt.json'), { outcome: cause === 'deadline' ? 'timeout' : code === 0 ? 'exited-0' : `exited-${code ?? sig}`, cause, at: T() });\n    fs.rmSync(P('home'), { recursive: true, force: true }); // finalize home (credential write-back would run here)\n    release(cwdLease.handle); if (control.status === 'acquired') release(control.handle);\n    process.exit(0);\n  });\n}\n\nif (role === 'gate') {\n  const buf = Buffer.alloc(8); let n = 0;\n  try { n = fs.readSync(3, buf, 0, 8, null); } catch { n = 0; }\n  if (n === 0) { fs.writeFileSync(P('gate-eof'), String(T())); process.exit(125); }\n  const owner = readJson(P('supervisor-binding.json'));\n  const env = readJson(P('envelope.json'));\n  const worker = spawn(process.execPath, [ME, 'worker', A, String(env.workMs)], { stdio: 'ignore' });\n  const watch = setInterval(() => {\n    if (!(kill0(owner.pid) && startTimeOf(owner.pid) === owner.startTime)) { // owner dead => stop the agent\n      fs.writeFileSync(P('gate-killed-worker'), String(T())); worker.kill('SIGKILL'); clearInterval(watch); process.exit(137);\n    }\n  }, 50);\n  process.on('SIGTERM', () => { worker.kill('SIGKILL'); process.exit(143); });\n  worker.on('exit', (code) => { clearInterval(watch); process.exit(code ?? 1); });\n}\n\nif (role === 'worker') {\n  const end = T() + Number(process.argv[4]);\n  while (T() < end) { fs.appendFileSync(P('worker.log'), `${T()}\\n`); sleepMs(50); }\n  fs.writeFileSync(P('outbox-result.json'), JSON.stringify({ done: true }));\n  process.exit(0);\n}\n\nif (role === 'controller') {\n  const out = fs.openSync(P('supervisor.out'), 'a');\n  const sup = spawn(process.execPath, [ME, 'supervisor', A], { detached: true, stdio: ['ignore', out, out] }); // no IPC\n  sup.unref();\n  waitFile(P('supervisor-binding.json'));\n  fs.writeFileSync(P('controller-saw-binding'), String(T()));\n  waitFile(P('receipt.json'), 60000);\n  adopt('controller');\n  process.exit(0);\n}\n\n/** Upper-layer door: settle the attempt from facts, never re-run it. */\nfunction adopt(by) {\n  const result = readJson(P('result.json'));\n  if (result) return result;\n  const sup = readJson(P('supervisor-binding.json'));\n  const supState = sup ? judgeOwner(sup) : 'never-started';\n  const receipt = readJson(P('receipt.json'));\n  if (receipt) { publishOnce(P('result.json'), { state: 'settled', from: 'receipt', receipt, by }); return readJson(P('result.json')); }\n  if (supState === 'alive' || supState === 'unknown') return { state: 'running', supervisor: supState };\n  // supervisor dead without receipt: make sure the agent is gone, then close the attempt\n  const wb = readJson(P('worker-binding.json'));\n  if (wb && kill0(wb.pid) && startTimeOf(wb.pid) === wb.startTime) { try { process.kill(-wb.pid, 'SIGKILL'); } catch {} }\n  publishOnce(P('result.json'), { state: 'abandoned', cause: 'supervisor-dead-without-receipt', by });\n  return readJson(P('result.json'));\n}\nfunction reaperDecision() {\n  const m = readJson(P('home', 'marker.json'));\n  if (!m) return 'no-home';\n  const v = judgeOwner(m.owner);\n  return v === 'dead' ? 'reap' : 'keep';\n}\nif (role === 'adopt') { fs.writeFileSync(P(`adopt-${process.argv[4]}.json`), JSON.stringify(adopt(process.argv[4]))); process.exit(0); }\n\n// ---------------- driver ----------------\nif (!role) {\n  const done = (cp) => new Promise((r) => cp.on('exit', r));\n  const mk = (name, envelope) => { const d = fs.mkdtempSync(path.join(HERE, `run-sup-${name}-`)); fs.writeFileSync(path.join(d, 'envelope.json'), JSON.stringify(envelope)); return d; };\n  const proc = (r, a, extra = []) => spawn(process.execPath, [ME, r, a, ...extra], { stdio: 'inherit' });\n  const lastWorkerWrite = (a) => { try { const l = fs.readFileSync(path.join(a, 'worker.log'), 'utf8').trim().split('\\n'); return Number(l[l.length - 1]); } catch { return null; } };\n  const supPid = (a) => readJson(path.join(a, 'supervisor-binding.json'))?.pid;\n  const report = [];\n\n  { // A: controller SIGKILL mid-run; supervisor finishes; adopt settles\n    const a = mk('A', { workMs: 1500, deadlineMs: 5000 });\n    const c = proc('controller', a); waitFile(path.join(a, 'controller-saw-binding'));\n    sleepMs(200); c.kill('SIGKILL'); await done(c);\n    const midRun = { reaper: (() => { const A0 = a; return (function () { const m = readJson(path.join(A0, 'home', 'marker.json')); return m ? (judgeOwner(m.owner) === 'dead' ? 'reap' : 'keep') : 'no-home'; })(); })(),\n      cwdLeaseForOthers: tryAcquire(path.join(a, 'locks', 'cwd')).status };\n    waitFile(path.join(a, 'receipt.json'));\n    await done(proc('adopt', a, ['resume']));\n    report.push({ case: 'A controller SIGKILL mid-run', midRun, receipt: readJson(path.join(a, 'receipt.json')), adopted: readJson(path.join(a, 'adopt-resume.json')), workerFinished: fs.existsSync(path.join(a, 'outbox-result.json')), homeAfter: fs.existsSync(path.join(a, 'home')) ? 'present' : 'finalized' });\n  }\n  { // B: controller SIGKILL; deadline shorter than the work\n    const a = mk('B', { workMs: 3000, deadlineMs: 1000 });\n    const c = proc('controller', a); waitFile(path.join(a, 'controller-saw-binding'));\n    const t0 = readJson(path.join(a, 'supervisor-binding.json')).at;\n    c.kill('SIGKILL'); await done(c);\n    waitFile(path.join(a, 'receipt.json'));\n    sleepMs(200);\n    await done(proc('adopt', a, ['resume']));\n    report.push({ case: 'B controller SIGKILL, deadline 1000 ms < work 3000 ms', receipt: readJson(path.join(a, 'receipt.json')), workerLastWriteAfterStartMs: lastWorkerWrite(a) - t0, workerFinished: fs.existsSync(path.join(a, 'outbox-result.json')), adopted: readJson(path.join(a, 'adopt-resume.json')) });\n  }\n  { // C: supervisor SIGKILL mid-run; gate stops the worker; adopt marks abandoned\n    const a = mk('C', { workMs: 4000, deadlineMs: 10000 });\n    const c = proc('controller', a); waitFile(path.join(a, 'controller-saw-binding'));\n    c.kill('SIGKILL'); await done(c);\n    sleepMs(500);\n    const killedAt = T(); process.kill(supPid(a), 'SIGKILL');\n    sleepMs(400);\n    const reaper = (() => { const m = readJson(path.join(a, 'home', 'marker.json')); return m ? (judgeOwner(m.owner) === 'dead' ? 'reap' : 'keep') : 'no-home'; })();\n    await done(proc('adopt', a, ['sweep']));\n    const lease = tryAcquire(path.join(a, 'locks', 'cwd'));\n    report.push({ case: 'C supervisor SIGKILL mid-run (controller already dead)', workerStoppedWithinMs: lastWorkerWrite(a) - killedAt, gateKilledWorker: fs.existsSync(path.join(a, 'gate-killed-worker')), reaperDecision: reaper, adopted: readJson(path.join(a, 'adopt-sweep.json')), cwdLeaseNow: lease.status });\n  }\n  { // D: resume while the supervisor is alive must not launch a second worker\n    const a = mk('D', { workMs: 1500, deadlineMs: 5000 });\n    const c = proc('controller', a); waitFile(path.join(a, 'controller-saw-binding'));\n    c.kill('SIGKILL'); await done(c);\n    await done(proc('adopt', a, ['resume-early']));\n    const secondLaunch = tryAcquire(path.join(a, 'locks', 'cwd'));\n    waitFile(path.join(a, 'receipt.json'));\n    await done(proc('adopt', a, ['resume-late']));\n    report.push({ case: 'D resume while supervisor alive, then after receipt', early: readJson(path.join(a, 'adopt-resume-early.json')), secondLaunchCwdLease: secondLaunch.status, late: readJson(path.join(a, 'adopt-resume-late.json')) });\n  }\n  { // E: supervisor SIGKILL after spawning the gate, before GO\n    const a = mk('E', { workMs: 1500, deadlineMs: 5000, pauseBeforeGo: true });\n    const c = proc('controller', a); waitFile(path.join(a, 'sup-before-go'));\n    process.kill(supPid(a), 'SIGKILL'); c.kill('SIGKILL'); await done(c);\n    sleepMs(300);\n    await done(proc('adopt', a, ['sweep']));\n    report.push({ case: 'E supervisor SIGKILL between gate spawn and GO', gateExitedOnEof: fs.existsSync(path.join(a, 'gate-eof')), workerEverRan: fs.existsSync(path.join(a, 'worker.log')), adopted: readJson(path.join(a, 'adopt-sweep.json')) });\n  }\n  fs.writeFileSync(path.join(HERE, 'probe-supervisor-crash-results.json'), JSON.stringify(report, null, 1));\n  for (const r of report) console.log(JSON.stringify(r));\n}\n"
+ },
+ "results": {
+  "p3-results.json": {
+   "root": "/tmp/claude-1000/-home-vantt-projects-forgentX/bbe6155f-ff18-4e69-ad42-40abac4a35bf/scratchpad/design-v3/p3-somg6emt",
+   "results": [
+    {
+     "case": "A-supervisor-dies-after-go",
+     "lockHeldAfterSupervisorDeath": true,
+     "ghostAliveWhileWorkerRuns": true,
+     "gateExit": {
+      "workerStatus": 0,
+      "descendantsKilled": [
+       3131311
+      ]
+     },
+     "ghostAliveAfterGateExit": false,
+     "lockFreeAfterGateExit": true
+    },
+    {
+     "case": "B-supervisor-dies-before-go",
+     "gateExitCode": 3,
+     "workerEverStarted": false,
+     "lockFreeAfter": true
+    }
+   ]
+  },
+  "p4-results.json": {
+   "root": "/tmp/claude-1000/-home-vantt-projects-forgentX/bbe6155f-ff18-4e69-ad42-40abac4a35bf/scratchpad/design-v3/p4-H69wvL",
+   "results": [
+    {
+     "case": "A controller SIGKILL, supervisor settles",
+     "receipt": {
+      "by": "supervisor",
+      "kind": "exited",
+      "gateExit": {
+       "workerPid": 3151307,
+       "waitStatus": 0,
+       "exitCode": 0,
+       "stoppedBy": null,
+       "descendantsKilled": []
+      },
+      "workerResultPresent": true
+     },
+     "result": {
+      "status": "pass",
+      "receiptBy": "supervisor",
+      "workerClaim": {
+       "claim": "done"
+      },
+      "settledEpoch": 2
+     },
+     "homeRemoved": true,
+     "attemptLockFree": true,
+     "controlGenerations": 2,
+     "adoptAfter": {
+      "adopt": "nothing-to-do",
+      "reason": "already-settled"
+     }
+    },
+    {
+     "case": "B supervisor SIGKILL mid-run, adopt later",
+     "adoptWhileWorkerRuns": {
+      "adopt": "kept",
+      "reason": "attempt-lock-held"
+     },
+     "homeKeptWhileWorkerRuns": true,
+     "adoptAfterWorkerDone": {
+      "adopt": "adopted",
+      "receiptPublishedByAdopter": true,
+      "settleExit": 0,
+      "controlEpoch": 2
+     },
+     "receipt": {
+      "by": "adopter",
+      "kind": "exited",
+      "gateExit": {
+       "workerPid": 3151352,
+       "waitStatus": 0,
+       "exitCode": 0,
+       "stoppedBy": null,
+       "descendantsKilled": []
+      },
+      "workerResultPresent": true
+     },
+     "result": {
+      "status": "pass",
+      "receiptBy": "adopter",
+      "workerClaim": {
+       "claim": "done"
+      },
+      "settledEpoch": 3
+     },
+     "homeRemoved": true,
+     "attemptLockFree": true,
+     "controlGenerations": 3,
+     "workerRanOnce": true
+    },
+    {
+     "case": "C deadline after controller death",
+     "elapsedMs": 1503,
+     "receipt": {
+      "by": "supervisor",
+      "kind": "timeout",
+      "gateExit": {
+       "workerPid": 3151430,
+       "waitStatus": 15,
+       "exitCode": -15,
+       "stoppedBy": "stopped",
+       "descendantsKilled": [
+        3151431
+       ]
+      },
+      "workerResultPresent": false
+     },
+     "result": {
+      "status": "timeout",
+      "receiptBy": "supervisor",
+      "workerClaim": null,
+      "settledEpoch": 2
+     },
+     "homeRemoved": true,
+     "attemptLockFree": true,
+     "controlGenerations": 2
+    },
+    {
+     "case": "D supervisor dead, gate hard ceiling",
+     "elapsedMs": 3019,
+     "workerAliveAfter": false,
+     "adopted": {
+      "adopt": "adopted",
+      "receiptPublishedByAdopter": true,
+      "settleExit": 0,
+      "controlEpoch": 2
+     },
+     "receipt": {
+      "by": "adopter",
+      "kind": "timeout",
+      "gateExit": {
+       "workerPid": 3151469,
+       "waitStatus": 15,
+       "exitCode": -15,
+       "stoppedBy": "hard-ceiling",
+       "descendantsKilled": [
+        3151470
+       ]
+      },
+      "workerResultPresent": false
+     },
+     "result": {
+      "status": "timeout",
+      "receiptBy": "adopter",
+      "workerClaim": null,
+      "settledEpoch": 3
+     },
+     "homeRemoved": true,
+     "attemptLockFree": true,
+     "controlGenerations": 3
+    },
+    {
+     "case": "E two adopters race",
+     "adopters": [
+      {
+       "adopt": "adopted",
+       "receiptPublishedByAdopter": true,
+       "settleExit": 0,
+       "controlEpoch": 2
+      },
+      {
+       "adopt": "kept",
+       "reason": "attempt-lock-held"
+      }
+     ],
+     "settleRefusals": 0,
+     "receipt": {
+      "by": "adopter",
+      "kind": "exited",
+      "gateExit": {
+       "workerPid": 3151650,
+       "waitStatus": 0,
+       "exitCode": 0,
+       "stoppedBy": null,
+       "descendantsKilled": []
+      },
+      "workerResultPresent": true
+     },
+     "result": {
+      "status": "pass",
+      "receiptBy": "adopter",
+      "workerClaim": {
+       "claim": "done"
+      },
+      "settledEpoch": 3
+     },
+     "homeRemoved": true,
+     "attemptLockFree": true,
+     "controlGenerations": 3
+    }
+   ]
+  },
+  "p5-results.json": {
+   "root": "/tmp/claude-1000/-home-vantt-projects-forgentX/bbe6155f-ff18-4e69-ad42-40abac4a35bf/scratchpad/design-v3/p5-jgHVpK",
+   "results": [
+    {
+     "case": "kernel-lock stress 8 procs x 120, 25 SIGKILLs of holders inside the CS",
+     "acquisitions": 1839,
+     "csViolations": 0,
+     "timeoutsWaiting5s": 0,
+     "elapsedMs": 4016,
+     "allWorkersFinished": true
+    },
+    {
+     "case": "B1 schedule on the run-control ledger without GC",
+     "staleLinkTo2": "EEXIST",
+     "redecidedAgainst": 3,
+     "cOutcome": "held",
+     "generationsOnDisk": 3,
+     "epochs": [
+      1,
+      2,
+      3
+     ]
+    }
+   ]
+  },
+  "p6-results.json": {
+   "root": "/tmp/claude-1000/-home-vantt-projects-forgentX/bbe6155f-ff18-4e69-ad42-40abac4a35bf/scratchpad/design-v3/p6-SoSXsF",
+   "case": "v1 holder paused past TTL inside its CS during upgrade",
+   "round2RaiserRule": {
+    "raiserV1Status": "acquired",
+    "wouldRaiseWhileHolderInCs": true
+   },
+   "v3QuiescentRaiseRule": {
+    "otherFgosProcesses": 1,
+    "v1FilePresent": false,
+    "decision": "refuse"
+   }
+  },
+  "probe-era-ledger-negative-results.json": [
+   {
+    "case": "holder compacts to era1 then dies; stale contender links into era0 while D holds era1",
+    "era0": "0000000000-8ee555c5300d4c42a0d21f14cc80b47f-0c348040",
+    "era1": "0000000001-8ee555c5300d4c42a0d21f14cc80b47f-feedbeef",
+    "C": {
+     "status": "acquired",
+     "era": "0000000000-8ee555c5300d4c42a0d21f14cc80b47f-0c348040",
+     "epoch": 2,
+     "othersInsideOnEntry": 1
+    },
+    "D": {
+     "epoch": 2,
+     "others": 0
+    },
+    "twoHolders": true
+   }
+  ],
+  "probe-era-ledger-results.json": {
+   "node": "v24.18.0",
+   "cpus": 16,
+   "load": 9.98,
+   "report": [
+    {
+     "case": "holder compacts to era1 then dies; stale contender links into era0 while D holds era1",
+     "era0": "0000000000-8ee555c5300d4c42a0d21f14cc80b47f-328801f8",
+     "era1": "0000000001-8ee555c5300d4c42a0d21f14cc80b47f-feedbeef",
+     "C": {
+      "status": "held",
+      "reason": "alive",
+      "othersInsideOnEntry": null
+     },
+     "D": {
+      "epoch": 2,
+      "others": 0
+     },
+     "twoHolders": false
+    },
+    {
+     "case": "B1 paused contender across era compaction, keepOldEras=false",
+     "C": {
+      "status": "held",
+      "reason": "alive",
+      "othersInsideOnEntry": null,
+      "stats": {
+       "lostLink": 1
+      }
+     },
+     "D": {
+      "epoch": 7,
+      "others": 0
+     },
+     "twoHolders": false
+    },
+    {
+     "case": "B1 paused contender across era compaction, keepOldEras=true",
+     "C": {
+      "status": "held",
+      "reason": "alive",
+      "othersInsideOnEntry": null,
+      "stats": {
+       "lostLink": 1
+      }
+     },
+     "D": {
+      "epoch": 7,
+      "others": 0
+     },
+     "twoHolders": false
+    },
+    {
+     "case": "winner paused between link and post-check; another contender tries",
+     "other": {
+      "status": "held",
+      "reason": "alive"
+     },
+     "P": {
+      "status": "acquired",
+      "epoch": 1,
+      "othersInsideOnEntry": 0
+     }
+    },
+    {
+     "case": "owner SIGKILLed while holding",
+     "contender": {
+      "status": "acquired",
+      "epoch": 2
+     }
+    },
+    {
+     "case": "boot era: live-pid owner recorded in boot A; contender in boot A vs boot B",
+     "bootA": {
+      "status": "acquired",
+      "era": "0000000000-aaaa-177f5cbe"
+     },
+     "contenderSameBoot": {
+      "status": "held",
+      "reason": "alive"
+     },
+     "contenderNewBoot": {
+      "status": "acquired",
+      "epoch": 2
+     },
+     "erasAfterNewBoot": [
+      "0000000002-bbbb-7fb61609"
+     ]
+    },
+    {
+     "case": "live owner with year-2000 mtime, then corrupt record in current-boot era",
+     "liveOwnerOldMtime": {
+      "status": "held",
+      "reason": "alive"
+     },
+     "corruptRecord": {
+      "status": "held",
+      "reason": "unknown-record"
+     }
+    },
+    {
+     "case": "stress 6 procs x 60, compaction every 3, jitter before link and before post-check",
+     "acquired": 360,
+     "csViolations": 0,
+     "compactions": 120,
+     "linksIntoDeletedOrTakenSlot": 431,
+     "linksIntoUnreachableEra": 0,
+     "eraGoneRestarts": 4,
+     "erasLeftOnDisk": 1,
+     "elapsedMs": 1021
+    },
+    {
+     "case": "stress 6 procs x 60, compaction every 3, jitter before link and before post-check",
+     "acquired": 360,
+     "csViolations": 0,
+     "compactions": 120,
+     "linksIntoDeletedOrTakenSlot": 448,
+     "linksIntoUnreachableEra": 0,
+     "eraGoneRestarts": 5,
+     "erasLeftOnDisk": 1,
+     "elapsedMs": 935
+    },
+    {
+     "case": "stress 6 procs x 60, compaction every 3, jitter before link and before post-check",
+     "acquired": 360,
+     "csViolations": 0,
+     "compactions": 120,
+     "linksIntoDeletedOrTakenSlot": 425,
+     "linksIntoUnreachableEra": 1,
+     "eraGoneRestarts": 1,
+     "erasLeftOnDisk": 1,
+     "elapsedMs": 1015
+    },
+    {
+     "case": "stress 12 procs x 80, compaction every 3, jitter before link and before post-check",
+     "acquired": 960,
+     "csViolations": 0,
+     "compactions": 320,
+     "linksIntoDeletedOrTakenSlot": 2393,
+     "linksIntoUnreachableEra": 8,
+     "eraGoneRestarts": 14,
+     "erasLeftOnDisk": 1,
+     "elapsedMs": 2942
+    }
+   ]
+  },
+  "probe-grant-gate-results.json": [
+   {
+    "case": "v2-order-owner-dies-before-bind",
+    "mode": "ungated",
+    "ownerKilled": "before-bind",
+    "childExitedOnEofWithoutSideEffect": false,
+    "sideEffectsTotal": 12,
+    "sideEffectsAfterContenderAcquired": 9,
+    "exclusionHeld": false,
+    "receiverCheck": null
+   },
+   {
+    "case": "v3-gate-owner-dies-before-bind",
+    "mode": "gated",
+    "ownerKilled": "before-bind",
+    "childExitedOnEofWithoutSideEffect": true,
+    "sideEffectsTotal": 0,
+    "sideEffectsAfterContenderAcquired": 0,
+    "exclusionHeld": true,
+    "receiverCheck": null
+   },
+   {
+    "case": "v3-gate-owner-dies-after-go",
+    "mode": "gated",
+    "ownerKilled": "after-go",
+    "childExitedOnEofWithoutSideEffect": false,
+    "sideEffectsTotal": 12,
+    "sideEffectsAfterContenderAcquired": 0,
+    "exclusionHeld": true,
+    "receiverCheck": {
+     "acceptedAsMyChild": true
+    }
+   },
+   {
+    "case": "receiver check with matching pid but different start time (models pid reuse)",
+    "pidOnlyAccepts": true,
+    "fullTupleAccepts": false
+   }
+  ],
+  "probe-hot-reclaim-results.json": [
+   {
+    "case": "A1 schedule on events.lock, reclaim under kernel lock = false",
+    "r2EnteredWhileR1PausedBeforeUnlink": true,
+    "R1": {
+     "result": "acquired",
+     "othersInsideOnEntry": 1
+    },
+    "twoHolders": true
+   },
+   {
+    "case": "A1 schedule on events.lock, reclaim under kernel lock = true",
+    "r2EnteredWhileR1PausedBeforeUnlink": false,
+    "R1": {
+     "result": "acquired",
+     "othersInsideOnEntry": 0
+    },
+    "twoHolders": false
+   },
+   {
+    "case": "stress 8 procs, 13 holders SIGKILLed in CS, reclaim under kernel lock = false",
+    "acquisitions": 80,
+    "csViolations": 12,
+    "finishedWorkers": 2,
+    "elapsedMs": 753
+   },
+   {
+    "case": "stress 8 procs, 19 holders SIGKILLed in CS, reclaim under kernel lock = true",
+    "acquisitions": 430,
+    "csViolations": 0,
+    "finishedWorkers": 8,
+    "elapsedMs": 1055
+   }
+  ],
+  "probe-kernel-lock-results.json": {
+   "node": "v24.18.0",
+   "cpus": 16,
+   "load": 7.46,
+   "report": [
+    {
+     "case": "node holds the lock after the helper exits; close releases",
+     "helper": "acquired",
+     "strangerWhileHeld": false,
+     "strangerAfterClose": true
+    },
+    {
+     "case": "same process, two transactions (two descriptions)",
+     "first": "acquired",
+     "secondWhileFirstHeld": "held",
+     "secondAfterFirstClosed": "acquired"
+    },
+    {
+     "case": "holder SIGKILL",
+     "strangerBeforeKill": false,
+     "strangerAfterKill": true
+    },
+    {
+     "case": "helper timeout -> SIGKILL + reap (spawnSync) -> close",
+     "result": "timeout",
+     "returnedAfterMs": 301,
+     "freeAfterBlockerDied": true
+    },
+    {
+     "case": "borrow through real git hook; owner SIGKILL right after spawn",
+     "hookBorrowCheck": "borrower",
+     "contenderWhileGitRuns": false,
+     "siblingWithEnvButOwnDescription": "refused",
+     "gitCommitted": true,
+     "contenderAfterGitExit": true
+    },
+    {
+     "case": "stress 8 procs x 100 (+30 per replacement), holders SIGKILLed inside the critical section and replaced",
+     "kills": 10,
+     "workersSpawned": 18,
+     "survivorsFinished": 8,
+     "acquisitions": 310,
+     "csViolations": 0,
+     "stuck": 0,
+     "elapsedMs": 1055
+    },
+    {
+     "case": "acquire cost via helper exec (ms)",
+     "n": 300,
+     "p50": 1.62,
+     "p95": 1.89,
+     "p99": 2.07
+    }
+   ]
+  },
+  "probe-supervisor-crash-results.json": [
+   {
+    "case": "A controller SIGKILL mid-run",
+    "midRun": {
+     "reaper": "keep",
+     "cwdLeaseForOthers": "held"
+    },
+    "receipt": {
+     "outcome": "exited-0",
+     "cause": "exit",
+     "at": 1792075097789
+    },
+    "adopted": {
+     "state": "settled",
+     "from": "receipt",
+     "receipt": {
+      "outcome": "exited-0",
+      "cause": "exit",
+      "at": 1792075097789
+     },
+     "by": "resume"
+    },
+    "workerFinished": true,
+    "homeAfter": "finalized"
+   },
+   {
+    "case": "B controller SIGKILL, deadline 1000 ms < work 3000 ms",
+    "receipt": {
+     "outcome": "timeout",
+     "cause": "deadline",
+     "at": 1792075099119
+    },
+    "workerLastWriteAfterStartMs": 1021,
+    "workerFinished": false,
+    "adopted": {
+     "state": "settled",
+     "from": "receipt",
+     "receipt": {
+      "outcome": "timeout",
+      "cause": "deadline",
+      "at": 1792075099119
+     },
+     "by": "resume"
+    }
+   },
+   {
+    "case": "C supervisor SIGKILL mid-run (controller already dead)",
+    "workerStoppedWithinMs": 0,
+    "gateKilledWorker": true,
+    "reaperDecision": "reap",
+    "adopted": {
+     "state": "abandoned",
+     "cause": "supervisor-dead-without-receipt",
+     "by": "sweep"
+    },
+    "cwdLeaseNow": "acquired"
+   },
+   {
+    "case": "D resume while supervisor alive, then after receipt",
+    "early": {
+     "state": "running",
+     "supervisor": "alive"
+    },
+    "secondLaunchCwdLease": "held",
+    "late": {
+     "state": "settled",
+     "from": "receipt",
+     "receipt": {
+      "outcome": "exited-0",
+      "cause": "exit",
+      "at": 1792075102460
+     },
+     "by": "resume-late"
+    }
+   },
+   {
+    "case": "E supervisor SIGKILL between gate spawn and GO",
+    "gateExitedOnEof": true,
+    "workerEverRan": false,
+    "adopted": {
+     "state": "abandoned",
+     "cause": "supervisor-dead-without-receipt",
+     "by": "sweep"
+    }
+   }
+  ],
+  "probe-terminal-gate-results.json": [
+   {
+    "case": "handover-then-supervisor-dies",
+    "strangerCanLockAfterSupervisorDeath": false,
+    "gateExit": {
+     "ran": true,
+     "exit": 0,
+     "heldLockFd": 4,
+     "seconds": 1.2
+    },
+    "workerRan": true,
+    "strangerCanLockAfterGateExit": true
+   },
+   {
+    "case": "gate-starts-after-supervisor-died",
+    "gateExit": {
+     "ran": false,
+     "why": "connect:111"
+    },
+    "workerRan": false,
+    "strangerCanLockAfterGateExit": true
+   },
+   {
+    "case": "supervisor-dies-while-gate-waits-for-go",
+    "strangerCanLockAfterSupervisorDeath": true,
+    "gateExit": {
+     "ran": false,
+     "why": "eof-before-go"
+    },
+    "workerRan": false,
+    "strangerCanLockAfterGateExit": true
+   }
+  ],
+  "probe-tombstone-events-results.json": {
+   "call": "withEventsLock with tombstone at events.lock",
+   "result": {
+    "threw": "EISDIR"
+   },
+   "ms": 2,
+   "tombstoneStillThere": true
+  },
+  "probe-tombstone-results.json": [
+   {
+    "variant": "main-HEAD",
+    "call": "acquire(pid)",
+    "threw": "EISDIR"
+   },
+   {
+    "variant": "main-HEAD",
+    "call": "acquire(session string)",
+    "threw": "EISDIR"
+   },
+   {
+    "variant": "main-HEAD",
+    "call": "inspect",
+    "threw": "EISDIR"
+   },
+   {
+    "variant": "main-HEAD",
+    "call": "release",
+    "threw": "EISDIR"
+   },
+   {
+    "variant": "main-HEAD",
+    "call": "releaseIfOwn",
+    "threw": "EISDIR"
+   },
+   {
+    "variant": "main-HEAD",
+    "call": "forceReclaimAmbiguous",
+    "threw": "EISDIR"
+   },
+   {
+    "variant": "main-HEAD",
+    "tombstoneStillThere": true
+   },
+   {
+    "variant": "W1-branch",
+    "call": "acquire(pid)",
+    "threw": "EISDIR"
+   },
+   {
+    "variant": "W1-branch",
+    "call": "acquire(session string)",
+    "threw": "EISDIR"
+   },
+   {
+    "variant": "W1-branch",
+    "call": "inspect",
+    "threw": "EISDIR"
+   },
+   {
+    "variant": "W1-branch",
+    "call": "release",
+    "threw": "EISDIR"
+   },
+   {
+    "variant": "W1-branch",
+    "call": "releaseIfOwn",
+    "threw": "EISDIR"
+   },
+   {
+    "variant": "W1-branch",
+    "call": "forceReclaimAmbiguous",
+    "threw": "EISDIR"
+   },
+   {
+    "variant": "W1-branch",
+    "tombstoneStillThere": true
+   }
+  ]
+ }
+}

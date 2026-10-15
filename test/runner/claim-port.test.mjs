@@ -462,6 +462,13 @@ test('claimWork transparently reclaims a conclusively-quiet session doing claim 
     (e) => e.type === 'decision' && e.payload?.id === 'item-a' && e.payload?.source === 'claimWork' && e.payload?.text?.startsWith('stale-claim-reclaim:'),
   );
   assert.equal(evidenceDecisions.length, 1, 'the release must be logged with its evidence (D2c) — reason itself is not stamped for the doing->todo edge (status-fsm.mjs:216-232)');
+  // Another writer's claim was released: the decision names both writers.
+  assert.deepEqual(evidenceDecisions[0].payload.admin, {
+    reason: 'stale-claim-reclaim',
+    ownerWriterId: 'session-A',
+    releasedByWriterId: 'session-B',
+    claimId: first.claimId,
+  });
 });
 
 // tsk-40m code-review finding (high, D4/D8): a stale-claim reclaim used to
@@ -704,6 +711,32 @@ test('fgos unclaim clears stale claim with {released:true, reason:"stale-livenes
     admin: { reason: 'unclaim:stale-liveness', ownerWriterId: 'session-A', releasedByWriterId: 'session-B' },
   });
   assert.equal(readClaim(dir, 'doing-item'), null, 'claim must be cleared');
+  const audit = readRawEvents(dir).filter((e) => e.type === 'decision' && e.payload?.source === 'unclaim');
+  assert.equal(audit.length, 1, 'releasing another writer\'s claim leaves one durable decision');
+  assert.equal(audit[0].payload.id, 'doing-item');
+  assert.equal(audit[0].payload.kind, 'engine');
+  assert.deepEqual(
+    { ...audit[0].payload.admin, claimId: undefined },
+    { reason: 'unclaim:stale-liveness', ownerWriterId: 'session-A', releasedByWriterId: 'session-B', claimId: undefined },
+  );
+  assert.equal(typeof audit[0].payload.admin.claimId, 'string');
+});
+
+test('fgos unclaim of another writer\'s claim on an unknown item records an id-less admin decision; the owner releasing its own claim records none', () => {
+  const { repoRoot, dir } = setup();
+  acquireClaimAs('session-A', dir, { id: 'ghost-item', actor: 'session', force: true });
+  const res = runUnclaim(repoRoot, 'ghost-item', { sessionId: 'session-B' });
+  assert.equal(res.status, 0);
+  const audit = readRawEvents(dir).filter((e) => e.type === 'decision' && e.payload?.source === 'unclaim');
+  assert.equal(audit.length, 1);
+  assert.equal(audit[0].payload.id, undefined);
+  assert.equal(audit[0].payload.admin.itemId, 'ghost-item');
+  assert.equal(audit[0].payload.admin.reason, 'unclaim:durable-status-mismatch');
+  assert.equal(audit[0].payload.admin.ownerWriterId, 'session-A');
+
+  acquireClaimAs('session-A', dir, { id: 'item-a', actor: 'session', force: true });
+  assert.equal(runUnclaim(repoRoot, 'item-a', { sessionId: 'session-A' }).status, 0);
+  assert.equal(readRawEvents(dir).filter((e) => e.type === 'decision' && e.payload?.source === 'unclaim').length, 1);
 });
 
 test('claimWork invokes runOpportunisticMainCheckoutChecks non-blockingly and succeeds even when truncation guard detects a break', () => {

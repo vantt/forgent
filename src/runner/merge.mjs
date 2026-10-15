@@ -50,7 +50,7 @@ import { runGoalCheck, runInvariantChecks, invariantFailureAsCheck } from './goa
 import { readInvariantCheckCommands } from '../config/shared-config-file.mjs';
 import { normalizePath } from '../util/normalize-path.mjs';
 import { nulPaths, statusPaths, nameStatusPaths, GIT_LIST_MAX_BUFFER } from '../util/git-paths.mjs';
-import { acquireMainCheckoutLock, renewMainCheckoutLockIfOwn, mergeSlotLockFile, HELD, AMBIGUOUS, DEFAULT_TTL_MS, HOLDER_PID_ENV_VAR, formatLockDurationMs } from './main-checkout-lock.mjs';
+import { acquireMainCheckoutLock, renewMainCheckoutLockIfOwn, mergeSlotLockFile, HELD, AMBIGUOUS, DEFAULT_TTL_MS, HOLDER_PID_ENV_VAR, formatLockDurationMs, lockRefusalDetail, heldMainCheckoutWriter, acquiringMainCheckoutWriter } from './main-checkout-lock.mjs';
 import { listSessions } from './session.mjs';
 import { listWork } from '../state/store.mjs';
 import { openLeavesSharingTarget, classifyPostLandDrift } from '../state/graph-harness.mjs';
@@ -793,7 +793,7 @@ export async function withMergeTargetSlot(lockRoot, targetRef, fn) {
       ? `, expires in ${formatLockDurationMs(lock.remainingTtlMs)}`
       : ', no TTL window known';
     throw new MergeError(
-      `cannot merge into "${targetRef}": target's merge slot is held by another live session (${lock.holderPid}, held ${formatLockDurationMs(lock.lockAgeMs)}${ttlPart}).`,
+      `cannot merge into "${targetRef}": target's merge slot is held by another live session (${lock.holderPid}, held ${formatLockDurationMs(lock.lockAgeMs)}${ttlPart})${lockRefusalDetail(lock)}.`,
       { targetRef, code: 'lock-held', remainingTtlMs: lock.remainingTtlMs, holderPid: lock.holderPid, lockAgeMs: lock.lockAgeMs },
     );
   }
@@ -801,7 +801,10 @@ export async function withMergeTargetSlot(lockRoot, targetRef, fn) {
     throw new MergeError(`cannot merge into "${targetRef}": target's merge slot lock is ambiguous (unparseable lock file) — refusing per fail-closed policy.`, { targetRef, code: 'lock-ambiguous', lockAgeMs: lock.lockAgeMs });
   }
 
-  runOpportunisticMainCheckoutChecks(fgosDir, lockRoot, { commitEnv: { [HOLDER_PID_ENV_VAR]: String(process.pid) } });
+  // This path holds only the target's slot, never main-checkout.lock: the
+  // checkpoint acquires the main mutex itself around its add -> commit ->
+  // reset and releases it right after, so it never races a land.
+  runOpportunisticMainCheckoutChecks(fgosDir, lockRoot, { mainCheckoutWriter: acquiringMainCheckoutWriter(fgosDir) });
 
   const heartbeatStatus = {
     status: 'renewed',
@@ -923,7 +926,7 @@ export async function mergeRunnerItem(repoRoot, item, { timeoutMs, lockRoot = re
       ? `, expires in ${formatLockDurationMs(lock.remainingTtlMs)}`
       : ', no TTL window known';
     throw new MergeError(
-      `cannot merge "${branch}": main checkout is locked by pid ${lock.holderPid} (held ${formatLockDurationMs(lock.lockAgeMs)}${ttlPart}).`,
+      `cannot merge "${branch}": main checkout is locked by pid ${lock.holderPid} (held ${formatLockDurationMs(lock.lockAgeMs)}${ttlPart})${lockRefusalDetail(lock)}.`,
       { branch, code: 'lock-held', remainingTtlMs: lock.remainingTtlMs, holderPid: lock.holderPid, lockAgeMs: lock.lockAgeMs },
     );
   }
@@ -931,7 +934,9 @@ export async function mergeRunnerItem(repoRoot, item, { timeoutMs, lockRoot = re
     throw new MergeError(`cannot merge "${branch}": main checkout lock is ambiguous (unparseable lock file) — refusing per fail-closed policy.`, { branch, code: 'lock-ambiguous', lockAgeMs: lock.lockAgeMs });
   }
 
-  runOpportunisticMainCheckoutChecks(fgosDir, lockRoot, { commitEnv: { [HOLDER_PID_ENV_VAR]: String(process.pid) } });
+  // Already holding main-checkout.lock as `identity`: the checkpoint
+  // commits under this hold, never acquiring the mutex a second time.
+  runOpportunisticMainCheckoutChecks(fgosDir, lockRoot, { mainCheckoutWriter: heldMainCheckoutWriter(identity) });
 
   // Heartbeat (tsk-4l8): renews the lock's timestamp every
   // HEARTBEAT_INTERVAL_MS for as long as this call holds it, so its age
@@ -1767,12 +1772,12 @@ export async function mergeRootIntoMainCas(repoRoot, item, branch, { timeoutMs, 
   const { execFileSync } = await import('child_process');
 
   if (failFastIfLocked) {
-    const { inspectMainCheckoutLock, DEFAULT_TTL_MS, formatLockDurationMs } = await import('./main-checkout-lock.mjs');
-    const lock = inspectMainCheckoutLock(path.join(repoRoot, '.fgos'), { ttlMs: DEFAULT_TTL_MS });
+    const { inspectMainCheckoutLock, formatLockDurationMs, lockRefusalDetail } = await import('./main-checkout-lock.mjs');
+    const lock = inspectMainCheckoutLock(path.join(repoRoot, '.fgos'));
     if (lock.outcome === 'live') {
       const ttlPart = lock.remainingTtlMs != null ? `, expires in ${formatLockDurationMs(lock.remainingTtlMs)}` : ', no TTL window known';
       throw new MergeError(
-        `cannot merge "${branch}": main checkout is locked by pid ${lock.holderPid} (held ${formatLockDurationMs(lock.lockAgeMs)}${ttlPart}).`,
+        `cannot merge "${branch}": main checkout is locked by pid ${lock.holderPid} (held ${formatLockDurationMs(lock.lockAgeMs)}${ttlPart})${lockRefusalDetail(lock)}.`,
         { branch, code: 'lock-held', remainingTtlMs: lock.remainingTtlMs, holderPid: lock.holderPid, lockAgeMs: lock.lockAgeMs }
       );
     }
@@ -1888,7 +1893,7 @@ const CAS_LAND_LOCK_WAIT_MS = 60 * 1000;
  * `update-ref`/`read-tree`.
  */
 async function landCasMergeUnderLock(repoRoot, { branch, targetBranch, targetTip, commitSha, ownFileSet = null }) {
-  const { acquireMainCheckoutLock, releaseMainCheckoutLockIfOwn, DEFAULT_TTL_MS, HELD, AMBIGUOUS, formatLockDurationMs } = await import('./main-checkout-lock.mjs');
+  const { acquireMainCheckoutLock, releaseMainCheckoutLockIfOwn, DEFAULT_TTL_MS, HELD, AMBIGUOUS, formatLockDurationMs, lockRefusalDetail } = await import('./main-checkout-lock.mjs');
   const { execFileSync } = await import('child_process');
   const fgosDir = path.join(repoRoot, '.fgos');
   const identity = process.pid;
@@ -1896,7 +1901,7 @@ async function landCasMergeUnderLock(repoRoot, { branch, targetBranch, targetTip
   if (lock.status === HELD) {
     const ttlPart = lock.remainingTtlMs != null ? `, expires in ${formatLockDurationMs(lock.remainingTtlMs)}` : ', no TTL window known';
     throw new MergeError(
-      `cannot merge "${branch}": main checkout is locked by pid ${lock.holderPid} (held ${formatLockDurationMs(lock.lockAgeMs)}${ttlPart}).`,
+      `cannot merge "${branch}": main checkout is locked by pid ${lock.holderPid} (held ${formatLockDurationMs(lock.lockAgeMs)}${ttlPart})${lockRefusalDetail(lock)}.`,
       { branch, code: 'lock-held', remainingTtlMs: lock.remainingTtlMs, holderPid: lock.holderPid, lockAgeMs: lock.lockAgeMs }
     );
   }
