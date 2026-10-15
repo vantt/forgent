@@ -1,0 +1,32 @@
+# Review: nine decision reworks (specs, ui-spec and main re-carry)
+
+Reviewer: reviewer:claude-session:a4954387@2026-10-14
+Author session: codex-session:unit-run-1792056203419-9b5bd055@2026-10-15
+Review mode: ordinary
+Request commit: 0be68ebeb
+Content commit: 7854cff84d8bcb67075d4f9c09cd0b6d04808ff4
+
+## Scope and method
+
+Nine pending rows (2 Step 8, 7 main re-carry) answering the nine reworks of review-261015-1526-specs-ui-reworks-main-recarry.md. Worktree pinned at 0be68ebeb; docs bytes equal the content commit (git diff 7854cff84..HEAD -- docs is empty). No sensitivity pack requested. Sampling: the set is 9 rows, below the minimum of 10, so all nine were deep-read; no random seed was needed (seed: n/a, all rows sampled). Every row also got the mechanical checks, scripted with extractMarkdownConservationUnits: source digest recomputed (current file, or the named historical commit for the four gap rows), target digest recomputed from the committed target file, shard entry byte-equal to the packet decision, anchors checked with list-doc-anchors --check, reviewStatus pending, no reviewer or approval fields, disposition legal per vocabulary (supersede needs the WHOLE unit carried; merge and promote do not require byte equality). Digests also hand-recomputed with python hashlib for 7 units (s995, t995, s194, t194, s665, s597, t665). Word diffs were read for the four gap rows and the two cli-io-contract rows.
+
+| Claim | Verdict | Note | Source digest | Target digest |
+|---|---|---|---|---|
+| claim_665eb7f4bfb9bee7ba3f5e58368eaba1 | ok | deep: repointed to unheaded-block-34 (the bullets unit, lines 304-318) with e013c5b0 which recomputes; source block 32 at 977509d5f recomputes to ba9c9d6e; diff shows only reworded effect-axis sentence with COMMAND_REGISTRY/15/no-coordination plus the new subcommands bullet, both named in the rationale; supersede legal as whole unit carried | ba9c9d6e641e3049b46d0596077eabd74593dd83e12391cd7336986f7733d796 | e013c5b05d6ff58782aa8231ab4a55967bd5ef853dac4015aec8f16f5fcf9c68 |
+| claim_e597b776163803dcf6e4194962ea4f6e | rework | deep: binding fixed correctly (block 34, e013c5b0, source 5bed5c61 at 9881f8622 recomputes) but the rationale says the only delta to the successor is adding review/approve/run examples, which is false: the diff also adds the whole subcommands bullet (3 lines); correct the rationale to name both deltas | 5bed5c61440ab7ef0a9c595d18e3485c47c1952c78cbd07a0ea354db8ad750c3 | e013c5b05d6ff58782aa8231ab4a55967bd5ef853dac4015aec8f16f5fcf9c68 |
+| claim_74a311a5ab882fe8ee4806125167e2d4 | ok | deep: section differs from source only in the corrected Work item id row (check has no shipped skill, optional id for pick/graph); disposition now supersede matching corrected siblings claim_3459a397 and claim_511605d3 (both supersede in the same shard), rationale names the corrected row truthfully; target 80aad498 and anchor data-dictionary ok | 5f7bbc0ccb0a688217a410356a618559820b7dfd24315cdd7dde1ca8ba7df0be | 80aad4984704cb2169f9b47f19b917eb49396d225f5ba07cd499b7ce6c68e015 |
+| claim_c4c6b55686b7e315f34ae005173b79db | ok | deep: section differs only in the capability row (check removed, parenthetical added); supersede now matches siblings, rationale names the corrected row and is true; target b1405975 and anchor actors-access ok | 4be8acef415d77200e8b8bef2f2f78665c99cf7882f2395a2597c5b9b99c8f01 | b1405975f4c717c854a7bb988a6af790be278401ffa1d415b2a24ec69c442c50 |
+| claim_15a24dbb1f2d0470f04cdf8900da67a0 | ok | deep: disposition restored to merge with the previously reviewed rationale word for word; only anchor (26 to 27) and digests differ from the reviewed form; source block 69 byte-equal to target block 27 (2140755c) | 2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9 | 2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9 |
+| claim_5dcb56608e17caeb53c197186ae33827 | ok | deep: disposition restored to merge with the reviewed rationale unchanged (the reviewed text still ends with a stale pending re-carry boilerplate sentence, harmless); source block 70 byte-equal to target block 36 (3964ac13), anchor ok | 3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62 | 3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62 |
+| claim_6fe86521fead9cec7253443e3275a3cf | ok | deep: disposition restored to promote with the reviewed rationale unchanged; source block 73 byte-equal to target block 40 (a1c9e2eb), anchor ok; promote legal since the unit stays a contract in the platform tree | a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798 | a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798 |
+| claim_9959e82e2874baeb627a8441faa07e9a | ok | deep: merge restored; rationale rewritten truthfully (not the earlier 2.0 verbatim claim): diff of 977509d5f block 66 against target block 30 is only the schema_version 2.0 to 3.0 history sentence, and the positional-parameter rule is in the target; 2.0 to 3.0 stated as correction, vocabulary merge needs no byte equality; target 878d708d and anchor ok | a2e6a5ffa58ec1f13d1321cf4b14d70b2a261fba6ce0f15c0bda50975cf8de04 | 878d708db7a0afb3e23a0829f98be122c83ac562946b51ab1989e73e5e4a8bfe |
+| claim_19495d2772ced1aa1af4b20d4640fa3a | ok | deep: merge restored with a truthful rationale; diff of 977509d5f io-contract block 18 against target block 32 is the 3.0 version sentence plus the added per-verb help --json and Rust host sentences, both covered by commands and per-verb entries wording; target 51dd3c8a and anchor ok | 83773dda67db8d5f71205bb8c7106186023672125b08cbe4f33b09b0578163ca | 51dd3c8aa026a8f5a15e4c12c522b3bf2ad7c29238c49bf9ba51324806e10e23 |
+
+## Notes
+
+- Eight of nine fixes answer the earlier rework exactly. Rows 5 to 7 restore the reviewed disposition and rationale verbatim; rows 8 and 9 restore merge with an honest rationale replacing the earlier verbatim wording, which the vocabulary permits.
+- The one rework is claim_e597b776: its rationale asserts the only delta is the example list, but the target unit also adds the subcommands bullet that the source never had. A one-sentence rationale correction suffices; binding and digests are right.
+- claim_665eb7f4 also adds the subcommands bullet but names it in the corrected binding sentence, so I accepted it; a clearer statement that the bullet is new would be welcome but is not required.
+- Worktree git status is empty. Scratch scripts are in work-s8-nine/.
+
+Unresolved: none beyond claim_e597b776 rationale wording.
