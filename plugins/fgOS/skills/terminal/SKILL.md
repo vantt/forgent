@@ -109,7 +109,10 @@ state, never chrome. This skill only ever writes.
    The script always exits `0` — it is a silent no-op whenever no
    `pane-labeling` provider is registered, the session isn't inside a
    herdr-managed pane, `herdr` isn't installed, or the pane id isn't
-   available. Never treat a non-zero exit or stderr
+   available. It also refuses, with one line on stderr, when `HERDR_PANE_ID`
+   names a pane herdr no longer knows or a pane whose shell is not an
+   ancestor of the caller (a shared agent daemon such as `codex app-server`
+   passes a stale pane id to every child) -- it never renames another pane. Never treat a non-zero exit or stderr
    output from it as a reason to stop or retry; if it somehow does exit
    non-zero, ignore it and continue exactly as if it had succeeded
    silently — this skill is decoration, never a gate on the caller's own

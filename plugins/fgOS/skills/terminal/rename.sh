@@ -64,6 +64,10 @@ fi
 [ "${HERDR_ENV:-}" = "1" ] || exit 0
 command -v herdr >/dev/null 2>&1 || exit 0
 [ -n "${HERDR_PANE_ID:-}" ] || exit 0
+# HERDR_PANE_ID can be inherited from a shared agent daemon and name a dead
+# pane or another session's pane: act only on this caller's own live pane.
+. "$(dirname "$0")/pane-owned.sh"
+fgos_pane_owned "$HERDR_PANE_ID" || exit 0
 
 # fg.ssid (D1): fgOS's own session id. FGOS_SESSION_ID first, else
 # resolveWriterIdentity()'s own env/registry/pid fallback chain
