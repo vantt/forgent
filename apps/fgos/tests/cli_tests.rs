@@ -1179,3 +1179,107 @@ fn native_discussions_reports_owner_voters_and_root_wide_summary_diagnostics() {
     );
     assert_eq!(report["summariesOutsideWindow"], 1);
 }
+
+fn identity_command(args: &[&str]) -> Command {
+    let mut cmd = Command::new(fgos_bin());
+    cmd.arg("identity").args(args);
+    for key in [
+        "FGOS_SESSION_ID",
+        "CODEX_THREAD_ID",
+        "CLAUDE_CODE_SESSION_ID",
+    ] {
+        cmd.env_remove(key);
+    }
+    cmd
+}
+
+fn identity_data(output: &std::process::Output) -> serde_json::Value {
+    assert_eq!(
+        output.status.code(),
+        Some(0),
+        "identity must exit 0, stderr={}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let parsed: serde_json::Value =
+        serde_json::from_slice(&output.stdout).expect("output must be a JSON envelope");
+    assert_eq!(parsed["contract"], "fgos.v1");
+    parsed["data"].clone()
+}
+
+#[test]
+fn identity_reports_the_env_session_and_confirms_it_from_the_registry() {
+    let dir = std::env::temp_dir().join(format!("fgos_test_identity_{}", std::process::id()));
+    let _ = fs::remove_dir_all(&dir);
+    fs::create_dir_all(&dir).unwrap();
+    fs::write(dir.join("sessions.json"), r#"[{"sessionId":"thread-a"}]"#).unwrap();
+
+    let env_only = identity_command(&[])
+        .env("CODEX_THREAD_ID", "thread-a")
+        .env("CLAUDE_CODE_SESSION_ID", "claude-b")
+        .output()
+        .unwrap();
+    assert_eq!(
+        identity_data(&env_only),
+        serde_json::json!({ "id": "thread-a", "source": "env" })
+    );
+
+    let confirmed = identity_command(&["--fgos-dir", dir.to_str().unwrap()])
+        .env("CODEX_THREAD_ID", "thread-a")
+        .output()
+        .unwrap();
+    assert_eq!(
+        identity_data(&confirmed),
+        serde_json::json!({ "id": "thread-a", "source": "registry" })
+    );
+    let _ = fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn identity_runs_under_the_recursion_guard() {
+    let output = identity_command(&["--json"])
+        .env("FGOS_SESSION_ID", "guarded")
+        .env("FGOS_RUST_HOST_RECURSION_GUARD", "1")
+        .output()
+        .unwrap();
+    assert_eq!(
+        identity_data(&output),
+        serde_json::json!({ "id": "guarded", "source": "env" })
+    );
+}
+
+#[test]
+fn identity_without_env_resolves_from_the_named_caller() {
+    let me = std::process::id().to_string();
+    let data = identity_data(&identity_command(&["--pid", &me]).output().unwrap());
+    assert!(
+        matches!(data["source"].as_str(), Some("pid") | Some("unresolved")),
+        "unexpected {data}"
+    );
+    assert!(data["id"].as_u64().unwrap() > 0);
+    if cfg!(not(unix)) {
+        assert_eq!(data["id"].as_u64().unwrap().to_string(), me);
+    }
+    // Without --pid the caller is the process that started fgos: this test.
+    let implicit = identity_data(&identity_command(&[]).output().unwrap());
+    if cfg!(unix) {
+        assert_eq!(data, implicit);
+    }
+}
+
+#[test]
+fn identity_rejects_bad_options() {
+    for args in [
+        vec!["--pid", "0"],
+        vec!["--pid", "abc"],
+        vec!["--pid"],
+        vec!["--fgos-dir="],
+        vec!["--unknown"],
+    ] {
+        let output = identity_command(&args).output().unwrap();
+        assert_ne!(output.status.code(), Some(0), "args {args:?} must fail");
+        assert!(
+            output.stdout.is_empty(),
+            "args {args:?} must print no envelope"
+        );
+    }
+}

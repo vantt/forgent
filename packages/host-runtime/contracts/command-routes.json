@@ -309,6 +309,15 @@
       "test/rust-host/command-routes.test.mjs"
     ]
   },
+  "identity": {
+    "selector": "identity",
+    "route_kind": "native",
+    "operation_id": "session-identity.resolve",
+    "owner_path": "packages/session-identity/rust",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
   "init": {
     "selector": "init",
     "route_kind": "legacy-cli",

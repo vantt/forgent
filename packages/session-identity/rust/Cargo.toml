@@ -1,0 +1,12 @@
+[package]
+name = "fgos-session-identity"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+fgos-host-runtime = { path = "../../host-runtime/rust" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+[target.'cfg(unix)'.dependencies]
+libc = { workspace = true }

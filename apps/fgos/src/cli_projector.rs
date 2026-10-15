@@ -82,6 +82,10 @@ pub fn project_cli_invocation(
             ContractRef::from_static("convention.query.request", "1.0.0"),
             Box::new(project_convention_request(args, root)?),
         ),
+        "session-identity.resolve" => (
+            ContractRef::from_static("session-identity.resolve.request", "1.0.0"),
+            Box::new(project_identity_request(args)?),
+        ),
         other => {
             return Err(format!(
                 "native CLI projector has no request mapping for '{}'",
@@ -93,6 +97,54 @@ pub fn project_cli_invocation(
     let invocation = HostInvocation::new("cli");
     let request = OperationRequest::new(operation, contract, input);
     Ok((invocation, request))
+}
+
+/// `fgos identity [--pid <n>] [--fgos-dir <dir>] [--json]`.
+fn project_identity_request(
+    args: &[OsString],
+) -> Result<fgos_session_identity::IdentityRequest, String> {
+    let mut request = fgos_session_identity::IdentityRequest::default();
+    let mut index = 1;
+    while index < args.len() {
+        let value = args[index].to_string_lossy().into_owned();
+        index += 1;
+        if value == "--json" {
+            continue;
+        }
+        let (flag, inline_value) = value
+            .split_once('=')
+            .map_or((value.as_str(), None), |(flag, value)| {
+                (flag, Some(value.to_owned()))
+            });
+        if !matches!(flag, "--pid" | "--fgos-dir") {
+            return Err(format!("unknown identity option '{value}'"));
+        }
+        let flag_value = match inline_value {
+            Some(value) => value,
+            None => {
+                let next = args
+                    .get(index)
+                    .map(|v| v.to_string_lossy().into_owned())
+                    .ok_or_else(|| format!("{flag} requires a value"))?;
+                index += 1;
+                next
+            }
+        };
+        if flag == "--pid" {
+            let pid = flag_value
+                .parse::<u32>()
+                .ok()
+                .filter(|pid| *pid > 0)
+                .ok_or_else(|| format!("--pid must be a positive integer, got '{flag_value}'"))?;
+            request.pid = Some(pid);
+        } else {
+            if flag_value.is_empty() {
+                return Err("--fgos-dir requires a value".into());
+            }
+            request.fgos_dir = Some(std::path::PathBuf::from(flag_value));
+        }
+    }
+    Ok(request)
 }
 
 fn project_convention_request(

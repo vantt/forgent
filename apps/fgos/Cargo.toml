@@ -9,6 +9,7 @@ fgos-distribution = { path = "../../packages/distribution/rust" }
 fgos-work-state = { path = "../../packages/work-state/rust" }
 fgos-observe = { path = "../../packages/observe/rust" }
 fgos-convention = { path = "../../packages/convention/rust" }
+fgos-session-identity = { path = "../../packages/session-identity/rust" }
 fgos-run-result = { path = "../../packages/run-result/rust" }
 tokio = { workspace = true }
 serde = { workspace = true }

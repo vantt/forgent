@@ -57,6 +57,7 @@ static COMPOSITION_PROVIDERS: &[ProviderDescriptor] = &[
     fgos_observe::OBSERVE_METRICS_DESCRIPTOR,
     fgos_observe::OBSERVE_FRICTION_DESCRIPTOR,
     fgos_convention::CONVENTION_DESCRIPTOR,
+    fgos_session_identity::IDENTITY_DESCRIPTOR,
 ];
 
 static NATIVE_SUBCOMMANDS: &[(&str, &[&str])] = &[
@@ -149,6 +150,7 @@ fn main() {
         ),
     ));
     service.register_provider(Arc::new(fgos_convention::ConventionProvider::new()));
+    service.register_provider(Arc::new(fgos_session_identity::IdentityProvider::new()));
     let tracker = service.tracker();
 
     // Help is answered by the legacy-node payload, which owns the verb

@@ -9,6 +9,7 @@ members = [
     "packages/convention/rust",
     "packages/run-result/rust",
     "packages/herdr-fgos-common/rust",
+    "packages/session-identity/rust",
 ]
 exclude = [
     "herdr-dashboard",
