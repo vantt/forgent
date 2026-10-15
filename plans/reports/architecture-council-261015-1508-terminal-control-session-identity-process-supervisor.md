@@ -92,7 +92,7 @@ Mỗi việc trên có test riêng. Trước khi activation: `npm test` đầy �
 |---|---|---|
 | Crate Rust `session-identity` (nguồn identity duy nhất, Node gọi sang) | Anh chọn hướng Rust (mục 5). **Số đo đã có:** gọi thẳng binary Rust ~3,3 ms, đạt nếu thiết kế đúng 5 điều kiện ([S6](spike-s6-261015-1638-rust-identity-call-latency-pre-commit-hook.md)) | Đã đo |
 | Crate Rust `terminal-control` + lệnh mới | Có multiplexer thứ hai thật (tmux…), hoặc có process không cùng cây cha cần chung tab | Rà mã nguồn (S5) |
-| Lock cho terminal | Như dòng trên | S5 |
+| Lock cho terminal (giữ thứ tự khi nhiều process cùng mở pane/tính layout; research đề xuất `terminal-layout.lock`). Hôm nay không cần: các worker cùng nhóm do một process Node bật, giữ tab trong bộ nhớ; process con nhận pane neo qua `FGOS_HERDR_ANCHOR_PANE`. Nếu cần sẽ là một loại trong lock component chung, đặt ngoài repo | Có process không cùng cha phải chung tab (gateway, hai terminal) | S5 |
 | Gom code kiểm `/proc` và dựng launcher giữa hai đường bật worker | Hai bên trùng ≥ 80% | Diffstat (S8, vài phút) |
 | Một supervisor riêng cho mỗi lần chạy (đề xuất của Astra) | Quan sát được herdr-spawn mất deadline/kết quả khi controller crash | Thử crash thật |
 | Danh tính cho pane do người tự mở | Quan sát herdr thật, hoặc thấy va chạm writer gây hại | S7 |
