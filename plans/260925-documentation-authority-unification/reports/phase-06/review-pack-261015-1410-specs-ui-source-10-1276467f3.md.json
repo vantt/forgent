@@ -1,0 +1,1471 @@
+{
+  "version": 1,
+  "contentCommit": "1276467f37a99d19aff05808d42fafbf40341449",
+  "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-distillery-01.json",
+  "shardSHA256": "92fc6f13591526b163d1b0e446cdb1627c148b554d0b20163154ce2da5db8d40",
+  "sourcePath": "docs/specs/distillery.md",
+  "part": 1,
+  "parts": 1,
+  "count": 21,
+  "classes": {
+    "Unit-exact": [
+      "claim_8d4400399f1a8eb72474e15691577d1f",
+      "claim_030914214315e12e5ee492361b959fa8",
+      "claim_40196224e217e77d89e57d0ffaf2abb2",
+      "claim_a299172986d37bd5b62d22f36bbb8779",
+      "claim_f9628d49e013fa3d4269ec432b7ba443",
+      "claim_5c674a057e92715ff96b88a32ae0f3f4",
+      "claim_00affff32942b999e43d36d74d1d9917",
+      "claim_637b69327d2486602ee428a8b90936c8",
+      "claim_4e14a24a1ef22e30a058748641d53ec4",
+      "claim_4e61f8ab46c7791e563a905c6dcc2ba4",
+      "claim_f94cf2b9ad1454f4fb3811c1cce319e6"
+    ],
+    "Weak-exact": [
+      "claim_1152a6c3ef3f0678dca8b5c4b28e7816",
+      "claim_38c50f26b5eddc17470cbce12d130184",
+      "claim_f237c7dc974c7146bd3cd48a0a77d05d",
+      "claim_1672eea7b12dcca590a6976253d8f4c9",
+      "claim_7af861c8f84a4a69a8e1bf2c05073f03",
+      "claim_edc3a60c5df1d6a3d5180c628f8f97ba",
+      "claim_9d1d7d136b9a9ff869d6af4a12e042cc",
+      "claim_10b6865dee162e3401febaf6d905128f",
+      "claim_a81c4bc7792d5b2b576357b9543176fa"
+    ],
+    "Judgment": [
+      "claim_6ff089f694102599d1fc8273ea6bbae9"
+    ]
+  },
+  "unequalDigestPairs": [
+    "claim_6ff089f694102599d1fc8273ea6bbae9"
+  ],
+  "noTargetGeneratedRows": [],
+  "mandatoryDeep": [
+    "claim_6ff089f694102599d1fc8273ea6bbae9"
+  ],
+  "reviewerSeedRequired": true,
+  "minimumSeededWeakJudgment": 10,
+  "rows": [
+    {
+      "claimId": "claim_8d4400399f1a8eb72474e15691577d1f",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-distillery-01.json",
+      "shardSHA256": "92fc6f13591526b163d1b0e446cdb1627c148b554d0b20163154ce2da5db8d40",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/specs/distillery.md",
+      "sourceAnchor": "unheaded-block-1",
+      "source": {
+        "unitKind": "unheaded-preamble",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded preamble",
+        "startLine": 1,
+        "endLine": 7,
+        "textDigest": "38b03ba75f9d6fd9e7f83f5ef5f909d79006e20e49a119a53a8a9a2c229e2e95",
+        "sample": "---\narea: distillery\nupdated: 2026-07-17\nsources: [distillery-state-consumer]\ndecisions: []\ncoverage: partial\n---",
+        "identityFingerprint": "e7e23bd5f98c266d854a21dfdd77006bd1d154fe4753f29424834888d701d18f",
+        "ancestry": [],
+        "text": "---\narea: distillery\nupdated: 2026-07-17\nsources: [distillery-state-consumer]\ndecisions: []\ncoverage: partial\n---"
+      },
+      "sourceShownText": "---\narea: distillery\nupdated: 2026-07-17\nsources: [distillery-state-consumer]\ndecisions: []\ncoverage: partial\n---",
+      "sourceDigest": "38b03ba75f9d6fd9e7f83f5ef5f909d79006e20e49a119a53a8a9a2c229e2e95",
+      "targetPath": "docs/platform/distillery/spec.md",
+      "targetAnchor": "unheaded-block-1",
+      "target": {
+        "unitKind": "unheaded-preamble",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded preamble",
+        "startLine": 1,
+        "endLine": 7,
+        "textDigest": "38b03ba75f9d6fd9e7f83f5ef5f909d79006e20e49a119a53a8a9a2c229e2e95",
+        "sample": "---\narea: distillery\nupdated: 2026-07-17\nsources: [distillery-state-consumer]\ndecisions: []\ncoverage: partial\n---",
+        "identityFingerprint": "e7e23bd5f98c266d854a21dfdd77006bd1d154fe4753f29424834888d701d18f",
+        "ancestry": [],
+        "text": "---\narea: distillery\nupdated: 2026-07-17\nsources: [distillery-state-consumer]\ndecisions: []\ncoverage: partial\n---"
+      },
+      "targetShownText": "---\narea: distillery\nupdated: 2026-07-17\nsources: [distillery-state-consumer]\ndecisions: []\ncoverage: partial\n---",
+      "targetDigest": "38b03ba75f9d6fd9e7f83f5ef5f909d79006e20e49a119a53a8a9a2c229e2e95",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_8d4400399f1a8eb72474e15691577d1f",
+        "sourceUnitDigest": "38b03ba75f9d6fd9e7f83f5ef5f909d79006e20e49a119a53a8a9a2c229e2e95",
+        "targetOwner": "docs/platform/distillery/spec.md",
+        "targetAnchor": "unheaded-block-1",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-preamble unit docs/specs/distillery.md#unheaded-block-1 (source lines 1-7) is carried at docs/platform/distillery/spec.md#unheaded-block-1 (candidate lines 1-7). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "38b03ba75f9d6fd9e7f83f5ef5f909d79006e20e49a119a53a8a9a2c229e2e95",
+        "targetAncestry": []
+      }
+    },
+    {
+      "claimId": "claim_6ff089f694102599d1fc8273ea6bbae9",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-distillery-01.json",
+      "shardSHA256": "92fc6f13591526b163d1b0e446cdb1627c148b554d0b20163154ce2da5db8d40",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/specs/distillery.md",
+      "sourceAnchor": "distillery-porting-lifecycle",
+      "source": {
+        "unitKind": "heading",
+        "level": 1,
+        "title": "Distillery — Porting Lifecycle",
+        "anchor": "distillery-porting-lifecycle",
+        "githubAnchor": "distillery-porting-lifecycle",
+        "stableAnchor": "h-ea9102a9d610",
+        "startLine": 9,
+        "endLine": 9,
+        "textDigest": "42384c377bf6a357000397ce4b6204783d0a8b2ca90462159600bdb48b109a2a",
+        "sample": "Distillery — Porting Lifecycle",
+        "sectionPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "followingBlockDigest": null,
+        "identityFingerprint": "cdefa0208f8f9feebaf51608068179b66889ed6ac7112362bfded034404d2339",
+        "ancestry": [],
+        "text": "# Distillery — Porting Lifecycle",
+        "sectionText": "# Distillery — Porting Lifecycle"
+      },
+      "sourceShownText": "# Distillery — Porting Lifecycle",
+      "sourceDigest": "42384c377bf6a357000397ce4b6204783d0a8b2ca90462159600bdb48b109a2a",
+      "targetPath": "docs/platform/distillery/spec.md",
+      "targetAnchor": "distillery-porting-lifecycle",
+      "target": {
+        "unitKind": "heading",
+        "level": 1,
+        "title": "Distillery — Porting Lifecycle",
+        "anchor": "distillery-porting-lifecycle",
+        "githubAnchor": "distillery-porting-lifecycle",
+        "stableAnchor": "h-ea9102a9d610",
+        "startLine": 9,
+        "endLine": 9,
+        "textDigest": "23c12fdbccf665c6fc46ba5262d8cd57c2782e69f6938ea2509ffd336dcd0e61",
+        "sample": "Distillery — Porting Lifecycle",
+        "sectionPayloadDigest": "f0d747438f9535c750d87175998d9db6cd7782b739a50c8586eae5a03b14fed6",
+        "followingBlockDigest": "78ae6650ca59a3b8667bc2f825a55a9248b7dfdd72c69f70a6b894ef819e96de",
+        "identityFingerprint": "6143d2177bfe9dffb1952dd6dcdb07f87b3b732a7ff78c1de97adbd94c9fa8fd",
+        "ancestry": [],
+        "text": "# Distillery — Porting Lifecycle",
+        "sectionText": "# Distillery — Porting Lifecycle\n\n```txt\nDocument type: Specification\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve mapped legacy content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; current implementation truth is not certified\nProvenance: docs/specs/distillery.md at 111adc51fd047d99121fd9d076eb4794c87045a4\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing carriage, placement and source conservation\nDo not use this for: Current canonical authority or implemented-behavior proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/specs/distillery.md\nSupersedes: None; candidate only\nSuperseded by: None\n```\n\n> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions."
+      },
+      "targetShownText": "# Distillery — Porting Lifecycle\n\n```txt\nDocument type: Specification\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve mapped legacy content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; current implementation truth is not certified\nProvenance: docs/specs/distillery.md at 111adc51fd047d99121fd9d076eb4794c87045a4\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing carriage, placement and source conservation\nDo not use this for: Current canonical authority or implemented-behavior proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/specs/distillery.md\nSupersedes: None; candidate only\nSuperseded by: None\n```\n\n> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions.",
+      "targetDigest": "23c12fdbccf665c6fc46ba5262d8cd57c2782e69f6938ea2509ffd336dcd0e61",
+      "classification": "Judgment",
+      "mandatoryDeep": true,
+      "decision": {
+        "claimId": "claim_6ff089f694102599d1fc8273ea6bbae9",
+        "sourceUnitDigest": "42384c377bf6a357000397ce4b6204783d0a8b2ca90462159600bdb48b109a2a",
+        "targetOwner": "docs/platform/distillery/spec.md",
+        "targetAnchor": "distillery-porting-lifecycle",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Judgment: no target digest match. The whole heading unit docs/specs/distillery.md#distillery-porting-lifecycle (source lines 9-9) is carried at docs/platform/distillery/spec.md#distillery-porting-lifecycle (candidate lines 9-9). The heading section digest changes because labelled candidate metadata is inserted after the original H1; original heading and direct source payload remain verbatim. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "23c12fdbccf665c6fc46ba5262d8cd57c2782e69f6938ea2509ffd336dcd0e61",
+        "targetAncestry": []
+      }
+    },
+    {
+      "claimId": "claim_1152a6c3ef3f0678dca8b5c4b28e7816",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-distillery-01.json",
+      "shardSHA256": "92fc6f13591526b163d1b0e446cdb1627c148b554d0b20163154ce2da5db8d40",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/specs/distillery.md",
+      "sourceAnchor": "purpose",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Purpose",
+        "anchor": "purpose",
+        "githubAnchor": "purpose",
+        "stableAnchor": "h-a82b748a4db9",
+        "startLine": 11,
+        "endLine": 11,
+        "textDigest": "7d67a471d1c385ca8cc0546874593e824df4cf0d1f9c1c6db9741ee0a8bd3acc",
+        "sample": "Purpose",
+        "sectionPayloadDigest": "0601f676d24bb748feb8d5ef2ef95533e43b12671f4ded9087e77e0607038e9c",
+        "followingBlockDigest": "0601f676d24bb748feb8d5ef2ef95533e43b12671f4ded9087e77e0607038e9c",
+        "identityFingerprint": "dcbd8e277e65cda1fa2a1caf069f6eb41d96919727607e3d23861430663b9a7d",
+        "ancestry": [
+          "Distillery — Porting Lifecycle"
+        ],
+        "text": "## Purpose",
+        "sectionText": "## Purpose\n\nDistillery is forgent's reference-learning system: it studies external sibling\nprojects to find ideas and patterns worth reusing. This spec covers one part\nof it — the **porting lifecycle**: how the adoption status of each considered\nidea (\"candidate\") is tracked from first identification through to its final\noutcome, and durably remembered so a rejected idea is never re-litigated by\naccident. Other distillery capabilities (finding new source material, cross-\nsource comparison, candidate ranking) are out of scope here — see Open Gaps."
+      },
+      "sourceShownText": "## Purpose\n\nDistillery is forgent's reference-learning system: it studies external sibling\nprojects to find ideas and patterns worth reusing. This spec covers one part\nof it — the **porting lifecycle**: how the adoption status of each considered\nidea (\"candidate\") is tracked from first identification through to its final\noutcome, and durably remembered so a rejected idea is never re-litigated by\naccident. Other distillery capabilities (finding new source material, cross-\nsource comparison, candidate ranking) are out of scope here — see Open Gaps.",
+      "sourceDigest": "7d67a471d1c385ca8cc0546874593e824df4cf0d1f9c1c6db9741ee0a8bd3acc",
+      "targetPath": "docs/platform/distillery/spec.md",
+      "targetAnchor": "purpose",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Purpose",
+        "anchor": "purpose",
+        "githubAnchor": "purpose",
+        "stableAnchor": "h-b0c10b06be6b",
+        "startLine": 33,
+        "endLine": 33,
+        "textDigest": "7d67a471d1c385ca8cc0546874593e824df4cf0d1f9c1c6db9741ee0a8bd3acc",
+        "sample": "Purpose",
+        "sectionPayloadDigest": "0601f676d24bb748feb8d5ef2ef95533e43b12671f4ded9087e77e0607038e9c",
+        "followingBlockDigest": "0601f676d24bb748feb8d5ef2ef95533e43b12671f4ded9087e77e0607038e9c",
+        "identityFingerprint": "dcbd8e277e65cda1fa2a1caf069f6eb41d96919727607e3d23861430663b9a7d",
+        "ancestry": [
+          "Distillery — Porting Lifecycle"
+        ],
+        "text": "## Purpose",
+        "sectionText": "## Purpose\n\nDistillery is forgent's reference-learning system: it studies external sibling\nprojects to find ideas and patterns worth reusing. This spec covers one part\nof it — the **porting lifecycle**: how the adoption status of each considered\nidea (\"candidate\") is tracked from first identification through to its final\noutcome, and durably remembered so a rejected idea is never re-litigated by\naccident. Other distillery capabilities (finding new source material, cross-\nsource comparison, candidate ranking) are out of scope here — see Open Gaps."
+      },
+      "targetShownText": "## Purpose\n\nDistillery is forgent's reference-learning system: it studies external sibling\nprojects to find ideas and patterns worth reusing. This spec covers one part\nof it — the **porting lifecycle**: how the adoption status of each considered\nidea (\"candidate\") is tracked from first identification through to its final\noutcome, and durably remembered so a rejected idea is never re-litigated by\naccident. Other distillery capabilities (finding new source material, cross-\nsource comparison, candidate ranking) are out of scope here — see Open Gaps.",
+      "targetDigest": "7d67a471d1c385ca8cc0546874593e824df4cf0d1f9c1c6db9741ee0a8bd3acc",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_1152a6c3ef3f0678dca8b5c4b28e7816",
+        "sourceUnitDigest": "7d67a471d1c385ca8cc0546874593e824df4cf0d1f9c1c6db9741ee0a8bd3acc",
+        "targetOwner": "docs/platform/distillery/spec.md",
+        "targetAnchor": "purpose",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/distillery.md#purpose (source lines 11-11) is carried at docs/platform/distillery/spec.md#purpose (candidate lines 33-33). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "7d67a471d1c385ca8cc0546874593e824df4cf0d1f9c1c6db9741ee0a8bd3acc",
+        "targetAncestry": [
+          "Distillery — Porting Lifecycle"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_030914214315e12e5ee492361b959fa8",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-distillery-01.json",
+      "shardSHA256": "92fc6f13591526b163d1b0e446cdb1627c148b554d0b20163154ce2da5db8d40",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/specs/distillery.md",
+      "sourceAnchor": "unheaded-block-2",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-2",
+        "githubAnchor": "unheaded-block-2",
+        "stableAnchor": "unheaded-block-2",
+        "title": "Unheaded block 2",
+        "startLine": 13,
+        "endLine": 19,
+        "textDigest": "0601f676d24bb748feb8d5ef2ef95533e43b12671f4ded9087e77e0607038e9c",
+        "sample": "Distillery is forgent's reference-learning system: it studies external sibling\nprojects to find ideas and patterns worth reusing. This spec covers one part\nof it — the **porting li",
+        "identityFingerprint": "fd9b525c0d96e30bba739d6109ee269df38bc9d12099f05163b1fec975d1e092",
+        "ancestry": [
+          "Distillery — Porting Lifecycle",
+          "Purpose"
+        ],
+        "text": "Distillery is forgent's reference-learning system: it studies external sibling\nprojects to find ideas and patterns worth reusing. This spec covers one part\nof it — the **porting lifecycle**: how the adoption status of each considered\nidea (\"candidate\") is tracked from first identification through to its final\noutcome, and durably remembered so a rejected idea is never re-litigated by\naccident. Other distillery capabilities (finding new source material, cross-\nsource comparison, candidate ranking) are out of scope here — see Open Gaps."
+      },
+      "sourceShownText": "Distillery is forgent's reference-learning system: it studies external sibling\nprojects to find ideas and patterns worth reusing. This spec covers one part\nof it — the **porting lifecycle**: how the adoption status of each considered\nidea (\"candidate\") is tracked from first identification through to its final\noutcome, and durably remembered so a rejected idea is never re-litigated by\naccident. Other distillery capabilities (finding new source material, cross-\nsource comparison, candidate ranking) are out of scope here — see Open Gaps.",
+      "sourceDigest": "0601f676d24bb748feb8d5ef2ef95533e43b12671f4ded9087e77e0607038e9c",
+      "targetPath": "docs/platform/distillery/spec.md",
+      "targetAnchor": "unheaded-block-4",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 35,
+        "endLine": 41,
+        "textDigest": "0601f676d24bb748feb8d5ef2ef95533e43b12671f4ded9087e77e0607038e9c",
+        "sample": "Distillery is forgent's reference-learning system: it studies external sibling\nprojects to find ideas and patterns worth reusing. This spec covers one part\nof it — the **porting li",
+        "identityFingerprint": "fd9b525c0d96e30bba739d6109ee269df38bc9d12099f05163b1fec975d1e092",
+        "ancestry": [
+          "Distillery — Porting Lifecycle",
+          "Purpose"
+        ],
+        "text": "Distillery is forgent's reference-learning system: it studies external sibling\nprojects to find ideas and patterns worth reusing. This spec covers one part\nof it — the **porting lifecycle**: how the adoption status of each considered\nidea (\"candidate\") is tracked from first identification through to its final\noutcome, and durably remembered so a rejected idea is never re-litigated by\naccident. Other distillery capabilities (finding new source material, cross-\nsource comparison, candidate ranking) are out of scope here — see Open Gaps."
+      },
+      "targetShownText": "Distillery is forgent's reference-learning system: it studies external sibling\nprojects to find ideas and patterns worth reusing. This spec covers one part\nof it — the **porting lifecycle**: how the adoption status of each considered\nidea (\"candidate\") is tracked from first identification through to its final\noutcome, and durably remembered so a rejected idea is never re-litigated by\naccident. Other distillery capabilities (finding new source material, cross-\nsource comparison, candidate ranking) are out of scope here — see Open Gaps.",
+      "targetDigest": "0601f676d24bb748feb8d5ef2ef95533e43b12671f4ded9087e77e0607038e9c",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_030914214315e12e5ee492361b959fa8",
+        "sourceUnitDigest": "0601f676d24bb748feb8d5ef2ef95533e43b12671f4ded9087e77e0607038e9c",
+        "targetOwner": "docs/platform/distillery/spec.md",
+        "targetAnchor": "unheaded-block-4",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/distillery.md#unheaded-block-2 (source lines 13-19) is carried at docs/platform/distillery/spec.md#unheaded-block-4 (candidate lines 35-41). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "0601f676d24bb748feb8d5ef2ef95533e43b12671f4ded9087e77e0607038e9c",
+        "targetAncestry": [
+          "Distillery — Porting Lifecycle",
+          "Purpose"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_38c50f26b5eddc17470cbce12d130184",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-distillery-01.json",
+      "shardSHA256": "92fc6f13591526b163d1b0e446cdb1627c148b554d0b20163154ce2da5db8d40",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/specs/distillery.md",
+      "sourceAnchor": "entry-points-triggers",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Entry Points & Triggers",
+        "anchor": "entry-points-triggers",
+        "githubAnchor": "entry-points-triggers",
+        "stableAnchor": "h-e96f9570f24e",
+        "startLine": 21,
+        "endLine": 21,
+        "textDigest": "870113cef74cbf14b1466445a335f784131f0db0065053e0f31e0b7f016f0ff6",
+        "sample": "Entry Points & Triggers",
+        "sectionPayloadDigest": "334c0e187773d73024ba617a9bed97656d0bbbcfdd3dcc49b1a6c8fd90b13275",
+        "followingBlockDigest": "334c0e187773d73024ba617a9bed97656d0bbbcfdd3dcc49b1a6c8fd90b13275",
+        "identityFingerprint": "f2cd1cd24947e9353b8cc0cd5da4013c3840ea03067033266cf200a88db364dd",
+        "ancestry": [
+          "Distillery — Porting Lifecycle"
+        ],
+        "text": "## Entry Points & Triggers",
+        "sectionText": "## Entry Points & Triggers\n\n- A person or agent decides a porting candidate should move to its next\n  lifecycle stage and runs the status-change command for it.\n- Once, at cutover: a seeding operation establishes the correct current status\n  for every candidate already on record, before the live status-change command\n  is used for the first time."
+      },
+      "sourceShownText": "## Entry Points & Triggers\n\n- A person or agent decides a porting candidate should move to its next\n  lifecycle stage and runs the status-change command for it.\n- Once, at cutover: a seeding operation establishes the correct current status\n  for every candidate already on record, before the live status-change command\n  is used for the first time.",
+      "sourceDigest": "870113cef74cbf14b1466445a335f784131f0db0065053e0f31e0b7f016f0ff6",
+      "targetPath": "docs/platform/distillery/spec.md",
+      "targetAnchor": "entry-points-triggers",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Entry Points & Triggers",
+        "anchor": "entry-points-triggers",
+        "githubAnchor": "entry-points-triggers",
+        "stableAnchor": "h-8edb9a8e25d1",
+        "startLine": 43,
+        "endLine": 43,
+        "textDigest": "870113cef74cbf14b1466445a335f784131f0db0065053e0f31e0b7f016f0ff6",
+        "sample": "Entry Points & Triggers",
+        "sectionPayloadDigest": "334c0e187773d73024ba617a9bed97656d0bbbcfdd3dcc49b1a6c8fd90b13275",
+        "followingBlockDigest": "334c0e187773d73024ba617a9bed97656d0bbbcfdd3dcc49b1a6c8fd90b13275",
+        "identityFingerprint": "f2cd1cd24947e9353b8cc0cd5da4013c3840ea03067033266cf200a88db364dd",
+        "ancestry": [
+          "Distillery — Porting Lifecycle"
+        ],
+        "text": "## Entry Points & Triggers",
+        "sectionText": "## Entry Points & Triggers\n\n- A person or agent decides a porting candidate should move to its next\n  lifecycle stage and runs the status-change command for it.\n- Once, at cutover: a seeding operation establishes the correct current status\n  for every candidate already on record, before the live status-change command\n  is used for the first time."
+      },
+      "targetShownText": "## Entry Points & Triggers\n\n- A person or agent decides a porting candidate should move to its next\n  lifecycle stage and runs the status-change command for it.\n- Once, at cutover: a seeding operation establishes the correct current status\n  for every candidate already on record, before the live status-change command\n  is used for the first time.",
+      "targetDigest": "870113cef74cbf14b1466445a335f784131f0db0065053e0f31e0b7f016f0ff6",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_38c50f26b5eddc17470cbce12d130184",
+        "sourceUnitDigest": "870113cef74cbf14b1466445a335f784131f0db0065053e0f31e0b7f016f0ff6",
+        "targetOwner": "docs/platform/distillery/spec.md",
+        "targetAnchor": "entry-points-triggers",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/distillery.md#entry-points-triggers (source lines 21-21) is carried at docs/platform/distillery/spec.md#entry-points-triggers (candidate lines 43-43). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "870113cef74cbf14b1466445a335f784131f0db0065053e0f31e0b7f016f0ff6",
+        "targetAncestry": [
+          "Distillery — Porting Lifecycle"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_40196224e217e77d89e57d0ffaf2abb2",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-distillery-01.json",
+      "shardSHA256": "92fc6f13591526b163d1b0e446cdb1627c148b554d0b20163154ce2da5db8d40",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/specs/distillery.md",
+      "sourceAnchor": "unheaded-block-3",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 23,
+        "endLine": 27,
+        "textDigest": "334c0e187773d73024ba617a9bed97656d0bbbcfdd3dcc49b1a6c8fd90b13275",
+        "sample": "- A person or agent decides a porting candidate should move to its next\n  lifecycle stage and runs the status-change command for it.\n- Once, at cutover: a seeding operation establi",
+        "identityFingerprint": "d26397d5b0081d1f7462426461179344bfae707f2ca3768f4192603a26482f78",
+        "ancestry": [
+          "Distillery — Porting Lifecycle",
+          "Entry Points & Triggers"
+        ],
+        "text": "- A person or agent decides a porting candidate should move to its next\n  lifecycle stage and runs the status-change command for it.\n- Once, at cutover: a seeding operation establishes the correct current status\n  for every candidate already on record, before the live status-change command\n  is used for the first time."
+      },
+      "sourceShownText": "- A person or agent decides a porting candidate should move to its next\n  lifecycle stage and runs the status-change command for it.\n- Once, at cutover: a seeding operation establishes the correct current status\n  for every candidate already on record, before the live status-change command\n  is used for the first time.",
+      "sourceDigest": "334c0e187773d73024ba617a9bed97656d0bbbcfdd3dcc49b1a6c8fd90b13275",
+      "targetPath": "docs/platform/distillery/spec.md",
+      "targetAnchor": "unheaded-block-5",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 45,
+        "endLine": 49,
+        "textDigest": "334c0e187773d73024ba617a9bed97656d0bbbcfdd3dcc49b1a6c8fd90b13275",
+        "sample": "- A person or agent decides a porting candidate should move to its next\n  lifecycle stage and runs the status-change command for it.\n- Once, at cutover: a seeding operation establi",
+        "identityFingerprint": "d26397d5b0081d1f7462426461179344bfae707f2ca3768f4192603a26482f78",
+        "ancestry": [
+          "Distillery — Porting Lifecycle",
+          "Entry Points & Triggers"
+        ],
+        "text": "- A person or agent decides a porting candidate should move to its next\n  lifecycle stage and runs the status-change command for it.\n- Once, at cutover: a seeding operation establishes the correct current status\n  for every candidate already on record, before the live status-change command\n  is used for the first time."
+      },
+      "targetShownText": "- A person or agent decides a porting candidate should move to its next\n  lifecycle stage and runs the status-change command for it.\n- Once, at cutover: a seeding operation establishes the correct current status\n  for every candidate already on record, before the live status-change command\n  is used for the first time.",
+      "targetDigest": "334c0e187773d73024ba617a9bed97656d0bbbcfdd3dcc49b1a6c8fd90b13275",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_40196224e217e77d89e57d0ffaf2abb2",
+        "sourceUnitDigest": "334c0e187773d73024ba617a9bed97656d0bbbcfdd3dcc49b1a6c8fd90b13275",
+        "targetOwner": "docs/platform/distillery/spec.md",
+        "targetAnchor": "unheaded-block-5",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/distillery.md#unheaded-block-3 (source lines 23-27) is carried at docs/platform/distillery/spec.md#unheaded-block-5 (candidate lines 45-49). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "334c0e187773d73024ba617a9bed97656d0bbbcfdd3dcc49b1a6c8fd90b13275",
+        "targetAncestry": [
+          "Distillery — Porting Lifecycle",
+          "Entry Points & Triggers"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_f237c7dc974c7146bd3cd48a0a77d05d",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-distillery-01.json",
+      "shardSHA256": "92fc6f13591526b163d1b0e446cdb1627c148b554d0b20163154ce2da5db8d40",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/specs/distillery.md",
+      "sourceAnchor": "data-dictionary",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Data Dictionary",
+        "anchor": "data-dictionary",
+        "githubAnchor": "data-dictionary",
+        "stableAnchor": "h-1714ea73b167",
+        "startLine": 29,
+        "endLine": 29,
+        "textDigest": "b0061eedc26338d900dcd637e1fecd0b447d89f7be32b6665942b2a39bcffd0c",
+        "sample": "Data Dictionary",
+        "sectionPayloadDigest": "3f0f6269d0ff09f0df3c6666b873653c8d001b1771a137fa043bec48268e6834",
+        "followingBlockDigest": "3f0f6269d0ff09f0df3c6666b873653c8d001b1771a137fa043bec48268e6834",
+        "identityFingerprint": "7c6da9f9294ebe34c455f1034a2a1aad9a83714bc5db3736c41c48b26e1a947a",
+        "ancestry": [
+          "Distillery — Porting Lifecycle"
+        ],
+        "text": "## Data Dictionary",
+        "sectionText": "## Data Dictionary\n\n| Field | Meaning |\n|---|---|\n| Feature (id) | The name of the extracted idea/pattern under consideration. Unique. |\n| Status | The candidate's current lifecycle stage — see enum below. This is the ONLY field this spec's lifecycle governs (R1). |\n| `candidate` | Identified as reusable, not yet committed to. |\n| `planned` | Decided to pursue; work has not started. |\n| `in-progress` | Actively being built/integrated. |\n| `ported` | Adopted as-is and shipped. |\n| `adapted` | Adopted with modification and shipped. |\n| `rejected` | Considered and declined — recorded permanently so it is never re-litigated. |\n| Score, Local, Đích (destination), Commit, Notes | Free-form metadata about the candidate. NOT governed by this lifecycle (R1) — still edited directly, unaffected by a status change. |"
+      },
+      "sourceShownText": "## Data Dictionary\n\n| Field | Meaning |\n|---|---|\n| Feature (id) | The name of the extracted idea/pattern under consideration. Unique. |\n| Status | The candidate's current lifecycle stage — see enum below. This is the ONLY field this spec's lifecycle governs (R1). |\n| `candidate` | Identified as reusable, not yet committed to. |\n| `planned` | Decided to pursue; work has not started. |\n| `in-progress` | Actively being built/integrated. |\n| `ported` | Adopted as-is and shipped. |\n| `adapted` | Adopted with modification and shipped. |\n| `rejected` | Considered and declined — recorded permanently so it is never re-litigated. |\n| Score, Local, Đích (destination), Commit, Notes | Free-form metadata about the candidate. NOT governed by this lifecycle (R1) — still edited directly, unaffected by a status change. |",
+      "sourceDigest": "b0061eedc26338d900dcd637e1fecd0b447d89f7be32b6665942b2a39bcffd0c",
+      "targetPath": "docs/platform/distillery/spec.md",
+      "targetAnchor": "data-dictionary",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Data Dictionary",
+        "anchor": "data-dictionary",
+        "githubAnchor": "data-dictionary",
+        "stableAnchor": "h-b237d29b483d",
+        "startLine": 51,
+        "endLine": 51,
+        "textDigest": "b0061eedc26338d900dcd637e1fecd0b447d89f7be32b6665942b2a39bcffd0c",
+        "sample": "Data Dictionary",
+        "sectionPayloadDigest": "3f0f6269d0ff09f0df3c6666b873653c8d001b1771a137fa043bec48268e6834",
+        "followingBlockDigest": "3f0f6269d0ff09f0df3c6666b873653c8d001b1771a137fa043bec48268e6834",
+        "identityFingerprint": "7c6da9f9294ebe34c455f1034a2a1aad9a83714bc5db3736c41c48b26e1a947a",
+        "ancestry": [
+          "Distillery — Porting Lifecycle"
+        ],
+        "text": "## Data Dictionary",
+        "sectionText": "## Data Dictionary\n\n| Field | Meaning |\n|---|---|\n| Feature (id) | The name of the extracted idea/pattern under consideration. Unique. |\n| Status | The candidate's current lifecycle stage — see enum below. This is the ONLY field this spec's lifecycle governs (R1). |\n| `candidate` | Identified as reusable, not yet committed to. |\n| `planned` | Decided to pursue; work has not started. |\n| `in-progress` | Actively being built/integrated. |\n| `ported` | Adopted as-is and shipped. |\n| `adapted` | Adopted with modification and shipped. |\n| `rejected` | Considered and declined — recorded permanently so it is never re-litigated. |\n| Score, Local, Đích (destination), Commit, Notes | Free-form metadata about the candidate. NOT governed by this lifecycle (R1) — still edited directly, unaffected by a status change. |"
+      },
+      "targetShownText": "## Data Dictionary\n\n| Field | Meaning |\n|---|---|\n| Feature (id) | The name of the extracted idea/pattern under consideration. Unique. |\n| Status | The candidate's current lifecycle stage — see enum below. This is the ONLY field this spec's lifecycle governs (R1). |\n| `candidate` | Identified as reusable, not yet committed to. |\n| `planned` | Decided to pursue; work has not started. |\n| `in-progress` | Actively being built/integrated. |\n| `ported` | Adopted as-is and shipped. |\n| `adapted` | Adopted with modification and shipped. |\n| `rejected` | Considered and declined — recorded permanently so it is never re-litigated. |\n| Score, Local, Đích (destination), Commit, Notes | Free-form metadata about the candidate. NOT governed by this lifecycle (R1) — still edited directly, unaffected by a status change. |",
+      "targetDigest": "b0061eedc26338d900dcd637e1fecd0b447d89f7be32b6665942b2a39bcffd0c",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_f237c7dc974c7146bd3cd48a0a77d05d",
+        "sourceUnitDigest": "b0061eedc26338d900dcd637e1fecd0b447d89f7be32b6665942b2a39bcffd0c",
+        "targetOwner": "docs/platform/distillery/spec.md",
+        "targetAnchor": "data-dictionary",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/distillery.md#data-dictionary (source lines 29-29) is carried at docs/platform/distillery/spec.md#data-dictionary (candidate lines 51-51). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "b0061eedc26338d900dcd637e1fecd0b447d89f7be32b6665942b2a39bcffd0c",
+        "targetAncestry": [
+          "Distillery — Porting Lifecycle"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_a299172986d37bd5b62d22f36bbb8779",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-distillery-01.json",
+      "shardSHA256": "92fc6f13591526b163d1b0e446cdb1627c148b554d0b20163154ce2da5db8d40",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/specs/distillery.md",
+      "sourceAnchor": "unheaded-block-4",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 31,
+        "endLine": 41,
+        "textDigest": "3f0f6269d0ff09f0df3c6666b873653c8d001b1771a137fa043bec48268e6834",
+        "sample": "| Field | Meaning |\n|---|---|\n| Feature (id) | The name of the extracted idea/pattern under consideration. Unique. |\n| Status | The candidate's current lifecycle stage — see enum b",
+        "identityFingerprint": "f626e8a69b32eec969f99bc47f78007d3e1759aeb460d4ed2becf4c50f91465f",
+        "ancestry": [
+          "Distillery — Porting Lifecycle",
+          "Data Dictionary"
+        ],
+        "text": "| Field | Meaning |\n|---|---|\n| Feature (id) | The name of the extracted idea/pattern under consideration. Unique. |\n| Status | The candidate's current lifecycle stage — see enum below. This is the ONLY field this spec's lifecycle governs (R1). |\n| `candidate` | Identified as reusable, not yet committed to. |\n| `planned` | Decided to pursue; work has not started. |\n| `in-progress` | Actively being built/integrated. |\n| `ported` | Adopted as-is and shipped. |\n| `adapted` | Adopted with modification and shipped. |\n| `rejected` | Considered and declined — recorded permanently so it is never re-litigated. |\n| Score, Local, Đích (destination), Commit, Notes | Free-form metadata about the candidate. NOT governed by this lifecycle (R1) — still edited directly, unaffected by a status change. |"
+      },
+      "sourceShownText": "| Field | Meaning |\n|---|---|\n| Feature (id) | The name of the extracted idea/pattern under consideration. Unique. |\n| Status | The candidate's current lifecycle stage — see enum below. This is the ONLY field this spec's lifecycle governs (R1). |\n| `candidate` | Identified as reusable, not yet committed to. |\n| `planned` | Decided to pursue; work has not started. |\n| `in-progress` | Actively being built/integrated. |\n| `ported` | Adopted as-is and shipped. |\n| `adapted` | Adopted with modification and shipped. |\n| `rejected` | Considered and declined — recorded permanently so it is never re-litigated. |\n| Score, Local, Đích (destination), Commit, Notes | Free-form metadata about the candidate. NOT governed by this lifecycle (R1) — still edited directly, unaffected by a status change. |",
+      "sourceDigest": "3f0f6269d0ff09f0df3c6666b873653c8d001b1771a137fa043bec48268e6834",
+      "targetPath": "docs/platform/distillery/spec.md",
+      "targetAnchor": "unheaded-block-6",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 53,
+        "endLine": 63,
+        "textDigest": "3f0f6269d0ff09f0df3c6666b873653c8d001b1771a137fa043bec48268e6834",
+        "sample": "| Field | Meaning |\n|---|---|\n| Feature (id) | The name of the extracted idea/pattern under consideration. Unique. |\n| Status | The candidate's current lifecycle stage — see enum b",
+        "identityFingerprint": "f626e8a69b32eec969f99bc47f78007d3e1759aeb460d4ed2becf4c50f91465f",
+        "ancestry": [
+          "Distillery — Porting Lifecycle",
+          "Data Dictionary"
+        ],
+        "text": "| Field | Meaning |\n|---|---|\n| Feature (id) | The name of the extracted idea/pattern under consideration. Unique. |\n| Status | The candidate's current lifecycle stage — see enum below. This is the ONLY field this spec's lifecycle governs (R1). |\n| `candidate` | Identified as reusable, not yet committed to. |\n| `planned` | Decided to pursue; work has not started. |\n| `in-progress` | Actively being built/integrated. |\n| `ported` | Adopted as-is and shipped. |\n| `adapted` | Adopted with modification and shipped. |\n| `rejected` | Considered and declined — recorded permanently so it is never re-litigated. |\n| Score, Local, Đích (destination), Commit, Notes | Free-form metadata about the candidate. NOT governed by this lifecycle (R1) — still edited directly, unaffected by a status change. |"
+      },
+      "targetShownText": "| Field | Meaning |\n|---|---|\n| Feature (id) | The name of the extracted idea/pattern under consideration. Unique. |\n| Status | The candidate's current lifecycle stage — see enum below. This is the ONLY field this spec's lifecycle governs (R1). |\n| `candidate` | Identified as reusable, not yet committed to. |\n| `planned` | Decided to pursue; work has not started. |\n| `in-progress` | Actively being built/integrated. |\n| `ported` | Adopted as-is and shipped. |\n| `adapted` | Adopted with modification and shipped. |\n| `rejected` | Considered and declined — recorded permanently so it is never re-litigated. |\n| Score, Local, Đích (destination), Commit, Notes | Free-form metadata about the candidate. NOT governed by this lifecycle (R1) — still edited directly, unaffected by a status change. |",
+      "targetDigest": "3f0f6269d0ff09f0df3c6666b873653c8d001b1771a137fa043bec48268e6834",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_a299172986d37bd5b62d22f36bbb8779",
+        "sourceUnitDigest": "3f0f6269d0ff09f0df3c6666b873653c8d001b1771a137fa043bec48268e6834",
+        "targetOwner": "docs/platform/distillery/spec.md",
+        "targetAnchor": "unheaded-block-6",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/distillery.md#unheaded-block-4 (source lines 31-41) is carried at docs/platform/distillery/spec.md#unheaded-block-6 (candidate lines 53-63). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "3f0f6269d0ff09f0df3c6666b873653c8d001b1771a137fa043bec48268e6834",
+        "targetAncestry": [
+          "Distillery — Porting Lifecycle",
+          "Data Dictionary"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_1672eea7b12dcca590a6976253d8f4c9",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-distillery-01.json",
+      "shardSHA256": "92fc6f13591526b163d1b0e446cdb1627c148b554d0b20163154ce2da5db8d40",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/specs/distillery.md",
+      "sourceAnchor": "behaviors-operations",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Behaviors & Operations",
+        "anchor": "behaviors-operations",
+        "githubAnchor": "behaviors-operations",
+        "stableAnchor": "h-3ea154f9fada",
+        "startLine": 43,
+        "endLine": 43,
+        "textDigest": "8944ba7233c55864d1d718a2e6a33aae31d0e4623adeb8eb6f911026282ed1f1",
+        "sample": "Behaviors & Operations",
+        "sectionPayloadDigest": "311636a8998c187812ba85c8179cbe60fbd2dad81db5a567276828e73f030eb7",
+        "followingBlockDigest": "51355c05a9fd75683883f82bc4d1d691274ca95e8d83722abe0933860c4bef99",
+        "identityFingerprint": "8e6efbd0606ea44781843fb00b6c6bc609bfc37094b6f37042e4af581067b5aa",
+        "ancestry": [
+          "Distillery — Porting Lifecycle"
+        ],
+        "text": "## Behaviors & Operations",
+        "sectionText": "## Behaviors & Operations\n\n**Advance a candidate's status.**\n- Triggers when: an operator or agent decides a candidate is ready for its\n  next lifecycle stage and issues the move.\n- Blocked when: the requested move is not one of the legal next stages for\n  the candidate's current status (see the enum's legal order above — each\n  status has a fixed, small set of stages it may move to next; most illegal\n  moves are attempts to skip stages or to move a candidate that has already\n  reached a final stage).\n- What changes: the candidate's status is durably recorded as changed. The\n  human-readable porting log is updated to show the new status for that one\n  candidate — nothing else on the log changes.\n- Side effects: the change is appended to a permanent record of every status\n  change ever made, so the complete history is always reconstructable from\n  scratch (R2).\n- What the operator observes: on success, confirmation that the move\n  happened. On an illegal move, a clear explanation of why (the candidate's\n  current status and what moves are actually legal from there) — and nothing\n  changes, neither the record nor the human-readable log.\n\n**Seed historical status (one-time, at cutover only).**\n- Triggers when: the porting lifecycle is switched on for the first time,\n  before any live status-change command has been used.\n- What changes: every candidate already on record gets its current status\n  established in the durable record, matching exactly what the human-readable\n  log already showed for it — no candidate starts over at the beginning.\n- What each status is \"reached\" through: the seeding operation only ever uses\n  the SAME legal stage-to-stage moves the live command would use — it never\n  takes a shortcut straight to a candidate's final status. This is itself a\n  proof that every candidate's recorded status is one the lifecycle can\n  actually produce.\n- Side effect / self-check: if a candidate's current status could NOT be\n  reached through any legal sequence of moves, seeding for that candidate\n  would fail loudly rather than silently accepting it — this has not\n  happened with real data yet (Edge Cases Settled).\n- Running the seeding operation again after it already ran changes nothing —\n  it recognizes work already done and skips it."
+      },
+      "sourceShownText": "## Behaviors & Operations\n\n**Advance a candidate's status.**\n- Triggers when: an operator or agent decides a candidate is ready for its\n  next lifecycle stage and issues the move.\n- Blocked when: the requested move is not one of the legal next stages for\n  the candidate's current status (see the enum's legal order above — each\n  status has a fixed, small set of stages it may move to next; most illegal\n  moves are attempts to skip stages or to move a candidate that has already\n  reached a final stage).\n- What changes: the candidate's status is durably recorded as changed. The\n  human-readable porting log is updated to show the new status for that one\n  candidate — nothing else on the log changes.\n- Side effects: the change is appended to a permanent record of every status\n  change ever made, so the complete history is always reconstructable from\n  scratch (R2).\n- What the operator observes: on success, confirmation that the move\n  happened. On an illegal move, a clear explanation of why (the candidate's\n  current status and what moves are actually legal from there) — and nothing\n  changes, neither the record nor the human-readable log.\n\n**Seed historical status (one-time, at cutover only).**\n- Triggers when: the porting lifecycle is switched on for the first time,\n  before any live status-change command has been used.\n- What changes: every candidate already on record gets its current status\n  established in the durable record, matching exactly what the human-readable\n  log already showed for it — no candidate starts over at the beginning.\n- What each status is \"reached\" through: the seeding operation only ever uses\n  the SAME legal stage-to-stage moves the live command would use — it never\n  takes a shortcut straight to a candidate's final status. This is itself a\n  proof that every candidate's recorded status is one the lifecycle can\n  actually produce.\n- Side effect / self-check: if a candidate's current status could NOT be\n  reached through any legal sequence of moves, seeding for that candidate\n  would fail loudly rather than silently accepting it — this has not\n  happened with real data yet (Edge Cases Settled).\n- Running the seeding operation again after it already ran changes nothing —\n  it recognizes work already done and skips it.",
+      "sourceDigest": "8944ba7233c55864d1d718a2e6a33aae31d0e4623adeb8eb6f911026282ed1f1",
+      "targetPath": "docs/platform/distillery/spec.md",
+      "targetAnchor": "behaviors-operations",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Behaviors & Operations",
+        "anchor": "behaviors-operations",
+        "githubAnchor": "behaviors-operations",
+        "stableAnchor": "h-2eee9b148e4a",
+        "startLine": 65,
+        "endLine": 65,
+        "textDigest": "8944ba7233c55864d1d718a2e6a33aae31d0e4623adeb8eb6f911026282ed1f1",
+        "sample": "Behaviors & Operations",
+        "sectionPayloadDigest": "311636a8998c187812ba85c8179cbe60fbd2dad81db5a567276828e73f030eb7",
+        "followingBlockDigest": "51355c05a9fd75683883f82bc4d1d691274ca95e8d83722abe0933860c4bef99",
+        "identityFingerprint": "8e6efbd0606ea44781843fb00b6c6bc609bfc37094b6f37042e4af581067b5aa",
+        "ancestry": [
+          "Distillery — Porting Lifecycle"
+        ],
+        "text": "## Behaviors & Operations",
+        "sectionText": "## Behaviors & Operations\n\n**Advance a candidate's status.**\n- Triggers when: an operator or agent decides a candidate is ready for its\n  next lifecycle stage and issues the move.\n- Blocked when: the requested move is not one of the legal next stages for\n  the candidate's current status (see the enum's legal order above — each\n  status has a fixed, small set of stages it may move to next; most illegal\n  moves are attempts to skip stages or to move a candidate that has already\n  reached a final stage).\n- What changes: the candidate's status is durably recorded as changed. The\n  human-readable porting log is updated to show the new status for that one\n  candidate — nothing else on the log changes.\n- Side effects: the change is appended to a permanent record of every status\n  change ever made, so the complete history is always reconstructable from\n  scratch (R2).\n- What the operator observes: on success, confirmation that the move\n  happened. On an illegal move, a clear explanation of why (the candidate's\n  current status and what moves are actually legal from there) — and nothing\n  changes, neither the record nor the human-readable log.\n\n**Seed historical status (one-time, at cutover only).**\n- Triggers when: the porting lifecycle is switched on for the first time,\n  before any live status-change command has been used.\n- What changes: every candidate already on record gets its current status\n  established in the durable record, matching exactly what the human-readable\n  log already showed for it — no candidate starts over at the beginning.\n- What each status is \"reached\" through: the seeding operation only ever uses\n  the SAME legal stage-to-stage moves the live command would use — it never\n  takes a shortcut straight to a candidate's final status. This is itself a\n  proof that every candidate's recorded status is one the lifecycle can\n  actually produce.\n- Side effect / self-check: if a candidate's current status could NOT be\n  reached through any legal sequence of moves, seeding for that candidate\n  would fail loudly rather than silently accepting it — this has not\n  happened with real data yet (Edge Cases Settled).\n- Running the seeding operation again after it already ran changes nothing —\n  it recognizes work already done and skips it."
+      },
+      "targetShownText": "## Behaviors & Operations\n\n**Advance a candidate's status.**\n- Triggers when: an operator or agent decides a candidate is ready for its\n  next lifecycle stage and issues the move.\n- Blocked when: the requested move is not one of the legal next stages for\n  the candidate's current status (see the enum's legal order above — each\n  status has a fixed, small set of stages it may move to next; most illegal\n  moves are attempts to skip stages or to move a candidate that has already\n  reached a final stage).\n- What changes: the candidate's status is durably recorded as changed. The\n  human-readable porting log is updated to show the new status for that one\n  candidate — nothing else on the log changes.\n- Side effects: the change is appended to a permanent record of every status\n  change ever made, so the complete history is always reconstructable from\n  scratch (R2).\n- What the operator observes: on success, confirmation that the move\n  happened. On an illegal move, a clear explanation of why (the candidate's\n  current status and what moves are actually legal from there) — and nothing\n  changes, neither the record nor the human-readable log.\n\n**Seed historical status (one-time, at cutover only).**\n- Triggers when: the porting lifecycle is switched on for the first time,\n  before any live status-change command has been used.\n- What changes: every candidate already on record gets its current status\n  established in the durable record, matching exactly what the human-readable\n  log already showed for it — no candidate starts over at the beginning.\n- What each status is \"reached\" through: the seeding operation only ever uses\n  the SAME legal stage-to-stage moves the live command would use — it never\n  takes a shortcut straight to a candidate's final status. This is itself a\n  proof that every candidate's recorded status is one the lifecycle can\n  actually produce.\n- Side effect / self-check: if a candidate's current status could NOT be\n  reached through any legal sequence of moves, seeding for that candidate\n  would fail loudly rather than silently accepting it — this has not\n  happened with real data yet (Edge Cases Settled).\n- Running the seeding operation again after it already ran changes nothing —\n  it recognizes work already done and skips it.",
+      "targetDigest": "8944ba7233c55864d1d718a2e6a33aae31d0e4623adeb8eb6f911026282ed1f1",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_1672eea7b12dcca590a6976253d8f4c9",
+        "sourceUnitDigest": "8944ba7233c55864d1d718a2e6a33aae31d0e4623adeb8eb6f911026282ed1f1",
+        "targetOwner": "docs/platform/distillery/spec.md",
+        "targetAnchor": "behaviors-operations",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/distillery.md#behaviors-operations (source lines 43-43) is carried at docs/platform/distillery/spec.md#behaviors-operations (candidate lines 65-65). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "8944ba7233c55864d1d718a2e6a33aae31d0e4623adeb8eb6f911026282ed1f1",
+        "targetAncestry": [
+          "Distillery — Porting Lifecycle"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_f9628d49e013fa3d4269ec432b7ba443",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-distillery-01.json",
+      "shardSHA256": "92fc6f13591526b163d1b0e446cdb1627c148b554d0b20163154ce2da5db8d40",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/specs/distillery.md",
+      "sourceAnchor": "unheaded-block-5",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 45,
+        "endLine": 62,
+        "textDigest": "51355c05a9fd75683883f82bc4d1d691274ca95e8d83722abe0933860c4bef99",
+        "sample": "**Advance a candidate's status.**\n- Triggers when: an operator or agent decides a candidate is ready for its\n  next lifecycle stage and issues the move.\n- Blocked when: the request",
+        "identityFingerprint": "e968713c1f7fae8acd13e6d77966c9d8ea2ddbf9d23c9f488cb2b8778b8ad17f",
+        "ancestry": [
+          "Distillery — Porting Lifecycle",
+          "Behaviors & Operations"
+        ],
+        "text": "**Advance a candidate's status.**\n- Triggers when: an operator or agent decides a candidate is ready for its\n  next lifecycle stage and issues the move.\n- Blocked when: the requested move is not one of the legal next stages for\n  the candidate's current status (see the enum's legal order above — each\n  status has a fixed, small set of stages it may move to next; most illegal\n  moves are attempts to skip stages or to move a candidate that has already\n  reached a final stage).\n- What changes: the candidate's status is durably recorded as changed. The\n  human-readable porting log is updated to show the new status for that one\n  candidate — nothing else on the log changes.\n- Side effects: the change is appended to a permanent record of every status\n  change ever made, so the complete history is always reconstructable from\n  scratch (R2).\n- What the operator observes: on success, confirmation that the move\n  happened. On an illegal move, a clear explanation of why (the candidate's\n  current status and what moves are actually legal from there) — and nothing\n  changes, neither the record nor the human-readable log."
+      },
+      "sourceShownText": "**Advance a candidate's status.**\n- Triggers when: an operator or agent decides a candidate is ready for its\n  next lifecycle stage and issues the move.\n- Blocked when: the requested move is not one of the legal next stages for\n  the candidate's current status (see the enum's legal order above — each\n  status has a fixed, small set of stages it may move to next; most illegal\n  moves are attempts to skip stages or to move a candidate that has already\n  reached a final stage).\n- What changes: the candidate's status is durably recorded as changed. The\n  human-readable porting log is updated to show the new status for that one\n  candidate — nothing else on the log changes.\n- Side effects: the change is appended to a permanent record of every status\n  change ever made, so the complete history is always reconstructable from\n  scratch (R2).\n- What the operator observes: on success, confirmation that the move\n  happened. On an illegal move, a clear explanation of why (the candidate's\n  current status and what moves are actually legal from there) — and nothing\n  changes, neither the record nor the human-readable log.",
+      "sourceDigest": "51355c05a9fd75683883f82bc4d1d691274ca95e8d83722abe0933860c4bef99",
+      "targetPath": "docs/platform/distillery/spec.md",
+      "targetAnchor": "unheaded-block-7",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 67,
+        "endLine": 84,
+        "textDigest": "51355c05a9fd75683883f82bc4d1d691274ca95e8d83722abe0933860c4bef99",
+        "sample": "**Advance a candidate's status.**\n- Triggers when: an operator or agent decides a candidate is ready for its\n  next lifecycle stage and issues the move.\n- Blocked when: the request",
+        "identityFingerprint": "e968713c1f7fae8acd13e6d77966c9d8ea2ddbf9d23c9f488cb2b8778b8ad17f",
+        "ancestry": [
+          "Distillery — Porting Lifecycle",
+          "Behaviors & Operations"
+        ],
+        "text": "**Advance a candidate's status.**\n- Triggers when: an operator or agent decides a candidate is ready for its\n  next lifecycle stage and issues the move.\n- Blocked when: the requested move is not one of the legal next stages for\n  the candidate's current status (see the enum's legal order above — each\n  status has a fixed, small set of stages it may move to next; most illegal\n  moves are attempts to skip stages or to move a candidate that has already\n  reached a final stage).\n- What changes: the candidate's status is durably recorded as changed. The\n  human-readable porting log is updated to show the new status for that one\n  candidate — nothing else on the log changes.\n- Side effects: the change is appended to a permanent record of every status\n  change ever made, so the complete history is always reconstructable from\n  scratch (R2).\n- What the operator observes: on success, confirmation that the move\n  happened. On an illegal move, a clear explanation of why (the candidate's\n  current status and what moves are actually legal from there) — and nothing\n  changes, neither the record nor the human-readable log."
+      },
+      "targetShownText": "**Advance a candidate's status.**\n- Triggers when: an operator or agent decides a candidate is ready for its\n  next lifecycle stage and issues the move.\n- Blocked when: the requested move is not one of the legal next stages for\n  the candidate's current status (see the enum's legal order above — each\n  status has a fixed, small set of stages it may move to next; most illegal\n  moves are attempts to skip stages or to move a candidate that has already\n  reached a final stage).\n- What changes: the candidate's status is durably recorded as changed. The\n  human-readable porting log is updated to show the new status for that one\n  candidate — nothing else on the log changes.\n- Side effects: the change is appended to a permanent record of every status\n  change ever made, so the complete history is always reconstructable from\n  scratch (R2).\n- What the operator observes: on success, confirmation that the move\n  happened. On an illegal move, a clear explanation of why (the candidate's\n  current status and what moves are actually legal from there) — and nothing\n  changes, neither the record nor the human-readable log.",
+      "targetDigest": "51355c05a9fd75683883f82bc4d1d691274ca95e8d83722abe0933860c4bef99",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_f9628d49e013fa3d4269ec432b7ba443",
+        "sourceUnitDigest": "51355c05a9fd75683883f82bc4d1d691274ca95e8d83722abe0933860c4bef99",
+        "targetOwner": "docs/platform/distillery/spec.md",
+        "targetAnchor": "unheaded-block-7",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/distillery.md#unheaded-block-5 (source lines 45-62) is carried at docs/platform/distillery/spec.md#unheaded-block-7 (candidate lines 67-84). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "51355c05a9fd75683883f82bc4d1d691274ca95e8d83722abe0933860c4bef99",
+        "targetAncestry": [
+          "Distillery — Porting Lifecycle",
+          "Behaviors & Operations"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_5c674a057e92715ff96b88a32ae0f3f4",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-distillery-01.json",
+      "shardSHA256": "92fc6f13591526b163d1b0e446cdb1627c148b554d0b20163154ce2da5db8d40",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/specs/distillery.md",
+      "sourceAnchor": "unheaded-block-6",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 64,
+        "endLine": 80,
+        "textDigest": "02543d603ca0b1be88bae787b73b2603664554883fc89896ab0f0e916e3287c4",
+        "sample": "**Seed historical status (one-time, at cutover only).**\n- Triggers when: the porting lifecycle is switched on for the first time,\n  before any live status-change command has been u",
+        "identityFingerprint": "bc1803134e14e164a06eb0578cd4945ac73a5a65a5e49407d030d65d31f1bb03",
+        "ancestry": [
+          "Distillery — Porting Lifecycle",
+          "Behaviors & Operations"
+        ],
+        "text": "**Seed historical status (one-time, at cutover only).**\n- Triggers when: the porting lifecycle is switched on for the first time,\n  before any live status-change command has been used.\n- What changes: every candidate already on record gets its current status\n  established in the durable record, matching exactly what the human-readable\n  log already showed for it — no candidate starts over at the beginning.\n- What each status is \"reached\" through: the seeding operation only ever uses\n  the SAME legal stage-to-stage moves the live command would use — it never\n  takes a shortcut straight to a candidate's final status. This is itself a\n  proof that every candidate's recorded status is one the lifecycle can\n  actually produce.\n- Side effect / self-check: if a candidate's current status could NOT be\n  reached through any legal sequence of moves, seeding for that candidate\n  would fail loudly rather than silently accepting it — this has not\n  happened with real data yet (Edge Cases Settled).\n- Running the seeding operation again after it already ran changes nothing —\n  it recognizes work already done and skips it."
+      },
+      "sourceShownText": "**Seed historical status (one-time, at cutover only).**\n- Triggers when: the porting lifecycle is switched on for the first time,\n  before any live status-change command has been used.\n- What changes: every candidate already on record gets its current status\n  established in the durable record, matching exactly what the human-readable\n  log already showed for it — no candidate starts over at the beginning.\n- What each status is \"reached\" through: the seeding operation only ever uses\n  the SAME legal stage-to-stage moves the live command would use — it never\n  takes a shortcut straight to a candidate's final status. This is itself a\n  proof that every candidate's recorded status is one the lifecycle can\n  actually produce.\n- Side effect / self-check: if a candidate's current status could NOT be\n  reached through any legal sequence of moves, seeding for that candidate\n  would fail loudly rather than silently accepting it — this has not\n  happened with real data yet (Edge Cases Settled).\n- Running the seeding operation again after it already ran changes nothing —\n  it recognizes work already done and skips it.",
+      "sourceDigest": "02543d603ca0b1be88bae787b73b2603664554883fc89896ab0f0e916e3287c4",
+      "targetPath": "docs/platform/distillery/spec.md",
+      "targetAnchor": "unheaded-block-8",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-8",
+        "githubAnchor": "unheaded-block-8",
+        "stableAnchor": "unheaded-block-8",
+        "title": "Unheaded block 8",
+        "startLine": 86,
+        "endLine": 102,
+        "textDigest": "02543d603ca0b1be88bae787b73b2603664554883fc89896ab0f0e916e3287c4",
+        "sample": "**Seed historical status (one-time, at cutover only).**\n- Triggers when: the porting lifecycle is switched on for the first time,\n  before any live status-change command has been u",
+        "identityFingerprint": "bc1803134e14e164a06eb0578cd4945ac73a5a65a5e49407d030d65d31f1bb03",
+        "ancestry": [
+          "Distillery — Porting Lifecycle",
+          "Behaviors & Operations"
+        ],
+        "text": "**Seed historical status (one-time, at cutover only).**\n- Triggers when: the porting lifecycle is switched on for the first time,\n  before any live status-change command has been used.\n- What changes: every candidate already on record gets its current status\n  established in the durable record, matching exactly what the human-readable\n  log already showed for it — no candidate starts over at the beginning.\n- What each status is \"reached\" through: the seeding operation only ever uses\n  the SAME legal stage-to-stage moves the live command would use — it never\n  takes a shortcut straight to a candidate's final status. This is itself a\n  proof that every candidate's recorded status is one the lifecycle can\n  actually produce.\n- Side effect / self-check: if a candidate's current status could NOT be\n  reached through any legal sequence of moves, seeding for that candidate\n  would fail loudly rather than silently accepting it — this has not\n  happened with real data yet (Edge Cases Settled).\n- Running the seeding operation again after it already ran changes nothing —\n  it recognizes work already done and skips it."
+      },
+      "targetShownText": "**Seed historical status (one-time, at cutover only).**\n- Triggers when: the porting lifecycle is switched on for the first time,\n  before any live status-change command has been used.\n- What changes: every candidate already on record gets its current status\n  established in the durable record, matching exactly what the human-readable\n  log already showed for it — no candidate starts over at the beginning.\n- What each status is \"reached\" through: the seeding operation only ever uses\n  the SAME legal stage-to-stage moves the live command would use — it never\n  takes a shortcut straight to a candidate's final status. This is itself a\n  proof that every candidate's recorded status is one the lifecycle can\n  actually produce.\n- Side effect / self-check: if a candidate's current status could NOT be\n  reached through any legal sequence of moves, seeding for that candidate\n  would fail loudly rather than silently accepting it — this has not\n  happened with real data yet (Edge Cases Settled).\n- Running the seeding operation again after it already ran changes nothing —\n  it recognizes work already done and skips it.",
+      "targetDigest": "02543d603ca0b1be88bae787b73b2603664554883fc89896ab0f0e916e3287c4",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_5c674a057e92715ff96b88a32ae0f3f4",
+        "sourceUnitDigest": "02543d603ca0b1be88bae787b73b2603664554883fc89896ab0f0e916e3287c4",
+        "targetOwner": "docs/platform/distillery/spec.md",
+        "targetAnchor": "unheaded-block-8",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/distillery.md#unheaded-block-6 (source lines 64-80) is carried at docs/platform/distillery/spec.md#unheaded-block-8 (candidate lines 86-102). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "02543d603ca0b1be88bae787b73b2603664554883fc89896ab0f0e916e3287c4",
+        "targetAncestry": [
+          "Distillery — Porting Lifecycle",
+          "Behaviors & Operations"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_7af861c8f84a4a69a8e1bf2c05073f03",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-distillery-01.json",
+      "shardSHA256": "92fc6f13591526b163d1b0e446cdb1627c148b554d0b20163154ce2da5db8d40",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/specs/distillery.md",
+      "sourceAnchor": "actors-access",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Actors & Access",
+        "anchor": "actors-access",
+        "githubAnchor": "actors-access",
+        "stableAnchor": "h-a12b6941e3b4",
+        "startLine": 82,
+        "endLine": 82,
+        "textDigest": "af0dc11faf7105cb162d9ac1088a5b1c0cd5f5eeec2774b7004540fe897fd326",
+        "sample": "Actors & Access",
+        "sectionPayloadDigest": "ecbc1e3549a472da566e42516264977768db33d26faedc079f50e6d641b9dc01",
+        "followingBlockDigest": "ecbc1e3549a472da566e42516264977768db33d26faedc079f50e6d641b9dc01",
+        "identityFingerprint": "e050decd5b3603e18ccf5e08ca30e8faedf8354d14e8da355a4b7ba21f01ed63",
+        "ancestry": [
+          "Distillery — Porting Lifecycle"
+        ],
+        "text": "## Actors & Access",
+        "sectionText": "## Actors & Access\n\n- **Operator/agent** — anyone with access to the distillery tooling. No\n  additional access control beyond ordinary tool access; this is internal\n  workshop tooling, not a user-facing product surface."
+      },
+      "sourceShownText": "## Actors & Access\n\n- **Operator/agent** — anyone with access to the distillery tooling. No\n  additional access control beyond ordinary tool access; this is internal\n  workshop tooling, not a user-facing product surface.",
+      "sourceDigest": "af0dc11faf7105cb162d9ac1088a5b1c0cd5f5eeec2774b7004540fe897fd326",
+      "targetPath": "docs/platform/distillery/spec.md",
+      "targetAnchor": "actors-access",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Actors & Access",
+        "anchor": "actors-access",
+        "githubAnchor": "actors-access",
+        "stableAnchor": "h-6733fff56f86",
+        "startLine": 104,
+        "endLine": 104,
+        "textDigest": "af0dc11faf7105cb162d9ac1088a5b1c0cd5f5eeec2774b7004540fe897fd326",
+        "sample": "Actors & Access",
+        "sectionPayloadDigest": "ecbc1e3549a472da566e42516264977768db33d26faedc079f50e6d641b9dc01",
+        "followingBlockDigest": "ecbc1e3549a472da566e42516264977768db33d26faedc079f50e6d641b9dc01",
+        "identityFingerprint": "e050decd5b3603e18ccf5e08ca30e8faedf8354d14e8da355a4b7ba21f01ed63",
+        "ancestry": [
+          "Distillery — Porting Lifecycle"
+        ],
+        "text": "## Actors & Access",
+        "sectionText": "## Actors & Access\n\n- **Operator/agent** — anyone with access to the distillery tooling. No\n  additional access control beyond ordinary tool access; this is internal\n  workshop tooling, not a user-facing product surface."
+      },
+      "targetShownText": "## Actors & Access\n\n- **Operator/agent** — anyone with access to the distillery tooling. No\n  additional access control beyond ordinary tool access; this is internal\n  workshop tooling, not a user-facing product surface.",
+      "targetDigest": "af0dc11faf7105cb162d9ac1088a5b1c0cd5f5eeec2774b7004540fe897fd326",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_7af861c8f84a4a69a8e1bf2c05073f03",
+        "sourceUnitDigest": "af0dc11faf7105cb162d9ac1088a5b1c0cd5f5eeec2774b7004540fe897fd326",
+        "targetOwner": "docs/platform/distillery/spec.md",
+        "targetAnchor": "actors-access",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/distillery.md#actors-access (source lines 82-82) is carried at docs/platform/distillery/spec.md#actors-access (candidate lines 104-104). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "af0dc11faf7105cb162d9ac1088a5b1c0cd5f5eeec2774b7004540fe897fd326",
+        "targetAncestry": [
+          "Distillery — Porting Lifecycle"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_00affff32942b999e43d36d74d1d9917",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-distillery-01.json",
+      "shardSHA256": "92fc6f13591526b163d1b0e446cdb1627c148b554d0b20163154ce2da5db8d40",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/specs/distillery.md",
+      "sourceAnchor": "unheaded-block-7",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 84,
+        "endLine": 86,
+        "textDigest": "ecbc1e3549a472da566e42516264977768db33d26faedc079f50e6d641b9dc01",
+        "sample": "- **Operator/agent** — anyone with access to the distillery tooling. No\n  additional access control beyond ordinary tool access; this is internal\n  workshop tooling, not a user-fac",
+        "identityFingerprint": "a7e62c2a796ae62e1264d18c64c2e09cc49c62779a74bce2321e83072041458c",
+        "ancestry": [
+          "Distillery — Porting Lifecycle",
+          "Actors & Access"
+        ],
+        "text": "- **Operator/agent** — anyone with access to the distillery tooling. No\n  additional access control beyond ordinary tool access; this is internal\n  workshop tooling, not a user-facing product surface."
+      },
+      "sourceShownText": "- **Operator/agent** — anyone with access to the distillery tooling. No\n  additional access control beyond ordinary tool access; this is internal\n  workshop tooling, not a user-facing product surface.",
+      "sourceDigest": "ecbc1e3549a472da566e42516264977768db33d26faedc079f50e6d641b9dc01",
+      "targetPath": "docs/platform/distillery/spec.md",
+      "targetAnchor": "unheaded-block-9",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-9",
+        "githubAnchor": "unheaded-block-9",
+        "stableAnchor": "unheaded-block-9",
+        "title": "Unheaded block 9",
+        "startLine": 106,
+        "endLine": 108,
+        "textDigest": "ecbc1e3549a472da566e42516264977768db33d26faedc079f50e6d641b9dc01",
+        "sample": "- **Operator/agent** — anyone with access to the distillery tooling. No\n  additional access control beyond ordinary tool access; this is internal\n  workshop tooling, not a user-fac",
+        "identityFingerprint": "a7e62c2a796ae62e1264d18c64c2e09cc49c62779a74bce2321e83072041458c",
+        "ancestry": [
+          "Distillery — Porting Lifecycle",
+          "Actors & Access"
+        ],
+        "text": "- **Operator/agent** — anyone with access to the distillery tooling. No\n  additional access control beyond ordinary tool access; this is internal\n  workshop tooling, not a user-facing product surface."
+      },
+      "targetShownText": "- **Operator/agent** — anyone with access to the distillery tooling. No\n  additional access control beyond ordinary tool access; this is internal\n  workshop tooling, not a user-facing product surface.",
+      "targetDigest": "ecbc1e3549a472da566e42516264977768db33d26faedc079f50e6d641b9dc01",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_00affff32942b999e43d36d74d1d9917",
+        "sourceUnitDigest": "ecbc1e3549a472da566e42516264977768db33d26faedc079f50e6d641b9dc01",
+        "targetOwner": "docs/platform/distillery/spec.md",
+        "targetAnchor": "unheaded-block-9",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/distillery.md#unheaded-block-7 (source lines 84-86) is carried at docs/platform/distillery/spec.md#unheaded-block-9 (candidate lines 106-108). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "ecbc1e3549a472da566e42516264977768db33d26faedc079f50e6d641b9dc01",
+        "targetAncestry": [
+          "Distillery — Porting Lifecycle",
+          "Actors & Access"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_edc3a60c5df1d6a3d5180c628f8f97ba",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-distillery-01.json",
+      "shardSHA256": "92fc6f13591526b163d1b0e446cdb1627c148b554d0b20163154ce2da5db8d40",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/specs/distillery.md",
+      "sourceAnchor": "business-rules",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Business Rules",
+        "anchor": "business-rules",
+        "githubAnchor": "business-rules",
+        "stableAnchor": "h-8a7ab3535cc8",
+        "startLine": 88,
+        "endLine": 88,
+        "textDigest": "bf43300daaca9c3415aecfd3aa504ea3ef398b02ba4d9a78406d930e813fbc1e",
+        "sample": "Business Rules",
+        "sectionPayloadDigest": "f770390c5ca45f6660f36a2c5dff4a537e9b0ac7a021d4a00c09643851c1d49b",
+        "followingBlockDigest": "f770390c5ca45f6660f36a2c5dff4a537e9b0ac7a021d4a00c09643851c1d49b",
+        "identityFingerprint": "7bd6745ef8f0425e0f83c9b89acaed3f58dcc84e3a91ca24fc324d4ae8be1a6a",
+        "ancestry": [
+          "Distillery — Porting Lifecycle"
+        ],
+        "text": "## Business Rules",
+        "sectionText": "## Business Rules\n\n- **R1.** The lifecycle governs the Status field only. Score, Local,\n  destination, commit, and notes stay freely editable and are never touched\n  by a status change.\n- **R2.** The durable record of status changes is the source of truth. The\n  human-readable porting log is always a reflection of it — after cutover,\n  it is never hand-edited for Status again.\n- **R3.** Status changes for distillery candidates go through the same kind\n  of durable, rule-checked mechanism forgent uses for tracking its own\n  work — not a separate, informal mechanism built just for this."
+      },
+      "sourceShownText": "## Business Rules\n\n- **R1.** The lifecycle governs the Status field only. Score, Local,\n  destination, commit, and notes stay freely editable and are never touched\n  by a status change.\n- **R2.** The durable record of status changes is the source of truth. The\n  human-readable porting log is always a reflection of it — after cutover,\n  it is never hand-edited for Status again.\n- **R3.** Status changes for distillery candidates go through the same kind\n  of durable, rule-checked mechanism forgent uses for tracking its own\n  work — not a separate, informal mechanism built just for this.",
+      "sourceDigest": "bf43300daaca9c3415aecfd3aa504ea3ef398b02ba4d9a78406d930e813fbc1e",
+      "targetPath": "docs/platform/distillery/spec.md",
+      "targetAnchor": "business-rules",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Business Rules",
+        "anchor": "business-rules",
+        "githubAnchor": "business-rules",
+        "stableAnchor": "h-e9c2eb4a64b0",
+        "startLine": 110,
+        "endLine": 110,
+        "textDigest": "bf43300daaca9c3415aecfd3aa504ea3ef398b02ba4d9a78406d930e813fbc1e",
+        "sample": "Business Rules",
+        "sectionPayloadDigest": "f770390c5ca45f6660f36a2c5dff4a537e9b0ac7a021d4a00c09643851c1d49b",
+        "followingBlockDigest": "f770390c5ca45f6660f36a2c5dff4a537e9b0ac7a021d4a00c09643851c1d49b",
+        "identityFingerprint": "7bd6745ef8f0425e0f83c9b89acaed3f58dcc84e3a91ca24fc324d4ae8be1a6a",
+        "ancestry": [
+          "Distillery — Porting Lifecycle"
+        ],
+        "text": "## Business Rules",
+        "sectionText": "## Business Rules\n\n- **R1.** The lifecycle governs the Status field only. Score, Local,\n  destination, commit, and notes stay freely editable and are never touched\n  by a status change.\n- **R2.** The durable record of status changes is the source of truth. The\n  human-readable porting log is always a reflection of it — after cutover,\n  it is never hand-edited for Status again.\n- **R3.** Status changes for distillery candidates go through the same kind\n  of durable, rule-checked mechanism forgent uses for tracking its own\n  work — not a separate, informal mechanism built just for this."
+      },
+      "targetShownText": "## Business Rules\n\n- **R1.** The lifecycle governs the Status field only. Score, Local,\n  destination, commit, and notes stay freely editable and are never touched\n  by a status change.\n- **R2.** The durable record of status changes is the source of truth. The\n  human-readable porting log is always a reflection of it — after cutover,\n  it is never hand-edited for Status again.\n- **R3.** Status changes for distillery candidates go through the same kind\n  of durable, rule-checked mechanism forgent uses for tracking its own\n  work — not a separate, informal mechanism built just for this.",
+      "targetDigest": "bf43300daaca9c3415aecfd3aa504ea3ef398b02ba4d9a78406d930e813fbc1e",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_edc3a60c5df1d6a3d5180c628f8f97ba",
+        "sourceUnitDigest": "bf43300daaca9c3415aecfd3aa504ea3ef398b02ba4d9a78406d930e813fbc1e",
+        "targetOwner": "docs/platform/distillery/spec.md",
+        "targetAnchor": "business-rules",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/distillery.md#business-rules (source lines 88-88) is carried at docs/platform/distillery/spec.md#business-rules (candidate lines 110-110). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "bf43300daaca9c3415aecfd3aa504ea3ef398b02ba4d9a78406d930e813fbc1e",
+        "targetAncestry": [
+          "Distillery — Porting Lifecycle"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_637b69327d2486602ee428a8b90936c8",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-distillery-01.json",
+      "shardSHA256": "92fc6f13591526b163d1b0e446cdb1627c148b554d0b20163154ce2da5db8d40",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/specs/distillery.md",
+      "sourceAnchor": "unheaded-block-8",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-8",
+        "githubAnchor": "unheaded-block-8",
+        "stableAnchor": "unheaded-block-8",
+        "title": "Unheaded block 8",
+        "startLine": 90,
+        "endLine": 98,
+        "textDigest": "f770390c5ca45f6660f36a2c5dff4a537e9b0ac7a021d4a00c09643851c1d49b",
+        "sample": "- **R1.** The lifecycle governs the Status field only. Score, Local,\n  destination, commit, and notes stay freely editable and are never touched\n  by a status change.\n- **R2.** The",
+        "identityFingerprint": "2f628440dc445832bf96298b01d950d1a25eb048c9292c1aa9e5ac3069cd6617",
+        "ancestry": [
+          "Distillery — Porting Lifecycle",
+          "Business Rules"
+        ],
+        "text": "- **R1.** The lifecycle governs the Status field only. Score, Local,\n  destination, commit, and notes stay freely editable and are never touched\n  by a status change.\n- **R2.** The durable record of status changes is the source of truth. The\n  human-readable porting log is always a reflection of it — after cutover,\n  it is never hand-edited for Status again.\n- **R3.** Status changes for distillery candidates go through the same kind\n  of durable, rule-checked mechanism forgent uses for tracking its own\n  work — not a separate, informal mechanism built just for this."
+      },
+      "sourceShownText": "- **R1.** The lifecycle governs the Status field only. Score, Local,\n  destination, commit, and notes stay freely editable and are never touched\n  by a status change.\n- **R2.** The durable record of status changes is the source of truth. The\n  human-readable porting log is always a reflection of it — after cutover,\n  it is never hand-edited for Status again.\n- **R3.** Status changes for distillery candidates go through the same kind\n  of durable, rule-checked mechanism forgent uses for tracking its own\n  work — not a separate, informal mechanism built just for this.",
+      "sourceDigest": "f770390c5ca45f6660f36a2c5dff4a537e9b0ac7a021d4a00c09643851c1d49b",
+      "targetPath": "docs/platform/distillery/spec.md",
+      "targetAnchor": "unheaded-block-10",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-10",
+        "githubAnchor": "unheaded-block-10",
+        "stableAnchor": "unheaded-block-10",
+        "title": "Unheaded block 10",
+        "startLine": 112,
+        "endLine": 120,
+        "textDigest": "f770390c5ca45f6660f36a2c5dff4a537e9b0ac7a021d4a00c09643851c1d49b",
+        "sample": "- **R1.** The lifecycle governs the Status field only. Score, Local,\n  destination, commit, and notes stay freely editable and are never touched\n  by a status change.\n- **R2.** The",
+        "identityFingerprint": "2f628440dc445832bf96298b01d950d1a25eb048c9292c1aa9e5ac3069cd6617",
+        "ancestry": [
+          "Distillery — Porting Lifecycle",
+          "Business Rules"
+        ],
+        "text": "- **R1.** The lifecycle governs the Status field only. Score, Local,\n  destination, commit, and notes stay freely editable and are never touched\n  by a status change.\n- **R2.** The durable record of status changes is the source of truth. The\n  human-readable porting log is always a reflection of it — after cutover,\n  it is never hand-edited for Status again.\n- **R3.** Status changes for distillery candidates go through the same kind\n  of durable, rule-checked mechanism forgent uses for tracking its own\n  work — not a separate, informal mechanism built just for this."
+      },
+      "targetShownText": "- **R1.** The lifecycle governs the Status field only. Score, Local,\n  destination, commit, and notes stay freely editable and are never touched\n  by a status change.\n- **R2.** The durable record of status changes is the source of truth. The\n  human-readable porting log is always a reflection of it — after cutover,\n  it is never hand-edited for Status again.\n- **R3.** Status changes for distillery candidates go through the same kind\n  of durable, rule-checked mechanism forgent uses for tracking its own\n  work — not a separate, informal mechanism built just for this.",
+      "targetDigest": "f770390c5ca45f6660f36a2c5dff4a537e9b0ac7a021d4a00c09643851c1d49b",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_637b69327d2486602ee428a8b90936c8",
+        "sourceUnitDigest": "f770390c5ca45f6660f36a2c5dff4a537e9b0ac7a021d4a00c09643851c1d49b",
+        "targetOwner": "docs/platform/distillery/spec.md",
+        "targetAnchor": "unheaded-block-10",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/distillery.md#unheaded-block-8 (source lines 90-98) is carried at docs/platform/distillery/spec.md#unheaded-block-10 (candidate lines 112-120). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "f770390c5ca45f6660f36a2c5dff4a537e9b0ac7a021d4a00c09643851c1d49b",
+        "targetAncestry": [
+          "Distillery — Porting Lifecycle",
+          "Business Rules"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_9d1d7d136b9a9ff869d6af4a12e042cc",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-distillery-01.json",
+      "shardSHA256": "92fc6f13591526b163d1b0e446cdb1627c148b554d0b20163154ce2da5db8d40",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/specs/distillery.md",
+      "sourceAnchor": "edge-cases-settled",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Edge Cases Settled",
+        "anchor": "edge-cases-settled",
+        "githubAnchor": "edge-cases-settled",
+        "stableAnchor": "h-736248cb2ba9",
+        "startLine": 100,
+        "endLine": 100,
+        "textDigest": "1bb6dbe7fdbfd4c9a7f067777e5cbeaa6b0af5a21bcd9633f5c2de56e164293b",
+        "sample": "Edge Cases Settled",
+        "sectionPayloadDigest": "60a616595e9c4ddd3d8a4514541aaf9c72c57b1bcc93d97889c5769189adc60d",
+        "followingBlockDigest": "60a616595e9c4ddd3d8a4514541aaf9c72c57b1bcc93d97889c5769189adc60d",
+        "identityFingerprint": "37fde1bcff7b4a906d3a2ac4b25f91a196af98286872d19d7382abf96758f174",
+        "ancestry": [
+          "Distillery — Porting Lifecycle"
+        ],
+        "text": "## Edge Cases Settled",
+        "sectionText": "## Edge Cases Settled\n\n- A candidate may end its life either by being rejected outright (never\n  built) or by being rejected after active work started — both are legal,\n  final outcomes.\n- An illegal move (skipping a stage, or trying to move a candidate that has\n  already reached a final stage) is refused in full: neither the durable\n  record nor the human-readable log changes.\n- As of this writing, every candidate on record reached its current status\n  through a sequence the lifecycle actually allows — none needed an\n  exception."
+      },
+      "sourceShownText": "## Edge Cases Settled\n\n- A candidate may end its life either by being rejected outright (never\n  built) or by being rejected after active work started — both are legal,\n  final outcomes.\n- An illegal move (skipping a stage, or trying to move a candidate that has\n  already reached a final stage) is refused in full: neither the durable\n  record nor the human-readable log changes.\n- As of this writing, every candidate on record reached its current status\n  through a sequence the lifecycle actually allows — none needed an\n  exception.",
+      "sourceDigest": "1bb6dbe7fdbfd4c9a7f067777e5cbeaa6b0af5a21bcd9633f5c2de56e164293b",
+      "targetPath": "docs/platform/distillery/spec.md",
+      "targetAnchor": "edge-cases-settled",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Edge Cases Settled",
+        "anchor": "edge-cases-settled",
+        "githubAnchor": "edge-cases-settled",
+        "stableAnchor": "h-1ef0b4370692",
+        "startLine": 122,
+        "endLine": 122,
+        "textDigest": "1bb6dbe7fdbfd4c9a7f067777e5cbeaa6b0af5a21bcd9633f5c2de56e164293b",
+        "sample": "Edge Cases Settled",
+        "sectionPayloadDigest": "60a616595e9c4ddd3d8a4514541aaf9c72c57b1bcc93d97889c5769189adc60d",
+        "followingBlockDigest": "60a616595e9c4ddd3d8a4514541aaf9c72c57b1bcc93d97889c5769189adc60d",
+        "identityFingerprint": "37fde1bcff7b4a906d3a2ac4b25f91a196af98286872d19d7382abf96758f174",
+        "ancestry": [
+          "Distillery — Porting Lifecycle"
+        ],
+        "text": "## Edge Cases Settled",
+        "sectionText": "## Edge Cases Settled\n\n- A candidate may end its life either by being rejected outright (never\n  built) or by being rejected after active work started — both are legal,\n  final outcomes.\n- An illegal move (skipping a stage, or trying to move a candidate that has\n  already reached a final stage) is refused in full: neither the durable\n  record nor the human-readable log changes.\n- As of this writing, every candidate on record reached its current status\n  through a sequence the lifecycle actually allows — none needed an\n  exception."
+      },
+      "targetShownText": "## Edge Cases Settled\n\n- A candidate may end its life either by being rejected outright (never\n  built) or by being rejected after active work started — both are legal,\n  final outcomes.\n- An illegal move (skipping a stage, or trying to move a candidate that has\n  already reached a final stage) is refused in full: neither the durable\n  record nor the human-readable log changes.\n- As of this writing, every candidate on record reached its current status\n  through a sequence the lifecycle actually allows — none needed an\n  exception.",
+      "targetDigest": "1bb6dbe7fdbfd4c9a7f067777e5cbeaa6b0af5a21bcd9633f5c2de56e164293b",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_9d1d7d136b9a9ff869d6af4a12e042cc",
+        "sourceUnitDigest": "1bb6dbe7fdbfd4c9a7f067777e5cbeaa6b0af5a21bcd9633f5c2de56e164293b",
+        "targetOwner": "docs/platform/distillery/spec.md",
+        "targetAnchor": "edge-cases-settled",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/distillery.md#edge-cases-settled (source lines 100-100) is carried at docs/platform/distillery/spec.md#edge-cases-settled (candidate lines 122-122). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "1bb6dbe7fdbfd4c9a7f067777e5cbeaa6b0af5a21bcd9633f5c2de56e164293b",
+        "targetAncestry": [
+          "Distillery — Porting Lifecycle"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_4e14a24a1ef22e30a058748641d53ec4",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-distillery-01.json",
+      "shardSHA256": "92fc6f13591526b163d1b0e446cdb1627c148b554d0b20163154ce2da5db8d40",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/specs/distillery.md",
+      "sourceAnchor": "unheaded-block-9",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-9",
+        "githubAnchor": "unheaded-block-9",
+        "stableAnchor": "unheaded-block-9",
+        "title": "Unheaded block 9",
+        "startLine": 102,
+        "endLine": 110,
+        "textDigest": "60a616595e9c4ddd3d8a4514541aaf9c72c57b1bcc93d97889c5769189adc60d",
+        "sample": "- A candidate may end its life either by being rejected outright (never\n  built) or by being rejected after active work started — both are legal,\n  final outcomes.\n- An illegal mov",
+        "identityFingerprint": "f0531cee12ab3d1581eb8e665cb0d5a9ed7ede44865a72644a1d81e4114c7050",
+        "ancestry": [
+          "Distillery — Porting Lifecycle",
+          "Edge Cases Settled"
+        ],
+        "text": "- A candidate may end its life either by being rejected outright (never\n  built) or by being rejected after active work started — both are legal,\n  final outcomes.\n- An illegal move (skipping a stage, or trying to move a candidate that has\n  already reached a final stage) is refused in full: neither the durable\n  record nor the human-readable log changes.\n- As of this writing, every candidate on record reached its current status\n  through a sequence the lifecycle actually allows — none needed an\n  exception."
+      },
+      "sourceShownText": "- A candidate may end its life either by being rejected outright (never\n  built) or by being rejected after active work started — both are legal,\n  final outcomes.\n- An illegal move (skipping a stage, or trying to move a candidate that has\n  already reached a final stage) is refused in full: neither the durable\n  record nor the human-readable log changes.\n- As of this writing, every candidate on record reached its current status\n  through a sequence the lifecycle actually allows — none needed an\n  exception.",
+      "sourceDigest": "60a616595e9c4ddd3d8a4514541aaf9c72c57b1bcc93d97889c5769189adc60d",
+      "targetPath": "docs/platform/distillery/spec.md",
+      "targetAnchor": "unheaded-block-11",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-11",
+        "githubAnchor": "unheaded-block-11",
+        "stableAnchor": "unheaded-block-11",
+        "title": "Unheaded block 11",
+        "startLine": 124,
+        "endLine": 132,
+        "textDigest": "60a616595e9c4ddd3d8a4514541aaf9c72c57b1bcc93d97889c5769189adc60d",
+        "sample": "- A candidate may end its life either by being rejected outright (never\n  built) or by being rejected after active work started — both are legal,\n  final outcomes.\n- An illegal mov",
+        "identityFingerprint": "f0531cee12ab3d1581eb8e665cb0d5a9ed7ede44865a72644a1d81e4114c7050",
+        "ancestry": [
+          "Distillery — Porting Lifecycle",
+          "Edge Cases Settled"
+        ],
+        "text": "- A candidate may end its life either by being rejected outright (never\n  built) or by being rejected after active work started — both are legal,\n  final outcomes.\n- An illegal move (skipping a stage, or trying to move a candidate that has\n  already reached a final stage) is refused in full: neither the durable\n  record nor the human-readable log changes.\n- As of this writing, every candidate on record reached its current status\n  through a sequence the lifecycle actually allows — none needed an\n  exception."
+      },
+      "targetShownText": "- A candidate may end its life either by being rejected outright (never\n  built) or by being rejected after active work started — both are legal,\n  final outcomes.\n- An illegal move (skipping a stage, or trying to move a candidate that has\n  already reached a final stage) is refused in full: neither the durable\n  record nor the human-readable log changes.\n- As of this writing, every candidate on record reached its current status\n  through a sequence the lifecycle actually allows — none needed an\n  exception.",
+      "targetDigest": "60a616595e9c4ddd3d8a4514541aaf9c72c57b1bcc93d97889c5769189adc60d",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_4e14a24a1ef22e30a058748641d53ec4",
+        "sourceUnitDigest": "60a616595e9c4ddd3d8a4514541aaf9c72c57b1bcc93d97889c5769189adc60d",
+        "targetOwner": "docs/platform/distillery/spec.md",
+        "targetAnchor": "unheaded-block-11",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/distillery.md#unheaded-block-9 (source lines 102-110) is carried at docs/platform/distillery/spec.md#unheaded-block-11 (candidate lines 124-132). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "60a616595e9c4ddd3d8a4514541aaf9c72c57b1bcc93d97889c5769189adc60d",
+        "targetAncestry": [
+          "Distillery — Porting Lifecycle",
+          "Edge Cases Settled"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_10b6865dee162e3401febaf6d905128f",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-distillery-01.json",
+      "shardSHA256": "92fc6f13591526b163d1b0e446cdb1627c148b554d0b20163154ce2da5db8d40",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/specs/distillery.md",
+      "sourceAnchor": "open-gaps",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Open Gaps",
+        "anchor": "open-gaps",
+        "githubAnchor": "open-gaps",
+        "stableAnchor": "h-263dce091f48",
+        "startLine": 112,
+        "endLine": 112,
+        "textDigest": "3fd19bb3ad9f0ce5f6db178d1904f98fd67c78ddb7b39f1eb70cd561e52faadd",
+        "sample": "Open Gaps",
+        "sectionPayloadDigest": "78a40b7774cf741b2728ba02969e60ad06b066734352b3445238c6cfb4c11b00",
+        "followingBlockDigest": "78a40b7774cf741b2728ba02969e60ad06b066734352b3445238c6cfb4c11b00",
+        "identityFingerprint": "1c6df024bf29c671938e093cb92b562c4793fb0b853335aa6960f9d46a29806c",
+        "ancestry": [
+          "Distillery — Porting Lifecycle"
+        ],
+        "text": "## Open Gaps",
+        "sectionText": "## Open Gaps\n\n- The status-change command currently must be run from the project's own\n  root location — running it from elsewhere is not yet supported.\n- The one-time seeding operation assumes every historical candidate reached\n  its current status the \"normal\" way (see Edge Cases Settled) — if a real\n  historical case ever turns out not to fit, that nuance would only be\n  recoverable from the free-form Notes column, not the durable record.\n- Distillery's other capabilities — finding new source material to review,\n  comparing ideas across sources, ranking candidates by score — are not yet\n  described in this spec; only the porting-status lifecycle is covered here.\n  `coverage: partial` reflects this.\n- `docs/specs/system-overview.md` already lists a `distillery` area entry\n  pointing here (and a separate `distill-skill` entry still marked\n  spec-pending) — this spec was written in the forgent-workshop project and\n  moved into this repo verbatim; it has not been re-harvested against this\n  repo's own doc conventions."
+      },
+      "sourceShownText": "## Open Gaps\n\n- The status-change command currently must be run from the project's own\n  root location — running it from elsewhere is not yet supported.\n- The one-time seeding operation assumes every historical candidate reached\n  its current status the \"normal\" way (see Edge Cases Settled) — if a real\n  historical case ever turns out not to fit, that nuance would only be\n  recoverable from the free-form Notes column, not the durable record.\n- Distillery's other capabilities — finding new source material to review,\n  comparing ideas across sources, ranking candidates by score — are not yet\n  described in this spec; only the porting-status lifecycle is covered here.\n  `coverage: partial` reflects this.\n- `docs/specs/system-overview.md` already lists a `distillery` area entry\n  pointing here (and a separate `distill-skill` entry still marked\n  spec-pending) — this spec was written in the forgent-workshop project and\n  moved into this repo verbatim; it has not been re-harvested against this\n  repo's own doc conventions.",
+      "sourceDigest": "3fd19bb3ad9f0ce5f6db178d1904f98fd67c78ddb7b39f1eb70cd561e52faadd",
+      "targetPath": "docs/platform/distillery/spec.md",
+      "targetAnchor": "open-gaps",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Open Gaps",
+        "anchor": "open-gaps",
+        "githubAnchor": "open-gaps",
+        "stableAnchor": "h-161c810e0e37",
+        "startLine": 134,
+        "endLine": 134,
+        "textDigest": "3fd19bb3ad9f0ce5f6db178d1904f98fd67c78ddb7b39f1eb70cd561e52faadd",
+        "sample": "Open Gaps",
+        "sectionPayloadDigest": "78a40b7774cf741b2728ba02969e60ad06b066734352b3445238c6cfb4c11b00",
+        "followingBlockDigest": "78a40b7774cf741b2728ba02969e60ad06b066734352b3445238c6cfb4c11b00",
+        "identityFingerprint": "1c6df024bf29c671938e093cb92b562c4793fb0b853335aa6960f9d46a29806c",
+        "ancestry": [
+          "Distillery — Porting Lifecycle"
+        ],
+        "text": "## Open Gaps",
+        "sectionText": "## Open Gaps\n\n- The status-change command currently must be run from the project's own\n  root location — running it from elsewhere is not yet supported.\n- The one-time seeding operation assumes every historical candidate reached\n  its current status the \"normal\" way (see Edge Cases Settled) — if a real\n  historical case ever turns out not to fit, that nuance would only be\n  recoverable from the free-form Notes column, not the durable record.\n- Distillery's other capabilities — finding new source material to review,\n  comparing ideas across sources, ranking candidates by score — are not yet\n  described in this spec; only the porting-status lifecycle is covered here.\n  `coverage: partial` reflects this.\n- `docs/specs/system-overview.md` already lists a `distillery` area entry\n  pointing here (and a separate `distill-skill` entry still marked\n  spec-pending) — this spec was written in the forgent-workshop project and\n  moved into this repo verbatim; it has not been re-harvested against this\n  repo's own doc conventions."
+      },
+      "targetShownText": "## Open Gaps\n\n- The status-change command currently must be run from the project's own\n  root location — running it from elsewhere is not yet supported.\n- The one-time seeding operation assumes every historical candidate reached\n  its current status the \"normal\" way (see Edge Cases Settled) — if a real\n  historical case ever turns out not to fit, that nuance would only be\n  recoverable from the free-form Notes column, not the durable record.\n- Distillery's other capabilities — finding new source material to review,\n  comparing ideas across sources, ranking candidates by score — are not yet\n  described in this spec; only the porting-status lifecycle is covered here.\n  `coverage: partial` reflects this.\n- `docs/specs/system-overview.md` already lists a `distillery` area entry\n  pointing here (and a separate `distill-skill` entry still marked\n  spec-pending) — this spec was written in the forgent-workshop project and\n  moved into this repo verbatim; it has not been re-harvested against this\n  repo's own doc conventions.",
+      "targetDigest": "3fd19bb3ad9f0ce5f6db178d1904f98fd67c78ddb7b39f1eb70cd561e52faadd",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_10b6865dee162e3401febaf6d905128f",
+        "sourceUnitDigest": "3fd19bb3ad9f0ce5f6db178d1904f98fd67c78ddb7b39f1eb70cd561e52faadd",
+        "targetOwner": "docs/platform/distillery/spec.md",
+        "targetAnchor": "open-gaps",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/distillery.md#open-gaps (source lines 112-112) is carried at docs/platform/distillery/spec.md#open-gaps (candidate lines 134-134). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "3fd19bb3ad9f0ce5f6db178d1904f98fd67c78ddb7b39f1eb70cd561e52faadd",
+        "targetAncestry": [
+          "Distillery — Porting Lifecycle"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_4e61f8ab46c7791e563a905c6dcc2ba4",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-distillery-01.json",
+      "shardSHA256": "92fc6f13591526b163d1b0e446cdb1627c148b554d0b20163154ce2da5db8d40",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/specs/distillery.md",
+      "sourceAnchor": "unheaded-block-10",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-10",
+        "githubAnchor": "unheaded-block-10",
+        "stableAnchor": "unheaded-block-10",
+        "title": "Unheaded block 10",
+        "startLine": 114,
+        "endLine": 128,
+        "textDigest": "78a40b7774cf741b2728ba02969e60ad06b066734352b3445238c6cfb4c11b00",
+        "sample": "- The status-change command currently must be run from the project's own\n  root location — running it from elsewhere is not yet supported.\n- The one-time seeding operation assumes ",
+        "identityFingerprint": "ff2f05971b91075b9fd83adffd6a29192d1389dc4fb944ddd29b76fa3da3c7bd",
+        "ancestry": [
+          "Distillery — Porting Lifecycle",
+          "Open Gaps"
+        ],
+        "text": "- The status-change command currently must be run from the project's own\n  root location — running it from elsewhere is not yet supported.\n- The one-time seeding operation assumes every historical candidate reached\n  its current status the \"normal\" way (see Edge Cases Settled) — if a real\n  historical case ever turns out not to fit, that nuance would only be\n  recoverable from the free-form Notes column, not the durable record.\n- Distillery's other capabilities — finding new source material to review,\n  comparing ideas across sources, ranking candidates by score — are not yet\n  described in this spec; only the porting-status lifecycle is covered here.\n  `coverage: partial` reflects this.\n- `docs/specs/system-overview.md` already lists a `distillery` area entry\n  pointing here (and a separate `distill-skill` entry still marked\n  spec-pending) — this spec was written in the forgent-workshop project and\n  moved into this repo verbatim; it has not been re-harvested against this\n  repo's own doc conventions."
+      },
+      "sourceShownText": "- The status-change command currently must be run from the project's own\n  root location — running it from elsewhere is not yet supported.\n- The one-time seeding operation assumes every historical candidate reached\n  its current status the \"normal\" way (see Edge Cases Settled) — if a real\n  historical case ever turns out not to fit, that nuance would only be\n  recoverable from the free-form Notes column, not the durable record.\n- Distillery's other capabilities — finding new source material to review,\n  comparing ideas across sources, ranking candidates by score — are not yet\n  described in this spec; only the porting-status lifecycle is covered here.\n  `coverage: partial` reflects this.\n- `docs/specs/system-overview.md` already lists a `distillery` area entry\n  pointing here (and a separate `distill-skill` entry still marked\n  spec-pending) — this spec was written in the forgent-workshop project and\n  moved into this repo verbatim; it has not been re-harvested against this\n  repo's own doc conventions.",
+      "sourceDigest": "78a40b7774cf741b2728ba02969e60ad06b066734352b3445238c6cfb4c11b00",
+      "targetPath": "docs/platform/distillery/spec.md",
+      "targetAnchor": "unheaded-block-12",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-12",
+        "githubAnchor": "unheaded-block-12",
+        "stableAnchor": "unheaded-block-12",
+        "title": "Unheaded block 12",
+        "startLine": 136,
+        "endLine": 150,
+        "textDigest": "78a40b7774cf741b2728ba02969e60ad06b066734352b3445238c6cfb4c11b00",
+        "sample": "- The status-change command currently must be run from the project's own\n  root location — running it from elsewhere is not yet supported.\n- The one-time seeding operation assumes ",
+        "identityFingerprint": "ff2f05971b91075b9fd83adffd6a29192d1389dc4fb944ddd29b76fa3da3c7bd",
+        "ancestry": [
+          "Distillery — Porting Lifecycle",
+          "Open Gaps"
+        ],
+        "text": "- The status-change command currently must be run from the project's own\n  root location — running it from elsewhere is not yet supported.\n- The one-time seeding operation assumes every historical candidate reached\n  its current status the \"normal\" way (see Edge Cases Settled) — if a real\n  historical case ever turns out not to fit, that nuance would only be\n  recoverable from the free-form Notes column, not the durable record.\n- Distillery's other capabilities — finding new source material to review,\n  comparing ideas across sources, ranking candidates by score — are not yet\n  described in this spec; only the porting-status lifecycle is covered here.\n  `coverage: partial` reflects this.\n- `docs/specs/system-overview.md` already lists a `distillery` area entry\n  pointing here (and a separate `distill-skill` entry still marked\n  spec-pending) — this spec was written in the forgent-workshop project and\n  moved into this repo verbatim; it has not been re-harvested against this\n  repo's own doc conventions."
+      },
+      "targetShownText": "- The status-change command currently must be run from the project's own\n  root location — running it from elsewhere is not yet supported.\n- The one-time seeding operation assumes every historical candidate reached\n  its current status the \"normal\" way (see Edge Cases Settled) — if a real\n  historical case ever turns out not to fit, that nuance would only be\n  recoverable from the free-form Notes column, not the durable record.\n- Distillery's other capabilities — finding new source material to review,\n  comparing ideas across sources, ranking candidates by score — are not yet\n  described in this spec; only the porting-status lifecycle is covered here.\n  `coverage: partial` reflects this.\n- `docs/specs/system-overview.md` already lists a `distillery` area entry\n  pointing here (and a separate `distill-skill` entry still marked\n  spec-pending) — this spec was written in the forgent-workshop project and\n  moved into this repo verbatim; it has not been re-harvested against this\n  repo's own doc conventions.",
+      "targetDigest": "78a40b7774cf741b2728ba02969e60ad06b066734352b3445238c6cfb4c11b00",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_4e61f8ab46c7791e563a905c6dcc2ba4",
+        "sourceUnitDigest": "78a40b7774cf741b2728ba02969e60ad06b066734352b3445238c6cfb4c11b00",
+        "targetOwner": "docs/platform/distillery/spec.md",
+        "targetAnchor": "unheaded-block-12",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/distillery.md#unheaded-block-10 (source lines 114-128) is carried at docs/platform/distillery/spec.md#unheaded-block-12 (candidate lines 136-150). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "78a40b7774cf741b2728ba02969e60ad06b066734352b3445238c6cfb4c11b00",
+        "targetAncestry": [
+          "Distillery — Porting Lifecycle",
+          "Open Gaps"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_a81c4bc7792d5b2b576357b9543176fa",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-distillery-01.json",
+      "shardSHA256": "92fc6f13591526b163d1b0e446cdb1627c148b554d0b20163154ce2da5db8d40",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/specs/distillery.md",
+      "sourceAnchor": "pointers-implementation",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Pointers (implementation)",
+        "anchor": "pointers-implementation",
+        "githubAnchor": "pointers-implementation",
+        "stableAnchor": "h-a79709d4327c",
+        "startLine": 130,
+        "endLine": 130,
+        "textDigest": "321c80e2289d089428120f6fb75f0ae62f81dd71cfe860c2f74b848981effb37",
+        "sample": "Pointers (implementation)",
+        "sectionPayloadDigest": "9423d35eb1a6338d9bcdac92d5492002e9328db395a488a88bd848e20be94289",
+        "followingBlockDigest": "9423d35eb1a6338d9bcdac92d5492002e9328db395a488a88bd848e20be94289",
+        "identityFingerprint": "9fb35b1bc7e86abcd5505881143e203bf0f0ea6a4de9687b0017b89a00ec5d92",
+        "ancestry": [
+          "Distillery — Porting Lifecycle"
+        ],
+        "text": "## Pointers (implementation)",
+        "sectionText": "## Pointers (implementation)\n\n- CLI command: `.agents/skills/distill/scripts/distill.mjs` (`move` verb)\n- State/lifecycle rules: `src/state/porting.mjs`\n- Durable record + human-readable-log sync: `src/state/porting-store.mjs`\n- Human-readable log: `docs/distillery/porting-log.md`\n- Durable record storage: `docs/distillery/state/porting/`\n- One-time seeding script: `.agents/skills/distill/scripts/migrate-porting-state-backfill.mjs`\n- Package boundary: this repo's `package.json` (`exports`) exposes `forgent/state/porting` and `forgent/state/porting-store` — the distill skill imports its own package by name (Node self-reference); external consumers (e.g. the forgent-workshop project) install this repo as the `forgent` dependency and import the same subpaths."
+      },
+      "sourceShownText": "## Pointers (implementation)\n\n- CLI command: `.agents/skills/distill/scripts/distill.mjs` (`move` verb)\n- State/lifecycle rules: `src/state/porting.mjs`\n- Durable record + human-readable-log sync: `src/state/porting-store.mjs`\n- Human-readable log: `docs/distillery/porting-log.md`\n- Durable record storage: `docs/distillery/state/porting/`\n- One-time seeding script: `.agents/skills/distill/scripts/migrate-porting-state-backfill.mjs`\n- Package boundary: this repo's `package.json` (`exports`) exposes `forgent/state/porting` and `forgent/state/porting-store` — the distill skill imports its own package by name (Node self-reference); external consumers (e.g. the forgent-workshop project) install this repo as the `forgent` dependency and import the same subpaths.",
+      "sourceDigest": "321c80e2289d089428120f6fb75f0ae62f81dd71cfe860c2f74b848981effb37",
+      "targetPath": "docs/platform/distillery/spec.md",
+      "targetAnchor": "pointers-implementation",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Pointers (implementation)",
+        "anchor": "pointers-implementation",
+        "githubAnchor": "pointers-implementation",
+        "stableAnchor": "h-ecccf8cd4de0",
+        "startLine": 152,
+        "endLine": 152,
+        "textDigest": "321c80e2289d089428120f6fb75f0ae62f81dd71cfe860c2f74b848981effb37",
+        "sample": "Pointers (implementation)",
+        "sectionPayloadDigest": "9423d35eb1a6338d9bcdac92d5492002e9328db395a488a88bd848e20be94289",
+        "followingBlockDigest": "9423d35eb1a6338d9bcdac92d5492002e9328db395a488a88bd848e20be94289",
+        "identityFingerprint": "9fb35b1bc7e86abcd5505881143e203bf0f0ea6a4de9687b0017b89a00ec5d92",
+        "ancestry": [
+          "Distillery — Porting Lifecycle"
+        ],
+        "text": "## Pointers (implementation)",
+        "sectionText": "## Pointers (implementation)\n\n- CLI command: `.agents/skills/distill/scripts/distill.mjs` (`move` verb)\n- State/lifecycle rules: `src/state/porting.mjs`\n- Durable record + human-readable-log sync: `src/state/porting-store.mjs`\n- Human-readable log: `docs/distillery/porting-log.md`\n- Durable record storage: `docs/distillery/state/porting/`\n- One-time seeding script: `.agents/skills/distill/scripts/migrate-porting-state-backfill.mjs`\n- Package boundary: this repo's `package.json` (`exports`) exposes `forgent/state/porting` and `forgent/state/porting-store` — the distill skill imports its own package by name (Node self-reference); external consumers (e.g. the forgent-workshop project) install this repo as the `forgent` dependency and import the same subpaths."
+      },
+      "targetShownText": "## Pointers (implementation)\n\n- CLI command: `.agents/skills/distill/scripts/distill.mjs` (`move` verb)\n- State/lifecycle rules: `src/state/porting.mjs`\n- Durable record + human-readable-log sync: `src/state/porting-store.mjs`\n- Human-readable log: `docs/distillery/porting-log.md`\n- Durable record storage: `docs/distillery/state/porting/`\n- One-time seeding script: `.agents/skills/distill/scripts/migrate-porting-state-backfill.mjs`\n- Package boundary: this repo's `package.json` (`exports`) exposes `forgent/state/porting` and `forgent/state/porting-store` — the distill skill imports its own package by name (Node self-reference); external consumers (e.g. the forgent-workshop project) install this repo as the `forgent` dependency and import the same subpaths.",
+      "targetDigest": "321c80e2289d089428120f6fb75f0ae62f81dd71cfe860c2f74b848981effb37",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_a81c4bc7792d5b2b576357b9543176fa",
+        "sourceUnitDigest": "321c80e2289d089428120f6fb75f0ae62f81dd71cfe860c2f74b848981effb37",
+        "targetOwner": "docs/platform/distillery/spec.md",
+        "targetAnchor": "pointers-implementation",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/distillery.md#pointers-implementation (source lines 130-130) is carried at docs/platform/distillery/spec.md#pointers-implementation (candidate lines 152-152). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "321c80e2289d089428120f6fb75f0ae62f81dd71cfe860c2f74b848981effb37",
+        "targetAncestry": [
+          "Distillery — Porting Lifecycle"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_f94cf2b9ad1454f4fb3811c1cce319e6",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-distillery-01.json",
+      "shardSHA256": "92fc6f13591526b163d1b0e446cdb1627c148b554d0b20163154ce2da5db8d40",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/specs/distillery.md",
+      "sourceAnchor": "unheaded-block-11",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-11",
+        "githubAnchor": "unheaded-block-11",
+        "stableAnchor": "unheaded-block-11",
+        "title": "Unheaded block 11",
+        "startLine": 132,
+        "endLine": 138,
+        "textDigest": "9423d35eb1a6338d9bcdac92d5492002e9328db395a488a88bd848e20be94289",
+        "sample": "- CLI command: `.agents/skills/distill/scripts/distill.mjs` (`move` verb)\n- State/lifecycle rules: `src/state/porting.mjs`\n- Durable record + human-readable-log sync: `src/state/po",
+        "identityFingerprint": "f7d7fe9978d2677d0de83c0c74922e022330756630c71e914ccffc2c47864b88",
+        "ancestry": [
+          "Distillery — Porting Lifecycle",
+          "Pointers (implementation)"
+        ],
+        "text": "- CLI command: `.agents/skills/distill/scripts/distill.mjs` (`move` verb)\n- State/lifecycle rules: `src/state/porting.mjs`\n- Durable record + human-readable-log sync: `src/state/porting-store.mjs`\n- Human-readable log: `docs/distillery/porting-log.md`\n- Durable record storage: `docs/distillery/state/porting/`\n- One-time seeding script: `.agents/skills/distill/scripts/migrate-porting-state-backfill.mjs`\n- Package boundary: this repo's `package.json` (`exports`) exposes `forgent/state/porting` and `forgent/state/porting-store` — the distill skill imports its own package by name (Node self-reference); external consumers (e.g. the forgent-workshop project) install this repo as the `forgent` dependency and import the same subpaths."
+      },
+      "sourceShownText": "- CLI command: `.agents/skills/distill/scripts/distill.mjs` (`move` verb)\n- State/lifecycle rules: `src/state/porting.mjs`\n- Durable record + human-readable-log sync: `src/state/porting-store.mjs`\n- Human-readable log: `docs/distillery/porting-log.md`\n- Durable record storage: `docs/distillery/state/porting/`\n- One-time seeding script: `.agents/skills/distill/scripts/migrate-porting-state-backfill.mjs`\n- Package boundary: this repo's `package.json` (`exports`) exposes `forgent/state/porting` and `forgent/state/porting-store` — the distill skill imports its own package by name (Node self-reference); external consumers (e.g. the forgent-workshop project) install this repo as the `forgent` dependency and import the same subpaths.",
+      "sourceDigest": "9423d35eb1a6338d9bcdac92d5492002e9328db395a488a88bd848e20be94289",
+      "targetPath": "docs/platform/distillery/spec.md",
+      "targetAnchor": "unheaded-block-13",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-13",
+        "githubAnchor": "unheaded-block-13",
+        "stableAnchor": "unheaded-block-13",
+        "title": "Unheaded block 13",
+        "startLine": 154,
+        "endLine": 160,
+        "textDigest": "9423d35eb1a6338d9bcdac92d5492002e9328db395a488a88bd848e20be94289",
+        "sample": "- CLI command: `.agents/skills/distill/scripts/distill.mjs` (`move` verb)\n- State/lifecycle rules: `src/state/porting.mjs`\n- Durable record + human-readable-log sync: `src/state/po",
+        "identityFingerprint": "f7d7fe9978d2677d0de83c0c74922e022330756630c71e914ccffc2c47864b88",
+        "ancestry": [
+          "Distillery — Porting Lifecycle",
+          "Pointers (implementation)"
+        ],
+        "text": "- CLI command: `.agents/skills/distill/scripts/distill.mjs` (`move` verb)\n- State/lifecycle rules: `src/state/porting.mjs`\n- Durable record + human-readable-log sync: `src/state/porting-store.mjs`\n- Human-readable log: `docs/distillery/porting-log.md`\n- Durable record storage: `docs/distillery/state/porting/`\n- One-time seeding script: `.agents/skills/distill/scripts/migrate-porting-state-backfill.mjs`\n- Package boundary: this repo's `package.json` (`exports`) exposes `forgent/state/porting` and `forgent/state/porting-store` — the distill skill imports its own package by name (Node self-reference); external consumers (e.g. the forgent-workshop project) install this repo as the `forgent` dependency and import the same subpaths."
+      },
+      "targetShownText": "- CLI command: `.agents/skills/distill/scripts/distill.mjs` (`move` verb)\n- State/lifecycle rules: `src/state/porting.mjs`\n- Durable record + human-readable-log sync: `src/state/porting-store.mjs`\n- Human-readable log: `docs/distillery/porting-log.md`\n- Durable record storage: `docs/distillery/state/porting/`\n- One-time seeding script: `.agents/skills/distill/scripts/migrate-porting-state-backfill.mjs`\n- Package boundary: this repo's `package.json` (`exports`) exposes `forgent/state/porting` and `forgent/state/porting-store` — the distill skill imports its own package by name (Node self-reference); external consumers (e.g. the forgent-workshop project) install this repo as the `forgent` dependency and import the same subpaths.",
+      "targetDigest": "9423d35eb1a6338d9bcdac92d5492002e9328db395a488a88bd848e20be94289",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_f94cf2b9ad1454f4fb3811c1cce319e6",
+        "sourceUnitDigest": "9423d35eb1a6338d9bcdac92d5492002e9328db395a488a88bd848e20be94289",
+        "targetOwner": "docs/platform/distillery/spec.md",
+        "targetAnchor": "unheaded-block-13",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/distillery.md#unheaded-block-11 (source lines 132-138) is carried at docs/platform/distillery/spec.md#unheaded-block-13 (candidate lines 154-160). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "9423d35eb1a6338d9bcdac92d5492002e9328db395a488a88bd848e20be94289",
+        "targetAncestry": [
+          "Distillery — Porting Lifecycle",
+          "Pointers (implementation)"
+        ]
+      }
+    }
+  ]
+}

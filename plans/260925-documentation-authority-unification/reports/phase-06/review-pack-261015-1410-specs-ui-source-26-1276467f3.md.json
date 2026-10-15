@@ -1,0 +1,776 @@
+{
+  "version": 1,
+  "contentCommit": "1276467f37a99d19aff05808d42fafbf40341449",
+  "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+  "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+  "sourcePath": "docs/ui-spec/modals/M01-answer-question.md",
+  "part": 1,
+  "parts": 1,
+  "count": 11,
+  "classes": {
+    "Unit-exact": [
+      "claim_95276218caefe2d0e64ea8a6587912de",
+      "claim_8d83aa2a13a65753ed3087531808f771",
+      "claim_81e60ba98c086609376e50fcde631003",
+      "claim_46d2aa894a82bd4231e161abc1de795a",
+      "claim_5ff80d2788c64645819e4747c97586f3",
+      "claim_89e1dad5a298dcd9a584cf7e436b07c8"
+    ],
+    "Weak-exact": [
+      "claim_7f3fff01ea50761fe1f33e54e1009dd5",
+      "claim_57b00d818bf1ae24871c4bf3d2d75b79",
+      "claim_2fca593fd29799a98ecb961e2bc31189",
+      "claim_42511baf61c8603df6dfa984707d7c02"
+    ],
+    "Judgment": [
+      "claim_2904d9efd9dfa41ef624c3cde4680773"
+    ]
+  },
+  "unequalDigestPairs": [
+    "claim_2904d9efd9dfa41ef624c3cde4680773"
+  ],
+  "noTargetGeneratedRows": [],
+  "mandatoryDeep": [
+    "claim_2904d9efd9dfa41ef624c3cde4680773"
+  ],
+  "reviewerSeedRequired": true,
+  "minimumSeededWeakJudgment": 5,
+  "rows": [
+    {
+      "claimId": "claim_95276218caefe2d0e64ea8a6587912de",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/modals/M01-answer-question.md",
+      "sourceAnchor": "unheaded-block-1",
+      "source": {
+        "unitKind": "unheaded-preamble",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded preamble",
+        "startLine": 1,
+        "endLine": 11,
+        "textDigest": "95fdfa2f1dfd4e34740fa261aaff32166299e3d447945559ef8b9a7743d75ecc",
+        "sample": "---\nid: M01\ntype: modal\nname: \"Answer a parked question\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R2]\nregions: [header, question_recap, answer_f",
+        "identityFingerprint": "6125005ff9a87db55c669af2bc19c67cfb30df4b449268bdf84f707d2066dfe6",
+        "ancestry": [],
+        "text": "---\nid: M01\ntype: modal\nname: \"Answer a parked question\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R2]\nregions: [header, question_recap, answer_form, footer]\n---"
+      },
+      "sourceShownText": "---\nid: M01\ntype: modal\nname: \"Answer a parked question\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R2]\nregions: [header, question_recap, answer_form, footer]\n---",
+      "sourceDigest": "95fdfa2f1dfd4e34740fa261aaff32166299e3d447945559ef8b9a7743d75ecc",
+      "targetPath": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+      "targetAnchor": "unheaded-block-1",
+      "target": {
+        "unitKind": "unheaded-preamble",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded preamble",
+        "startLine": 1,
+        "endLine": 11,
+        "textDigest": "95fdfa2f1dfd4e34740fa261aaff32166299e3d447945559ef8b9a7743d75ecc",
+        "sample": "---\nid: M01\ntype: modal\nname: \"Answer a parked question\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R2]\nregions: [header, question_recap, answer_f",
+        "identityFingerprint": "6125005ff9a87db55c669af2bc19c67cfb30df4b449268bdf84f707d2066dfe6",
+        "ancestry": [],
+        "text": "---\nid: M01\ntype: modal\nname: \"Answer a parked question\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R2]\nregions: [header, question_recap, answer_form, footer]\n---"
+      },
+      "targetShownText": "---\nid: M01\ntype: modal\nname: \"Answer a parked question\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R2]\nregions: [header, question_recap, answer_form, footer]\n---",
+      "targetDigest": "95fdfa2f1dfd4e34740fa261aaff32166299e3d447945559ef8b9a7743d75ecc",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_95276218caefe2d0e64ea8a6587912de",
+        "sourceUnitDigest": "95fdfa2f1dfd4e34740fa261aaff32166299e3d447945559ef8b9a7743d75ecc",
+        "targetOwner": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+        "targetAnchor": "unheaded-block-1",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-preamble unit docs/ui-spec/modals/M01-answer-question.md#unheaded-block-1 (source lines 1-11) is carried at docs/platform/ui-spec/architecture/modals/M01-answer-question.md#unheaded-block-1 (candidate lines 1-11). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/modals/M01-answer-question.md verbatim in docs/platform/ui-spec/architecture/modals/M01-answer-question.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "95fdfa2f1dfd4e34740fa261aaff32166299e3d447945559ef8b9a7743d75ecc",
+        "targetAncestry": []
+      }
+    },
+    {
+      "claimId": "claim_2904d9efd9dfa41ef624c3cde4680773",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/modals/M01-answer-question.md",
+      "sourceAnchor": "m01-answer-a-parked-question",
+      "source": {
+        "unitKind": "heading",
+        "level": 1,
+        "title": "M01 — Answer a parked question",
+        "anchor": "m01-answer-a-parked-question",
+        "githubAnchor": "m01-answer-a-parked-question",
+        "stableAnchor": "h-e58fb30844a9",
+        "startLine": 13,
+        "endLine": 13,
+        "textDigest": "b0be3ec5e702722306f7db73f1405c08748705d4c3771b01583f2f0c0daa4ba7",
+        "sample": "M01 — Answer a parked question",
+        "sectionPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "followingBlockDigest": null,
+        "identityFingerprint": "713c9c91db3f3235dcb9c6b1336b74c08d3c18ee120e8b27b0b86abcbf30f305",
+        "ancestry": [],
+        "text": "# M01 — Answer a parked question",
+        "sectionText": "# M01 — Answer a parked question"
+      },
+      "sourceShownText": "# M01 — Answer a parked question",
+      "sourceDigest": "b0be3ec5e702722306f7db73f1405c08748705d4c3771b01583f2f0c0daa4ba7",
+      "targetPath": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+      "targetAnchor": "m01-answer-a-parked-question",
+      "target": {
+        "unitKind": "heading",
+        "level": 1,
+        "title": "M01 — Answer a parked question",
+        "anchor": "m01-answer-a-parked-question",
+        "githubAnchor": "m01-answer-a-parked-question",
+        "stableAnchor": "h-e58fb30844a9",
+        "startLine": 13,
+        "endLine": 13,
+        "textDigest": "84bef4adbd1d83ced73c9bd250861843f6d12d4fe70e65d87761cff233686498",
+        "sample": "M01 — Answer a parked question",
+        "sectionPayloadDigest": "4963c7d08c60f822ed61899348dd90ae8fecb0edb4ffa9516098d2d3a2beb956",
+        "followingBlockDigest": "f595d0f9ef916266e4bd3f97cc9d706e4c2a626508835c909131f922d57ddb9a",
+        "identityFingerprint": "aed8c19937b0a066ed6b44816d1812baf2588505b35340864309edc2467876af",
+        "ancestry": [],
+        "text": "# M01 — Answer a parked question",
+        "sectionText": "# M01 — Answer a parked question\n\n```txt\nDocument type: Architecture\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve mapped legacy content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; current implementation truth is not certified\nProvenance: docs/ui-spec/modals/M01-answer-question.md at 111adc51fd047d99121fd9d076eb4794c87045a4\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing carriage, placement and source conservation\nDo not use this for: Current canonical authority or implemented-behavior proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/ui-spec/modals/M01-answer-question.md\nSupersedes: None; candidate only\nSuperseded by: None\n```\n\n> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions."
+      },
+      "targetShownText": "# M01 — Answer a parked question\n\n```txt\nDocument type: Architecture\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve mapped legacy content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; current implementation truth is not certified\nProvenance: docs/ui-spec/modals/M01-answer-question.md at 111adc51fd047d99121fd9d076eb4794c87045a4\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing carriage, placement and source conservation\nDo not use this for: Current canonical authority or implemented-behavior proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/ui-spec/modals/M01-answer-question.md\nSupersedes: None; candidate only\nSuperseded by: None\n```\n\n> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions.",
+      "targetDigest": "84bef4adbd1d83ced73c9bd250861843f6d12d4fe70e65d87761cff233686498",
+      "classification": "Judgment",
+      "mandatoryDeep": true,
+      "decision": {
+        "claimId": "claim_2904d9efd9dfa41ef624c3cde4680773",
+        "sourceUnitDigest": "b0be3ec5e702722306f7db73f1405c08748705d4c3771b01583f2f0c0daa4ba7",
+        "targetOwner": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+        "targetAnchor": "m01-answer-a-parked-question",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Judgment: no target digest match. The whole heading unit docs/ui-spec/modals/M01-answer-question.md#m01-answer-a-parked-question (source lines 13-13) is carried at docs/platform/ui-spec/architecture/modals/M01-answer-question.md#m01-answer-a-parked-question (candidate lines 13-13). The heading section digest changes because labelled candidate metadata is inserted after the original H1; original heading and direct source payload remain verbatim. Frozen specs-ui map and Step 8: preserve docs/ui-spec/modals/M01-answer-question.md verbatim in docs/platform/ui-spec/architecture/modals/M01-answer-question.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "84bef4adbd1d83ced73c9bd250861843f6d12d4fe70e65d87761cff233686498",
+        "targetAncestry": []
+      }
+    },
+    {
+      "claimId": "claim_7f3fff01ea50761fe1f33e54e1009dd5",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/modals/M01-answer-question.md",
+      "sourceAnchor": "purpose",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Purpose",
+        "anchor": "purpose",
+        "githubAnchor": "purpose",
+        "stableAnchor": "h-2f4fe421d538",
+        "startLine": 15,
+        "endLine": 15,
+        "textDigest": "59a831ae0edbf02969fdc01ec8a458ad4bf2f082b585938edca18fc6641e9df6",
+        "sample": "Purpose",
+        "sectionPayloadDigest": "0e19234fb7746212577c283341625672fb296ec9f7459dd55d7c65196a872ac4",
+        "followingBlockDigest": "0e19234fb7746212577c283341625672fb296ec9f7459dd55d7c65196a872ac4",
+        "identityFingerprint": "a4b1f630d91a37d15ed618c28ab4ec01e111dec41004fb3221a54bc4730954d8",
+        "ancestry": [
+          "M01 — Answer a parked question"
+        ],
+        "text": "## Purpose",
+        "sectionText": "## Purpose\n\nSubmit an answer **in place**, without sending the person to a terminal.\nThe area spec settles this explicitly: the gateway already runs fgOS write\nverbs on a client's behalf and `answer` is named among them, so linking\nout to the CLI would contradict the contract this client is written\nagainst (`docs/specs/herdr-web-dashboard.md` §Answer a parked question)."
+      },
+      "sourceShownText": "## Purpose\n\nSubmit an answer **in place**, without sending the person to a terminal.\nThe area spec settles this explicitly: the gateway already runs fgOS write\nverbs on a client's behalf and `answer` is named among them, so linking\nout to the CLI would contradict the contract this client is written\nagainst (`docs/specs/herdr-web-dashboard.md` §Answer a parked question).",
+      "sourceDigest": "59a831ae0edbf02969fdc01ec8a458ad4bf2f082b585938edca18fc6641e9df6",
+      "targetPath": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+      "targetAnchor": "purpose",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Purpose",
+        "anchor": "purpose",
+        "githubAnchor": "purpose",
+        "stableAnchor": "h-15cea22a442e",
+        "startLine": 37,
+        "endLine": 37,
+        "textDigest": "59a831ae0edbf02969fdc01ec8a458ad4bf2f082b585938edca18fc6641e9df6",
+        "sample": "Purpose",
+        "sectionPayloadDigest": "0e19234fb7746212577c283341625672fb296ec9f7459dd55d7c65196a872ac4",
+        "followingBlockDigest": "0e19234fb7746212577c283341625672fb296ec9f7459dd55d7c65196a872ac4",
+        "identityFingerprint": "a4b1f630d91a37d15ed618c28ab4ec01e111dec41004fb3221a54bc4730954d8",
+        "ancestry": [
+          "M01 — Answer a parked question"
+        ],
+        "text": "## Purpose",
+        "sectionText": "## Purpose\n\nSubmit an answer **in place**, without sending the person to a terminal.\nThe area spec settles this explicitly: the gateway already runs fgOS write\nverbs on a client's behalf and `answer` is named among them, so linking\nout to the CLI would contradict the contract this client is written\nagainst (`docs/specs/herdr-web-dashboard.md` §Answer a parked question)."
+      },
+      "targetShownText": "## Purpose\n\nSubmit an answer **in place**, without sending the person to a terminal.\nThe area spec settles this explicitly: the gateway already runs fgOS write\nverbs on a client's behalf and `answer` is named among them, so linking\nout to the CLI would contradict the contract this client is written\nagainst (`docs/specs/herdr-web-dashboard.md` §Answer a parked question).",
+      "targetDigest": "59a831ae0edbf02969fdc01ec8a458ad4bf2f082b585938edca18fc6641e9df6",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_7f3fff01ea50761fe1f33e54e1009dd5",
+        "sourceUnitDigest": "59a831ae0edbf02969fdc01ec8a458ad4bf2f082b585938edca18fc6641e9df6",
+        "targetOwner": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+        "targetAnchor": "purpose",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/ui-spec/modals/M01-answer-question.md#purpose (source lines 15-15) is carried at docs/platform/ui-spec/architecture/modals/M01-answer-question.md#purpose (candidate lines 37-37). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/modals/M01-answer-question.md verbatim in docs/platform/ui-spec/architecture/modals/M01-answer-question.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "59a831ae0edbf02969fdc01ec8a458ad4bf2f082b585938edca18fc6641e9df6",
+        "targetAncestry": [
+          "M01 — Answer a parked question"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_8d83aa2a13a65753ed3087531808f771",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/modals/M01-answer-question.md",
+      "sourceAnchor": "unheaded-block-2",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-2",
+        "githubAnchor": "unheaded-block-2",
+        "stableAnchor": "unheaded-block-2",
+        "title": "Unheaded block 2",
+        "startLine": 17,
+        "endLine": 21,
+        "textDigest": "0e19234fb7746212577c283341625672fb296ec9f7459dd55d7c65196a872ac4",
+        "sample": "Submit an answer **in place**, without sending the person to a terminal.\nThe area spec settles this explicitly: the gateway already runs fgOS write\nverbs on a client's behalf and `",
+        "identityFingerprint": "93e7e6f1bdab8cf5f82e763e9c59a65365fe57e60afabaa84cf15a145ae5eb31",
+        "ancestry": [
+          "M01 — Answer a parked question",
+          "Purpose"
+        ],
+        "text": "Submit an answer **in place**, without sending the person to a terminal.\nThe area spec settles this explicitly: the gateway already runs fgOS write\nverbs on a client's behalf and `answer` is named among them, so linking\nout to the CLI would contradict the contract this client is written\nagainst (`docs/specs/herdr-web-dashboard.md` §Answer a parked question)."
+      },
+      "sourceShownText": "Submit an answer **in place**, without sending the person to a terminal.\nThe area spec settles this explicitly: the gateway already runs fgOS write\nverbs on a client's behalf and `answer` is named among them, so linking\nout to the CLI would contradict the contract this client is written\nagainst (`docs/specs/herdr-web-dashboard.md` §Answer a parked question).",
+      "sourceDigest": "0e19234fb7746212577c283341625672fb296ec9f7459dd55d7c65196a872ac4",
+      "targetPath": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+      "targetAnchor": "unheaded-block-4",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 39,
+        "endLine": 43,
+        "textDigest": "0e19234fb7746212577c283341625672fb296ec9f7459dd55d7c65196a872ac4",
+        "sample": "Submit an answer **in place**, without sending the person to a terminal.\nThe area spec settles this explicitly: the gateway already runs fgOS write\nverbs on a client's behalf and `",
+        "identityFingerprint": "93e7e6f1bdab8cf5f82e763e9c59a65365fe57e60afabaa84cf15a145ae5eb31",
+        "ancestry": [
+          "M01 — Answer a parked question",
+          "Purpose"
+        ],
+        "text": "Submit an answer **in place**, without sending the person to a terminal.\nThe area spec settles this explicitly: the gateway already runs fgOS write\nverbs on a client's behalf and `answer` is named among them, so linking\nout to the CLI would contradict the contract this client is written\nagainst (`docs/specs/herdr-web-dashboard.md` §Answer a parked question)."
+      },
+      "targetShownText": "Submit an answer **in place**, without sending the person to a terminal.\nThe area spec settles this explicitly: the gateway already runs fgOS write\nverbs on a client's behalf and `answer` is named among them, so linking\nout to the CLI would contradict the contract this client is written\nagainst (`docs/specs/herdr-web-dashboard.md` §Answer a parked question).",
+      "targetDigest": "0e19234fb7746212577c283341625672fb296ec9f7459dd55d7c65196a872ac4",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_8d83aa2a13a65753ed3087531808f771",
+        "sourceUnitDigest": "0e19234fb7746212577c283341625672fb296ec9f7459dd55d7c65196a872ac4",
+        "targetOwner": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+        "targetAnchor": "unheaded-block-4",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/modals/M01-answer-question.md#unheaded-block-2 (source lines 17-21) is carried at docs/platform/ui-spec/architecture/modals/M01-answer-question.md#unheaded-block-4 (candidate lines 39-43). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/modals/M01-answer-question.md verbatim in docs/platform/ui-spec/architecture/modals/M01-answer-question.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "0e19234fb7746212577c283341625672fb296ec9f7459dd55d7c65196a872ac4",
+        "targetAncestry": [
+          "M01 — Answer a parked question",
+          "Purpose"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_57b00d818bf1ae24871c4bf3d2d75b79",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/modals/M01-answer-question.md",
+      "sourceAnchor": "layout",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Layout",
+        "anchor": "layout",
+        "githubAnchor": "layout",
+        "stableAnchor": "h-124d07ebe28a",
+        "startLine": 23,
+        "endLine": 23,
+        "textDigest": "c2120985caf351f1ff6195e63d8723699bf5b23f2ea05a0d929501dbca458ff8",
+        "sample": "Layout",
+        "sectionPayloadDigest": "82e99f55269366e9bb7a7d8831ad7a381d6240d221601a9eddc71a728b643889",
+        "followingBlockDigest": "243f37484ada7bbcf9a52d14082146a53a20d58cb9e6cf073444d668a3d1e70a",
+        "identityFingerprint": "4f6813074000dc63d933e89e3397191e39171d36eb2ee25a317eacac479b4496",
+        "ancestry": [
+          "M01 — Answer a parked question"
+        ],
+        "text": "## Layout",
+        "sectionText": "## Layout\n\n```\n┌────────────────────────────────────────────────────┐\n│ Answer · tsk-4id                              [✕]  │  header\n├────────────────────────────────────────────────────┤\n│ Which pairing key should the timeline use when     │  question_recap\n│ askHistory and settlements have drifted by one?    │\n│                                                    │\n│ Why you're being asked                             │\n│ Two options still standing; D2 added no linking    │\n│ key. Tried: read D2, ran pairing on tsk-48i.       │\n├────────────────────────────────────────────────────┤\n│ Your answer                                        │  answer_form\n│ ┌────────────────────────────────────────────────┐ │\n│ │                                                │ │\n│ │                                                │ │\n│ └────────────────────────────────────────────────┘ │\n│ Goes through `fgos answer`.                        │\n├────────────────────────────────────────────────────┤\n│                          [ Cancel ]  [ Send answer ]│ footer\n└────────────────────────────────────────────────────┘\n```\n\nThe question is repeated inside the modal, with its \"why\", so a person\nanswering on a phone never has to dismiss the modal to re-read what they\nare answering. The footnote naming the verb is not decoration — R2 says\nevery write maps to one one-door-write verb, and showing which one is how\na person knows what they are actually about to do."
+      },
+      "sourceShownText": "## Layout\n\n```\n┌────────────────────────────────────────────────────┐\n│ Answer · tsk-4id                              [✕]  │  header\n├────────────────────────────────────────────────────┤\n│ Which pairing key should the timeline use when     │  question_recap\n│ askHistory and settlements have drifted by one?    │\n│                                                    │\n│ Why you're being asked                             │\n│ Two options still standing; D2 added no linking    │\n│ key. Tried: read D2, ran pairing on tsk-48i.       │\n├────────────────────────────────────────────────────┤\n│ Your answer                                        │  answer_form\n│ ┌────────────────────────────────────────────────┐ │\n│ │                                                │ │\n│ │                                                │ │\n│ └────────────────────────────────────────────────┘ │\n│ Goes through `fgos answer`.                        │\n├────────────────────────────────────────────────────┤\n│                          [ Cancel ]  [ Send answer ]│ footer\n└────────────────────────────────────────────────────┘\n```\n\nThe question is repeated inside the modal, with its \"why\", so a person\nanswering on a phone never has to dismiss the modal to re-read what they\nare answering. The footnote naming the verb is not decoration — R2 says\nevery write maps to one one-door-write verb, and showing which one is how\na person knows what they are actually about to do.",
+      "sourceDigest": "c2120985caf351f1ff6195e63d8723699bf5b23f2ea05a0d929501dbca458ff8",
+      "targetPath": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+      "targetAnchor": "layout",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Layout",
+        "anchor": "layout",
+        "githubAnchor": "layout",
+        "stableAnchor": "h-7a891a3c8430",
+        "startLine": 45,
+        "endLine": 45,
+        "textDigest": "c2120985caf351f1ff6195e63d8723699bf5b23f2ea05a0d929501dbca458ff8",
+        "sample": "Layout",
+        "sectionPayloadDigest": "82e99f55269366e9bb7a7d8831ad7a381d6240d221601a9eddc71a728b643889",
+        "followingBlockDigest": "243f37484ada7bbcf9a52d14082146a53a20d58cb9e6cf073444d668a3d1e70a",
+        "identityFingerprint": "4f6813074000dc63d933e89e3397191e39171d36eb2ee25a317eacac479b4496",
+        "ancestry": [
+          "M01 — Answer a parked question"
+        ],
+        "text": "## Layout",
+        "sectionText": "## Layout\n\n```\n┌────────────────────────────────────────────────────┐\n│ Answer · tsk-4id                              [✕]  │  header\n├────────────────────────────────────────────────────┤\n│ Which pairing key should the timeline use when     │  question_recap\n│ askHistory and settlements have drifted by one?    │\n│                                                    │\n│ Why you're being asked                             │\n│ Two options still standing; D2 added no linking    │\n│ key. Tried: read D2, ran pairing on tsk-48i.       │\n├────────────────────────────────────────────────────┤\n│ Your answer                                        │  answer_form\n│ ┌────────────────────────────────────────────────┐ │\n│ │                                                │ │\n│ │                                                │ │\n│ └────────────────────────────────────────────────┘ │\n│ Goes through `fgos answer`.                        │\n├────────────────────────────────────────────────────┤\n│                          [ Cancel ]  [ Send answer ]│ footer\n└────────────────────────────────────────────────────┘\n```\n\nThe question is repeated inside the modal, with its \"why\", so a person\nanswering on a phone never has to dismiss the modal to re-read what they\nare answering. The footnote naming the verb is not decoration — R2 says\nevery write maps to one one-door-write verb, and showing which one is how\na person knows what they are actually about to do."
+      },
+      "targetShownText": "## Layout\n\n```\n┌────────────────────────────────────────────────────┐\n│ Answer · tsk-4id                              [✕]  │  header\n├────────────────────────────────────────────────────┤\n│ Which pairing key should the timeline use when     │  question_recap\n│ askHistory and settlements have drifted by one?    │\n│                                                    │\n│ Why you're being asked                             │\n│ Two options still standing; D2 added no linking    │\n│ key. Tried: read D2, ran pairing on tsk-48i.       │\n├────────────────────────────────────────────────────┤\n│ Your answer                                        │  answer_form\n│ ┌────────────────────────────────────────────────┐ │\n│ │                                                │ │\n│ │                                                │ │\n│ └────────────────────────────────────────────────┘ │\n│ Goes through `fgos answer`.                        │\n├────────────────────────────────────────────────────┤\n│                          [ Cancel ]  [ Send answer ]│ footer\n└────────────────────────────────────────────────────┘\n```\n\nThe question is repeated inside the modal, with its \"why\", so a person\nanswering on a phone never has to dismiss the modal to re-read what they\nare answering. The footnote naming the verb is not decoration — R2 says\nevery write maps to one one-door-write verb, and showing which one is how\na person knows what they are actually about to do.",
+      "targetDigest": "c2120985caf351f1ff6195e63d8723699bf5b23f2ea05a0d929501dbca458ff8",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_57b00d818bf1ae24871c4bf3d2d75b79",
+        "sourceUnitDigest": "c2120985caf351f1ff6195e63d8723699bf5b23f2ea05a0d929501dbca458ff8",
+        "targetOwner": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+        "targetAnchor": "layout",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/ui-spec/modals/M01-answer-question.md#layout (source lines 23-23) is carried at docs/platform/ui-spec/architecture/modals/M01-answer-question.md#layout (candidate lines 45-45). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/modals/M01-answer-question.md verbatim in docs/platform/ui-spec/architecture/modals/M01-answer-question.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "c2120985caf351f1ff6195e63d8723699bf5b23f2ea05a0d929501dbca458ff8",
+        "targetAncestry": [
+          "M01 — Answer a parked question"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_81e60ba98c086609376e50fcde631003",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/modals/M01-answer-question.md",
+      "sourceAnchor": "unheaded-block-3",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 25,
+        "endLine": 45,
+        "textDigest": "243f37484ada7bbcf9a52d14082146a53a20d58cb9e6cf073444d668a3d1e70a",
+        "sample": "```\n┌────────────────────────────────────────────────────┐\n│ Answer · tsk-4id                              [✕]  │  header\n├────────────────────────────────────────────────────┤\n│ W",
+        "identityFingerprint": "7b5c622d776e22a98106d810b6e91ea264a6d016d0ecef5ce978be550f1f2a80",
+        "ancestry": [
+          "M01 — Answer a parked question",
+          "Layout"
+        ],
+        "text": "```\n┌────────────────────────────────────────────────────┐\n│ Answer · tsk-4id                              [✕]  │  header\n├────────────────────────────────────────────────────┤\n│ Which pairing key should the timeline use when     │  question_recap\n│ askHistory and settlements have drifted by one?    │\n│                                                    │\n│ Why you're being asked                             │\n│ Two options still standing; D2 added no linking    │\n│ key. Tried: read D2, ran pairing on tsk-48i.       │\n├────────────────────────────────────────────────────┤\n│ Your answer                                        │  answer_form\n│ ┌────────────────────────────────────────────────┐ │\n│ │                                                │ │\n│ │                                                │ │\n│ └────────────────────────────────────────────────┘ │\n│ Goes through `fgos answer`.                        │\n├────────────────────────────────────────────────────┤\n│                          [ Cancel ]  [ Send answer ]│ footer\n└────────────────────────────────────────────────────┘\n```"
+      },
+      "sourceShownText": "```\n┌────────────────────────────────────────────────────┐\n│ Answer · tsk-4id                              [✕]  │  header\n├────────────────────────────────────────────────────┤\n│ Which pairing key should the timeline use when     │  question_recap\n│ askHistory and settlements have drifted by one?    │\n│                                                    │\n│ Why you're being asked                             │\n│ Two options still standing; D2 added no linking    │\n│ key. Tried: read D2, ran pairing on tsk-48i.       │\n├────────────────────────────────────────────────────┤\n│ Your answer                                        │  answer_form\n│ ┌────────────────────────────────────────────────┐ │\n│ │                                                │ │\n│ │                                                │ │\n│ └────────────────────────────────────────────────┘ │\n│ Goes through `fgos answer`.                        │\n├────────────────────────────────────────────────────┤\n│                          [ Cancel ]  [ Send answer ]│ footer\n└────────────────────────────────────────────────────┘\n```",
+      "sourceDigest": "243f37484ada7bbcf9a52d14082146a53a20d58cb9e6cf073444d668a3d1e70a",
+      "targetPath": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+      "targetAnchor": "unheaded-block-5",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 47,
+        "endLine": 67,
+        "textDigest": "243f37484ada7bbcf9a52d14082146a53a20d58cb9e6cf073444d668a3d1e70a",
+        "sample": "```\n┌────────────────────────────────────────────────────┐\n│ Answer · tsk-4id                              [✕]  │  header\n├────────────────────────────────────────────────────┤\n│ W",
+        "identityFingerprint": "7b5c622d776e22a98106d810b6e91ea264a6d016d0ecef5ce978be550f1f2a80",
+        "ancestry": [
+          "M01 — Answer a parked question",
+          "Layout"
+        ],
+        "text": "```\n┌────────────────────────────────────────────────────┐\n│ Answer · tsk-4id                              [✕]  │  header\n├────────────────────────────────────────────────────┤\n│ Which pairing key should the timeline use when     │  question_recap\n│ askHistory and settlements have drifted by one?    │\n│                                                    │\n│ Why you're being asked                             │\n│ Two options still standing; D2 added no linking    │\n│ key. Tried: read D2, ran pairing on tsk-48i.       │\n├────────────────────────────────────────────────────┤\n│ Your answer                                        │  answer_form\n│ ┌────────────────────────────────────────────────┐ │\n│ │                                                │ │\n│ │                                                │ │\n│ └────────────────────────────────────────────────┘ │\n│ Goes through `fgos answer`.                        │\n├────────────────────────────────────────────────────┤\n│                          [ Cancel ]  [ Send answer ]│ footer\n└────────────────────────────────────────────────────┘\n```"
+      },
+      "targetShownText": "```\n┌────────────────────────────────────────────────────┐\n│ Answer · tsk-4id                              [✕]  │  header\n├────────────────────────────────────────────────────┤\n│ Which pairing key should the timeline use when     │  question_recap\n│ askHistory and settlements have drifted by one?    │\n│                                                    │\n│ Why you're being asked                             │\n│ Two options still standing; D2 added no linking    │\n│ key. Tried: read D2, ran pairing on tsk-48i.       │\n├────────────────────────────────────────────────────┤\n│ Your answer                                        │  answer_form\n│ ┌────────────────────────────────────────────────┐ │\n│ │                                                │ │\n│ │                                                │ │\n│ └────────────────────────────────────────────────┘ │\n│ Goes through `fgos answer`.                        │\n├────────────────────────────────────────────────────┤\n│                          [ Cancel ]  [ Send answer ]│ footer\n└────────────────────────────────────────────────────┘\n```",
+      "targetDigest": "243f37484ada7bbcf9a52d14082146a53a20d58cb9e6cf073444d668a3d1e70a",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_81e60ba98c086609376e50fcde631003",
+        "sourceUnitDigest": "243f37484ada7bbcf9a52d14082146a53a20d58cb9e6cf073444d668a3d1e70a",
+        "targetOwner": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+        "targetAnchor": "unheaded-block-5",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/modals/M01-answer-question.md#unheaded-block-3 (source lines 25-45) is carried at docs/platform/ui-spec/architecture/modals/M01-answer-question.md#unheaded-block-5 (candidate lines 47-67). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/modals/M01-answer-question.md verbatim in docs/platform/ui-spec/architecture/modals/M01-answer-question.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "243f37484ada7bbcf9a52d14082146a53a20d58cb9e6cf073444d668a3d1e70a",
+        "targetAncestry": [
+          "M01 — Answer a parked question",
+          "Layout"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_46d2aa894a82bd4231e161abc1de795a",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/modals/M01-answer-question.md",
+      "sourceAnchor": "unheaded-block-4",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 47,
+        "endLine": 51,
+        "textDigest": "00da42d1fca43f605f8dfd40f68babb3a77c8d178aa33e60614543a7a7a3a759",
+        "sample": "The question is repeated inside the modal, with its \"why\", so a person\nanswering on a phone never has to dismiss the modal to re-read what they\nare answering. The footnote naming t",
+        "identityFingerprint": "f885fd71b4257156e55b1903bca183799d8c9249f732ba867f4b34e5639aa6c7",
+        "ancestry": [
+          "M01 — Answer a parked question",
+          "Layout"
+        ],
+        "text": "The question is repeated inside the modal, with its \"why\", so a person\nanswering on a phone never has to dismiss the modal to re-read what they\nare answering. The footnote naming the verb is not decoration — R2 says\nevery write maps to one one-door-write verb, and showing which one is how\na person knows what they are actually about to do."
+      },
+      "sourceShownText": "The question is repeated inside the modal, with its \"why\", so a person\nanswering on a phone never has to dismiss the modal to re-read what they\nare answering. The footnote naming the verb is not decoration — R2 says\nevery write maps to one one-door-write verb, and showing which one is how\na person knows what they are actually about to do.",
+      "sourceDigest": "00da42d1fca43f605f8dfd40f68babb3a77c8d178aa33e60614543a7a7a3a759",
+      "targetPath": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+      "targetAnchor": "unheaded-block-6",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 69,
+        "endLine": 73,
+        "textDigest": "00da42d1fca43f605f8dfd40f68babb3a77c8d178aa33e60614543a7a7a3a759",
+        "sample": "The question is repeated inside the modal, with its \"why\", so a person\nanswering on a phone never has to dismiss the modal to re-read what they\nare answering. The footnote naming t",
+        "identityFingerprint": "f885fd71b4257156e55b1903bca183799d8c9249f732ba867f4b34e5639aa6c7",
+        "ancestry": [
+          "M01 — Answer a parked question",
+          "Layout"
+        ],
+        "text": "The question is repeated inside the modal, with its \"why\", so a person\nanswering on a phone never has to dismiss the modal to re-read what they\nare answering. The footnote naming the verb is not decoration — R2 says\nevery write maps to one one-door-write verb, and showing which one is how\na person knows what they are actually about to do."
+      },
+      "targetShownText": "The question is repeated inside the modal, with its \"why\", so a person\nanswering on a phone never has to dismiss the modal to re-read what they\nare answering. The footnote naming the verb is not decoration — R2 says\nevery write maps to one one-door-write verb, and showing which one is how\na person knows what they are actually about to do.",
+      "targetDigest": "00da42d1fca43f605f8dfd40f68babb3a77c8d178aa33e60614543a7a7a3a759",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_46d2aa894a82bd4231e161abc1de795a",
+        "sourceUnitDigest": "00da42d1fca43f605f8dfd40f68babb3a77c8d178aa33e60614543a7a7a3a759",
+        "targetOwner": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+        "targetAnchor": "unheaded-block-6",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/modals/M01-answer-question.md#unheaded-block-4 (source lines 47-51) is carried at docs/platform/ui-spec/architecture/modals/M01-answer-question.md#unheaded-block-6 (candidate lines 69-73). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/modals/M01-answer-question.md verbatim in docs/platform/ui-spec/architecture/modals/M01-answer-question.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "00da42d1fca43f605f8dfd40f68babb3a77c8d178aa33e60614543a7a7a3a759",
+        "targetAncestry": [
+          "M01 — Answer a parked question",
+          "Layout"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_2fca593fd29799a98ecb961e2bc31189",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/modals/M01-answer-question.md",
+      "sourceAnchor": "states",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "States",
+        "anchor": "states",
+        "githubAnchor": "states",
+        "stableAnchor": "h-8d14ef2b93aa",
+        "startLine": 53,
+        "endLine": 53,
+        "textDigest": "fed79adbb21c77cf08962e43f59af9709f516446087eed5db76b20d234ff76a2",
+        "sample": "States",
+        "sectionPayloadDigest": "bd8db0fe9a91124526c6ea88ff30ddd6173dbc2b4eb00938d01ded7000ee3c74",
+        "followingBlockDigest": "bd8db0fe9a91124526c6ea88ff30ddd6173dbc2b4eb00938d01ded7000ee3c74",
+        "identityFingerprint": "6c7d867b9d072a4d1ea0eb76d8924bcf1ea5b723f93fdb3b6463144ed04d5fb7",
+        "ancestry": [
+          "M01 — Answer a parked question"
+        ],
+        "text": "## States",
+        "sectionText": "## States\n\n- **ST-READY** — send disabled until the answer is non-empty.\n- **ST-SUBMITTING** — send shows progress; the textarea goes read-only but\n  stays visible, so nothing typed is ever hidden mid-flight.\n- **ERR-WRITE-REFUSED** — fgOS refused the write (the item was no longer\n  parked, say). The engine's own message is shown verbatim, and the typed\n  answer is kept, never cleared."
+      },
+      "sourceShownText": "## States\n\n- **ST-READY** — send disabled until the answer is non-empty.\n- **ST-SUBMITTING** — send shows progress; the textarea goes read-only but\n  stays visible, so nothing typed is ever hidden mid-flight.\n- **ERR-WRITE-REFUSED** — fgOS refused the write (the item was no longer\n  parked, say). The engine's own message is shown verbatim, and the typed\n  answer is kept, never cleared.",
+      "sourceDigest": "fed79adbb21c77cf08962e43f59af9709f516446087eed5db76b20d234ff76a2",
+      "targetPath": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+      "targetAnchor": "states",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "States",
+        "anchor": "states",
+        "githubAnchor": "states",
+        "stableAnchor": "h-708ab7af1939",
+        "startLine": 75,
+        "endLine": 75,
+        "textDigest": "fed79adbb21c77cf08962e43f59af9709f516446087eed5db76b20d234ff76a2",
+        "sample": "States",
+        "sectionPayloadDigest": "bd8db0fe9a91124526c6ea88ff30ddd6173dbc2b4eb00938d01ded7000ee3c74",
+        "followingBlockDigest": "bd8db0fe9a91124526c6ea88ff30ddd6173dbc2b4eb00938d01ded7000ee3c74",
+        "identityFingerprint": "6c7d867b9d072a4d1ea0eb76d8924bcf1ea5b723f93fdb3b6463144ed04d5fb7",
+        "ancestry": [
+          "M01 — Answer a parked question"
+        ],
+        "text": "## States",
+        "sectionText": "## States\n\n- **ST-READY** — send disabled until the answer is non-empty.\n- **ST-SUBMITTING** — send shows progress; the textarea goes read-only but\n  stays visible, so nothing typed is ever hidden mid-flight.\n- **ERR-WRITE-REFUSED** — fgOS refused the write (the item was no longer\n  parked, say). The engine's own message is shown verbatim, and the typed\n  answer is kept, never cleared."
+      },
+      "targetShownText": "## States\n\n- **ST-READY** — send disabled until the answer is non-empty.\n- **ST-SUBMITTING** — send shows progress; the textarea goes read-only but\n  stays visible, so nothing typed is ever hidden mid-flight.\n- **ERR-WRITE-REFUSED** — fgOS refused the write (the item was no longer\n  parked, say). The engine's own message is shown verbatim, and the typed\n  answer is kept, never cleared.",
+      "targetDigest": "fed79adbb21c77cf08962e43f59af9709f516446087eed5db76b20d234ff76a2",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_2fca593fd29799a98ecb961e2bc31189",
+        "sourceUnitDigest": "fed79adbb21c77cf08962e43f59af9709f516446087eed5db76b20d234ff76a2",
+        "targetOwner": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+        "targetAnchor": "states",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/ui-spec/modals/M01-answer-question.md#states (source lines 53-53) is carried at docs/platform/ui-spec/architecture/modals/M01-answer-question.md#states (candidate lines 75-75). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/modals/M01-answer-question.md verbatim in docs/platform/ui-spec/architecture/modals/M01-answer-question.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "fed79adbb21c77cf08962e43f59af9709f516446087eed5db76b20d234ff76a2",
+        "targetAncestry": [
+          "M01 — Answer a parked question"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_5ff80d2788c64645819e4747c97586f3",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/modals/M01-answer-question.md",
+      "sourceAnchor": "unheaded-block-5",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 55,
+        "endLine": 60,
+        "textDigest": "bd8db0fe9a91124526c6ea88ff30ddd6173dbc2b4eb00938d01ded7000ee3c74",
+        "sample": "- **ST-READY** — send disabled until the answer is non-empty.\n- **ST-SUBMITTING** — send shows progress; the textarea goes read-only but\n  stays visible, so nothing typed is ever h",
+        "identityFingerprint": "211a542833e29b55697ee85af05c28cd16314845cb3fed7081980dc625d65b25",
+        "ancestry": [
+          "M01 — Answer a parked question",
+          "States"
+        ],
+        "text": "- **ST-READY** — send disabled until the answer is non-empty.\n- **ST-SUBMITTING** — send shows progress; the textarea goes read-only but\n  stays visible, so nothing typed is ever hidden mid-flight.\n- **ERR-WRITE-REFUSED** — fgOS refused the write (the item was no longer\n  parked, say). The engine's own message is shown verbatim, and the typed\n  answer is kept, never cleared."
+      },
+      "sourceShownText": "- **ST-READY** — send disabled until the answer is non-empty.\n- **ST-SUBMITTING** — send shows progress; the textarea goes read-only but\n  stays visible, so nothing typed is ever hidden mid-flight.\n- **ERR-WRITE-REFUSED** — fgOS refused the write (the item was no longer\n  parked, say). The engine's own message is shown verbatim, and the typed\n  answer is kept, never cleared.",
+      "sourceDigest": "bd8db0fe9a91124526c6ea88ff30ddd6173dbc2b4eb00938d01ded7000ee3c74",
+      "targetPath": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+      "targetAnchor": "unheaded-block-7",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 77,
+        "endLine": 82,
+        "textDigest": "bd8db0fe9a91124526c6ea88ff30ddd6173dbc2b4eb00938d01ded7000ee3c74",
+        "sample": "- **ST-READY** — send disabled until the answer is non-empty.\n- **ST-SUBMITTING** — send shows progress; the textarea goes read-only but\n  stays visible, so nothing typed is ever h",
+        "identityFingerprint": "211a542833e29b55697ee85af05c28cd16314845cb3fed7081980dc625d65b25",
+        "ancestry": [
+          "M01 — Answer a parked question",
+          "States"
+        ],
+        "text": "- **ST-READY** — send disabled until the answer is non-empty.\n- **ST-SUBMITTING** — send shows progress; the textarea goes read-only but\n  stays visible, so nothing typed is ever hidden mid-flight.\n- **ERR-WRITE-REFUSED** — fgOS refused the write (the item was no longer\n  parked, say). The engine's own message is shown verbatim, and the typed\n  answer is kept, never cleared."
+      },
+      "targetShownText": "- **ST-READY** — send disabled until the answer is non-empty.\n- **ST-SUBMITTING** — send shows progress; the textarea goes read-only but\n  stays visible, so nothing typed is ever hidden mid-flight.\n- **ERR-WRITE-REFUSED** — fgOS refused the write (the item was no longer\n  parked, say). The engine's own message is shown verbatim, and the typed\n  answer is kept, never cleared.",
+      "targetDigest": "bd8db0fe9a91124526c6ea88ff30ddd6173dbc2b4eb00938d01ded7000ee3c74",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_5ff80d2788c64645819e4747c97586f3",
+        "sourceUnitDigest": "bd8db0fe9a91124526c6ea88ff30ddd6173dbc2b4eb00938d01ded7000ee3c74",
+        "targetOwner": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+        "targetAnchor": "unheaded-block-7",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/modals/M01-answer-question.md#unheaded-block-5 (source lines 55-60) is carried at docs/platform/ui-spec/architecture/modals/M01-answer-question.md#unheaded-block-7 (candidate lines 77-82). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/modals/M01-answer-question.md verbatim in docs/platform/ui-spec/architecture/modals/M01-answer-question.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "bd8db0fe9a91124526c6ea88ff30ddd6173dbc2b4eb00938d01ded7000ee3c74",
+        "targetAncestry": [
+          "M01 — Answer a parked question",
+          "States"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_42511baf61c8603df6dfa984707d7c02",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/modals/M01-answer-question.md",
+      "sourceAnchor": "interactions",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Interactions",
+        "anchor": "interactions",
+        "githubAnchor": "interactions",
+        "stableAnchor": "h-5a32fc416d55",
+        "startLine": 62,
+        "endLine": 62,
+        "textDigest": "0310499305b9425d55f76b3343b1886213c1d5dec72ba2a0951c583544352ecb",
+        "sample": "Interactions",
+        "sectionPayloadDigest": "3863c313178b0aea88f942dae236aeda908f0d6202da0384ce55f0fbe0b9601a",
+        "followingBlockDigest": "3863c313178b0aea88f942dae236aeda908f0d6202da0384ce55f0fbe0b9601a",
+        "identityFingerprint": "84d9efd14ef48dba3fdc204087acc865c0d40258efe647998da41ab10d37ec82",
+        "ancestry": [
+          "M01 — Answer a parked question"
+        ],
+        "text": "## Interactions",
+        "sectionText": "## Interactions\n\n```yaml herdrweb-contract\ninteractions:\n  - id: A-M01-001\n    element: answer_textarea\n    region: answer_form\n    trigger: input\n    action: mutate\n    effects: [enable_send_when_non_empty]\n  - id: A-M01-002\n    element: send_answer_button\n    region: footer\n    trigger: submit\n    guard: \"answer.nonEmpty\"\n    action: close_overlay\n    target: return_to_invoker\n    effects: [run_fgos_answer_verb]\n  - id: A-M01-003\n    element: cancel_button\n    region: footer\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n  - id: A-M01-004\n    element: close_icon\n    region: header\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n```"
+      },
+      "sourceShownText": "## Interactions\n\n```yaml herdrweb-contract\ninteractions:\n  - id: A-M01-001\n    element: answer_textarea\n    region: answer_form\n    trigger: input\n    action: mutate\n    effects: [enable_send_when_non_empty]\n  - id: A-M01-002\n    element: send_answer_button\n    region: footer\n    trigger: submit\n    guard: \"answer.nonEmpty\"\n    action: close_overlay\n    target: return_to_invoker\n    effects: [run_fgos_answer_verb]\n  - id: A-M01-003\n    element: cancel_button\n    region: footer\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n  - id: A-M01-004\n    element: close_icon\n    region: header\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n```",
+      "sourceDigest": "0310499305b9425d55f76b3343b1886213c1d5dec72ba2a0951c583544352ecb",
+      "targetPath": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+      "targetAnchor": "interactions",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Interactions",
+        "anchor": "interactions",
+        "githubAnchor": "interactions",
+        "stableAnchor": "h-34ebd43eb279",
+        "startLine": 84,
+        "endLine": 84,
+        "textDigest": "0310499305b9425d55f76b3343b1886213c1d5dec72ba2a0951c583544352ecb",
+        "sample": "Interactions",
+        "sectionPayloadDigest": "3863c313178b0aea88f942dae236aeda908f0d6202da0384ce55f0fbe0b9601a",
+        "followingBlockDigest": "3863c313178b0aea88f942dae236aeda908f0d6202da0384ce55f0fbe0b9601a",
+        "identityFingerprint": "84d9efd14ef48dba3fdc204087acc865c0d40258efe647998da41ab10d37ec82",
+        "ancestry": [
+          "M01 — Answer a parked question"
+        ],
+        "text": "## Interactions",
+        "sectionText": "## Interactions\n\n```yaml herdrweb-contract\ninteractions:\n  - id: A-M01-001\n    element: answer_textarea\n    region: answer_form\n    trigger: input\n    action: mutate\n    effects: [enable_send_when_non_empty]\n  - id: A-M01-002\n    element: send_answer_button\n    region: footer\n    trigger: submit\n    guard: \"answer.nonEmpty\"\n    action: close_overlay\n    target: return_to_invoker\n    effects: [run_fgos_answer_verb]\n  - id: A-M01-003\n    element: cancel_button\n    region: footer\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n  - id: A-M01-004\n    element: close_icon\n    region: header\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n```"
+      },
+      "targetShownText": "## Interactions\n\n```yaml herdrweb-contract\ninteractions:\n  - id: A-M01-001\n    element: answer_textarea\n    region: answer_form\n    trigger: input\n    action: mutate\n    effects: [enable_send_when_non_empty]\n  - id: A-M01-002\n    element: send_answer_button\n    region: footer\n    trigger: submit\n    guard: \"answer.nonEmpty\"\n    action: close_overlay\n    target: return_to_invoker\n    effects: [run_fgos_answer_verb]\n  - id: A-M01-003\n    element: cancel_button\n    region: footer\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n  - id: A-M01-004\n    element: close_icon\n    region: header\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n```",
+      "targetDigest": "0310499305b9425d55f76b3343b1886213c1d5dec72ba2a0951c583544352ecb",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_42511baf61c8603df6dfa984707d7c02",
+        "sourceUnitDigest": "0310499305b9425d55f76b3343b1886213c1d5dec72ba2a0951c583544352ecb",
+        "targetOwner": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+        "targetAnchor": "interactions",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/ui-spec/modals/M01-answer-question.md#interactions (source lines 62-62) is carried at docs/platform/ui-spec/architecture/modals/M01-answer-question.md#interactions (candidate lines 84-84). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/modals/M01-answer-question.md verbatim in docs/platform/ui-spec/architecture/modals/M01-answer-question.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "0310499305b9425d55f76b3343b1886213c1d5dec72ba2a0951c583544352ecb",
+        "targetAncestry": [
+          "M01 — Answer a parked question"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_89e1dad5a298dcd9a584cf7e436b07c8",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/modals/M01-answer-question.md",
+      "sourceAnchor": "unheaded-block-6",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 64,
+        "endLine": 92,
+        "textDigest": "3863c313178b0aea88f942dae236aeda908f0d6202da0384ce55f0fbe0b9601a",
+        "sample": "```yaml herdrweb-contract\ninteractions:\n  - id: A-M01-001\n    element: answer_textarea\n    region: answer_form\n    trigger: input\n    action: mutate\n    effects: [enable_send_when_",
+        "identityFingerprint": "22b749ffdc61dd4746c4eac0ed8276468316d77a697e5e9aeec3780df0b8bd45",
+        "ancestry": [
+          "M01 — Answer a parked question",
+          "Interactions"
+        ],
+        "text": "```yaml herdrweb-contract\ninteractions:\n  - id: A-M01-001\n    element: answer_textarea\n    region: answer_form\n    trigger: input\n    action: mutate\n    effects: [enable_send_when_non_empty]\n  - id: A-M01-002\n    element: send_answer_button\n    region: footer\n    trigger: submit\n    guard: \"answer.nonEmpty\"\n    action: close_overlay\n    target: return_to_invoker\n    effects: [run_fgos_answer_verb]\n  - id: A-M01-003\n    element: cancel_button\n    region: footer\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n  - id: A-M01-004\n    element: close_icon\n    region: header\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n```"
+      },
+      "sourceShownText": "```yaml herdrweb-contract\ninteractions:\n  - id: A-M01-001\n    element: answer_textarea\n    region: answer_form\n    trigger: input\n    action: mutate\n    effects: [enable_send_when_non_empty]\n  - id: A-M01-002\n    element: send_answer_button\n    region: footer\n    trigger: submit\n    guard: \"answer.nonEmpty\"\n    action: close_overlay\n    target: return_to_invoker\n    effects: [run_fgos_answer_verb]\n  - id: A-M01-003\n    element: cancel_button\n    region: footer\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n  - id: A-M01-004\n    element: close_icon\n    region: header\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n```",
+      "sourceDigest": "3863c313178b0aea88f942dae236aeda908f0d6202da0384ce55f0fbe0b9601a",
+      "targetPath": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+      "targetAnchor": "unheaded-block-8",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-8",
+        "githubAnchor": "unheaded-block-8",
+        "stableAnchor": "unheaded-block-8",
+        "title": "Unheaded block 8",
+        "startLine": 86,
+        "endLine": 114,
+        "textDigest": "3863c313178b0aea88f942dae236aeda908f0d6202da0384ce55f0fbe0b9601a",
+        "sample": "```yaml herdrweb-contract\ninteractions:\n  - id: A-M01-001\n    element: answer_textarea\n    region: answer_form\n    trigger: input\n    action: mutate\n    effects: [enable_send_when_",
+        "identityFingerprint": "22b749ffdc61dd4746c4eac0ed8276468316d77a697e5e9aeec3780df0b8bd45",
+        "ancestry": [
+          "M01 — Answer a parked question",
+          "Interactions"
+        ],
+        "text": "```yaml herdrweb-contract\ninteractions:\n  - id: A-M01-001\n    element: answer_textarea\n    region: answer_form\n    trigger: input\n    action: mutate\n    effects: [enable_send_when_non_empty]\n  - id: A-M01-002\n    element: send_answer_button\n    region: footer\n    trigger: submit\n    guard: \"answer.nonEmpty\"\n    action: close_overlay\n    target: return_to_invoker\n    effects: [run_fgos_answer_verb]\n  - id: A-M01-003\n    element: cancel_button\n    region: footer\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n  - id: A-M01-004\n    element: close_icon\n    region: header\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n```"
+      },
+      "targetShownText": "```yaml herdrweb-contract\ninteractions:\n  - id: A-M01-001\n    element: answer_textarea\n    region: answer_form\n    trigger: input\n    action: mutate\n    effects: [enable_send_when_non_empty]\n  - id: A-M01-002\n    element: send_answer_button\n    region: footer\n    trigger: submit\n    guard: \"answer.nonEmpty\"\n    action: close_overlay\n    target: return_to_invoker\n    effects: [run_fgos_answer_verb]\n  - id: A-M01-003\n    element: cancel_button\n    region: footer\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n  - id: A-M01-004\n    element: close_icon\n    region: header\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n```",
+      "targetDigest": "3863c313178b0aea88f942dae236aeda908f0d6202da0384ce55f0fbe0b9601a",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_89e1dad5a298dcd9a584cf7e436b07c8",
+        "sourceUnitDigest": "3863c313178b0aea88f942dae236aeda908f0d6202da0384ce55f0fbe0b9601a",
+        "targetOwner": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+        "targetAnchor": "unheaded-block-8",
+        "claimKind": "contract",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/modals/M01-answer-question.md#unheaded-block-6 (source lines 64-92) is carried at docs/platform/ui-spec/architecture/modals/M01-answer-question.md#unheaded-block-8 (candidate lines 86-114). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/modals/M01-answer-question.md verbatim in docs/platform/ui-spec/architecture/modals/M01-answer-question.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "3863c313178b0aea88f942dae236aeda908f0d6202da0384ce55f0fbe0b9601a",
+        "targetAncestry": [
+          "M01 — Answer a parked question",
+          "Interactions"
+        ]
+      }
+    }
+  ]
+}

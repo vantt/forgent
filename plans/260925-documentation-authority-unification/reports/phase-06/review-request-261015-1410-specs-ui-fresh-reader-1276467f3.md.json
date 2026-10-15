@@ -1,0 +1,67 @@
+{
+  "version": 1,
+  "contentCommit": "1276467f37a99d19aff05808d42fafbf40341449",
+  "channel": "fresh-reader",
+  "count": 7,
+  "reviewStatus": "pending",
+  "authorSession": "codex-session:unit-run-1792047735364-5c1a0eb5@2026-10-15",
+  "instructions": "Prepare and execute later per-area fresh-reader keys/runs independently. Follow phase contract and previous fresh-reader precedents without treating an earlier limited run as this area’s proof. Verify orientation, authority, component/contracts and consumer ownership from repository evidence. No truth or fresh-reader success is asserted by packaging.",
+  "entries": [
+    {
+      "entryId": "fresh-reader-agent-confinement",
+      "portal": "docs/platform/agent-confinement/README.md",
+      "contentCommit": "1276467f37a99d19aff05808d42fafbf40341449",
+      "answerKeyStatus": "not selected or authored by producer",
+      "runStatus": "not run",
+      "obligations": "Independent key setter defines repository-grounded questions, evidence-backed answer key and success criteria; a fresh session with no author chat reads portal first, traces candidate and legacy authority and reports answers/evidence/ambiguities. Keep key separate from fresh reader until answers are committed; report per-area results and unresolved gaps."
+    },
+    {
+      "entryId": "fresh-reader-claude-plugin",
+      "portal": "docs/platform/claude-plugin/README.md",
+      "contentCommit": "1276467f37a99d19aff05808d42fafbf40341449",
+      "answerKeyStatus": "not selected or authored by producer",
+      "runStatus": "not run",
+      "obligations": "Independent key setter defines repository-grounded questions, evidence-backed answer key and success criteria; a fresh session with no author chat reads portal first, traces candidate and legacy authority and reports answers/evidence/ambiguities. Keep key separate from fresh reader until answers are committed; report per-area results and unresolved gaps."
+    },
+    {
+      "entryId": "fresh-reader-decision-citation-drift",
+      "portal": "docs/platform/decision-citation-drift/README.md",
+      "contentCommit": "1276467f37a99d19aff05808d42fafbf40341449",
+      "answerKeyStatus": "not selected or authored by producer",
+      "runStatus": "not run",
+      "obligations": "Independent key setter defines repository-grounded questions, evidence-backed answer key and success criteria; a fresh session with no author chat reads portal first, traces candidate and legacy authority and reports answers/evidence/ambiguities. Keep key separate from fresh reader until answers are committed; report per-area results and unresolved gaps."
+    },
+    {
+      "entryId": "fresh-reader-distillery",
+      "portal": "docs/platform/distillery/README.md",
+      "contentCommit": "1276467f37a99d19aff05808d42fafbf40341449",
+      "answerKeyStatus": "not selected or authored by producer",
+      "runStatus": "not run",
+      "obligations": "Independent key setter defines repository-grounded questions, evidence-backed answer key and success criteria; a fresh session with no author chat reads portal first, traces candidate and legacy authority and reports answers/evidence/ambiguities. Keep key separate from fresh reader until answers are committed; report per-area results and unresolved gaps."
+    },
+    {
+      "entryId": "fresh-reader-herdr-web-dashboard",
+      "portal": "docs/platform/herdr-web-dashboard/README.md",
+      "contentCommit": "1276467f37a99d19aff05808d42fafbf40341449",
+      "answerKeyStatus": "not selected or authored by producer",
+      "runStatus": "not run",
+      "obligations": "Independent key setter defines repository-grounded questions, evidence-backed answer key and success criteria; a fresh session with no author chat reads portal first, traces candidate and legacy authority and reports answers/evidence/ambiguities. Keep key separate from fresh reader until answers are committed; report per-area results and unresolved gaps."
+    },
+    {
+      "entryId": "fresh-reader-observe",
+      "portal": "docs/platform/observe/README.md",
+      "contentCommit": "1276467f37a99d19aff05808d42fafbf40341449",
+      "answerKeyStatus": "not selected or authored by producer",
+      "runStatus": "not run",
+      "obligations": "Independent key setter defines repository-grounded questions, evidence-backed answer key and success criteria; a fresh session with no author chat reads portal first, traces candidate and legacy authority and reports answers/evidence/ambiguities. Keep key separate from fresh reader until answers are committed; report per-area results and unresolved gaps."
+    },
+    {
+      "entryId": "fresh-reader-ui-spec",
+      "portal": "docs/platform/ui-spec/README.md",
+      "contentCommit": "1276467f37a99d19aff05808d42fafbf40341449",
+      "answerKeyStatus": "not selected or authored by producer",
+      "runStatus": "not run",
+      "obligations": "Independent key setter defines repository-grounded questions, evidence-backed answer key and success criteria; a fresh session with no author chat reads portal first, traces candidate and legacy authority and reports answers/evidence/ambiguities. Keep key separate from fresh reader until answers are committed; report per-area results and unresolved gaps."
+    }
+  ]
+}

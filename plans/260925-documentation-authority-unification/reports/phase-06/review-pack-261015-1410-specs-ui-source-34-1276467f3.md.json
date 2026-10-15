@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "contentCommit": "1276467f37a99d19aff05808d42fafbf40341449",
+  "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+  "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+  "sourcePath": "docs/ui-spec/spec.config.yaml",
+  "part": 1,
+  "parts": 1,
+  "count": 1,
+  "classes": {
+    "Unit-exact": [
+      "claim_a7dc196cb13fecefb11ee504bd56df4d"
+    ],
+    "Weak-exact": [],
+    "Judgment": []
+  },
+  "unequalDigestPairs": [],
+  "noTargetGeneratedRows": [],
+  "mandatoryDeep": [],
+  "reviewerSeedRequired": true,
+  "minimumSeededWeakJudgment": 0,
+  "rows": [
+    {
+      "claimId": "claim_a7dc196cb13fecefb11ee504bd56df4d",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/spec.config.yaml",
+      "sourceAnchor": "file-block",
+      "source": {
+        "unitKind": "file-block",
+        "anchor": "file-block",
+        "githubAnchor": "file-block",
+        "stableAnchor": "file-block",
+        "title": "spec.config.yaml",
+        "startLine": 1,
+        "endLine": 24,
+        "textDigest": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+        "identityFingerprint": "e846a2d67b51f1c87d01009b557613564e24c15d2ad11e5c71adb8c4999e7270",
+        "sample": "# UI Spec configuration — herdr web dashboard\n#\n# Product source of truth: docs/specs/herdr-web-dashboard.md (tsk-54j).\n# This spec adds the interaction/layout layer only; it never",
+        "ancestry": [],
+        "text": "# UI Spec configuration — herdr web dashboard\n#\n# Product source of truth: docs/specs/herdr-web-dashboard.md (tsk-54j).\n# This spec adds the interaction/layout layer only; it never re-decides a\n# product question the area spec already settled.\n\nproject: herdrweb\ncontract_tag: herdrweb-contract\nentry_surface: S01\nplatforms: [desktop, mobile]\n\nsurface_dirs:\n  - screens\n  - modals\n  - components\n  - flows\n\ncross_cutting:\n  - 20-domain-rules.md\n  - 15-system-events.md\n\nextra_triggers: []\nextra_actions: []"
+      },
+      "sourceShownText": "# UI Spec configuration — herdr web dashboard\n#\n# Product source of truth: docs/specs/herdr-web-dashboard.md (tsk-54j).\n# This spec adds the interaction/layout layer only; it never re-decides a\n# product question the area spec already settled.\n\nproject: herdrweb\ncontract_tag: herdrweb-contract\nentry_surface: S01\nplatforms: [desktop, mobile]\n\nsurface_dirs:\n  - screens\n  - modals\n  - components\n  - flows\n\ncross_cutting:\n  - 20-domain-rules.md\n  - 15-system-events.md\n\nextra_triggers: []\nextra_actions: []",
+      "sourceDigest": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+      "targetPath": "docs/platform/ui-spec/architecture/spec.config.yaml",
+      "targetAnchor": "file-block",
+      "target": {
+        "unitKind": "file-block",
+        "anchor": "file-block",
+        "githubAnchor": "file-block",
+        "stableAnchor": "file-block",
+        "title": "spec.config.yaml",
+        "startLine": 1,
+        "endLine": 24,
+        "textDigest": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+        "identityFingerprint": "e846a2d67b51f1c87d01009b557613564e24c15d2ad11e5c71adb8c4999e7270",
+        "sample": "# UI Spec configuration — herdr web dashboard\n#\n# Product source of truth: docs/specs/herdr-web-dashboard.md (tsk-54j).\n# This spec adds the interaction/layout layer only; it never",
+        "ancestry": [],
+        "text": "# UI Spec configuration — herdr web dashboard\n#\n# Product source of truth: docs/specs/herdr-web-dashboard.md (tsk-54j).\n# This spec adds the interaction/layout layer only; it never re-decides a\n# product question the area spec already settled.\n\nproject: herdrweb\ncontract_tag: herdrweb-contract\nentry_surface: S01\nplatforms: [desktop, mobile]\n\nsurface_dirs:\n  - screens\n  - modals\n  - components\n  - flows\n\ncross_cutting:\n  - 20-domain-rules.md\n  - 15-system-events.md\n\nextra_triggers: []\nextra_actions: []"
+      },
+      "targetShownText": "# UI Spec configuration — herdr web dashboard\n#\n# Product source of truth: docs/specs/herdr-web-dashboard.md (tsk-54j).\n# This spec adds the interaction/layout layer only; it never re-decides a\n# product question the area spec already settled.\n\nproject: herdrweb\ncontract_tag: herdrweb-contract\nentry_surface: S01\nplatforms: [desktop, mobile]\n\nsurface_dirs:\n  - screens\n  - modals\n  - components\n  - flows\n\ncross_cutting:\n  - 20-domain-rules.md\n  - 15-system-events.md\n\nextra_triggers: []\nextra_actions: []",
+      "targetDigest": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_a7dc196cb13fecefb11ee504bd56df4d",
+        "sourceUnitDigest": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+        "targetOwner": "docs/platform/ui-spec/architecture/spec.config.yaml",
+        "targetAnchor": "file-block",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole file-block unit docs/ui-spec/spec.config.yaml#file-block (source lines 1-24) is carried at docs/platform/ui-spec/architecture/spec.config.yaml#file-block (candidate lines 1-24). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/spec.config.yaml verbatim in docs/platform/ui-spec/architecture/spec.config.yaml. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+        "targetAncestry": []
+      }
+    }
+  ]
+}

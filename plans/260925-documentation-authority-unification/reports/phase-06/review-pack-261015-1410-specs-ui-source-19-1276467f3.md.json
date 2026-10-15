@@ -1,0 +1,704 @@
+{
+  "version": 1,
+  "contentCommit": "1276467f37a99d19aff05808d42fafbf40341449",
+  "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+  "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+  "sourcePath": "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+  "part": 1,
+  "parts": 1,
+  "count": 10,
+  "classes": {
+    "Unit-exact": [
+      "claim_1d6b3967b477d9ada8de5c5b69a68ece",
+      "claim_4fca4420a5f2baea4c37309fdc4f7555",
+      "claim_d17fc43b1d58c9992a60d5605b155e37",
+      "claim_028c68be7bd8559c92b54d6a11eca48a",
+      "claim_91a51cee06251cc0d253768eb037c821",
+      "claim_fc71787af183cc17ea2100bcecb32b58"
+    ],
+    "Weak-exact": [
+      "claim_80ff4624d518db7befbdccfcd92a2ed3",
+      "claim_4ddde2c3d97535b424143c3847753bab",
+      "claim_2e79d3dd87585da273910fa943bdccf7"
+    ],
+    "Judgment": [
+      "claim_9a46c9f995367d176ac61cf2d59647a4"
+    ]
+  },
+  "unequalDigestPairs": [
+    "claim_9a46c9f995367d176ac61cf2d59647a4"
+  ],
+  "noTargetGeneratedRows": [],
+  "mandatoryDeep": [
+    "claim_9a46c9f995367d176ac61cf2d59647a4"
+  ],
+  "reviewerSeedRequired": true,
+  "minimumSeededWeakJudgment": 4,
+  "rows": [
+    {
+      "claimId": "claim_1d6b3967b477d9ada8de5c5b69a68ece",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+      "sourceAnchor": "unheaded-block-1",
+      "source": {
+        "unitKind": "unheaded-preamble",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded preamble",
+        "startLine": 1,
+        "endLine": 11,
+        "textDigest": "4b9fa3e77cd364e748d9e3e8b15c51ac292b76768c2acab6f609d94b85646480",
+        "sample": "---\nid: F01\ntype: flow\nname: \"Answer a parked question, end to end\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: []\nregions: []\n---",
+        "identityFingerprint": "8df50df08ad8640c948358a59a16453d737263b22abe353d938baccb3a267103",
+        "ancestry": [],
+        "text": "---\nid: F01\ntype: flow\nname: \"Answer a parked question, end to end\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: []\nregions: []\n---"
+      },
+      "sourceShownText": "---\nid: F01\ntype: flow\nname: \"Answer a parked question, end to end\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: []\nregions: []\n---",
+      "sourceDigest": "4b9fa3e77cd364e748d9e3e8b15c51ac292b76768c2acab6f609d94b85646480",
+      "targetPath": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+      "targetAnchor": "unheaded-block-1",
+      "target": {
+        "unitKind": "unheaded-preamble",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded preamble",
+        "startLine": 1,
+        "endLine": 11,
+        "textDigest": "4b9fa3e77cd364e748d9e3e8b15c51ac292b76768c2acab6f609d94b85646480",
+        "sample": "---\nid: F01\ntype: flow\nname: \"Answer a parked question, end to end\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: []\nregions: []\n---",
+        "identityFingerprint": "8df50df08ad8640c948358a59a16453d737263b22abe353d938baccb3a267103",
+        "ancestry": [],
+        "text": "---\nid: F01\ntype: flow\nname: \"Answer a parked question, end to end\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: []\nregions: []\n---"
+      },
+      "targetShownText": "---\nid: F01\ntype: flow\nname: \"Answer a parked question, end to end\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: []\nregions: []\n---",
+      "targetDigest": "4b9fa3e77cd364e748d9e3e8b15c51ac292b76768c2acab6f609d94b85646480",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_1d6b3967b477d9ada8de5c5b69a68ece",
+        "sourceUnitDigest": "4b9fa3e77cd364e748d9e3e8b15c51ac292b76768c2acab6f609d94b85646480",
+        "targetOwner": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+        "targetAnchor": "unheaded-block-1",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-preamble unit docs/ui-spec/flows/F01-answer-a-parked-question.md#unheaded-block-1 (source lines 1-11) is carried at docs/platform/ui-spec/operations/F01-answer-a-parked-question.md#unheaded-block-1 (candidate lines 1-11). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/flows/F01-answer-a-parked-question.md verbatim in docs/platform/ui-spec/operations/F01-answer-a-parked-question.md. Map kind guide-runbook is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "4b9fa3e77cd364e748d9e3e8b15c51ac292b76768c2acab6f609d94b85646480",
+        "targetAncestry": []
+      }
+    },
+    {
+      "claimId": "claim_9a46c9f995367d176ac61cf2d59647a4",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+      "sourceAnchor": "f01-answer-a-parked-question-end-to-end",
+      "source": {
+        "unitKind": "heading",
+        "level": 1,
+        "title": "F01 — Answer a parked question, end to end",
+        "anchor": "f01-answer-a-parked-question-end-to-end",
+        "githubAnchor": "f01-answer-a-parked-question-end-to-end",
+        "stableAnchor": "h-1941f1e79500",
+        "startLine": 13,
+        "endLine": 13,
+        "textDigest": "ebdf554cc21344a0ae7e2b7d3c15494c3df19bdea61f05b208bd970f7fd23bdc",
+        "sample": "F01 — Answer a parked question, end to end",
+        "sectionPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "followingBlockDigest": null,
+        "identityFingerprint": "c8b79867f4c56b5060613ee925b8eb60fe35119e1caa1c0df735f53a966aa1f3",
+        "ancestry": [],
+        "text": "# F01 — Answer a parked question, end to end",
+        "sectionText": "# F01 — Answer a parked question, end to end"
+      },
+      "sourceShownText": "# F01 — Answer a parked question, end to end",
+      "sourceDigest": "ebdf554cc21344a0ae7e2b7d3c15494c3df19bdea61f05b208bd970f7fd23bdc",
+      "targetPath": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+      "targetAnchor": "f01-answer-a-parked-question-end-to-end",
+      "target": {
+        "unitKind": "heading",
+        "level": 1,
+        "title": "F01 — Answer a parked question, end to end",
+        "anchor": "f01-answer-a-parked-question-end-to-end",
+        "githubAnchor": "f01-answer-a-parked-question-end-to-end",
+        "stableAnchor": "h-1941f1e79500",
+        "startLine": 13,
+        "endLine": 13,
+        "textDigest": "cc39f42f0483ed065fac41079ddfd01c8555123c26412021290c758fd09b2576",
+        "sample": "F01 — Answer a parked question, end to end",
+        "sectionPayloadDigest": "a72edb65066984110e6ce4cb843bb4af5148a48c430a6f134a54a883b51a71db",
+        "followingBlockDigest": "60df5ee75aeda28ea54dce20e2b61833724ce513a6a0038cf9945a75b78c39a7",
+        "identityFingerprint": "7cf56f53c20239e89256df4e1d274afa4b021b37f09ad9d65d49ef323810302c",
+        "ancestry": [],
+        "text": "# F01 — Answer a parked question, end to end",
+        "sectionText": "# F01 — Answer a parked question, end to end\n\n```txt\nDocument type: Guide / Runbook\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve mapped legacy content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; current implementation truth is not certified\nProvenance: docs/ui-spec/flows/F01-answer-a-parked-question.md at 111adc51fd047d99121fd9d076eb4794c87045a4\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing carriage, placement and source conservation\nDo not use this for: Current canonical authority or implemented-behavior proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/ui-spec/flows/F01-answer-a-parked-question.md\nSupersedes: None; candidate only\nSuperseded by: None\n```\n\n> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions."
+      },
+      "targetShownText": "# F01 — Answer a parked question, end to end\n\n```txt\nDocument type: Guide / Runbook\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve mapped legacy content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; current implementation truth is not certified\nProvenance: docs/ui-spec/flows/F01-answer-a-parked-question.md at 111adc51fd047d99121fd9d076eb4794c87045a4\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing carriage, placement and source conservation\nDo not use this for: Current canonical authority or implemented-behavior proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/ui-spec/flows/F01-answer-a-parked-question.md\nSupersedes: None; candidate only\nSuperseded by: None\n```\n\n> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions.",
+      "targetDigest": "cc39f42f0483ed065fac41079ddfd01c8555123c26412021290c758fd09b2576",
+      "classification": "Judgment",
+      "mandatoryDeep": true,
+      "decision": {
+        "claimId": "claim_9a46c9f995367d176ac61cf2d59647a4",
+        "sourceUnitDigest": "ebdf554cc21344a0ae7e2b7d3c15494c3df19bdea61f05b208bd970f7fd23bdc",
+        "targetOwner": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+        "targetAnchor": "f01-answer-a-parked-question-end-to-end",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Judgment: no target digest match. The whole heading unit docs/ui-spec/flows/F01-answer-a-parked-question.md#f01-answer-a-parked-question-end-to-end (source lines 13-13) is carried at docs/platform/ui-spec/operations/F01-answer-a-parked-question.md#f01-answer-a-parked-question-end-to-end (candidate lines 13-13). The heading section digest changes because labelled candidate metadata is inserted after the original H1; original heading and direct source payload remain verbatim. Frozen specs-ui map and Step 8: preserve docs/ui-spec/flows/F01-answer-a-parked-question.md verbatim in docs/platform/ui-spec/operations/F01-answer-a-parked-question.md. Map kind guide-runbook is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "cc39f42f0483ed065fac41079ddfd01c8555123c26412021290c758fd09b2576",
+        "targetAncestry": []
+      }
+    },
+    {
+      "claimId": "claim_80ff4624d518db7befbdccfcd92a2ed3",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+      "sourceAnchor": "purpose",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Purpose",
+        "anchor": "purpose",
+        "githubAnchor": "purpose",
+        "stableAnchor": "h-2f4fe421d538",
+        "startLine": 15,
+        "endLine": 15,
+        "textDigest": "223a81e591cd70cf4ff13dbbab0f2c60c71f512fbc35c8bbcd4564853d089024",
+        "sample": "Purpose",
+        "sectionPayloadDigest": "51ec0637fabfb84d01a41bd937a4ebb55845618f16b0f0330ef610fb9b93d451",
+        "followingBlockDigest": "09c8331014a8c087f0aea468f1aa00a8b993f995ab1d62de18323e208792328d",
+        "identityFingerprint": "caad3354aab791d5eec038768b4f3541bb92e414141ac77beaf2f0cea800c102",
+        "ancestry": [
+          "F01 — Answer a parked question, end to end"
+        ],
+        "text": "## Purpose",
+        "sectionText": "## Purpose\n\nThe flow the whole cluster exists for: a person picks up their phone, finds\nout something needs them, and answers it — without opening a terminal.\n\nMeasured against the real acceptance criterion (*a person with no context\nin their head can answer quickly*), this flow is where that is either true\nor false. It is five taps from cold to answered, and only one of them\nrequires reading."
+      },
+      "sourceShownText": "## Purpose\n\nThe flow the whole cluster exists for: a person picks up their phone, finds\nout something needs them, and answers it — without opening a terminal.\n\nMeasured against the real acceptance criterion (*a person with no context\nin their head can answer quickly*), this flow is where that is either true\nor false. It is five taps from cold to answered, and only one of them\nrequires reading.",
+      "sourceDigest": "223a81e591cd70cf4ff13dbbab0f2c60c71f512fbc35c8bbcd4564853d089024",
+      "targetPath": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+      "targetAnchor": "purpose",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Purpose",
+        "anchor": "purpose",
+        "githubAnchor": "purpose",
+        "stableAnchor": "h-15cea22a442e",
+        "startLine": 37,
+        "endLine": 37,
+        "textDigest": "223a81e591cd70cf4ff13dbbab0f2c60c71f512fbc35c8bbcd4564853d089024",
+        "sample": "Purpose",
+        "sectionPayloadDigest": "51ec0637fabfb84d01a41bd937a4ebb55845618f16b0f0330ef610fb9b93d451",
+        "followingBlockDigest": "09c8331014a8c087f0aea468f1aa00a8b993f995ab1d62de18323e208792328d",
+        "identityFingerprint": "caad3354aab791d5eec038768b4f3541bb92e414141ac77beaf2f0cea800c102",
+        "ancestry": [
+          "F01 — Answer a parked question, end to end"
+        ],
+        "text": "## Purpose",
+        "sectionText": "## Purpose\n\nThe flow the whole cluster exists for: a person picks up their phone, finds\nout something needs them, and answers it — without opening a terminal.\n\nMeasured against the real acceptance criterion (*a person with no context\nin their head can answer quickly*), this flow is where that is either true\nor false. It is five taps from cold to answered, and only one of them\nrequires reading."
+      },
+      "targetShownText": "## Purpose\n\nThe flow the whole cluster exists for: a person picks up their phone, finds\nout something needs them, and answers it — without opening a terminal.\n\nMeasured against the real acceptance criterion (*a person with no context\nin their head can answer quickly*), this flow is where that is either true\nor false. It is five taps from cold to answered, and only one of them\nrequires reading.",
+      "targetDigest": "223a81e591cd70cf4ff13dbbab0f2c60c71f512fbc35c8bbcd4564853d089024",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_80ff4624d518db7befbdccfcd92a2ed3",
+        "sourceUnitDigest": "223a81e591cd70cf4ff13dbbab0f2c60c71f512fbc35c8bbcd4564853d089024",
+        "targetOwner": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+        "targetAnchor": "purpose",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/ui-spec/flows/F01-answer-a-parked-question.md#purpose (source lines 15-15) is carried at docs/platform/ui-spec/operations/F01-answer-a-parked-question.md#purpose (candidate lines 37-37). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/flows/F01-answer-a-parked-question.md verbatim in docs/platform/ui-spec/operations/F01-answer-a-parked-question.md. Map kind guide-runbook is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "223a81e591cd70cf4ff13dbbab0f2c60c71f512fbc35c8bbcd4564853d089024",
+        "targetAncestry": [
+          "F01 — Answer a parked question, end to end"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_4fca4420a5f2baea4c37309fdc4f7555",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+      "sourceAnchor": "unheaded-block-2",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-2",
+        "githubAnchor": "unheaded-block-2",
+        "stableAnchor": "unheaded-block-2",
+        "title": "Unheaded block 2",
+        "startLine": 17,
+        "endLine": 18,
+        "textDigest": "09c8331014a8c087f0aea468f1aa00a8b993f995ab1d62de18323e208792328d",
+        "sample": "The flow the whole cluster exists for: a person picks up their phone, finds\nout something needs them, and answers it — without opening a terminal.",
+        "identityFingerprint": "091da81222b8f9cba94ff1eea33a0198195829e39c81922d450b2fa332efceed",
+        "ancestry": [
+          "F01 — Answer a parked question, end to end",
+          "Purpose"
+        ],
+        "text": "The flow the whole cluster exists for: a person picks up their phone, finds\nout something needs them, and answers it — without opening a terminal."
+      },
+      "sourceShownText": "The flow the whole cluster exists for: a person picks up their phone, finds\nout something needs them, and answers it — without opening a terminal.",
+      "sourceDigest": "09c8331014a8c087f0aea468f1aa00a8b993f995ab1d62de18323e208792328d",
+      "targetPath": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+      "targetAnchor": "unheaded-block-4",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 39,
+        "endLine": 40,
+        "textDigest": "09c8331014a8c087f0aea468f1aa00a8b993f995ab1d62de18323e208792328d",
+        "sample": "The flow the whole cluster exists for: a person picks up their phone, finds\nout something needs them, and answers it — without opening a terminal.",
+        "identityFingerprint": "091da81222b8f9cba94ff1eea33a0198195829e39c81922d450b2fa332efceed",
+        "ancestry": [
+          "F01 — Answer a parked question, end to end",
+          "Purpose"
+        ],
+        "text": "The flow the whole cluster exists for: a person picks up their phone, finds\nout something needs them, and answers it — without opening a terminal."
+      },
+      "targetShownText": "The flow the whole cluster exists for: a person picks up their phone, finds\nout something needs them, and answers it — without opening a terminal.",
+      "targetDigest": "09c8331014a8c087f0aea468f1aa00a8b993f995ab1d62de18323e208792328d",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_4fca4420a5f2baea4c37309fdc4f7555",
+        "sourceUnitDigest": "09c8331014a8c087f0aea468f1aa00a8b993f995ab1d62de18323e208792328d",
+        "targetOwner": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+        "targetAnchor": "unheaded-block-4",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/flows/F01-answer-a-parked-question.md#unheaded-block-2 (source lines 17-18) is carried at docs/platform/ui-spec/operations/F01-answer-a-parked-question.md#unheaded-block-4 (candidate lines 39-40). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/flows/F01-answer-a-parked-question.md verbatim in docs/platform/ui-spec/operations/F01-answer-a-parked-question.md. Map kind guide-runbook is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "09c8331014a8c087f0aea468f1aa00a8b993f995ab1d62de18323e208792328d",
+        "targetAncestry": [
+          "F01 — Answer a parked question, end to end",
+          "Purpose"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_d17fc43b1d58c9992a60d5605b155e37",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+      "sourceAnchor": "unheaded-block-3",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 20,
+        "endLine": 23,
+        "textDigest": "09fa989ef2e7c36e36a09ac4b51d4066dbc9ed6069a3b04246606aad55053491",
+        "sample": "Measured against the real acceptance criterion (*a person with no context\nin their head can answer quickly*), this flow is where that is either true\nor false. It is five taps from ",
+        "identityFingerprint": "714622f73444f2fad1f85f97b6d4130f57da1cb466f1561c726baf040902f799",
+        "ancestry": [
+          "F01 — Answer a parked question, end to end",
+          "Purpose"
+        ],
+        "text": "Measured against the real acceptance criterion (*a person with no context\nin their head can answer quickly*), this flow is where that is either true\nor false. It is five taps from cold to answered, and only one of them\nrequires reading."
+      },
+      "sourceShownText": "Measured against the real acceptance criterion (*a person with no context\nin their head can answer quickly*), this flow is where that is either true\nor false. It is five taps from cold to answered, and only one of them\nrequires reading.",
+      "sourceDigest": "09fa989ef2e7c36e36a09ac4b51d4066dbc9ed6069a3b04246606aad55053491",
+      "targetPath": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+      "targetAnchor": "unheaded-block-5",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 42,
+        "endLine": 45,
+        "textDigest": "09fa989ef2e7c36e36a09ac4b51d4066dbc9ed6069a3b04246606aad55053491",
+        "sample": "Measured against the real acceptance criterion (*a person with no context\nin their head can answer quickly*), this flow is where that is either true\nor false. It is five taps from ",
+        "identityFingerprint": "714622f73444f2fad1f85f97b6d4130f57da1cb466f1561c726baf040902f799",
+        "ancestry": [
+          "F01 — Answer a parked question, end to end",
+          "Purpose"
+        ],
+        "text": "Measured against the real acceptance criterion (*a person with no context\nin their head can answer quickly*), this flow is where that is either true\nor false. It is five taps from cold to answered, and only one of them\nrequires reading."
+      },
+      "targetShownText": "Measured against the real acceptance criterion (*a person with no context\nin their head can answer quickly*), this flow is where that is either true\nor false. It is five taps from cold to answered, and only one of them\nrequires reading.",
+      "targetDigest": "09fa989ef2e7c36e36a09ac4b51d4066dbc9ed6069a3b04246606aad55053491",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_d17fc43b1d58c9992a60d5605b155e37",
+        "sourceUnitDigest": "09fa989ef2e7c36e36a09ac4b51d4066dbc9ed6069a3b04246606aad55053491",
+        "targetOwner": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+        "targetAnchor": "unheaded-block-5",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/flows/F01-answer-a-parked-question.md#unheaded-block-3 (source lines 20-23) is carried at docs/platform/ui-spec/operations/F01-answer-a-parked-question.md#unheaded-block-5 (candidate lines 42-45). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/flows/F01-answer-a-parked-question.md verbatim in docs/platform/ui-spec/operations/F01-answer-a-parked-question.md. Map kind guide-runbook is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "09fa989ef2e7c36e36a09ac4b51d4066dbc9ed6069a3b04246606aad55053491",
+        "targetAncestry": [
+          "F01 — Answer a parked question, end to end",
+          "Purpose"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_4ddde2c3d97535b424143c3847753bab",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+      "sourceAnchor": "steps",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Steps",
+        "anchor": "steps",
+        "githubAnchor": "steps",
+        "stableAnchor": "h-157624a4ae7e",
+        "startLine": 25,
+        "endLine": 25,
+        "textDigest": "5852d441d24adcc3831e02a5b4d4a2e463fcd1e593aba8dc9b7c184140386e7a",
+        "sample": "Steps",
+        "sectionPayloadDigest": "999b24a2dff4d2d168348cafbfd961f1c3c9bfec878507ad95ec2e8493e45775",
+        "followingBlockDigest": "999b24a2dff4d2d168348cafbfd961f1c3c9bfec878507ad95ec2e8493e45775",
+        "identityFingerprint": "c7adbfa119ef103225a62451bc1469eebbe3f90cab1815a059a3495c8b33412b",
+        "ancestry": [
+          "F01 — Answer a parked question, end to end"
+        ],
+        "text": "## Steps",
+        "sectionText": "## Steps\n\n1. **Sign in** (S01) — one field. On a phone, usually already a live\n   session, so this step is skipped in practice.\n2. **Land on the taskboard** (S02) — `NEEDS ANSWER` is the first group on\n   mobile and the pinned rail on desktop. The count answers \"is there\n   anything for me\" before anything is read.\n3. **Open the question** — either straight from the rail, or via the\n   questions list (S04) when there is more than one to triage. S04's rows\n   carry the question text itself, so triage happens without opening.\n4. **Read** (S03) — question, then why it is being asked (including what\n   was already tried), then the item. This is the only step that takes\n   real attention, and the region order is what makes it short.\n5. **Answer** (M01) — the question and its \"why\" are repeated inside the\n   modal, so nothing has to be dismissed to re-read. Submit runs\n   `fgos answer` through the gateway.\n6. **Confirmation** — the item resumes, `question.answered` arrives, the\n   row leaves S04 and the open round on S03's timeline closes."
+      },
+      "sourceShownText": "## Steps\n\n1. **Sign in** (S01) — one field. On a phone, usually already a live\n   session, so this step is skipped in practice.\n2. **Land on the taskboard** (S02) — `NEEDS ANSWER` is the first group on\n   mobile and the pinned rail on desktop. The count answers \"is there\n   anything for me\" before anything is read.\n3. **Open the question** — either straight from the rail, or via the\n   questions list (S04) when there is more than one to triage. S04's rows\n   carry the question text itself, so triage happens without opening.\n4. **Read** (S03) — question, then why it is being asked (including what\n   was already tried), then the item. This is the only step that takes\n   real attention, and the region order is what makes it short.\n5. **Answer** (M01) — the question and its \"why\" are repeated inside the\n   modal, so nothing has to be dismissed to re-read. Submit runs\n   `fgos answer` through the gateway.\n6. **Confirmation** — the item resumes, `question.answered` arrives, the\n   row leaves S04 and the open round on S03's timeline closes.",
+      "sourceDigest": "5852d441d24adcc3831e02a5b4d4a2e463fcd1e593aba8dc9b7c184140386e7a",
+      "targetPath": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+      "targetAnchor": "steps",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Steps",
+        "anchor": "steps",
+        "githubAnchor": "steps",
+        "stableAnchor": "h-32c9de5c3c65",
+        "startLine": 47,
+        "endLine": 47,
+        "textDigest": "5852d441d24adcc3831e02a5b4d4a2e463fcd1e593aba8dc9b7c184140386e7a",
+        "sample": "Steps",
+        "sectionPayloadDigest": "999b24a2dff4d2d168348cafbfd961f1c3c9bfec878507ad95ec2e8493e45775",
+        "followingBlockDigest": "999b24a2dff4d2d168348cafbfd961f1c3c9bfec878507ad95ec2e8493e45775",
+        "identityFingerprint": "c7adbfa119ef103225a62451bc1469eebbe3f90cab1815a059a3495c8b33412b",
+        "ancestry": [
+          "F01 — Answer a parked question, end to end"
+        ],
+        "text": "## Steps",
+        "sectionText": "## Steps\n\n1. **Sign in** (S01) — one field. On a phone, usually already a live\n   session, so this step is skipped in practice.\n2. **Land on the taskboard** (S02) — `NEEDS ANSWER` is the first group on\n   mobile and the pinned rail on desktop. The count answers \"is there\n   anything for me\" before anything is read.\n3. **Open the question** — either straight from the rail, or via the\n   questions list (S04) when there is more than one to triage. S04's rows\n   carry the question text itself, so triage happens without opening.\n4. **Read** (S03) — question, then why it is being asked (including what\n   was already tried), then the item. This is the only step that takes\n   real attention, and the region order is what makes it short.\n5. **Answer** (M01) — the question and its \"why\" are repeated inside the\n   modal, so nothing has to be dismissed to re-read. Submit runs\n   `fgos answer` through the gateway.\n6. **Confirmation** — the item resumes, `question.answered` arrives, the\n   row leaves S04 and the open round on S03's timeline closes."
+      },
+      "targetShownText": "## Steps\n\n1. **Sign in** (S01) — one field. On a phone, usually already a live\n   session, so this step is skipped in practice.\n2. **Land on the taskboard** (S02) — `NEEDS ANSWER` is the first group on\n   mobile and the pinned rail on desktop. The count answers \"is there\n   anything for me\" before anything is read.\n3. **Open the question** — either straight from the rail, or via the\n   questions list (S04) when there is more than one to triage. S04's rows\n   carry the question text itself, so triage happens without opening.\n4. **Read** (S03) — question, then why it is being asked (including what\n   was already tried), then the item. This is the only step that takes\n   real attention, and the region order is what makes it short.\n5. **Answer** (M01) — the question and its \"why\" are repeated inside the\n   modal, so nothing has to be dismissed to re-read. Submit runs\n   `fgos answer` through the gateway.\n6. **Confirmation** — the item resumes, `question.answered` arrives, the\n   row leaves S04 and the open round on S03's timeline closes.",
+      "targetDigest": "5852d441d24adcc3831e02a5b4d4a2e463fcd1e593aba8dc9b7c184140386e7a",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_4ddde2c3d97535b424143c3847753bab",
+        "sourceUnitDigest": "5852d441d24adcc3831e02a5b4d4a2e463fcd1e593aba8dc9b7c184140386e7a",
+        "targetOwner": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+        "targetAnchor": "steps",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/ui-spec/flows/F01-answer-a-parked-question.md#steps (source lines 25-25) is carried at docs/platform/ui-spec/operations/F01-answer-a-parked-question.md#steps (candidate lines 47-47). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/flows/F01-answer-a-parked-question.md verbatim in docs/platform/ui-spec/operations/F01-answer-a-parked-question.md. Map kind guide-runbook is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "5852d441d24adcc3831e02a5b4d4a2e463fcd1e593aba8dc9b7c184140386e7a",
+        "targetAncestry": [
+          "F01 — Answer a parked question, end to end"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_028c68be7bd8559c92b54d6a11eca48a",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+      "sourceAnchor": "unheaded-block-4",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 27,
+        "endLine": 42,
+        "textDigest": "999b24a2dff4d2d168348cafbfd961f1c3c9bfec878507ad95ec2e8493e45775",
+        "sample": "1. **Sign in** (S01) — one field. On a phone, usually already a live\n   session, so this step is skipped in practice.\n2. **Land on the taskboard** (S02) — `NEEDS ANSWER` is the fir",
+        "identityFingerprint": "73523879abeb278ded455047308b6fec1c3ef48cc3a620a1e66d337cfc1ac31a",
+        "ancestry": [
+          "F01 — Answer a parked question, end to end",
+          "Steps"
+        ],
+        "text": "1. **Sign in** (S01) — one field. On a phone, usually already a live\n   session, so this step is skipped in practice.\n2. **Land on the taskboard** (S02) — `NEEDS ANSWER` is the first group on\n   mobile and the pinned rail on desktop. The count answers \"is there\n   anything for me\" before anything is read.\n3. **Open the question** — either straight from the rail, or via the\n   questions list (S04) when there is more than one to triage. S04's rows\n   carry the question text itself, so triage happens without opening.\n4. **Read** (S03) — question, then why it is being asked (including what\n   was already tried), then the item. This is the only step that takes\n   real attention, and the region order is what makes it short.\n5. **Answer** (M01) — the question and its \"why\" are repeated inside the\n   modal, so nothing has to be dismissed to re-read. Submit runs\n   `fgos answer` through the gateway.\n6. **Confirmation** — the item resumes, `question.answered` arrives, the\n   row leaves S04 and the open round on S03's timeline closes."
+      },
+      "sourceShownText": "1. **Sign in** (S01) — one field. On a phone, usually already a live\n   session, so this step is skipped in practice.\n2. **Land on the taskboard** (S02) — `NEEDS ANSWER` is the first group on\n   mobile and the pinned rail on desktop. The count answers \"is there\n   anything for me\" before anything is read.\n3. **Open the question** — either straight from the rail, or via the\n   questions list (S04) when there is more than one to triage. S04's rows\n   carry the question text itself, so triage happens without opening.\n4. **Read** (S03) — question, then why it is being asked (including what\n   was already tried), then the item. This is the only step that takes\n   real attention, and the region order is what makes it short.\n5. **Answer** (M01) — the question and its \"why\" are repeated inside the\n   modal, so nothing has to be dismissed to re-read. Submit runs\n   `fgos answer` through the gateway.\n6. **Confirmation** — the item resumes, `question.answered` arrives, the\n   row leaves S04 and the open round on S03's timeline closes.",
+      "sourceDigest": "999b24a2dff4d2d168348cafbfd961f1c3c9bfec878507ad95ec2e8493e45775",
+      "targetPath": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+      "targetAnchor": "unheaded-block-6",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 49,
+        "endLine": 64,
+        "textDigest": "999b24a2dff4d2d168348cafbfd961f1c3c9bfec878507ad95ec2e8493e45775",
+        "sample": "1. **Sign in** (S01) — one field. On a phone, usually already a live\n   session, so this step is skipped in practice.\n2. **Land on the taskboard** (S02) — `NEEDS ANSWER` is the fir",
+        "identityFingerprint": "73523879abeb278ded455047308b6fec1c3ef48cc3a620a1e66d337cfc1ac31a",
+        "ancestry": [
+          "F01 — Answer a parked question, end to end",
+          "Steps"
+        ],
+        "text": "1. **Sign in** (S01) — one field. On a phone, usually already a live\n   session, so this step is skipped in practice.\n2. **Land on the taskboard** (S02) — `NEEDS ANSWER` is the first group on\n   mobile and the pinned rail on desktop. The count answers \"is there\n   anything for me\" before anything is read.\n3. **Open the question** — either straight from the rail, or via the\n   questions list (S04) when there is more than one to triage. S04's rows\n   carry the question text itself, so triage happens without opening.\n4. **Read** (S03) — question, then why it is being asked (including what\n   was already tried), then the item. This is the only step that takes\n   real attention, and the region order is what makes it short.\n5. **Answer** (M01) — the question and its \"why\" are repeated inside the\n   modal, so nothing has to be dismissed to re-read. Submit runs\n   `fgos answer` through the gateway.\n6. **Confirmation** — the item resumes, `question.answered` arrives, the\n   row leaves S04 and the open round on S03's timeline closes."
+      },
+      "targetShownText": "1. **Sign in** (S01) — one field. On a phone, usually already a live\n   session, so this step is skipped in practice.\n2. **Land on the taskboard** (S02) — `NEEDS ANSWER` is the first group on\n   mobile and the pinned rail on desktop. The count answers \"is there\n   anything for me\" before anything is read.\n3. **Open the question** — either straight from the rail, or via the\n   questions list (S04) when there is more than one to triage. S04's rows\n   carry the question text itself, so triage happens without opening.\n4. **Read** (S03) — question, then why it is being asked (including what\n   was already tried), then the item. This is the only step that takes\n   real attention, and the region order is what makes it short.\n5. **Answer** (M01) — the question and its \"why\" are repeated inside the\n   modal, so nothing has to be dismissed to re-read. Submit runs\n   `fgos answer` through the gateway.\n6. **Confirmation** — the item resumes, `question.answered` arrives, the\n   row leaves S04 and the open round on S03's timeline closes.",
+      "targetDigest": "999b24a2dff4d2d168348cafbfd961f1c3c9bfec878507ad95ec2e8493e45775",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_028c68be7bd8559c92b54d6a11eca48a",
+        "sourceUnitDigest": "999b24a2dff4d2d168348cafbfd961f1c3c9bfec878507ad95ec2e8493e45775",
+        "targetOwner": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+        "targetAnchor": "unheaded-block-6",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/flows/F01-answer-a-parked-question.md#unheaded-block-4 (source lines 27-42) is carried at docs/platform/ui-spec/operations/F01-answer-a-parked-question.md#unheaded-block-6 (candidate lines 49-64). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/flows/F01-answer-a-parked-question.md verbatim in docs/platform/ui-spec/operations/F01-answer-a-parked-question.md. Map kind guide-runbook is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "999b24a2dff4d2d168348cafbfd961f1c3c9bfec878507ad95ec2e8493e45775",
+        "targetAncestry": [
+          "F01 — Answer a parked question, end to end",
+          "Steps"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_2e79d3dd87585da273910fa943bdccf7",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+      "sourceAnchor": "branches",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Branches",
+        "anchor": "branches",
+        "githubAnchor": "branches",
+        "stableAnchor": "h-265fbf153a3e",
+        "startLine": 44,
+        "endLine": 44,
+        "textDigest": "a9b491ffd9b9d866fb204799d5571f20b5818f322f6422d4ab4231b0b6608fbf",
+        "sample": "Branches",
+        "sectionPayloadDigest": "a8b72236cad5ffdf52f53d4b8ada5d4295e2b2d7583980a5efffe10877d3d525",
+        "followingBlockDigest": "ac90701211328c0b7c9f37b1e2371c4e8ff39077d29e411b2b03155c0f6c613d",
+        "identityFingerprint": "c57446e3ed94787b08aeab01ad6fec9918d0f83eef0c373683206e401a4c5763",
+        "ancestry": [
+          "F01 — Answer a parked question, end to end"
+        ],
+        "text": "## Branches",
+        "sectionText": "## Branches\n\n- **The item is no longer parked** when the answer is submitted (someone\n  answered from a terminal first): fgOS refuses the write, and\n  ERR-WRITE-REFUSED shows the engine's own words with the typed answer\n  preserved.\n- **The gateway is unreachable** mid-flow: ST-DISCONNECTED marks content\n  stale and disables the write controls, rather than accepting an answer\n  it cannot deliver.\n\n```yaml herdrweb-contract\nflow:\n  goal: \"Answer a question that is blocking a work item, from a phone, without a terminal\"\n  preconditions:\n    - \"at least one item is parked awaiting a person\"\n    - \"the client has a reachable gateway\"\n  steps:\n    - A-S01-002\n    - A-S02-006\n    - A-S04-001\n    - A-M01-001\n    - A-M01-002\n  branches:\n    - when: \"triage several questions before answering\"\n      action: A-S04-002\n    - when: \"answer directly from the item's own detail screen\"\n      action: A-S03-001\n    - when: \"gateway drops mid-flow\"\n      action: A-S04-006\n```"
+      },
+      "sourceShownText": "## Branches\n\n- **The item is no longer parked** when the answer is submitted (someone\n  answered from a terminal first): fgOS refuses the write, and\n  ERR-WRITE-REFUSED shows the engine's own words with the typed answer\n  preserved.\n- **The gateway is unreachable** mid-flow: ST-DISCONNECTED marks content\n  stale and disables the write controls, rather than accepting an answer\n  it cannot deliver.\n\n```yaml herdrweb-contract\nflow:\n  goal: \"Answer a question that is blocking a work item, from a phone, without a terminal\"\n  preconditions:\n    - \"at least one item is parked awaiting a person\"\n    - \"the client has a reachable gateway\"\n  steps:\n    - A-S01-002\n    - A-S02-006\n    - A-S04-001\n    - A-M01-001\n    - A-M01-002\n  branches:\n    - when: \"triage several questions before answering\"\n      action: A-S04-002\n    - when: \"answer directly from the item's own detail screen\"\n      action: A-S03-001\n    - when: \"gateway drops mid-flow\"\n      action: A-S04-006\n```",
+      "sourceDigest": "a9b491ffd9b9d866fb204799d5571f20b5818f322f6422d4ab4231b0b6608fbf",
+      "targetPath": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+      "targetAnchor": "branches",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Branches",
+        "anchor": "branches",
+        "githubAnchor": "branches",
+        "stableAnchor": "h-953cf31f7dee",
+        "startLine": 66,
+        "endLine": 66,
+        "textDigest": "a9b491ffd9b9d866fb204799d5571f20b5818f322f6422d4ab4231b0b6608fbf",
+        "sample": "Branches",
+        "sectionPayloadDigest": "a8b72236cad5ffdf52f53d4b8ada5d4295e2b2d7583980a5efffe10877d3d525",
+        "followingBlockDigest": "ac90701211328c0b7c9f37b1e2371c4e8ff39077d29e411b2b03155c0f6c613d",
+        "identityFingerprint": "c57446e3ed94787b08aeab01ad6fec9918d0f83eef0c373683206e401a4c5763",
+        "ancestry": [
+          "F01 — Answer a parked question, end to end"
+        ],
+        "text": "## Branches",
+        "sectionText": "## Branches\n\n- **The item is no longer parked** when the answer is submitted (someone\n  answered from a terminal first): fgOS refuses the write, and\n  ERR-WRITE-REFUSED shows the engine's own words with the typed answer\n  preserved.\n- **The gateway is unreachable** mid-flow: ST-DISCONNECTED marks content\n  stale and disables the write controls, rather than accepting an answer\n  it cannot deliver.\n\n```yaml herdrweb-contract\nflow:\n  goal: \"Answer a question that is blocking a work item, from a phone, without a terminal\"\n  preconditions:\n    - \"at least one item is parked awaiting a person\"\n    - \"the client has a reachable gateway\"\n  steps:\n    - A-S01-002\n    - A-S02-006\n    - A-S04-001\n    - A-M01-001\n    - A-M01-002\n  branches:\n    - when: \"triage several questions before answering\"\n      action: A-S04-002\n    - when: \"answer directly from the item's own detail screen\"\n      action: A-S03-001\n    - when: \"gateway drops mid-flow\"\n      action: A-S04-006\n```"
+      },
+      "targetShownText": "## Branches\n\n- **The item is no longer parked** when the answer is submitted (someone\n  answered from a terminal first): fgOS refuses the write, and\n  ERR-WRITE-REFUSED shows the engine's own words with the typed answer\n  preserved.\n- **The gateway is unreachable** mid-flow: ST-DISCONNECTED marks content\n  stale and disables the write controls, rather than accepting an answer\n  it cannot deliver.\n\n```yaml herdrweb-contract\nflow:\n  goal: \"Answer a question that is blocking a work item, from a phone, without a terminal\"\n  preconditions:\n    - \"at least one item is parked awaiting a person\"\n    - \"the client has a reachable gateway\"\n  steps:\n    - A-S01-002\n    - A-S02-006\n    - A-S04-001\n    - A-M01-001\n    - A-M01-002\n  branches:\n    - when: \"triage several questions before answering\"\n      action: A-S04-002\n    - when: \"answer directly from the item's own detail screen\"\n      action: A-S03-001\n    - when: \"gateway drops mid-flow\"\n      action: A-S04-006\n```",
+      "targetDigest": "a9b491ffd9b9d866fb204799d5571f20b5818f322f6422d4ab4231b0b6608fbf",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_2e79d3dd87585da273910fa943bdccf7",
+        "sourceUnitDigest": "a9b491ffd9b9d866fb204799d5571f20b5818f322f6422d4ab4231b0b6608fbf",
+        "targetOwner": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+        "targetAnchor": "branches",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/ui-spec/flows/F01-answer-a-parked-question.md#branches (source lines 44-44) is carried at docs/platform/ui-spec/operations/F01-answer-a-parked-question.md#branches (candidate lines 66-66). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/flows/F01-answer-a-parked-question.md verbatim in docs/platform/ui-spec/operations/F01-answer-a-parked-question.md. Map kind guide-runbook is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "a9b491ffd9b9d866fb204799d5571f20b5818f322f6422d4ab4231b0b6608fbf",
+        "targetAncestry": [
+          "F01 — Answer a parked question, end to end"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_91a51cee06251cc0d253768eb037c821",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+      "sourceAnchor": "unheaded-block-5",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 46,
+        "endLine": 52,
+        "textDigest": "ac90701211328c0b7c9f37b1e2371c4e8ff39077d29e411b2b03155c0f6c613d",
+        "sample": "- **The item is no longer parked** when the answer is submitted (someone\n  answered from a terminal first): fgOS refuses the write, and\n  ERR-WRITE-REFUSED shows the engine's own w",
+        "identityFingerprint": "899181372135fb852d835c661d9b5392fe3a58b9a9e7437a7ba86a087cece704",
+        "ancestry": [
+          "F01 — Answer a parked question, end to end",
+          "Branches"
+        ],
+        "text": "- **The item is no longer parked** when the answer is submitted (someone\n  answered from a terminal first): fgOS refuses the write, and\n  ERR-WRITE-REFUSED shows the engine's own words with the typed answer\n  preserved.\n- **The gateway is unreachable** mid-flow: ST-DISCONNECTED marks content\n  stale and disables the write controls, rather than accepting an answer\n  it cannot deliver."
+      },
+      "sourceShownText": "- **The item is no longer parked** when the answer is submitted (someone\n  answered from a terminal first): fgOS refuses the write, and\n  ERR-WRITE-REFUSED shows the engine's own words with the typed answer\n  preserved.\n- **The gateway is unreachable** mid-flow: ST-DISCONNECTED marks content\n  stale and disables the write controls, rather than accepting an answer\n  it cannot deliver.",
+      "sourceDigest": "ac90701211328c0b7c9f37b1e2371c4e8ff39077d29e411b2b03155c0f6c613d",
+      "targetPath": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+      "targetAnchor": "unheaded-block-7",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 68,
+        "endLine": 74,
+        "textDigest": "ac90701211328c0b7c9f37b1e2371c4e8ff39077d29e411b2b03155c0f6c613d",
+        "sample": "- **The item is no longer parked** when the answer is submitted (someone\n  answered from a terminal first): fgOS refuses the write, and\n  ERR-WRITE-REFUSED shows the engine's own w",
+        "identityFingerprint": "899181372135fb852d835c661d9b5392fe3a58b9a9e7437a7ba86a087cece704",
+        "ancestry": [
+          "F01 — Answer a parked question, end to end",
+          "Branches"
+        ],
+        "text": "- **The item is no longer parked** when the answer is submitted (someone\n  answered from a terminal first): fgOS refuses the write, and\n  ERR-WRITE-REFUSED shows the engine's own words with the typed answer\n  preserved.\n- **The gateway is unreachable** mid-flow: ST-DISCONNECTED marks content\n  stale and disables the write controls, rather than accepting an answer\n  it cannot deliver."
+      },
+      "targetShownText": "- **The item is no longer parked** when the answer is submitted (someone\n  answered from a terminal first): fgOS refuses the write, and\n  ERR-WRITE-REFUSED shows the engine's own words with the typed answer\n  preserved.\n- **The gateway is unreachable** mid-flow: ST-DISCONNECTED marks content\n  stale and disables the write controls, rather than accepting an answer\n  it cannot deliver.",
+      "targetDigest": "ac90701211328c0b7c9f37b1e2371c4e8ff39077d29e411b2b03155c0f6c613d",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_91a51cee06251cc0d253768eb037c821",
+        "sourceUnitDigest": "ac90701211328c0b7c9f37b1e2371c4e8ff39077d29e411b2b03155c0f6c613d",
+        "targetOwner": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+        "targetAnchor": "unheaded-block-7",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/flows/F01-answer-a-parked-question.md#unheaded-block-5 (source lines 46-52) is carried at docs/platform/ui-spec/operations/F01-answer-a-parked-question.md#unheaded-block-7 (candidate lines 68-74). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/flows/F01-answer-a-parked-question.md verbatim in docs/platform/ui-spec/operations/F01-answer-a-parked-question.md. Map kind guide-runbook is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "ac90701211328c0b7c9f37b1e2371c4e8ff39077d29e411b2b03155c0f6c613d",
+        "targetAncestry": [
+          "F01 — Answer a parked question, end to end",
+          "Branches"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_fc71787af183cc17ea2100bcecb32b58",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+      "sourceAnchor": "unheaded-block-6",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 54,
+        "endLine": 73,
+        "textDigest": "b7b08196e6a7323347802d2b1dcaee20799136977e5601548532afff12321643",
+        "sample": "```yaml herdrweb-contract\nflow:\n  goal: \"Answer a question that is blocking a work item, from a phone, without a terminal\"\n  preconditions:\n    - \"at least one item is parked await",
+        "identityFingerprint": "b72e8479546a67d6985d48edc1355f1f7659642740456a7d605ad860c71ef46c",
+        "ancestry": [
+          "F01 — Answer a parked question, end to end",
+          "Branches"
+        ],
+        "text": "```yaml herdrweb-contract\nflow:\n  goal: \"Answer a question that is blocking a work item, from a phone, without a terminal\"\n  preconditions:\n    - \"at least one item is parked awaiting a person\"\n    - \"the client has a reachable gateway\"\n  steps:\n    - A-S01-002\n    - A-S02-006\n    - A-S04-001\n    - A-M01-001\n    - A-M01-002\n  branches:\n    - when: \"triage several questions before answering\"\n      action: A-S04-002\n    - when: \"answer directly from the item's own detail screen\"\n      action: A-S03-001\n    - when: \"gateway drops mid-flow\"\n      action: A-S04-006\n```"
+      },
+      "sourceShownText": "```yaml herdrweb-contract\nflow:\n  goal: \"Answer a question that is blocking a work item, from a phone, without a terminal\"\n  preconditions:\n    - \"at least one item is parked awaiting a person\"\n    - \"the client has a reachable gateway\"\n  steps:\n    - A-S01-002\n    - A-S02-006\n    - A-S04-001\n    - A-M01-001\n    - A-M01-002\n  branches:\n    - when: \"triage several questions before answering\"\n      action: A-S04-002\n    - when: \"answer directly from the item's own detail screen\"\n      action: A-S03-001\n    - when: \"gateway drops mid-flow\"\n      action: A-S04-006\n```",
+      "sourceDigest": "b7b08196e6a7323347802d2b1dcaee20799136977e5601548532afff12321643",
+      "targetPath": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+      "targetAnchor": "unheaded-block-8",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-8",
+        "githubAnchor": "unheaded-block-8",
+        "stableAnchor": "unheaded-block-8",
+        "title": "Unheaded block 8",
+        "startLine": 76,
+        "endLine": 95,
+        "textDigest": "b7b08196e6a7323347802d2b1dcaee20799136977e5601548532afff12321643",
+        "sample": "```yaml herdrweb-contract\nflow:\n  goal: \"Answer a question that is blocking a work item, from a phone, without a terminal\"\n  preconditions:\n    - \"at least one item is parked await",
+        "identityFingerprint": "b72e8479546a67d6985d48edc1355f1f7659642740456a7d605ad860c71ef46c",
+        "ancestry": [
+          "F01 — Answer a parked question, end to end",
+          "Branches"
+        ],
+        "text": "```yaml herdrweb-contract\nflow:\n  goal: \"Answer a question that is blocking a work item, from a phone, without a terminal\"\n  preconditions:\n    - \"at least one item is parked awaiting a person\"\n    - \"the client has a reachable gateway\"\n  steps:\n    - A-S01-002\n    - A-S02-006\n    - A-S04-001\n    - A-M01-001\n    - A-M01-002\n  branches:\n    - when: \"triage several questions before answering\"\n      action: A-S04-002\n    - when: \"answer directly from the item's own detail screen\"\n      action: A-S03-001\n    - when: \"gateway drops mid-flow\"\n      action: A-S04-006\n```"
+      },
+      "targetShownText": "```yaml herdrweb-contract\nflow:\n  goal: \"Answer a question that is blocking a work item, from a phone, without a terminal\"\n  preconditions:\n    - \"at least one item is parked awaiting a person\"\n    - \"the client has a reachable gateway\"\n  steps:\n    - A-S01-002\n    - A-S02-006\n    - A-S04-001\n    - A-M01-001\n    - A-M01-002\n  branches:\n    - when: \"triage several questions before answering\"\n      action: A-S04-002\n    - when: \"answer directly from the item's own detail screen\"\n      action: A-S03-001\n    - when: \"gateway drops mid-flow\"\n      action: A-S04-006\n```",
+      "targetDigest": "b7b08196e6a7323347802d2b1dcaee20799136977e5601548532afff12321643",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_fc71787af183cc17ea2100bcecb32b58",
+        "sourceUnitDigest": "b7b08196e6a7323347802d2b1dcaee20799136977e5601548532afff12321643",
+        "targetOwner": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+        "targetAnchor": "unheaded-block-8",
+        "claimKind": "contract",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/flows/F01-answer-a-parked-question.md#unheaded-block-6 (source lines 54-73) is carried at docs/platform/ui-spec/operations/F01-answer-a-parked-question.md#unheaded-block-8 (candidate lines 76-95). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/flows/F01-answer-a-parked-question.md verbatim in docs/platform/ui-spec/operations/F01-answer-a-parked-question.md. Map kind guide-runbook is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "b7b08196e6a7323347802d2b1dcaee20799136977e5601548532afff12321643",
+        "targetAncestry": [
+          "F01 — Answer a parked question, end to end",
+          "Branches"
+        ]
+      }
+    }
+  ]
+}

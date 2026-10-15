@@ -1,0 +1,647 @@
+{
+  "version": 1,
+  "contentCommit": "1276467f37a99d19aff05808d42fafbf40341449",
+  "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json",
+  "shardSHA256": "754c1e315b8b924b70e4d1d25e8be74e8c70574e9e398dc069d2e6d64746d141",
+  "sourcePath": "docs/specs/herdr-web-dashboard.md",
+  "part": 2,
+  "parts": 2,
+  "count": 9,
+  "classes": {
+    "Unit-exact": [
+      "claim_45115f693318a55ed50c43db83c97baa",
+      "claim_878e9f5faa08a2977408f49e04af0a7a",
+      "claim_83dd4d99cd52076452282b5565b0ea22",
+      "claim_dc3d0ae980bf2501bc8eabfa0484a46d",
+      "claim_69691b25b6d84c05b566346866ec6c83"
+    ],
+    "Weak-exact": [
+      "claim_7e17ce226062d06a53b940f64b9d5cdb",
+      "claim_2aae8d6820a6ad622e47c07d29c428bf",
+      "claim_b2e9e87b9980819fad263ba9c6b02b33",
+      "claim_28bc1b3d26ce9cf45d2477c1d69d181d"
+    ],
+    "Judgment": []
+  },
+  "unequalDigestPairs": [],
+  "noTargetGeneratedRows": [],
+  "mandatoryDeep": [],
+  "reviewerSeedRequired": true,
+  "minimumSeededWeakJudgment": 4,
+  "rows": [
+    {
+      "claimId": "claim_45115f693318a55ed50c43db83c97baa",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json",
+      "shardSHA256": "754c1e315b8b924b70e4d1d25e8be74e8c70574e9e398dc069d2e6d64746d141",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/specs/herdr-web-dashboard.md",
+      "sourceAnchor": "unheaded-block-21",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-21",
+        "githubAnchor": "unheaded-block-21",
+        "stableAnchor": "unheaded-block-21",
+        "title": "Unheaded block 21",
+        "startLine": 200,
+        "endLine": 244,
+        "textDigest": "7d9e2d425937e495926bbff08bacc8e77e9781253b5c83692215e62cf6da2913",
+        "sample": "- **R1.** The surface is a client of the gateway's API, never an embedded\n  server inside the former combined binary (per fgos-interface-daemon's hexagonal-ports decision, decision",
+        "identityFingerprint": "e257325948bfdd868f51553345d74c39c472c2ce35f39b39d99dc267ff3bb44c",
+        "ancestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)",
+          "Business Rules"
+        ],
+        "text": "- **R1.** The surface is a client of the gateway's API, never an embedded\n  server inside the former combined binary (per fgos-interface-daemon's hexagonal-ports decision, decision `0014`). It is built to\n  address more than one gateway, so no single fixed origin may be baked into\n  it (per fgos-interface-daemon's per-machine-scope decision).\n- **R2.** Every write goes through an fgOS one-door-write verb — `answer`\n  (forwarding `--approve` when `approve: true`), `approve`, the intake verb, `edit`,\n  `move` (forwarding `--approve` when `approve: true`) — executed by the gateway, which\n  is the sole component that runs those verbs on a client's behalf (per fgos-interface-daemon — gateway is the sole chokepoint that ever spawns fgos verbs). The web surface never writes fgOS state directly. No second write path\n  is introduced by anything in this spec.\n- **R3.** A person may not read anything before signing in (mandatory token auth from v1). Sign-in is\n  token-based, and every failure is indistinguishable from \"nothing here\"\n  (an opaque 404, never 401). A second, alternative credential path exists in the design and, if\n  used, must verify its assertion's signature properly rather than trusting a\n  header (the two-layer additive auth design — cookie session plus an optional cf-access JWT that must be cryptographically verified, never trusted on the header alone).\n- **R4.** The token is never stored anywhere that is committed. It comes from\n  the environment when set; otherwise it is generated into a local file that\n  is excluded from version control and readable only by its owner.\n- **R5.** The surface is enabled by default (its own config toggle defaults ON, unlike other auto-launch toggles) and its default bind reaches\n  beyond loopback (binds 0.0.0.0 by default, bind address configurable), with a warning raised when the bind is not loopback.\n  Its port is 8788, chosen to coexist with the neighbouring service on 8787\n  (its config section carries a port field, defaulting to 8788).\n- **R6.** The dashboard's lifetime is independent of the cockpit's. Closing a\n  cockpit pane does not stop it (it runs as a child process outliving the cockpit pane).\n- **R7.** A merge approval can only be performed where fgOS allows it: the\n  `approve` verb structurally refuses to run from a linked worktree and\n  requires the repository's main working tree. This is a real mechanical\n  constraint on the deployment, not a UI concern — a gateway positioned\n  anywhere else cannot offer this operation at all, and the surface must\n  report that honestly rather than appearing to offer it.\n- **R8.** The combination of R5 (on by default, bind beyond loopback) and the\n  write operations above means **the first run of the cockpit exposes a\n  trunk-changing surface on the network, without anyone having chosen to**.\n  The token (R3/R4) is therefore not a hardening layer that can be traded away\n  for convenience — it is the only thing holding the surface closed. The\n  product owner decided this default having been shown this exact consequence\n  (rationale: `docs/history/herdr-web-dashboard/CONTEXT.md`'s own consequences section for the on-by-default decision), and the\n  write operations added later raise its weight rather than changing the\n  decision.\n- **R9.** Questions and answers are paired positionally, by order of\n  recording, with no linking key added to the underlying records — the record\n  shape is deliberately unchanged.\n- **R10.** The narrative written for humans is the primary account of what an\n  agent did; the machine-side decision log is secondary detail.\n- **R11.** Nothing on this surface pushes to a person. Being informed is a\n  pull: the person opens the dashboard and looks."
+      },
+      "sourceShownText": "- **R1.** The surface is a client of the gateway's API, never an embedded\n  server inside the former combined binary (per fgos-interface-daemon's hexagonal-ports decision, decision `0014`). It is built to\n  address more than one gateway, so no single fixed origin may be baked into\n  it (per fgos-interface-daemon's per-machine-scope decision).\n- **R2.** Every write goes through an fgOS one-door-write verb — `answer`\n  (forwarding `--approve` when `approve: true`), `approve`, the intake verb, `edit`,\n  `move` (forwarding `--approve` when `approve: true`) — executed by the gateway, which\n  is the sole component that runs those verbs on a client's behalf (per fgos-interface-daemon — gateway is the sole chokepoint that ever spawns fgos verbs). The web surface never writes fgOS state directly. No second write path\n  is introduced by anything in this spec.\n- **R3.** A person may not read anything before signing in (mandatory token auth from v1). Sign-in is\n  token-based, and every failure is indistinguishable from \"nothing here\"\n  (an opaque 404, never 401). A second, alternative credential path exists in the design and, if\n  used, must verify its assertion's signature properly rather than trusting a\n  header (the two-layer additive auth design — cookie session plus an optional cf-access JWT that must be cryptographically verified, never trusted on the header alone).\n- **R4.** The token is never stored anywhere that is committed. It comes from\n  the environment when set; otherwise it is generated into a local file that\n  is excluded from version control and readable only by its owner.\n- **R5.** The surface is enabled by default (its own config toggle defaults ON, unlike other auto-launch toggles) and its default bind reaches\n  beyond loopback (binds 0.0.0.0 by default, bind address configurable), with a warning raised when the bind is not loopback.\n  Its port is 8788, chosen to coexist with the neighbouring service on 8787\n  (its config section carries a port field, defaulting to 8788).\n- **R6.** The dashboard's lifetime is independent of the cockpit's. Closing a\n  cockpit pane does not stop it (it runs as a child process outliving the cockpit pane).\n- **R7.** A merge approval can only be performed where fgOS allows it: the\n  `approve` verb structurally refuses to run from a linked worktree and\n  requires the repository's main working tree. This is a real mechanical\n  constraint on the deployment, not a UI concern — a gateway positioned\n  anywhere else cannot offer this operation at all, and the surface must\n  report that honestly rather than appearing to offer it.\n- **R8.** The combination of R5 (on by default, bind beyond loopback) and the\n  write operations above means **the first run of the cockpit exposes a\n  trunk-changing surface on the network, without anyone having chosen to**.\n  The token (R3/R4) is therefore not a hardening layer that can be traded away\n  for convenience — it is the only thing holding the surface closed. The\n  product owner decided this default having been shown this exact consequence\n  (rationale: `docs/history/herdr-web-dashboard/CONTEXT.md`'s own consequences section for the on-by-default decision), and the\n  write operations added later raise its weight rather than changing the\n  decision.\n- **R9.** Questions and answers are paired positionally, by order of\n  recording, with no linking key added to the underlying records — the record\n  shape is deliberately unchanged.\n- **R10.** The narrative written for humans is the primary account of what an\n  agent did; the machine-side decision log is secondary detail.\n- **R11.** Nothing on this surface pushes to a person. Being informed is a\n  pull: the person opens the dashboard and looks.",
+      "sourceDigest": "7d9e2d425937e495926bbff08bacc8e77e9781253b5c83692215e62cf6da2913",
+      "targetPath": "docs/platform/herdr-web-dashboard/spec.md",
+      "targetAnchor": "unheaded-block-23",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-23",
+        "githubAnchor": "unheaded-block-23",
+        "stableAnchor": "unheaded-block-23",
+        "title": "Unheaded block 23",
+        "startLine": 222,
+        "endLine": 266,
+        "textDigest": "7d9e2d425937e495926bbff08bacc8e77e9781253b5c83692215e62cf6da2913",
+        "sample": "- **R1.** The surface is a client of the gateway's API, never an embedded\n  server inside the former combined binary (per fgos-interface-daemon's hexagonal-ports decision, decision",
+        "identityFingerprint": "e257325948bfdd868f51553345d74c39c472c2ce35f39b39d99dc267ff3bb44c",
+        "ancestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)",
+          "Business Rules"
+        ],
+        "text": "- **R1.** The surface is a client of the gateway's API, never an embedded\n  server inside the former combined binary (per fgos-interface-daemon's hexagonal-ports decision, decision `0014`). It is built to\n  address more than one gateway, so no single fixed origin may be baked into\n  it (per fgos-interface-daemon's per-machine-scope decision).\n- **R2.** Every write goes through an fgOS one-door-write verb — `answer`\n  (forwarding `--approve` when `approve: true`), `approve`, the intake verb, `edit`,\n  `move` (forwarding `--approve` when `approve: true`) — executed by the gateway, which\n  is the sole component that runs those verbs on a client's behalf (per fgos-interface-daemon — gateway is the sole chokepoint that ever spawns fgos verbs). The web surface never writes fgOS state directly. No second write path\n  is introduced by anything in this spec.\n- **R3.** A person may not read anything before signing in (mandatory token auth from v1). Sign-in is\n  token-based, and every failure is indistinguishable from \"nothing here\"\n  (an opaque 404, never 401). A second, alternative credential path exists in the design and, if\n  used, must verify its assertion's signature properly rather than trusting a\n  header (the two-layer additive auth design — cookie session plus an optional cf-access JWT that must be cryptographically verified, never trusted on the header alone).\n- **R4.** The token is never stored anywhere that is committed. It comes from\n  the environment when set; otherwise it is generated into a local file that\n  is excluded from version control and readable only by its owner.\n- **R5.** The surface is enabled by default (its own config toggle defaults ON, unlike other auto-launch toggles) and its default bind reaches\n  beyond loopback (binds 0.0.0.0 by default, bind address configurable), with a warning raised when the bind is not loopback.\n  Its port is 8788, chosen to coexist with the neighbouring service on 8787\n  (its config section carries a port field, defaulting to 8788).\n- **R6.** The dashboard's lifetime is independent of the cockpit's. Closing a\n  cockpit pane does not stop it (it runs as a child process outliving the cockpit pane).\n- **R7.** A merge approval can only be performed where fgOS allows it: the\n  `approve` verb structurally refuses to run from a linked worktree and\n  requires the repository's main working tree. This is a real mechanical\n  constraint on the deployment, not a UI concern — a gateway positioned\n  anywhere else cannot offer this operation at all, and the surface must\n  report that honestly rather than appearing to offer it.\n- **R8.** The combination of R5 (on by default, bind beyond loopback) and the\n  write operations above means **the first run of the cockpit exposes a\n  trunk-changing surface on the network, without anyone having chosen to**.\n  The token (R3/R4) is therefore not a hardening layer that can be traded away\n  for convenience — it is the only thing holding the surface closed. The\n  product owner decided this default having been shown this exact consequence\n  (rationale: `docs/history/herdr-web-dashboard/CONTEXT.md`'s own consequences section for the on-by-default decision), and the\n  write operations added later raise its weight rather than changing the\n  decision.\n- **R9.** Questions and answers are paired positionally, by order of\n  recording, with no linking key added to the underlying records — the record\n  shape is deliberately unchanged.\n- **R10.** The narrative written for humans is the primary account of what an\n  agent did; the machine-side decision log is secondary detail.\n- **R11.** Nothing on this surface pushes to a person. Being informed is a\n  pull: the person opens the dashboard and looks."
+      },
+      "targetShownText": "- **R1.** The surface is a client of the gateway's API, never an embedded\n  server inside the former combined binary (per fgos-interface-daemon's hexagonal-ports decision, decision `0014`). It is built to\n  address more than one gateway, so no single fixed origin may be baked into\n  it (per fgos-interface-daemon's per-machine-scope decision).\n- **R2.** Every write goes through an fgOS one-door-write verb — `answer`\n  (forwarding `--approve` when `approve: true`), `approve`, the intake verb, `edit`,\n  `move` (forwarding `--approve` when `approve: true`) — executed by the gateway, which\n  is the sole component that runs those verbs on a client's behalf (per fgos-interface-daemon — gateway is the sole chokepoint that ever spawns fgos verbs). The web surface never writes fgOS state directly. No second write path\n  is introduced by anything in this spec.\n- **R3.** A person may not read anything before signing in (mandatory token auth from v1). Sign-in is\n  token-based, and every failure is indistinguishable from \"nothing here\"\n  (an opaque 404, never 401). A second, alternative credential path exists in the design and, if\n  used, must verify its assertion's signature properly rather than trusting a\n  header (the two-layer additive auth design — cookie session plus an optional cf-access JWT that must be cryptographically verified, never trusted on the header alone).\n- **R4.** The token is never stored anywhere that is committed. It comes from\n  the environment when set; otherwise it is generated into a local file that\n  is excluded from version control and readable only by its owner.\n- **R5.** The surface is enabled by default (its own config toggle defaults ON, unlike other auto-launch toggles) and its default bind reaches\n  beyond loopback (binds 0.0.0.0 by default, bind address configurable), with a warning raised when the bind is not loopback.\n  Its port is 8788, chosen to coexist with the neighbouring service on 8787\n  (its config section carries a port field, defaulting to 8788).\n- **R6.** The dashboard's lifetime is independent of the cockpit's. Closing a\n  cockpit pane does not stop it (it runs as a child process outliving the cockpit pane).\n- **R7.** A merge approval can only be performed where fgOS allows it: the\n  `approve` verb structurally refuses to run from a linked worktree and\n  requires the repository's main working tree. This is a real mechanical\n  constraint on the deployment, not a UI concern — a gateway positioned\n  anywhere else cannot offer this operation at all, and the surface must\n  report that honestly rather than appearing to offer it.\n- **R8.** The combination of R5 (on by default, bind beyond loopback) and the\n  write operations above means **the first run of the cockpit exposes a\n  trunk-changing surface on the network, without anyone having chosen to**.\n  The token (R3/R4) is therefore not a hardening layer that can be traded away\n  for convenience — it is the only thing holding the surface closed. The\n  product owner decided this default having been shown this exact consequence\n  (rationale: `docs/history/herdr-web-dashboard/CONTEXT.md`'s own consequences section for the on-by-default decision), and the\n  write operations added later raise its weight rather than changing the\n  decision.\n- **R9.** Questions and answers are paired positionally, by order of\n  recording, with no linking key added to the underlying records — the record\n  shape is deliberately unchanged.\n- **R10.** The narrative written for humans is the primary account of what an\n  agent did; the machine-side decision log is secondary detail.\n- **R11.** Nothing on this surface pushes to a person. Being informed is a\n  pull: the person opens the dashboard and looks.",
+      "targetDigest": "7d9e2d425937e495926bbff08bacc8e77e9781253b5c83692215e62cf6da2913",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_45115f693318a55ed50c43db83c97baa",
+        "sourceUnitDigest": "7d9e2d425937e495926bbff08bacc8e77e9781253b5c83692215e62cf6da2913",
+        "targetOwner": "docs/platform/herdr-web-dashboard/spec.md",
+        "targetAnchor": "unheaded-block-23",
+        "claimKind": "decision",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/herdr-web-dashboard.md#unheaded-block-21 (source lines 200-244) is carried at docs/platform/herdr-web-dashboard/spec.md#unheaded-block-23 (candidate lines 222-266). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "7d9e2d425937e495926bbff08bacc8e77e9781253b5c83692215e62cf6da2913",
+        "targetAncestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)",
+          "Business Rules"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_7e17ce226062d06a53b940f64b9d5cdb",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json",
+      "shardSHA256": "754c1e315b8b924b70e4d1d25e8be74e8c70574e9e398dc069d2e6d64746d141",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/specs/herdr-web-dashboard.md",
+      "sourceAnchor": "edge-cases-settled",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Edge Cases Settled",
+        "anchor": "edge-cases-settled",
+        "githubAnchor": "edge-cases-settled",
+        "stableAnchor": "h-cc51d2f48367",
+        "startLine": 246,
+        "endLine": 246,
+        "textDigest": "e57fadfa3c6367e1098e0565fa3a61fe011bb34b4994eb241557beaa2c2ff879",
+        "sample": "Edge Cases Settled",
+        "sectionPayloadDigest": "1c226a16285c1c611d2dcbc3db679c21f6367eb19f66428f97fa0b6741c2027d",
+        "followingBlockDigest": "1c226a16285c1c611d2dcbc3db679c21f6367eb19f66428f97fa0b6741c2027d",
+        "identityFingerprint": "53b973196d2667138be76f057343c97eaf9a521ba2169947a16d11b650108985",
+        "ancestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)"
+        ],
+        "text": "## Edge Cases Settled",
+        "sectionText": "## Edge Cases Settled\n\n- **An item that has never been parked.** Its task detail shows a work history\n  and an empty question/answer timeline — the empty timeline is the normal\n  case, not an error.\n- **An item whose narrative source is missing.** Its documentation reference\n  can point at a directory that does not exist. The detail screen shows the\n  item without its narrative rather than failing; the missing narrative is\n  reported as missing.\n- **A narrative reference pointing outside the documentation tree.** Treated\n  as invalid and refused, not followed.\n- **The cockpit is closed.** The dashboard keeps serving (R6) — this is\n  the whole point of the design, not a leftover process.\n- **The gateway is unreachable.** The client says so plainly and offers to\n  retry; it never presents stale data as current.\n- **Approve is offered where it cannot run.** Covered by R7 — reported as\n  unavailable with the reason, never attempted and silently failed.\n- **Retire is asked for as \"delete\".** Covered under Retire a work item —\n  the surface performs retirement and names it as such."
+      },
+      "sourceShownText": "## Edge Cases Settled\n\n- **An item that has never been parked.** Its task detail shows a work history\n  and an empty question/answer timeline — the empty timeline is the normal\n  case, not an error.\n- **An item whose narrative source is missing.** Its documentation reference\n  can point at a directory that does not exist. The detail screen shows the\n  item without its narrative rather than failing; the missing narrative is\n  reported as missing.\n- **A narrative reference pointing outside the documentation tree.** Treated\n  as invalid and refused, not followed.\n- **The cockpit is closed.** The dashboard keeps serving (R6) — this is\n  the whole point of the design, not a leftover process.\n- **The gateway is unreachable.** The client says so plainly and offers to\n  retry; it never presents stale data as current.\n- **Approve is offered where it cannot run.** Covered by R7 — reported as\n  unavailable with the reason, never attempted and silently failed.\n- **Retire is asked for as \"delete\".** Covered under Retire a work item —\n  the surface performs retirement and names it as such.",
+      "sourceDigest": "e57fadfa3c6367e1098e0565fa3a61fe011bb34b4994eb241557beaa2c2ff879",
+      "targetPath": "docs/platform/herdr-web-dashboard/spec.md",
+      "targetAnchor": "edge-cases-settled",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Edge Cases Settled",
+        "anchor": "edge-cases-settled",
+        "githubAnchor": "edge-cases-settled",
+        "stableAnchor": "h-39e9edcae9e5",
+        "startLine": 268,
+        "endLine": 268,
+        "textDigest": "e57fadfa3c6367e1098e0565fa3a61fe011bb34b4994eb241557beaa2c2ff879",
+        "sample": "Edge Cases Settled",
+        "sectionPayloadDigest": "1c226a16285c1c611d2dcbc3db679c21f6367eb19f66428f97fa0b6741c2027d",
+        "followingBlockDigest": "1c226a16285c1c611d2dcbc3db679c21f6367eb19f66428f97fa0b6741c2027d",
+        "identityFingerprint": "53b973196d2667138be76f057343c97eaf9a521ba2169947a16d11b650108985",
+        "ancestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)"
+        ],
+        "text": "## Edge Cases Settled",
+        "sectionText": "## Edge Cases Settled\n\n- **An item that has never been parked.** Its task detail shows a work history\n  and an empty question/answer timeline — the empty timeline is the normal\n  case, not an error.\n- **An item whose narrative source is missing.** Its documentation reference\n  can point at a directory that does not exist. The detail screen shows the\n  item without its narrative rather than failing; the missing narrative is\n  reported as missing.\n- **A narrative reference pointing outside the documentation tree.** Treated\n  as invalid and refused, not followed.\n- **The cockpit is closed.** The dashboard keeps serving (R6) — this is\n  the whole point of the design, not a leftover process.\n- **The gateway is unreachable.** The client says so plainly and offers to\n  retry; it never presents stale data as current.\n- **Approve is offered where it cannot run.** Covered by R7 — reported as\n  unavailable with the reason, never attempted and silently failed.\n- **Retire is asked for as \"delete\".** Covered under Retire a work item —\n  the surface performs retirement and names it as such."
+      },
+      "targetShownText": "## Edge Cases Settled\n\n- **An item that has never been parked.** Its task detail shows a work history\n  and an empty question/answer timeline — the empty timeline is the normal\n  case, not an error.\n- **An item whose narrative source is missing.** Its documentation reference\n  can point at a directory that does not exist. The detail screen shows the\n  item without its narrative rather than failing; the missing narrative is\n  reported as missing.\n- **A narrative reference pointing outside the documentation tree.** Treated\n  as invalid and refused, not followed.\n- **The cockpit is closed.** The dashboard keeps serving (R6) — this is\n  the whole point of the design, not a leftover process.\n- **The gateway is unreachable.** The client says so plainly and offers to\n  retry; it never presents stale data as current.\n- **Approve is offered where it cannot run.** Covered by R7 — reported as\n  unavailable with the reason, never attempted and silently failed.\n- **Retire is asked for as \"delete\".** Covered under Retire a work item —\n  the surface performs retirement and names it as such.",
+      "targetDigest": "e57fadfa3c6367e1098e0565fa3a61fe011bb34b4994eb241557beaa2c2ff879",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_7e17ce226062d06a53b940f64b9d5cdb",
+        "sourceUnitDigest": "e57fadfa3c6367e1098e0565fa3a61fe011bb34b4994eb241557beaa2c2ff879",
+        "targetOwner": "docs/platform/herdr-web-dashboard/spec.md",
+        "targetAnchor": "edge-cases-settled",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/herdr-web-dashboard.md#edge-cases-settled (source lines 246-246) is carried at docs/platform/herdr-web-dashboard/spec.md#edge-cases-settled (candidate lines 268-268). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "e57fadfa3c6367e1098e0565fa3a61fe011bb34b4994eb241557beaa2c2ff879",
+        "targetAncestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_878e9f5faa08a2977408f49e04af0a7a",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json",
+      "shardSHA256": "754c1e315b8b924b70e4d1d25e8be74e8c70574e9e398dc069d2e6d64746d141",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/specs/herdr-web-dashboard.md",
+      "sourceAnchor": "unheaded-block-22",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-22",
+        "githubAnchor": "unheaded-block-22",
+        "stableAnchor": "unheaded-block-22",
+        "title": "Unheaded block 22",
+        "startLine": 248,
+        "endLine": 264,
+        "textDigest": "1c226a16285c1c611d2dcbc3db679c21f6367eb19f66428f97fa0b6741c2027d",
+        "sample": "- **An item that has never been parked.** Its task detail shows a work history\n  and an empty question/answer timeline — the empty timeline is the normal\n  case, not an error.\n- **",
+        "identityFingerprint": "e6d55d9372d52ae11e331a5735295759d2a5601a111e07bd01b60aec59b2d446",
+        "ancestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)",
+          "Edge Cases Settled"
+        ],
+        "text": "- **An item that has never been parked.** Its task detail shows a work history\n  and an empty question/answer timeline — the empty timeline is the normal\n  case, not an error.\n- **An item whose narrative source is missing.** Its documentation reference\n  can point at a directory that does not exist. The detail screen shows the\n  item without its narrative rather than failing; the missing narrative is\n  reported as missing.\n- **A narrative reference pointing outside the documentation tree.** Treated\n  as invalid and refused, not followed.\n- **The cockpit is closed.** The dashboard keeps serving (R6) — this is\n  the whole point of the design, not a leftover process.\n- **The gateway is unreachable.** The client says so plainly and offers to\n  retry; it never presents stale data as current.\n- **Approve is offered where it cannot run.** Covered by R7 — reported as\n  unavailable with the reason, never attempted and silently failed.\n- **Retire is asked for as \"delete\".** Covered under Retire a work item —\n  the surface performs retirement and names it as such."
+      },
+      "sourceShownText": "- **An item that has never been parked.** Its task detail shows a work history\n  and an empty question/answer timeline — the empty timeline is the normal\n  case, not an error.\n- **An item whose narrative source is missing.** Its documentation reference\n  can point at a directory that does not exist. The detail screen shows the\n  item without its narrative rather than failing; the missing narrative is\n  reported as missing.\n- **A narrative reference pointing outside the documentation tree.** Treated\n  as invalid and refused, not followed.\n- **The cockpit is closed.** The dashboard keeps serving (R6) — this is\n  the whole point of the design, not a leftover process.\n- **The gateway is unreachable.** The client says so plainly and offers to\n  retry; it never presents stale data as current.\n- **Approve is offered where it cannot run.** Covered by R7 — reported as\n  unavailable with the reason, never attempted and silently failed.\n- **Retire is asked for as \"delete\".** Covered under Retire a work item —\n  the surface performs retirement and names it as such.",
+      "sourceDigest": "1c226a16285c1c611d2dcbc3db679c21f6367eb19f66428f97fa0b6741c2027d",
+      "targetPath": "docs/platform/herdr-web-dashboard/spec.md",
+      "targetAnchor": "unheaded-block-24",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-24",
+        "githubAnchor": "unheaded-block-24",
+        "stableAnchor": "unheaded-block-24",
+        "title": "Unheaded block 24",
+        "startLine": 270,
+        "endLine": 286,
+        "textDigest": "1c226a16285c1c611d2dcbc3db679c21f6367eb19f66428f97fa0b6741c2027d",
+        "sample": "- **An item that has never been parked.** Its task detail shows a work history\n  and an empty question/answer timeline — the empty timeline is the normal\n  case, not an error.\n- **",
+        "identityFingerprint": "e6d55d9372d52ae11e331a5735295759d2a5601a111e07bd01b60aec59b2d446",
+        "ancestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)",
+          "Edge Cases Settled"
+        ],
+        "text": "- **An item that has never been parked.** Its task detail shows a work history\n  and an empty question/answer timeline — the empty timeline is the normal\n  case, not an error.\n- **An item whose narrative source is missing.** Its documentation reference\n  can point at a directory that does not exist. The detail screen shows the\n  item without its narrative rather than failing; the missing narrative is\n  reported as missing.\n- **A narrative reference pointing outside the documentation tree.** Treated\n  as invalid and refused, not followed.\n- **The cockpit is closed.** The dashboard keeps serving (R6) — this is\n  the whole point of the design, not a leftover process.\n- **The gateway is unreachable.** The client says so plainly and offers to\n  retry; it never presents stale data as current.\n- **Approve is offered where it cannot run.** Covered by R7 — reported as\n  unavailable with the reason, never attempted and silently failed.\n- **Retire is asked for as \"delete\".** Covered under Retire a work item —\n  the surface performs retirement and names it as such."
+      },
+      "targetShownText": "- **An item that has never been parked.** Its task detail shows a work history\n  and an empty question/answer timeline — the empty timeline is the normal\n  case, not an error.\n- **An item whose narrative source is missing.** Its documentation reference\n  can point at a directory that does not exist. The detail screen shows the\n  item without its narrative rather than failing; the missing narrative is\n  reported as missing.\n- **A narrative reference pointing outside the documentation tree.** Treated\n  as invalid and refused, not followed.\n- **The cockpit is closed.** The dashboard keeps serving (R6) — this is\n  the whole point of the design, not a leftover process.\n- **The gateway is unreachable.** The client says so plainly and offers to\n  retry; it never presents stale data as current.\n- **Approve is offered where it cannot run.** Covered by R7 — reported as\n  unavailable with the reason, never attempted and silently failed.\n- **Retire is asked for as \"delete\".** Covered under Retire a work item —\n  the surface performs retirement and names it as such.",
+      "targetDigest": "1c226a16285c1c611d2dcbc3db679c21f6367eb19f66428f97fa0b6741c2027d",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_878e9f5faa08a2977408f49e04af0a7a",
+        "sourceUnitDigest": "1c226a16285c1c611d2dcbc3db679c21f6367eb19f66428f97fa0b6741c2027d",
+        "targetOwner": "docs/platform/herdr-web-dashboard/spec.md",
+        "targetAnchor": "unheaded-block-24",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/herdr-web-dashboard.md#unheaded-block-22 (source lines 248-264) is carried at docs/platform/herdr-web-dashboard/spec.md#unheaded-block-24 (candidate lines 270-286). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "1c226a16285c1c611d2dcbc3db679c21f6367eb19f66428f97fa0b6741c2027d",
+        "targetAncestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)",
+          "Edge Cases Settled"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_2aae8d6820a6ad622e47c07d29c428bf",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json",
+      "shardSHA256": "754c1e315b8b924b70e4d1d25e8be74e8c70574e9e398dc069d2e6d64746d141",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/specs/herdr-web-dashboard.md",
+      "sourceAnchor": "open-gaps",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Open Gaps",
+        "anchor": "open-gaps",
+        "githubAnchor": "open-gaps",
+        "stableAnchor": "h-6bd9d60a4e79",
+        "startLine": 266,
+        "endLine": 266,
+        "textDigest": "7eb0dd6b83a72e530a30575cbf43286ab809b83fba028d19ff465496a540375f",
+        "sample": "Open Gaps",
+        "sectionPayloadDigest": "ef410a08c708a2f590fd777deb282577a8712b80ca1eee9522247534cc06ad99",
+        "followingBlockDigest": "ef410a08c708a2f590fd777deb282577a8712b80ca1eee9522247534cc06ad99",
+        "identityFingerprint": "1dcdfaabc5480183c5cb156de106d63f11bf560f00ce07c9cf79859e34782165",
+        "ancestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)"
+        ],
+        "text": "## Open Gaps",
+        "sectionText": "## Open Gaps\n\n- **Authorization granularity for write actions — unresolved, and it is the\n  significant one.** Everything under Behaviors & Operations that writes, and\n  `approve` above all, is available to whoever holds the machine's single\n  token. There is no per-person, per-project, or per-verb distinction to\n  spec against, because neither fgOS nor the gateway has one (STR38 unbuilt;\n  fgos-interface-daemon's own one-token-per-machine decision does not add one). The exposure is stated rather than mitigated. Closing this\n  needs its own item and its own decision — the authorization layer's own\n  scope, not this spec's, and not something to be improvised inside the web\n  client.\n- **The gateway's own API contract now exists** —\n  `docs/contracts/fgos-gateway-api-v1.yaml`, landed by tsk-7l9, carrying 18\n  paths that match `apps/fgos-gateway/src/gateway.rs`'s registered routes 1-to-1.\n  This spec still describes operations in product terms rather than\n  restating endpoint shapes, but that contract — not this prose — is the\n  boundary's source of truth, and any surface built against it cites it\n  directly. Two facts from it constrain this spec's own surfaces and are\n  recorded here rather than left to be rediscovered: there is **no edit\n  route** (`/work/{id}` is `get` only), so M03's edit mode depends on a\n  route that has to be added first; and there is **no SSE or WebSocket**,\n  only a `GET /state/digest` cheap poll, which is why `15-system-events.md`\n  describes client-derived events rather than server-pushed ones.\n- **Multi-project and multi-endpoint behaviour is only half-decided.** The\n  client must not assume one fixed gateway (fgos-interface-daemon's per-machine-scope decision, R1), but how a person\n  chooses between projects and instances, and how the surface shows which one\n  they are looking at, is deferred to `tsk-3b0` (multi-project port/identity handling is deferred there).\n- **No attention channel.** R11 records that nothing notifies a person. Whether\n  it should is a separate, unbuilt capability (STR48).\n- **Coverage is `partial` on purpose.** The three read screens are locked by\n  fourteen decisions; the six write operations were added later, outside that\n  discussion, and are settled here only as far as existing mechanisms and the\n  product owner's decisions at this item's own gate allow."
+      },
+      "sourceShownText": "## Open Gaps\n\n- **Authorization granularity for write actions — unresolved, and it is the\n  significant one.** Everything under Behaviors & Operations that writes, and\n  `approve` above all, is available to whoever holds the machine's single\n  token. There is no per-person, per-project, or per-verb distinction to\n  spec against, because neither fgOS nor the gateway has one (STR38 unbuilt;\n  fgos-interface-daemon's own one-token-per-machine decision does not add one). The exposure is stated rather than mitigated. Closing this\n  needs its own item and its own decision — the authorization layer's own\n  scope, not this spec's, and not something to be improvised inside the web\n  client.\n- **The gateway's own API contract now exists** —\n  `docs/contracts/fgos-gateway-api-v1.yaml`, landed by tsk-7l9, carrying 18\n  paths that match `apps/fgos-gateway/src/gateway.rs`'s registered routes 1-to-1.\n  This spec still describes operations in product terms rather than\n  restating endpoint shapes, but that contract — not this prose — is the\n  boundary's source of truth, and any surface built against it cites it\n  directly. Two facts from it constrain this spec's own surfaces and are\n  recorded here rather than left to be rediscovered: there is **no edit\n  route** (`/work/{id}` is `get` only), so M03's edit mode depends on a\n  route that has to be added first; and there is **no SSE or WebSocket**,\n  only a `GET /state/digest` cheap poll, which is why `15-system-events.md`\n  describes client-derived events rather than server-pushed ones.\n- **Multi-project and multi-endpoint behaviour is only half-decided.** The\n  client must not assume one fixed gateway (fgos-interface-daemon's per-machine-scope decision, R1), but how a person\n  chooses between projects and instances, and how the surface shows which one\n  they are looking at, is deferred to `tsk-3b0` (multi-project port/identity handling is deferred there).\n- **No attention channel.** R11 records that nothing notifies a person. Whether\n  it should is a separate, unbuilt capability (STR48).\n- **Coverage is `partial` on purpose.** The three read screens are locked by\n  fourteen decisions; the six write operations were added later, outside that\n  discussion, and are settled here only as far as existing mechanisms and the\n  product owner's decisions at this item's own gate allow.",
+      "sourceDigest": "7eb0dd6b83a72e530a30575cbf43286ab809b83fba028d19ff465496a540375f",
+      "targetPath": "docs/platform/herdr-web-dashboard/spec.md",
+      "targetAnchor": "open-gaps",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Open Gaps",
+        "anchor": "open-gaps",
+        "githubAnchor": "open-gaps",
+        "stableAnchor": "h-2bb8f7ea3daa",
+        "startLine": 288,
+        "endLine": 288,
+        "textDigest": "7eb0dd6b83a72e530a30575cbf43286ab809b83fba028d19ff465496a540375f",
+        "sample": "Open Gaps",
+        "sectionPayloadDigest": "ef410a08c708a2f590fd777deb282577a8712b80ca1eee9522247534cc06ad99",
+        "followingBlockDigest": "ef410a08c708a2f590fd777deb282577a8712b80ca1eee9522247534cc06ad99",
+        "identityFingerprint": "1dcdfaabc5480183c5cb156de106d63f11bf560f00ce07c9cf79859e34782165",
+        "ancestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)"
+        ],
+        "text": "## Open Gaps",
+        "sectionText": "## Open Gaps\n\n- **Authorization granularity for write actions — unresolved, and it is the\n  significant one.** Everything under Behaviors & Operations that writes, and\n  `approve` above all, is available to whoever holds the machine's single\n  token. There is no per-person, per-project, or per-verb distinction to\n  spec against, because neither fgOS nor the gateway has one (STR38 unbuilt;\n  fgos-interface-daemon's own one-token-per-machine decision does not add one). The exposure is stated rather than mitigated. Closing this\n  needs its own item and its own decision — the authorization layer's own\n  scope, not this spec's, and not something to be improvised inside the web\n  client.\n- **The gateway's own API contract now exists** —\n  `docs/contracts/fgos-gateway-api-v1.yaml`, landed by tsk-7l9, carrying 18\n  paths that match `apps/fgos-gateway/src/gateway.rs`'s registered routes 1-to-1.\n  This spec still describes operations in product terms rather than\n  restating endpoint shapes, but that contract — not this prose — is the\n  boundary's source of truth, and any surface built against it cites it\n  directly. Two facts from it constrain this spec's own surfaces and are\n  recorded here rather than left to be rediscovered: there is **no edit\n  route** (`/work/{id}` is `get` only), so M03's edit mode depends on a\n  route that has to be added first; and there is **no SSE or WebSocket**,\n  only a `GET /state/digest` cheap poll, which is why `15-system-events.md`\n  describes client-derived events rather than server-pushed ones.\n- **Multi-project and multi-endpoint behaviour is only half-decided.** The\n  client must not assume one fixed gateway (fgos-interface-daemon's per-machine-scope decision, R1), but how a person\n  chooses between projects and instances, and how the surface shows which one\n  they are looking at, is deferred to `tsk-3b0` (multi-project port/identity handling is deferred there).\n- **No attention channel.** R11 records that nothing notifies a person. Whether\n  it should is a separate, unbuilt capability (STR48).\n- **Coverage is `partial` on purpose.** The three read screens are locked by\n  fourteen decisions; the six write operations were added later, outside that\n  discussion, and are settled here only as far as existing mechanisms and the\n  product owner's decisions at this item's own gate allow."
+      },
+      "targetShownText": "## Open Gaps\n\n- **Authorization granularity for write actions — unresolved, and it is the\n  significant one.** Everything under Behaviors & Operations that writes, and\n  `approve` above all, is available to whoever holds the machine's single\n  token. There is no per-person, per-project, or per-verb distinction to\n  spec against, because neither fgOS nor the gateway has one (STR38 unbuilt;\n  fgos-interface-daemon's own one-token-per-machine decision does not add one). The exposure is stated rather than mitigated. Closing this\n  needs its own item and its own decision — the authorization layer's own\n  scope, not this spec's, and not something to be improvised inside the web\n  client.\n- **The gateway's own API contract now exists** —\n  `docs/contracts/fgos-gateway-api-v1.yaml`, landed by tsk-7l9, carrying 18\n  paths that match `apps/fgos-gateway/src/gateway.rs`'s registered routes 1-to-1.\n  This spec still describes operations in product terms rather than\n  restating endpoint shapes, but that contract — not this prose — is the\n  boundary's source of truth, and any surface built against it cites it\n  directly. Two facts from it constrain this spec's own surfaces and are\n  recorded here rather than left to be rediscovered: there is **no edit\n  route** (`/work/{id}` is `get` only), so M03's edit mode depends on a\n  route that has to be added first; and there is **no SSE or WebSocket**,\n  only a `GET /state/digest` cheap poll, which is why `15-system-events.md`\n  describes client-derived events rather than server-pushed ones.\n- **Multi-project and multi-endpoint behaviour is only half-decided.** The\n  client must not assume one fixed gateway (fgos-interface-daemon's per-machine-scope decision, R1), but how a person\n  chooses between projects and instances, and how the surface shows which one\n  they are looking at, is deferred to `tsk-3b0` (multi-project port/identity handling is deferred there).\n- **No attention channel.** R11 records that nothing notifies a person. Whether\n  it should is a separate, unbuilt capability (STR48).\n- **Coverage is `partial` on purpose.** The three read screens are locked by\n  fourteen decisions; the six write operations were added later, outside that\n  discussion, and are settled here only as far as existing mechanisms and the\n  product owner's decisions at this item's own gate allow.",
+      "targetDigest": "7eb0dd6b83a72e530a30575cbf43286ab809b83fba028d19ff465496a540375f",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_2aae8d6820a6ad622e47c07d29c428bf",
+        "sourceUnitDigest": "7eb0dd6b83a72e530a30575cbf43286ab809b83fba028d19ff465496a540375f",
+        "targetOwner": "docs/platform/herdr-web-dashboard/spec.md",
+        "targetAnchor": "open-gaps",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/herdr-web-dashboard.md#open-gaps (source lines 266-266) is carried at docs/platform/herdr-web-dashboard/spec.md#open-gaps (candidate lines 288-288). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "7eb0dd6b83a72e530a30575cbf43286ab809b83fba028d19ff465496a540375f",
+        "targetAncestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_83dd4d99cd52076452282b5565b0ea22",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json",
+      "shardSHA256": "754c1e315b8b924b70e4d1d25e8be74e8c70574e9e398dc069d2e6d64746d141",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/specs/herdr-web-dashboard.md",
+      "sourceAnchor": "unheaded-block-23",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-23",
+        "githubAnchor": "unheaded-block-23",
+        "stableAnchor": "unheaded-block-23",
+        "title": "Unheaded block 23",
+        "startLine": 268,
+        "endLine": 298,
+        "textDigest": "ef410a08c708a2f590fd777deb282577a8712b80ca1eee9522247534cc06ad99",
+        "sample": "- **Authorization granularity for write actions — unresolved, and it is the\n  significant one.** Everything under Behaviors & Operations that writes, and\n  `approve` above all, is ",
+        "identityFingerprint": "88db3b6644b49dfdb427e9aec2c51b45cc5bd00d5627369da8b3e5eefba19aa8",
+        "ancestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)",
+          "Open Gaps"
+        ],
+        "text": "- **Authorization granularity for write actions — unresolved, and it is the\n  significant one.** Everything under Behaviors & Operations that writes, and\n  `approve` above all, is available to whoever holds the machine's single\n  token. There is no per-person, per-project, or per-verb distinction to\n  spec against, because neither fgOS nor the gateway has one (STR38 unbuilt;\n  fgos-interface-daemon's own one-token-per-machine decision does not add one). The exposure is stated rather than mitigated. Closing this\n  needs its own item and its own decision — the authorization layer's own\n  scope, not this spec's, and not something to be improvised inside the web\n  client.\n- **The gateway's own API contract now exists** —\n  `docs/contracts/fgos-gateway-api-v1.yaml`, landed by tsk-7l9, carrying 18\n  paths that match `apps/fgos-gateway/src/gateway.rs`'s registered routes 1-to-1.\n  This spec still describes operations in product terms rather than\n  restating endpoint shapes, but that contract — not this prose — is the\n  boundary's source of truth, and any surface built against it cites it\n  directly. Two facts from it constrain this spec's own surfaces and are\n  recorded here rather than left to be rediscovered: there is **no edit\n  route** (`/work/{id}` is `get` only), so M03's edit mode depends on a\n  route that has to be added first; and there is **no SSE or WebSocket**,\n  only a `GET /state/digest` cheap poll, which is why `15-system-events.md`\n  describes client-derived events rather than server-pushed ones.\n- **Multi-project and multi-endpoint behaviour is only half-decided.** The\n  client must not assume one fixed gateway (fgos-interface-daemon's per-machine-scope decision, R1), but how a person\n  chooses between projects and instances, and how the surface shows which one\n  they are looking at, is deferred to `tsk-3b0` (multi-project port/identity handling is deferred there).\n- **No attention channel.** R11 records that nothing notifies a person. Whether\n  it should is a separate, unbuilt capability (STR48).\n- **Coverage is `partial` on purpose.** The three read screens are locked by\n  fourteen decisions; the six write operations were added later, outside that\n  discussion, and are settled here only as far as existing mechanisms and the\n  product owner's decisions at this item's own gate allow."
+      },
+      "sourceShownText": "- **Authorization granularity for write actions — unresolved, and it is the\n  significant one.** Everything under Behaviors & Operations that writes, and\n  `approve` above all, is available to whoever holds the machine's single\n  token. There is no per-person, per-project, or per-verb distinction to\n  spec against, because neither fgOS nor the gateway has one (STR38 unbuilt;\n  fgos-interface-daemon's own one-token-per-machine decision does not add one). The exposure is stated rather than mitigated. Closing this\n  needs its own item and its own decision — the authorization layer's own\n  scope, not this spec's, and not something to be improvised inside the web\n  client.\n- **The gateway's own API contract now exists** —\n  `docs/contracts/fgos-gateway-api-v1.yaml`, landed by tsk-7l9, carrying 18\n  paths that match `apps/fgos-gateway/src/gateway.rs`'s registered routes 1-to-1.\n  This spec still describes operations in product terms rather than\n  restating endpoint shapes, but that contract — not this prose — is the\n  boundary's source of truth, and any surface built against it cites it\n  directly. Two facts from it constrain this spec's own surfaces and are\n  recorded here rather than left to be rediscovered: there is **no edit\n  route** (`/work/{id}` is `get` only), so M03's edit mode depends on a\n  route that has to be added first; and there is **no SSE or WebSocket**,\n  only a `GET /state/digest` cheap poll, which is why `15-system-events.md`\n  describes client-derived events rather than server-pushed ones.\n- **Multi-project and multi-endpoint behaviour is only half-decided.** The\n  client must not assume one fixed gateway (fgos-interface-daemon's per-machine-scope decision, R1), but how a person\n  chooses between projects and instances, and how the surface shows which one\n  they are looking at, is deferred to `tsk-3b0` (multi-project port/identity handling is deferred there).\n- **No attention channel.** R11 records that nothing notifies a person. Whether\n  it should is a separate, unbuilt capability (STR48).\n- **Coverage is `partial` on purpose.** The three read screens are locked by\n  fourteen decisions; the six write operations were added later, outside that\n  discussion, and are settled here only as far as existing mechanisms and the\n  product owner's decisions at this item's own gate allow.",
+      "sourceDigest": "ef410a08c708a2f590fd777deb282577a8712b80ca1eee9522247534cc06ad99",
+      "targetPath": "docs/platform/herdr-web-dashboard/spec.md",
+      "targetAnchor": "unheaded-block-25",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-25",
+        "githubAnchor": "unheaded-block-25",
+        "stableAnchor": "unheaded-block-25",
+        "title": "Unheaded block 25",
+        "startLine": 290,
+        "endLine": 320,
+        "textDigest": "ef410a08c708a2f590fd777deb282577a8712b80ca1eee9522247534cc06ad99",
+        "sample": "- **Authorization granularity for write actions — unresolved, and it is the\n  significant one.** Everything under Behaviors & Operations that writes, and\n  `approve` above all, is ",
+        "identityFingerprint": "88db3b6644b49dfdb427e9aec2c51b45cc5bd00d5627369da8b3e5eefba19aa8",
+        "ancestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)",
+          "Open Gaps"
+        ],
+        "text": "- **Authorization granularity for write actions — unresolved, and it is the\n  significant one.** Everything under Behaviors & Operations that writes, and\n  `approve` above all, is available to whoever holds the machine's single\n  token. There is no per-person, per-project, or per-verb distinction to\n  spec against, because neither fgOS nor the gateway has one (STR38 unbuilt;\n  fgos-interface-daemon's own one-token-per-machine decision does not add one). The exposure is stated rather than mitigated. Closing this\n  needs its own item and its own decision — the authorization layer's own\n  scope, not this spec's, and not something to be improvised inside the web\n  client.\n- **The gateway's own API contract now exists** —\n  `docs/contracts/fgos-gateway-api-v1.yaml`, landed by tsk-7l9, carrying 18\n  paths that match `apps/fgos-gateway/src/gateway.rs`'s registered routes 1-to-1.\n  This spec still describes operations in product terms rather than\n  restating endpoint shapes, but that contract — not this prose — is the\n  boundary's source of truth, and any surface built against it cites it\n  directly. Two facts from it constrain this spec's own surfaces and are\n  recorded here rather than left to be rediscovered: there is **no edit\n  route** (`/work/{id}` is `get` only), so M03's edit mode depends on a\n  route that has to be added first; and there is **no SSE or WebSocket**,\n  only a `GET /state/digest` cheap poll, which is why `15-system-events.md`\n  describes client-derived events rather than server-pushed ones.\n- **Multi-project and multi-endpoint behaviour is only half-decided.** The\n  client must not assume one fixed gateway (fgos-interface-daemon's per-machine-scope decision, R1), but how a person\n  chooses between projects and instances, and how the surface shows which one\n  they are looking at, is deferred to `tsk-3b0` (multi-project port/identity handling is deferred there).\n- **No attention channel.** R11 records that nothing notifies a person. Whether\n  it should is a separate, unbuilt capability (STR48).\n- **Coverage is `partial` on purpose.** The three read screens are locked by\n  fourteen decisions; the six write operations were added later, outside that\n  discussion, and are settled here only as far as existing mechanisms and the\n  product owner's decisions at this item's own gate allow."
+      },
+      "targetShownText": "- **Authorization granularity for write actions — unresolved, and it is the\n  significant one.** Everything under Behaviors & Operations that writes, and\n  `approve` above all, is available to whoever holds the machine's single\n  token. There is no per-person, per-project, or per-verb distinction to\n  spec against, because neither fgOS nor the gateway has one (STR38 unbuilt;\n  fgos-interface-daemon's own one-token-per-machine decision does not add one). The exposure is stated rather than mitigated. Closing this\n  needs its own item and its own decision — the authorization layer's own\n  scope, not this spec's, and not something to be improvised inside the web\n  client.\n- **The gateway's own API contract now exists** —\n  `docs/contracts/fgos-gateway-api-v1.yaml`, landed by tsk-7l9, carrying 18\n  paths that match `apps/fgos-gateway/src/gateway.rs`'s registered routes 1-to-1.\n  This spec still describes operations in product terms rather than\n  restating endpoint shapes, but that contract — not this prose — is the\n  boundary's source of truth, and any surface built against it cites it\n  directly. Two facts from it constrain this spec's own surfaces and are\n  recorded here rather than left to be rediscovered: there is **no edit\n  route** (`/work/{id}` is `get` only), so M03's edit mode depends on a\n  route that has to be added first; and there is **no SSE or WebSocket**,\n  only a `GET /state/digest` cheap poll, which is why `15-system-events.md`\n  describes client-derived events rather than server-pushed ones.\n- **Multi-project and multi-endpoint behaviour is only half-decided.** The\n  client must not assume one fixed gateway (fgos-interface-daemon's per-machine-scope decision, R1), but how a person\n  chooses between projects and instances, and how the surface shows which one\n  they are looking at, is deferred to `tsk-3b0` (multi-project port/identity handling is deferred there).\n- **No attention channel.** R11 records that nothing notifies a person. Whether\n  it should is a separate, unbuilt capability (STR48).\n- **Coverage is `partial` on purpose.** The three read screens are locked by\n  fourteen decisions; the six write operations were added later, outside that\n  discussion, and are settled here only as far as existing mechanisms and the\n  product owner's decisions at this item's own gate allow.",
+      "targetDigest": "ef410a08c708a2f590fd777deb282577a8712b80ca1eee9522247534cc06ad99",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_83dd4d99cd52076452282b5565b0ea22",
+        "sourceUnitDigest": "ef410a08c708a2f590fd777deb282577a8712b80ca1eee9522247534cc06ad99",
+        "targetOwner": "docs/platform/herdr-web-dashboard/spec.md",
+        "targetAnchor": "unheaded-block-25",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/herdr-web-dashboard.md#unheaded-block-23 (source lines 268-298) is carried at docs/platform/herdr-web-dashboard/spec.md#unheaded-block-25 (candidate lines 290-320). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "ef410a08c708a2f590fd777deb282577a8712b80ca1eee9522247534cc06ad99",
+        "targetAncestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)",
+          "Open Gaps"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_b2e9e87b9980819fad263ba9c6b02b33",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json",
+      "shardSHA256": "754c1e315b8b924b70e4d1d25e8be74e8c70574e9e398dc069d2e6d64746d141",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/specs/herdr-web-dashboard.md",
+      "sourceAnchor": "visuals",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Visuals",
+        "anchor": "visuals",
+        "githubAnchor": "visuals",
+        "stableAnchor": "h-2b0697433797",
+        "startLine": 300,
+        "endLine": 300,
+        "textDigest": "437a511cf26520d71ce066d992c8affdc6c87a686d737c2e54f748e640ee1b6a",
+        "sample": "Visuals",
+        "sectionPayloadDigest": "b3f1a4dd83b0ff718a816b9eb068e4c5521f1d4ee30919d3ad097e62f4d16512",
+        "followingBlockDigest": "b3f1a4dd83b0ff718a816b9eb068e4c5521f1d4ee30919d3ad097e62f4d16512",
+        "identityFingerprint": "3a3d2bb456995a2a53969117eb0a38996b4ff95abf5d108242c6edf9fd4ef1a1",
+        "ancestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)"
+        ],
+        "text": "## Visuals",
+        "sectionText": "## Visuals\n\nNot specified here by design. The concrete layout, userflow, empty/error\npresentation, colour and typography are `tsk-3x6`'s deliverable:\n`docs/reference/herdr-web-dashboard-layout.md`, which takes this spec as its\nproduct input. The one direction this spec pins is the actor-facing\nexpectation recorded under \"View the taskboard\": a Monday.com/ClickUp-style\ngrouped board with in-place quick actions and filtering, not a flat table."
+      },
+      "sourceShownText": "## Visuals\n\nNot specified here by design. The concrete layout, userflow, empty/error\npresentation, colour and typography are `tsk-3x6`'s deliverable:\n`docs/reference/herdr-web-dashboard-layout.md`, which takes this spec as its\nproduct input. The one direction this spec pins is the actor-facing\nexpectation recorded under \"View the taskboard\": a Monday.com/ClickUp-style\ngrouped board with in-place quick actions and filtering, not a flat table.",
+      "sourceDigest": "437a511cf26520d71ce066d992c8affdc6c87a686d737c2e54f748e640ee1b6a",
+      "targetPath": "docs/platform/herdr-web-dashboard/spec.md",
+      "targetAnchor": "visuals",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Visuals",
+        "anchor": "visuals",
+        "githubAnchor": "visuals",
+        "stableAnchor": "h-75257ece12ad",
+        "startLine": 322,
+        "endLine": 322,
+        "textDigest": "437a511cf26520d71ce066d992c8affdc6c87a686d737c2e54f748e640ee1b6a",
+        "sample": "Visuals",
+        "sectionPayloadDigest": "b3f1a4dd83b0ff718a816b9eb068e4c5521f1d4ee30919d3ad097e62f4d16512",
+        "followingBlockDigest": "b3f1a4dd83b0ff718a816b9eb068e4c5521f1d4ee30919d3ad097e62f4d16512",
+        "identityFingerprint": "3a3d2bb456995a2a53969117eb0a38996b4ff95abf5d108242c6edf9fd4ef1a1",
+        "ancestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)"
+        ],
+        "text": "## Visuals",
+        "sectionText": "## Visuals\n\nNot specified here by design. The concrete layout, userflow, empty/error\npresentation, colour and typography are `tsk-3x6`'s deliverable:\n`docs/reference/herdr-web-dashboard-layout.md`, which takes this spec as its\nproduct input. The one direction this spec pins is the actor-facing\nexpectation recorded under \"View the taskboard\": a Monday.com/ClickUp-style\ngrouped board with in-place quick actions and filtering, not a flat table."
+      },
+      "targetShownText": "## Visuals\n\nNot specified here by design. The concrete layout, userflow, empty/error\npresentation, colour and typography are `tsk-3x6`'s deliverable:\n`docs/reference/herdr-web-dashboard-layout.md`, which takes this spec as its\nproduct input. The one direction this spec pins is the actor-facing\nexpectation recorded under \"View the taskboard\": a Monday.com/ClickUp-style\ngrouped board with in-place quick actions and filtering, not a flat table.",
+      "targetDigest": "437a511cf26520d71ce066d992c8affdc6c87a686d737c2e54f748e640ee1b6a",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_b2e9e87b9980819fad263ba9c6b02b33",
+        "sourceUnitDigest": "437a511cf26520d71ce066d992c8affdc6c87a686d737c2e54f748e640ee1b6a",
+        "targetOwner": "docs/platform/herdr-web-dashboard/spec.md",
+        "targetAnchor": "visuals",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/herdr-web-dashboard.md#visuals (source lines 300-300) is carried at docs/platform/herdr-web-dashboard/spec.md#visuals (candidate lines 322-322). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "437a511cf26520d71ce066d992c8affdc6c87a686d737c2e54f748e640ee1b6a",
+        "targetAncestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_dc3d0ae980bf2501bc8eabfa0484a46d",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json",
+      "shardSHA256": "754c1e315b8b924b70e4d1d25e8be74e8c70574e9e398dc069d2e6d64746d141",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/specs/herdr-web-dashboard.md",
+      "sourceAnchor": "unheaded-block-24",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-24",
+        "githubAnchor": "unheaded-block-24",
+        "stableAnchor": "unheaded-block-24",
+        "title": "Unheaded block 24",
+        "startLine": 302,
+        "endLine": 307,
+        "textDigest": "b3f1a4dd83b0ff718a816b9eb068e4c5521f1d4ee30919d3ad097e62f4d16512",
+        "sample": "Not specified here by design. The concrete layout, userflow, empty/error\npresentation, colour and typography are `tsk-3x6`'s deliverable:\n`docs/reference/herdr-web-dashboard-layout",
+        "identityFingerprint": "4486c3a99b561d464e55931386d2861abdbeee9693877ac4608a915b3f08165b",
+        "ancestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)",
+          "Visuals"
+        ],
+        "text": "Not specified here by design. The concrete layout, userflow, empty/error\npresentation, colour and typography are `tsk-3x6`'s deliverable:\n`docs/reference/herdr-web-dashboard-layout.md`, which takes this spec as its\nproduct input. The one direction this spec pins is the actor-facing\nexpectation recorded under \"View the taskboard\": a Monday.com/ClickUp-style\ngrouped board with in-place quick actions and filtering, not a flat table."
+      },
+      "sourceShownText": "Not specified here by design. The concrete layout, userflow, empty/error\npresentation, colour and typography are `tsk-3x6`'s deliverable:\n`docs/reference/herdr-web-dashboard-layout.md`, which takes this spec as its\nproduct input. The one direction this spec pins is the actor-facing\nexpectation recorded under \"View the taskboard\": a Monday.com/ClickUp-style\ngrouped board with in-place quick actions and filtering, not a flat table.",
+      "sourceDigest": "b3f1a4dd83b0ff718a816b9eb068e4c5521f1d4ee30919d3ad097e62f4d16512",
+      "targetPath": "docs/platform/herdr-web-dashboard/spec.md",
+      "targetAnchor": "unheaded-block-26",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-26",
+        "githubAnchor": "unheaded-block-26",
+        "stableAnchor": "unheaded-block-26",
+        "title": "Unheaded block 26",
+        "startLine": 324,
+        "endLine": 329,
+        "textDigest": "b3f1a4dd83b0ff718a816b9eb068e4c5521f1d4ee30919d3ad097e62f4d16512",
+        "sample": "Not specified here by design. The concrete layout, userflow, empty/error\npresentation, colour and typography are `tsk-3x6`'s deliverable:\n`docs/reference/herdr-web-dashboard-layout",
+        "identityFingerprint": "4486c3a99b561d464e55931386d2861abdbeee9693877ac4608a915b3f08165b",
+        "ancestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)",
+          "Visuals"
+        ],
+        "text": "Not specified here by design. The concrete layout, userflow, empty/error\npresentation, colour and typography are `tsk-3x6`'s deliverable:\n`docs/reference/herdr-web-dashboard-layout.md`, which takes this spec as its\nproduct input. The one direction this spec pins is the actor-facing\nexpectation recorded under \"View the taskboard\": a Monday.com/ClickUp-style\ngrouped board with in-place quick actions and filtering, not a flat table."
+      },
+      "targetShownText": "Not specified here by design. The concrete layout, userflow, empty/error\npresentation, colour and typography are `tsk-3x6`'s deliverable:\n`docs/reference/herdr-web-dashboard-layout.md`, which takes this spec as its\nproduct input. The one direction this spec pins is the actor-facing\nexpectation recorded under \"View the taskboard\": a Monday.com/ClickUp-style\ngrouped board with in-place quick actions and filtering, not a flat table.",
+      "targetDigest": "b3f1a4dd83b0ff718a816b9eb068e4c5521f1d4ee30919d3ad097e62f4d16512",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_dc3d0ae980bf2501bc8eabfa0484a46d",
+        "sourceUnitDigest": "b3f1a4dd83b0ff718a816b9eb068e4c5521f1d4ee30919d3ad097e62f4d16512",
+        "targetOwner": "docs/platform/herdr-web-dashboard/spec.md",
+        "targetAnchor": "unheaded-block-26",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/herdr-web-dashboard.md#unheaded-block-24 (source lines 302-307) is carried at docs/platform/herdr-web-dashboard/spec.md#unheaded-block-26 (candidate lines 324-329). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "b3f1a4dd83b0ff718a816b9eb068e4c5521f1d4ee30919d3ad097e62f4d16512",
+        "targetAncestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)",
+          "Visuals"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_28bc1b3d26ce9cf45d2477c1d69d181d",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json",
+      "shardSHA256": "754c1e315b8b924b70e4d1d25e8be74e8c70574e9e398dc069d2e6d64746d141",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/specs/herdr-web-dashboard.md",
+      "sourceAnchor": "pointers-implementation",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Pointers (implementation)",
+        "anchor": "pointers-implementation",
+        "githubAnchor": "pointers-implementation",
+        "stableAnchor": "h-6d3936002d88",
+        "startLine": 309,
+        "endLine": 309,
+        "textDigest": "89f24a77c23b2d756b009fe0082bcf8b38734023875f1b84869980e67e1ed580",
+        "sample": "Pointers (implementation)",
+        "sectionPayloadDigest": "b0d3ed0823c5a6e58fc870563461d32c3ce61fd9745b78444276500e7135addb",
+        "followingBlockDigest": "b0d3ed0823c5a6e58fc870563461d32c3ce61fd9745b78444276500e7135addb",
+        "identityFingerprint": "2f6c63d6d93675ef682c393eeb161a8c4daae552ba3c81107d64e9552770900a",
+        "ancestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)"
+        ],
+        "text": "## Pointers (implementation)",
+        "sectionText": "## Pointers (implementation)\n\n- `docs/history/herdr-web-dashboard/CONTEXT.md` — the fourteen locked\n  decisions this spec cites throughout, plus the scout evidence\n  behind them.\n- `docs/history/herdr-web-dashboard/DISCUSSION.md` — the five discussion\n  rounds those decisions came out of.\n- `docs/history/herdr-web-dashboard/plan.md` — the build shape: five pieces\n  (config/doctor, server core and sign-in, taskboard, task detail, alternative\n  credential path), plus this spec's own planning section.\n- `docs/history/fgos-interface-daemon/CONTEXT.md` — the gateway's own locked\n  decisions, in particular per-machine scope (multi-endpoint clients),\n  one token per machine, gateway is the sole runner of fgOS verbs,\n  where gateway lives (that web is an independent client), and the API\n  contract still to be written.\n- `docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md` — why a non-terminal\n  UI is a client of a network gate rather than its own server.\n- `docs/io-contract.md` — the CLI's in/out contract, and the explicit boundary\n  saying the authorization layer (STR38) and the attention channel (STR48) are\n  outside it.\n- `docs/specs/work-state.md` — the lifecycle meaning behind every status,\n  stage, question and answer this surface displays.\n- `docs/reference/herdr-web-dashboard-layout.md` — the UI layer (`tsk-3x6`)."
+      },
+      "sourceShownText": "## Pointers (implementation)\n\n- `docs/history/herdr-web-dashboard/CONTEXT.md` — the fourteen locked\n  decisions this spec cites throughout, plus the scout evidence\n  behind them.\n- `docs/history/herdr-web-dashboard/DISCUSSION.md` — the five discussion\n  rounds those decisions came out of.\n- `docs/history/herdr-web-dashboard/plan.md` — the build shape: five pieces\n  (config/doctor, server core and sign-in, taskboard, task detail, alternative\n  credential path), plus this spec's own planning section.\n- `docs/history/fgos-interface-daemon/CONTEXT.md` — the gateway's own locked\n  decisions, in particular per-machine scope (multi-endpoint clients),\n  one token per machine, gateway is the sole runner of fgOS verbs,\n  where gateway lives (that web is an independent client), and the API\n  contract still to be written.\n- `docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md` — why a non-terminal\n  UI is a client of a network gate rather than its own server.\n- `docs/io-contract.md` — the CLI's in/out contract, and the explicit boundary\n  saying the authorization layer (STR38) and the attention channel (STR48) are\n  outside it.\n- `docs/specs/work-state.md` — the lifecycle meaning behind every status,\n  stage, question and answer this surface displays.\n- `docs/reference/herdr-web-dashboard-layout.md` — the UI layer (`tsk-3x6`).",
+      "sourceDigest": "89f24a77c23b2d756b009fe0082bcf8b38734023875f1b84869980e67e1ed580",
+      "targetPath": "docs/platform/herdr-web-dashboard/spec.md",
+      "targetAnchor": "pointers-implementation",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Pointers (implementation)",
+        "anchor": "pointers-implementation",
+        "githubAnchor": "pointers-implementation",
+        "stableAnchor": "h-f50872493f38",
+        "startLine": 331,
+        "endLine": 331,
+        "textDigest": "89f24a77c23b2d756b009fe0082bcf8b38734023875f1b84869980e67e1ed580",
+        "sample": "Pointers (implementation)",
+        "sectionPayloadDigest": "b0d3ed0823c5a6e58fc870563461d32c3ce61fd9745b78444276500e7135addb",
+        "followingBlockDigest": "b0d3ed0823c5a6e58fc870563461d32c3ce61fd9745b78444276500e7135addb",
+        "identityFingerprint": "2f6c63d6d93675ef682c393eeb161a8c4daae552ba3c81107d64e9552770900a",
+        "ancestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)"
+        ],
+        "text": "## Pointers (implementation)",
+        "sectionText": "## Pointers (implementation)\n\n- `docs/history/herdr-web-dashboard/CONTEXT.md` — the fourteen locked\n  decisions this spec cites throughout, plus the scout evidence\n  behind them.\n- `docs/history/herdr-web-dashboard/DISCUSSION.md` — the five discussion\n  rounds those decisions came out of.\n- `docs/history/herdr-web-dashboard/plan.md` — the build shape: five pieces\n  (config/doctor, server core and sign-in, taskboard, task detail, alternative\n  credential path), plus this spec's own planning section.\n- `docs/history/fgos-interface-daemon/CONTEXT.md` — the gateway's own locked\n  decisions, in particular per-machine scope (multi-endpoint clients),\n  one token per machine, gateway is the sole runner of fgOS verbs,\n  where gateway lives (that web is an independent client), and the API\n  contract still to be written.\n- `docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md` — why a non-terminal\n  UI is a client of a network gate rather than its own server.\n- `docs/io-contract.md` — the CLI's in/out contract, and the explicit boundary\n  saying the authorization layer (STR38) and the attention channel (STR48) are\n  outside it.\n- `docs/specs/work-state.md` — the lifecycle meaning behind every status,\n  stage, question and answer this surface displays.\n- `docs/reference/herdr-web-dashboard-layout.md` — the UI layer (`tsk-3x6`)."
+      },
+      "targetShownText": "## Pointers (implementation)\n\n- `docs/history/herdr-web-dashboard/CONTEXT.md` — the fourteen locked\n  decisions this spec cites throughout, plus the scout evidence\n  behind them.\n- `docs/history/herdr-web-dashboard/DISCUSSION.md` — the five discussion\n  rounds those decisions came out of.\n- `docs/history/herdr-web-dashboard/plan.md` — the build shape: five pieces\n  (config/doctor, server core and sign-in, taskboard, task detail, alternative\n  credential path), plus this spec's own planning section.\n- `docs/history/fgos-interface-daemon/CONTEXT.md` — the gateway's own locked\n  decisions, in particular per-machine scope (multi-endpoint clients),\n  one token per machine, gateway is the sole runner of fgOS verbs,\n  where gateway lives (that web is an independent client), and the API\n  contract still to be written.\n- `docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md` — why a non-terminal\n  UI is a client of a network gate rather than its own server.\n- `docs/io-contract.md` — the CLI's in/out contract, and the explicit boundary\n  saying the authorization layer (STR38) and the attention channel (STR48) are\n  outside it.\n- `docs/specs/work-state.md` — the lifecycle meaning behind every status,\n  stage, question and answer this surface displays.\n- `docs/reference/herdr-web-dashboard-layout.md` — the UI layer (`tsk-3x6`).",
+      "targetDigest": "89f24a77c23b2d756b009fe0082bcf8b38734023875f1b84869980e67e1ed580",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_28bc1b3d26ce9cf45d2477c1d69d181d",
+        "sourceUnitDigest": "89f24a77c23b2d756b009fe0082bcf8b38734023875f1b84869980e67e1ed580",
+        "targetOwner": "docs/platform/herdr-web-dashboard/spec.md",
+        "targetAnchor": "pointers-implementation",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/herdr-web-dashboard.md#pointers-implementation (source lines 309-309) is carried at docs/platform/herdr-web-dashboard/spec.md#pointers-implementation (candidate lines 331-331). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "89f24a77c23b2d756b009fe0082bcf8b38734023875f1b84869980e67e1ed580",
+        "targetAncestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_69691b25b6d84c05b566346866ec6c83",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json",
+      "shardSHA256": "754c1e315b8b924b70e4d1d25e8be74e8c70574e9e398dc069d2e6d64746d141",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/specs/herdr-web-dashboard.md",
+      "sourceAnchor": "unheaded-block-25",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-25",
+        "githubAnchor": "unheaded-block-25",
+        "stableAnchor": "unheaded-block-25",
+        "title": "Unheaded block 25",
+        "startLine": 311,
+        "endLine": 331,
+        "textDigest": "b0d3ed0823c5a6e58fc870563461d32c3ce61fd9745b78444276500e7135addb",
+        "sample": "- `docs/history/herdr-web-dashboard/CONTEXT.md` — the fourteen locked\n  decisions this spec cites throughout, plus the scout evidence\n  behind them.\n- `docs/history/herdr-web-dashb",
+        "identityFingerprint": "822f80ac535c14b8d866a8bd7a1d8da718c66168a999da79f20718c89a64c417",
+        "ancestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)",
+          "Pointers (implementation)"
+        ],
+        "text": "- `docs/history/herdr-web-dashboard/CONTEXT.md` — the fourteen locked\n  decisions this spec cites throughout, plus the scout evidence\n  behind them.\n- `docs/history/herdr-web-dashboard/DISCUSSION.md` — the five discussion\n  rounds those decisions came out of.\n- `docs/history/herdr-web-dashboard/plan.md` — the build shape: five pieces\n  (config/doctor, server core and sign-in, taskboard, task detail, alternative\n  credential path), plus this spec's own planning section.\n- `docs/history/fgos-interface-daemon/CONTEXT.md` — the gateway's own locked\n  decisions, in particular per-machine scope (multi-endpoint clients),\n  one token per machine, gateway is the sole runner of fgOS verbs,\n  where gateway lives (that web is an independent client), and the API\n  contract still to be written.\n- `docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md` — why a non-terminal\n  UI is a client of a network gate rather than its own server.\n- `docs/io-contract.md` — the CLI's in/out contract, and the explicit boundary\n  saying the authorization layer (STR38) and the attention channel (STR48) are\n  outside it.\n- `docs/specs/work-state.md` — the lifecycle meaning behind every status,\n  stage, question and answer this surface displays.\n- `docs/reference/herdr-web-dashboard-layout.md` — the UI layer (`tsk-3x6`)."
+      },
+      "sourceShownText": "- `docs/history/herdr-web-dashboard/CONTEXT.md` — the fourteen locked\n  decisions this spec cites throughout, plus the scout evidence\n  behind them.\n- `docs/history/herdr-web-dashboard/DISCUSSION.md` — the five discussion\n  rounds those decisions came out of.\n- `docs/history/herdr-web-dashboard/plan.md` — the build shape: five pieces\n  (config/doctor, server core and sign-in, taskboard, task detail, alternative\n  credential path), plus this spec's own planning section.\n- `docs/history/fgos-interface-daemon/CONTEXT.md` — the gateway's own locked\n  decisions, in particular per-machine scope (multi-endpoint clients),\n  one token per machine, gateway is the sole runner of fgOS verbs,\n  where gateway lives (that web is an independent client), and the API\n  contract still to be written.\n- `docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md` — why a non-terminal\n  UI is a client of a network gate rather than its own server.\n- `docs/io-contract.md` — the CLI's in/out contract, and the explicit boundary\n  saying the authorization layer (STR38) and the attention channel (STR48) are\n  outside it.\n- `docs/specs/work-state.md` — the lifecycle meaning behind every status,\n  stage, question and answer this surface displays.\n- `docs/reference/herdr-web-dashboard-layout.md` — the UI layer (`tsk-3x6`).",
+      "sourceDigest": "b0d3ed0823c5a6e58fc870563461d32c3ce61fd9745b78444276500e7135addb",
+      "targetPath": "docs/platform/herdr-web-dashboard/spec.md",
+      "targetAnchor": "unheaded-block-27",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-27",
+        "githubAnchor": "unheaded-block-27",
+        "stableAnchor": "unheaded-block-27",
+        "title": "Unheaded block 27",
+        "startLine": 333,
+        "endLine": 353,
+        "textDigest": "b0d3ed0823c5a6e58fc870563461d32c3ce61fd9745b78444276500e7135addb",
+        "sample": "- `docs/history/herdr-web-dashboard/CONTEXT.md` — the fourteen locked\n  decisions this spec cites throughout, plus the scout evidence\n  behind them.\n- `docs/history/herdr-web-dashb",
+        "identityFingerprint": "822f80ac535c14b8d866a8bd7a1d8da718c66168a999da79f20718c89a64c417",
+        "ancestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)",
+          "Pointers (implementation)"
+        ],
+        "text": "- `docs/history/herdr-web-dashboard/CONTEXT.md` — the fourteen locked\n  decisions this spec cites throughout, plus the scout evidence\n  behind them.\n- `docs/history/herdr-web-dashboard/DISCUSSION.md` — the five discussion\n  rounds those decisions came out of.\n- `docs/history/herdr-web-dashboard/plan.md` — the build shape: five pieces\n  (config/doctor, server core and sign-in, taskboard, task detail, alternative\n  credential path), plus this spec's own planning section.\n- `docs/history/fgos-interface-daemon/CONTEXT.md` — the gateway's own locked\n  decisions, in particular per-machine scope (multi-endpoint clients),\n  one token per machine, gateway is the sole runner of fgOS verbs,\n  where gateway lives (that web is an independent client), and the API\n  contract still to be written.\n- `docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md` — why a non-terminal\n  UI is a client of a network gate rather than its own server.\n- `docs/io-contract.md` — the CLI's in/out contract, and the explicit boundary\n  saying the authorization layer (STR38) and the attention channel (STR48) are\n  outside it.\n- `docs/specs/work-state.md` — the lifecycle meaning behind every status,\n  stage, question and answer this surface displays.\n- `docs/reference/herdr-web-dashboard-layout.md` — the UI layer (`tsk-3x6`)."
+      },
+      "targetShownText": "- `docs/history/herdr-web-dashboard/CONTEXT.md` — the fourteen locked\n  decisions this spec cites throughout, plus the scout evidence\n  behind them.\n- `docs/history/herdr-web-dashboard/DISCUSSION.md` — the five discussion\n  rounds those decisions came out of.\n- `docs/history/herdr-web-dashboard/plan.md` — the build shape: five pieces\n  (config/doctor, server core and sign-in, taskboard, task detail, alternative\n  credential path), plus this spec's own planning section.\n- `docs/history/fgos-interface-daemon/CONTEXT.md` — the gateway's own locked\n  decisions, in particular per-machine scope (multi-endpoint clients),\n  one token per machine, gateway is the sole runner of fgOS verbs,\n  where gateway lives (that web is an independent client), and the API\n  contract still to be written.\n- `docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md` — why a non-terminal\n  UI is a client of a network gate rather than its own server.\n- `docs/io-contract.md` — the CLI's in/out contract, and the explicit boundary\n  saying the authorization layer (STR38) and the attention channel (STR48) are\n  outside it.\n- `docs/specs/work-state.md` — the lifecycle meaning behind every status,\n  stage, question and answer this surface displays.\n- `docs/reference/herdr-web-dashboard-layout.md` — the UI layer (`tsk-3x6`).",
+      "targetDigest": "b0d3ed0823c5a6e58fc870563461d32c3ce61fd9745b78444276500e7135addb",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_69691b25b6d84c05b566346866ec6c83",
+        "sourceUnitDigest": "b0d3ed0823c5a6e58fc870563461d32c3ce61fd9745b78444276500e7135addb",
+        "targetOwner": "docs/platform/herdr-web-dashboard/spec.md",
+        "targetAnchor": "unheaded-block-27",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/herdr-web-dashboard.md#unheaded-block-25 (source lines 311-331) is carried at docs/platform/herdr-web-dashboard/spec.md#unheaded-block-27 (candidate lines 333-353). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "b0d3ed0823c5a6e58fc870563461d32c3ce61fd9745b78444276500e7135addb",
+        "targetAncestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)",
+          "Pointers (implementation)"
+        ]
+      }
+    }
+  ]
+}

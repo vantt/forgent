@@ -1,0 +1,2217 @@
+{
+  "version": 1,
+  "contentCommit": "1276467f37a99d19aff05808d42fafbf40341449",
+  "channel": "script-exact",
+  "count": 1,
+  "reviewStatus": "pending",
+  "authorSession": "codex-session:unit-run-1792047735364-5c1a0eb5@2026-10-15",
+  "instructions": "Separate from A36 sampling, independently seed and draw 100 distinct Unit-exact rows from all 275 rows shown here, stratifying by source file/shard and documenting allocation and short strata honestly. Record seed, method, full population digest and sampled IDs; no duplicates. Recompute full committed source/target and shown-text digests, ancestry, anchors, source eligibility, unique target ownership and classifyExactCarry thresholds. Mechanically check every source row as required by A36 as well. This producer claims no script approval.",
+  "entries": [
+    {
+      "entryId": "script-exact-population",
+      "count": 275,
+      "population": [
+        {
+          "claimId": "claim_28445ce7abe834f5e2bccedbe9b8889e",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "8af62581941a8d7fbd1389929adcf64779ae231c0d39915b8a063af018279e49",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "8af62581941a8d7fbd1389929adcf64779ae231c0d39915b8a063af018279e49",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_ba0b2e1a3bc56167392758ded5e83687",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "9c7a5f29c2242f9aae324b709b533335f6161724e9882e17db9d1a999d86988c",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "9c7a5f29c2242f9aae324b709b533335f6161724e9882e17db9d1a999d86988c",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_b37787b010e98b1593a8c6c64c103822",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "9d4d164e372af43991d3261be4b79b667ccf22f6638a95d779a39b5d8a2c507e",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "9d4d164e372af43991d3261be4b79b667ccf22f6638a95d779a39b5d8a2c507e",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_be68ea4edd1f4f0241883cc9def779c6",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "e384c0c10fe8fd6b869a7be0d2de9f930130ad7a1414087ffb543d0357fd4108",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "e384c0c10fe8fd6b869a7be0d2de9f930130ad7a1414087ffb543d0357fd4108",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_5ae789a08a8f79f3c477af66da37991f",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "1bd83bcb38f40d1a4ed245ba1b513ab5a174bd6bc1b4d2f3a931766b5b0bd96d",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "1bd83bcb38f40d1a4ed245ba1b513ab5a174bd6bc1b4d2f3a931766b5b0bd96d",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_1a5f2f8d637db33e541569e8bc3a0b77",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "ea53abaf5e95cecd30240f63cad49962f5acca16df85c4a32c65dba40a621dac",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "ea53abaf5e95cecd30240f63cad49962f5acca16df85c4a32c65dba40a621dac",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_0625608d3d14292eee1a9c772fdf2943",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "c925e836abc1dfa057f90f82e9c2307792e1fce53c77e881c1359cd136acb642",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "c925e836abc1dfa057f90f82e9c2307792e1fce53c77e881c1359cd136acb642",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_5acdd2b61706f8f7888eef81f73a88e8",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "85615858f7582bd250778a1f45ac6b437662679bf2ef85ee4e21bc4020380a96",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "85615858f7582bd250778a1f45ac6b437662679bf2ef85ee4e21bc4020380a96",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_e82c910f47e10ea84480da23a9b40d9e",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "cdc2076b281a4cc71b1c038a08fa902599137f915486ba487deede97672be124",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "cdc2076b281a4cc71b1c038a08fa902599137f915486ba487deede97672be124",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_1248b0418e459f1bc95c7327f21f62af",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "f5322e1b6b0a6cc2889ea9c713ab098d0caf9520f7aa856f5c72e0bf63f9e4b4",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "f5322e1b6b0a6cc2889ea9c713ab098d0caf9520f7aa856f5c72e0bf63f9e4b4",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_f0da93423628b5c149c0af2f278587ed",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "df9207a3ace166343d8025978e5409c42dfd1ce28e4de1e88ca5499e66703881",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "df9207a3ace166343d8025978e5409c42dfd1ce28e4de1e88ca5499e66703881",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_51b1a9d25306e44527217999038fb853",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "3cf2768b10b9304382d4ba662dcef7f1a45677693e3747976d99c21b9b80188c",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "3cf2768b10b9304382d4ba662dcef7f1a45677693e3747976d99c21b9b80188c",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_e3125befbd9b679d5d1fc64283064bfa",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "26140143831da0f2e8c9e325debb900f01b964c4da8e833176574e14292d86fb",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "26140143831da0f2e8c9e325debb900f01b964c4da8e833176574e14292d86fb",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_18f82ecfa8ca710243b4a9e2e4009871",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "5988e9107c5e1f93a6a203244071b7020b294ab5b855fea771691a4504177421",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "5988e9107c5e1f93a6a203244071b7020b294ab5b855fea771691a4504177421",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_7bc7717a92a34ad4dc50159f7cf1d93f",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "9c04558a540d0fc1dbaaa1b4873972a1a77bc6d49d8fdf13af722161dfa97d72",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "9c04558a540d0fc1dbaaa1b4873972a1a77bc6d49d8fdf13af722161dfa97d72",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_ee82a796cb4e8350b49633fc8b827c47",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "7dc76c05398590e943ab78d13d574f0f66841e659505f94999893ac40caaebe7",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "7dc76c05398590e943ab78d13d574f0f66841e659505f94999893ac40caaebe7",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_974ab4ff20c3e4ef63805c191e7dec9c",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "0034e87f9be5666d0e95dfc3c4a8f54454f40fe51f7b8891d3ea7fd4f241ed11",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "0034e87f9be5666d0e95dfc3c4a8f54454f40fe51f7b8891d3ea7fd4f241ed11",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_a73dbba44f9d78cb44cf898ec93bb955",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "779d0248a0709725dc0bd8d0ffdbd4b5257325e259c824143b8c8b79d5d0903d",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "779d0248a0709725dc0bd8d0ffdbd4b5257325e259c824143b8c8b79d5d0903d",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_9235033a167934865ae9528d85596b9d",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "fbe04ecca29a8fc82519684dcfead7d2c94adcdb68ceaa637dbd5845b5e83033",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "fbe04ecca29a8fc82519684dcfead7d2c94adcdb68ceaa637dbd5845b5e83033",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_261fd234537163e9c306c0990de2cccb",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "b1dd0ead1405bd4a8e01cf9358cba6b084ef835b43f78f550012d05cdf3ff002",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "b1dd0ead1405bd4a8e01cf9358cba6b084ef835b43f78f550012d05cdf3ff002",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_b9193c06d7a58f44eb151b6b730668bb",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "50350bcfe22e57e77360aad5d1e994053801f7d59e47c1d83ed9c602253b3ecd",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "50350bcfe22e57e77360aad5d1e994053801f7d59e47c1d83ed9c602253b3ecd",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_6ae075930d08b33b19fa26d11dddbb7e",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "82a9fc630b06efc1ff9160ddf99d1ef14782fc3bc60922926371aff69b9ca768",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "82a9fc630b06efc1ff9160ddf99d1ef14782fc3bc60922926371aff69b9ca768",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_1720c1e2b7546fb9abc46f977dca5825",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "58de682e70a5457522892e8231fb6d7cf5c71ba825b60d0b16e3386248a8156b",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "58de682e70a5457522892e8231fb6d7cf5c71ba825b60d0b16e3386248a8156b",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_579b1a0a3f1da1f0dd4b7cf68df7296c",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "be716ac2e12a5034e40af648c86c875e85a8959bbc8b36fdb5767121bd29460b",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "be716ac2e12a5034e40af648c86c875e85a8959bbc8b36fdb5767121bd29460b",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_35b15d0934b7b00d4dc499e636e5454a",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "75fcceade6aa085b470fe340ea5938c62fb80e1f413bf4a9833fe96eb305dc0b",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "75fcceade6aa085b470fe340ea5938c62fb80e1f413bf4a9833fe96eb305dc0b",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_f720709d19fbec377b1da6118d3017e1",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "ae3e82541e20bbf22e7804f3cb3fcdc42582b93303a71e221acf99a6fec61522",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "ae3e82541e20bbf22e7804f3cb3fcdc42582b93303a71e221acf99a6fec61522",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_8c0f0587e917eb027f7904f9d2ec5ab1",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "696474a359edf32d98a7cc86a8e42e841414dc3c40437ceeb67fe94a80f21163",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "696474a359edf32d98a7cc86a8e42e841414dc3c40437ceeb67fe94a80f21163",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_1818fed994fc49f9c1084ae57df27a01",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "12b7882b372d729494e050cc316c0dfc77f753c58d110032331e9d26b9aaff97",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "12b7882b372d729494e050cc316c0dfc77f753c58d110032331e9d26b9aaff97",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_467d37a7c682201f64cf45145bb77633",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "9e8799eecd7d7c8646a012459732c22b9ab75b0b66923b1de2c4e72edfcf65e6",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "9e8799eecd7d7c8646a012459732c22b9ab75b0b66923b1de2c4e72edfcf65e6",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_8986987d4027a2f84a4b4c69fc636ac8",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "20d9856cf018fb4ea9d199a3f2d18b6256ac6e69242dee66192a5722319c5f1f",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "20d9856cf018fb4ea9d199a3f2d18b6256ac6e69242dee66192a5722319c5f1f",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_d867754cefbf1a753fef272a57b00603",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "f922c23605a7afcce50568cdb5592cf3aeabed7b4e80cb18c659f784cfd691f7",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "f922c23605a7afcce50568cdb5592cf3aeabed7b4e80cb18c659f784cfd691f7",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_d43968f2b346d8eb2c736f9cbf45a837",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "27dc52c7862d7251d951ad1f856ae4384602106ba36de03aee380ed2836d1a6c",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "27dc52c7862d7251d951ad1f856ae4384602106ba36de03aee380ed2836d1a6c",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_b74317580138e8ca89ad5beaaa9ebae5",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "a66912f90790f4423a1b15c4d7c7793f67269922307207dac097b390fea6c688",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "a66912f90790f4423a1b15c4d7c7793f67269922307207dac097b390fea6c688",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_7519a17d8b83682007e1040f0208a38a",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "3300e69aaf8c8b60327ca4e4500cf24b7d2bc0209017cc33ad23a4b47f626a51",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "3300e69aaf8c8b60327ca4e4500cf24b7d2bc0209017cc33ad23a4b47f626a51",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_d6e3a8b6bdbad6eb8832dedecce3af68",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "85dd373e75b663aca06c5bea845195248ff866e19991342b8b704f570c2b0bbe",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "85dd373e75b663aca06c5bea845195248ff866e19991342b8b704f570c2b0bbe",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_5c6c4d70a4f3bcc674519b97ec484952",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "ccb3a64a1dc5acf178a7ba526cf6a9be174bd826509e99d87c074a0eb7264643",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "ccb3a64a1dc5acf178a7ba526cf6a9be174bd826509e99d87c074a0eb7264643",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_9e6f7a0b46212d4b4f91e785385c6ea9",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "9444b6beda96ccb7d692897811f254e234ebc9fcb63694100e8273c43ffc440f",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "9444b6beda96ccb7d692897811f254e234ebc9fcb63694100e8273c43ffc440f",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_fc0d0b9362e1734b895dc1915e30cfda",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "cd788e051633b838a8eba0416f3addbdecd4a55c109c640e14a92a2018708af4",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "cd788e051633b838a8eba0416f3addbdecd4a55c109c640e14a92a2018708af4",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_88fa79d61b6875d241559f455b555e53",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "d7c67ba46fef4124882b233b5de07688ed35bdc17bce71df485df3f12e93b77f",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "d7c67ba46fef4124882b233b5de07688ed35bdc17bce71df485df3f12e93b77f",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_61c31179243d131b181e336912a03c4b",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "6416dbce784bfaf46f852f45fd816295d0ac623d8599dc5c8bcf955ccea8e3da",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "6416dbce784bfaf46f852f45fd816295d0ac623d8599dc5c8bcf955ccea8e3da",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_b7a4044f5956f2a0da7a3f0b38c059c6",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "518bb6a9bd04306acbbe91276823860e4203d0f26f481506b44059d186c4481c",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "518bb6a9bd04306acbbe91276823860e4203d0f26f481506b44059d186c4481c",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_0117008e3dfef395f044eb1556ad0fca",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "906e55e4bb1dac799667c832ac3b77cf4a3052bdaa8bd07aae21592364e59f44",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "906e55e4bb1dac799667c832ac3b77cf4a3052bdaa8bd07aae21592364e59f44",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_c0cd54862f6365e2da2856925bef04c1",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "237461836affe4167aaf89d08ee087d9de21a39a3afc2f10e54bfe6bcaeaeb2b",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "237461836affe4167aaf89d08ee087d9de21a39a3afc2f10e54bfe6bcaeaeb2b",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_2cfa54b977cf929a5f73250095379bd2",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "0ab59371b3385f8142084098da1a758776a37360071cd460fdb90dea8eb2a8f1",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "0ab59371b3385f8142084098da1a758776a37360071cd460fdb90dea8eb2a8f1",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_26b3a49adef572e1be2ed219e292c8b0",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "ab25a8a3c32e9f823859789e4005083667f0b527ebafe9a4d572c918738bdefe",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "ab25a8a3c32e9f823859789e4005083667f0b527ebafe9a4d572c918738bdefe",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_d7fa39da9698c447594edefdc44d7ce5",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "a89aecc164ff54f3f6807a0d3231e27b4ca2c77c4e41fd121bbfdb18ea8024f0",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "a89aecc164ff54f3f6807a0d3231e27b4ca2c77c4e41fd121bbfdb18ea8024f0",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_daf2ec0996ad074a68903680fce85adb",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "f43f3ff53150980b52653b87618308619ddaae4a8ce19572b2589bb7cf744f7a",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "f43f3ff53150980b52653b87618308619ddaae4a8ce19572b2589bb7cf744f7a",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_73ae83a090b77eed0e84212e99fa6e7c",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "0ef8d6c210698ac4fae241e133b626be662e36e1023900186b541f3f7d0e27b8",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "0ef8d6c210698ac4fae241e133b626be662e36e1023900186b541f3f7d0e27b8",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_f1aeeff92e7bbf3f52b1cc88896cc41e",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "2fcf6811e81b5faf421dcc8038872613f72ad4fb0f62a9c552a56c090a6b31c0",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "2fcf6811e81b5faf421dcc8038872613f72ad4fb0f62a9c552a56c090a6b31c0",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_1538dad17e4fa44207a7f70dc2ca7b55",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "9077d21c4c3ff52bd3ddcb04d54a03a978ee83919055752883a6609016055acf",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "9077d21c4c3ff52bd3ddcb04d54a03a978ee83919055752883a6609016055acf",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_daa730ce31dbd045d14a42c31c57f316",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "fdcc56c6036171a7393772c55e187bfd7e86e9b00b045bc9d0ae3c81c963fd67",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "fdcc56c6036171a7393772c55e187bfd7e86e9b00b045bc9d0ae3c81c963fd67",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_1a847c3e3266a47169a83f7ac836ef7b",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "14f3ee1a5085e8338b27e811d4a6fdddb36726d4f98c9df86111a65f594d85fa",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "14f3ee1a5085e8338b27e811d4a6fdddb36726d4f98c9df86111a65f594d85fa",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_d4bc3fb932ca2d29e917119191f45f1c",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "62da6aab49287cf95b091c9f3b8d55e5eed5b510a040c7663c8d3616cef1a994",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "62da6aab49287cf95b091c9f3b8d55e5eed5b510a040c7663c8d3616cef1a994",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_3770d5a0b897fbd8c1393a38c48c3333",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "28ef20e16a5b5c8d4fe7db58cfb81fa2915a15bd591ddfbdac9094abd5cdd4bc",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "28ef20e16a5b5c8d4fe7db58cfb81fa2915a15bd591ddfbdac9094abd5cdd4bc",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_68dd1d19379c9a16393429b5e2aac34a",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "cd86d66ba41c3e216cfd4d8bd8d3d67ba807275450780add3123faf7d91d35bb",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "cd86d66ba41c3e216cfd4d8bd8d3d67ba807275450780add3123faf7d91d35bb",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_b1731956c352b9977eef7ffa07f88991",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "7cf71cce1a2badb415557e66813aa0937d285bc90ad11c6264e1e54083199ff6",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "7cf71cce1a2badb415557e66813aa0937d285bc90ad11c6264e1e54083199ff6",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_54f630d44a33c5624ebeca834cf25ceb",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "8caafcb371d02a300d8aa42288fc25e25354ddd2301e48508ee4810c99340902",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "8caafcb371d02a300d8aa42288fc25e25354ddd2301e48508ee4810c99340902",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_220b8163566ad8b38cbf1d534c871e42",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "d0eb5b8c250cd17479ceba5b41a114e24933e13bfe9ca355ed5871091093e30f",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "d0eb5b8c250cd17479ceba5b41a114e24933e13bfe9ca355ed5871091093e30f",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_9d863e7c1e4c3983292845628b60e041",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "a42feb4ea36f23dcda856872a41811401e058cee1f3bfd71af95069725466bc8",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "a42feb4ea36f23dcda856872a41811401e058cee1f3bfd71af95069725466bc8",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_bb5abf5828264d19c061b9b0920618a3",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "7653e11267b25193a2a1f9c9969fffcc140830bfec41bb55bd80af4a541dc396",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "7653e11267b25193a2a1f9c9969fffcc140830bfec41bb55bd80af4a541dc396",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_bd94f9efb9ccdbbc8ca5b90916290c6f",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "ef13d34054bfb70d28e34612c2fa9c8baf76e7a153c8f38c1673b92b9936f2bd",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "ef13d34054bfb70d28e34612c2fa9c8baf76e7a153c8f38c1673b92b9936f2bd",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_2977601fcac216f335c121ce5a58ec9e",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "6dc2d3110bcb9737263766d842a280447bb840efd94b14cc54cbc739d7c3c0a8",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "6dc2d3110bcb9737263766d842a280447bb840efd94b14cc54cbc739d7c3c0a8",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_d81f120837aab96ba270276e5090e2e0",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "e3281f44b9de246979eb391c466d2aec235d67fd39c35775a42a31261ae2a129",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "e3281f44b9de246979eb391c466d2aec235d67fd39c35775a42a31261ae2a129",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_34983077687032d7a49ecc61907a6806",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "81541208991d526412de79630015558afcc29113e90b9e33d5818071621c09f7",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "81541208991d526412de79630015558afcc29113e90b9e33d5818071621c09f7",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_d9f0a2209948f0357cac70dc0778b0bb",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "0863b0b9257af2b10d97f01c65e9433aa9e18f3bca620427ae014d6c874bd9dc",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "0863b0b9257af2b10d97f01c65e9433aa9e18f3bca620427ae014d6c874bd9dc",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_f82a2cff173a458bb2231203222c10e0",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "03aadf655bc30ec74e7e34d25a18d3b8f3f866fc2120a48550822fada8afa1d5",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "03aadf655bc30ec74e7e34d25a18d3b8f3f866fc2120a48550822fada8afa1d5",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_c491a724bb730522215633d79a66e5b3",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceDigest": "b412674cbe8f64e89a752ba65cf9752f00b362a19455bcded73bd2a283d4ab16",
+          "targetPath": "docs/platform/agent-confinement/spec.md",
+          "targetDigest": "b412674cbe8f64e89a752ba65cf9752f00b362a19455bcded73bd2a283d4ab16",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json"
+        },
+        {
+          "claimId": "claim_905d120454c22b01bc7d709a1803ead5",
+          "sourcePath": "docs/specs/fgos-plugin.md",
+          "sourceDigest": "accf803c7e73f896e243e25b1600bb5ab2d868fb2591e43054c4c283455d5c80",
+          "targetPath": "docs/platform/claude-plugin/spec.md",
+          "targetDigest": "accf803c7e73f896e243e25b1600bb5ab2d868fb2591e43054c4c283455d5c80",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-claude-plugin-01.json"
+        },
+        {
+          "claimId": "claim_a3670407e66560218ba2688dd31075c7",
+          "sourcePath": "docs/specs/fgos-plugin.md",
+          "sourceDigest": "d2988254b0a58d5ddf41e20b1c4fdc5bf07a35b3214fa61c94034e6b0f194e3a",
+          "targetPath": "docs/platform/claude-plugin/spec.md",
+          "targetDigest": "d2988254b0a58d5ddf41e20b1c4fdc5bf07a35b3214fa61c94034e6b0f194e3a",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-claude-plugin-01.json"
+        },
+        {
+          "claimId": "claim_d2d19426a24c78719c9ceb11bf924d33",
+          "sourcePath": "docs/specs/fgos-plugin.md",
+          "sourceDigest": "b9e6c0ab26679c055bf00490c18221eab33d08712fbfd82458032f7cfded5642",
+          "targetPath": "docs/platform/claude-plugin/spec.md",
+          "targetDigest": "b9e6c0ab26679c055bf00490c18221eab33d08712fbfd82458032f7cfded5642",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-claude-plugin-01.json"
+        },
+        {
+          "claimId": "claim_b78f1258e64bd182d527105502e087be",
+          "sourcePath": "docs/specs/fgos-plugin.md",
+          "sourceDigest": "c4423a6e79bd0e75d2d4ddce1e935e386ad69ad08b3411958a40879bf0a320f9",
+          "targetPath": "docs/platform/claude-plugin/spec.md",
+          "targetDigest": "c4423a6e79bd0e75d2d4ddce1e935e386ad69ad08b3411958a40879bf0a320f9",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-claude-plugin-01.json"
+        },
+        {
+          "claimId": "claim_385aed77384716abfc069f4a48427d88",
+          "sourcePath": "docs/specs/fgos-plugin.md",
+          "sourceDigest": "69ee36940c62e85bae6cb0a8f6133292739fd5a659908adf38e9895c800d756c",
+          "targetPath": "docs/platform/claude-plugin/spec.md",
+          "targetDigest": "69ee36940c62e85bae6cb0a8f6133292739fd5a659908adf38e9895c800d756c",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-claude-plugin-01.json"
+        },
+        {
+          "claimId": "claim_8fb4083ea46573d60c5f2546534a4066",
+          "sourcePath": "docs/specs/fgos-plugin.md",
+          "sourceDigest": "3248bbfe3551bed95fbe752e14d15dbf2423cf3faedfebe7861ded08cea3848b",
+          "targetPath": "docs/platform/claude-plugin/spec.md",
+          "targetDigest": "3248bbfe3551bed95fbe752e14d15dbf2423cf3faedfebe7861ded08cea3848b",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-claude-plugin-01.json"
+        },
+        {
+          "claimId": "claim_a24a497ee44ed4600b872d298d5be9b2",
+          "sourcePath": "docs/specs/fgos-plugin.md",
+          "sourceDigest": "bf99b50c0e43c39c941d57769068ae7d464d50c9b1424200b8e2db515b3c33f0",
+          "targetPath": "docs/platform/claude-plugin/spec.md",
+          "targetDigest": "bf99b50c0e43c39c941d57769068ae7d464d50c9b1424200b8e2db515b3c33f0",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-claude-plugin-01.json"
+        },
+        {
+          "claimId": "claim_e060be5e6acfef53337f6b999131cdce",
+          "sourcePath": "docs/specs/fgos-plugin.md",
+          "sourceDigest": "277f2f5f4050e839469b2e30ec823c030fa3eb8484e123bf7ab838602344ab36",
+          "targetPath": "docs/platform/claude-plugin/spec.md",
+          "targetDigest": "277f2f5f4050e839469b2e30ec823c030fa3eb8484e123bf7ab838602344ab36",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-claude-plugin-01.json"
+        },
+        {
+          "claimId": "claim_5d1a541d049da86b8276fd5bca6a6ca1",
+          "sourcePath": "docs/specs/fgos-plugin.md",
+          "sourceDigest": "557f85599964f0fff74ee36cdecd5fd745b8178192267939c973f1e4ffc2722c",
+          "targetPath": "docs/platform/claude-plugin/spec.md",
+          "targetDigest": "557f85599964f0fff74ee36cdecd5fd745b8178192267939c973f1e4ffc2722c",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-claude-plugin-01.json"
+        },
+        {
+          "claimId": "claim_b1dd08c917b5378afded6ca097985955",
+          "sourcePath": "docs/specs/fgos-plugin.md",
+          "sourceDigest": "a4b9943bc3c6e66737b9d80f3679611b3285299feedf1815d367d8ea48b7f78d",
+          "targetPath": "docs/platform/claude-plugin/spec.md",
+          "targetDigest": "a4b9943bc3c6e66737b9d80f3679611b3285299feedf1815d367d8ea48b7f78d",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-claude-plugin-01.json"
+        },
+        {
+          "claimId": "claim_9010b5e75fd37710c5f44ad96a55639c",
+          "sourcePath": "docs/specs/fgos-plugin.md",
+          "sourceDigest": "f74520870a5e9a82d39e255bf81abc8ceafd05921cedb345756469bf567a8924",
+          "targetPath": "docs/platform/claude-plugin/spec.md",
+          "targetDigest": "f74520870a5e9a82d39e255bf81abc8ceafd05921cedb345756469bf567a8924",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-claude-plugin-01.json"
+        },
+        {
+          "claimId": "claim_0346f6df67ee90d852cbf6b82a44e102",
+          "sourcePath": "docs/specs/fgos-plugin.md",
+          "sourceDigest": "a6e56e7f186ae8caba61e67a7409c2326933f9fa5c42f7ded397110d75639bf4",
+          "targetPath": "docs/platform/claude-plugin/spec.md",
+          "targetDigest": "a6e56e7f186ae8caba61e67a7409c2326933f9fa5c42f7ded397110d75639bf4",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-claude-plugin-01.json"
+        },
+        {
+          "claimId": "claim_31e7045fdfec6efddb4c1ba1c5c9d667",
+          "sourcePath": "docs/specs/fgos-plugin.md",
+          "sourceDigest": "4c8071c71c115b559f27ed2cad3a156e32341c1758e1cfd2363c9610d06a4af6",
+          "targetPath": "docs/platform/claude-plugin/spec.md",
+          "targetDigest": "4c8071c71c115b559f27ed2cad3a156e32341c1758e1cfd2363c9610d06a4af6",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-claude-plugin-01.json"
+        },
+        {
+          "claimId": "claim_511605d386df9bae4aa29fb1baad15ac",
+          "sourcePath": "docs/specs/fgos-plugin.md",
+          "sourceDigest": "fd8bfcfe77b5019d779cae2f38067585409e1d8cceb5f0e767c515659ba4f1af",
+          "targetPath": "docs/platform/claude-plugin/spec.md",
+          "targetDigest": "fd8bfcfe77b5019d779cae2f38067585409e1d8cceb5f0e767c515659ba4f1af",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-claude-plugin-01.json"
+        },
+        {
+          "claimId": "claim_23f3500fb4d183df2bfccc49e503277c",
+          "sourcePath": "docs/specs/fgos-plugin.md",
+          "sourceDigest": "cc42ca44f1f20f3a20b2ae3c472c41e3ce256c283f9cc81f00ee7fabf4d3a721",
+          "targetPath": "docs/platform/claude-plugin/spec.md",
+          "targetDigest": "cc42ca44f1f20f3a20b2ae3c472c41e3ce256c283f9cc81f00ee7fabf4d3a721",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-claude-plugin-01.json"
+        },
+        {
+          "claimId": "claim_50c93fdb3fd4fd3b6df90a9c6988209c",
+          "sourcePath": "docs/specs/fgos-plugin.md",
+          "sourceDigest": "3cb73398342551d4386bd987ddb2b74058cfafa4fbbaca660057d11379725122",
+          "targetPath": "docs/platform/claude-plugin/spec.md",
+          "targetDigest": "3cb73398342551d4386bd987ddb2b74058cfafa4fbbaca660057d11379725122",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-claude-plugin-01.json"
+        },
+        {
+          "claimId": "claim_32b42cc343ea5bed231dbfd43ef4b433",
+          "sourcePath": "docs/specs/fgos-plugin.md",
+          "sourceDigest": "e02f12896615760aad3f55c30a0d47c09cf0019eb7e05580b82722c372172891",
+          "targetPath": "docs/platform/claude-plugin/spec.md",
+          "targetDigest": "e02f12896615760aad3f55c30a0d47c09cf0019eb7e05580b82722c372172891",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-claude-plugin-01.json"
+        },
+        {
+          "claimId": "claim_dd811f34a76357f46fd5bdf22fc90c93",
+          "sourcePath": "docs/specs/fgos-plugin.md",
+          "sourceDigest": "a07dd8cc5608f2eb02359c77e86e8b33e108977fb591ad984ca41fc1e5791e9e",
+          "targetPath": "docs/platform/claude-plugin/spec.md",
+          "targetDigest": "a07dd8cc5608f2eb02359c77e86e8b33e108977fb591ad984ca41fc1e5791e9e",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-claude-plugin-01.json"
+        },
+        {
+          "claimId": "claim_9ab01867539b225be5a4ee39b7034cd5",
+          "sourcePath": "docs/specs/fgos-plugin.md",
+          "sourceDigest": "57301b02e1179ead982bc32b716f9c3afef040908df4c8885fda7999d10211ea",
+          "targetPath": "docs/platform/claude-plugin/spec.md",
+          "targetDigest": "57301b02e1179ead982bc32b716f9c3afef040908df4c8885fda7999d10211ea",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-claude-plugin-01.json"
+        },
+        {
+          "claimId": "claim_59bc02175a2f8dc3faff32956d7b57d7",
+          "sourcePath": "docs/specs/fgos-plugin.md",
+          "sourceDigest": "8f6837b88c85ff3a553869172595c5ec1cb22a56c067fd324aa576673c536cc1",
+          "targetPath": "docs/platform/claude-plugin/spec.md",
+          "targetDigest": "8f6837b88c85ff3a553869172595c5ec1cb22a56c067fd324aa576673c536cc1",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-claude-plugin-01.json"
+        },
+        {
+          "claimId": "claim_2a1e1a761f429a1927ca41e55ee824a1",
+          "sourcePath": "docs/specs/fgos-plugin.md",
+          "sourceDigest": "cfba02bb0c64c5f1e11aad85ce72d2127e002b8f7e28c505a3aff5ea0befc137",
+          "targetPath": "docs/platform/claude-plugin/spec.md",
+          "targetDigest": "cfba02bb0c64c5f1e11aad85ce72d2127e002b8f7e28c505a3aff5ea0befc137",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-claude-plugin-01.json"
+        },
+        {
+          "claimId": "claim_ca6cdaccc48e3ff8da4532ff2fc1fa55",
+          "sourcePath": "docs/specs/fgos-plugin.md",
+          "sourceDigest": "15cc6bd4314b7981d203e220c5fe4e4c37dd75542ab1dc62aae55a8d3d1264e4",
+          "targetPath": "docs/platform/claude-plugin/spec.md",
+          "targetDigest": "15cc6bd4314b7981d203e220c5fe4e4c37dd75542ab1dc62aae55a8d3d1264e4",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-claude-plugin-01.json"
+        },
+        {
+          "claimId": "claim_7937db7d5974c226d7e05f97326a5bc9",
+          "sourcePath": "docs/specs/fgos-plugin.md",
+          "sourceDigest": "9e819c07e10200717785bb78ce288f08488d76f33547a8874f589fa191967bd5",
+          "targetPath": "docs/platform/claude-plugin/spec.md",
+          "targetDigest": "9e819c07e10200717785bb78ce288f08488d76f33547a8874f589fa191967bd5",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-claude-plugin-01.json"
+        },
+        {
+          "claimId": "claim_e20f7ff7ebbd47f4699edd6198797231",
+          "sourcePath": "docs/specs/decision-citation-drift.md",
+          "sourceDigest": "3893aff63d9705062d55c666da7760e16657cf2d144d1f702329a14948f64630",
+          "targetPath": "docs/platform/decision-citation-drift/spec.md",
+          "targetDigest": "3893aff63d9705062d55c666da7760e16657cf2d144d1f702329a14948f64630",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-decision-citation-drift-01.json"
+        },
+        {
+          "claimId": "claim_799091fae7d0b1a35a7053b22b43d065",
+          "sourcePath": "docs/specs/decision-citation-drift.md",
+          "sourceDigest": "408313efba87b25d55682f602abb76cc4728e6be0c0866bb434e7c027c0ce19e",
+          "targetPath": "docs/platform/decision-citation-drift/spec.md",
+          "targetDigest": "408313efba87b25d55682f602abb76cc4728e6be0c0866bb434e7c027c0ce19e",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-decision-citation-drift-01.json"
+        },
+        {
+          "claimId": "claim_3556818f023663dfcad72a90b7782e02",
+          "sourcePath": "docs/specs/decision-citation-drift.md",
+          "sourceDigest": "8914cbc1229686fc16ddda1dbde86708ac60615b0b313050b59e740ef45f8e9c",
+          "targetPath": "docs/platform/decision-citation-drift/spec.md",
+          "targetDigest": "8914cbc1229686fc16ddda1dbde86708ac60615b0b313050b59e740ef45f8e9c",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-decision-citation-drift-01.json"
+        },
+        {
+          "claimId": "claim_7e425277fb658644e211d3a6ba18f5c5",
+          "sourcePath": "docs/specs/decision-citation-drift.md",
+          "sourceDigest": "ddc10a212e811df7dfee1b3c902aa0417b08473aad551911cc5e52a0a2dc2ff8",
+          "targetPath": "docs/platform/decision-citation-drift/spec.md",
+          "targetDigest": "ddc10a212e811df7dfee1b3c902aa0417b08473aad551911cc5e52a0a2dc2ff8",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-decision-citation-drift-01.json"
+        },
+        {
+          "claimId": "claim_98824ede2fb41b178a6a92aed5591b28",
+          "sourcePath": "docs/specs/decision-citation-drift.md",
+          "sourceDigest": "587dc1ed801795c039c0cf635242d774809fdd15591993e049f779d4cd523121",
+          "targetPath": "docs/platform/decision-citation-drift/spec.md",
+          "targetDigest": "587dc1ed801795c039c0cf635242d774809fdd15591993e049f779d4cd523121",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-decision-citation-drift-01.json"
+        },
+        {
+          "claimId": "claim_5176afd2c7a6b5cf980c6ea133419f9e",
+          "sourcePath": "docs/specs/decision-citation-drift.md",
+          "sourceDigest": "fa66523b9149930dae2c9cbeb4d5dbfb5559e8ec842310f86505af1c0ae0ea54",
+          "targetPath": "docs/platform/decision-citation-drift/spec.md",
+          "targetDigest": "fa66523b9149930dae2c9cbeb4d5dbfb5559e8ec842310f86505af1c0ae0ea54",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-decision-citation-drift-01.json"
+        },
+        {
+          "claimId": "claim_e26e9f5cc87f216bf7a4144f6a2fd62a",
+          "sourcePath": "docs/specs/decision-citation-drift.md",
+          "sourceDigest": "99281802ea8714ea8170f59bd553f0b307f603a746c6596110379cea0b5b1adc",
+          "targetPath": "docs/platform/decision-citation-drift/spec.md",
+          "targetDigest": "99281802ea8714ea8170f59bd553f0b307f603a746c6596110379cea0b5b1adc",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-decision-citation-drift-01.json"
+        },
+        {
+          "claimId": "claim_2cba8bb652aeb76ce0ab3c0317c39a6b",
+          "sourcePath": "docs/specs/decision-citation-drift.md",
+          "sourceDigest": "590a6241c63ec4da994d248188f60056371d9051dcbd657d8ff59335dd382b60",
+          "targetPath": "docs/platform/decision-citation-drift/spec.md",
+          "targetDigest": "590a6241c63ec4da994d248188f60056371d9051dcbd657d8ff59335dd382b60",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-decision-citation-drift-01.json"
+        },
+        {
+          "claimId": "claim_231e775c29956a4a2a776810cc12a935",
+          "sourcePath": "docs/specs/decision-citation-drift.md",
+          "sourceDigest": "7a22bf47723aee067c9ee720b0fc8d75121b13f4aeb9aa8ed233d20da9c93500",
+          "targetPath": "docs/platform/decision-citation-drift/spec.md",
+          "targetDigest": "7a22bf47723aee067c9ee720b0fc8d75121b13f4aeb9aa8ed233d20da9c93500",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-decision-citation-drift-01.json"
+        },
+        {
+          "claimId": "claim_4966e71788ccddf622cb3c79fa20b4ec",
+          "sourcePath": "docs/specs/decision-citation-drift.md",
+          "sourceDigest": "b2c59c202dc6de42a01a6cec95a4aeca692960350aee8e0f37198a01c736dacd",
+          "targetPath": "docs/platform/decision-citation-drift/spec.md",
+          "targetDigest": "b2c59c202dc6de42a01a6cec95a4aeca692960350aee8e0f37198a01c736dacd",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-decision-citation-drift-01.json"
+        },
+        {
+          "claimId": "claim_8d4400399f1a8eb72474e15691577d1f",
+          "sourcePath": "docs/specs/distillery.md",
+          "sourceDigest": "38b03ba75f9d6fd9e7f83f5ef5f909d79006e20e49a119a53a8a9a2c229e2e95",
+          "targetPath": "docs/platform/distillery/spec.md",
+          "targetDigest": "38b03ba75f9d6fd9e7f83f5ef5f909d79006e20e49a119a53a8a9a2c229e2e95",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-distillery-01.json"
+        },
+        {
+          "claimId": "claim_030914214315e12e5ee492361b959fa8",
+          "sourcePath": "docs/specs/distillery.md",
+          "sourceDigest": "0601f676d24bb748feb8d5ef2ef95533e43b12671f4ded9087e77e0607038e9c",
+          "targetPath": "docs/platform/distillery/spec.md",
+          "targetDigest": "0601f676d24bb748feb8d5ef2ef95533e43b12671f4ded9087e77e0607038e9c",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-distillery-01.json"
+        },
+        {
+          "claimId": "claim_40196224e217e77d89e57d0ffaf2abb2",
+          "sourcePath": "docs/specs/distillery.md",
+          "sourceDigest": "334c0e187773d73024ba617a9bed97656d0bbbcfdd3dcc49b1a6c8fd90b13275",
+          "targetPath": "docs/platform/distillery/spec.md",
+          "targetDigest": "334c0e187773d73024ba617a9bed97656d0bbbcfdd3dcc49b1a6c8fd90b13275",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-distillery-01.json"
+        },
+        {
+          "claimId": "claim_a299172986d37bd5b62d22f36bbb8779",
+          "sourcePath": "docs/specs/distillery.md",
+          "sourceDigest": "3f0f6269d0ff09f0df3c6666b873653c8d001b1771a137fa043bec48268e6834",
+          "targetPath": "docs/platform/distillery/spec.md",
+          "targetDigest": "3f0f6269d0ff09f0df3c6666b873653c8d001b1771a137fa043bec48268e6834",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-distillery-01.json"
+        },
+        {
+          "claimId": "claim_f9628d49e013fa3d4269ec432b7ba443",
+          "sourcePath": "docs/specs/distillery.md",
+          "sourceDigest": "51355c05a9fd75683883f82bc4d1d691274ca95e8d83722abe0933860c4bef99",
+          "targetPath": "docs/platform/distillery/spec.md",
+          "targetDigest": "51355c05a9fd75683883f82bc4d1d691274ca95e8d83722abe0933860c4bef99",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-distillery-01.json"
+        },
+        {
+          "claimId": "claim_5c674a057e92715ff96b88a32ae0f3f4",
+          "sourcePath": "docs/specs/distillery.md",
+          "sourceDigest": "02543d603ca0b1be88bae787b73b2603664554883fc89896ab0f0e916e3287c4",
+          "targetPath": "docs/platform/distillery/spec.md",
+          "targetDigest": "02543d603ca0b1be88bae787b73b2603664554883fc89896ab0f0e916e3287c4",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-distillery-01.json"
+        },
+        {
+          "claimId": "claim_00affff32942b999e43d36d74d1d9917",
+          "sourcePath": "docs/specs/distillery.md",
+          "sourceDigest": "ecbc1e3549a472da566e42516264977768db33d26faedc079f50e6d641b9dc01",
+          "targetPath": "docs/platform/distillery/spec.md",
+          "targetDigest": "ecbc1e3549a472da566e42516264977768db33d26faedc079f50e6d641b9dc01",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-distillery-01.json"
+        },
+        {
+          "claimId": "claim_637b69327d2486602ee428a8b90936c8",
+          "sourcePath": "docs/specs/distillery.md",
+          "sourceDigest": "f770390c5ca45f6660f36a2c5dff4a537e9b0ac7a021d4a00c09643851c1d49b",
+          "targetPath": "docs/platform/distillery/spec.md",
+          "targetDigest": "f770390c5ca45f6660f36a2c5dff4a537e9b0ac7a021d4a00c09643851c1d49b",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-distillery-01.json"
+        },
+        {
+          "claimId": "claim_4e14a24a1ef22e30a058748641d53ec4",
+          "sourcePath": "docs/specs/distillery.md",
+          "sourceDigest": "60a616595e9c4ddd3d8a4514541aaf9c72c57b1bcc93d97889c5769189adc60d",
+          "targetPath": "docs/platform/distillery/spec.md",
+          "targetDigest": "60a616595e9c4ddd3d8a4514541aaf9c72c57b1bcc93d97889c5769189adc60d",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-distillery-01.json"
+        },
+        {
+          "claimId": "claim_4e61f8ab46c7791e563a905c6dcc2ba4",
+          "sourcePath": "docs/specs/distillery.md",
+          "sourceDigest": "78a40b7774cf741b2728ba02969e60ad06b066734352b3445238c6cfb4c11b00",
+          "targetPath": "docs/platform/distillery/spec.md",
+          "targetDigest": "78a40b7774cf741b2728ba02969e60ad06b066734352b3445238c6cfb4c11b00",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-distillery-01.json"
+        },
+        {
+          "claimId": "claim_f94cf2b9ad1454f4fb3811c1cce319e6",
+          "sourcePath": "docs/specs/distillery.md",
+          "sourceDigest": "9423d35eb1a6338d9bcdac92d5492002e9328db395a488a88bd848e20be94289",
+          "targetPath": "docs/platform/distillery/spec.md",
+          "targetDigest": "9423d35eb1a6338d9bcdac92d5492002e9328db395a488a88bd848e20be94289",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-distillery-01.json"
+        },
+        {
+          "claimId": "claim_a6e14d898be041f4bc809648957380c1",
+          "sourcePath": "docs/specs/herdr-web-dashboard.md",
+          "sourceDigest": "dea3185efa03fa43112df841e918ccc6c17fc3768e2b6617f6d9c2ebbefefda5",
+          "targetPath": "docs/platform/herdr-web-dashboard/spec.md",
+          "targetDigest": "dea3185efa03fa43112df841e918ccc6c17fc3768e2b6617f6d9c2ebbefefda5",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json"
+        },
+        {
+          "claimId": "claim_48a409dd2114987646733cb3d66bd6b1",
+          "sourcePath": "docs/specs/herdr-web-dashboard.md",
+          "sourceDigest": "f5637b304adfb2017df338ea99078d779a43a721765c812868be7dce2b0b55d3",
+          "targetPath": "docs/platform/herdr-web-dashboard/spec.md",
+          "targetDigest": "f5637b304adfb2017df338ea99078d779a43a721765c812868be7dce2b0b55d3",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json"
+        },
+        {
+          "claimId": "claim_e9ca88e52937c9e6a7b45683453caf86",
+          "sourcePath": "docs/specs/herdr-web-dashboard.md",
+          "sourceDigest": "9cb9250c3b4a59113aabd2ea750c259a8d9dd93ec8c844738c9759af740673af",
+          "targetPath": "docs/platform/herdr-web-dashboard/spec.md",
+          "targetDigest": "9cb9250c3b4a59113aabd2ea750c259a8d9dd93ec8c844738c9759af740673af",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json"
+        },
+        {
+          "claimId": "claim_ba9a64fb389def2b21fce816844701ee",
+          "sourcePath": "docs/specs/herdr-web-dashboard.md",
+          "sourceDigest": "43742a6b577526fdf6a3e89da2aebda6d2c1b22533ba745d7b1a5399ba734fd5",
+          "targetPath": "docs/platform/herdr-web-dashboard/spec.md",
+          "targetDigest": "43742a6b577526fdf6a3e89da2aebda6d2c1b22533ba745d7b1a5399ba734fd5",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json"
+        },
+        {
+          "claimId": "claim_ec3a7b2ec42c939b9ac745b6bdbcf5c3",
+          "sourcePath": "docs/specs/herdr-web-dashboard.md",
+          "sourceDigest": "95e0c20e567a40e3bb624dd8e039e6f08b3f079260bbe5fba7a95b53f03197d8",
+          "targetPath": "docs/platform/herdr-web-dashboard/spec.md",
+          "targetDigest": "95e0c20e567a40e3bb624dd8e039e6f08b3f079260bbe5fba7a95b53f03197d8",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json"
+        },
+        {
+          "claimId": "claim_5877600a52b4cf5568796da3c9044b65",
+          "sourcePath": "docs/specs/herdr-web-dashboard.md",
+          "sourceDigest": "6fe8b44476ba00c6aa3e5c46960ec7e060c6186fffd0f444669a3bc8950cb176",
+          "targetPath": "docs/platform/herdr-web-dashboard/spec.md",
+          "targetDigest": "6fe8b44476ba00c6aa3e5c46960ec7e060c6186fffd0f444669a3bc8950cb176",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json"
+        },
+        {
+          "claimId": "claim_cdbe500eb5f501430eed0011898c2437",
+          "sourcePath": "docs/specs/herdr-web-dashboard.md",
+          "sourceDigest": "8e2f1fc09a1d0e22e5063a741ee91537bcccf3b7527fe5b49447c9c6c4526605",
+          "targetPath": "docs/platform/herdr-web-dashboard/spec.md",
+          "targetDigest": "8e2f1fc09a1d0e22e5063a741ee91537bcccf3b7527fe5b49447c9c6c4526605",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json"
+        },
+        {
+          "claimId": "claim_7d20f3261994b06bf8aab4ce53375a6b",
+          "sourcePath": "docs/specs/herdr-web-dashboard.md",
+          "sourceDigest": "56ef9d1bb263a4c4ebb9bb6f14c8e76fc860e387d12b3bd162e9f7758fa7523a",
+          "targetPath": "docs/platform/herdr-web-dashboard/spec.md",
+          "targetDigest": "56ef9d1bb263a4c4ebb9bb6f14c8e76fc860e387d12b3bd162e9f7758fa7523a",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json"
+        },
+        {
+          "claimId": "claim_8fc8f5d9d754055cd3192f32178f0ef8",
+          "sourcePath": "docs/specs/herdr-web-dashboard.md",
+          "sourceDigest": "fa5bf141c33adf0feb5f6118ac5d549d6c8b49a74dc1bbd5c5ef5b12b54f90a3",
+          "targetPath": "docs/platform/herdr-web-dashboard/spec.md",
+          "targetDigest": "fa5bf141c33adf0feb5f6118ac5d549d6c8b49a74dc1bbd5c5ef5b12b54f90a3",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json"
+        },
+        {
+          "claimId": "claim_713e8533374a977b44c019d9296ff88f",
+          "sourcePath": "docs/specs/herdr-web-dashboard.md",
+          "sourceDigest": "5dd7066702c3791b0b10a5648dbf72eadbd6caa22a72d2315ccbc363474cfd2d",
+          "targetPath": "docs/platform/herdr-web-dashboard/spec.md",
+          "targetDigest": "5dd7066702c3791b0b10a5648dbf72eadbd6caa22a72d2315ccbc363474cfd2d",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json"
+        },
+        {
+          "claimId": "claim_0af7828129bb0ef344d1aff694b04b63",
+          "sourcePath": "docs/specs/herdr-web-dashboard.md",
+          "sourceDigest": "fddea92eb03048fc39ca8e07c7d5d6648080519149c35168970e5c5314579ceb",
+          "targetPath": "docs/platform/herdr-web-dashboard/spec.md",
+          "targetDigest": "fddea92eb03048fc39ca8e07c7d5d6648080519149c35168970e5c5314579ceb",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json"
+        },
+        {
+          "claimId": "claim_9d613c56217c5da75868821a335fafbc",
+          "sourcePath": "docs/specs/herdr-web-dashboard.md",
+          "sourceDigest": "02c2abfc0e3fe0906c987d5096cd89e700df4ddfdb6c624d8ca8c5014e313208",
+          "targetPath": "docs/platform/herdr-web-dashboard/spec.md",
+          "targetDigest": "02c2abfc0e3fe0906c987d5096cd89e700df4ddfdb6c624d8ca8c5014e313208",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json"
+        },
+        {
+          "claimId": "claim_9d7b246d0d09f47c6fe718ca58c8d36b",
+          "sourcePath": "docs/specs/herdr-web-dashboard.md",
+          "sourceDigest": "56f851b8da5f2ef6070d3123168a84c84275cab6214cc0bc5c53c5fcfebf70a7",
+          "targetPath": "docs/platform/herdr-web-dashboard/spec.md",
+          "targetDigest": "56f851b8da5f2ef6070d3123168a84c84275cab6214cc0bc5c53c5fcfebf70a7",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json"
+        },
+        {
+          "claimId": "claim_027ad55814e7186aae754658b36a3da4",
+          "sourcePath": "docs/specs/herdr-web-dashboard.md",
+          "sourceDigest": "4e9dfc7b870ed0c42ee01256f4dd11e3147a0fbcfee3110d924ca2a91bf50c4b",
+          "targetPath": "docs/platform/herdr-web-dashboard/spec.md",
+          "targetDigest": "4e9dfc7b870ed0c42ee01256f4dd11e3147a0fbcfee3110d924ca2a91bf50c4b",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json"
+        },
+        {
+          "claimId": "claim_8103c8b9283356118e1c5f0126d387da",
+          "sourcePath": "docs/specs/herdr-web-dashboard.md",
+          "sourceDigest": "2f88434b367c4e8e15004d9d8dc0176f0c18d30dda2922a07a2272af81036838",
+          "targetPath": "docs/platform/herdr-web-dashboard/spec.md",
+          "targetDigest": "2f88434b367c4e8e15004d9d8dc0176f0c18d30dda2922a07a2272af81036838",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json"
+        },
+        {
+          "claimId": "claim_1b33df3ee3004adf514f1532e32002cc",
+          "sourcePath": "docs/specs/herdr-web-dashboard.md",
+          "sourceDigest": "9e0b0e9b88a3b25b9731259e1c31d18661c588da2987fc364957d480a2391dd6",
+          "targetPath": "docs/platform/herdr-web-dashboard/spec.md",
+          "targetDigest": "9e0b0e9b88a3b25b9731259e1c31d18661c588da2987fc364957d480a2391dd6",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json"
+        },
+        {
+          "claimId": "claim_ea002bc3d8c38abf1f348cce4f96931e",
+          "sourcePath": "docs/specs/herdr-web-dashboard.md",
+          "sourceDigest": "ab25ec2e78e6b621aef48959d5050681a09fcfcd9f0bb232c6e17fb089c3527a",
+          "targetPath": "docs/platform/herdr-web-dashboard/spec.md",
+          "targetDigest": "ab25ec2e78e6b621aef48959d5050681a09fcfcd9f0bb232c6e17fb089c3527a",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json"
+        },
+        {
+          "claimId": "claim_7b00d9d035bd97de226726944f711311",
+          "sourcePath": "docs/specs/herdr-web-dashboard.md",
+          "sourceDigest": "956aba0bd61a349e8e839c956ce22ee818fd15e47af10c447c34b9030859ad27",
+          "targetPath": "docs/platform/herdr-web-dashboard/spec.md",
+          "targetDigest": "956aba0bd61a349e8e839c956ce22ee818fd15e47af10c447c34b9030859ad27",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json"
+        },
+        {
+          "claimId": "claim_1522a44e0505b7aaed5d55bf4f2b1900",
+          "sourcePath": "docs/specs/herdr-web-dashboard.md",
+          "sourceDigest": "b56dc220d011602cc15df733f86c367b9582332414162a6ca27b45ca34f09705",
+          "targetPath": "docs/platform/herdr-web-dashboard/spec.md",
+          "targetDigest": "b56dc220d011602cc15df733f86c367b9582332414162a6ca27b45ca34f09705",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json"
+        },
+        {
+          "claimId": "claim_45115f693318a55ed50c43db83c97baa",
+          "sourcePath": "docs/specs/herdr-web-dashboard.md",
+          "sourceDigest": "7d9e2d425937e495926bbff08bacc8e77e9781253b5c83692215e62cf6da2913",
+          "targetPath": "docs/platform/herdr-web-dashboard/spec.md",
+          "targetDigest": "7d9e2d425937e495926bbff08bacc8e77e9781253b5c83692215e62cf6da2913",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json"
+        },
+        {
+          "claimId": "claim_878e9f5faa08a2977408f49e04af0a7a",
+          "sourcePath": "docs/specs/herdr-web-dashboard.md",
+          "sourceDigest": "1c226a16285c1c611d2dcbc3db679c21f6367eb19f66428f97fa0b6741c2027d",
+          "targetPath": "docs/platform/herdr-web-dashboard/spec.md",
+          "targetDigest": "1c226a16285c1c611d2dcbc3db679c21f6367eb19f66428f97fa0b6741c2027d",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json"
+        },
+        {
+          "claimId": "claim_83dd4d99cd52076452282b5565b0ea22",
+          "sourcePath": "docs/specs/herdr-web-dashboard.md",
+          "sourceDigest": "ef410a08c708a2f590fd777deb282577a8712b80ca1eee9522247534cc06ad99",
+          "targetPath": "docs/platform/herdr-web-dashboard/spec.md",
+          "targetDigest": "ef410a08c708a2f590fd777deb282577a8712b80ca1eee9522247534cc06ad99",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json"
+        },
+        {
+          "claimId": "claim_dc3d0ae980bf2501bc8eabfa0484a46d",
+          "sourcePath": "docs/specs/herdr-web-dashboard.md",
+          "sourceDigest": "b3f1a4dd83b0ff718a816b9eb068e4c5521f1d4ee30919d3ad097e62f4d16512",
+          "targetPath": "docs/platform/herdr-web-dashboard/spec.md",
+          "targetDigest": "b3f1a4dd83b0ff718a816b9eb068e4c5521f1d4ee30919d3ad097e62f4d16512",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json"
+        },
+        {
+          "claimId": "claim_69691b25b6d84c05b566346866ec6c83",
+          "sourcePath": "docs/specs/herdr-web-dashboard.md",
+          "sourceDigest": "b0d3ed0823c5a6e58fc870563461d32c3ce61fd9745b78444276500e7135addb",
+          "targetPath": "docs/platform/herdr-web-dashboard/spec.md",
+          "targetDigest": "b0d3ed0823c5a6e58fc870563461d32c3ce61fd9745b78444276500e7135addb",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json"
+        },
+        {
+          "claimId": "claim_398a2a6235ab1ae2d5264325daf42a5c",
+          "sourcePath": "docs/specs/observe.md",
+          "sourceDigest": "b268929538ae29dad4d30bcab03673684209ffaad00be9cf4e111374c1827513",
+          "targetPath": "docs/platform/observe/spec.md",
+          "targetDigest": "b268929538ae29dad4d30bcab03673684209ffaad00be9cf4e111374c1827513",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json"
+        },
+        {
+          "claimId": "claim_a2b2774f89a89257732a551b52addc22",
+          "sourcePath": "docs/specs/observe.md",
+          "sourceDigest": "4b789fc020f2595baff813b25b8f25e819353196670c3d4d838d46c72d70012d",
+          "targetPath": "docs/platform/observe/spec.md",
+          "targetDigest": "4b789fc020f2595baff813b25b8f25e819353196670c3d4d838d46c72d70012d",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json"
+        },
+        {
+          "claimId": "claim_a7278e1567e5432cfb079506cf2f5050",
+          "sourcePath": "docs/specs/observe.md",
+          "sourceDigest": "1840cc4b1da22587ed69755276cad9a882139c62a36179d8fba2269905414623",
+          "targetPath": "docs/platform/observe/spec.md",
+          "targetDigest": "1840cc4b1da22587ed69755276cad9a882139c62a36179d8fba2269905414623",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json"
+        },
+        {
+          "claimId": "claim_50d0f11082f8a7c2a9460b3a970586af",
+          "sourcePath": "docs/specs/observe.md",
+          "sourceDigest": "cda71f698f80c3f641fc0c525f08d2e8ae35083e5e6b3619f97f815b5ec99f93",
+          "targetPath": "docs/platform/observe/spec.md",
+          "targetDigest": "cda71f698f80c3f641fc0c525f08d2e8ae35083e5e6b3619f97f815b5ec99f93",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json"
+        },
+        {
+          "claimId": "claim_7910591f62e9bc90ce6c1a90b8aa31bc",
+          "sourcePath": "docs/specs/observe.md",
+          "sourceDigest": "f8410587c25fa1a5be9615ca6551e2347ce424eb682e8fe3867fd7775e96fadc",
+          "targetPath": "docs/platform/observe/spec.md",
+          "targetDigest": "f8410587c25fa1a5be9615ca6551e2347ce424eb682e8fe3867fd7775e96fadc",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json"
+        },
+        {
+          "claimId": "claim_7ff19d6895d1d1e5ea2d56e881259e4d",
+          "sourcePath": "docs/specs/observe.md",
+          "sourceDigest": "91ec155bfcec407b060d39ed9ca7458c928f51cc4ff4a69be8942daa0e8c943d",
+          "targetPath": "docs/platform/observe/spec.md",
+          "targetDigest": "91ec155bfcec407b060d39ed9ca7458c928f51cc4ff4a69be8942daa0e8c943d",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json"
+        },
+        {
+          "claimId": "claim_af8421bdba71901b8706678586ae03cb",
+          "sourcePath": "docs/specs/observe.md",
+          "sourceDigest": "9c492a74b2527331a937aced7683a78cd847277317273fe52b6a41c8119931ee",
+          "targetPath": "docs/platform/observe/spec.md",
+          "targetDigest": "9c492a74b2527331a937aced7683a78cd847277317273fe52b6a41c8119931ee",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json"
+        },
+        {
+          "claimId": "claim_9e9c3f9e870fed7d23af811ce2178b47",
+          "sourcePath": "docs/specs/observe.md",
+          "sourceDigest": "ba7d2394b0857879e6448aaba7d9f085662941256e47407f0b72bd18e178a75c",
+          "targetPath": "docs/platform/observe/spec.md",
+          "targetDigest": "ba7d2394b0857879e6448aaba7d9f085662941256e47407f0b72bd18e178a75c",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json"
+        },
+        {
+          "claimId": "claim_46877d1e9417370e4b6f2c36cd2a84cb",
+          "sourcePath": "docs/specs/observe.md",
+          "sourceDigest": "38a6ec109f43ee224a59731555260f01a4727b8b0a39937a7e15fd7af3b3d731",
+          "targetPath": "docs/platform/observe/spec.md",
+          "targetDigest": "38a6ec109f43ee224a59731555260f01a4727b8b0a39937a7e15fd7af3b3d731",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json"
+        },
+        {
+          "claimId": "claim_d8df03b03865a0d0968739d00129f0a3",
+          "sourcePath": "docs/specs/observe.md",
+          "sourceDigest": "6b68a1227525c179699df85a2740ac5cddef67482e08d171e27dfac789472e8b",
+          "targetPath": "docs/platform/observe/spec.md",
+          "targetDigest": "6b68a1227525c179699df85a2740ac5cddef67482e08d171e27dfac789472e8b",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json"
+        },
+        {
+          "claimId": "claim_4fa792519d532d3ad333e0c2566bc935",
+          "sourcePath": "docs/ui-spec/00-overview.md",
+          "sourceDigest": "b61e74726631cc9e12744d93383ce64b2afff77ec3d0a58e3fac7631be969ecd",
+          "targetPath": "docs/platform/ui-spec/spec.md",
+          "targetDigest": "b61e74726631cc9e12744d93383ce64b2afff77ec3d0a58e3fac7631be969ecd",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_a6ab93a6bd86cc14f83e5022a2323387",
+          "sourcePath": "docs/ui-spec/00-overview.md",
+          "sourceDigest": "1e1a662c6e15fe8e83c97b729c44872d5cc75aa94cf4f8e1b1789d7e3ba2775d",
+          "targetPath": "docs/platform/ui-spec/spec.md",
+          "targetDigest": "1e1a662c6e15fe8e83c97b729c44872d5cc75aa94cf4f8e1b1789d7e3ba2775d",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_88fd76453441113b17cd784177a9081c",
+          "sourcePath": "docs/ui-spec/00-overview.md",
+          "sourceDigest": "5d2b18d22620d6ad6bb42432f5f38fa6660f15e7e6c604225f67d96faa40ac55",
+          "targetPath": "docs/platform/ui-spec/spec.md",
+          "targetDigest": "5d2b18d22620d6ad6bb42432f5f38fa6660f15e7e6c604225f67d96faa40ac55",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_91330f2248982f1d6df5071f335b1064",
+          "sourcePath": "docs/ui-spec/00-overview.md",
+          "sourceDigest": "ea8915b9b44ba81d2f47d5949641f3daf7f112d295f68b4e35e1d0e59576ee26",
+          "targetPath": "docs/platform/ui-spec/spec.md",
+          "targetDigest": "ea8915b9b44ba81d2f47d5949641f3daf7f112d295f68b4e35e1d0e59576ee26",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_af10734d11a45127f86e662a27b20bff",
+          "sourcePath": "docs/ui-spec/00-overview.md",
+          "sourceDigest": "3a16ef11f4728b4ec8127ff4000b0c62f5f7c886f54be0e13e2a866539db5c69",
+          "targetPath": "docs/platform/ui-spec/spec.md",
+          "targetDigest": "3a16ef11f4728b4ec8127ff4000b0c62f5f7c886f54be0e13e2a866539db5c69",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_902e852cbdd48042261059044bba9304",
+          "sourcePath": "docs/ui-spec/00-overview.md",
+          "sourceDigest": "3624843473276cc436449e523d8d392d2c97b9e91ba36ceb685f8b1fd295aea8",
+          "targetPath": "docs/platform/ui-spec/spec.md",
+          "targetDigest": "3624843473276cc436449e523d8d392d2c97b9e91ba36ceb685f8b1fd295aea8",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_23152a13579b15a727ac20354b0c0889",
+          "sourcePath": "docs/ui-spec/00-overview.md",
+          "sourceDigest": "6ebc8583aa59e28c3ce8bea6ad719ca3947b2625c56d1666dcc2cdb90f642277",
+          "targetPath": "docs/platform/ui-spec/spec.md",
+          "targetDigest": "6ebc8583aa59e28c3ce8bea6ad719ca3947b2625c56d1666dcc2cdb90f642277",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_f5414fdf7b56dcc5ecfee0dbbe5b9cd2",
+          "sourcePath": "docs/ui-spec/00-overview.md",
+          "sourceDigest": "7e6438293b79664d86dbdd4dea092ac9cccbaa898bd646bdf0382525c97ac972",
+          "targetPath": "docs/platform/ui-spec/spec.md",
+          "targetDigest": "7e6438293b79664d86dbdd4dea092ac9cccbaa898bd646bdf0382525c97ac972",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_dd3ad839ba07d233d4389822d192e7a1",
+          "sourcePath": "docs/ui-spec/00-overview.md",
+          "sourceDigest": "aae24ffa47c4b917567873038a8c3a499338d69d9b42de12ac65ec64aef4782d",
+          "targetPath": "docs/platform/ui-spec/spec.md",
+          "targetDigest": "aae24ffa47c4b917567873038a8c3a499338d69d9b42de12ac65ec64aef4782d",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_7adfa144991fe6de9a316f7ea81553d0",
+          "sourcePath": "docs/ui-spec/00-overview.md",
+          "sourceDigest": "3324fde2c080f440e352d3276b5dddb25b0b74dc48201f293d0e905c6afced8e",
+          "targetPath": "docs/platform/ui-spec/spec.md",
+          "targetDigest": "3324fde2c080f440e352d3276b5dddb25b0b74dc48201f293d0e905c6afced8e",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_271679d81259c0ae4190964de3d736f2",
+          "sourcePath": "docs/ui-spec/00-overview.md",
+          "sourceDigest": "2f30aaa9f483a4a395a79fda930732ebc9e66af7d52852fad2ca25bf466cb218",
+          "targetPath": "docs/platform/ui-spec/spec.md",
+          "targetDigest": "2f30aaa9f483a4a395a79fda930732ebc9e66af7d52852fad2ca25bf466cb218",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_1d9a2f67d538f7938f0987b2065c7e16",
+          "sourcePath": "docs/ui-spec/15-system-events.md",
+          "sourceDigest": "e13c6b0538fcc22c0487c1bd07773dea3e9900b4add7789e144f0daf94145a66",
+          "targetPath": "docs/platform/ui-spec/contracts/15-system-events.md",
+          "targetDigest": "e13c6b0538fcc22c0487c1bd07773dea3e9900b4add7789e144f0daf94145a66",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_1ddab2f3852d81b387b8cf74a1311d0a",
+          "sourcePath": "docs/ui-spec/15-system-events.md",
+          "sourceDigest": "913f124f9b88bca2eb8e1d9d8350df0bb8b5637505ec127a5dad11a33e763f1a",
+          "targetPath": "docs/platform/ui-spec/contracts/15-system-events.md",
+          "targetDigest": "913f124f9b88bca2eb8e1d9d8350df0bb8b5637505ec127a5dad11a33e763f1a",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_d6076e6b828e60d4f4461a9fa942abd0",
+          "sourcePath": "docs/ui-spec/15-system-events.md",
+          "sourceDigest": "c75c05d93e077f415da151b39988a18e3fea9d74828310aad3e6b05e41d45220",
+          "targetPath": "docs/platform/ui-spec/contracts/15-system-events.md",
+          "targetDigest": "c75c05d93e077f415da151b39988a18e3fea9d74828310aad3e6b05e41d45220",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_de45b6ef8f78c2b53349376df8072f5d",
+          "sourcePath": "docs/ui-spec/15-system-events.md",
+          "sourceDigest": "3230d51afd86168ac0d6b0b941bdbec980f1c93342cfbf90d889d99a79c37b7c",
+          "targetPath": "docs/platform/ui-spec/contracts/15-system-events.md",
+          "targetDigest": "3230d51afd86168ac0d6b0b941bdbec980f1c93342cfbf90d889d99a79c37b7c",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_96fc409e143e98260cfd0695c72fa9a0",
+          "sourcePath": "docs/ui-spec/15-system-events.md",
+          "sourceDigest": "c3d3ec45edcf27bd90678fd6c343e01f42f3b3e9d46dea269689f945734d04b7",
+          "targetPath": "docs/platform/ui-spec/contracts/15-system-events.md",
+          "targetDigest": "c3d3ec45edcf27bd90678fd6c343e01f42f3b3e9d46dea269689f945734d04b7",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_c843b4d07d3d98b6ae711e0d44dee9cd",
+          "sourcePath": "docs/ui-spec/15-system-events.md",
+          "sourceDigest": "4bbbe0a7e63ef0ba2347a43f05399168b927a3be951963e858498793bbdc293d",
+          "targetPath": "docs/platform/ui-spec/contracts/15-system-events.md",
+          "targetDigest": "4bbbe0a7e63ef0ba2347a43f05399168b927a3be951963e858498793bbdc293d",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_0dfdb4f90458e4e9005cca22add8561e",
+          "sourcePath": "docs/ui-spec/15-system-events.md",
+          "sourceDigest": "4446f3202dc7b42c7772d91df31d7824e97d8b9cf83a0c7d621cdec61be731c5",
+          "targetPath": "docs/platform/ui-spec/contracts/15-system-events.md",
+          "targetDigest": "4446f3202dc7b42c7772d91df31d7824e97d8b9cf83a0c7d621cdec61be731c5",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_3840275b1b17103c2967eb18f7a7406c",
+          "sourcePath": "docs/ui-spec/15-system-events.md",
+          "sourceDigest": "0254be7d0a2b2b74189749eac67e1264bef26cf1740265399789dc61ef6d4b45",
+          "targetPath": "docs/platform/ui-spec/contracts/15-system-events.md",
+          "targetDigest": "0254be7d0a2b2b74189749eac67e1264bef26cf1740265399789dc61ef6d4b45",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_27a3faa641f5cfd73b3038fcbaf000e5",
+          "sourcePath": "docs/ui-spec/20-domain-rules.md",
+          "sourceDigest": "c69ce9aa380c0eefd8f19f2740d37efd0ed5db921081d06953a54ade0cd3f7b1",
+          "targetPath": "docs/platform/ui-spec/contracts/20-domain-rules.md",
+          "targetDigest": "c69ce9aa380c0eefd8f19f2740d37efd0ed5db921081d06953a54ade0cd3f7b1",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_0380d86ba81fabec2f0826967ca3371e",
+          "sourcePath": "docs/ui-spec/20-domain-rules.md",
+          "sourceDigest": "ff9d4af305d3725a010e2add750c1935610012e2cede02238b41d15df2b50f09",
+          "targetPath": "docs/platform/ui-spec/contracts/20-domain-rules.md",
+          "targetDigest": "ff9d4af305d3725a010e2add750c1935610012e2cede02238b41d15df2b50f09",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_15126cc42a23aadb0a85c7a1328483f0",
+          "sourcePath": "docs/ui-spec/20-domain-rules.md",
+          "sourceDigest": "eefeb7d9db1e2cd91a10a80b8e5681f856ab4390d97cd3bbb209c25fb9601882",
+          "targetPath": "docs/platform/ui-spec/contracts/20-domain-rules.md",
+          "targetDigest": "eefeb7d9db1e2cd91a10a80b8e5681f856ab4390d97cd3bbb209c25fb9601882",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_c8ef81d2c23f4c1a516b889b7793de8e",
+          "sourcePath": "docs/ui-spec/20-domain-rules.md",
+          "sourceDigest": "08e2b5ce8d14a2be7069be53afb328c74153781ca698650bb9c6e47326035862",
+          "targetPath": "docs/platform/ui-spec/contracts/20-domain-rules.md",
+          "targetDigest": "08e2b5ce8d14a2be7069be53afb328c74153781ca698650bb9c6e47326035862",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_1528d6ae51b240a56a0e797f2791de5f",
+          "sourcePath": "docs/ui-spec/30-states-and-errors.md",
+          "sourceDigest": "111c5d3203513c70223511db3fe0713d6dab6173324ea10e21e75937087341b8",
+          "targetPath": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+          "targetDigest": "111c5d3203513c70223511db3fe0713d6dab6173324ea10e21e75937087341b8",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_e0c32c0638e0318ea1837d3ba029b40a",
+          "sourcePath": "docs/ui-spec/30-states-and-errors.md",
+          "sourceDigest": "5047b3cf3d85feddac09d65297fff638c47d665f45b69cc315b9df3df3ec2897",
+          "targetPath": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+          "targetDigest": "5047b3cf3d85feddac09d65297fff638c47d665f45b69cc315b9df3df3ec2897",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_a722999eb69d1c9d24447a86e90fcfd8",
+          "sourcePath": "docs/ui-spec/30-states-and-errors.md",
+          "sourceDigest": "8d86adebaee9f38520cddd95e1244a8decea21908e574610b40ded1d4e2697c0",
+          "targetPath": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+          "targetDigest": "8d86adebaee9f38520cddd95e1244a8decea21908e574610b40ded1d4e2697c0",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_4c11f5b519993b7e09de5246b7233dff",
+          "sourcePath": "docs/ui-spec/30-states-and-errors.md",
+          "sourceDigest": "dc78b582477b8dbf10e9281aa4de123c7bff4bcf2345a79afc7c73a4c988f60f",
+          "targetPath": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+          "targetDigest": "dc78b582477b8dbf10e9281aa4de123c7bff4bcf2345a79afc7c73a4c988f60f",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_808f0e82855544f8d09f94e674e44287",
+          "sourcePath": "docs/ui-spec/30-states-and-errors.md",
+          "sourceDigest": "89f5c24155ba871213196dbc7292ddd6f1592ffd1cdf3ddafceb23d8f7939638",
+          "targetPath": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+          "targetDigest": "89f5c24155ba871213196dbc7292ddd6f1592ffd1cdf3ddafceb23d8f7939638",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_d3d16b8feb8e452e15fe031621dd4629",
+          "sourcePath": "docs/ui-spec/30-states-and-errors.md",
+          "sourceDigest": "7c91a431b7eb89f26d1e8c10cc211b4528c38c3eb4cc72af2e54ab1c31368c51",
+          "targetPath": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+          "targetDigest": "7c91a431b7eb89f26d1e8c10cc211b4528c38c3eb4cc72af2e54ab1c31368c51",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_e3719cba1ffabfc2412cded7ca37041a",
+          "sourcePath": "docs/ui-spec/30-states-and-errors.md",
+          "sourceDigest": "45ee41b24f6371b6ae532ef8d3ccfe93ad3d9c86f0aff3eaeb685985c29e5088",
+          "targetPath": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+          "targetDigest": "45ee41b24f6371b6ae532ef8d3ccfe93ad3d9c86f0aff3eaeb685985c29e5088",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_4bcebe987cb103cc6f08c0c5c0be4943",
+          "sourcePath": "docs/ui-spec/30-states-and-errors.md",
+          "sourceDigest": "b2979dfc61dbc48cc1ff19423e5bf2494d7dad75757e24c02ad4ce0622d6a9d1",
+          "targetPath": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+          "targetDigest": "b2979dfc61dbc48cc1ff19423e5bf2494d7dad75757e24c02ad4ce0622d6a9d1",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_caad47154bc6946185ab1956c2af2435",
+          "sourcePath": "docs/ui-spec/30-states-and-errors.md",
+          "sourceDigest": "dfb06d8668600a4799167db2c6b4ab381430dd5497815057cbf7b2460d41171f",
+          "targetPath": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+          "targetDigest": "dfb06d8668600a4799167db2c6b4ab381430dd5497815057cbf7b2460d41171f",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_4c58ddfb5b033b778fa302b22391743f",
+          "sourcePath": "docs/ui-spec/30-states-and-errors.md",
+          "sourceDigest": "ebf2a831837a1fd9c887a6b857f3d17d9c0ba3c00cad23f49b9b80af521b6a97",
+          "targetPath": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+          "targetDigest": "ebf2a831837a1fd9c887a6b857f3d17d9c0ba3c00cad23f49b9b80af521b6a97",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_c8a3f574ec2210840cc738016305180b",
+          "sourcePath": "docs/ui-spec/30-states-and-errors.md",
+          "sourceDigest": "504311ca1d958ac45ae1698e7f2e1831d32f5f44ae97aa63c917b2f6634c6477",
+          "targetPath": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+          "targetDigest": "504311ca1d958ac45ae1698e7f2e1831d32f5f44ae97aa63c917b2f6634c6477",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_aecbc3babae704d462203a431851ec94",
+          "sourcePath": "docs/ui-spec/30-states-and-errors.md",
+          "sourceDigest": "0784a58a7ce6f15c715fcdfb8aba800c83655eb9f5c95098954b0b38e9cf7fe9",
+          "targetPath": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+          "targetDigest": "0784a58a7ce6f15c715fcdfb8aba800c83655eb9f5c95098954b0b38e9cf7fe9",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_01ca3b8e35f5ed270cfdcdfdc91ff7ec",
+          "sourcePath": "docs/ui-spec/30-states-and-errors.md",
+          "sourceDigest": "45109a415776433fff6402225f349518b227508e1e3f0af58fa6d88c7c3c6c82",
+          "targetPath": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+          "targetDigest": "45109a415776433fff6402225f349518b227508e1e3f0af58fa6d88c7c3c6c82",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_109add81bb924e6eee91fd71970cb736",
+          "sourcePath": "docs/ui-spec/components/C01-item-card.md",
+          "sourceDigest": "3a145c4c61d69e30e4e21c9ec2b01c1a093c2f2cf67e3d4a755bd1e73a676d04",
+          "targetPath": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+          "targetDigest": "3a145c4c61d69e30e4e21c9ec2b01c1a093c2f2cf67e3d4a755bd1e73a676d04",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_395f43e9fcab6a33a53287f989fc8c9f",
+          "sourcePath": "docs/ui-spec/components/C01-item-card.md",
+          "sourceDigest": "15b3c360bea3a0d48a0d56ddf9f43657b6155dd1d42168d987ccbaf856477ae5",
+          "targetPath": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+          "targetDigest": "15b3c360bea3a0d48a0d56ddf9f43657b6155dd1d42168d987ccbaf856477ae5",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_148f80fabb2860c02f3ecaae066d0dd9",
+          "sourcePath": "docs/ui-spec/components/C01-item-card.md",
+          "sourceDigest": "3f017de8e115fe6a31a606eff031929e6bfaa0d5fa79ea6bffc26784dc11510c",
+          "targetPath": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+          "targetDigest": "3f017de8e115fe6a31a606eff031929e6bfaa0d5fa79ea6bffc26784dc11510c",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_8979277c1d0e4524cae97fd341bebd94",
+          "sourcePath": "docs/ui-spec/components/C01-item-card.md",
+          "sourceDigest": "b1f21928b96cebaf6ee1f6dd16b8590999001215f981d3dc0299995c5954b32f",
+          "targetPath": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+          "targetDigest": "b1f21928b96cebaf6ee1f6dd16b8590999001215f981d3dc0299995c5954b32f",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_8a6a231da62f2274143d262fb24b062a",
+          "sourcePath": "docs/ui-spec/components/C01-item-card.md",
+          "sourceDigest": "55296892dc25c55b80f4e00a9369b7ebe0869ea53df9042f33894444baef91da",
+          "targetPath": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+          "targetDigest": "55296892dc25c55b80f4e00a9369b7ebe0869ea53df9042f33894444baef91da",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_3df1dabc3fce9334394d809c46c61e6b",
+          "sourcePath": "docs/ui-spec/components/C01-item-card.md",
+          "sourceDigest": "31cdc0799218defe77f0c879496156f54d4a0ab2aea7f5ae6463e51838695364",
+          "targetPath": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+          "targetDigest": "31cdc0799218defe77f0c879496156f54d4a0ab2aea7f5ae6463e51838695364",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_5764f10fa89eb4c38e22ce38a4fb1d6a",
+          "sourcePath": "docs/ui-spec/components/C01-item-card.md",
+          "sourceDigest": "7ff302f6acd07aa606cb4da2969c237e465d58ffbf3fd77fe987f59fa33d808f",
+          "targetPath": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+          "targetDigest": "7ff302f6acd07aa606cb4da2969c237e465d58ffbf3fd77fe987f59fa33d808f",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_bd5ce1469ab840023fd2640668a1ab35",
+          "sourcePath": "docs/ui-spec/components/C01-item-card.md",
+          "sourceDigest": "6f2e5a2ea6ae53322b557ee6fbb8cc479c38e36e5737d0b2c9d9e76d4ccfb016",
+          "targetPath": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+          "targetDigest": "6f2e5a2ea6ae53322b557ee6fbb8cc479c38e36e5737d0b2c9d9e76d4ccfb016",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_1d6b3967b477d9ada8de5c5b69a68ece",
+          "sourcePath": "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+          "sourceDigest": "4b9fa3e77cd364e748d9e3e8b15c51ac292b76768c2acab6f609d94b85646480",
+          "targetPath": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+          "targetDigest": "4b9fa3e77cd364e748d9e3e8b15c51ac292b76768c2acab6f609d94b85646480",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_4fca4420a5f2baea4c37309fdc4f7555",
+          "sourcePath": "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+          "sourceDigest": "09c8331014a8c087f0aea468f1aa00a8b993f995ab1d62de18323e208792328d",
+          "targetPath": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+          "targetDigest": "09c8331014a8c087f0aea468f1aa00a8b993f995ab1d62de18323e208792328d",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_d17fc43b1d58c9992a60d5605b155e37",
+          "sourcePath": "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+          "sourceDigest": "09fa989ef2e7c36e36a09ac4b51d4066dbc9ed6069a3b04246606aad55053491",
+          "targetPath": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+          "targetDigest": "09fa989ef2e7c36e36a09ac4b51d4066dbc9ed6069a3b04246606aad55053491",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_028c68be7bd8559c92b54d6a11eca48a",
+          "sourcePath": "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+          "sourceDigest": "999b24a2dff4d2d168348cafbfd961f1c3c9bfec878507ad95ec2e8493e45775",
+          "targetPath": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+          "targetDigest": "999b24a2dff4d2d168348cafbfd961f1c3c9bfec878507ad95ec2e8493e45775",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_91a51cee06251cc0d253768eb037c821",
+          "sourcePath": "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+          "sourceDigest": "ac90701211328c0b7c9f37b1e2371c4e8ff39077d29e411b2b03155c0f6c613d",
+          "targetPath": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+          "targetDigest": "ac90701211328c0b7c9f37b1e2371c4e8ff39077d29e411b2b03155c0f6c613d",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_fc71787af183cc17ea2100bcecb32b58",
+          "sourcePath": "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+          "sourceDigest": "b7b08196e6a7323347802d2b1dcaee20799136977e5601548532afff12321643",
+          "targetPath": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+          "targetDigest": "b7b08196e6a7323347802d2b1dcaee20799136977e5601548532afff12321643",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_5f420ddb02566c9c8a56fbafd6b983e2",
+          "sourcePath": "docs/ui-spec/flows/F02-approve-a-merge.md",
+          "sourceDigest": "7d74b74c5b051465a4b4e23eab5a5457e44425ba878bdede39e6035f831ef106",
+          "targetPath": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+          "targetDigest": "7d74b74c5b051465a4b4e23eab5a5457e44425ba878bdede39e6035f831ef106",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_60dac881eaa2cdcd199178d215ffbb36",
+          "sourcePath": "docs/ui-spec/flows/F02-approve-a-merge.md",
+          "sourceDigest": "b89920d32de2e95a424ca8027ac2ae5084becee16016525d4f12d2c9127b5aef",
+          "targetPath": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+          "targetDigest": "b89920d32de2e95a424ca8027ac2ae5084becee16016525d4f12d2c9127b5aef",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_1d369d57f0c92d6946fd444b3c185ee9",
+          "sourcePath": "docs/ui-spec/flows/F02-approve-a-merge.md",
+          "sourceDigest": "c66607647f3353fc31e1b288c83d8edbac45954da8e277c6615a9f03a4c4550c",
+          "targetPath": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+          "targetDigest": "c66607647f3353fc31e1b288c83d8edbac45954da8e277c6615a9f03a4c4550c",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_c4e3bc74cc2ced13097609eb24abd538",
+          "sourcePath": "docs/ui-spec/flows/F02-approve-a-merge.md",
+          "sourceDigest": "bf3e48fb9720dee593a4bdf4ce216773a980635dc50b3a82abfbf94e65c60e04",
+          "targetPath": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+          "targetDigest": "bf3e48fb9720dee593a4bdf4ce216773a980635dc50b3a82abfbf94e65c60e04",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_0bdecaf6bb7f4c5d03d4dd32edd6e372",
+          "sourcePath": "docs/ui-spec/flows/F02-approve-a-merge.md",
+          "sourceDigest": "f9712966a2963770e4d52613d18e2d66e61d803e2f24661f7b860ef640e35224",
+          "targetPath": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+          "targetDigest": "f9712966a2963770e4d52613d18e2d66e61d803e2f24661f7b860ef640e35224",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_95276218caefe2d0e64ea8a6587912de",
+          "sourcePath": "docs/ui-spec/modals/M01-answer-question.md",
+          "sourceDigest": "95fdfa2f1dfd4e34740fa261aaff32166299e3d447945559ef8b9a7743d75ecc",
+          "targetPath": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+          "targetDigest": "95fdfa2f1dfd4e34740fa261aaff32166299e3d447945559ef8b9a7743d75ecc",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_8d83aa2a13a65753ed3087531808f771",
+          "sourcePath": "docs/ui-spec/modals/M01-answer-question.md",
+          "sourceDigest": "0e19234fb7746212577c283341625672fb296ec9f7459dd55d7c65196a872ac4",
+          "targetPath": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+          "targetDigest": "0e19234fb7746212577c283341625672fb296ec9f7459dd55d7c65196a872ac4",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_81e60ba98c086609376e50fcde631003",
+          "sourcePath": "docs/ui-spec/modals/M01-answer-question.md",
+          "sourceDigest": "243f37484ada7bbcf9a52d14082146a53a20d58cb9e6cf073444d668a3d1e70a",
+          "targetPath": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+          "targetDigest": "243f37484ada7bbcf9a52d14082146a53a20d58cb9e6cf073444d668a3d1e70a",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_46d2aa894a82bd4231e161abc1de795a",
+          "sourcePath": "docs/ui-spec/modals/M01-answer-question.md",
+          "sourceDigest": "00da42d1fca43f605f8dfd40f68babb3a77c8d178aa33e60614543a7a7a3a759",
+          "targetPath": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+          "targetDigest": "00da42d1fca43f605f8dfd40f68babb3a77c8d178aa33e60614543a7a7a3a759",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_5ff80d2788c64645819e4747c97586f3",
+          "sourcePath": "docs/ui-spec/modals/M01-answer-question.md",
+          "sourceDigest": "bd8db0fe9a91124526c6ea88ff30ddd6173dbc2b4eb00938d01ded7000ee3c74",
+          "targetPath": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+          "targetDigest": "bd8db0fe9a91124526c6ea88ff30ddd6173dbc2b4eb00938d01ded7000ee3c74",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_89e1dad5a298dcd9a584cf7e436b07c8",
+          "sourcePath": "docs/ui-spec/modals/M01-answer-question.md",
+          "sourceDigest": "3863c313178b0aea88f942dae236aeda908f0d6202da0384ce55f0fbe0b9601a",
+          "targetPath": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+          "targetDigest": "3863c313178b0aea88f942dae236aeda908f0d6202da0384ce55f0fbe0b9601a",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_4c9a110f623532bc7d83fdf6f547093e",
+          "sourcePath": "docs/ui-spec/modals/M02-approve-merge.md",
+          "sourceDigest": "633382525da36aece4691ddcee98749217ae3c1281c0e6f6792ead72327c67ab",
+          "targetPath": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+          "targetDigest": "633382525da36aece4691ddcee98749217ae3c1281c0e6f6792ead72327c67ab",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_6c1cdb570e57b0c547e768903d487ca1",
+          "sourcePath": "docs/ui-spec/modals/M02-approve-merge.md",
+          "sourceDigest": "16d1f15d8e32929635905282f55e305e296b5b158c7e85eb03afe669b45ef526",
+          "targetPath": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+          "targetDigest": "16d1f15d8e32929635905282f55e305e296b5b158c7e85eb03afe669b45ef526",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_b0824e0cd564f4705e50da13b6780123",
+          "sourcePath": "docs/ui-spec/modals/M02-approve-merge.md",
+          "sourceDigest": "3ac787a95b4671add2b27b1d4cc92720e884bef5507314bd6e2b1ac5610397d2",
+          "targetPath": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+          "targetDigest": "3ac787a95b4671add2b27b1d4cc92720e884bef5507314bd6e2b1ac5610397d2",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_3048b1128d4d98dc6ee07aba2324c3b8",
+          "sourcePath": "docs/ui-spec/modals/M02-approve-merge.md",
+          "sourceDigest": "a94a6123d5be3a892e593e2a46c81eff3b372cecd11436fa4316fa9b220d0e11",
+          "targetPath": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+          "targetDigest": "a94a6123d5be3a892e593e2a46c81eff3b372cecd11436fa4316fa9b220d0e11",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_af451e04d9d67d144a3557b2403a3842",
+          "sourcePath": "docs/ui-spec/modals/M02-approve-merge.md",
+          "sourceDigest": "dea3561c21d91935bd45492ef13274f2fcb98ce353514227b12dc4c81a4077e4",
+          "targetPath": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+          "targetDigest": "dea3561c21d91935bd45492ef13274f2fcb98ce353514227b12dc4c81a4077e4",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_8078baf6ee718f1be4d482c2f303e62d",
+          "sourcePath": "docs/ui-spec/modals/M02-approve-merge.md",
+          "sourceDigest": "adfe80ad864fe0a34219ab5c5201ed1e2423f5ab7ebd0e8b2ec9fdf7c0dab091",
+          "targetPath": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+          "targetDigest": "adfe80ad864fe0a34219ab5c5201ed1e2423f5ab7ebd0e8b2ec9fdf7c0dab091",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_c6659cd7ed74e445fe099f5236551cb7",
+          "sourcePath": "docs/ui-spec/modals/M02-approve-merge.md",
+          "sourceDigest": "5cc68620a8b0811fa889b25ab1c46d45a394835254085bd439000aaff59b0fa6",
+          "targetPath": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+          "targetDigest": "5cc68620a8b0811fa889b25ab1c46d45a394835254085bd439000aaff59b0fa6",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_e71250e07f6665431fa08d2d8e0b2dff",
+          "sourcePath": "docs/ui-spec/modals/M03-add-edit-item.md",
+          "sourceDigest": "24c8d79862a55393166a0eaaacec85b4ae046d8a96f3a12e0b44b1784fc23550",
+          "targetPath": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+          "targetDigest": "24c8d79862a55393166a0eaaacec85b4ae046d8a96f3a12e0b44b1784fc23550",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_d7150c78cea2f7c841c76814f9dfea0f",
+          "sourcePath": "docs/ui-spec/modals/M03-add-edit-item.md",
+          "sourceDigest": "f23c10c096eb804d89eb694e20dfd43da56f30554d94a2927985c17698af5374",
+          "targetPath": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+          "targetDigest": "f23c10c096eb804d89eb694e20dfd43da56f30554d94a2927985c17698af5374",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_d01d11ce35e918523f65bc915d2da0b9",
+          "sourcePath": "docs/ui-spec/modals/M03-add-edit-item.md",
+          "sourceDigest": "15762277ea0230fa83aaef36a20d316da6a17d4f1ea9d3bbf12aae8d900f44de",
+          "targetPath": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+          "targetDigest": "15762277ea0230fa83aaef36a20d316da6a17d4f1ea9d3bbf12aae8d900f44de",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_4ad34124a2811bb062ec03fd65ac8dc7",
+          "sourcePath": "docs/ui-spec/modals/M03-add-edit-item.md",
+          "sourceDigest": "54e00a531b44734aed2fe09a8aa961df3451f98796ae523524be9a1f5e54d3f6",
+          "targetPath": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+          "targetDigest": "54e00a531b44734aed2fe09a8aa961df3451f98796ae523524be9a1f5e54d3f6",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_71d00e3b90a0d091b06f0cbf5dd1d360",
+          "sourcePath": "docs/ui-spec/modals/M03-add-edit-item.md",
+          "sourceDigest": "d025e2982b7a57e0a540fa8e9ab43023ae631df0c9f1d08e07abfa5fab364ff1",
+          "targetPath": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+          "targetDigest": "d025e2982b7a57e0a540fa8e9ab43023ae631df0c9f1d08e07abfa5fab364ff1",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_f25678161e3944edca10dce0bf2c9e83",
+          "sourcePath": "docs/ui-spec/modals/M03-add-edit-item.md",
+          "sourceDigest": "bfde915b1fb47245c55e1823285df8b92841101c0a8712bcb0ffdee98cf3663c",
+          "targetPath": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+          "targetDigest": "bfde915b1fb47245c55e1823285df8b92841101c0a8712bcb0ffdee98cf3663c",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_f2aac5602a04a55ae1af5277932bafa2",
+          "sourcePath": "docs/ui-spec/modals/M03-add-edit-item.md",
+          "sourceDigest": "ca36dd365ddfcc167033301303bc1d374cbaf26b13c05156626e8290f13ff5fc",
+          "targetPath": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+          "targetDigest": "ca36dd365ddfcc167033301303bc1d374cbaf26b13c05156626e8290f13ff5fc",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_3d2697461e6860c1c7b7ad98e1bb2f75",
+          "sourcePath": "docs/ui-spec/modals/M03-add-edit-item.md",
+          "sourceDigest": "19182a48049bb62a94fdee2e76c7bcdd872da2397e0f65207b3f586a6ffb250b",
+          "targetPath": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+          "targetDigest": "19182a48049bb62a94fdee2e76c7bcdd872da2397e0f65207b3f586a6ffb250b",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_8d3e88929e90d8bdcb24dd9051eeac45",
+          "sourcePath": "docs/ui-spec/schema/surface-contract.schema.json",
+          "sourceDigest": "2ce8f77f92bb0cf512f74f5eac133be50a8a0d301b3de13b82e5fbf4d950db7e",
+          "targetPath": "docs/platform/ui-spec/history/schema/surface-contract.schema.json",
+          "targetDigest": "2ce8f77f92bb0cf512f74f5eac133be50a8a0d301b3de13b82e5fbf4d950db7e",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_7967889d10d6af36a4fb383045b65a96",
+          "sourcePath": "docs/ui-spec/screens/S01-sign-in.md",
+          "sourceDigest": "77c1514fc17688374acb9a7a09ff5183257acf2a5c56401588c5c0d55052b99f",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+          "targetDigest": "77c1514fc17688374acb9a7a09ff5183257acf2a5c56401588c5c0d55052b99f",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_3a04f4e739420cfc63f7fc90ee9d868e",
+          "sourcePath": "docs/ui-spec/screens/S01-sign-in.md",
+          "sourceDigest": "0beef4d2245a0124917db86d62ab32535b8d692d87092579891e6263a4565f04",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+          "targetDigest": "0beef4d2245a0124917db86d62ab32535b8d692d87092579891e6263a4565f04",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_ee445ed3633ffaf1046847c22af0fb7f",
+          "sourcePath": "docs/ui-spec/screens/S01-sign-in.md",
+          "sourceDigest": "ea5525c5b2864c0c8bb3de1d5af8e2533672b46433909f40dd3664a49ca805ef",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+          "targetDigest": "ea5525c5b2864c0c8bb3de1d5af8e2533672b46433909f40dd3664a49ca805ef",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_c114e4da6a0aa74dd6d6a4908b558893",
+          "sourcePath": "docs/ui-spec/screens/S01-sign-in.md",
+          "sourceDigest": "4fcd1b19835c8541752a8db0350ae5bf1912cea6549777cfbbf4020dea6146fe",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+          "targetDigest": "4fcd1b19835c8541752a8db0350ae5bf1912cea6549777cfbbf4020dea6146fe",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_c5c6c48bbd8baba4da9c0a46b757e1c6",
+          "sourcePath": "docs/ui-spec/screens/S01-sign-in.md",
+          "sourceDigest": "52e625daaea2d5fd48b3b9d4d436367a94d665c43b3f5902b377280ec9f265ec",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+          "targetDigest": "52e625daaea2d5fd48b3b9d4d436367a94d665c43b3f5902b377280ec9f265ec",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_cd456a28153788805cf7c6ebccf02f81",
+          "sourcePath": "docs/ui-spec/screens/S01-sign-in.md",
+          "sourceDigest": "a8ec43d1ca3cd4b07dce61b718332c537db2909bfcfe32c41a4e0223f97d3f64",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+          "targetDigest": "a8ec43d1ca3cd4b07dce61b718332c537db2909bfcfe32c41a4e0223f97d3f64",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_d233fa65d860141b65898ec00d944180",
+          "sourcePath": "docs/ui-spec/screens/S01-sign-in.md",
+          "sourceDigest": "6c01f258d2d51d91bfb53840c1568640183da8669c640df98bc0a0999c5d28b7",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+          "targetDigest": "6c01f258d2d51d91bfb53840c1568640183da8669c640df98bc0a0999c5d28b7",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_45d619262877e3606c6434a80eac0ea7",
+          "sourcePath": "docs/ui-spec/screens/S01-sign-in.md",
+          "sourceDigest": "d30b7cd79d3cf89c5ab75507209b4bde9ac4646cb248f3fdd5ef19e3935895c3",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+          "targetDigest": "d30b7cd79d3cf89c5ab75507209b4bde9ac4646cb248f3fdd5ef19e3935895c3",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_66959db8980be9e2431a5436b0acdb21",
+          "sourcePath": "docs/ui-spec/screens/S01-sign-in.md",
+          "sourceDigest": "432201863dab2e41ba63bca951a1c5906c41ce90fe0ff2c4328e371b5df345f5",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+          "targetDigest": "432201863dab2e41ba63bca951a1c5906c41ce90fe0ff2c4328e371b5df345f5",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_a7fe7d3eb849b053ed9e0649f9ccfa87",
+          "sourcePath": "docs/ui-spec/screens/S02-taskboard.md",
+          "sourceDigest": "e8291716ea7a09bddc4a88d8afb788b8eabc0c6a4fdea6b026f41b0f6936ab32",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+          "targetDigest": "e8291716ea7a09bddc4a88d8afb788b8eabc0c6a4fdea6b026f41b0f6936ab32",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_605e72f3a6df29f642a1f45962d051ff",
+          "sourcePath": "docs/ui-spec/screens/S02-taskboard.md",
+          "sourceDigest": "de8dfe32ef6f9e54cbc969902056ccde6751597aa532a45ef0fa6c510d3fa925",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+          "targetDigest": "de8dfe32ef6f9e54cbc969902056ccde6751597aa532a45ef0fa6c510d3fa925",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_6a5a28e29d2e65708f5f17fef23e8ef0",
+          "sourcePath": "docs/ui-spec/screens/S02-taskboard.md",
+          "sourceDigest": "29fbb9af60bb2b881536741d9039a846bd2489688d77201bafd9167c567e2665",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+          "targetDigest": "29fbb9af60bb2b881536741d9039a846bd2489688d77201bafd9167c567e2665",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_6c49dcd927215fbd7baede5222cf1ab5",
+          "sourcePath": "docs/ui-spec/screens/S02-taskboard.md",
+          "sourceDigest": "92d5bb85b24a6afb40d5a3307f5ec307c29432af7ae1e8d96917e851e4f42559",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+          "targetDigest": "92d5bb85b24a6afb40d5a3307f5ec307c29432af7ae1e8d96917e851e4f42559",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_8f3f773ca083b9fa8272988d07965164",
+          "sourcePath": "docs/ui-spec/screens/S02-taskboard.md",
+          "sourceDigest": "9d5272a9af071d018bebc204e6a0e664b384eeec29da148b705025af29ee6f65",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+          "targetDigest": "9d5272a9af071d018bebc204e6a0e664b384eeec29da148b705025af29ee6f65",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_369a407225765e238efb7a418e0a44a5",
+          "sourcePath": "docs/ui-spec/screens/S02-taskboard.md",
+          "sourceDigest": "2b6f1fe0ac2043898c36fa322709dbd8d1b00cc292b35b1d3e2fdf60ecc7d49c",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+          "targetDigest": "2b6f1fe0ac2043898c36fa322709dbd8d1b00cc292b35b1d3e2fdf60ecc7d49c",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_d30db7db84e70167a04fe1c5fb39a4e5",
+          "sourcePath": "docs/ui-spec/screens/S02-taskboard.md",
+          "sourceDigest": "44e5096326dec39d14a8a592692f8a35506500aa313895e4f25751193f0be1a2",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+          "targetDigest": "44e5096326dec39d14a8a592692f8a35506500aa313895e4f25751193f0be1a2",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_38f435fc7cb64228e37d157820f6222c",
+          "sourcePath": "docs/ui-spec/screens/S02-taskboard.md",
+          "sourceDigest": "b536b23ef7b47aec1235043d572a048bdfbcdf4339af68ecfccdd7977336c6a2",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+          "targetDigest": "b536b23ef7b47aec1235043d572a048bdfbcdf4339af68ecfccdd7977336c6a2",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_2cc8f26dc0394eb2b7b92cc169beb784",
+          "sourcePath": "docs/ui-spec/screens/S02-taskboard.md",
+          "sourceDigest": "5871d326ddf941670b46430bef5aeb8943e96bb7633632d0024e62ed91227d91",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+          "targetDigest": "5871d326ddf941670b46430bef5aeb8943e96bb7633632d0024e62ed91227d91",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_66dc01994689c5fb630f56fdb1180788",
+          "sourcePath": "docs/ui-spec/screens/S02-taskboard.md",
+          "sourceDigest": "a768cd0192df2071b079184f5b8405d4264a777258de3c2cbcb2001773328c9d",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+          "targetDigest": "a768cd0192df2071b079184f5b8405d4264a777258de3c2cbcb2001773328c9d",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_16ece324dc00b79759255e4acb8435ae",
+          "sourcePath": "docs/ui-spec/screens/S02-taskboard.md",
+          "sourceDigest": "0ca03f8d5a4fc7686ab220d8c37c4cb7550adbb659ba634f15b572532c529b6d",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+          "targetDigest": "0ca03f8d5a4fc7686ab220d8c37c4cb7550adbb659ba634f15b572532c529b6d",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_6cd22f67c65c9cc4aa70c160cababb24",
+          "sourcePath": "docs/ui-spec/screens/S02-taskboard.md",
+          "sourceDigest": "c6219ddf92aa1f458b5ff3801173d8bf355b5e4c27b4c1411258f4ac60bb49f7",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+          "targetDigest": "c6219ddf92aa1f458b5ff3801173d8bf355b5e4c27b4c1411258f4ac60bb49f7",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_9fe8558f49b4210f3268eaa0a158d8ee",
+          "sourcePath": "docs/ui-spec/screens/S02-taskboard.md",
+          "sourceDigest": "11e667e7a1a777b3438dc5cb09e5b06a99d03669ed81e932ae4039ab5830c1b2",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+          "targetDigest": "11e667e7a1a777b3438dc5cb09e5b06a99d03669ed81e932ae4039ab5830c1b2",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_6c75a8d85b8232cfedf1ae86a7eda90a",
+          "sourcePath": "docs/ui-spec/screens/S02-taskboard.md",
+          "sourceDigest": "6dde20c3978ee0c0934fe097a36e8d402767de43ff2d906b1f1f619356552e51",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+          "targetDigest": "6dde20c3978ee0c0934fe097a36e8d402767de43ff2d906b1f1f619356552e51",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_47dd03576e4ae838330cee0a1a15e4bd",
+          "sourcePath": "docs/ui-spec/screens/S02-taskboard.md",
+          "sourceDigest": "bad3057a791408cebe7749d16be0cac1086d0aa3a4825b16e2e96bf9494e5aa2",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+          "targetDigest": "bad3057a791408cebe7749d16be0cac1086d0aa3a4825b16e2e96bf9494e5aa2",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_b1381898ffcd6fd63e9e64586b7acd6c",
+          "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+          "sourceDigest": "3567e61162c801d95c3b42120f6527521b11318fccd623d43dded28f5d14645d",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+          "targetDigest": "3567e61162c801d95c3b42120f6527521b11318fccd623d43dded28f5d14645d",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_4a7fc646586751db12885986313c0350",
+          "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+          "sourceDigest": "e5a061704919c09652d5d54bfeb63372e4172bf04727b1697c175ef6f895b376",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+          "targetDigest": "e5a061704919c09652d5d54bfeb63372e4172bf04727b1697c175ef6f895b376",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_ba270fdaa4bfeec20ceb3f52d7434e6d",
+          "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+          "sourceDigest": "1ae9f696b585e22dc8277c99e20f55fbd09dde300571f51948fb4acc8e087cce",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+          "targetDigest": "1ae9f696b585e22dc8277c99e20f55fbd09dde300571f51948fb4acc8e087cce",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_4fb38e3e862e3f8fb1353ca7f5c38c87",
+          "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+          "sourceDigest": "606f6a0016df5a909d44d0f75366ef2bf776b57ef7b47081b1ceab0cd79d23c3",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+          "targetDigest": "606f6a0016df5a909d44d0f75366ef2bf776b57ef7b47081b1ceab0cd79d23c3",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_692e59d327dfdc4ac060b679ff60a8df",
+          "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+          "sourceDigest": "2f7ba97eab08768fccbc32a6b3edcbebeb7449cc07753e516da2cd883d52f3f2",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+          "targetDigest": "2f7ba97eab08768fccbc32a6b3edcbebeb7449cc07753e516da2cd883d52f3f2",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_093b3e6a5b56f2219f9056058964c884",
+          "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+          "sourceDigest": "5011f46096ff98b1d5c0ce491fe5d75a52de5db059d305c8082096da2b8b930d",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+          "targetDigest": "5011f46096ff98b1d5c0ce491fe5d75a52de5db059d305c8082096da2b8b930d",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_7c2b88b65ffc0692b8fe3d9751070b02",
+          "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+          "sourceDigest": "912c6946a895c279ae9ff495722a7afd0eb2905de2f117c5e3c6f7a98a7a27b1",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+          "targetDigest": "912c6946a895c279ae9ff495722a7afd0eb2905de2f117c5e3c6f7a98a7a27b1",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_26c0a04e72c06c15be9a007f50fd312b",
+          "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+          "sourceDigest": "b68da59feac0406607b0751d67e0a3d2951a328011e0070a80ebb1cabf05efc3",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+          "targetDigest": "b68da59feac0406607b0751d67e0a3d2951a328011e0070a80ebb1cabf05efc3",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_7b1759a49d26fd1dcc834b3f38bade04",
+          "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+          "sourceDigest": "df88b650b1482175d2fb5e47624cd391af36bb52cc3f31aa67f8874a7ab75404",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+          "targetDigest": "df88b650b1482175d2fb5e47624cd391af36bb52cc3f31aa67f8874a7ab75404",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_8320314c57006644884f6d5f4edfc5bd",
+          "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+          "sourceDigest": "c1bdd1e5de39d873ebc746fa92ea8a7dbffd363be076c51141e9816788d242fc",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+          "targetDigest": "c1bdd1e5de39d873ebc746fa92ea8a7dbffd363be076c51141e9816788d242fc",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_eb244fc0c4068fc1ab3c907db369a326",
+          "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+          "sourceDigest": "ded2ddb7ce7a2bdc492e95e3cd32732382f8048bd0e46a60bba2622026420f24",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+          "targetDigest": "ded2ddb7ce7a2bdc492e95e3cd32732382f8048bd0e46a60bba2622026420f24",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_4abab9f7a787bead0ff5f1d162c2bd07",
+          "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+          "sourceDigest": "7b636169f5f4f687e45215c4b3ebe993d604fca24992c590ebec1eb747eee029",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+          "targetDigest": "7b636169f5f4f687e45215c4b3ebe993d604fca24992c590ebec1eb747eee029",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_0295a9bbd34b084c523f0c057b5899da",
+          "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+          "sourceDigest": "0a1c545c0f2469060bd1e06ebfa03c5eaf87ccfd97972784c2a969487d3ca1c7",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+          "targetDigest": "0a1c545c0f2469060bd1e06ebfa03c5eaf87ccfd97972784c2a969487d3ca1c7",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_e2969564bc033087099738ac927d2263",
+          "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+          "sourceDigest": "b78f2fe03bdcec998a797758f3fc19d9e09d43c81b83a6e87923a2e83e450159",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+          "targetDigest": "b78f2fe03bdcec998a797758f3fc19d9e09d43c81b83a6e87923a2e83e450159",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_b391fc12268d78ddd19bf6a9f8f66656",
+          "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+          "sourceDigest": "c5c214f47346cbc378a79c77a7bb210b510e6f2a5a7229f821f08e75fe587517",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+          "targetDigest": "c5c214f47346cbc378a79c77a7bb210b510e6f2a5a7229f821f08e75fe587517",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_9a2e11a231c97ddf61ceb228fed26010",
+          "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+          "sourceDigest": "b2ada90792e03a4ebfe8767adbf7f9c86be70ba1f3ce4fe9d6269f8485a7fa05",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+          "targetDigest": "b2ada90792e03a4ebfe8767adbf7f9c86be70ba1f3ce4fe9d6269f8485a7fa05",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_73cab9a36191997438af84b13c76cf85",
+          "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+          "sourceDigest": "0e91e3c92c13cc041ce0dc29fc7b5adde5f55b7b39db0afab2c854744aaae02c",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+          "targetDigest": "0e91e3c92c13cc041ce0dc29fc7b5adde5f55b7b39db0afab2c854744aaae02c",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_cb783b44a6284c43bbaac2e46c89026f",
+          "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+          "sourceDigest": "a51154d8995076f88b5a062b8db7af5c48e04601c63c8df48791f741b52a9d08",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+          "targetDigest": "a51154d8995076f88b5a062b8db7af5c48e04601c63c8df48791f741b52a9d08",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_879a93675dea691099f52d778198f61a",
+          "sourcePath": "docs/ui-spec/screens/S04-questions-needing-answer.md",
+          "sourceDigest": "d6f3328dcbd970ce632f7c70c6eb9f9dd81e7a20eef758dfc5892d2851a00228",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+          "targetDigest": "d6f3328dcbd970ce632f7c70c6eb9f9dd81e7a20eef758dfc5892d2851a00228",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_99de7a5a1f002e16db2bbcf68045d707",
+          "sourcePath": "docs/ui-spec/screens/S04-questions-needing-answer.md",
+          "sourceDigest": "eda037d21266247be1f0691c0af1f92f5682eb6431ca5a1d3db13f82bab8b2b6",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+          "targetDigest": "eda037d21266247be1f0691c0af1f92f5682eb6431ca5a1d3db13f82bab8b2b6",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_6998a7b8301334cca30507533c23e493",
+          "sourcePath": "docs/ui-spec/screens/S04-questions-needing-answer.md",
+          "sourceDigest": "7557c6339e87b867a3d0e076b1de35ca0b8e66e60c94a6bacd3a23a4ba5447a0",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+          "targetDigest": "7557c6339e87b867a3d0e076b1de35ca0b8e66e60c94a6bacd3a23a4ba5447a0",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_228b96188da500e85ae818b66fe09233",
+          "sourcePath": "docs/ui-spec/screens/S04-questions-needing-answer.md",
+          "sourceDigest": "3c9936789761d321fdd43ad8661693f53d5243481db6bcce718ccae8616fbb3d",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+          "targetDigest": "3c9936789761d321fdd43ad8661693f53d5243481db6bcce718ccae8616fbb3d",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_d922400df0f2e4df9838ec9c5670c0df",
+          "sourcePath": "docs/ui-spec/screens/S04-questions-needing-answer.md",
+          "sourceDigest": "cc6bae0c18965be51df7067ebc3df52dc68cb5b472f3569313b1a1c0fcb72b17",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+          "targetDigest": "cc6bae0c18965be51df7067ebc3df52dc68cb5b472f3569313b1a1c0fcb72b17",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_6765123fbb5f11ffe97a098154c0795e",
+          "sourcePath": "docs/ui-spec/screens/S04-questions-needing-answer.md",
+          "sourceDigest": "c6d3f9804798de60b16fbf791ff2bd3ec040dbea5c62b73f278ffaf2a4fffba3",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+          "targetDigest": "c6d3f9804798de60b16fbf791ff2bd3ec040dbea5c62b73f278ffaf2a4fffba3",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_8c5e3f2968eb2cc04ee63b53168afadd",
+          "sourcePath": "docs/ui-spec/screens/S04-questions-needing-answer.md",
+          "sourceDigest": "286a6ef07e9dccf18b6dbfc9862944028af76b5663812f047c214da01a4b5db8",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+          "targetDigest": "286a6ef07e9dccf18b6dbfc9862944028af76b5663812f047c214da01a4b5db8",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_4543fb352c50cbb81ce2c271062f7d25",
+          "sourcePath": "docs/ui-spec/screens/S04-questions-needing-answer.md",
+          "sourceDigest": "18a084a1df6021dc90c5677b274a75f41401d3d50d2c9d373c5a039002c71531",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+          "targetDigest": "18a084a1df6021dc90c5677b274a75f41401d3d50d2c9d373c5a039002c71531",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_41441a240174152e1705db9f6a528bc3",
+          "sourcePath": "docs/ui-spec/screens/S04-questions-needing-answer.md",
+          "sourceDigest": "f211ef10b17e1b4dd9f4188b7fa36304aa092c6c66b555cb9c0f3055882979f5",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+          "targetDigest": "f211ef10b17e1b4dd9f4188b7fa36304aa092c6c66b555cb9c0f3055882979f5",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_3c3858b298aac0087ecce77ed003fd63",
+          "sourcePath": "docs/ui-spec/screens/S04-questions-needing-answer.md",
+          "sourceDigest": "6779b6023c27123800d5f097b22f29fb334bc406514dab199240e9710996a477",
+          "targetPath": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+          "targetDigest": "6779b6023c27123800d5f097b22f29fb334bc406514dab199240e9710996a477",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        },
+        {
+          "claimId": "claim_a7dc196cb13fecefb11ee504bd56df4d",
+          "sourcePath": "docs/ui-spec/spec.config.yaml",
+          "sourceDigest": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+          "targetPath": "docs/platform/ui-spec/architecture/spec.config.yaml",
+          "targetDigest": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+          "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json"
+        }
+      ]
+    }
+  ]
+}

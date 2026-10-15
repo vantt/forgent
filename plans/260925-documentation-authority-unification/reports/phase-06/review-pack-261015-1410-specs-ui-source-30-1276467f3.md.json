@@ -1,0 +1,977 @@
+{
+  "version": 1,
+  "contentCommit": "1276467f37a99d19aff05808d42fafbf40341449",
+  "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+  "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+  "sourcePath": "docs/ui-spec/screens/S01-sign-in.md",
+  "part": 1,
+  "parts": 1,
+  "count": 14,
+  "classes": {
+    "Unit-exact": [
+      "claim_7967889d10d6af36a4fb383045b65a96",
+      "claim_3a04f4e739420cfc63f7fc90ee9d868e",
+      "claim_ee445ed3633ffaf1046847c22af0fb7f",
+      "claim_c114e4da6a0aa74dd6d6a4908b558893",
+      "claim_c5c6c48bbd8baba4da9c0a46b757e1c6",
+      "claim_cd456a28153788805cf7c6ebccf02f81",
+      "claim_d233fa65d860141b65898ec00d944180",
+      "claim_45d619262877e3606c6434a80eac0ea7",
+      "claim_66959db8980be9e2431a5436b0acdb21"
+    ],
+    "Weak-exact": [
+      "claim_bba819e1574e95eb1c661ad4e65b52d7",
+      "claim_7eb4d4508811b2fea52a5a0b1ca60f6b",
+      "claim_39f417443d65ce04f112c932f2293375",
+      "claim_3bd0f8ba521d2a8972d6e44b78002bc3"
+    ],
+    "Judgment": [
+      "claim_6cbca8eed8cc0595110b6b1bc8f0db80"
+    ]
+  },
+  "unequalDigestPairs": [
+    "claim_6cbca8eed8cc0595110b6b1bc8f0db80"
+  ],
+  "noTargetGeneratedRows": [],
+  "mandatoryDeep": [
+    "claim_6cbca8eed8cc0595110b6b1bc8f0db80"
+  ],
+  "reviewerSeedRequired": true,
+  "minimumSeededWeakJudgment": 5,
+  "rows": [
+    {
+      "claimId": "claim_7967889d10d6af36a4fb383045b65a96",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S01-sign-in.md",
+      "sourceAnchor": "unheaded-block-1",
+      "source": {
+        "unitKind": "unheaded-preamble",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded preamble",
+        "startLine": 1,
+        "endLine": 11,
+        "textDigest": "77c1514fc17688374acb9a7a09ff5183257acf2a5c56401588c5c0d55052b99f",
+        "sample": "---\nid: S01\ntype: screen\nname: \"Sign in\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R3, R4, R6]\nregions: [brand, form, footnote]\n---",
+        "identityFingerprint": "25f8d1fc5d0367d4e3b1d42ed8c7af4d6301d576276d6c42fd1dc3d98e1aafc1",
+        "ancestry": [],
+        "text": "---\nid: S01\ntype: screen\nname: \"Sign in\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R3, R4, R6]\nregions: [brand, form, footnote]\n---"
+      },
+      "sourceShownText": "---\nid: S01\ntype: screen\nname: \"Sign in\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R3, R4, R6]\nregions: [brand, form, footnote]\n---",
+      "sourceDigest": "77c1514fc17688374acb9a7a09ff5183257acf2a5c56401588c5c0d55052b99f",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "targetAnchor": "unheaded-block-1",
+      "target": {
+        "unitKind": "unheaded-preamble",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded preamble",
+        "startLine": 1,
+        "endLine": 11,
+        "textDigest": "77c1514fc17688374acb9a7a09ff5183257acf2a5c56401588c5c0d55052b99f",
+        "sample": "---\nid: S01\ntype: screen\nname: \"Sign in\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R3, R4, R6]\nregions: [brand, form, footnote]\n---",
+        "identityFingerprint": "25f8d1fc5d0367d4e3b1d42ed8c7af4d6301d576276d6c42fd1dc3d98e1aafc1",
+        "ancestry": [],
+        "text": "---\nid: S01\ntype: screen\nname: \"Sign in\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R3, R4, R6]\nregions: [brand, form, footnote]\n---"
+      },
+      "targetShownText": "---\nid: S01\ntype: screen\nname: \"Sign in\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R3, R4, R6]\nregions: [brand, form, footnote]\n---",
+      "targetDigest": "77c1514fc17688374acb9a7a09ff5183257acf2a5c56401588c5c0d55052b99f",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_7967889d10d6af36a4fb383045b65a96",
+        "sourceUnitDigest": "77c1514fc17688374acb9a7a09ff5183257acf2a5c56401588c5c0d55052b99f",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+        "targetAnchor": "unheaded-block-1",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-preamble unit docs/ui-spec/screens/S01-sign-in.md#unheaded-block-1 (source lines 1-11) is carried at docs/platform/ui-spec/architecture/screens/S01-sign-in.md#unheaded-block-1 (candidate lines 1-11). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S01-sign-in.md verbatim in docs/platform/ui-spec/architecture/screens/S01-sign-in.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "77c1514fc17688374acb9a7a09ff5183257acf2a5c56401588c5c0d55052b99f",
+        "targetAncestry": []
+      }
+    },
+    {
+      "claimId": "claim_6cbca8eed8cc0595110b6b1bc8f0db80",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S01-sign-in.md",
+      "sourceAnchor": "s01-sign-in",
+      "source": {
+        "unitKind": "heading",
+        "level": 1,
+        "title": "S01 — Sign in",
+        "anchor": "s01-sign-in",
+        "githubAnchor": "s01-sign-in",
+        "stableAnchor": "h-63b102f58449",
+        "startLine": 13,
+        "endLine": 13,
+        "textDigest": "129d0e0a74bb924b506fd2652519a2b2d3efa83bd2818944b7c9b55236250146",
+        "sample": "S01 — Sign in",
+        "sectionPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "followingBlockDigest": null,
+        "identityFingerprint": "3ff7d58fbe172e519f3fb04d16f538b43c93e7550045d86b126f44d85f821b72",
+        "ancestry": [],
+        "text": "# S01 — Sign in",
+        "sectionText": "# S01 — Sign in"
+      },
+      "sourceShownText": "# S01 — Sign in",
+      "sourceDigest": "129d0e0a74bb924b506fd2652519a2b2d3efa83bd2818944b7c9b55236250146",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "targetAnchor": "s01-sign-in",
+      "target": {
+        "unitKind": "heading",
+        "level": 1,
+        "title": "S01 — Sign in",
+        "anchor": "s01-sign-in",
+        "githubAnchor": "s01-sign-in",
+        "stableAnchor": "h-63b102f58449",
+        "startLine": 13,
+        "endLine": 13,
+        "textDigest": "55c57e558e6986ee134114e366b1ded489d53cf59522508214ef3244020bb46a",
+        "sample": "S01 — Sign in",
+        "sectionPayloadDigest": "dcf81e9233ea9707a5b0de0f3ac9d49cc79e6eb6e3e3aa2f96cc8c122ae81255",
+        "followingBlockDigest": "f156c5fc0daea4a5a2f207530419ae80cc785a914a993522c57d73e0e5e649c8",
+        "identityFingerprint": "9da28761860a141341bef7e8b9db7efa801e84f9935d133b0167c588b84e4c2c",
+        "ancestry": [],
+        "text": "# S01 — Sign in",
+        "sectionText": "# S01 — Sign in\n\n```txt\nDocument type: Architecture\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve mapped legacy content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; current implementation truth is not certified\nProvenance: docs/ui-spec/screens/S01-sign-in.md at 111adc51fd047d99121fd9d076eb4794c87045a4\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing carriage, placement and source conservation\nDo not use this for: Current canonical authority or implemented-behavior proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/ui-spec/screens/S01-sign-in.md\nSupersedes: None; candidate only\nSuperseded by: None\n```\n\n> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions."
+      },
+      "targetShownText": "# S01 — Sign in\n\n```txt\nDocument type: Architecture\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve mapped legacy content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; current implementation truth is not certified\nProvenance: docs/ui-spec/screens/S01-sign-in.md at 111adc51fd047d99121fd9d076eb4794c87045a4\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing carriage, placement and source conservation\nDo not use this for: Current canonical authority or implemented-behavior proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/ui-spec/screens/S01-sign-in.md\nSupersedes: None; candidate only\nSuperseded by: None\n```\n\n> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions.",
+      "targetDigest": "55c57e558e6986ee134114e366b1ded489d53cf59522508214ef3244020bb46a",
+      "classification": "Judgment",
+      "mandatoryDeep": true,
+      "decision": {
+        "claimId": "claim_6cbca8eed8cc0595110b6b1bc8f0db80",
+        "sourceUnitDigest": "129d0e0a74bb924b506fd2652519a2b2d3efa83bd2818944b7c9b55236250146",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+        "targetAnchor": "s01-sign-in",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Judgment: no target digest match. The whole heading unit docs/ui-spec/screens/S01-sign-in.md#s01-sign-in (source lines 13-13) is carried at docs/platform/ui-spec/architecture/screens/S01-sign-in.md#s01-sign-in (candidate lines 13-13). The heading section digest changes because labelled candidate metadata is inserted after the original H1; original heading and direct source payload remain verbatim. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S01-sign-in.md verbatim in docs/platform/ui-spec/architecture/screens/S01-sign-in.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "55c57e558e6986ee134114e366b1ded489d53cf59522508214ef3244020bb46a",
+        "targetAncestry": []
+      }
+    },
+    {
+      "claimId": "claim_bba819e1574e95eb1c661ad4e65b52d7",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S01-sign-in.md",
+      "sourceAnchor": "purpose",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Purpose",
+        "anchor": "purpose",
+        "githubAnchor": "purpose",
+        "stableAnchor": "h-2f4fe421d538",
+        "startLine": 15,
+        "endLine": 15,
+        "textDigest": "dfb50996e4d6dd9f7668e8e6e4a51cd7f239e7d3550efc895cdfa1e34ef40679",
+        "sample": "Purpose",
+        "sectionPayloadDigest": "91528cbdb4801f652c3cd669b6052a2f3860e60f3cddffc6c7c0e989bbbebcb1",
+        "followingBlockDigest": "0beef4d2245a0124917db86d62ab32535b8d692d87092579891e6263a4565f04",
+        "identityFingerprint": "7310635f2ccc9e4800235e9fb67b8328e08de4e542a4ccf34b617463eedf06e6",
+        "ancestry": [
+          "S01 — Sign in"
+        ],
+        "text": "## Purpose",
+        "sectionText": "## Purpose\n\nThe first and only door. Nothing on this client is readable before it\n(`docs/specs/herdr-web-dashboard.md` §Sign in, R3). It exists to take one\ncredential — the machine's token — and exchange it for a session.\n\nDesigned for the origin case: a phone, one-handed, at a moment when no\ncockpit terminal is open. So the form is one field, the field is the\nfocus, and there is nothing else to read or decide."
+      },
+      "sourceShownText": "## Purpose\n\nThe first and only door. Nothing on this client is readable before it\n(`docs/specs/herdr-web-dashboard.md` §Sign in, R3). It exists to take one\ncredential — the machine's token — and exchange it for a session.\n\nDesigned for the origin case: a phone, one-handed, at a moment when no\ncockpit terminal is open. So the form is one field, the field is the\nfocus, and there is nothing else to read or decide.",
+      "sourceDigest": "dfb50996e4d6dd9f7668e8e6e4a51cd7f239e7d3550efc895cdfa1e34ef40679",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "targetAnchor": "purpose",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Purpose",
+        "anchor": "purpose",
+        "githubAnchor": "purpose",
+        "stableAnchor": "h-15cea22a442e",
+        "startLine": 37,
+        "endLine": 37,
+        "textDigest": "dfb50996e4d6dd9f7668e8e6e4a51cd7f239e7d3550efc895cdfa1e34ef40679",
+        "sample": "Purpose",
+        "sectionPayloadDigest": "91528cbdb4801f652c3cd669b6052a2f3860e60f3cddffc6c7c0e989bbbebcb1",
+        "followingBlockDigest": "0beef4d2245a0124917db86d62ab32535b8d692d87092579891e6263a4565f04",
+        "identityFingerprint": "7310635f2ccc9e4800235e9fb67b8328e08de4e542a4ccf34b617463eedf06e6",
+        "ancestry": [
+          "S01 — Sign in"
+        ],
+        "text": "## Purpose",
+        "sectionText": "## Purpose\n\nThe first and only door. Nothing on this client is readable before it\n(`docs/specs/herdr-web-dashboard.md` §Sign in, R3). It exists to take one\ncredential — the machine's token — and exchange it for a session.\n\nDesigned for the origin case: a phone, one-handed, at a moment when no\ncockpit terminal is open. So the form is one field, the field is the\nfocus, and there is nothing else to read or decide."
+      },
+      "targetShownText": "## Purpose\n\nThe first and only door. Nothing on this client is readable before it\n(`docs/specs/herdr-web-dashboard.md` §Sign in, R3). It exists to take one\ncredential — the machine's token — and exchange it for a session.\n\nDesigned for the origin case: a phone, one-handed, at a moment when no\ncockpit terminal is open. So the form is one field, the field is the\nfocus, and there is nothing else to read or decide.",
+      "targetDigest": "dfb50996e4d6dd9f7668e8e6e4a51cd7f239e7d3550efc895cdfa1e34ef40679",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_bba819e1574e95eb1c661ad4e65b52d7",
+        "sourceUnitDigest": "dfb50996e4d6dd9f7668e8e6e4a51cd7f239e7d3550efc895cdfa1e34ef40679",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+        "targetAnchor": "purpose",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/ui-spec/screens/S01-sign-in.md#purpose (source lines 15-15) is carried at docs/platform/ui-spec/architecture/screens/S01-sign-in.md#purpose (candidate lines 37-37). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S01-sign-in.md verbatim in docs/platform/ui-spec/architecture/screens/S01-sign-in.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "dfb50996e4d6dd9f7668e8e6e4a51cd7f239e7d3550efc895cdfa1e34ef40679",
+        "targetAncestry": [
+          "S01 — Sign in"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_3a04f4e739420cfc63f7fc90ee9d868e",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S01-sign-in.md",
+      "sourceAnchor": "unheaded-block-2",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-2",
+        "githubAnchor": "unheaded-block-2",
+        "stableAnchor": "unheaded-block-2",
+        "title": "Unheaded block 2",
+        "startLine": 17,
+        "endLine": 19,
+        "textDigest": "0beef4d2245a0124917db86d62ab32535b8d692d87092579891e6263a4565f04",
+        "sample": "The first and only door. Nothing on this client is readable before it\n(`docs/specs/herdr-web-dashboard.md` §Sign in, R3). It exists to take one\ncredential — the machine's token — a",
+        "identityFingerprint": "9abe4ebd8a52e3ffa4e51527c9cd0ad667c6e89573447334d21777d5e9b43190",
+        "ancestry": [
+          "S01 — Sign in",
+          "Purpose"
+        ],
+        "text": "The first and only door. Nothing on this client is readable before it\n(`docs/specs/herdr-web-dashboard.md` §Sign in, R3). It exists to take one\ncredential — the machine's token — and exchange it for a session."
+      },
+      "sourceShownText": "The first and only door. Nothing on this client is readable before it\n(`docs/specs/herdr-web-dashboard.md` §Sign in, R3). It exists to take one\ncredential — the machine's token — and exchange it for a session.",
+      "sourceDigest": "0beef4d2245a0124917db86d62ab32535b8d692d87092579891e6263a4565f04",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "targetAnchor": "unheaded-block-4",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 39,
+        "endLine": 41,
+        "textDigest": "0beef4d2245a0124917db86d62ab32535b8d692d87092579891e6263a4565f04",
+        "sample": "The first and only door. Nothing on this client is readable before it\n(`docs/specs/herdr-web-dashboard.md` §Sign in, R3). It exists to take one\ncredential — the machine's token — a",
+        "identityFingerprint": "9abe4ebd8a52e3ffa4e51527c9cd0ad667c6e89573447334d21777d5e9b43190",
+        "ancestry": [
+          "S01 — Sign in",
+          "Purpose"
+        ],
+        "text": "The first and only door. Nothing on this client is readable before it\n(`docs/specs/herdr-web-dashboard.md` §Sign in, R3). It exists to take one\ncredential — the machine's token — and exchange it for a session."
+      },
+      "targetShownText": "The first and only door. Nothing on this client is readable before it\n(`docs/specs/herdr-web-dashboard.md` §Sign in, R3). It exists to take one\ncredential — the machine's token — and exchange it for a session.",
+      "targetDigest": "0beef4d2245a0124917db86d62ab32535b8d692d87092579891e6263a4565f04",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_3a04f4e739420cfc63f7fc90ee9d868e",
+        "sourceUnitDigest": "0beef4d2245a0124917db86d62ab32535b8d692d87092579891e6263a4565f04",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+        "targetAnchor": "unheaded-block-4",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/screens/S01-sign-in.md#unheaded-block-2 (source lines 17-19) is carried at docs/platform/ui-spec/architecture/screens/S01-sign-in.md#unheaded-block-4 (candidate lines 39-41). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S01-sign-in.md verbatim in docs/platform/ui-spec/architecture/screens/S01-sign-in.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "0beef4d2245a0124917db86d62ab32535b8d692d87092579891e6263a4565f04",
+        "targetAncestry": [
+          "S01 — Sign in",
+          "Purpose"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_ee445ed3633ffaf1046847c22af0fb7f",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S01-sign-in.md",
+      "sourceAnchor": "unheaded-block-3",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 21,
+        "endLine": 23,
+        "textDigest": "ea5525c5b2864c0c8bb3de1d5af8e2533672b46433909f40dd3664a49ca805ef",
+        "sample": "Designed for the origin case: a phone, one-handed, at a moment when no\ncockpit terminal is open. So the form is one field, the field is the\nfocus, and there is nothing else to read",
+        "identityFingerprint": "75a153b8a2cd3b566e0d3497c4dbaa6e40b7433f59813b622e10f03ae0ee7975",
+        "ancestry": [
+          "S01 — Sign in",
+          "Purpose"
+        ],
+        "text": "Designed for the origin case: a phone, one-handed, at a moment when no\ncockpit terminal is open. So the form is one field, the field is the\nfocus, and there is nothing else to read or decide."
+      },
+      "sourceShownText": "Designed for the origin case: a phone, one-handed, at a moment when no\ncockpit terminal is open. So the form is one field, the field is the\nfocus, and there is nothing else to read or decide.",
+      "sourceDigest": "ea5525c5b2864c0c8bb3de1d5af8e2533672b46433909f40dd3664a49ca805ef",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "targetAnchor": "unheaded-block-5",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 43,
+        "endLine": 45,
+        "textDigest": "ea5525c5b2864c0c8bb3de1d5af8e2533672b46433909f40dd3664a49ca805ef",
+        "sample": "Designed for the origin case: a phone, one-handed, at a moment when no\ncockpit terminal is open. So the form is one field, the field is the\nfocus, and there is nothing else to read",
+        "identityFingerprint": "75a153b8a2cd3b566e0d3497c4dbaa6e40b7433f59813b622e10f03ae0ee7975",
+        "ancestry": [
+          "S01 — Sign in",
+          "Purpose"
+        ],
+        "text": "Designed for the origin case: a phone, one-handed, at a moment when no\ncockpit terminal is open. So the form is one field, the field is the\nfocus, and there is nothing else to read or decide."
+      },
+      "targetShownText": "Designed for the origin case: a phone, one-handed, at a moment when no\ncockpit terminal is open. So the form is one field, the field is the\nfocus, and there is nothing else to read or decide.",
+      "targetDigest": "ea5525c5b2864c0c8bb3de1d5af8e2533672b46433909f40dd3664a49ca805ef",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_ee445ed3633ffaf1046847c22af0fb7f",
+        "sourceUnitDigest": "ea5525c5b2864c0c8bb3de1d5af8e2533672b46433909f40dd3664a49ca805ef",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+        "targetAnchor": "unheaded-block-5",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/screens/S01-sign-in.md#unheaded-block-3 (source lines 21-23) is carried at docs/platform/ui-spec/architecture/screens/S01-sign-in.md#unheaded-block-5 (candidate lines 43-45). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S01-sign-in.md verbatim in docs/platform/ui-spec/architecture/screens/S01-sign-in.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "ea5525c5b2864c0c8bb3de1d5af8e2533672b46433909f40dd3664a49ca805ef",
+        "targetAncestry": [
+          "S01 — Sign in",
+          "Purpose"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_7eb4d4508811b2fea52a5a0b1ca60f6b",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S01-sign-in.md",
+      "sourceAnchor": "layout",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Layout",
+        "anchor": "layout",
+        "githubAnchor": "layout",
+        "stableAnchor": "h-b86b20447d22",
+        "startLine": 25,
+        "endLine": 25,
+        "textDigest": "225d6cada78ff281f42012629d520aa2fd16e54a943a884653b295cde65f8bca",
+        "sample": "Layout",
+        "sectionPayloadDigest": "ef323a42789949b67d6ae92c637fe5a4390f513ca9c614ecd0492d13067750db",
+        "followingBlockDigest": "4fcd1b19835c8541752a8db0350ae5bf1912cea6549777cfbbf4020dea6146fe",
+        "identityFingerprint": "2c2095b81bd9401e4eb74fb6fa50e58ea86fcb4e418ed06804f26b018d3e3906",
+        "ancestry": [
+          "S01 — Sign in"
+        ],
+        "text": "## Layout",
+        "sectionText": "## Layout\n\n```\n┌──────────────────────────────────────┐\n│                                      │\n│              herdr                   │  brand\n│         fgOS work dashboard          │\n│                                      │\n│  ┌────────────────────────────────┐  │\n│  │ Access token                   │  │  form\n│  │ ┌────────────────────────────┐ │  │\n│  │ │ ••••••••••••••••••••••••   │ │  │\n│  │ └────────────────────────────┘ │  │\n│  │                                │  │\n│  │ [        Sign in         ]     │  │\n│  │                                │  │\n│  │  Sign-in failed.               │  │  (ERR-AUTH, one message only)\n│  └────────────────────────────────┘  │\n│                                      │\n│  Reachable beyond this machine.      │  footnote\n│                                      │\n└──────────────────────────────────────┘\n```\n\nMobile is the same layout at full width — there is nothing to reflow. The\ntoken field uses a password-type input so a shoulder-surfer on a train\nsees nothing, and so the browser does not offer to autofill it into\nunrelated forms."
+      },
+      "sourceShownText": "## Layout\n\n```\n┌──────────────────────────────────────┐\n│                                      │\n│              herdr                   │  brand\n│         fgOS work dashboard          │\n│                                      │\n│  ┌────────────────────────────────┐  │\n│  │ Access token                   │  │  form\n│  │ ┌────────────────────────────┐ │  │\n│  │ │ ••••••••••••••••••••••••   │ │  │\n│  │ └────────────────────────────┘ │  │\n│  │                                │  │\n│  │ [        Sign in         ]     │  │\n│  │                                │  │\n│  │  Sign-in failed.               │  │  (ERR-AUTH, one message only)\n│  └────────────────────────────────┘  │\n│                                      │\n│  Reachable beyond this machine.      │  footnote\n│                                      │\n└──────────────────────────────────────┘\n```\n\nMobile is the same layout at full width — there is nothing to reflow. The\ntoken field uses a password-type input so a shoulder-surfer on a train\nsees nothing, and so the browser does not offer to autofill it into\nunrelated forms.",
+      "sourceDigest": "225d6cada78ff281f42012629d520aa2fd16e54a943a884653b295cde65f8bca",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "targetAnchor": "layout",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Layout",
+        "anchor": "layout",
+        "githubAnchor": "layout",
+        "stableAnchor": "h-dde0d64e36bd",
+        "startLine": 47,
+        "endLine": 47,
+        "textDigest": "225d6cada78ff281f42012629d520aa2fd16e54a943a884653b295cde65f8bca",
+        "sample": "Layout",
+        "sectionPayloadDigest": "ef323a42789949b67d6ae92c637fe5a4390f513ca9c614ecd0492d13067750db",
+        "followingBlockDigest": "4fcd1b19835c8541752a8db0350ae5bf1912cea6549777cfbbf4020dea6146fe",
+        "identityFingerprint": "2c2095b81bd9401e4eb74fb6fa50e58ea86fcb4e418ed06804f26b018d3e3906",
+        "ancestry": [
+          "S01 — Sign in"
+        ],
+        "text": "## Layout",
+        "sectionText": "## Layout\n\n```\n┌──────────────────────────────────────┐\n│                                      │\n│              herdr                   │  brand\n│         fgOS work dashboard          │\n│                                      │\n│  ┌────────────────────────────────┐  │\n│  │ Access token                   │  │  form\n│  │ ┌────────────────────────────┐ │  │\n│  │ │ ••••••••••••••••••••••••   │ │  │\n│  │ └────────────────────────────┘ │  │\n│  │                                │  │\n│  │ [        Sign in         ]     │  │\n│  │                                │  │\n│  │  Sign-in failed.               │  │  (ERR-AUTH, one message only)\n│  └────────────────────────────────┘  │\n│                                      │\n│  Reachable beyond this machine.      │  footnote\n│                                      │\n└──────────────────────────────────────┘\n```\n\nMobile is the same layout at full width — there is nothing to reflow. The\ntoken field uses a password-type input so a shoulder-surfer on a train\nsees nothing, and so the browser does not offer to autofill it into\nunrelated forms."
+      },
+      "targetShownText": "## Layout\n\n```\n┌──────────────────────────────────────┐\n│                                      │\n│              herdr                   │  brand\n│         fgOS work dashboard          │\n│                                      │\n│  ┌────────────────────────────────┐  │\n│  │ Access token                   │  │  form\n│  │ ┌────────────────────────────┐ │  │\n│  │ │ ••••••••••••••••••••••••   │ │  │\n│  │ └────────────────────────────┘ │  │\n│  │                                │  │\n│  │ [        Sign in         ]     │  │\n│  │                                │  │\n│  │  Sign-in failed.               │  │  (ERR-AUTH, one message only)\n│  └────────────────────────────────┘  │\n│                                      │\n│  Reachable beyond this machine.      │  footnote\n│                                      │\n└──────────────────────────────────────┘\n```\n\nMobile is the same layout at full width — there is nothing to reflow. The\ntoken field uses a password-type input so a shoulder-surfer on a train\nsees nothing, and so the browser does not offer to autofill it into\nunrelated forms.",
+      "targetDigest": "225d6cada78ff281f42012629d520aa2fd16e54a943a884653b295cde65f8bca",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_7eb4d4508811b2fea52a5a0b1ca60f6b",
+        "sourceUnitDigest": "225d6cada78ff281f42012629d520aa2fd16e54a943a884653b295cde65f8bca",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+        "targetAnchor": "layout",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/ui-spec/screens/S01-sign-in.md#layout (source lines 25-25) is carried at docs/platform/ui-spec/architecture/screens/S01-sign-in.md#layout (candidate lines 47-47). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S01-sign-in.md verbatim in docs/platform/ui-spec/architecture/screens/S01-sign-in.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "225d6cada78ff281f42012629d520aa2fd16e54a943a884653b295cde65f8bca",
+        "targetAncestry": [
+          "S01 — Sign in"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_c114e4da6a0aa74dd6d6a4908b558893",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S01-sign-in.md",
+      "sourceAnchor": "unheaded-block-4",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 27,
+        "endLine": 47,
+        "textDigest": "4fcd1b19835c8541752a8db0350ae5bf1912cea6549777cfbbf4020dea6146fe",
+        "sample": "```\n┌──────────────────────────────────────┐\n│                                      │\n│              herdr                   │  brand\n│         fgOS work dashboard          │\n│    ",
+        "identityFingerprint": "e0f80a58f7eee42e87713064623c17b5c3d0e9949762b6c81f7036361e5d85ee",
+        "ancestry": [
+          "S01 — Sign in",
+          "Layout"
+        ],
+        "text": "```\n┌──────────────────────────────────────┐\n│                                      │\n│              herdr                   │  brand\n│         fgOS work dashboard          │\n│                                      │\n│  ┌────────────────────────────────┐  │\n│  │ Access token                   │  │  form\n│  │ ┌────────────────────────────┐ │  │\n│  │ │ ••••••••••••••••••••••••   │ │  │\n│  │ └────────────────────────────┘ │  │\n│  │                                │  │\n│  │ [        Sign in         ]     │  │\n│  │                                │  │\n│  │  Sign-in failed.               │  │  (ERR-AUTH, one message only)\n│  └────────────────────────────────┘  │\n│                                      │\n│  Reachable beyond this machine.      │  footnote\n│                                      │\n└──────────────────────────────────────┘\n```"
+      },
+      "sourceShownText": "```\n┌──────────────────────────────────────┐\n│                                      │\n│              herdr                   │  brand\n│         fgOS work dashboard          │\n│                                      │\n│  ┌────────────────────────────────┐  │\n│  │ Access token                   │  │  form\n│  │ ┌────────────────────────────┐ │  │\n│  │ │ ••••••••••••••••••••••••   │ │  │\n│  │ └────────────────────────────┘ │  │\n│  │                                │  │\n│  │ [        Sign in         ]     │  │\n│  │                                │  │\n│  │  Sign-in failed.               │  │  (ERR-AUTH, one message only)\n│  └────────────────────────────────┘  │\n│                                      │\n│  Reachable beyond this machine.      │  footnote\n│                                      │\n└──────────────────────────────────────┘\n```",
+      "sourceDigest": "4fcd1b19835c8541752a8db0350ae5bf1912cea6549777cfbbf4020dea6146fe",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "targetAnchor": "unheaded-block-6",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 49,
+        "endLine": 69,
+        "textDigest": "4fcd1b19835c8541752a8db0350ae5bf1912cea6549777cfbbf4020dea6146fe",
+        "sample": "```\n┌──────────────────────────────────────┐\n│                                      │\n│              herdr                   │  brand\n│         fgOS work dashboard          │\n│    ",
+        "identityFingerprint": "e0f80a58f7eee42e87713064623c17b5c3d0e9949762b6c81f7036361e5d85ee",
+        "ancestry": [
+          "S01 — Sign in",
+          "Layout"
+        ],
+        "text": "```\n┌──────────────────────────────────────┐\n│                                      │\n│              herdr                   │  brand\n│         fgOS work dashboard          │\n│                                      │\n│  ┌────────────────────────────────┐  │\n│  │ Access token                   │  │  form\n│  │ ┌────────────────────────────┐ │  │\n│  │ │ ••••••••••••••••••••••••   │ │  │\n│  │ └────────────────────────────┘ │  │\n│  │                                │  │\n│  │ [        Sign in         ]     │  │\n│  │                                │  │\n│  │  Sign-in failed.               │  │  (ERR-AUTH, one message only)\n│  └────────────────────────────────┘  │\n│                                      │\n│  Reachable beyond this machine.      │  footnote\n│                                      │\n└──────────────────────────────────────┘\n```"
+      },
+      "targetShownText": "```\n┌──────────────────────────────────────┐\n│                                      │\n│              herdr                   │  brand\n│         fgOS work dashboard          │\n│                                      │\n│  ┌────────────────────────────────┐  │\n│  │ Access token                   │  │  form\n│  │ ┌────────────────────────────┐ │  │\n│  │ │ ••••••••••••••••••••••••   │ │  │\n│  │ └────────────────────────────┘ │  │\n│  │                                │  │\n│  │ [        Sign in         ]     │  │\n│  │                                │  │\n│  │  Sign-in failed.               │  │  (ERR-AUTH, one message only)\n│  └────────────────────────────────┘  │\n│                                      │\n│  Reachable beyond this machine.      │  footnote\n│                                      │\n└──────────────────────────────────────┘\n```",
+      "targetDigest": "4fcd1b19835c8541752a8db0350ae5bf1912cea6549777cfbbf4020dea6146fe",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_c114e4da6a0aa74dd6d6a4908b558893",
+        "sourceUnitDigest": "4fcd1b19835c8541752a8db0350ae5bf1912cea6549777cfbbf4020dea6146fe",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+        "targetAnchor": "unheaded-block-6",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/screens/S01-sign-in.md#unheaded-block-4 (source lines 27-47) is carried at docs/platform/ui-spec/architecture/screens/S01-sign-in.md#unheaded-block-6 (candidate lines 49-69). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S01-sign-in.md verbatim in docs/platform/ui-spec/architecture/screens/S01-sign-in.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "4fcd1b19835c8541752a8db0350ae5bf1912cea6549777cfbbf4020dea6146fe",
+        "targetAncestry": [
+          "S01 — Sign in",
+          "Layout"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_c5c6c48bbd8baba4da9c0a46b757e1c6",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S01-sign-in.md",
+      "sourceAnchor": "unheaded-block-5",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 49,
+        "endLine": 52,
+        "textDigest": "52e625daaea2d5fd48b3b9d4d436367a94d665c43b3f5902b377280ec9f265ec",
+        "sample": "Mobile is the same layout at full width — there is nothing to reflow. The\ntoken field uses a password-type input so a shoulder-surfer on a train\nsees nothing, and so the browser do",
+        "identityFingerprint": "6aab40cdef9a4ef611728b98a30487e041404df91c091efdbe5ea37b0cc872f9",
+        "ancestry": [
+          "S01 — Sign in",
+          "Layout"
+        ],
+        "text": "Mobile is the same layout at full width — there is nothing to reflow. The\ntoken field uses a password-type input so a shoulder-surfer on a train\nsees nothing, and so the browser does not offer to autofill it into\nunrelated forms."
+      },
+      "sourceShownText": "Mobile is the same layout at full width — there is nothing to reflow. The\ntoken field uses a password-type input so a shoulder-surfer on a train\nsees nothing, and so the browser does not offer to autofill it into\nunrelated forms.",
+      "sourceDigest": "52e625daaea2d5fd48b3b9d4d436367a94d665c43b3f5902b377280ec9f265ec",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "targetAnchor": "unheaded-block-7",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 71,
+        "endLine": 74,
+        "textDigest": "52e625daaea2d5fd48b3b9d4d436367a94d665c43b3f5902b377280ec9f265ec",
+        "sample": "Mobile is the same layout at full width — there is nothing to reflow. The\ntoken field uses a password-type input so a shoulder-surfer on a train\nsees nothing, and so the browser do",
+        "identityFingerprint": "6aab40cdef9a4ef611728b98a30487e041404df91c091efdbe5ea37b0cc872f9",
+        "ancestry": [
+          "S01 — Sign in",
+          "Layout"
+        ],
+        "text": "Mobile is the same layout at full width — there is nothing to reflow. The\ntoken field uses a password-type input so a shoulder-surfer on a train\nsees nothing, and so the browser does not offer to autofill it into\nunrelated forms."
+      },
+      "targetShownText": "Mobile is the same layout at full width — there is nothing to reflow. The\ntoken field uses a password-type input so a shoulder-surfer on a train\nsees nothing, and so the browser does not offer to autofill it into\nunrelated forms.",
+      "targetDigest": "52e625daaea2d5fd48b3b9d4d436367a94d665c43b3f5902b377280ec9f265ec",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_c5c6c48bbd8baba4da9c0a46b757e1c6",
+        "sourceUnitDigest": "52e625daaea2d5fd48b3b9d4d436367a94d665c43b3f5902b377280ec9f265ec",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+        "targetAnchor": "unheaded-block-7",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/screens/S01-sign-in.md#unheaded-block-5 (source lines 49-52) is carried at docs/platform/ui-spec/architecture/screens/S01-sign-in.md#unheaded-block-7 (candidate lines 71-74). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S01-sign-in.md verbatim in docs/platform/ui-spec/architecture/screens/S01-sign-in.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "52e625daaea2d5fd48b3b9d4d436367a94d665c43b3f5902b377280ec9f265ec",
+        "targetAncestry": [
+          "S01 — Sign in",
+          "Layout"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_39f417443d65ce04f112c932f2293375",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S01-sign-in.md",
+      "sourceAnchor": "states",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "States",
+        "anchor": "states",
+        "githubAnchor": "states",
+        "stableAnchor": "h-494eeb937f8b",
+        "startLine": 54,
+        "endLine": 54,
+        "textDigest": "9f2473dea651d71ca83df5c9284357798640160bfa24b7b10d8c3e47547e5133",
+        "sample": "States",
+        "sectionPayloadDigest": "c5d07aae412f5d3195d72e0dc66ce099b5d6b8aaaee4d5b43e8119fdc2bb352b",
+        "followingBlockDigest": "a8ec43d1ca3cd4b07dce61b718332c537db2909bfcfe32c41a4e0223f97d3f64",
+        "identityFingerprint": "ea49ca6d87dcd14742bff67253104aaf55315d84777dbfbfa890804cc4991b63",
+        "ancestry": [
+          "S01 — Sign in"
+        ],
+        "text": "## States",
+        "sectionText": "## States\n\n- **ST-READY** — empty field, focused, submit disabled until non-empty.\n- **ST-SUBMITTING** — submit shows progress; the field stays visible but\n  read-only.\n- **ERR-AUTH** — one message, always the same words, no matter the cause.\n  This is R3 rendered: the screen must not become an oracle that tells an\n  attacker which half of their guess was right.\n\nThree things this screen never does, each one a rule:\n\n- never shows the token back, never writes it anywhere but the request,\n  never keeps it after the session cookie exists (R4);\n- never says \"open the cockpit first\" — the dashboard's availability does\n  not depend on a terminal being open (R6);\n- never offers \"remember me\" as a way to skip the door."
+      },
+      "sourceShownText": "## States\n\n- **ST-READY** — empty field, focused, submit disabled until non-empty.\n- **ST-SUBMITTING** — submit shows progress; the field stays visible but\n  read-only.\n- **ERR-AUTH** — one message, always the same words, no matter the cause.\n  This is R3 rendered: the screen must not become an oracle that tells an\n  attacker which half of their guess was right.\n\nThree things this screen never does, each one a rule:\n\n- never shows the token back, never writes it anywhere but the request,\n  never keeps it after the session cookie exists (R4);\n- never says \"open the cockpit first\" — the dashboard's availability does\n  not depend on a terminal being open (R6);\n- never offers \"remember me\" as a way to skip the door.",
+      "sourceDigest": "9f2473dea651d71ca83df5c9284357798640160bfa24b7b10d8c3e47547e5133",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "targetAnchor": "states",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "States",
+        "anchor": "states",
+        "githubAnchor": "states",
+        "stableAnchor": "h-8a717888ba5b",
+        "startLine": 76,
+        "endLine": 76,
+        "textDigest": "9f2473dea651d71ca83df5c9284357798640160bfa24b7b10d8c3e47547e5133",
+        "sample": "States",
+        "sectionPayloadDigest": "c5d07aae412f5d3195d72e0dc66ce099b5d6b8aaaee4d5b43e8119fdc2bb352b",
+        "followingBlockDigest": "a8ec43d1ca3cd4b07dce61b718332c537db2909bfcfe32c41a4e0223f97d3f64",
+        "identityFingerprint": "ea49ca6d87dcd14742bff67253104aaf55315d84777dbfbfa890804cc4991b63",
+        "ancestry": [
+          "S01 — Sign in"
+        ],
+        "text": "## States",
+        "sectionText": "## States\n\n- **ST-READY** — empty field, focused, submit disabled until non-empty.\n- **ST-SUBMITTING** — submit shows progress; the field stays visible but\n  read-only.\n- **ERR-AUTH** — one message, always the same words, no matter the cause.\n  This is R3 rendered: the screen must not become an oracle that tells an\n  attacker which half of their guess was right.\n\nThree things this screen never does, each one a rule:\n\n- never shows the token back, never writes it anywhere but the request,\n  never keeps it after the session cookie exists (R4);\n- never says \"open the cockpit first\" — the dashboard's availability does\n  not depend on a terminal being open (R6);\n- never offers \"remember me\" as a way to skip the door."
+      },
+      "targetShownText": "## States\n\n- **ST-READY** — empty field, focused, submit disabled until non-empty.\n- **ST-SUBMITTING** — submit shows progress; the field stays visible but\n  read-only.\n- **ERR-AUTH** — one message, always the same words, no matter the cause.\n  This is R3 rendered: the screen must not become an oracle that tells an\n  attacker which half of their guess was right.\n\nThree things this screen never does, each one a rule:\n\n- never shows the token back, never writes it anywhere but the request,\n  never keeps it after the session cookie exists (R4);\n- never says \"open the cockpit first\" — the dashboard's availability does\n  not depend on a terminal being open (R6);\n- never offers \"remember me\" as a way to skip the door.",
+      "targetDigest": "9f2473dea651d71ca83df5c9284357798640160bfa24b7b10d8c3e47547e5133",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_39f417443d65ce04f112c932f2293375",
+        "sourceUnitDigest": "9f2473dea651d71ca83df5c9284357798640160bfa24b7b10d8c3e47547e5133",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+        "targetAnchor": "states",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/ui-spec/screens/S01-sign-in.md#states (source lines 54-54) is carried at docs/platform/ui-spec/architecture/screens/S01-sign-in.md#states (candidate lines 76-76). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S01-sign-in.md verbatim in docs/platform/ui-spec/architecture/screens/S01-sign-in.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "9f2473dea651d71ca83df5c9284357798640160bfa24b7b10d8c3e47547e5133",
+        "targetAncestry": [
+          "S01 — Sign in"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_cd456a28153788805cf7c6ebccf02f81",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S01-sign-in.md",
+      "sourceAnchor": "unheaded-block-6",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 56,
+        "endLine": 61,
+        "textDigest": "a8ec43d1ca3cd4b07dce61b718332c537db2909bfcfe32c41a4e0223f97d3f64",
+        "sample": "- **ST-READY** — empty field, focused, submit disabled until non-empty.\n- **ST-SUBMITTING** — submit shows progress; the field stays visible but\n  read-only.\n- **ERR-AUTH** — one m",
+        "identityFingerprint": "9fc4befb80307af04e21830103ca6cd576cb62dcf1975b0fa279b3b4fbfe90d2",
+        "ancestry": [
+          "S01 — Sign in",
+          "States"
+        ],
+        "text": "- **ST-READY** — empty field, focused, submit disabled until non-empty.\n- **ST-SUBMITTING** — submit shows progress; the field stays visible but\n  read-only.\n- **ERR-AUTH** — one message, always the same words, no matter the cause.\n  This is R3 rendered: the screen must not become an oracle that tells an\n  attacker which half of their guess was right."
+      },
+      "sourceShownText": "- **ST-READY** — empty field, focused, submit disabled until non-empty.\n- **ST-SUBMITTING** — submit shows progress; the field stays visible but\n  read-only.\n- **ERR-AUTH** — one message, always the same words, no matter the cause.\n  This is R3 rendered: the screen must not become an oracle that tells an\n  attacker which half of their guess was right.",
+      "sourceDigest": "a8ec43d1ca3cd4b07dce61b718332c537db2909bfcfe32c41a4e0223f97d3f64",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "targetAnchor": "unheaded-block-8",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-8",
+        "githubAnchor": "unheaded-block-8",
+        "stableAnchor": "unheaded-block-8",
+        "title": "Unheaded block 8",
+        "startLine": 78,
+        "endLine": 83,
+        "textDigest": "a8ec43d1ca3cd4b07dce61b718332c537db2909bfcfe32c41a4e0223f97d3f64",
+        "sample": "- **ST-READY** — empty field, focused, submit disabled until non-empty.\n- **ST-SUBMITTING** — submit shows progress; the field stays visible but\n  read-only.\n- **ERR-AUTH** — one m",
+        "identityFingerprint": "9fc4befb80307af04e21830103ca6cd576cb62dcf1975b0fa279b3b4fbfe90d2",
+        "ancestry": [
+          "S01 — Sign in",
+          "States"
+        ],
+        "text": "- **ST-READY** — empty field, focused, submit disabled until non-empty.\n- **ST-SUBMITTING** — submit shows progress; the field stays visible but\n  read-only.\n- **ERR-AUTH** — one message, always the same words, no matter the cause.\n  This is R3 rendered: the screen must not become an oracle that tells an\n  attacker which half of their guess was right."
+      },
+      "targetShownText": "- **ST-READY** — empty field, focused, submit disabled until non-empty.\n- **ST-SUBMITTING** — submit shows progress; the field stays visible but\n  read-only.\n- **ERR-AUTH** — one message, always the same words, no matter the cause.\n  This is R3 rendered: the screen must not become an oracle that tells an\n  attacker which half of their guess was right.",
+      "targetDigest": "a8ec43d1ca3cd4b07dce61b718332c537db2909bfcfe32c41a4e0223f97d3f64",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_cd456a28153788805cf7c6ebccf02f81",
+        "sourceUnitDigest": "a8ec43d1ca3cd4b07dce61b718332c537db2909bfcfe32c41a4e0223f97d3f64",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+        "targetAnchor": "unheaded-block-8",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/screens/S01-sign-in.md#unheaded-block-6 (source lines 56-61) is carried at docs/platform/ui-spec/architecture/screens/S01-sign-in.md#unheaded-block-8 (candidate lines 78-83). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S01-sign-in.md verbatim in docs/platform/ui-spec/architecture/screens/S01-sign-in.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "a8ec43d1ca3cd4b07dce61b718332c537db2909bfcfe32c41a4e0223f97d3f64",
+        "targetAncestry": [
+          "S01 — Sign in",
+          "States"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_d233fa65d860141b65898ec00d944180",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S01-sign-in.md",
+      "sourceAnchor": "unheaded-block-7",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 63,
+        "endLine": 63,
+        "textDigest": "6c01f258d2d51d91bfb53840c1568640183da8669c640df98bc0a0999c5d28b7",
+        "sample": "Three things this screen never does, each one a rule:",
+        "identityFingerprint": "8070b09a6e923e9f9829068f390cc6dc79a4f5a295a89f74d5425af580241ab2",
+        "ancestry": [
+          "S01 — Sign in",
+          "States"
+        ],
+        "text": "Three things this screen never does, each one a rule:"
+      },
+      "sourceShownText": "Three things this screen never does, each one a rule:",
+      "sourceDigest": "6c01f258d2d51d91bfb53840c1568640183da8669c640df98bc0a0999c5d28b7",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "targetAnchor": "unheaded-block-9",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-9",
+        "githubAnchor": "unheaded-block-9",
+        "stableAnchor": "unheaded-block-9",
+        "title": "Unheaded block 9",
+        "startLine": 85,
+        "endLine": 85,
+        "textDigest": "6c01f258d2d51d91bfb53840c1568640183da8669c640df98bc0a0999c5d28b7",
+        "sample": "Three things this screen never does, each one a rule:",
+        "identityFingerprint": "8070b09a6e923e9f9829068f390cc6dc79a4f5a295a89f74d5425af580241ab2",
+        "ancestry": [
+          "S01 — Sign in",
+          "States"
+        ],
+        "text": "Three things this screen never does, each one a rule:"
+      },
+      "targetShownText": "Three things this screen never does, each one a rule:",
+      "targetDigest": "6c01f258d2d51d91bfb53840c1568640183da8669c640df98bc0a0999c5d28b7",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_d233fa65d860141b65898ec00d944180",
+        "sourceUnitDigest": "6c01f258d2d51d91bfb53840c1568640183da8669c640df98bc0a0999c5d28b7",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+        "targetAnchor": "unheaded-block-9",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/screens/S01-sign-in.md#unheaded-block-7 (source lines 63-63) is carried at docs/platform/ui-spec/architecture/screens/S01-sign-in.md#unheaded-block-9 (candidate lines 85-85). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S01-sign-in.md verbatim in docs/platform/ui-spec/architecture/screens/S01-sign-in.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "6c01f258d2d51d91bfb53840c1568640183da8669c640df98bc0a0999c5d28b7",
+        "targetAncestry": [
+          "S01 — Sign in",
+          "States"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_45d619262877e3606c6434a80eac0ea7",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S01-sign-in.md",
+      "sourceAnchor": "unheaded-block-8",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-8",
+        "githubAnchor": "unheaded-block-8",
+        "stableAnchor": "unheaded-block-8",
+        "title": "Unheaded block 8",
+        "startLine": 65,
+        "endLine": 69,
+        "textDigest": "d30b7cd79d3cf89c5ab75507209b4bde9ac4646cb248f3fdd5ef19e3935895c3",
+        "sample": "- never shows the token back, never writes it anywhere but the request,\n  never keeps it after the session cookie exists (R4);\n- never says \"open the cockpit first\" — the dashboard",
+        "identityFingerprint": "0e012ba7325652c8e07c98888e00ec79a891f94c04cf5f9232cb5fc37d143014",
+        "ancestry": [
+          "S01 — Sign in",
+          "States"
+        ],
+        "text": "- never shows the token back, never writes it anywhere but the request,\n  never keeps it after the session cookie exists (R4);\n- never says \"open the cockpit first\" — the dashboard's availability does\n  not depend on a terminal being open (R6);\n- never offers \"remember me\" as a way to skip the door."
+      },
+      "sourceShownText": "- never shows the token back, never writes it anywhere but the request,\n  never keeps it after the session cookie exists (R4);\n- never says \"open the cockpit first\" — the dashboard's availability does\n  not depend on a terminal being open (R6);\n- never offers \"remember me\" as a way to skip the door.",
+      "sourceDigest": "d30b7cd79d3cf89c5ab75507209b4bde9ac4646cb248f3fdd5ef19e3935895c3",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "targetAnchor": "unheaded-block-10",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-10",
+        "githubAnchor": "unheaded-block-10",
+        "stableAnchor": "unheaded-block-10",
+        "title": "Unheaded block 10",
+        "startLine": 87,
+        "endLine": 91,
+        "textDigest": "d30b7cd79d3cf89c5ab75507209b4bde9ac4646cb248f3fdd5ef19e3935895c3",
+        "sample": "- never shows the token back, never writes it anywhere but the request,\n  never keeps it after the session cookie exists (R4);\n- never says \"open the cockpit first\" — the dashboard",
+        "identityFingerprint": "0e012ba7325652c8e07c98888e00ec79a891f94c04cf5f9232cb5fc37d143014",
+        "ancestry": [
+          "S01 — Sign in",
+          "States"
+        ],
+        "text": "- never shows the token back, never writes it anywhere but the request,\n  never keeps it after the session cookie exists (R4);\n- never says \"open the cockpit first\" — the dashboard's availability does\n  not depend on a terminal being open (R6);\n- never offers \"remember me\" as a way to skip the door."
+      },
+      "targetShownText": "- never shows the token back, never writes it anywhere but the request,\n  never keeps it after the session cookie exists (R4);\n- never says \"open the cockpit first\" — the dashboard's availability does\n  not depend on a terminal being open (R6);\n- never offers \"remember me\" as a way to skip the door.",
+      "targetDigest": "d30b7cd79d3cf89c5ab75507209b4bde9ac4646cb248f3fdd5ef19e3935895c3",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_45d619262877e3606c6434a80eac0ea7",
+        "sourceUnitDigest": "d30b7cd79d3cf89c5ab75507209b4bde9ac4646cb248f3fdd5ef19e3935895c3",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+        "targetAnchor": "unheaded-block-10",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/screens/S01-sign-in.md#unheaded-block-8 (source lines 65-69) is carried at docs/platform/ui-spec/architecture/screens/S01-sign-in.md#unheaded-block-10 (candidate lines 87-91). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S01-sign-in.md verbatim in docs/platform/ui-spec/architecture/screens/S01-sign-in.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "d30b7cd79d3cf89c5ab75507209b4bde9ac4646cb248f3fdd5ef19e3935895c3",
+        "targetAncestry": [
+          "S01 — Sign in",
+          "States"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_3bd0f8ba521d2a8972d6e44b78002bc3",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S01-sign-in.md",
+      "sourceAnchor": "interactions",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Interactions",
+        "anchor": "interactions",
+        "githubAnchor": "interactions",
+        "stableAnchor": "h-a03404b71cdc",
+        "startLine": 71,
+        "endLine": 71,
+        "textDigest": "895f6a966aea555382214e9031cb9bd8e62d4c1782ad7bb3abe348c7deee2d07",
+        "sample": "Interactions",
+        "sectionPayloadDigest": "432201863dab2e41ba63bca951a1c5906c41ce90fe0ff2c4328e371b5df345f5",
+        "followingBlockDigest": "432201863dab2e41ba63bca951a1c5906c41ce90fe0ff2c4328e371b5df345f5",
+        "identityFingerprint": "0a3041f5f241ceca1c0b3e40ef49df1a5b71634bec2debf13d0dda43c3c6588e",
+        "ancestry": [
+          "S01 — Sign in"
+        ],
+        "text": "## Interactions",
+        "sectionText": "## Interactions\n\n```yaml herdrweb-contract\ninteractions:\n  - id: A-S01-001\n    element: token_field\n    region: form\n    trigger: input\n    action: mutate\n    effects: [enable_submit_when_non_empty]\n  - id: A-S01-002\n    element: sign_in_button\n    region: form\n    trigger: submit\n    guard: \"token.nonEmpty\"\n    action: navigate\n    target: S02\n    effects: [establish_session, clear_token_from_memory]\n```"
+      },
+      "sourceShownText": "## Interactions\n\n```yaml herdrweb-contract\ninteractions:\n  - id: A-S01-001\n    element: token_field\n    region: form\n    trigger: input\n    action: mutate\n    effects: [enable_submit_when_non_empty]\n  - id: A-S01-002\n    element: sign_in_button\n    region: form\n    trigger: submit\n    guard: \"token.nonEmpty\"\n    action: navigate\n    target: S02\n    effects: [establish_session, clear_token_from_memory]\n```",
+      "sourceDigest": "895f6a966aea555382214e9031cb9bd8e62d4c1782ad7bb3abe348c7deee2d07",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "targetAnchor": "interactions",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Interactions",
+        "anchor": "interactions",
+        "githubAnchor": "interactions",
+        "stableAnchor": "h-4c399831b996",
+        "startLine": 93,
+        "endLine": 93,
+        "textDigest": "895f6a966aea555382214e9031cb9bd8e62d4c1782ad7bb3abe348c7deee2d07",
+        "sample": "Interactions",
+        "sectionPayloadDigest": "432201863dab2e41ba63bca951a1c5906c41ce90fe0ff2c4328e371b5df345f5",
+        "followingBlockDigest": "432201863dab2e41ba63bca951a1c5906c41ce90fe0ff2c4328e371b5df345f5",
+        "identityFingerprint": "0a3041f5f241ceca1c0b3e40ef49df1a5b71634bec2debf13d0dda43c3c6588e",
+        "ancestry": [
+          "S01 — Sign in"
+        ],
+        "text": "## Interactions",
+        "sectionText": "## Interactions\n\n```yaml herdrweb-contract\ninteractions:\n  - id: A-S01-001\n    element: token_field\n    region: form\n    trigger: input\n    action: mutate\n    effects: [enable_submit_when_non_empty]\n  - id: A-S01-002\n    element: sign_in_button\n    region: form\n    trigger: submit\n    guard: \"token.nonEmpty\"\n    action: navigate\n    target: S02\n    effects: [establish_session, clear_token_from_memory]\n```"
+      },
+      "targetShownText": "## Interactions\n\n```yaml herdrweb-contract\ninteractions:\n  - id: A-S01-001\n    element: token_field\n    region: form\n    trigger: input\n    action: mutate\n    effects: [enable_submit_when_non_empty]\n  - id: A-S01-002\n    element: sign_in_button\n    region: form\n    trigger: submit\n    guard: \"token.nonEmpty\"\n    action: navigate\n    target: S02\n    effects: [establish_session, clear_token_from_memory]\n```",
+      "targetDigest": "895f6a966aea555382214e9031cb9bd8e62d4c1782ad7bb3abe348c7deee2d07",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_3bd0f8ba521d2a8972d6e44b78002bc3",
+        "sourceUnitDigest": "895f6a966aea555382214e9031cb9bd8e62d4c1782ad7bb3abe348c7deee2d07",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+        "targetAnchor": "interactions",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/ui-spec/screens/S01-sign-in.md#interactions (source lines 71-71) is carried at docs/platform/ui-spec/architecture/screens/S01-sign-in.md#interactions (candidate lines 93-93). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S01-sign-in.md verbatim in docs/platform/ui-spec/architecture/screens/S01-sign-in.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "895f6a966aea555382214e9031cb9bd8e62d4c1782ad7bb3abe348c7deee2d07",
+        "targetAncestry": [
+          "S01 — Sign in"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_66959db8980be9e2431a5436b0acdb21",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S01-sign-in.md",
+      "sourceAnchor": "unheaded-block-9",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-9",
+        "githubAnchor": "unheaded-block-9",
+        "stableAnchor": "unheaded-block-9",
+        "title": "Unheaded block 9",
+        "startLine": 73,
+        "endLine": 89,
+        "textDigest": "432201863dab2e41ba63bca951a1c5906c41ce90fe0ff2c4328e371b5df345f5",
+        "sample": "```yaml herdrweb-contract\ninteractions:\n  - id: A-S01-001\n    element: token_field\n    region: form\n    trigger: input\n    action: mutate\n    effects: [enable_submit_when_non_empty",
+        "identityFingerprint": "ca1c5d2504586f00bc71fef0db771b09627190f09b75cb55fd5318ba94d3d4e8",
+        "ancestry": [
+          "S01 — Sign in",
+          "Interactions"
+        ],
+        "text": "```yaml herdrweb-contract\ninteractions:\n  - id: A-S01-001\n    element: token_field\n    region: form\n    trigger: input\n    action: mutate\n    effects: [enable_submit_when_non_empty]\n  - id: A-S01-002\n    element: sign_in_button\n    region: form\n    trigger: submit\n    guard: \"token.nonEmpty\"\n    action: navigate\n    target: S02\n    effects: [establish_session, clear_token_from_memory]\n```"
+      },
+      "sourceShownText": "```yaml herdrweb-contract\ninteractions:\n  - id: A-S01-001\n    element: token_field\n    region: form\n    trigger: input\n    action: mutate\n    effects: [enable_submit_when_non_empty]\n  - id: A-S01-002\n    element: sign_in_button\n    region: form\n    trigger: submit\n    guard: \"token.nonEmpty\"\n    action: navigate\n    target: S02\n    effects: [establish_session, clear_token_from_memory]\n```",
+      "sourceDigest": "432201863dab2e41ba63bca951a1c5906c41ce90fe0ff2c4328e371b5df345f5",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "targetAnchor": "unheaded-block-11",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-11",
+        "githubAnchor": "unheaded-block-11",
+        "stableAnchor": "unheaded-block-11",
+        "title": "Unheaded block 11",
+        "startLine": 95,
+        "endLine": 111,
+        "textDigest": "432201863dab2e41ba63bca951a1c5906c41ce90fe0ff2c4328e371b5df345f5",
+        "sample": "```yaml herdrweb-contract\ninteractions:\n  - id: A-S01-001\n    element: token_field\n    region: form\n    trigger: input\n    action: mutate\n    effects: [enable_submit_when_non_empty",
+        "identityFingerprint": "ca1c5d2504586f00bc71fef0db771b09627190f09b75cb55fd5318ba94d3d4e8",
+        "ancestry": [
+          "S01 — Sign in",
+          "Interactions"
+        ],
+        "text": "```yaml herdrweb-contract\ninteractions:\n  - id: A-S01-001\n    element: token_field\n    region: form\n    trigger: input\n    action: mutate\n    effects: [enable_submit_when_non_empty]\n  - id: A-S01-002\n    element: sign_in_button\n    region: form\n    trigger: submit\n    guard: \"token.nonEmpty\"\n    action: navigate\n    target: S02\n    effects: [establish_session, clear_token_from_memory]\n```"
+      },
+      "targetShownText": "```yaml herdrweb-contract\ninteractions:\n  - id: A-S01-001\n    element: token_field\n    region: form\n    trigger: input\n    action: mutate\n    effects: [enable_submit_when_non_empty]\n  - id: A-S01-002\n    element: sign_in_button\n    region: form\n    trigger: submit\n    guard: \"token.nonEmpty\"\n    action: navigate\n    target: S02\n    effects: [establish_session, clear_token_from_memory]\n```",
+      "targetDigest": "432201863dab2e41ba63bca951a1c5906c41ce90fe0ff2c4328e371b5df345f5",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_66959db8980be9e2431a5436b0acdb21",
+        "sourceUnitDigest": "432201863dab2e41ba63bca951a1c5906c41ce90fe0ff2c4328e371b5df345f5",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+        "targetAnchor": "unheaded-block-11",
+        "claimKind": "contract",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/screens/S01-sign-in.md#unheaded-block-9 (source lines 73-89) is carried at docs/platform/ui-spec/architecture/screens/S01-sign-in.md#unheaded-block-11 (candidate lines 95-111). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S01-sign-in.md verbatim in docs/platform/ui-spec/architecture/screens/S01-sign-in.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "432201863dab2e41ba63bca951a1c5906c41ce90fe0ff2c4328e371b5df345f5",
+        "targetAncestry": [
+          "S01 — Sign in",
+          "Interactions"
+        ]
+      }
+    }
+  ]
+}

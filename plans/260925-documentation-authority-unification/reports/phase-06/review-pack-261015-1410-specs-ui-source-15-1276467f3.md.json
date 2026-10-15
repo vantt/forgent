@@ -1,0 +1,600 @@
+{
+  "version": 1,
+  "contentCommit": "1276467f37a99d19aff05808d42fafbf40341449",
+  "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+  "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+  "sourcePath": "docs/ui-spec/15-system-events.md",
+  "part": 1,
+  "parts": 1,
+  "count": 9,
+  "classes": {
+    "Unit-exact": [
+      "claim_1d9a2f67d538f7938f0987b2065c7e16",
+      "claim_1ddab2f3852d81b387b8cf74a1311d0a",
+      "claim_d6076e6b828e60d4f4461a9fa942abd0",
+      "claim_de45b6ef8f78c2b53349376df8072f5d",
+      "claim_96fc409e143e98260cfd0695c72fa9a0",
+      "claim_c843b4d07d3d98b6ae711e0d44dee9cd",
+      "claim_0dfdb4f90458e4e9005cca22add8561e",
+      "claim_3840275b1b17103c2967eb18f7a7406c"
+    ],
+    "Weak-exact": [],
+    "Judgment": [
+      "claim_72d974cfc4b8fc20f10bebfb25de4930"
+    ]
+  },
+  "unequalDigestPairs": [
+    "claim_72d974cfc4b8fc20f10bebfb25de4930"
+  ],
+  "noTargetGeneratedRows": [],
+  "mandatoryDeep": [
+    "claim_72d974cfc4b8fc20f10bebfb25de4930"
+  ],
+  "reviewerSeedRequired": true,
+  "minimumSeededWeakJudgment": 1,
+  "rows": [
+    {
+      "claimId": "claim_1d9a2f67d538f7938f0987b2065c7e16",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/15-system-events.md",
+      "sourceAnchor": "unheaded-block-1",
+      "source": {
+        "unitKind": "unheaded-preamble",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded preamble",
+        "startLine": 1,
+        "endLine": 6,
+        "textDigest": "e13c6b0538fcc22c0487c1bd07773dea3e9900b4add7789e144f0daf94145a66",
+        "sample": "---\nid: system-events\ntype: cross-cutting\nname: \"System Events\"\nstatus: active\n---",
+        "identityFingerprint": "a141c0f02d90feed2a52f282547f1c74ec3d68d962ec0a062056f66bfb9702c0",
+        "ancestry": [],
+        "text": "---\nid: system-events\ntype: cross-cutting\nname: \"System Events\"\nstatus: active\n---"
+      },
+      "sourceShownText": "---\nid: system-events\ntype: cross-cutting\nname: \"System Events\"\nstatus: active\n---",
+      "sourceDigest": "e13c6b0538fcc22c0487c1bd07773dea3e9900b4add7789e144f0daf94145a66",
+      "targetPath": "docs/platform/ui-spec/contracts/15-system-events.md",
+      "targetAnchor": "unheaded-block-1",
+      "target": {
+        "unitKind": "unheaded-preamble",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded preamble",
+        "startLine": 1,
+        "endLine": 6,
+        "textDigest": "e13c6b0538fcc22c0487c1bd07773dea3e9900b4add7789e144f0daf94145a66",
+        "sample": "---\nid: system-events\ntype: cross-cutting\nname: \"System Events\"\nstatus: active\n---",
+        "identityFingerprint": "a141c0f02d90feed2a52f282547f1c74ec3d68d962ec0a062056f66bfb9702c0",
+        "ancestry": [],
+        "text": "---\nid: system-events\ntype: cross-cutting\nname: \"System Events\"\nstatus: active\n---"
+      },
+      "targetShownText": "---\nid: system-events\ntype: cross-cutting\nname: \"System Events\"\nstatus: active\n---",
+      "targetDigest": "e13c6b0538fcc22c0487c1bd07773dea3e9900b4add7789e144f0daf94145a66",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_1d9a2f67d538f7938f0987b2065c7e16",
+        "sourceUnitDigest": "e13c6b0538fcc22c0487c1bd07773dea3e9900b4add7789e144f0daf94145a66",
+        "targetOwner": "docs/platform/ui-spec/contracts/15-system-events.md",
+        "targetAnchor": "unheaded-block-1",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-preamble unit docs/ui-spec/15-system-events.md#unheaded-block-1 (source lines 1-6) is carried at docs/platform/ui-spec/contracts/15-system-events.md#unheaded-block-1 (candidate lines 1-6). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/15-system-events.md verbatim in docs/platform/ui-spec/contracts/15-system-events.md. Map kind contract is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "e13c6b0538fcc22c0487c1bd07773dea3e9900b4add7789e144f0daf94145a66",
+        "targetAncestry": []
+      }
+    },
+    {
+      "claimId": "claim_72d974cfc4b8fc20f10bebfb25de4930",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/15-system-events.md",
+      "sourceAnchor": "system-events",
+      "source": {
+        "unitKind": "heading",
+        "level": 1,
+        "title": "System events",
+        "anchor": "system-events",
+        "githubAnchor": "system-events",
+        "stableAnchor": "h-2379957bc543",
+        "startLine": 8,
+        "endLine": 8,
+        "textDigest": "fbf9bdc1e819ef62041ff6c93fbc78696ed91e1fa23c939a373ff0c8566d349f",
+        "sample": "System events",
+        "sectionPayloadDigest": "a9d384297a55e0d6d0295e0e1ad27c346dc1bc97b078859d82d9c879ec77776d",
+        "followingBlockDigest": "913f124f9b88bca2eb8e1d9d8350df0bb8b5637505ec127a5dad11a33e763f1a",
+        "identityFingerprint": "79112536e6dd58edb5bfe92a77bf5fd3988df8eb205e8d0efc7f3a5231a6afeb",
+        "ancestry": [],
+        "text": "# System events",
+        "sectionText": "# System events\n\nBackend signals surfaces listen to. Dotted names, exempt from\nVR-LISTEN-ORPHAN (they come from the gateway, not from a component).\n\n**These are client-derived events, not server-pushed ones.** The gateway\nhas no SSE and no WebSocket — its only change-detection surface is a cheap\npoll of `GET /v1/state/digest`, which returns a `data_hash`\n(`docs/contracts/fgos-gateway-api-v1.yaml`; 17 routes, none of them a\nstream). The client polls that digest, and when the hash differs from the\none it last saw, it re-reads whatever the open screen needs and raises the\nevents below itself. Nothing in the gateway emits them.\n\nThat distinction is load-bearing for anyone implementing a screen: there is\nno subscription to open, no connection to keep alive, and no ordering\nguarantee between events — only \"the hash changed, so something did.\" An\nevent here names *what the client concluded changed*, not a message that\narrived.\n\nR11 still pins that nothing on this surface alerts a person, so these\nevents only keep an already-open screen current. A person who is not\nlooking learns nothing — and with polling that is doubly true, since a\nscreen that is closed is not polling at all.\n\n| Event | Meaning | Listened to by |\n|---|---|---|\n| `work.changed` | One work item's status/stage changed | S02, S03 |\n| `question.opened` | An item parked and now needs a person | S02, S04 |\n| `question.answered` | A parked item resumed | S03, S04 |\n| `merge.settled` | An approve-merge finished (delivered or blocked) | S03 |\n| `gateway.unreachable` | The digest poll itself failed | S02, S03, S04 |\n\n`gateway.unreachable` is the one event every data-bearing screen must\nhandle, because the area spec's Edge Cases pin the behaviour: say so\nplainly, offer retry, and never present stale data as current. Under\npolling it is also the most common of the five, since every poll is a fresh\nchance for the gateway to be unreachable.\n\n```yaml herdrweb-contract\nsystem: gateway\n```"
+      },
+      "sourceShownText": "# System events\n\nBackend signals surfaces listen to. Dotted names, exempt from\nVR-LISTEN-ORPHAN (they come from the gateway, not from a component).\n\n**These are client-derived events, not server-pushed ones.** The gateway\nhas no SSE and no WebSocket — its only change-detection surface is a cheap\npoll of `GET /v1/state/digest`, which returns a `data_hash`\n(`docs/contracts/fgos-gateway-api-v1.yaml`; 17 routes, none of them a\nstream). The client polls that digest, and when the hash differs from the\none it last saw, it re-reads whatever the open screen needs and raises the\nevents below itself. Nothing in the gateway emits them.\n\nThat distinction is load-bearing for anyone implementing a screen: there is\nno subscription to open, no connection to keep alive, and no ordering\nguarantee between events — only \"the hash changed, so something did.\" An\nevent here names *what the client concluded changed*, not a message that\narrived.\n\nR11 still pins that nothing on this surface alerts a person, so these\nevents only keep an already-open screen current. A person who is not\nlooking learns nothing — and with polling that is doubly true, since a\nscreen that is closed is not polling at all.\n\n| Event | Meaning | Listened to by |\n|---|---|---|\n| `work.changed` | One work item's status/stage changed | S02, S03 |\n| `question.opened` | An item parked and now needs a person | S02, S04 |\n| `question.answered` | A parked item resumed | S03, S04 |\n| `merge.settled` | An approve-merge finished (delivered or blocked) | S03 |\n| `gateway.unreachable` | The digest poll itself failed | S02, S03, S04 |\n\n`gateway.unreachable` is the one event every data-bearing screen must\nhandle, because the area spec's Edge Cases pin the behaviour: say so\nplainly, offer retry, and never present stale data as current. Under\npolling it is also the most common of the five, since every poll is a fresh\nchance for the gateway to be unreachable.\n\n```yaml herdrweb-contract\nsystem: gateway\n```",
+      "sourceDigest": "fbf9bdc1e819ef62041ff6c93fbc78696ed91e1fa23c939a373ff0c8566d349f",
+      "targetPath": "docs/platform/ui-spec/contracts/15-system-events.md",
+      "targetAnchor": "system-events",
+      "target": {
+        "unitKind": "heading",
+        "level": 1,
+        "title": "System events",
+        "anchor": "system-events",
+        "githubAnchor": "system-events",
+        "stableAnchor": "h-2379957bc543",
+        "startLine": 8,
+        "endLine": 8,
+        "textDigest": "ec92c276bba30aa7cee14efca6fbec7517137f00775ec64608fbfda2dd1cde0b",
+        "sample": "System events",
+        "sectionPayloadDigest": "930d1b41ee3ebcb1cfd14db8b29280d86f61e79285002b1e0e372e95e3fdc2bc",
+        "followingBlockDigest": "82ad4b95a95ca6fd12a6cbc2ba1d7e20a0613d7fb9967409e5219a568b95e75c",
+        "identityFingerprint": "3342025e48236d804532a02d8bcfebf124f51d1234e144dad6b11ca4f40518bb",
+        "ancestry": [],
+        "text": "# System events",
+        "sectionText": "# System events\n\n```txt\nDocument type: Contract\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve mapped legacy content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; current implementation truth is not certified\nProvenance: docs/ui-spec/15-system-events.md at 111adc51fd047d99121fd9d076eb4794c87045a4\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing carriage, placement and source conservation\nDo not use this for: Current canonical authority or implemented-behavior proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/ui-spec/15-system-events.md\nSupersedes: None; candidate only\nSuperseded by: None\n```\n\n> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions.\n\n\nBackend signals surfaces listen to. Dotted names, exempt from\nVR-LISTEN-ORPHAN (they come from the gateway, not from a component).\n\n**These are client-derived events, not server-pushed ones.** The gateway\nhas no SSE and no WebSocket — its only change-detection surface is a cheap\npoll of `GET /v1/state/digest`, which returns a `data_hash`\n(`docs/contracts/fgos-gateway-api-v1.yaml`; 17 routes, none of them a\nstream). The client polls that digest, and when the hash differs from the\none it last saw, it re-reads whatever the open screen needs and raises the\nevents below itself. Nothing in the gateway emits them.\n\nThat distinction is load-bearing for anyone implementing a screen: there is\nno subscription to open, no connection to keep alive, and no ordering\nguarantee between events — only \"the hash changed, so something did.\" An\nevent here names *what the client concluded changed*, not a message that\narrived.\n\nR11 still pins that nothing on this surface alerts a person, so these\nevents only keep an already-open screen current. A person who is not\nlooking learns nothing — and with polling that is doubly true, since a\nscreen that is closed is not polling at all.\n\n| Event | Meaning | Listened to by |\n|---|---|---|\n| `work.changed` | One work item's status/stage changed | S02, S03 |\n| `question.opened` | An item parked and now needs a person | S02, S04 |\n| `question.answered` | A parked item resumed | S03, S04 |\n| `merge.settled` | An approve-merge finished (delivered or blocked) | S03 |\n| `gateway.unreachable` | The digest poll itself failed | S02, S03, S04 |\n\n`gateway.unreachable` is the one event every data-bearing screen must\nhandle, because the area spec's Edge Cases pin the behaviour: say so\nplainly, offer retry, and never present stale data as current. Under\npolling it is also the most common of the five, since every poll is a fresh\nchance for the gateway to be unreachable.\n\n```yaml herdrweb-contract\nsystem: gateway\n```"
+      },
+      "targetShownText": "# System events\n\n```txt\nDocument type: Contract\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve mapped legacy content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; current implementation truth is not certified\nProvenance: docs/ui-spec/15-system-events.md at 111adc51fd047d99121fd9d076eb4794c87045a4\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing carriage, placement and source conservation\nDo not use this for: Current canonical authority or implemented-behavior proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/ui-spec/15-system-events.md\nSupersedes: None; candidate only\nSuperseded by: None\n```\n\n> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions.\n\n\nBackend signals surfaces listen to. Dotted names, exempt from\nVR-LISTEN-ORPHAN (they come from the gateway, not from a component).\n\n**These are client-derived events, not server-pushed ones.** The gateway\nhas no SSE and no WebSocket — its only change-detection surface is a cheap\npoll of `GET /v1/state/digest`, which returns a `data_hash`\n(`docs/contracts/fgos-gateway-api-v1.yaml`; 17 routes, none of them a\nstream). The client polls that digest, and when the hash differs from the\none it last saw, it re-reads whatever the open screen needs and raises the\nevents below itself. Nothing in the gateway emits them.\n\nThat distinction is load-bearing for anyone implementing a screen: there is\nno subscription to open, no connection to keep alive, and no ordering\nguarantee between events — only \"the hash changed, so something did.\" An\nevent here names *what the client concluded changed*, not a message that\narrived.\n\nR11 still pins that nothing on this surface alerts a person, so these\nevents only keep an already-open screen current. A person who is not\nlooking learns nothing — and with polling that is doubly true, since a\nscreen that is closed is not polling at all.\n\n| Event | Meaning | Listened to by |\n|---|---|---|\n| `work.changed` | One work item's status/stage changed | S02, S03 |\n| `question.opened` | An item parked and now needs a person | S02, S04 |\n| `question.answered` | A parked item resumed | S03, S04 |\n| `merge.settled` | An approve-merge finished (delivered or blocked) | S03 |\n| `gateway.unreachable` | The digest poll itself failed | S02, S03, S04 |\n\n`gateway.unreachable` is the one event every data-bearing screen must\nhandle, because the area spec's Edge Cases pin the behaviour: say so\nplainly, offer retry, and never present stale data as current. Under\npolling it is also the most common of the five, since every poll is a fresh\nchance for the gateway to be unreachable.\n\n```yaml herdrweb-contract\nsystem: gateway\n```",
+      "targetDigest": "ec92c276bba30aa7cee14efca6fbec7517137f00775ec64608fbfda2dd1cde0b",
+      "classification": "Judgment",
+      "mandatoryDeep": true,
+      "decision": {
+        "claimId": "claim_72d974cfc4b8fc20f10bebfb25de4930",
+        "sourceUnitDigest": "fbf9bdc1e819ef62041ff6c93fbc78696ed91e1fa23c939a373ff0c8566d349f",
+        "targetOwner": "docs/platform/ui-spec/contracts/15-system-events.md",
+        "targetAnchor": "system-events",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Judgment: no target digest match. The whole heading unit docs/ui-spec/15-system-events.md#system-events (source lines 8-8) is carried at docs/platform/ui-spec/contracts/15-system-events.md#system-events (candidate lines 8-8). The heading section digest changes because labelled candidate metadata is inserted after the original H1; original heading and direct source payload remain verbatim. Frozen specs-ui map and Step 8: preserve docs/ui-spec/15-system-events.md verbatim in docs/platform/ui-spec/contracts/15-system-events.md. Map kind contract is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "ec92c276bba30aa7cee14efca6fbec7517137f00775ec64608fbfda2dd1cde0b",
+        "targetAncestry": []
+      }
+    },
+    {
+      "claimId": "claim_1ddab2f3852d81b387b8cf74a1311d0a",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/15-system-events.md",
+      "sourceAnchor": "unheaded-block-2",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-2",
+        "githubAnchor": "unheaded-block-2",
+        "stableAnchor": "unheaded-block-2",
+        "title": "Unheaded block 2",
+        "startLine": 10,
+        "endLine": 11,
+        "textDigest": "913f124f9b88bca2eb8e1d9d8350df0bb8b5637505ec127a5dad11a33e763f1a",
+        "sample": "Backend signals surfaces listen to. Dotted names, exempt from\nVR-LISTEN-ORPHAN (they come from the gateway, not from a component).",
+        "identityFingerprint": "b12eb6089df1174237273a2667ccc9d7badb55262d8bfbb80adcd8e3e5c3a914",
+        "ancestry": [
+          "System events"
+        ],
+        "text": "Backend signals surfaces listen to. Dotted names, exempt from\nVR-LISTEN-ORPHAN (they come from the gateway, not from a component)."
+      },
+      "sourceShownText": "Backend signals surfaces listen to. Dotted names, exempt from\nVR-LISTEN-ORPHAN (they come from the gateway, not from a component).",
+      "sourceDigest": "913f124f9b88bca2eb8e1d9d8350df0bb8b5637505ec127a5dad11a33e763f1a",
+      "targetPath": "docs/platform/ui-spec/contracts/15-system-events.md",
+      "targetAnchor": "unheaded-block-4",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 32,
+        "endLine": 33,
+        "textDigest": "913f124f9b88bca2eb8e1d9d8350df0bb8b5637505ec127a5dad11a33e763f1a",
+        "sample": "Backend signals surfaces listen to. Dotted names, exempt from\nVR-LISTEN-ORPHAN (they come from the gateway, not from a component).",
+        "identityFingerprint": "b12eb6089df1174237273a2667ccc9d7badb55262d8bfbb80adcd8e3e5c3a914",
+        "ancestry": [
+          "System events"
+        ],
+        "text": "Backend signals surfaces listen to. Dotted names, exempt from\nVR-LISTEN-ORPHAN (they come from the gateway, not from a component)."
+      },
+      "targetShownText": "Backend signals surfaces listen to. Dotted names, exempt from\nVR-LISTEN-ORPHAN (they come from the gateway, not from a component).",
+      "targetDigest": "913f124f9b88bca2eb8e1d9d8350df0bb8b5637505ec127a5dad11a33e763f1a",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_1ddab2f3852d81b387b8cf74a1311d0a",
+        "sourceUnitDigest": "913f124f9b88bca2eb8e1d9d8350df0bb8b5637505ec127a5dad11a33e763f1a",
+        "targetOwner": "docs/platform/ui-spec/contracts/15-system-events.md",
+        "targetAnchor": "unheaded-block-4",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/15-system-events.md#unheaded-block-2 (source lines 10-11) is carried at docs/platform/ui-spec/contracts/15-system-events.md#unheaded-block-4 (candidate lines 32-33). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/15-system-events.md verbatim in docs/platform/ui-spec/contracts/15-system-events.md. Map kind contract is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "913f124f9b88bca2eb8e1d9d8350df0bb8b5637505ec127a5dad11a33e763f1a",
+        "targetAncestry": [
+          "System events"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_d6076e6b828e60d4f4461a9fa942abd0",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/15-system-events.md",
+      "sourceAnchor": "unheaded-block-3",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 13,
+        "endLine": 19,
+        "textDigest": "c75c05d93e077f415da151b39988a18e3fea9d74828310aad3e6b05e41d45220",
+        "sample": "**These are client-derived events, not server-pushed ones.** The gateway\nhas no SSE and no WebSocket — its only change-detection surface is a cheap\npoll of `GET /v1/state/digest`, ",
+        "identityFingerprint": "2ce7421503fe7a46c1bed4c8abceebc7c19184a53850ffae5376084a5a5aed26",
+        "ancestry": [
+          "System events"
+        ],
+        "text": "**These are client-derived events, not server-pushed ones.** The gateway\nhas no SSE and no WebSocket — its only change-detection surface is a cheap\npoll of `GET /v1/state/digest`, which returns a `data_hash`\n(`docs/contracts/fgos-gateway-api-v1.yaml`; 17 routes, none of them a\nstream). The client polls that digest, and when the hash differs from the\none it last saw, it re-reads whatever the open screen needs and raises the\nevents below itself. Nothing in the gateway emits them."
+      },
+      "sourceShownText": "**These are client-derived events, not server-pushed ones.** The gateway\nhas no SSE and no WebSocket — its only change-detection surface is a cheap\npoll of `GET /v1/state/digest`, which returns a `data_hash`\n(`docs/contracts/fgos-gateway-api-v1.yaml`; 17 routes, none of them a\nstream). The client polls that digest, and when the hash differs from the\none it last saw, it re-reads whatever the open screen needs and raises the\nevents below itself. Nothing in the gateway emits them.",
+      "sourceDigest": "c75c05d93e077f415da151b39988a18e3fea9d74828310aad3e6b05e41d45220",
+      "targetPath": "docs/platform/ui-spec/contracts/15-system-events.md",
+      "targetAnchor": "unheaded-block-5",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 35,
+        "endLine": 41,
+        "textDigest": "c75c05d93e077f415da151b39988a18e3fea9d74828310aad3e6b05e41d45220",
+        "sample": "**These are client-derived events, not server-pushed ones.** The gateway\nhas no SSE and no WebSocket — its only change-detection surface is a cheap\npoll of `GET /v1/state/digest`, ",
+        "identityFingerprint": "2ce7421503fe7a46c1bed4c8abceebc7c19184a53850ffae5376084a5a5aed26",
+        "ancestry": [
+          "System events"
+        ],
+        "text": "**These are client-derived events, not server-pushed ones.** The gateway\nhas no SSE and no WebSocket — its only change-detection surface is a cheap\npoll of `GET /v1/state/digest`, which returns a `data_hash`\n(`docs/contracts/fgos-gateway-api-v1.yaml`; 17 routes, none of them a\nstream). The client polls that digest, and when the hash differs from the\none it last saw, it re-reads whatever the open screen needs and raises the\nevents below itself. Nothing in the gateway emits them."
+      },
+      "targetShownText": "**These are client-derived events, not server-pushed ones.** The gateway\nhas no SSE and no WebSocket — its only change-detection surface is a cheap\npoll of `GET /v1/state/digest`, which returns a `data_hash`\n(`docs/contracts/fgos-gateway-api-v1.yaml`; 17 routes, none of them a\nstream). The client polls that digest, and when the hash differs from the\none it last saw, it re-reads whatever the open screen needs and raises the\nevents below itself. Nothing in the gateway emits them.",
+      "targetDigest": "c75c05d93e077f415da151b39988a18e3fea9d74828310aad3e6b05e41d45220",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_d6076e6b828e60d4f4461a9fa942abd0",
+        "sourceUnitDigest": "c75c05d93e077f415da151b39988a18e3fea9d74828310aad3e6b05e41d45220",
+        "targetOwner": "docs/platform/ui-spec/contracts/15-system-events.md",
+        "targetAnchor": "unheaded-block-5",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/15-system-events.md#unheaded-block-3 (source lines 13-19) is carried at docs/platform/ui-spec/contracts/15-system-events.md#unheaded-block-5 (candidate lines 35-41). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/15-system-events.md verbatim in docs/platform/ui-spec/contracts/15-system-events.md. Map kind contract is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "c75c05d93e077f415da151b39988a18e3fea9d74828310aad3e6b05e41d45220",
+        "targetAncestry": [
+          "System events"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_de45b6ef8f78c2b53349376df8072f5d",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/15-system-events.md",
+      "sourceAnchor": "unheaded-block-4",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 21,
+        "endLine": 25,
+        "textDigest": "3230d51afd86168ac0d6b0b941bdbec980f1c93342cfbf90d889d99a79c37b7c",
+        "sample": "That distinction is load-bearing for anyone implementing a screen: there is\nno subscription to open, no connection to keep alive, and no ordering\nguarantee between events — only \"t",
+        "identityFingerprint": "70156b07f296cc224fe61c3c054d8f74bd5cff07cb596cd2c703d69274011cf3",
+        "ancestry": [
+          "System events"
+        ],
+        "text": "That distinction is load-bearing for anyone implementing a screen: there is\nno subscription to open, no connection to keep alive, and no ordering\nguarantee between events — only \"the hash changed, so something did.\" An\nevent here names *what the client concluded changed*, not a message that\narrived."
+      },
+      "sourceShownText": "That distinction is load-bearing for anyone implementing a screen: there is\nno subscription to open, no connection to keep alive, and no ordering\nguarantee between events — only \"the hash changed, so something did.\" An\nevent here names *what the client concluded changed*, not a message that\narrived.",
+      "sourceDigest": "3230d51afd86168ac0d6b0b941bdbec980f1c93342cfbf90d889d99a79c37b7c",
+      "targetPath": "docs/platform/ui-spec/contracts/15-system-events.md",
+      "targetAnchor": "unheaded-block-6",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 43,
+        "endLine": 47,
+        "textDigest": "3230d51afd86168ac0d6b0b941bdbec980f1c93342cfbf90d889d99a79c37b7c",
+        "sample": "That distinction is load-bearing for anyone implementing a screen: there is\nno subscription to open, no connection to keep alive, and no ordering\nguarantee between events — only \"t",
+        "identityFingerprint": "70156b07f296cc224fe61c3c054d8f74bd5cff07cb596cd2c703d69274011cf3",
+        "ancestry": [
+          "System events"
+        ],
+        "text": "That distinction is load-bearing for anyone implementing a screen: there is\nno subscription to open, no connection to keep alive, and no ordering\nguarantee between events — only \"the hash changed, so something did.\" An\nevent here names *what the client concluded changed*, not a message that\narrived."
+      },
+      "targetShownText": "That distinction is load-bearing for anyone implementing a screen: there is\nno subscription to open, no connection to keep alive, and no ordering\nguarantee between events — only \"the hash changed, so something did.\" An\nevent here names *what the client concluded changed*, not a message that\narrived.",
+      "targetDigest": "3230d51afd86168ac0d6b0b941bdbec980f1c93342cfbf90d889d99a79c37b7c",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_de45b6ef8f78c2b53349376df8072f5d",
+        "sourceUnitDigest": "3230d51afd86168ac0d6b0b941bdbec980f1c93342cfbf90d889d99a79c37b7c",
+        "targetOwner": "docs/platform/ui-spec/contracts/15-system-events.md",
+        "targetAnchor": "unheaded-block-6",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/15-system-events.md#unheaded-block-4 (source lines 21-25) is carried at docs/platform/ui-spec/contracts/15-system-events.md#unheaded-block-6 (candidate lines 43-47). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/15-system-events.md verbatim in docs/platform/ui-spec/contracts/15-system-events.md. Map kind contract is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "3230d51afd86168ac0d6b0b941bdbec980f1c93342cfbf90d889d99a79c37b7c",
+        "targetAncestry": [
+          "System events"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_96fc409e143e98260cfd0695c72fa9a0",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/15-system-events.md",
+      "sourceAnchor": "unheaded-block-5",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 27,
+        "endLine": 30,
+        "textDigest": "c3d3ec45edcf27bd90678fd6c343e01f42f3b3e9d46dea269689f945734d04b7",
+        "sample": "R11 still pins that nothing on this surface alerts a person, so these\nevents only keep an already-open screen current. A person who is not\nlooking learns nothing — and with polling",
+        "identityFingerprint": "f3b9a736fcd003e19eef1d1ed00f820985487cfeb5194697e858cda9495deb4d",
+        "ancestry": [
+          "System events"
+        ],
+        "text": "R11 still pins that nothing on this surface alerts a person, so these\nevents only keep an already-open screen current. A person who is not\nlooking learns nothing — and with polling that is doubly true, since a\nscreen that is closed is not polling at all."
+      },
+      "sourceShownText": "R11 still pins that nothing on this surface alerts a person, so these\nevents only keep an already-open screen current. A person who is not\nlooking learns nothing — and with polling that is doubly true, since a\nscreen that is closed is not polling at all.",
+      "sourceDigest": "c3d3ec45edcf27bd90678fd6c343e01f42f3b3e9d46dea269689f945734d04b7",
+      "targetPath": "docs/platform/ui-spec/contracts/15-system-events.md",
+      "targetAnchor": "unheaded-block-7",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 49,
+        "endLine": 52,
+        "textDigest": "c3d3ec45edcf27bd90678fd6c343e01f42f3b3e9d46dea269689f945734d04b7",
+        "sample": "R11 still pins that nothing on this surface alerts a person, so these\nevents only keep an already-open screen current. A person who is not\nlooking learns nothing — and with polling",
+        "identityFingerprint": "f3b9a736fcd003e19eef1d1ed00f820985487cfeb5194697e858cda9495deb4d",
+        "ancestry": [
+          "System events"
+        ],
+        "text": "R11 still pins that nothing on this surface alerts a person, so these\nevents only keep an already-open screen current. A person who is not\nlooking learns nothing — and with polling that is doubly true, since a\nscreen that is closed is not polling at all."
+      },
+      "targetShownText": "R11 still pins that nothing on this surface alerts a person, so these\nevents only keep an already-open screen current. A person who is not\nlooking learns nothing — and with polling that is doubly true, since a\nscreen that is closed is not polling at all.",
+      "targetDigest": "c3d3ec45edcf27bd90678fd6c343e01f42f3b3e9d46dea269689f945734d04b7",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_96fc409e143e98260cfd0695c72fa9a0",
+        "sourceUnitDigest": "c3d3ec45edcf27bd90678fd6c343e01f42f3b3e9d46dea269689f945734d04b7",
+        "targetOwner": "docs/platform/ui-spec/contracts/15-system-events.md",
+        "targetAnchor": "unheaded-block-7",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/15-system-events.md#unheaded-block-5 (source lines 27-30) is carried at docs/platform/ui-spec/contracts/15-system-events.md#unheaded-block-7 (candidate lines 49-52). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/15-system-events.md verbatim in docs/platform/ui-spec/contracts/15-system-events.md. Map kind contract is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "c3d3ec45edcf27bd90678fd6c343e01f42f3b3e9d46dea269689f945734d04b7",
+        "targetAncestry": [
+          "System events"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_c843b4d07d3d98b6ae711e0d44dee9cd",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/15-system-events.md",
+      "sourceAnchor": "unheaded-block-6",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 32,
+        "endLine": 38,
+        "textDigest": "4bbbe0a7e63ef0ba2347a43f05399168b927a3be951963e858498793bbdc293d",
+        "sample": "| Event | Meaning | Listened to by |\n|---|---|---|\n| `work.changed` | One work item's status/stage changed | S02, S03 |\n| `question.opened` | An item parked and now needs a person ",
+        "identityFingerprint": "0c2599b32022e154ac92dbe7b5a515935183a866b421b11e925b9bc0943b646f",
+        "ancestry": [
+          "System events"
+        ],
+        "text": "| Event | Meaning | Listened to by |\n|---|---|---|\n| `work.changed` | One work item's status/stage changed | S02, S03 |\n| `question.opened` | An item parked and now needs a person | S02, S04 |\n| `question.answered` | A parked item resumed | S03, S04 |\n| `merge.settled` | An approve-merge finished (delivered or blocked) | S03 |\n| `gateway.unreachable` | The digest poll itself failed | S02, S03, S04 |"
+      },
+      "sourceShownText": "| Event | Meaning | Listened to by |\n|---|---|---|\n| `work.changed` | One work item's status/stage changed | S02, S03 |\n| `question.opened` | An item parked and now needs a person | S02, S04 |\n| `question.answered` | A parked item resumed | S03, S04 |\n| `merge.settled` | An approve-merge finished (delivered or blocked) | S03 |\n| `gateway.unreachable` | The digest poll itself failed | S02, S03, S04 |",
+      "sourceDigest": "4bbbe0a7e63ef0ba2347a43f05399168b927a3be951963e858498793bbdc293d",
+      "targetPath": "docs/platform/ui-spec/contracts/15-system-events.md",
+      "targetAnchor": "unheaded-block-8",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-8",
+        "githubAnchor": "unheaded-block-8",
+        "stableAnchor": "unheaded-block-8",
+        "title": "Unheaded block 8",
+        "startLine": 54,
+        "endLine": 60,
+        "textDigest": "4bbbe0a7e63ef0ba2347a43f05399168b927a3be951963e858498793bbdc293d",
+        "sample": "| Event | Meaning | Listened to by |\n|---|---|---|\n| `work.changed` | One work item's status/stage changed | S02, S03 |\n| `question.opened` | An item parked and now needs a person ",
+        "identityFingerprint": "0c2599b32022e154ac92dbe7b5a515935183a866b421b11e925b9bc0943b646f",
+        "ancestry": [
+          "System events"
+        ],
+        "text": "| Event | Meaning | Listened to by |\n|---|---|---|\n| `work.changed` | One work item's status/stage changed | S02, S03 |\n| `question.opened` | An item parked and now needs a person | S02, S04 |\n| `question.answered` | A parked item resumed | S03, S04 |\n| `merge.settled` | An approve-merge finished (delivered or blocked) | S03 |\n| `gateway.unreachable` | The digest poll itself failed | S02, S03, S04 |"
+      },
+      "targetShownText": "| Event | Meaning | Listened to by |\n|---|---|---|\n| `work.changed` | One work item's status/stage changed | S02, S03 |\n| `question.opened` | An item parked and now needs a person | S02, S04 |\n| `question.answered` | A parked item resumed | S03, S04 |\n| `merge.settled` | An approve-merge finished (delivered or blocked) | S03 |\n| `gateway.unreachable` | The digest poll itself failed | S02, S03, S04 |",
+      "targetDigest": "4bbbe0a7e63ef0ba2347a43f05399168b927a3be951963e858498793bbdc293d",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_c843b4d07d3d98b6ae711e0d44dee9cd",
+        "sourceUnitDigest": "4bbbe0a7e63ef0ba2347a43f05399168b927a3be951963e858498793bbdc293d",
+        "targetOwner": "docs/platform/ui-spec/contracts/15-system-events.md",
+        "targetAnchor": "unheaded-block-8",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/15-system-events.md#unheaded-block-6 (source lines 32-38) is carried at docs/platform/ui-spec/contracts/15-system-events.md#unheaded-block-8 (candidate lines 54-60). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/15-system-events.md verbatim in docs/platform/ui-spec/contracts/15-system-events.md. Map kind contract is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "4bbbe0a7e63ef0ba2347a43f05399168b927a3be951963e858498793bbdc293d",
+        "targetAncestry": [
+          "System events"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_0dfdb4f90458e4e9005cca22add8561e",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/15-system-events.md",
+      "sourceAnchor": "unheaded-block-7",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 40,
+        "endLine": 44,
+        "textDigest": "4446f3202dc7b42c7772d91df31d7824e97d8b9cf83a0c7d621cdec61be731c5",
+        "sample": "`gateway.unreachable` is the one event every data-bearing screen must\nhandle, because the area spec's Edge Cases pin the behaviour: say so\nplainly, offer retry, and never present s",
+        "identityFingerprint": "ca46f98f7006303fd409fc0d023b9ed17c30af457602f095aeba8f7112dff049",
+        "ancestry": [
+          "System events"
+        ],
+        "text": "`gateway.unreachable` is the one event every data-bearing screen must\nhandle, because the area spec's Edge Cases pin the behaviour: say so\nplainly, offer retry, and never present stale data as current. Under\npolling it is also the most common of the five, since every poll is a fresh\nchance for the gateway to be unreachable."
+      },
+      "sourceShownText": "`gateway.unreachable` is the one event every data-bearing screen must\nhandle, because the area spec's Edge Cases pin the behaviour: say so\nplainly, offer retry, and never present stale data as current. Under\npolling it is also the most common of the five, since every poll is a fresh\nchance for the gateway to be unreachable.",
+      "sourceDigest": "4446f3202dc7b42c7772d91df31d7824e97d8b9cf83a0c7d621cdec61be731c5",
+      "targetPath": "docs/platform/ui-spec/contracts/15-system-events.md",
+      "targetAnchor": "unheaded-block-9",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-9",
+        "githubAnchor": "unheaded-block-9",
+        "stableAnchor": "unheaded-block-9",
+        "title": "Unheaded block 9",
+        "startLine": 62,
+        "endLine": 66,
+        "textDigest": "4446f3202dc7b42c7772d91df31d7824e97d8b9cf83a0c7d621cdec61be731c5",
+        "sample": "`gateway.unreachable` is the one event every data-bearing screen must\nhandle, because the area spec's Edge Cases pin the behaviour: say so\nplainly, offer retry, and never present s",
+        "identityFingerprint": "ca46f98f7006303fd409fc0d023b9ed17c30af457602f095aeba8f7112dff049",
+        "ancestry": [
+          "System events"
+        ],
+        "text": "`gateway.unreachable` is the one event every data-bearing screen must\nhandle, because the area spec's Edge Cases pin the behaviour: say so\nplainly, offer retry, and never present stale data as current. Under\npolling it is also the most common of the five, since every poll is a fresh\nchance for the gateway to be unreachable."
+      },
+      "targetShownText": "`gateway.unreachable` is the one event every data-bearing screen must\nhandle, because the area spec's Edge Cases pin the behaviour: say so\nplainly, offer retry, and never present stale data as current. Under\npolling it is also the most common of the five, since every poll is a fresh\nchance for the gateway to be unreachable.",
+      "targetDigest": "4446f3202dc7b42c7772d91df31d7824e97d8b9cf83a0c7d621cdec61be731c5",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_0dfdb4f90458e4e9005cca22add8561e",
+        "sourceUnitDigest": "4446f3202dc7b42c7772d91df31d7824e97d8b9cf83a0c7d621cdec61be731c5",
+        "targetOwner": "docs/platform/ui-spec/contracts/15-system-events.md",
+        "targetAnchor": "unheaded-block-9",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/15-system-events.md#unheaded-block-7 (source lines 40-44) is carried at docs/platform/ui-spec/contracts/15-system-events.md#unheaded-block-9 (candidate lines 62-66). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/15-system-events.md verbatim in docs/platform/ui-spec/contracts/15-system-events.md. Map kind contract is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "4446f3202dc7b42c7772d91df31d7824e97d8b9cf83a0c7d621cdec61be731c5",
+        "targetAncestry": [
+          "System events"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_3840275b1b17103c2967eb18f7a7406c",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/15-system-events.md",
+      "sourceAnchor": "unheaded-block-8",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-8",
+        "githubAnchor": "unheaded-block-8",
+        "stableAnchor": "unheaded-block-8",
+        "title": "Unheaded block 8",
+        "startLine": 46,
+        "endLine": 48,
+        "textDigest": "0254be7d0a2b2b74189749eac67e1264bef26cf1740265399789dc61ef6d4b45",
+        "sample": "```yaml herdrweb-contract\nsystem: gateway\n```",
+        "identityFingerprint": "60c6428bab9731d20dc476b15dd706727511c69f8d6225f8cf4613d051c70e9c",
+        "ancestry": [
+          "System events"
+        ],
+        "text": "```yaml herdrweb-contract\nsystem: gateway\n```"
+      },
+      "sourceShownText": "```yaml herdrweb-contract\nsystem: gateway\n```",
+      "sourceDigest": "0254be7d0a2b2b74189749eac67e1264bef26cf1740265399789dc61ef6d4b45",
+      "targetPath": "docs/platform/ui-spec/contracts/15-system-events.md",
+      "targetAnchor": "unheaded-block-10",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-10",
+        "githubAnchor": "unheaded-block-10",
+        "stableAnchor": "unheaded-block-10",
+        "title": "Unheaded block 10",
+        "startLine": 68,
+        "endLine": 70,
+        "textDigest": "0254be7d0a2b2b74189749eac67e1264bef26cf1740265399789dc61ef6d4b45",
+        "sample": "```yaml herdrweb-contract\nsystem: gateway\n```",
+        "identityFingerprint": "60c6428bab9731d20dc476b15dd706727511c69f8d6225f8cf4613d051c70e9c",
+        "ancestry": [
+          "System events"
+        ],
+        "text": "```yaml herdrweb-contract\nsystem: gateway\n```"
+      },
+      "targetShownText": "```yaml herdrweb-contract\nsystem: gateway\n```",
+      "targetDigest": "0254be7d0a2b2b74189749eac67e1264bef26cf1740265399789dc61ef6d4b45",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_3840275b1b17103c2967eb18f7a7406c",
+        "sourceUnitDigest": "0254be7d0a2b2b74189749eac67e1264bef26cf1740265399789dc61ef6d4b45",
+        "targetOwner": "docs/platform/ui-spec/contracts/15-system-events.md",
+        "targetAnchor": "unheaded-block-10",
+        "claimKind": "contract",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/15-system-events.md#unheaded-block-8 (source lines 46-48) is carried at docs/platform/ui-spec/contracts/15-system-events.md#unheaded-block-10 (candidate lines 68-70). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/15-system-events.md verbatim in docs/platform/ui-spec/contracts/15-system-events.md. Map kind contract is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "0254be7d0a2b2b74189749eac67e1264bef26cf1740265399789dc61ef6d4b45",
+        "targetAncestry": [
+          "System events"
+        ]
+      }
+    }
+  ]
+}

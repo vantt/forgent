@@ -1,0 +1,838 @@
+{
+  "version": 1,
+  "contentCommit": "1276467f37a99d19aff05808d42fafbf40341449",
+  "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+  "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+  "sourcePath": "docs/ui-spec/components/C01-item-card.md",
+  "part": 1,
+  "parts": 1,
+  "count": 12,
+  "classes": {
+    "Unit-exact": [
+      "claim_109add81bb924e6eee91fd71970cb736",
+      "claim_395f43e9fcab6a33a53287f989fc8c9f",
+      "claim_148f80fabb2860c02f3ecaae066d0dd9",
+      "claim_8979277c1d0e4524cae97fd341bebd94",
+      "claim_8a6a231da62f2274143d262fb24b062a",
+      "claim_3df1dabc3fce9334394d809c46c61e6b",
+      "claim_5764f10fa89eb4c38e22ce38a4fb1d6a",
+      "claim_bd5ce1469ab840023fd2640668a1ab35"
+    ],
+    "Weak-exact": [
+      "claim_882d57e5238d9ecd469765384149aa66",
+      "claim_538202d0e8e5c97c325d21ac4a0df9f0",
+      "claim_63d6b36c5ef9c4bb74f84d3c4056928f"
+    ],
+    "Judgment": [
+      "claim_8627caebb796137a1850158610034a48"
+    ]
+  },
+  "unequalDigestPairs": [
+    "claim_8627caebb796137a1850158610034a48"
+  ],
+  "noTargetGeneratedRows": [],
+  "mandatoryDeep": [
+    "claim_8627caebb796137a1850158610034a48"
+  ],
+  "reviewerSeedRequired": true,
+  "minimumSeededWeakJudgment": 4,
+  "rows": [
+    {
+      "claimId": "claim_109add81bb924e6eee91fd71970cb736",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/components/C01-item-card.md",
+      "sourceAnchor": "unheaded-block-1",
+      "source": {
+        "unitKind": "unheaded-preamble",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded preamble",
+        "startLine": 1,
+        "endLine": 11,
+        "textDigest": "3a145c4c61d69e30e4e21c9ec2b01c1a093c2f2cf67e3d4a755bd1e73a676d04",
+        "sample": "---\nid: C01\ntype: component\nname: \"Item card with status pill and quick actions\"\nplatforms: [desktop, mobile]\nhosts: [S02, S03]\nstatus: active\ndesign_ref: \"\"\nrules: [R2, R8]\nregion",
+        "identityFingerprint": "2d54c47d2bfe2bf27ab8ccc7fe06addfff3e450fde0d460ef16e0aaf475bdaeb",
+        "ancestry": [],
+        "text": "---\nid: C01\ntype: component\nname: \"Item card with status pill and quick actions\"\nplatforms: [desktop, mobile]\nhosts: [S02, S03]\nstatus: active\ndesign_ref: \"\"\nrules: [R2, R8]\nregions: [pill, title, quick_actions]\n---"
+      },
+      "sourceShownText": "---\nid: C01\ntype: component\nname: \"Item card with status pill and quick actions\"\nplatforms: [desktop, mobile]\nhosts: [S02, S03]\nstatus: active\ndesign_ref: \"\"\nrules: [R2, R8]\nregions: [pill, title, quick_actions]\n---",
+      "sourceDigest": "3a145c4c61d69e30e4e21c9ec2b01c1a093c2f2cf67e3d4a755bd1e73a676d04",
+      "targetPath": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "targetAnchor": "unheaded-block-1",
+      "target": {
+        "unitKind": "unheaded-preamble",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded preamble",
+        "startLine": 1,
+        "endLine": 11,
+        "textDigest": "3a145c4c61d69e30e4e21c9ec2b01c1a093c2f2cf67e3d4a755bd1e73a676d04",
+        "sample": "---\nid: C01\ntype: component\nname: \"Item card with status pill and quick actions\"\nplatforms: [desktop, mobile]\nhosts: [S02, S03]\nstatus: active\ndesign_ref: \"\"\nrules: [R2, R8]\nregion",
+        "identityFingerprint": "2d54c47d2bfe2bf27ab8ccc7fe06addfff3e450fde0d460ef16e0aaf475bdaeb",
+        "ancestry": [],
+        "text": "---\nid: C01\ntype: component\nname: \"Item card with status pill and quick actions\"\nplatforms: [desktop, mobile]\nhosts: [S02, S03]\nstatus: active\ndesign_ref: \"\"\nrules: [R2, R8]\nregions: [pill, title, quick_actions]\n---"
+      },
+      "targetShownText": "---\nid: C01\ntype: component\nname: \"Item card with status pill and quick actions\"\nplatforms: [desktop, mobile]\nhosts: [S02, S03]\nstatus: active\ndesign_ref: \"\"\nrules: [R2, R8]\nregions: [pill, title, quick_actions]\n---",
+      "targetDigest": "3a145c4c61d69e30e4e21c9ec2b01c1a093c2f2cf67e3d4a755bd1e73a676d04",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_109add81bb924e6eee91fd71970cb736",
+        "sourceUnitDigest": "3a145c4c61d69e30e4e21c9ec2b01c1a093c2f2cf67e3d4a755bd1e73a676d04",
+        "targetOwner": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+        "targetAnchor": "unheaded-block-1",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-preamble unit docs/ui-spec/components/C01-item-card.md#unheaded-block-1 (source lines 1-11) is carried at docs/platform/ui-spec/architecture/components/C01-item-card.md#unheaded-block-1 (candidate lines 1-11). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/components/C01-item-card.md verbatim in docs/platform/ui-spec/architecture/components/C01-item-card.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "3a145c4c61d69e30e4e21c9ec2b01c1a093c2f2cf67e3d4a755bd1e73a676d04",
+        "targetAncestry": []
+      }
+    },
+    {
+      "claimId": "claim_8627caebb796137a1850158610034a48",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/components/C01-item-card.md",
+      "sourceAnchor": "c01-item-card-status-pill-quick-actions",
+      "source": {
+        "unitKind": "heading",
+        "level": 1,
+        "title": "C01 — Item card (status pill + quick actions)",
+        "anchor": "c01-item-card-status-pill-quick-actions",
+        "githubAnchor": "c01-item-card-status-pill-quick-actions",
+        "stableAnchor": "h-e558efa69b7f",
+        "startLine": 13,
+        "endLine": 13,
+        "textDigest": "814b93ef3240891bb7518a43191b364f9a128fb4eb5c67479c91263e9080681d",
+        "sample": "C01 — Item card (status pill + quick actions)",
+        "sectionPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "followingBlockDigest": null,
+        "identityFingerprint": "b0ebec4e22886ce81f292977872b5e1e4ff2d01123b7dc6a02ec15b3e5a87050",
+        "ancestry": [],
+        "text": "# C01 — Item card (status pill + quick actions)",
+        "sectionText": "# C01 — Item card (status pill + quick actions)"
+      },
+      "sourceShownText": "# C01 — Item card (status pill + quick actions)",
+      "sourceDigest": "814b93ef3240891bb7518a43191b364f9a128fb4eb5c67479c91263e9080681d",
+      "targetPath": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "targetAnchor": "c01-item-card-status-pill-quick-actions",
+      "target": {
+        "unitKind": "heading",
+        "level": 1,
+        "title": "C01 — Item card (status pill + quick actions)",
+        "anchor": "c01-item-card-status-pill-quick-actions",
+        "githubAnchor": "c01-item-card-status-pill-quick-actions",
+        "stableAnchor": "h-e558efa69b7f",
+        "startLine": 13,
+        "endLine": 13,
+        "textDigest": "32dc856ec2c0aa3433f0fb42e7160e3a87f4694b111a3b1336544165e3769b99",
+        "sample": "C01 — Item card (status pill + quick actions)",
+        "sectionPayloadDigest": "442c13af40a555fcb4d53a6a606ea1c729507dce1312d7801d637dfdfcda7b54",
+        "followingBlockDigest": "bc1ef3aa25bbd55d0ff400fc0ee8bc6e77e8d788fb8048860f3817fcd51585bc",
+        "identityFingerprint": "a35f41cdd2162ca748078e6305cc371a02ff97635ce9e8ce187068d65d01d9ed",
+        "ancestry": [],
+        "text": "# C01 — Item card (status pill + quick actions)",
+        "sectionText": "# C01 — Item card (status pill + quick actions)\n\n```txt\nDocument type: Architecture\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve mapped legacy content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; current implementation truth is not certified\nProvenance: docs/ui-spec/components/C01-item-card.md at 111adc51fd047d99121fd9d076eb4794c87045a4\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing carriage, placement and source conservation\nDo not use this for: Current canonical authority or implemented-behavior proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/ui-spec/components/C01-item-card.md\nSupersedes: None; candidate only\nSuperseded by: None\n```\n\n> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions."
+      },
+      "targetShownText": "# C01 — Item card (status pill + quick actions)\n\n```txt\nDocument type: Architecture\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve mapped legacy content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; current implementation truth is not certified\nProvenance: docs/ui-spec/components/C01-item-card.md at 111adc51fd047d99121fd9d076eb4794c87045a4\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing carriage, placement and source conservation\nDo not use this for: Current canonical authority or implemented-behavior proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/ui-spec/components/C01-item-card.md\nSupersedes: None; candidate only\nSuperseded by: None\n```\n\n> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions.",
+      "targetDigest": "32dc856ec2c0aa3433f0fb42e7160e3a87f4694b111a3b1336544165e3769b99",
+      "classification": "Judgment",
+      "mandatoryDeep": true,
+      "decision": {
+        "claimId": "claim_8627caebb796137a1850158610034a48",
+        "sourceUnitDigest": "814b93ef3240891bb7518a43191b364f9a128fb4eb5c67479c91263e9080681d",
+        "targetOwner": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+        "targetAnchor": "c01-item-card-status-pill-quick-actions",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Judgment: no target digest match. The whole heading unit docs/ui-spec/components/C01-item-card.md#c01-item-card-status-pill-quick-actions (source lines 13-13) is carried at docs/platform/ui-spec/architecture/components/C01-item-card.md#c01-item-card-status-pill-quick-actions (candidate lines 13-13). The heading section digest changes because labelled candidate metadata is inserted after the original H1; original heading and direct source payload remain verbatim. Frozen specs-ui map and Step 8: preserve docs/ui-spec/components/C01-item-card.md verbatim in docs/platform/ui-spec/architecture/components/C01-item-card.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "32dc856ec2c0aa3433f0fb42e7160e3a87f4694b111a3b1336544165e3769b99",
+        "targetAncestry": []
+      }
+    },
+    {
+      "claimId": "claim_882d57e5238d9ecd469765384149aa66",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/components/C01-item-card.md",
+      "sourceAnchor": "purpose",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Purpose",
+        "anchor": "purpose",
+        "githubAnchor": "purpose",
+        "stableAnchor": "h-2f4fe421d538",
+        "startLine": 15,
+        "endLine": 15,
+        "textDigest": "3e708823454641bbda3388d542273d11192509337285064feb4e9172e1642fa7",
+        "sample": "Purpose",
+        "sectionPayloadDigest": "15b3c360bea3a0d48a0d56ddf9f43657b6155dd1d42168d987ccbaf856477ae5",
+        "followingBlockDigest": "15b3c360bea3a0d48a0d56ddf9f43657b6155dd1d42168d987ccbaf856477ae5",
+        "identityFingerprint": "8cc54dcde2c897d673f02851e69e26be3aa96d57990e433a130c92d18db97f66",
+        "ancestry": [
+          "C01 — Item card (status pill + quick actions)"
+        ],
+        "text": "## Purpose",
+        "sectionText": "## Purpose\n\nThe repeated unit of the taskboard, and the thing that makes it a board\nrather than a table. It carries the two affordances the Monday.com/ClickUp\nreference is actually about: **status legible at a glance** (a coloured\npill) and **quick actions reachable in place** without opening the item\n(`docs/specs/herdr-web-dashboard.md` §View the taskboard)."
+      },
+      "sourceShownText": "## Purpose\n\nThe repeated unit of the taskboard, and the thing that makes it a board\nrather than a table. It carries the two affordances the Monday.com/ClickUp\nreference is actually about: **status legible at a glance** (a coloured\npill) and **quick actions reachable in place** without opening the item\n(`docs/specs/herdr-web-dashboard.md` §View the taskboard).",
+      "sourceDigest": "3e708823454641bbda3388d542273d11192509337285064feb4e9172e1642fa7",
+      "targetPath": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "targetAnchor": "purpose",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Purpose",
+        "anchor": "purpose",
+        "githubAnchor": "purpose",
+        "stableAnchor": "h-15cea22a442e",
+        "startLine": 37,
+        "endLine": 37,
+        "textDigest": "3e708823454641bbda3388d542273d11192509337285064feb4e9172e1642fa7",
+        "sample": "Purpose",
+        "sectionPayloadDigest": "15b3c360bea3a0d48a0d56ddf9f43657b6155dd1d42168d987ccbaf856477ae5",
+        "followingBlockDigest": "15b3c360bea3a0d48a0d56ddf9f43657b6155dd1d42168d987ccbaf856477ae5",
+        "identityFingerprint": "8cc54dcde2c897d673f02851e69e26be3aa96d57990e433a130c92d18db97f66",
+        "ancestry": [
+          "C01 — Item card (status pill + quick actions)"
+        ],
+        "text": "## Purpose",
+        "sectionText": "## Purpose\n\nThe repeated unit of the taskboard, and the thing that makes it a board\nrather than a table. It carries the two affordances the Monday.com/ClickUp\nreference is actually about: **status legible at a glance** (a coloured\npill) and **quick actions reachable in place** without opening the item\n(`docs/specs/herdr-web-dashboard.md` §View the taskboard)."
+      },
+      "targetShownText": "## Purpose\n\nThe repeated unit of the taskboard, and the thing that makes it a board\nrather than a table. It carries the two affordances the Monday.com/ClickUp\nreference is actually about: **status legible at a glance** (a coloured\npill) and **quick actions reachable in place** without opening the item\n(`docs/specs/herdr-web-dashboard.md` §View the taskboard).",
+      "targetDigest": "3e708823454641bbda3388d542273d11192509337285064feb4e9172e1642fa7",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_882d57e5238d9ecd469765384149aa66",
+        "sourceUnitDigest": "3e708823454641bbda3388d542273d11192509337285064feb4e9172e1642fa7",
+        "targetOwner": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+        "targetAnchor": "purpose",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/ui-spec/components/C01-item-card.md#purpose (source lines 15-15) is carried at docs/platform/ui-spec/architecture/components/C01-item-card.md#purpose (candidate lines 37-37). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/components/C01-item-card.md verbatim in docs/platform/ui-spec/architecture/components/C01-item-card.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "3e708823454641bbda3388d542273d11192509337285064feb4e9172e1642fa7",
+        "targetAncestry": [
+          "C01 — Item card (status pill + quick actions)"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_395f43e9fcab6a33a53287f989fc8c9f",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/components/C01-item-card.md",
+      "sourceAnchor": "unheaded-block-2",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-2",
+        "githubAnchor": "unheaded-block-2",
+        "stableAnchor": "unheaded-block-2",
+        "title": "Unheaded block 2",
+        "startLine": 17,
+        "endLine": 21,
+        "textDigest": "15b3c360bea3a0d48a0d56ddf9f43657b6155dd1d42168d987ccbaf856477ae5",
+        "sample": "The repeated unit of the taskboard, and the thing that makes it a board\nrather than a table. It carries the two affordances the Monday.com/ClickUp\nreference is actually about: **st",
+        "identityFingerprint": "bf0909ffc2432eca7a87f91e672d48df916e9bf489488f04a70f83b3d6ba56b0",
+        "ancestry": [
+          "C01 — Item card (status pill + quick actions)",
+          "Purpose"
+        ],
+        "text": "The repeated unit of the taskboard, and the thing that makes it a board\nrather than a table. It carries the two affordances the Monday.com/ClickUp\nreference is actually about: **status legible at a glance** (a coloured\npill) and **quick actions reachable in place** without opening the item\n(`docs/specs/herdr-web-dashboard.md` §View the taskboard)."
+      },
+      "sourceShownText": "The repeated unit of the taskboard, and the thing that makes it a board\nrather than a table. It carries the two affordances the Monday.com/ClickUp\nreference is actually about: **status legible at a glance** (a coloured\npill) and **quick actions reachable in place** without opening the item\n(`docs/specs/herdr-web-dashboard.md` §View the taskboard).",
+      "sourceDigest": "15b3c360bea3a0d48a0d56ddf9f43657b6155dd1d42168d987ccbaf856477ae5",
+      "targetPath": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "targetAnchor": "unheaded-block-4",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 39,
+        "endLine": 43,
+        "textDigest": "15b3c360bea3a0d48a0d56ddf9f43657b6155dd1d42168d987ccbaf856477ae5",
+        "sample": "The repeated unit of the taskboard, and the thing that makes it a board\nrather than a table. It carries the two affordances the Monday.com/ClickUp\nreference is actually about: **st",
+        "identityFingerprint": "bf0909ffc2432eca7a87f91e672d48df916e9bf489488f04a70f83b3d6ba56b0",
+        "ancestry": [
+          "C01 — Item card (status pill + quick actions)",
+          "Purpose"
+        ],
+        "text": "The repeated unit of the taskboard, and the thing that makes it a board\nrather than a table. It carries the two affordances the Monday.com/ClickUp\nreference is actually about: **status legible at a glance** (a coloured\npill) and **quick actions reachable in place** without opening the item\n(`docs/specs/herdr-web-dashboard.md` §View the taskboard)."
+      },
+      "targetShownText": "The repeated unit of the taskboard, and the thing that makes it a board\nrather than a table. It carries the two affordances the Monday.com/ClickUp\nreference is actually about: **status legible at a glance** (a coloured\npill) and **quick actions reachable in place** without opening the item\n(`docs/specs/herdr-web-dashboard.md` §View the taskboard).",
+      "targetDigest": "15b3c360bea3a0d48a0d56ddf9f43657b6155dd1d42168d987ccbaf856477ae5",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_395f43e9fcab6a33a53287f989fc8c9f",
+        "sourceUnitDigest": "15b3c360bea3a0d48a0d56ddf9f43657b6155dd1d42168d987ccbaf856477ae5",
+        "targetOwner": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+        "targetAnchor": "unheaded-block-4",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/components/C01-item-card.md#unheaded-block-2 (source lines 17-21) is carried at docs/platform/ui-spec/architecture/components/C01-item-card.md#unheaded-block-4 (candidate lines 39-43). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/components/C01-item-card.md verbatim in docs/platform/ui-spec/architecture/components/C01-item-card.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "15b3c360bea3a0d48a0d56ddf9f43657b6155dd1d42168d987ccbaf856477ae5",
+        "targetAncestry": [
+          "C01 — Item card (status pill + quick actions)",
+          "Purpose"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_538202d0e8e5c97c325d21ac4a0df9f0",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/components/C01-item-card.md",
+      "sourceAnchor": "layout",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Layout",
+        "anchor": "layout",
+        "githubAnchor": "layout",
+        "stableAnchor": "h-124d07ebe28a",
+        "startLine": 23,
+        "endLine": 23,
+        "textDigest": "cdabcbb72c176864ea7a1b83c6b1edd9e361d54eeda367295f29f3cbd6023213",
+        "sample": "Layout",
+        "sectionPayloadDigest": "a7e6fe8bf9326fd9dbcbd971c9fed83c3545033ea0ba7387c82f995ed71d3ad2",
+        "followingBlockDigest": "3f017de8e115fe6a31a606eff031929e6bfaa0d5fa79ea6bffc26784dc11510c",
+        "identityFingerprint": "e4acbbe2d90c10ffd7d0a2535acac06053246cb84bbdb7483f534c3fc0a5d54d",
+        "ancestry": [
+          "C01 — Item card (status pill + quick actions)"
+        ],
+        "text": "## Layout",
+        "sectionText": "## Layout\n\n```\n┌────────────────────────────────────┐\n│ tsk-4id  Task detail pairing    ⋯ │  ← quick_actions menu\n│ ● awaiting-human · executing       │  ← pill + stage\n└────────────────────────────────────┘\n\n⋯ menu:\n  ┌──────────────────┐\n  │ Answer           │  (only when parked)\n  │ Edit             │\n  │ Retire           │\n  └──────────────────┘\n```\n\nThe pill carries **status**, in colour; the stage rides alongside it as\nplain text. Status is what a person triages on; stage is detail. Giving\nboth the same visual weight would defeat the glance.\n\n`Retire` is worded as retire, never as delete — fgOS has no delete verb\nand the history is append-only, so calling it \"delete\" would promise\nsomething the system cannot do\n(`docs/specs/herdr-web-dashboard.md` §Retire a work item).\n\nPer R8 the quick-action menu is visually distinct from the card body: the\ncard is a read surface, the menu is where writes happen. `Approve merge`\nis deliberately **not** in this menu — the one trunk-changing action does\nnot live behind a hover affordance on a list row."
+      },
+      "sourceShownText": "## Layout\n\n```\n┌────────────────────────────────────┐\n│ tsk-4id  Task detail pairing    ⋯ │  ← quick_actions menu\n│ ● awaiting-human · executing       │  ← pill + stage\n└────────────────────────────────────┘\n\n⋯ menu:\n  ┌──────────────────┐\n  │ Answer           │  (only when parked)\n  │ Edit             │\n  │ Retire           │\n  └──────────────────┘\n```\n\nThe pill carries **status**, in colour; the stage rides alongside it as\nplain text. Status is what a person triages on; stage is detail. Giving\nboth the same visual weight would defeat the glance.\n\n`Retire` is worded as retire, never as delete — fgOS has no delete verb\nand the history is append-only, so calling it \"delete\" would promise\nsomething the system cannot do\n(`docs/specs/herdr-web-dashboard.md` §Retire a work item).\n\nPer R8 the quick-action menu is visually distinct from the card body: the\ncard is a read surface, the menu is where writes happen. `Approve merge`\nis deliberately **not** in this menu — the one trunk-changing action does\nnot live behind a hover affordance on a list row.",
+      "sourceDigest": "cdabcbb72c176864ea7a1b83c6b1edd9e361d54eeda367295f29f3cbd6023213",
+      "targetPath": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "targetAnchor": "layout",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Layout",
+        "anchor": "layout",
+        "githubAnchor": "layout",
+        "stableAnchor": "h-7a891a3c8430",
+        "startLine": 45,
+        "endLine": 45,
+        "textDigest": "cdabcbb72c176864ea7a1b83c6b1edd9e361d54eeda367295f29f3cbd6023213",
+        "sample": "Layout",
+        "sectionPayloadDigest": "a7e6fe8bf9326fd9dbcbd971c9fed83c3545033ea0ba7387c82f995ed71d3ad2",
+        "followingBlockDigest": "3f017de8e115fe6a31a606eff031929e6bfaa0d5fa79ea6bffc26784dc11510c",
+        "identityFingerprint": "e4acbbe2d90c10ffd7d0a2535acac06053246cb84bbdb7483f534c3fc0a5d54d",
+        "ancestry": [
+          "C01 — Item card (status pill + quick actions)"
+        ],
+        "text": "## Layout",
+        "sectionText": "## Layout\n\n```\n┌────────────────────────────────────┐\n│ tsk-4id  Task detail pairing    ⋯ │  ← quick_actions menu\n│ ● awaiting-human · executing       │  ← pill + stage\n└────────────────────────────────────┘\n\n⋯ menu:\n  ┌──────────────────┐\n  │ Answer           │  (only when parked)\n  │ Edit             │\n  │ Retire           │\n  └──────────────────┘\n```\n\nThe pill carries **status**, in colour; the stage rides alongside it as\nplain text. Status is what a person triages on; stage is detail. Giving\nboth the same visual weight would defeat the glance.\n\n`Retire` is worded as retire, never as delete — fgOS has no delete verb\nand the history is append-only, so calling it \"delete\" would promise\nsomething the system cannot do\n(`docs/specs/herdr-web-dashboard.md` §Retire a work item).\n\nPer R8 the quick-action menu is visually distinct from the card body: the\ncard is a read surface, the menu is where writes happen. `Approve merge`\nis deliberately **not** in this menu — the one trunk-changing action does\nnot live behind a hover affordance on a list row."
+      },
+      "targetShownText": "## Layout\n\n```\n┌────────────────────────────────────┐\n│ tsk-4id  Task detail pairing    ⋯ │  ← quick_actions menu\n│ ● awaiting-human · executing       │  ← pill + stage\n└────────────────────────────────────┘\n\n⋯ menu:\n  ┌──────────────────┐\n  │ Answer           │  (only when parked)\n  │ Edit             │\n  │ Retire           │\n  └──────────────────┘\n```\n\nThe pill carries **status**, in colour; the stage rides alongside it as\nplain text. Status is what a person triages on; stage is detail. Giving\nboth the same visual weight would defeat the glance.\n\n`Retire` is worded as retire, never as delete — fgOS has no delete verb\nand the history is append-only, so calling it \"delete\" would promise\nsomething the system cannot do\n(`docs/specs/herdr-web-dashboard.md` §Retire a work item).\n\nPer R8 the quick-action menu is visually distinct from the card body: the\ncard is a read surface, the menu is where writes happen. `Approve merge`\nis deliberately **not** in this menu — the one trunk-changing action does\nnot live behind a hover affordance on a list row.",
+      "targetDigest": "cdabcbb72c176864ea7a1b83c6b1edd9e361d54eeda367295f29f3cbd6023213",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_538202d0e8e5c97c325d21ac4a0df9f0",
+        "sourceUnitDigest": "cdabcbb72c176864ea7a1b83c6b1edd9e361d54eeda367295f29f3cbd6023213",
+        "targetOwner": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+        "targetAnchor": "layout",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/ui-spec/components/C01-item-card.md#layout (source lines 23-23) is carried at docs/platform/ui-spec/architecture/components/C01-item-card.md#layout (candidate lines 45-45). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/components/C01-item-card.md verbatim in docs/platform/ui-spec/architecture/components/C01-item-card.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "cdabcbb72c176864ea7a1b83c6b1edd9e361d54eeda367295f29f3cbd6023213",
+        "targetAncestry": [
+          "C01 — Item card (status pill + quick actions)"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_148f80fabb2860c02f3ecaae066d0dd9",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/components/C01-item-card.md",
+      "sourceAnchor": "unheaded-block-3",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 25,
+        "endLine": 37,
+        "textDigest": "3f017de8e115fe6a31a606eff031929e6bfaa0d5fa79ea6bffc26784dc11510c",
+        "sample": "```\n┌────────────────────────────────────┐\n│ tsk-4id  Task detail pairing    ⋯ │  ← quick_actions menu\n│ ● awaiting-human · executing       │  ← pill + stage\n└─────────────────────",
+        "identityFingerprint": "05f2d54359abaedab7a0e6a2cfd2394780dab4d4378939991e727f70fd5ed587",
+        "ancestry": [
+          "C01 — Item card (status pill + quick actions)",
+          "Layout"
+        ],
+        "text": "```\n┌────────────────────────────────────┐\n│ tsk-4id  Task detail pairing    ⋯ │  ← quick_actions menu\n│ ● awaiting-human · executing       │  ← pill + stage\n└────────────────────────────────────┘\n\n⋯ menu:\n  ┌──────────────────┐\n  │ Answer           │  (only when parked)\n  │ Edit             │\n  │ Retire           │\n  └──────────────────┘\n```"
+      },
+      "sourceShownText": "```\n┌────────────────────────────────────┐\n│ tsk-4id  Task detail pairing    ⋯ │  ← quick_actions menu\n│ ● awaiting-human · executing       │  ← pill + stage\n└────────────────────────────────────┘\n\n⋯ menu:\n  ┌──────────────────┐\n  │ Answer           │  (only when parked)\n  │ Edit             │\n  │ Retire           │\n  └──────────────────┘\n```",
+      "sourceDigest": "3f017de8e115fe6a31a606eff031929e6bfaa0d5fa79ea6bffc26784dc11510c",
+      "targetPath": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "targetAnchor": "unheaded-block-5",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 47,
+        "endLine": 59,
+        "textDigest": "3f017de8e115fe6a31a606eff031929e6bfaa0d5fa79ea6bffc26784dc11510c",
+        "sample": "```\n┌────────────────────────────────────┐\n│ tsk-4id  Task detail pairing    ⋯ │  ← quick_actions menu\n│ ● awaiting-human · executing       │  ← pill + stage\n└─────────────────────",
+        "identityFingerprint": "05f2d54359abaedab7a0e6a2cfd2394780dab4d4378939991e727f70fd5ed587",
+        "ancestry": [
+          "C01 — Item card (status pill + quick actions)",
+          "Layout"
+        ],
+        "text": "```\n┌────────────────────────────────────┐\n│ tsk-4id  Task detail pairing    ⋯ │  ← quick_actions menu\n│ ● awaiting-human · executing       │  ← pill + stage\n└────────────────────────────────────┘\n\n⋯ menu:\n  ┌──────────────────┐\n  │ Answer           │  (only when parked)\n  │ Edit             │\n  │ Retire           │\n  └──────────────────┘\n```"
+      },
+      "targetShownText": "```\n┌────────────────────────────────────┐\n│ tsk-4id  Task detail pairing    ⋯ │  ← quick_actions menu\n│ ● awaiting-human · executing       │  ← pill + stage\n└────────────────────────────────────┘\n\n⋯ menu:\n  ┌──────────────────┐\n  │ Answer           │  (only when parked)\n  │ Edit             │\n  │ Retire           │\n  └──────────────────┘\n```",
+      "targetDigest": "3f017de8e115fe6a31a606eff031929e6bfaa0d5fa79ea6bffc26784dc11510c",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_148f80fabb2860c02f3ecaae066d0dd9",
+        "sourceUnitDigest": "3f017de8e115fe6a31a606eff031929e6bfaa0d5fa79ea6bffc26784dc11510c",
+        "targetOwner": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+        "targetAnchor": "unheaded-block-5",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/components/C01-item-card.md#unheaded-block-3 (source lines 25-37) is carried at docs/platform/ui-spec/architecture/components/C01-item-card.md#unheaded-block-5 (candidate lines 47-59). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/components/C01-item-card.md verbatim in docs/platform/ui-spec/architecture/components/C01-item-card.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "3f017de8e115fe6a31a606eff031929e6bfaa0d5fa79ea6bffc26784dc11510c",
+        "targetAncestry": [
+          "C01 — Item card (status pill + quick actions)",
+          "Layout"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_8979277c1d0e4524cae97fd341bebd94",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/components/C01-item-card.md",
+      "sourceAnchor": "unheaded-block-4",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 39,
+        "endLine": 41,
+        "textDigest": "b1f21928b96cebaf6ee1f6dd16b8590999001215f981d3dc0299995c5954b32f",
+        "sample": "The pill carries **status**, in colour; the stage rides alongside it as\nplain text. Status is what a person triages on; stage is detail. Giving\nboth the same visual weight would de",
+        "identityFingerprint": "197d201d2418066d8ae32ee405775ecb185f0538b03729b38e3f2ca5656fcf37",
+        "ancestry": [
+          "C01 — Item card (status pill + quick actions)",
+          "Layout"
+        ],
+        "text": "The pill carries **status**, in colour; the stage rides alongside it as\nplain text. Status is what a person triages on; stage is detail. Giving\nboth the same visual weight would defeat the glance."
+      },
+      "sourceShownText": "The pill carries **status**, in colour; the stage rides alongside it as\nplain text. Status is what a person triages on; stage is detail. Giving\nboth the same visual weight would defeat the glance.",
+      "sourceDigest": "b1f21928b96cebaf6ee1f6dd16b8590999001215f981d3dc0299995c5954b32f",
+      "targetPath": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "targetAnchor": "unheaded-block-6",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 61,
+        "endLine": 63,
+        "textDigest": "b1f21928b96cebaf6ee1f6dd16b8590999001215f981d3dc0299995c5954b32f",
+        "sample": "The pill carries **status**, in colour; the stage rides alongside it as\nplain text. Status is what a person triages on; stage is detail. Giving\nboth the same visual weight would de",
+        "identityFingerprint": "197d201d2418066d8ae32ee405775ecb185f0538b03729b38e3f2ca5656fcf37",
+        "ancestry": [
+          "C01 — Item card (status pill + quick actions)",
+          "Layout"
+        ],
+        "text": "The pill carries **status**, in colour; the stage rides alongside it as\nplain text. Status is what a person triages on; stage is detail. Giving\nboth the same visual weight would defeat the glance."
+      },
+      "targetShownText": "The pill carries **status**, in colour; the stage rides alongside it as\nplain text. Status is what a person triages on; stage is detail. Giving\nboth the same visual weight would defeat the glance.",
+      "targetDigest": "b1f21928b96cebaf6ee1f6dd16b8590999001215f981d3dc0299995c5954b32f",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_8979277c1d0e4524cae97fd341bebd94",
+        "sourceUnitDigest": "b1f21928b96cebaf6ee1f6dd16b8590999001215f981d3dc0299995c5954b32f",
+        "targetOwner": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+        "targetAnchor": "unheaded-block-6",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/components/C01-item-card.md#unheaded-block-4 (source lines 39-41) is carried at docs/platform/ui-spec/architecture/components/C01-item-card.md#unheaded-block-6 (candidate lines 61-63). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/components/C01-item-card.md verbatim in docs/platform/ui-spec/architecture/components/C01-item-card.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "b1f21928b96cebaf6ee1f6dd16b8590999001215f981d3dc0299995c5954b32f",
+        "targetAncestry": [
+          "C01 — Item card (status pill + quick actions)",
+          "Layout"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_8a6a231da62f2274143d262fb24b062a",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/components/C01-item-card.md",
+      "sourceAnchor": "unheaded-block-5",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 43,
+        "endLine": 46,
+        "textDigest": "55296892dc25c55b80f4e00a9369b7ebe0869ea53df9042f33894444baef91da",
+        "sample": "`Retire` is worded as retire, never as delete — fgOS has no delete verb\nand the history is append-only, so calling it \"delete\" would promise\nsomething the system cannot do\n(`docs/s",
+        "identityFingerprint": "16378d9d3a4f874318ccc9e3c2ceb0dc62992ddd9121782029ab3d4b0ddca1be",
+        "ancestry": [
+          "C01 — Item card (status pill + quick actions)",
+          "Layout"
+        ],
+        "text": "`Retire` is worded as retire, never as delete — fgOS has no delete verb\nand the history is append-only, so calling it \"delete\" would promise\nsomething the system cannot do\n(`docs/specs/herdr-web-dashboard.md` §Retire a work item)."
+      },
+      "sourceShownText": "`Retire` is worded as retire, never as delete — fgOS has no delete verb\nand the history is append-only, so calling it \"delete\" would promise\nsomething the system cannot do\n(`docs/specs/herdr-web-dashboard.md` §Retire a work item).",
+      "sourceDigest": "55296892dc25c55b80f4e00a9369b7ebe0869ea53df9042f33894444baef91da",
+      "targetPath": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "targetAnchor": "unheaded-block-7",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 65,
+        "endLine": 68,
+        "textDigest": "55296892dc25c55b80f4e00a9369b7ebe0869ea53df9042f33894444baef91da",
+        "sample": "`Retire` is worded as retire, never as delete — fgOS has no delete verb\nand the history is append-only, so calling it \"delete\" would promise\nsomething the system cannot do\n(`docs/s",
+        "identityFingerprint": "16378d9d3a4f874318ccc9e3c2ceb0dc62992ddd9121782029ab3d4b0ddca1be",
+        "ancestry": [
+          "C01 — Item card (status pill + quick actions)",
+          "Layout"
+        ],
+        "text": "`Retire` is worded as retire, never as delete — fgOS has no delete verb\nand the history is append-only, so calling it \"delete\" would promise\nsomething the system cannot do\n(`docs/specs/herdr-web-dashboard.md` §Retire a work item)."
+      },
+      "targetShownText": "`Retire` is worded as retire, never as delete — fgOS has no delete verb\nand the history is append-only, so calling it \"delete\" would promise\nsomething the system cannot do\n(`docs/specs/herdr-web-dashboard.md` §Retire a work item).",
+      "targetDigest": "55296892dc25c55b80f4e00a9369b7ebe0869ea53df9042f33894444baef91da",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_8a6a231da62f2274143d262fb24b062a",
+        "sourceUnitDigest": "55296892dc25c55b80f4e00a9369b7ebe0869ea53df9042f33894444baef91da",
+        "targetOwner": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+        "targetAnchor": "unheaded-block-7",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/components/C01-item-card.md#unheaded-block-5 (source lines 43-46) is carried at docs/platform/ui-spec/architecture/components/C01-item-card.md#unheaded-block-7 (candidate lines 65-68). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/components/C01-item-card.md verbatim in docs/platform/ui-spec/architecture/components/C01-item-card.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "55296892dc25c55b80f4e00a9369b7ebe0869ea53df9042f33894444baef91da",
+        "targetAncestry": [
+          "C01 — Item card (status pill + quick actions)",
+          "Layout"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_3df1dabc3fce9334394d809c46c61e6b",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/components/C01-item-card.md",
+      "sourceAnchor": "unheaded-block-6",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 48,
+        "endLine": 51,
+        "textDigest": "31cdc0799218defe77f0c879496156f54d4a0ab2aea7f5ae6463e51838695364",
+        "sample": "Per R8 the quick-action menu is visually distinct from the card body: the\ncard is a read surface, the menu is where writes happen. `Approve merge`\nis deliberately **not** in this m",
+        "identityFingerprint": "a911e0a49f97ac73b8073555498dbd289b47a7b99b25f58fe64832178f1b0302",
+        "ancestry": [
+          "C01 — Item card (status pill + quick actions)",
+          "Layout"
+        ],
+        "text": "Per R8 the quick-action menu is visually distinct from the card body: the\ncard is a read surface, the menu is where writes happen. `Approve merge`\nis deliberately **not** in this menu — the one trunk-changing action does\nnot live behind a hover affordance on a list row."
+      },
+      "sourceShownText": "Per R8 the quick-action menu is visually distinct from the card body: the\ncard is a read surface, the menu is where writes happen. `Approve merge`\nis deliberately **not** in this menu — the one trunk-changing action does\nnot live behind a hover affordance on a list row.",
+      "sourceDigest": "31cdc0799218defe77f0c879496156f54d4a0ab2aea7f5ae6463e51838695364",
+      "targetPath": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "targetAnchor": "unheaded-block-8",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-8",
+        "githubAnchor": "unheaded-block-8",
+        "stableAnchor": "unheaded-block-8",
+        "title": "Unheaded block 8",
+        "startLine": 70,
+        "endLine": 73,
+        "textDigest": "31cdc0799218defe77f0c879496156f54d4a0ab2aea7f5ae6463e51838695364",
+        "sample": "Per R8 the quick-action menu is visually distinct from the card body: the\ncard is a read surface, the menu is where writes happen. `Approve merge`\nis deliberately **not** in this m",
+        "identityFingerprint": "a911e0a49f97ac73b8073555498dbd289b47a7b99b25f58fe64832178f1b0302",
+        "ancestry": [
+          "C01 — Item card (status pill + quick actions)",
+          "Layout"
+        ],
+        "text": "Per R8 the quick-action menu is visually distinct from the card body: the\ncard is a read surface, the menu is where writes happen. `Approve merge`\nis deliberately **not** in this menu — the one trunk-changing action does\nnot live behind a hover affordance on a list row."
+      },
+      "targetShownText": "Per R8 the quick-action menu is visually distinct from the card body: the\ncard is a read surface, the menu is where writes happen. `Approve merge`\nis deliberately **not** in this menu — the one trunk-changing action does\nnot live behind a hover affordance on a list row.",
+      "targetDigest": "31cdc0799218defe77f0c879496156f54d4a0ab2aea7f5ae6463e51838695364",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_3df1dabc3fce9334394d809c46c61e6b",
+        "sourceUnitDigest": "31cdc0799218defe77f0c879496156f54d4a0ab2aea7f5ae6463e51838695364",
+        "targetOwner": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+        "targetAnchor": "unheaded-block-8",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/components/C01-item-card.md#unheaded-block-6 (source lines 48-51) is carried at docs/platform/ui-spec/architecture/components/C01-item-card.md#unheaded-block-8 (candidate lines 70-73). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/components/C01-item-card.md verbatim in docs/platform/ui-spec/architecture/components/C01-item-card.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "31cdc0799218defe77f0c879496156f54d4a0ab2aea7f5ae6463e51838695364",
+        "targetAncestry": [
+          "C01 — Item card (status pill + quick actions)",
+          "Layout"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_63d6b36c5ef9c4bb74f84d3c4056928f",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/components/C01-item-card.md",
+      "sourceAnchor": "component-contract",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Component contract",
+        "anchor": "component-contract",
+        "githubAnchor": "component-contract",
+        "stableAnchor": "h-f463992a2c35",
+        "startLine": 53,
+        "endLine": 53,
+        "textDigest": "b47a7823db8cba7179fcdd6ccee7b52d27241007655291db2d4da246540c28a0",
+        "sample": "Component contract",
+        "sectionPayloadDigest": "ff9467c147ff2f2e8a8ec918599db8e93a2a559036e960a7a19cbabaf3ba0ff0",
+        "followingBlockDigest": "7ff302f6acd07aa606cb4da2969c237e465d58ffbf3fd77fe987f59fa33d808f",
+        "identityFingerprint": "49a0145cf909d5aaa8fa572335c5f7cea53ab47565ce0877b2a53a4aa3115bbd",
+        "ancestry": [
+          "C01 — Item card (status pill + quick actions)"
+        ],
+        "text": "## Component contract",
+        "sectionText": "## Component contract\n\nPer the component model, this emits events only; hosts decide what\nhappens. That is what keeps the card reusable on both S02 and S03 without\neither screen's navigation leaking into it.\n\n```yaml herdrweb-contract\nemits:\n  - id: A-C01-001\n    element: quick_action_menu_item\n    region: quick_actions\n    trigger: click\n    event: item.quick_action\n    payload: { item_id: \"$item.id\", verb: \"$action.verb\" }\n```"
+      },
+      "sourceShownText": "## Component contract\n\nPer the component model, this emits events only; hosts decide what\nhappens. That is what keeps the card reusable on both S02 and S03 without\neither screen's navigation leaking into it.\n\n```yaml herdrweb-contract\nemits:\n  - id: A-C01-001\n    element: quick_action_menu_item\n    region: quick_actions\n    trigger: click\n    event: item.quick_action\n    payload: { item_id: \"$item.id\", verb: \"$action.verb\" }\n```",
+      "sourceDigest": "b47a7823db8cba7179fcdd6ccee7b52d27241007655291db2d4da246540c28a0",
+      "targetPath": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "targetAnchor": "component-contract",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Component contract",
+        "anchor": "component-contract",
+        "githubAnchor": "component-contract",
+        "stableAnchor": "h-301da29faede",
+        "startLine": 75,
+        "endLine": 75,
+        "textDigest": "b47a7823db8cba7179fcdd6ccee7b52d27241007655291db2d4da246540c28a0",
+        "sample": "Component contract",
+        "sectionPayloadDigest": "ff9467c147ff2f2e8a8ec918599db8e93a2a559036e960a7a19cbabaf3ba0ff0",
+        "followingBlockDigest": "7ff302f6acd07aa606cb4da2969c237e465d58ffbf3fd77fe987f59fa33d808f",
+        "identityFingerprint": "49a0145cf909d5aaa8fa572335c5f7cea53ab47565ce0877b2a53a4aa3115bbd",
+        "ancestry": [
+          "C01 — Item card (status pill + quick actions)"
+        ],
+        "text": "## Component contract",
+        "sectionText": "## Component contract\n\nPer the component model, this emits events only; hosts decide what\nhappens. That is what keeps the card reusable on both S02 and S03 without\neither screen's navigation leaking into it.\n\n```yaml herdrweb-contract\nemits:\n  - id: A-C01-001\n    element: quick_action_menu_item\n    region: quick_actions\n    trigger: click\n    event: item.quick_action\n    payload: { item_id: \"$item.id\", verb: \"$action.verb\" }\n```"
+      },
+      "targetShownText": "## Component contract\n\nPer the component model, this emits events only; hosts decide what\nhappens. That is what keeps the card reusable on both S02 and S03 without\neither screen's navigation leaking into it.\n\n```yaml herdrweb-contract\nemits:\n  - id: A-C01-001\n    element: quick_action_menu_item\n    region: quick_actions\n    trigger: click\n    event: item.quick_action\n    payload: { item_id: \"$item.id\", verb: \"$action.verb\" }\n```",
+      "targetDigest": "b47a7823db8cba7179fcdd6ccee7b52d27241007655291db2d4da246540c28a0",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_63d6b36c5ef9c4bb74f84d3c4056928f",
+        "sourceUnitDigest": "b47a7823db8cba7179fcdd6ccee7b52d27241007655291db2d4da246540c28a0",
+        "targetOwner": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+        "targetAnchor": "component-contract",
+        "claimKind": "contract",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/ui-spec/components/C01-item-card.md#component-contract (source lines 53-53) is carried at docs/platform/ui-spec/architecture/components/C01-item-card.md#component-contract (candidate lines 75-75). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/components/C01-item-card.md verbatim in docs/platform/ui-spec/architecture/components/C01-item-card.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "b47a7823db8cba7179fcdd6ccee7b52d27241007655291db2d4da246540c28a0",
+        "targetAncestry": [
+          "C01 — Item card (status pill + quick actions)"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_5764f10fa89eb4c38e22ce38a4fb1d6a",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/components/C01-item-card.md",
+      "sourceAnchor": "unheaded-block-7",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 55,
+        "endLine": 57,
+        "textDigest": "7ff302f6acd07aa606cb4da2969c237e465d58ffbf3fd77fe987f59fa33d808f",
+        "sample": "Per the component model, this emits events only; hosts decide what\nhappens. That is what keeps the card reusable on both S02 and S03 without\neither screen's navigation leaking into",
+        "identityFingerprint": "a0de1655a7b12500d13d1a3a80c51f689a8ef3b58adea2734cd06d5571ee9878",
+        "ancestry": [
+          "C01 — Item card (status pill + quick actions)",
+          "Component contract"
+        ],
+        "text": "Per the component model, this emits events only; hosts decide what\nhappens. That is what keeps the card reusable on both S02 and S03 without\neither screen's navigation leaking into it."
+      },
+      "sourceShownText": "Per the component model, this emits events only; hosts decide what\nhappens. That is what keeps the card reusable on both S02 and S03 without\neither screen's navigation leaking into it.",
+      "sourceDigest": "7ff302f6acd07aa606cb4da2969c237e465d58ffbf3fd77fe987f59fa33d808f",
+      "targetPath": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "targetAnchor": "unheaded-block-9",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-9",
+        "githubAnchor": "unheaded-block-9",
+        "stableAnchor": "unheaded-block-9",
+        "title": "Unheaded block 9",
+        "startLine": 77,
+        "endLine": 79,
+        "textDigest": "7ff302f6acd07aa606cb4da2969c237e465d58ffbf3fd77fe987f59fa33d808f",
+        "sample": "Per the component model, this emits events only; hosts decide what\nhappens. That is what keeps the card reusable on both S02 and S03 without\neither screen's navigation leaking into",
+        "identityFingerprint": "a0de1655a7b12500d13d1a3a80c51f689a8ef3b58adea2734cd06d5571ee9878",
+        "ancestry": [
+          "C01 — Item card (status pill + quick actions)",
+          "Component contract"
+        ],
+        "text": "Per the component model, this emits events only; hosts decide what\nhappens. That is what keeps the card reusable on both S02 and S03 without\neither screen's navigation leaking into it."
+      },
+      "targetShownText": "Per the component model, this emits events only; hosts decide what\nhappens. That is what keeps the card reusable on both S02 and S03 without\neither screen's navigation leaking into it.",
+      "targetDigest": "7ff302f6acd07aa606cb4da2969c237e465d58ffbf3fd77fe987f59fa33d808f",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_5764f10fa89eb4c38e22ce38a4fb1d6a",
+        "sourceUnitDigest": "7ff302f6acd07aa606cb4da2969c237e465d58ffbf3fd77fe987f59fa33d808f",
+        "targetOwner": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+        "targetAnchor": "unheaded-block-9",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/components/C01-item-card.md#unheaded-block-7 (source lines 55-57) is carried at docs/platform/ui-spec/architecture/components/C01-item-card.md#unheaded-block-9 (candidate lines 77-79). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/components/C01-item-card.md verbatim in docs/platform/ui-spec/architecture/components/C01-item-card.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "7ff302f6acd07aa606cb4da2969c237e465d58ffbf3fd77fe987f59fa33d808f",
+        "targetAncestry": [
+          "C01 — Item card (status pill + quick actions)",
+          "Component contract"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_bd5ce1469ab840023fd2640668a1ab35",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/components/C01-item-card.md",
+      "sourceAnchor": "unheaded-block-8",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-8",
+        "githubAnchor": "unheaded-block-8",
+        "stableAnchor": "unheaded-block-8",
+        "title": "Unheaded block 8",
+        "startLine": 59,
+        "endLine": 67,
+        "textDigest": "6f2e5a2ea6ae53322b557ee6fbb8cc479c38e36e5737d0b2c9d9e76d4ccfb016",
+        "sample": "```yaml herdrweb-contract\nemits:\n  - id: A-C01-001\n    element: quick_action_menu_item\n    region: quick_actions\n    trigger: click\n    event: item.quick_action\n    payload: { item",
+        "identityFingerprint": "f4adc9093764ee55f224f439398d349bfb8d07de01c3be70cdd4f1f08c88ff4d",
+        "ancestry": [
+          "C01 — Item card (status pill + quick actions)",
+          "Component contract"
+        ],
+        "text": "```yaml herdrweb-contract\nemits:\n  - id: A-C01-001\n    element: quick_action_menu_item\n    region: quick_actions\n    trigger: click\n    event: item.quick_action\n    payload: { item_id: \"$item.id\", verb: \"$action.verb\" }\n```"
+      },
+      "sourceShownText": "```yaml herdrweb-contract\nemits:\n  - id: A-C01-001\n    element: quick_action_menu_item\n    region: quick_actions\n    trigger: click\n    event: item.quick_action\n    payload: { item_id: \"$item.id\", verb: \"$action.verb\" }\n```",
+      "sourceDigest": "6f2e5a2ea6ae53322b557ee6fbb8cc479c38e36e5737d0b2c9d9e76d4ccfb016",
+      "targetPath": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "targetAnchor": "unheaded-block-10",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-10",
+        "githubAnchor": "unheaded-block-10",
+        "stableAnchor": "unheaded-block-10",
+        "title": "Unheaded block 10",
+        "startLine": 81,
+        "endLine": 89,
+        "textDigest": "6f2e5a2ea6ae53322b557ee6fbb8cc479c38e36e5737d0b2c9d9e76d4ccfb016",
+        "sample": "```yaml herdrweb-contract\nemits:\n  - id: A-C01-001\n    element: quick_action_menu_item\n    region: quick_actions\n    trigger: click\n    event: item.quick_action\n    payload: { item",
+        "identityFingerprint": "f4adc9093764ee55f224f439398d349bfb8d07de01c3be70cdd4f1f08c88ff4d",
+        "ancestry": [
+          "C01 — Item card (status pill + quick actions)",
+          "Component contract"
+        ],
+        "text": "```yaml herdrweb-contract\nemits:\n  - id: A-C01-001\n    element: quick_action_menu_item\n    region: quick_actions\n    trigger: click\n    event: item.quick_action\n    payload: { item_id: \"$item.id\", verb: \"$action.verb\" }\n```"
+      },
+      "targetShownText": "```yaml herdrweb-contract\nemits:\n  - id: A-C01-001\n    element: quick_action_menu_item\n    region: quick_actions\n    trigger: click\n    event: item.quick_action\n    payload: { item_id: \"$item.id\", verb: \"$action.verb\" }\n```",
+      "targetDigest": "6f2e5a2ea6ae53322b557ee6fbb8cc479c38e36e5737d0b2c9d9e76d4ccfb016",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_bd5ce1469ab840023fd2640668a1ab35",
+        "sourceUnitDigest": "6f2e5a2ea6ae53322b557ee6fbb8cc479c38e36e5737d0b2c9d9e76d4ccfb016",
+        "targetOwner": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+        "targetAnchor": "unheaded-block-10",
+        "claimKind": "contract",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/components/C01-item-card.md#unheaded-block-8 (source lines 59-67) is carried at docs/platform/ui-spec/architecture/components/C01-item-card.md#unheaded-block-10 (candidate lines 81-89). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/components/C01-item-card.md verbatim in docs/platform/ui-spec/architecture/components/C01-item-card.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "6f2e5a2ea6ae53322b557ee6fbb8cc479c38e36e5737d0b2c9d9e76d4ccfb016",
+        "targetAncestry": [
+          "C01 — Item card (status pill + quick actions)",
+          "Component contract"
+        ]
+      }
+    }
+  ]
+}

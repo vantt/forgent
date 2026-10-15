@@ -1,0 +1,910 @@
+{
+  "version": 1,
+  "contentCommit": "1276467f37a99d19aff05808d42fafbf40341449",
+  "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+  "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+  "sourcePath": "docs/ui-spec/modals/M03-add-edit-item.md",
+  "part": 1,
+  "parts": 1,
+  "count": 13,
+  "classes": {
+    "Unit-exact": [
+      "claim_e71250e07f6665431fa08d2d8e0b2dff",
+      "claim_d7150c78cea2f7c841c76814f9dfea0f",
+      "claim_d01d11ce35e918523f65bc915d2da0b9",
+      "claim_4ad34124a2811bb062ec03fd65ac8dc7",
+      "claim_71d00e3b90a0d091b06f0cbf5dd1d360",
+      "claim_f25678161e3944edca10dce0bf2c9e83",
+      "claim_f2aac5602a04a55ae1af5277932bafa2",
+      "claim_3d2697461e6860c1c7b7ad98e1bb2f75"
+    ],
+    "Weak-exact": [
+      "claim_a72c34c5936a40c3517b75b6fac112b3",
+      "claim_56170cb013fb6f88d51c9f9052edf8d5",
+      "claim_a3a9c673695f9ad9ae898eba35875979",
+      "claim_68a4f9c55c4dd71e01dd0a511d3894c1"
+    ],
+    "Judgment": [
+      "claim_9c63e8a354951e0f84f3a1399b6af388"
+    ]
+  },
+  "unequalDigestPairs": [
+    "claim_9c63e8a354951e0f84f3a1399b6af388"
+  ],
+  "noTargetGeneratedRows": [],
+  "mandatoryDeep": [
+    "claim_9c63e8a354951e0f84f3a1399b6af388"
+  ],
+  "reviewerSeedRequired": true,
+  "minimumSeededWeakJudgment": 5,
+  "rows": [
+    {
+      "claimId": "claim_e71250e07f6665431fa08d2d8e0b2dff",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/modals/M03-add-edit-item.md",
+      "sourceAnchor": "unheaded-block-1",
+      "source": {
+        "unitKind": "unheaded-preamble",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded preamble",
+        "startLine": 1,
+        "endLine": 11,
+        "textDigest": "24c8d79862a55393166a0eaaacec85b4ae046d8a96f3a12e0b44b1784fc23550",
+        "sample": "---\nid: M03\ntype: modal\nname: \"Add or edit a work item\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R2]\nregions: [header, form, footer]\n---",
+        "identityFingerprint": "fc3c082584872062233fc6aefcafadf552536d870abaac8eca305844d47ec5c4",
+        "ancestry": [],
+        "text": "---\nid: M03\ntype: modal\nname: \"Add or edit a work item\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R2]\nregions: [header, form, footer]\n---"
+      },
+      "sourceShownText": "---\nid: M03\ntype: modal\nname: \"Add or edit a work item\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R2]\nregions: [header, form, footer]\n---",
+      "sourceDigest": "24c8d79862a55393166a0eaaacec85b4ae046d8a96f3a12e0b44b1784fc23550",
+      "targetPath": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "targetAnchor": "unheaded-block-1",
+      "target": {
+        "unitKind": "unheaded-preamble",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded preamble",
+        "startLine": 1,
+        "endLine": 11,
+        "textDigest": "24c8d79862a55393166a0eaaacec85b4ae046d8a96f3a12e0b44b1784fc23550",
+        "sample": "---\nid: M03\ntype: modal\nname: \"Add or edit a work item\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R2]\nregions: [header, form, footer]\n---",
+        "identityFingerprint": "fc3c082584872062233fc6aefcafadf552536d870abaac8eca305844d47ec5c4",
+        "ancestry": [],
+        "text": "---\nid: M03\ntype: modal\nname: \"Add or edit a work item\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R2]\nregions: [header, form, footer]\n---"
+      },
+      "targetShownText": "---\nid: M03\ntype: modal\nname: \"Add or edit a work item\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R2]\nregions: [header, form, footer]\n---",
+      "targetDigest": "24c8d79862a55393166a0eaaacec85b4ae046d8a96f3a12e0b44b1784fc23550",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_e71250e07f6665431fa08d2d8e0b2dff",
+        "sourceUnitDigest": "24c8d79862a55393166a0eaaacec85b4ae046d8a96f3a12e0b44b1784fc23550",
+        "targetOwner": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+        "targetAnchor": "unheaded-block-1",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-preamble unit docs/ui-spec/modals/M03-add-edit-item.md#unheaded-block-1 (source lines 1-11) is carried at docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md#unheaded-block-1 (candidate lines 1-11). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/modals/M03-add-edit-item.md verbatim in docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "24c8d79862a55393166a0eaaacec85b4ae046d8a96f3a12e0b44b1784fc23550",
+        "targetAncestry": []
+      }
+    },
+    {
+      "claimId": "claim_9c63e8a354951e0f84f3a1399b6af388",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/modals/M03-add-edit-item.md",
+      "sourceAnchor": "m03-add-or-edit-a-work-item",
+      "source": {
+        "unitKind": "heading",
+        "level": 1,
+        "title": "M03 — Add or edit a work item",
+        "anchor": "m03-add-or-edit-a-work-item",
+        "githubAnchor": "m03-add-or-edit-a-work-item",
+        "stableAnchor": "h-af8e2b6b063d",
+        "startLine": 13,
+        "endLine": 13,
+        "textDigest": "d405eb32a994edf7c67d0deea40e0203e06ab47fcd449ec338db6bf70dc692b0",
+        "sample": "M03 — Add or edit a work item",
+        "sectionPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "followingBlockDigest": null,
+        "identityFingerprint": "6b142929ae852c0e121599667bd31ce2cbfe5d6019d4f63e9cb5ceb9c06f8d8e",
+        "ancestry": [],
+        "text": "# M03 — Add or edit a work item",
+        "sectionText": "# M03 — Add or edit a work item"
+      },
+      "sourceShownText": "# M03 — Add or edit a work item",
+      "sourceDigest": "d405eb32a994edf7c67d0deea40e0203e06ab47fcd449ec338db6bf70dc692b0",
+      "targetPath": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "targetAnchor": "m03-add-or-edit-a-work-item",
+      "target": {
+        "unitKind": "heading",
+        "level": 1,
+        "title": "M03 — Add or edit a work item",
+        "anchor": "m03-add-or-edit-a-work-item",
+        "githubAnchor": "m03-add-or-edit-a-work-item",
+        "stableAnchor": "h-af8e2b6b063d",
+        "startLine": 13,
+        "endLine": 13,
+        "textDigest": "942bb5ce19e825141370aa234cc3b8950559082e388a1e249824b6fba347e968",
+        "sample": "M03 — Add or edit a work item",
+        "sectionPayloadDigest": "56daa97a8a2969abdc4ef1d8126b570e0fc9c2e0c0e5cb5925f7550a0baff27b",
+        "followingBlockDigest": "1052d33c3e1746e23b7fe9e479e4b19c51e2c5ef8acfe7a4ed809468e987d856",
+        "identityFingerprint": "6200c5c0c5bd33b2d2f07d37bfb0756a8de39a2a24cdbe83cb5f7b432c43c1ab",
+        "ancestry": [],
+        "text": "# M03 — Add or edit a work item",
+        "sectionText": "# M03 — Add or edit a work item\n\n```txt\nDocument type: Architecture\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve mapped legacy content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; current implementation truth is not certified\nProvenance: docs/ui-spec/modals/M03-add-edit-item.md at 111adc51fd047d99121fd9d076eb4794c87045a4\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing carriage, placement and source conservation\nDo not use this for: Current canonical authority or implemented-behavior proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/ui-spec/modals/M03-add-edit-item.md\nSupersedes: None; candidate only\nSuperseded by: None\n```\n\n> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions."
+      },
+      "targetShownText": "# M03 — Add or edit a work item\n\n```txt\nDocument type: Architecture\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve mapped legacy content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; current implementation truth is not certified\nProvenance: docs/ui-spec/modals/M03-add-edit-item.md at 111adc51fd047d99121fd9d076eb4794c87045a4\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing carriage, placement and source conservation\nDo not use this for: Current canonical authority or implemented-behavior proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/ui-spec/modals/M03-add-edit-item.md\nSupersedes: None; candidate only\nSuperseded by: None\n```\n\n> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions.",
+      "targetDigest": "942bb5ce19e825141370aa234cc3b8950559082e388a1e249824b6fba347e968",
+      "classification": "Judgment",
+      "mandatoryDeep": true,
+      "decision": {
+        "claimId": "claim_9c63e8a354951e0f84f3a1399b6af388",
+        "sourceUnitDigest": "d405eb32a994edf7c67d0deea40e0203e06ab47fcd449ec338db6bf70dc692b0",
+        "targetOwner": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+        "targetAnchor": "m03-add-or-edit-a-work-item",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Judgment: no target digest match. The whole heading unit docs/ui-spec/modals/M03-add-edit-item.md#m03-add-or-edit-a-work-item (source lines 13-13) is carried at docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md#m03-add-or-edit-a-work-item (candidate lines 13-13). The heading section digest changes because labelled candidate metadata is inserted after the original H1; original heading and direct source payload remain verbatim. Frozen specs-ui map and Step 8: preserve docs/ui-spec/modals/M03-add-edit-item.md verbatim in docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "942bb5ce19e825141370aa234cc3b8950559082e388a1e249824b6fba347e968",
+        "targetAncestry": []
+      }
+    },
+    {
+      "claimId": "claim_a72c34c5936a40c3517b75b6fac112b3",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/modals/M03-add-edit-item.md",
+      "sourceAnchor": "purpose",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Purpose",
+        "anchor": "purpose",
+        "githubAnchor": "purpose",
+        "stableAnchor": "h-2f4fe421d538",
+        "startLine": 15,
+        "endLine": 15,
+        "textDigest": "72e7d038a93f287e6aea46d022eced3b171773e84fa24195c4aed29922a35013",
+        "sample": "Purpose",
+        "sectionPayloadDigest": "f23c10c096eb804d89eb694e20dfd43da56f30554d94a2927985c17698af5374",
+        "followingBlockDigest": "f23c10c096eb804d89eb694e20dfd43da56f30554d94a2927985c17698af5374",
+        "identityFingerprint": "a6d3822efa77a75b1396b721dcc287cdf79c81db3753ff8bc69264587125821f",
+        "ancestry": [
+          "M03 — Add or edit a work item"
+        ],
+        "text": "## Purpose",
+        "sectionText": "## Purpose\n\nCreate a new work item, or overwrite the fields of an existing one\n(`docs/specs/herdr-web-dashboard.md` §Add a work item, §Edit a work item).\nOne modal in two modes, because the fields and the validation are the\nsame; only the verb underneath differs."
+      },
+      "sourceShownText": "## Purpose\n\nCreate a new work item, or overwrite the fields of an existing one\n(`docs/specs/herdr-web-dashboard.md` §Add a work item, §Edit a work item).\nOne modal in two modes, because the fields and the validation are the\nsame; only the verb underneath differs.",
+      "sourceDigest": "72e7d038a93f287e6aea46d022eced3b171773e84fa24195c4aed29922a35013",
+      "targetPath": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "targetAnchor": "purpose",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Purpose",
+        "anchor": "purpose",
+        "githubAnchor": "purpose",
+        "stableAnchor": "h-15cea22a442e",
+        "startLine": 37,
+        "endLine": 37,
+        "textDigest": "72e7d038a93f287e6aea46d022eced3b171773e84fa24195c4aed29922a35013",
+        "sample": "Purpose",
+        "sectionPayloadDigest": "f23c10c096eb804d89eb694e20dfd43da56f30554d94a2927985c17698af5374",
+        "followingBlockDigest": "f23c10c096eb804d89eb694e20dfd43da56f30554d94a2927985c17698af5374",
+        "identityFingerprint": "a6d3822efa77a75b1396b721dcc287cdf79c81db3753ff8bc69264587125821f",
+        "ancestry": [
+          "M03 — Add or edit a work item"
+        ],
+        "text": "## Purpose",
+        "sectionText": "## Purpose\n\nCreate a new work item, or overwrite the fields of an existing one\n(`docs/specs/herdr-web-dashboard.md` §Add a work item, §Edit a work item).\nOne modal in two modes, because the fields and the validation are the\nsame; only the verb underneath differs."
+      },
+      "targetShownText": "## Purpose\n\nCreate a new work item, or overwrite the fields of an existing one\n(`docs/specs/herdr-web-dashboard.md` §Add a work item, §Edit a work item).\nOne modal in two modes, because the fields and the validation are the\nsame; only the verb underneath differs.",
+      "targetDigest": "72e7d038a93f287e6aea46d022eced3b171773e84fa24195c4aed29922a35013",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_a72c34c5936a40c3517b75b6fac112b3",
+        "sourceUnitDigest": "72e7d038a93f287e6aea46d022eced3b171773e84fa24195c4aed29922a35013",
+        "targetOwner": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+        "targetAnchor": "purpose",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/ui-spec/modals/M03-add-edit-item.md#purpose (source lines 15-15) is carried at docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md#purpose (candidate lines 37-37). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/modals/M03-add-edit-item.md verbatim in docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "72e7d038a93f287e6aea46d022eced3b171773e84fa24195c4aed29922a35013",
+        "targetAncestry": [
+          "M03 — Add or edit a work item"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_d7150c78cea2f7c841c76814f9dfea0f",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/modals/M03-add-edit-item.md",
+      "sourceAnchor": "unheaded-block-2",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-2",
+        "githubAnchor": "unheaded-block-2",
+        "stableAnchor": "unheaded-block-2",
+        "title": "Unheaded block 2",
+        "startLine": 17,
+        "endLine": 20,
+        "textDigest": "f23c10c096eb804d89eb694e20dfd43da56f30554d94a2927985c17698af5374",
+        "sample": "Create a new work item, or overwrite the fields of an existing one\n(`docs/specs/herdr-web-dashboard.md` §Add a work item, §Edit a work item).\nOne modal in two modes, because the fi",
+        "identityFingerprint": "68a96361719d3abc688af6c5facc08f0d327086b6e5fdbd56c7ba56b62e20fdf",
+        "ancestry": [
+          "M03 — Add or edit a work item",
+          "Purpose"
+        ],
+        "text": "Create a new work item, or overwrite the fields of an existing one\n(`docs/specs/herdr-web-dashboard.md` §Add a work item, §Edit a work item).\nOne modal in two modes, because the fields and the validation are the\nsame; only the verb underneath differs."
+      },
+      "sourceShownText": "Create a new work item, or overwrite the fields of an existing one\n(`docs/specs/herdr-web-dashboard.md` §Add a work item, §Edit a work item).\nOne modal in two modes, because the fields and the validation are the\nsame; only the verb underneath differs.",
+      "sourceDigest": "f23c10c096eb804d89eb694e20dfd43da56f30554d94a2927985c17698af5374",
+      "targetPath": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "targetAnchor": "unheaded-block-4",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 39,
+        "endLine": 42,
+        "textDigest": "f23c10c096eb804d89eb694e20dfd43da56f30554d94a2927985c17698af5374",
+        "sample": "Create a new work item, or overwrite the fields of an existing one\n(`docs/specs/herdr-web-dashboard.md` §Add a work item, §Edit a work item).\nOne modal in two modes, because the fi",
+        "identityFingerprint": "68a96361719d3abc688af6c5facc08f0d327086b6e5fdbd56c7ba56b62e20fdf",
+        "ancestry": [
+          "M03 — Add or edit a work item",
+          "Purpose"
+        ],
+        "text": "Create a new work item, or overwrite the fields of an existing one\n(`docs/specs/herdr-web-dashboard.md` §Add a work item, §Edit a work item).\nOne modal in two modes, because the fields and the validation are the\nsame; only the verb underneath differs."
+      },
+      "targetShownText": "Create a new work item, or overwrite the fields of an existing one\n(`docs/specs/herdr-web-dashboard.md` §Add a work item, §Edit a work item).\nOne modal in two modes, because the fields and the validation are the\nsame; only the verb underneath differs.",
+      "targetDigest": "f23c10c096eb804d89eb694e20dfd43da56f30554d94a2927985c17698af5374",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_d7150c78cea2f7c841c76814f9dfea0f",
+        "sourceUnitDigest": "f23c10c096eb804d89eb694e20dfd43da56f30554d94a2927985c17698af5374",
+        "targetOwner": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+        "targetAnchor": "unheaded-block-4",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/modals/M03-add-edit-item.md#unheaded-block-2 (source lines 17-20) is carried at docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md#unheaded-block-4 (candidate lines 39-42). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/modals/M03-add-edit-item.md verbatim in docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "f23c10c096eb804d89eb694e20dfd43da56f30554d94a2927985c17698af5374",
+        "targetAncestry": [
+          "M03 — Add or edit a work item",
+          "Purpose"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_56170cb013fb6f88d51c9f9052edf8d5",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/modals/M03-add-edit-item.md",
+      "sourceAnchor": "layout",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Layout",
+        "anchor": "layout",
+        "githubAnchor": "layout",
+        "stableAnchor": "h-5db0fa8bad24",
+        "startLine": 22,
+        "endLine": 22,
+        "textDigest": "6f21e81bc2f36a0f4491679c7d0580c0b9f002aa939fbd25ff3425c65c9c0bbd",
+        "sample": "Layout",
+        "sectionPayloadDigest": "704c6dc26f56c1140d2e546d4842932d02ba043eee685430f8768d615f99c299",
+        "followingBlockDigest": "15762277ea0230fa83aaef36a20d316da6a17d4f1ea9d3bbf12aae8d900f44de",
+        "identityFingerprint": "0eab2e4569641f42c2ee653c12563775bb078ace9984067381261d70119c0cc4",
+        "ancestry": [
+          "M03 — Add or edit a work item"
+        ],
+        "text": "## Layout",
+        "sectionText": "## Layout\n\n```\n┌────────────────────────────────────────────────────┐\n│ New work item                                 [✕]  │  header\n│ (edit mode: \"Edit · tsk-4id\")                      │\n├────────────────────────────────────────────────────┤\n│ Description                                        │  form\n│ ┌────────────────────────────────────────────────┐ │\n│ │ What needs doing, in plain language.           │ │\n│ └────────────────────────────────────────────────┘ │\n│                                                    │\n│ (edit mode also shows: title, kind, risk, verify,  │\n│  deps, priority — the fields `fgos edit` accepts)  │\n│                                                    │\n│ Goes through `fgos add` / `fgos edit`.             │\n├────────────────────────────────────────────────────┤\n│                             [ Cancel ]  [ Create ] │  footer\n└────────────────────────────────────────────────────┘\n```\n\n**Add mode is deliberately one field.** Intake derives title, kind, risk\nand id from the description — asking a person to fill those in would be\nasking them to do work the engine already does, and would make capturing\na thought from a phone slow enough that they would not bother.\n\n**Edit mode shows the real fields** `fgos edit` accepts, because editing\nis a deliberate correction rather than a capture.\n\nValidation is not reimplemented here: the same rules a terminal edit gets\napply, and the engine's refusal is what the person sees (R2)."
+      },
+      "sourceShownText": "## Layout\n\n```\n┌────────────────────────────────────────────────────┐\n│ New work item                                 [✕]  │  header\n│ (edit mode: \"Edit · tsk-4id\")                      │\n├────────────────────────────────────────────────────┤\n│ Description                                        │  form\n│ ┌────────────────────────────────────────────────┐ │\n│ │ What needs doing, in plain language.           │ │\n│ └────────────────────────────────────────────────┘ │\n│                                                    │\n│ (edit mode also shows: title, kind, risk, verify,  │\n│  deps, priority — the fields `fgos edit` accepts)  │\n│                                                    │\n│ Goes through `fgos add` / `fgos edit`.             │\n├────────────────────────────────────────────────────┤\n│                             [ Cancel ]  [ Create ] │  footer\n└────────────────────────────────────────────────────┘\n```\n\n**Add mode is deliberately one field.** Intake derives title, kind, risk\nand id from the description — asking a person to fill those in would be\nasking them to do work the engine already does, and would make capturing\na thought from a phone slow enough that they would not bother.\n\n**Edit mode shows the real fields** `fgos edit` accepts, because editing\nis a deliberate correction rather than a capture.\n\nValidation is not reimplemented here: the same rules a terminal edit gets\napply, and the engine's refusal is what the person sees (R2).",
+      "sourceDigest": "6f21e81bc2f36a0f4491679c7d0580c0b9f002aa939fbd25ff3425c65c9c0bbd",
+      "targetPath": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "targetAnchor": "layout",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Layout",
+        "anchor": "layout",
+        "githubAnchor": "layout",
+        "stableAnchor": "h-c16db6c793a2",
+        "startLine": 44,
+        "endLine": 44,
+        "textDigest": "6f21e81bc2f36a0f4491679c7d0580c0b9f002aa939fbd25ff3425c65c9c0bbd",
+        "sample": "Layout",
+        "sectionPayloadDigest": "704c6dc26f56c1140d2e546d4842932d02ba043eee685430f8768d615f99c299",
+        "followingBlockDigest": "15762277ea0230fa83aaef36a20d316da6a17d4f1ea9d3bbf12aae8d900f44de",
+        "identityFingerprint": "0eab2e4569641f42c2ee653c12563775bb078ace9984067381261d70119c0cc4",
+        "ancestry": [
+          "M03 — Add or edit a work item"
+        ],
+        "text": "## Layout",
+        "sectionText": "## Layout\n\n```\n┌────────────────────────────────────────────────────┐\n│ New work item                                 [✕]  │  header\n│ (edit mode: \"Edit · tsk-4id\")                      │\n├────────────────────────────────────────────────────┤\n│ Description                                        │  form\n│ ┌────────────────────────────────────────────────┐ │\n│ │ What needs doing, in plain language.           │ │\n│ └────────────────────────────────────────────────┘ │\n│                                                    │\n│ (edit mode also shows: title, kind, risk, verify,  │\n│  deps, priority — the fields `fgos edit` accepts)  │\n│                                                    │\n│ Goes through `fgos add` / `fgos edit`.             │\n├────────────────────────────────────────────────────┤\n│                             [ Cancel ]  [ Create ] │  footer\n└────────────────────────────────────────────────────┘\n```\n\n**Add mode is deliberately one field.** Intake derives title, kind, risk\nand id from the description — asking a person to fill those in would be\nasking them to do work the engine already does, and would make capturing\na thought from a phone slow enough that they would not bother.\n\n**Edit mode shows the real fields** `fgos edit` accepts, because editing\nis a deliberate correction rather than a capture.\n\nValidation is not reimplemented here: the same rules a terminal edit gets\napply, and the engine's refusal is what the person sees (R2)."
+      },
+      "targetShownText": "## Layout\n\n```\n┌────────────────────────────────────────────────────┐\n│ New work item                                 [✕]  │  header\n│ (edit mode: \"Edit · tsk-4id\")                      │\n├────────────────────────────────────────────────────┤\n│ Description                                        │  form\n│ ┌────────────────────────────────────────────────┐ │\n│ │ What needs doing, in plain language.           │ │\n│ └────────────────────────────────────────────────┘ │\n│                                                    │\n│ (edit mode also shows: title, kind, risk, verify,  │\n│  deps, priority — the fields `fgos edit` accepts)  │\n│                                                    │\n│ Goes through `fgos add` / `fgos edit`.             │\n├────────────────────────────────────────────────────┤\n│                             [ Cancel ]  [ Create ] │  footer\n└────────────────────────────────────────────────────┘\n```\n\n**Add mode is deliberately one field.** Intake derives title, kind, risk\nand id from the description — asking a person to fill those in would be\nasking them to do work the engine already does, and would make capturing\na thought from a phone slow enough that they would not bother.\n\n**Edit mode shows the real fields** `fgos edit` accepts, because editing\nis a deliberate correction rather than a capture.\n\nValidation is not reimplemented here: the same rules a terminal edit gets\napply, and the engine's refusal is what the person sees (R2).",
+      "targetDigest": "6f21e81bc2f36a0f4491679c7d0580c0b9f002aa939fbd25ff3425c65c9c0bbd",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_56170cb013fb6f88d51c9f9052edf8d5",
+        "sourceUnitDigest": "6f21e81bc2f36a0f4491679c7d0580c0b9f002aa939fbd25ff3425c65c9c0bbd",
+        "targetOwner": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+        "targetAnchor": "layout",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/ui-spec/modals/M03-add-edit-item.md#layout (source lines 22-22) is carried at docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md#layout (candidate lines 44-44). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/modals/M03-add-edit-item.md verbatim in docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "6f21e81bc2f36a0f4491679c7d0580c0b9f002aa939fbd25ff3425c65c9c0bbd",
+        "targetAncestry": [
+          "M03 — Add or edit a work item"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_d01d11ce35e918523f65bc915d2da0b9",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/modals/M03-add-edit-item.md",
+      "sourceAnchor": "unheaded-block-3",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 24,
+        "endLine": 41,
+        "textDigest": "15762277ea0230fa83aaef36a20d316da6a17d4f1ea9d3bbf12aae8d900f44de",
+        "sample": "```\n┌────────────────────────────────────────────────────┐\n│ New work item                                 [✕]  │  header\n│ (edit mode: \"Edit · tsk-4id\")                      │\n├──",
+        "identityFingerprint": "ae3b6c50a0c2a2d9eb5815a22e43aa0d6fd68a5d3a098d503a0e4bb0130d9f40",
+        "ancestry": [
+          "M03 — Add or edit a work item",
+          "Layout"
+        ],
+        "text": "```\n┌────────────────────────────────────────────────────┐\n│ New work item                                 [✕]  │  header\n│ (edit mode: \"Edit · tsk-4id\")                      │\n├────────────────────────────────────────────────────┤\n│ Description                                        │  form\n│ ┌────────────────────────────────────────────────┐ │\n│ │ What needs doing, in plain language.           │ │\n│ └────────────────────────────────────────────────┘ │\n│                                                    │\n│ (edit mode also shows: title, kind, risk, verify,  │\n│  deps, priority — the fields `fgos edit` accepts)  │\n│                                                    │\n│ Goes through `fgos add` / `fgos edit`.             │\n├────────────────────────────────────────────────────┤\n│                             [ Cancel ]  [ Create ] │  footer\n└────────────────────────────────────────────────────┘\n```"
+      },
+      "sourceShownText": "```\n┌────────────────────────────────────────────────────┐\n│ New work item                                 [✕]  │  header\n│ (edit mode: \"Edit · tsk-4id\")                      │\n├────────────────────────────────────────────────────┤\n│ Description                                        │  form\n│ ┌────────────────────────────────────────────────┐ │\n│ │ What needs doing, in plain language.           │ │\n│ └────────────────────────────────────────────────┘ │\n│                                                    │\n│ (edit mode also shows: title, kind, risk, verify,  │\n│  deps, priority — the fields `fgos edit` accepts)  │\n│                                                    │\n│ Goes through `fgos add` / `fgos edit`.             │\n├────────────────────────────────────────────────────┤\n│                             [ Cancel ]  [ Create ] │  footer\n└────────────────────────────────────────────────────┘\n```",
+      "sourceDigest": "15762277ea0230fa83aaef36a20d316da6a17d4f1ea9d3bbf12aae8d900f44de",
+      "targetPath": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "targetAnchor": "unheaded-block-5",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 46,
+        "endLine": 63,
+        "textDigest": "15762277ea0230fa83aaef36a20d316da6a17d4f1ea9d3bbf12aae8d900f44de",
+        "sample": "```\n┌────────────────────────────────────────────────────┐\n│ New work item                                 [✕]  │  header\n│ (edit mode: \"Edit · tsk-4id\")                      │\n├──",
+        "identityFingerprint": "ae3b6c50a0c2a2d9eb5815a22e43aa0d6fd68a5d3a098d503a0e4bb0130d9f40",
+        "ancestry": [
+          "M03 — Add or edit a work item",
+          "Layout"
+        ],
+        "text": "```\n┌────────────────────────────────────────────────────┐\n│ New work item                                 [✕]  │  header\n│ (edit mode: \"Edit · tsk-4id\")                      │\n├────────────────────────────────────────────────────┤\n│ Description                                        │  form\n│ ┌────────────────────────────────────────────────┐ │\n│ │ What needs doing, in plain language.           │ │\n│ └────────────────────────────────────────────────┘ │\n│                                                    │\n│ (edit mode also shows: title, kind, risk, verify,  │\n│  deps, priority — the fields `fgos edit` accepts)  │\n│                                                    │\n│ Goes through `fgos add` / `fgos edit`.             │\n├────────────────────────────────────────────────────┤\n│                             [ Cancel ]  [ Create ] │  footer\n└────────────────────────────────────────────────────┘\n```"
+      },
+      "targetShownText": "```\n┌────────────────────────────────────────────────────┐\n│ New work item                                 [✕]  │  header\n│ (edit mode: \"Edit · tsk-4id\")                      │\n├────────────────────────────────────────────────────┤\n│ Description                                        │  form\n│ ┌────────────────────────────────────────────────┐ │\n│ │ What needs doing, in plain language.           │ │\n│ └────────────────────────────────────────────────┘ │\n│                                                    │\n│ (edit mode also shows: title, kind, risk, verify,  │\n│  deps, priority — the fields `fgos edit` accepts)  │\n│                                                    │\n│ Goes through `fgos add` / `fgos edit`.             │\n├────────────────────────────────────────────────────┤\n│                             [ Cancel ]  [ Create ] │  footer\n└────────────────────────────────────────────────────┘\n```",
+      "targetDigest": "15762277ea0230fa83aaef36a20d316da6a17d4f1ea9d3bbf12aae8d900f44de",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_d01d11ce35e918523f65bc915d2da0b9",
+        "sourceUnitDigest": "15762277ea0230fa83aaef36a20d316da6a17d4f1ea9d3bbf12aae8d900f44de",
+        "targetOwner": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+        "targetAnchor": "unheaded-block-5",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/modals/M03-add-edit-item.md#unheaded-block-3 (source lines 24-41) is carried at docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md#unheaded-block-5 (candidate lines 46-63). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/modals/M03-add-edit-item.md verbatim in docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "15762277ea0230fa83aaef36a20d316da6a17d4f1ea9d3bbf12aae8d900f44de",
+        "targetAncestry": [
+          "M03 — Add or edit a work item",
+          "Layout"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_4ad34124a2811bb062ec03fd65ac8dc7",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/modals/M03-add-edit-item.md",
+      "sourceAnchor": "unheaded-block-4",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 43,
+        "endLine": 46,
+        "textDigest": "54e00a531b44734aed2fe09a8aa961df3451f98796ae523524be9a1f5e54d3f6",
+        "sample": "**Add mode is deliberately one field.** Intake derives title, kind, risk\nand id from the description — asking a person to fill those in would be\nasking them to do work the engine a",
+        "identityFingerprint": "4ae102d4d027ffa9298af4d93f60597f7ce1dd064738f7fc1ae55c181d6d932a",
+        "ancestry": [
+          "M03 — Add or edit a work item",
+          "Layout"
+        ],
+        "text": "**Add mode is deliberately one field.** Intake derives title, kind, risk\nand id from the description — asking a person to fill those in would be\nasking them to do work the engine already does, and would make capturing\na thought from a phone slow enough that they would not bother."
+      },
+      "sourceShownText": "**Add mode is deliberately one field.** Intake derives title, kind, risk\nand id from the description — asking a person to fill those in would be\nasking them to do work the engine already does, and would make capturing\na thought from a phone slow enough that they would not bother.",
+      "sourceDigest": "54e00a531b44734aed2fe09a8aa961df3451f98796ae523524be9a1f5e54d3f6",
+      "targetPath": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "targetAnchor": "unheaded-block-6",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 65,
+        "endLine": 68,
+        "textDigest": "54e00a531b44734aed2fe09a8aa961df3451f98796ae523524be9a1f5e54d3f6",
+        "sample": "**Add mode is deliberately one field.** Intake derives title, kind, risk\nand id from the description — asking a person to fill those in would be\nasking them to do work the engine a",
+        "identityFingerprint": "4ae102d4d027ffa9298af4d93f60597f7ce1dd064738f7fc1ae55c181d6d932a",
+        "ancestry": [
+          "M03 — Add or edit a work item",
+          "Layout"
+        ],
+        "text": "**Add mode is deliberately one field.** Intake derives title, kind, risk\nand id from the description — asking a person to fill those in would be\nasking them to do work the engine already does, and would make capturing\na thought from a phone slow enough that they would not bother."
+      },
+      "targetShownText": "**Add mode is deliberately one field.** Intake derives title, kind, risk\nand id from the description — asking a person to fill those in would be\nasking them to do work the engine already does, and would make capturing\na thought from a phone slow enough that they would not bother.",
+      "targetDigest": "54e00a531b44734aed2fe09a8aa961df3451f98796ae523524be9a1f5e54d3f6",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_4ad34124a2811bb062ec03fd65ac8dc7",
+        "sourceUnitDigest": "54e00a531b44734aed2fe09a8aa961df3451f98796ae523524be9a1f5e54d3f6",
+        "targetOwner": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+        "targetAnchor": "unheaded-block-6",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/modals/M03-add-edit-item.md#unheaded-block-4 (source lines 43-46) is carried at docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md#unheaded-block-6 (candidate lines 65-68). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/modals/M03-add-edit-item.md verbatim in docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "54e00a531b44734aed2fe09a8aa961df3451f98796ae523524be9a1f5e54d3f6",
+        "targetAncestry": [
+          "M03 — Add or edit a work item",
+          "Layout"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_71d00e3b90a0d091b06f0cbf5dd1d360",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/modals/M03-add-edit-item.md",
+      "sourceAnchor": "unheaded-block-5",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 48,
+        "endLine": 49,
+        "textDigest": "d025e2982b7a57e0a540fa8e9ab43023ae631df0c9f1d08e07abfa5fab364ff1",
+        "sample": "**Edit mode shows the real fields** `fgos edit` accepts, because editing\nis a deliberate correction rather than a capture.",
+        "identityFingerprint": "99e6d7021c64dc21a85273fb58d70fcefd6b33d6369ce8f43865237a9ea5c213",
+        "ancestry": [
+          "M03 — Add or edit a work item",
+          "Layout"
+        ],
+        "text": "**Edit mode shows the real fields** `fgos edit` accepts, because editing\nis a deliberate correction rather than a capture."
+      },
+      "sourceShownText": "**Edit mode shows the real fields** `fgos edit` accepts, because editing\nis a deliberate correction rather than a capture.",
+      "sourceDigest": "d025e2982b7a57e0a540fa8e9ab43023ae631df0c9f1d08e07abfa5fab364ff1",
+      "targetPath": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "targetAnchor": "unheaded-block-7",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 70,
+        "endLine": 71,
+        "textDigest": "d025e2982b7a57e0a540fa8e9ab43023ae631df0c9f1d08e07abfa5fab364ff1",
+        "sample": "**Edit mode shows the real fields** `fgos edit` accepts, because editing\nis a deliberate correction rather than a capture.",
+        "identityFingerprint": "99e6d7021c64dc21a85273fb58d70fcefd6b33d6369ce8f43865237a9ea5c213",
+        "ancestry": [
+          "M03 — Add or edit a work item",
+          "Layout"
+        ],
+        "text": "**Edit mode shows the real fields** `fgos edit` accepts, because editing\nis a deliberate correction rather than a capture."
+      },
+      "targetShownText": "**Edit mode shows the real fields** `fgos edit` accepts, because editing\nis a deliberate correction rather than a capture.",
+      "targetDigest": "d025e2982b7a57e0a540fa8e9ab43023ae631df0c9f1d08e07abfa5fab364ff1",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_71d00e3b90a0d091b06f0cbf5dd1d360",
+        "sourceUnitDigest": "d025e2982b7a57e0a540fa8e9ab43023ae631df0c9f1d08e07abfa5fab364ff1",
+        "targetOwner": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+        "targetAnchor": "unheaded-block-7",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/modals/M03-add-edit-item.md#unheaded-block-5 (source lines 48-49) is carried at docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md#unheaded-block-7 (candidate lines 70-71). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/modals/M03-add-edit-item.md verbatim in docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "d025e2982b7a57e0a540fa8e9ab43023ae631df0c9f1d08e07abfa5fab364ff1",
+        "targetAncestry": [
+          "M03 — Add or edit a work item",
+          "Layout"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_f25678161e3944edca10dce0bf2c9e83",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/modals/M03-add-edit-item.md",
+      "sourceAnchor": "unheaded-block-6",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 51,
+        "endLine": 52,
+        "textDigest": "bfde915b1fb47245c55e1823285df8b92841101c0a8712bcb0ffdee98cf3663c",
+        "sample": "Validation is not reimplemented here: the same rules a terminal edit gets\napply, and the engine's refusal is what the person sees (R2).",
+        "identityFingerprint": "38ce04b32a386d97b0e0b74060e019b72a40caf9d0b592d5547abd1324d67e9c",
+        "ancestry": [
+          "M03 — Add or edit a work item",
+          "Layout"
+        ],
+        "text": "Validation is not reimplemented here: the same rules a terminal edit gets\napply, and the engine's refusal is what the person sees (R2)."
+      },
+      "sourceShownText": "Validation is not reimplemented here: the same rules a terminal edit gets\napply, and the engine's refusal is what the person sees (R2).",
+      "sourceDigest": "bfde915b1fb47245c55e1823285df8b92841101c0a8712bcb0ffdee98cf3663c",
+      "targetPath": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "targetAnchor": "unheaded-block-8",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-8",
+        "githubAnchor": "unheaded-block-8",
+        "stableAnchor": "unheaded-block-8",
+        "title": "Unheaded block 8",
+        "startLine": 73,
+        "endLine": 74,
+        "textDigest": "bfde915b1fb47245c55e1823285df8b92841101c0a8712bcb0ffdee98cf3663c",
+        "sample": "Validation is not reimplemented here: the same rules a terminal edit gets\napply, and the engine's refusal is what the person sees (R2).",
+        "identityFingerprint": "38ce04b32a386d97b0e0b74060e019b72a40caf9d0b592d5547abd1324d67e9c",
+        "ancestry": [
+          "M03 — Add or edit a work item",
+          "Layout"
+        ],
+        "text": "Validation is not reimplemented here: the same rules a terminal edit gets\napply, and the engine's refusal is what the person sees (R2)."
+      },
+      "targetShownText": "Validation is not reimplemented here: the same rules a terminal edit gets\napply, and the engine's refusal is what the person sees (R2).",
+      "targetDigest": "bfde915b1fb47245c55e1823285df8b92841101c0a8712bcb0ffdee98cf3663c",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_f25678161e3944edca10dce0bf2c9e83",
+        "sourceUnitDigest": "bfde915b1fb47245c55e1823285df8b92841101c0a8712bcb0ffdee98cf3663c",
+        "targetOwner": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+        "targetAnchor": "unheaded-block-8",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/modals/M03-add-edit-item.md#unheaded-block-6 (source lines 51-52) is carried at docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md#unheaded-block-8 (candidate lines 73-74). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/modals/M03-add-edit-item.md verbatim in docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "bfde915b1fb47245c55e1823285df8b92841101c0a8712bcb0ffdee98cf3663c",
+        "targetAncestry": [
+          "M03 — Add or edit a work item",
+          "Layout"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_a3a9c673695f9ad9ae898eba35875979",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/modals/M03-add-edit-item.md",
+      "sourceAnchor": "states",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "States",
+        "anchor": "states",
+        "githubAnchor": "states",
+        "stableAnchor": "h-494eeb937f8b",
+        "startLine": 54,
+        "endLine": 54,
+        "textDigest": "238d0b1db923cf498006a239dcb275ea455dd286233baebfa2536ba8c0dae7e9",
+        "sample": "States",
+        "sectionPayloadDigest": "ca36dd365ddfcc167033301303bc1d374cbaf26b13c05156626e8290f13ff5fc",
+        "followingBlockDigest": "ca36dd365ddfcc167033301303bc1d374cbaf26b13c05156626e8290f13ff5fc",
+        "identityFingerprint": "7b31571530dede30cfcf404da6e044b41407aa36b3157b86ba43cef4bd2bab51",
+        "ancestry": [
+          "M03 — Add or edit a work item"
+        ],
+        "text": "## States",
+        "sectionText": "## States\n\n- **ST-READY** — create disabled while the description is empty.\n- **ST-SUBMITTING** — button shows progress; fields read-only, still\n  visible.\n- **ERR-WRITE-REFUSED** — shown verbatim from the engine, with everything\n  typed preserved."
+      },
+      "sourceShownText": "## States\n\n- **ST-READY** — create disabled while the description is empty.\n- **ST-SUBMITTING** — button shows progress; fields read-only, still\n  visible.\n- **ERR-WRITE-REFUSED** — shown verbatim from the engine, with everything\n  typed preserved.",
+      "sourceDigest": "238d0b1db923cf498006a239dcb275ea455dd286233baebfa2536ba8c0dae7e9",
+      "targetPath": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "targetAnchor": "states",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "States",
+        "anchor": "states",
+        "githubAnchor": "states",
+        "stableAnchor": "h-8a717888ba5b",
+        "startLine": 76,
+        "endLine": 76,
+        "textDigest": "238d0b1db923cf498006a239dcb275ea455dd286233baebfa2536ba8c0dae7e9",
+        "sample": "States",
+        "sectionPayloadDigest": "ca36dd365ddfcc167033301303bc1d374cbaf26b13c05156626e8290f13ff5fc",
+        "followingBlockDigest": "ca36dd365ddfcc167033301303bc1d374cbaf26b13c05156626e8290f13ff5fc",
+        "identityFingerprint": "7b31571530dede30cfcf404da6e044b41407aa36b3157b86ba43cef4bd2bab51",
+        "ancestry": [
+          "M03 — Add or edit a work item"
+        ],
+        "text": "## States",
+        "sectionText": "## States\n\n- **ST-READY** — create disabled while the description is empty.\n- **ST-SUBMITTING** — button shows progress; fields read-only, still\n  visible.\n- **ERR-WRITE-REFUSED** — shown verbatim from the engine, with everything\n  typed preserved."
+      },
+      "targetShownText": "## States\n\n- **ST-READY** — create disabled while the description is empty.\n- **ST-SUBMITTING** — button shows progress; fields read-only, still\n  visible.\n- **ERR-WRITE-REFUSED** — shown verbatim from the engine, with everything\n  typed preserved.",
+      "targetDigest": "238d0b1db923cf498006a239dcb275ea455dd286233baebfa2536ba8c0dae7e9",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_a3a9c673695f9ad9ae898eba35875979",
+        "sourceUnitDigest": "238d0b1db923cf498006a239dcb275ea455dd286233baebfa2536ba8c0dae7e9",
+        "targetOwner": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+        "targetAnchor": "states",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/ui-spec/modals/M03-add-edit-item.md#states (source lines 54-54) is carried at docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md#states (candidate lines 76-76). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/modals/M03-add-edit-item.md verbatim in docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "238d0b1db923cf498006a239dcb275ea455dd286233baebfa2536ba8c0dae7e9",
+        "targetAncestry": [
+          "M03 — Add or edit a work item"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_f2aac5602a04a55ae1af5277932bafa2",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/modals/M03-add-edit-item.md",
+      "sourceAnchor": "unheaded-block-7",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 56,
+        "endLine": 60,
+        "textDigest": "ca36dd365ddfcc167033301303bc1d374cbaf26b13c05156626e8290f13ff5fc",
+        "sample": "- **ST-READY** — create disabled while the description is empty.\n- **ST-SUBMITTING** — button shows progress; fields read-only, still\n  visible.\n- **ERR-WRITE-REFUSED** — shown ver",
+        "identityFingerprint": "4d89a08b9175b4242189efd98e0f16a6c83ee9903ab663ee1f0105628fa7a027",
+        "ancestry": [
+          "M03 — Add or edit a work item",
+          "States"
+        ],
+        "text": "- **ST-READY** — create disabled while the description is empty.\n- **ST-SUBMITTING** — button shows progress; fields read-only, still\n  visible.\n- **ERR-WRITE-REFUSED** — shown verbatim from the engine, with everything\n  typed preserved."
+      },
+      "sourceShownText": "- **ST-READY** — create disabled while the description is empty.\n- **ST-SUBMITTING** — button shows progress; fields read-only, still\n  visible.\n- **ERR-WRITE-REFUSED** — shown verbatim from the engine, with everything\n  typed preserved.",
+      "sourceDigest": "ca36dd365ddfcc167033301303bc1d374cbaf26b13c05156626e8290f13ff5fc",
+      "targetPath": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "targetAnchor": "unheaded-block-9",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-9",
+        "githubAnchor": "unheaded-block-9",
+        "stableAnchor": "unheaded-block-9",
+        "title": "Unheaded block 9",
+        "startLine": 78,
+        "endLine": 82,
+        "textDigest": "ca36dd365ddfcc167033301303bc1d374cbaf26b13c05156626e8290f13ff5fc",
+        "sample": "- **ST-READY** — create disabled while the description is empty.\n- **ST-SUBMITTING** — button shows progress; fields read-only, still\n  visible.\n- **ERR-WRITE-REFUSED** — shown ver",
+        "identityFingerprint": "4d89a08b9175b4242189efd98e0f16a6c83ee9903ab663ee1f0105628fa7a027",
+        "ancestry": [
+          "M03 — Add or edit a work item",
+          "States"
+        ],
+        "text": "- **ST-READY** — create disabled while the description is empty.\n- **ST-SUBMITTING** — button shows progress; fields read-only, still\n  visible.\n- **ERR-WRITE-REFUSED** — shown verbatim from the engine, with everything\n  typed preserved."
+      },
+      "targetShownText": "- **ST-READY** — create disabled while the description is empty.\n- **ST-SUBMITTING** — button shows progress; fields read-only, still\n  visible.\n- **ERR-WRITE-REFUSED** — shown verbatim from the engine, with everything\n  typed preserved.",
+      "targetDigest": "ca36dd365ddfcc167033301303bc1d374cbaf26b13c05156626e8290f13ff5fc",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_f2aac5602a04a55ae1af5277932bafa2",
+        "sourceUnitDigest": "ca36dd365ddfcc167033301303bc1d374cbaf26b13c05156626e8290f13ff5fc",
+        "targetOwner": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+        "targetAnchor": "unheaded-block-9",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/modals/M03-add-edit-item.md#unheaded-block-7 (source lines 56-60) is carried at docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md#unheaded-block-9 (candidate lines 78-82). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/modals/M03-add-edit-item.md verbatim in docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "ca36dd365ddfcc167033301303bc1d374cbaf26b13c05156626e8290f13ff5fc",
+        "targetAncestry": [
+          "M03 — Add or edit a work item",
+          "States"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_68a4f9c55c4dd71e01dd0a511d3894c1",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/modals/M03-add-edit-item.md",
+      "sourceAnchor": "interactions",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Interactions",
+        "anchor": "interactions",
+        "githubAnchor": "interactions",
+        "stableAnchor": "h-5a32fc416d55",
+        "startLine": 62,
+        "endLine": 62,
+        "textDigest": "d49d33e9d7ce24ccc04ef064bf8da74c35144b715738215b4edef6aa32ae46fe",
+        "sample": "Interactions",
+        "sectionPayloadDigest": "19182a48049bb62a94fdee2e76c7bcdd872da2397e0f65207b3f586a6ffb250b",
+        "followingBlockDigest": "19182a48049bb62a94fdee2e76c7bcdd872da2397e0f65207b3f586a6ffb250b",
+        "identityFingerprint": "8a7f8f6c7afdbe96beb925b3d63ac6d3117185d0544a0b87b4fcce59292fdd15",
+        "ancestry": [
+          "M03 — Add or edit a work item"
+        ],
+        "text": "## Interactions",
+        "sectionText": "## Interactions\n\n```yaml herdrweb-contract\ninteractions:\n  - id: A-M03-001\n    element: description_field\n    region: form\n    trigger: input\n    action: mutate\n    effects: [enable_submit_when_non_empty]\n  - id: A-M03-002\n    element: submit_button\n    region: footer\n    trigger: submit\n    guard: \"description.nonEmpty\"\n    action: close_overlay\n    target: return_to_invoker\n    effects: [run_fgos_add_or_edit_verb]\n  - id: A-M03-003\n    element: cancel_button\n    region: footer\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n  - id: A-M03-004\n    element: close_icon\n    region: header\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n```"
+      },
+      "sourceShownText": "## Interactions\n\n```yaml herdrweb-contract\ninteractions:\n  - id: A-M03-001\n    element: description_field\n    region: form\n    trigger: input\n    action: mutate\n    effects: [enable_submit_when_non_empty]\n  - id: A-M03-002\n    element: submit_button\n    region: footer\n    trigger: submit\n    guard: \"description.nonEmpty\"\n    action: close_overlay\n    target: return_to_invoker\n    effects: [run_fgos_add_or_edit_verb]\n  - id: A-M03-003\n    element: cancel_button\n    region: footer\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n  - id: A-M03-004\n    element: close_icon\n    region: header\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n```",
+      "sourceDigest": "d49d33e9d7ce24ccc04ef064bf8da74c35144b715738215b4edef6aa32ae46fe",
+      "targetPath": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "targetAnchor": "interactions",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Interactions",
+        "anchor": "interactions",
+        "githubAnchor": "interactions",
+        "stableAnchor": "h-34ebd43eb279",
+        "startLine": 84,
+        "endLine": 84,
+        "textDigest": "d49d33e9d7ce24ccc04ef064bf8da74c35144b715738215b4edef6aa32ae46fe",
+        "sample": "Interactions",
+        "sectionPayloadDigest": "19182a48049bb62a94fdee2e76c7bcdd872da2397e0f65207b3f586a6ffb250b",
+        "followingBlockDigest": "19182a48049bb62a94fdee2e76c7bcdd872da2397e0f65207b3f586a6ffb250b",
+        "identityFingerprint": "8a7f8f6c7afdbe96beb925b3d63ac6d3117185d0544a0b87b4fcce59292fdd15",
+        "ancestry": [
+          "M03 — Add or edit a work item"
+        ],
+        "text": "## Interactions",
+        "sectionText": "## Interactions\n\n```yaml herdrweb-contract\ninteractions:\n  - id: A-M03-001\n    element: description_field\n    region: form\n    trigger: input\n    action: mutate\n    effects: [enable_submit_when_non_empty]\n  - id: A-M03-002\n    element: submit_button\n    region: footer\n    trigger: submit\n    guard: \"description.nonEmpty\"\n    action: close_overlay\n    target: return_to_invoker\n    effects: [run_fgos_add_or_edit_verb]\n  - id: A-M03-003\n    element: cancel_button\n    region: footer\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n  - id: A-M03-004\n    element: close_icon\n    region: header\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n```"
+      },
+      "targetShownText": "## Interactions\n\n```yaml herdrweb-contract\ninteractions:\n  - id: A-M03-001\n    element: description_field\n    region: form\n    trigger: input\n    action: mutate\n    effects: [enable_submit_when_non_empty]\n  - id: A-M03-002\n    element: submit_button\n    region: footer\n    trigger: submit\n    guard: \"description.nonEmpty\"\n    action: close_overlay\n    target: return_to_invoker\n    effects: [run_fgos_add_or_edit_verb]\n  - id: A-M03-003\n    element: cancel_button\n    region: footer\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n  - id: A-M03-004\n    element: close_icon\n    region: header\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n```",
+      "targetDigest": "d49d33e9d7ce24ccc04ef064bf8da74c35144b715738215b4edef6aa32ae46fe",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_68a4f9c55c4dd71e01dd0a511d3894c1",
+        "sourceUnitDigest": "d49d33e9d7ce24ccc04ef064bf8da74c35144b715738215b4edef6aa32ae46fe",
+        "targetOwner": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+        "targetAnchor": "interactions",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/ui-spec/modals/M03-add-edit-item.md#interactions (source lines 62-62) is carried at docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md#interactions (candidate lines 84-84). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/modals/M03-add-edit-item.md verbatim in docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "d49d33e9d7ce24ccc04ef064bf8da74c35144b715738215b4edef6aa32ae46fe",
+        "targetAncestry": [
+          "M03 — Add or edit a work item"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_3d2697461e6860c1c7b7ad98e1bb2f75",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/modals/M03-add-edit-item.md",
+      "sourceAnchor": "unheaded-block-8",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-8",
+        "githubAnchor": "unheaded-block-8",
+        "stableAnchor": "unheaded-block-8",
+        "title": "Unheaded block 8",
+        "startLine": 64,
+        "endLine": 92,
+        "textDigest": "19182a48049bb62a94fdee2e76c7bcdd872da2397e0f65207b3f586a6ffb250b",
+        "sample": "```yaml herdrweb-contract\ninteractions:\n  - id: A-M03-001\n    element: description_field\n    region: form\n    trigger: input\n    action: mutate\n    effects: [enable_submit_when_non",
+        "identityFingerprint": "175c516100b4a99c99e8aa66fb0d7fe9ff2aadd2e31018e20cd12d0f952d03d9",
+        "ancestry": [
+          "M03 — Add or edit a work item",
+          "Interactions"
+        ],
+        "text": "```yaml herdrweb-contract\ninteractions:\n  - id: A-M03-001\n    element: description_field\n    region: form\n    trigger: input\n    action: mutate\n    effects: [enable_submit_when_non_empty]\n  - id: A-M03-002\n    element: submit_button\n    region: footer\n    trigger: submit\n    guard: \"description.nonEmpty\"\n    action: close_overlay\n    target: return_to_invoker\n    effects: [run_fgos_add_or_edit_verb]\n  - id: A-M03-003\n    element: cancel_button\n    region: footer\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n  - id: A-M03-004\n    element: close_icon\n    region: header\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n```"
+      },
+      "sourceShownText": "```yaml herdrweb-contract\ninteractions:\n  - id: A-M03-001\n    element: description_field\n    region: form\n    trigger: input\n    action: mutate\n    effects: [enable_submit_when_non_empty]\n  - id: A-M03-002\n    element: submit_button\n    region: footer\n    trigger: submit\n    guard: \"description.nonEmpty\"\n    action: close_overlay\n    target: return_to_invoker\n    effects: [run_fgos_add_or_edit_verb]\n  - id: A-M03-003\n    element: cancel_button\n    region: footer\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n  - id: A-M03-004\n    element: close_icon\n    region: header\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n```",
+      "sourceDigest": "19182a48049bb62a94fdee2e76c7bcdd872da2397e0f65207b3f586a6ffb250b",
+      "targetPath": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "targetAnchor": "unheaded-block-10",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-10",
+        "githubAnchor": "unheaded-block-10",
+        "stableAnchor": "unheaded-block-10",
+        "title": "Unheaded block 10",
+        "startLine": 86,
+        "endLine": 114,
+        "textDigest": "19182a48049bb62a94fdee2e76c7bcdd872da2397e0f65207b3f586a6ffb250b",
+        "sample": "```yaml herdrweb-contract\ninteractions:\n  - id: A-M03-001\n    element: description_field\n    region: form\n    trigger: input\n    action: mutate\n    effects: [enable_submit_when_non",
+        "identityFingerprint": "175c516100b4a99c99e8aa66fb0d7fe9ff2aadd2e31018e20cd12d0f952d03d9",
+        "ancestry": [
+          "M03 — Add or edit a work item",
+          "Interactions"
+        ],
+        "text": "```yaml herdrweb-contract\ninteractions:\n  - id: A-M03-001\n    element: description_field\n    region: form\n    trigger: input\n    action: mutate\n    effects: [enable_submit_when_non_empty]\n  - id: A-M03-002\n    element: submit_button\n    region: footer\n    trigger: submit\n    guard: \"description.nonEmpty\"\n    action: close_overlay\n    target: return_to_invoker\n    effects: [run_fgos_add_or_edit_verb]\n  - id: A-M03-003\n    element: cancel_button\n    region: footer\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n  - id: A-M03-004\n    element: close_icon\n    region: header\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n```"
+      },
+      "targetShownText": "```yaml herdrweb-contract\ninteractions:\n  - id: A-M03-001\n    element: description_field\n    region: form\n    trigger: input\n    action: mutate\n    effects: [enable_submit_when_non_empty]\n  - id: A-M03-002\n    element: submit_button\n    region: footer\n    trigger: submit\n    guard: \"description.nonEmpty\"\n    action: close_overlay\n    target: return_to_invoker\n    effects: [run_fgos_add_or_edit_verb]\n  - id: A-M03-003\n    element: cancel_button\n    region: footer\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n  - id: A-M03-004\n    element: close_icon\n    region: header\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n```",
+      "targetDigest": "19182a48049bb62a94fdee2e76c7bcdd872da2397e0f65207b3f586a6ffb250b",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_3d2697461e6860c1c7b7ad98e1bb2f75",
+        "sourceUnitDigest": "19182a48049bb62a94fdee2e76c7bcdd872da2397e0f65207b3f586a6ffb250b",
+        "targetOwner": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+        "targetAnchor": "unheaded-block-10",
+        "claimKind": "contract",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/modals/M03-add-edit-item.md#unheaded-block-8 (source lines 64-92) is carried at docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md#unheaded-block-10 (candidate lines 86-114). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/modals/M03-add-edit-item.md verbatim in docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "19182a48049bb62a94fdee2e76c7bcdd872da2397e0f65207b3f586a6ffb250b",
+        "targetAncestry": [
+          "M03 — Add or edit a work item",
+          "Interactions"
+        ]
+      }
+    }
+  ]
+}

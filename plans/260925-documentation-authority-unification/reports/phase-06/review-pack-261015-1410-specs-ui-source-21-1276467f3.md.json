@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "contentCommit": "1276467f37a99d19aff05808d42fafbf40341449",
+  "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+  "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+  "sourcePath": "docs/ui-spec/generated/action-registry.csv",
+  "part": 1,
+  "parts": 1,
+  "count": 1,
+  "classes": {
+    "Unit-exact": [],
+    "Weak-exact": [],
+    "Judgment": [
+      "claim_7d55d8b906459068668dbd17eca9a793"
+    ]
+  },
+  "unequalDigestPairs": [],
+  "noTargetGeneratedRows": [
+    "claim_7d55d8b906459068668dbd17eca9a793"
+  ],
+  "mandatoryDeep": [
+    "claim_7d55d8b906459068668dbd17eca9a793"
+  ],
+  "reviewerSeedRequired": true,
+  "minimumSeededWeakJudgment": 1,
+  "rows": [
+    {
+      "claimId": "claim_7d55d8b906459068668dbd17eca9a793",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/generated/action-registry.csv",
+      "sourceAnchor": "file-block",
+      "source": {
+        "unitKind": "file-block",
+        "anchor": "file-block",
+        "githubAnchor": "file-block",
+        "stableAnchor": "file-block",
+        "title": "action-registry.csv",
+        "startLine": 1,
+        "endLine": 44,
+        "textDigest": "9061f86a22a4aa7506e627c8bf2decf3ccdb5b75cf88f2382481851b1d5a02bc",
+        "identityFingerprint": "30d02e529d2d799e36cc4f952f005c30b31ab2fe2cf316331d0134ff47039d82",
+        "sample": "id,from,trigger,action,target,guard,region\nA-S01-001,S01,input,mutate,,,form\nA-S01-002,S01,submit,navigate,S02,token.nonEmpty,form\nA-S02-001,S02,click,navigate,S03,,board\nA-S02-002",
+        "ancestry": [],
+        "text": "id,from,trigger,action,target,guard,region\nA-S01-001,S01,input,mutate,,,form\nA-S01-002,S01,submit,navigate,S02,token.nonEmpty,form\nA-S02-001,S02,click,navigate,S03,,board\nA-S02-002,S02,click,open_overlay,M03,,controls\nA-S02-003,S02,click,mutate,,,board\nA-S02-004,S02,change,mutate,,,controls\nA-S02-005,S02,change,mutate,,,controls\nA-S02-006,S02,click,navigate,S04,,needs_answer_rail\nA-S02-007,S02,change,mutate,,,topbar\nA-S02-008,S02,work.changed,mutate,,,\nA-S02-009,S02,question.opened,mutate,,,\nA-S02-010,S02,gateway.unreachable,mutate,,,\nA-S02-011,S02,item.quick_action,mutate,,,\nA-S03-001,S03,click,open_overlay,M01,item.isParked,question\nA-S03-002,S03,click,open_overlay,M02,item.awaitingApproval && gateway.atMainWorkingTree,actions\nA-S03-003,S03,click,open_overlay,M03,,actions\nA-S03-004,S03,click,mutate,,,context\nA-S03-005,S03,click,navigate,S02,,topbar\nA-S03-006,S03,click,mutate,,,timeline\nA-S03-007,S03,work.changed,mutate,,,\nA-S03-008,S03,question.answered,mutate,,,\nA-S03-009,S03,merge.settled,mutate,,,\nA-S03-010,S03,gateway.unreachable,mutate,,,\nA-S03-011,S03,item.quick_action,mutate,,,\nA-S04-001,S04,click,open_overlay,M01,,list\nA-S04-002,S04,click,navigate,S03,,list\nA-S04-003,S04,click,navigate,S02,,topbar\nA-S04-004,S04,question.opened,mutate,,,\nA-S04-005,S04,question.answered,mutate,,,\nA-S04-006,S04,gateway.unreachable,mutate,,,\nA-M01-001,M01,input,mutate,,,answer_form\nA-M01-002,M01,submit,close_overlay,return_to_invoker,answer.nonEmpty,footer\nA-M01-003,M01,click,close_overlay,return_to_invoker,,footer\nA-M01-004,M01,click,close_overlay,return_to_invoker,,header\nA-M02-001,M02,submit,close_overlay,return_to_invoker,gateway.atMainWorkingTree,footer\nA-M02-002,M02,click,close_overlay,return_to_invoker,,footer\nA-M02-003,M02,click,close_overlay,return_to_invoker,,header\nA-M03-001,M03,input,mutate,,,form\nA-M03-002,M03,submit,close_overlay,return_to_invoker,description.nonEmpty,footer\nA-M03-003,M03,click,close_overlay,return_to_invoker,,footer\nA-M03-004,M03,click,close_overlay,return_to_invoker,,header\nA-C01-001,C01,click,emit_event,,,quick_actions"
+      },
+      "sourceShownText": "id,from,trigger,action,target,guard,region\nA-S01-001,S01,input,mutate,,,form\nA-S01-002,S01,submit,navigate,S02,token.nonEmpty,form\nA-S02-001,S02,click,navigate,S03,,board\nA-S02-002,S02,click,open_overlay,M03,,controls\nA-S02-003,S02,click,mutate,,,board\nA-S02-004,S02,change,mutate,,,controls\nA-S02-005,S02,change,mutate,,,controls\nA-S02-006,S02,click,navigate,S04,,needs_answer_rail\nA-S02-007,S02,change,mutate,,,topbar\nA-S02-008,S02,work.changed,mutate,,,\nA-S02-009,S02,question.opened,mutate,,,\nA-S02-010,S02,gateway.unreachable,mutate,,,\nA-S02-011,S02,item.quick_action,mutate,,,\nA-S03-001,S03,click,open_overlay,M01,item.isParked,question\nA-S03-002,S03,click,open_overlay,M02,item.awaitingApproval && gateway.atMainWorkingTree,actions\nA-S03-003,S03,click,open_overlay,M03,,actions\nA-S03-004,S03,click,mutate,,,context\nA-S03-005,S03,click,navigate,S02,,topbar\nA-S03-006,S03,click,mutate,,,timeline\nA-S03-007,S03,work.changed,mutate,,,\nA-S03-008,S03,question.answered,mutate,,,\nA-S03-009,S03,merge.settled,mutate,,,\nA-S03-010,S03,gateway.unreachable,mutate,,,\nA-S03-011,S03,item.quick_action,mutate,,,\nA-S04-001,S04,click,open_overlay,M01,,list\nA-S04-002,S04,click,navigate,S03,,list\nA-S04-003,S04,click,navigate,S02,,topbar\nA-S04-004,S04,question.opened,mutate,,,\nA-S04-005,S04,question.answered,mutate,,,\nA-S04-006,S04,gateway.unreachable,mutate,,,\nA-M01-001,M01,input,mutate,,,answer_form\nA-M01-002,M01,submit,close_overlay,return_to_invoker,answer.nonEmpty,footer\nA-M01-003,M01,click,close_overlay,return_to_invoker,,footer\nA-M01-004,M01,click,close_overlay,return_to_invoker,,header\nA-M02-001,M02,submit,close_overlay,return_to_invoker,gateway.atMainWorkingTree,footer\nA-M02-002,M02,click,close_overlay,return_to_invoker,,footer\nA-M02-003,M02,click,close_overlay,return_to_invoker,,header\nA-M03-001,M03,input,mutate,,,form\nA-M03-002,M03,submit,close_overlay,return_to_invoker,description.nonEmpty,footer\nA-M03-003,M03,click,close_overlay,return_to_invoker,,footer\nA-M03-004,M03,click,close_overlay,return_to_invoker,,header\nA-C01-001,C01,click,emit_event,,,quick_actions",
+      "sourceDigest": "9061f86a22a4aa7506e627c8bf2decf3ccdb5b75cf88f2382481851b1d5a02bc",
+      "targetPath": null,
+      "targetAnchor": null,
+      "target": null,
+      "targetShownText": null,
+      "targetDigest": null,
+      "classification": "Judgment",
+      "mandatoryDeep": true,
+      "decision": {
+        "claimId": "claim_7d55d8b906459068668dbd17eca9a793",
+        "sourceUnitDigest": "9061f86a22a4aa7506e627c8bf2decf3ccdb5b75cf88f2382481851b1d5a02bc",
+        "targetOwner": null,
+        "targetAnchor": null,
+        "claimKind": "specification",
+        "disposition": "regenerate-from-source",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "docs/ui-spec/generated/action-registry.csv#file-block (1-44) is a declared generated projection unit. Declared ui-spec build output remains at its legacy path; regenerate using .claude/skills/ui-spec/tools/build.mjs and interpret-wireframe.mjs against docs/ui-spec. No candidate snapshot or candidate carrier is created. A9/N1 and constitution section 4 override this file's frozen history/place-verbatim map row. Preserve the existing output bytes; no candidate copy, owner, anchor or current freshness approval is asserted."
+      }
+    }
+  ]
+}

@@ -1,0 +1,1379 @@
+{
+  "version": 1,
+  "contentCommit": "1276467f37a99d19aff05808d42fafbf40341449",
+  "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+  "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+  "sourcePath": "docs/ui-spec/screens/S02-taskboard.md",
+  "part": 1,
+  "parts": 1,
+  "count": 20,
+  "classes": {
+    "Unit-exact": [
+      "claim_a7fe7d3eb849b053ed9e0649f9ccfa87",
+      "claim_605e72f3a6df29f642a1f45962d051ff",
+      "claim_6a5a28e29d2e65708f5f17fef23e8ef0",
+      "claim_6c49dcd927215fbd7baede5222cf1ab5",
+      "claim_8f3f773ca083b9fa8272988d07965164",
+      "claim_369a407225765e238efb7a418e0a44a5",
+      "claim_d30db7db84e70167a04fe1c5fb39a4e5",
+      "claim_38f435fc7cb64228e37d157820f6222c",
+      "claim_2cc8f26dc0394eb2b7b92cc169beb784",
+      "claim_66dc01994689c5fb630f56fdb1180788",
+      "claim_16ece324dc00b79759255e4acb8435ae",
+      "claim_6cd22f67c65c9cc4aa70c160cababb24",
+      "claim_9fe8558f49b4210f3268eaa0a158d8ee",
+      "claim_6c75a8d85b8232cfedf1ae86a7eda90a",
+      "claim_47dd03576e4ae838330cee0a1a15e4bd"
+    ],
+    "Weak-exact": [
+      "claim_e9363bc06e8f7f4b941bf74ea143ff6e",
+      "claim_a3568914bacae6331716fa11beabe655",
+      "claim_1ed9286862955b20a1067b2ba1f9de9e",
+      "claim_695d51475befe3701ccb1b7d9570db36"
+    ],
+    "Judgment": [
+      "claim_1526b583a680ad5f2b907a7b5da02ad1"
+    ]
+  },
+  "unequalDigestPairs": [
+    "claim_1526b583a680ad5f2b907a7b5da02ad1"
+  ],
+  "noTargetGeneratedRows": [],
+  "mandatoryDeep": [
+    "claim_1526b583a680ad5f2b907a7b5da02ad1"
+  ],
+  "reviewerSeedRequired": true,
+  "minimumSeededWeakJudgment": 5,
+  "rows": [
+    {
+      "claimId": "claim_a7fe7d3eb849b053ed9e0649f9ccfa87",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S02-taskboard.md",
+      "sourceAnchor": "unheaded-block-1",
+      "source": {
+        "unitKind": "unheaded-preamble",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded preamble",
+        "startLine": 1,
+        "endLine": 11,
+        "textDigest": "e8291716ea7a09bddc4a88d8afb788b8eabc0c6a4fdea6b026f41b0f6936ab32",
+        "sample": "---\nid: S02\ntype: screen\nname: \"Taskboard\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R1, R5, R11]\nregions: [topbar, controls, board, needs_answer",
+        "identityFingerprint": "89487c7d267b9caca9820ed19f96f2a06b9077a316bf156ff9141f1a3a11891a",
+        "ancestry": [],
+        "text": "---\nid: S02\ntype: screen\nname: \"Taskboard\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R1, R5, R11]\nregions: [topbar, controls, board, needs_answer_rail]\n---"
+      },
+      "sourceShownText": "---\nid: S02\ntype: screen\nname: \"Taskboard\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R1, R5, R11]\nregions: [topbar, controls, board, needs_answer_rail]\n---",
+      "sourceDigest": "e8291716ea7a09bddc4a88d8afb788b8eabc0c6a4fdea6b026f41b0f6936ab32",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "targetAnchor": "unheaded-block-1",
+      "target": {
+        "unitKind": "unheaded-preamble",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded preamble",
+        "startLine": 1,
+        "endLine": 11,
+        "textDigest": "e8291716ea7a09bddc4a88d8afb788b8eabc0c6a4fdea6b026f41b0f6936ab32",
+        "sample": "---\nid: S02\ntype: screen\nname: \"Taskboard\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R1, R5, R11]\nregions: [topbar, controls, board, needs_answer",
+        "identityFingerprint": "89487c7d267b9caca9820ed19f96f2a06b9077a316bf156ff9141f1a3a11891a",
+        "ancestry": [],
+        "text": "---\nid: S02\ntype: screen\nname: \"Taskboard\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R1, R5, R11]\nregions: [topbar, controls, board, needs_answer_rail]\n---"
+      },
+      "targetShownText": "---\nid: S02\ntype: screen\nname: \"Taskboard\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R1, R5, R11]\nregions: [topbar, controls, board, needs_answer_rail]\n---",
+      "targetDigest": "e8291716ea7a09bddc4a88d8afb788b8eabc0c6a4fdea6b026f41b0f6936ab32",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_a7fe7d3eb849b053ed9e0649f9ccfa87",
+        "sourceUnitDigest": "e8291716ea7a09bddc4a88d8afb788b8eabc0c6a4fdea6b026f41b0f6936ab32",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+        "targetAnchor": "unheaded-block-1",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-preamble unit docs/ui-spec/screens/S02-taskboard.md#unheaded-block-1 (source lines 1-11) is carried at docs/platform/ui-spec/architecture/screens/S02-taskboard.md#unheaded-block-1 (candidate lines 1-11). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S02-taskboard.md verbatim in docs/platform/ui-spec/architecture/screens/S02-taskboard.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "e8291716ea7a09bddc4a88d8afb788b8eabc0c6a4fdea6b026f41b0f6936ab32",
+        "targetAncestry": []
+      }
+    },
+    {
+      "claimId": "claim_1526b583a680ad5f2b907a7b5da02ad1",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S02-taskboard.md",
+      "sourceAnchor": "s02-taskboard",
+      "source": {
+        "unitKind": "heading",
+        "level": 1,
+        "title": "S02 — Taskboard",
+        "anchor": "s02-taskboard",
+        "githubAnchor": "s02-taskboard",
+        "stableAnchor": "h-53b03d682966",
+        "startLine": 13,
+        "endLine": 13,
+        "textDigest": "b03e9d3fd049f6c76ae6d22d6aca9593f1bb2aeb6f8380bf63f6e8486ff139eb",
+        "sample": "S02 — Taskboard",
+        "sectionPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "followingBlockDigest": null,
+        "identityFingerprint": "14d975ef0e5b68ff075956b872ee3457ae7c887c1407b8d7d2db47b460ba75a0",
+        "ancestry": [],
+        "text": "# S02 — Taskboard",
+        "sectionText": "# S02 — Taskboard"
+      },
+      "sourceShownText": "# S02 — Taskboard",
+      "sourceDigest": "b03e9d3fd049f6c76ae6d22d6aca9593f1bb2aeb6f8380bf63f6e8486ff139eb",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "targetAnchor": "s02-taskboard",
+      "target": {
+        "unitKind": "heading",
+        "level": 1,
+        "title": "S02 — Taskboard",
+        "anchor": "s02-taskboard",
+        "githubAnchor": "s02-taskboard",
+        "stableAnchor": "h-53b03d682966",
+        "startLine": 13,
+        "endLine": 13,
+        "textDigest": "61e519c98077e79b1747ee49f4e236db58a523d35f2d053499b7f05898a3ca8a",
+        "sample": "S02 — Taskboard",
+        "sectionPayloadDigest": "09f1fa6be5462c8a4c2ee8f5d13a50f1c26e835e1d465c2eebe299dab2394220",
+        "followingBlockDigest": "e5f00999d045638f3bccf3def0dccee4bbb3e2ff756f79e3e3f5bb31fc20facd",
+        "identityFingerprint": "46d65b5b5e1d5cffbc53a2446c7608d65b475ee9cb500225bb9729b17ca6ee74",
+        "ancestry": [],
+        "text": "# S02 — Taskboard",
+        "sectionText": "# S02 — Taskboard\n\n```txt\nDocument type: Architecture\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve mapped legacy content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; current implementation truth is not certified\nProvenance: docs/ui-spec/screens/S02-taskboard.md at 111adc51fd047d99121fd9d076eb4794c87045a4\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing carriage, placement and source conservation\nDo not use this for: Current canonical authority or implemented-behavior proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/ui-spec/screens/S02-taskboard.md\nSupersedes: None; candidate only\nSuperseded by: None\n```\n\n> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions."
+      },
+      "targetShownText": "# S02 — Taskboard\n\n```txt\nDocument type: Architecture\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve mapped legacy content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; current implementation truth is not certified\nProvenance: docs/ui-spec/screens/S02-taskboard.md at 111adc51fd047d99121fd9d076eb4794c87045a4\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing carriage, placement and source conservation\nDo not use this for: Current canonical authority or implemented-behavior proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/ui-spec/screens/S02-taskboard.md\nSupersedes: None; candidate only\nSuperseded by: None\n```\n\n> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions.",
+      "targetDigest": "61e519c98077e79b1747ee49f4e236db58a523d35f2d053499b7f05898a3ca8a",
+      "classification": "Judgment",
+      "mandatoryDeep": true,
+      "decision": {
+        "claimId": "claim_1526b583a680ad5f2b907a7b5da02ad1",
+        "sourceUnitDigest": "b03e9d3fd049f6c76ae6d22d6aca9593f1bb2aeb6f8380bf63f6e8486ff139eb",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+        "targetAnchor": "s02-taskboard",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Judgment: no target digest match. The whole heading unit docs/ui-spec/screens/S02-taskboard.md#s02-taskboard (source lines 13-13) is carried at docs/platform/ui-spec/architecture/screens/S02-taskboard.md#s02-taskboard (candidate lines 13-13). The heading section digest changes because labelled candidate metadata is inserted after the original H1; original heading and direct source payload remain verbatim. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S02-taskboard.md verbatim in docs/platform/ui-spec/architecture/screens/S02-taskboard.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "61e519c98077e79b1747ee49f4e236db58a523d35f2d053499b7f05898a3ca8a",
+        "targetAncestry": []
+      }
+    },
+    {
+      "claimId": "claim_e9363bc06e8f7f4b941bf74ea143ff6e",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S02-taskboard.md",
+      "sourceAnchor": "purpose",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Purpose",
+        "anchor": "purpose",
+        "githubAnchor": "purpose",
+        "stableAnchor": "h-2f4fe421d538",
+        "startLine": 15,
+        "endLine": 15,
+        "textDigest": "a6348ae6ccac163f26dc71670713e17a2fd89825093716c6cbbd9c3b9683828d",
+        "sample": "Purpose",
+        "sectionPayloadDigest": "ed060630087f250a66782c7a9a2873ee62a2642ce51691d05ec26e266d9fda0f",
+        "followingBlockDigest": "de8dfe32ef6f9e54cbc969902056ccde6751597aa532a45ef0fa6c510d3fa925",
+        "identityFingerprint": "560fa2fa4d5c06e927f27bb6975dbec82cfba6850d250990d0c668e1906b7242",
+        "ancestry": [
+          "S02 — Taskboard"
+        ],
+        "text": "## Purpose",
+        "sectionText": "## Purpose\n\nThe landing surface after sign-in, and the way to reach everything else.\nThe area spec is explicit that this is **a board, not a flat table**, with\nMonday.com/ClickUp as the reference: items grouped by status, state\nlegible at a glance, quick actions in place, and controls to filter and\nregroup (`docs/specs/herdr-web-dashboard.md` §View the taskboard).\n\nThat reference is not decoration. The thing this whole cluster is for is a\nperson opening their phone and finding out, in one look, whether anything\nneeds them. A flat table makes that a reading exercise; a grouped board\nwith coloured status makes it a glance."
+      },
+      "sourceShownText": "## Purpose\n\nThe landing surface after sign-in, and the way to reach everything else.\nThe area spec is explicit that this is **a board, not a flat table**, with\nMonday.com/ClickUp as the reference: items grouped by status, state\nlegible at a glance, quick actions in place, and controls to filter and\nregroup (`docs/specs/herdr-web-dashboard.md` §View the taskboard).\n\nThat reference is not decoration. The thing this whole cluster is for is a\nperson opening their phone and finding out, in one look, whether anything\nneeds them. A flat table makes that a reading exercise; a grouped board\nwith coloured status makes it a glance.",
+      "sourceDigest": "a6348ae6ccac163f26dc71670713e17a2fd89825093716c6cbbd9c3b9683828d",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "targetAnchor": "purpose",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Purpose",
+        "anchor": "purpose",
+        "githubAnchor": "purpose",
+        "stableAnchor": "h-15cea22a442e",
+        "startLine": 37,
+        "endLine": 37,
+        "textDigest": "a6348ae6ccac163f26dc71670713e17a2fd89825093716c6cbbd9c3b9683828d",
+        "sample": "Purpose",
+        "sectionPayloadDigest": "ed060630087f250a66782c7a9a2873ee62a2642ce51691d05ec26e266d9fda0f",
+        "followingBlockDigest": "de8dfe32ef6f9e54cbc969902056ccde6751597aa532a45ef0fa6c510d3fa925",
+        "identityFingerprint": "560fa2fa4d5c06e927f27bb6975dbec82cfba6850d250990d0c668e1906b7242",
+        "ancestry": [
+          "S02 — Taskboard"
+        ],
+        "text": "## Purpose",
+        "sectionText": "## Purpose\n\nThe landing surface after sign-in, and the way to reach everything else.\nThe area spec is explicit that this is **a board, not a flat table**, with\nMonday.com/ClickUp as the reference: items grouped by status, state\nlegible at a glance, quick actions in place, and controls to filter and\nregroup (`docs/specs/herdr-web-dashboard.md` §View the taskboard).\n\nThat reference is not decoration. The thing this whole cluster is for is a\nperson opening their phone and finding out, in one look, whether anything\nneeds them. A flat table makes that a reading exercise; a grouped board\nwith coloured status makes it a glance."
+      },
+      "targetShownText": "## Purpose\n\nThe landing surface after sign-in, and the way to reach everything else.\nThe area spec is explicit that this is **a board, not a flat table**, with\nMonday.com/ClickUp as the reference: items grouped by status, state\nlegible at a glance, quick actions in place, and controls to filter and\nregroup (`docs/specs/herdr-web-dashboard.md` §View the taskboard).\n\nThat reference is not decoration. The thing this whole cluster is for is a\nperson opening their phone and finding out, in one look, whether anything\nneeds them. A flat table makes that a reading exercise; a grouped board\nwith coloured status makes it a glance.",
+      "targetDigest": "a6348ae6ccac163f26dc71670713e17a2fd89825093716c6cbbd9c3b9683828d",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_e9363bc06e8f7f4b941bf74ea143ff6e",
+        "sourceUnitDigest": "a6348ae6ccac163f26dc71670713e17a2fd89825093716c6cbbd9c3b9683828d",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+        "targetAnchor": "purpose",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/ui-spec/screens/S02-taskboard.md#purpose (source lines 15-15) is carried at docs/platform/ui-spec/architecture/screens/S02-taskboard.md#purpose (candidate lines 37-37). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S02-taskboard.md verbatim in docs/platform/ui-spec/architecture/screens/S02-taskboard.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "a6348ae6ccac163f26dc71670713e17a2fd89825093716c6cbbd9c3b9683828d",
+        "targetAncestry": [
+          "S02 — Taskboard"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_605e72f3a6df29f642a1f45962d051ff",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S02-taskboard.md",
+      "sourceAnchor": "unheaded-block-2",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-2",
+        "githubAnchor": "unheaded-block-2",
+        "stableAnchor": "unheaded-block-2",
+        "title": "Unheaded block 2",
+        "startLine": 17,
+        "endLine": 21,
+        "textDigest": "de8dfe32ef6f9e54cbc969902056ccde6751597aa532a45ef0fa6c510d3fa925",
+        "sample": "The landing surface after sign-in, and the way to reach everything else.\nThe area spec is explicit that this is **a board, not a flat table**, with\nMonday.com/ClickUp as the refere",
+        "identityFingerprint": "1d64cd0b9ba630093a0df481683d85466c7cc249a6efad9da49be3a6a51bff86",
+        "ancestry": [
+          "S02 — Taskboard",
+          "Purpose"
+        ],
+        "text": "The landing surface after sign-in, and the way to reach everything else.\nThe area spec is explicit that this is **a board, not a flat table**, with\nMonday.com/ClickUp as the reference: items grouped by status, state\nlegible at a glance, quick actions in place, and controls to filter and\nregroup (`docs/specs/herdr-web-dashboard.md` §View the taskboard)."
+      },
+      "sourceShownText": "The landing surface after sign-in, and the way to reach everything else.\nThe area spec is explicit that this is **a board, not a flat table**, with\nMonday.com/ClickUp as the reference: items grouped by status, state\nlegible at a glance, quick actions in place, and controls to filter and\nregroup (`docs/specs/herdr-web-dashboard.md` §View the taskboard).",
+      "sourceDigest": "de8dfe32ef6f9e54cbc969902056ccde6751597aa532a45ef0fa6c510d3fa925",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "targetAnchor": "unheaded-block-4",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 39,
+        "endLine": 43,
+        "textDigest": "de8dfe32ef6f9e54cbc969902056ccde6751597aa532a45ef0fa6c510d3fa925",
+        "sample": "The landing surface after sign-in, and the way to reach everything else.\nThe area spec is explicit that this is **a board, not a flat table**, with\nMonday.com/ClickUp as the refere",
+        "identityFingerprint": "1d64cd0b9ba630093a0df481683d85466c7cc249a6efad9da49be3a6a51bff86",
+        "ancestry": [
+          "S02 — Taskboard",
+          "Purpose"
+        ],
+        "text": "The landing surface after sign-in, and the way to reach everything else.\nThe area spec is explicit that this is **a board, not a flat table**, with\nMonday.com/ClickUp as the reference: items grouped by status, state\nlegible at a glance, quick actions in place, and controls to filter and\nregroup (`docs/specs/herdr-web-dashboard.md` §View the taskboard)."
+      },
+      "targetShownText": "The landing surface after sign-in, and the way to reach everything else.\nThe area spec is explicit that this is **a board, not a flat table**, with\nMonday.com/ClickUp as the reference: items grouped by status, state\nlegible at a glance, quick actions in place, and controls to filter and\nregroup (`docs/specs/herdr-web-dashboard.md` §View the taskboard).",
+      "targetDigest": "de8dfe32ef6f9e54cbc969902056ccde6751597aa532a45ef0fa6c510d3fa925",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_605e72f3a6df29f642a1f45962d051ff",
+        "sourceUnitDigest": "de8dfe32ef6f9e54cbc969902056ccde6751597aa532a45ef0fa6c510d3fa925",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+        "targetAnchor": "unheaded-block-4",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/screens/S02-taskboard.md#unheaded-block-2 (source lines 17-21) is carried at docs/platform/ui-spec/architecture/screens/S02-taskboard.md#unheaded-block-4 (candidate lines 39-43). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S02-taskboard.md verbatim in docs/platform/ui-spec/architecture/screens/S02-taskboard.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "de8dfe32ef6f9e54cbc969902056ccde6751597aa532a45ef0fa6c510d3fa925",
+        "targetAncestry": [
+          "S02 — Taskboard",
+          "Purpose"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_6a5a28e29d2e65708f5f17fef23e8ef0",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S02-taskboard.md",
+      "sourceAnchor": "unheaded-block-3",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 23,
+        "endLine": 26,
+        "textDigest": "29fbb9af60bb2b881536741d9039a846bd2489688d77201bafd9167c567e2665",
+        "sample": "That reference is not decoration. The thing this whole cluster is for is a\nperson opening their phone and finding out, in one look, whether anything\nneeds them. A flat table makes ",
+        "identityFingerprint": "869c5737a7ac626cf970c98d27216efe23fae03b14bae3930a4505a6d8830986",
+        "ancestry": [
+          "S02 — Taskboard",
+          "Purpose"
+        ],
+        "text": "That reference is not decoration. The thing this whole cluster is for is a\nperson opening their phone and finding out, in one look, whether anything\nneeds them. A flat table makes that a reading exercise; a grouped board\nwith coloured status makes it a glance."
+      },
+      "sourceShownText": "That reference is not decoration. The thing this whole cluster is for is a\nperson opening their phone and finding out, in one look, whether anything\nneeds them. A flat table makes that a reading exercise; a grouped board\nwith coloured status makes it a glance.",
+      "sourceDigest": "29fbb9af60bb2b881536741d9039a846bd2489688d77201bafd9167c567e2665",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "targetAnchor": "unheaded-block-5",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 45,
+        "endLine": 48,
+        "textDigest": "29fbb9af60bb2b881536741d9039a846bd2489688d77201bafd9167c567e2665",
+        "sample": "That reference is not decoration. The thing this whole cluster is for is a\nperson opening their phone and finding out, in one look, whether anything\nneeds them. A flat table makes ",
+        "identityFingerprint": "869c5737a7ac626cf970c98d27216efe23fae03b14bae3930a4505a6d8830986",
+        "ancestry": [
+          "S02 — Taskboard",
+          "Purpose"
+        ],
+        "text": "That reference is not decoration. The thing this whole cluster is for is a\nperson opening their phone and finding out, in one look, whether anything\nneeds them. A flat table makes that a reading exercise; a grouped board\nwith coloured status makes it a glance."
+      },
+      "targetShownText": "That reference is not decoration. The thing this whole cluster is for is a\nperson opening their phone and finding out, in one look, whether anything\nneeds them. A flat table makes that a reading exercise; a grouped board\nwith coloured status makes it a glance.",
+      "targetDigest": "29fbb9af60bb2b881536741d9039a846bd2489688d77201bafd9167c567e2665",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_6a5a28e29d2e65708f5f17fef23e8ef0",
+        "sourceUnitDigest": "29fbb9af60bb2b881536741d9039a846bd2489688d77201bafd9167c567e2665",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+        "targetAnchor": "unheaded-block-5",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/screens/S02-taskboard.md#unheaded-block-3 (source lines 23-26) is carried at docs/platform/ui-spec/architecture/screens/S02-taskboard.md#unheaded-block-5 (candidate lines 45-48). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S02-taskboard.md verbatim in docs/platform/ui-spec/architecture/screens/S02-taskboard.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "29fbb9af60bb2b881536741d9039a846bd2489688d77201bafd9167c567e2665",
+        "targetAncestry": [
+          "S02 — Taskboard",
+          "Purpose"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_a3568914bacae6331716fa11beabe655",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S02-taskboard.md",
+      "sourceAnchor": "layout",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Layout",
+        "anchor": "layout",
+        "githubAnchor": "layout",
+        "stableAnchor": "h-145b0b7392e8",
+        "startLine": 28,
+        "endLine": 28,
+        "textDigest": "4d0bf2c9e7d751d20034f938f244eb1ca5730b7473398737c9d3d150780e908e",
+        "sample": "Layout",
+        "sectionPayloadDigest": "dd8716133c35ca4c47beb1d9411063911db2feddbf017568bead069fedd94184",
+        "followingBlockDigest": "92d5bb85b24a6afb40d5a3307f5ec307c29432af7ae1e8d96917e851e4f42559",
+        "identityFingerprint": "36bc5fdb83099a687c24384cdf49fb363b53033a38cb5bd04746bafa1aebb248",
+        "ancestry": [
+          "S02 — Taskboard"
+        ],
+        "text": "## Layout",
+        "sectionText": "## Layout\n\nDesktop offers **two board views of the same underlying grouped data** —\na person picks whichever reading suits the moment, and the choice is\nremembered (D16, `docs/history/herdr-web-dashboard/CONTEXT.md`). Neither\nview is a separate screen; both read the same `GET /work` grouped-by-status\ndata, they only differ in how that grouping renders.\n\n**Group view** (default) — status groups stacked vertically, each\ncollapsible, with the \"needs answer\" rail pinned right so the one urgent\ncategory is never scrolled past. Best for triage: scan every group's count\nwithout horizontal scanning.\n\n```\n┌ TOPBAR ────────────────────────────────────────────────────────────────┐\n│ herdr   [project ▾]  [gateway: dev-box ▾]      ⚠ reachable on network  │\n├ CONTROLS ──────────────────────────────────────────────────────────────┤\n│ [search…]  Group by: [Status ▾]  Filter: [Stage ▾][Risk ▾]  View:[▤ ▥]  [+ Add] │\n├ BOARD ──────────────────────────────────┬ NEEDS ANSWER ────────────────┤\n│                                         │                              │\n│ ▾ NEEDS ANSWER · 2          ● amber     │  tsk-4id                     │\n│  ┌────────────────────────────────────┐ │  \"Which pairing key…\"        │\n│  │ tsk-4id  Task detail pairing    ⋯ │ │  parked 2h ago               │\n│  │ ● awaiting-human · executing      │ │  [ Answer ]                  │\n│  └────────────────────────────────────┘ │                              │\n│  ┌────────────────────────────────────┐ │  tsk-k4v                     │\n│  │ tsk-k4v  Webserver core         ⋯ │ │  gate: validateApprove       │\n│  │ ● awaiting-approval · executing   │ │  [ Review ]                  │\n│  └────────────────────────────────────┘ │                              │\n│                                         │                              │\n│ ▾ IN PROGRESS · 3           ● blue      │                              │\n│  ┌────────────────────────────────────┐ │                              │\n│  │ tsk-5jr  Taskboard              ⋯ │ │                              │\n│  │ ● doing · executing               │ │                              │\n│  └────────────────────────────────────┘ │                              │\n│                                         │                              │\n│ ▸ TODO · 11                 ● slate     │                              │\n│ ▸ DONE · 48                 ● green     │                              │\n└─────────────────────────────────────────┴──────────────────────────────┘\n```\n\n**Kanban view** — the same groups as side-by-side columns, each with its\nown colored header bar; cards move by drag or by the same `⋯` quick-action\nmenu group view uses. Best for working a single group's queue left-to-right\nwithout collapsing everything else. The \"needs answer\" rail still pins\nright, unchanged, because A-S02-006's target (S04) does not depend on\nwhich board view is active.\n\n```\n┌ TOPBAR ────────────────────────────────────────────────────────────────┐\n│ herdr   [project ▾]  [gateway: dev-box ▾]      ⚠ reachable on network  │\n├ CONTROLS ──────────────────────────────────────────────────────────────┤\n│ [search…]  Group by: [Status ▾]  Filter: [Stage ▾][Risk ▾]  View:[▤ ▥]  [+ Add] │\n├ BOARD (kanban) ─────────────────────────────────────────┬ NEEDS ANSWER ┤\n│ ●AMBER        │ ●BLUE          │ ●SLATE      │ ●GREEN   │              │\n│ NEEDS ANSWER·2│ IN PROGRESS·3  │ TODO·11     │ DONE·48  │  tsk-4id     │\n│ ┌───────────┐ │ ┌────────────┐ │ ┌─────────┐ │          │  \"Which…\"    │\n│ │ tsk-4id ⋯ │ │ │ tsk-5jr  ⋯ │ │ │ ...   ⋯ │ │          │  [ Answer ]  │\n│ │ awaiting- │ │ │ doing ·    │ │ └─────────┘ │          │              │\n│ │ human     │ │ │ executing  │ │ ┌─────────┐ │          │  tsk-k4v     │\n│ └───────────┘ │ └────────────┘ │ │ ...   ⋯ │ │          │  gate: ...   │\n│ ┌───────────┐ │                │ └─────────┘ │          │  [ Review ]  │\n│ │ tsk-k4v ⋯ │ │                │             │          │              │\n│ └───────────┘ │                │             │          │              │\n└────────────────┴────────────────┴─────────────┴──────────┴──────────────┘\n```\n\nMobile always uses group view (kanban's side-by-side columns do not fit a\nphone width) — the rail becomes the first group, because on a phone the\nwhole point is \"does anything need me\":\n\n```\n┌────────────────────────────┐\n│ herdr  [dev-box ▾]   ⚠     │\n│ [search…]      [Filter ▾]  │\n├────────────────────────────┤\n│ ▾ NEEDS ANSWER · 2   ●     │\n│ ┌────────────────────────┐ │\n│ │ tsk-4id             ⋯ │ │\n│ │ Task detail pairing    │ │\n│ │ ● awaiting-human       │ │\n│ │ [ Answer ]             │ │\n│ └────────────────────────┘ │\n│ ▸ IN PROGRESS · 3    ●     │\n│ ▸ TODO · 11          ●     │\n└────────────────────────────┘\n```\n\nFour layout decisions worth stating, because each one is load-bearing:\n\n- **Groups are collapsible and remember their state.** `DONE · 48` is\n  noise on a phone; it collapses and stays collapsed.\n- **The exposure indicator lives in the topbar, always.** R5 says the\n  surface is on by default and reachable beyond loopback. That is a\n  standing fact about this deployment, so it gets a standing indicator,\n  never a dismissable toast.\n- **The gateway picker is in the topbar too**, because R1 forbids\n  assuming one fixed origin, and a person aggregating several machines\n  needs to know which one they are looking at before they read a number.\n- **Group view and kanban view are the same data, two renderings** (D16).\n  The toggle lives in CONTROLS next to Group by, not in the topbar — it is\n  a reading preference, not deployment state like the exposure indicator.\n  Desktop only; a phone always gets group view (side-by-side columns do\n  not fit)."
+      },
+      "sourceShownText": "## Layout\n\nDesktop offers **two board views of the same underlying grouped data** —\na person picks whichever reading suits the moment, and the choice is\nremembered (D16, `docs/history/herdr-web-dashboard/CONTEXT.md`). Neither\nview is a separate screen; both read the same `GET /work` grouped-by-status\ndata, they only differ in how that grouping renders.\n\n**Group view** (default) — status groups stacked vertically, each\ncollapsible, with the \"needs answer\" rail pinned right so the one urgent\ncategory is never scrolled past. Best for triage: scan every group's count\nwithout horizontal scanning.\n\n```\n┌ TOPBAR ────────────────────────────────────────────────────────────────┐\n│ herdr   [project ▾]  [gateway: dev-box ▾]      ⚠ reachable on network  │\n├ CONTROLS ──────────────────────────────────────────────────────────────┤\n│ [search…]  Group by: [Status ▾]  Filter: [Stage ▾][Risk ▾]  View:[▤ ▥]  [+ Add] │\n├ BOARD ──────────────────────────────────┬ NEEDS ANSWER ────────────────┤\n│                                         │                              │\n│ ▾ NEEDS ANSWER · 2          ● amber     │  tsk-4id                     │\n│  ┌────────────────────────────────────┐ │  \"Which pairing key…\"        │\n│  │ tsk-4id  Task detail pairing    ⋯ │ │  parked 2h ago               │\n│  │ ● awaiting-human · executing      │ │  [ Answer ]                  │\n│  └────────────────────────────────────┘ │                              │\n│  ┌────────────────────────────────────┐ │  tsk-k4v                     │\n│  │ tsk-k4v  Webserver core         ⋯ │ │  gate: validateApprove       │\n│  │ ● awaiting-approval · executing   │ │  [ Review ]                  │\n│  └────────────────────────────────────┘ │                              │\n│                                         │                              │\n│ ▾ IN PROGRESS · 3           ● blue      │                              │\n│  ┌────────────────────────────────────┐ │                              │\n│  │ tsk-5jr  Taskboard              ⋯ │ │                              │\n│  │ ● doing · executing               │ │                              │\n│  └────────────────────────────────────┘ │                              │\n│                                         │                              │\n│ ▸ TODO · 11                 ● slate     │                              │\n│ ▸ DONE · 48                 ● green     │                              │\n└─────────────────────────────────────────┴──────────────────────────────┘\n```\n\n**Kanban view** — the same groups as side-by-side columns, each with its\nown colored header bar; cards move by drag or by the same `⋯` quick-action\nmenu group view uses. Best for working a single group's queue left-to-right\nwithout collapsing everything else. The \"needs answer\" rail still pins\nright, unchanged, because A-S02-006's target (S04) does not depend on\nwhich board view is active.\n\n```\n┌ TOPBAR ────────────────────────────────────────────────────────────────┐\n│ herdr   [project ▾]  [gateway: dev-box ▾]      ⚠ reachable on network  │\n├ CONTROLS ──────────────────────────────────────────────────────────────┤\n│ [search…]  Group by: [Status ▾]  Filter: [Stage ▾][Risk ▾]  View:[▤ ▥]  [+ Add] │\n├ BOARD (kanban) ─────────────────────────────────────────┬ NEEDS ANSWER ┤\n│ ●AMBER        │ ●BLUE          │ ●SLATE      │ ●GREEN   │              │\n│ NEEDS ANSWER·2│ IN PROGRESS·3  │ TODO·11     │ DONE·48  │  tsk-4id     │\n│ ┌───────────┐ │ ┌────────────┐ │ ┌─────────┐ │          │  \"Which…\"    │\n│ │ tsk-4id ⋯ │ │ │ tsk-5jr  ⋯ │ │ │ ...   ⋯ │ │          │  [ Answer ]  │\n│ │ awaiting- │ │ │ doing ·    │ │ └─────────┘ │          │              │\n│ │ human     │ │ │ executing  │ │ ┌─────────┐ │          │  tsk-k4v     │\n│ └───────────┘ │ └────────────┘ │ │ ...   ⋯ │ │          │  gate: ...   │\n│ ┌───────────┐ │                │ └─────────┘ │          │  [ Review ]  │\n│ │ tsk-k4v ⋯ │ │                │             │          │              │\n│ └───────────┘ │                │             │          │              │\n└────────────────┴────────────────┴─────────────┴──────────┴──────────────┘\n```\n\nMobile always uses group view (kanban's side-by-side columns do not fit a\nphone width) — the rail becomes the first group, because on a phone the\nwhole point is \"does anything need me\":\n\n```\n┌────────────────────────────┐\n│ herdr  [dev-box ▾]   ⚠     │\n│ [search…]      [Filter ▾]  │\n├────────────────────────────┤\n│ ▾ NEEDS ANSWER · 2   ●     │\n│ ┌────────────────────────┐ │\n│ │ tsk-4id             ⋯ │ │\n│ │ Task detail pairing    │ │\n│ │ ● awaiting-human       │ │\n│ │ [ Answer ]             │ │\n│ └────────────────────────┘ │\n│ ▸ IN PROGRESS · 3    ●     │\n│ ▸ TODO · 11          ●     │\n└────────────────────────────┘\n```\n\nFour layout decisions worth stating, because each one is load-bearing:\n\n- **Groups are collapsible and remember their state.** `DONE · 48` is\n  noise on a phone; it collapses and stays collapsed.\n- **The exposure indicator lives in the topbar, always.** R5 says the\n  surface is on by default and reachable beyond loopback. That is a\n  standing fact about this deployment, so it gets a standing indicator,\n  never a dismissable toast.\n- **The gateway picker is in the topbar too**, because R1 forbids\n  assuming one fixed origin, and a person aggregating several machines\n  needs to know which one they are looking at before they read a number.\n- **Group view and kanban view are the same data, two renderings** (D16).\n  The toggle lives in CONTROLS next to Group by, not in the topbar — it is\n  a reading preference, not deployment state like the exposure indicator.\n  Desktop only; a phone always gets group view (side-by-side columns do\n  not fit).",
+      "sourceDigest": "4d0bf2c9e7d751d20034f938f244eb1ca5730b7473398737c9d3d150780e908e",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "targetAnchor": "layout",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Layout",
+        "anchor": "layout",
+        "githubAnchor": "layout",
+        "stableAnchor": "h-e45b3ccb5fef",
+        "startLine": 50,
+        "endLine": 50,
+        "textDigest": "4d0bf2c9e7d751d20034f938f244eb1ca5730b7473398737c9d3d150780e908e",
+        "sample": "Layout",
+        "sectionPayloadDigest": "dd8716133c35ca4c47beb1d9411063911db2feddbf017568bead069fedd94184",
+        "followingBlockDigest": "92d5bb85b24a6afb40d5a3307f5ec307c29432af7ae1e8d96917e851e4f42559",
+        "identityFingerprint": "36bc5fdb83099a687c24384cdf49fb363b53033a38cb5bd04746bafa1aebb248",
+        "ancestry": [
+          "S02 — Taskboard"
+        ],
+        "text": "## Layout",
+        "sectionText": "## Layout\n\nDesktop offers **two board views of the same underlying grouped data** —\na person picks whichever reading suits the moment, and the choice is\nremembered (D16, `docs/history/herdr-web-dashboard/CONTEXT.md`). Neither\nview is a separate screen; both read the same `GET /work` grouped-by-status\ndata, they only differ in how that grouping renders.\n\n**Group view** (default) — status groups stacked vertically, each\ncollapsible, with the \"needs answer\" rail pinned right so the one urgent\ncategory is never scrolled past. Best for triage: scan every group's count\nwithout horizontal scanning.\n\n```\n┌ TOPBAR ────────────────────────────────────────────────────────────────┐\n│ herdr   [project ▾]  [gateway: dev-box ▾]      ⚠ reachable on network  │\n├ CONTROLS ──────────────────────────────────────────────────────────────┤\n│ [search…]  Group by: [Status ▾]  Filter: [Stage ▾][Risk ▾]  View:[▤ ▥]  [+ Add] │\n├ BOARD ──────────────────────────────────┬ NEEDS ANSWER ────────────────┤\n│                                         │                              │\n│ ▾ NEEDS ANSWER · 2          ● amber     │  tsk-4id                     │\n│  ┌────────────────────────────────────┐ │  \"Which pairing key…\"        │\n│  │ tsk-4id  Task detail pairing    ⋯ │ │  parked 2h ago               │\n│  │ ● awaiting-human · executing      │ │  [ Answer ]                  │\n│  └────────────────────────────────────┘ │                              │\n│  ┌────────────────────────────────────┐ │  tsk-k4v                     │\n│  │ tsk-k4v  Webserver core         ⋯ │ │  gate: validateApprove       │\n│  │ ● awaiting-approval · executing   │ │  [ Review ]                  │\n│  └────────────────────────────────────┘ │                              │\n│                                         │                              │\n│ ▾ IN PROGRESS · 3           ● blue      │                              │\n│  ┌────────────────────────────────────┐ │                              │\n│  │ tsk-5jr  Taskboard              ⋯ │ │                              │\n│  │ ● doing · executing               │ │                              │\n│  └────────────────────────────────────┘ │                              │\n│                                         │                              │\n│ ▸ TODO · 11                 ● slate     │                              │\n│ ▸ DONE · 48                 ● green     │                              │\n└─────────────────────────────────────────┴──────────────────────────────┘\n```\n\n**Kanban view** — the same groups as side-by-side columns, each with its\nown colored header bar; cards move by drag or by the same `⋯` quick-action\nmenu group view uses. Best for working a single group's queue left-to-right\nwithout collapsing everything else. The \"needs answer\" rail still pins\nright, unchanged, because A-S02-006's target (S04) does not depend on\nwhich board view is active.\n\n```\n┌ TOPBAR ────────────────────────────────────────────────────────────────┐\n│ herdr   [project ▾]  [gateway: dev-box ▾]      ⚠ reachable on network  │\n├ CONTROLS ──────────────────────────────────────────────────────────────┤\n│ [search…]  Group by: [Status ▾]  Filter: [Stage ▾][Risk ▾]  View:[▤ ▥]  [+ Add] │\n├ BOARD (kanban) ─────────────────────────────────────────┬ NEEDS ANSWER ┤\n│ ●AMBER        │ ●BLUE          │ ●SLATE      │ ●GREEN   │              │\n│ NEEDS ANSWER·2│ IN PROGRESS·3  │ TODO·11     │ DONE·48  │  tsk-4id     │\n│ ┌───────────┐ │ ┌────────────┐ │ ┌─────────┐ │          │  \"Which…\"    │\n│ │ tsk-4id ⋯ │ │ │ tsk-5jr  ⋯ │ │ │ ...   ⋯ │ │          │  [ Answer ]  │\n│ │ awaiting- │ │ │ doing ·    │ │ └─────────┘ │          │              │\n│ │ human     │ │ │ executing  │ │ ┌─────────┐ │          │  tsk-k4v     │\n│ └───────────┘ │ └────────────┘ │ │ ...   ⋯ │ │          │  gate: ...   │\n│ ┌───────────┐ │                │ └─────────┘ │          │  [ Review ]  │\n│ │ tsk-k4v ⋯ │ │                │             │          │              │\n│ └───────────┘ │                │             │          │              │\n└────────────────┴────────────────┴─────────────┴──────────┴──────────────┘\n```\n\nMobile always uses group view (kanban's side-by-side columns do not fit a\nphone width) — the rail becomes the first group, because on a phone the\nwhole point is \"does anything need me\":\n\n```\n┌────────────────────────────┐\n│ herdr  [dev-box ▾]   ⚠     │\n│ [search…]      [Filter ▾]  │\n├────────────────────────────┤\n│ ▾ NEEDS ANSWER · 2   ●     │\n│ ┌────────────────────────┐ │\n│ │ tsk-4id             ⋯ │ │\n│ │ Task detail pairing    │ │\n│ │ ● awaiting-human       │ │\n│ │ [ Answer ]             │ │\n│ └────────────────────────┘ │\n│ ▸ IN PROGRESS · 3    ●     │\n│ ▸ TODO · 11          ●     │\n└────────────────────────────┘\n```\n\nFour layout decisions worth stating, because each one is load-bearing:\n\n- **Groups are collapsible and remember their state.** `DONE · 48` is\n  noise on a phone; it collapses and stays collapsed.\n- **The exposure indicator lives in the topbar, always.** R5 says the\n  surface is on by default and reachable beyond loopback. That is a\n  standing fact about this deployment, so it gets a standing indicator,\n  never a dismissable toast.\n- **The gateway picker is in the topbar too**, because R1 forbids\n  assuming one fixed origin, and a person aggregating several machines\n  needs to know which one they are looking at before they read a number.\n- **Group view and kanban view are the same data, two renderings** (D16).\n  The toggle lives in CONTROLS next to Group by, not in the topbar — it is\n  a reading preference, not deployment state like the exposure indicator.\n  Desktop only; a phone always gets group view (side-by-side columns do\n  not fit)."
+      },
+      "targetShownText": "## Layout\n\nDesktop offers **two board views of the same underlying grouped data** —\na person picks whichever reading suits the moment, and the choice is\nremembered (D16, `docs/history/herdr-web-dashboard/CONTEXT.md`). Neither\nview is a separate screen; both read the same `GET /work` grouped-by-status\ndata, they only differ in how that grouping renders.\n\n**Group view** (default) — status groups stacked vertically, each\ncollapsible, with the \"needs answer\" rail pinned right so the one urgent\ncategory is never scrolled past. Best for triage: scan every group's count\nwithout horizontal scanning.\n\n```\n┌ TOPBAR ────────────────────────────────────────────────────────────────┐\n│ herdr   [project ▾]  [gateway: dev-box ▾]      ⚠ reachable on network  │\n├ CONTROLS ──────────────────────────────────────────────────────────────┤\n│ [search…]  Group by: [Status ▾]  Filter: [Stage ▾][Risk ▾]  View:[▤ ▥]  [+ Add] │\n├ BOARD ──────────────────────────────────┬ NEEDS ANSWER ────────────────┤\n│                                         │                              │\n│ ▾ NEEDS ANSWER · 2          ● amber     │  tsk-4id                     │\n│  ┌────────────────────────────────────┐ │  \"Which pairing key…\"        │\n│  │ tsk-4id  Task detail pairing    ⋯ │ │  parked 2h ago               │\n│  │ ● awaiting-human · executing      │ │  [ Answer ]                  │\n│  └────────────────────────────────────┘ │                              │\n│  ┌────────────────────────────────────┐ │  tsk-k4v                     │\n│  │ tsk-k4v  Webserver core         ⋯ │ │  gate: validateApprove       │\n│  │ ● awaiting-approval · executing   │ │  [ Review ]                  │\n│  └────────────────────────────────────┘ │                              │\n│                                         │                              │\n│ ▾ IN PROGRESS · 3           ● blue      │                              │\n│  ┌────────────────────────────────────┐ │                              │\n│  │ tsk-5jr  Taskboard              ⋯ │ │                              │\n│  │ ● doing · executing               │ │                              │\n│  └────────────────────────────────────┘ │                              │\n│                                         │                              │\n│ ▸ TODO · 11                 ● slate     │                              │\n│ ▸ DONE · 48                 ● green     │                              │\n└─────────────────────────────────────────┴──────────────────────────────┘\n```\n\n**Kanban view** — the same groups as side-by-side columns, each with its\nown colored header bar; cards move by drag or by the same `⋯` quick-action\nmenu group view uses. Best for working a single group's queue left-to-right\nwithout collapsing everything else. The \"needs answer\" rail still pins\nright, unchanged, because A-S02-006's target (S04) does not depend on\nwhich board view is active.\n\n```\n┌ TOPBAR ────────────────────────────────────────────────────────────────┐\n│ herdr   [project ▾]  [gateway: dev-box ▾]      ⚠ reachable on network  │\n├ CONTROLS ──────────────────────────────────────────────────────────────┤\n│ [search…]  Group by: [Status ▾]  Filter: [Stage ▾][Risk ▾]  View:[▤ ▥]  [+ Add] │\n├ BOARD (kanban) ─────────────────────────────────────────┬ NEEDS ANSWER ┤\n│ ●AMBER        │ ●BLUE          │ ●SLATE      │ ●GREEN   │              │\n│ NEEDS ANSWER·2│ IN PROGRESS·3  │ TODO·11     │ DONE·48  │  tsk-4id     │\n│ ┌───────────┐ │ ┌────────────┐ │ ┌─────────┐ │          │  \"Which…\"    │\n│ │ tsk-4id ⋯ │ │ │ tsk-5jr  ⋯ │ │ │ ...   ⋯ │ │          │  [ Answer ]  │\n│ │ awaiting- │ │ │ doing ·    │ │ └─────────┘ │          │              │\n│ │ human     │ │ │ executing  │ │ ┌─────────┐ │          │  tsk-k4v     │\n│ └───────────┘ │ └────────────┘ │ │ ...   ⋯ │ │          │  gate: ...   │\n│ ┌───────────┐ │                │ └─────────┘ │          │  [ Review ]  │\n│ │ tsk-k4v ⋯ │ │                │             │          │              │\n│ └───────────┘ │                │             │          │              │\n└────────────────┴────────────────┴─────────────┴──────────┴──────────────┘\n```\n\nMobile always uses group view (kanban's side-by-side columns do not fit a\nphone width) — the rail becomes the first group, because on a phone the\nwhole point is \"does anything need me\":\n\n```\n┌────────────────────────────┐\n│ herdr  [dev-box ▾]   ⚠     │\n│ [search…]      [Filter ▾]  │\n├────────────────────────────┤\n│ ▾ NEEDS ANSWER · 2   ●     │\n│ ┌────────────────────────┐ │\n│ │ tsk-4id             ⋯ │ │\n│ │ Task detail pairing    │ │\n│ │ ● awaiting-human       │ │\n│ │ [ Answer ]             │ │\n│ └────────────────────────┘ │\n│ ▸ IN PROGRESS · 3    ●     │\n│ ▸ TODO · 11          ●     │\n└────────────────────────────┘\n```\n\nFour layout decisions worth stating, because each one is load-bearing:\n\n- **Groups are collapsible and remember their state.** `DONE · 48` is\n  noise on a phone; it collapses and stays collapsed.\n- **The exposure indicator lives in the topbar, always.** R5 says the\n  surface is on by default and reachable beyond loopback. That is a\n  standing fact about this deployment, so it gets a standing indicator,\n  never a dismissable toast.\n- **The gateway picker is in the topbar too**, because R1 forbids\n  assuming one fixed origin, and a person aggregating several machines\n  needs to know which one they are looking at before they read a number.\n- **Group view and kanban view are the same data, two renderings** (D16).\n  The toggle lives in CONTROLS next to Group by, not in the topbar — it is\n  a reading preference, not deployment state like the exposure indicator.\n  Desktop only; a phone always gets group view (side-by-side columns do\n  not fit).",
+      "targetDigest": "4d0bf2c9e7d751d20034f938f244eb1ca5730b7473398737c9d3d150780e908e",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_a3568914bacae6331716fa11beabe655",
+        "sourceUnitDigest": "4d0bf2c9e7d751d20034f938f244eb1ca5730b7473398737c9d3d150780e908e",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+        "targetAnchor": "layout",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/ui-spec/screens/S02-taskboard.md#layout (source lines 28-28) is carried at docs/platform/ui-spec/architecture/screens/S02-taskboard.md#layout (candidate lines 50-50). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S02-taskboard.md verbatim in docs/platform/ui-spec/architecture/screens/S02-taskboard.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "4d0bf2c9e7d751d20034f938f244eb1ca5730b7473398737c9d3d150780e908e",
+        "targetAncestry": [
+          "S02 — Taskboard"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_6c49dcd927215fbd7baede5222cf1ab5",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S02-taskboard.md",
+      "sourceAnchor": "unheaded-block-4",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 30,
+        "endLine": 34,
+        "textDigest": "92d5bb85b24a6afb40d5a3307f5ec307c29432af7ae1e8d96917e851e4f42559",
+        "sample": "Desktop offers **two board views of the same underlying grouped data** —\na person picks whichever reading suits the moment, and the choice is\nremembered (D16, `docs/history/herdr-w",
+        "identityFingerprint": "9fca37f723c31e6297e21225e2b24b2e643a6b8ad8560884e900da5c997da189",
+        "ancestry": [
+          "S02 — Taskboard",
+          "Layout"
+        ],
+        "text": "Desktop offers **two board views of the same underlying grouped data** —\na person picks whichever reading suits the moment, and the choice is\nremembered (D16, `docs/history/herdr-web-dashboard/CONTEXT.md`). Neither\nview is a separate screen; both read the same `GET /work` grouped-by-status\ndata, they only differ in how that grouping renders."
+      },
+      "sourceShownText": "Desktop offers **two board views of the same underlying grouped data** —\na person picks whichever reading suits the moment, and the choice is\nremembered (D16, `docs/history/herdr-web-dashboard/CONTEXT.md`). Neither\nview is a separate screen; both read the same `GET /work` grouped-by-status\ndata, they only differ in how that grouping renders.",
+      "sourceDigest": "92d5bb85b24a6afb40d5a3307f5ec307c29432af7ae1e8d96917e851e4f42559",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "targetAnchor": "unheaded-block-6",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 52,
+        "endLine": 56,
+        "textDigest": "92d5bb85b24a6afb40d5a3307f5ec307c29432af7ae1e8d96917e851e4f42559",
+        "sample": "Desktop offers **two board views of the same underlying grouped data** —\na person picks whichever reading suits the moment, and the choice is\nremembered (D16, `docs/history/herdr-w",
+        "identityFingerprint": "9fca37f723c31e6297e21225e2b24b2e643a6b8ad8560884e900da5c997da189",
+        "ancestry": [
+          "S02 — Taskboard",
+          "Layout"
+        ],
+        "text": "Desktop offers **two board views of the same underlying grouped data** —\na person picks whichever reading suits the moment, and the choice is\nremembered (D16, `docs/history/herdr-web-dashboard/CONTEXT.md`). Neither\nview is a separate screen; both read the same `GET /work` grouped-by-status\ndata, they only differ in how that grouping renders."
+      },
+      "targetShownText": "Desktop offers **two board views of the same underlying grouped data** —\na person picks whichever reading suits the moment, and the choice is\nremembered (D16, `docs/history/herdr-web-dashboard/CONTEXT.md`). Neither\nview is a separate screen; both read the same `GET /work` grouped-by-status\ndata, they only differ in how that grouping renders.",
+      "targetDigest": "92d5bb85b24a6afb40d5a3307f5ec307c29432af7ae1e8d96917e851e4f42559",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_6c49dcd927215fbd7baede5222cf1ab5",
+        "sourceUnitDigest": "92d5bb85b24a6afb40d5a3307f5ec307c29432af7ae1e8d96917e851e4f42559",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+        "targetAnchor": "unheaded-block-6",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/screens/S02-taskboard.md#unheaded-block-4 (source lines 30-34) is carried at docs/platform/ui-spec/architecture/screens/S02-taskboard.md#unheaded-block-6 (candidate lines 52-56). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S02-taskboard.md verbatim in docs/platform/ui-spec/architecture/screens/S02-taskboard.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "92d5bb85b24a6afb40d5a3307f5ec307c29432af7ae1e8d96917e851e4f42559",
+        "targetAncestry": [
+          "S02 — Taskboard",
+          "Layout"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_8f3f773ca083b9fa8272988d07965164",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S02-taskboard.md",
+      "sourceAnchor": "unheaded-block-5",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 36,
+        "endLine": 39,
+        "textDigest": "9d5272a9af071d018bebc204e6a0e664b384eeec29da148b705025af29ee6f65",
+        "sample": "**Group view** (default) — status groups stacked vertically, each\ncollapsible, with the \"needs answer\" rail pinned right so the one urgent\ncategory is never scrolled past. Best for",
+        "identityFingerprint": "bb89585499f70bca877136a7327a2a41a65b8ff67d2788a32082a403ad42f10e",
+        "ancestry": [
+          "S02 — Taskboard",
+          "Layout"
+        ],
+        "text": "**Group view** (default) — status groups stacked vertically, each\ncollapsible, with the \"needs answer\" rail pinned right so the one urgent\ncategory is never scrolled past. Best for triage: scan every group's count\nwithout horizontal scanning."
+      },
+      "sourceShownText": "**Group view** (default) — status groups stacked vertically, each\ncollapsible, with the \"needs answer\" rail pinned right so the one urgent\ncategory is never scrolled past. Best for triage: scan every group's count\nwithout horizontal scanning.",
+      "sourceDigest": "9d5272a9af071d018bebc204e6a0e664b384eeec29da148b705025af29ee6f65",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "targetAnchor": "unheaded-block-7",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 58,
+        "endLine": 61,
+        "textDigest": "9d5272a9af071d018bebc204e6a0e664b384eeec29da148b705025af29ee6f65",
+        "sample": "**Group view** (default) — status groups stacked vertically, each\ncollapsible, with the \"needs answer\" rail pinned right so the one urgent\ncategory is never scrolled past. Best for",
+        "identityFingerprint": "bb89585499f70bca877136a7327a2a41a65b8ff67d2788a32082a403ad42f10e",
+        "ancestry": [
+          "S02 — Taskboard",
+          "Layout"
+        ],
+        "text": "**Group view** (default) — status groups stacked vertically, each\ncollapsible, with the \"needs answer\" rail pinned right so the one urgent\ncategory is never scrolled past. Best for triage: scan every group's count\nwithout horizontal scanning."
+      },
+      "targetShownText": "**Group view** (default) — status groups stacked vertically, each\ncollapsible, with the \"needs answer\" rail pinned right so the one urgent\ncategory is never scrolled past. Best for triage: scan every group's count\nwithout horizontal scanning.",
+      "targetDigest": "9d5272a9af071d018bebc204e6a0e664b384eeec29da148b705025af29ee6f65",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_8f3f773ca083b9fa8272988d07965164",
+        "sourceUnitDigest": "9d5272a9af071d018bebc204e6a0e664b384eeec29da148b705025af29ee6f65",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+        "targetAnchor": "unheaded-block-7",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/screens/S02-taskboard.md#unheaded-block-5 (source lines 36-39) is carried at docs/platform/ui-spec/architecture/screens/S02-taskboard.md#unheaded-block-7 (candidate lines 58-61). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S02-taskboard.md verbatim in docs/platform/ui-spec/architecture/screens/S02-taskboard.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "9d5272a9af071d018bebc204e6a0e664b384eeec29da148b705025af29ee6f65",
+        "targetAncestry": [
+          "S02 — Taskboard",
+          "Layout"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_369a407225765e238efb7a418e0a44a5",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S02-taskboard.md",
+      "sourceAnchor": "unheaded-block-6",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 41,
+        "endLine": 67,
+        "textDigest": "2b6f1fe0ac2043898c36fa322709dbd8d1b00cc292b35b1d3e2fdf60ecc7d49c",
+        "sample": "```\n┌ TOPBAR ────────────────────────────────────────────────────────────────┐\n│ herdr   [project ▾]  [gateway: dev-box ▾]      ⚠ reachable on network  │\n├ CONTROLS ───────────────",
+        "identityFingerprint": "afb5aa506ca83c0afa141f70dbfed633fa24d8e091e41c63b32383e38b92368c",
+        "ancestry": [
+          "S02 — Taskboard",
+          "Layout"
+        ],
+        "text": "```\n┌ TOPBAR ────────────────────────────────────────────────────────────────┐\n│ herdr   [project ▾]  [gateway: dev-box ▾]      ⚠ reachable on network  │\n├ CONTROLS ──────────────────────────────────────────────────────────────┤\n│ [search…]  Group by: [Status ▾]  Filter: [Stage ▾][Risk ▾]  View:[▤ ▥]  [+ Add] │\n├ BOARD ──────────────────────────────────┬ NEEDS ANSWER ────────────────┤\n│                                         │                              │\n│ ▾ NEEDS ANSWER · 2          ● amber     │  tsk-4id                     │\n│  ┌────────────────────────────────────┐ │  \"Which pairing key…\"        │\n│  │ tsk-4id  Task detail pairing    ⋯ │ │  parked 2h ago               │\n│  │ ● awaiting-human · executing      │ │  [ Answer ]                  │\n│  └────────────────────────────────────┘ │                              │\n│  ┌────────────────────────────────────┐ │  tsk-k4v                     │\n│  │ tsk-k4v  Webserver core         ⋯ │ │  gate: validateApprove       │\n│  │ ● awaiting-approval · executing   │ │  [ Review ]                  │\n│  └────────────────────────────────────┘ │                              │\n│                                         │                              │\n│ ▾ IN PROGRESS · 3           ● blue      │                              │\n│  ┌────────────────────────────────────┐ │                              │\n│  │ tsk-5jr  Taskboard              ⋯ │ │                              │\n│  │ ● doing · executing               │ │                              │\n│  └────────────────────────────────────┘ │                              │\n│                                         │                              │\n│ ▸ TODO · 11                 ● slate     │                              │\n│ ▸ DONE · 48                 ● green     │                              │\n└─────────────────────────────────────────┴──────────────────────────────┘\n```"
+      },
+      "sourceShownText": "```\n┌ TOPBAR ────────────────────────────────────────────────────────────────┐\n│ herdr   [project ▾]  [gateway: dev-box ▾]      ⚠ reachable on network  │\n├ CONTROLS ──────────────────────────────────────────────────────────────┤\n│ [search…]  Group by: [Status ▾]  Filter: [Stage ▾][Risk ▾]  View:[▤ ▥]  [+ Add] │\n├ BOARD ──────────────────────────────────┬ NEEDS ANSWER ────────────────┤\n│                                         │                              │\n│ ▾ NEEDS ANSWER · 2          ● amber     │  tsk-4id                     │\n│  ┌────────────────────────────────────┐ │  \"Which pairing key…\"        │\n│  │ tsk-4id  Task detail pairing    ⋯ │ │  parked 2h ago               │\n│  │ ● awaiting-human · executing      │ │  [ Answer ]                  │\n│  └────────────────────────────────────┘ │                              │\n│  ┌────────────────────────────────────┐ │  tsk-k4v                     │\n│  │ tsk-k4v  Webserver core         ⋯ │ │  gate: validateApprove       │\n│  │ ● awaiting-approval · executing   │ │  [ Review ]                  │\n│  └────────────────────────────────────┘ │                              │\n│                                         │                              │\n│ ▾ IN PROGRESS · 3           ● blue      │                              │\n│  ┌────────────────────────────────────┐ │                              │\n│  │ tsk-5jr  Taskboard              ⋯ │ │                              │\n│  │ ● doing · executing               │ │                              │\n│  └────────────────────────────────────┘ │                              │\n│                                         │                              │\n│ ▸ TODO · 11                 ● slate     │                              │\n│ ▸ DONE · 48                 ● green     │                              │\n└─────────────────────────────────────────┴──────────────────────────────┘\n```",
+      "sourceDigest": "2b6f1fe0ac2043898c36fa322709dbd8d1b00cc292b35b1d3e2fdf60ecc7d49c",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "targetAnchor": "unheaded-block-8",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-8",
+        "githubAnchor": "unheaded-block-8",
+        "stableAnchor": "unheaded-block-8",
+        "title": "Unheaded block 8",
+        "startLine": 63,
+        "endLine": 89,
+        "textDigest": "2b6f1fe0ac2043898c36fa322709dbd8d1b00cc292b35b1d3e2fdf60ecc7d49c",
+        "sample": "```\n┌ TOPBAR ────────────────────────────────────────────────────────────────┐\n│ herdr   [project ▾]  [gateway: dev-box ▾]      ⚠ reachable on network  │\n├ CONTROLS ───────────────",
+        "identityFingerprint": "afb5aa506ca83c0afa141f70dbfed633fa24d8e091e41c63b32383e38b92368c",
+        "ancestry": [
+          "S02 — Taskboard",
+          "Layout"
+        ],
+        "text": "```\n┌ TOPBAR ────────────────────────────────────────────────────────────────┐\n│ herdr   [project ▾]  [gateway: dev-box ▾]      ⚠ reachable on network  │\n├ CONTROLS ──────────────────────────────────────────────────────────────┤\n│ [search…]  Group by: [Status ▾]  Filter: [Stage ▾][Risk ▾]  View:[▤ ▥]  [+ Add] │\n├ BOARD ──────────────────────────────────┬ NEEDS ANSWER ────────────────┤\n│                                         │                              │\n│ ▾ NEEDS ANSWER · 2          ● amber     │  tsk-4id                     │\n│  ┌────────────────────────────────────┐ │  \"Which pairing key…\"        │\n│  │ tsk-4id  Task detail pairing    ⋯ │ │  parked 2h ago               │\n│  │ ● awaiting-human · executing      │ │  [ Answer ]                  │\n│  └────────────────────────────────────┘ │                              │\n│  ┌────────────────────────────────────┐ │  tsk-k4v                     │\n│  │ tsk-k4v  Webserver core         ⋯ │ │  gate: validateApprove       │\n│  │ ● awaiting-approval · executing   │ │  [ Review ]                  │\n│  └────────────────────────────────────┘ │                              │\n│                                         │                              │\n│ ▾ IN PROGRESS · 3           ● blue      │                              │\n│  ┌────────────────────────────────────┐ │                              │\n│  │ tsk-5jr  Taskboard              ⋯ │ │                              │\n│  │ ● doing · executing               │ │                              │\n│  └────────────────────────────────────┘ │                              │\n│                                         │                              │\n│ ▸ TODO · 11                 ● slate     │                              │\n│ ▸ DONE · 48                 ● green     │                              │\n└─────────────────────────────────────────┴──────────────────────────────┘\n```"
+      },
+      "targetShownText": "```\n┌ TOPBAR ────────────────────────────────────────────────────────────────┐\n│ herdr   [project ▾]  [gateway: dev-box ▾]      ⚠ reachable on network  │\n├ CONTROLS ──────────────────────────────────────────────────────────────┤\n│ [search…]  Group by: [Status ▾]  Filter: [Stage ▾][Risk ▾]  View:[▤ ▥]  [+ Add] │\n├ BOARD ──────────────────────────────────┬ NEEDS ANSWER ────────────────┤\n│                                         │                              │\n│ ▾ NEEDS ANSWER · 2          ● amber     │  tsk-4id                     │\n│  ┌────────────────────────────────────┐ │  \"Which pairing key…\"        │\n│  │ tsk-4id  Task detail pairing    ⋯ │ │  parked 2h ago               │\n│  │ ● awaiting-human · executing      │ │  [ Answer ]                  │\n│  └────────────────────────────────────┘ │                              │\n│  ┌────────────────────────────────────┐ │  tsk-k4v                     │\n│  │ tsk-k4v  Webserver core         ⋯ │ │  gate: validateApprove       │\n│  │ ● awaiting-approval · executing   │ │  [ Review ]                  │\n│  └────────────────────────────────────┘ │                              │\n│                                         │                              │\n│ ▾ IN PROGRESS · 3           ● blue      │                              │\n│  ┌────────────────────────────────────┐ │                              │\n│  │ tsk-5jr  Taskboard              ⋯ │ │                              │\n│  │ ● doing · executing               │ │                              │\n│  └────────────────────────────────────┘ │                              │\n│                                         │                              │\n│ ▸ TODO · 11                 ● slate     │                              │\n│ ▸ DONE · 48                 ● green     │                              │\n└─────────────────────────────────────────┴──────────────────────────────┘\n```",
+      "targetDigest": "2b6f1fe0ac2043898c36fa322709dbd8d1b00cc292b35b1d3e2fdf60ecc7d49c",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_369a407225765e238efb7a418e0a44a5",
+        "sourceUnitDigest": "2b6f1fe0ac2043898c36fa322709dbd8d1b00cc292b35b1d3e2fdf60ecc7d49c",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+        "targetAnchor": "unheaded-block-8",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/screens/S02-taskboard.md#unheaded-block-6 (source lines 41-67) is carried at docs/platform/ui-spec/architecture/screens/S02-taskboard.md#unheaded-block-8 (candidate lines 63-89). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S02-taskboard.md verbatim in docs/platform/ui-spec/architecture/screens/S02-taskboard.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "2b6f1fe0ac2043898c36fa322709dbd8d1b00cc292b35b1d3e2fdf60ecc7d49c",
+        "targetAncestry": [
+          "S02 — Taskboard",
+          "Layout"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_d30db7db84e70167a04fe1c5fb39a4e5",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S02-taskboard.md",
+      "sourceAnchor": "unheaded-block-7",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 69,
+        "endLine": 74,
+        "textDigest": "44e5096326dec39d14a8a592692f8a35506500aa313895e4f25751193f0be1a2",
+        "sample": "**Kanban view** — the same groups as side-by-side columns, each with its\nown colored header bar; cards move by drag or by the same `⋯` quick-action\nmenu group view uses. Best for w",
+        "identityFingerprint": "041de4e57ae7f55f4992ae517414039a2877401d662993dfd9b731ce05a3c4af",
+        "ancestry": [
+          "S02 — Taskboard",
+          "Layout"
+        ],
+        "text": "**Kanban view** — the same groups as side-by-side columns, each with its\nown colored header bar; cards move by drag or by the same `⋯` quick-action\nmenu group view uses. Best for working a single group's queue left-to-right\nwithout collapsing everything else. The \"needs answer\" rail still pins\nright, unchanged, because A-S02-006's target (S04) does not depend on\nwhich board view is active."
+      },
+      "sourceShownText": "**Kanban view** — the same groups as side-by-side columns, each with its\nown colored header bar; cards move by drag or by the same `⋯` quick-action\nmenu group view uses. Best for working a single group's queue left-to-right\nwithout collapsing everything else. The \"needs answer\" rail still pins\nright, unchanged, because A-S02-006's target (S04) does not depend on\nwhich board view is active.",
+      "sourceDigest": "44e5096326dec39d14a8a592692f8a35506500aa313895e4f25751193f0be1a2",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "targetAnchor": "unheaded-block-9",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-9",
+        "githubAnchor": "unheaded-block-9",
+        "stableAnchor": "unheaded-block-9",
+        "title": "Unheaded block 9",
+        "startLine": 91,
+        "endLine": 96,
+        "textDigest": "44e5096326dec39d14a8a592692f8a35506500aa313895e4f25751193f0be1a2",
+        "sample": "**Kanban view** — the same groups as side-by-side columns, each with its\nown colored header bar; cards move by drag or by the same `⋯` quick-action\nmenu group view uses. Best for w",
+        "identityFingerprint": "041de4e57ae7f55f4992ae517414039a2877401d662993dfd9b731ce05a3c4af",
+        "ancestry": [
+          "S02 — Taskboard",
+          "Layout"
+        ],
+        "text": "**Kanban view** — the same groups as side-by-side columns, each with its\nown colored header bar; cards move by drag or by the same `⋯` quick-action\nmenu group view uses. Best for working a single group's queue left-to-right\nwithout collapsing everything else. The \"needs answer\" rail still pins\nright, unchanged, because A-S02-006's target (S04) does not depend on\nwhich board view is active."
+      },
+      "targetShownText": "**Kanban view** — the same groups as side-by-side columns, each with its\nown colored header bar; cards move by drag or by the same `⋯` quick-action\nmenu group view uses. Best for working a single group's queue left-to-right\nwithout collapsing everything else. The \"needs answer\" rail still pins\nright, unchanged, because A-S02-006's target (S04) does not depend on\nwhich board view is active.",
+      "targetDigest": "44e5096326dec39d14a8a592692f8a35506500aa313895e4f25751193f0be1a2",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_d30db7db84e70167a04fe1c5fb39a4e5",
+        "sourceUnitDigest": "44e5096326dec39d14a8a592692f8a35506500aa313895e4f25751193f0be1a2",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+        "targetAnchor": "unheaded-block-9",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/screens/S02-taskboard.md#unheaded-block-7 (source lines 69-74) is carried at docs/platform/ui-spec/architecture/screens/S02-taskboard.md#unheaded-block-9 (candidate lines 91-96). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S02-taskboard.md verbatim in docs/platform/ui-spec/architecture/screens/S02-taskboard.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "44e5096326dec39d14a8a592692f8a35506500aa313895e4f25751193f0be1a2",
+        "targetAncestry": [
+          "S02 — Taskboard",
+          "Layout"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_38f435fc7cb64228e37d157820f6222c",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S02-taskboard.md",
+      "sourceAnchor": "unheaded-block-8",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-8",
+        "githubAnchor": "unheaded-block-8",
+        "stableAnchor": "unheaded-block-8",
+        "title": "Unheaded block 8",
+        "startLine": 76,
+        "endLine": 93,
+        "textDigest": "b536b23ef7b47aec1235043d572a048bdfbcdf4339af68ecfccdd7977336c6a2",
+        "sample": "```\n┌ TOPBAR ────────────────────────────────────────────────────────────────┐\n│ herdr   [project ▾]  [gateway: dev-box ▾]      ⚠ reachable on network  │\n├ CONTROLS ───────────────",
+        "identityFingerprint": "999ad45e3240214dbedaa4a25e9d5446d31ecfda1125495c7b724c882de52d28",
+        "ancestry": [
+          "S02 — Taskboard",
+          "Layout"
+        ],
+        "text": "```\n┌ TOPBAR ────────────────────────────────────────────────────────────────┐\n│ herdr   [project ▾]  [gateway: dev-box ▾]      ⚠ reachable on network  │\n├ CONTROLS ──────────────────────────────────────────────────────────────┤\n│ [search…]  Group by: [Status ▾]  Filter: [Stage ▾][Risk ▾]  View:[▤ ▥]  [+ Add] │\n├ BOARD (kanban) ─────────────────────────────────────────┬ NEEDS ANSWER ┤\n│ ●AMBER        │ ●BLUE          │ ●SLATE      │ ●GREEN   │              │\n│ NEEDS ANSWER·2│ IN PROGRESS·3  │ TODO·11     │ DONE·48  │  tsk-4id     │\n│ ┌───────────┐ │ ┌────────────┐ │ ┌─────────┐ │          │  \"Which…\"    │\n│ │ tsk-4id ⋯ │ │ │ tsk-5jr  ⋯ │ │ │ ...   ⋯ │ │          │  [ Answer ]  │\n│ │ awaiting- │ │ │ doing ·    │ │ └─────────┘ │          │              │\n│ │ human     │ │ │ executing  │ │ ┌─────────┐ │          │  tsk-k4v     │\n│ └───────────┘ │ └────────────┘ │ │ ...   ⋯ │ │          │  gate: ...   │\n│ ┌───────────┐ │                │ └─────────┘ │          │  [ Review ]  │\n│ │ tsk-k4v ⋯ │ │                │             │          │              │\n│ └───────────┘ │                │             │          │              │\n└────────────────┴────────────────┴─────────────┴──────────┴──────────────┘\n```"
+      },
+      "sourceShownText": "```\n┌ TOPBAR ────────────────────────────────────────────────────────────────┐\n│ herdr   [project ▾]  [gateway: dev-box ▾]      ⚠ reachable on network  │\n├ CONTROLS ──────────────────────────────────────────────────────────────┤\n│ [search…]  Group by: [Status ▾]  Filter: [Stage ▾][Risk ▾]  View:[▤ ▥]  [+ Add] │\n├ BOARD (kanban) ─────────────────────────────────────────┬ NEEDS ANSWER ┤\n│ ●AMBER        │ ●BLUE          │ ●SLATE      │ ●GREEN   │              │\n│ NEEDS ANSWER·2│ IN PROGRESS·3  │ TODO·11     │ DONE·48  │  tsk-4id     │\n│ ┌───────────┐ │ ┌────────────┐ │ ┌─────────┐ │          │  \"Which…\"    │\n│ │ tsk-4id ⋯ │ │ │ tsk-5jr  ⋯ │ │ │ ...   ⋯ │ │          │  [ Answer ]  │\n│ │ awaiting- │ │ │ doing ·    │ │ └─────────┘ │          │              │\n│ │ human     │ │ │ executing  │ │ ┌─────────┐ │          │  tsk-k4v     │\n│ └───────────┘ │ └────────────┘ │ │ ...   ⋯ │ │          │  gate: ...   │\n│ ┌───────────┐ │                │ └─────────┘ │          │  [ Review ]  │\n│ │ tsk-k4v ⋯ │ │                │             │          │              │\n│ └───────────┘ │                │             │          │              │\n└────────────────┴────────────────┴─────────────┴──────────┴──────────────┘\n```",
+      "sourceDigest": "b536b23ef7b47aec1235043d572a048bdfbcdf4339af68ecfccdd7977336c6a2",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "targetAnchor": "unheaded-block-10",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-10",
+        "githubAnchor": "unheaded-block-10",
+        "stableAnchor": "unheaded-block-10",
+        "title": "Unheaded block 10",
+        "startLine": 98,
+        "endLine": 115,
+        "textDigest": "b536b23ef7b47aec1235043d572a048bdfbcdf4339af68ecfccdd7977336c6a2",
+        "sample": "```\n┌ TOPBAR ────────────────────────────────────────────────────────────────┐\n│ herdr   [project ▾]  [gateway: dev-box ▾]      ⚠ reachable on network  │\n├ CONTROLS ───────────────",
+        "identityFingerprint": "999ad45e3240214dbedaa4a25e9d5446d31ecfda1125495c7b724c882de52d28",
+        "ancestry": [
+          "S02 — Taskboard",
+          "Layout"
+        ],
+        "text": "```\n┌ TOPBAR ────────────────────────────────────────────────────────────────┐\n│ herdr   [project ▾]  [gateway: dev-box ▾]      ⚠ reachable on network  │\n├ CONTROLS ──────────────────────────────────────────────────────────────┤\n│ [search…]  Group by: [Status ▾]  Filter: [Stage ▾][Risk ▾]  View:[▤ ▥]  [+ Add] │\n├ BOARD (kanban) ─────────────────────────────────────────┬ NEEDS ANSWER ┤\n│ ●AMBER        │ ●BLUE          │ ●SLATE      │ ●GREEN   │              │\n│ NEEDS ANSWER·2│ IN PROGRESS·3  │ TODO·11     │ DONE·48  │  tsk-4id     │\n│ ┌───────────┐ │ ┌────────────┐ │ ┌─────────┐ │          │  \"Which…\"    │\n│ │ tsk-4id ⋯ │ │ │ tsk-5jr  ⋯ │ │ │ ...   ⋯ │ │          │  [ Answer ]  │\n│ │ awaiting- │ │ │ doing ·    │ │ └─────────┘ │          │              │\n│ │ human     │ │ │ executing  │ │ ┌─────────┐ │          │  tsk-k4v     │\n│ └───────────┘ │ └────────────┘ │ │ ...   ⋯ │ │          │  gate: ...   │\n│ ┌───────────┐ │                │ └─────────┘ │          │  [ Review ]  │\n│ │ tsk-k4v ⋯ │ │                │             │          │              │\n│ └───────────┘ │                │             │          │              │\n└────────────────┴────────────────┴─────────────┴──────────┴──────────────┘\n```"
+      },
+      "targetShownText": "```\n┌ TOPBAR ────────────────────────────────────────────────────────────────┐\n│ herdr   [project ▾]  [gateway: dev-box ▾]      ⚠ reachable on network  │\n├ CONTROLS ──────────────────────────────────────────────────────────────┤\n│ [search…]  Group by: [Status ▾]  Filter: [Stage ▾][Risk ▾]  View:[▤ ▥]  [+ Add] │\n├ BOARD (kanban) ─────────────────────────────────────────┬ NEEDS ANSWER ┤\n│ ●AMBER        │ ●BLUE          │ ●SLATE      │ ●GREEN   │              │\n│ NEEDS ANSWER·2│ IN PROGRESS·3  │ TODO·11     │ DONE·48  │  tsk-4id     │\n│ ┌───────────┐ │ ┌────────────┐ │ ┌─────────┐ │          │  \"Which…\"    │\n│ │ tsk-4id ⋯ │ │ │ tsk-5jr  ⋯ │ │ │ ...   ⋯ │ │          │  [ Answer ]  │\n│ │ awaiting- │ │ │ doing ·    │ │ └─────────┘ │          │              │\n│ │ human     │ │ │ executing  │ │ ┌─────────┐ │          │  tsk-k4v     │\n│ └───────────┘ │ └────────────┘ │ │ ...   ⋯ │ │          │  gate: ...   │\n│ ┌───────────┐ │                │ └─────────┘ │          │  [ Review ]  │\n│ │ tsk-k4v ⋯ │ │                │             │          │              │\n│ └───────────┘ │                │             │          │              │\n└────────────────┴────────────────┴─────────────┴──────────┴──────────────┘\n```",
+      "targetDigest": "b536b23ef7b47aec1235043d572a048bdfbcdf4339af68ecfccdd7977336c6a2",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_38f435fc7cb64228e37d157820f6222c",
+        "sourceUnitDigest": "b536b23ef7b47aec1235043d572a048bdfbcdf4339af68ecfccdd7977336c6a2",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+        "targetAnchor": "unheaded-block-10",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/screens/S02-taskboard.md#unheaded-block-8 (source lines 76-93) is carried at docs/platform/ui-spec/architecture/screens/S02-taskboard.md#unheaded-block-10 (candidate lines 98-115). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S02-taskboard.md verbatim in docs/platform/ui-spec/architecture/screens/S02-taskboard.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "b536b23ef7b47aec1235043d572a048bdfbcdf4339af68ecfccdd7977336c6a2",
+        "targetAncestry": [
+          "S02 — Taskboard",
+          "Layout"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_2cc8f26dc0394eb2b7b92cc169beb784",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S02-taskboard.md",
+      "sourceAnchor": "unheaded-block-9",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-9",
+        "githubAnchor": "unheaded-block-9",
+        "stableAnchor": "unheaded-block-9",
+        "title": "Unheaded block 9",
+        "startLine": 95,
+        "endLine": 97,
+        "textDigest": "5871d326ddf941670b46430bef5aeb8943e96bb7633632d0024e62ed91227d91",
+        "sample": "Mobile always uses group view (kanban's side-by-side columns do not fit a\nphone width) — the rail becomes the first group, because on a phone the\nwhole point is \"does anything need",
+        "identityFingerprint": "8b80c37fab63093ce77f4cccbca00c6686158c7af143e524e085b1b6db24ebc0",
+        "ancestry": [
+          "S02 — Taskboard",
+          "Layout"
+        ],
+        "text": "Mobile always uses group view (kanban's side-by-side columns do not fit a\nphone width) — the rail becomes the first group, because on a phone the\nwhole point is \"does anything need me\":"
+      },
+      "sourceShownText": "Mobile always uses group view (kanban's side-by-side columns do not fit a\nphone width) — the rail becomes the first group, because on a phone the\nwhole point is \"does anything need me\":",
+      "sourceDigest": "5871d326ddf941670b46430bef5aeb8943e96bb7633632d0024e62ed91227d91",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "targetAnchor": "unheaded-block-11",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-11",
+        "githubAnchor": "unheaded-block-11",
+        "stableAnchor": "unheaded-block-11",
+        "title": "Unheaded block 11",
+        "startLine": 117,
+        "endLine": 119,
+        "textDigest": "5871d326ddf941670b46430bef5aeb8943e96bb7633632d0024e62ed91227d91",
+        "sample": "Mobile always uses group view (kanban's side-by-side columns do not fit a\nphone width) — the rail becomes the first group, because on a phone the\nwhole point is \"does anything need",
+        "identityFingerprint": "8b80c37fab63093ce77f4cccbca00c6686158c7af143e524e085b1b6db24ebc0",
+        "ancestry": [
+          "S02 — Taskboard",
+          "Layout"
+        ],
+        "text": "Mobile always uses group view (kanban's side-by-side columns do not fit a\nphone width) — the rail becomes the first group, because on a phone the\nwhole point is \"does anything need me\":"
+      },
+      "targetShownText": "Mobile always uses group view (kanban's side-by-side columns do not fit a\nphone width) — the rail becomes the first group, because on a phone the\nwhole point is \"does anything need me\":",
+      "targetDigest": "5871d326ddf941670b46430bef5aeb8943e96bb7633632d0024e62ed91227d91",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_2cc8f26dc0394eb2b7b92cc169beb784",
+        "sourceUnitDigest": "5871d326ddf941670b46430bef5aeb8943e96bb7633632d0024e62ed91227d91",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+        "targetAnchor": "unheaded-block-11",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/screens/S02-taskboard.md#unheaded-block-9 (source lines 95-97) is carried at docs/platform/ui-spec/architecture/screens/S02-taskboard.md#unheaded-block-11 (candidate lines 117-119). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S02-taskboard.md verbatim in docs/platform/ui-spec/architecture/screens/S02-taskboard.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "5871d326ddf941670b46430bef5aeb8943e96bb7633632d0024e62ed91227d91",
+        "targetAncestry": [
+          "S02 — Taskboard",
+          "Layout"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_66dc01994689c5fb630f56fdb1180788",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S02-taskboard.md",
+      "sourceAnchor": "unheaded-block-10",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-10",
+        "githubAnchor": "unheaded-block-10",
+        "stableAnchor": "unheaded-block-10",
+        "title": "Unheaded block 10",
+        "startLine": 99,
+        "endLine": 114,
+        "textDigest": "a768cd0192df2071b079184f5b8405d4264a777258de3c2cbcb2001773328c9d",
+        "sample": "```\n┌────────────────────────────┐\n│ herdr  [dev-box ▾]   ⚠     │\n│ [search…]      [Filter ▾]  │\n├────────────────────────────┤\n│ ▾ NEEDS ANSWER · 2   ●     │\n│ ┌──────────────────",
+        "identityFingerprint": "f4b9f861f630edae465829d55b4311402d4d497df50285419909053b752df231",
+        "ancestry": [
+          "S02 — Taskboard",
+          "Layout"
+        ],
+        "text": "```\n┌────────────────────────────┐\n│ herdr  [dev-box ▾]   ⚠     │\n│ [search…]      [Filter ▾]  │\n├────────────────────────────┤\n│ ▾ NEEDS ANSWER · 2   ●     │\n│ ┌────────────────────────┐ │\n│ │ tsk-4id             ⋯ │ │\n│ │ Task detail pairing    │ │\n│ │ ● awaiting-human       │ │\n│ │ [ Answer ]             │ │\n│ └────────────────────────┘ │\n│ ▸ IN PROGRESS · 3    ●     │\n│ ▸ TODO · 11          ●     │\n└────────────────────────────┘\n```"
+      },
+      "sourceShownText": "```\n┌────────────────────────────┐\n│ herdr  [dev-box ▾]   ⚠     │\n│ [search…]      [Filter ▾]  │\n├────────────────────────────┤\n│ ▾ NEEDS ANSWER · 2   ●     │\n│ ┌────────────────────────┐ │\n│ │ tsk-4id             ⋯ │ │\n│ │ Task detail pairing    │ │\n│ │ ● awaiting-human       │ │\n│ │ [ Answer ]             │ │\n│ └────────────────────────┘ │\n│ ▸ IN PROGRESS · 3    ●     │\n│ ▸ TODO · 11          ●     │\n└────────────────────────────┘\n```",
+      "sourceDigest": "a768cd0192df2071b079184f5b8405d4264a777258de3c2cbcb2001773328c9d",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "targetAnchor": "unheaded-block-12",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-12",
+        "githubAnchor": "unheaded-block-12",
+        "stableAnchor": "unheaded-block-12",
+        "title": "Unheaded block 12",
+        "startLine": 121,
+        "endLine": 136,
+        "textDigest": "a768cd0192df2071b079184f5b8405d4264a777258de3c2cbcb2001773328c9d",
+        "sample": "```\n┌────────────────────────────┐\n│ herdr  [dev-box ▾]   ⚠     │\n│ [search…]      [Filter ▾]  │\n├────────────────────────────┤\n│ ▾ NEEDS ANSWER · 2   ●     │\n│ ┌──────────────────",
+        "identityFingerprint": "f4b9f861f630edae465829d55b4311402d4d497df50285419909053b752df231",
+        "ancestry": [
+          "S02 — Taskboard",
+          "Layout"
+        ],
+        "text": "```\n┌────────────────────────────┐\n│ herdr  [dev-box ▾]   ⚠     │\n│ [search…]      [Filter ▾]  │\n├────────────────────────────┤\n│ ▾ NEEDS ANSWER · 2   ●     │\n│ ┌────────────────────────┐ │\n│ │ tsk-4id             ⋯ │ │\n│ │ Task detail pairing    │ │\n│ │ ● awaiting-human       │ │\n│ │ [ Answer ]             │ │\n│ └────────────────────────┘ │\n│ ▸ IN PROGRESS · 3    ●     │\n│ ▸ TODO · 11          ●     │\n└────────────────────────────┘\n```"
+      },
+      "targetShownText": "```\n┌────────────────────────────┐\n│ herdr  [dev-box ▾]   ⚠     │\n│ [search…]      [Filter ▾]  │\n├────────────────────────────┤\n│ ▾ NEEDS ANSWER · 2   ●     │\n│ ┌────────────────────────┐ │\n│ │ tsk-4id             ⋯ │ │\n│ │ Task detail pairing    │ │\n│ │ ● awaiting-human       │ │\n│ │ [ Answer ]             │ │\n│ └────────────────────────┘ │\n│ ▸ IN PROGRESS · 3    ●     │\n│ ▸ TODO · 11          ●     │\n└────────────────────────────┘\n```",
+      "targetDigest": "a768cd0192df2071b079184f5b8405d4264a777258de3c2cbcb2001773328c9d",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_66dc01994689c5fb630f56fdb1180788",
+        "sourceUnitDigest": "a768cd0192df2071b079184f5b8405d4264a777258de3c2cbcb2001773328c9d",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+        "targetAnchor": "unheaded-block-12",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/screens/S02-taskboard.md#unheaded-block-10 (source lines 99-114) is carried at docs/platform/ui-spec/architecture/screens/S02-taskboard.md#unheaded-block-12 (candidate lines 121-136). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S02-taskboard.md verbatim in docs/platform/ui-spec/architecture/screens/S02-taskboard.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "a768cd0192df2071b079184f5b8405d4264a777258de3c2cbcb2001773328c9d",
+        "targetAncestry": [
+          "S02 — Taskboard",
+          "Layout"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_16ece324dc00b79759255e4acb8435ae",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S02-taskboard.md",
+      "sourceAnchor": "unheaded-block-11",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-11",
+        "githubAnchor": "unheaded-block-11",
+        "stableAnchor": "unheaded-block-11",
+        "title": "Unheaded block 11",
+        "startLine": 116,
+        "endLine": 116,
+        "textDigest": "0ca03f8d5a4fc7686ab220d8c37c4cb7550adbb659ba634f15b572532c529b6d",
+        "sample": "Four layout decisions worth stating, because each one is load-bearing:",
+        "identityFingerprint": "e3dbfdcf8faddc407bb09b3d981979ef5cebcd58b540e3250642b0835c4c29fb",
+        "ancestry": [
+          "S02 — Taskboard",
+          "Layout"
+        ],
+        "text": "Four layout decisions worth stating, because each one is load-bearing:"
+      },
+      "sourceShownText": "Four layout decisions worth stating, because each one is load-bearing:",
+      "sourceDigest": "0ca03f8d5a4fc7686ab220d8c37c4cb7550adbb659ba634f15b572532c529b6d",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "targetAnchor": "unheaded-block-13",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-13",
+        "githubAnchor": "unheaded-block-13",
+        "stableAnchor": "unheaded-block-13",
+        "title": "Unheaded block 13",
+        "startLine": 138,
+        "endLine": 138,
+        "textDigest": "0ca03f8d5a4fc7686ab220d8c37c4cb7550adbb659ba634f15b572532c529b6d",
+        "sample": "Four layout decisions worth stating, because each one is load-bearing:",
+        "identityFingerprint": "e3dbfdcf8faddc407bb09b3d981979ef5cebcd58b540e3250642b0835c4c29fb",
+        "ancestry": [
+          "S02 — Taskboard",
+          "Layout"
+        ],
+        "text": "Four layout decisions worth stating, because each one is load-bearing:"
+      },
+      "targetShownText": "Four layout decisions worth stating, because each one is load-bearing:",
+      "targetDigest": "0ca03f8d5a4fc7686ab220d8c37c4cb7550adbb659ba634f15b572532c529b6d",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_16ece324dc00b79759255e4acb8435ae",
+        "sourceUnitDigest": "0ca03f8d5a4fc7686ab220d8c37c4cb7550adbb659ba634f15b572532c529b6d",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+        "targetAnchor": "unheaded-block-13",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/screens/S02-taskboard.md#unheaded-block-11 (source lines 116-116) is carried at docs/platform/ui-spec/architecture/screens/S02-taskboard.md#unheaded-block-13 (candidate lines 138-138). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S02-taskboard.md verbatim in docs/platform/ui-spec/architecture/screens/S02-taskboard.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "0ca03f8d5a4fc7686ab220d8c37c4cb7550adbb659ba634f15b572532c529b6d",
+        "targetAncestry": [
+          "S02 — Taskboard",
+          "Layout"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_6cd22f67c65c9cc4aa70c160cababb24",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S02-taskboard.md",
+      "sourceAnchor": "unheaded-block-12",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-12",
+        "githubAnchor": "unheaded-block-12",
+        "stableAnchor": "unheaded-block-12",
+        "title": "Unheaded block 12",
+        "startLine": 118,
+        "endLine": 131,
+        "textDigest": "c6219ddf92aa1f458b5ff3801173d8bf355b5e4c27b4c1411258f4ac60bb49f7",
+        "sample": "- **Groups are collapsible and remember their state.** `DONE · 48` is\n  noise on a phone; it collapses and stays collapsed.\n- **The exposure indicator lives in the topbar, always.*",
+        "identityFingerprint": "2ee0d6707352d291696884a602ae1b04d54112e8c6b8298bf7379ddff85f9b0c",
+        "ancestry": [
+          "S02 — Taskboard",
+          "Layout"
+        ],
+        "text": "- **Groups are collapsible and remember their state.** `DONE · 48` is\n  noise on a phone; it collapses and stays collapsed.\n- **The exposure indicator lives in the topbar, always.** R5 says the\n  surface is on by default and reachable beyond loopback. That is a\n  standing fact about this deployment, so it gets a standing indicator,\n  never a dismissable toast.\n- **The gateway picker is in the topbar too**, because R1 forbids\n  assuming one fixed origin, and a person aggregating several machines\n  needs to know which one they are looking at before they read a number.\n- **Group view and kanban view are the same data, two renderings** (D16).\n  The toggle lives in CONTROLS next to Group by, not in the topbar — it is\n  a reading preference, not deployment state like the exposure indicator.\n  Desktop only; a phone always gets group view (side-by-side columns do\n  not fit)."
+      },
+      "sourceShownText": "- **Groups are collapsible and remember their state.** `DONE · 48` is\n  noise on a phone; it collapses and stays collapsed.\n- **The exposure indicator lives in the topbar, always.** R5 says the\n  surface is on by default and reachable beyond loopback. That is a\n  standing fact about this deployment, so it gets a standing indicator,\n  never a dismissable toast.\n- **The gateway picker is in the topbar too**, because R1 forbids\n  assuming one fixed origin, and a person aggregating several machines\n  needs to know which one they are looking at before they read a number.\n- **Group view and kanban view are the same data, two renderings** (D16).\n  The toggle lives in CONTROLS next to Group by, not in the topbar — it is\n  a reading preference, not deployment state like the exposure indicator.\n  Desktop only; a phone always gets group view (side-by-side columns do\n  not fit).",
+      "sourceDigest": "c6219ddf92aa1f458b5ff3801173d8bf355b5e4c27b4c1411258f4ac60bb49f7",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "targetAnchor": "unheaded-block-14",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-14",
+        "githubAnchor": "unheaded-block-14",
+        "stableAnchor": "unheaded-block-14",
+        "title": "Unheaded block 14",
+        "startLine": 140,
+        "endLine": 153,
+        "textDigest": "c6219ddf92aa1f458b5ff3801173d8bf355b5e4c27b4c1411258f4ac60bb49f7",
+        "sample": "- **Groups are collapsible and remember their state.** `DONE · 48` is\n  noise on a phone; it collapses and stays collapsed.\n- **The exposure indicator lives in the topbar, always.*",
+        "identityFingerprint": "2ee0d6707352d291696884a602ae1b04d54112e8c6b8298bf7379ddff85f9b0c",
+        "ancestry": [
+          "S02 — Taskboard",
+          "Layout"
+        ],
+        "text": "- **Groups are collapsible and remember their state.** `DONE · 48` is\n  noise on a phone; it collapses and stays collapsed.\n- **The exposure indicator lives in the topbar, always.** R5 says the\n  surface is on by default and reachable beyond loopback. That is a\n  standing fact about this deployment, so it gets a standing indicator,\n  never a dismissable toast.\n- **The gateway picker is in the topbar too**, because R1 forbids\n  assuming one fixed origin, and a person aggregating several machines\n  needs to know which one they are looking at before they read a number.\n- **Group view and kanban view are the same data, two renderings** (D16).\n  The toggle lives in CONTROLS next to Group by, not in the topbar — it is\n  a reading preference, not deployment state like the exposure indicator.\n  Desktop only; a phone always gets group view (side-by-side columns do\n  not fit)."
+      },
+      "targetShownText": "- **Groups are collapsible and remember their state.** `DONE · 48` is\n  noise on a phone; it collapses and stays collapsed.\n- **The exposure indicator lives in the topbar, always.** R5 says the\n  surface is on by default and reachable beyond loopback. That is a\n  standing fact about this deployment, so it gets a standing indicator,\n  never a dismissable toast.\n- **The gateway picker is in the topbar too**, because R1 forbids\n  assuming one fixed origin, and a person aggregating several machines\n  needs to know which one they are looking at before they read a number.\n- **Group view and kanban view are the same data, two renderings** (D16).\n  The toggle lives in CONTROLS next to Group by, not in the topbar — it is\n  a reading preference, not deployment state like the exposure indicator.\n  Desktop only; a phone always gets group view (side-by-side columns do\n  not fit).",
+      "targetDigest": "c6219ddf92aa1f458b5ff3801173d8bf355b5e4c27b4c1411258f4ac60bb49f7",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_6cd22f67c65c9cc4aa70c160cababb24",
+        "sourceUnitDigest": "c6219ddf92aa1f458b5ff3801173d8bf355b5e4c27b4c1411258f4ac60bb49f7",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+        "targetAnchor": "unheaded-block-14",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/screens/S02-taskboard.md#unheaded-block-12 (source lines 118-131) is carried at docs/platform/ui-spec/architecture/screens/S02-taskboard.md#unheaded-block-14 (candidate lines 140-153). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S02-taskboard.md verbatim in docs/platform/ui-spec/architecture/screens/S02-taskboard.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "c6219ddf92aa1f458b5ff3801173d8bf355b5e4c27b4c1411258f4ac60bb49f7",
+        "targetAncestry": [
+          "S02 — Taskboard",
+          "Layout"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_1ed9286862955b20a1067b2ba1f9de9e",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S02-taskboard.md",
+      "sourceAnchor": "states",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "States",
+        "anchor": "states",
+        "githubAnchor": "states",
+        "stableAnchor": "h-91f7e3c08ee9",
+        "startLine": 133,
+        "endLine": 133,
+        "textDigest": "1293e7519f82a1ce0df25de2cde9a5f7a52fd645b74fae0d8b56a633a3035a43",
+        "sample": "States",
+        "sectionPayloadDigest": "c330494a1942ee66b97d3a17daf4cedb81177057f426d1db4ead7aba1aca55e1",
+        "followingBlockDigest": "11e667e7a1a777b3438dc5cb09e5b06a99d03669ed81e932ae4039ab5830c1b2",
+        "identityFingerprint": "4a079b8d56500ceab2d3aff6cd7f8f263df9adaaf4f22769fa098965de49e150",
+        "ancestry": [
+          "S02 — Taskboard"
+        ],
+        "text": "## States",
+        "sectionText": "## States\n\n**ST-LOADING** shows skeleton cards inside real group headers (both\nviews), so counts appear before content and the layout never jumps.\n**ST-EMPTY-BOARD** and **ST-EMPTY-FILTER** are deliberately different\nscreens — see `30-states-and-errors.md`. **ST-DISCONNECTED** marks the\nboard stale in place rather than blanking it.\n\nNo bell, no notification badge that implies push: **R11** — the count in\na group header is current only because the person is looking at it."
+      },
+      "sourceShownText": "## States\n\n**ST-LOADING** shows skeleton cards inside real group headers (both\nviews), so counts appear before content and the layout never jumps.\n**ST-EMPTY-BOARD** and **ST-EMPTY-FILTER** are deliberately different\nscreens — see `30-states-and-errors.md`. **ST-DISCONNECTED** marks the\nboard stale in place rather than blanking it.\n\nNo bell, no notification badge that implies push: **R11** — the count in\na group header is current only because the person is looking at it.",
+      "sourceDigest": "1293e7519f82a1ce0df25de2cde9a5f7a52fd645b74fae0d8b56a633a3035a43",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "targetAnchor": "states",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "States",
+        "anchor": "states",
+        "githubAnchor": "states",
+        "stableAnchor": "h-7a49d3695c83",
+        "startLine": 155,
+        "endLine": 155,
+        "textDigest": "1293e7519f82a1ce0df25de2cde9a5f7a52fd645b74fae0d8b56a633a3035a43",
+        "sample": "States",
+        "sectionPayloadDigest": "c330494a1942ee66b97d3a17daf4cedb81177057f426d1db4ead7aba1aca55e1",
+        "followingBlockDigest": "11e667e7a1a777b3438dc5cb09e5b06a99d03669ed81e932ae4039ab5830c1b2",
+        "identityFingerprint": "4a079b8d56500ceab2d3aff6cd7f8f263df9adaaf4f22769fa098965de49e150",
+        "ancestry": [
+          "S02 — Taskboard"
+        ],
+        "text": "## States",
+        "sectionText": "## States\n\n**ST-LOADING** shows skeleton cards inside real group headers (both\nviews), so counts appear before content and the layout never jumps.\n**ST-EMPTY-BOARD** and **ST-EMPTY-FILTER** are deliberately different\nscreens — see `30-states-and-errors.md`. **ST-DISCONNECTED** marks the\nboard stale in place rather than blanking it.\n\nNo bell, no notification badge that implies push: **R11** — the count in\na group header is current only because the person is looking at it."
+      },
+      "targetShownText": "## States\n\n**ST-LOADING** shows skeleton cards inside real group headers (both\nviews), so counts appear before content and the layout never jumps.\n**ST-EMPTY-BOARD** and **ST-EMPTY-FILTER** are deliberately different\nscreens — see `30-states-and-errors.md`. **ST-DISCONNECTED** marks the\nboard stale in place rather than blanking it.\n\nNo bell, no notification badge that implies push: **R11** — the count in\na group header is current only because the person is looking at it.",
+      "targetDigest": "1293e7519f82a1ce0df25de2cde9a5f7a52fd645b74fae0d8b56a633a3035a43",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_1ed9286862955b20a1067b2ba1f9de9e",
+        "sourceUnitDigest": "1293e7519f82a1ce0df25de2cde9a5f7a52fd645b74fae0d8b56a633a3035a43",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+        "targetAnchor": "states",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/ui-spec/screens/S02-taskboard.md#states (source lines 133-133) is carried at docs/platform/ui-spec/architecture/screens/S02-taskboard.md#states (candidate lines 155-155). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S02-taskboard.md verbatim in docs/platform/ui-spec/architecture/screens/S02-taskboard.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "1293e7519f82a1ce0df25de2cde9a5f7a52fd645b74fae0d8b56a633a3035a43",
+        "targetAncestry": [
+          "S02 — Taskboard"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_9fe8558f49b4210f3268eaa0a158d8ee",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S02-taskboard.md",
+      "sourceAnchor": "unheaded-block-13",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-13",
+        "githubAnchor": "unheaded-block-13",
+        "stableAnchor": "unheaded-block-13",
+        "title": "Unheaded block 13",
+        "startLine": 135,
+        "endLine": 139,
+        "textDigest": "11e667e7a1a777b3438dc5cb09e5b06a99d03669ed81e932ae4039ab5830c1b2",
+        "sample": "**ST-LOADING** shows skeleton cards inside real group headers (both\nviews), so counts appear before content and the layout never jumps.\n**ST-EMPTY-BOARD** and **ST-EMPTY-FILTER** a",
+        "identityFingerprint": "8753db50448373e3b711ead6c09f1f5e1557c584b2e98ce1e2724fcd175d4f01",
+        "ancestry": [
+          "S02 — Taskboard",
+          "States"
+        ],
+        "text": "**ST-LOADING** shows skeleton cards inside real group headers (both\nviews), so counts appear before content and the layout never jumps.\n**ST-EMPTY-BOARD** and **ST-EMPTY-FILTER** are deliberately different\nscreens — see `30-states-and-errors.md`. **ST-DISCONNECTED** marks the\nboard stale in place rather than blanking it."
+      },
+      "sourceShownText": "**ST-LOADING** shows skeleton cards inside real group headers (both\nviews), so counts appear before content and the layout never jumps.\n**ST-EMPTY-BOARD** and **ST-EMPTY-FILTER** are deliberately different\nscreens — see `30-states-and-errors.md`. **ST-DISCONNECTED** marks the\nboard stale in place rather than blanking it.",
+      "sourceDigest": "11e667e7a1a777b3438dc5cb09e5b06a99d03669ed81e932ae4039ab5830c1b2",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "targetAnchor": "unheaded-block-15",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-15",
+        "githubAnchor": "unheaded-block-15",
+        "stableAnchor": "unheaded-block-15",
+        "title": "Unheaded block 15",
+        "startLine": 157,
+        "endLine": 161,
+        "textDigest": "11e667e7a1a777b3438dc5cb09e5b06a99d03669ed81e932ae4039ab5830c1b2",
+        "sample": "**ST-LOADING** shows skeleton cards inside real group headers (both\nviews), so counts appear before content and the layout never jumps.\n**ST-EMPTY-BOARD** and **ST-EMPTY-FILTER** a",
+        "identityFingerprint": "8753db50448373e3b711ead6c09f1f5e1557c584b2e98ce1e2724fcd175d4f01",
+        "ancestry": [
+          "S02 — Taskboard",
+          "States"
+        ],
+        "text": "**ST-LOADING** shows skeleton cards inside real group headers (both\nviews), so counts appear before content and the layout never jumps.\n**ST-EMPTY-BOARD** and **ST-EMPTY-FILTER** are deliberately different\nscreens — see `30-states-and-errors.md`. **ST-DISCONNECTED** marks the\nboard stale in place rather than blanking it."
+      },
+      "targetShownText": "**ST-LOADING** shows skeleton cards inside real group headers (both\nviews), so counts appear before content and the layout never jumps.\n**ST-EMPTY-BOARD** and **ST-EMPTY-FILTER** are deliberately different\nscreens — see `30-states-and-errors.md`. **ST-DISCONNECTED** marks the\nboard stale in place rather than blanking it.",
+      "targetDigest": "11e667e7a1a777b3438dc5cb09e5b06a99d03669ed81e932ae4039ab5830c1b2",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_9fe8558f49b4210f3268eaa0a158d8ee",
+        "sourceUnitDigest": "11e667e7a1a777b3438dc5cb09e5b06a99d03669ed81e932ae4039ab5830c1b2",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+        "targetAnchor": "unheaded-block-15",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/screens/S02-taskboard.md#unheaded-block-13 (source lines 135-139) is carried at docs/platform/ui-spec/architecture/screens/S02-taskboard.md#unheaded-block-15 (candidate lines 157-161). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S02-taskboard.md verbatim in docs/platform/ui-spec/architecture/screens/S02-taskboard.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "11e667e7a1a777b3438dc5cb09e5b06a99d03669ed81e932ae4039ab5830c1b2",
+        "targetAncestry": [
+          "S02 — Taskboard",
+          "States"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_6c75a8d85b8232cfedf1ae86a7eda90a",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S02-taskboard.md",
+      "sourceAnchor": "unheaded-block-14",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-14",
+        "githubAnchor": "unheaded-block-14",
+        "stableAnchor": "unheaded-block-14",
+        "title": "Unheaded block 14",
+        "startLine": 141,
+        "endLine": 142,
+        "textDigest": "6dde20c3978ee0c0934fe097a36e8d402767de43ff2d906b1f1f619356552e51",
+        "sample": "No bell, no notification badge that implies push: **R11** — the count in\na group header is current only because the person is looking at it.",
+        "identityFingerprint": "844ae2f7fdac5f25b86cc75daf83a0e09002164c82309351ebbaa22c9a737b56",
+        "ancestry": [
+          "S02 — Taskboard",
+          "States"
+        ],
+        "text": "No bell, no notification badge that implies push: **R11** — the count in\na group header is current only because the person is looking at it."
+      },
+      "sourceShownText": "No bell, no notification badge that implies push: **R11** — the count in\na group header is current only because the person is looking at it.",
+      "sourceDigest": "6dde20c3978ee0c0934fe097a36e8d402767de43ff2d906b1f1f619356552e51",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "targetAnchor": "unheaded-block-16",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-16",
+        "githubAnchor": "unheaded-block-16",
+        "stableAnchor": "unheaded-block-16",
+        "title": "Unheaded block 16",
+        "startLine": 163,
+        "endLine": 164,
+        "textDigest": "6dde20c3978ee0c0934fe097a36e8d402767de43ff2d906b1f1f619356552e51",
+        "sample": "No bell, no notification badge that implies push: **R11** — the count in\na group header is current only because the person is looking at it.",
+        "identityFingerprint": "844ae2f7fdac5f25b86cc75daf83a0e09002164c82309351ebbaa22c9a737b56",
+        "ancestry": [
+          "S02 — Taskboard",
+          "States"
+        ],
+        "text": "No bell, no notification badge that implies push: **R11** — the count in\na group header is current only because the person is looking at it."
+      },
+      "targetShownText": "No bell, no notification badge that implies push: **R11** — the count in\na group header is current only because the person is looking at it.",
+      "targetDigest": "6dde20c3978ee0c0934fe097a36e8d402767de43ff2d906b1f1f619356552e51",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_6c75a8d85b8232cfedf1ae86a7eda90a",
+        "sourceUnitDigest": "6dde20c3978ee0c0934fe097a36e8d402767de43ff2d906b1f1f619356552e51",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+        "targetAnchor": "unheaded-block-16",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/screens/S02-taskboard.md#unheaded-block-14 (source lines 141-142) is carried at docs/platform/ui-spec/architecture/screens/S02-taskboard.md#unheaded-block-16 (candidate lines 163-164). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S02-taskboard.md verbatim in docs/platform/ui-spec/architecture/screens/S02-taskboard.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "6dde20c3978ee0c0934fe097a36e8d402767de43ff2d906b1f1f619356552e51",
+        "targetAncestry": [
+          "S02 — Taskboard",
+          "States"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_695d51475befe3701ccb1b7d9570db36",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S02-taskboard.md",
+      "sourceAnchor": "interactions",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Interactions",
+        "anchor": "interactions",
+        "githubAnchor": "interactions",
+        "stableAnchor": "h-a10edea439e7",
+        "startLine": 144,
+        "endLine": 144,
+        "textDigest": "2ff4e1779675c3cd12fc22aa14a5a68e794b4b7d58cd001ad9e2eb945a8452d2",
+        "sample": "Interactions",
+        "sectionPayloadDigest": "bad3057a791408cebe7749d16be0cac1086d0aa3a4825b16e2e96bf9494e5aa2",
+        "followingBlockDigest": "bad3057a791408cebe7749d16be0cac1086d0aa3a4825b16e2e96bf9494e5aa2",
+        "identityFingerprint": "de9ea13afb829dfad82b43b9d9f86f42082a810c28cf4be074905320b8c540a6",
+        "ancestry": [
+          "S02 — Taskboard"
+        ],
+        "text": "## Interactions",
+        "sectionText": "## Interactions\n\n```yaml herdrweb-contract\ninteractions:\n  - id: A-S02-001\n    element: item_card\n    region: board\n    trigger: click\n    action: navigate\n    target: S03\n    payload: { item_id: \"$item.id\" }\n  - id: A-S02-002\n    element: add_item_button\n    region: controls\n    trigger: click\n    action: open_overlay\n    target: M03\n  - id: A-S02-003\n    element: group_header\n    region: board\n    trigger: click\n    action: mutate\n    effects: [toggle_group_collapsed, persist_collapse_state]\n  - id: A-S02-004\n    element: filter_control\n    region: controls\n    trigger: change\n    action: mutate\n    effects: [apply_filter, show_active_filter_summary]\n  - id: A-S02-005\n    element: group_by_control\n    region: controls\n    trigger: change\n    action: mutate\n    effects: [regroup_board]\n  - id: A-S02-006\n    element: needs_answer_entry\n    region: needs_answer_rail\n    trigger: click\n    action: navigate\n    target: S04\n  - id: A-S02-007\n    element: gateway_picker\n    region: topbar\n    trigger: change\n    action: mutate\n    effects: [switch_gateway_endpoint, reload_board]\n  - id: A-S02-008\n    element: board\n    listens_to: work.changed\n    action: mutate\n    effects: [refresh_affected_card]\n  - id: A-S02-009\n    element: needs_answer_rail\n    listens_to: question.opened\n    action: mutate\n    effects: [add_to_rail]\n  - id: A-S02-010\n    element: board\n    listens_to: gateway.unreachable\n    action: mutate\n    effects: [mark_stale, offer_retry]\n  - id: A-S02-011\n    element: card_quick_action\n    listens_to: item.quick_action\n    action: mutate\n    effects: [run_one_door_write_verb]\n  - id: A-S02-012\n    element: view_toggle_control\n    region: controls\n    trigger: click\n    action: mutate\n    effects: [switch_board_view, persist_view_state]\n  - id: A-S02-013\n    element: kanban_card\n    region: board\n    trigger: drag_drop\n    guard: \"board.view === 'kanban'\"\n    action: mutate\n    effects: [run_one_door_write_verb, regroup_board]\n```"
+      },
+      "sourceShownText": "## Interactions\n\n```yaml herdrweb-contract\ninteractions:\n  - id: A-S02-001\n    element: item_card\n    region: board\n    trigger: click\n    action: navigate\n    target: S03\n    payload: { item_id: \"$item.id\" }\n  - id: A-S02-002\n    element: add_item_button\n    region: controls\n    trigger: click\n    action: open_overlay\n    target: M03\n  - id: A-S02-003\n    element: group_header\n    region: board\n    trigger: click\n    action: mutate\n    effects: [toggle_group_collapsed, persist_collapse_state]\n  - id: A-S02-004\n    element: filter_control\n    region: controls\n    trigger: change\n    action: mutate\n    effects: [apply_filter, show_active_filter_summary]\n  - id: A-S02-005\n    element: group_by_control\n    region: controls\n    trigger: change\n    action: mutate\n    effects: [regroup_board]\n  - id: A-S02-006\n    element: needs_answer_entry\n    region: needs_answer_rail\n    trigger: click\n    action: navigate\n    target: S04\n  - id: A-S02-007\n    element: gateway_picker\n    region: topbar\n    trigger: change\n    action: mutate\n    effects: [switch_gateway_endpoint, reload_board]\n  - id: A-S02-008\n    element: board\n    listens_to: work.changed\n    action: mutate\n    effects: [refresh_affected_card]\n  - id: A-S02-009\n    element: needs_answer_rail\n    listens_to: question.opened\n    action: mutate\n    effects: [add_to_rail]\n  - id: A-S02-010\n    element: board\n    listens_to: gateway.unreachable\n    action: mutate\n    effects: [mark_stale, offer_retry]\n  - id: A-S02-011\n    element: card_quick_action\n    listens_to: item.quick_action\n    action: mutate\n    effects: [run_one_door_write_verb]\n  - id: A-S02-012\n    element: view_toggle_control\n    region: controls\n    trigger: click\n    action: mutate\n    effects: [switch_board_view, persist_view_state]\n  - id: A-S02-013\n    element: kanban_card\n    region: board\n    trigger: drag_drop\n    guard: \"board.view === 'kanban'\"\n    action: mutate\n    effects: [run_one_door_write_verb, regroup_board]\n```",
+      "sourceDigest": "2ff4e1779675c3cd12fc22aa14a5a68e794b4b7d58cd001ad9e2eb945a8452d2",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "targetAnchor": "interactions",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Interactions",
+        "anchor": "interactions",
+        "githubAnchor": "interactions",
+        "stableAnchor": "h-453e75d87933",
+        "startLine": 166,
+        "endLine": 166,
+        "textDigest": "2ff4e1779675c3cd12fc22aa14a5a68e794b4b7d58cd001ad9e2eb945a8452d2",
+        "sample": "Interactions",
+        "sectionPayloadDigest": "bad3057a791408cebe7749d16be0cac1086d0aa3a4825b16e2e96bf9494e5aa2",
+        "followingBlockDigest": "bad3057a791408cebe7749d16be0cac1086d0aa3a4825b16e2e96bf9494e5aa2",
+        "identityFingerprint": "de9ea13afb829dfad82b43b9d9f86f42082a810c28cf4be074905320b8c540a6",
+        "ancestry": [
+          "S02 — Taskboard"
+        ],
+        "text": "## Interactions",
+        "sectionText": "## Interactions\n\n```yaml herdrweb-contract\ninteractions:\n  - id: A-S02-001\n    element: item_card\n    region: board\n    trigger: click\n    action: navigate\n    target: S03\n    payload: { item_id: \"$item.id\" }\n  - id: A-S02-002\n    element: add_item_button\n    region: controls\n    trigger: click\n    action: open_overlay\n    target: M03\n  - id: A-S02-003\n    element: group_header\n    region: board\n    trigger: click\n    action: mutate\n    effects: [toggle_group_collapsed, persist_collapse_state]\n  - id: A-S02-004\n    element: filter_control\n    region: controls\n    trigger: change\n    action: mutate\n    effects: [apply_filter, show_active_filter_summary]\n  - id: A-S02-005\n    element: group_by_control\n    region: controls\n    trigger: change\n    action: mutate\n    effects: [regroup_board]\n  - id: A-S02-006\n    element: needs_answer_entry\n    region: needs_answer_rail\n    trigger: click\n    action: navigate\n    target: S04\n  - id: A-S02-007\n    element: gateway_picker\n    region: topbar\n    trigger: change\n    action: mutate\n    effects: [switch_gateway_endpoint, reload_board]\n  - id: A-S02-008\n    element: board\n    listens_to: work.changed\n    action: mutate\n    effects: [refresh_affected_card]\n  - id: A-S02-009\n    element: needs_answer_rail\n    listens_to: question.opened\n    action: mutate\n    effects: [add_to_rail]\n  - id: A-S02-010\n    element: board\n    listens_to: gateway.unreachable\n    action: mutate\n    effects: [mark_stale, offer_retry]\n  - id: A-S02-011\n    element: card_quick_action\n    listens_to: item.quick_action\n    action: mutate\n    effects: [run_one_door_write_verb]\n  - id: A-S02-012\n    element: view_toggle_control\n    region: controls\n    trigger: click\n    action: mutate\n    effects: [switch_board_view, persist_view_state]\n  - id: A-S02-013\n    element: kanban_card\n    region: board\n    trigger: drag_drop\n    guard: \"board.view === 'kanban'\"\n    action: mutate\n    effects: [run_one_door_write_verb, regroup_board]\n```"
+      },
+      "targetShownText": "## Interactions\n\n```yaml herdrweb-contract\ninteractions:\n  - id: A-S02-001\n    element: item_card\n    region: board\n    trigger: click\n    action: navigate\n    target: S03\n    payload: { item_id: \"$item.id\" }\n  - id: A-S02-002\n    element: add_item_button\n    region: controls\n    trigger: click\n    action: open_overlay\n    target: M03\n  - id: A-S02-003\n    element: group_header\n    region: board\n    trigger: click\n    action: mutate\n    effects: [toggle_group_collapsed, persist_collapse_state]\n  - id: A-S02-004\n    element: filter_control\n    region: controls\n    trigger: change\n    action: mutate\n    effects: [apply_filter, show_active_filter_summary]\n  - id: A-S02-005\n    element: group_by_control\n    region: controls\n    trigger: change\n    action: mutate\n    effects: [regroup_board]\n  - id: A-S02-006\n    element: needs_answer_entry\n    region: needs_answer_rail\n    trigger: click\n    action: navigate\n    target: S04\n  - id: A-S02-007\n    element: gateway_picker\n    region: topbar\n    trigger: change\n    action: mutate\n    effects: [switch_gateway_endpoint, reload_board]\n  - id: A-S02-008\n    element: board\n    listens_to: work.changed\n    action: mutate\n    effects: [refresh_affected_card]\n  - id: A-S02-009\n    element: needs_answer_rail\n    listens_to: question.opened\n    action: mutate\n    effects: [add_to_rail]\n  - id: A-S02-010\n    element: board\n    listens_to: gateway.unreachable\n    action: mutate\n    effects: [mark_stale, offer_retry]\n  - id: A-S02-011\n    element: card_quick_action\n    listens_to: item.quick_action\n    action: mutate\n    effects: [run_one_door_write_verb]\n  - id: A-S02-012\n    element: view_toggle_control\n    region: controls\n    trigger: click\n    action: mutate\n    effects: [switch_board_view, persist_view_state]\n  - id: A-S02-013\n    element: kanban_card\n    region: board\n    trigger: drag_drop\n    guard: \"board.view === 'kanban'\"\n    action: mutate\n    effects: [run_one_door_write_verb, regroup_board]\n```",
+      "targetDigest": "2ff4e1779675c3cd12fc22aa14a5a68e794b4b7d58cd001ad9e2eb945a8452d2",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_695d51475befe3701ccb1b7d9570db36",
+        "sourceUnitDigest": "2ff4e1779675c3cd12fc22aa14a5a68e794b4b7d58cd001ad9e2eb945a8452d2",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+        "targetAnchor": "interactions",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/ui-spec/screens/S02-taskboard.md#interactions (source lines 144-144) is carried at docs/platform/ui-spec/architecture/screens/S02-taskboard.md#interactions (candidate lines 166-166). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S02-taskboard.md verbatim in docs/platform/ui-spec/architecture/screens/S02-taskboard.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "2ff4e1779675c3cd12fc22aa14a5a68e794b4b7d58cd001ad9e2eb945a8452d2",
+        "targetAncestry": [
+          "S02 — Taskboard"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_47dd03576e4ae838330cee0a1a15e4bd",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S02-taskboard.md",
+      "sourceAnchor": "unheaded-block-15",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-15",
+        "githubAnchor": "unheaded-block-15",
+        "stableAnchor": "unheaded-block-15",
+        "title": "Unheaded block 15",
+        "startLine": 146,
+        "endLine": 224,
+        "textDigest": "bad3057a791408cebe7749d16be0cac1086d0aa3a4825b16e2e96bf9494e5aa2",
+        "sample": "```yaml herdrweb-contract\ninteractions:\n  - id: A-S02-001\n    element: item_card\n    region: board\n    trigger: click\n    action: navigate\n    target: S03\n    payload: { item_id: \"",
+        "identityFingerprint": "453593b43656213abbcff4e9ef7f1d7b8e1a207595adc8d1c7fc45e93abedcba",
+        "ancestry": [
+          "S02 — Taskboard",
+          "Interactions"
+        ],
+        "text": "```yaml herdrweb-contract\ninteractions:\n  - id: A-S02-001\n    element: item_card\n    region: board\n    trigger: click\n    action: navigate\n    target: S03\n    payload: { item_id: \"$item.id\" }\n  - id: A-S02-002\n    element: add_item_button\n    region: controls\n    trigger: click\n    action: open_overlay\n    target: M03\n  - id: A-S02-003\n    element: group_header\n    region: board\n    trigger: click\n    action: mutate\n    effects: [toggle_group_collapsed, persist_collapse_state]\n  - id: A-S02-004\n    element: filter_control\n    region: controls\n    trigger: change\n    action: mutate\n    effects: [apply_filter, show_active_filter_summary]\n  - id: A-S02-005\n    element: group_by_control\n    region: controls\n    trigger: change\n    action: mutate\n    effects: [regroup_board]\n  - id: A-S02-006\n    element: needs_answer_entry\n    region: needs_answer_rail\n    trigger: click\n    action: navigate\n    target: S04\n  - id: A-S02-007\n    element: gateway_picker\n    region: topbar\n    trigger: change\n    action: mutate\n    effects: [switch_gateway_endpoint, reload_board]\n  - id: A-S02-008\n    element: board\n    listens_to: work.changed\n    action: mutate\n    effects: [refresh_affected_card]\n  - id: A-S02-009\n    element: needs_answer_rail\n    listens_to: question.opened\n    action: mutate\n    effects: [add_to_rail]\n  - id: A-S02-010\n    element: board\n    listens_to: gateway.unreachable\n    action: mutate\n    effects: [mark_stale, offer_retry]\n  - id: A-S02-011\n    element: card_quick_action\n    listens_to: item.quick_action\n    action: mutate\n    effects: [run_one_door_write_verb]\n  - id: A-S02-012\n    element: view_toggle_control\n    region: controls\n    trigger: click\n    action: mutate\n    effects: [switch_board_view, persist_view_state]\n  - id: A-S02-013\n    element: kanban_card\n    region: board\n    trigger: drag_drop\n    guard: \"board.view === 'kanban'\"\n    action: mutate\n    effects: [run_one_door_write_verb, regroup_board]\n```"
+      },
+      "sourceShownText": "```yaml herdrweb-contract\ninteractions:\n  - id: A-S02-001\n    element: item_card\n    region: board\n    trigger: click\n    action: navigate\n    target: S03\n    payload: { item_id: \"$item.id\" }\n  - id: A-S02-002\n    element: add_item_button\n    region: controls\n    trigger: click\n    action: open_overlay\n    target: M03\n  - id: A-S02-003\n    element: group_header\n    region: board\n    trigger: click\n    action: mutate\n    effects: [toggle_group_collapsed, persist_collapse_state]\n  - id: A-S02-004\n    element: filter_control\n    region: controls\n    trigger: change\n    action: mutate\n    effects: [apply_filter, show_active_filter_summary]\n  - id: A-S02-005\n    element: group_by_control\n    region: controls\n    trigger: change\n    action: mutate\n    effects: [regroup_board]\n  - id: A-S02-006\n    element: needs_answer_entry\n    region: needs_answer_rail\n    trigger: click\n    action: navigate\n    target: S04\n  - id: A-S02-007\n    element: gateway_picker\n    region: topbar\n    trigger: change\n    action: mutate\n    effects: [switch_gateway_endpoint, reload_board]\n  - id: A-S02-008\n    element: board\n    listens_to: work.changed\n    action: mutate\n    effects: [refresh_affected_card]\n  - id: A-S02-009\n    element: needs_answer_rail\n    listens_to: question.opened\n    action: mutate\n    effects: [add_to_rail]\n  - id: A-S02-010\n    element: board\n    listens_to: gateway.unreachable\n    action: mutate\n    effects: [mark_stale, offer_retry]\n  - id: A-S02-011\n    element: card_quick_action\n    listens_to: item.quick_action\n    action: mutate\n    effects: [run_one_door_write_verb]\n  - id: A-S02-012\n    element: view_toggle_control\n    region: controls\n    trigger: click\n    action: mutate\n    effects: [switch_board_view, persist_view_state]\n  - id: A-S02-013\n    element: kanban_card\n    region: board\n    trigger: drag_drop\n    guard: \"board.view === 'kanban'\"\n    action: mutate\n    effects: [run_one_door_write_verb, regroup_board]\n```",
+      "sourceDigest": "bad3057a791408cebe7749d16be0cac1086d0aa3a4825b16e2e96bf9494e5aa2",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "targetAnchor": "unheaded-block-17",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-17",
+        "githubAnchor": "unheaded-block-17",
+        "stableAnchor": "unheaded-block-17",
+        "title": "Unheaded block 17",
+        "startLine": 168,
+        "endLine": 246,
+        "textDigest": "bad3057a791408cebe7749d16be0cac1086d0aa3a4825b16e2e96bf9494e5aa2",
+        "sample": "```yaml herdrweb-contract\ninteractions:\n  - id: A-S02-001\n    element: item_card\n    region: board\n    trigger: click\n    action: navigate\n    target: S03\n    payload: { item_id: \"",
+        "identityFingerprint": "453593b43656213abbcff4e9ef7f1d7b8e1a207595adc8d1c7fc45e93abedcba",
+        "ancestry": [
+          "S02 — Taskboard",
+          "Interactions"
+        ],
+        "text": "```yaml herdrweb-contract\ninteractions:\n  - id: A-S02-001\n    element: item_card\n    region: board\n    trigger: click\n    action: navigate\n    target: S03\n    payload: { item_id: \"$item.id\" }\n  - id: A-S02-002\n    element: add_item_button\n    region: controls\n    trigger: click\n    action: open_overlay\n    target: M03\n  - id: A-S02-003\n    element: group_header\n    region: board\n    trigger: click\n    action: mutate\n    effects: [toggle_group_collapsed, persist_collapse_state]\n  - id: A-S02-004\n    element: filter_control\n    region: controls\n    trigger: change\n    action: mutate\n    effects: [apply_filter, show_active_filter_summary]\n  - id: A-S02-005\n    element: group_by_control\n    region: controls\n    trigger: change\n    action: mutate\n    effects: [regroup_board]\n  - id: A-S02-006\n    element: needs_answer_entry\n    region: needs_answer_rail\n    trigger: click\n    action: navigate\n    target: S04\n  - id: A-S02-007\n    element: gateway_picker\n    region: topbar\n    trigger: change\n    action: mutate\n    effects: [switch_gateway_endpoint, reload_board]\n  - id: A-S02-008\n    element: board\n    listens_to: work.changed\n    action: mutate\n    effects: [refresh_affected_card]\n  - id: A-S02-009\n    element: needs_answer_rail\n    listens_to: question.opened\n    action: mutate\n    effects: [add_to_rail]\n  - id: A-S02-010\n    element: board\n    listens_to: gateway.unreachable\n    action: mutate\n    effects: [mark_stale, offer_retry]\n  - id: A-S02-011\n    element: card_quick_action\n    listens_to: item.quick_action\n    action: mutate\n    effects: [run_one_door_write_verb]\n  - id: A-S02-012\n    element: view_toggle_control\n    region: controls\n    trigger: click\n    action: mutate\n    effects: [switch_board_view, persist_view_state]\n  - id: A-S02-013\n    element: kanban_card\n    region: board\n    trigger: drag_drop\n    guard: \"board.view === 'kanban'\"\n    action: mutate\n    effects: [run_one_door_write_verb, regroup_board]\n```"
+      },
+      "targetShownText": "```yaml herdrweb-contract\ninteractions:\n  - id: A-S02-001\n    element: item_card\n    region: board\n    trigger: click\n    action: navigate\n    target: S03\n    payload: { item_id: \"$item.id\" }\n  - id: A-S02-002\n    element: add_item_button\n    region: controls\n    trigger: click\n    action: open_overlay\n    target: M03\n  - id: A-S02-003\n    element: group_header\n    region: board\n    trigger: click\n    action: mutate\n    effects: [toggle_group_collapsed, persist_collapse_state]\n  - id: A-S02-004\n    element: filter_control\n    region: controls\n    trigger: change\n    action: mutate\n    effects: [apply_filter, show_active_filter_summary]\n  - id: A-S02-005\n    element: group_by_control\n    region: controls\n    trigger: change\n    action: mutate\n    effects: [regroup_board]\n  - id: A-S02-006\n    element: needs_answer_entry\n    region: needs_answer_rail\n    trigger: click\n    action: navigate\n    target: S04\n  - id: A-S02-007\n    element: gateway_picker\n    region: topbar\n    trigger: change\n    action: mutate\n    effects: [switch_gateway_endpoint, reload_board]\n  - id: A-S02-008\n    element: board\n    listens_to: work.changed\n    action: mutate\n    effects: [refresh_affected_card]\n  - id: A-S02-009\n    element: needs_answer_rail\n    listens_to: question.opened\n    action: mutate\n    effects: [add_to_rail]\n  - id: A-S02-010\n    element: board\n    listens_to: gateway.unreachable\n    action: mutate\n    effects: [mark_stale, offer_retry]\n  - id: A-S02-011\n    element: card_quick_action\n    listens_to: item.quick_action\n    action: mutate\n    effects: [run_one_door_write_verb]\n  - id: A-S02-012\n    element: view_toggle_control\n    region: controls\n    trigger: click\n    action: mutate\n    effects: [switch_board_view, persist_view_state]\n  - id: A-S02-013\n    element: kanban_card\n    region: board\n    trigger: drag_drop\n    guard: \"board.view === 'kanban'\"\n    action: mutate\n    effects: [run_one_door_write_verb, regroup_board]\n```",
+      "targetDigest": "bad3057a791408cebe7749d16be0cac1086d0aa3a4825b16e2e96bf9494e5aa2",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_47dd03576e4ae838330cee0a1a15e4bd",
+        "sourceUnitDigest": "bad3057a791408cebe7749d16be0cac1086d0aa3a4825b16e2e96bf9494e5aa2",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+        "targetAnchor": "unheaded-block-17",
+        "claimKind": "contract",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/screens/S02-taskboard.md#unheaded-block-15 (source lines 146-224) is carried at docs/platform/ui-spec/architecture/screens/S02-taskboard.md#unheaded-block-17 (candidate lines 168-246). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S02-taskboard.md verbatim in docs/platform/ui-spec/architecture/screens/S02-taskboard.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "bad3057a791408cebe7749d16be0cac1086d0aa3a4825b16e2e96bf9494e5aa2",
+        "targetAncestry": [
+          "S02 — Taskboard",
+          "Interactions"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,637 @@
+{
+  "version": 1,
+  "contentCommit": "1276467f37a99d19aff05808d42fafbf40341449",
+  "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+  "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+  "sourcePath": "docs/ui-spec/flows/F02-approve-a-merge.md",
+  "part": 1,
+  "parts": 1,
+  "count": 9,
+  "classes": {
+    "Unit-exact": [
+      "claim_5f420ddb02566c9c8a56fbafd6b983e2",
+      "claim_60dac881eaa2cdcd199178d215ffbb36",
+      "claim_1d369d57f0c92d6946fd444b3c185ee9",
+      "claim_c4e3bc74cc2ced13097609eb24abd538",
+      "claim_0bdecaf6bb7f4c5d03d4dd32edd6e372"
+    ],
+    "Weak-exact": [
+      "claim_f842d35b41d8dffa74f3046ff8849c84",
+      "claim_f7005f7ebad9ae0ce51496641db22437",
+      "claim_20574a3ed563c18bcb4429ef021da422"
+    ],
+    "Judgment": [
+      "claim_c3403dd5ad03f954dc9df76b0cdfd920"
+    ]
+  },
+  "unequalDigestPairs": [
+    "claim_c3403dd5ad03f954dc9df76b0cdfd920"
+  ],
+  "noTargetGeneratedRows": [],
+  "mandatoryDeep": [
+    "claim_c3403dd5ad03f954dc9df76b0cdfd920"
+  ],
+  "reviewerSeedRequired": true,
+  "minimumSeededWeakJudgment": 4,
+  "rows": [
+    {
+      "claimId": "claim_5f420ddb02566c9c8a56fbafd6b983e2",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/flows/F02-approve-a-merge.md",
+      "sourceAnchor": "unheaded-block-1",
+      "source": {
+        "unitKind": "unheaded-preamble",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded preamble",
+        "startLine": 1,
+        "endLine": 11,
+        "textDigest": "7d74b74c5b051465a4b4e23eab5a5457e44425ba878bdede39e6035f831ef106",
+        "sample": "---\nid: F02\ntype: flow\nname: \"Approve a merge, end to end\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: []\nregions: []\n---",
+        "identityFingerprint": "dc453f485abcf5d27d34ed5f086d7939740bab75b79ce1144a59173aab9e18d0",
+        "ancestry": [],
+        "text": "---\nid: F02\ntype: flow\nname: \"Approve a merge, end to end\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: []\nregions: []\n---"
+      },
+      "sourceShownText": "---\nid: F02\ntype: flow\nname: \"Approve a merge, end to end\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: []\nregions: []\n---",
+      "sourceDigest": "7d74b74c5b051465a4b4e23eab5a5457e44425ba878bdede39e6035f831ef106",
+      "targetPath": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+      "targetAnchor": "unheaded-block-1",
+      "target": {
+        "unitKind": "unheaded-preamble",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded preamble",
+        "startLine": 1,
+        "endLine": 11,
+        "textDigest": "7d74b74c5b051465a4b4e23eab5a5457e44425ba878bdede39e6035f831ef106",
+        "sample": "---\nid: F02\ntype: flow\nname: \"Approve a merge, end to end\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: []\nregions: []\n---",
+        "identityFingerprint": "dc453f485abcf5d27d34ed5f086d7939740bab75b79ce1144a59173aab9e18d0",
+        "ancestry": [],
+        "text": "---\nid: F02\ntype: flow\nname: \"Approve a merge, end to end\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: []\nregions: []\n---"
+      },
+      "targetShownText": "---\nid: F02\ntype: flow\nname: \"Approve a merge, end to end\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: []\nregions: []\n---",
+      "targetDigest": "7d74b74c5b051465a4b4e23eab5a5457e44425ba878bdede39e6035f831ef106",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_5f420ddb02566c9c8a56fbafd6b983e2",
+        "sourceUnitDigest": "7d74b74c5b051465a4b4e23eab5a5457e44425ba878bdede39e6035f831ef106",
+        "targetOwner": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+        "targetAnchor": "unheaded-block-1",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-preamble unit docs/ui-spec/flows/F02-approve-a-merge.md#unheaded-block-1 (source lines 1-11) is carried at docs/platform/ui-spec/operations/F02-approve-a-merge.md#unheaded-block-1 (candidate lines 1-11). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/flows/F02-approve-a-merge.md verbatim in docs/platform/ui-spec/operations/F02-approve-a-merge.md. Map kind guide-runbook is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "7d74b74c5b051465a4b4e23eab5a5457e44425ba878bdede39e6035f831ef106",
+        "targetAncestry": []
+      }
+    },
+    {
+      "claimId": "claim_c3403dd5ad03f954dc9df76b0cdfd920",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/flows/F02-approve-a-merge.md",
+      "sourceAnchor": "f02-approve-a-merge-end-to-end",
+      "source": {
+        "unitKind": "heading",
+        "level": 1,
+        "title": "F02 — Approve a merge, end to end",
+        "anchor": "f02-approve-a-merge-end-to-end",
+        "githubAnchor": "f02-approve-a-merge-end-to-end",
+        "stableAnchor": "h-f35a192a5ed9",
+        "startLine": 13,
+        "endLine": 13,
+        "textDigest": "dbc61e203133d70aa3e54b3c37c3d40baee3297fea3e5877a9e17be8189dbdbf",
+        "sample": "F02 — Approve a merge, end to end",
+        "sectionPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "followingBlockDigest": null,
+        "identityFingerprint": "173e588dc3aad761689417a975f879932950fa3b77e54a5a931cc47d6da190e1",
+        "ancestry": [],
+        "text": "# F02 — Approve a merge, end to end",
+        "sectionText": "# F02 — Approve a merge, end to end"
+      },
+      "sourceShownText": "# F02 — Approve a merge, end to end",
+      "sourceDigest": "dbc61e203133d70aa3e54b3c37c3d40baee3297fea3e5877a9e17be8189dbdbf",
+      "targetPath": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+      "targetAnchor": "f02-approve-a-merge-end-to-end",
+      "target": {
+        "unitKind": "heading",
+        "level": 1,
+        "title": "F02 — Approve a merge, end to end",
+        "anchor": "f02-approve-a-merge-end-to-end",
+        "githubAnchor": "f02-approve-a-merge-end-to-end",
+        "stableAnchor": "h-f35a192a5ed9",
+        "startLine": 13,
+        "endLine": 13,
+        "textDigest": "9f0af999ce086d659b25211989bf844d88cedf2430226d3716cb22ecdadcfc50",
+        "sample": "F02 — Approve a merge, end to end",
+        "sectionPayloadDigest": "694b9a61224693c5c0046c812efefe3295dcf694686ebf2fb4fc2cdf3c52d898",
+        "followingBlockDigest": "a84c511067da8dae846303eac65dc5a197a3d65f267328b344ce9dfb12182690",
+        "identityFingerprint": "a9ca9114cd2c33f6f4ed0c5a36c7141e18fd9af0c9c62f23b8723cad54b6262e",
+        "ancestry": [],
+        "text": "# F02 — Approve a merge, end to end",
+        "sectionText": "# F02 — Approve a merge, end to end\n\n```txt\nDocument type: Guide / Runbook\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve mapped legacy content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; current implementation truth is not certified\nProvenance: docs/ui-spec/flows/F02-approve-a-merge.md at 111adc51fd047d99121fd9d076eb4794c87045a4\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing carriage, placement and source conservation\nDo not use this for: Current canonical authority or implemented-behavior proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/ui-spec/flows/F02-approve-a-merge.md\nSupersedes: None; candidate only\nSuperseded by: None\n```\n\n> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions."
+      },
+      "targetShownText": "# F02 — Approve a merge, end to end\n\n```txt\nDocument type: Guide / Runbook\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve mapped legacy content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; current implementation truth is not certified\nProvenance: docs/ui-spec/flows/F02-approve-a-merge.md at 111adc51fd047d99121fd9d076eb4794c87045a4\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing carriage, placement and source conservation\nDo not use this for: Current canonical authority or implemented-behavior proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/ui-spec/flows/F02-approve-a-merge.md\nSupersedes: None; candidate only\nSuperseded by: None\n```\n\n> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions.",
+      "targetDigest": "9f0af999ce086d659b25211989bf844d88cedf2430226d3716cb22ecdadcfc50",
+      "classification": "Judgment",
+      "mandatoryDeep": true,
+      "decision": {
+        "claimId": "claim_c3403dd5ad03f954dc9df76b0cdfd920",
+        "sourceUnitDigest": "dbc61e203133d70aa3e54b3c37c3d40baee3297fea3e5877a9e17be8189dbdbf",
+        "targetOwner": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+        "targetAnchor": "f02-approve-a-merge-end-to-end",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Judgment: no target digest match. The whole heading unit docs/ui-spec/flows/F02-approve-a-merge.md#f02-approve-a-merge-end-to-end (source lines 13-13) is carried at docs/platform/ui-spec/operations/F02-approve-a-merge.md#f02-approve-a-merge-end-to-end (candidate lines 13-13). The heading section digest changes because labelled candidate metadata is inserted after the original H1; original heading and direct source payload remain verbatim. Frozen specs-ui map and Step 8: preserve docs/ui-spec/flows/F02-approve-a-merge.md verbatim in docs/platform/ui-spec/operations/F02-approve-a-merge.md. Map kind guide-runbook is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "9f0af999ce086d659b25211989bf844d88cedf2430226d3716cb22ecdadcfc50",
+        "targetAncestry": []
+      }
+    },
+    {
+      "claimId": "claim_f842d35b41d8dffa74f3046ff8849c84",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/flows/F02-approve-a-merge.md",
+      "sourceAnchor": "purpose",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Purpose",
+        "anchor": "purpose",
+        "githubAnchor": "purpose",
+        "stableAnchor": "h-2f4fe421d538",
+        "startLine": 15,
+        "endLine": 15,
+        "textDigest": "964b1729bc45333c4be1e9e22133009a3ea41d19b56884481e8a1f3201d0d448",
+        "sample": "Purpose",
+        "sectionPayloadDigest": "b89920d32de2e95a424ca8027ac2ae5084becee16016525d4f12d2c9127b5aef",
+        "followingBlockDigest": "b89920d32de2e95a424ca8027ac2ae5084becee16016525d4f12d2c9127b5aef",
+        "identityFingerprint": "7237dc4c2cd1de7a4922d27606d5d02fab03a283ee644d175bd62a4d2d998745",
+        "ancestry": [
+          "F02 — Approve a merge, end to end"
+        ],
+        "text": "## Purpose",
+        "sectionText": "## Purpose\n\nThe only flow on this client that changes trunk. Everything about its\nshape is downstream of that one fact."
+      },
+      "sourceShownText": "## Purpose\n\nThe only flow on this client that changes trunk. Everything about its\nshape is downstream of that one fact.",
+      "sourceDigest": "964b1729bc45333c4be1e9e22133009a3ea41d19b56884481e8a1f3201d0d448",
+      "targetPath": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+      "targetAnchor": "purpose",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Purpose",
+        "anchor": "purpose",
+        "githubAnchor": "purpose",
+        "stableAnchor": "h-15cea22a442e",
+        "startLine": 37,
+        "endLine": 37,
+        "textDigest": "964b1729bc45333c4be1e9e22133009a3ea41d19b56884481e8a1f3201d0d448",
+        "sample": "Purpose",
+        "sectionPayloadDigest": "b89920d32de2e95a424ca8027ac2ae5084becee16016525d4f12d2c9127b5aef",
+        "followingBlockDigest": "b89920d32de2e95a424ca8027ac2ae5084becee16016525d4f12d2c9127b5aef",
+        "identityFingerprint": "7237dc4c2cd1de7a4922d27606d5d02fab03a283ee644d175bd62a4d2d998745",
+        "ancestry": [
+          "F02 — Approve a merge, end to end"
+        ],
+        "text": "## Purpose",
+        "sectionText": "## Purpose\n\nThe only flow on this client that changes trunk. Everything about its\nshape is downstream of that one fact."
+      },
+      "targetShownText": "## Purpose\n\nThe only flow on this client that changes trunk. Everything about its\nshape is downstream of that one fact.",
+      "targetDigest": "964b1729bc45333c4be1e9e22133009a3ea41d19b56884481e8a1f3201d0d448",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_f842d35b41d8dffa74f3046ff8849c84",
+        "sourceUnitDigest": "964b1729bc45333c4be1e9e22133009a3ea41d19b56884481e8a1f3201d0d448",
+        "targetOwner": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+        "targetAnchor": "purpose",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/ui-spec/flows/F02-approve-a-merge.md#purpose (source lines 15-15) is carried at docs/platform/ui-spec/operations/F02-approve-a-merge.md#purpose (candidate lines 37-37). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/flows/F02-approve-a-merge.md verbatim in docs/platform/ui-spec/operations/F02-approve-a-merge.md. Map kind guide-runbook is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "964b1729bc45333c4be1e9e22133009a3ea41d19b56884481e8a1f3201d0d448",
+        "targetAncestry": [
+          "F02 — Approve a merge, end to end"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_60dac881eaa2cdcd199178d215ffbb36",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/flows/F02-approve-a-merge.md",
+      "sourceAnchor": "unheaded-block-2",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-2",
+        "githubAnchor": "unheaded-block-2",
+        "stableAnchor": "unheaded-block-2",
+        "title": "Unheaded block 2",
+        "startLine": 17,
+        "endLine": 18,
+        "textDigest": "b89920d32de2e95a424ca8027ac2ae5084becee16016525d4f12d2c9127b5aef",
+        "sample": "The only flow on this client that changes trunk. Everything about its\nshape is downstream of that one fact.",
+        "identityFingerprint": "33715dd68de84413b152f7b03dacc92a92ea0e9b01d9aff543392f0f637caf43",
+        "ancestry": [
+          "F02 — Approve a merge, end to end",
+          "Purpose"
+        ],
+        "text": "The only flow on this client that changes trunk. Everything about its\nshape is downstream of that one fact."
+      },
+      "sourceShownText": "The only flow on this client that changes trunk. Everything about its\nshape is downstream of that one fact.",
+      "sourceDigest": "b89920d32de2e95a424ca8027ac2ae5084becee16016525d4f12d2c9127b5aef",
+      "targetPath": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+      "targetAnchor": "unheaded-block-4",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 39,
+        "endLine": 40,
+        "textDigest": "b89920d32de2e95a424ca8027ac2ae5084becee16016525d4f12d2c9127b5aef",
+        "sample": "The only flow on this client that changes trunk. Everything about its\nshape is downstream of that one fact.",
+        "identityFingerprint": "33715dd68de84413b152f7b03dacc92a92ea0e9b01d9aff543392f0f637caf43",
+        "ancestry": [
+          "F02 — Approve a merge, end to end",
+          "Purpose"
+        ],
+        "text": "The only flow on this client that changes trunk. Everything about its\nshape is downstream of that one fact."
+      },
+      "targetShownText": "The only flow on this client that changes trunk. Everything about its\nshape is downstream of that one fact.",
+      "targetDigest": "b89920d32de2e95a424ca8027ac2ae5084becee16016525d4f12d2c9127b5aef",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_60dac881eaa2cdcd199178d215ffbb36",
+        "sourceUnitDigest": "b89920d32de2e95a424ca8027ac2ae5084becee16016525d4f12d2c9127b5aef",
+        "targetOwner": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+        "targetAnchor": "unheaded-block-4",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/flows/F02-approve-a-merge.md#unheaded-block-2 (source lines 17-18) is carried at docs/platform/ui-spec/operations/F02-approve-a-merge.md#unheaded-block-4 (candidate lines 39-40). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/flows/F02-approve-a-merge.md verbatim in docs/platform/ui-spec/operations/F02-approve-a-merge.md. Map kind guide-runbook is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "b89920d32de2e95a424ca8027ac2ae5084becee16016525d4f12d2c9127b5aef",
+        "targetAncestry": [
+          "F02 — Approve a merge, end to end",
+          "Purpose"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_f7005f7ebad9ae0ce51496641db22437",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/flows/F02-approve-a-merge.md",
+      "sourceAnchor": "steps",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Steps",
+        "anchor": "steps",
+        "githubAnchor": "steps",
+        "stableAnchor": "h-e42f65fff125",
+        "startLine": 20,
+        "endLine": 20,
+        "textDigest": "6c706c276db8d7ba2f3445aa4cddb2384a72168f10e8ec1ed0a5a096fe19bd39",
+        "sample": "Steps",
+        "sectionPayloadDigest": "c66607647f3353fc31e1b288c83d8edbac45954da8e277c6615a9f03a4c4550c",
+        "followingBlockDigest": "c66607647f3353fc31e1b288c83d8edbac45954da8e277c6615a9f03a4c4550c",
+        "identityFingerprint": "5bfc9138d1e177fdeda92986015b2a7ca730504947692a4259fed4840a0da4f5",
+        "ancestry": [
+          "F02 — Approve a merge, end to end"
+        ],
+        "text": "## Steps",
+        "sectionText": "## Steps\n\n1. **Land on the taskboard** (S02) — the item sits in the `NEEDS ANSWER`\n   group tagged as a gate, because D4 makes a gate-approve question the\n   same category to a person as an `ask`.\n2. **Open the item** (S03) — the person reads what the agent did, the\n   narrative first, machine log collapsed.\n3. **Trigger approve** — `Approve merge` in the ACTIONS region, visually\n   distinct from `Edit`/`Retire` (R8). If the gateway is not at the\n   repository's main working tree, this control is **disabled with the\n   reason attached** (ERR-APPROVE-UNAVAILABLE) and the flow stops here,\n   honestly, before the person invests any attention.\n4. **Confirm** (M02) — what lands, into which branch, which verb runs on\n   which machine, and what happens if the re-run verify fails.\n5. **Wait** — approve is not instant; the verify re-runs before anything\n   merges. ST-SUBMITTING keeps the modal alive rather than looking frozen.\n6. **Outcome** — `merge.settled` arrives. Delivered, or parked blocked\n   with the engine's own reason. Both are shown; neither is summarized\n   into \"something went wrong\"."
+      },
+      "sourceShownText": "## Steps\n\n1. **Land on the taskboard** (S02) — the item sits in the `NEEDS ANSWER`\n   group tagged as a gate, because D4 makes a gate-approve question the\n   same category to a person as an `ask`.\n2. **Open the item** (S03) — the person reads what the agent did, the\n   narrative first, machine log collapsed.\n3. **Trigger approve** — `Approve merge` in the ACTIONS region, visually\n   distinct from `Edit`/`Retire` (R8). If the gateway is not at the\n   repository's main working tree, this control is **disabled with the\n   reason attached** (ERR-APPROVE-UNAVAILABLE) and the flow stops here,\n   honestly, before the person invests any attention.\n4. **Confirm** (M02) — what lands, into which branch, which verb runs on\n   which machine, and what happens if the re-run verify fails.\n5. **Wait** — approve is not instant; the verify re-runs before anything\n   merges. ST-SUBMITTING keeps the modal alive rather than looking frozen.\n6. **Outcome** — `merge.settled` arrives. Delivered, or parked blocked\n   with the engine's own reason. Both are shown; neither is summarized\n   into \"something went wrong\".",
+      "sourceDigest": "6c706c276db8d7ba2f3445aa4cddb2384a72168f10e8ec1ed0a5a096fe19bd39",
+      "targetPath": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+      "targetAnchor": "steps",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Steps",
+        "anchor": "steps",
+        "githubAnchor": "steps",
+        "stableAnchor": "h-97bcc540e5aa",
+        "startLine": 42,
+        "endLine": 42,
+        "textDigest": "6c706c276db8d7ba2f3445aa4cddb2384a72168f10e8ec1ed0a5a096fe19bd39",
+        "sample": "Steps",
+        "sectionPayloadDigest": "c66607647f3353fc31e1b288c83d8edbac45954da8e277c6615a9f03a4c4550c",
+        "followingBlockDigest": "c66607647f3353fc31e1b288c83d8edbac45954da8e277c6615a9f03a4c4550c",
+        "identityFingerprint": "5bfc9138d1e177fdeda92986015b2a7ca730504947692a4259fed4840a0da4f5",
+        "ancestry": [
+          "F02 — Approve a merge, end to end"
+        ],
+        "text": "## Steps",
+        "sectionText": "## Steps\n\n1. **Land on the taskboard** (S02) — the item sits in the `NEEDS ANSWER`\n   group tagged as a gate, because D4 makes a gate-approve question the\n   same category to a person as an `ask`.\n2. **Open the item** (S03) — the person reads what the agent did, the\n   narrative first, machine log collapsed.\n3. **Trigger approve** — `Approve merge` in the ACTIONS region, visually\n   distinct from `Edit`/`Retire` (R8). If the gateway is not at the\n   repository's main working tree, this control is **disabled with the\n   reason attached** (ERR-APPROVE-UNAVAILABLE) and the flow stops here,\n   honestly, before the person invests any attention.\n4. **Confirm** (M02) — what lands, into which branch, which verb runs on\n   which machine, and what happens if the re-run verify fails.\n5. **Wait** — approve is not instant; the verify re-runs before anything\n   merges. ST-SUBMITTING keeps the modal alive rather than looking frozen.\n6. **Outcome** — `merge.settled` arrives. Delivered, or parked blocked\n   with the engine's own reason. Both are shown; neither is summarized\n   into \"something went wrong\"."
+      },
+      "targetShownText": "## Steps\n\n1. **Land on the taskboard** (S02) — the item sits in the `NEEDS ANSWER`\n   group tagged as a gate, because D4 makes a gate-approve question the\n   same category to a person as an `ask`.\n2. **Open the item** (S03) — the person reads what the agent did, the\n   narrative first, machine log collapsed.\n3. **Trigger approve** — `Approve merge` in the ACTIONS region, visually\n   distinct from `Edit`/`Retire` (R8). If the gateway is not at the\n   repository's main working tree, this control is **disabled with the\n   reason attached** (ERR-APPROVE-UNAVAILABLE) and the flow stops here,\n   honestly, before the person invests any attention.\n4. **Confirm** (M02) — what lands, into which branch, which verb runs on\n   which machine, and what happens if the re-run verify fails.\n5. **Wait** — approve is not instant; the verify re-runs before anything\n   merges. ST-SUBMITTING keeps the modal alive rather than looking frozen.\n6. **Outcome** — `merge.settled` arrives. Delivered, or parked blocked\n   with the engine's own reason. Both are shown; neither is summarized\n   into \"something went wrong\".",
+      "targetDigest": "6c706c276db8d7ba2f3445aa4cddb2384a72168f10e8ec1ed0a5a096fe19bd39",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_f7005f7ebad9ae0ce51496641db22437",
+        "sourceUnitDigest": "6c706c276db8d7ba2f3445aa4cddb2384a72168f10e8ec1ed0a5a096fe19bd39",
+        "targetOwner": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+        "targetAnchor": "steps",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/ui-spec/flows/F02-approve-a-merge.md#steps (source lines 20-20) is carried at docs/platform/ui-spec/operations/F02-approve-a-merge.md#steps (candidate lines 42-42). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/flows/F02-approve-a-merge.md verbatim in docs/platform/ui-spec/operations/F02-approve-a-merge.md. Map kind guide-runbook is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "6c706c276db8d7ba2f3445aa4cddb2384a72168f10e8ec1ed0a5a096fe19bd39",
+        "targetAncestry": [
+          "F02 — Approve a merge, end to end"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_1d369d57f0c92d6946fd444b3c185ee9",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/flows/F02-approve-a-merge.md",
+      "sourceAnchor": "unheaded-block-3",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 22,
+        "endLine": 38,
+        "textDigest": "c66607647f3353fc31e1b288c83d8edbac45954da8e277c6615a9f03a4c4550c",
+        "sample": "1. **Land on the taskboard** (S02) — the item sits in the `NEEDS ANSWER`\n   group tagged as a gate, because D4 makes a gate-approve question the\n   same category to a person as an ",
+        "identityFingerprint": "0999d87eda2273c880b58fbf2b836057e439b1d064678d107f792cfc84b6cddb",
+        "ancestry": [
+          "F02 — Approve a merge, end to end",
+          "Steps"
+        ],
+        "text": "1. **Land on the taskboard** (S02) — the item sits in the `NEEDS ANSWER`\n   group tagged as a gate, because D4 makes a gate-approve question the\n   same category to a person as an `ask`.\n2. **Open the item** (S03) — the person reads what the agent did, the\n   narrative first, machine log collapsed.\n3. **Trigger approve** — `Approve merge` in the ACTIONS region, visually\n   distinct from `Edit`/`Retire` (R8). If the gateway is not at the\n   repository's main working tree, this control is **disabled with the\n   reason attached** (ERR-APPROVE-UNAVAILABLE) and the flow stops here,\n   honestly, before the person invests any attention.\n4. **Confirm** (M02) — what lands, into which branch, which verb runs on\n   which machine, and what happens if the re-run verify fails.\n5. **Wait** — approve is not instant; the verify re-runs before anything\n   merges. ST-SUBMITTING keeps the modal alive rather than looking frozen.\n6. **Outcome** — `merge.settled` arrives. Delivered, or parked blocked\n   with the engine's own reason. Both are shown; neither is summarized\n   into \"something went wrong\"."
+      },
+      "sourceShownText": "1. **Land on the taskboard** (S02) — the item sits in the `NEEDS ANSWER`\n   group tagged as a gate, because D4 makes a gate-approve question the\n   same category to a person as an `ask`.\n2. **Open the item** (S03) — the person reads what the agent did, the\n   narrative first, machine log collapsed.\n3. **Trigger approve** — `Approve merge` in the ACTIONS region, visually\n   distinct from `Edit`/`Retire` (R8). If the gateway is not at the\n   repository's main working tree, this control is **disabled with the\n   reason attached** (ERR-APPROVE-UNAVAILABLE) and the flow stops here,\n   honestly, before the person invests any attention.\n4. **Confirm** (M02) — what lands, into which branch, which verb runs on\n   which machine, and what happens if the re-run verify fails.\n5. **Wait** — approve is not instant; the verify re-runs before anything\n   merges. ST-SUBMITTING keeps the modal alive rather than looking frozen.\n6. **Outcome** — `merge.settled` arrives. Delivered, or parked blocked\n   with the engine's own reason. Both are shown; neither is summarized\n   into \"something went wrong\".",
+      "sourceDigest": "c66607647f3353fc31e1b288c83d8edbac45954da8e277c6615a9f03a4c4550c",
+      "targetPath": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+      "targetAnchor": "unheaded-block-5",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 44,
+        "endLine": 60,
+        "textDigest": "c66607647f3353fc31e1b288c83d8edbac45954da8e277c6615a9f03a4c4550c",
+        "sample": "1. **Land on the taskboard** (S02) — the item sits in the `NEEDS ANSWER`\n   group tagged as a gate, because D4 makes a gate-approve question the\n   same category to a person as an ",
+        "identityFingerprint": "0999d87eda2273c880b58fbf2b836057e439b1d064678d107f792cfc84b6cddb",
+        "ancestry": [
+          "F02 — Approve a merge, end to end",
+          "Steps"
+        ],
+        "text": "1. **Land on the taskboard** (S02) — the item sits in the `NEEDS ANSWER`\n   group tagged as a gate, because D4 makes a gate-approve question the\n   same category to a person as an `ask`.\n2. **Open the item** (S03) — the person reads what the agent did, the\n   narrative first, machine log collapsed.\n3. **Trigger approve** — `Approve merge` in the ACTIONS region, visually\n   distinct from `Edit`/`Retire` (R8). If the gateway is not at the\n   repository's main working tree, this control is **disabled with the\n   reason attached** (ERR-APPROVE-UNAVAILABLE) and the flow stops here,\n   honestly, before the person invests any attention.\n4. **Confirm** (M02) — what lands, into which branch, which verb runs on\n   which machine, and what happens if the re-run verify fails.\n5. **Wait** — approve is not instant; the verify re-runs before anything\n   merges. ST-SUBMITTING keeps the modal alive rather than looking frozen.\n6. **Outcome** — `merge.settled` arrives. Delivered, or parked blocked\n   with the engine's own reason. Both are shown; neither is summarized\n   into \"something went wrong\"."
+      },
+      "targetShownText": "1. **Land on the taskboard** (S02) — the item sits in the `NEEDS ANSWER`\n   group tagged as a gate, because D4 makes a gate-approve question the\n   same category to a person as an `ask`.\n2. **Open the item** (S03) — the person reads what the agent did, the\n   narrative first, machine log collapsed.\n3. **Trigger approve** — `Approve merge` in the ACTIONS region, visually\n   distinct from `Edit`/`Retire` (R8). If the gateway is not at the\n   repository's main working tree, this control is **disabled with the\n   reason attached** (ERR-APPROVE-UNAVAILABLE) and the flow stops here,\n   honestly, before the person invests any attention.\n4. **Confirm** (M02) — what lands, into which branch, which verb runs on\n   which machine, and what happens if the re-run verify fails.\n5. **Wait** — approve is not instant; the verify re-runs before anything\n   merges. ST-SUBMITTING keeps the modal alive rather than looking frozen.\n6. **Outcome** — `merge.settled` arrives. Delivered, or parked blocked\n   with the engine's own reason. Both are shown; neither is summarized\n   into \"something went wrong\".",
+      "targetDigest": "c66607647f3353fc31e1b288c83d8edbac45954da8e277c6615a9f03a4c4550c",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_1d369d57f0c92d6946fd444b3c185ee9",
+        "sourceUnitDigest": "c66607647f3353fc31e1b288c83d8edbac45954da8e277c6615a9f03a4c4550c",
+        "targetOwner": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+        "targetAnchor": "unheaded-block-5",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/flows/F02-approve-a-merge.md#unheaded-block-3 (source lines 22-38) is carried at docs/platform/ui-spec/operations/F02-approve-a-merge.md#unheaded-block-5 (candidate lines 44-60). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/flows/F02-approve-a-merge.md verbatim in docs/platform/ui-spec/operations/F02-approve-a-merge.md. Map kind guide-runbook is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "c66607647f3353fc31e1b288c83d8edbac45954da8e277c6615a9f03a4c4550c",
+        "targetAncestry": [
+          "F02 — Approve a merge, end to end",
+          "Steps"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_20574a3ed563c18bcb4429ef021da422",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/flows/F02-approve-a-merge.md",
+      "sourceAnchor": "branches",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Branches",
+        "anchor": "branches",
+        "githubAnchor": "branches",
+        "stableAnchor": "h-2b3b3f51e833",
+        "startLine": 40,
+        "endLine": 40,
+        "textDigest": "0da42a6e808a2622f28dd6d96a2bd6685792bbccf20dae4cc3cee329ca8287f6",
+        "sample": "Branches",
+        "sectionPayloadDigest": "3ffa47e68cf3a315296d82c8d68f573d208b6fc1aaf40cff624adf578e847c62",
+        "followingBlockDigest": "bf3e48fb9720dee593a4bdf4ce216773a980635dc50b3a82abfbf94e65c60e04",
+        "identityFingerprint": "10cb8831c060a132a3ba79da27d3787902c57d0aa0a6e75c303aa941eff7fc9a",
+        "ancestry": [
+          "F02 — Approve a merge, end to end"
+        ],
+        "text": "## Branches",
+        "sectionText": "## Branches\n\n- **Approve cannot run here** — step 3 stops the flow with the reason\n  visible. This is the R7 branch, and it is a designed outcome rather\n  than a failure.\n- **Post-merge verify fails** — the item parks blocked; M02 stays open\n  showing the park reason verbatim, so the person is not returned to a\n  screen that appears to have done nothing.\n\n```yaml herdrweb-contract\nflow:\n  goal: \"Review and approve a merge from the dashboard, with the trunk consequence stated before confirming\"\n  preconditions:\n    - \"an item is awaiting approval\"\n    - \"the gateway runs at the repository's main working tree\"\n  steps:\n    - A-S02-001\n    - A-S03-002\n    - A-M02-001\n  branches:\n    - when: \"approve cannot run where this gateway sits\"\n      action: A-S03-009\n    - when: \"decide not to approve after reading what lands\"\n      action: A-M02-002\n```"
+      },
+      "sourceShownText": "## Branches\n\n- **Approve cannot run here** — step 3 stops the flow with the reason\n  visible. This is the R7 branch, and it is a designed outcome rather\n  than a failure.\n- **Post-merge verify fails** — the item parks blocked; M02 stays open\n  showing the park reason verbatim, so the person is not returned to a\n  screen that appears to have done nothing.\n\n```yaml herdrweb-contract\nflow:\n  goal: \"Review and approve a merge from the dashboard, with the trunk consequence stated before confirming\"\n  preconditions:\n    - \"an item is awaiting approval\"\n    - \"the gateway runs at the repository's main working tree\"\n  steps:\n    - A-S02-001\n    - A-S03-002\n    - A-M02-001\n  branches:\n    - when: \"approve cannot run where this gateway sits\"\n      action: A-S03-009\n    - when: \"decide not to approve after reading what lands\"\n      action: A-M02-002\n```",
+      "sourceDigest": "0da42a6e808a2622f28dd6d96a2bd6685792bbccf20dae4cc3cee329ca8287f6",
+      "targetPath": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+      "targetAnchor": "branches",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Branches",
+        "anchor": "branches",
+        "githubAnchor": "branches",
+        "stableAnchor": "h-1a7cb8f29adb",
+        "startLine": 62,
+        "endLine": 62,
+        "textDigest": "0da42a6e808a2622f28dd6d96a2bd6685792bbccf20dae4cc3cee329ca8287f6",
+        "sample": "Branches",
+        "sectionPayloadDigest": "3ffa47e68cf3a315296d82c8d68f573d208b6fc1aaf40cff624adf578e847c62",
+        "followingBlockDigest": "bf3e48fb9720dee593a4bdf4ce216773a980635dc50b3a82abfbf94e65c60e04",
+        "identityFingerprint": "10cb8831c060a132a3ba79da27d3787902c57d0aa0a6e75c303aa941eff7fc9a",
+        "ancestry": [
+          "F02 — Approve a merge, end to end"
+        ],
+        "text": "## Branches",
+        "sectionText": "## Branches\n\n- **Approve cannot run here** — step 3 stops the flow with the reason\n  visible. This is the R7 branch, and it is a designed outcome rather\n  than a failure.\n- **Post-merge verify fails** — the item parks blocked; M02 stays open\n  showing the park reason verbatim, so the person is not returned to a\n  screen that appears to have done nothing.\n\n```yaml herdrweb-contract\nflow:\n  goal: \"Review and approve a merge from the dashboard, with the trunk consequence stated before confirming\"\n  preconditions:\n    - \"an item is awaiting approval\"\n    - \"the gateway runs at the repository's main working tree\"\n  steps:\n    - A-S02-001\n    - A-S03-002\n    - A-M02-001\n  branches:\n    - when: \"approve cannot run where this gateway sits\"\n      action: A-S03-009\n    - when: \"decide not to approve after reading what lands\"\n      action: A-M02-002\n```"
+      },
+      "targetShownText": "## Branches\n\n- **Approve cannot run here** — step 3 stops the flow with the reason\n  visible. This is the R7 branch, and it is a designed outcome rather\n  than a failure.\n- **Post-merge verify fails** — the item parks blocked; M02 stays open\n  showing the park reason verbatim, so the person is not returned to a\n  screen that appears to have done nothing.\n\n```yaml herdrweb-contract\nflow:\n  goal: \"Review and approve a merge from the dashboard, with the trunk consequence stated before confirming\"\n  preconditions:\n    - \"an item is awaiting approval\"\n    - \"the gateway runs at the repository's main working tree\"\n  steps:\n    - A-S02-001\n    - A-S03-002\n    - A-M02-001\n  branches:\n    - when: \"approve cannot run where this gateway sits\"\n      action: A-S03-009\n    - when: \"decide not to approve after reading what lands\"\n      action: A-M02-002\n```",
+      "targetDigest": "0da42a6e808a2622f28dd6d96a2bd6685792bbccf20dae4cc3cee329ca8287f6",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_20574a3ed563c18bcb4429ef021da422",
+        "sourceUnitDigest": "0da42a6e808a2622f28dd6d96a2bd6685792bbccf20dae4cc3cee329ca8287f6",
+        "targetOwner": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+        "targetAnchor": "branches",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/ui-spec/flows/F02-approve-a-merge.md#branches (source lines 40-40) is carried at docs/platform/ui-spec/operations/F02-approve-a-merge.md#branches (candidate lines 62-62). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/flows/F02-approve-a-merge.md verbatim in docs/platform/ui-spec/operations/F02-approve-a-merge.md. Map kind guide-runbook is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "0da42a6e808a2622f28dd6d96a2bd6685792bbccf20dae4cc3cee329ca8287f6",
+        "targetAncestry": [
+          "F02 — Approve a merge, end to end"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_c4e3bc74cc2ced13097609eb24abd538",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/flows/F02-approve-a-merge.md",
+      "sourceAnchor": "unheaded-block-4",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 42,
+        "endLine": 47,
+        "textDigest": "bf3e48fb9720dee593a4bdf4ce216773a980635dc50b3a82abfbf94e65c60e04",
+        "sample": "- **Approve cannot run here** — step 3 stops the flow with the reason\n  visible. This is the R7 branch, and it is a designed outcome rather\n  than a failure.\n- **Post-merge verify ",
+        "identityFingerprint": "f4904d41925d444a31fbbe72ffde7a697b0fa3d38b58bd830249abab79615534",
+        "ancestry": [
+          "F02 — Approve a merge, end to end",
+          "Branches"
+        ],
+        "text": "- **Approve cannot run here** — step 3 stops the flow with the reason\n  visible. This is the R7 branch, and it is a designed outcome rather\n  than a failure.\n- **Post-merge verify fails** — the item parks blocked; M02 stays open\n  showing the park reason verbatim, so the person is not returned to a\n  screen that appears to have done nothing."
+      },
+      "sourceShownText": "- **Approve cannot run here** — step 3 stops the flow with the reason\n  visible. This is the R7 branch, and it is a designed outcome rather\n  than a failure.\n- **Post-merge verify fails** — the item parks blocked; M02 stays open\n  showing the park reason verbatim, so the person is not returned to a\n  screen that appears to have done nothing.",
+      "sourceDigest": "bf3e48fb9720dee593a4bdf4ce216773a980635dc50b3a82abfbf94e65c60e04",
+      "targetPath": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+      "targetAnchor": "unheaded-block-6",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 64,
+        "endLine": 69,
+        "textDigest": "bf3e48fb9720dee593a4bdf4ce216773a980635dc50b3a82abfbf94e65c60e04",
+        "sample": "- **Approve cannot run here** — step 3 stops the flow with the reason\n  visible. This is the R7 branch, and it is a designed outcome rather\n  than a failure.\n- **Post-merge verify ",
+        "identityFingerprint": "f4904d41925d444a31fbbe72ffde7a697b0fa3d38b58bd830249abab79615534",
+        "ancestry": [
+          "F02 — Approve a merge, end to end",
+          "Branches"
+        ],
+        "text": "- **Approve cannot run here** — step 3 stops the flow with the reason\n  visible. This is the R7 branch, and it is a designed outcome rather\n  than a failure.\n- **Post-merge verify fails** — the item parks blocked; M02 stays open\n  showing the park reason verbatim, so the person is not returned to a\n  screen that appears to have done nothing."
+      },
+      "targetShownText": "- **Approve cannot run here** — step 3 stops the flow with the reason\n  visible. This is the R7 branch, and it is a designed outcome rather\n  than a failure.\n- **Post-merge verify fails** — the item parks blocked; M02 stays open\n  showing the park reason verbatim, so the person is not returned to a\n  screen that appears to have done nothing.",
+      "targetDigest": "bf3e48fb9720dee593a4bdf4ce216773a980635dc50b3a82abfbf94e65c60e04",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_c4e3bc74cc2ced13097609eb24abd538",
+        "sourceUnitDigest": "bf3e48fb9720dee593a4bdf4ce216773a980635dc50b3a82abfbf94e65c60e04",
+        "targetOwner": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+        "targetAnchor": "unheaded-block-6",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/flows/F02-approve-a-merge.md#unheaded-block-4 (source lines 42-47) is carried at docs/platform/ui-spec/operations/F02-approve-a-merge.md#unheaded-block-6 (candidate lines 64-69). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/flows/F02-approve-a-merge.md verbatim in docs/platform/ui-spec/operations/F02-approve-a-merge.md. Map kind guide-runbook is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "bf3e48fb9720dee593a4bdf4ce216773a980635dc50b3a82abfbf94e65c60e04",
+        "targetAncestry": [
+          "F02 — Approve a merge, end to end",
+          "Branches"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_0bdecaf6bb7f4c5d03d4dd32edd6e372",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/flows/F02-approve-a-merge.md",
+      "sourceAnchor": "unheaded-block-5",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 49,
+        "endLine": 64,
+        "textDigest": "f9712966a2963770e4d52613d18e2d66e61d803e2f24661f7b860ef640e35224",
+        "sample": "```yaml herdrweb-contract\nflow:\n  goal: \"Review and approve a merge from the dashboard, with the trunk consequence stated before confirming\"\n  preconditions:\n    - \"an item is awai",
+        "identityFingerprint": "81cdefc98ef603b8ef475eb51c4e5d8d35ad85babb5523744f4064a144cc79bc",
+        "ancestry": [
+          "F02 — Approve a merge, end to end",
+          "Branches"
+        ],
+        "text": "```yaml herdrweb-contract\nflow:\n  goal: \"Review and approve a merge from the dashboard, with the trunk consequence stated before confirming\"\n  preconditions:\n    - \"an item is awaiting approval\"\n    - \"the gateway runs at the repository's main working tree\"\n  steps:\n    - A-S02-001\n    - A-S03-002\n    - A-M02-001\n  branches:\n    - when: \"approve cannot run where this gateway sits\"\n      action: A-S03-009\n    - when: \"decide not to approve after reading what lands\"\n      action: A-M02-002\n```"
+      },
+      "sourceShownText": "```yaml herdrweb-contract\nflow:\n  goal: \"Review and approve a merge from the dashboard, with the trunk consequence stated before confirming\"\n  preconditions:\n    - \"an item is awaiting approval\"\n    - \"the gateway runs at the repository's main working tree\"\n  steps:\n    - A-S02-001\n    - A-S03-002\n    - A-M02-001\n  branches:\n    - when: \"approve cannot run where this gateway sits\"\n      action: A-S03-009\n    - when: \"decide not to approve after reading what lands\"\n      action: A-M02-002\n```",
+      "sourceDigest": "f9712966a2963770e4d52613d18e2d66e61d803e2f24661f7b860ef640e35224",
+      "targetPath": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+      "targetAnchor": "unheaded-block-7",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 71,
+        "endLine": 86,
+        "textDigest": "f9712966a2963770e4d52613d18e2d66e61d803e2f24661f7b860ef640e35224",
+        "sample": "```yaml herdrweb-contract\nflow:\n  goal: \"Review and approve a merge from the dashboard, with the trunk consequence stated before confirming\"\n  preconditions:\n    - \"an item is awai",
+        "identityFingerprint": "81cdefc98ef603b8ef475eb51c4e5d8d35ad85babb5523744f4064a144cc79bc",
+        "ancestry": [
+          "F02 — Approve a merge, end to end",
+          "Branches"
+        ],
+        "text": "```yaml herdrweb-contract\nflow:\n  goal: \"Review and approve a merge from the dashboard, with the trunk consequence stated before confirming\"\n  preconditions:\n    - \"an item is awaiting approval\"\n    - \"the gateway runs at the repository's main working tree\"\n  steps:\n    - A-S02-001\n    - A-S03-002\n    - A-M02-001\n  branches:\n    - when: \"approve cannot run where this gateway sits\"\n      action: A-S03-009\n    - when: \"decide not to approve after reading what lands\"\n      action: A-M02-002\n```"
+      },
+      "targetShownText": "```yaml herdrweb-contract\nflow:\n  goal: \"Review and approve a merge from the dashboard, with the trunk consequence stated before confirming\"\n  preconditions:\n    - \"an item is awaiting approval\"\n    - \"the gateway runs at the repository's main working tree\"\n  steps:\n    - A-S02-001\n    - A-S03-002\n    - A-M02-001\n  branches:\n    - when: \"approve cannot run where this gateway sits\"\n      action: A-S03-009\n    - when: \"decide not to approve after reading what lands\"\n      action: A-M02-002\n```",
+      "targetDigest": "f9712966a2963770e4d52613d18e2d66e61d803e2f24661f7b860ef640e35224",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_0bdecaf6bb7f4c5d03d4dd32edd6e372",
+        "sourceUnitDigest": "f9712966a2963770e4d52613d18e2d66e61d803e2f24661f7b860ef640e35224",
+        "targetOwner": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+        "targetAnchor": "unheaded-block-7",
+        "claimKind": "contract",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/flows/F02-approve-a-merge.md#unheaded-block-5 (source lines 49-64) is carried at docs/platform/ui-spec/operations/F02-approve-a-merge.md#unheaded-block-7 (candidate lines 71-86). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/flows/F02-approve-a-merge.md verbatim in docs/platform/ui-spec/operations/F02-approve-a-merge.md. Map kind guide-runbook is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "f9712966a2963770e4d52613d18e2d66e61d803e2f24661f7b860ef640e35224",
+        "targetAncestry": [
+          "F02 — Approve a merge, end to end",
+          "Branches"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+Persisted exactly once 61594143 0ce06b5c2086953ed1cd92ce9a05f91ccfcc9c89c7c79bb4b95e521fa7742847
+START D-both 2026-10-15T07:12:38.838Z
+DONE {"name":"D-both","priors":["plans/260925-documentation-authority-unification/reports/identity-registry.json","plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json"],"scope":null,"durationSeconds":75.758,"fatalCount":0,"open":[{"type":"files-unknown-blocking","count":1161},{"type":"claims-unknown-blocking","count":22612},{"type":"claims-partial-carry","count":14},{"type":"claims-not-reviewed","count":23405},{"type":"claims-without-own-rationale","count":22612},{"type":"identical-units-multiple-owners","count":361},{"type":"registry-gaps-without-disposition","count":465},{"type":"candidate-blocks-unreferenced","count":2363}],"structuralFatalCount":0}
+START E-both 2026-10-15T07:13:54.596Z
+DONE {"name":"E-both","priors":["plans/260925-documentation-authority-unification/reports/identity-registry.json","plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json"],"scope":["docs/specs/confinement-authority.md","docs/specs/decision-citation-drift.md","docs/specs/distillery.md","docs/specs/fgos-plugin.md","docs/specs/herdr-web-dashboard.md","docs/specs/observe.md","docs/ui-spec/00-overview.md","docs/ui-spec/15-system-events.md","docs/ui-spec/20-domain-rules.md","docs/ui-spec/30-states-and-errors.md","docs/ui-spec/components/C01-item-card.md","docs/ui-spec/flows/F01-answer-a-parked-question.md","docs/ui-spec/flows/F02-approve-a-merge.md","docs/ui-spec/generated/action-registry.csv","docs/ui-spec/generated/coverage-report.md","docs/ui-spec/generated/navigation-graph.yaml","docs/ui-spec/generated/surface-registry.yaml","docs/ui-spec/generated/wireframe-v2.html","docs/ui-spec/modals/M01-answer-question.md","docs/ui-spec/modals/M02-approve-merge.md","docs/ui-spec/modals/M03-add-edit-item.md","docs/ui-spec/schema/surface-contract.schema.json","docs/ui-spec/screens/S01-sign-in.md","docs/ui-spec/screens/S02-taskboard.md","docs/ui-spec/screens/S03-task-detail.md","docs/ui-spec/screens/S04-questions-needing-answer.md","docs/ui-spec/spec.config.yaml"],"durationSeconds":80.141,"fatalCount":4,"open":[{"type":"claims-not-reviewed","count":566},{"type":"identical-units-multiple-owners","count":1},{"type":"registry-gaps-without-disposition","count":1},{"type":"candidate-blocks-unreferenced","count":117}],"structuralFatalCount":0}
+START D-identity 2026-10-15T07:15:14.737Z
+DONE {"name":"D-identity","priors":["plans/260925-documentation-authority-unification/reports/identity-registry.json"],"scope":null,"durationSeconds":80.001,"fatalCount":0,"open":[{"type":"files-unknown-blocking","count":1161},{"type":"claims-unknown-blocking","count":22612},{"type":"claims-partial-carry","count":14},{"type":"claims-not-reviewed","count":23405},{"type":"claims-without-own-rationale","count":22612},{"type":"identical-units-multiple-owners","count":361},{"type":"registry-gaps-without-disposition","count":465},{"type":"candidate-blocks-unreferenced","count":2363}],"structuralFatalCount":0}
+START E-identity 2026-10-15T07:16:34.738Z
+DONE {"name":"E-identity","priors":["plans/260925-documentation-authority-unification/reports/identity-registry.json"],"scope":["docs/specs/confinement-authority.md","docs/specs/decision-citation-drift.md","docs/specs/distillery.md","docs/specs/fgos-plugin.md","docs/specs/herdr-web-dashboard.md","docs/specs/observe.md","docs/ui-spec/00-overview.md","docs/ui-spec/15-system-events.md","docs/ui-spec/20-domain-rules.md","docs/ui-spec/30-states-and-errors.md","docs/ui-spec/components/C01-item-card.md","docs/ui-spec/flows/F01-answer-a-parked-question.md","docs/ui-spec/flows/F02-approve-a-merge.md","docs/ui-spec/generated/action-registry.csv","docs/ui-spec/generated/coverage-report.md","docs/ui-spec/generated/navigation-graph.yaml","docs/ui-spec/generated/surface-registry.yaml","docs/ui-spec/generated/wireframe-v2.html","docs/ui-spec/modals/M01-answer-question.md","docs/ui-spec/modals/M02-approve-merge.md","docs/ui-spec/modals/M03-add-edit-item.md","docs/ui-spec/schema/surface-contract.schema.json","docs/ui-spec/screens/S01-sign-in.md","docs/ui-spec/screens/S02-taskboard.md","docs/ui-spec/screens/S03-task-detail.md","docs/ui-spec/screens/S04-questions-needing-answer.md","docs/ui-spec/spec.config.yaml"],"durationSeconds":80.556,"fatalCount":4,"open":[{"type":"claims-not-reviewed","count":566},{"type":"identical-units-multiple-owners","count":1},{"type":"registry-gaps-without-disposition","count":1},{"type":"candidate-blocks-unreferenced","count":117}],"structuralFatalCount":0}
+START D-phase02 2026-10-15T07:17:55.294Z
+DONE {"name":"D-phase02","priors":["plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json"],"scope":null,"durationSeconds":77.599,"fatalCount":0,"open":[{"type":"files-unknown-blocking","count":1161},{"type":"claims-unknown-blocking","count":22612},{"type":"claims-partial-carry","count":14},{"type":"claims-not-reviewed","count":23405},{"type":"claims-without-own-rationale","count":22612},{"type":"identical-units-multiple-owners","count":361},{"type":"registry-gaps-without-disposition","count":465},{"type":"candidate-blocks-unreferenced","count":2363}],"structuralFatalCount":0}
+START E-phase02 2026-10-15T07:19:12.893Z
+DONE {"name":"E-phase02","priors":["plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json"],"scope":["docs/specs/confinement-authority.md","docs/specs/decision-citation-drift.md","docs/specs/distillery.md","docs/specs/fgos-plugin.md","docs/specs/herdr-web-dashboard.md","docs/specs/observe.md","docs/ui-spec/00-overview.md","docs/ui-spec/15-system-events.md","docs/ui-spec/20-domain-rules.md","docs/ui-spec/30-states-and-errors.md","docs/ui-spec/components/C01-item-card.md","docs/ui-spec/flows/F01-answer-a-parked-question.md","docs/ui-spec/flows/F02-approve-a-merge.md","docs/ui-spec/generated/action-registry.csv","docs/ui-spec/generated/coverage-report.md","docs/ui-spec/generated/navigation-graph.yaml","docs/ui-spec/generated/surface-registry.yaml","docs/ui-spec/generated/wireframe-v2.html","docs/ui-spec/modals/M01-answer-question.md","docs/ui-spec/modals/M02-approve-merge.md","docs/ui-spec/modals/M03-add-edit-item.md","docs/ui-spec/schema/surface-contract.schema.json","docs/ui-spec/screens/S01-sign-in.md","docs/ui-spec/screens/S02-taskboard.md","docs/ui-spec/screens/S03-task-detail.md","docs/ui-spec/screens/S04-questions-needing-answer.md","docs/ui-spec/spec.config.yaml"],"durationSeconds":78.371,"fatalCount":4,"open":[{"type":"claims-not-reviewed","count":566},{"type":"identical-units-multiple-owners","count":1},{"type":"registry-gaps-without-disposition","count":1},{"type":"candidate-blocks-unreferenced","count":117}],"structuralFatalCount":0}
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
++ actual - expected
+
+  {
+    'candidate-blocks-unreferenced': 117,
+    'claims-not-reviewed': 566,
+    'identical-units-multiple-owners': 1,
++   'registry-gaps-without-disposition': 1
+-   'registry-gaps-without-disposition': 3
+  }
+
+    at file:///tmp/fgos-work/step8-1276467f3/check-and-persist.mjs:17:302 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: {
+    'claims-not-reviewed': 566,
+    'identical-units-multiple-owners': 1,
+    'registry-gaps-without-disposition': 1,
+    'candidate-blocks-unreferenced': 117
+  },
+  expected: {
+    'claims-not-reviewed': 566,
+    'identical-units-multiple-owners': 1,
+    'registry-gaps-without-disposition': 3,
+    'candidate-blocks-unreferenced': 117
+  },
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.18.0

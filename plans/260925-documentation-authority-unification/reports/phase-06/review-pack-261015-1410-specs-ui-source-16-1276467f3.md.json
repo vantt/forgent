@@ -1,0 +1,344 @@
+{
+  "version": 1,
+  "contentCommit": "1276467f37a99d19aff05808d42fafbf40341449",
+  "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+  "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+  "sourcePath": "docs/ui-spec/20-domain-rules.md",
+  "part": 1,
+  "parts": 1,
+  "count": 5,
+  "classes": {
+    "Unit-exact": [
+      "claim_27a3faa641f5cfd73b3038fcbaf000e5",
+      "claim_0380d86ba81fabec2f0826967ca3371e",
+      "claim_15126cc42a23aadb0a85c7a1328483f0",
+      "claim_c8ef81d2c23f4c1a516b889b7793de8e"
+    ],
+    "Weak-exact": [],
+    "Judgment": [
+      "claim_b7557c11c5f05a3e02439d60a904c9d1"
+    ]
+  },
+  "unequalDigestPairs": [
+    "claim_b7557c11c5f05a3e02439d60a904c9d1"
+  ],
+  "noTargetGeneratedRows": [],
+  "mandatoryDeep": [
+    "claim_b7557c11c5f05a3e02439d60a904c9d1"
+  ],
+  "reviewerSeedRequired": true,
+  "minimumSeededWeakJudgment": 1,
+  "rows": [
+    {
+      "claimId": "claim_27a3faa641f5cfd73b3038fcbaf000e5",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/20-domain-rules.md",
+      "sourceAnchor": "unheaded-block-1",
+      "source": {
+        "unitKind": "unheaded-preamble",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded preamble",
+        "startLine": 1,
+        "endLine": 6,
+        "textDigest": "c69ce9aa380c0eefd8f19f2740d37efd0ed5db921081d06953a54ade0cd3f7b1",
+        "sample": "---\nid: domain-rules\ntype: cross-cutting\nname: \"Domain Rules\"\nstatus: active\n---",
+        "identityFingerprint": "0b85be9f6a0e07d6e6e6377087c12a655f2d127e6328248598850ee82878cba3",
+        "ancestry": [],
+        "text": "---\nid: domain-rules\ntype: cross-cutting\nname: \"Domain Rules\"\nstatus: active\n---"
+      },
+      "sourceShownText": "---\nid: domain-rules\ntype: cross-cutting\nname: \"Domain Rules\"\nstatus: active\n---",
+      "sourceDigest": "c69ce9aa380c0eefd8f19f2740d37efd0ed5db921081d06953a54ade0cd3f7b1",
+      "targetPath": "docs/platform/ui-spec/contracts/20-domain-rules.md",
+      "targetAnchor": "unheaded-block-1",
+      "target": {
+        "unitKind": "unheaded-preamble",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded preamble",
+        "startLine": 1,
+        "endLine": 6,
+        "textDigest": "c69ce9aa380c0eefd8f19f2740d37efd0ed5db921081d06953a54ade0cd3f7b1",
+        "sample": "---\nid: domain-rules\ntype: cross-cutting\nname: \"Domain Rules\"\nstatus: active\n---",
+        "identityFingerprint": "0b85be9f6a0e07d6e6e6377087c12a655f2d127e6328248598850ee82878cba3",
+        "ancestry": [],
+        "text": "---\nid: domain-rules\ntype: cross-cutting\nname: \"Domain Rules\"\nstatus: active\n---"
+      },
+      "targetShownText": "---\nid: domain-rules\ntype: cross-cutting\nname: \"Domain Rules\"\nstatus: active\n---",
+      "targetDigest": "c69ce9aa380c0eefd8f19f2740d37efd0ed5db921081d06953a54ade0cd3f7b1",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_27a3faa641f5cfd73b3038fcbaf000e5",
+        "sourceUnitDigest": "c69ce9aa380c0eefd8f19f2740d37efd0ed5db921081d06953a54ade0cd3f7b1",
+        "targetOwner": "docs/platform/ui-spec/contracts/20-domain-rules.md",
+        "targetAnchor": "unheaded-block-1",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-preamble unit docs/ui-spec/20-domain-rules.md#unheaded-block-1 (source lines 1-6) is carried at docs/platform/ui-spec/contracts/20-domain-rules.md#unheaded-block-1 (candidate lines 1-6). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/20-domain-rules.md verbatim in docs/platform/ui-spec/contracts/20-domain-rules.md. Map kind contract is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "c69ce9aa380c0eefd8f19f2740d37efd0ed5db921081d06953a54ade0cd3f7b1",
+        "targetAncestry": []
+      }
+    },
+    {
+      "claimId": "claim_b7557c11c5f05a3e02439d60a904c9d1",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/20-domain-rules.md",
+      "sourceAnchor": "domain-rules",
+      "source": {
+        "unitKind": "heading",
+        "level": 1,
+        "title": "Domain rules",
+        "anchor": "domain-rules",
+        "githubAnchor": "domain-rules",
+        "stableAnchor": "h-445d768f61f8",
+        "startLine": 8,
+        "endLine": 8,
+        "textDigest": "32bf7c30be97154fe592d7ea1d1e2b4525cb598eab97e4ec7de5da5f3b60ab2d",
+        "sample": "Domain rules",
+        "sectionPayloadDigest": "75c7638339ff57e2769e4c82e6aefa2603c669a570edc3d2c12e6ffbf47a91b5",
+        "followingBlockDigest": "ff9d4af305d3725a010e2add750c1935610012e2cede02238b41d15df2b50f09",
+        "identityFingerprint": "db71fc9550e8f12c05db84ac46e8c8b76b71fe0bdd7c8596343155bb6badb8b0",
+        "ancestry": [],
+        "text": "# Domain rules",
+        "sectionText": "# Domain rules\n\nEvery rule here is taken from `docs/specs/herdr-web-dashboard.md`\n`## Business Rules` (R1-R11). **No rule is invented at this layer** — the\nUI spec draws the product's rules, it does not add any. The mapping below\nis bidirectional: a surface listed under a rule must carry that rule ID in\nits own frontmatter `rules:` array, or `npm run check` errors with\nVR-RULE-DRIFT.\n\n| Rule | What it means for the UI |\n|---|---|\n| **R1** | The client addresses a gateway, and must not assume a single fixed one. Every data-bearing surface shows which endpoint it is reading, and the endpoint is switchable rather than baked in. |\n| **R2** | Every write on screen maps to one fgOS one-door-write verb. A control that cannot name its verb does not belong in this spec. |\n| **R3** | Nothing is readable before sign-in, and a failed sign-in reveals nothing — one indistinguishable failure state, never \"wrong password\" vs \"no such user\". |\n| **R4** | The token is never displayed, never copied into the DOM, and never persisted by the client beyond its session cookie. |\n| **R5** | The surface is on by default and reachable beyond loopback; the UI carries a standing, non-dismissable exposure indicator rather than a one-time notice. |\n| **R6** | Dashboard availability is independent of the cockpit — the UI never tells a person to \"open the cockpit first\". |\n| **R7** | Approve-merge is only offered where fgOS can actually run it. Where it cannot, the control is shown disabled **with the reason**, never hidden and never offered-then-failed. |\n| **R8** | Because the surface is exposed by default and can change trunk, the write controls are visually distinct from the read surface — a person must never trigger a trunk change by muscle memory. |\n| **R9** | Question/answer pairing is positional. The timeline renders pairs in recorded order and never implies a link the data does not carry. |\n| **R10** | The human narrative is the primary account; the machine decision log renders collapsed by default. |\n| **R11** | Nothing pushes. The UI must not imply it will alert anyone — no bell, no \"we'll notify you\". |\n\n```yaml herdrweb-contract\nrules:\n  - id: R1\n    name: Client of a gateway, never a fixed origin\n    surfaces: [S02, S03, S04]\n  - id: R2\n    name: Every write goes through a one-door-write verb\n    surfaces: [M01, M02, M03, C01]\n  - id: R3\n    name: No read before sign-in, opaque failure\n    surfaces: [S01]\n  - id: R4\n    name: Token never surfaced or persisted by the client\n    surfaces: [S01]\n  - id: R5\n    name: Standing exposure indicator\n    surfaces: [S02, S03, S04]\n  - id: R6\n    name: Availability independent of the cockpit\n    surfaces: [S01]\n  - id: R7\n    name: Approve-merge only where it can run, disabled with a reason otherwise\n    surfaces: [S03, M02]\n  - id: R8\n    name: Write controls visually distinct from the read surface\n    surfaces: [S03, M02, C01]\n  - id: R9\n    name: Positional question/answer pairing\n    surfaces: [S03, S04]\n  - id: R10\n    name: Narrative primary, machine log collapsed\n    surfaces: [S03]\n  - id: R11\n    name: Nothing pushes; being informed is a pull\n    surfaces: [S02, S04]\n```"
+      },
+      "sourceShownText": "# Domain rules\n\nEvery rule here is taken from `docs/specs/herdr-web-dashboard.md`\n`## Business Rules` (R1-R11). **No rule is invented at this layer** — the\nUI spec draws the product's rules, it does not add any. The mapping below\nis bidirectional: a surface listed under a rule must carry that rule ID in\nits own frontmatter `rules:` array, or `npm run check` errors with\nVR-RULE-DRIFT.\n\n| Rule | What it means for the UI |\n|---|---|\n| **R1** | The client addresses a gateway, and must not assume a single fixed one. Every data-bearing surface shows which endpoint it is reading, and the endpoint is switchable rather than baked in. |\n| **R2** | Every write on screen maps to one fgOS one-door-write verb. A control that cannot name its verb does not belong in this spec. |\n| **R3** | Nothing is readable before sign-in, and a failed sign-in reveals nothing — one indistinguishable failure state, never \"wrong password\" vs \"no such user\". |\n| **R4** | The token is never displayed, never copied into the DOM, and never persisted by the client beyond its session cookie. |\n| **R5** | The surface is on by default and reachable beyond loopback; the UI carries a standing, non-dismissable exposure indicator rather than a one-time notice. |\n| **R6** | Dashboard availability is independent of the cockpit — the UI never tells a person to \"open the cockpit first\". |\n| **R7** | Approve-merge is only offered where fgOS can actually run it. Where it cannot, the control is shown disabled **with the reason**, never hidden and never offered-then-failed. |\n| **R8** | Because the surface is exposed by default and can change trunk, the write controls are visually distinct from the read surface — a person must never trigger a trunk change by muscle memory. |\n| **R9** | Question/answer pairing is positional. The timeline renders pairs in recorded order and never implies a link the data does not carry. |\n| **R10** | The human narrative is the primary account; the machine decision log renders collapsed by default. |\n| **R11** | Nothing pushes. The UI must not imply it will alert anyone — no bell, no \"we'll notify you\". |\n\n```yaml herdrweb-contract\nrules:\n  - id: R1\n    name: Client of a gateway, never a fixed origin\n    surfaces: [S02, S03, S04]\n  - id: R2\n    name: Every write goes through a one-door-write verb\n    surfaces: [M01, M02, M03, C01]\n  - id: R3\n    name: No read before sign-in, opaque failure\n    surfaces: [S01]\n  - id: R4\n    name: Token never surfaced or persisted by the client\n    surfaces: [S01]\n  - id: R5\n    name: Standing exposure indicator\n    surfaces: [S02, S03, S04]\n  - id: R6\n    name: Availability independent of the cockpit\n    surfaces: [S01]\n  - id: R7\n    name: Approve-merge only where it can run, disabled with a reason otherwise\n    surfaces: [S03, M02]\n  - id: R8\n    name: Write controls visually distinct from the read surface\n    surfaces: [S03, M02, C01]\n  - id: R9\n    name: Positional question/answer pairing\n    surfaces: [S03, S04]\n  - id: R10\n    name: Narrative primary, machine log collapsed\n    surfaces: [S03]\n  - id: R11\n    name: Nothing pushes; being informed is a pull\n    surfaces: [S02, S04]\n```",
+      "sourceDigest": "32bf7c30be97154fe592d7ea1d1e2b4525cb598eab97e4ec7de5da5f3b60ab2d",
+      "targetPath": "docs/platform/ui-spec/contracts/20-domain-rules.md",
+      "targetAnchor": "domain-rules",
+      "target": {
+        "unitKind": "heading",
+        "level": 1,
+        "title": "Domain rules",
+        "anchor": "domain-rules",
+        "githubAnchor": "domain-rules",
+        "stableAnchor": "h-445d768f61f8",
+        "startLine": 8,
+        "endLine": 8,
+        "textDigest": "f31806949d7daf2dde868322ed78365e87bf39be0b3a91a6f1bb797b2846d9e9",
+        "sample": "Domain rules",
+        "sectionPayloadDigest": "dbb829c61c92bee806b1ace8cf3c789059eaabe8b6b9a0ef7d577d3070631c01",
+        "followingBlockDigest": "4c0794638277fac4696c069781ddf9bea75a43146ec62aa3be2ddb848708f096",
+        "identityFingerprint": "97139f30b9299a95287062c9870b58cda4f044d2b933ec042751b8f3d0ff0d96",
+        "ancestry": [],
+        "text": "# Domain rules",
+        "sectionText": "# Domain rules\n\n```txt\nDocument type: Contract\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve mapped legacy content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; current implementation truth is not certified\nProvenance: docs/ui-spec/20-domain-rules.md at 111adc51fd047d99121fd9d076eb4794c87045a4\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing carriage, placement and source conservation\nDo not use this for: Current canonical authority or implemented-behavior proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/ui-spec/20-domain-rules.md\nSupersedes: None; candidate only\nSuperseded by: None\n```\n\n> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions.\n\n\nEvery rule here is taken from `docs/specs/herdr-web-dashboard.md`\n`## Business Rules` (R1-R11). **No rule is invented at this layer** — the\nUI spec draws the product's rules, it does not add any. The mapping below\nis bidirectional: a surface listed under a rule must carry that rule ID in\nits own frontmatter `rules:` array, or `npm run check` errors with\nVR-RULE-DRIFT.\n\n| Rule | What it means for the UI |\n|---|---|\n| **R1** | The client addresses a gateway, and must not assume a single fixed one. Every data-bearing surface shows which endpoint it is reading, and the endpoint is switchable rather than baked in. |\n| **R2** | Every write on screen maps to one fgOS one-door-write verb. A control that cannot name its verb does not belong in this spec. |\n| **R3** | Nothing is readable before sign-in, and a failed sign-in reveals nothing — one indistinguishable failure state, never \"wrong password\" vs \"no such user\". |\n| **R4** | The token is never displayed, never copied into the DOM, and never persisted by the client beyond its session cookie. |\n| **R5** | The surface is on by default and reachable beyond loopback; the UI carries a standing, non-dismissable exposure indicator rather than a one-time notice. |\n| **R6** | Dashboard availability is independent of the cockpit — the UI never tells a person to \"open the cockpit first\". |\n| **R7** | Approve-merge is only offered where fgOS can actually run it. Where it cannot, the control is shown disabled **with the reason**, never hidden and never offered-then-failed. |\n| **R8** | Because the surface is exposed by default and can change trunk, the write controls are visually distinct from the read surface — a person must never trigger a trunk change by muscle memory. |\n| **R9** | Question/answer pairing is positional. The timeline renders pairs in recorded order and never implies a link the data does not carry. |\n| **R10** | The human narrative is the primary account; the machine decision log renders collapsed by default. |\n| **R11** | Nothing pushes. The UI must not imply it will alert anyone — no bell, no \"we'll notify you\". |\n\n```yaml herdrweb-contract\nrules:\n  - id: R1\n    name: Client of a gateway, never a fixed origin\n    surfaces: [S02, S03, S04]\n  - id: R2\n    name: Every write goes through a one-door-write verb\n    surfaces: [M01, M02, M03, C01]\n  - id: R3\n    name: No read before sign-in, opaque failure\n    surfaces: [S01]\n  - id: R4\n    name: Token never surfaced or persisted by the client\n    surfaces: [S01]\n  - id: R5\n    name: Standing exposure indicator\n    surfaces: [S02, S03, S04]\n  - id: R6\n    name: Availability independent of the cockpit\n    surfaces: [S01]\n  - id: R7\n    name: Approve-merge only where it can run, disabled with a reason otherwise\n    surfaces: [S03, M02]\n  - id: R8\n    name: Write controls visually distinct from the read surface\n    surfaces: [S03, M02, C01]\n  - id: R9\n    name: Positional question/answer pairing\n    surfaces: [S03, S04]\n  - id: R10\n    name: Narrative primary, machine log collapsed\n    surfaces: [S03]\n  - id: R11\n    name: Nothing pushes; being informed is a pull\n    surfaces: [S02, S04]\n```"
+      },
+      "targetShownText": "# Domain rules\n\n```txt\nDocument type: Contract\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve mapped legacy content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; current implementation truth is not certified\nProvenance: docs/ui-spec/20-domain-rules.md at 111adc51fd047d99121fd9d076eb4794c87045a4\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing carriage, placement and source conservation\nDo not use this for: Current canonical authority or implemented-behavior proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/ui-spec/20-domain-rules.md\nSupersedes: None; candidate only\nSuperseded by: None\n```\n\n> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions.\n\n\nEvery rule here is taken from `docs/specs/herdr-web-dashboard.md`\n`## Business Rules` (R1-R11). **No rule is invented at this layer** — the\nUI spec draws the product's rules, it does not add any. The mapping below\nis bidirectional: a surface listed under a rule must carry that rule ID in\nits own frontmatter `rules:` array, or `npm run check` errors with\nVR-RULE-DRIFT.\n\n| Rule | What it means for the UI |\n|---|---|\n| **R1** | The client addresses a gateway, and must not assume a single fixed one. Every data-bearing surface shows which endpoint it is reading, and the endpoint is switchable rather than baked in. |\n| **R2** | Every write on screen maps to one fgOS one-door-write verb. A control that cannot name its verb does not belong in this spec. |\n| **R3** | Nothing is readable before sign-in, and a failed sign-in reveals nothing — one indistinguishable failure state, never \"wrong password\" vs \"no such user\". |\n| **R4** | The token is never displayed, never copied into the DOM, and never persisted by the client beyond its session cookie. |\n| **R5** | The surface is on by default and reachable beyond loopback; the UI carries a standing, non-dismissable exposure indicator rather than a one-time notice. |\n| **R6** | Dashboard availability is independent of the cockpit — the UI never tells a person to \"open the cockpit first\". |\n| **R7** | Approve-merge is only offered where fgOS can actually run it. Where it cannot, the control is shown disabled **with the reason**, never hidden and never offered-then-failed. |\n| **R8** | Because the surface is exposed by default and can change trunk, the write controls are visually distinct from the read surface — a person must never trigger a trunk change by muscle memory. |\n| **R9** | Question/answer pairing is positional. The timeline renders pairs in recorded order and never implies a link the data does not carry. |\n| **R10** | The human narrative is the primary account; the machine decision log renders collapsed by default. |\n| **R11** | Nothing pushes. The UI must not imply it will alert anyone — no bell, no \"we'll notify you\". |\n\n```yaml herdrweb-contract\nrules:\n  - id: R1\n    name: Client of a gateway, never a fixed origin\n    surfaces: [S02, S03, S04]\n  - id: R2\n    name: Every write goes through a one-door-write verb\n    surfaces: [M01, M02, M03, C01]\n  - id: R3\n    name: No read before sign-in, opaque failure\n    surfaces: [S01]\n  - id: R4\n    name: Token never surfaced or persisted by the client\n    surfaces: [S01]\n  - id: R5\n    name: Standing exposure indicator\n    surfaces: [S02, S03, S04]\n  - id: R6\n    name: Availability independent of the cockpit\n    surfaces: [S01]\n  - id: R7\n    name: Approve-merge only where it can run, disabled with a reason otherwise\n    surfaces: [S03, M02]\n  - id: R8\n    name: Write controls visually distinct from the read surface\n    surfaces: [S03, M02, C01]\n  - id: R9\n    name: Positional question/answer pairing\n    surfaces: [S03, S04]\n  - id: R10\n    name: Narrative primary, machine log collapsed\n    surfaces: [S03]\n  - id: R11\n    name: Nothing pushes; being informed is a pull\n    surfaces: [S02, S04]\n```",
+      "targetDigest": "f31806949d7daf2dde868322ed78365e87bf39be0b3a91a6f1bb797b2846d9e9",
+      "classification": "Judgment",
+      "mandatoryDeep": true,
+      "decision": {
+        "claimId": "claim_b7557c11c5f05a3e02439d60a904c9d1",
+        "sourceUnitDigest": "32bf7c30be97154fe592d7ea1d1e2b4525cb598eab97e4ec7de5da5f3b60ab2d",
+        "targetOwner": "docs/platform/ui-spec/contracts/20-domain-rules.md",
+        "targetAnchor": "domain-rules",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Judgment: no target digest match. The whole heading unit docs/ui-spec/20-domain-rules.md#domain-rules (source lines 8-8) is carried at docs/platform/ui-spec/contracts/20-domain-rules.md#domain-rules (candidate lines 8-8). The heading section digest changes because labelled candidate metadata is inserted after the original H1; original heading and direct source payload remain verbatim. Frozen specs-ui map and Step 8: preserve docs/ui-spec/20-domain-rules.md verbatim in docs/platform/ui-spec/contracts/20-domain-rules.md. Map kind contract is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "f31806949d7daf2dde868322ed78365e87bf39be0b3a91a6f1bb797b2846d9e9",
+        "targetAncestry": []
+      }
+    },
+    {
+      "claimId": "claim_0380d86ba81fabec2f0826967ca3371e",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/20-domain-rules.md",
+      "sourceAnchor": "unheaded-block-2",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-2",
+        "githubAnchor": "unheaded-block-2",
+        "stableAnchor": "unheaded-block-2",
+        "title": "Unheaded block 2",
+        "startLine": 10,
+        "endLine": 15,
+        "textDigest": "ff9d4af305d3725a010e2add750c1935610012e2cede02238b41d15df2b50f09",
+        "sample": "Every rule here is taken from `docs/specs/herdr-web-dashboard.md`\n`## Business Rules` (R1-R11). **No rule is invented at this layer** — the\nUI spec draws the product's rules, it do",
+        "identityFingerprint": "736f7bea552edc3d91bb40e095213b83de4f73169e5f95f36eadaf428c7f275b",
+        "ancestry": [
+          "Domain rules"
+        ],
+        "text": "Every rule here is taken from `docs/specs/herdr-web-dashboard.md`\n`## Business Rules` (R1-R11). **No rule is invented at this layer** — the\nUI spec draws the product's rules, it does not add any. The mapping below\nis bidirectional: a surface listed under a rule must carry that rule ID in\nits own frontmatter `rules:` array, or `npm run check` errors with\nVR-RULE-DRIFT."
+      },
+      "sourceShownText": "Every rule here is taken from `docs/specs/herdr-web-dashboard.md`\n`## Business Rules` (R1-R11). **No rule is invented at this layer** — the\nUI spec draws the product's rules, it does not add any. The mapping below\nis bidirectional: a surface listed under a rule must carry that rule ID in\nits own frontmatter `rules:` array, or `npm run check` errors with\nVR-RULE-DRIFT.",
+      "sourceDigest": "ff9d4af305d3725a010e2add750c1935610012e2cede02238b41d15df2b50f09",
+      "targetPath": "docs/platform/ui-spec/contracts/20-domain-rules.md",
+      "targetAnchor": "unheaded-block-4",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 32,
+        "endLine": 37,
+        "textDigest": "ff9d4af305d3725a010e2add750c1935610012e2cede02238b41d15df2b50f09",
+        "sample": "Every rule here is taken from `docs/specs/herdr-web-dashboard.md`\n`## Business Rules` (R1-R11). **No rule is invented at this layer** — the\nUI spec draws the product's rules, it do",
+        "identityFingerprint": "736f7bea552edc3d91bb40e095213b83de4f73169e5f95f36eadaf428c7f275b",
+        "ancestry": [
+          "Domain rules"
+        ],
+        "text": "Every rule here is taken from `docs/specs/herdr-web-dashboard.md`\n`## Business Rules` (R1-R11). **No rule is invented at this layer** — the\nUI spec draws the product's rules, it does not add any. The mapping below\nis bidirectional: a surface listed under a rule must carry that rule ID in\nits own frontmatter `rules:` array, or `npm run check` errors with\nVR-RULE-DRIFT."
+      },
+      "targetShownText": "Every rule here is taken from `docs/specs/herdr-web-dashboard.md`\n`## Business Rules` (R1-R11). **No rule is invented at this layer** — the\nUI spec draws the product's rules, it does not add any. The mapping below\nis bidirectional: a surface listed under a rule must carry that rule ID in\nits own frontmatter `rules:` array, or `npm run check` errors with\nVR-RULE-DRIFT.",
+      "targetDigest": "ff9d4af305d3725a010e2add750c1935610012e2cede02238b41d15df2b50f09",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_0380d86ba81fabec2f0826967ca3371e",
+        "sourceUnitDigest": "ff9d4af305d3725a010e2add750c1935610012e2cede02238b41d15df2b50f09",
+        "targetOwner": "docs/platform/ui-spec/contracts/20-domain-rules.md",
+        "targetAnchor": "unheaded-block-4",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/20-domain-rules.md#unheaded-block-2 (source lines 10-15) is carried at docs/platform/ui-spec/contracts/20-domain-rules.md#unheaded-block-4 (candidate lines 32-37). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/20-domain-rules.md verbatim in docs/platform/ui-spec/contracts/20-domain-rules.md. Map kind contract is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "ff9d4af305d3725a010e2add750c1935610012e2cede02238b41d15df2b50f09",
+        "targetAncestry": [
+          "Domain rules"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_15126cc42a23aadb0a85c7a1328483f0",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/20-domain-rules.md",
+      "sourceAnchor": "unheaded-block-3",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 17,
+        "endLine": 29,
+        "textDigest": "eefeb7d9db1e2cd91a10a80b8e5681f856ab4390d97cd3bbb209c25fb9601882",
+        "sample": "| Rule | What it means for the UI |\n|---|---|\n| **R1** | The client addresses a gateway, and must not assume a single fixed one. Every data-bearing surface shows which endpoint it ",
+        "identityFingerprint": "5b9cd9d49808a8c44c62d6909cc4b89d05c2f7b2bd04ff8aff24250aee36745e",
+        "ancestry": [
+          "Domain rules"
+        ],
+        "text": "| Rule | What it means for the UI |\n|---|---|\n| **R1** | The client addresses a gateway, and must not assume a single fixed one. Every data-bearing surface shows which endpoint it is reading, and the endpoint is switchable rather than baked in. |\n| **R2** | Every write on screen maps to one fgOS one-door-write verb. A control that cannot name its verb does not belong in this spec. |\n| **R3** | Nothing is readable before sign-in, and a failed sign-in reveals nothing — one indistinguishable failure state, never \"wrong password\" vs \"no such user\". |\n| **R4** | The token is never displayed, never copied into the DOM, and never persisted by the client beyond its session cookie. |\n| **R5** | The surface is on by default and reachable beyond loopback; the UI carries a standing, non-dismissable exposure indicator rather than a one-time notice. |\n| **R6** | Dashboard availability is independent of the cockpit — the UI never tells a person to \"open the cockpit first\". |\n| **R7** | Approve-merge is only offered where fgOS can actually run it. Where it cannot, the control is shown disabled **with the reason**, never hidden and never offered-then-failed. |\n| **R8** | Because the surface is exposed by default and can change trunk, the write controls are visually distinct from the read surface — a person must never trigger a trunk change by muscle memory. |\n| **R9** | Question/answer pairing is positional. The timeline renders pairs in recorded order and never implies a link the data does not carry. |\n| **R10** | The human narrative is the primary account; the machine decision log renders collapsed by default. |\n| **R11** | Nothing pushes. The UI must not imply it will alert anyone — no bell, no \"we'll notify you\". |"
+      },
+      "sourceShownText": "| Rule | What it means for the UI |\n|---|---|\n| **R1** | The client addresses a gateway, and must not assume a single fixed one. Every data-bearing surface shows which endpoint it is reading, and the endpoint is switchable rather than baked in. |\n| **R2** | Every write on screen maps to one fgOS one-door-write verb. A control that cannot name its verb does not belong in this spec. |\n| **R3** | Nothing is readable before sign-in, and a failed sign-in reveals nothing — one indistinguishable failure state, never \"wrong password\" vs \"no such user\". |\n| **R4** | The token is never displayed, never copied into the DOM, and never persisted by the client beyond its session cookie. |\n| **R5** | The surface is on by default and reachable beyond loopback; the UI carries a standing, non-dismissable exposure indicator rather than a one-time notice. |\n| **R6** | Dashboard availability is independent of the cockpit — the UI never tells a person to \"open the cockpit first\". |\n| **R7** | Approve-merge is only offered where fgOS can actually run it. Where it cannot, the control is shown disabled **with the reason**, never hidden and never offered-then-failed. |\n| **R8** | Because the surface is exposed by default and can change trunk, the write controls are visually distinct from the read surface — a person must never trigger a trunk change by muscle memory. |\n| **R9** | Question/answer pairing is positional. The timeline renders pairs in recorded order and never implies a link the data does not carry. |\n| **R10** | The human narrative is the primary account; the machine decision log renders collapsed by default. |\n| **R11** | Nothing pushes. The UI must not imply it will alert anyone — no bell, no \"we'll notify you\". |",
+      "sourceDigest": "eefeb7d9db1e2cd91a10a80b8e5681f856ab4390d97cd3bbb209c25fb9601882",
+      "targetPath": "docs/platform/ui-spec/contracts/20-domain-rules.md",
+      "targetAnchor": "unheaded-block-5",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 39,
+        "endLine": 51,
+        "textDigest": "eefeb7d9db1e2cd91a10a80b8e5681f856ab4390d97cd3bbb209c25fb9601882",
+        "sample": "| Rule | What it means for the UI |\n|---|---|\n| **R1** | The client addresses a gateway, and must not assume a single fixed one. Every data-bearing surface shows which endpoint it ",
+        "identityFingerprint": "5b9cd9d49808a8c44c62d6909cc4b89d05c2f7b2bd04ff8aff24250aee36745e",
+        "ancestry": [
+          "Domain rules"
+        ],
+        "text": "| Rule | What it means for the UI |\n|---|---|\n| **R1** | The client addresses a gateway, and must not assume a single fixed one. Every data-bearing surface shows which endpoint it is reading, and the endpoint is switchable rather than baked in. |\n| **R2** | Every write on screen maps to one fgOS one-door-write verb. A control that cannot name its verb does not belong in this spec. |\n| **R3** | Nothing is readable before sign-in, and a failed sign-in reveals nothing — one indistinguishable failure state, never \"wrong password\" vs \"no such user\". |\n| **R4** | The token is never displayed, never copied into the DOM, and never persisted by the client beyond its session cookie. |\n| **R5** | The surface is on by default and reachable beyond loopback; the UI carries a standing, non-dismissable exposure indicator rather than a one-time notice. |\n| **R6** | Dashboard availability is independent of the cockpit — the UI never tells a person to \"open the cockpit first\". |\n| **R7** | Approve-merge is only offered where fgOS can actually run it. Where it cannot, the control is shown disabled **with the reason**, never hidden and never offered-then-failed. |\n| **R8** | Because the surface is exposed by default and can change trunk, the write controls are visually distinct from the read surface — a person must never trigger a trunk change by muscle memory. |\n| **R9** | Question/answer pairing is positional. The timeline renders pairs in recorded order and never implies a link the data does not carry. |\n| **R10** | The human narrative is the primary account; the machine decision log renders collapsed by default. |\n| **R11** | Nothing pushes. The UI must not imply it will alert anyone — no bell, no \"we'll notify you\". |"
+      },
+      "targetShownText": "| Rule | What it means for the UI |\n|---|---|\n| **R1** | The client addresses a gateway, and must not assume a single fixed one. Every data-bearing surface shows which endpoint it is reading, and the endpoint is switchable rather than baked in. |\n| **R2** | Every write on screen maps to one fgOS one-door-write verb. A control that cannot name its verb does not belong in this spec. |\n| **R3** | Nothing is readable before sign-in, and a failed sign-in reveals nothing — one indistinguishable failure state, never \"wrong password\" vs \"no such user\". |\n| **R4** | The token is never displayed, never copied into the DOM, and never persisted by the client beyond its session cookie. |\n| **R5** | The surface is on by default and reachable beyond loopback; the UI carries a standing, non-dismissable exposure indicator rather than a one-time notice. |\n| **R6** | Dashboard availability is independent of the cockpit — the UI never tells a person to \"open the cockpit first\". |\n| **R7** | Approve-merge is only offered where fgOS can actually run it. Where it cannot, the control is shown disabled **with the reason**, never hidden and never offered-then-failed. |\n| **R8** | Because the surface is exposed by default and can change trunk, the write controls are visually distinct from the read surface — a person must never trigger a trunk change by muscle memory. |\n| **R9** | Question/answer pairing is positional. The timeline renders pairs in recorded order and never implies a link the data does not carry. |\n| **R10** | The human narrative is the primary account; the machine decision log renders collapsed by default. |\n| **R11** | Nothing pushes. The UI must not imply it will alert anyone — no bell, no \"we'll notify you\". |",
+      "targetDigest": "eefeb7d9db1e2cd91a10a80b8e5681f856ab4390d97cd3bbb209c25fb9601882",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_15126cc42a23aadb0a85c7a1328483f0",
+        "sourceUnitDigest": "eefeb7d9db1e2cd91a10a80b8e5681f856ab4390d97cd3bbb209c25fb9601882",
+        "targetOwner": "docs/platform/ui-spec/contracts/20-domain-rules.md",
+        "targetAnchor": "unheaded-block-5",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/20-domain-rules.md#unheaded-block-3 (source lines 17-29) is carried at docs/platform/ui-spec/contracts/20-domain-rules.md#unheaded-block-5 (candidate lines 39-51). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/20-domain-rules.md verbatim in docs/platform/ui-spec/contracts/20-domain-rules.md. Map kind contract is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "eefeb7d9db1e2cd91a10a80b8e5681f856ab4390d97cd3bbb209c25fb9601882",
+        "targetAncestry": [
+          "Domain rules"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_c8ef81d2c23f4c1a516b889b7793de8e",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/20-domain-rules.md",
+      "sourceAnchor": "unheaded-block-4",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 31,
+        "endLine": 66,
+        "textDigest": "08e2b5ce8d14a2be7069be53afb328c74153781ca698650bb9c6e47326035862",
+        "sample": "```yaml herdrweb-contract\nrules:\n  - id: R1\n    name: Client of a gateway, never a fixed origin\n    surfaces: [S02, S03, S04]\n  - id: R2\n    name: Every write goes through a one-do",
+        "identityFingerprint": "d72144b543fcaf878ce483d166c1a70d71d9faa8211f9faa3d9f9da25ffe624f",
+        "ancestry": [
+          "Domain rules"
+        ],
+        "text": "```yaml herdrweb-contract\nrules:\n  - id: R1\n    name: Client of a gateway, never a fixed origin\n    surfaces: [S02, S03, S04]\n  - id: R2\n    name: Every write goes through a one-door-write verb\n    surfaces: [M01, M02, M03, C01]\n  - id: R3\n    name: No read before sign-in, opaque failure\n    surfaces: [S01]\n  - id: R4\n    name: Token never surfaced or persisted by the client\n    surfaces: [S01]\n  - id: R5\n    name: Standing exposure indicator\n    surfaces: [S02, S03, S04]\n  - id: R6\n    name: Availability independent of the cockpit\n    surfaces: [S01]\n  - id: R7\n    name: Approve-merge only where it can run, disabled with a reason otherwise\n    surfaces: [S03, M02]\n  - id: R8\n    name: Write controls visually distinct from the read surface\n    surfaces: [S03, M02, C01]\n  - id: R9\n    name: Positional question/answer pairing\n    surfaces: [S03, S04]\n  - id: R10\n    name: Narrative primary, machine log collapsed\n    surfaces: [S03]\n  - id: R11\n    name: Nothing pushes; being informed is a pull\n    surfaces: [S02, S04]\n```"
+      },
+      "sourceShownText": "```yaml herdrweb-contract\nrules:\n  - id: R1\n    name: Client of a gateway, never a fixed origin\n    surfaces: [S02, S03, S04]\n  - id: R2\n    name: Every write goes through a one-door-write verb\n    surfaces: [M01, M02, M03, C01]\n  - id: R3\n    name: No read before sign-in, opaque failure\n    surfaces: [S01]\n  - id: R4\n    name: Token never surfaced or persisted by the client\n    surfaces: [S01]\n  - id: R5\n    name: Standing exposure indicator\n    surfaces: [S02, S03, S04]\n  - id: R6\n    name: Availability independent of the cockpit\n    surfaces: [S01]\n  - id: R7\n    name: Approve-merge only where it can run, disabled with a reason otherwise\n    surfaces: [S03, M02]\n  - id: R8\n    name: Write controls visually distinct from the read surface\n    surfaces: [S03, M02, C01]\n  - id: R9\n    name: Positional question/answer pairing\n    surfaces: [S03, S04]\n  - id: R10\n    name: Narrative primary, machine log collapsed\n    surfaces: [S03]\n  - id: R11\n    name: Nothing pushes; being informed is a pull\n    surfaces: [S02, S04]\n```",
+      "sourceDigest": "08e2b5ce8d14a2be7069be53afb328c74153781ca698650bb9c6e47326035862",
+      "targetPath": "docs/platform/ui-spec/contracts/20-domain-rules.md",
+      "targetAnchor": "unheaded-block-6",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 53,
+        "endLine": 88,
+        "textDigest": "08e2b5ce8d14a2be7069be53afb328c74153781ca698650bb9c6e47326035862",
+        "sample": "```yaml herdrweb-contract\nrules:\n  - id: R1\n    name: Client of a gateway, never a fixed origin\n    surfaces: [S02, S03, S04]\n  - id: R2\n    name: Every write goes through a one-do",
+        "identityFingerprint": "d72144b543fcaf878ce483d166c1a70d71d9faa8211f9faa3d9f9da25ffe624f",
+        "ancestry": [
+          "Domain rules"
+        ],
+        "text": "```yaml herdrweb-contract\nrules:\n  - id: R1\n    name: Client of a gateway, never a fixed origin\n    surfaces: [S02, S03, S04]\n  - id: R2\n    name: Every write goes through a one-door-write verb\n    surfaces: [M01, M02, M03, C01]\n  - id: R3\n    name: No read before sign-in, opaque failure\n    surfaces: [S01]\n  - id: R4\n    name: Token never surfaced or persisted by the client\n    surfaces: [S01]\n  - id: R5\n    name: Standing exposure indicator\n    surfaces: [S02, S03, S04]\n  - id: R6\n    name: Availability independent of the cockpit\n    surfaces: [S01]\n  - id: R7\n    name: Approve-merge only where it can run, disabled with a reason otherwise\n    surfaces: [S03, M02]\n  - id: R8\n    name: Write controls visually distinct from the read surface\n    surfaces: [S03, M02, C01]\n  - id: R9\n    name: Positional question/answer pairing\n    surfaces: [S03, S04]\n  - id: R10\n    name: Narrative primary, machine log collapsed\n    surfaces: [S03]\n  - id: R11\n    name: Nothing pushes; being informed is a pull\n    surfaces: [S02, S04]\n```"
+      },
+      "targetShownText": "```yaml herdrweb-contract\nrules:\n  - id: R1\n    name: Client of a gateway, never a fixed origin\n    surfaces: [S02, S03, S04]\n  - id: R2\n    name: Every write goes through a one-door-write verb\n    surfaces: [M01, M02, M03, C01]\n  - id: R3\n    name: No read before sign-in, opaque failure\n    surfaces: [S01]\n  - id: R4\n    name: Token never surfaced or persisted by the client\n    surfaces: [S01]\n  - id: R5\n    name: Standing exposure indicator\n    surfaces: [S02, S03, S04]\n  - id: R6\n    name: Availability independent of the cockpit\n    surfaces: [S01]\n  - id: R7\n    name: Approve-merge only where it can run, disabled with a reason otherwise\n    surfaces: [S03, M02]\n  - id: R8\n    name: Write controls visually distinct from the read surface\n    surfaces: [S03, M02, C01]\n  - id: R9\n    name: Positional question/answer pairing\n    surfaces: [S03, S04]\n  - id: R10\n    name: Narrative primary, machine log collapsed\n    surfaces: [S03]\n  - id: R11\n    name: Nothing pushes; being informed is a pull\n    surfaces: [S02, S04]\n```",
+      "targetDigest": "08e2b5ce8d14a2be7069be53afb328c74153781ca698650bb9c6e47326035862",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_c8ef81d2c23f4c1a516b889b7793de8e",
+        "sourceUnitDigest": "08e2b5ce8d14a2be7069be53afb328c74153781ca698650bb9c6e47326035862",
+        "targetOwner": "docs/platform/ui-spec/contracts/20-domain-rules.md",
+        "targetAnchor": "unheaded-block-6",
+        "claimKind": "contract",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/20-domain-rules.md#unheaded-block-4 (source lines 31-66) is carried at docs/platform/ui-spec/contracts/20-domain-rules.md#unheaded-block-6 (candidate lines 53-88). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/20-domain-rules.md verbatim in docs/platform/ui-spec/contracts/20-domain-rules.md. Map kind contract is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "08e2b5ce8d14a2be7069be53afb328c74153781ca698650bb9c6e47326035862",
+        "targetAncestry": [
+          "Domain rules"
+        ]
+      }
+    }
+  ]
+}

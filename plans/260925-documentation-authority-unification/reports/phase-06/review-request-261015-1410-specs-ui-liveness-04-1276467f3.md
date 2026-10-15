@@ -1,0 +1,2112 @@
+# Independent section liveness classification
+
+Content commit: 1276467f37a99d19aff05808d42fafbf40341449
+Author session: codex-session:unit-run-1792047735364-5c1a0eb5@2026-10-15
+Entries: **44**. Separate non-source verdict channel; no source approval, truth approval, retirement, promotion or cutover follows. No reviewer seed or verdict supplied.
+
+Review each of the 224 section classifications across these four requests. Validate full shown text, section range/SHA256, direct and concept consumers, implementation paths and subject hits against the pinned tree; lexical absence does not prove retirement. No source subject was adjudicated retired. Explicitly inspect confinement §13.1 mixed current recipe/history, §13.2 remaining spec, §13.3 decisions and Observe §6. History placement is distinct from retired-subject and current-truth judgments. Known stale current sentences remain queued for A28. Read step8-liveness.md/json and step8-evidence.md.
+
+Return Reviewer, Author session(s), Review mode: ordinary, request/content pin and one row per entry. Use the entryId in Claim; Source digest binds JSON evidence for that entry (given below); Target digest is none for this separate accounting channel. Each note must describe the actual check and its limits. This table does not apply source verdicts through applyReviewVerdicts.
+
+| Claim | Verdict | Note | Source digest | Target digest |
+|---|---|---|---|---|
+
+## liveness-19-004
+
+Source digest (evidence JSON): 0b7012119bcb9142a18b3290a5620774cb87227f8178b66cbc37970dca4d2519
+Target digest: none
+
+````json
+{
+  "entryId": "liveness-19-004",
+  "source": "docs/ui-spec/modals/M01-answer-question.md",
+  "sourceBlob": "6dc51a45d24ffc3fca7b051c121b5d1d7b63aa9d",
+  "section": {
+    "heading": "Layout",
+    "anchor": "layout",
+    "startLine": 23,
+    "endLine": 52,
+    "sha256": "1d03652c236e989336aa45b2d74c31b0ee98bcdd4069d702c82651e50ff6b528",
+    "classification": "current-by-default",
+    "directReferenceCount": 1,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "## Layout\n\n```\n┌────────────────────────────────────────────────────┐\n│ Answer · tsk-4id                              [✕]  │  header\n├────────────────────────────────────────────────────┤\n│ Which pairing key should the timeline use when     │  question_recap\n│ askHistory and settlements have drifted by one?    │\n│                                                    │\n│ Why you're being asked                             │\n│ Two options still standing; D2 added no linking    │\n│ key. Tried: read D2, ran pairing on tsk-48i.       │\n├────────────────────────────────────────────────────┤\n│ Your answer                                        │  answer_form\n│ ┌────────────────────────────────────────────────┐ │\n│ │                                                │ │\n│ │                                                │ │\n│ └────────────────────────────────────────────────┘ │\n│ Goes through `fgos answer`.                        │\n├────────────────────────────────────────────────────┤\n│                          [ Cancel ]  [ Send answer ]│ footer\n└────────────────────────────────────────────────────┘\n```\n\nThe question is repeated inside the modal, with its \"why\", so a person\nanswering on a phone never has to dismiss the modal to re-read what they\nare answering. The footnote naming the verb is not decoration — R2 says\nevery write maps to one one-door-write verb, and showing which one is how\na person knows what they are actually about to do.\n",
+  "directReferences": [
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 59,
+      "text": "│   ├── M01-answer-question.md"
+    }
+  ],
+  "sourceSHA256": "6c459c08d0ad35c362181fac748b68c765c60441597049e3e3c00c8485a61f23"
+}
+````
+
+
+## liveness-19-005
+
+Source digest (evidence JSON): eae1e217d063d9e82275aca8d0b77a5da02d2ff4d59b02a1eba2d9b2e4266adf
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-19-005",
+  "source": "docs/ui-spec/modals/M01-answer-question.md",
+  "sourceBlob": "6dc51a45d24ffc3fca7b051c121b5d1d7b63aa9d",
+  "section": {
+    "heading": "States",
+    "anchor": "states",
+    "startLine": 53,
+    "endLine": 61,
+    "sha256": "9c1fddcb2e12667357a350dca9dcc05f1d0e77fbfd37e9d9d92c7739f61bc4b4",
+    "classification": "current-by-default",
+    "directReferenceCount": 1,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "## States\n\n- **ST-READY** — send disabled until the answer is non-empty.\n- **ST-SUBMITTING** — send shows progress; the textarea goes read-only but\n  stays visible, so nothing typed is ever hidden mid-flight.\n- **ERR-WRITE-REFUSED** — fgOS refused the write (the item was no longer\n  parked, say). The engine's own message is shown verbatim, and the typed\n  answer is kept, never cleared.\n",
+  "directReferences": [
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 59,
+      "text": "│   ├── M01-answer-question.md"
+    }
+  ],
+  "sourceSHA256": "6c459c08d0ad35c362181fac748b68c765c60441597049e3e3c00c8485a61f23"
+}
+```
+
+
+## liveness-19-006
+
+Source digest (evidence JSON): 6826e7c4a491ef31fb74a23002dd5634df19943ab3079cdb6754db17b58d1f88
+Target digest: none
+
+````json
+{
+  "entryId": "liveness-19-006",
+  "source": "docs/ui-spec/modals/M01-answer-question.md",
+  "sourceBlob": "6dc51a45d24ffc3fca7b051c121b5d1d7b63aa9d",
+  "section": {
+    "heading": "Interactions",
+    "anchor": "interactions",
+    "startLine": 62,
+    "endLine": 93,
+    "sha256": "55dc5afd5de85d126247d0a5f6ce054457d84e00abf292661a98d803b78dc242",
+    "classification": "current-by-default",
+    "directReferenceCount": 1,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "## Interactions\n\n```yaml herdrweb-contract\ninteractions:\n  - id: A-M01-001\n    element: answer_textarea\n    region: answer_form\n    trigger: input\n    action: mutate\n    effects: [enable_send_when_non_empty]\n  - id: A-M01-002\n    element: send_answer_button\n    region: footer\n    trigger: submit\n    guard: \"answer.nonEmpty\"\n    action: close_overlay\n    target: return_to_invoker\n    effects: [run_fgos_answer_verb]\n  - id: A-M01-003\n    element: cancel_button\n    region: footer\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n  - id: A-M01-004\n    element: close_icon\n    region: header\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n```\n",
+  "directReferences": [
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 59,
+      "text": "│   ├── M01-answer-question.md"
+    }
+  ],
+  "sourceSHA256": "6c459c08d0ad35c362181fac748b68c765c60441597049e3e3c00c8485a61f23"
+}
+````
+
+
+## liveness-20-001
+
+Source digest (evidence JSON): 4e2f442a9c9ad270ea859dc5ca6dfdfce653abf80f1c44ab3aa4d0b439cf6617
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-20-001",
+  "source": "docs/ui-spec/modals/M02-approve-merge.md",
+  "sourceBlob": "4a4d851df85cb09c915f0fbf2d1b71ae174aa563",
+  "section": {
+    "heading": "Preamble",
+    "anchor": "preamble",
+    "startLine": 1,
+    "endLine": 12,
+    "sha256": "b4fae95edd77a91e744d305cfa525fc3e3a210183347fcd816f1899399163538",
+    "classification": "current-by-default",
+    "directReferenceCount": 1,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "---\nid: M02\ntype: modal\nname: \"Approve a merge\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R2, R7, R8]\nregions: [header, what_lands, consequence, footer]\n---\n",
+  "directReferences": [
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 60,
+      "text": "│   ├── M02-approve-merge.md"
+    }
+  ],
+  "sourceSHA256": "f52cb369e8ec0039fa64b0f4a7ca3bbf9ccfd37b3fe2fc342a410d59c5bb23b8"
+}
+```
+
+
+## liveness-20-002
+
+Source digest (evidence JSON): 468a60c56db6234e67d42d5415d4ab0a56edddc35bcbe4a4edf3e7c5b5f16685
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-20-002",
+  "source": "docs/ui-spec/modals/M02-approve-merge.md",
+  "sourceBlob": "4a4d851df85cb09c915f0fbf2d1b71ae174aa563",
+  "section": {
+    "heading": "M02 — Approve a merge",
+    "anchor": "m02-approve-a-merge",
+    "startLine": 13,
+    "endLine": 14,
+    "sha256": "58fc8e71819496f1590f5f24cc95f14b5da8a092edb7819560970e445311486a",
+    "classification": "current-by-default",
+    "directReferenceCount": 1,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "# M02 — Approve a merge\n",
+  "directReferences": [
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 60,
+      "text": "│   ├── M02-approve-merge.md"
+    }
+  ],
+  "sourceSHA256": "f52cb369e8ec0039fa64b0f4a7ca3bbf9ccfd37b3fe2fc342a410d59c5bb23b8"
+}
+```
+
+
+## liveness-20-003
+
+Source digest (evidence JSON): f93c52d60756ac083d90b07481a65f3c5c0512fc5b5d3bf89c6a2be5d61b4ab0
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-20-003",
+  "source": "docs/ui-spec/modals/M02-approve-merge.md",
+  "sourceBlob": "4a4d851df85cb09c915f0fbf2d1b71ae174aa563",
+  "section": {
+    "heading": "Purpose",
+    "anchor": "purpose",
+    "startLine": 15,
+    "endLine": 21,
+    "sha256": "dd74a1d95491b5894e0f9881b715471ede68d5713795ed2ddabaa895888885d4",
+    "classification": "current-by-default",
+    "directReferenceCount": 1,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "## Purpose\n\nConfirm and run the one operation on this client that changes trunk\n(`docs/specs/herdr-web-dashboard.md` §Approve a merge). It exists as its\nown modal, rather than an inline button, precisely because of R8: a person\nmust never change trunk by muscle memory.\n",
+  "directReferences": [
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 60,
+      "text": "│   ├── M02-approve-merge.md"
+    }
+  ],
+  "sourceSHA256": "f52cb369e8ec0039fa64b0f4a7ca3bbf9ccfd37b3fe2fc342a410d59c5bb23b8"
+}
+```
+
+
+## liveness-20-004
+
+Source digest (evidence JSON): ad120fb7a9f812c1568321da6420831b298a43df18cc3630cd9ffc9e9a75151e
+Target digest: none
+
+````json
+{
+  "entryId": "liveness-20-004",
+  "source": "docs/ui-spec/modals/M02-approve-merge.md",
+  "sourceBlob": "4a4d851df85cb09c915f0fbf2d1b71ae174aa563",
+  "section": {
+    "heading": "Layout",
+    "anchor": "layout",
+    "startLine": 22,
+    "endLine": 54,
+    "sha256": "9e0cd5b55ae00bdd635b64e158fab62d1c610ad3ae6cbe5f72a34c82df8c4c80",
+    "classification": "current-by-default",
+    "directReferenceCount": 1,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "## Layout\n\n```\n┌────────────────────────────────────────────────────┐\n│ Approve merge · tsk-k4v                       [✕]  │  header\n├────────────────────────────────────────────────────┤\n│ What lands                                         │  what_lands\n│ 6 files, +412 / −18                                │\n│ into  fgw/tsk-ldb                                  │\n│                                                    │\n│ herdr-plugin/src/web/mod.rs                        │\n│ herdr-plugin/src/web/auth.rs                       │\n│ … 4 more                                           │\n├────────────────────────────────────────────────────┤\n│ This changes trunk.                                │  consequence\n│ Runs `fgos approve` on dev-box. The item's own     │\n│ verify runs again first; if it fails the item      │\n│ parks blocked instead of merging.                  │\n├────────────────────────────────────────────────────┤\n│                        [ Cancel ]  [ Approve merge ]│ footer\n└────────────────────────────────────────────────────┘\n```\n\nThe consequence panel is not a warning banner to be skimmed — it states\nthree specific facts (what verb, on which machine, and what happens if\nverify fails) so that confirming is an informed act rather than a reflex.\n\n**Where approve cannot run, this modal never opens.** R7 puts the\nconstraint on the invoking control instead: `Approve merge` on S03 renders\ndisabled with the reason attached (ERR-APPROVE-UNAVAILABLE). Offering the\nmodal and failing at submit would be exactly the offered-then-failed\npattern the area spec rules out.\n",
+  "directReferences": [
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 60,
+      "text": "│   ├── M02-approve-merge.md"
+    }
+  ],
+  "sourceSHA256": "f52cb369e8ec0039fa64b0f4a7ca3bbf9ccfd37b3fe2fc342a410d59c5bb23b8"
+}
+````
+
+
+## liveness-20-005
+
+Source digest (evidence JSON): 3d714270c190c0504075286d89930be7ece9e51bd6919110377a30d5a551e328
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-20-005",
+  "source": "docs/ui-spec/modals/M02-approve-merge.md",
+  "sourceBlob": "4a4d851df85cb09c915f0fbf2d1b71ae174aa563",
+  "section": {
+    "heading": "States",
+    "anchor": "states",
+    "startLine": 55,
+    "endLine": 65,
+    "sha256": "4d319205de7333d2dc4861a017ad3bf8ab97aeab2fccae700bd1051284fe2095",
+    "classification": "current-by-default",
+    "directReferenceCount": 1,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "## States\n\n- **ST-READY** — the diff summary and target branch are loaded.\n- **ST-SUBMITTING** — approve in flight; both buttons disabled, progress\n  on the approve button. This one is not instant, and the modal must not\n  look frozen while the verify re-runs.\n- **ERR-WRITE-REFUSED** — fgOS refused or the post-merge verify failed and\n  the item parked blocked. The engine's own outcome is shown verbatim,\n  including the park reason, and the modal stays open so the person reads\n  it rather than being dropped back to a screen that silently did nothing.\n",
+  "directReferences": [
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 60,
+      "text": "│   ├── M02-approve-merge.md"
+    }
+  ],
+  "sourceSHA256": "f52cb369e8ec0039fa64b0f4a7ca3bbf9ccfd37b3fe2fc342a410d59c5bb23b8"
+}
+```
+
+
+## liveness-20-006
+
+Source digest (evidence JSON): bfe160fa6fefcdea902fde352c18ba25be010225922ce10b753cac515dc51fef
+Target digest: none
+
+````json
+{
+  "entryId": "liveness-20-006",
+  "source": "docs/ui-spec/modals/M02-approve-merge.md",
+  "sourceBlob": "4a4d851df85cb09c915f0fbf2d1b71ae174aa563",
+  "section": {
+    "heading": "Interactions",
+    "anchor": "interactions",
+    "startLine": 66,
+    "endLine": 91,
+    "sha256": "cbbae09703f20e71dcade523f8cbbd15aa36a3422b1be3b9d2ad2eda2bb05a10",
+    "classification": "current-by-default",
+    "directReferenceCount": 1,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "## Interactions\n\n```yaml herdrweb-contract\ninteractions:\n  - id: A-M02-001\n    element: approve_merge_button\n    region: footer\n    trigger: submit\n    guard: \"gateway.atMainWorkingTree\"\n    action: close_overlay\n    target: return_to_invoker\n    effects: [run_fgos_approve_verb]\n  - id: A-M02-002\n    element: cancel_button\n    region: footer\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n  - id: A-M02-003\n    element: close_icon\n    region: header\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n```\n",
+  "directReferences": [
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 60,
+      "text": "│   ├── M02-approve-merge.md"
+    }
+  ],
+  "sourceSHA256": "f52cb369e8ec0039fa64b0f4a7ca3bbf9ccfd37b3fe2fc342a410d59c5bb23b8"
+}
+````
+
+
+## liveness-21-001
+
+Source digest (evidence JSON): b523ee5ed07b8569509eb6043b5756ebc4fb31b23bfe1452bba4c965d83f4bd0
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-21-001",
+  "source": "docs/ui-spec/modals/M03-add-edit-item.md",
+  "sourceBlob": "09aa20dbc0fae13211c64077188d5e7950d56120",
+  "section": {
+    "heading": "Preamble",
+    "anchor": "preamble",
+    "startLine": 1,
+    "endLine": 12,
+    "sha256": "6bfde2e975f4a8316b5d45cc351e497c1d2766390cb27e099e3a5170570ee8b1",
+    "classification": "current-by-default",
+    "directReferenceCount": 4,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "---\nid: M03\ntype: modal\nname: \"Add or edit a work item\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R2]\nregions: [header, form, footer]\n---\n",
+  "directReferences": [
+    {
+      "path": "apps/fgos-gateway/web/src/screens/TaskDetail.tsx",
+      "line": 487,
+      "text": "        // M03 (docs/ui-spec/modals/M03-add-edit-item.md) is not owned by"
+    },
+    {
+      "path": "apps/fgos-gateway/web/src/screens/Taskboard.tsx",
+      "line": 439,
+      "text": "        // M03 (docs/ui-spec/modals/M03-add-edit-item.md) is not owned by"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 61,
+      "text": "│   └── M03-add-edit-item.md"
+    },
+    {
+      "path": "docs/knowledge/why-the-gateway-s-patch-work-id-edit-route-uses-patch-semant/why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md",
+      "line": 10,
+      "text": "item — `POST /work` only adds. `docs/ui-spec/modals/M03-add-edit-item.md`'s"
+    }
+  ],
+  "sourceSHA256": "b0a16742180949c5a1b6836690c67c74c9dbd7f0ebf400d3c26eb7a4d18fe3d1"
+}
+```
+
+
+## liveness-21-002
+
+Source digest (evidence JSON): d1bfd9a90e95e74c05fbdece21f74a22e0a8ff3f7f7dfa771a0008d60c22223a
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-21-002",
+  "source": "docs/ui-spec/modals/M03-add-edit-item.md",
+  "sourceBlob": "09aa20dbc0fae13211c64077188d5e7950d56120",
+  "section": {
+    "heading": "M03 — Add or edit a work item",
+    "anchor": "m03-add-or-edit-a-work-item",
+    "startLine": 13,
+    "endLine": 14,
+    "sha256": "895fa0072e540537cf898d28e73efc9c7d09ec957445fbfc832dc9a8a27fa8ad",
+    "classification": "current-by-default",
+    "directReferenceCount": 4,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "# M03 — Add or edit a work item\n",
+  "directReferences": [
+    {
+      "path": "apps/fgos-gateway/web/src/screens/TaskDetail.tsx",
+      "line": 487,
+      "text": "        // M03 (docs/ui-spec/modals/M03-add-edit-item.md) is not owned by"
+    },
+    {
+      "path": "apps/fgos-gateway/web/src/screens/Taskboard.tsx",
+      "line": 439,
+      "text": "        // M03 (docs/ui-spec/modals/M03-add-edit-item.md) is not owned by"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 61,
+      "text": "│   └── M03-add-edit-item.md"
+    },
+    {
+      "path": "docs/knowledge/why-the-gateway-s-patch-work-id-edit-route-uses-patch-semant/why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md",
+      "line": 10,
+      "text": "item — `POST /work` only adds. `docs/ui-spec/modals/M03-add-edit-item.md`'s"
+    }
+  ],
+  "sourceSHA256": "b0a16742180949c5a1b6836690c67c74c9dbd7f0ebf400d3c26eb7a4d18fe3d1"
+}
+```
+
+
+## liveness-21-003
+
+Source digest (evidence JSON): ea142ff2999c84030ff2ec00559b69cab26adc042a36cdf80060e95dcb79a9f2
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-21-003",
+  "source": "docs/ui-spec/modals/M03-add-edit-item.md",
+  "sourceBlob": "09aa20dbc0fae13211c64077188d5e7950d56120",
+  "section": {
+    "heading": "Purpose",
+    "anchor": "purpose",
+    "startLine": 15,
+    "endLine": 21,
+    "sha256": "1156dda1141ea6ef1f47f98dd39664829216215bd234b453a9ea9a74d683af5c",
+    "classification": "current-by-default",
+    "directReferenceCount": 4,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "## Purpose\n\nCreate a new work item, or overwrite the fields of an existing one\n(`docs/specs/herdr-web-dashboard.md` §Add a work item, §Edit a work item).\nOne modal in two modes, because the fields and the validation are the\nsame; only the verb underneath differs.\n",
+  "directReferences": [
+    {
+      "path": "apps/fgos-gateway/web/src/screens/TaskDetail.tsx",
+      "line": 487,
+      "text": "        // M03 (docs/ui-spec/modals/M03-add-edit-item.md) is not owned by"
+    },
+    {
+      "path": "apps/fgos-gateway/web/src/screens/Taskboard.tsx",
+      "line": 439,
+      "text": "        // M03 (docs/ui-spec/modals/M03-add-edit-item.md) is not owned by"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 61,
+      "text": "│   └── M03-add-edit-item.md"
+    },
+    {
+      "path": "docs/knowledge/why-the-gateway-s-patch-work-id-edit-route-uses-patch-semant/why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md",
+      "line": 10,
+      "text": "item — `POST /work` only adds. `docs/ui-spec/modals/M03-add-edit-item.md`'s"
+    }
+  ],
+  "sourceSHA256": "b0a16742180949c5a1b6836690c67c74c9dbd7f0ebf400d3c26eb7a4d18fe3d1"
+}
+```
+
+
+## liveness-21-004
+
+Source digest (evidence JSON): be0880eee4f5aa3375c6bca436be23c609f1f3629d791246e7cdfc971a08177d
+Target digest: none
+
+````json
+{
+  "entryId": "liveness-21-004",
+  "source": "docs/ui-spec/modals/M03-add-edit-item.md",
+  "sourceBlob": "09aa20dbc0fae13211c64077188d5e7950d56120",
+  "section": {
+    "heading": "Layout",
+    "anchor": "layout",
+    "startLine": 22,
+    "endLine": 53,
+    "sha256": "b1b6b77808444cf885f51497d68ee73512dc035bf7562eb48f7843acafd58869",
+    "classification": "current-by-default",
+    "directReferenceCount": 4,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "## Layout\n\n```\n┌────────────────────────────────────────────────────┐\n│ New work item                                 [✕]  │  header\n│ (edit mode: \"Edit · tsk-4id\")                      │\n├────────────────────────────────────────────────────┤\n│ Description                                        │  form\n│ ┌────────────────────────────────────────────────┐ │\n│ │ What needs doing, in plain language.           │ │\n│ └────────────────────────────────────────────────┘ │\n│                                                    │\n│ (edit mode also shows: title, kind, risk, verify,  │\n│  deps, priority — the fields `fgos edit` accepts)  │\n│                                                    │\n│ Goes through `fgos add` / `fgos edit`.             │\n├────────────────────────────────────────────────────┤\n│                             [ Cancel ]  [ Create ] │  footer\n└────────────────────────────────────────────────────┘\n```\n\n**Add mode is deliberately one field.** Intake derives title, kind, risk\nand id from the description — asking a person to fill those in would be\nasking them to do work the engine already does, and would make capturing\na thought from a phone slow enough that they would not bother.\n\n**Edit mode shows the real fields** `fgos edit` accepts, because editing\nis a deliberate correction rather than a capture.\n\nValidation is not reimplemented here: the same rules a terminal edit gets\napply, and the engine's refusal is what the person sees (R2).\n",
+  "directReferences": [
+    {
+      "path": "apps/fgos-gateway/web/src/screens/TaskDetail.tsx",
+      "line": 487,
+      "text": "        // M03 (docs/ui-spec/modals/M03-add-edit-item.md) is not owned by"
+    },
+    {
+      "path": "apps/fgos-gateway/web/src/screens/Taskboard.tsx",
+      "line": 439,
+      "text": "        // M03 (docs/ui-spec/modals/M03-add-edit-item.md) is not owned by"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 61,
+      "text": "│   └── M03-add-edit-item.md"
+    },
+    {
+      "path": "docs/knowledge/why-the-gateway-s-patch-work-id-edit-route-uses-patch-semant/why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md",
+      "line": 10,
+      "text": "item — `POST /work` only adds. `docs/ui-spec/modals/M03-add-edit-item.md`'s"
+    }
+  ],
+  "sourceSHA256": "b0a16742180949c5a1b6836690c67c74c9dbd7f0ebf400d3c26eb7a4d18fe3d1"
+}
+````
+
+
+## liveness-21-005
+
+Source digest (evidence JSON): 12f29bb93cc4e2332195a5fb0bdfd2dcec22b8d18ff1cd1c6716854b66f861e0
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-21-005",
+  "source": "docs/ui-spec/modals/M03-add-edit-item.md",
+  "sourceBlob": "09aa20dbc0fae13211c64077188d5e7950d56120",
+  "section": {
+    "heading": "States",
+    "anchor": "states",
+    "startLine": 54,
+    "endLine": 61,
+    "sha256": "0590d971a4fc60ac49cedd2985dc4e013c64b8fa54ba82eaa95db52d49129a9d",
+    "classification": "current-by-default",
+    "directReferenceCount": 4,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "## States\n\n- **ST-READY** — create disabled while the description is empty.\n- **ST-SUBMITTING** — button shows progress; fields read-only, still\n  visible.\n- **ERR-WRITE-REFUSED** — shown verbatim from the engine, with everything\n  typed preserved.\n",
+  "directReferences": [
+    {
+      "path": "apps/fgos-gateway/web/src/screens/TaskDetail.tsx",
+      "line": 487,
+      "text": "        // M03 (docs/ui-spec/modals/M03-add-edit-item.md) is not owned by"
+    },
+    {
+      "path": "apps/fgos-gateway/web/src/screens/Taskboard.tsx",
+      "line": 439,
+      "text": "        // M03 (docs/ui-spec/modals/M03-add-edit-item.md) is not owned by"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 61,
+      "text": "│   └── M03-add-edit-item.md"
+    },
+    {
+      "path": "docs/knowledge/why-the-gateway-s-patch-work-id-edit-route-uses-patch-semant/why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md",
+      "line": 10,
+      "text": "item — `POST /work` only adds. `docs/ui-spec/modals/M03-add-edit-item.md`'s"
+    }
+  ],
+  "sourceSHA256": "b0a16742180949c5a1b6836690c67c74c9dbd7f0ebf400d3c26eb7a4d18fe3d1"
+}
+```
+
+
+## liveness-21-006
+
+Source digest (evidence JSON): 940932c4b3eb8176e2d96a73e59abffdb64588e8a7ca46f2885e52299ca81999
+Target digest: none
+
+````json
+{
+  "entryId": "liveness-21-006",
+  "source": "docs/ui-spec/modals/M03-add-edit-item.md",
+  "sourceBlob": "09aa20dbc0fae13211c64077188d5e7950d56120",
+  "section": {
+    "heading": "Interactions",
+    "anchor": "interactions",
+    "startLine": 62,
+    "endLine": 93,
+    "sha256": "d33e9a8b216e40157e6cee1ee8750f706038fbdb400855f0176b8689a6aa8c51",
+    "classification": "current-by-default",
+    "directReferenceCount": 4,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "## Interactions\n\n```yaml herdrweb-contract\ninteractions:\n  - id: A-M03-001\n    element: description_field\n    region: form\n    trigger: input\n    action: mutate\n    effects: [enable_submit_when_non_empty]\n  - id: A-M03-002\n    element: submit_button\n    region: footer\n    trigger: submit\n    guard: \"description.nonEmpty\"\n    action: close_overlay\n    target: return_to_invoker\n    effects: [run_fgos_add_or_edit_verb]\n  - id: A-M03-003\n    element: cancel_button\n    region: footer\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n  - id: A-M03-004\n    element: close_icon\n    region: header\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n```\n",
+  "directReferences": [
+    {
+      "path": "apps/fgos-gateway/web/src/screens/TaskDetail.tsx",
+      "line": 487,
+      "text": "        // M03 (docs/ui-spec/modals/M03-add-edit-item.md) is not owned by"
+    },
+    {
+      "path": "apps/fgos-gateway/web/src/screens/Taskboard.tsx",
+      "line": 439,
+      "text": "        // M03 (docs/ui-spec/modals/M03-add-edit-item.md) is not owned by"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 61,
+      "text": "│   └── M03-add-edit-item.md"
+    },
+    {
+      "path": "docs/knowledge/why-the-gateway-s-patch-work-id-edit-route-uses-patch-semant/why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md",
+      "line": 10,
+      "text": "item — `POST /work` only adds. `docs/ui-spec/modals/M03-add-edit-item.md`'s"
+    }
+  ],
+  "sourceSHA256": "b0a16742180949c5a1b6836690c67c74c9dbd7f0ebf400d3c26eb7a4d18fe3d1"
+}
+````
+
+
+## liveness-22-001
+
+Source digest (evidence JSON): 7e77d1488ea1b63124e63ca7c3653491ea6a0d0d4b250207a0d61e13d17af085
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-22-001",
+  "source": "docs/ui-spec/schema/surface-contract.schema.json",
+  "sourceBlob": "2f163ff6092e16b1cb619c7dcc0765f316af1753",
+  "section": {
+    "heading": "Preamble",
+    "anchor": "preamble",
+    "startLine": 1,
+    "endLine": 124,
+    "sha256": "2ce8f77f92bb0cf512f74f5eac133be50a8a0d301b3de13b82e5fbf4d950db7e",
+    "classification": "current-by-default",
+    "directReferenceCount": 5,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "{\n  \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n  \"$id\": \"ui-spec-surface-contract\",\n  \"title\": \"UI Spec surface interaction contract\",\n  \"description\": \"Schema for the fenced YAML contract block embedded in each surface markdown file.\",\n  \"type\": \"object\",\n  \"additionalProperties\": false,\n  \"minProperties\": 1,\n  \"properties\": {\n    \"system\": {\n      \"type\": \"string\",\n      \"description\": \"Optional: system/subsystem name for system event files\"\n    },\n    \"interactions\": {\n      \"type\": \"array\",\n      \"items\": { \"$ref\": \"#/$defs/interaction\" }\n    },\n    \"emits\": {\n      \"type\": \"array\",\n      \"items\": { \"$ref\": \"#/$defs/emit\" }\n    },\n    \"flow\": { \"$ref\": \"#/$defs/flow\" },\n    \"rules\": {\n      \"type\": \"array\",\n      \"items\": { \"$ref\": \"#/$defs/ruleMapping\" }\n    }\n  },\n  \"$defs\": {\n    \"actionId\": {\n      \"type\": \"string\",\n      \"pattern\": \"^A-[A-Z0-9]+-[A-Za-z0-9]+$\"\n    },\n    \"trigger\": {\n      \"type\": \"string\",\n      \"enum\": [\n        \"click\", \"double_click\", \"contextmenu\", \"tap\", \"long_press\",\n        \"drag\", \"drag_start\", \"drag_end\", \"drag_drop\", \"drop\",\n        \"submit\", \"change\", \"input\", \"blur\", \"validate\",\n        \"keydown\", \"hover\", \"focus\",\n        \"system_event\", \"event\"\n      ]\n    },\n    \"action\": {\n      \"type\": \"string\",\n      \"enum\": [\"navigate\", \"open_overlay\", \"close_overlay\", \"mutate\", \"emit_event\", \"external\", \"system_event\"]\n    },\n    \"interaction\": {\n      \"type\": \"object\",\n      \"additionalProperties\": false,\n      \"properties\": {\n        \"id\": { \"$ref\": \"#/$defs/actionId\" },\n        \"element\": { \"type\": \"string\" },\n        \"region\": { \"type\": \"string\", \"description\": \"Optional: named region within the surface (e.g. header, sidebar, footer)\" },\n        \"trigger\": { \"$ref\": \"#/$defs/trigger\" },\n        \"listens_to\": { \"type\": \"string\" },\n        \"guard\": { \"type\": \"string\" },\n        \"action\": { \"$ref\": \"#/$defs/action\" },\n        \"target\": { \"type\": \"string\" },\n        \"event\": { \"type\": \"string\" },\n        \"payload\": { \"type\": \"object\" },\n        \"effects\": { \"type\": \"array\", \"items\": { \"type\": \"string\" } }\n      },\n      \"allOf\": [\n        {\n          \"comment\": \"navigate/open_overlay require a target\",\n          \"if\": { \"properties\": { \"action\": { \"enum\": [\"navigate\", \"open_overlay\"] } }, \"required\": [\"action\"] },\n          \"then\": { \"required\": [\"target\"] }\n        },\n        {\n          \"comment\": \"a non-listener interaction needs a trigger\",\n          \"if\": { \"not\": { \"required\": [\"listens_to\"] } },\n          \"then\": { \"required\": [\"trigger\"] }\n        }\n      ]\n    },\n    \"emit\": {\n      \"type\": \"object\",\n      \"additionalProperties\": false,\n      \"required\": [\"id\", \"event\"],\n      \"properties\": {\n        \"id\": { \"$ref\": \"#/$defs/actionId\" },\n        \"element\": { \"type\": \"string\" },\n        \"region\": { \"type\": \"string\", \"description\": \"Optional: named region within the surface\" },\n        \"trigger\": { \"$ref\": \"#/$defs/trigger\" },\n        \"guard\": { \"type\": \"string\" },\n        \"event\": { \"type\": \"string\" },\n        \"payload\": { \"type\": \"object\" }\n      }\n    },\n    \"flow\": {\n      \"type\": \"object\",\n      \"additionalProperties\": false,\n      \"required\": [\"goal\", \"steps\"],\n      \"properties\": {\n        \"goal\": { \"type\": \"string\" },\n        \"preconditions\": { \"type\": \"array\", \"items\": { \"type\": \"string\" } },\n        \"steps\": { \"type\": \"array\", \"items\": { \"$ref\": \"#/$defs/actionId\" } },\n        \"branches\": {\n          \"type\": \"array\",\n          \"items\": {\n            \"type\": \"object\",\n            \"additionalProperties\": false,\n            \"required\": [\"when\", \"action\"],\n            \"properties\": {\n              \"when\": { \"type\": \"string\" },\n              \"action\": { \"$ref\": \"#/$defs/actionId\" }\n            }\n          }\n        }\n      }\n    },\n    \"ruleMapping\": {\n      \"type\": \"object\",\n      \"additionalProperties\": false,\n      \"required\": [\"id\", \"surfaces\"],\n      \"properties\": {\n        \"id\": { \"type\": \"string\", \"pattern\": \"^R[0-9]+$\" },\n        \"name\": { \"type\": \"string\" },\n        \"surfaces\": { \"type\": \"array\", \"items\": { \"type\": \"string\" } }\n      }\n    }\n  }\n}\n",
+  "directReferences": [
+    {
+      "path": ".claude/skills/ui-spec/templates/README.md",
+      "line": 48,
+      "text": "The compiler extracts and validates all contract blocks against `schema/surface-contract.schema.json`."
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 38,
+      "text": "├── schema/surface-contract.schema.json"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/config.mjs",
+      "line": 57,
+      "text": "  const schemaPath = join(specRoot, config.schema_path ?? \"schema/surface-contract.schema.json\");"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/validate.mjs",
+      "line": 17,
+      "text": "  console.error(`ERROR: Schema not found at ${schemaPath}\\n  Create schema/surface-contract.schema.json in your spec root.`);"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 52,
+      "text": "│   └── surface-contract.schema.json"
+    }
+  ],
+  "sourceSHA256": "2ce8f77f92bb0cf512f74f5eac133be50a8a0d301b3de13b82e5fbf4d950db7e"
+}
+```
+
+
+## liveness-23-001
+
+Source digest (evidence JSON): bab1a9ba26cad46331af80b5481f84ae9961c9760b6dea43619055d495c2f56d
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-23-001",
+  "source": "docs/ui-spec/screens/S01-sign-in.md",
+  "sourceBlob": "04b2bb2c1861e0557a43f8fd1ab7d6948dde1409",
+  "section": {
+    "heading": "Preamble",
+    "anchor": "preamble",
+    "startLine": 1,
+    "endLine": 12,
+    "sha256": "73e387ce8316780f145bf2beb9a34b046121da0bf421e5060603fbe0b2930dd4",
+    "classification": "current-by-default",
+    "directReferenceCount": 3,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "---\nid: S01\ntype: screen\nname: \"Sign in\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R3, R4, R6]\nregions: [brand, form, footnote]\n---\n",
+  "directReferences": [
+    {
+      "path": "apps/fgos-gateway/web/src/App.tsx",
+      "line": 24,
+      "text": "// S01 — Sign in (docs/ui-spec/screens/S01-sign-in.md). \"The first and"
+    },
+    {
+      "path": "apps/fgos-gateway/web/src/App.test.tsx",
+      "line": 6,
+      "text": "// S01 — Sign in (docs/ui-spec/screens/S01-sign-in.md). tsk-51i: the"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 54,
+      "text": "│   ├── S01-sign-in.md"
+    }
+  ],
+  "sourceSHA256": "725f76c4946a2c051770d59891b395eb194003cbb916a5731945ee5e22ac3eff"
+}
+```
+
+
+## liveness-23-002
+
+Source digest (evidence JSON): a6e03d03688b79c21e356db5ebb764cbed454f81c58e17d43113b045d6218456
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-23-002",
+  "source": "docs/ui-spec/screens/S01-sign-in.md",
+  "sourceBlob": "04b2bb2c1861e0557a43f8fd1ab7d6948dde1409",
+  "section": {
+    "heading": "S01 — Sign in",
+    "anchor": "s01-sign-in",
+    "startLine": 13,
+    "endLine": 14,
+    "sha256": "aef3d19fa262799d4df282fe7d77dd5dbdbdbed2eb2b61a6a6ce762893697d0a",
+    "classification": "current-by-default",
+    "directReferenceCount": 3,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "# S01 — Sign in\n",
+  "directReferences": [
+    {
+      "path": "apps/fgos-gateway/web/src/App.tsx",
+      "line": 24,
+      "text": "// S01 — Sign in (docs/ui-spec/screens/S01-sign-in.md). \"The first and"
+    },
+    {
+      "path": "apps/fgos-gateway/web/src/App.test.tsx",
+      "line": 6,
+      "text": "// S01 — Sign in (docs/ui-spec/screens/S01-sign-in.md). tsk-51i: the"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 54,
+      "text": "│   ├── S01-sign-in.md"
+    }
+  ],
+  "sourceSHA256": "725f76c4946a2c051770d59891b395eb194003cbb916a5731945ee5e22ac3eff"
+}
+```
+
+
+## liveness-23-003
+
+Source digest (evidence JSON): 181786a2dd5d53c5caddba9984399767b7f34725e45045170ece96ec2e5dacb5
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-23-003",
+  "source": "docs/ui-spec/screens/S01-sign-in.md",
+  "sourceBlob": "04b2bb2c1861e0557a43f8fd1ab7d6948dde1409",
+  "section": {
+    "heading": "Purpose",
+    "anchor": "purpose",
+    "startLine": 15,
+    "endLine": 24,
+    "sha256": "e2d8f83b492f73e00ed5c5a5dd7d8625e7a27935eecf49c33bc41987f8a6c4fe",
+    "classification": "current-by-default",
+    "directReferenceCount": 3,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "## Purpose\n\nThe first and only door. Nothing on this client is readable before it\n(`docs/specs/herdr-web-dashboard.md` §Sign in, R3). It exists to take one\ncredential — the machine's token — and exchange it for a session.\n\nDesigned for the origin case: a phone, one-handed, at a moment when no\ncockpit terminal is open. So the form is one field, the field is the\nfocus, and there is nothing else to read or decide.\n",
+  "directReferences": [
+    {
+      "path": "apps/fgos-gateway/web/src/App.tsx",
+      "line": 24,
+      "text": "// S01 — Sign in (docs/ui-spec/screens/S01-sign-in.md). \"The first and"
+    },
+    {
+      "path": "apps/fgos-gateway/web/src/App.test.tsx",
+      "line": 6,
+      "text": "// S01 — Sign in (docs/ui-spec/screens/S01-sign-in.md). tsk-51i: the"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 54,
+      "text": "│   ├── S01-sign-in.md"
+    }
+  ],
+  "sourceSHA256": "725f76c4946a2c051770d59891b395eb194003cbb916a5731945ee5e22ac3eff"
+}
+```
+
+
+## liveness-23-004
+
+Source digest (evidence JSON): fc33c54b00e0e6e53ca34d8977cfe0552c195ecd7a3d7625fb952450329e0bc8
+Target digest: none
+
+````json
+{
+  "entryId": "liveness-23-004",
+  "source": "docs/ui-spec/screens/S01-sign-in.md",
+  "sourceBlob": "04b2bb2c1861e0557a43f8fd1ab7d6948dde1409",
+  "section": {
+    "heading": "Layout",
+    "anchor": "layout",
+    "startLine": 25,
+    "endLine": 53,
+    "sha256": "801f6cbf2b5e2d1fadecc97311200950adae2274bc205dacf15c7324c51f21c3",
+    "classification": "current-by-default",
+    "directReferenceCount": 3,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "## Layout\n\n```\n┌──────────────────────────────────────┐\n│                                      │\n│              herdr                   │  brand\n│         fgOS work dashboard          │\n│                                      │\n│  ┌────────────────────────────────┐  │\n│  │ Access token                   │  │  form\n│  │ ┌────────────────────────────┐ │  │\n│  │ │ ••••••••••••••••••••••••   │ │  │\n│  │ └────────────────────────────┘ │  │\n│  │                                │  │\n│  │ [        Sign in         ]     │  │\n│  │                                │  │\n│  │  Sign-in failed.               │  │  (ERR-AUTH, one message only)\n│  └────────────────────────────────┘  │\n│                                      │\n│  Reachable beyond this machine.      │  footnote\n│                                      │\n└──────────────────────────────────────┘\n```\n\nMobile is the same layout at full width — there is nothing to reflow. The\ntoken field uses a password-type input so a shoulder-surfer on a train\nsees nothing, and so the browser does not offer to autofill it into\nunrelated forms.\n",
+  "directReferences": [
+    {
+      "path": "apps/fgos-gateway/web/src/App.tsx",
+      "line": 24,
+      "text": "// S01 — Sign in (docs/ui-spec/screens/S01-sign-in.md). \"The first and"
+    },
+    {
+      "path": "apps/fgos-gateway/web/src/App.test.tsx",
+      "line": 6,
+      "text": "// S01 — Sign in (docs/ui-spec/screens/S01-sign-in.md). tsk-51i: the"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 54,
+      "text": "│   ├── S01-sign-in.md"
+    }
+  ],
+  "sourceSHA256": "725f76c4946a2c051770d59891b395eb194003cbb916a5731945ee5e22ac3eff"
+}
+````
+
+
+## liveness-23-005
+
+Source digest (evidence JSON): 85b3ee22c521c0b7f06f8dce88830b0abaab3842374e926a65642b79c9bada9f
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-23-005",
+  "source": "docs/ui-spec/screens/S01-sign-in.md",
+  "sourceBlob": "04b2bb2c1861e0557a43f8fd1ab7d6948dde1409",
+  "section": {
+    "heading": "States",
+    "anchor": "states",
+    "startLine": 54,
+    "endLine": 70,
+    "sha256": "ba5a760a62664fdad02cdedc59e4aaed068ad3055907347dc075f547707a2d82",
+    "classification": "current-by-default",
+    "directReferenceCount": 3,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "## States\n\n- **ST-READY** — empty field, focused, submit disabled until non-empty.\n- **ST-SUBMITTING** — submit shows progress; the field stays visible but\n  read-only.\n- **ERR-AUTH** — one message, always the same words, no matter the cause.\n  This is R3 rendered: the screen must not become an oracle that tells an\n  attacker which half of their guess was right.\n\nThree things this screen never does, each one a rule:\n\n- never shows the token back, never writes it anywhere but the request,\n  never keeps it after the session cookie exists (R4);\n- never says \"open the cockpit first\" — the dashboard's availability does\n  not depend on a terminal being open (R6);\n- never offers \"remember me\" as a way to skip the door.\n",
+  "directReferences": [
+    {
+      "path": "apps/fgos-gateway/web/src/App.tsx",
+      "line": 24,
+      "text": "// S01 — Sign in (docs/ui-spec/screens/S01-sign-in.md). \"The first and"
+    },
+    {
+      "path": "apps/fgos-gateway/web/src/App.test.tsx",
+      "line": 6,
+      "text": "// S01 — Sign in (docs/ui-spec/screens/S01-sign-in.md). tsk-51i: the"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 54,
+      "text": "│   ├── S01-sign-in.md"
+    }
+  ],
+  "sourceSHA256": "725f76c4946a2c051770d59891b395eb194003cbb916a5731945ee5e22ac3eff"
+}
+```
+
+
+## liveness-23-006
+
+Source digest (evidence JSON): 90d9b68c3a3e14580a1975c4f5323a8eeee2357247f51d5ff66efcfbb0f82ba8
+Target digest: none
+
+````json
+{
+  "entryId": "liveness-23-006",
+  "source": "docs/ui-spec/screens/S01-sign-in.md",
+  "sourceBlob": "04b2bb2c1861e0557a43f8fd1ab7d6948dde1409",
+  "section": {
+    "heading": "Interactions",
+    "anchor": "interactions",
+    "startLine": 71,
+    "endLine": 90,
+    "sha256": "cd3b7571215463b1505157a3d1afb97edbd5024cb54c42dc57d846ca3a0fbb46",
+    "classification": "current-by-default",
+    "directReferenceCount": 3,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "## Interactions\n\n```yaml herdrweb-contract\ninteractions:\n  - id: A-S01-001\n    element: token_field\n    region: form\n    trigger: input\n    action: mutate\n    effects: [enable_submit_when_non_empty]\n  - id: A-S01-002\n    element: sign_in_button\n    region: form\n    trigger: submit\n    guard: \"token.nonEmpty\"\n    action: navigate\n    target: S02\n    effects: [establish_session, clear_token_from_memory]\n```\n",
+  "directReferences": [
+    {
+      "path": "apps/fgos-gateway/web/src/App.tsx",
+      "line": 24,
+      "text": "// S01 — Sign in (docs/ui-spec/screens/S01-sign-in.md). \"The first and"
+    },
+    {
+      "path": "apps/fgos-gateway/web/src/App.test.tsx",
+      "line": 6,
+      "text": "// S01 — Sign in (docs/ui-spec/screens/S01-sign-in.md). tsk-51i: the"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 54,
+      "text": "│   ├── S01-sign-in.md"
+    }
+  ],
+  "sourceSHA256": "725f76c4946a2c051770d59891b395eb194003cbb916a5731945ee5e22ac3eff"
+}
+````
+
+
+## liveness-24-001
+
+Source digest (evidence JSON): cd6e12be182b306c5c2f8c89d0e1f61b0278ee264b7d752c2a15ce2a9e62b9a2
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-24-001",
+  "source": "docs/ui-spec/screens/S02-taskboard.md",
+  "sourceBlob": "d8a20dd65bf1933d31ff334b5200b6efb0f4cb08",
+  "section": {
+    "heading": "Preamble",
+    "anchor": "preamble",
+    "startLine": 1,
+    "endLine": 12,
+    "sha256": "2e1e4c56a40ff7c8375aa5761491e6963a8c5fd51fba5cc9cdd19560a6719bf2",
+    "classification": "current-by-default",
+    "directReferenceCount": 3,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "---\nid: S02\ntype: screen\nname: \"Taskboard\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R1, R5, R11]\nregions: [topbar, controls, board, needs_answer_rail]\n---\n",
+  "directReferences": [
+    {
+      "path": "apps/fgos-gateway/web/src/screens/Taskboard.tsx",
+      "line": 9,
+      "text": "// S02 — Taskboard (docs/ui-spec/screens/S02-taskboard.md). Statuses that"
+    },
+    {
+      "path": "apps/fgos-gateway/web/src/screens/Taskboard.tsx",
+      "line": 65,
+      "text": "  // A-S02-006 (S02-taskboard.md): a rail entry click navigates to S04"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 55,
+      "text": "│   ├── S02-taskboard.md"
+    }
+  ],
+  "sourceSHA256": "d84abd8635907d8b69402c6fc767e97479348e2c66517d38e7bb3f03b9bf800f"
+}
+```
+
+
+## liveness-24-002
+
+Source digest (evidence JSON): 487427a57a18f36c1ac49666bf26f46087011c501c547927b27e727532116770
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-24-002",
+  "source": "docs/ui-spec/screens/S02-taskboard.md",
+  "sourceBlob": "d8a20dd65bf1933d31ff334b5200b6efb0f4cb08",
+  "section": {
+    "heading": "S02 — Taskboard",
+    "anchor": "s02-taskboard",
+    "startLine": 13,
+    "endLine": 14,
+    "sha256": "84c1fe5502373f6b128552082588c53dbfacb4a91987a02d9fe9ed261e3d8f48",
+    "classification": "current-by-default",
+    "directReferenceCount": 3,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "# S02 — Taskboard\n",
+  "directReferences": [
+    {
+      "path": "apps/fgos-gateway/web/src/screens/Taskboard.tsx",
+      "line": 9,
+      "text": "// S02 — Taskboard (docs/ui-spec/screens/S02-taskboard.md). Statuses that"
+    },
+    {
+      "path": "apps/fgos-gateway/web/src/screens/Taskboard.tsx",
+      "line": 65,
+      "text": "  // A-S02-006 (S02-taskboard.md): a rail entry click navigates to S04"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 55,
+      "text": "│   ├── S02-taskboard.md"
+    }
+  ],
+  "sourceSHA256": "d84abd8635907d8b69402c6fc767e97479348e2c66517d38e7bb3f03b9bf800f"
+}
+```
+
+
+## liveness-24-003
+
+Source digest (evidence JSON): e802a8381f28ae9d0b857fa6fb1b0fe0078107acd39120fbe70bca9ed14fd599
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-24-003",
+  "source": "docs/ui-spec/screens/S02-taskboard.md",
+  "sourceBlob": "d8a20dd65bf1933d31ff334b5200b6efb0f4cb08",
+  "section": {
+    "heading": "Purpose",
+    "anchor": "purpose",
+    "startLine": 15,
+    "endLine": 27,
+    "sha256": "283a271e6e9a8542276819ea0c487c508813f4cfa183070500e411e141cf2b3b",
+    "classification": "current-by-default",
+    "directReferenceCount": 3,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "## Purpose\n\nThe landing surface after sign-in, and the way to reach everything else.\nThe area spec is explicit that this is **a board, not a flat table**, with\nMonday.com/ClickUp as the reference: items grouped by status, state\nlegible at a glance, quick actions in place, and controls to filter and\nregroup (`docs/specs/herdr-web-dashboard.md` §View the taskboard).\n\nThat reference is not decoration. The thing this whole cluster is for is a\nperson opening their phone and finding out, in one look, whether anything\nneeds them. A flat table makes that a reading exercise; a grouped board\nwith coloured status makes it a glance.\n",
+  "directReferences": [
+    {
+      "path": "apps/fgos-gateway/web/src/screens/Taskboard.tsx",
+      "line": 9,
+      "text": "// S02 — Taskboard (docs/ui-spec/screens/S02-taskboard.md). Statuses that"
+    },
+    {
+      "path": "apps/fgos-gateway/web/src/screens/Taskboard.tsx",
+      "line": 65,
+      "text": "  // A-S02-006 (S02-taskboard.md): a rail entry click navigates to S04"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 55,
+      "text": "│   ├── S02-taskboard.md"
+    }
+  ],
+  "sourceSHA256": "d84abd8635907d8b69402c6fc767e97479348e2c66517d38e7bb3f03b9bf800f"
+}
+```
+
+
+## liveness-24-004
+
+Source digest (evidence JSON): 8569fc8dc33d4203822d207580056b4e7e0766ead5e7726cd6640b52f6c41b7b
+Target digest: none
+
+````json
+{
+  "entryId": "liveness-24-004",
+  "source": "docs/ui-spec/screens/S02-taskboard.md",
+  "sourceBlob": "d8a20dd65bf1933d31ff334b5200b6efb0f4cb08",
+  "section": {
+    "heading": "Layout",
+    "anchor": "layout",
+    "startLine": 28,
+    "endLine": 132,
+    "sha256": "7b2031ce43c28b14b7a11438bbf5e5b686ba3bc2a093d48681eb47641a8bd148",
+    "classification": "current-by-default",
+    "directReferenceCount": 3,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "## Layout\n\nDesktop offers **two board views of the same underlying grouped data** —\na person picks whichever reading suits the moment, and the choice is\nremembered (D16, `docs/history/herdr-web-dashboard/CONTEXT.md`). Neither\nview is a separate screen; both read the same `GET /work` grouped-by-status\ndata, they only differ in how that grouping renders.\n\n**Group view** (default) — status groups stacked vertically, each\ncollapsible, with the \"needs answer\" rail pinned right so the one urgent\ncategory is never scrolled past. Best for triage: scan every group's count\nwithout horizontal scanning.\n\n```\n┌ TOPBAR ────────────────────────────────────────────────────────────────┐\n│ herdr   [project ▾]  [gateway: dev-box ▾]      ⚠ reachable on network  │\n├ CONTROLS ──────────────────────────────────────────────────────────────┤\n│ [search…]  Group by: [Status ▾]  Filter: [Stage ▾][Risk ▾]  View:[▤ ▥]  [+ Add] │\n├ BOARD ──────────────────────────────────┬ NEEDS ANSWER ────────────────┤\n│                                         │                              │\n│ ▾ NEEDS ANSWER · 2          ● amber     │  tsk-4id                     │\n│  ┌────────────────────────────────────┐ │  \"Which pairing key…\"        │\n│  │ tsk-4id  Task detail pairing    ⋯ │ │  parked 2h ago               │\n│  │ ● awaiting-human · executing      │ │  [ Answer ]                  │\n│  └────────────────────────────────────┘ │                              │\n│  ┌────────────────────────────────────┐ │  tsk-k4v                     │\n│  │ tsk-k4v  Webserver core         ⋯ │ │  gate: validateApprove       │\n│  │ ● awaiting-approval · executing   │ │  [ Review ]                  │\n│  └────────────────────────────────────┘ │                              │\n│                                         │                              │\n│ ▾ IN PROGRESS · 3           ● blue      │                              │\n│  ┌────────────────────────────────────┐ │                              │\n│  │ tsk-5jr  Taskboard              ⋯ │ │                              │\n│  │ ● doing · executing               │ │                              │\n│  └────────────────────────────────────┘ │                              │\n│                                         │                              │\n│ ▸ TODO · 11                 ● slate     │                              │\n│ ▸ DONE · 48                 ● green     │                              │\n└─────────────────────────────────────────┴──────────────────────────────┘\n```\n\n**Kanban view** — the same groups as side-by-side columns, each with its\nown colored header bar; cards move by drag or by the same `⋯` quick-action\nmenu group view uses. Best for working a single group's queue left-to-right\nwithout collapsing everything else. The \"needs answer\" rail still pins\nright, unchanged, because A-S02-006's target (S04) does not depend on\nwhich board view is active.\n\n```\n┌ TOPBAR ────────────────────────────────────────────────────────────────┐\n│ herdr   [project ▾]  [gateway: dev-box ▾]      ⚠ reachable on network  │\n├ CONTROLS ──────────────────────────────────────────────────────────────┤\n│ [search…]  Group by: [Status ▾]  Filter: [Stage ▾][Risk ▾]  View:[▤ ▥]  [+ Add] │\n├ BOARD (kanban) ─────────────────────────────────────────┬ NEEDS ANSWER ┤\n│ ●AMBER        │ ●BLUE          │ ●SLATE      │ ●GREEN   │              │\n│ NEEDS ANSWER·2│ IN PROGRESS·3  │ TODO·11     │ DONE·48  │  tsk-4id     │\n│ ┌───────────┐ │ ┌────────────┐ │ ┌─────────┐ │          │  \"Which…\"    │\n│ │ tsk-4id ⋯ │ │ │ tsk-5jr  ⋯ │ │ │ ...   ⋯ │ │          │  [ Answer ]  │\n│ │ awaiting- │ │ │ doing ·    │ │ └─────────┘ │          │              │\n│ │ human     │ │ │ executing  │ │ ┌─────────┐ │          │  tsk-k4v     │\n│ └───────────┘ │ └────────────┘ │ │ ...   ⋯ │ │          │  gate: ...   │\n│ ┌───────────┐ │                │ └─────────┘ │          │  [ Review ]  │\n│ │ tsk-k4v ⋯ │ │                │             │          │              │\n│ └───────────┘ │                │             │          │              │\n└────────────────┴────────────────┴─────────────┴──────────┴──────────────┘\n```\n\nMobile always uses group view (kanban's side-by-side columns do not fit a\nphone width) — the rail becomes the first group, because on a phone the\nwhole point is \"does anything need me\":\n\n```\n┌────────────────────────────┐\n│ herdr  [dev-box ▾]   ⚠     │\n│ [search…]      [Filter ▾]  │\n├────────────────────────────┤\n│ ▾ NEEDS ANSWER · 2   ●     │\n│ ┌────────────────────────┐ │\n│ │ tsk-4id             ⋯ │ │\n│ │ Task detail pairing    │ │\n│ │ ● awaiting-human       │ │\n│ │ [ Answer ]             │ │\n│ └────────────────────────┘ │\n│ ▸ IN PROGRESS · 3    ●     │\n│ ▸ TODO · 11          ●     │\n└────────────────────────────┘\n```\n\nFour layout decisions worth stating, because each one is load-bearing:\n\n- **Groups are collapsible and remember their state.** `DONE · 48` is\n  noise on a phone; it collapses and stays collapsed.\n- **The exposure indicator lives in the topbar, always.** R5 says the\n  surface is on by default and reachable beyond loopback. That is a\n  standing fact about this deployment, so it gets a standing indicator,\n  never a dismissable toast.\n- **The gateway picker is in the topbar too**, because R1 forbids\n  assuming one fixed origin, and a person aggregating several machines\n  needs to know which one they are looking at before they read a number.\n- **Group view and kanban view are the same data, two renderings** (D16).\n  The toggle lives in CONTROLS next to Group by, not in the topbar — it is\n  a reading preference, not deployment state like the exposure indicator.\n  Desktop only; a phone always gets group view (side-by-side columns do\n  not fit).\n",
+  "directReferences": [
+    {
+      "path": "apps/fgos-gateway/web/src/screens/Taskboard.tsx",
+      "line": 9,
+      "text": "// S02 — Taskboard (docs/ui-spec/screens/S02-taskboard.md). Statuses that"
+    },
+    {
+      "path": "apps/fgos-gateway/web/src/screens/Taskboard.tsx",
+      "line": 65,
+      "text": "  // A-S02-006 (S02-taskboard.md): a rail entry click navigates to S04"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 55,
+      "text": "│   ├── S02-taskboard.md"
+    }
+  ],
+  "sourceSHA256": "d84abd8635907d8b69402c6fc767e97479348e2c66517d38e7bb3f03b9bf800f"
+}
+````
+
+
+## liveness-24-005
+
+Source digest (evidence JSON): 441e6165402899129c6ce59a2c1f651e1be0762949840267c2eb29a7727a703a
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-24-005",
+  "source": "docs/ui-spec/screens/S02-taskboard.md",
+  "sourceBlob": "d8a20dd65bf1933d31ff334b5200b6efb0f4cb08",
+  "section": {
+    "heading": "States",
+    "anchor": "states",
+    "startLine": 133,
+    "endLine": 143,
+    "sha256": "6b9fc6a50cb4008ba0fe2544db61e3d335e360081a8cf9e830ad924658032d63",
+    "classification": "current-by-default",
+    "directReferenceCount": 3,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "## States\n\n**ST-LOADING** shows skeleton cards inside real group headers (both\nviews), so counts appear before content and the layout never jumps.\n**ST-EMPTY-BOARD** and **ST-EMPTY-FILTER** are deliberately different\nscreens — see `30-states-and-errors.md`. **ST-DISCONNECTED** marks the\nboard stale in place rather than blanking it.\n\nNo bell, no notification badge that implies push: **R11** — the count in\na group header is current only because the person is looking at it.\n",
+  "directReferences": [
+    {
+      "path": "apps/fgos-gateway/web/src/screens/Taskboard.tsx",
+      "line": 9,
+      "text": "// S02 — Taskboard (docs/ui-spec/screens/S02-taskboard.md). Statuses that"
+    },
+    {
+      "path": "apps/fgos-gateway/web/src/screens/Taskboard.tsx",
+      "line": 65,
+      "text": "  // A-S02-006 (S02-taskboard.md): a rail entry click navigates to S04"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 55,
+      "text": "│   ├── S02-taskboard.md"
+    }
+  ],
+  "sourceSHA256": "d84abd8635907d8b69402c6fc767e97479348e2c66517d38e7bb3f03b9bf800f"
+}
+```
+
+
+## liveness-24-006
+
+Source digest (evidence JSON): ccd6c66dacbc45784b0795b8840391fdb2de59c88d390c5fc6dc20769d8bfe97
+Target digest: none
+
+````json
+{
+  "entryId": "liveness-24-006",
+  "source": "docs/ui-spec/screens/S02-taskboard.md",
+  "sourceBlob": "d8a20dd65bf1933d31ff334b5200b6efb0f4cb08",
+  "section": {
+    "heading": "Interactions",
+    "anchor": "interactions",
+    "startLine": 144,
+    "endLine": 225,
+    "sha256": "4bf1f45af3cf9e88ef90753919657e113af203b67f5573fd1ec2e6a613d66348",
+    "classification": "current-by-default",
+    "directReferenceCount": 3,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "## Interactions\n\n```yaml herdrweb-contract\ninteractions:\n  - id: A-S02-001\n    element: item_card\n    region: board\n    trigger: click\n    action: navigate\n    target: S03\n    payload: { item_id: \"$item.id\" }\n  - id: A-S02-002\n    element: add_item_button\n    region: controls\n    trigger: click\n    action: open_overlay\n    target: M03\n  - id: A-S02-003\n    element: group_header\n    region: board\n    trigger: click\n    action: mutate\n    effects: [toggle_group_collapsed, persist_collapse_state]\n  - id: A-S02-004\n    element: filter_control\n    region: controls\n    trigger: change\n    action: mutate\n    effects: [apply_filter, show_active_filter_summary]\n  - id: A-S02-005\n    element: group_by_control\n    region: controls\n    trigger: change\n    action: mutate\n    effects: [regroup_board]\n  - id: A-S02-006\n    element: needs_answer_entry\n    region: needs_answer_rail\n    trigger: click\n    action: navigate\n    target: S04\n  - id: A-S02-007\n    element: gateway_picker\n    region: topbar\n    trigger: change\n    action: mutate\n    effects: [switch_gateway_endpoint, reload_board]\n  - id: A-S02-008\n    element: board\n    listens_to: work.changed\n    action: mutate\n    effects: [refresh_affected_card]\n  - id: A-S02-009\n    element: needs_answer_rail\n    listens_to: question.opened\n    action: mutate\n    effects: [add_to_rail]\n  - id: A-S02-010\n    element: board\n    listens_to: gateway.unreachable\n    action: mutate\n    effects: [mark_stale, offer_retry]\n  - id: A-S02-011\n    element: card_quick_action\n    listens_to: item.quick_action\n    action: mutate\n    effects: [run_one_door_write_verb]\n  - id: A-S02-012\n    element: view_toggle_control\n    region: controls\n    trigger: click\n    action: mutate\n    effects: [switch_board_view, persist_view_state]\n  - id: A-S02-013\n    element: kanban_card\n    region: board\n    trigger: drag_drop\n    guard: \"board.view === 'kanban'\"\n    action: mutate\n    effects: [run_one_door_write_verb, regroup_board]\n```\n",
+  "directReferences": [
+    {
+      "path": "apps/fgos-gateway/web/src/screens/Taskboard.tsx",
+      "line": 9,
+      "text": "// S02 — Taskboard (docs/ui-spec/screens/S02-taskboard.md). Statuses that"
+    },
+    {
+      "path": "apps/fgos-gateway/web/src/screens/Taskboard.tsx",
+      "line": 65,
+      "text": "  // A-S02-006 (S02-taskboard.md): a rail entry click navigates to S04"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 55,
+      "text": "│   ├── S02-taskboard.md"
+    }
+  ],
+  "sourceSHA256": "d84abd8635907d8b69402c6fc767e97479348e2c66517d38e7bb3f03b9bf800f"
+}
+````
+
+
+## liveness-25-001
+
+Source digest (evidence JSON): b80e76ebbe4051c93ede03bda0c323ad575d86055cf4f619f40dbd2f3a583d4f
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-25-001",
+  "source": "docs/ui-spec/screens/S03-task-detail.md",
+  "sourceBlob": "e62243c904ab68c7b0fcdb65cf203e5fdf112072",
+  "section": {
+    "heading": "Preamble",
+    "anchor": "preamble",
+    "startLine": 1,
+    "endLine": 12,
+    "sha256": "3e09257f7219e06d051b467c48607d328da85439ff21482e03ed38786c350cea",
+    "classification": "current-by-default",
+    "directReferenceCount": 2,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "---\nid: S03\ntype: screen\nname: \"Task detail\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R1, R5, R7, R8, R9, R10]\nregions: [topbar, question, why, context, timeline, actions]\n---\n",
+  "directReferences": [
+    {
+      "path": "apps/fgos-gateway/web/src/screens/TaskDetail.tsx",
+      "line": 9,
+      "text": "// S03 — Task detail (docs/ui-spec/screens/S03-task-detail.md). \"The core"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 56,
+      "text": "│   ├── S03-task-detail.md"
+    }
+  ],
+  "sourceSHA256": "df9faacc4ec5e989f935d7e7a3ef327ba751e7271f6e55be7d9891cb0f7b52b3"
+}
+```
+
+
+## liveness-25-002
+
+Source digest (evidence JSON): 0274cab756689ff91934fbf8c228cdf6f46e0fbe371e74e70b35c74cb61b63b6
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-25-002",
+  "source": "docs/ui-spec/screens/S03-task-detail.md",
+  "sourceBlob": "e62243c904ab68c7b0fcdb65cf203e5fdf112072",
+  "section": {
+    "heading": "S03 — Task detail",
+    "anchor": "s03-task-detail",
+    "startLine": 13,
+    "endLine": 14,
+    "sha256": "c4665bebd5a7857479d61809e482097ae46be64d0ac1e8af802a40f4e04d68e0",
+    "classification": "current-by-default",
+    "directReferenceCount": 2,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "# S03 — Task detail\n",
+  "directReferences": [
+    {
+      "path": "apps/fgos-gateway/web/src/screens/TaskDetail.tsx",
+      "line": 9,
+      "text": "// S03 — Task detail (docs/ui-spec/screens/S03-task-detail.md). \"The core"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 56,
+      "text": "│   ├── S03-task-detail.md"
+    }
+  ],
+  "sourceSHA256": "df9faacc4ec5e989f935d7e7a3ef327ba751e7271f6e55be7d9891cb0f7b52b3"
+}
+```
+
+
+## liveness-25-003
+
+Source digest (evidence JSON): db0d260099ff92ecea48f6917989a98090e1832241d04d0a1ae06150c39b20eb
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-25-003",
+  "source": "docs/ui-spec/screens/S03-task-detail.md",
+  "sourceBlob": "e62243c904ab68c7b0fcdb65cf203e5fdf112072",
+  "section": {
+    "heading": "Purpose",
+    "anchor": "purpose",
+    "startLine": 15,
+    "endLine": 26,
+    "sha256": "ff244aba22fe529b267c390016e71697956e8c4bd9a6ec2713296726ee2cc9dd",
+    "classification": "current-by-default",
+    "directReferenceCount": 2,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "## Purpose\n\n**The core deliverable of the whole cluster.** The area spec says the\ntaskboard exists mainly to reach this screen\n(`docs/specs/herdr-web-dashboard.md` §View a task's detail).\n\nThe acceptance criterion is subjective and stated plainly in the item that\ncommissioned this spec: *a question framed so a person with no context in\ntheir head can answer it quickly*. That sentence is the whole design\nbrief. Everything below is downstream of it, and it is why the layout\nleads with the question rather than with the item.\n",
+  "directReferences": [
+    {
+      "path": "apps/fgos-gateway/web/src/screens/TaskDetail.tsx",
+      "line": 9,
+      "text": "// S03 — Task detail (docs/ui-spec/screens/S03-task-detail.md). \"The core"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 56,
+      "text": "│   ├── S03-task-detail.md"
+    }
+  ],
+  "sourceSHA256": "df9faacc4ec5e989f935d7e7a3ef327ba751e7271f6e55be7d9891cb0f7b52b3"
+}
+```
+
+
+## liveness-25-004
+
+Source digest (evidence JSON): 53cf158e4afe72001b3d86e0626135b4cd26c0d07817c82fd7fa4fd64ce65fb0
+Target digest: none
+
+````json
+{
+  "entryId": "liveness-25-004",
+  "source": "docs/ui-spec/screens/S03-task-detail.md",
+  "sourceBlob": "e62243c904ab68c7b0fcdb65cf203e5fdf112072",
+  "section": {
+    "heading": "Layout",
+    "anchor": "layout",
+    "startLine": 27,
+    "endLine": 81,
+    "sha256": "f869d8b289ae6ae33ff3336b5458ccdf5bd1e16e5faed92ee7f822f8c63dc6e5",
+    "classification": "current-by-default",
+    "directReferenceCount": 2,
+    "implementationPaths": [],
+    "subjectSymbols": [
+      "TaskDetail",
+      "WorkItemSource"
+    ],
+    "subjectHitPaths": [
+      "packages/herdr-fgos-common/rust/src/fgos.rs",
+      "apps/fgos-gateway/src/ports.rs",
+      "packages/herdr-fgos-common/rust/src/ports.rs",
+      "apps/fgos-gateway/web/src/lib/network.ts",
+      "apps/fgos-gateway/web/src/lib/status.ts",
+      "apps/fgos-gateway/web/stitch-exports/S03/design.html",
+      "apps/fgos-gateway/web/src/screens/TaskDetail.tsx",
+      "apps/fgos-gateway/web/src/screens/NeedsAnswer.tsx",
+      "apps/fgos-gateway/web/stitch-exports/S04/design.html",
+      "apps/fgos-gateway/web/src/screens/TaskDetail.test.tsx",
+      "apps/fgos-gateway/web/src/App.tsx"
+    ],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "## Layout\n\nThree regions, in a fixed reading order, because the order **is** the\ndesign: what is being asked → why it is being asked → what it is about.\n\n```\n┌ TOPBAR ────────────────────────────────────────────────────────────────┐\n│ ← Board    tsk-4id · Task detail pairing        ⚠ reachable on network │\n├ QUESTION ──────────────────────────────────────────────────────────────┤\n│                                                                        │\n│  NEEDS YOUR ANSWER · parked 2h ago · round 3 of 3                      │\n│                                                                        │\n│  Which pairing key should the timeline use when askHistory and         │\n│  settlements have drifted by one?                                      │\n│                                                                        │\n│  [ Answer this ]                                                       │\n│                                                                        │\n├ WHY ───────────────────────────────────────────────────────────────────┤\n│  Why you're being asked                                                │\n│  Two options are still standing after a real comparison, and the       │\n│  locked decision (D2) deliberately added no linking key.               │\n│  Tried already: read D2, ran the pairing on tsk-48i's 23/23 records.   │\n├ CONTEXT ───────────────────────────────────┬ TIMELINE ─────────────────┤\n│  What this item is                         │  round 1 · 4d ago         │\n│                                            │  Q  Should the detail     │\n│  tsk-4id · Task detail pairing             │     screen show the       │\n│  ● awaiting-human · executing · high-risk  │     machine log at all?   │\n│  coding · tier-2 · deps: tsk-yo0, tsk-5jr  │  A  No — narrative first. │\n│                                            │                          │\n│  A person with no context in their head    │  round 2 · 2d ago         │\n│  should be able to answer the parked       │  Q  Collapse or omit?     │\n│  question quickly, from this screen alone. │  A  Collapse.             │\n│  (full description, not truncated)         │                          │\n│                                            │  round 3 · 2h ago         │\n│  verify: cd herdr-plugin && cargo test     │  Q  Which pairing key…    │\n│  --lib gateway && cd web && npm run test   │  A  — waiting             │\n│  footprint: gateway.rs, TaskDetail.tsx     │                          │\n│  docsRef: docs/history/tsk-4id ↗           │                          │\n│                                            │                          │\n│  What the agent did                        │                          │\n│  Read ports.rs, confirmed WorkItemSource   │                          │\n│  has 5 fetch_* methods. Wrote the pairing  │                          │\n│  read on top of settlements[] ordered by   │                          │\n│  seq, no schema change (D2).               │                          │\n│                                            │                          │\n│  ▸ Machine decision log (12)               │                          │\n├ ACTIONS ───────────────────────────────────┴──────────────────────────┤\n│  [ Answer this ]   [ Edit ]   [ Retire ]      [ Approve merge ⓘ ]     │\n└────────────────────────────────────────────────────────────────────────┘\n```\n\nMobile stacks the same order — question, why, context, timeline — because\nthe order is the value, not the columns. The timeline collapses to its\nmost recent round with \"show 2 earlier rounds\".\n",
+  "directReferences": [
+    {
+      "path": "apps/fgos-gateway/web/src/screens/TaskDetail.tsx",
+      "line": 9,
+      "text": "// S03 — Task detail (docs/ui-spec/screens/S03-task-detail.md). \"The core"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 56,
+      "text": "│   ├── S03-task-detail.md"
+    }
+  ],
+  "sourceSHA256": "df9faacc4ec5e989f935d7e7a3ef327ba751e7271f6e55be7d9891cb0f7b52b3"
+}
+````
+
+
+## liveness-25-005
+
+Source digest (evidence JSON): 602256f47e072b9657af67e5ff94adbd91095e7b2b3c08a16032785f813c44d4
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-25-005",
+  "source": "docs/ui-spec/screens/S03-task-detail.md",
+  "sourceBlob": "e62243c904ab68c7b0fcdb65cf203e5fdf112072",
+  "section": {
+    "heading": "Why the three regions sit in this order",
+    "anchor": "why-the-three-regions-sit-in-this-order",
+    "startLine": 82,
+    "endLine": 95,
+    "sha256": "383254bc2704e0ec75015a4a67545c587a84542b840d007a6e15a27c7aff7815",
+    "classification": "current-by-default",
+    "directReferenceCount": 2,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "### Why the three regions sit in this order\n\n- **QUESTION first, alone, large.** A person arriving cold reads one\n  thing. Putting item metadata above it would make them scroll past\n  bookkeeping to reach the only thing that needs them.\n- **WHY second, and it carries what was already tried.** This is the\n  difference between a question a person can answer in ten seconds and one\n  they have to go investigate. It names the options still standing and the\n  work already done — so the person is editing reasoning, not starting\n  from nothing.\n- **CONTEXT third, narrative before machine log.** R10 exactly: the human\n  narrative is the primary account, the machine decision log renders\n  collapsed behind a disclosure showing its count.\n",
+  "directReferences": [
+    {
+      "path": "apps/fgos-gateway/web/src/screens/TaskDetail.tsx",
+      "line": 9,
+      "text": "// S03 — Task detail (docs/ui-spec/screens/S03-task-detail.md). \"The core"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 56,
+      "text": "│   ├── S03-task-detail.md"
+    }
+  ],
+  "sourceSHA256": "df9faacc4ec5e989f935d7e7a3ef327ba751e7271f6e55be7d9891cb0f7b52b3"
+}
+```
+
+
+## liveness-25-006
+
+Source digest (evidence JSON): ac48c272c650db63d72860066b54144bc1e068fd4a86604ceeb2fce467a15eb6
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-25-006",
+  "source": "docs/ui-spec/screens/S03-task-detail.md",
+  "sourceBlob": "e62243c904ab68c7b0fcdb65cf203e5fdf112072",
+  "section": {
+    "heading": "What CONTEXT actually shows (D17)",
+    "anchor": "what-context-actually-shows-d17",
+    "startLine": 96,
+    "endLine": 132,
+    "sha256": "217cb195701a4bf22b5b198de3d388dccd7934e8899e3468728d806b3c45f9ff",
+    "classification": "current-by-default",
+    "directReferenceCount": 2,
+    "implementationPaths": [],
+    "subjectSymbols": [
+      "WorkItem"
+    ],
+    "subjectHitPaths": [
+      "packages/herdr-fgos-common/rust/src/fgos.rs",
+      "packages/herdr-fgos-common/rust/src/ports.rs",
+      "apps/fgos-gateway/web/src/screens/NeedsAnswer.tsx",
+      "apps/fgos-gateway/web/src/screens/TaskDetail.test.tsx",
+      "apps/fgos-gateway/web/src/screens/Taskboard.tsx",
+      "apps/fgos-gateway/web/src/api/client.ts",
+      "apps/fgos-gateway/web/src/api/types.ts",
+      "apps/fgos-gateway/web/stitch-exports/review.html",
+      "apps/fgos-gateway/src/ports.rs",
+      "src/runner/dispatch/assignment.mjs",
+      "src/runner/dispatch/assignment-policy.mjs",
+      "src/runner/dispatch/cli.mjs",
+      "src/runner/dispatch/assignment-runner.mjs",
+      "src/runner/dispatch/plan.mjs",
+      "test/architecture.test.mjs"
+    ],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "### What CONTEXT actually shows (D17)\n\n`GET /work/{id}`'s `work` object (the `WorkItem` schema,\n`docs/contracts/fgos-gateway-api-v1.yaml`) carries more than the id/title/\nstatus this screen showed before D17 — CONTEXT surfaces the full set that\nis meaningful to a person deciding whether to trust the answer they are\nabout to give, in this order:\n\n- **Identity line** — `id`, `title`.\n- **State pills** — `status`, `stage`, `risk` (as already shown).\n- **Classification line** — `domain`, `tier`, and `deps` (as item ids; a\n  person weighing an answer needs to know what else is waiting on this\n  one). `parent` renders here too when non-null.\n- **`description`** — the item's own full text, never truncated. This is\n  new: before D17 the acceptance-criterion sentence quoted in this\n  screen's own Purpose section (\"a question framed so a person with no\n  context in their head can answer it quickly\") had no `description` field\n  to draw on, which was the actual gap a person noticed live (2026-08-15).\n- **`verify`** — the real command that proves this item done, shown\n  verbatim (a monospace line, not summarized) so a person can judge\n  whether the item's own bar for \"done\" matches what the question is\n  asking them to approve.\n- **`footprint`** — the files this item touches, as a short list.\n- **`docsRef`** when non-null — a link to `GET /work/{id}/docs` (tsk-4id),\n  for the rare case CONTEXT's own summary is not enough and a person wants\n  the full plan/CONTEXT.md.\n\nThen, unchanged from before D17: **\"What the agent did\"** (the narrative\naccount) and the collapsed **machine decision log** disclosure.\n\nFields the `WorkItem` schema carries that CONTEXT deliberately does NOT\nsurface here: `kind` (redundant with `domain` for a person, not a new\nfact), `parent` when null. Nothing here is fabricated from a placeholder —\nevery field above is a real `WorkItem` property with a $ref in the\ncontract; a field that is absent/null on a given item simply does not\nrender its row, the same convention `docsRef` already used before D17.\n",
+  "directReferences": [
+    {
+      "path": "apps/fgos-gateway/web/src/screens/TaskDetail.tsx",
+      "line": 9,
+      "text": "// S03 — Task detail (docs/ui-spec/screens/S03-task-detail.md). \"The core"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 56,
+      "text": "│   ├── S03-task-detail.md"
+    }
+  ],
+  "sourceSHA256": "df9faacc4ec5e989f935d7e7a3ef327ba751e7271f6e55be7d9891cb0f7b52b3"
+}
+```
+
+
+## liveness-25-007
+
+Source digest (evidence JSON): 26b5d0bda73206dddc600bc59fc9d4bedbe5c10644ddfb243ab6e9ae0991ce28
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-25-007",
+  "source": "docs/ui-spec/screens/S03-task-detail.md",
+  "sourceBlob": "e62243c904ab68c7b0fcdb65cf203e5fdf112072",
+  "section": {
+    "heading": "The question/answer timeline across rounds",
+    "anchor": "the-questionanswer-timeline-across-rounds",
+    "startLine": 133,
+    "endLine": 144,
+    "sha256": "912c699a0639726d33851d7a98d8dd332d02f2238b8838d173360507abbfd5c8",
+    "classification": "current-by-default",
+    "directReferenceCount": 2,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "### The question/answer timeline across rounds\n\nR9 governs this and constrains it honestly: pairing is **positional** —\nthe i-th question with the i-th answer, in recorded order. So the timeline\nrenders as an ordered list of rounds and **never draws a link the data\ndoes not carry**. No arrows implying causality between a specific answer\nand a specific later question; just order, with timestamps.\n\nThe still-open round renders with its answer slot visibly empty (`—\nwaiting`) rather than omitted, so a person can see at a glance that\nexactly one round is outstanding and which one.\n",
+  "directReferences": [
+    {
+      "path": "apps/fgos-gateway/web/src/screens/TaskDetail.tsx",
+      "line": 9,
+      "text": "// S03 — Task detail (docs/ui-spec/screens/S03-task-detail.md). \"The core"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 56,
+      "text": "│   ├── S03-task-detail.md"
+    }
+  ],
+  "sourceSHA256": "df9faacc4ec5e989f935d7e7a3ef327ba751e7271f6e55be7d9891cb0f7b52b3"
+}
+```
+
+
+## liveness-25-008
+
+Source digest (evidence JSON): 2356d93eb1fd6601cbd61fa03825d35debd7037eeb618f0ea0367c001defaf83
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-25-008",
+  "source": "docs/ui-spec/screens/S03-task-detail.md",
+  "sourceBlob": "e62243c904ab68c7b0fcdb65cf203e5fdf112072",
+  "section": {
+    "heading": "States",
+    "anchor": "states",
+    "startLine": 145,
+    "endLine": 163,
+    "sha256": "6432340e9740eef40d2d95e8e3f747956ced5a22ba5990f51f69e7a1dcaf3baf",
+    "classification": "current-by-default",
+    "directReferenceCount": 2,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "## States\n\n- **ST-NEVER-PARKED** — the QUESTION region is replaced by a quiet \"This\n  item has never needed a person\", and TIMELINE says the same. Not an\n  error, and not an empty box with no explanation.\n- **ST-NARRATIVE-MISSING** — CONTEXT keeps the item's own fields and says\n  the narrative directory was not found, naming the path it looked for.\n- **ERR-NARRATIVE-PATH** — same region, different sentence: the reference\n  resolved outside the documentation tree and was refused.\n- **ERR-APPROVE-UNAVAILABLE** — R7 rendered: `Approve merge` is shown\n  **disabled with the reason attached** (the ⓘ in the layout above), never\n  hidden and never offered-then-failed.\n- **ST-DISCONNECTED** — content marked stale, actions disabled, retry\n  offered.\n\nPer R8, the three write controls in ACTIONS are visually distinct from\neverything above them, and `Approve merge` is distinct again from the\nother two — it is the only control on this client that changes trunk.\n",
+  "directReferences": [
+    {
+      "path": "apps/fgos-gateway/web/src/screens/TaskDetail.tsx",
+      "line": 9,
+      "text": "// S03 — Task detail (docs/ui-spec/screens/S03-task-detail.md). \"The core"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 56,
+      "text": "│   ├── S03-task-detail.md"
+    }
+  ],
+  "sourceSHA256": "df9faacc4ec5e989f935d7e7a3ef327ba751e7271f6e55be7d9891cb0f7b52b3"
+}
+```
+
+
+## liveness-25-009
+
+Source digest (evidence JSON): 9edd53a49f0ef26d952cc26b2ebad4867382cc8111880570768345cb929bace4
+Target digest: none
+
+````json
+{
+  "entryId": "liveness-25-009",
+  "source": "docs/ui-spec/screens/S03-task-detail.md",
+  "sourceBlob": "e62243c904ab68c7b0fcdb65cf203e5fdf112072",
+  "section": {
+    "heading": "Interactions",
+    "anchor": "interactions",
+    "startLine": 164,
+    "endLine": 235,
+    "sha256": "e781fc984f84a7959d7d81c89ed16303cdedfadd9cc40fbbe4126cfb0e50821c",
+    "classification": "current-by-default",
+    "directReferenceCount": 2,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "## Interactions\n\n```yaml herdrweb-contract\ninteractions:\n  - id: A-S03-001\n    element: answer_button\n    region: question\n    trigger: click\n    guard: \"item.isParked\"\n    action: open_overlay\n    target: M01\n    payload: { item_id: \"$item.id\" }\n  - id: A-S03-002\n    element: approve_merge_button\n    region: actions\n    trigger: click\n    guard: \"item.awaitingApproval && gateway.atMainWorkingTree\"\n    action: open_overlay\n    target: M02\n    payload: { item_id: \"$item.id\" }\n  - id: A-S03-003\n    element: edit_button\n    region: actions\n    trigger: click\n    action: open_overlay\n    target: M03\n    payload: { item_id: \"$item.id\", mode: \"edit\" }\n  - id: A-S03-004\n    element: machine_log_disclosure\n    region: context\n    trigger: click\n    action: mutate\n    effects: [toggle_machine_log]\n  - id: A-S03-005\n    element: back_to_board\n    region: topbar\n    trigger: click\n    action: navigate\n    target: S02\n  - id: A-S03-006\n    element: timeline_show_earlier\n    region: timeline\n    trigger: click\n    action: mutate\n    effects: [expand_earlier_rounds]\n  - id: A-S03-007\n    element: detail\n    listens_to: work.changed\n    action: mutate\n    effects: [refresh_item]\n  - id: A-S03-008\n    element: timeline\n    listens_to: question.answered\n    action: mutate\n    effects: [close_open_round]\n  - id: A-S03-009\n    element: actions\n    listens_to: merge.settled\n    action: mutate\n    effects: [refresh_item, show_outcome]\n  - id: A-S03-010\n    element: detail\n    listens_to: gateway.unreachable\n    action: mutate\n    effects: [mark_stale, disable_writes]\n  - id: A-S03-011\n    element: retire_action\n    listens_to: item.quick_action\n    action: mutate\n    effects: [run_move_to_wontfix]\n```\n",
+  "directReferences": [
+    {
+      "path": "apps/fgos-gateway/web/src/screens/TaskDetail.tsx",
+      "line": 9,
+      "text": "// S03 — Task detail (docs/ui-spec/screens/S03-task-detail.md). \"The core"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 56,
+      "text": "│   ├── S03-task-detail.md"
+    }
+  ],
+  "sourceSHA256": "df9faacc4ec5e989f935d7e7a3ef327ba751e7271f6e55be7d9891cb0f7b52b3"
+}
+````
+
+
+## liveness-26-001
+
+Source digest (evidence JSON): cced5762423666ae502621dea31bbb86a5bc29d6510fecfc4f3a6a652caf7ad0
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-26-001",
+  "source": "docs/ui-spec/screens/S04-questions-needing-answer.md",
+  "sourceBlob": "01dedd23e6a1565ae463c421d2873fa8ad3482ec",
+  "section": {
+    "heading": "Preamble",
+    "anchor": "preamble",
+    "startLine": 1,
+    "endLine": 12,
+    "sha256": "046134f6f90c6aefba3a42836a1d2cdaf4a86d7b17550883295332400fd176fa",
+    "classification": "current-by-default",
+    "directReferenceCount": 1,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "---\nid: S04\ntype: screen\nname: \"Questions needing answer\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R1, R5, R9, R11]\nregions: [topbar, list]\n---\n",
+  "directReferences": [
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 57,
+      "text": "│   └── S04-questions-needing-answer.md"
+    }
+  ],
+  "sourceSHA256": "0f358fadb71d6aa504c26c7e8f851c911e4feee10b5ef102456df0007da5ab7b"
+}
+```
+
+
+## liveness-26-002
+
+Source digest (evidence JSON): 5718859eae7f4813586756b618f11010319d5d17535a204107f4d781da71c3ba
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-26-002",
+  "source": "docs/ui-spec/screens/S04-questions-needing-answer.md",
+  "sourceBlob": "01dedd23e6a1565ae463c421d2873fa8ad3482ec",
+  "section": {
+    "heading": "S04 — Questions needing answer",
+    "anchor": "s04-questions-needing-answer",
+    "startLine": 13,
+    "endLine": 14,
+    "sha256": "8bafa51aadc2c5f9d2a5f0022961110dd46257acfb03b9bcd3f051eef4a7e24b",
+    "classification": "current-by-default",
+    "directReferenceCount": 1,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "# S04 — Questions needing answer\n",
+  "directReferences": [
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 57,
+      "text": "│   └── S04-questions-needing-answer.md"
+    }
+  ],
+  "sourceSHA256": "0f358fadb71d6aa504c26c7e8f851c911e4feee10b5ef102456df0007da5ab7b"
+}
+```
+
+
+## liveness-26-003
+
+Source digest (evidence JSON): f00e3625e3fbf4946f23d47f67348f1bb27212b1658f8c85bceded5a546208b6
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-26-003",
+  "source": "docs/ui-spec/screens/S04-questions-needing-answer.md",
+  "sourceBlob": "01dedd23e6a1565ae463c421d2873fa8ad3482ec",
+  "section": {
+    "heading": "Purpose",
+    "anchor": "purpose",
+    "startLine": 15,
+    "endLine": 25,
+    "sha256": "9fba6c08d804d3b396f3545835f35475c9b04a16d29d5d6c2987aae66ce69c3a",
+    "classification": "current-by-default",
+    "directReferenceCount": 1,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "## Purpose\n\nOne list of everything currently waiting on a person, across **both**\nchannels — `ask` questions and `gate-approve` questions (D4, and\n`docs/specs/herdr-web-dashboard.md` Data Dictionary #4). D4's whole point\nis that these are one category to a person even though they are two\nmechanisms to the engine, so this screen never splits them into two tabs.\n\nIt is the \"is there anything for me\" surface. On a phone it is often the\nonly screen a person opens.\n",
+  "directReferences": [
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 57,
+      "text": "│   └── S04-questions-needing-answer.md"
+    }
+  ],
+  "sourceSHA256": "0f358fadb71d6aa504c26c7e8f851c911e4feee10b5ef102456df0007da5ab7b"
+}
+```
+
+
+## liveness-26-004
+
+Source digest (evidence JSON): fec1e45abfabc9afb9fdf2947049b5bd5feb18e403ee78ba233399d981d70b28
+Target digest: none
+
+````json
+{
+  "entryId": "liveness-26-004",
+  "source": "docs/ui-spec/screens/S04-questions-needing-answer.md",
+  "sourceBlob": "01dedd23e6a1565ae463c421d2873fa8ad3482ec",
+  "section": {
+    "heading": "Layout",
+    "anchor": "layout",
+    "startLine": 26,
+    "endLine": 62,
+    "sha256": "fb8430c75b6914df41787c5a9aa68ca0329ac87de58b2d2acc155ca7c7e4ca65",
+    "classification": "current-by-default",
+    "directReferenceCount": 1,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "## Layout\n\n```\n┌ TOPBAR ────────────────────────────────────────────────────┐\n│ ← Board   Needs answer · 2      ⚠ reachable on network     │\n├ LIST ──────────────────────────────────────────────────────┤\n│ ┌────────────────────────────────────────────────────────┐ │\n│ │ tsk-4id · Task detail pairing            parked 2h ago │ │\n│ │ ASK                                                    │ │\n│ │ Which pairing key should the timeline use when         │ │\n│ │ askHistory and settlements have drifted by one?        │ │\n│ │                                    [ Answer ] [ Open ] │ │\n│ └────────────────────────────────────────────────────────┘ │\n│ ┌────────────────────────────────────────────────────────┐ │\n│ │ tsk-k4v · Webserver core                 parked 6h ago │ │\n│ │ GATE · validateApprove                                 │ │\n│ │ Plan is ready and the reality gate passed. Two CSS     │ │\n│ │ options are still standing — which one?                │ │\n│ │                                    [ Answer ] [ Open ] │ │\n│ └────────────────────────────────────────────────────────┘ │\n└────────────────────────────────────────────────────────────┘\n```\n\nThe channel shows as a small tag (`ASK` / `GATE · <gate name>`) rather\nthan as a section split. A person answering does not care which mechanism\nparked the item; they care what is being asked. But the tag stays visible\nbecause a gate question and an ask question have different weight, and\nhiding that would be flattening real information.\n\n**Each row carries the question text itself, not just the item title.**\nThat is the readability criterion applied at list level: a person should\nbe able to triage — \"this one I can answer now, that one needs a laptop\" —\nwithout opening anything.\n\nRows are ordered oldest-first: the thing that has been waiting longest is\nthe thing most likely to be blocking something else.\n",
+  "directReferences": [
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 57,
+      "text": "│   └── S04-questions-needing-answer.md"
+    }
+  ],
+  "sourceSHA256": "0f358fadb71d6aa504c26c7e8f851c911e4feee10b5ef102456df0007da5ab7b"
+}
+````
+
+
+## liveness-26-005
+
+Source digest (evidence JSON): 833186891878f717a6d5bc133061de9f43fe66e5ba5f827df9eb3039a1a104ea
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-26-005",
+  "source": "docs/ui-spec/screens/S04-questions-needing-answer.md",
+  "sourceBlob": "01dedd23e6a1565ae463c421d2873fa8ad3482ec",
+  "section": {
+    "heading": "States",
+    "anchor": "states",
+    "startLine": 63,
+    "endLine": 72,
+    "sha256": "a58908d65f323e82c9a2df43fcaea119a4f8b7c50f7b5471f957739ae397c8a7",
+    "classification": "current-by-default",
+    "directReferenceCount": 1,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "## States\n\n- **ST-EMPTY-QUESTIONS** — \"Nothing is waiting on you.\" Reads as the good\n  outcome, with no error styling and no call to action.\n- **ST-DISCONNECTED** — list marked stale, answer controls disabled.\n\nPer R11 there is no bell and no badge that implies push. The count in the\ntopbar is true at the moment of looking, and the screen does not pretend\notherwise.\n",
+  "directReferences": [
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 57,
+      "text": "│   └── S04-questions-needing-answer.md"
+    }
+  ],
+  "sourceSHA256": "0f358fadb71d6aa504c26c7e8f851c911e4feee10b5ef102456df0007da5ab7b"
+}
+```
+
+
+## liveness-26-006
+
+Source digest (evidence JSON): b9b72aea1502d739759b130cbc42007aaac8d3181e36b58ea9cc140f06748ed8
+Target digest: none
+
+````json
+{
+  "entryId": "liveness-26-006",
+  "source": "docs/ui-spec/screens/S04-questions-needing-answer.md",
+  "sourceBlob": "01dedd23e6a1565ae463c421d2873fa8ad3482ec",
+  "section": {
+    "heading": "Interactions",
+    "anchor": "interactions",
+    "startLine": 73,
+    "endLine": 113,
+    "sha256": "2a6ce90d9202002a2a3025d868545ced8691f83fee3a7c08fb06ac0c0b699299",
+    "classification": "current-by-default",
+    "directReferenceCount": 1,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "## Interactions\n\n```yaml herdrweb-contract\ninteractions:\n  - id: A-S04-001\n    element: answer_button\n    region: list\n    trigger: click\n    action: open_overlay\n    target: M01\n    payload: { item_id: \"$row.item_id\" }\n  - id: A-S04-002\n    element: open_item_button\n    region: list\n    trigger: click\n    action: navigate\n    target: S03\n    payload: { item_id: \"$row.item_id\" }\n  - id: A-S04-003\n    element: back_to_board\n    region: topbar\n    trigger: click\n    action: navigate\n    target: S02\n  - id: A-S04-004\n    element: list\n    listens_to: question.opened\n    action: mutate\n    effects: [insert_row_oldest_first]\n  - id: A-S04-005\n    element: list\n    listens_to: question.answered\n    action: mutate\n    effects: [remove_row]\n  - id: A-S04-006\n    element: list\n    listens_to: gateway.unreachable\n    action: mutate\n    effects: [mark_stale, disable_writes]\n```\n",
+  "directReferences": [
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 57,
+      "text": "│   └── S04-questions-needing-answer.md"
+    }
+  ],
+  "sourceSHA256": "0f358fadb71d6aa504c26c7e8f851c911e4feee10b5ef102456df0007da5ab7b"
+}
+````
+
+
+## liveness-27-001
+
+Source digest (evidence JSON): 5297adb834af67a2ab78b5fe8afc32ca8fc4ef60a7e71ba14cc93eb4fc6333db
+Target digest: none
+
+```json
+{
+  "entryId": "liveness-27-001",
+  "source": "docs/ui-spec/spec.config.yaml",
+  "sourceBlob": "c51d822673e66f5012eab484c0974f57dd21a2ae",
+  "section": {
+    "heading": "Preamble",
+    "anchor": "preamble",
+    "startLine": 1,
+    "endLine": 24,
+    "sha256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+    "classification": "current-by-default",
+    "directReferenceCount": 25,
+    "implementationPaths": [],
+    "subjectSymbols": [],
+    "subjectHitPaths": [],
+    "retired": false,
+    "retirementEligible": false,
+    "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+  },
+  "shownText": "# UI Spec configuration — herdr web dashboard\n#\n# Product source of truth: docs/specs/herdr-web-dashboard.md (tsk-54j).\n# This spec adds the interaction/layout layer only; it never re-decides a\n# product question the area spec already settled.\n\nproject: herdrweb\ncontract_tag: herdrweb-contract\nentry_surface: S01\nplatforms: [desktop, mobile]\n\nsurface_dirs:\n  - screens\n  - modals\n  - components\n  - flows\n\ncross_cutting:\n  - 20-domain-rules.md\n  - 15-system-events.md\n\nextra_triggers: []\nextra_actions: []\n",
+  "directReferences": [
+    {
+      "path": ".claude/skills/ui-spec/references/METHODOLOGY.md",
+      "line": 84,
+      "text": "  spec.config.yaml → contract_tag, ID prefixes, entry_surface"
+    },
+    {
+      "path": ".claude/skills/ui-spec/references/METHODOLOGY.md",
+      "line": 100,
+      "text": "1. `spec.config.yaml` — understand project name, contract tag, ID prefixes"
+    },
+    {
+      "path": ".claude/skills/ui-spec/references/CONVENTION.md",
+      "line": 4,
+      "text": "> The `{project}-contract` tag is configured in `spec.config.yaml` → `contract_tag`. Example: `crm-contract`, `shop-contract`."
+    },
+    {
+      "path": ".claude/skills/ui-spec/references/CONVENTION.md",
+      "line": 198,
+      "text": "## 8. `spec.config.yaml` reference"
+    },
+    {
+      "path": ".claude/skills/ui-spec/templates/README.md",
+      "line": 10,
+      "text": "cp spec.config.yaml my-app/spec.config.yaml"
+    },
+    {
+      "path": ".claude/skills/ui-spec/templates/surfaces/overview.md",
+      "line": 25,
+      "text": "├── spec.config.yaml            ← compiler config"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 26,
+      "text": "3. **Pass 1 — Skeleton:** generate `spec.config.yaml`, `00-overview.md`, `20-domain-rules.md`, `30-states-and-errors.md`, `15-system-events.md`; create all surface files with frontmatter + prose only (no contract blocks yet)"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 37,
+      "text": "├── spec.config.yaml          # project name, contract tag, surface ID prefixes"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 66,
+      "text": "- Resolves entry surface from `spec.config.yaml`"
+    },
+    {
+      "path": ".claude/skills/ui-spec/SKILL.md",
+      "line": 232,
+      "text": "1. **Inventory surfaces** from the PRD: list every screen (S), panel (P), modal (M), overlay (OV), component (C), flow (F) + assign IDs using `spec.config.yaml` prefixes."
+    },
+    {
+      "path": ".claude/skills/ui-spec/METHODOLOGY.md",
+      "line": 84,
+      "text": "  spec.config.yaml → contract_tag, ID prefixes, entry_surface"
+    },
+    {
+      "path": ".claude/skills/ui-spec/METHODOLOGY.md",
+      "line": 100,
+      "text": "1. `spec.config.yaml` — understand project name, contract tag, ID prefixes"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/interpret.mjs",
+      "line": 734,
+      "text": "    '<p style=\"color:#9ca3af;padding:40px;text-align:center\">No surfaces found. Check your spec.config.yaml and surface directories.</p>';"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/config.mjs",
+      "line": 2,
+      "text": "// Reads spec.config.yaml from spec root. Spec root is found via:"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/config.mjs",
+      "line": 4,
+      "text": "//   2. Walking up from CWD looking for spec.config.yaml"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/config.mjs",
+      "line": 10,
+      "text": "/** Find spec root by walking up from startDir looking for spec.config.yaml. */"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/config.mjs",
+      "line": 14,
+      "text": "    if (existsSync(join(dir, \"spec.config.yaml\"))) return dir;"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/config.mjs",
+      "line": 31,
+      "text": "/** Load and validate spec.config.yaml. Exits with helpful message on failure. */"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/config.mjs",
+      "line": 37,
+      "text": "      \"ERROR: Cannot find spec.config.yaml.\\n\" +"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/config.mjs",
+      "line": 44,
+      "text": "  const configPath = join(specRoot, \"spec.config.yaml\");"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/config.mjs",
+      "line": 49,
+      "text": "    console.error(`ERROR: Cannot read spec.config.yaml at ${configPath}\\n  ${e.message}`);"
+    },
+    {
+      "path": ".claude/skills/ui-spec/CONVENTION.md",
+      "line": 4,
+      "text": "> The `{project}-contract` tag is configured in `spec.config.yaml` → `contract_tag`. Example: `crm-contract`, `shop-contract`."
+    },
+    {
+      "path": ".claude/skills/ui-spec/CONVENTION.md",
+      "line": 198,
+      "text": "## 8. `spec.config.yaml` reference"
+    },
+    {
+      "path": ".claude/skills/ui-spec/tools/wireframe/client/app.js",
+      "line": 191,
+      "text": "    '<p style=\"color:#9ca3af;padding:40px;text-align:center\">No surfaces found. Check spec.config.yaml.</p>';"
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "line": 46,
+      "text": "├── spec.config.yaml"
+    }
+  ],
+  "sourceSHA256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb"
+}
+```
+

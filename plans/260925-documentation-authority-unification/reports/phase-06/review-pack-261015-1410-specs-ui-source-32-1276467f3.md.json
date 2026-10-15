@@ -1,0 +1,1692 @@
+{
+  "version": 1,
+  "contentCommit": "1276467f37a99d19aff05808d42fafbf40341449",
+  "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+  "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+  "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+  "part": 1,
+  "parts": 1,
+  "count": 24,
+  "classes": {
+    "Unit-exact": [
+      "claim_b1381898ffcd6fd63e9e64586b7acd6c",
+      "claim_4a7fc646586751db12885986313c0350",
+      "claim_ba270fdaa4bfeec20ceb3f52d7434e6d",
+      "claim_4fb38e3e862e3f8fb1353ca7f5c38c87",
+      "claim_692e59d327dfdc4ac060b679ff60a8df",
+      "claim_093b3e6a5b56f2219f9056058964c884",
+      "claim_7c2b88b65ffc0692b8fe3d9751070b02",
+      "claim_26c0a04e72c06c15be9a007f50fd312b",
+      "claim_7b1759a49d26fd1dcc834b3f38bade04",
+      "claim_8320314c57006644884f6d5f4edfc5bd",
+      "claim_eb244fc0c4068fc1ab3c907db369a326",
+      "claim_4abab9f7a787bead0ff5f1d162c2bd07",
+      "claim_0295a9bbd34b084c523f0c057b5899da",
+      "claim_e2969564bc033087099738ac927d2263",
+      "claim_b391fc12268d78ddd19bf6a9f8f66656",
+      "claim_9a2e11a231c97ddf61ceb228fed26010",
+      "claim_73cab9a36191997438af84b13c76cf85",
+      "claim_cb783b44a6284c43bbaac2e46c89026f"
+    ],
+    "Weak-exact": [
+      "claim_74176d4e4289afc7fcaa8a4e6deaa014",
+      "claim_2833db673d67cf600233251aac117628",
+      "claim_b7bec6190021c6543edb08c12717fea6",
+      "claim_a59c4971ef0276a190d1436f39614c63",
+      "claim_0799ccec326a89dc36b6463e3a7d1699"
+    ],
+    "Judgment": [
+      "claim_57fe165c28132a8679657bc25f8aad0b"
+    ]
+  },
+  "unequalDigestPairs": [
+    "claim_57fe165c28132a8679657bc25f8aad0b"
+  ],
+  "noTargetGeneratedRows": [],
+  "mandatoryDeep": [
+    "claim_57fe165c28132a8679657bc25f8aad0b"
+  ],
+  "reviewerSeedRequired": true,
+  "minimumSeededWeakJudgment": 6,
+  "rows": [
+    {
+      "claimId": "claim_b1381898ffcd6fd63e9e64586b7acd6c",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+      "sourceAnchor": "unheaded-block-1",
+      "source": {
+        "unitKind": "unheaded-preamble",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded preamble",
+        "startLine": 1,
+        "endLine": 11,
+        "textDigest": "3567e61162c801d95c3b42120f6527521b11318fccd623d43dded28f5d14645d",
+        "sample": "---\nid: S03\ntype: screen\nname: \"Task detail\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R1, R5, R7, R8, R9, R10]\nregions: [topbar, question, why, ",
+        "identityFingerprint": "c1b0509c2fdcabd00c3e1bb5df82c9f1276e287541cd6da24cb59cbe02a863b0",
+        "ancestry": [],
+        "text": "---\nid: S03\ntype: screen\nname: \"Task detail\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R1, R5, R7, R8, R9, R10]\nregions: [topbar, question, why, context, timeline, actions]\n---"
+      },
+      "sourceShownText": "---\nid: S03\ntype: screen\nname: \"Task detail\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R1, R5, R7, R8, R9, R10]\nregions: [topbar, question, why, context, timeline, actions]\n---",
+      "sourceDigest": "3567e61162c801d95c3b42120f6527521b11318fccd623d43dded28f5d14645d",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "targetAnchor": "unheaded-block-1",
+      "target": {
+        "unitKind": "unheaded-preamble",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded preamble",
+        "startLine": 1,
+        "endLine": 11,
+        "textDigest": "3567e61162c801d95c3b42120f6527521b11318fccd623d43dded28f5d14645d",
+        "sample": "---\nid: S03\ntype: screen\nname: \"Task detail\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R1, R5, R7, R8, R9, R10]\nregions: [topbar, question, why, ",
+        "identityFingerprint": "c1b0509c2fdcabd00c3e1bb5df82c9f1276e287541cd6da24cb59cbe02a863b0",
+        "ancestry": [],
+        "text": "---\nid: S03\ntype: screen\nname: \"Task detail\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R1, R5, R7, R8, R9, R10]\nregions: [topbar, question, why, context, timeline, actions]\n---"
+      },
+      "targetShownText": "---\nid: S03\ntype: screen\nname: \"Task detail\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R1, R5, R7, R8, R9, R10]\nregions: [topbar, question, why, context, timeline, actions]\n---",
+      "targetDigest": "3567e61162c801d95c3b42120f6527521b11318fccd623d43dded28f5d14645d",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_b1381898ffcd6fd63e9e64586b7acd6c",
+        "sourceUnitDigest": "3567e61162c801d95c3b42120f6527521b11318fccd623d43dded28f5d14645d",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+        "targetAnchor": "unheaded-block-1",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-preamble unit docs/ui-spec/screens/S03-task-detail.md#unheaded-block-1 (source lines 1-11) is carried at docs/platform/ui-spec/architecture/screens/S03-task-detail.md#unheaded-block-1 (candidate lines 1-11). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S03-task-detail.md verbatim in docs/platform/ui-spec/architecture/screens/S03-task-detail.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "3567e61162c801d95c3b42120f6527521b11318fccd623d43dded28f5d14645d",
+        "targetAncestry": []
+      }
+    },
+    {
+      "claimId": "claim_57fe165c28132a8679657bc25f8aad0b",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+      "sourceAnchor": "s03-task-detail",
+      "source": {
+        "unitKind": "heading",
+        "level": 1,
+        "title": "S03 — Task detail",
+        "anchor": "s03-task-detail",
+        "githubAnchor": "s03-task-detail",
+        "stableAnchor": "h-04d8bb361c13",
+        "startLine": 13,
+        "endLine": 13,
+        "textDigest": "5ab3427e30e233452717da9a369d5e28d8c5c257b434f3d273b18e98ef9e57f5",
+        "sample": "S03 — Task detail",
+        "sectionPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "followingBlockDigest": null,
+        "identityFingerprint": "8bb61de32739ba7bdd6e530799c90f7e8b365409203b8485556167677b02dc78",
+        "ancestry": [],
+        "text": "# S03 — Task detail",
+        "sectionText": "# S03 — Task detail"
+      },
+      "sourceShownText": "# S03 — Task detail",
+      "sourceDigest": "5ab3427e30e233452717da9a369d5e28d8c5c257b434f3d273b18e98ef9e57f5",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "targetAnchor": "s03-task-detail",
+      "target": {
+        "unitKind": "heading",
+        "level": 1,
+        "title": "S03 — Task detail",
+        "anchor": "s03-task-detail",
+        "githubAnchor": "s03-task-detail",
+        "stableAnchor": "h-04d8bb361c13",
+        "startLine": 13,
+        "endLine": 13,
+        "textDigest": "fc1c6f08523061fb099b0b259b952c6872be4d7cdf93376297dd191461c5f882",
+        "sample": "S03 — Task detail",
+        "sectionPayloadDigest": "0b32095d6d749432c1c202e1904f77b367a347924c2c4dfbaec9f7c7f91e4ac5",
+        "followingBlockDigest": "c15e158b9ed176c6809d36a9c858cb0f06743bece223668f7622121e08e5ec17",
+        "identityFingerprint": "71279e8a59a6f531ca908fac412a6dca608abebfb42de33aece2f811bea5508d",
+        "ancestry": [],
+        "text": "# S03 — Task detail",
+        "sectionText": "# S03 — Task detail\n\n```txt\nDocument type: Architecture\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve mapped legacy content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; current implementation truth is not certified\nProvenance: docs/ui-spec/screens/S03-task-detail.md at 111adc51fd047d99121fd9d076eb4794c87045a4\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing carriage, placement and source conservation\nDo not use this for: Current canonical authority or implemented-behavior proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/ui-spec/screens/S03-task-detail.md\nSupersedes: None; candidate only\nSuperseded by: None\n```\n\n> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions."
+      },
+      "targetShownText": "# S03 — Task detail\n\n```txt\nDocument type: Architecture\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve mapped legacy content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; current implementation truth is not certified\nProvenance: docs/ui-spec/screens/S03-task-detail.md at 111adc51fd047d99121fd9d076eb4794c87045a4\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing carriage, placement and source conservation\nDo not use this for: Current canonical authority or implemented-behavior proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/ui-spec/screens/S03-task-detail.md\nSupersedes: None; candidate only\nSuperseded by: None\n```\n\n> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions.",
+      "targetDigest": "fc1c6f08523061fb099b0b259b952c6872be4d7cdf93376297dd191461c5f882",
+      "classification": "Judgment",
+      "mandatoryDeep": true,
+      "decision": {
+        "claimId": "claim_57fe165c28132a8679657bc25f8aad0b",
+        "sourceUnitDigest": "5ab3427e30e233452717da9a369d5e28d8c5c257b434f3d273b18e98ef9e57f5",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+        "targetAnchor": "s03-task-detail",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Judgment: no target digest match. The whole heading unit docs/ui-spec/screens/S03-task-detail.md#s03-task-detail (source lines 13-13) is carried at docs/platform/ui-spec/architecture/screens/S03-task-detail.md#s03-task-detail (candidate lines 13-13). The heading section digest changes because labelled candidate metadata is inserted after the original H1; original heading and direct source payload remain verbatim. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S03-task-detail.md verbatim in docs/platform/ui-spec/architecture/screens/S03-task-detail.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "fc1c6f08523061fb099b0b259b952c6872be4d7cdf93376297dd191461c5f882",
+        "targetAncestry": []
+      }
+    },
+    {
+      "claimId": "claim_74176d4e4289afc7fcaa8a4e6deaa014",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+      "sourceAnchor": "purpose",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Purpose",
+        "anchor": "purpose",
+        "githubAnchor": "purpose",
+        "stableAnchor": "h-2f4fe421d538",
+        "startLine": 15,
+        "endLine": 15,
+        "textDigest": "8e70f80a13bde941a81a989c9ca3ad71d671701b56f8c206c528335cd9659670",
+        "sample": "Purpose",
+        "sectionPayloadDigest": "65c527ee44d2e35fbbf1f1a55434f66a2e6d056a32486cffe1d08a1881a43cc2",
+        "followingBlockDigest": "e5a061704919c09652d5d54bfeb63372e4172bf04727b1697c175ef6f895b376",
+        "identityFingerprint": "692f3b7721c964a82bfc49d2410f7d92a392aedb0836522b5fa8e1b493ef0437",
+        "ancestry": [
+          "S03 — Task detail"
+        ],
+        "text": "## Purpose",
+        "sectionText": "## Purpose\n\n**The core deliverable of the whole cluster.** The area spec says the\ntaskboard exists mainly to reach this screen\n(`docs/specs/herdr-web-dashboard.md` §View a task's detail).\n\nThe acceptance criterion is subjective and stated plainly in the item that\ncommissioned this spec: *a question framed so a person with no context in\ntheir head can answer it quickly*. That sentence is the whole design\nbrief. Everything below is downstream of it, and it is why the layout\nleads with the question rather than with the item."
+      },
+      "sourceShownText": "## Purpose\n\n**The core deliverable of the whole cluster.** The area spec says the\ntaskboard exists mainly to reach this screen\n(`docs/specs/herdr-web-dashboard.md` §View a task's detail).\n\nThe acceptance criterion is subjective and stated plainly in the item that\ncommissioned this spec: *a question framed so a person with no context in\ntheir head can answer it quickly*. That sentence is the whole design\nbrief. Everything below is downstream of it, and it is why the layout\nleads with the question rather than with the item.",
+      "sourceDigest": "8e70f80a13bde941a81a989c9ca3ad71d671701b56f8c206c528335cd9659670",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "targetAnchor": "purpose",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Purpose",
+        "anchor": "purpose",
+        "githubAnchor": "purpose",
+        "stableAnchor": "h-15cea22a442e",
+        "startLine": 37,
+        "endLine": 37,
+        "textDigest": "8e70f80a13bde941a81a989c9ca3ad71d671701b56f8c206c528335cd9659670",
+        "sample": "Purpose",
+        "sectionPayloadDigest": "65c527ee44d2e35fbbf1f1a55434f66a2e6d056a32486cffe1d08a1881a43cc2",
+        "followingBlockDigest": "e5a061704919c09652d5d54bfeb63372e4172bf04727b1697c175ef6f895b376",
+        "identityFingerprint": "692f3b7721c964a82bfc49d2410f7d92a392aedb0836522b5fa8e1b493ef0437",
+        "ancestry": [
+          "S03 — Task detail"
+        ],
+        "text": "## Purpose",
+        "sectionText": "## Purpose\n\n**The core deliverable of the whole cluster.** The area spec says the\ntaskboard exists mainly to reach this screen\n(`docs/specs/herdr-web-dashboard.md` §View a task's detail).\n\nThe acceptance criterion is subjective and stated plainly in the item that\ncommissioned this spec: *a question framed so a person with no context in\ntheir head can answer it quickly*. That sentence is the whole design\nbrief. Everything below is downstream of it, and it is why the layout\nleads with the question rather than with the item."
+      },
+      "targetShownText": "## Purpose\n\n**The core deliverable of the whole cluster.** The area spec says the\ntaskboard exists mainly to reach this screen\n(`docs/specs/herdr-web-dashboard.md` §View a task's detail).\n\nThe acceptance criterion is subjective and stated plainly in the item that\ncommissioned this spec: *a question framed so a person with no context in\ntheir head can answer it quickly*. That sentence is the whole design\nbrief. Everything below is downstream of it, and it is why the layout\nleads with the question rather than with the item.",
+      "targetDigest": "8e70f80a13bde941a81a989c9ca3ad71d671701b56f8c206c528335cd9659670",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_74176d4e4289afc7fcaa8a4e6deaa014",
+        "sourceUnitDigest": "8e70f80a13bde941a81a989c9ca3ad71d671701b56f8c206c528335cd9659670",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+        "targetAnchor": "purpose",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/ui-spec/screens/S03-task-detail.md#purpose (source lines 15-15) is carried at docs/platform/ui-spec/architecture/screens/S03-task-detail.md#purpose (candidate lines 37-37). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S03-task-detail.md verbatim in docs/platform/ui-spec/architecture/screens/S03-task-detail.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "8e70f80a13bde941a81a989c9ca3ad71d671701b56f8c206c528335cd9659670",
+        "targetAncestry": [
+          "S03 — Task detail"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_4a7fc646586751db12885986313c0350",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+      "sourceAnchor": "unheaded-block-2",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-2",
+        "githubAnchor": "unheaded-block-2",
+        "stableAnchor": "unheaded-block-2",
+        "title": "Unheaded block 2",
+        "startLine": 17,
+        "endLine": 19,
+        "textDigest": "e5a061704919c09652d5d54bfeb63372e4172bf04727b1697c175ef6f895b376",
+        "sample": "**The core deliverable of the whole cluster.** The area spec says the\ntaskboard exists mainly to reach this screen\n(`docs/specs/herdr-web-dashboard.md` §View a task's detail).",
+        "identityFingerprint": "277bcb6f21113829c85e62972294d11572eec485b3fa96d52994852a61cfae4d",
+        "ancestry": [
+          "S03 — Task detail",
+          "Purpose"
+        ],
+        "text": "**The core deliverable of the whole cluster.** The area spec says the\ntaskboard exists mainly to reach this screen\n(`docs/specs/herdr-web-dashboard.md` §View a task's detail)."
+      },
+      "sourceShownText": "**The core deliverable of the whole cluster.** The area spec says the\ntaskboard exists mainly to reach this screen\n(`docs/specs/herdr-web-dashboard.md` §View a task's detail).",
+      "sourceDigest": "e5a061704919c09652d5d54bfeb63372e4172bf04727b1697c175ef6f895b376",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "targetAnchor": "unheaded-block-4",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 39,
+        "endLine": 41,
+        "textDigest": "e5a061704919c09652d5d54bfeb63372e4172bf04727b1697c175ef6f895b376",
+        "sample": "**The core deliverable of the whole cluster.** The area spec says the\ntaskboard exists mainly to reach this screen\n(`docs/specs/herdr-web-dashboard.md` §View a task's detail).",
+        "identityFingerprint": "277bcb6f21113829c85e62972294d11572eec485b3fa96d52994852a61cfae4d",
+        "ancestry": [
+          "S03 — Task detail",
+          "Purpose"
+        ],
+        "text": "**The core deliverable of the whole cluster.** The area spec says the\ntaskboard exists mainly to reach this screen\n(`docs/specs/herdr-web-dashboard.md` §View a task's detail)."
+      },
+      "targetShownText": "**The core deliverable of the whole cluster.** The area spec says the\ntaskboard exists mainly to reach this screen\n(`docs/specs/herdr-web-dashboard.md` §View a task's detail).",
+      "targetDigest": "e5a061704919c09652d5d54bfeb63372e4172bf04727b1697c175ef6f895b376",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_4a7fc646586751db12885986313c0350",
+        "sourceUnitDigest": "e5a061704919c09652d5d54bfeb63372e4172bf04727b1697c175ef6f895b376",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+        "targetAnchor": "unheaded-block-4",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/screens/S03-task-detail.md#unheaded-block-2 (source lines 17-19) is carried at docs/platform/ui-spec/architecture/screens/S03-task-detail.md#unheaded-block-4 (candidate lines 39-41). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S03-task-detail.md verbatim in docs/platform/ui-spec/architecture/screens/S03-task-detail.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "e5a061704919c09652d5d54bfeb63372e4172bf04727b1697c175ef6f895b376",
+        "targetAncestry": [
+          "S03 — Task detail",
+          "Purpose"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_ba270fdaa4bfeec20ceb3f52d7434e6d",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+      "sourceAnchor": "unheaded-block-3",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 21,
+        "endLine": 25,
+        "textDigest": "1ae9f696b585e22dc8277c99e20f55fbd09dde300571f51948fb4acc8e087cce",
+        "sample": "The acceptance criterion is subjective and stated plainly in the item that\ncommissioned this spec: *a question framed so a person with no context in\ntheir head can answer it quickl",
+        "identityFingerprint": "34c7da3063aa321e43f0ce3d7e2e6f58fa8db5cd46e09c2ff8b21fcf9d3c0aaa",
+        "ancestry": [
+          "S03 — Task detail",
+          "Purpose"
+        ],
+        "text": "The acceptance criterion is subjective and stated plainly in the item that\ncommissioned this spec: *a question framed so a person with no context in\ntheir head can answer it quickly*. That sentence is the whole design\nbrief. Everything below is downstream of it, and it is why the layout\nleads with the question rather than with the item."
+      },
+      "sourceShownText": "The acceptance criterion is subjective and stated plainly in the item that\ncommissioned this spec: *a question framed so a person with no context in\ntheir head can answer it quickly*. That sentence is the whole design\nbrief. Everything below is downstream of it, and it is why the layout\nleads with the question rather than with the item.",
+      "sourceDigest": "1ae9f696b585e22dc8277c99e20f55fbd09dde300571f51948fb4acc8e087cce",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "targetAnchor": "unheaded-block-5",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 43,
+        "endLine": 47,
+        "textDigest": "1ae9f696b585e22dc8277c99e20f55fbd09dde300571f51948fb4acc8e087cce",
+        "sample": "The acceptance criterion is subjective and stated plainly in the item that\ncommissioned this spec: *a question framed so a person with no context in\ntheir head can answer it quickl",
+        "identityFingerprint": "34c7da3063aa321e43f0ce3d7e2e6f58fa8db5cd46e09c2ff8b21fcf9d3c0aaa",
+        "ancestry": [
+          "S03 — Task detail",
+          "Purpose"
+        ],
+        "text": "The acceptance criterion is subjective and stated plainly in the item that\ncommissioned this spec: *a question framed so a person with no context in\ntheir head can answer it quickly*. That sentence is the whole design\nbrief. Everything below is downstream of it, and it is why the layout\nleads with the question rather than with the item."
+      },
+      "targetShownText": "The acceptance criterion is subjective and stated plainly in the item that\ncommissioned this spec: *a question framed so a person with no context in\ntheir head can answer it quickly*. That sentence is the whole design\nbrief. Everything below is downstream of it, and it is why the layout\nleads with the question rather than with the item.",
+      "targetDigest": "1ae9f696b585e22dc8277c99e20f55fbd09dde300571f51948fb4acc8e087cce",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_ba270fdaa4bfeec20ceb3f52d7434e6d",
+        "sourceUnitDigest": "1ae9f696b585e22dc8277c99e20f55fbd09dde300571f51948fb4acc8e087cce",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+        "targetAnchor": "unheaded-block-5",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/screens/S03-task-detail.md#unheaded-block-3 (source lines 21-25) is carried at docs/platform/ui-spec/architecture/screens/S03-task-detail.md#unheaded-block-5 (candidate lines 43-47). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S03-task-detail.md verbatim in docs/platform/ui-spec/architecture/screens/S03-task-detail.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "1ae9f696b585e22dc8277c99e20f55fbd09dde300571f51948fb4acc8e087cce",
+        "targetAncestry": [
+          "S03 — Task detail",
+          "Purpose"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_2833db673d67cf600233251aac117628",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+      "sourceAnchor": "layout",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Layout",
+        "anchor": "layout",
+        "githubAnchor": "layout",
+        "stableAnchor": "h-c12a9c5c50a6",
+        "startLine": 27,
+        "endLine": 27,
+        "textDigest": "f1c2ffc9a487b9f31419cb06961dd2e25f746de2aa4db30b780c0ce5ca520daa",
+        "sample": "Layout",
+        "sectionPayloadDigest": "950ab866ef145f639cfe072ae800b6c7acb1e90340a72f68b5d65596534a1f10",
+        "followingBlockDigest": "606f6a0016df5a909d44d0f75366ef2bf776b57ef7b47081b1ceab0cd79d23c3",
+        "identityFingerprint": "b207c2dcf57e81c30b3b44dcc92bf7ededa254a99ae33b277ce9087b91a2850f",
+        "ancestry": [
+          "S03 — Task detail"
+        ],
+        "text": "## Layout",
+        "sectionText": "## Layout\n\nThree regions, in a fixed reading order, because the order **is** the\ndesign: what is being asked → why it is being asked → what it is about.\n\n```\n┌ TOPBAR ────────────────────────────────────────────────────────────────┐\n│ ← Board    tsk-4id · Task detail pairing        ⚠ reachable on network │\n├ QUESTION ──────────────────────────────────────────────────────────────┤\n│                                                                        │\n│  NEEDS YOUR ANSWER · parked 2h ago · round 3 of 3                      │\n│                                                                        │\n│  Which pairing key should the timeline use when askHistory and         │\n│  settlements have drifted by one?                                      │\n│                                                                        │\n│  [ Answer this ]                                                       │\n│                                                                        │\n├ WHY ───────────────────────────────────────────────────────────────────┤\n│  Why you're being asked                                                │\n│  Two options are still standing after a real comparison, and the       │\n│  locked decision (D2) deliberately added no linking key.               │\n│  Tried already: read D2, ran the pairing on tsk-48i's 23/23 records.   │\n├ CONTEXT ───────────────────────────────────┬ TIMELINE ─────────────────┤\n│  What this item is                         │  round 1 · 4d ago         │\n│                                            │  Q  Should the detail     │\n│  tsk-4id · Task detail pairing             │     screen show the       │\n│  ● awaiting-human · executing · high-risk  │     machine log at all?   │\n│  coding · tier-2 · deps: tsk-yo0, tsk-5jr  │  A  No — narrative first. │\n│                                            │                          │\n│  A person with no context in their head    │  round 2 · 2d ago         │\n│  should be able to answer the parked       │  Q  Collapse or omit?     │\n│  question quickly, from this screen alone. │  A  Collapse.             │\n│  (full description, not truncated)         │                          │\n│                                            │  round 3 · 2h ago         │\n│  verify: cd herdr-plugin && cargo test     │  Q  Which pairing key…    │\n│  --lib gateway && cd web && npm run test   │  A  — waiting             │\n│  footprint: gateway.rs, TaskDetail.tsx     │                          │\n│  docsRef: docs/history/tsk-4id ↗           │                          │\n│                                            │                          │\n│  What the agent did                        │                          │\n│  Read ports.rs, confirmed WorkItemSource   │                          │\n│  has 5 fetch_* methods. Wrote the pairing  │                          │\n│  read on top of settlements[] ordered by   │                          │\n│  seq, no schema change (D2).               │                          │\n│                                            │                          │\n│  ▸ Machine decision log (12)               │                          │\n├ ACTIONS ───────────────────────────────────┴──────────────────────────┤\n│  [ Answer this ]   [ Edit ]   [ Retire ]      [ Approve merge ⓘ ]     │\n└────────────────────────────────────────────────────────────────────────┘\n```\n\nMobile stacks the same order — question, why, context, timeline — because\nthe order is the value, not the columns. The timeline collapses to its\nmost recent round with \"show 2 earlier rounds\"."
+      },
+      "sourceShownText": "## Layout\n\nThree regions, in a fixed reading order, because the order **is** the\ndesign: what is being asked → why it is being asked → what it is about.\n\n```\n┌ TOPBAR ────────────────────────────────────────────────────────────────┐\n│ ← Board    tsk-4id · Task detail pairing        ⚠ reachable on network │\n├ QUESTION ──────────────────────────────────────────────────────────────┤\n│                                                                        │\n│  NEEDS YOUR ANSWER · parked 2h ago · round 3 of 3                      │\n│                                                                        │\n│  Which pairing key should the timeline use when askHistory and         │\n│  settlements have drifted by one?                                      │\n│                                                                        │\n│  [ Answer this ]                                                       │\n│                                                                        │\n├ WHY ───────────────────────────────────────────────────────────────────┤\n│  Why you're being asked                                                │\n│  Two options are still standing after a real comparison, and the       │\n│  locked decision (D2) deliberately added no linking key.               │\n│  Tried already: read D2, ran the pairing on tsk-48i's 23/23 records.   │\n├ CONTEXT ───────────────────────────────────┬ TIMELINE ─────────────────┤\n│  What this item is                         │  round 1 · 4d ago         │\n│                                            │  Q  Should the detail     │\n│  tsk-4id · Task detail pairing             │     screen show the       │\n│  ● awaiting-human · executing · high-risk  │     machine log at all?   │\n│  coding · tier-2 · deps: tsk-yo0, tsk-5jr  │  A  No — narrative first. │\n│                                            │                          │\n│  A person with no context in their head    │  round 2 · 2d ago         │\n│  should be able to answer the parked       │  Q  Collapse or omit?     │\n│  question quickly, from this screen alone. │  A  Collapse.             │\n│  (full description, not truncated)         │                          │\n│                                            │  round 3 · 2h ago         │\n│  verify: cd herdr-plugin && cargo test     │  Q  Which pairing key…    │\n│  --lib gateway && cd web && npm run test   │  A  — waiting             │\n│  footprint: gateway.rs, TaskDetail.tsx     │                          │\n│  docsRef: docs/history/tsk-4id ↗           │                          │\n│                                            │                          │\n│  What the agent did                        │                          │\n│  Read ports.rs, confirmed WorkItemSource   │                          │\n│  has 5 fetch_* methods. Wrote the pairing  │                          │\n│  read on top of settlements[] ordered by   │                          │\n│  seq, no schema change (D2).               │                          │\n│                                            │                          │\n│  ▸ Machine decision log (12)               │                          │\n├ ACTIONS ───────────────────────────────────┴──────────────────────────┤\n│  [ Answer this ]   [ Edit ]   [ Retire ]      [ Approve merge ⓘ ]     │\n└────────────────────────────────────────────────────────────────────────┘\n```\n\nMobile stacks the same order — question, why, context, timeline — because\nthe order is the value, not the columns. The timeline collapses to its\nmost recent round with \"show 2 earlier rounds\".",
+      "sourceDigest": "f1c2ffc9a487b9f31419cb06961dd2e25f746de2aa4db30b780c0ce5ca520daa",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "targetAnchor": "layout",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Layout",
+        "anchor": "layout",
+        "githubAnchor": "layout",
+        "stableAnchor": "h-7c6b4db23374",
+        "startLine": 49,
+        "endLine": 49,
+        "textDigest": "f1c2ffc9a487b9f31419cb06961dd2e25f746de2aa4db30b780c0ce5ca520daa",
+        "sample": "Layout",
+        "sectionPayloadDigest": "950ab866ef145f639cfe072ae800b6c7acb1e90340a72f68b5d65596534a1f10",
+        "followingBlockDigest": "606f6a0016df5a909d44d0f75366ef2bf776b57ef7b47081b1ceab0cd79d23c3",
+        "identityFingerprint": "b207c2dcf57e81c30b3b44dcc92bf7ededa254a99ae33b277ce9087b91a2850f",
+        "ancestry": [
+          "S03 — Task detail"
+        ],
+        "text": "## Layout",
+        "sectionText": "## Layout\n\nThree regions, in a fixed reading order, because the order **is** the\ndesign: what is being asked → why it is being asked → what it is about.\n\n```\n┌ TOPBAR ────────────────────────────────────────────────────────────────┐\n│ ← Board    tsk-4id · Task detail pairing        ⚠ reachable on network │\n├ QUESTION ──────────────────────────────────────────────────────────────┤\n│                                                                        │\n│  NEEDS YOUR ANSWER · parked 2h ago · round 3 of 3                      │\n│                                                                        │\n│  Which pairing key should the timeline use when askHistory and         │\n│  settlements have drifted by one?                                      │\n│                                                                        │\n│  [ Answer this ]                                                       │\n│                                                                        │\n├ WHY ───────────────────────────────────────────────────────────────────┤\n│  Why you're being asked                                                │\n│  Two options are still standing after a real comparison, and the       │\n│  locked decision (D2) deliberately added no linking key.               │\n│  Tried already: read D2, ran the pairing on tsk-48i's 23/23 records.   │\n├ CONTEXT ───────────────────────────────────┬ TIMELINE ─────────────────┤\n│  What this item is                         │  round 1 · 4d ago         │\n│                                            │  Q  Should the detail     │\n│  tsk-4id · Task detail pairing             │     screen show the       │\n│  ● awaiting-human · executing · high-risk  │     machine log at all?   │\n│  coding · tier-2 · deps: tsk-yo0, tsk-5jr  │  A  No — narrative first. │\n│                                            │                          │\n│  A person with no context in their head    │  round 2 · 2d ago         │\n│  should be able to answer the parked       │  Q  Collapse or omit?     │\n│  question quickly, from this screen alone. │  A  Collapse.             │\n│  (full description, not truncated)         │                          │\n│                                            │  round 3 · 2h ago         │\n│  verify: cd herdr-plugin && cargo test     │  Q  Which pairing key…    │\n│  --lib gateway && cd web && npm run test   │  A  — waiting             │\n│  footprint: gateway.rs, TaskDetail.tsx     │                          │\n│  docsRef: docs/history/tsk-4id ↗           │                          │\n│                                            │                          │\n│  What the agent did                        │                          │\n│  Read ports.rs, confirmed WorkItemSource   │                          │\n│  has 5 fetch_* methods. Wrote the pairing  │                          │\n│  read on top of settlements[] ordered by   │                          │\n│  seq, no schema change (D2).               │                          │\n│                                            │                          │\n│  ▸ Machine decision log (12)               │                          │\n├ ACTIONS ───────────────────────────────────┴──────────────────────────┤\n│  [ Answer this ]   [ Edit ]   [ Retire ]      [ Approve merge ⓘ ]     │\n└────────────────────────────────────────────────────────────────────────┘\n```\n\nMobile stacks the same order — question, why, context, timeline — because\nthe order is the value, not the columns. The timeline collapses to its\nmost recent round with \"show 2 earlier rounds\"."
+      },
+      "targetShownText": "## Layout\n\nThree regions, in a fixed reading order, because the order **is** the\ndesign: what is being asked → why it is being asked → what it is about.\n\n```\n┌ TOPBAR ────────────────────────────────────────────────────────────────┐\n│ ← Board    tsk-4id · Task detail pairing        ⚠ reachable on network │\n├ QUESTION ──────────────────────────────────────────────────────────────┤\n│                                                                        │\n│  NEEDS YOUR ANSWER · parked 2h ago · round 3 of 3                      │\n│                                                                        │\n│  Which pairing key should the timeline use when askHistory and         │\n│  settlements have drifted by one?                                      │\n│                                                                        │\n│  [ Answer this ]                                                       │\n│                                                                        │\n├ WHY ───────────────────────────────────────────────────────────────────┤\n│  Why you're being asked                                                │\n│  Two options are still standing after a real comparison, and the       │\n│  locked decision (D2) deliberately added no linking key.               │\n│  Tried already: read D2, ran the pairing on tsk-48i's 23/23 records.   │\n├ CONTEXT ───────────────────────────────────┬ TIMELINE ─────────────────┤\n│  What this item is                         │  round 1 · 4d ago         │\n│                                            │  Q  Should the detail     │\n│  tsk-4id · Task detail pairing             │     screen show the       │\n│  ● awaiting-human · executing · high-risk  │     machine log at all?   │\n│  coding · tier-2 · deps: tsk-yo0, tsk-5jr  │  A  No — narrative first. │\n│                                            │                          │\n│  A person with no context in their head    │  round 2 · 2d ago         │\n│  should be able to answer the parked       │  Q  Collapse or omit?     │\n│  question quickly, from this screen alone. │  A  Collapse.             │\n│  (full description, not truncated)         │                          │\n│                                            │  round 3 · 2h ago         │\n│  verify: cd herdr-plugin && cargo test     │  Q  Which pairing key…    │\n│  --lib gateway && cd web && npm run test   │  A  — waiting             │\n│  footprint: gateway.rs, TaskDetail.tsx     │                          │\n│  docsRef: docs/history/tsk-4id ↗           │                          │\n│                                            │                          │\n│  What the agent did                        │                          │\n│  Read ports.rs, confirmed WorkItemSource   │                          │\n│  has 5 fetch_* methods. Wrote the pairing  │                          │\n│  read on top of settlements[] ordered by   │                          │\n│  seq, no schema change (D2).               │                          │\n│                                            │                          │\n│  ▸ Machine decision log (12)               │                          │\n├ ACTIONS ───────────────────────────────────┴──────────────────────────┤\n│  [ Answer this ]   [ Edit ]   [ Retire ]      [ Approve merge ⓘ ]     │\n└────────────────────────────────────────────────────────────────────────┘\n```\n\nMobile stacks the same order — question, why, context, timeline — because\nthe order is the value, not the columns. The timeline collapses to its\nmost recent round with \"show 2 earlier rounds\".",
+      "targetDigest": "f1c2ffc9a487b9f31419cb06961dd2e25f746de2aa4db30b780c0ce5ca520daa",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_2833db673d67cf600233251aac117628",
+        "sourceUnitDigest": "f1c2ffc9a487b9f31419cb06961dd2e25f746de2aa4db30b780c0ce5ca520daa",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+        "targetAnchor": "layout",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/ui-spec/screens/S03-task-detail.md#layout (source lines 27-27) is carried at docs/platform/ui-spec/architecture/screens/S03-task-detail.md#layout (candidate lines 49-49). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S03-task-detail.md verbatim in docs/platform/ui-spec/architecture/screens/S03-task-detail.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "f1c2ffc9a487b9f31419cb06961dd2e25f746de2aa4db30b780c0ce5ca520daa",
+        "targetAncestry": [
+          "S03 — Task detail"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_4fb38e3e862e3f8fb1353ca7f5c38c87",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+      "sourceAnchor": "unheaded-block-4",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 29,
+        "endLine": 30,
+        "textDigest": "606f6a0016df5a909d44d0f75366ef2bf776b57ef7b47081b1ceab0cd79d23c3",
+        "sample": "Three regions, in a fixed reading order, because the order **is** the\ndesign: what is being asked → why it is being asked → what it is about.",
+        "identityFingerprint": "4f2a9bf4a49e7bd40265dd0f907f86826e280fae00953befa05fcccda208f7be",
+        "ancestry": [
+          "S03 — Task detail",
+          "Layout"
+        ],
+        "text": "Three regions, in a fixed reading order, because the order **is** the\ndesign: what is being asked → why it is being asked → what it is about."
+      },
+      "sourceShownText": "Three regions, in a fixed reading order, because the order **is** the\ndesign: what is being asked → why it is being asked → what it is about.",
+      "sourceDigest": "606f6a0016df5a909d44d0f75366ef2bf776b57ef7b47081b1ceab0cd79d23c3",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "targetAnchor": "unheaded-block-6",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 51,
+        "endLine": 52,
+        "textDigest": "606f6a0016df5a909d44d0f75366ef2bf776b57ef7b47081b1ceab0cd79d23c3",
+        "sample": "Three regions, in a fixed reading order, because the order **is** the\ndesign: what is being asked → why it is being asked → what it is about.",
+        "identityFingerprint": "4f2a9bf4a49e7bd40265dd0f907f86826e280fae00953befa05fcccda208f7be",
+        "ancestry": [
+          "S03 — Task detail",
+          "Layout"
+        ],
+        "text": "Three regions, in a fixed reading order, because the order **is** the\ndesign: what is being asked → why it is being asked → what it is about."
+      },
+      "targetShownText": "Three regions, in a fixed reading order, because the order **is** the\ndesign: what is being asked → why it is being asked → what it is about.",
+      "targetDigest": "606f6a0016df5a909d44d0f75366ef2bf776b57ef7b47081b1ceab0cd79d23c3",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_4fb38e3e862e3f8fb1353ca7f5c38c87",
+        "sourceUnitDigest": "606f6a0016df5a909d44d0f75366ef2bf776b57ef7b47081b1ceab0cd79d23c3",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+        "targetAnchor": "unheaded-block-6",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/screens/S03-task-detail.md#unheaded-block-4 (source lines 29-30) is carried at docs/platform/ui-spec/architecture/screens/S03-task-detail.md#unheaded-block-6 (candidate lines 51-52). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S03-task-detail.md verbatim in docs/platform/ui-spec/architecture/screens/S03-task-detail.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "606f6a0016df5a909d44d0f75366ef2bf776b57ef7b47081b1ceab0cd79d23c3",
+        "targetAncestry": [
+          "S03 — Task detail",
+          "Layout"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_692e59d327dfdc4ac060b679ff60a8df",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+      "sourceAnchor": "unheaded-block-5",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 32,
+        "endLine": 76,
+        "textDigest": "2f7ba97eab08768fccbc32a6b3edcbebeb7449cc07753e516da2cd883d52f3f2",
+        "sample": "```\n┌ TOPBAR ────────────────────────────────────────────────────────────────┐\n│ ← Board    tsk-4id · Task detail pairing        ⚠ reachable on network │\n├ QUESTION ───────────────",
+        "identityFingerprint": "1e87a4c68ffc99118f9c5dc90fdeea10e68c6628ef8835fccc6aca09ecfb46c5",
+        "ancestry": [
+          "S03 — Task detail",
+          "Layout"
+        ],
+        "text": "```\n┌ TOPBAR ────────────────────────────────────────────────────────────────┐\n│ ← Board    tsk-4id · Task detail pairing        ⚠ reachable on network │\n├ QUESTION ──────────────────────────────────────────────────────────────┤\n│                                                                        │\n│  NEEDS YOUR ANSWER · parked 2h ago · round 3 of 3                      │\n│                                                                        │\n│  Which pairing key should the timeline use when askHistory and         │\n│  settlements have drifted by one?                                      │\n│                                                                        │\n│  [ Answer this ]                                                       │\n│                                                                        │\n├ WHY ───────────────────────────────────────────────────────────────────┤\n│  Why you're being asked                                                │\n│  Two options are still standing after a real comparison, and the       │\n│  locked decision (D2) deliberately added no linking key.               │\n│  Tried already: read D2, ran the pairing on tsk-48i's 23/23 records.   │\n├ CONTEXT ───────────────────────────────────┬ TIMELINE ─────────────────┤\n│  What this item is                         │  round 1 · 4d ago         │\n│                                            │  Q  Should the detail     │\n│  tsk-4id · Task detail pairing             │     screen show the       │\n│  ● awaiting-human · executing · high-risk  │     machine log at all?   │\n│  coding · tier-2 · deps: tsk-yo0, tsk-5jr  │  A  No — narrative first. │\n│                                            │                          │\n│  A person with no context in their head    │  round 2 · 2d ago         │\n│  should be able to answer the parked       │  Q  Collapse or omit?     │\n│  question quickly, from this screen alone. │  A  Collapse.             │\n│  (full description, not truncated)         │                          │\n│                                            │  round 3 · 2h ago         │\n│  verify: cd herdr-plugin && cargo test     │  Q  Which pairing key…    │\n│  --lib gateway && cd web && npm run test   │  A  — waiting             │\n│  footprint: gateway.rs, TaskDetail.tsx     │                          │\n│  docsRef: docs/history/tsk-4id ↗           │                          │\n│                                            │                          │\n│  What the agent did                        │                          │\n│  Read ports.rs, confirmed WorkItemSource   │                          │\n│  has 5 fetch_* methods. Wrote the pairing  │                          │\n│  read on top of settlements[] ordered by   │                          │\n│  seq, no schema change (D2).               │                          │\n│                                            │                          │\n│  ▸ Machine decision log (12)               │                          │\n├ ACTIONS ───────────────────────────────────┴──────────────────────────┤\n│  [ Answer this ]   [ Edit ]   [ Retire ]      [ Approve merge ⓘ ]     │\n└────────────────────────────────────────────────────────────────────────┘\n```"
+      },
+      "sourceShownText": "```\n┌ TOPBAR ────────────────────────────────────────────────────────────────┐\n│ ← Board    tsk-4id · Task detail pairing        ⚠ reachable on network │\n├ QUESTION ──────────────────────────────────────────────────────────────┤\n│                                                                        │\n│  NEEDS YOUR ANSWER · parked 2h ago · round 3 of 3                      │\n│                                                                        │\n│  Which pairing key should the timeline use when askHistory and         │\n│  settlements have drifted by one?                                      │\n│                                                                        │\n│  [ Answer this ]                                                       │\n│                                                                        │\n├ WHY ───────────────────────────────────────────────────────────────────┤\n│  Why you're being asked                                                │\n│  Two options are still standing after a real comparison, and the       │\n│  locked decision (D2) deliberately added no linking key.               │\n│  Tried already: read D2, ran the pairing on tsk-48i's 23/23 records.   │\n├ CONTEXT ───────────────────────────────────┬ TIMELINE ─────────────────┤\n│  What this item is                         │  round 1 · 4d ago         │\n│                                            │  Q  Should the detail     │\n│  tsk-4id · Task detail pairing             │     screen show the       │\n│  ● awaiting-human · executing · high-risk  │     machine log at all?   │\n│  coding · tier-2 · deps: tsk-yo0, tsk-5jr  │  A  No — narrative first. │\n│                                            │                          │\n│  A person with no context in their head    │  round 2 · 2d ago         │\n│  should be able to answer the parked       │  Q  Collapse or omit?     │\n│  question quickly, from this screen alone. │  A  Collapse.             │\n│  (full description, not truncated)         │                          │\n│                                            │  round 3 · 2h ago         │\n│  verify: cd herdr-plugin && cargo test     │  Q  Which pairing key…    │\n│  --lib gateway && cd web && npm run test   │  A  — waiting             │\n│  footprint: gateway.rs, TaskDetail.tsx     │                          │\n│  docsRef: docs/history/tsk-4id ↗           │                          │\n│                                            │                          │\n│  What the agent did                        │                          │\n│  Read ports.rs, confirmed WorkItemSource   │                          │\n│  has 5 fetch_* methods. Wrote the pairing  │                          │\n│  read on top of settlements[] ordered by   │                          │\n│  seq, no schema change (D2).               │                          │\n│                                            │                          │\n│  ▸ Machine decision log (12)               │                          │\n├ ACTIONS ───────────────────────────────────┴──────────────────────────┤\n│  [ Answer this ]   [ Edit ]   [ Retire ]      [ Approve merge ⓘ ]     │\n└────────────────────────────────────────────────────────────────────────┘\n```",
+      "sourceDigest": "2f7ba97eab08768fccbc32a6b3edcbebeb7449cc07753e516da2cd883d52f3f2",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "targetAnchor": "unheaded-block-7",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 54,
+        "endLine": 98,
+        "textDigest": "2f7ba97eab08768fccbc32a6b3edcbebeb7449cc07753e516da2cd883d52f3f2",
+        "sample": "```\n┌ TOPBAR ────────────────────────────────────────────────────────────────┐\n│ ← Board    tsk-4id · Task detail pairing        ⚠ reachable on network │\n├ QUESTION ───────────────",
+        "identityFingerprint": "1e87a4c68ffc99118f9c5dc90fdeea10e68c6628ef8835fccc6aca09ecfb46c5",
+        "ancestry": [
+          "S03 — Task detail",
+          "Layout"
+        ],
+        "text": "```\n┌ TOPBAR ────────────────────────────────────────────────────────────────┐\n│ ← Board    tsk-4id · Task detail pairing        ⚠ reachable on network │\n├ QUESTION ──────────────────────────────────────────────────────────────┤\n│                                                                        │\n│  NEEDS YOUR ANSWER · parked 2h ago · round 3 of 3                      │\n│                                                                        │\n│  Which pairing key should the timeline use when askHistory and         │\n│  settlements have drifted by one?                                      │\n│                                                                        │\n│  [ Answer this ]                                                       │\n│                                                                        │\n├ WHY ───────────────────────────────────────────────────────────────────┤\n│  Why you're being asked                                                │\n│  Two options are still standing after a real comparison, and the       │\n│  locked decision (D2) deliberately added no linking key.               │\n│  Tried already: read D2, ran the pairing on tsk-48i's 23/23 records.   │\n├ CONTEXT ───────────────────────────────────┬ TIMELINE ─────────────────┤\n│  What this item is                         │  round 1 · 4d ago         │\n│                                            │  Q  Should the detail     │\n│  tsk-4id · Task detail pairing             │     screen show the       │\n│  ● awaiting-human · executing · high-risk  │     machine log at all?   │\n│  coding · tier-2 · deps: tsk-yo0, tsk-5jr  │  A  No — narrative first. │\n│                                            │                          │\n│  A person with no context in their head    │  round 2 · 2d ago         │\n│  should be able to answer the parked       │  Q  Collapse or omit?     │\n│  question quickly, from this screen alone. │  A  Collapse.             │\n│  (full description, not truncated)         │                          │\n│                                            │  round 3 · 2h ago         │\n│  verify: cd herdr-plugin && cargo test     │  Q  Which pairing key…    │\n│  --lib gateway && cd web && npm run test   │  A  — waiting             │\n│  footprint: gateway.rs, TaskDetail.tsx     │                          │\n│  docsRef: docs/history/tsk-4id ↗           │                          │\n│                                            │                          │\n│  What the agent did                        │                          │\n│  Read ports.rs, confirmed WorkItemSource   │                          │\n│  has 5 fetch_* methods. Wrote the pairing  │                          │\n│  read on top of settlements[] ordered by   │                          │\n│  seq, no schema change (D2).               │                          │\n│                                            │                          │\n│  ▸ Machine decision log (12)               │                          │\n├ ACTIONS ───────────────────────────────────┴──────────────────────────┤\n│  [ Answer this ]   [ Edit ]   [ Retire ]      [ Approve merge ⓘ ]     │\n└────────────────────────────────────────────────────────────────────────┘\n```"
+      },
+      "targetShownText": "```\n┌ TOPBAR ────────────────────────────────────────────────────────────────┐\n│ ← Board    tsk-4id · Task detail pairing        ⚠ reachable on network │\n├ QUESTION ──────────────────────────────────────────────────────────────┤\n│                                                                        │\n│  NEEDS YOUR ANSWER · parked 2h ago · round 3 of 3                      │\n│                                                                        │\n│  Which pairing key should the timeline use when askHistory and         │\n│  settlements have drifted by one?                                      │\n│                                                                        │\n│  [ Answer this ]                                                       │\n│                                                                        │\n├ WHY ───────────────────────────────────────────────────────────────────┤\n│  Why you're being asked                                                │\n│  Two options are still standing after a real comparison, and the       │\n│  locked decision (D2) deliberately added no linking key.               │\n│  Tried already: read D2, ran the pairing on tsk-48i's 23/23 records.   │\n├ CONTEXT ───────────────────────────────────┬ TIMELINE ─────────────────┤\n│  What this item is                         │  round 1 · 4d ago         │\n│                                            │  Q  Should the detail     │\n│  tsk-4id · Task detail pairing             │     screen show the       │\n│  ● awaiting-human · executing · high-risk  │     machine log at all?   │\n│  coding · tier-2 · deps: tsk-yo0, tsk-5jr  │  A  No — narrative first. │\n│                                            │                          │\n│  A person with no context in their head    │  round 2 · 2d ago         │\n│  should be able to answer the parked       │  Q  Collapse or omit?     │\n│  question quickly, from this screen alone. │  A  Collapse.             │\n│  (full description, not truncated)         │                          │\n│                                            │  round 3 · 2h ago         │\n│  verify: cd herdr-plugin && cargo test     │  Q  Which pairing key…    │\n│  --lib gateway && cd web && npm run test   │  A  — waiting             │\n│  footprint: gateway.rs, TaskDetail.tsx     │                          │\n│  docsRef: docs/history/tsk-4id ↗           │                          │\n│                                            │                          │\n│  What the agent did                        │                          │\n│  Read ports.rs, confirmed WorkItemSource   │                          │\n│  has 5 fetch_* methods. Wrote the pairing  │                          │\n│  read on top of settlements[] ordered by   │                          │\n│  seq, no schema change (D2).               │                          │\n│                                            │                          │\n│  ▸ Machine decision log (12)               │                          │\n├ ACTIONS ───────────────────────────────────┴──────────────────────────┤\n│  [ Answer this ]   [ Edit ]   [ Retire ]      [ Approve merge ⓘ ]     │\n└────────────────────────────────────────────────────────────────────────┘\n```",
+      "targetDigest": "2f7ba97eab08768fccbc32a6b3edcbebeb7449cc07753e516da2cd883d52f3f2",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_692e59d327dfdc4ac060b679ff60a8df",
+        "sourceUnitDigest": "2f7ba97eab08768fccbc32a6b3edcbebeb7449cc07753e516da2cd883d52f3f2",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+        "targetAnchor": "unheaded-block-7",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/screens/S03-task-detail.md#unheaded-block-5 (source lines 32-76) is carried at docs/platform/ui-spec/architecture/screens/S03-task-detail.md#unheaded-block-7 (candidate lines 54-98). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S03-task-detail.md verbatim in docs/platform/ui-spec/architecture/screens/S03-task-detail.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "2f7ba97eab08768fccbc32a6b3edcbebeb7449cc07753e516da2cd883d52f3f2",
+        "targetAncestry": [
+          "S03 — Task detail",
+          "Layout"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_093b3e6a5b56f2219f9056058964c884",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+      "sourceAnchor": "unheaded-block-6",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 78,
+        "endLine": 80,
+        "textDigest": "5011f46096ff98b1d5c0ce491fe5d75a52de5db059d305c8082096da2b8b930d",
+        "sample": "Mobile stacks the same order — question, why, context, timeline — because\nthe order is the value, not the columns. The timeline collapses to its\nmost recent round with \"show 2 earl",
+        "identityFingerprint": "0b35d3323cdc4c86026488b76024cfe1f00588bfcd1bbe502b11bce9e7b0d785",
+        "ancestry": [
+          "S03 — Task detail",
+          "Layout"
+        ],
+        "text": "Mobile stacks the same order — question, why, context, timeline — because\nthe order is the value, not the columns. The timeline collapses to its\nmost recent round with \"show 2 earlier rounds\"."
+      },
+      "sourceShownText": "Mobile stacks the same order — question, why, context, timeline — because\nthe order is the value, not the columns. The timeline collapses to its\nmost recent round with \"show 2 earlier rounds\".",
+      "sourceDigest": "5011f46096ff98b1d5c0ce491fe5d75a52de5db059d305c8082096da2b8b930d",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "targetAnchor": "unheaded-block-8",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-8",
+        "githubAnchor": "unheaded-block-8",
+        "stableAnchor": "unheaded-block-8",
+        "title": "Unheaded block 8",
+        "startLine": 100,
+        "endLine": 102,
+        "textDigest": "5011f46096ff98b1d5c0ce491fe5d75a52de5db059d305c8082096da2b8b930d",
+        "sample": "Mobile stacks the same order — question, why, context, timeline — because\nthe order is the value, not the columns. The timeline collapses to its\nmost recent round with \"show 2 earl",
+        "identityFingerprint": "0b35d3323cdc4c86026488b76024cfe1f00588bfcd1bbe502b11bce9e7b0d785",
+        "ancestry": [
+          "S03 — Task detail",
+          "Layout"
+        ],
+        "text": "Mobile stacks the same order — question, why, context, timeline — because\nthe order is the value, not the columns. The timeline collapses to its\nmost recent round with \"show 2 earlier rounds\"."
+      },
+      "targetShownText": "Mobile stacks the same order — question, why, context, timeline — because\nthe order is the value, not the columns. The timeline collapses to its\nmost recent round with \"show 2 earlier rounds\".",
+      "targetDigest": "5011f46096ff98b1d5c0ce491fe5d75a52de5db059d305c8082096da2b8b930d",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_093b3e6a5b56f2219f9056058964c884",
+        "sourceUnitDigest": "5011f46096ff98b1d5c0ce491fe5d75a52de5db059d305c8082096da2b8b930d",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+        "targetAnchor": "unheaded-block-8",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/screens/S03-task-detail.md#unheaded-block-6 (source lines 78-80) is carried at docs/platform/ui-spec/architecture/screens/S03-task-detail.md#unheaded-block-8 (candidate lines 100-102). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S03-task-detail.md verbatim in docs/platform/ui-spec/architecture/screens/S03-task-detail.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "5011f46096ff98b1d5c0ce491fe5d75a52de5db059d305c8082096da2b8b930d",
+        "targetAncestry": [
+          "S03 — Task detail",
+          "Layout"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_7c2b88b65ffc0692b8fe3d9751070b02",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+      "sourceAnchor": "why-the-three-regions-sit-in-this-order",
+      "source": {
+        "unitKind": "heading",
+        "level": 3,
+        "title": "Why the three regions sit in this order",
+        "anchor": "why-the-three-regions-sit-in-this-order",
+        "githubAnchor": "why-the-three-regions-sit-in-this-order",
+        "stableAnchor": "h-3ec7741db692",
+        "startLine": 82,
+        "endLine": 82,
+        "textDigest": "912c6946a895c279ae9ff495722a7afd0eb2905de2f117c5e3c6f7a98a7a27b1",
+        "sample": "Why the three regions sit in this order",
+        "sectionPayloadDigest": "b68da59feac0406607b0751d67e0a3d2951a328011e0070a80ebb1cabf05efc3",
+        "followingBlockDigest": "b68da59feac0406607b0751d67e0a3d2951a328011e0070a80ebb1cabf05efc3",
+        "identityFingerprint": "9494c6ecb6361ff1db7deea712850734ba51ad29eb497db67f675289af33e383",
+        "ancestry": [
+          "S03 — Task detail",
+          "Layout"
+        ],
+        "text": "### Why the three regions sit in this order",
+        "sectionText": "### Why the three regions sit in this order\n\n- **QUESTION first, alone, large.** A person arriving cold reads one\n  thing. Putting item metadata above it would make them scroll past\n  bookkeeping to reach the only thing that needs them.\n- **WHY second, and it carries what was already tried.** This is the\n  difference between a question a person can answer in ten seconds and one\n  they have to go investigate. It names the options still standing and the\n  work already done — so the person is editing reasoning, not starting\n  from nothing.\n- **CONTEXT third, narrative before machine log.** R10 exactly: the human\n  narrative is the primary account, the machine decision log renders\n  collapsed behind a disclosure showing its count."
+      },
+      "sourceShownText": "### Why the three regions sit in this order\n\n- **QUESTION first, alone, large.** A person arriving cold reads one\n  thing. Putting item metadata above it would make them scroll past\n  bookkeeping to reach the only thing that needs them.\n- **WHY second, and it carries what was already tried.** This is the\n  difference between a question a person can answer in ten seconds and one\n  they have to go investigate. It names the options still standing and the\n  work already done — so the person is editing reasoning, not starting\n  from nothing.\n- **CONTEXT third, narrative before machine log.** R10 exactly: the human\n  narrative is the primary account, the machine decision log renders\n  collapsed behind a disclosure showing its count.",
+      "sourceDigest": "912c6946a895c279ae9ff495722a7afd0eb2905de2f117c5e3c6f7a98a7a27b1",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "targetAnchor": "why-the-three-regions-sit-in-this-order",
+      "target": {
+        "unitKind": "heading",
+        "level": 3,
+        "title": "Why the three regions sit in this order",
+        "anchor": "why-the-three-regions-sit-in-this-order",
+        "githubAnchor": "why-the-three-regions-sit-in-this-order",
+        "stableAnchor": "h-65ea2339eec0",
+        "startLine": 104,
+        "endLine": 104,
+        "textDigest": "912c6946a895c279ae9ff495722a7afd0eb2905de2f117c5e3c6f7a98a7a27b1",
+        "sample": "Why the three regions sit in this order",
+        "sectionPayloadDigest": "b68da59feac0406607b0751d67e0a3d2951a328011e0070a80ebb1cabf05efc3",
+        "followingBlockDigest": "b68da59feac0406607b0751d67e0a3d2951a328011e0070a80ebb1cabf05efc3",
+        "identityFingerprint": "9494c6ecb6361ff1db7deea712850734ba51ad29eb497db67f675289af33e383",
+        "ancestry": [
+          "S03 — Task detail",
+          "Layout"
+        ],
+        "text": "### Why the three regions sit in this order",
+        "sectionText": "### Why the three regions sit in this order\n\n- **QUESTION first, alone, large.** A person arriving cold reads one\n  thing. Putting item metadata above it would make them scroll past\n  bookkeeping to reach the only thing that needs them.\n- **WHY second, and it carries what was already tried.** This is the\n  difference between a question a person can answer in ten seconds and one\n  they have to go investigate. It names the options still standing and the\n  work already done — so the person is editing reasoning, not starting\n  from nothing.\n- **CONTEXT third, narrative before machine log.** R10 exactly: the human\n  narrative is the primary account, the machine decision log renders\n  collapsed behind a disclosure showing its count."
+      },
+      "targetShownText": "### Why the three regions sit in this order\n\n- **QUESTION first, alone, large.** A person arriving cold reads one\n  thing. Putting item metadata above it would make them scroll past\n  bookkeeping to reach the only thing that needs them.\n- **WHY second, and it carries what was already tried.** This is the\n  difference between a question a person can answer in ten seconds and one\n  they have to go investigate. It names the options still standing and the\n  work already done — so the person is editing reasoning, not starting\n  from nothing.\n- **CONTEXT third, narrative before machine log.** R10 exactly: the human\n  narrative is the primary account, the machine decision log renders\n  collapsed behind a disclosure showing its count.",
+      "targetDigest": "912c6946a895c279ae9ff495722a7afd0eb2905de2f117c5e3c6f7a98a7a27b1",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_7c2b88b65ffc0692b8fe3d9751070b02",
+        "sourceUnitDigest": "912c6946a895c279ae9ff495722a7afd0eb2905de2f117c5e3c6f7a98a7a27b1",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+        "targetAnchor": "why-the-three-regions-sit-in-this-order",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole heading unit docs/ui-spec/screens/S03-task-detail.md#why-the-three-regions-sit-in-this-order (source lines 82-82) is carried at docs/platform/ui-spec/architecture/screens/S03-task-detail.md#why-the-three-regions-sit-in-this-order (candidate lines 104-104). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S03-task-detail.md verbatim in docs/platform/ui-spec/architecture/screens/S03-task-detail.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "912c6946a895c279ae9ff495722a7afd0eb2905de2f117c5e3c6f7a98a7a27b1",
+        "targetAncestry": [
+          "S03 — Task detail",
+          "Layout"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_26c0a04e72c06c15be9a007f50fd312b",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+      "sourceAnchor": "unheaded-block-7",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 84,
+        "endLine": 94,
+        "textDigest": "b68da59feac0406607b0751d67e0a3d2951a328011e0070a80ebb1cabf05efc3",
+        "sample": "- **QUESTION first, alone, large.** A person arriving cold reads one\n  thing. Putting item metadata above it would make them scroll past\n  bookkeeping to reach the only thing that ",
+        "identityFingerprint": "2aab06a48ac61f762c7bf6fd54ce8551350d5b1881100ded6bbc1c40062e1f41",
+        "ancestry": [
+          "S03 — Task detail",
+          "Layout",
+          "Why the three regions sit in this order"
+        ],
+        "text": "- **QUESTION first, alone, large.** A person arriving cold reads one\n  thing. Putting item metadata above it would make them scroll past\n  bookkeeping to reach the only thing that needs them.\n- **WHY second, and it carries what was already tried.** This is the\n  difference between a question a person can answer in ten seconds and one\n  they have to go investigate. It names the options still standing and the\n  work already done — so the person is editing reasoning, not starting\n  from nothing.\n- **CONTEXT third, narrative before machine log.** R10 exactly: the human\n  narrative is the primary account, the machine decision log renders\n  collapsed behind a disclosure showing its count."
+      },
+      "sourceShownText": "- **QUESTION first, alone, large.** A person arriving cold reads one\n  thing. Putting item metadata above it would make them scroll past\n  bookkeeping to reach the only thing that needs them.\n- **WHY second, and it carries what was already tried.** This is the\n  difference between a question a person can answer in ten seconds and one\n  they have to go investigate. It names the options still standing and the\n  work already done — so the person is editing reasoning, not starting\n  from nothing.\n- **CONTEXT third, narrative before machine log.** R10 exactly: the human\n  narrative is the primary account, the machine decision log renders\n  collapsed behind a disclosure showing its count.",
+      "sourceDigest": "b68da59feac0406607b0751d67e0a3d2951a328011e0070a80ebb1cabf05efc3",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "targetAnchor": "unheaded-block-9",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-9",
+        "githubAnchor": "unheaded-block-9",
+        "stableAnchor": "unheaded-block-9",
+        "title": "Unheaded block 9",
+        "startLine": 106,
+        "endLine": 116,
+        "textDigest": "b68da59feac0406607b0751d67e0a3d2951a328011e0070a80ebb1cabf05efc3",
+        "sample": "- **QUESTION first, alone, large.** A person arriving cold reads one\n  thing. Putting item metadata above it would make them scroll past\n  bookkeeping to reach the only thing that ",
+        "identityFingerprint": "2aab06a48ac61f762c7bf6fd54ce8551350d5b1881100ded6bbc1c40062e1f41",
+        "ancestry": [
+          "S03 — Task detail",
+          "Layout",
+          "Why the three regions sit in this order"
+        ],
+        "text": "- **QUESTION first, alone, large.** A person arriving cold reads one\n  thing. Putting item metadata above it would make them scroll past\n  bookkeeping to reach the only thing that needs them.\n- **WHY second, and it carries what was already tried.** This is the\n  difference between a question a person can answer in ten seconds and one\n  they have to go investigate. It names the options still standing and the\n  work already done — so the person is editing reasoning, not starting\n  from nothing.\n- **CONTEXT third, narrative before machine log.** R10 exactly: the human\n  narrative is the primary account, the machine decision log renders\n  collapsed behind a disclosure showing its count."
+      },
+      "targetShownText": "- **QUESTION first, alone, large.** A person arriving cold reads one\n  thing. Putting item metadata above it would make them scroll past\n  bookkeeping to reach the only thing that needs them.\n- **WHY second, and it carries what was already tried.** This is the\n  difference between a question a person can answer in ten seconds and one\n  they have to go investigate. It names the options still standing and the\n  work already done — so the person is editing reasoning, not starting\n  from nothing.\n- **CONTEXT third, narrative before machine log.** R10 exactly: the human\n  narrative is the primary account, the machine decision log renders\n  collapsed behind a disclosure showing its count.",
+      "targetDigest": "b68da59feac0406607b0751d67e0a3d2951a328011e0070a80ebb1cabf05efc3",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_26c0a04e72c06c15be9a007f50fd312b",
+        "sourceUnitDigest": "b68da59feac0406607b0751d67e0a3d2951a328011e0070a80ebb1cabf05efc3",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+        "targetAnchor": "unheaded-block-9",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/screens/S03-task-detail.md#unheaded-block-7 (source lines 84-94) is carried at docs/platform/ui-spec/architecture/screens/S03-task-detail.md#unheaded-block-9 (candidate lines 106-116). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S03-task-detail.md verbatim in docs/platform/ui-spec/architecture/screens/S03-task-detail.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "b68da59feac0406607b0751d67e0a3d2951a328011e0070a80ebb1cabf05efc3",
+        "targetAncestry": [
+          "S03 — Task detail",
+          "Layout",
+          "Why the three regions sit in this order"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_b7bec6190021c6543edb08c12717fea6",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+      "sourceAnchor": "what-context-actually-shows-d17",
+      "source": {
+        "unitKind": "heading",
+        "level": 3,
+        "title": "What CONTEXT actually shows (D17)",
+        "anchor": "what-context-actually-shows-d17",
+        "githubAnchor": "what-context-actually-shows-d17",
+        "stableAnchor": "h-86f71880c8b6",
+        "startLine": 96,
+        "endLine": 96,
+        "textDigest": "9542d216b781deb7ab31a504a5a3fbb10c1dba64b258e360234962c51992f10a",
+        "sample": "What CONTEXT actually shows (D17)",
+        "sectionPayloadDigest": "b943a532fa337749f41ce86cf28fd83b98f2ae5594d16c7f44eb964829e794ed",
+        "followingBlockDigest": "df88b650b1482175d2fb5e47624cd391af36bb52cc3f31aa67f8874a7ab75404",
+        "identityFingerprint": "bc45babe6c82329b190a45fef2bb44dcb2adba5f3de733ae3f96e4b6df9f4010",
+        "ancestry": [
+          "S03 — Task detail",
+          "Layout"
+        ],
+        "text": "### What CONTEXT actually shows (D17)",
+        "sectionText": "### What CONTEXT actually shows (D17)\n\n`GET /work/{id}`'s `work` object (the `WorkItem` schema,\n`docs/contracts/fgos-gateway-api-v1.yaml`) carries more than the id/title/\nstatus this screen showed before D17 — CONTEXT surfaces the full set that\nis meaningful to a person deciding whether to trust the answer they are\nabout to give, in this order:\n\n- **Identity line** — `id`, `title`.\n- **State pills** — `status`, `stage`, `risk` (as already shown).\n- **Classification line** — `domain`, `tier`, and `deps` (as item ids; a\n  person weighing an answer needs to know what else is waiting on this\n  one). `parent` renders here too when non-null.\n- **`description`** — the item's own full text, never truncated. This is\n  new: before D17 the acceptance-criterion sentence quoted in this\n  screen's own Purpose section (\"a question framed so a person with no\n  context in their head can answer it quickly\") had no `description` field\n  to draw on, which was the actual gap a person noticed live (2026-08-15).\n- **`verify`** — the real command that proves this item done, shown\n  verbatim (a monospace line, not summarized) so a person can judge\n  whether the item's own bar for \"done\" matches what the question is\n  asking them to approve.\n- **`footprint`** — the files this item touches, as a short list.\n- **`docsRef`** when non-null — a link to `GET /work/{id}/docs` (tsk-4id),\n  for the rare case CONTEXT's own summary is not enough and a person wants\n  the full plan/CONTEXT.md.\n\nThen, unchanged from before D17: **\"What the agent did\"** (the narrative\naccount) and the collapsed **machine decision log** disclosure.\n\nFields the `WorkItem` schema carries that CONTEXT deliberately does NOT\nsurface here: `kind` (redundant with `domain` for a person, not a new\nfact), `parent` when null. Nothing here is fabricated from a placeholder —\nevery field above is a real `WorkItem` property with a $ref in the\ncontract; a field that is absent/null on a given item simply does not\nrender its row, the same convention `docsRef` already used before D17."
+      },
+      "sourceShownText": "### What CONTEXT actually shows (D17)\n\n`GET /work/{id}`'s `work` object (the `WorkItem` schema,\n`docs/contracts/fgos-gateway-api-v1.yaml`) carries more than the id/title/\nstatus this screen showed before D17 — CONTEXT surfaces the full set that\nis meaningful to a person deciding whether to trust the answer they are\nabout to give, in this order:\n\n- **Identity line** — `id`, `title`.\n- **State pills** — `status`, `stage`, `risk` (as already shown).\n- **Classification line** — `domain`, `tier`, and `deps` (as item ids; a\n  person weighing an answer needs to know what else is waiting on this\n  one). `parent` renders here too when non-null.\n- **`description`** — the item's own full text, never truncated. This is\n  new: before D17 the acceptance-criterion sentence quoted in this\n  screen's own Purpose section (\"a question framed so a person with no\n  context in their head can answer it quickly\") had no `description` field\n  to draw on, which was the actual gap a person noticed live (2026-08-15).\n- **`verify`** — the real command that proves this item done, shown\n  verbatim (a monospace line, not summarized) so a person can judge\n  whether the item's own bar for \"done\" matches what the question is\n  asking them to approve.\n- **`footprint`** — the files this item touches, as a short list.\n- **`docsRef`** when non-null — a link to `GET /work/{id}/docs` (tsk-4id),\n  for the rare case CONTEXT's own summary is not enough and a person wants\n  the full plan/CONTEXT.md.\n\nThen, unchanged from before D17: **\"What the agent did\"** (the narrative\naccount) and the collapsed **machine decision log** disclosure.\n\nFields the `WorkItem` schema carries that CONTEXT deliberately does NOT\nsurface here: `kind` (redundant with `domain` for a person, not a new\nfact), `parent` when null. Nothing here is fabricated from a placeholder —\nevery field above is a real `WorkItem` property with a $ref in the\ncontract; a field that is absent/null on a given item simply does not\nrender its row, the same convention `docsRef` already used before D17.",
+      "sourceDigest": "9542d216b781deb7ab31a504a5a3fbb10c1dba64b258e360234962c51992f10a",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "targetAnchor": "what-context-actually-shows-d17",
+      "target": {
+        "unitKind": "heading",
+        "level": 3,
+        "title": "What CONTEXT actually shows (D17)",
+        "anchor": "what-context-actually-shows-d17",
+        "githubAnchor": "what-context-actually-shows-d17",
+        "stableAnchor": "h-9fca08265e1c",
+        "startLine": 118,
+        "endLine": 118,
+        "textDigest": "9542d216b781deb7ab31a504a5a3fbb10c1dba64b258e360234962c51992f10a",
+        "sample": "What CONTEXT actually shows (D17)",
+        "sectionPayloadDigest": "b943a532fa337749f41ce86cf28fd83b98f2ae5594d16c7f44eb964829e794ed",
+        "followingBlockDigest": "df88b650b1482175d2fb5e47624cd391af36bb52cc3f31aa67f8874a7ab75404",
+        "identityFingerprint": "bc45babe6c82329b190a45fef2bb44dcb2adba5f3de733ae3f96e4b6df9f4010",
+        "ancestry": [
+          "S03 — Task detail",
+          "Layout"
+        ],
+        "text": "### What CONTEXT actually shows (D17)",
+        "sectionText": "### What CONTEXT actually shows (D17)\n\n`GET /work/{id}`'s `work` object (the `WorkItem` schema,\n`docs/contracts/fgos-gateway-api-v1.yaml`) carries more than the id/title/\nstatus this screen showed before D17 — CONTEXT surfaces the full set that\nis meaningful to a person deciding whether to trust the answer they are\nabout to give, in this order:\n\n- **Identity line** — `id`, `title`.\n- **State pills** — `status`, `stage`, `risk` (as already shown).\n- **Classification line** — `domain`, `tier`, and `deps` (as item ids; a\n  person weighing an answer needs to know what else is waiting on this\n  one). `parent` renders here too when non-null.\n- **`description`** — the item's own full text, never truncated. This is\n  new: before D17 the acceptance-criterion sentence quoted in this\n  screen's own Purpose section (\"a question framed so a person with no\n  context in their head can answer it quickly\") had no `description` field\n  to draw on, which was the actual gap a person noticed live (2026-08-15).\n- **`verify`** — the real command that proves this item done, shown\n  verbatim (a monospace line, not summarized) so a person can judge\n  whether the item's own bar for \"done\" matches what the question is\n  asking them to approve.\n- **`footprint`** — the files this item touches, as a short list.\n- **`docsRef`** when non-null — a link to `GET /work/{id}/docs` (tsk-4id),\n  for the rare case CONTEXT's own summary is not enough and a person wants\n  the full plan/CONTEXT.md.\n\nThen, unchanged from before D17: **\"What the agent did\"** (the narrative\naccount) and the collapsed **machine decision log** disclosure.\n\nFields the `WorkItem` schema carries that CONTEXT deliberately does NOT\nsurface here: `kind` (redundant with `domain` for a person, not a new\nfact), `parent` when null. Nothing here is fabricated from a placeholder —\nevery field above is a real `WorkItem` property with a $ref in the\ncontract; a field that is absent/null on a given item simply does not\nrender its row, the same convention `docsRef` already used before D17."
+      },
+      "targetShownText": "### What CONTEXT actually shows (D17)\n\n`GET /work/{id}`'s `work` object (the `WorkItem` schema,\n`docs/contracts/fgos-gateway-api-v1.yaml`) carries more than the id/title/\nstatus this screen showed before D17 — CONTEXT surfaces the full set that\nis meaningful to a person deciding whether to trust the answer they are\nabout to give, in this order:\n\n- **Identity line** — `id`, `title`.\n- **State pills** — `status`, `stage`, `risk` (as already shown).\n- **Classification line** — `domain`, `tier`, and `deps` (as item ids; a\n  person weighing an answer needs to know what else is waiting on this\n  one). `parent` renders here too when non-null.\n- **`description`** — the item's own full text, never truncated. This is\n  new: before D17 the acceptance-criterion sentence quoted in this\n  screen's own Purpose section (\"a question framed so a person with no\n  context in their head can answer it quickly\") had no `description` field\n  to draw on, which was the actual gap a person noticed live (2026-08-15).\n- **`verify`** — the real command that proves this item done, shown\n  verbatim (a monospace line, not summarized) so a person can judge\n  whether the item's own bar for \"done\" matches what the question is\n  asking them to approve.\n- **`footprint`** — the files this item touches, as a short list.\n- **`docsRef`** when non-null — a link to `GET /work/{id}/docs` (tsk-4id),\n  for the rare case CONTEXT's own summary is not enough and a person wants\n  the full plan/CONTEXT.md.\n\nThen, unchanged from before D17: **\"What the agent did\"** (the narrative\naccount) and the collapsed **machine decision log** disclosure.\n\nFields the `WorkItem` schema carries that CONTEXT deliberately does NOT\nsurface here: `kind` (redundant with `domain` for a person, not a new\nfact), `parent` when null. Nothing here is fabricated from a placeholder —\nevery field above is a real `WorkItem` property with a $ref in the\ncontract; a field that is absent/null on a given item simply does not\nrender its row, the same convention `docsRef` already used before D17.",
+      "targetDigest": "9542d216b781deb7ab31a504a5a3fbb10c1dba64b258e360234962c51992f10a",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_b7bec6190021c6543edb08c12717fea6",
+        "sourceUnitDigest": "9542d216b781deb7ab31a504a5a3fbb10c1dba64b258e360234962c51992f10a",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+        "targetAnchor": "what-context-actually-shows-d17",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/ui-spec/screens/S03-task-detail.md#what-context-actually-shows-d17 (source lines 96-96) is carried at docs/platform/ui-spec/architecture/screens/S03-task-detail.md#what-context-actually-shows-d17 (candidate lines 118-118). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S03-task-detail.md verbatim in docs/platform/ui-spec/architecture/screens/S03-task-detail.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "9542d216b781deb7ab31a504a5a3fbb10c1dba64b258e360234962c51992f10a",
+        "targetAncestry": [
+          "S03 — Task detail",
+          "Layout"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_7b1759a49d26fd1dcc834b3f38bade04",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+      "sourceAnchor": "unheaded-block-8",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-8",
+        "githubAnchor": "unheaded-block-8",
+        "stableAnchor": "unheaded-block-8",
+        "title": "Unheaded block 8",
+        "startLine": 98,
+        "endLine": 102,
+        "textDigest": "df88b650b1482175d2fb5e47624cd391af36bb52cc3f31aa67f8874a7ab75404",
+        "sample": "`GET /work/{id}`'s `work` object (the `WorkItem` schema,\n`docs/contracts/fgos-gateway-api-v1.yaml`) carries more than the id/title/\nstatus this screen showed before D17 — CONTEXT s",
+        "identityFingerprint": "73fd7fd5a2a4fbeead43f7bcfa6492d0de80520f2b493ef4df526ea27c1f9951",
+        "ancestry": [
+          "S03 — Task detail",
+          "Layout",
+          "What CONTEXT actually shows (D17)"
+        ],
+        "text": "`GET /work/{id}`'s `work` object (the `WorkItem` schema,\n`docs/contracts/fgos-gateway-api-v1.yaml`) carries more than the id/title/\nstatus this screen showed before D17 — CONTEXT surfaces the full set that\nis meaningful to a person deciding whether to trust the answer they are\nabout to give, in this order:"
+      },
+      "sourceShownText": "`GET /work/{id}`'s `work` object (the `WorkItem` schema,\n`docs/contracts/fgos-gateway-api-v1.yaml`) carries more than the id/title/\nstatus this screen showed before D17 — CONTEXT surfaces the full set that\nis meaningful to a person deciding whether to trust the answer they are\nabout to give, in this order:",
+      "sourceDigest": "df88b650b1482175d2fb5e47624cd391af36bb52cc3f31aa67f8874a7ab75404",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "targetAnchor": "unheaded-block-10",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-10",
+        "githubAnchor": "unheaded-block-10",
+        "stableAnchor": "unheaded-block-10",
+        "title": "Unheaded block 10",
+        "startLine": 120,
+        "endLine": 124,
+        "textDigest": "df88b650b1482175d2fb5e47624cd391af36bb52cc3f31aa67f8874a7ab75404",
+        "sample": "`GET /work/{id}`'s `work` object (the `WorkItem` schema,\n`docs/contracts/fgos-gateway-api-v1.yaml`) carries more than the id/title/\nstatus this screen showed before D17 — CONTEXT s",
+        "identityFingerprint": "73fd7fd5a2a4fbeead43f7bcfa6492d0de80520f2b493ef4df526ea27c1f9951",
+        "ancestry": [
+          "S03 — Task detail",
+          "Layout",
+          "What CONTEXT actually shows (D17)"
+        ],
+        "text": "`GET /work/{id}`'s `work` object (the `WorkItem` schema,\n`docs/contracts/fgos-gateway-api-v1.yaml`) carries more than the id/title/\nstatus this screen showed before D17 — CONTEXT surfaces the full set that\nis meaningful to a person deciding whether to trust the answer they are\nabout to give, in this order:"
+      },
+      "targetShownText": "`GET /work/{id}`'s `work` object (the `WorkItem` schema,\n`docs/contracts/fgos-gateway-api-v1.yaml`) carries more than the id/title/\nstatus this screen showed before D17 — CONTEXT surfaces the full set that\nis meaningful to a person deciding whether to trust the answer they are\nabout to give, in this order:",
+      "targetDigest": "df88b650b1482175d2fb5e47624cd391af36bb52cc3f31aa67f8874a7ab75404",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_7b1759a49d26fd1dcc834b3f38bade04",
+        "sourceUnitDigest": "df88b650b1482175d2fb5e47624cd391af36bb52cc3f31aa67f8874a7ab75404",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+        "targetAnchor": "unheaded-block-10",
+        "claimKind": "contract",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/screens/S03-task-detail.md#unheaded-block-8 (source lines 98-102) is carried at docs/platform/ui-spec/architecture/screens/S03-task-detail.md#unheaded-block-10 (candidate lines 120-124). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S03-task-detail.md verbatim in docs/platform/ui-spec/architecture/screens/S03-task-detail.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "df88b650b1482175d2fb5e47624cd391af36bb52cc3f31aa67f8874a7ab75404",
+        "targetAncestry": [
+          "S03 — Task detail",
+          "Layout",
+          "What CONTEXT actually shows (D17)"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_8320314c57006644884f6d5f4edfc5bd",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+      "sourceAnchor": "unheaded-block-9",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-9",
+        "githubAnchor": "unheaded-block-9",
+        "stableAnchor": "unheaded-block-9",
+        "title": "Unheaded block 9",
+        "startLine": 104,
+        "endLine": 121,
+        "textDigest": "c1bdd1e5de39d873ebc746fa92ea8a7dbffd363be076c51141e9816788d242fc",
+        "sample": "- **Identity line** — `id`, `title`.\n- **State pills** — `status`, `stage`, `risk` (as already shown).\n- **Classification line** — `domain`, `tier`, and `deps` (as item ids; a\n  pe",
+        "identityFingerprint": "4c17e57380621e74989a9f12f555ba5427ef0bad22ed575772c91e94ab299df5",
+        "ancestry": [
+          "S03 — Task detail",
+          "Layout",
+          "What CONTEXT actually shows (D17)"
+        ],
+        "text": "- **Identity line** — `id`, `title`.\n- **State pills** — `status`, `stage`, `risk` (as already shown).\n- **Classification line** — `domain`, `tier`, and `deps` (as item ids; a\n  person weighing an answer needs to know what else is waiting on this\n  one). `parent` renders here too when non-null.\n- **`description`** — the item's own full text, never truncated. This is\n  new: before D17 the acceptance-criterion sentence quoted in this\n  screen's own Purpose section (\"a question framed so a person with no\n  context in their head can answer it quickly\") had no `description` field\n  to draw on, which was the actual gap a person noticed live (2026-08-15).\n- **`verify`** — the real command that proves this item done, shown\n  verbatim (a monospace line, not summarized) so a person can judge\n  whether the item's own bar for \"done\" matches what the question is\n  asking them to approve.\n- **`footprint`** — the files this item touches, as a short list.\n- **`docsRef`** when non-null — a link to `GET /work/{id}/docs` (tsk-4id),\n  for the rare case CONTEXT's own summary is not enough and a person wants\n  the full plan/CONTEXT.md."
+      },
+      "sourceShownText": "- **Identity line** — `id`, `title`.\n- **State pills** — `status`, `stage`, `risk` (as already shown).\n- **Classification line** — `domain`, `tier`, and `deps` (as item ids; a\n  person weighing an answer needs to know what else is waiting on this\n  one). `parent` renders here too when non-null.\n- **`description`** — the item's own full text, never truncated. This is\n  new: before D17 the acceptance-criterion sentence quoted in this\n  screen's own Purpose section (\"a question framed so a person with no\n  context in their head can answer it quickly\") had no `description` field\n  to draw on, which was the actual gap a person noticed live (2026-08-15).\n- **`verify`** — the real command that proves this item done, shown\n  verbatim (a monospace line, not summarized) so a person can judge\n  whether the item's own bar for \"done\" matches what the question is\n  asking them to approve.\n- **`footprint`** — the files this item touches, as a short list.\n- **`docsRef`** when non-null — a link to `GET /work/{id}/docs` (tsk-4id),\n  for the rare case CONTEXT's own summary is not enough and a person wants\n  the full plan/CONTEXT.md.",
+      "sourceDigest": "c1bdd1e5de39d873ebc746fa92ea8a7dbffd363be076c51141e9816788d242fc",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "targetAnchor": "unheaded-block-11",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-11",
+        "githubAnchor": "unheaded-block-11",
+        "stableAnchor": "unheaded-block-11",
+        "title": "Unheaded block 11",
+        "startLine": 126,
+        "endLine": 143,
+        "textDigest": "c1bdd1e5de39d873ebc746fa92ea8a7dbffd363be076c51141e9816788d242fc",
+        "sample": "- **Identity line** — `id`, `title`.\n- **State pills** — `status`, `stage`, `risk` (as already shown).\n- **Classification line** — `domain`, `tier`, and `deps` (as item ids; a\n  pe",
+        "identityFingerprint": "4c17e57380621e74989a9f12f555ba5427ef0bad22ed575772c91e94ab299df5",
+        "ancestry": [
+          "S03 — Task detail",
+          "Layout",
+          "What CONTEXT actually shows (D17)"
+        ],
+        "text": "- **Identity line** — `id`, `title`.\n- **State pills** — `status`, `stage`, `risk` (as already shown).\n- **Classification line** — `domain`, `tier`, and `deps` (as item ids; a\n  person weighing an answer needs to know what else is waiting on this\n  one). `parent` renders here too when non-null.\n- **`description`** — the item's own full text, never truncated. This is\n  new: before D17 the acceptance-criterion sentence quoted in this\n  screen's own Purpose section (\"a question framed so a person with no\n  context in their head can answer it quickly\") had no `description` field\n  to draw on, which was the actual gap a person noticed live (2026-08-15).\n- **`verify`** — the real command that proves this item done, shown\n  verbatim (a monospace line, not summarized) so a person can judge\n  whether the item's own bar for \"done\" matches what the question is\n  asking them to approve.\n- **`footprint`** — the files this item touches, as a short list.\n- **`docsRef`** when non-null — a link to `GET /work/{id}/docs` (tsk-4id),\n  for the rare case CONTEXT's own summary is not enough and a person wants\n  the full plan/CONTEXT.md."
+      },
+      "targetShownText": "- **Identity line** — `id`, `title`.\n- **State pills** — `status`, `stage`, `risk` (as already shown).\n- **Classification line** — `domain`, `tier`, and `deps` (as item ids; a\n  person weighing an answer needs to know what else is waiting on this\n  one). `parent` renders here too when non-null.\n- **`description`** — the item's own full text, never truncated. This is\n  new: before D17 the acceptance-criterion sentence quoted in this\n  screen's own Purpose section (\"a question framed so a person with no\n  context in their head can answer it quickly\") had no `description` field\n  to draw on, which was the actual gap a person noticed live (2026-08-15).\n- **`verify`** — the real command that proves this item done, shown\n  verbatim (a monospace line, not summarized) so a person can judge\n  whether the item's own bar for \"done\" matches what the question is\n  asking them to approve.\n- **`footprint`** — the files this item touches, as a short list.\n- **`docsRef`** when non-null — a link to `GET /work/{id}/docs` (tsk-4id),\n  for the rare case CONTEXT's own summary is not enough and a person wants\n  the full plan/CONTEXT.md.",
+      "targetDigest": "c1bdd1e5de39d873ebc746fa92ea8a7dbffd363be076c51141e9816788d242fc",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_8320314c57006644884f6d5f4edfc5bd",
+        "sourceUnitDigest": "c1bdd1e5de39d873ebc746fa92ea8a7dbffd363be076c51141e9816788d242fc",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+        "targetAnchor": "unheaded-block-11",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/screens/S03-task-detail.md#unheaded-block-9 (source lines 104-121) is carried at docs/platform/ui-spec/architecture/screens/S03-task-detail.md#unheaded-block-11 (candidate lines 126-143). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S03-task-detail.md verbatim in docs/platform/ui-spec/architecture/screens/S03-task-detail.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "c1bdd1e5de39d873ebc746fa92ea8a7dbffd363be076c51141e9816788d242fc",
+        "targetAncestry": [
+          "S03 — Task detail",
+          "Layout",
+          "What CONTEXT actually shows (D17)"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_eb244fc0c4068fc1ab3c907db369a326",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+      "sourceAnchor": "unheaded-block-10",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-10",
+        "githubAnchor": "unheaded-block-10",
+        "stableAnchor": "unheaded-block-10",
+        "title": "Unheaded block 10",
+        "startLine": 123,
+        "endLine": 124,
+        "textDigest": "ded2ddb7ce7a2bdc492e95e3cd32732382f8048bd0e46a60bba2622026420f24",
+        "sample": "Then, unchanged from before D17: **\"What the agent did\"** (the narrative\naccount) and the collapsed **machine decision log** disclosure.",
+        "identityFingerprint": "6e51008bd68c3530d0286b94985525887f3f55bcee0e8f5df3cef3e43fd47748",
+        "ancestry": [
+          "S03 — Task detail",
+          "Layout",
+          "What CONTEXT actually shows (D17)"
+        ],
+        "text": "Then, unchanged from before D17: **\"What the agent did\"** (the narrative\naccount) and the collapsed **machine decision log** disclosure."
+      },
+      "sourceShownText": "Then, unchanged from before D17: **\"What the agent did\"** (the narrative\naccount) and the collapsed **machine decision log** disclosure.",
+      "sourceDigest": "ded2ddb7ce7a2bdc492e95e3cd32732382f8048bd0e46a60bba2622026420f24",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "targetAnchor": "unheaded-block-12",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-12",
+        "githubAnchor": "unheaded-block-12",
+        "stableAnchor": "unheaded-block-12",
+        "title": "Unheaded block 12",
+        "startLine": 145,
+        "endLine": 146,
+        "textDigest": "ded2ddb7ce7a2bdc492e95e3cd32732382f8048bd0e46a60bba2622026420f24",
+        "sample": "Then, unchanged from before D17: **\"What the agent did\"** (the narrative\naccount) and the collapsed **machine decision log** disclosure.",
+        "identityFingerprint": "6e51008bd68c3530d0286b94985525887f3f55bcee0e8f5df3cef3e43fd47748",
+        "ancestry": [
+          "S03 — Task detail",
+          "Layout",
+          "What CONTEXT actually shows (D17)"
+        ],
+        "text": "Then, unchanged from before D17: **\"What the agent did\"** (the narrative\naccount) and the collapsed **machine decision log** disclosure."
+      },
+      "targetShownText": "Then, unchanged from before D17: **\"What the agent did\"** (the narrative\naccount) and the collapsed **machine decision log** disclosure.",
+      "targetDigest": "ded2ddb7ce7a2bdc492e95e3cd32732382f8048bd0e46a60bba2622026420f24",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_eb244fc0c4068fc1ab3c907db369a326",
+        "sourceUnitDigest": "ded2ddb7ce7a2bdc492e95e3cd32732382f8048bd0e46a60bba2622026420f24",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+        "targetAnchor": "unheaded-block-12",
+        "claimKind": "decision",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/screens/S03-task-detail.md#unheaded-block-10 (source lines 123-124) is carried at docs/platform/ui-spec/architecture/screens/S03-task-detail.md#unheaded-block-12 (candidate lines 145-146). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S03-task-detail.md verbatim in docs/platform/ui-spec/architecture/screens/S03-task-detail.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "ded2ddb7ce7a2bdc492e95e3cd32732382f8048bd0e46a60bba2622026420f24",
+        "targetAncestry": [
+          "S03 — Task detail",
+          "Layout",
+          "What CONTEXT actually shows (D17)"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_4abab9f7a787bead0ff5f1d162c2bd07",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+      "sourceAnchor": "unheaded-block-11",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-11",
+        "githubAnchor": "unheaded-block-11",
+        "stableAnchor": "unheaded-block-11",
+        "title": "Unheaded block 11",
+        "startLine": 126,
+        "endLine": 131,
+        "textDigest": "7b636169f5f4f687e45215c4b3ebe993d604fca24992c590ebec1eb747eee029",
+        "sample": "Fields the `WorkItem` schema carries that CONTEXT deliberately does NOT\nsurface here: `kind` (redundant with `domain` for a person, not a new\nfact), `parent` when null. Nothing her",
+        "identityFingerprint": "c003d0291c654380af8cbc3d5364d578adfa4392664a6e05c0c768500b554f74",
+        "ancestry": [
+          "S03 — Task detail",
+          "Layout",
+          "What CONTEXT actually shows (D17)"
+        ],
+        "text": "Fields the `WorkItem` schema carries that CONTEXT deliberately does NOT\nsurface here: `kind` (redundant with `domain` for a person, not a new\nfact), `parent` when null. Nothing here is fabricated from a placeholder —\nevery field above is a real `WorkItem` property with a $ref in the\ncontract; a field that is absent/null on a given item simply does not\nrender its row, the same convention `docsRef` already used before D17."
+      },
+      "sourceShownText": "Fields the `WorkItem` schema carries that CONTEXT deliberately does NOT\nsurface here: `kind` (redundant with `domain` for a person, not a new\nfact), `parent` when null. Nothing here is fabricated from a placeholder —\nevery field above is a real `WorkItem` property with a $ref in the\ncontract; a field that is absent/null on a given item simply does not\nrender its row, the same convention `docsRef` already used before D17.",
+      "sourceDigest": "7b636169f5f4f687e45215c4b3ebe993d604fca24992c590ebec1eb747eee029",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "targetAnchor": "unheaded-block-13",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-13",
+        "githubAnchor": "unheaded-block-13",
+        "stableAnchor": "unheaded-block-13",
+        "title": "Unheaded block 13",
+        "startLine": 148,
+        "endLine": 153,
+        "textDigest": "7b636169f5f4f687e45215c4b3ebe993d604fca24992c590ebec1eb747eee029",
+        "sample": "Fields the `WorkItem` schema carries that CONTEXT deliberately does NOT\nsurface here: `kind` (redundant with `domain` for a person, not a new\nfact), `parent` when null. Nothing her",
+        "identityFingerprint": "c003d0291c654380af8cbc3d5364d578adfa4392664a6e05c0c768500b554f74",
+        "ancestry": [
+          "S03 — Task detail",
+          "Layout",
+          "What CONTEXT actually shows (D17)"
+        ],
+        "text": "Fields the `WorkItem` schema carries that CONTEXT deliberately does NOT\nsurface here: `kind` (redundant with `domain` for a person, not a new\nfact), `parent` when null. Nothing here is fabricated from a placeholder —\nevery field above is a real `WorkItem` property with a $ref in the\ncontract; a field that is absent/null on a given item simply does not\nrender its row, the same convention `docsRef` already used before D17."
+      },
+      "targetShownText": "Fields the `WorkItem` schema carries that CONTEXT deliberately does NOT\nsurface here: `kind` (redundant with `domain` for a person, not a new\nfact), `parent` when null. Nothing here is fabricated from a placeholder —\nevery field above is a real `WorkItem` property with a $ref in the\ncontract; a field that is absent/null on a given item simply does not\nrender its row, the same convention `docsRef` already used before D17.",
+      "targetDigest": "7b636169f5f4f687e45215c4b3ebe993d604fca24992c590ebec1eb747eee029",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_4abab9f7a787bead0ff5f1d162c2bd07",
+        "sourceUnitDigest": "7b636169f5f4f687e45215c4b3ebe993d604fca24992c590ebec1eb747eee029",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+        "targetAnchor": "unheaded-block-13",
+        "claimKind": "contract",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/screens/S03-task-detail.md#unheaded-block-11 (source lines 126-131) is carried at docs/platform/ui-spec/architecture/screens/S03-task-detail.md#unheaded-block-13 (candidate lines 148-153). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S03-task-detail.md verbatim in docs/platform/ui-spec/architecture/screens/S03-task-detail.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "7b636169f5f4f687e45215c4b3ebe993d604fca24992c590ebec1eb747eee029",
+        "targetAncestry": [
+          "S03 — Task detail",
+          "Layout",
+          "What CONTEXT actually shows (D17)"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_0295a9bbd34b084c523f0c057b5899da",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+      "sourceAnchor": "the-questionanswer-timeline-across-rounds",
+      "source": {
+        "unitKind": "heading",
+        "level": 3,
+        "title": "The question/answer timeline across rounds",
+        "anchor": "the-questionanswer-timeline-across-rounds",
+        "githubAnchor": "the-questionanswer-timeline-across-rounds",
+        "stableAnchor": "h-550a9e992902",
+        "startLine": 133,
+        "endLine": 133,
+        "textDigest": "0a1c545c0f2469060bd1e06ebfa03c5eaf87ccfd97972784c2a969487d3ca1c7",
+        "sample": "The question/answer timeline across rounds",
+        "sectionPayloadDigest": "e6fa17f4b3c1bc18ccd448572ae472fb54b9aee79f254ffa01c4631d45c156db",
+        "followingBlockDigest": "b78f2fe03bdcec998a797758f3fc19d9e09d43c81b83a6e87923a2e83e450159",
+        "identityFingerprint": "66c8d7e46fff058b78d922734c9551186cfabab543ba38aa643bb2e17aa838b8",
+        "ancestry": [
+          "S03 — Task detail",
+          "Layout"
+        ],
+        "text": "### The question/answer timeline across rounds",
+        "sectionText": "### The question/answer timeline across rounds\n\nR9 governs this and constrains it honestly: pairing is **positional** —\nthe i-th question with the i-th answer, in recorded order. So the timeline\nrenders as an ordered list of rounds and **never draws a link the data\ndoes not carry**. No arrows implying causality between a specific answer\nand a specific later question; just order, with timestamps.\n\nThe still-open round renders with its answer slot visibly empty (`—\nwaiting`) rather than omitted, so a person can see at a glance that\nexactly one round is outstanding and which one."
+      },
+      "sourceShownText": "### The question/answer timeline across rounds\n\nR9 governs this and constrains it honestly: pairing is **positional** —\nthe i-th question with the i-th answer, in recorded order. So the timeline\nrenders as an ordered list of rounds and **never draws a link the data\ndoes not carry**. No arrows implying causality between a specific answer\nand a specific later question; just order, with timestamps.\n\nThe still-open round renders with its answer slot visibly empty (`—\nwaiting`) rather than omitted, so a person can see at a glance that\nexactly one round is outstanding and which one.",
+      "sourceDigest": "0a1c545c0f2469060bd1e06ebfa03c5eaf87ccfd97972784c2a969487d3ca1c7",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "targetAnchor": "the-questionanswer-timeline-across-rounds",
+      "target": {
+        "unitKind": "heading",
+        "level": 3,
+        "title": "The question/answer timeline across rounds",
+        "anchor": "the-questionanswer-timeline-across-rounds",
+        "githubAnchor": "the-questionanswer-timeline-across-rounds",
+        "stableAnchor": "h-e97c77deb3b6",
+        "startLine": 155,
+        "endLine": 155,
+        "textDigest": "0a1c545c0f2469060bd1e06ebfa03c5eaf87ccfd97972784c2a969487d3ca1c7",
+        "sample": "The question/answer timeline across rounds",
+        "sectionPayloadDigest": "e6fa17f4b3c1bc18ccd448572ae472fb54b9aee79f254ffa01c4631d45c156db",
+        "followingBlockDigest": "b78f2fe03bdcec998a797758f3fc19d9e09d43c81b83a6e87923a2e83e450159",
+        "identityFingerprint": "66c8d7e46fff058b78d922734c9551186cfabab543ba38aa643bb2e17aa838b8",
+        "ancestry": [
+          "S03 — Task detail",
+          "Layout"
+        ],
+        "text": "### The question/answer timeline across rounds",
+        "sectionText": "### The question/answer timeline across rounds\n\nR9 governs this and constrains it honestly: pairing is **positional** —\nthe i-th question with the i-th answer, in recorded order. So the timeline\nrenders as an ordered list of rounds and **never draws a link the data\ndoes not carry**. No arrows implying causality between a specific answer\nand a specific later question; just order, with timestamps.\n\nThe still-open round renders with its answer slot visibly empty (`—\nwaiting`) rather than omitted, so a person can see at a glance that\nexactly one round is outstanding and which one."
+      },
+      "targetShownText": "### The question/answer timeline across rounds\n\nR9 governs this and constrains it honestly: pairing is **positional** —\nthe i-th question with the i-th answer, in recorded order. So the timeline\nrenders as an ordered list of rounds and **never draws a link the data\ndoes not carry**. No arrows implying causality between a specific answer\nand a specific later question; just order, with timestamps.\n\nThe still-open round renders with its answer slot visibly empty (`—\nwaiting`) rather than omitted, so a person can see at a glance that\nexactly one round is outstanding and which one.",
+      "targetDigest": "0a1c545c0f2469060bd1e06ebfa03c5eaf87ccfd97972784c2a969487d3ca1c7",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_0295a9bbd34b084c523f0c057b5899da",
+        "sourceUnitDigest": "0a1c545c0f2469060bd1e06ebfa03c5eaf87ccfd97972784c2a969487d3ca1c7",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+        "targetAnchor": "the-questionanswer-timeline-across-rounds",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole heading unit docs/ui-spec/screens/S03-task-detail.md#the-questionanswer-timeline-across-rounds (source lines 133-133) is carried at docs/platform/ui-spec/architecture/screens/S03-task-detail.md#the-questionanswer-timeline-across-rounds (candidate lines 155-155). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S03-task-detail.md verbatim in docs/platform/ui-spec/architecture/screens/S03-task-detail.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "0a1c545c0f2469060bd1e06ebfa03c5eaf87ccfd97972784c2a969487d3ca1c7",
+        "targetAncestry": [
+          "S03 — Task detail",
+          "Layout"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_e2969564bc033087099738ac927d2263",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+      "sourceAnchor": "unheaded-block-12",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-12",
+        "githubAnchor": "unheaded-block-12",
+        "stableAnchor": "unheaded-block-12",
+        "title": "Unheaded block 12",
+        "startLine": 135,
+        "endLine": 139,
+        "textDigest": "b78f2fe03bdcec998a797758f3fc19d9e09d43c81b83a6e87923a2e83e450159",
+        "sample": "R9 governs this and constrains it honestly: pairing is **positional** —\nthe i-th question with the i-th answer, in recorded order. So the timeline\nrenders as an ordered list of rou",
+        "identityFingerprint": "203c0bf2f492b9b92da2dccd168d968d6a80c63871757b24552752e57396cc83",
+        "ancestry": [
+          "S03 — Task detail",
+          "Layout",
+          "The question/answer timeline across rounds"
+        ],
+        "text": "R9 governs this and constrains it honestly: pairing is **positional** —\nthe i-th question with the i-th answer, in recorded order. So the timeline\nrenders as an ordered list of rounds and **never draws a link the data\ndoes not carry**. No arrows implying causality between a specific answer\nand a specific later question; just order, with timestamps."
+      },
+      "sourceShownText": "R9 governs this and constrains it honestly: pairing is **positional** —\nthe i-th question with the i-th answer, in recorded order. So the timeline\nrenders as an ordered list of rounds and **never draws a link the data\ndoes not carry**. No arrows implying causality between a specific answer\nand a specific later question; just order, with timestamps.",
+      "sourceDigest": "b78f2fe03bdcec998a797758f3fc19d9e09d43c81b83a6e87923a2e83e450159",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "targetAnchor": "unheaded-block-14",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-14",
+        "githubAnchor": "unheaded-block-14",
+        "stableAnchor": "unheaded-block-14",
+        "title": "Unheaded block 14",
+        "startLine": 157,
+        "endLine": 161,
+        "textDigest": "b78f2fe03bdcec998a797758f3fc19d9e09d43c81b83a6e87923a2e83e450159",
+        "sample": "R9 governs this and constrains it honestly: pairing is **positional** —\nthe i-th question with the i-th answer, in recorded order. So the timeline\nrenders as an ordered list of rou",
+        "identityFingerprint": "203c0bf2f492b9b92da2dccd168d968d6a80c63871757b24552752e57396cc83",
+        "ancestry": [
+          "S03 — Task detail",
+          "Layout",
+          "The question/answer timeline across rounds"
+        ],
+        "text": "R9 governs this and constrains it honestly: pairing is **positional** —\nthe i-th question with the i-th answer, in recorded order. So the timeline\nrenders as an ordered list of rounds and **never draws a link the data\ndoes not carry**. No arrows implying causality between a specific answer\nand a specific later question; just order, with timestamps."
+      },
+      "targetShownText": "R9 governs this and constrains it honestly: pairing is **positional** —\nthe i-th question with the i-th answer, in recorded order. So the timeline\nrenders as an ordered list of rounds and **never draws a link the data\ndoes not carry**. No arrows implying causality between a specific answer\nand a specific later question; just order, with timestamps.",
+      "targetDigest": "b78f2fe03bdcec998a797758f3fc19d9e09d43c81b83a6e87923a2e83e450159",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_e2969564bc033087099738ac927d2263",
+        "sourceUnitDigest": "b78f2fe03bdcec998a797758f3fc19d9e09d43c81b83a6e87923a2e83e450159",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+        "targetAnchor": "unheaded-block-14",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/screens/S03-task-detail.md#unheaded-block-12 (source lines 135-139) is carried at docs/platform/ui-spec/architecture/screens/S03-task-detail.md#unheaded-block-14 (candidate lines 157-161). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S03-task-detail.md verbatim in docs/platform/ui-spec/architecture/screens/S03-task-detail.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "b78f2fe03bdcec998a797758f3fc19d9e09d43c81b83a6e87923a2e83e450159",
+        "targetAncestry": [
+          "S03 — Task detail",
+          "Layout",
+          "The question/answer timeline across rounds"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_b391fc12268d78ddd19bf6a9f8f66656",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+      "sourceAnchor": "unheaded-block-13",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-13",
+        "githubAnchor": "unheaded-block-13",
+        "stableAnchor": "unheaded-block-13",
+        "title": "Unheaded block 13",
+        "startLine": 141,
+        "endLine": 143,
+        "textDigest": "c5c214f47346cbc378a79c77a7bb210b510e6f2a5a7229f821f08e75fe587517",
+        "sample": "The still-open round renders with its answer slot visibly empty (`—\nwaiting`) rather than omitted, so a person can see at a glance that\nexactly one round is outstanding and which o",
+        "identityFingerprint": "eacbe240c943bc2bb1950909af62c6cfa41509572cd491aa7f5871de4b3eacfa",
+        "ancestry": [
+          "S03 — Task detail",
+          "Layout",
+          "The question/answer timeline across rounds"
+        ],
+        "text": "The still-open round renders with its answer slot visibly empty (`—\nwaiting`) rather than omitted, so a person can see at a glance that\nexactly one round is outstanding and which one."
+      },
+      "sourceShownText": "The still-open round renders with its answer slot visibly empty (`—\nwaiting`) rather than omitted, so a person can see at a glance that\nexactly one round is outstanding and which one.",
+      "sourceDigest": "c5c214f47346cbc378a79c77a7bb210b510e6f2a5a7229f821f08e75fe587517",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "targetAnchor": "unheaded-block-15",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-15",
+        "githubAnchor": "unheaded-block-15",
+        "stableAnchor": "unheaded-block-15",
+        "title": "Unheaded block 15",
+        "startLine": 163,
+        "endLine": 165,
+        "textDigest": "c5c214f47346cbc378a79c77a7bb210b510e6f2a5a7229f821f08e75fe587517",
+        "sample": "The still-open round renders with its answer slot visibly empty (`—\nwaiting`) rather than omitted, so a person can see at a glance that\nexactly one round is outstanding and which o",
+        "identityFingerprint": "eacbe240c943bc2bb1950909af62c6cfa41509572cd491aa7f5871de4b3eacfa",
+        "ancestry": [
+          "S03 — Task detail",
+          "Layout",
+          "The question/answer timeline across rounds"
+        ],
+        "text": "The still-open round renders with its answer slot visibly empty (`—\nwaiting`) rather than omitted, so a person can see at a glance that\nexactly one round is outstanding and which one."
+      },
+      "targetShownText": "The still-open round renders with its answer slot visibly empty (`—\nwaiting`) rather than omitted, so a person can see at a glance that\nexactly one round is outstanding and which one.",
+      "targetDigest": "c5c214f47346cbc378a79c77a7bb210b510e6f2a5a7229f821f08e75fe587517",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_b391fc12268d78ddd19bf6a9f8f66656",
+        "sourceUnitDigest": "c5c214f47346cbc378a79c77a7bb210b510e6f2a5a7229f821f08e75fe587517",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+        "targetAnchor": "unheaded-block-15",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/screens/S03-task-detail.md#unheaded-block-13 (source lines 141-143) is carried at docs/platform/ui-spec/architecture/screens/S03-task-detail.md#unheaded-block-15 (candidate lines 163-165). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S03-task-detail.md verbatim in docs/platform/ui-spec/architecture/screens/S03-task-detail.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "c5c214f47346cbc378a79c77a7bb210b510e6f2a5a7229f821f08e75fe587517",
+        "targetAncestry": [
+          "S03 — Task detail",
+          "Layout",
+          "The question/answer timeline across rounds"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_a59c4971ef0276a190d1436f39614c63",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+      "sourceAnchor": "states",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "States",
+        "anchor": "states",
+        "githubAnchor": "states",
+        "stableAnchor": "h-e7bea0983f62",
+        "startLine": 145,
+        "endLine": 145,
+        "textDigest": "4bdb10422d9ccb84bd67360f748986ac2f5483abcc1e32c402e7964315af8bbf",
+        "sample": "States",
+        "sectionPayloadDigest": "6e251570aa0ab2893f5e61651df89562c1533c0f752a22f26aafd57fca040a57",
+        "followingBlockDigest": "b2ada90792e03a4ebfe8767adbf7f9c86be70ba1f3ce4fe9d6269f8485a7fa05",
+        "identityFingerprint": "ac83e572868d726a28fd34ff1b87cd979c3053666d5a71c51044471676a26633",
+        "ancestry": [
+          "S03 — Task detail"
+        ],
+        "text": "## States",
+        "sectionText": "## States\n\n- **ST-NEVER-PARKED** — the QUESTION region is replaced by a quiet \"This\n  item has never needed a person\", and TIMELINE says the same. Not an\n  error, and not an empty box with no explanation.\n- **ST-NARRATIVE-MISSING** — CONTEXT keeps the item's own fields and says\n  the narrative directory was not found, naming the path it looked for.\n- **ERR-NARRATIVE-PATH** — same region, different sentence: the reference\n  resolved outside the documentation tree and was refused.\n- **ERR-APPROVE-UNAVAILABLE** — R7 rendered: `Approve merge` is shown\n  **disabled with the reason attached** (the ⓘ in the layout above), never\n  hidden and never offered-then-failed.\n- **ST-DISCONNECTED** — content marked stale, actions disabled, retry\n  offered.\n\nPer R8, the three write controls in ACTIONS are visually distinct from\neverything above them, and `Approve merge` is distinct again from the\nother two — it is the only control on this client that changes trunk."
+      },
+      "sourceShownText": "## States\n\n- **ST-NEVER-PARKED** — the QUESTION region is replaced by a quiet \"This\n  item has never needed a person\", and TIMELINE says the same. Not an\n  error, and not an empty box with no explanation.\n- **ST-NARRATIVE-MISSING** — CONTEXT keeps the item's own fields and says\n  the narrative directory was not found, naming the path it looked for.\n- **ERR-NARRATIVE-PATH** — same region, different sentence: the reference\n  resolved outside the documentation tree and was refused.\n- **ERR-APPROVE-UNAVAILABLE** — R7 rendered: `Approve merge` is shown\n  **disabled with the reason attached** (the ⓘ in the layout above), never\n  hidden and never offered-then-failed.\n- **ST-DISCONNECTED** — content marked stale, actions disabled, retry\n  offered.\n\nPer R8, the three write controls in ACTIONS are visually distinct from\neverything above them, and `Approve merge` is distinct again from the\nother two — it is the only control on this client that changes trunk.",
+      "sourceDigest": "4bdb10422d9ccb84bd67360f748986ac2f5483abcc1e32c402e7964315af8bbf",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "targetAnchor": "states",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "States",
+        "anchor": "states",
+        "githubAnchor": "states",
+        "stableAnchor": "h-fa9d93618c0f",
+        "startLine": 167,
+        "endLine": 167,
+        "textDigest": "4bdb10422d9ccb84bd67360f748986ac2f5483abcc1e32c402e7964315af8bbf",
+        "sample": "States",
+        "sectionPayloadDigest": "6e251570aa0ab2893f5e61651df89562c1533c0f752a22f26aafd57fca040a57",
+        "followingBlockDigest": "b2ada90792e03a4ebfe8767adbf7f9c86be70ba1f3ce4fe9d6269f8485a7fa05",
+        "identityFingerprint": "ac83e572868d726a28fd34ff1b87cd979c3053666d5a71c51044471676a26633",
+        "ancestry": [
+          "S03 — Task detail"
+        ],
+        "text": "## States",
+        "sectionText": "## States\n\n- **ST-NEVER-PARKED** — the QUESTION region is replaced by a quiet \"This\n  item has never needed a person\", and TIMELINE says the same. Not an\n  error, and not an empty box with no explanation.\n- **ST-NARRATIVE-MISSING** — CONTEXT keeps the item's own fields and says\n  the narrative directory was not found, naming the path it looked for.\n- **ERR-NARRATIVE-PATH** — same region, different sentence: the reference\n  resolved outside the documentation tree and was refused.\n- **ERR-APPROVE-UNAVAILABLE** — R7 rendered: `Approve merge` is shown\n  **disabled with the reason attached** (the ⓘ in the layout above), never\n  hidden and never offered-then-failed.\n- **ST-DISCONNECTED** — content marked stale, actions disabled, retry\n  offered.\n\nPer R8, the three write controls in ACTIONS are visually distinct from\neverything above them, and `Approve merge` is distinct again from the\nother two — it is the only control on this client that changes trunk."
+      },
+      "targetShownText": "## States\n\n- **ST-NEVER-PARKED** — the QUESTION region is replaced by a quiet \"This\n  item has never needed a person\", and TIMELINE says the same. Not an\n  error, and not an empty box with no explanation.\n- **ST-NARRATIVE-MISSING** — CONTEXT keeps the item's own fields and says\n  the narrative directory was not found, naming the path it looked for.\n- **ERR-NARRATIVE-PATH** — same region, different sentence: the reference\n  resolved outside the documentation tree and was refused.\n- **ERR-APPROVE-UNAVAILABLE** — R7 rendered: `Approve merge` is shown\n  **disabled with the reason attached** (the ⓘ in the layout above), never\n  hidden and never offered-then-failed.\n- **ST-DISCONNECTED** — content marked stale, actions disabled, retry\n  offered.\n\nPer R8, the three write controls in ACTIONS are visually distinct from\neverything above them, and `Approve merge` is distinct again from the\nother two — it is the only control on this client that changes trunk.",
+      "targetDigest": "4bdb10422d9ccb84bd67360f748986ac2f5483abcc1e32c402e7964315af8bbf",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_a59c4971ef0276a190d1436f39614c63",
+        "sourceUnitDigest": "4bdb10422d9ccb84bd67360f748986ac2f5483abcc1e32c402e7964315af8bbf",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+        "targetAnchor": "states",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/ui-spec/screens/S03-task-detail.md#states (source lines 145-145) is carried at docs/platform/ui-spec/architecture/screens/S03-task-detail.md#states (candidate lines 167-167). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S03-task-detail.md verbatim in docs/platform/ui-spec/architecture/screens/S03-task-detail.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "4bdb10422d9ccb84bd67360f748986ac2f5483abcc1e32c402e7964315af8bbf",
+        "targetAncestry": [
+          "S03 — Task detail"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_9a2e11a231c97ddf61ceb228fed26010",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+      "sourceAnchor": "unheaded-block-14",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-14",
+        "githubAnchor": "unheaded-block-14",
+        "stableAnchor": "unheaded-block-14",
+        "title": "Unheaded block 14",
+        "startLine": 147,
+        "endLine": 158,
+        "textDigest": "b2ada90792e03a4ebfe8767adbf7f9c86be70ba1f3ce4fe9d6269f8485a7fa05",
+        "sample": "- **ST-NEVER-PARKED** — the QUESTION region is replaced by a quiet \"This\n  item has never needed a person\", and TIMELINE says the same. Not an\n  error, and not an empty box with no",
+        "identityFingerprint": "d255d01d509d858f8f4a929640903377b279ef5218d602c70ec1ff3420501a7a",
+        "ancestry": [
+          "S03 — Task detail",
+          "States"
+        ],
+        "text": "- **ST-NEVER-PARKED** — the QUESTION region is replaced by a quiet \"This\n  item has never needed a person\", and TIMELINE says the same. Not an\n  error, and not an empty box with no explanation.\n- **ST-NARRATIVE-MISSING** — CONTEXT keeps the item's own fields and says\n  the narrative directory was not found, naming the path it looked for.\n- **ERR-NARRATIVE-PATH** — same region, different sentence: the reference\n  resolved outside the documentation tree and was refused.\n- **ERR-APPROVE-UNAVAILABLE** — R7 rendered: `Approve merge` is shown\n  **disabled with the reason attached** (the ⓘ in the layout above), never\n  hidden and never offered-then-failed.\n- **ST-DISCONNECTED** — content marked stale, actions disabled, retry\n  offered."
+      },
+      "sourceShownText": "- **ST-NEVER-PARKED** — the QUESTION region is replaced by a quiet \"This\n  item has never needed a person\", and TIMELINE says the same. Not an\n  error, and not an empty box with no explanation.\n- **ST-NARRATIVE-MISSING** — CONTEXT keeps the item's own fields and says\n  the narrative directory was not found, naming the path it looked for.\n- **ERR-NARRATIVE-PATH** — same region, different sentence: the reference\n  resolved outside the documentation tree and was refused.\n- **ERR-APPROVE-UNAVAILABLE** — R7 rendered: `Approve merge` is shown\n  **disabled with the reason attached** (the ⓘ in the layout above), never\n  hidden and never offered-then-failed.\n- **ST-DISCONNECTED** — content marked stale, actions disabled, retry\n  offered.",
+      "sourceDigest": "b2ada90792e03a4ebfe8767adbf7f9c86be70ba1f3ce4fe9d6269f8485a7fa05",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "targetAnchor": "unheaded-block-16",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-16",
+        "githubAnchor": "unheaded-block-16",
+        "stableAnchor": "unheaded-block-16",
+        "title": "Unheaded block 16",
+        "startLine": 169,
+        "endLine": 180,
+        "textDigest": "b2ada90792e03a4ebfe8767adbf7f9c86be70ba1f3ce4fe9d6269f8485a7fa05",
+        "sample": "- **ST-NEVER-PARKED** — the QUESTION region is replaced by a quiet \"This\n  item has never needed a person\", and TIMELINE says the same. Not an\n  error, and not an empty box with no",
+        "identityFingerprint": "d255d01d509d858f8f4a929640903377b279ef5218d602c70ec1ff3420501a7a",
+        "ancestry": [
+          "S03 — Task detail",
+          "States"
+        ],
+        "text": "- **ST-NEVER-PARKED** — the QUESTION region is replaced by a quiet \"This\n  item has never needed a person\", and TIMELINE says the same. Not an\n  error, and not an empty box with no explanation.\n- **ST-NARRATIVE-MISSING** — CONTEXT keeps the item's own fields and says\n  the narrative directory was not found, naming the path it looked for.\n- **ERR-NARRATIVE-PATH** — same region, different sentence: the reference\n  resolved outside the documentation tree and was refused.\n- **ERR-APPROVE-UNAVAILABLE** — R7 rendered: `Approve merge` is shown\n  **disabled with the reason attached** (the ⓘ in the layout above), never\n  hidden and never offered-then-failed.\n- **ST-DISCONNECTED** — content marked stale, actions disabled, retry\n  offered."
+      },
+      "targetShownText": "- **ST-NEVER-PARKED** — the QUESTION region is replaced by a quiet \"This\n  item has never needed a person\", and TIMELINE says the same. Not an\n  error, and not an empty box with no explanation.\n- **ST-NARRATIVE-MISSING** — CONTEXT keeps the item's own fields and says\n  the narrative directory was not found, naming the path it looked for.\n- **ERR-NARRATIVE-PATH** — same region, different sentence: the reference\n  resolved outside the documentation tree and was refused.\n- **ERR-APPROVE-UNAVAILABLE** — R7 rendered: `Approve merge` is shown\n  **disabled with the reason attached** (the ⓘ in the layout above), never\n  hidden and never offered-then-failed.\n- **ST-DISCONNECTED** — content marked stale, actions disabled, retry\n  offered.",
+      "targetDigest": "b2ada90792e03a4ebfe8767adbf7f9c86be70ba1f3ce4fe9d6269f8485a7fa05",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_9a2e11a231c97ddf61ceb228fed26010",
+        "sourceUnitDigest": "b2ada90792e03a4ebfe8767adbf7f9c86be70ba1f3ce4fe9d6269f8485a7fa05",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+        "targetAnchor": "unheaded-block-16",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/screens/S03-task-detail.md#unheaded-block-14 (source lines 147-158) is carried at docs/platform/ui-spec/architecture/screens/S03-task-detail.md#unheaded-block-16 (candidate lines 169-180). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S03-task-detail.md verbatim in docs/platform/ui-spec/architecture/screens/S03-task-detail.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "b2ada90792e03a4ebfe8767adbf7f9c86be70ba1f3ce4fe9d6269f8485a7fa05",
+        "targetAncestry": [
+          "S03 — Task detail",
+          "States"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_73cab9a36191997438af84b13c76cf85",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+      "sourceAnchor": "unheaded-block-15",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-15",
+        "githubAnchor": "unheaded-block-15",
+        "stableAnchor": "unheaded-block-15",
+        "title": "Unheaded block 15",
+        "startLine": 160,
+        "endLine": 162,
+        "textDigest": "0e91e3c92c13cc041ce0dc29fc7b5adde5f55b7b39db0afab2c854744aaae02c",
+        "sample": "Per R8, the three write controls in ACTIONS are visually distinct from\neverything above them, and `Approve merge` is distinct again from the\nother two — it is the only control on t",
+        "identityFingerprint": "a97261fa177b12762f777268cd0da3df0ff41b8b949c588d942ffc388470b7f3",
+        "ancestry": [
+          "S03 — Task detail",
+          "States"
+        ],
+        "text": "Per R8, the three write controls in ACTIONS are visually distinct from\neverything above them, and `Approve merge` is distinct again from the\nother two — it is the only control on this client that changes trunk."
+      },
+      "sourceShownText": "Per R8, the three write controls in ACTIONS are visually distinct from\neverything above them, and `Approve merge` is distinct again from the\nother two — it is the only control on this client that changes trunk.",
+      "sourceDigest": "0e91e3c92c13cc041ce0dc29fc7b5adde5f55b7b39db0afab2c854744aaae02c",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "targetAnchor": "unheaded-block-17",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-17",
+        "githubAnchor": "unheaded-block-17",
+        "stableAnchor": "unheaded-block-17",
+        "title": "Unheaded block 17",
+        "startLine": 182,
+        "endLine": 184,
+        "textDigest": "0e91e3c92c13cc041ce0dc29fc7b5adde5f55b7b39db0afab2c854744aaae02c",
+        "sample": "Per R8, the three write controls in ACTIONS are visually distinct from\neverything above them, and `Approve merge` is distinct again from the\nother two — it is the only control on t",
+        "identityFingerprint": "a97261fa177b12762f777268cd0da3df0ff41b8b949c588d942ffc388470b7f3",
+        "ancestry": [
+          "S03 — Task detail",
+          "States"
+        ],
+        "text": "Per R8, the three write controls in ACTIONS are visually distinct from\neverything above them, and `Approve merge` is distinct again from the\nother two — it is the only control on this client that changes trunk."
+      },
+      "targetShownText": "Per R8, the three write controls in ACTIONS are visually distinct from\neverything above them, and `Approve merge` is distinct again from the\nother two — it is the only control on this client that changes trunk.",
+      "targetDigest": "0e91e3c92c13cc041ce0dc29fc7b5adde5f55b7b39db0afab2c854744aaae02c",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_73cab9a36191997438af84b13c76cf85",
+        "sourceUnitDigest": "0e91e3c92c13cc041ce0dc29fc7b5adde5f55b7b39db0afab2c854744aaae02c",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+        "targetAnchor": "unheaded-block-17",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/screens/S03-task-detail.md#unheaded-block-15 (source lines 160-162) is carried at docs/platform/ui-spec/architecture/screens/S03-task-detail.md#unheaded-block-17 (candidate lines 182-184). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S03-task-detail.md verbatim in docs/platform/ui-spec/architecture/screens/S03-task-detail.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "0e91e3c92c13cc041ce0dc29fc7b5adde5f55b7b39db0afab2c854744aaae02c",
+        "targetAncestry": [
+          "S03 — Task detail",
+          "States"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_0799ccec326a89dc36b6463e3a7d1699",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+      "sourceAnchor": "interactions",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Interactions",
+        "anchor": "interactions",
+        "githubAnchor": "interactions",
+        "stableAnchor": "h-094b5796008c",
+        "startLine": 164,
+        "endLine": 164,
+        "textDigest": "bdf0b4839f92bed569d302ba225ffc3994a4a746184ad2b4268d9b604a6b935c",
+        "sample": "Interactions",
+        "sectionPayloadDigest": "a51154d8995076f88b5a062b8db7af5c48e04601c63c8df48791f741b52a9d08",
+        "followingBlockDigest": "a51154d8995076f88b5a062b8db7af5c48e04601c63c8df48791f741b52a9d08",
+        "identityFingerprint": "214c1e0ba5184ca488a65c5e15ea020347800f782754f0916a793f5515fb483a",
+        "ancestry": [
+          "S03 — Task detail"
+        ],
+        "text": "## Interactions",
+        "sectionText": "## Interactions\n\n```yaml herdrweb-contract\ninteractions:\n  - id: A-S03-001\n    element: answer_button\n    region: question\n    trigger: click\n    guard: \"item.isParked\"\n    action: open_overlay\n    target: M01\n    payload: { item_id: \"$item.id\" }\n  - id: A-S03-002\n    element: approve_merge_button\n    region: actions\n    trigger: click\n    guard: \"item.awaitingApproval && gateway.atMainWorkingTree\"\n    action: open_overlay\n    target: M02\n    payload: { item_id: \"$item.id\" }\n  - id: A-S03-003\n    element: edit_button\n    region: actions\n    trigger: click\n    action: open_overlay\n    target: M03\n    payload: { item_id: \"$item.id\", mode: \"edit\" }\n  - id: A-S03-004\n    element: machine_log_disclosure\n    region: context\n    trigger: click\n    action: mutate\n    effects: [toggle_machine_log]\n  - id: A-S03-005\n    element: back_to_board\n    region: topbar\n    trigger: click\n    action: navigate\n    target: S02\n  - id: A-S03-006\n    element: timeline_show_earlier\n    region: timeline\n    trigger: click\n    action: mutate\n    effects: [expand_earlier_rounds]\n  - id: A-S03-007\n    element: detail\n    listens_to: work.changed\n    action: mutate\n    effects: [refresh_item]\n  - id: A-S03-008\n    element: timeline\n    listens_to: question.answered\n    action: mutate\n    effects: [close_open_round]\n  - id: A-S03-009\n    element: actions\n    listens_to: merge.settled\n    action: mutate\n    effects: [refresh_item, show_outcome]\n  - id: A-S03-010\n    element: detail\n    listens_to: gateway.unreachable\n    action: mutate\n    effects: [mark_stale, disable_writes]\n  - id: A-S03-011\n    element: retire_action\n    listens_to: item.quick_action\n    action: mutate\n    effects: [run_move_to_wontfix]\n```"
+      },
+      "sourceShownText": "## Interactions\n\n```yaml herdrweb-contract\ninteractions:\n  - id: A-S03-001\n    element: answer_button\n    region: question\n    trigger: click\n    guard: \"item.isParked\"\n    action: open_overlay\n    target: M01\n    payload: { item_id: \"$item.id\" }\n  - id: A-S03-002\n    element: approve_merge_button\n    region: actions\n    trigger: click\n    guard: \"item.awaitingApproval && gateway.atMainWorkingTree\"\n    action: open_overlay\n    target: M02\n    payload: { item_id: \"$item.id\" }\n  - id: A-S03-003\n    element: edit_button\n    region: actions\n    trigger: click\n    action: open_overlay\n    target: M03\n    payload: { item_id: \"$item.id\", mode: \"edit\" }\n  - id: A-S03-004\n    element: machine_log_disclosure\n    region: context\n    trigger: click\n    action: mutate\n    effects: [toggle_machine_log]\n  - id: A-S03-005\n    element: back_to_board\n    region: topbar\n    trigger: click\n    action: navigate\n    target: S02\n  - id: A-S03-006\n    element: timeline_show_earlier\n    region: timeline\n    trigger: click\n    action: mutate\n    effects: [expand_earlier_rounds]\n  - id: A-S03-007\n    element: detail\n    listens_to: work.changed\n    action: mutate\n    effects: [refresh_item]\n  - id: A-S03-008\n    element: timeline\n    listens_to: question.answered\n    action: mutate\n    effects: [close_open_round]\n  - id: A-S03-009\n    element: actions\n    listens_to: merge.settled\n    action: mutate\n    effects: [refresh_item, show_outcome]\n  - id: A-S03-010\n    element: detail\n    listens_to: gateway.unreachable\n    action: mutate\n    effects: [mark_stale, disable_writes]\n  - id: A-S03-011\n    element: retire_action\n    listens_to: item.quick_action\n    action: mutate\n    effects: [run_move_to_wontfix]\n```",
+      "sourceDigest": "bdf0b4839f92bed569d302ba225ffc3994a4a746184ad2b4268d9b604a6b935c",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "targetAnchor": "interactions",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Interactions",
+        "anchor": "interactions",
+        "githubAnchor": "interactions",
+        "stableAnchor": "h-78f6cc4f5182",
+        "startLine": 186,
+        "endLine": 186,
+        "textDigest": "bdf0b4839f92bed569d302ba225ffc3994a4a746184ad2b4268d9b604a6b935c",
+        "sample": "Interactions",
+        "sectionPayloadDigest": "a51154d8995076f88b5a062b8db7af5c48e04601c63c8df48791f741b52a9d08",
+        "followingBlockDigest": "a51154d8995076f88b5a062b8db7af5c48e04601c63c8df48791f741b52a9d08",
+        "identityFingerprint": "214c1e0ba5184ca488a65c5e15ea020347800f782754f0916a793f5515fb483a",
+        "ancestry": [
+          "S03 — Task detail"
+        ],
+        "text": "## Interactions",
+        "sectionText": "## Interactions\n\n```yaml herdrweb-contract\ninteractions:\n  - id: A-S03-001\n    element: answer_button\n    region: question\n    trigger: click\n    guard: \"item.isParked\"\n    action: open_overlay\n    target: M01\n    payload: { item_id: \"$item.id\" }\n  - id: A-S03-002\n    element: approve_merge_button\n    region: actions\n    trigger: click\n    guard: \"item.awaitingApproval && gateway.atMainWorkingTree\"\n    action: open_overlay\n    target: M02\n    payload: { item_id: \"$item.id\" }\n  - id: A-S03-003\n    element: edit_button\n    region: actions\n    trigger: click\n    action: open_overlay\n    target: M03\n    payload: { item_id: \"$item.id\", mode: \"edit\" }\n  - id: A-S03-004\n    element: machine_log_disclosure\n    region: context\n    trigger: click\n    action: mutate\n    effects: [toggle_machine_log]\n  - id: A-S03-005\n    element: back_to_board\n    region: topbar\n    trigger: click\n    action: navigate\n    target: S02\n  - id: A-S03-006\n    element: timeline_show_earlier\n    region: timeline\n    trigger: click\n    action: mutate\n    effects: [expand_earlier_rounds]\n  - id: A-S03-007\n    element: detail\n    listens_to: work.changed\n    action: mutate\n    effects: [refresh_item]\n  - id: A-S03-008\n    element: timeline\n    listens_to: question.answered\n    action: mutate\n    effects: [close_open_round]\n  - id: A-S03-009\n    element: actions\n    listens_to: merge.settled\n    action: mutate\n    effects: [refresh_item, show_outcome]\n  - id: A-S03-010\n    element: detail\n    listens_to: gateway.unreachable\n    action: mutate\n    effects: [mark_stale, disable_writes]\n  - id: A-S03-011\n    element: retire_action\n    listens_to: item.quick_action\n    action: mutate\n    effects: [run_move_to_wontfix]\n```"
+      },
+      "targetShownText": "## Interactions\n\n```yaml herdrweb-contract\ninteractions:\n  - id: A-S03-001\n    element: answer_button\n    region: question\n    trigger: click\n    guard: \"item.isParked\"\n    action: open_overlay\n    target: M01\n    payload: { item_id: \"$item.id\" }\n  - id: A-S03-002\n    element: approve_merge_button\n    region: actions\n    trigger: click\n    guard: \"item.awaitingApproval && gateway.atMainWorkingTree\"\n    action: open_overlay\n    target: M02\n    payload: { item_id: \"$item.id\" }\n  - id: A-S03-003\n    element: edit_button\n    region: actions\n    trigger: click\n    action: open_overlay\n    target: M03\n    payload: { item_id: \"$item.id\", mode: \"edit\" }\n  - id: A-S03-004\n    element: machine_log_disclosure\n    region: context\n    trigger: click\n    action: mutate\n    effects: [toggle_machine_log]\n  - id: A-S03-005\n    element: back_to_board\n    region: topbar\n    trigger: click\n    action: navigate\n    target: S02\n  - id: A-S03-006\n    element: timeline_show_earlier\n    region: timeline\n    trigger: click\n    action: mutate\n    effects: [expand_earlier_rounds]\n  - id: A-S03-007\n    element: detail\n    listens_to: work.changed\n    action: mutate\n    effects: [refresh_item]\n  - id: A-S03-008\n    element: timeline\n    listens_to: question.answered\n    action: mutate\n    effects: [close_open_round]\n  - id: A-S03-009\n    element: actions\n    listens_to: merge.settled\n    action: mutate\n    effects: [refresh_item, show_outcome]\n  - id: A-S03-010\n    element: detail\n    listens_to: gateway.unreachable\n    action: mutate\n    effects: [mark_stale, disable_writes]\n  - id: A-S03-011\n    element: retire_action\n    listens_to: item.quick_action\n    action: mutate\n    effects: [run_move_to_wontfix]\n```",
+      "targetDigest": "bdf0b4839f92bed569d302ba225ffc3994a4a746184ad2b4268d9b604a6b935c",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_0799ccec326a89dc36b6463e3a7d1699",
+        "sourceUnitDigest": "bdf0b4839f92bed569d302ba225ffc3994a4a746184ad2b4268d9b604a6b935c",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+        "targetAnchor": "interactions",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/ui-spec/screens/S03-task-detail.md#interactions (source lines 164-164) is carried at docs/platform/ui-spec/architecture/screens/S03-task-detail.md#interactions (candidate lines 186-186). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S03-task-detail.md verbatim in docs/platform/ui-spec/architecture/screens/S03-task-detail.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "bdf0b4839f92bed569d302ba225ffc3994a4a746184ad2b4268d9b604a6b935c",
+        "targetAncestry": [
+          "S03 — Task detail"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_cb783b44a6284c43bbaac2e46c89026f",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+      "sourceAnchor": "unheaded-block-16",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-16",
+        "githubAnchor": "unheaded-block-16",
+        "stableAnchor": "unheaded-block-16",
+        "title": "Unheaded block 16",
+        "startLine": 166,
+        "endLine": 234,
+        "textDigest": "a51154d8995076f88b5a062b8db7af5c48e04601c63c8df48791f741b52a9d08",
+        "sample": "```yaml herdrweb-contract\ninteractions:\n  - id: A-S03-001\n    element: answer_button\n    region: question\n    trigger: click\n    guard: \"item.isParked\"\n    action: open_overlay\n   ",
+        "identityFingerprint": "266e4f91aba895f57972a05fd19d157a70e2012ce23f586af94252c8c60e8702",
+        "ancestry": [
+          "S03 — Task detail",
+          "Interactions"
+        ],
+        "text": "```yaml herdrweb-contract\ninteractions:\n  - id: A-S03-001\n    element: answer_button\n    region: question\n    trigger: click\n    guard: \"item.isParked\"\n    action: open_overlay\n    target: M01\n    payload: { item_id: \"$item.id\" }\n  - id: A-S03-002\n    element: approve_merge_button\n    region: actions\n    trigger: click\n    guard: \"item.awaitingApproval && gateway.atMainWorkingTree\"\n    action: open_overlay\n    target: M02\n    payload: { item_id: \"$item.id\" }\n  - id: A-S03-003\n    element: edit_button\n    region: actions\n    trigger: click\n    action: open_overlay\n    target: M03\n    payload: { item_id: \"$item.id\", mode: \"edit\" }\n  - id: A-S03-004\n    element: machine_log_disclosure\n    region: context\n    trigger: click\n    action: mutate\n    effects: [toggle_machine_log]\n  - id: A-S03-005\n    element: back_to_board\n    region: topbar\n    trigger: click\n    action: navigate\n    target: S02\n  - id: A-S03-006\n    element: timeline_show_earlier\n    region: timeline\n    trigger: click\n    action: mutate\n    effects: [expand_earlier_rounds]\n  - id: A-S03-007\n    element: detail\n    listens_to: work.changed\n    action: mutate\n    effects: [refresh_item]\n  - id: A-S03-008\n    element: timeline\n    listens_to: question.answered\n    action: mutate\n    effects: [close_open_round]\n  - id: A-S03-009\n    element: actions\n    listens_to: merge.settled\n    action: mutate\n    effects: [refresh_item, show_outcome]\n  - id: A-S03-010\n    element: detail\n    listens_to: gateway.unreachable\n    action: mutate\n    effects: [mark_stale, disable_writes]\n  - id: A-S03-011\n    element: retire_action\n    listens_to: item.quick_action\n    action: mutate\n    effects: [run_move_to_wontfix]\n```"
+      },
+      "sourceShownText": "```yaml herdrweb-contract\ninteractions:\n  - id: A-S03-001\n    element: answer_button\n    region: question\n    trigger: click\n    guard: \"item.isParked\"\n    action: open_overlay\n    target: M01\n    payload: { item_id: \"$item.id\" }\n  - id: A-S03-002\n    element: approve_merge_button\n    region: actions\n    trigger: click\n    guard: \"item.awaitingApproval && gateway.atMainWorkingTree\"\n    action: open_overlay\n    target: M02\n    payload: { item_id: \"$item.id\" }\n  - id: A-S03-003\n    element: edit_button\n    region: actions\n    trigger: click\n    action: open_overlay\n    target: M03\n    payload: { item_id: \"$item.id\", mode: \"edit\" }\n  - id: A-S03-004\n    element: machine_log_disclosure\n    region: context\n    trigger: click\n    action: mutate\n    effects: [toggle_machine_log]\n  - id: A-S03-005\n    element: back_to_board\n    region: topbar\n    trigger: click\n    action: navigate\n    target: S02\n  - id: A-S03-006\n    element: timeline_show_earlier\n    region: timeline\n    trigger: click\n    action: mutate\n    effects: [expand_earlier_rounds]\n  - id: A-S03-007\n    element: detail\n    listens_to: work.changed\n    action: mutate\n    effects: [refresh_item]\n  - id: A-S03-008\n    element: timeline\n    listens_to: question.answered\n    action: mutate\n    effects: [close_open_round]\n  - id: A-S03-009\n    element: actions\n    listens_to: merge.settled\n    action: mutate\n    effects: [refresh_item, show_outcome]\n  - id: A-S03-010\n    element: detail\n    listens_to: gateway.unreachable\n    action: mutate\n    effects: [mark_stale, disable_writes]\n  - id: A-S03-011\n    element: retire_action\n    listens_to: item.quick_action\n    action: mutate\n    effects: [run_move_to_wontfix]\n```",
+      "sourceDigest": "a51154d8995076f88b5a062b8db7af5c48e04601c63c8df48791f741b52a9d08",
+      "targetPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "targetAnchor": "unheaded-block-18",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-18",
+        "githubAnchor": "unheaded-block-18",
+        "stableAnchor": "unheaded-block-18",
+        "title": "Unheaded block 18",
+        "startLine": 188,
+        "endLine": 256,
+        "textDigest": "a51154d8995076f88b5a062b8db7af5c48e04601c63c8df48791f741b52a9d08",
+        "sample": "```yaml herdrweb-contract\ninteractions:\n  - id: A-S03-001\n    element: answer_button\n    region: question\n    trigger: click\n    guard: \"item.isParked\"\n    action: open_overlay\n   ",
+        "identityFingerprint": "266e4f91aba895f57972a05fd19d157a70e2012ce23f586af94252c8c60e8702",
+        "ancestry": [
+          "S03 — Task detail",
+          "Interactions"
+        ],
+        "text": "```yaml herdrweb-contract\ninteractions:\n  - id: A-S03-001\n    element: answer_button\n    region: question\n    trigger: click\n    guard: \"item.isParked\"\n    action: open_overlay\n    target: M01\n    payload: { item_id: \"$item.id\" }\n  - id: A-S03-002\n    element: approve_merge_button\n    region: actions\n    trigger: click\n    guard: \"item.awaitingApproval && gateway.atMainWorkingTree\"\n    action: open_overlay\n    target: M02\n    payload: { item_id: \"$item.id\" }\n  - id: A-S03-003\n    element: edit_button\n    region: actions\n    trigger: click\n    action: open_overlay\n    target: M03\n    payload: { item_id: \"$item.id\", mode: \"edit\" }\n  - id: A-S03-004\n    element: machine_log_disclosure\n    region: context\n    trigger: click\n    action: mutate\n    effects: [toggle_machine_log]\n  - id: A-S03-005\n    element: back_to_board\n    region: topbar\n    trigger: click\n    action: navigate\n    target: S02\n  - id: A-S03-006\n    element: timeline_show_earlier\n    region: timeline\n    trigger: click\n    action: mutate\n    effects: [expand_earlier_rounds]\n  - id: A-S03-007\n    element: detail\n    listens_to: work.changed\n    action: mutate\n    effects: [refresh_item]\n  - id: A-S03-008\n    element: timeline\n    listens_to: question.answered\n    action: mutate\n    effects: [close_open_round]\n  - id: A-S03-009\n    element: actions\n    listens_to: merge.settled\n    action: mutate\n    effects: [refresh_item, show_outcome]\n  - id: A-S03-010\n    element: detail\n    listens_to: gateway.unreachable\n    action: mutate\n    effects: [mark_stale, disable_writes]\n  - id: A-S03-011\n    element: retire_action\n    listens_to: item.quick_action\n    action: mutate\n    effects: [run_move_to_wontfix]\n```"
+      },
+      "targetShownText": "```yaml herdrweb-contract\ninteractions:\n  - id: A-S03-001\n    element: answer_button\n    region: question\n    trigger: click\n    guard: \"item.isParked\"\n    action: open_overlay\n    target: M01\n    payload: { item_id: \"$item.id\" }\n  - id: A-S03-002\n    element: approve_merge_button\n    region: actions\n    trigger: click\n    guard: \"item.awaitingApproval && gateway.atMainWorkingTree\"\n    action: open_overlay\n    target: M02\n    payload: { item_id: \"$item.id\" }\n  - id: A-S03-003\n    element: edit_button\n    region: actions\n    trigger: click\n    action: open_overlay\n    target: M03\n    payload: { item_id: \"$item.id\", mode: \"edit\" }\n  - id: A-S03-004\n    element: machine_log_disclosure\n    region: context\n    trigger: click\n    action: mutate\n    effects: [toggle_machine_log]\n  - id: A-S03-005\n    element: back_to_board\n    region: topbar\n    trigger: click\n    action: navigate\n    target: S02\n  - id: A-S03-006\n    element: timeline_show_earlier\n    region: timeline\n    trigger: click\n    action: mutate\n    effects: [expand_earlier_rounds]\n  - id: A-S03-007\n    element: detail\n    listens_to: work.changed\n    action: mutate\n    effects: [refresh_item]\n  - id: A-S03-008\n    element: timeline\n    listens_to: question.answered\n    action: mutate\n    effects: [close_open_round]\n  - id: A-S03-009\n    element: actions\n    listens_to: merge.settled\n    action: mutate\n    effects: [refresh_item, show_outcome]\n  - id: A-S03-010\n    element: detail\n    listens_to: gateway.unreachable\n    action: mutate\n    effects: [mark_stale, disable_writes]\n  - id: A-S03-011\n    element: retire_action\n    listens_to: item.quick_action\n    action: mutate\n    effects: [run_move_to_wontfix]\n```",
+      "targetDigest": "a51154d8995076f88b5a062b8db7af5c48e04601c63c8df48791f741b52a9d08",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_cb783b44a6284c43bbaac2e46c89026f",
+        "sourceUnitDigest": "a51154d8995076f88b5a062b8db7af5c48e04601c63c8df48791f741b52a9d08",
+        "targetOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+        "targetAnchor": "unheaded-block-18",
+        "claimKind": "contract",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/screens/S03-task-detail.md#unheaded-block-16 (source lines 166-234) is carried at docs/platform/ui-spec/architecture/screens/S03-task-detail.md#unheaded-block-18 (candidate lines 188-256). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/screens/S03-task-detail.md verbatim in docs/platform/ui-spec/architecture/screens/S03-task-detail.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "a51154d8995076f88b5a062b8db7af5c48e04601c63c8df48791f741b52a9d08",
+        "targetAncestry": [
+          "S03 — Task detail",
+          "Interactions"
+        ]
+      }
+    }
+  ]
+}

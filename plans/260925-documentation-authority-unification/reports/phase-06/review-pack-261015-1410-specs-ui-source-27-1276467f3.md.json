@@ -1,0 +1,843 @@
+{
+  "version": 1,
+  "contentCommit": "1276467f37a99d19aff05808d42fafbf40341449",
+  "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+  "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+  "sourcePath": "docs/ui-spec/modals/M02-approve-merge.md",
+  "part": 1,
+  "parts": 1,
+  "count": 12,
+  "classes": {
+    "Unit-exact": [
+      "claim_4c9a110f623532bc7d83fdf6f547093e",
+      "claim_6c1cdb570e57b0c547e768903d487ca1",
+      "claim_b0824e0cd564f4705e50da13b6780123",
+      "claim_3048b1128d4d98dc6ee07aba2324c3b8",
+      "claim_af451e04d9d67d144a3557b2403a3842",
+      "claim_8078baf6ee718f1be4d482c2f303e62d",
+      "claim_c6659cd7ed74e445fe099f5236551cb7"
+    ],
+    "Weak-exact": [
+      "claim_d940a673245e4f5b3145c8b545ce299c",
+      "claim_00353fead06bdc3f8468690a63df4aa7",
+      "claim_4734588af7752f05c0f3fd9b0ce531da",
+      "claim_64fd7dcc92d75c4ea35fc85e3b0bf0e4"
+    ],
+    "Judgment": [
+      "claim_ae961815f238b5b8335b08e8b21662ee"
+    ]
+  },
+  "unequalDigestPairs": [
+    "claim_ae961815f238b5b8335b08e8b21662ee"
+  ],
+  "noTargetGeneratedRows": [],
+  "mandatoryDeep": [
+    "claim_ae961815f238b5b8335b08e8b21662ee"
+  ],
+  "reviewerSeedRequired": true,
+  "minimumSeededWeakJudgment": 5,
+  "rows": [
+    {
+      "claimId": "claim_4c9a110f623532bc7d83fdf6f547093e",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/modals/M02-approve-merge.md",
+      "sourceAnchor": "unheaded-block-1",
+      "source": {
+        "unitKind": "unheaded-preamble",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded preamble",
+        "startLine": 1,
+        "endLine": 11,
+        "textDigest": "633382525da36aece4691ddcee98749217ae3c1281c0e6f6792ead72327c67ab",
+        "sample": "---\nid: M02\ntype: modal\nname: \"Approve a merge\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R2, R7, R8]\nregions: [header, what_lands, consequence, ",
+        "identityFingerprint": "8dfa3eedc3b6eb2b70ce5195c19520b8b255c0cdc363bf3be37ae436f183bd08",
+        "ancestry": [],
+        "text": "---\nid: M02\ntype: modal\nname: \"Approve a merge\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R2, R7, R8]\nregions: [header, what_lands, consequence, footer]\n---"
+      },
+      "sourceShownText": "---\nid: M02\ntype: modal\nname: \"Approve a merge\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R2, R7, R8]\nregions: [header, what_lands, consequence, footer]\n---",
+      "sourceDigest": "633382525da36aece4691ddcee98749217ae3c1281c0e6f6792ead72327c67ab",
+      "targetPath": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "targetAnchor": "unheaded-block-1",
+      "target": {
+        "unitKind": "unheaded-preamble",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded preamble",
+        "startLine": 1,
+        "endLine": 11,
+        "textDigest": "633382525da36aece4691ddcee98749217ae3c1281c0e6f6792ead72327c67ab",
+        "sample": "---\nid: M02\ntype: modal\nname: \"Approve a merge\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R2, R7, R8]\nregions: [header, what_lands, consequence, ",
+        "identityFingerprint": "8dfa3eedc3b6eb2b70ce5195c19520b8b255c0cdc363bf3be37ae436f183bd08",
+        "ancestry": [],
+        "text": "---\nid: M02\ntype: modal\nname: \"Approve a merge\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R2, R7, R8]\nregions: [header, what_lands, consequence, footer]\n---"
+      },
+      "targetShownText": "---\nid: M02\ntype: modal\nname: \"Approve a merge\"\nplatforms: [desktop, mobile]\nhosts: []\nstatus: active\ndesign_ref: \"\"\nrules: [R2, R7, R8]\nregions: [header, what_lands, consequence, footer]\n---",
+      "targetDigest": "633382525da36aece4691ddcee98749217ae3c1281c0e6f6792ead72327c67ab",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_4c9a110f623532bc7d83fdf6f547093e",
+        "sourceUnitDigest": "633382525da36aece4691ddcee98749217ae3c1281c0e6f6792ead72327c67ab",
+        "targetOwner": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+        "targetAnchor": "unheaded-block-1",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-preamble unit docs/ui-spec/modals/M02-approve-merge.md#unheaded-block-1 (source lines 1-11) is carried at docs/platform/ui-spec/architecture/modals/M02-approve-merge.md#unheaded-block-1 (candidate lines 1-11). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/modals/M02-approve-merge.md verbatim in docs/platform/ui-spec/architecture/modals/M02-approve-merge.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "633382525da36aece4691ddcee98749217ae3c1281c0e6f6792ead72327c67ab",
+        "targetAncestry": []
+      }
+    },
+    {
+      "claimId": "claim_ae961815f238b5b8335b08e8b21662ee",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/modals/M02-approve-merge.md",
+      "sourceAnchor": "m02-approve-a-merge",
+      "source": {
+        "unitKind": "heading",
+        "level": 1,
+        "title": "M02 — Approve a merge",
+        "anchor": "m02-approve-a-merge",
+        "githubAnchor": "m02-approve-a-merge",
+        "stableAnchor": "h-6e0412dca143",
+        "startLine": 13,
+        "endLine": 13,
+        "textDigest": "8b0400b48431739d1b32132719d5521bb15195b481e9dd99c3a7c7055c83d2e7",
+        "sample": "M02 — Approve a merge",
+        "sectionPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "followingBlockDigest": null,
+        "identityFingerprint": "7bab9a903d21da885d3d20c3c210ea29ff5ab78283e2dd814c7c351384ea8aa2",
+        "ancestry": [],
+        "text": "# M02 — Approve a merge",
+        "sectionText": "# M02 — Approve a merge"
+      },
+      "sourceShownText": "# M02 — Approve a merge",
+      "sourceDigest": "8b0400b48431739d1b32132719d5521bb15195b481e9dd99c3a7c7055c83d2e7",
+      "targetPath": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "targetAnchor": "m02-approve-a-merge",
+      "target": {
+        "unitKind": "heading",
+        "level": 1,
+        "title": "M02 — Approve a merge",
+        "anchor": "m02-approve-a-merge",
+        "githubAnchor": "m02-approve-a-merge",
+        "stableAnchor": "h-6e0412dca143",
+        "startLine": 13,
+        "endLine": 13,
+        "textDigest": "4ec2fd0d0b267020695e0142a23f26aae54497ae1e92e0390750d3c50e23ec32",
+        "sample": "M02 — Approve a merge",
+        "sectionPayloadDigest": "9b0676251fa02c603260af07fe6dbc5627b2d2a313515ea350bbd7523d8de344",
+        "followingBlockDigest": "a24d7cda246a135326ee84c4f5045c82ea788564b713ffb8383c6b9614175223",
+        "identityFingerprint": "4ac1abf49e1eef32cdc8a9c0c9ac14210e7304188615f26248ccd7da62392878",
+        "ancestry": [],
+        "text": "# M02 — Approve a merge",
+        "sectionText": "# M02 — Approve a merge\n\n```txt\nDocument type: Architecture\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve mapped legacy content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; current implementation truth is not certified\nProvenance: docs/ui-spec/modals/M02-approve-merge.md at 111adc51fd047d99121fd9d076eb4794c87045a4\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing carriage, placement and source conservation\nDo not use this for: Current canonical authority or implemented-behavior proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/ui-spec/modals/M02-approve-merge.md\nSupersedes: None; candidate only\nSuperseded by: None\n```\n\n> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions."
+      },
+      "targetShownText": "# M02 — Approve a merge\n\n```txt\nDocument type: Architecture\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve mapped legacy content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; current implementation truth is not certified\nProvenance: docs/ui-spec/modals/M02-approve-merge.md at 111adc51fd047d99121fd9d076eb4794c87045a4\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing carriage, placement and source conservation\nDo not use this for: Current canonical authority or implemented-behavior proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/ui-spec/modals/M02-approve-merge.md\nSupersedes: None; candidate only\nSuperseded by: None\n```\n\n> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions.",
+      "targetDigest": "4ec2fd0d0b267020695e0142a23f26aae54497ae1e92e0390750d3c50e23ec32",
+      "classification": "Judgment",
+      "mandatoryDeep": true,
+      "decision": {
+        "claimId": "claim_ae961815f238b5b8335b08e8b21662ee",
+        "sourceUnitDigest": "8b0400b48431739d1b32132719d5521bb15195b481e9dd99c3a7c7055c83d2e7",
+        "targetOwner": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+        "targetAnchor": "m02-approve-a-merge",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Judgment: no target digest match. The whole heading unit docs/ui-spec/modals/M02-approve-merge.md#m02-approve-a-merge (source lines 13-13) is carried at docs/platform/ui-spec/architecture/modals/M02-approve-merge.md#m02-approve-a-merge (candidate lines 13-13). The heading section digest changes because labelled candidate metadata is inserted after the original H1; original heading and direct source payload remain verbatim. Frozen specs-ui map and Step 8: preserve docs/ui-spec/modals/M02-approve-merge.md verbatim in docs/platform/ui-spec/architecture/modals/M02-approve-merge.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "4ec2fd0d0b267020695e0142a23f26aae54497ae1e92e0390750d3c50e23ec32",
+        "targetAncestry": []
+      }
+    },
+    {
+      "claimId": "claim_d940a673245e4f5b3145c8b545ce299c",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/modals/M02-approve-merge.md",
+      "sourceAnchor": "purpose",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Purpose",
+        "anchor": "purpose",
+        "githubAnchor": "purpose",
+        "stableAnchor": "h-2f4fe421d538",
+        "startLine": 15,
+        "endLine": 15,
+        "textDigest": "a900f08ce9335e018bcac1c24e3a3e5a244891ac9bd2a537680d6a60825f92d3",
+        "sample": "Purpose",
+        "sectionPayloadDigest": "16d1f15d8e32929635905282f55e305e296b5b158c7e85eb03afe669b45ef526",
+        "followingBlockDigest": "16d1f15d8e32929635905282f55e305e296b5b158c7e85eb03afe669b45ef526",
+        "identityFingerprint": "e2fe70f7430295c1660c22c6728828d8041ff38c5a9c81b2d980f1d9c42fae99",
+        "ancestry": [
+          "M02 — Approve a merge"
+        ],
+        "text": "## Purpose",
+        "sectionText": "## Purpose\n\nConfirm and run the one operation on this client that changes trunk\n(`docs/specs/herdr-web-dashboard.md` §Approve a merge). It exists as its\nown modal, rather than an inline button, precisely because of R8: a person\nmust never change trunk by muscle memory."
+      },
+      "sourceShownText": "## Purpose\n\nConfirm and run the one operation on this client that changes trunk\n(`docs/specs/herdr-web-dashboard.md` §Approve a merge). It exists as its\nown modal, rather than an inline button, precisely because of R8: a person\nmust never change trunk by muscle memory.",
+      "sourceDigest": "a900f08ce9335e018bcac1c24e3a3e5a244891ac9bd2a537680d6a60825f92d3",
+      "targetPath": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "targetAnchor": "purpose",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Purpose",
+        "anchor": "purpose",
+        "githubAnchor": "purpose",
+        "stableAnchor": "h-15cea22a442e",
+        "startLine": 37,
+        "endLine": 37,
+        "textDigest": "a900f08ce9335e018bcac1c24e3a3e5a244891ac9bd2a537680d6a60825f92d3",
+        "sample": "Purpose",
+        "sectionPayloadDigest": "16d1f15d8e32929635905282f55e305e296b5b158c7e85eb03afe669b45ef526",
+        "followingBlockDigest": "16d1f15d8e32929635905282f55e305e296b5b158c7e85eb03afe669b45ef526",
+        "identityFingerprint": "e2fe70f7430295c1660c22c6728828d8041ff38c5a9c81b2d980f1d9c42fae99",
+        "ancestry": [
+          "M02 — Approve a merge"
+        ],
+        "text": "## Purpose",
+        "sectionText": "## Purpose\n\nConfirm and run the one operation on this client that changes trunk\n(`docs/specs/herdr-web-dashboard.md` §Approve a merge). It exists as its\nown modal, rather than an inline button, precisely because of R8: a person\nmust never change trunk by muscle memory."
+      },
+      "targetShownText": "## Purpose\n\nConfirm and run the one operation on this client that changes trunk\n(`docs/specs/herdr-web-dashboard.md` §Approve a merge). It exists as its\nown modal, rather than an inline button, precisely because of R8: a person\nmust never change trunk by muscle memory.",
+      "targetDigest": "a900f08ce9335e018bcac1c24e3a3e5a244891ac9bd2a537680d6a60825f92d3",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_d940a673245e4f5b3145c8b545ce299c",
+        "sourceUnitDigest": "a900f08ce9335e018bcac1c24e3a3e5a244891ac9bd2a537680d6a60825f92d3",
+        "targetOwner": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+        "targetAnchor": "purpose",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/ui-spec/modals/M02-approve-merge.md#purpose (source lines 15-15) is carried at docs/platform/ui-spec/architecture/modals/M02-approve-merge.md#purpose (candidate lines 37-37). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/modals/M02-approve-merge.md verbatim in docs/platform/ui-spec/architecture/modals/M02-approve-merge.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "a900f08ce9335e018bcac1c24e3a3e5a244891ac9bd2a537680d6a60825f92d3",
+        "targetAncestry": [
+          "M02 — Approve a merge"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_6c1cdb570e57b0c547e768903d487ca1",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/modals/M02-approve-merge.md",
+      "sourceAnchor": "unheaded-block-2",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-2",
+        "githubAnchor": "unheaded-block-2",
+        "stableAnchor": "unheaded-block-2",
+        "title": "Unheaded block 2",
+        "startLine": 17,
+        "endLine": 20,
+        "textDigest": "16d1f15d8e32929635905282f55e305e296b5b158c7e85eb03afe669b45ef526",
+        "sample": "Confirm and run the one operation on this client that changes trunk\n(`docs/specs/herdr-web-dashboard.md` §Approve a merge). It exists as its\nown modal, rather than an inline button",
+        "identityFingerprint": "4ddd7cfc9b29939f6965cd7d1dc6b78b32b70a3b597a61bd998cba48221e2cc2",
+        "ancestry": [
+          "M02 — Approve a merge",
+          "Purpose"
+        ],
+        "text": "Confirm and run the one operation on this client that changes trunk\n(`docs/specs/herdr-web-dashboard.md` §Approve a merge). It exists as its\nown modal, rather than an inline button, precisely because of R8: a person\nmust never change trunk by muscle memory."
+      },
+      "sourceShownText": "Confirm and run the one operation on this client that changes trunk\n(`docs/specs/herdr-web-dashboard.md` §Approve a merge). It exists as its\nown modal, rather than an inline button, precisely because of R8: a person\nmust never change trunk by muscle memory.",
+      "sourceDigest": "16d1f15d8e32929635905282f55e305e296b5b158c7e85eb03afe669b45ef526",
+      "targetPath": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "targetAnchor": "unheaded-block-4",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 39,
+        "endLine": 42,
+        "textDigest": "16d1f15d8e32929635905282f55e305e296b5b158c7e85eb03afe669b45ef526",
+        "sample": "Confirm and run the one operation on this client that changes trunk\n(`docs/specs/herdr-web-dashboard.md` §Approve a merge). It exists as its\nown modal, rather than an inline button",
+        "identityFingerprint": "4ddd7cfc9b29939f6965cd7d1dc6b78b32b70a3b597a61bd998cba48221e2cc2",
+        "ancestry": [
+          "M02 — Approve a merge",
+          "Purpose"
+        ],
+        "text": "Confirm and run the one operation on this client that changes trunk\n(`docs/specs/herdr-web-dashboard.md` §Approve a merge). It exists as its\nown modal, rather than an inline button, precisely because of R8: a person\nmust never change trunk by muscle memory."
+      },
+      "targetShownText": "Confirm and run the one operation on this client that changes trunk\n(`docs/specs/herdr-web-dashboard.md` §Approve a merge). It exists as its\nown modal, rather than an inline button, precisely because of R8: a person\nmust never change trunk by muscle memory.",
+      "targetDigest": "16d1f15d8e32929635905282f55e305e296b5b158c7e85eb03afe669b45ef526",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_6c1cdb570e57b0c547e768903d487ca1",
+        "sourceUnitDigest": "16d1f15d8e32929635905282f55e305e296b5b158c7e85eb03afe669b45ef526",
+        "targetOwner": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+        "targetAnchor": "unheaded-block-4",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/modals/M02-approve-merge.md#unheaded-block-2 (source lines 17-20) is carried at docs/platform/ui-spec/architecture/modals/M02-approve-merge.md#unheaded-block-4 (candidate lines 39-42). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/modals/M02-approve-merge.md verbatim in docs/platform/ui-spec/architecture/modals/M02-approve-merge.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "16d1f15d8e32929635905282f55e305e296b5b158c7e85eb03afe669b45ef526",
+        "targetAncestry": [
+          "M02 — Approve a merge",
+          "Purpose"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_00353fead06bdc3f8468690a63df4aa7",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/modals/M02-approve-merge.md",
+      "sourceAnchor": "layout",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Layout",
+        "anchor": "layout",
+        "githubAnchor": "layout",
+        "stableAnchor": "h-5db0fa8bad24",
+        "startLine": 22,
+        "endLine": 22,
+        "textDigest": "1f9bd3f97bba3865c620ce5b309166ef121aedb0a8432e2d141a53cae2821370",
+        "sample": "Layout",
+        "sectionPayloadDigest": "7717a40864bd4487e2ede2e2b123dfbf3f534996a016ed05856eef34003bdf9b",
+        "followingBlockDigest": "3ac787a95b4671add2b27b1d4cc92720e884bef5507314bd6e2b1ac5610397d2",
+        "identityFingerprint": "1e5b9c74c4785cc6c48891f23afc9bc02ea9b4b9d4edb73f996dc8c8df4b5d5f",
+        "ancestry": [
+          "M02 — Approve a merge"
+        ],
+        "text": "## Layout",
+        "sectionText": "## Layout\n\n```\n┌────────────────────────────────────────────────────┐\n│ Approve merge · tsk-k4v                       [✕]  │  header\n├────────────────────────────────────────────────────┤\n│ What lands                                         │  what_lands\n│ 6 files, +412 / −18                                │\n│ into  fgw/tsk-ldb                                  │\n│                                                    │\n│ herdr-plugin/src/web/mod.rs                        │\n│ herdr-plugin/src/web/auth.rs                       │\n│ … 4 more                                           │\n├────────────────────────────────────────────────────┤\n│ This changes trunk.                                │  consequence\n│ Runs `fgos approve` on dev-box. The item's own     │\n│ verify runs again first; if it fails the item      │\n│ parks blocked instead of merging.                  │\n├────────────────────────────────────────────────────┤\n│                        [ Cancel ]  [ Approve merge ]│ footer\n└────────────────────────────────────────────────────┘\n```\n\nThe consequence panel is not a warning banner to be skimmed — it states\nthree specific facts (what verb, on which machine, and what happens if\nverify fails) so that confirming is an informed act rather than a reflex.\n\n**Where approve cannot run, this modal never opens.** R7 puts the\nconstraint on the invoking control instead: `Approve merge` on S03 renders\ndisabled with the reason attached (ERR-APPROVE-UNAVAILABLE). Offering the\nmodal and failing at submit would be exactly the offered-then-failed\npattern the area spec rules out."
+      },
+      "sourceShownText": "## Layout\n\n```\n┌────────────────────────────────────────────────────┐\n│ Approve merge · tsk-k4v                       [✕]  │  header\n├────────────────────────────────────────────────────┤\n│ What lands                                         │  what_lands\n│ 6 files, +412 / −18                                │\n│ into  fgw/tsk-ldb                                  │\n│                                                    │\n│ herdr-plugin/src/web/mod.rs                        │\n│ herdr-plugin/src/web/auth.rs                       │\n│ … 4 more                                           │\n├────────────────────────────────────────────────────┤\n│ This changes trunk.                                │  consequence\n│ Runs `fgos approve` on dev-box. The item's own     │\n│ verify runs again first; if it fails the item      │\n│ parks blocked instead of merging.                  │\n├────────────────────────────────────────────────────┤\n│                        [ Cancel ]  [ Approve merge ]│ footer\n└────────────────────────────────────────────────────┘\n```\n\nThe consequence panel is not a warning banner to be skimmed — it states\nthree specific facts (what verb, on which machine, and what happens if\nverify fails) so that confirming is an informed act rather than a reflex.\n\n**Where approve cannot run, this modal never opens.** R7 puts the\nconstraint on the invoking control instead: `Approve merge` on S03 renders\ndisabled with the reason attached (ERR-APPROVE-UNAVAILABLE). Offering the\nmodal and failing at submit would be exactly the offered-then-failed\npattern the area spec rules out.",
+      "sourceDigest": "1f9bd3f97bba3865c620ce5b309166ef121aedb0a8432e2d141a53cae2821370",
+      "targetPath": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "targetAnchor": "layout",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Layout",
+        "anchor": "layout",
+        "githubAnchor": "layout",
+        "stableAnchor": "h-c16db6c793a2",
+        "startLine": 44,
+        "endLine": 44,
+        "textDigest": "1f9bd3f97bba3865c620ce5b309166ef121aedb0a8432e2d141a53cae2821370",
+        "sample": "Layout",
+        "sectionPayloadDigest": "7717a40864bd4487e2ede2e2b123dfbf3f534996a016ed05856eef34003bdf9b",
+        "followingBlockDigest": "3ac787a95b4671add2b27b1d4cc92720e884bef5507314bd6e2b1ac5610397d2",
+        "identityFingerprint": "1e5b9c74c4785cc6c48891f23afc9bc02ea9b4b9d4edb73f996dc8c8df4b5d5f",
+        "ancestry": [
+          "M02 — Approve a merge"
+        ],
+        "text": "## Layout",
+        "sectionText": "## Layout\n\n```\n┌────────────────────────────────────────────────────┐\n│ Approve merge · tsk-k4v                       [✕]  │  header\n├────────────────────────────────────────────────────┤\n│ What lands                                         │  what_lands\n│ 6 files, +412 / −18                                │\n│ into  fgw/tsk-ldb                                  │\n│                                                    │\n│ herdr-plugin/src/web/mod.rs                        │\n│ herdr-plugin/src/web/auth.rs                       │\n│ … 4 more                                           │\n├────────────────────────────────────────────────────┤\n│ This changes trunk.                                │  consequence\n│ Runs `fgos approve` on dev-box. The item's own     │\n│ verify runs again first; if it fails the item      │\n│ parks blocked instead of merging.                  │\n├────────────────────────────────────────────────────┤\n│                        [ Cancel ]  [ Approve merge ]│ footer\n└────────────────────────────────────────────────────┘\n```\n\nThe consequence panel is not a warning banner to be skimmed — it states\nthree specific facts (what verb, on which machine, and what happens if\nverify fails) so that confirming is an informed act rather than a reflex.\n\n**Where approve cannot run, this modal never opens.** R7 puts the\nconstraint on the invoking control instead: `Approve merge` on S03 renders\ndisabled with the reason attached (ERR-APPROVE-UNAVAILABLE). Offering the\nmodal and failing at submit would be exactly the offered-then-failed\npattern the area spec rules out."
+      },
+      "targetShownText": "## Layout\n\n```\n┌────────────────────────────────────────────────────┐\n│ Approve merge · tsk-k4v                       [✕]  │  header\n├────────────────────────────────────────────────────┤\n│ What lands                                         │  what_lands\n│ 6 files, +412 / −18                                │\n│ into  fgw/tsk-ldb                                  │\n│                                                    │\n│ herdr-plugin/src/web/mod.rs                        │\n│ herdr-plugin/src/web/auth.rs                       │\n│ … 4 more                                           │\n├────────────────────────────────────────────────────┤\n│ This changes trunk.                                │  consequence\n│ Runs `fgos approve` on dev-box. The item's own     │\n│ verify runs again first; if it fails the item      │\n│ parks blocked instead of merging.                  │\n├────────────────────────────────────────────────────┤\n│                        [ Cancel ]  [ Approve merge ]│ footer\n└────────────────────────────────────────────────────┘\n```\n\nThe consequence panel is not a warning banner to be skimmed — it states\nthree specific facts (what verb, on which machine, and what happens if\nverify fails) so that confirming is an informed act rather than a reflex.\n\n**Where approve cannot run, this modal never opens.** R7 puts the\nconstraint on the invoking control instead: `Approve merge` on S03 renders\ndisabled with the reason attached (ERR-APPROVE-UNAVAILABLE). Offering the\nmodal and failing at submit would be exactly the offered-then-failed\npattern the area spec rules out.",
+      "targetDigest": "1f9bd3f97bba3865c620ce5b309166ef121aedb0a8432e2d141a53cae2821370",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_00353fead06bdc3f8468690a63df4aa7",
+        "sourceUnitDigest": "1f9bd3f97bba3865c620ce5b309166ef121aedb0a8432e2d141a53cae2821370",
+        "targetOwner": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+        "targetAnchor": "layout",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/ui-spec/modals/M02-approve-merge.md#layout (source lines 22-22) is carried at docs/platform/ui-spec/architecture/modals/M02-approve-merge.md#layout (candidate lines 44-44). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/modals/M02-approve-merge.md verbatim in docs/platform/ui-spec/architecture/modals/M02-approve-merge.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "1f9bd3f97bba3865c620ce5b309166ef121aedb0a8432e2d141a53cae2821370",
+        "targetAncestry": [
+          "M02 — Approve a merge"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_b0824e0cd564f4705e50da13b6780123",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/modals/M02-approve-merge.md",
+      "sourceAnchor": "unheaded-block-3",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 24,
+        "endLine": 43,
+        "textDigest": "3ac787a95b4671add2b27b1d4cc92720e884bef5507314bd6e2b1ac5610397d2",
+        "sample": "```\n┌────────────────────────────────────────────────────┐\n│ Approve merge · tsk-k4v                       [✕]  │  header\n├────────────────────────────────────────────────────┤\n│ W",
+        "identityFingerprint": "8b2924ef0ef1f3fcc26f4a21296437cbfef534baba04891be56e718e20a9f529",
+        "ancestry": [
+          "M02 — Approve a merge",
+          "Layout"
+        ],
+        "text": "```\n┌────────────────────────────────────────────────────┐\n│ Approve merge · tsk-k4v                       [✕]  │  header\n├────────────────────────────────────────────────────┤\n│ What lands                                         │  what_lands\n│ 6 files, +412 / −18                                │\n│ into  fgw/tsk-ldb                                  │\n│                                                    │\n│ herdr-plugin/src/web/mod.rs                        │\n│ herdr-plugin/src/web/auth.rs                       │\n│ … 4 more                                           │\n├────────────────────────────────────────────────────┤\n│ This changes trunk.                                │  consequence\n│ Runs `fgos approve` on dev-box. The item's own     │\n│ verify runs again first; if it fails the item      │\n│ parks blocked instead of merging.                  │\n├────────────────────────────────────────────────────┤\n│                        [ Cancel ]  [ Approve merge ]│ footer\n└────────────────────────────────────────────────────┘\n```"
+      },
+      "sourceShownText": "```\n┌────────────────────────────────────────────────────┐\n│ Approve merge · tsk-k4v                       [✕]  │  header\n├────────────────────────────────────────────────────┤\n│ What lands                                         │  what_lands\n│ 6 files, +412 / −18                                │\n│ into  fgw/tsk-ldb                                  │\n│                                                    │\n│ herdr-plugin/src/web/mod.rs                        │\n│ herdr-plugin/src/web/auth.rs                       │\n│ … 4 more                                           │\n├────────────────────────────────────────────────────┤\n│ This changes trunk.                                │  consequence\n│ Runs `fgos approve` on dev-box. The item's own     │\n│ verify runs again first; if it fails the item      │\n│ parks blocked instead of merging.                  │\n├────────────────────────────────────────────────────┤\n│                        [ Cancel ]  [ Approve merge ]│ footer\n└────────────────────────────────────────────────────┘\n```",
+      "sourceDigest": "3ac787a95b4671add2b27b1d4cc92720e884bef5507314bd6e2b1ac5610397d2",
+      "targetPath": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "targetAnchor": "unheaded-block-5",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 46,
+        "endLine": 65,
+        "textDigest": "3ac787a95b4671add2b27b1d4cc92720e884bef5507314bd6e2b1ac5610397d2",
+        "sample": "```\n┌────────────────────────────────────────────────────┐\n│ Approve merge · tsk-k4v                       [✕]  │  header\n├────────────────────────────────────────────────────┤\n│ W",
+        "identityFingerprint": "8b2924ef0ef1f3fcc26f4a21296437cbfef534baba04891be56e718e20a9f529",
+        "ancestry": [
+          "M02 — Approve a merge",
+          "Layout"
+        ],
+        "text": "```\n┌────────────────────────────────────────────────────┐\n│ Approve merge · tsk-k4v                       [✕]  │  header\n├────────────────────────────────────────────────────┤\n│ What lands                                         │  what_lands\n│ 6 files, +412 / −18                                │\n│ into  fgw/tsk-ldb                                  │\n│                                                    │\n│ herdr-plugin/src/web/mod.rs                        │\n│ herdr-plugin/src/web/auth.rs                       │\n│ … 4 more                                           │\n├────────────────────────────────────────────────────┤\n│ This changes trunk.                                │  consequence\n│ Runs `fgos approve` on dev-box. The item's own     │\n│ verify runs again first; if it fails the item      │\n│ parks blocked instead of merging.                  │\n├────────────────────────────────────────────────────┤\n│                        [ Cancel ]  [ Approve merge ]│ footer\n└────────────────────────────────────────────────────┘\n```"
+      },
+      "targetShownText": "```\n┌────────────────────────────────────────────────────┐\n│ Approve merge · tsk-k4v                       [✕]  │  header\n├────────────────────────────────────────────────────┤\n│ What lands                                         │  what_lands\n│ 6 files, +412 / −18                                │\n│ into  fgw/tsk-ldb                                  │\n│                                                    │\n│ herdr-plugin/src/web/mod.rs                        │\n│ herdr-plugin/src/web/auth.rs                       │\n│ … 4 more                                           │\n├────────────────────────────────────────────────────┤\n│ This changes trunk.                                │  consequence\n│ Runs `fgos approve` on dev-box. The item's own     │\n│ verify runs again first; if it fails the item      │\n│ parks blocked instead of merging.                  │\n├────────────────────────────────────────────────────┤\n│                        [ Cancel ]  [ Approve merge ]│ footer\n└────────────────────────────────────────────────────┘\n```",
+      "targetDigest": "3ac787a95b4671add2b27b1d4cc92720e884bef5507314bd6e2b1ac5610397d2",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_b0824e0cd564f4705e50da13b6780123",
+        "sourceUnitDigest": "3ac787a95b4671add2b27b1d4cc92720e884bef5507314bd6e2b1ac5610397d2",
+        "targetOwner": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+        "targetAnchor": "unheaded-block-5",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/modals/M02-approve-merge.md#unheaded-block-3 (source lines 24-43) is carried at docs/platform/ui-spec/architecture/modals/M02-approve-merge.md#unheaded-block-5 (candidate lines 46-65). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/modals/M02-approve-merge.md verbatim in docs/platform/ui-spec/architecture/modals/M02-approve-merge.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "3ac787a95b4671add2b27b1d4cc92720e884bef5507314bd6e2b1ac5610397d2",
+        "targetAncestry": [
+          "M02 — Approve a merge",
+          "Layout"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_3048b1128d4d98dc6ee07aba2324c3b8",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/modals/M02-approve-merge.md",
+      "sourceAnchor": "unheaded-block-4",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 45,
+        "endLine": 47,
+        "textDigest": "a94a6123d5be3a892e593e2a46c81eff3b372cecd11436fa4316fa9b220d0e11",
+        "sample": "The consequence panel is not a warning banner to be skimmed — it states\nthree specific facts (what verb, on which machine, and what happens if\nverify fails) so that confirming is a",
+        "identityFingerprint": "f73641a79510c1ed22b8c4e85467bb857f3b4240b46d61345b0539c91146cf7e",
+        "ancestry": [
+          "M02 — Approve a merge",
+          "Layout"
+        ],
+        "text": "The consequence panel is not a warning banner to be skimmed — it states\nthree specific facts (what verb, on which machine, and what happens if\nverify fails) so that confirming is an informed act rather than a reflex."
+      },
+      "sourceShownText": "The consequence panel is not a warning banner to be skimmed — it states\nthree specific facts (what verb, on which machine, and what happens if\nverify fails) so that confirming is an informed act rather than a reflex.",
+      "sourceDigest": "a94a6123d5be3a892e593e2a46c81eff3b372cecd11436fa4316fa9b220d0e11",
+      "targetPath": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "targetAnchor": "unheaded-block-6",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 67,
+        "endLine": 69,
+        "textDigest": "a94a6123d5be3a892e593e2a46c81eff3b372cecd11436fa4316fa9b220d0e11",
+        "sample": "The consequence panel is not a warning banner to be skimmed — it states\nthree specific facts (what verb, on which machine, and what happens if\nverify fails) so that confirming is a",
+        "identityFingerprint": "f73641a79510c1ed22b8c4e85467bb857f3b4240b46d61345b0539c91146cf7e",
+        "ancestry": [
+          "M02 — Approve a merge",
+          "Layout"
+        ],
+        "text": "The consequence panel is not a warning banner to be skimmed — it states\nthree specific facts (what verb, on which machine, and what happens if\nverify fails) so that confirming is an informed act rather than a reflex."
+      },
+      "targetShownText": "The consequence panel is not a warning banner to be skimmed — it states\nthree specific facts (what verb, on which machine, and what happens if\nverify fails) so that confirming is an informed act rather than a reflex.",
+      "targetDigest": "a94a6123d5be3a892e593e2a46c81eff3b372cecd11436fa4316fa9b220d0e11",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_3048b1128d4d98dc6ee07aba2324c3b8",
+        "sourceUnitDigest": "a94a6123d5be3a892e593e2a46c81eff3b372cecd11436fa4316fa9b220d0e11",
+        "targetOwner": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+        "targetAnchor": "unheaded-block-6",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/modals/M02-approve-merge.md#unheaded-block-4 (source lines 45-47) is carried at docs/platform/ui-spec/architecture/modals/M02-approve-merge.md#unheaded-block-6 (candidate lines 67-69). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/modals/M02-approve-merge.md verbatim in docs/platform/ui-spec/architecture/modals/M02-approve-merge.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "a94a6123d5be3a892e593e2a46c81eff3b372cecd11436fa4316fa9b220d0e11",
+        "targetAncestry": [
+          "M02 — Approve a merge",
+          "Layout"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_af451e04d9d67d144a3557b2403a3842",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/modals/M02-approve-merge.md",
+      "sourceAnchor": "unheaded-block-5",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 49,
+        "endLine": 53,
+        "textDigest": "dea3561c21d91935bd45492ef13274f2fcb98ce353514227b12dc4c81a4077e4",
+        "sample": "**Where approve cannot run, this modal never opens.** R7 puts the\nconstraint on the invoking control instead: `Approve merge` on S03 renders\ndisabled with the reason attached (ERR-",
+        "identityFingerprint": "2a224bf34d9891bf879b248e81ee9844b2c1d048d8f822ce7c8fa3e16cdb6a3a",
+        "ancestry": [
+          "M02 — Approve a merge",
+          "Layout"
+        ],
+        "text": "**Where approve cannot run, this modal never opens.** R7 puts the\nconstraint on the invoking control instead: `Approve merge` on S03 renders\ndisabled with the reason attached (ERR-APPROVE-UNAVAILABLE). Offering the\nmodal and failing at submit would be exactly the offered-then-failed\npattern the area spec rules out."
+      },
+      "sourceShownText": "**Where approve cannot run, this modal never opens.** R7 puts the\nconstraint on the invoking control instead: `Approve merge` on S03 renders\ndisabled with the reason attached (ERR-APPROVE-UNAVAILABLE). Offering the\nmodal and failing at submit would be exactly the offered-then-failed\npattern the area spec rules out.",
+      "sourceDigest": "dea3561c21d91935bd45492ef13274f2fcb98ce353514227b12dc4c81a4077e4",
+      "targetPath": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "targetAnchor": "unheaded-block-7",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 71,
+        "endLine": 75,
+        "textDigest": "dea3561c21d91935bd45492ef13274f2fcb98ce353514227b12dc4c81a4077e4",
+        "sample": "**Where approve cannot run, this modal never opens.** R7 puts the\nconstraint on the invoking control instead: `Approve merge` on S03 renders\ndisabled with the reason attached (ERR-",
+        "identityFingerprint": "2a224bf34d9891bf879b248e81ee9844b2c1d048d8f822ce7c8fa3e16cdb6a3a",
+        "ancestry": [
+          "M02 — Approve a merge",
+          "Layout"
+        ],
+        "text": "**Where approve cannot run, this modal never opens.** R7 puts the\nconstraint on the invoking control instead: `Approve merge` on S03 renders\ndisabled with the reason attached (ERR-APPROVE-UNAVAILABLE). Offering the\nmodal and failing at submit would be exactly the offered-then-failed\npattern the area spec rules out."
+      },
+      "targetShownText": "**Where approve cannot run, this modal never opens.** R7 puts the\nconstraint on the invoking control instead: `Approve merge` on S03 renders\ndisabled with the reason attached (ERR-APPROVE-UNAVAILABLE). Offering the\nmodal and failing at submit would be exactly the offered-then-failed\npattern the area spec rules out.",
+      "targetDigest": "dea3561c21d91935bd45492ef13274f2fcb98ce353514227b12dc4c81a4077e4",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_af451e04d9d67d144a3557b2403a3842",
+        "sourceUnitDigest": "dea3561c21d91935bd45492ef13274f2fcb98ce353514227b12dc4c81a4077e4",
+        "targetOwner": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+        "targetAnchor": "unheaded-block-7",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/modals/M02-approve-merge.md#unheaded-block-5 (source lines 49-53) is carried at docs/platform/ui-spec/architecture/modals/M02-approve-merge.md#unheaded-block-7 (candidate lines 71-75). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/modals/M02-approve-merge.md verbatim in docs/platform/ui-spec/architecture/modals/M02-approve-merge.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "dea3561c21d91935bd45492ef13274f2fcb98ce353514227b12dc4c81a4077e4",
+        "targetAncestry": [
+          "M02 — Approve a merge",
+          "Layout"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_4734588af7752f05c0f3fd9b0ce531da",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/modals/M02-approve-merge.md",
+      "sourceAnchor": "states",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "States",
+        "anchor": "states",
+        "githubAnchor": "states",
+        "stableAnchor": "h-5a2fd4d9bd0d",
+        "startLine": 55,
+        "endLine": 55,
+        "textDigest": "3fa89c4bcc1fa4ce08b6dda0fb96488d20612826c14e719d4db536cb6766140d",
+        "sample": "States",
+        "sectionPayloadDigest": "adfe80ad864fe0a34219ab5c5201ed1e2423f5ab7ebd0e8b2ec9fdf7c0dab091",
+        "followingBlockDigest": "adfe80ad864fe0a34219ab5c5201ed1e2423f5ab7ebd0e8b2ec9fdf7c0dab091",
+        "identityFingerprint": "a8e1a90e8354c16c123880b0e036385a2de6883345e4834fd8fa9e0c0ea26856",
+        "ancestry": [
+          "M02 — Approve a merge"
+        ],
+        "text": "## States",
+        "sectionText": "## States\n\n- **ST-READY** — the diff summary and target branch are loaded.\n- **ST-SUBMITTING** — approve in flight; both buttons disabled, progress\n  on the approve button. This one is not instant, and the modal must not\n  look frozen while the verify re-runs.\n- **ERR-WRITE-REFUSED** — fgOS refused or the post-merge verify failed and\n  the item parked blocked. The engine's own outcome is shown verbatim,\n  including the park reason, and the modal stays open so the person reads\n  it rather than being dropped back to a screen that silently did nothing."
+      },
+      "sourceShownText": "## States\n\n- **ST-READY** — the diff summary and target branch are loaded.\n- **ST-SUBMITTING** — approve in flight; both buttons disabled, progress\n  on the approve button. This one is not instant, and the modal must not\n  look frozen while the verify re-runs.\n- **ERR-WRITE-REFUSED** — fgOS refused or the post-merge verify failed and\n  the item parked blocked. The engine's own outcome is shown verbatim,\n  including the park reason, and the modal stays open so the person reads\n  it rather than being dropped back to a screen that silently did nothing.",
+      "sourceDigest": "3fa89c4bcc1fa4ce08b6dda0fb96488d20612826c14e719d4db536cb6766140d",
+      "targetPath": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "targetAnchor": "states",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "States",
+        "anchor": "states",
+        "githubAnchor": "states",
+        "stableAnchor": "h-41c98b57e12d",
+        "startLine": 77,
+        "endLine": 77,
+        "textDigest": "3fa89c4bcc1fa4ce08b6dda0fb96488d20612826c14e719d4db536cb6766140d",
+        "sample": "States",
+        "sectionPayloadDigest": "adfe80ad864fe0a34219ab5c5201ed1e2423f5ab7ebd0e8b2ec9fdf7c0dab091",
+        "followingBlockDigest": "adfe80ad864fe0a34219ab5c5201ed1e2423f5ab7ebd0e8b2ec9fdf7c0dab091",
+        "identityFingerprint": "a8e1a90e8354c16c123880b0e036385a2de6883345e4834fd8fa9e0c0ea26856",
+        "ancestry": [
+          "M02 — Approve a merge"
+        ],
+        "text": "## States",
+        "sectionText": "## States\n\n- **ST-READY** — the diff summary and target branch are loaded.\n- **ST-SUBMITTING** — approve in flight; both buttons disabled, progress\n  on the approve button. This one is not instant, and the modal must not\n  look frozen while the verify re-runs.\n- **ERR-WRITE-REFUSED** — fgOS refused or the post-merge verify failed and\n  the item parked blocked. The engine's own outcome is shown verbatim,\n  including the park reason, and the modal stays open so the person reads\n  it rather than being dropped back to a screen that silently did nothing."
+      },
+      "targetShownText": "## States\n\n- **ST-READY** — the diff summary and target branch are loaded.\n- **ST-SUBMITTING** — approve in flight; both buttons disabled, progress\n  on the approve button. This one is not instant, and the modal must not\n  look frozen while the verify re-runs.\n- **ERR-WRITE-REFUSED** — fgOS refused or the post-merge verify failed and\n  the item parked blocked. The engine's own outcome is shown verbatim,\n  including the park reason, and the modal stays open so the person reads\n  it rather than being dropped back to a screen that silently did nothing.",
+      "targetDigest": "3fa89c4bcc1fa4ce08b6dda0fb96488d20612826c14e719d4db536cb6766140d",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_4734588af7752f05c0f3fd9b0ce531da",
+        "sourceUnitDigest": "3fa89c4bcc1fa4ce08b6dda0fb96488d20612826c14e719d4db536cb6766140d",
+        "targetOwner": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+        "targetAnchor": "states",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/ui-spec/modals/M02-approve-merge.md#states (source lines 55-55) is carried at docs/platform/ui-spec/architecture/modals/M02-approve-merge.md#states (candidate lines 77-77). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/modals/M02-approve-merge.md verbatim in docs/platform/ui-spec/architecture/modals/M02-approve-merge.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "3fa89c4bcc1fa4ce08b6dda0fb96488d20612826c14e719d4db536cb6766140d",
+        "targetAncestry": [
+          "M02 — Approve a merge"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_8078baf6ee718f1be4d482c2f303e62d",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/modals/M02-approve-merge.md",
+      "sourceAnchor": "unheaded-block-6",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 57,
+        "endLine": 64,
+        "textDigest": "adfe80ad864fe0a34219ab5c5201ed1e2423f5ab7ebd0e8b2ec9fdf7c0dab091",
+        "sample": "- **ST-READY** — the diff summary and target branch are loaded.\n- **ST-SUBMITTING** — approve in flight; both buttons disabled, progress\n  on the approve button. This one is not in",
+        "identityFingerprint": "6262592eb3da26378a7e58b0bf7b1362824d97fc321cbf21f73a3987bef659e7",
+        "ancestry": [
+          "M02 — Approve a merge",
+          "States"
+        ],
+        "text": "- **ST-READY** — the diff summary and target branch are loaded.\n- **ST-SUBMITTING** — approve in flight; both buttons disabled, progress\n  on the approve button. This one is not instant, and the modal must not\n  look frozen while the verify re-runs.\n- **ERR-WRITE-REFUSED** — fgOS refused or the post-merge verify failed and\n  the item parked blocked. The engine's own outcome is shown verbatim,\n  including the park reason, and the modal stays open so the person reads\n  it rather than being dropped back to a screen that silently did nothing."
+      },
+      "sourceShownText": "- **ST-READY** — the diff summary and target branch are loaded.\n- **ST-SUBMITTING** — approve in flight; both buttons disabled, progress\n  on the approve button. This one is not instant, and the modal must not\n  look frozen while the verify re-runs.\n- **ERR-WRITE-REFUSED** — fgOS refused or the post-merge verify failed and\n  the item parked blocked. The engine's own outcome is shown verbatim,\n  including the park reason, and the modal stays open so the person reads\n  it rather than being dropped back to a screen that silently did nothing.",
+      "sourceDigest": "adfe80ad864fe0a34219ab5c5201ed1e2423f5ab7ebd0e8b2ec9fdf7c0dab091",
+      "targetPath": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "targetAnchor": "unheaded-block-8",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-8",
+        "githubAnchor": "unheaded-block-8",
+        "stableAnchor": "unheaded-block-8",
+        "title": "Unheaded block 8",
+        "startLine": 79,
+        "endLine": 86,
+        "textDigest": "adfe80ad864fe0a34219ab5c5201ed1e2423f5ab7ebd0e8b2ec9fdf7c0dab091",
+        "sample": "- **ST-READY** — the diff summary and target branch are loaded.\n- **ST-SUBMITTING** — approve in flight; both buttons disabled, progress\n  on the approve button. This one is not in",
+        "identityFingerprint": "6262592eb3da26378a7e58b0bf7b1362824d97fc321cbf21f73a3987bef659e7",
+        "ancestry": [
+          "M02 — Approve a merge",
+          "States"
+        ],
+        "text": "- **ST-READY** — the diff summary and target branch are loaded.\n- **ST-SUBMITTING** — approve in flight; both buttons disabled, progress\n  on the approve button. This one is not instant, and the modal must not\n  look frozen while the verify re-runs.\n- **ERR-WRITE-REFUSED** — fgOS refused or the post-merge verify failed and\n  the item parked blocked. The engine's own outcome is shown verbatim,\n  including the park reason, and the modal stays open so the person reads\n  it rather than being dropped back to a screen that silently did nothing."
+      },
+      "targetShownText": "- **ST-READY** — the diff summary and target branch are loaded.\n- **ST-SUBMITTING** — approve in flight; both buttons disabled, progress\n  on the approve button. This one is not instant, and the modal must not\n  look frozen while the verify re-runs.\n- **ERR-WRITE-REFUSED** — fgOS refused or the post-merge verify failed and\n  the item parked blocked. The engine's own outcome is shown verbatim,\n  including the park reason, and the modal stays open so the person reads\n  it rather than being dropped back to a screen that silently did nothing.",
+      "targetDigest": "adfe80ad864fe0a34219ab5c5201ed1e2423f5ab7ebd0e8b2ec9fdf7c0dab091",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_8078baf6ee718f1be4d482c2f303e62d",
+        "sourceUnitDigest": "adfe80ad864fe0a34219ab5c5201ed1e2423f5ab7ebd0e8b2ec9fdf7c0dab091",
+        "targetOwner": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+        "targetAnchor": "unheaded-block-8",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/modals/M02-approve-merge.md#unheaded-block-6 (source lines 57-64) is carried at docs/platform/ui-spec/architecture/modals/M02-approve-merge.md#unheaded-block-8 (candidate lines 79-86). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/modals/M02-approve-merge.md verbatim in docs/platform/ui-spec/architecture/modals/M02-approve-merge.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "adfe80ad864fe0a34219ab5c5201ed1e2423f5ab7ebd0e8b2ec9fdf7c0dab091",
+        "targetAncestry": [
+          "M02 — Approve a merge",
+          "States"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_64fd7dcc92d75c4ea35fc85e3b0bf0e4",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/modals/M02-approve-merge.md",
+      "sourceAnchor": "interactions",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Interactions",
+        "anchor": "interactions",
+        "githubAnchor": "interactions",
+        "stableAnchor": "h-e908e2c95ecc",
+        "startLine": 66,
+        "endLine": 66,
+        "textDigest": "02c34309f74a28101722d3bf5d0e6c0f2fb7f3f6965cb299eb1e75435ebe0e29",
+        "sample": "Interactions",
+        "sectionPayloadDigest": "5cc68620a8b0811fa889b25ab1c46d45a394835254085bd439000aaff59b0fa6",
+        "followingBlockDigest": "5cc68620a8b0811fa889b25ab1c46d45a394835254085bd439000aaff59b0fa6",
+        "identityFingerprint": "4fa7e0ae5cb8ecca38d7c51abb8cb868b61c57c3a82925c5e46cc504d5cb05ed",
+        "ancestry": [
+          "M02 — Approve a merge"
+        ],
+        "text": "## Interactions",
+        "sectionText": "## Interactions\n\n```yaml herdrweb-contract\ninteractions:\n  - id: A-M02-001\n    element: approve_merge_button\n    region: footer\n    trigger: submit\n    guard: \"gateway.atMainWorkingTree\"\n    action: close_overlay\n    target: return_to_invoker\n    effects: [run_fgos_approve_verb]\n  - id: A-M02-002\n    element: cancel_button\n    region: footer\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n  - id: A-M02-003\n    element: close_icon\n    region: header\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n```"
+      },
+      "sourceShownText": "## Interactions\n\n```yaml herdrweb-contract\ninteractions:\n  - id: A-M02-001\n    element: approve_merge_button\n    region: footer\n    trigger: submit\n    guard: \"gateway.atMainWorkingTree\"\n    action: close_overlay\n    target: return_to_invoker\n    effects: [run_fgos_approve_verb]\n  - id: A-M02-002\n    element: cancel_button\n    region: footer\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n  - id: A-M02-003\n    element: close_icon\n    region: header\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n```",
+      "sourceDigest": "02c34309f74a28101722d3bf5d0e6c0f2fb7f3f6965cb299eb1e75435ebe0e29",
+      "targetPath": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "targetAnchor": "interactions",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Interactions",
+        "anchor": "interactions",
+        "githubAnchor": "interactions",
+        "stableAnchor": "h-09b809ce67a5",
+        "startLine": 88,
+        "endLine": 88,
+        "textDigest": "02c34309f74a28101722d3bf5d0e6c0f2fb7f3f6965cb299eb1e75435ebe0e29",
+        "sample": "Interactions",
+        "sectionPayloadDigest": "5cc68620a8b0811fa889b25ab1c46d45a394835254085bd439000aaff59b0fa6",
+        "followingBlockDigest": "5cc68620a8b0811fa889b25ab1c46d45a394835254085bd439000aaff59b0fa6",
+        "identityFingerprint": "4fa7e0ae5cb8ecca38d7c51abb8cb868b61c57c3a82925c5e46cc504d5cb05ed",
+        "ancestry": [
+          "M02 — Approve a merge"
+        ],
+        "text": "## Interactions",
+        "sectionText": "## Interactions\n\n```yaml herdrweb-contract\ninteractions:\n  - id: A-M02-001\n    element: approve_merge_button\n    region: footer\n    trigger: submit\n    guard: \"gateway.atMainWorkingTree\"\n    action: close_overlay\n    target: return_to_invoker\n    effects: [run_fgos_approve_verb]\n  - id: A-M02-002\n    element: cancel_button\n    region: footer\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n  - id: A-M02-003\n    element: close_icon\n    region: header\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n```"
+      },
+      "targetShownText": "## Interactions\n\n```yaml herdrweb-contract\ninteractions:\n  - id: A-M02-001\n    element: approve_merge_button\n    region: footer\n    trigger: submit\n    guard: \"gateway.atMainWorkingTree\"\n    action: close_overlay\n    target: return_to_invoker\n    effects: [run_fgos_approve_verb]\n  - id: A-M02-002\n    element: cancel_button\n    region: footer\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n  - id: A-M02-003\n    element: close_icon\n    region: header\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n```",
+      "targetDigest": "02c34309f74a28101722d3bf5d0e6c0f2fb7f3f6965cb299eb1e75435ebe0e29",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_64fd7dcc92d75c4ea35fc85e3b0bf0e4",
+        "sourceUnitDigest": "02c34309f74a28101722d3bf5d0e6c0f2fb7f3f6965cb299eb1e75435ebe0e29",
+        "targetOwner": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+        "targetAnchor": "interactions",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/ui-spec/modals/M02-approve-merge.md#interactions (source lines 66-66) is carried at docs/platform/ui-spec/architecture/modals/M02-approve-merge.md#interactions (candidate lines 88-88). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/modals/M02-approve-merge.md verbatim in docs/platform/ui-spec/architecture/modals/M02-approve-merge.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "02c34309f74a28101722d3bf5d0e6c0f2fb7f3f6965cb299eb1e75435ebe0e29",
+        "targetAncestry": [
+          "M02 — Approve a merge"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_c6659cd7ed74e445fe099f5236551cb7",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/modals/M02-approve-merge.md",
+      "sourceAnchor": "unheaded-block-7",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 68,
+        "endLine": 90,
+        "textDigest": "5cc68620a8b0811fa889b25ab1c46d45a394835254085bd439000aaff59b0fa6",
+        "sample": "```yaml herdrweb-contract\ninteractions:\n  - id: A-M02-001\n    element: approve_merge_button\n    region: footer\n    trigger: submit\n    guard: \"gateway.atMainWorkingTree\"\n    action",
+        "identityFingerprint": "aa5fc818acbe6f331793529d1e495a78abed0841cbb6ed276ac9d2cca8008fce",
+        "ancestry": [
+          "M02 — Approve a merge",
+          "Interactions"
+        ],
+        "text": "```yaml herdrweb-contract\ninteractions:\n  - id: A-M02-001\n    element: approve_merge_button\n    region: footer\n    trigger: submit\n    guard: \"gateway.atMainWorkingTree\"\n    action: close_overlay\n    target: return_to_invoker\n    effects: [run_fgos_approve_verb]\n  - id: A-M02-002\n    element: cancel_button\n    region: footer\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n  - id: A-M02-003\n    element: close_icon\n    region: header\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n```"
+      },
+      "sourceShownText": "```yaml herdrweb-contract\ninteractions:\n  - id: A-M02-001\n    element: approve_merge_button\n    region: footer\n    trigger: submit\n    guard: \"gateway.atMainWorkingTree\"\n    action: close_overlay\n    target: return_to_invoker\n    effects: [run_fgos_approve_verb]\n  - id: A-M02-002\n    element: cancel_button\n    region: footer\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n  - id: A-M02-003\n    element: close_icon\n    region: header\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n```",
+      "sourceDigest": "5cc68620a8b0811fa889b25ab1c46d45a394835254085bd439000aaff59b0fa6",
+      "targetPath": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "targetAnchor": "unheaded-block-9",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-9",
+        "githubAnchor": "unheaded-block-9",
+        "stableAnchor": "unheaded-block-9",
+        "title": "Unheaded block 9",
+        "startLine": 90,
+        "endLine": 112,
+        "textDigest": "5cc68620a8b0811fa889b25ab1c46d45a394835254085bd439000aaff59b0fa6",
+        "sample": "```yaml herdrweb-contract\ninteractions:\n  - id: A-M02-001\n    element: approve_merge_button\n    region: footer\n    trigger: submit\n    guard: \"gateway.atMainWorkingTree\"\n    action",
+        "identityFingerprint": "aa5fc818acbe6f331793529d1e495a78abed0841cbb6ed276ac9d2cca8008fce",
+        "ancestry": [
+          "M02 — Approve a merge",
+          "Interactions"
+        ],
+        "text": "```yaml herdrweb-contract\ninteractions:\n  - id: A-M02-001\n    element: approve_merge_button\n    region: footer\n    trigger: submit\n    guard: \"gateway.atMainWorkingTree\"\n    action: close_overlay\n    target: return_to_invoker\n    effects: [run_fgos_approve_verb]\n  - id: A-M02-002\n    element: cancel_button\n    region: footer\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n  - id: A-M02-003\n    element: close_icon\n    region: header\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n```"
+      },
+      "targetShownText": "```yaml herdrweb-contract\ninteractions:\n  - id: A-M02-001\n    element: approve_merge_button\n    region: footer\n    trigger: submit\n    guard: \"gateway.atMainWorkingTree\"\n    action: close_overlay\n    target: return_to_invoker\n    effects: [run_fgos_approve_verb]\n  - id: A-M02-002\n    element: cancel_button\n    region: footer\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n  - id: A-M02-003\n    element: close_icon\n    region: header\n    trigger: click\n    action: close_overlay\n    target: return_to_invoker\n```",
+      "targetDigest": "5cc68620a8b0811fa889b25ab1c46d45a394835254085bd439000aaff59b0fa6",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_c6659cd7ed74e445fe099f5236551cb7",
+        "sourceUnitDigest": "5cc68620a8b0811fa889b25ab1c46d45a394835254085bd439000aaff59b0fa6",
+        "targetOwner": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+        "targetAnchor": "unheaded-block-9",
+        "claimKind": "contract",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/modals/M02-approve-merge.md#unheaded-block-7 (source lines 68-90) is carried at docs/platform/ui-spec/architecture/modals/M02-approve-merge.md#unheaded-block-9 (candidate lines 90-112). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/modals/M02-approve-merge.md verbatim in docs/platform/ui-spec/architecture/modals/M02-approve-merge.md. Map kind architecture is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "5cc68620a8b0811fa889b25ab1c46d45a394835254085bd439000aaff59b0fa6",
+        "targetAncestry": [
+          "M02 — Approve a merge",
+          "Interactions"
+        ]
+      }
+    }
+  ]
+}

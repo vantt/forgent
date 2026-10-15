@@ -1,0 +1,1102 @@
+{
+  "version": 1,
+  "contentCommit": "1276467f37a99d19aff05808d42fafbf40341449",
+  "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+  "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+  "sourcePath": "docs/ui-spec/00-overview.md",
+  "part": 1,
+  "parts": 1,
+  "count": 16,
+  "classes": {
+    "Unit-exact": [
+      "claim_4fa792519d532d3ad333e0c2566bc935",
+      "claim_a6ab93a6bd86cc14f83e5022a2323387",
+      "claim_88fd76453441113b17cd784177a9081c",
+      "claim_91330f2248982f1d6df5071f335b1064",
+      "claim_af10734d11a45127f86e662a27b20bff",
+      "claim_902e852cbdd48042261059044bba9304",
+      "claim_23152a13579b15a727ac20354b0c0889",
+      "claim_f5414fdf7b56dcc5ecfee0dbbe5b9cd2",
+      "claim_dd3ad839ba07d233d4389822d192e7a1",
+      "claim_7adfa144991fe6de9a316f7ea81553d0",
+      "claim_271679d81259c0ae4190964de3d736f2"
+    ],
+    "Weak-exact": [
+      "claim_93f7e5f60f6407a6ff0969b5e85302fd",
+      "claim_1745b0635297cf66ced230f28ef40703",
+      "claim_a3fe6a352c2538925b3831551da1762d",
+      "claim_2361b06eda9a97678fdb502cb5949d3e"
+    ],
+    "Judgment": [
+      "claim_4e48bd602a0ab47752c147905e76c3e2"
+    ]
+  },
+  "unequalDigestPairs": [
+    "claim_4e48bd602a0ab47752c147905e76c3e2"
+  ],
+  "noTargetGeneratedRows": [],
+  "mandatoryDeep": [
+    "claim_4e48bd602a0ab47752c147905e76c3e2"
+  ],
+  "reviewerSeedRequired": true,
+  "minimumSeededWeakJudgment": 5,
+  "rows": [
+    {
+      "claimId": "claim_4fa792519d532d3ad333e0c2566bc935",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/00-overview.md",
+      "sourceAnchor": "unheaded-block-1",
+      "source": {
+        "unitKind": "unheaded-preamble",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded preamble",
+        "startLine": 1,
+        "endLine": 7,
+        "textDigest": "b61e74726631cc9e12744d93383ce64b2afff77ec3d0a58e3fac7631be969ecd",
+        "sample": "---\nid: overview\ntype: meta\nname: \"herdr web dashboard UI Spec — Overview\"\nstatus: active\nversion: \"0.1.0\"\n---",
+        "identityFingerprint": "c4e4567758e54f8bc196d5e29b97a51ae53a24bdb9410578beca2d0161687d39",
+        "ancestry": [],
+        "text": "---\nid: overview\ntype: meta\nname: \"herdr web dashboard UI Spec — Overview\"\nstatus: active\nversion: \"0.1.0\"\n---"
+      },
+      "sourceShownText": "---\nid: overview\ntype: meta\nname: \"herdr web dashboard UI Spec — Overview\"\nstatus: active\nversion: \"0.1.0\"\n---",
+      "sourceDigest": "b61e74726631cc9e12744d93383ce64b2afff77ec3d0a58e3fac7631be969ecd",
+      "targetPath": "docs/platform/ui-spec/spec.md",
+      "targetAnchor": "unheaded-block-1",
+      "target": {
+        "unitKind": "unheaded-preamble",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded preamble",
+        "startLine": 1,
+        "endLine": 7,
+        "textDigest": "b61e74726631cc9e12744d93383ce64b2afff77ec3d0a58e3fac7631be969ecd",
+        "sample": "---\nid: overview\ntype: meta\nname: \"herdr web dashboard UI Spec — Overview\"\nstatus: active\nversion: \"0.1.0\"\n---",
+        "identityFingerprint": "c4e4567758e54f8bc196d5e29b97a51ae53a24bdb9410578beca2d0161687d39",
+        "ancestry": [],
+        "text": "---\nid: overview\ntype: meta\nname: \"herdr web dashboard UI Spec — Overview\"\nstatus: active\nversion: \"0.1.0\"\n---"
+      },
+      "targetShownText": "---\nid: overview\ntype: meta\nname: \"herdr web dashboard UI Spec — Overview\"\nstatus: active\nversion: \"0.1.0\"\n---",
+      "targetDigest": "b61e74726631cc9e12744d93383ce64b2afff77ec3d0a58e3fac7631be969ecd",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_4fa792519d532d3ad333e0c2566bc935",
+        "sourceUnitDigest": "b61e74726631cc9e12744d93383ce64b2afff77ec3d0a58e3fac7631be969ecd",
+        "targetOwner": "docs/platform/ui-spec/spec.md",
+        "targetAnchor": "unheaded-block-1",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-preamble unit docs/ui-spec/00-overview.md#unheaded-block-1 (source lines 1-7) is carried at docs/platform/ui-spec/spec.md#unheaded-block-1 (candidate lines 1-7). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/00-overview.md verbatim in docs/platform/ui-spec/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "b61e74726631cc9e12744d93383ce64b2afff77ec3d0a58e3fac7631be969ecd",
+        "targetAncestry": []
+      }
+    },
+    {
+      "claimId": "claim_4e48bd602a0ab47752c147905e76c3e2",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/00-overview.md",
+      "sourceAnchor": "herdr-web-dashboard-ui-spec-overview",
+      "source": {
+        "unitKind": "heading",
+        "level": 1,
+        "title": "herdr web dashboard — UI spec overview",
+        "anchor": "herdr-web-dashboard-ui-spec-overview",
+        "githubAnchor": "herdr-web-dashboard-ui-spec-overview",
+        "stableAnchor": "h-2073e25d4501",
+        "startLine": 9,
+        "endLine": 9,
+        "textDigest": "87f229e8d1ca3a6c606726b5462eb73225eb295df6c23ad54eacb323825e0a63",
+        "sample": "herdr web dashboard — UI spec overview",
+        "sectionPayloadDigest": "5927992ba3c4cdd4f54249028af54afa5a152d394c70563c82f5c419a9135ffe",
+        "followingBlockDigest": "1e1a662c6e15fe8e83c97b729c44872d5cc75aa94cf4f8e1b1789d7e3ba2775d",
+        "identityFingerprint": "06d46582363046a6c66ab5f1f835b96ca1fcaddd967ead0bb1ad246802f8ecab",
+        "ancestry": [],
+        "text": "# herdr web dashboard — UI spec overview",
+        "sectionText": "# herdr web dashboard — UI spec overview\n\nInteraction and layout layer for the herdr web dashboard.\n\n**Product source of truth:** `docs/specs/herdr-web-dashboard.md` (the area\nspec, `tsk-54j`). Every surface, rule and behaviour here traces back to a\nsection of that document. This layer never settles a product question —\nwhere the area spec has an Open Gap, so does this spec.\n\n**Human-readable companion:** `docs/reference/herdr-web-dashboard-layout.md`\n— the read-in-one-pass layout document that `tsk-5jr` (taskboard) and\n`tsk-4id` (task detail) open while building."
+      },
+      "sourceShownText": "# herdr web dashboard — UI spec overview\n\nInteraction and layout layer for the herdr web dashboard.\n\n**Product source of truth:** `docs/specs/herdr-web-dashboard.md` (the area\nspec, `tsk-54j`). Every surface, rule and behaviour here traces back to a\nsection of that document. This layer never settles a product question —\nwhere the area spec has an Open Gap, so does this spec.\n\n**Human-readable companion:** `docs/reference/herdr-web-dashboard-layout.md`\n— the read-in-one-pass layout document that `tsk-5jr` (taskboard) and\n`tsk-4id` (task detail) open while building.",
+      "sourceDigest": "87f229e8d1ca3a6c606726b5462eb73225eb295df6c23ad54eacb323825e0a63",
+      "targetPath": "docs/platform/ui-spec/spec.md",
+      "targetAnchor": "herdr-web-dashboard-ui-spec-overview",
+      "target": {
+        "unitKind": "heading",
+        "level": 1,
+        "title": "herdr web dashboard — UI spec overview",
+        "anchor": "herdr-web-dashboard-ui-spec-overview",
+        "githubAnchor": "herdr-web-dashboard-ui-spec-overview",
+        "stableAnchor": "h-2073e25d4501",
+        "startLine": 9,
+        "endLine": 9,
+        "textDigest": "d099070fdd330d25219555158140d87b108242e10e119bba5ce4d82ac40d2aa7",
+        "sample": "herdr web dashboard — UI spec overview",
+        "sectionPayloadDigest": "5552af674a4474028edf644556d6946498a046568a06e0e1c15548791902804b",
+        "followingBlockDigest": "1f0a905d563027e15844e4b9dfff0ba7ac076a1a7eb05ada3c24b4bc5f81d5f6",
+        "identityFingerprint": "bc1221b0cc6c338011e9073db8b524d330131c943fe83ebb993cd7f525e4b42f",
+        "ancestry": [],
+        "text": "# herdr web dashboard — UI spec overview",
+        "sectionText": "# herdr web dashboard — UI spec overview\n\n```txt\nDocument type: Specification\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve mapped legacy content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; current implementation truth is not certified\nProvenance: docs/ui-spec/00-overview.md at 111adc51fd047d99121fd9d076eb4794c87045a4\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing carriage, placement and source conservation\nDo not use this for: Current canonical authority or implemented-behavior proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/ui-spec/00-overview.md\nSupersedes: None; candidate only\nSuperseded by: None\n```\n\n> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions.\n\n\nInteraction and layout layer for the herdr web dashboard.\n\n**Product source of truth:** `docs/specs/herdr-web-dashboard.md` (the area\nspec, `tsk-54j`). Every surface, rule and behaviour here traces back to a\nsection of that document. This layer never settles a product question —\nwhere the area spec has an Open Gap, so does this spec.\n\n**Human-readable companion:** `docs/reference/herdr-web-dashboard-layout.md`\n— the read-in-one-pass layout document that `tsk-5jr` (taskboard) and\n`tsk-4id` (task detail) open while building."
+      },
+      "targetShownText": "# herdr web dashboard — UI spec overview\n\n```txt\nDocument type: Specification\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve mapped legacy content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; current implementation truth is not certified\nProvenance: docs/ui-spec/00-overview.md at 111adc51fd047d99121fd9d076eb4794c87045a4\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing carriage, placement and source conservation\nDo not use this for: Current canonical authority or implemented-behavior proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/ui-spec/00-overview.md\nSupersedes: None; candidate only\nSuperseded by: None\n```\n\n> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions.\n\n\nInteraction and layout layer for the herdr web dashboard.\n\n**Product source of truth:** `docs/specs/herdr-web-dashboard.md` (the area\nspec, `tsk-54j`). Every surface, rule and behaviour here traces back to a\nsection of that document. This layer never settles a product question —\nwhere the area spec has an Open Gap, so does this spec.\n\n**Human-readable companion:** `docs/reference/herdr-web-dashboard-layout.md`\n— the read-in-one-pass layout document that `tsk-5jr` (taskboard) and\n`tsk-4id` (task detail) open while building.",
+      "targetDigest": "d099070fdd330d25219555158140d87b108242e10e119bba5ce4d82ac40d2aa7",
+      "classification": "Judgment",
+      "mandatoryDeep": true,
+      "decision": {
+        "claimId": "claim_4e48bd602a0ab47752c147905e76c3e2",
+        "sourceUnitDigest": "87f229e8d1ca3a6c606726b5462eb73225eb295df6c23ad54eacb323825e0a63",
+        "targetOwner": "docs/platform/ui-spec/spec.md",
+        "targetAnchor": "herdr-web-dashboard-ui-spec-overview",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Judgment: no target digest match. The whole heading unit docs/ui-spec/00-overview.md#herdr-web-dashboard-ui-spec-overview (source lines 9-9) is carried at docs/platform/ui-spec/spec.md#herdr-web-dashboard-ui-spec-overview (candidate lines 9-9). The heading section digest changes because labelled candidate metadata is inserted after the original H1; original heading and direct source payload remain verbatim. Frozen specs-ui map and Step 8: preserve docs/ui-spec/00-overview.md verbatim in docs/platform/ui-spec/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "d099070fdd330d25219555158140d87b108242e10e119bba5ce4d82ac40d2aa7",
+        "targetAncestry": []
+      }
+    },
+    {
+      "claimId": "claim_a6ab93a6bd86cc14f83e5022a2323387",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/00-overview.md",
+      "sourceAnchor": "unheaded-block-2",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-2",
+        "githubAnchor": "unheaded-block-2",
+        "stableAnchor": "unheaded-block-2",
+        "title": "Unheaded block 2",
+        "startLine": 11,
+        "endLine": 11,
+        "textDigest": "1e1a662c6e15fe8e83c97b729c44872d5cc75aa94cf4f8e1b1789d7e3ba2775d",
+        "sample": "Interaction and layout layer for the herdr web dashboard.",
+        "identityFingerprint": "b5378070116a62190e3ee4743d811ea4b6c57bb8b46cca06072a67f7ec3caa5e",
+        "ancestry": [
+          "herdr web dashboard — UI spec overview"
+        ],
+        "text": "Interaction and layout layer for the herdr web dashboard."
+      },
+      "sourceShownText": "Interaction and layout layer for the herdr web dashboard.",
+      "sourceDigest": "1e1a662c6e15fe8e83c97b729c44872d5cc75aa94cf4f8e1b1789d7e3ba2775d",
+      "targetPath": "docs/platform/ui-spec/spec.md",
+      "targetAnchor": "unheaded-block-4",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 33,
+        "endLine": 33,
+        "textDigest": "1e1a662c6e15fe8e83c97b729c44872d5cc75aa94cf4f8e1b1789d7e3ba2775d",
+        "sample": "Interaction and layout layer for the herdr web dashboard.",
+        "identityFingerprint": "b5378070116a62190e3ee4743d811ea4b6c57bb8b46cca06072a67f7ec3caa5e",
+        "ancestry": [
+          "herdr web dashboard — UI spec overview"
+        ],
+        "text": "Interaction and layout layer for the herdr web dashboard."
+      },
+      "targetShownText": "Interaction and layout layer for the herdr web dashboard.",
+      "targetDigest": "1e1a662c6e15fe8e83c97b729c44872d5cc75aa94cf4f8e1b1789d7e3ba2775d",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_a6ab93a6bd86cc14f83e5022a2323387",
+        "sourceUnitDigest": "1e1a662c6e15fe8e83c97b729c44872d5cc75aa94cf4f8e1b1789d7e3ba2775d",
+        "targetOwner": "docs/platform/ui-spec/spec.md",
+        "targetAnchor": "unheaded-block-4",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/00-overview.md#unheaded-block-2 (source lines 11-11) is carried at docs/platform/ui-spec/spec.md#unheaded-block-4 (candidate lines 33-33). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/00-overview.md verbatim in docs/platform/ui-spec/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "1e1a662c6e15fe8e83c97b729c44872d5cc75aa94cf4f8e1b1789d7e3ba2775d",
+        "targetAncestry": [
+          "herdr web dashboard — UI spec overview"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_88fd76453441113b17cd784177a9081c",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/00-overview.md",
+      "sourceAnchor": "unheaded-block-3",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 13,
+        "endLine": 16,
+        "textDigest": "5d2b18d22620d6ad6bb42432f5f38fa6660f15e7e6c604225f67d96faa40ac55",
+        "sample": "**Product source of truth:** `docs/specs/herdr-web-dashboard.md` (the area\nspec, `tsk-54j`). Every surface, rule and behaviour here traces back to a\nsection of that document. This ",
+        "identityFingerprint": "bd51d0bc8e0ccfe5a5c9ef1f9a7b72686d33163742a9ce6040ba41a48d71c6c2",
+        "ancestry": [
+          "herdr web dashboard — UI spec overview"
+        ],
+        "text": "**Product source of truth:** `docs/specs/herdr-web-dashboard.md` (the area\nspec, `tsk-54j`). Every surface, rule and behaviour here traces back to a\nsection of that document. This layer never settles a product question —\nwhere the area spec has an Open Gap, so does this spec."
+      },
+      "sourceShownText": "**Product source of truth:** `docs/specs/herdr-web-dashboard.md` (the area\nspec, `tsk-54j`). Every surface, rule and behaviour here traces back to a\nsection of that document. This layer never settles a product question —\nwhere the area spec has an Open Gap, so does this spec.",
+      "sourceDigest": "5d2b18d22620d6ad6bb42432f5f38fa6660f15e7e6c604225f67d96faa40ac55",
+      "targetPath": "docs/platform/ui-spec/spec.md",
+      "targetAnchor": "unheaded-block-5",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 35,
+        "endLine": 38,
+        "textDigest": "5d2b18d22620d6ad6bb42432f5f38fa6660f15e7e6c604225f67d96faa40ac55",
+        "sample": "**Product source of truth:** `docs/specs/herdr-web-dashboard.md` (the area\nspec, `tsk-54j`). Every surface, rule and behaviour here traces back to a\nsection of that document. This ",
+        "identityFingerprint": "bd51d0bc8e0ccfe5a5c9ef1f9a7b72686d33163742a9ce6040ba41a48d71c6c2",
+        "ancestry": [
+          "herdr web dashboard — UI spec overview"
+        ],
+        "text": "**Product source of truth:** `docs/specs/herdr-web-dashboard.md` (the area\nspec, `tsk-54j`). Every surface, rule and behaviour here traces back to a\nsection of that document. This layer never settles a product question —\nwhere the area spec has an Open Gap, so does this spec."
+      },
+      "targetShownText": "**Product source of truth:** `docs/specs/herdr-web-dashboard.md` (the area\nspec, `tsk-54j`). Every surface, rule and behaviour here traces back to a\nsection of that document. This layer never settles a product question —\nwhere the area spec has an Open Gap, so does this spec.",
+      "targetDigest": "5d2b18d22620d6ad6bb42432f5f38fa6660f15e7e6c604225f67d96faa40ac55",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_88fd76453441113b17cd784177a9081c",
+        "sourceUnitDigest": "5d2b18d22620d6ad6bb42432f5f38fa6660f15e7e6c604225f67d96faa40ac55",
+        "targetOwner": "docs/platform/ui-spec/spec.md",
+        "targetAnchor": "unheaded-block-5",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/00-overview.md#unheaded-block-3 (source lines 13-16) is carried at docs/platform/ui-spec/spec.md#unheaded-block-5 (candidate lines 35-38). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/00-overview.md verbatim in docs/platform/ui-spec/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "5d2b18d22620d6ad6bb42432f5f38fa6660f15e7e6c604225f67d96faa40ac55",
+        "targetAncestry": [
+          "herdr web dashboard — UI spec overview"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_91330f2248982f1d6df5071f335b1064",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/00-overview.md",
+      "sourceAnchor": "unheaded-block-4",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 18,
+        "endLine": 20,
+        "textDigest": "ea8915b9b44ba81d2f47d5949641f3daf7f112d295f68b4e35e1d0e59576ee26",
+        "sample": "**Human-readable companion:** `docs/reference/herdr-web-dashboard-layout.md`\n— the read-in-one-pass layout document that `tsk-5jr` (taskboard) and\n`tsk-4id` (task detail) open whil",
+        "identityFingerprint": "f78054c72180b2e4738232674fefeeca4e45d1cd62da7c795ecfb5c5c7bdcfbc",
+        "ancestry": [
+          "herdr web dashboard — UI spec overview"
+        ],
+        "text": "**Human-readable companion:** `docs/reference/herdr-web-dashboard-layout.md`\n— the read-in-one-pass layout document that `tsk-5jr` (taskboard) and\n`tsk-4id` (task detail) open while building."
+      },
+      "sourceShownText": "**Human-readable companion:** `docs/reference/herdr-web-dashboard-layout.md`\n— the read-in-one-pass layout document that `tsk-5jr` (taskboard) and\n`tsk-4id` (task detail) open while building.",
+      "sourceDigest": "ea8915b9b44ba81d2f47d5949641f3daf7f112d295f68b4e35e1d0e59576ee26",
+      "targetPath": "docs/platform/ui-spec/spec.md",
+      "targetAnchor": "unheaded-block-6",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 40,
+        "endLine": 42,
+        "textDigest": "ea8915b9b44ba81d2f47d5949641f3daf7f112d295f68b4e35e1d0e59576ee26",
+        "sample": "**Human-readable companion:** `docs/reference/herdr-web-dashboard-layout.md`\n— the read-in-one-pass layout document that `tsk-5jr` (taskboard) and\n`tsk-4id` (task detail) open whil",
+        "identityFingerprint": "f78054c72180b2e4738232674fefeeca4e45d1cd62da7c795ecfb5c5c7bdcfbc",
+        "ancestry": [
+          "herdr web dashboard — UI spec overview"
+        ],
+        "text": "**Human-readable companion:** `docs/reference/herdr-web-dashboard-layout.md`\n— the read-in-one-pass layout document that `tsk-5jr` (taskboard) and\n`tsk-4id` (task detail) open while building."
+      },
+      "targetShownText": "**Human-readable companion:** `docs/reference/herdr-web-dashboard-layout.md`\n— the read-in-one-pass layout document that `tsk-5jr` (taskboard) and\n`tsk-4id` (task detail) open while building.",
+      "targetDigest": "ea8915b9b44ba81d2f47d5949641f3daf7f112d295f68b4e35e1d0e59576ee26",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_91330f2248982f1d6df5071f335b1064",
+        "sourceUnitDigest": "ea8915b9b44ba81d2f47d5949641f3daf7f112d295f68b4e35e1d0e59576ee26",
+        "targetOwner": "docs/platform/ui-spec/spec.md",
+        "targetAnchor": "unheaded-block-6",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/00-overview.md#unheaded-block-4 (source lines 18-20) is carried at docs/platform/ui-spec/spec.md#unheaded-block-6 (candidate lines 40-42). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/00-overview.md verbatim in docs/platform/ui-spec/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "ea8915b9b44ba81d2f47d5949641f3daf7f112d295f68b4e35e1d0e59576ee26",
+        "targetAncestry": [
+          "herdr web dashboard — UI spec overview"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_93f7e5f60f6407a6ff0969b5e85302fd",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/00-overview.md",
+      "sourceAnchor": "surface-index",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Surface index",
+        "anchor": "surface-index",
+        "githubAnchor": "surface-index",
+        "stableAnchor": "h-6f4c0a0da036",
+        "startLine": 22,
+        "endLine": 22,
+        "textDigest": "c54dfe553e1f9d27c69b590fea4d02964f262edc90e49d59771e2fc45e7b7b2d",
+        "sample": "Surface index",
+        "sectionPayloadDigest": "b2478f0a0afcf5d770bc7d21f043829a5ec197b25e8fdc2390c443530f1a1c93",
+        "followingBlockDigest": "3a16ef11f4728b4ec8127ff4000b0c62f5f7c886f54be0e13e2a866539db5c69",
+        "identityFingerprint": "5a1928945441fd5f70618ecfe1ac5e0b953b0a1e1e64093ea486c0e8f422d1e8",
+        "ancestry": [
+          "herdr web dashboard — UI spec overview"
+        ],
+        "text": "## Surface index",
+        "sectionText": "## Surface index\n\n| ID | Name | Type | Source in the area spec |\n|---|---|---|---|\n| S01 | Sign in | screen | §Sign in |\n| S02 | Taskboard | screen | §View the taskboard |\n| S03 | Task detail | screen | §View a task's detail |\n| S04 | Questions needing answer | screen | §Entry Points, Data Dictionary #4 |\n| M01 | Answer a parked question | modal | §Answer a parked question |\n| M02 | Approve a merge | modal | §Approve a merge |\n| M03 | Add or edit a work item | modal | §Add a work item, §Edit a work item |\n| C01 | Item card with status pill and quick actions | component | §View the taskboard |\n| F01 | Answer a parked question, end to end | flow | commissioning item's required userflow |\n| F02 | Approve a merge, end to end | flow | commissioning item's required userflow |\n\nAll eight `###` behaviour subsections of the area spec are covered.\n\"Retire a work item\" has no surface of its own by design — it is a quick\naction on C01 plus a confirmation, matching the area spec's own framing of\nretirement rather than deletion."
+      },
+      "sourceShownText": "## Surface index\n\n| ID | Name | Type | Source in the area spec |\n|---|---|---|---|\n| S01 | Sign in | screen | §Sign in |\n| S02 | Taskboard | screen | §View the taskboard |\n| S03 | Task detail | screen | §View a task's detail |\n| S04 | Questions needing answer | screen | §Entry Points, Data Dictionary #4 |\n| M01 | Answer a parked question | modal | §Answer a parked question |\n| M02 | Approve a merge | modal | §Approve a merge |\n| M03 | Add or edit a work item | modal | §Add a work item, §Edit a work item |\n| C01 | Item card with status pill and quick actions | component | §View the taskboard |\n| F01 | Answer a parked question, end to end | flow | commissioning item's required userflow |\n| F02 | Approve a merge, end to end | flow | commissioning item's required userflow |\n\nAll eight `###` behaviour subsections of the area spec are covered.\n\"Retire a work item\" has no surface of its own by design — it is a quick\naction on C01 plus a confirmation, matching the area spec's own framing of\nretirement rather than deletion.",
+      "sourceDigest": "c54dfe553e1f9d27c69b590fea4d02964f262edc90e49d59771e2fc45e7b7b2d",
+      "targetPath": "docs/platform/ui-spec/spec.md",
+      "targetAnchor": "surface-index",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Surface index",
+        "anchor": "surface-index",
+        "githubAnchor": "surface-index",
+        "stableAnchor": "h-aa00f3497343",
+        "startLine": 44,
+        "endLine": 44,
+        "textDigest": "c54dfe553e1f9d27c69b590fea4d02964f262edc90e49d59771e2fc45e7b7b2d",
+        "sample": "Surface index",
+        "sectionPayloadDigest": "b2478f0a0afcf5d770bc7d21f043829a5ec197b25e8fdc2390c443530f1a1c93",
+        "followingBlockDigest": "3a16ef11f4728b4ec8127ff4000b0c62f5f7c886f54be0e13e2a866539db5c69",
+        "identityFingerprint": "5a1928945441fd5f70618ecfe1ac5e0b953b0a1e1e64093ea486c0e8f422d1e8",
+        "ancestry": [
+          "herdr web dashboard — UI spec overview"
+        ],
+        "text": "## Surface index",
+        "sectionText": "## Surface index\n\n| ID | Name | Type | Source in the area spec |\n|---|---|---|---|\n| S01 | Sign in | screen | §Sign in |\n| S02 | Taskboard | screen | §View the taskboard |\n| S03 | Task detail | screen | §View a task's detail |\n| S04 | Questions needing answer | screen | §Entry Points, Data Dictionary #4 |\n| M01 | Answer a parked question | modal | §Answer a parked question |\n| M02 | Approve a merge | modal | §Approve a merge |\n| M03 | Add or edit a work item | modal | §Add a work item, §Edit a work item |\n| C01 | Item card with status pill and quick actions | component | §View the taskboard |\n| F01 | Answer a parked question, end to end | flow | commissioning item's required userflow |\n| F02 | Approve a merge, end to end | flow | commissioning item's required userflow |\n\nAll eight `###` behaviour subsections of the area spec are covered.\n\"Retire a work item\" has no surface of its own by design — it is a quick\naction on C01 plus a confirmation, matching the area spec's own framing of\nretirement rather than deletion."
+      },
+      "targetShownText": "## Surface index\n\n| ID | Name | Type | Source in the area spec |\n|---|---|---|---|\n| S01 | Sign in | screen | §Sign in |\n| S02 | Taskboard | screen | §View the taskboard |\n| S03 | Task detail | screen | §View a task's detail |\n| S04 | Questions needing answer | screen | §Entry Points, Data Dictionary #4 |\n| M01 | Answer a parked question | modal | §Answer a parked question |\n| M02 | Approve a merge | modal | §Approve a merge |\n| M03 | Add or edit a work item | modal | §Add a work item, §Edit a work item |\n| C01 | Item card with status pill and quick actions | component | §View the taskboard |\n| F01 | Answer a parked question, end to end | flow | commissioning item's required userflow |\n| F02 | Approve a merge, end to end | flow | commissioning item's required userflow |\n\nAll eight `###` behaviour subsections of the area spec are covered.\n\"Retire a work item\" has no surface of its own by design — it is a quick\naction on C01 plus a confirmation, matching the area spec's own framing of\nretirement rather than deletion.",
+      "targetDigest": "c54dfe553e1f9d27c69b590fea4d02964f262edc90e49d59771e2fc45e7b7b2d",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_93f7e5f60f6407a6ff0969b5e85302fd",
+        "sourceUnitDigest": "c54dfe553e1f9d27c69b590fea4d02964f262edc90e49d59771e2fc45e7b7b2d",
+        "targetOwner": "docs/platform/ui-spec/spec.md",
+        "targetAnchor": "surface-index",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/ui-spec/00-overview.md#surface-index (source lines 22-22) is carried at docs/platform/ui-spec/spec.md#surface-index (candidate lines 44-44). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/00-overview.md verbatim in docs/platform/ui-spec/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "c54dfe553e1f9d27c69b590fea4d02964f262edc90e49d59771e2fc45e7b7b2d",
+        "targetAncestry": [
+          "herdr web dashboard — UI spec overview"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_af10734d11a45127f86e662a27b20bff",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/00-overview.md",
+      "sourceAnchor": "unheaded-block-5",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 24,
+        "endLine": 35,
+        "textDigest": "3a16ef11f4728b4ec8127ff4000b0c62f5f7c886f54be0e13e2a866539db5c69",
+        "sample": "| ID | Name | Type | Source in the area spec |\n|---|---|---|---|\n| S01 | Sign in | screen | §Sign in |\n| S02 | Taskboard | screen | §View the taskboard |\n| S03 | Task detail | scre",
+        "identityFingerprint": "208febc523e9ae566ad92e96de0e225cade96894bff66981c804043e7d1bf787",
+        "ancestry": [
+          "herdr web dashboard — UI spec overview",
+          "Surface index"
+        ],
+        "text": "| ID | Name | Type | Source in the area spec |\n|---|---|---|---|\n| S01 | Sign in | screen | §Sign in |\n| S02 | Taskboard | screen | §View the taskboard |\n| S03 | Task detail | screen | §View a task's detail |\n| S04 | Questions needing answer | screen | §Entry Points, Data Dictionary #4 |\n| M01 | Answer a parked question | modal | §Answer a parked question |\n| M02 | Approve a merge | modal | §Approve a merge |\n| M03 | Add or edit a work item | modal | §Add a work item, §Edit a work item |\n| C01 | Item card with status pill and quick actions | component | §View the taskboard |\n| F01 | Answer a parked question, end to end | flow | commissioning item's required userflow |\n| F02 | Approve a merge, end to end | flow | commissioning item's required userflow |"
+      },
+      "sourceShownText": "| ID | Name | Type | Source in the area spec |\n|---|---|---|---|\n| S01 | Sign in | screen | §Sign in |\n| S02 | Taskboard | screen | §View the taskboard |\n| S03 | Task detail | screen | §View a task's detail |\n| S04 | Questions needing answer | screen | §Entry Points, Data Dictionary #4 |\n| M01 | Answer a parked question | modal | §Answer a parked question |\n| M02 | Approve a merge | modal | §Approve a merge |\n| M03 | Add or edit a work item | modal | §Add a work item, §Edit a work item |\n| C01 | Item card with status pill and quick actions | component | §View the taskboard |\n| F01 | Answer a parked question, end to end | flow | commissioning item's required userflow |\n| F02 | Approve a merge, end to end | flow | commissioning item's required userflow |",
+      "sourceDigest": "3a16ef11f4728b4ec8127ff4000b0c62f5f7c886f54be0e13e2a866539db5c69",
+      "targetPath": "docs/platform/ui-spec/spec.md",
+      "targetAnchor": "unheaded-block-7",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 46,
+        "endLine": 57,
+        "textDigest": "3a16ef11f4728b4ec8127ff4000b0c62f5f7c886f54be0e13e2a866539db5c69",
+        "sample": "| ID | Name | Type | Source in the area spec |\n|---|---|---|---|\n| S01 | Sign in | screen | §Sign in |\n| S02 | Taskboard | screen | §View the taskboard |\n| S03 | Task detail | scre",
+        "identityFingerprint": "208febc523e9ae566ad92e96de0e225cade96894bff66981c804043e7d1bf787",
+        "ancestry": [
+          "herdr web dashboard — UI spec overview",
+          "Surface index"
+        ],
+        "text": "| ID | Name | Type | Source in the area spec |\n|---|---|---|---|\n| S01 | Sign in | screen | §Sign in |\n| S02 | Taskboard | screen | §View the taskboard |\n| S03 | Task detail | screen | §View a task's detail |\n| S04 | Questions needing answer | screen | §Entry Points, Data Dictionary #4 |\n| M01 | Answer a parked question | modal | §Answer a parked question |\n| M02 | Approve a merge | modal | §Approve a merge |\n| M03 | Add or edit a work item | modal | §Add a work item, §Edit a work item |\n| C01 | Item card with status pill and quick actions | component | §View the taskboard |\n| F01 | Answer a parked question, end to end | flow | commissioning item's required userflow |\n| F02 | Approve a merge, end to end | flow | commissioning item's required userflow |"
+      },
+      "targetShownText": "| ID | Name | Type | Source in the area spec |\n|---|---|---|---|\n| S01 | Sign in | screen | §Sign in |\n| S02 | Taskboard | screen | §View the taskboard |\n| S03 | Task detail | screen | §View a task's detail |\n| S04 | Questions needing answer | screen | §Entry Points, Data Dictionary #4 |\n| M01 | Answer a parked question | modal | §Answer a parked question |\n| M02 | Approve a merge | modal | §Approve a merge |\n| M03 | Add or edit a work item | modal | §Add a work item, §Edit a work item |\n| C01 | Item card with status pill and quick actions | component | §View the taskboard |\n| F01 | Answer a parked question, end to end | flow | commissioning item's required userflow |\n| F02 | Approve a merge, end to end | flow | commissioning item's required userflow |",
+      "targetDigest": "3a16ef11f4728b4ec8127ff4000b0c62f5f7c886f54be0e13e2a866539db5c69",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_af10734d11a45127f86e662a27b20bff",
+        "sourceUnitDigest": "3a16ef11f4728b4ec8127ff4000b0c62f5f7c886f54be0e13e2a866539db5c69",
+        "targetOwner": "docs/platform/ui-spec/spec.md",
+        "targetAnchor": "unheaded-block-7",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/00-overview.md#unheaded-block-5 (source lines 24-35) is carried at docs/platform/ui-spec/spec.md#unheaded-block-7 (candidate lines 46-57). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/00-overview.md verbatim in docs/platform/ui-spec/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "3a16ef11f4728b4ec8127ff4000b0c62f5f7c886f54be0e13e2a866539db5c69",
+        "targetAncestry": [
+          "herdr web dashboard — UI spec overview",
+          "Surface index"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_902e852cbdd48042261059044bba9304",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/00-overview.md",
+      "sourceAnchor": "unheaded-block-6",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 37,
+        "endLine": 40,
+        "textDigest": "3624843473276cc436449e523d8d392d2c97b9e91ba36ceb685f8b1fd295aea8",
+        "sample": "All eight `###` behaviour subsections of the area spec are covered.\n\"Retire a work item\" has no surface of its own by design — it is a quick\naction on C01 plus a confirmation, matc",
+        "identityFingerprint": "b457522c32032ef68985731013ab7ed5035c010d4d051e73fd887a61706ff4f5",
+        "ancestry": [
+          "herdr web dashboard — UI spec overview",
+          "Surface index"
+        ],
+        "text": "All eight `###` behaviour subsections of the area spec are covered.\n\"Retire a work item\" has no surface of its own by design — it is a quick\naction on C01 plus a confirmation, matching the area spec's own framing of\nretirement rather than deletion."
+      },
+      "sourceShownText": "All eight `###` behaviour subsections of the area spec are covered.\n\"Retire a work item\" has no surface of its own by design — it is a quick\naction on C01 plus a confirmation, matching the area spec's own framing of\nretirement rather than deletion.",
+      "sourceDigest": "3624843473276cc436449e523d8d392d2c97b9e91ba36ceb685f8b1fd295aea8",
+      "targetPath": "docs/platform/ui-spec/spec.md",
+      "targetAnchor": "unheaded-block-8",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-8",
+        "githubAnchor": "unheaded-block-8",
+        "stableAnchor": "unheaded-block-8",
+        "title": "Unheaded block 8",
+        "startLine": 59,
+        "endLine": 62,
+        "textDigest": "3624843473276cc436449e523d8d392d2c97b9e91ba36ceb685f8b1fd295aea8",
+        "sample": "All eight `###` behaviour subsections of the area spec are covered.\n\"Retire a work item\" has no surface of its own by design — it is a quick\naction on C01 plus a confirmation, matc",
+        "identityFingerprint": "b457522c32032ef68985731013ab7ed5035c010d4d051e73fd887a61706ff4f5",
+        "ancestry": [
+          "herdr web dashboard — UI spec overview",
+          "Surface index"
+        ],
+        "text": "All eight `###` behaviour subsections of the area spec are covered.\n\"Retire a work item\" has no surface of its own by design — it is a quick\naction on C01 plus a confirmation, matching the area spec's own framing of\nretirement rather than deletion."
+      },
+      "targetShownText": "All eight `###` behaviour subsections of the area spec are covered.\n\"Retire a work item\" has no surface of its own by design — it is a quick\naction on C01 plus a confirmation, matching the area spec's own framing of\nretirement rather than deletion.",
+      "targetDigest": "3624843473276cc436449e523d8d392d2c97b9e91ba36ceb685f8b1fd295aea8",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_902e852cbdd48042261059044bba9304",
+        "sourceUnitDigest": "3624843473276cc436449e523d8d392d2c97b9e91ba36ceb685f8b1fd295aea8",
+        "targetOwner": "docs/platform/ui-spec/spec.md",
+        "targetAnchor": "unheaded-block-8",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/00-overview.md#unheaded-block-6 (source lines 37-40) is carried at docs/platform/ui-spec/spec.md#unheaded-block-8 (candidate lines 59-62). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/00-overview.md verbatim in docs/platform/ui-spec/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "3624843473276cc436449e523d8d392d2c97b9e91ba36ceb685f8b1fd295aea8",
+        "targetAncestry": [
+          "herdr web dashboard — UI spec overview",
+          "Surface index"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_1745b0635297cf66ced230f28ef40703",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/00-overview.md",
+      "sourceAnchor": "directory-tree",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Directory tree",
+        "anchor": "directory-tree",
+        "githubAnchor": "directory-tree",
+        "stableAnchor": "h-4aa7a50f17dc",
+        "startLine": 42,
+        "endLine": 42,
+        "textDigest": "2f2c656184619923093adc71d350ee383d96041799fff6813a967db841c5d032",
+        "sample": "Directory tree",
+        "sectionPayloadDigest": "6ebc8583aa59e28c3ce8bea6ad719ca3947b2625c56d1666dcc2cdb90f642277",
+        "followingBlockDigest": "6ebc8583aa59e28c3ce8bea6ad719ca3947b2625c56d1666dcc2cdb90f642277",
+        "identityFingerprint": "e83bffa63d1b457a51008e8cfd1777de9335ba321878cc93b3db0a38814adbcd",
+        "ancestry": [
+          "herdr web dashboard — UI spec overview"
+        ],
+        "text": "## Directory tree",
+        "sectionText": "## Directory tree\n\n```\ndocs/ui-spec/\n├── spec.config.yaml\n├── 00-overview.md                  ← this file\n├── 15-system-events.md\n├── 20-domain-rules.md              ← R1–R11, taken from the area spec\n├── 30-states-and-errors.md\n├── schema/\n│   └── surface-contract.schema.json\n├── screens/\n│   ├── S01-sign-in.md\n│   ├── S02-taskboard.md\n│   ├── S03-task-detail.md\n│   └── S04-questions-needing-answer.md\n├── modals/\n│   ├── M01-answer-question.md\n│   ├── M02-approve-merge.md\n│   └── M03-add-edit-item.md\n├── components/\n│   └── C01-item-card.md\n└── flows/\n    ├── F01-answer-a-parked-question.md\n    └── F02-approve-a-merge.md\n```"
+      },
+      "sourceShownText": "## Directory tree\n\n```\ndocs/ui-spec/\n├── spec.config.yaml\n├── 00-overview.md                  ← this file\n├── 15-system-events.md\n├── 20-domain-rules.md              ← R1–R11, taken from the area spec\n├── 30-states-and-errors.md\n├── schema/\n│   └── surface-contract.schema.json\n├── screens/\n│   ├── S01-sign-in.md\n│   ├── S02-taskboard.md\n│   ├── S03-task-detail.md\n│   └── S04-questions-needing-answer.md\n├── modals/\n│   ├── M01-answer-question.md\n│   ├── M02-approve-merge.md\n│   └── M03-add-edit-item.md\n├── components/\n│   └── C01-item-card.md\n└── flows/\n    ├── F01-answer-a-parked-question.md\n    └── F02-approve-a-merge.md\n```",
+      "sourceDigest": "2f2c656184619923093adc71d350ee383d96041799fff6813a967db841c5d032",
+      "targetPath": "docs/platform/ui-spec/spec.md",
+      "targetAnchor": "directory-tree",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Directory tree",
+        "anchor": "directory-tree",
+        "githubAnchor": "directory-tree",
+        "stableAnchor": "h-264491247e88",
+        "startLine": 64,
+        "endLine": 64,
+        "textDigest": "2f2c656184619923093adc71d350ee383d96041799fff6813a967db841c5d032",
+        "sample": "Directory tree",
+        "sectionPayloadDigest": "6ebc8583aa59e28c3ce8bea6ad719ca3947b2625c56d1666dcc2cdb90f642277",
+        "followingBlockDigest": "6ebc8583aa59e28c3ce8bea6ad719ca3947b2625c56d1666dcc2cdb90f642277",
+        "identityFingerprint": "e83bffa63d1b457a51008e8cfd1777de9335ba321878cc93b3db0a38814adbcd",
+        "ancestry": [
+          "herdr web dashboard — UI spec overview"
+        ],
+        "text": "## Directory tree",
+        "sectionText": "## Directory tree\n\n```\ndocs/ui-spec/\n├── spec.config.yaml\n├── 00-overview.md                  ← this file\n├── 15-system-events.md\n├── 20-domain-rules.md              ← R1–R11, taken from the area spec\n├── 30-states-and-errors.md\n├── schema/\n│   └── surface-contract.schema.json\n├── screens/\n│   ├── S01-sign-in.md\n│   ├── S02-taskboard.md\n│   ├── S03-task-detail.md\n│   └── S04-questions-needing-answer.md\n├── modals/\n│   ├── M01-answer-question.md\n│   ├── M02-approve-merge.md\n│   └── M03-add-edit-item.md\n├── components/\n│   └── C01-item-card.md\n└── flows/\n    ├── F01-answer-a-parked-question.md\n    └── F02-approve-a-merge.md\n```"
+      },
+      "targetShownText": "## Directory tree\n\n```\ndocs/ui-spec/\n├── spec.config.yaml\n├── 00-overview.md                  ← this file\n├── 15-system-events.md\n├── 20-domain-rules.md              ← R1–R11, taken from the area spec\n├── 30-states-and-errors.md\n├── schema/\n│   └── surface-contract.schema.json\n├── screens/\n│   ├── S01-sign-in.md\n│   ├── S02-taskboard.md\n│   ├── S03-task-detail.md\n│   └── S04-questions-needing-answer.md\n├── modals/\n│   ├── M01-answer-question.md\n│   ├── M02-approve-merge.md\n│   └── M03-add-edit-item.md\n├── components/\n│   └── C01-item-card.md\n└── flows/\n    ├── F01-answer-a-parked-question.md\n    └── F02-approve-a-merge.md\n```",
+      "targetDigest": "2f2c656184619923093adc71d350ee383d96041799fff6813a967db841c5d032",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_1745b0635297cf66ced230f28ef40703",
+        "sourceUnitDigest": "2f2c656184619923093adc71d350ee383d96041799fff6813a967db841c5d032",
+        "targetOwner": "docs/platform/ui-spec/spec.md",
+        "targetAnchor": "directory-tree",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/ui-spec/00-overview.md#directory-tree (source lines 42-42) is carried at docs/platform/ui-spec/spec.md#directory-tree (candidate lines 64-64). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/00-overview.md verbatim in docs/platform/ui-spec/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "2f2c656184619923093adc71d350ee383d96041799fff6813a967db841c5d032",
+        "targetAncestry": [
+          "herdr web dashboard — UI spec overview"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_23152a13579b15a727ac20354b0c0889",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/00-overview.md",
+      "sourceAnchor": "unheaded-block-7",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 44,
+        "endLine": 67,
+        "textDigest": "6ebc8583aa59e28c3ce8bea6ad719ca3947b2625c56d1666dcc2cdb90f642277",
+        "sample": "```\ndocs/ui-spec/\n├── spec.config.yaml\n├── 00-overview.md                  ← this file\n├── 15-system-events.md\n├── 20-domain-rules.md              ← R1–R11, taken from the area spe",
+        "identityFingerprint": "4b6b72cb82b0412b2fab631fadb74f317e632906bf986dc5103d0b9fdf19bc5e",
+        "ancestry": [
+          "herdr web dashboard — UI spec overview",
+          "Directory tree"
+        ],
+        "text": "```\ndocs/ui-spec/\n├── spec.config.yaml\n├── 00-overview.md                  ← this file\n├── 15-system-events.md\n├── 20-domain-rules.md              ← R1–R11, taken from the area spec\n├── 30-states-and-errors.md\n├── schema/\n│   └── surface-contract.schema.json\n├── screens/\n│   ├── S01-sign-in.md\n│   ├── S02-taskboard.md\n│   ├── S03-task-detail.md\n│   └── S04-questions-needing-answer.md\n├── modals/\n│   ├── M01-answer-question.md\n│   ├── M02-approve-merge.md\n│   └── M03-add-edit-item.md\n├── components/\n│   └── C01-item-card.md\n└── flows/\n    ├── F01-answer-a-parked-question.md\n    └── F02-approve-a-merge.md\n```"
+      },
+      "sourceShownText": "```\ndocs/ui-spec/\n├── spec.config.yaml\n├── 00-overview.md                  ← this file\n├── 15-system-events.md\n├── 20-domain-rules.md              ← R1–R11, taken from the area spec\n├── 30-states-and-errors.md\n├── schema/\n│   └── surface-contract.schema.json\n├── screens/\n│   ├── S01-sign-in.md\n│   ├── S02-taskboard.md\n│   ├── S03-task-detail.md\n│   └── S04-questions-needing-answer.md\n├── modals/\n│   ├── M01-answer-question.md\n│   ├── M02-approve-merge.md\n│   └── M03-add-edit-item.md\n├── components/\n│   └── C01-item-card.md\n└── flows/\n    ├── F01-answer-a-parked-question.md\n    └── F02-approve-a-merge.md\n```",
+      "sourceDigest": "6ebc8583aa59e28c3ce8bea6ad719ca3947b2625c56d1666dcc2cdb90f642277",
+      "targetPath": "docs/platform/ui-spec/spec.md",
+      "targetAnchor": "unheaded-block-9",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-9",
+        "githubAnchor": "unheaded-block-9",
+        "stableAnchor": "unheaded-block-9",
+        "title": "Unheaded block 9",
+        "startLine": 66,
+        "endLine": 89,
+        "textDigest": "6ebc8583aa59e28c3ce8bea6ad719ca3947b2625c56d1666dcc2cdb90f642277",
+        "sample": "```\ndocs/ui-spec/\n├── spec.config.yaml\n├── 00-overview.md                  ← this file\n├── 15-system-events.md\n├── 20-domain-rules.md              ← R1–R11, taken from the area spe",
+        "identityFingerprint": "4b6b72cb82b0412b2fab631fadb74f317e632906bf986dc5103d0b9fdf19bc5e",
+        "ancestry": [
+          "herdr web dashboard — UI spec overview",
+          "Directory tree"
+        ],
+        "text": "```\ndocs/ui-spec/\n├── spec.config.yaml\n├── 00-overview.md                  ← this file\n├── 15-system-events.md\n├── 20-domain-rules.md              ← R1–R11, taken from the area spec\n├── 30-states-and-errors.md\n├── schema/\n│   └── surface-contract.schema.json\n├── screens/\n│   ├── S01-sign-in.md\n│   ├── S02-taskboard.md\n│   ├── S03-task-detail.md\n│   └── S04-questions-needing-answer.md\n├── modals/\n│   ├── M01-answer-question.md\n│   ├── M02-approve-merge.md\n│   └── M03-add-edit-item.md\n├── components/\n│   └── C01-item-card.md\n└── flows/\n    ├── F01-answer-a-parked-question.md\n    └── F02-approve-a-merge.md\n```"
+      },
+      "targetShownText": "```\ndocs/ui-spec/\n├── spec.config.yaml\n├── 00-overview.md                  ← this file\n├── 15-system-events.md\n├── 20-domain-rules.md              ← R1–R11, taken from the area spec\n├── 30-states-and-errors.md\n├── schema/\n│   └── surface-contract.schema.json\n├── screens/\n│   ├── S01-sign-in.md\n│   ├── S02-taskboard.md\n│   ├── S03-task-detail.md\n│   └── S04-questions-needing-answer.md\n├── modals/\n│   ├── M01-answer-question.md\n│   ├── M02-approve-merge.md\n│   └── M03-add-edit-item.md\n├── components/\n│   └── C01-item-card.md\n└── flows/\n    ├── F01-answer-a-parked-question.md\n    └── F02-approve-a-merge.md\n```",
+      "targetDigest": "6ebc8583aa59e28c3ce8bea6ad719ca3947b2625c56d1666dcc2cdb90f642277",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_23152a13579b15a727ac20354b0c0889",
+        "sourceUnitDigest": "6ebc8583aa59e28c3ce8bea6ad719ca3947b2625c56d1666dcc2cdb90f642277",
+        "targetOwner": "docs/platform/ui-spec/spec.md",
+        "targetAnchor": "unheaded-block-9",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/00-overview.md#unheaded-block-7 (source lines 44-67) is carried at docs/platform/ui-spec/spec.md#unheaded-block-9 (candidate lines 66-89). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/00-overview.md verbatim in docs/platform/ui-spec/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "6ebc8583aa59e28c3ce8bea6ad719ca3947b2625c56d1666dcc2cdb90f642277",
+        "targetAncestry": [
+          "herdr web dashboard — UI spec overview",
+          "Directory tree"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_a3fe6a352c2538925b3831551da1762d",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/00-overview.md",
+      "sourceAnchor": "how-to-work-on-this-spec",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "How to work on this spec",
+        "anchor": "how-to-work-on-this-spec",
+        "githubAnchor": "how-to-work-on-this-spec",
+        "stableAnchor": "h-c9533e863c1a",
+        "startLine": 69,
+        "endLine": 69,
+        "textDigest": "fb45e3220fd282bd5bfebfed7ffe2b753249fbe60f5bb2a66fc05f0764f44664",
+        "sample": "How to work on this spec",
+        "sectionPayloadDigest": "cdc9fbd7f725da339b5b08ef386ab9b30003a510fe746ca95e8353de6b63193a",
+        "followingBlockDigest": "7e6438293b79664d86dbdd4dea092ac9cccbaa898bd646bdf0382525c97ac972",
+        "identityFingerprint": "d4a6dc9510a6bbd498e72aad8fe5efa2727d4abcc558de0f3e5ca05fcecf53c5",
+        "ancestry": [
+          "herdr web dashboard — UI spec overview"
+        ],
+        "text": "## How to work on this spec",
+        "sectionText": "## How to work on this spec\n\nThe compiler lives with the `ui-spec` skill, not in this tree. Run it\nagainst this root:\n\n```bash\ncd ~/.claude/skills/ui-spec/tools\nnpm ci                                   # once, if node_modules is absent\nnode validate.mjs --root <repo>/docs/ui-spec\nnode build.mjs    --root <repo>/docs/ui-spec\nnode interpret-wireframe.mjs --root <repo>/docs/ui-spec\n```\n\n`validate` is the trust gate — dangling navigate targets, bad component\nhosts, listen-orphans and rule drift are errors, not warnings.\n`interpret-wireframe` produces the clickable wireframe;\n`generated/` is build output and is gitignored."
+      },
+      "sourceShownText": "## How to work on this spec\n\nThe compiler lives with the `ui-spec` skill, not in this tree. Run it\nagainst this root:\n\n```bash\ncd ~/.claude/skills/ui-spec/tools\nnpm ci                                   # once, if node_modules is absent\nnode validate.mjs --root <repo>/docs/ui-spec\nnode build.mjs    --root <repo>/docs/ui-spec\nnode interpret-wireframe.mjs --root <repo>/docs/ui-spec\n```\n\n`validate` is the trust gate — dangling navigate targets, bad component\nhosts, listen-orphans and rule drift are errors, not warnings.\n`interpret-wireframe` produces the clickable wireframe;\n`generated/` is build output and is gitignored.",
+      "sourceDigest": "fb45e3220fd282bd5bfebfed7ffe2b753249fbe60f5bb2a66fc05f0764f44664",
+      "targetPath": "docs/platform/ui-spec/spec.md",
+      "targetAnchor": "how-to-work-on-this-spec",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "How to work on this spec",
+        "anchor": "how-to-work-on-this-spec",
+        "githubAnchor": "how-to-work-on-this-spec",
+        "stableAnchor": "h-e00c08cbdf8f",
+        "startLine": 91,
+        "endLine": 91,
+        "textDigest": "fb45e3220fd282bd5bfebfed7ffe2b753249fbe60f5bb2a66fc05f0764f44664",
+        "sample": "How to work on this spec",
+        "sectionPayloadDigest": "cdc9fbd7f725da339b5b08ef386ab9b30003a510fe746ca95e8353de6b63193a",
+        "followingBlockDigest": "7e6438293b79664d86dbdd4dea092ac9cccbaa898bd646bdf0382525c97ac972",
+        "identityFingerprint": "d4a6dc9510a6bbd498e72aad8fe5efa2727d4abcc558de0f3e5ca05fcecf53c5",
+        "ancestry": [
+          "herdr web dashboard — UI spec overview"
+        ],
+        "text": "## How to work on this spec",
+        "sectionText": "## How to work on this spec\n\nThe compiler lives with the `ui-spec` skill, not in this tree. Run it\nagainst this root:\n\n```bash\ncd ~/.claude/skills/ui-spec/tools\nnpm ci                                   # once, if node_modules is absent\nnode validate.mjs --root <repo>/docs/ui-spec\nnode build.mjs    --root <repo>/docs/ui-spec\nnode interpret-wireframe.mjs --root <repo>/docs/ui-spec\n```\n\n`validate` is the trust gate — dangling navigate targets, bad component\nhosts, listen-orphans and rule drift are errors, not warnings.\n`interpret-wireframe` produces the clickable wireframe;\n`generated/` is build output and is gitignored."
+      },
+      "targetShownText": "## How to work on this spec\n\nThe compiler lives with the `ui-spec` skill, not in this tree. Run it\nagainst this root:\n\n```bash\ncd ~/.claude/skills/ui-spec/tools\nnpm ci                                   # once, if node_modules is absent\nnode validate.mjs --root <repo>/docs/ui-spec\nnode build.mjs    --root <repo>/docs/ui-spec\nnode interpret-wireframe.mjs --root <repo>/docs/ui-spec\n```\n\n`validate` is the trust gate — dangling navigate targets, bad component\nhosts, listen-orphans and rule drift are errors, not warnings.\n`interpret-wireframe` produces the clickable wireframe;\n`generated/` is build output and is gitignored.",
+      "targetDigest": "fb45e3220fd282bd5bfebfed7ffe2b753249fbe60f5bb2a66fc05f0764f44664",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_a3fe6a352c2538925b3831551da1762d",
+        "sourceUnitDigest": "fb45e3220fd282bd5bfebfed7ffe2b753249fbe60f5bb2a66fc05f0764f44664",
+        "targetOwner": "docs/platform/ui-spec/spec.md",
+        "targetAnchor": "how-to-work-on-this-spec",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/ui-spec/00-overview.md#how-to-work-on-this-spec (source lines 69-69) is carried at docs/platform/ui-spec/spec.md#how-to-work-on-this-spec (candidate lines 91-91). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/00-overview.md verbatim in docs/platform/ui-spec/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "fb45e3220fd282bd5bfebfed7ffe2b753249fbe60f5bb2a66fc05f0764f44664",
+        "targetAncestry": [
+          "herdr web dashboard — UI spec overview"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_f5414fdf7b56dcc5ecfee0dbbe5b9cd2",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/00-overview.md",
+      "sourceAnchor": "unheaded-block-8",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-8",
+        "githubAnchor": "unheaded-block-8",
+        "stableAnchor": "unheaded-block-8",
+        "title": "Unheaded block 8",
+        "startLine": 71,
+        "endLine": 72,
+        "textDigest": "7e6438293b79664d86dbdd4dea092ac9cccbaa898bd646bdf0382525c97ac972",
+        "sample": "The compiler lives with the `ui-spec` skill, not in this tree. Run it\nagainst this root:",
+        "identityFingerprint": "ab2335cb542eead8a17c0610dd454bc11e8c36a60472d604224377e6a24af1d9",
+        "ancestry": [
+          "herdr web dashboard — UI spec overview",
+          "How to work on this spec"
+        ],
+        "text": "The compiler lives with the `ui-spec` skill, not in this tree. Run it\nagainst this root:"
+      },
+      "sourceShownText": "The compiler lives with the `ui-spec` skill, not in this tree. Run it\nagainst this root:",
+      "sourceDigest": "7e6438293b79664d86dbdd4dea092ac9cccbaa898bd646bdf0382525c97ac972",
+      "targetPath": "docs/platform/ui-spec/spec.md",
+      "targetAnchor": "unheaded-block-10",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-10",
+        "githubAnchor": "unheaded-block-10",
+        "stableAnchor": "unheaded-block-10",
+        "title": "Unheaded block 10",
+        "startLine": 93,
+        "endLine": 94,
+        "textDigest": "7e6438293b79664d86dbdd4dea092ac9cccbaa898bd646bdf0382525c97ac972",
+        "sample": "The compiler lives with the `ui-spec` skill, not in this tree. Run it\nagainst this root:",
+        "identityFingerprint": "ab2335cb542eead8a17c0610dd454bc11e8c36a60472d604224377e6a24af1d9",
+        "ancestry": [
+          "herdr web dashboard — UI spec overview",
+          "How to work on this spec"
+        ],
+        "text": "The compiler lives with the `ui-spec` skill, not in this tree. Run it\nagainst this root:"
+      },
+      "targetShownText": "The compiler lives with the `ui-spec` skill, not in this tree. Run it\nagainst this root:",
+      "targetDigest": "7e6438293b79664d86dbdd4dea092ac9cccbaa898bd646bdf0382525c97ac972",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_f5414fdf7b56dcc5ecfee0dbbe5b9cd2",
+        "sourceUnitDigest": "7e6438293b79664d86dbdd4dea092ac9cccbaa898bd646bdf0382525c97ac972",
+        "targetOwner": "docs/platform/ui-spec/spec.md",
+        "targetAnchor": "unheaded-block-10",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/00-overview.md#unheaded-block-8 (source lines 71-72) is carried at docs/platform/ui-spec/spec.md#unheaded-block-10 (candidate lines 93-94). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/00-overview.md verbatim in docs/platform/ui-spec/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "7e6438293b79664d86dbdd4dea092ac9cccbaa898bd646bdf0382525c97ac972",
+        "targetAncestry": [
+          "herdr web dashboard — UI spec overview",
+          "How to work on this spec"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_dd3ad839ba07d233d4389822d192e7a1",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/00-overview.md",
+      "sourceAnchor": "unheaded-block-9",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-9",
+        "githubAnchor": "unheaded-block-9",
+        "stableAnchor": "unheaded-block-9",
+        "title": "Unheaded block 9",
+        "startLine": 74,
+        "endLine": 80,
+        "textDigest": "aae24ffa47c4b917567873038a8c3a499338d69d9b42de12ac65ec64aef4782d",
+        "sample": "```bash\ncd ~/.claude/skills/ui-spec/tools\nnpm ci                                   # once, if node_modules is absent\nnode validate.mjs --root <repo>/docs/ui-spec\nnode build.mjs    ",
+        "identityFingerprint": "6860806ffb2f84185cce546afd3bb4054f9c0fca3908c66f0a9519cc3f9c33c0",
+        "ancestry": [
+          "herdr web dashboard — UI spec overview",
+          "How to work on this spec"
+        ],
+        "text": "```bash\ncd ~/.claude/skills/ui-spec/tools\nnpm ci                                   # once, if node_modules is absent\nnode validate.mjs --root <repo>/docs/ui-spec\nnode build.mjs    --root <repo>/docs/ui-spec\nnode interpret-wireframe.mjs --root <repo>/docs/ui-spec\n```"
+      },
+      "sourceShownText": "```bash\ncd ~/.claude/skills/ui-spec/tools\nnpm ci                                   # once, if node_modules is absent\nnode validate.mjs --root <repo>/docs/ui-spec\nnode build.mjs    --root <repo>/docs/ui-spec\nnode interpret-wireframe.mjs --root <repo>/docs/ui-spec\n```",
+      "sourceDigest": "aae24ffa47c4b917567873038a8c3a499338d69d9b42de12ac65ec64aef4782d",
+      "targetPath": "docs/platform/ui-spec/spec.md",
+      "targetAnchor": "unheaded-block-11",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-11",
+        "githubAnchor": "unheaded-block-11",
+        "stableAnchor": "unheaded-block-11",
+        "title": "Unheaded block 11",
+        "startLine": 96,
+        "endLine": 102,
+        "textDigest": "aae24ffa47c4b917567873038a8c3a499338d69d9b42de12ac65ec64aef4782d",
+        "sample": "```bash\ncd ~/.claude/skills/ui-spec/tools\nnpm ci                                   # once, if node_modules is absent\nnode validate.mjs --root <repo>/docs/ui-spec\nnode build.mjs    ",
+        "identityFingerprint": "6860806ffb2f84185cce546afd3bb4054f9c0fca3908c66f0a9519cc3f9c33c0",
+        "ancestry": [
+          "herdr web dashboard — UI spec overview",
+          "How to work on this spec"
+        ],
+        "text": "```bash\ncd ~/.claude/skills/ui-spec/tools\nnpm ci                                   # once, if node_modules is absent\nnode validate.mjs --root <repo>/docs/ui-spec\nnode build.mjs    --root <repo>/docs/ui-spec\nnode interpret-wireframe.mjs --root <repo>/docs/ui-spec\n```"
+      },
+      "targetShownText": "```bash\ncd ~/.claude/skills/ui-spec/tools\nnpm ci                                   # once, if node_modules is absent\nnode validate.mjs --root <repo>/docs/ui-spec\nnode build.mjs    --root <repo>/docs/ui-spec\nnode interpret-wireframe.mjs --root <repo>/docs/ui-spec\n```",
+      "targetDigest": "aae24ffa47c4b917567873038a8c3a499338d69d9b42de12ac65ec64aef4782d",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_dd3ad839ba07d233d4389822d192e7a1",
+        "sourceUnitDigest": "aae24ffa47c4b917567873038a8c3a499338d69d9b42de12ac65ec64aef4782d",
+        "targetOwner": "docs/platform/ui-spec/spec.md",
+        "targetAnchor": "unheaded-block-11",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/00-overview.md#unheaded-block-9 (source lines 74-80) is carried at docs/platform/ui-spec/spec.md#unheaded-block-11 (candidate lines 96-102). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/00-overview.md verbatim in docs/platform/ui-spec/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "aae24ffa47c4b917567873038a8c3a499338d69d9b42de12ac65ec64aef4782d",
+        "targetAncestry": [
+          "herdr web dashboard — UI spec overview",
+          "How to work on this spec"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_7adfa144991fe6de9a316f7ea81553d0",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/00-overview.md",
+      "sourceAnchor": "unheaded-block-10",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-10",
+        "githubAnchor": "unheaded-block-10",
+        "stableAnchor": "unheaded-block-10",
+        "title": "Unheaded block 10",
+        "startLine": 82,
+        "endLine": 85,
+        "textDigest": "3324fde2c080f440e352d3276b5dddb25b0b74dc48201f293d0e905c6afced8e",
+        "sample": "`validate` is the trust gate — dangling navigate targets, bad component\nhosts, listen-orphans and rule drift are errors, not warnings.\n`interpret-wireframe` produces the clickable ",
+        "identityFingerprint": "7d2b0d95141f3fdcf584c615faeac8d8d0785ab5b081d9ce382b5c1468cbfd7d",
+        "ancestry": [
+          "herdr web dashboard — UI spec overview",
+          "How to work on this spec"
+        ],
+        "text": "`validate` is the trust gate — dangling navigate targets, bad component\nhosts, listen-orphans and rule drift are errors, not warnings.\n`interpret-wireframe` produces the clickable wireframe;\n`generated/` is build output and is gitignored."
+      },
+      "sourceShownText": "`validate` is the trust gate — dangling navigate targets, bad component\nhosts, listen-orphans and rule drift are errors, not warnings.\n`interpret-wireframe` produces the clickable wireframe;\n`generated/` is build output and is gitignored.",
+      "sourceDigest": "3324fde2c080f440e352d3276b5dddb25b0b74dc48201f293d0e905c6afced8e",
+      "targetPath": "docs/platform/ui-spec/spec.md",
+      "targetAnchor": "unheaded-block-12",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-12",
+        "githubAnchor": "unheaded-block-12",
+        "stableAnchor": "unheaded-block-12",
+        "title": "Unheaded block 12",
+        "startLine": 104,
+        "endLine": 107,
+        "textDigest": "3324fde2c080f440e352d3276b5dddb25b0b74dc48201f293d0e905c6afced8e",
+        "sample": "`validate` is the trust gate — dangling navigate targets, bad component\nhosts, listen-orphans and rule drift are errors, not warnings.\n`interpret-wireframe` produces the clickable ",
+        "identityFingerprint": "7d2b0d95141f3fdcf584c615faeac8d8d0785ab5b081d9ce382b5c1468cbfd7d",
+        "ancestry": [
+          "herdr web dashboard — UI spec overview",
+          "How to work on this spec"
+        ],
+        "text": "`validate` is the trust gate — dangling navigate targets, bad component\nhosts, listen-orphans and rule drift are errors, not warnings.\n`interpret-wireframe` produces the clickable wireframe;\n`generated/` is build output and is gitignored."
+      },
+      "targetShownText": "`validate` is the trust gate — dangling navigate targets, bad component\nhosts, listen-orphans and rule drift are errors, not warnings.\n`interpret-wireframe` produces the clickable wireframe;\n`generated/` is build output and is gitignored.",
+      "targetDigest": "3324fde2c080f440e352d3276b5dddb25b0b74dc48201f293d0e905c6afced8e",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_7adfa144991fe6de9a316f7ea81553d0",
+        "sourceUnitDigest": "3324fde2c080f440e352d3276b5dddb25b0b74dc48201f293d0e905c6afced8e",
+        "targetOwner": "docs/platform/ui-spec/spec.md",
+        "targetAnchor": "unheaded-block-12",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/00-overview.md#unheaded-block-10 (source lines 82-85) is carried at docs/platform/ui-spec/spec.md#unheaded-block-12 (candidate lines 104-107). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/00-overview.md verbatim in docs/platform/ui-spec/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "3324fde2c080f440e352d3276b5dddb25b0b74dc48201f293d0e905c6afced8e",
+        "targetAncestry": [
+          "herdr web dashboard — UI spec overview",
+          "How to work on this spec"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_2361b06eda9a97678fdb502cb5949d3e",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/00-overview.md",
+      "sourceAnchor": "a-note-on-scale",
+      "source": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "A note on scale",
+        "anchor": "a-note-on-scale",
+        "githubAnchor": "a-note-on-scale",
+        "stableAnchor": "h-092205ffd96e",
+        "startLine": 87,
+        "endLine": 87,
+        "textDigest": "4fe39a3a337800c3d7972d0517f0abb9601a73d047978fcb482a25c456da4cce",
+        "sample": "A note on scale",
+        "sectionPayloadDigest": "2f30aaa9f483a4a395a79fda930732ebc9e66af7d52852fad2ca25bf466cb218",
+        "followingBlockDigest": "2f30aaa9f483a4a395a79fda930732ebc9e66af7d52852fad2ca25bf466cb218",
+        "identityFingerprint": "551b2d43aabaac3e0ced042a6b4628ee54a10ccd4df8fc1625243511233a2d19",
+        "ancestry": [
+          "herdr web dashboard — UI spec overview"
+        ],
+        "text": "## A note on scale",
+        "sectionText": "## A note on scale\n\nThe `ui-spec` skill states it is for applications of ~20 surfaces or more.\nThis one has ten. It is used here anyway, deliberately: the thing this\ncluster actually needs is a **clickable wireframe to test readability\nbefore any pixel exists**, and that is what this tooling produces\nregardless of surface count. Recorded so a later reader does not think the\nskill's own threshold was overlooked."
+      },
+      "sourceShownText": "## A note on scale\n\nThe `ui-spec` skill states it is for applications of ~20 surfaces or more.\nThis one has ten. It is used here anyway, deliberately: the thing this\ncluster actually needs is a **clickable wireframe to test readability\nbefore any pixel exists**, and that is what this tooling produces\nregardless of surface count. Recorded so a later reader does not think the\nskill's own threshold was overlooked.",
+      "sourceDigest": "4fe39a3a337800c3d7972d0517f0abb9601a73d047978fcb482a25c456da4cce",
+      "targetPath": "docs/platform/ui-spec/spec.md",
+      "targetAnchor": "a-note-on-scale",
+      "target": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "A note on scale",
+        "anchor": "a-note-on-scale",
+        "githubAnchor": "a-note-on-scale",
+        "stableAnchor": "h-c2983d6efaee",
+        "startLine": 109,
+        "endLine": 109,
+        "textDigest": "4fe39a3a337800c3d7972d0517f0abb9601a73d047978fcb482a25c456da4cce",
+        "sample": "A note on scale",
+        "sectionPayloadDigest": "2f30aaa9f483a4a395a79fda930732ebc9e66af7d52852fad2ca25bf466cb218",
+        "followingBlockDigest": "2f30aaa9f483a4a395a79fda930732ebc9e66af7d52852fad2ca25bf466cb218",
+        "identityFingerprint": "551b2d43aabaac3e0ced042a6b4628ee54a10ccd4df8fc1625243511233a2d19",
+        "ancestry": [
+          "herdr web dashboard — UI spec overview"
+        ],
+        "text": "## A note on scale",
+        "sectionText": "## A note on scale\n\nThe `ui-spec` skill states it is for applications of ~20 surfaces or more.\nThis one has ten. It is used here anyway, deliberately: the thing this\ncluster actually needs is a **clickable wireframe to test readability\nbefore any pixel exists**, and that is what this tooling produces\nregardless of surface count. Recorded so a later reader does not think the\nskill's own threshold was overlooked."
+      },
+      "targetShownText": "## A note on scale\n\nThe `ui-spec` skill states it is for applications of ~20 surfaces or more.\nThis one has ten. It is used here anyway, deliberately: the thing this\ncluster actually needs is a **clickable wireframe to test readability\nbefore any pixel exists**, and that is what this tooling produces\nregardless of surface count. Recorded so a later reader does not think the\nskill's own threshold was overlooked.",
+      "targetDigest": "4fe39a3a337800c3d7972d0517f0abb9601a73d047978fcb482a25c456da4cce",
+      "classification": "Weak-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_2361b06eda9a97678fdb502cb5949d3e",
+        "sourceUnitDigest": "4fe39a3a337800c3d7972d0517f0abb9601a73d047978fcb482a25c456da4cce",
+        "targetOwner": "docs/platform/ui-spec/spec.md",
+        "targetAnchor": "a-note-on-scale",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/ui-spec/00-overview.md#a-note-on-scale (source lines 87-87) is carried at docs/platform/ui-spec/spec.md#a-note-on-scale (candidate lines 109-109). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/00-overview.md verbatim in docs/platform/ui-spec/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "4fe39a3a337800c3d7972d0517f0abb9601a73d047978fcb482a25c456da4cce",
+        "targetAncestry": [
+          "herdr web dashboard — UI spec overview"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_271679d81259c0ae4190964de3d736f2",
+      "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "shardSHA256": "92d9c405f3eb4795fc09b6b58504f33d1153a43505752799d0e7c463e83f9833",
+      "authorSession": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+      "sourcePath": "docs/ui-spec/00-overview.md",
+      "sourceAnchor": "unheaded-block-11",
+      "source": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-11",
+        "githubAnchor": "unheaded-block-11",
+        "stableAnchor": "unheaded-block-11",
+        "title": "Unheaded block 11",
+        "startLine": 89,
+        "endLine": 94,
+        "textDigest": "2f30aaa9f483a4a395a79fda930732ebc9e66af7d52852fad2ca25bf466cb218",
+        "sample": "The `ui-spec` skill states it is for applications of ~20 surfaces or more.\nThis one has ten. It is used here anyway, deliberately: the thing this\ncluster actually needs is a **clic",
+        "identityFingerprint": "d69cdb08fea95786c45f5fff3b6f9830c6e488a685efa844d342d00d54c5825f",
+        "ancestry": [
+          "herdr web dashboard — UI spec overview",
+          "A note on scale"
+        ],
+        "text": "The `ui-spec` skill states it is for applications of ~20 surfaces or more.\nThis one has ten. It is used here anyway, deliberately: the thing this\ncluster actually needs is a **clickable wireframe to test readability\nbefore any pixel exists**, and that is what this tooling produces\nregardless of surface count. Recorded so a later reader does not think the\nskill's own threshold was overlooked."
+      },
+      "sourceShownText": "The `ui-spec` skill states it is for applications of ~20 surfaces or more.\nThis one has ten. It is used here anyway, deliberately: the thing this\ncluster actually needs is a **clickable wireframe to test readability\nbefore any pixel exists**, and that is what this tooling produces\nregardless of surface count. Recorded so a later reader does not think the\nskill's own threshold was overlooked.",
+      "sourceDigest": "2f30aaa9f483a4a395a79fda930732ebc9e66af7d52852fad2ca25bf466cb218",
+      "targetPath": "docs/platform/ui-spec/spec.md",
+      "targetAnchor": "unheaded-block-13",
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-13",
+        "githubAnchor": "unheaded-block-13",
+        "stableAnchor": "unheaded-block-13",
+        "title": "Unheaded block 13",
+        "startLine": 111,
+        "endLine": 116,
+        "textDigest": "2f30aaa9f483a4a395a79fda930732ebc9e66af7d52852fad2ca25bf466cb218",
+        "sample": "The `ui-spec` skill states it is for applications of ~20 surfaces or more.\nThis one has ten. It is used here anyway, deliberately: the thing this\ncluster actually needs is a **clic",
+        "identityFingerprint": "d69cdb08fea95786c45f5fff3b6f9830c6e488a685efa844d342d00d54c5825f",
+        "ancestry": [
+          "herdr web dashboard — UI spec overview",
+          "A note on scale"
+        ],
+        "text": "The `ui-spec` skill states it is for applications of ~20 surfaces or more.\nThis one has ten. It is used here anyway, deliberately: the thing this\ncluster actually needs is a **clickable wireframe to test readability\nbefore any pixel exists**, and that is what this tooling produces\nregardless of surface count. Recorded so a later reader does not think the\nskill's own threshold was overlooked."
+      },
+      "targetShownText": "The `ui-spec` skill states it is for applications of ~20 surfaces or more.\nThis one has ten. It is used here anyway, deliberately: the thing this\ncluster actually needs is a **clickable wireframe to test readability\nbefore any pixel exists**, and that is what this tooling produces\nregardless of surface count. Recorded so a later reader does not think the\nskill's own threshold was overlooked.",
+      "targetDigest": "2f30aaa9f483a4a395a79fda930732ebc9e66af7d52852fad2ca25bf466cb218",
+      "classification": "Unit-exact",
+      "mandatoryDeep": false,
+      "decision": {
+        "claimId": "claim_271679d81259c0ae4190964de3d736f2",
+        "sourceUnitDigest": "2f30aaa9f483a4a395a79fda930732ebc9e66af7d52852fad2ca25bf466cb218",
+        "targetOwner": "docs/platform/ui-spec/spec.md",
+        "targetAnchor": "unheaded-block-13",
+        "claimKind": "specification",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/ui-spec/00-overview.md#unheaded-block-11 (source lines 89-94) is carried at docs/platform/ui-spec/spec.md#unheaded-block-13 (candidate lines 111-116). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/00-overview.md verbatim in docs/platform/ui-spec/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetUnitDigest": "2f30aaa9f483a4a395a79fda930732ebc9e66af7d52852fad2ca25bf466cb218",
+        "targetAncestry": [
+          "herdr web dashboard — UI spec overview",
+          "A note on scale"
+        ]
+      }
+    }
+  ]
+}

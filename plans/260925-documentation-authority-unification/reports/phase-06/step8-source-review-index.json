@@ -1,0 +1,646 @@
+{
+  "contentCommit": "1276467f37a99d19aff05808d42fafbf40341449",
+  "sourceRows": 566,
+  "sourceFiles": 27,
+  "classes": {
+    "Unit-exact": 275,
+    "Weak-exact": 260,
+    "Judgment": 31
+  },
+  "requests": [
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1410-specs-ui-source-01-1276467f3.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-01-1276467f3.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-01-1276467f3.md.json",
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "count": 41,
+      "classes": {
+        "Unit-exact": 30,
+        "Weak-exact": 10,
+        "Judgment": 1
+      },
+      "mandatoryDeep": [
+        "claim_15b8c9068c1c07bed6aa09b4234faf4f"
+      ],
+      "unequalCount": 1,
+      "noTargetCount": 0,
+      "packBytes": 157659,
+      "packSHA256": "c02a07f0074ccd59b53e2d40c915991c654087b8d73aca3f9c6f0638555d2c7d"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1410-specs-ui-source-02-1276467f3.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-02-1276467f3.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-02-1276467f3.md.json",
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "count": 34,
+      "classes": {
+        "Unit-exact": 1,
+        "Weak-exact": 33,
+        "Judgment": 0
+      },
+      "mandatoryDeep": [],
+      "unequalCount": 0,
+      "noTargetCount": 0,
+      "packBytes": 152458,
+      "packSHA256": "855c28c3da3e23fec8101c18c1bc823446e79fffe31aaf248fb78053a1e10f03"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1410-specs-ui-source-03-1276467f3.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-03-1276467f3.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-03-1276467f3.md.json",
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "count": 30,
+      "classes": {
+        "Unit-exact": 0,
+        "Weak-exact": 30,
+        "Judgment": 0
+      },
+      "mandatoryDeep": [],
+      "unequalCount": 0,
+      "noTargetCount": 0,
+      "packBytes": 144009,
+      "packSHA256": "7b056af6e6a662a539c4fc12149b6bcbe6d67d46b4d8da2cc123d1c9b8d5d122"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1410-specs-ui-source-04-1276467f3.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-04-1276467f3.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-04-1276467f3.md.json",
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "count": 35,
+      "classes": {
+        "Unit-exact": 11,
+        "Weak-exact": 24,
+        "Judgment": 0
+      },
+      "mandatoryDeep": [],
+      "unequalCount": 0,
+      "noTargetCount": 0,
+      "packBytes": 149504,
+      "packSHA256": "dec09b0694a06db2e0c71e8d279b4b6d073ffb735ffd58bdfccfbf9a1f25e59b"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1410-specs-ui-source-05-1276467f3.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-05-1276467f3.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-05-1276467f3.md.json",
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "count": 30,
+      "classes": {
+        "Unit-exact": 19,
+        "Weak-exact": 11,
+        "Judgment": 0
+      },
+      "mandatoryDeep": [],
+      "unequalCount": 0,
+      "noTargetCount": 0,
+      "packBytes": 147424,
+      "packSHA256": "1ab2d52e2a8923fea5cca019c481a09c25e3216fe4dffb4ed5bdc29e022ad7d9"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1410-specs-ui-source-06-1276467f3.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-06-1276467f3.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-06-1276467f3.md.json",
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "count": 25,
+      "classes": {
+        "Unit-exact": 5,
+        "Weak-exact": 20,
+        "Judgment": 0
+      },
+      "mandatoryDeep": [],
+      "unequalCount": 0,
+      "noTargetCount": 0,
+      "packBytes": 149406,
+      "packSHA256": "52ea859be5df07f7ee705998ae8fdda8517dae708830ebd36ca086c7b2f41d71"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1410-specs-ui-source-07-1276467f3.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-07-1276467f3.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-07-1276467f3.md.json",
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "count": 5,
+      "classes": {
+        "Unit-exact": 1,
+        "Weak-exact": 4,
+        "Judgment": 0
+      },
+      "mandatoryDeep": [],
+      "unequalCount": 0,
+      "noTargetCount": 0,
+      "packBytes": 23941,
+      "packSHA256": "bca435bc9707a8f947325e459311a5c0b2ea34e7e9aac6b6e5d49b2e7503c682"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1410-specs-ui-source-08-1276467f3.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-08-1276467f3.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-08-1276467f3.md.json",
+      "sourcePath": "docs/specs/fgos-plugin.md",
+      "count": 45,
+      "classes": {
+        "Unit-exact": 23,
+        "Weak-exact": 21,
+        "Judgment": 1
+      },
+      "mandatoryDeep": [
+        "claim_c7e7f597fc9c30ce57b225834fc66afa"
+      ],
+      "unequalCount": 1,
+      "noTargetCount": 0,
+      "packBytes": 142493,
+      "packSHA256": "06c7a4f08caf56355078e441ec0ac1480cd908c04c4e603e6daf775796d483fe"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1410-specs-ui-source-09-1276467f3.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-09-1276467f3.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-09-1276467f3.md.json",
+      "sourcePath": "docs/specs/decision-citation-drift.md",
+      "count": 20,
+      "classes": {
+        "Unit-exact": 10,
+        "Weak-exact": 9,
+        "Judgment": 1
+      },
+      "mandatoryDeep": [
+        "claim_f8a80ce657505415a0cf4bdcbb8b1a82"
+      ],
+      "unequalCount": 1,
+      "noTargetCount": 0,
+      "packBytes": 70705,
+      "packSHA256": "226ceea069f8bfaa8b3a83a17f4a89ff833776607e2a4113356a6aedd7bdfe94"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1410-specs-ui-source-10-1276467f3.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-10-1276467f3.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-10-1276467f3.md.json",
+      "sourcePath": "docs/specs/distillery.md",
+      "count": 21,
+      "classes": {
+        "Unit-exact": 11,
+        "Weak-exact": 9,
+        "Judgment": 1
+      },
+      "mandatoryDeep": [
+        "claim_6ff089f694102599d1fc8273ea6bbae9"
+      ],
+      "unequalCount": 1,
+      "noTargetCount": 0,
+      "packBytes": 76088,
+      "packSHA256": "dc1f01ecc0df959451a1fce98d911e1888f05499fb430bd0fdf672e13969cb7f"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1410-specs-ui-source-11-1276467f3.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-11-1276467f3.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-11-1276467f3.md.json",
+      "sourcePath": "docs/specs/herdr-web-dashboard.md",
+      "count": 35,
+      "classes": {
+        "Unit-exact": 19,
+        "Weak-exact": 15,
+        "Judgment": 1
+      },
+      "mandatoryDeep": [
+        "claim_c947f71f7866d04b60b65ac874dd05a1"
+      ],
+      "unequalCount": 1,
+      "noTargetCount": 0,
+      "packBytes": 139312,
+      "packSHA256": "5c3ba0f937d54aa1adfc57928a11e388441ae02c5352cc9f9d952adbff9f0757"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1410-specs-ui-source-12-1276467f3.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-12-1276467f3.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-12-1276467f3.md.json",
+      "sourcePath": "docs/specs/herdr-web-dashboard.md",
+      "count": 9,
+      "classes": {
+        "Unit-exact": 5,
+        "Weak-exact": 4,
+        "Judgment": 0
+      },
+      "mandatoryDeep": [],
+      "unequalCount": 0,
+      "noTargetCount": 0,
+      "packBytes": 50550,
+      "packSHA256": "a164fb1d531fae6edb25a61118bfb0a1979e68c42b51886959a3cfa58b7e31a9"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1410-specs-ui-source-13-1276467f3.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-13-1276467f3.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-13-1276467f3.md.json",
+      "sourcePath": "docs/specs/observe.md",
+      "count": 25,
+      "classes": {
+        "Unit-exact": 10,
+        "Weak-exact": 12,
+        "Judgment": 3
+      },
+      "mandatoryDeep": [
+        "claim_c9cc1ff2abdd7adf91641d4c8b240523",
+        "claim_12da781dbd66869bbf765410d887c7f0",
+        "claim_41988cae1fdd914bf7a8a4d1df2aeb82"
+      ],
+      "unequalCount": 3,
+      "noTargetCount": 0,
+      "packBytes": 139368,
+      "packSHA256": "c751c6acaea24945c2cab75905888144007afa648e70790a8b0fcb4d240b9339"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1410-specs-ui-source-14-1276467f3.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-14-1276467f3.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-14-1276467f3.md.json",
+      "sourcePath": "docs/ui-spec/00-overview.md",
+      "count": 16,
+      "classes": {
+        "Unit-exact": 11,
+        "Weak-exact": 4,
+        "Judgment": 1
+      },
+      "mandatoryDeep": [
+        "claim_4e48bd602a0ab47752c147905e76c3e2"
+      ],
+      "unequalCount": 1,
+      "noTargetCount": 0,
+      "packBytes": 50938,
+      "packSHA256": "26df2944362b77ede88f3a2eac71444493e9eca8b73a98fe45763ec02db00cc0"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1410-specs-ui-source-15-1276467f3.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-15-1276467f3.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-15-1276467f3.md.json",
+      "sourcePath": "docs/ui-spec/15-system-events.md",
+      "count": 9,
+      "classes": {
+        "Unit-exact": 8,
+        "Weak-exact": 0,
+        "Judgment": 1
+      },
+      "mandatoryDeep": [
+        "claim_72d974cfc4b8fc20f10bebfb25de4930"
+      ],
+      "unequalCount": 1,
+      "noTargetCount": 0,
+      "packBytes": 30192,
+      "packSHA256": "01a49d10db002219f2e91ee08a8014c7e71fcd026b896e25546d7747ed2adc0e"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1410-specs-ui-source-16-1276467f3.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-16-1276467f3.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-16-1276467f3.md.json",
+      "sourcePath": "docs/ui-spec/20-domain-rules.md",
+      "count": 5,
+      "classes": {
+        "Unit-exact": 4,
+        "Weak-exact": 0,
+        "Judgment": 1
+      },
+      "mandatoryDeep": [
+        "claim_b7557c11c5f05a3e02439d60a904c9d1"
+      ],
+      "unequalCount": 1,
+      "noTargetCount": 0,
+      "packBytes": 26268,
+      "packSHA256": "ca0c5c574a3f9ac5fca41aae9559fc458f76e3c53dece7eb61dfb27903af4ecf"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1410-specs-ui-source-17-1276467f3.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-17-1276467f3.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-17-1276467f3.md.json",
+      "sourcePath": "docs/ui-spec/30-states-and-errors.md",
+      "count": 30,
+      "classes": {
+        "Unit-exact": 13,
+        "Weak-exact": 16,
+        "Judgment": 1
+      },
+      "mandatoryDeep": [
+        "claim_8f1b4d60296f2d4ba2fa501e030aaeb1"
+      ],
+      "unequalCount": 1,
+      "noTargetCount": 0,
+      "packBytes": 78226,
+      "packSHA256": "dcc3dda87d5c64d3564d3c7c9a60bed234b664e5eb0e174a741dcd86455cb7f2"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1410-specs-ui-source-18-1276467f3.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-18-1276467f3.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-18-1276467f3.md.json",
+      "sourcePath": "docs/ui-spec/components/C01-item-card.md",
+      "count": 12,
+      "classes": {
+        "Unit-exact": 8,
+        "Weak-exact": 3,
+        "Judgment": 1
+      },
+      "mandatoryDeep": [
+        "claim_8627caebb796137a1850158610034a48"
+      ],
+      "unequalCount": 1,
+      "noTargetCount": 0,
+      "packBytes": 39729,
+      "packSHA256": "8cbb08ae5c2a1d9b8639fa26b87a23aeabfd69da0e53cd1a39ccae4baf51180c"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1410-specs-ui-source-19-1276467f3.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-19-1276467f3.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-19-1276467f3.md.json",
+      "sourcePath": "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+      "count": 10,
+      "classes": {
+        "Unit-exact": 6,
+        "Weak-exact": 3,
+        "Judgment": 1
+      },
+      "mandatoryDeep": [
+        "claim_9a46c9f995367d176ac61cf2d59647a4"
+      ],
+      "unequalCount": 1,
+      "noTargetCount": 0,
+      "packBytes": 36383,
+      "packSHA256": "87ffe8a253a819fe06a4266763aec6cd28201c8ab7211effd6260cba26681bf2"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1410-specs-ui-source-20-1276467f3.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-20-1276467f3.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-20-1276467f3.md.json",
+      "sourcePath": "docs/ui-spec/flows/F02-approve-a-merge.md",
+      "count": 9,
+      "classes": {
+        "Unit-exact": 5,
+        "Weak-exact": 3,
+        "Judgment": 1
+      },
+      "mandatoryDeep": [
+        "claim_c3403dd5ad03f954dc9df76b0cdfd920"
+      ],
+      "unequalCount": 1,
+      "noTargetCount": 0,
+      "packBytes": 31775,
+      "packSHA256": "bf42c7893540f478be309aed897167f958a7e33b3be97734ecdba7f51408c895"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1410-specs-ui-source-21-1276467f3.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-21-1276467f3.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-21-1276467f3.md.json",
+      "sourcePath": "docs/ui-spec/generated/action-registry.csv",
+      "count": 1,
+      "classes": {
+        "Unit-exact": 0,
+        "Weak-exact": 0,
+        "Judgment": 1
+      },
+      "mandatoryDeep": [
+        "claim_7d55d8b906459068668dbd17eca9a793"
+      ],
+      "unequalCount": 0,
+      "noTargetCount": 1,
+      "packBytes": 5524,
+      "packSHA256": "51a1641b6f6b5a3412203c91c4693492a155e63655135c64f6628e1020291116"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1410-specs-ui-source-22-1276467f3.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-22-1276467f3.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-22-1276467f3.md.json",
+      "sourcePath": "docs/ui-spec/generated/coverage-report.md",
+      "count": 5,
+      "classes": {
+        "Unit-exact": 0,
+        "Weak-exact": 0,
+        "Judgment": 5
+      },
+      "mandatoryDeep": [
+        "claim_0425b0d3ca4c87a48480fd06b7f4b3a1",
+        "claim_e4ea923e4191c63b3205f0d1cf58c47b",
+        "claim_c35084edff1ab74d06c8ce9df0b70573",
+        "claim_095b489fddaa04d86255162083a092cf",
+        "claim_d24e844fa1382691afed5ad450888915"
+      ],
+      "unequalCount": 0,
+      "noTargetCount": 5,
+      "packBytes": 11380,
+      "packSHA256": "a7b50fad21be0da4e2736a7ef53e8b19a5b0555fac4e664702331fad0591d8b5"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1410-specs-ui-source-23-1276467f3.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-23-1276467f3.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-23-1276467f3.md.json",
+      "sourcePath": "docs/ui-spec/generated/navigation-graph.yaml",
+      "count": 1,
+      "classes": {
+        "Unit-exact": 0,
+        "Weak-exact": 0,
+        "Judgment": 1
+      },
+      "mandatoryDeep": [
+        "claim_1e344887a48271c75c2a7c1ed62e2c3c"
+      ],
+      "unequalCount": 0,
+      "noTargetCount": 1,
+      "packBytes": 10813,
+      "packSHA256": "529d0065ce4a969003b69ec1d7ddb49f0e1ad01a6633f39898ff8a7479b1fce1"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1410-specs-ui-source-24-1276467f3.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-24-1276467f3.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-24-1276467f3.md.json",
+      "sourcePath": "docs/ui-spec/generated/surface-registry.yaml",
+      "count": 1,
+      "classes": {
+        "Unit-exact": 0,
+        "Weak-exact": 0,
+        "Judgment": 1
+      },
+      "mandatoryDeep": [
+        "claim_e30ae1a5f1b7742c5ece3b7f00aa781f"
+      ],
+      "unequalCount": 0,
+      "noTargetCount": 1,
+      "packBytes": 6651,
+      "packSHA256": "a29a18aa1e8b9863a3fa6117951c6f0e28987c185bc7782f3b32c32c7d2a1c24"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1410-specs-ui-source-25-1276467f3.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-25-1276467f3.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-25-1276467f3.md.json",
+      "sourcePath": "docs/ui-spec/generated/wireframe-v2.html",
+      "count": 1,
+      "classes": {
+        "Unit-exact": 0,
+        "Weak-exact": 0,
+        "Judgment": 1
+      },
+      "mandatoryDeep": [
+        "claim_b54078cfa0980242783d2eeba5baf644"
+      ],
+      "unequalCount": 0,
+      "noTargetCount": 1,
+      "packBytes": 634766,
+      "packSHA256": "6c0cc83b3280dc47d9d66d96ff6eaf57af89edafc234189a378a19cf4c048a65"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1410-specs-ui-source-26-1276467f3.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-26-1276467f3.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-26-1276467f3.md.json",
+      "sourcePath": "docs/ui-spec/modals/M01-answer-question.md",
+      "count": 11,
+      "classes": {
+        "Unit-exact": 6,
+        "Weak-exact": 4,
+        "Judgment": 1
+      },
+      "mandatoryDeep": [
+        "claim_2904d9efd9dfa41ef624c3cde4680773"
+      ],
+      "unequalCount": 1,
+      "noTargetCount": 0,
+      "packBytes": 43202,
+      "packSHA256": "a3999408b58acf7d7d300a8fbca7d07140afeac71ce581987f192aaea8e9001d"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1410-specs-ui-source-27-1276467f3.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-27-1276467f3.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-27-1276467f3.md.json",
+      "sourcePath": "docs/ui-spec/modals/M02-approve-merge.md",
+      "count": 12,
+      "classes": {
+        "Unit-exact": 7,
+        "Weak-exact": 4,
+        "Judgment": 1
+      },
+      "mandatoryDeep": [
+        "claim_ae961815f238b5b8335b08e8b21662ee"
+      ],
+      "unequalCount": 1,
+      "noTargetCount": 0,
+      "packBytes": 44432,
+      "packSHA256": "3772bfaa2d34e67c9c155fb72267c6e7e3d2215cd9a8785ee47800254a64a69d"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1410-specs-ui-source-28-1276467f3.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-28-1276467f3.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-28-1276467f3.md.json",
+      "sourcePath": "docs/ui-spec/modals/M03-add-edit-item.md",
+      "count": 13,
+      "classes": {
+        "Unit-exact": 8,
+        "Weak-exact": 4,
+        "Judgment": 1
+      },
+      "mandatoryDeep": [
+        "claim_9c63e8a354951e0f84f3a1399b6af388"
+      ],
+      "unequalCount": 1,
+      "noTargetCount": 0,
+      "packBytes": 46195,
+      "packSHA256": "e5a755c53b7e736e7e8f6c22093f9012b02ba07ed9be7c251586ea44c817b3a4"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1410-specs-ui-source-29-1276467f3.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-29-1276467f3.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-29-1276467f3.md.json",
+      "sourcePath": "docs/ui-spec/schema/surface-contract.schema.json",
+      "count": 1,
+      "classes": {
+        "Unit-exact": 1,
+        "Weak-exact": 0,
+        "Judgment": 0
+      },
+      "mandatoryDeep": [],
+      "unequalCount": 0,
+      "noTargetCount": 0,
+      "packBytes": 12093,
+      "packSHA256": "313e80e880fd597bd365c23943f8921ec85be9c375bc07a33babee0c9db92e59"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1410-specs-ui-source-30-1276467f3.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-30-1276467f3.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-30-1276467f3.md.json",
+      "sourcePath": "docs/ui-spec/screens/S01-sign-in.md",
+      "count": 14,
+      "classes": {
+        "Unit-exact": 9,
+        "Weak-exact": 4,
+        "Judgment": 1
+      },
+      "mandatoryDeep": [
+        "claim_6cbca8eed8cc0595110b6b1bc8f0db80"
+      ],
+      "unequalCount": 1,
+      "noTargetCount": 0,
+      "packBytes": 46658,
+      "packSHA256": "ae71795452f923fac1b9de2255110c3d0fcf2c7dc4303550d05b61adffea9b2c"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1410-specs-ui-source-31-1276467f3.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-31-1276467f3.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-31-1276467f3.md.json",
+      "sourcePath": "docs/ui-spec/screens/S02-taskboard.md",
+      "count": 20,
+      "classes": {
+        "Unit-exact": 15,
+        "Weak-exact": 4,
+        "Judgment": 1
+      },
+      "mandatoryDeep": [
+        "claim_1526b583a680ad5f2b907a7b5da02ad1"
+      ],
+      "unequalCount": 1,
+      "noTargetCount": 0,
+      "packBytes": 92854,
+      "packSHA256": "0a8ba04672e8c0b325c0dd896a898a22f1898f5c03d36da7ed0894ccf1d8e709"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1410-specs-ui-source-32-1276467f3.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-32-1276467f3.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-32-1276467f3.md.json",
+      "sourcePath": "docs/ui-spec/screens/S03-task-detail.md",
+      "count": 24,
+      "classes": {
+        "Unit-exact": 18,
+        "Weak-exact": 5,
+        "Judgment": 1
+      },
+      "mandatoryDeep": [
+        "claim_57fe165c28132a8679657bc25f8aad0b"
+      ],
+      "unequalCount": 1,
+      "noTargetCount": 0,
+      "packBytes": 102941,
+      "packSHA256": "881e45ea28359af5cff718405505fe82697d1e5bdc02632507ef0156038c1d17"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1410-specs-ui-source-33-1276467f3.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-33-1276467f3.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-33-1276467f3.md.json",
+      "sourcePath": "docs/ui-spec/screens/S04-questions-needing-answer.md",
+      "count": 15,
+      "classes": {
+        "Unit-exact": 10,
+        "Weak-exact": 4,
+        "Judgment": 1
+      },
+      "mandatoryDeep": [
+        "claim_bbfba2a05bf22181fa09c1776b039725"
+      ],
+      "unequalCount": 1,
+      "noTargetCount": 0,
+      "packBytes": 56748,
+      "packSHA256": "055cb897f95e185493f6bfa2000ae774e9f0e416501d021e2a9dae199708f664"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1410-specs-ui-source-34-1276467f3.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-34-1276467f3.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1410-specs-ui-source-34-1276467f3.md.json",
+      "sourcePath": "docs/ui-spec/spec.config.yaml",
+      "count": 1,
+      "classes": {
+        "Unit-exact": 1,
+        "Weak-exact": 0,
+        "Judgment": 0
+      },
+      "mandatoryDeep": [],
+      "unequalCount": 0,
+      "noTargetCount": 0,
+      "packBytes": 4818,
+      "packSHA256": "f3e503eb48cb4ba23053ec86dae623812af9587f20810d25328a0586c620e518"
+    }
+  ]
+}

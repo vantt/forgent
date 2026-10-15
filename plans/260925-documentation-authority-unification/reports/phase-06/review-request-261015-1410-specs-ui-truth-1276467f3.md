@@ -1,0 +1,3237 @@
+# Independent A28 truth draw preparation
+
+Content commit: 1276467f37a99d19aff05808d42fafbf40341449
+Author session: codex-session:unit-run-1792047735364-5c1a0eb5@2026-10-15
+Entries: **1**. Separate non-source verdict channel; no source approval, truth approval, retirement, promotion or cutover follows. No reviewer seed or verdict supplied.
+
+Reviewer independently freezes the complete current-content population at 1276467f3, chooses a reproducible random 30 distinct current-content-unit draw (all if fewer), records seed/population/sample IDs, and checks every assertion against pinned implementation. Source approval/eligibility is not truth approval. Include known stale carried sentences in the population; do not preferentially pick or avoid them. Any false sentence needs A19 correction and A22 rebind; more than 10% false stops for owner. Producer supplies no seed, sample, code receipt or verdict. Full truth at promotion remains owed.
+
+Return Reviewer, Author session(s), Review mode: ordinary, request/content pin and one row per entry. Use the entryId in Claim; Source digest binds JSON evidence for that entry (given below); Target digest is none for this separate accounting channel. Each note must describe the actual check and its limits. This table does not apply source verdicts through applyReviewVerdicts.
+
+| Claim | Verdict | Note | Source digest | Target digest |
+|---|---|---|---|---|
+
+## truth-draw
+
+Source digest (evidence JSON): ced7ff455d912cbf28dfca4d125b48d4bdf1228391d0eb86cccf63d8284d9d01
+Target digest: none
+
+```json
+{
+  "entryId": "truth-draw",
+  "sourcePopulation": [
+    {
+      "claimId": "claim_28445ce7abe834f5e2bccedbe9b8889e",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "8af62581941a8d7fbd1389929adcf64779ae231c0d39915b8a063af018279e49"
+    },
+    {
+      "claimId": "claim_15b8c9068c1c07bed6aa09b4234faf4f",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "spec-agent-confinement-authority",
+      "unitDigest": "8fb2143ec2d34a8501d2b0b5f4f81d0e0dd0300b41ac8af267bfb0c166e083b0"
+    },
+    {
+      "claimId": "claim_ba0b2e1a3bc56167392758ded5e83687",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-4",
+      "unitDigest": "9c7a5f29c2242f9aae324b709b533335f6161724e9882e17db9d1a999d86988c"
+    },
+    {
+      "claimId": "claim_f28782f0b3d1c34833072a10b026b808",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "1-quyết-định-kiến-trúc",
+      "unitDigest": "c119ae3b82e1912e427be4ae6078517a2a5e6b3658d78b2f2f5718bc9eb84b70"
+    },
+    {
+      "claimId": "claim_b37787b010e98b1593a8c6c64c103822",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-5",
+      "unitDigest": "9d4d164e372af43991d3261be4b79b667ccf22f6638a95d779a39b5d8a2c507e"
+    },
+    {
+      "claimId": "claim_be68ea4edd1f4f0241883cc9def779c6",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-6",
+      "unitDigest": "e384c0c10fe8fd6b869a7be0d2de9f930130ad7a1414087ffb543d0357fd4108"
+    },
+    {
+      "claimId": "claim_5ae789a08a8f79f3c477af66da37991f",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-7",
+      "unitDigest": "1bd83bcb38f40d1a4ed245ba1b513ab5a174bd6bc1b4d2f3a931766b5b0bd96d"
+    },
+    {
+      "claimId": "claim_1a5f2f8d637db33e541569e8bc3a0b77",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-8",
+      "unitDigest": "ea53abaf5e95cecd30240f63cad49962f5acca16df85c4a32c65dba40a621dac"
+    },
+    {
+      "claimId": "claim_0625608d3d14292eee1a9c772fdf2943",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-9",
+      "unitDigest": "c925e836abc1dfa057f90f82e9c2307792e1fce53c77e881c1359cd136acb642"
+    },
+    {
+      "claimId": "claim_c63a6259672b4c3406cd8c18c559c1b0",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "11-vì-sao-một-cửa-quan-trọng",
+      "unitDigest": "01917de3660e3d39505f58b3957a70b7bab65168b52a8d36442f945802b419f3"
+    },
+    {
+      "claimId": "claim_5acdd2b61706f8f7888eef81f73a88e8",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-10",
+      "unitDigest": "85615858f7582bd250778a1f45ac6b437662679bf2ef85ee4e21bc4020380a96"
+    },
+    {
+      "claimId": "claim_e82c910f47e10ea84480da23a9b40d9e",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "2-vấn-đề-lịch-sử-và-giải-pháp-đã-chốt",
+      "unitDigest": "cdc2076b281a4cc71b1c038a08fa902599137f915486ba487deede97672be124"
+    },
+    {
+      "claimId": "claim_1248b0418e459f1bc95c7327f21f62af",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-11",
+      "unitDigest": "f5322e1b6b0a6cc2889ea9c713ab098d0caf9520f7aa856f5c72e0bf63f9e4b4"
+    },
+    {
+      "claimId": "claim_f0da93423628b5c149c0af2f278587ed",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-12",
+      "unitDigest": "df9207a3ace166343d8025978e5409c42dfd1ce28e4de1e88ca5499e66703881"
+    },
+    {
+      "claimId": "claim_51b1a9d25306e44527217999038fb853",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-13",
+      "unitDigest": "3cf2768b10b9304382d4ba662dcef7f1a45677693e3747976d99c21b9b80188c"
+    },
+    {
+      "claimId": "claim_e3125befbd9b679d5d1fc64283064bfa",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-14",
+      "unitDigest": "26140143831da0f2e8c9e325debb900f01b964c4da8e833176574e14292d86fb"
+    },
+    {
+      "claimId": "claim_f92bcfc37e44731bd0a188e9bd41cb7c",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "3-mục-tiêu-và-phi-mục-tiêu",
+      "unitDigest": "e611e532ff4cc0f1c9168081419271fc8db68b61d56867614551f7b660d21400"
+    },
+    {
+      "claimId": "claim_0f9d4212de2327b3df41fd6f706215a5",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "31-mục-tiêu",
+      "unitDigest": "95910a9adb38ca27d11f8417e6bc455e771873351ec383f854dea2a11a4014c9"
+    },
+    {
+      "claimId": "claim_18f82ecfa8ca710243b4a9e2e4009871",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-15",
+      "unitDigest": "5988e9107c5e1f93a6a203244071b7020b294ab5b855fea771691a4504177421"
+    },
+    {
+      "claimId": "claim_44bb41b373e3a877467622c4e64bfbfb",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "32-phi-mục-tiêu",
+      "unitDigest": "cdfde5146a65a6fec68998b706feccb15e1f785cee0b79a6338a97bc437a1e18"
+    },
+    {
+      "claimId": "claim_7bc7717a92a34ad4dc50159f7cf1d93f",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-16",
+      "unitDigest": "9c04558a540d0fc1dbaaa1b4873972a1a77bc6d49d8fdf13af722161dfa97d72"
+    },
+    {
+      "claimId": "claim_ee82a796cb4e8350b49633fc8b827c47",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "33-use-case-đích-và-cách-dùng-mặc-định",
+      "unitDigest": "7dc76c05398590e943ab78d13d574f0f66841e659505f94999893ac40caaebe7"
+    },
+    {
+      "claimId": "claim_974ab4ff20c3e4ef63805c191e7dec9c",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-17",
+      "unitDigest": "0034e87f9be5666d0e95dfc3c4a8f54454f40fe51f7b8891d3ea7fd4f241ed11"
+    },
+    {
+      "claimId": "claim_a73dbba44f9d78cb44cf898ec93bb955",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-18",
+      "unitDigest": "779d0248a0709725dc0bd8d0ffdbd4b5257325e259c824143b8c8b79d5d0903d"
+    },
+    {
+      "claimId": "claim_3357bf4450864c841ccb60bb3d03dcef",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "4-threat-model",
+      "unitDigest": "03005174fec0d1410da6c08443f52a2de9eb5b0a6b6f3e7c8015749bf627491a"
+    },
+    {
+      "claimId": "claim_9235033a167934865ae9528d85596b9d",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-19",
+      "unitDigest": "fbe04ecca29a8fc82519684dcfead7d2c94adcdb68ceaa637dbd5845b5e83033"
+    },
+    {
+      "claimId": "claim_261fd234537163e9c306c0990de2cccb",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-20",
+      "unitDigest": "b1dd0ead1405bd4a8e01cf9358cba6b084ef835b43f78f550012d05cdf3ff002"
+    },
+    {
+      "claimId": "claim_b9193c06d7a58f44eb151b6b730668bb",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-21",
+      "unitDigest": "50350bcfe22e57e77360aad5d1e994053801f7d59e47c1d83ed9c602253b3ecd"
+    },
+    {
+      "claimId": "claim_6ae075930d08b33b19fa26d11dddbb7e",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-22",
+      "unitDigest": "82a9fc630b06efc1ff9160ddf99d1ef14782fc3bc60922926371aff69b9ca768"
+    },
+    {
+      "claimId": "claim_1720c1e2b7546fb9abc46f977dca5825",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-23",
+      "unitDigest": "58de682e70a5457522892e8231fb6d7cf5c71ba825b60d0b16e3386248a8156b"
+    },
+    {
+      "claimId": "claim_579b1a0a3f1da1f0dd4b7cf68df7296c",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-24",
+      "unitDigest": "be716ac2e12a5034e40af648c86c875e85a8959bbc8b36fdb5767121bd29460b"
+    },
+    {
+      "claimId": "claim_d4f22adcf76f556e71fd4b571c65fd02",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "5-component-boundary",
+      "unitDigest": "bd8e4286da3b9be7ecca63ef6997d223b301f60c28afc8a6a5917091e7e46241"
+    },
+    {
+      "claimId": "claim_f083b4f83f01dbdb32c7cd11aa57f872",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "51-vị-trí-và-parent",
+      "unitDigest": "1f7803f54ad8e97373ec11ddaf6f2c0c4e4b1217eacd9059e9008ca69bdaed10"
+    },
+    {
+      "claimId": "claim_35b15d0934b7b00d4dc499e636e5454a",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-25",
+      "unitDigest": "75fcceade6aa085b470fe340ea5938c62fb80e1f413bf4a9833fe96eb305dc0b"
+    },
+    {
+      "claimId": "claim_3f9830e586c476dd28ffdb5e32b6ec72",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-26",
+      "unitDigest": "c197e2049c5a07656d02143a56b987482fd5eb433e461694a1c11ad171d736ff"
+    },
+    {
+      "claimId": "claim_f720709d19fbec377b1da6118d3017e1",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-27",
+      "unitDigest": "ae3e82541e20bbf22e7804f3cb3fcdc42582b93303a71e221acf99a6fec61522"
+    },
+    {
+      "claimId": "claim_8c0f0587e917eb027f7904f9d2ec5ab1",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-28",
+      "unitDigest": "696474a359edf32d98a7cc86a8e42e841414dc3c40437ceeb67fe94a80f21163"
+    },
+    {
+      "claimId": "claim_1818fed994fc49f9c1084ae57df27a01",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-29",
+      "unitDigest": "12b7882b372d729494e050cc316c0dfc77f753c58d110032331e9d26b9aaff97"
+    },
+    {
+      "claimId": "claim_42c16b046b463e8a2aea19bbd55e284c",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "52-quy-tắc-dependency",
+      "unitDigest": "12f929a888d5b3bdf3a8e7a1509877484be9590833fdebce0277c0e6e7d228b9"
+    },
+    {
+      "claimId": "claim_467d37a7c682201f64cf45145bb77633",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-30",
+      "unitDigest": "9e8799eecd7d7c8646a012459732c22b9ab75b0b66923b1de2c4e72edfcf65e6"
+    },
+    {
+      "claimId": "claim_8986987d4027a2f84a4b4c69fc636ac8",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-31",
+      "unitDigest": "20d9856cf018fb4ea9d199a3f2d18b6256ac6e69242dee66192a5722319c5f1f"
+    },
+    {
+      "claimId": "claim_d867754cefbf1a753fef272a57b00603",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-32",
+      "unitDigest": "f922c23605a7afcce50568cdb5592cf3aeabed7b4e80cb18c659f784cfd691f7"
+    },
+    {
+      "claimId": "claim_3c32f6e251ad5b14894ad90eed79d494",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "6-canonical-contracts",
+      "unitDigest": "d254eef730f5414dcdf6f6c748ad5579f3557e842c7234930d5b503e195fff16"
+    },
+    {
+      "claimId": "claim_aceb99e66710c74e37fffe44001f80df",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-3",
+      "unitDigest": "9a4c1352f50e0f212ffcd376be7eb6daf6aaa184187043e0aa977c91c04ddbd0"
+    },
+    {
+      "claimId": "claim_7bf382199b928a3ab6f591dace5d4ba0",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "61-confinementpolicy",
+      "unitDigest": "cf864e273a4652744a19ede737cb847431f5dbb4092c029a5e65089030ee147c"
+    },
+    {
+      "claimId": "claim_8a41f5ebfb682108b780226cb00a9720",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-4",
+      "unitDigest": "144306fc23422ced2d9f4ce6ea50de58d300c00160f2d1a952e8794165f41364"
+    },
+    {
+      "claimId": "claim_621f64668264b6ed6d389e54e9757c75",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-5",
+      "unitDigest": "82974998a4d9a5d1cd113cf5bc697a1493802a4d5b42fc4a29efe62f682794dd"
+    },
+    {
+      "claimId": "claim_fa68c61965120a25c91cdcf5fb53b908",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-6",
+      "unitDigest": "c5fed59ea82e4179183d322c4994aa0dd9fe6fec922ac6c75c739b0cb993f482"
+    },
+    {
+      "claimId": "claim_468db5188d82a8173af30117b269e05a",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-7",
+      "unitDigest": "174065be7731e065d49df8831765e8b1621624e5e9c4147b65fc3f3d59bef97e"
+    },
+    {
+      "claimId": "claim_373330f7e7533c795af584bab3dd5be6",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-8",
+      "unitDigest": "77d2d471883052250200ab7600172e75a4629ddcc35862fd36dad5c808926384"
+    },
+    {
+      "claimId": "claim_c2fd6287ed90af9fd0a9588d1e0af4e8",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-9",
+      "unitDigest": "34e25b534cf851fdcca5ee576a24508f5e64e3ce2202bb48088a3827822cce87"
+    },
+    {
+      "claimId": "claim_72db8aa2341abee798ff2aa09f120129",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "62-nơi-đặt-policy",
+      "unitDigest": "e8c7201602b1661b1d1c2d0bcd200de348fa9f5ca2db3942a9cdedd5138b47e0"
+    },
+    {
+      "claimId": "claim_0ad70a8bb3d703165ed3757c16d9eef6",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-10",
+      "unitDigest": "ac0a0c84105227bcfd944b8130d6b3d17154e9c4e22729a3fd5d1ac6a6eeb211"
+    },
+    {
+      "claimId": "claim_c061feaa8e24659688ca80707d9a5952",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-11",
+      "unitDigest": "7b98849030627dd574a65bdc66dcae626816913bf146d7d0563ffe208e741bba"
+    },
+    {
+      "claimId": "claim_709d3b396f94bb46538b3be750723b77",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-12",
+      "unitDigest": "6d3a53fec3b2db3ccb67a44456cfa49581dc393b660909021f2ce70797bbb15e"
+    },
+    {
+      "claimId": "claim_414314452db8243d0e4d144939e7747e",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-13",
+      "unitDigest": "6d04aec7233a3abca178f1faeb3165af28667ce83052b987786fbbe4f382119c"
+    },
+    {
+      "claimId": "claim_61f6287707c0668d5d6c402a69c693d2",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-14",
+      "unitDigest": "aef1e73b22aa08d3ade14ec51cac96b5f2b8011355459ddc3fa512d0550748cc"
+    },
+    {
+      "claimId": "claim_c04f7a8ff0d5c8273209f2a742efe0c4",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-15",
+      "unitDigest": "36e771f87aee65315d67207605e953c9e01114e3a44901731a7da9a5a6f7d97c"
+    },
+    {
+      "claimId": "claim_cf8d898c041074cd559527f9f320330d",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-16",
+      "unitDigest": "46511410e541ae7f3d505f24b96474a308661046620525bdc78b0132632503ac"
+    },
+    {
+      "claimId": "claim_4190bbef80014aeece619a82d678182a",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-17",
+      "unitDigest": "b4384b488cab8d5b506feb676b0806a3a4359417a76025ae33e510f669118d5b"
+    },
+    {
+      "claimId": "claim_a7e6bbbc506d7d77d7e8ce6bcf85db31",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-18",
+      "unitDigest": "a8993901e0112ac1a6abc97ad6af873a631e01d29de08abe7603f4857dea40bc"
+    },
+    {
+      "claimId": "claim_65d53f69b094914bb1ffe25a8e54402c",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-19",
+      "unitDigest": "b3e564641ff23cbde2e94d06283e58ae0ddefcbcc0928d31b2aa18c1b6c4d4b8"
+    },
+    {
+      "claimId": "claim_7a56441f60be947b5cbe5856d4c3128b",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-20",
+      "unitDigest": "5f56c09a0921d072e749320c929cf1ee3801280e3288ce0f388accb47e6f399c"
+    },
+    {
+      "claimId": "claim_a93df57649380e87940372c1ae98bc14",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-21",
+      "unitDigest": "d8a9fb19101ac0e03201ba2cc768c704b2aa263798aef9c98f10712f587e67f6"
+    },
+    {
+      "claimId": "claim_096bfa1baf75a9eb27e5ed86313d18c0",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-22",
+      "unitDigest": "066ac1063e1440ff187b3549a9a0767e3a73e0d8ed51d563746d3674f1b75adf"
+    },
+    {
+      "claimId": "claim_7ef6fc6ee5c72cd61746952b1c926596",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-23",
+      "unitDigest": "3cef3c7a3f285561a7ddffb1c2c51186af1674c44611658a12b638f5337dcaf1"
+    },
+    {
+      "claimId": "claim_ee19375a832b214415316df2880b9d38",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-24",
+      "unitDigest": "1c88074cc7336dc83b3ad38729360fe21f7dd439060af7a287bc4fd0bb7f5e47"
+    },
+    {
+      "claimId": "claim_9747eeeefab2b4de2147cabdd10cf940",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-25",
+      "unitDigest": "c979fe19764ba16590b0f9f551bc05298d26b38d39ef9ecd18c354b7aa5311c6"
+    },
+    {
+      "claimId": "claim_03ebfa4088b7739930c4cf656a755f6b",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-26",
+      "unitDigest": "31662baa9e369dcb6cf5055ca1889e2036714c0505a740d883b0ccd1cd13abd6"
+    },
+    {
+      "claimId": "claim_542bb522121735ddb090894820aef357",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-27",
+      "unitDigest": "6e03ccb65264e6643bf7207bc062fa8805c7576c3ee873d95818f0e06730f263"
+    },
+    {
+      "claimId": "claim_4425d37263ae0477205ac7493e0489a6",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-28",
+      "unitDigest": "41e420ab27f84a409a736afe94d48d53b7189944b2e8eab354d5808f1928d87e"
+    },
+    {
+      "claimId": "claim_362e53bd4c41468d0f31bbaff3766062",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-29",
+      "unitDigest": "05c490af337290c284cdda8846ae5ae6c55ba87783b627d5565966fbb32ff22c"
+    },
+    {
+      "claimId": "claim_85614de5b582dd7f646938bf02212fad",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "621-trust-boundary-của-backend-registry",
+      "unitDigest": "6881955b6321c52b6c9feb850cdd00c7205c99aa02bdd18025a771e908b91003"
+    },
+    {
+      "claimId": "claim_534f0deefbdb22153d1310a77bc908e8",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-30",
+      "unitDigest": "8d1d0290f08fff8a37ca8c4df31c7e374a99a8a734dfed30635740417f6b2449"
+    },
+    {
+      "claimId": "claim_23c306e93da431c5b58dc42eae67791c",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-31",
+      "unitDigest": "b23088a2e289401fe24b97ed2e1a116c59e6fbf44c5a2a23addf2a1e61ff87c3"
+    },
+    {
+      "claimId": "claim_0870894b58e3cf580c819f86aaf4aca9",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-32",
+      "unitDigest": "56dd7eb62d06c283727cf88865d888ad8e0cb8d4d4b073794be71e2af4fc85bd"
+    },
+    {
+      "claimId": "claim_c24cc4613c3ac072520ef666a443b1ba",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-33",
+      "unitDigest": "5e9e62faae2fce40894b8d475702c842c54249bb1f25f3183a8584c4fb549ba4"
+    },
+    {
+      "claimId": "claim_01eda8a43079cc517399ede91d3bb01f",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-34",
+      "unitDigest": "f74a150d52beabb3e5c3a6f2ebfbb7566a43287c85ae6d944b76c692925466cb"
+    },
+    {
+      "claimId": "claim_c36cf0603526e446bd7db3af1dee79dd",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-35",
+      "unitDigest": "88261031ef650f143ae4ba47fd8c1a7453082b83e92ceb8f25dd1174ccf52acf"
+    },
+    {
+      "claimId": "claim_c5ea3072dec5e438ecb6ab8cb6940180",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-36",
+      "unitDigest": "c8b981d3fe9349795218066abe6fc97123368dc6b73b184748f04af9c504c574"
+    },
+    {
+      "claimId": "claim_f23b446a1760074a92c601a9f4613c04",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-37",
+      "unitDigest": "0c228c628bd3d18adc97e83532fb52d588c5cee0d5835e6211155c37de3568fd"
+    },
+    {
+      "claimId": "claim_4f30adc11320bb5e798a8bc0db62f495",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-38",
+      "unitDigest": "08f5437a2edf680768899a27c79fe45abcb69a0fb79d53529243f812b1f788d5"
+    },
+    {
+      "claimId": "claim_cac60d0f1164309f87ede7041b9f1895",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "63-confinementrequest",
+      "unitDigest": "f72908db532eea1fabf7ca2802a34a2e95ec81bc49b1f220c182f25a8a75a8f3"
+    },
+    {
+      "claimId": "claim_f5c22d02812194f9d8df13b4d7c3ec72",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-39",
+      "unitDigest": "243f9c7a472a472994fb186884a60bba0663fa2a88ca22ec227b73d82a8a8379"
+    },
+    {
+      "claimId": "claim_401c62c07a0647b8a318471d2de204d5",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-40",
+      "unitDigest": "fa9f2bd13fb1ceab92b04aac0394bf0eb56a399fe887087f5d8e44483f16d590"
+    },
+    {
+      "claimId": "claim_7bc1444acbdb454fd660b3f1881331d7",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-41",
+      "unitDigest": "93e2804980576701a4a72931a954008cf6bdd673e36939d85ef2414581623855"
+    },
+    {
+      "claimId": "claim_0f2924da178560767d4a7dc21e6227f0",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-42",
+      "unitDigest": "d25458887a8603d248604aaf1ef55ca94fc14a5dbea5d5631db83950840ec492"
+    },
+    {
+      "claimId": "claim_4c9859c0447d4eb0ea46e885c1946494",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-43",
+      "unitDigest": "bc442418deabb38062109ee413f6cdbce852c513665fb09388458180787834e0"
+    },
+    {
+      "claimId": "claim_0c1b99b0888721e4fa61beff6a7725ca",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-44",
+      "unitDigest": "0b3fe05e83b37073480e24dad16055a7cf52ca7997ad4d1d2a4a8aec05587a1f"
+    },
+    {
+      "claimId": "claim_fad6a3c963e073b50db3575515628051",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-45",
+      "unitDigest": "781ad161936829706a9cb0681013fd165c5c218f7e4b509f617c3035147d06e6"
+    },
+    {
+      "claimId": "claim_9a9d66f4e786b598282a64c085432a11",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-46",
+      "unitDigest": "21f17ef9f28dce5a128ccff3b509f4f1ef314f516665c113fc072cd78ea5c343"
+    },
+    {
+      "claimId": "claim_af639c0f4fe8f6c0dc329f1a1eb9c97b",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "64-confinementplan",
+      "unitDigest": "8928a0f81055cbe7077d99e75a47b1514fea1b6461e357cbbd48b056a2b9a864"
+    },
+    {
+      "claimId": "claim_45cb6ab722c2078e7a59c86715237268",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-47",
+      "unitDigest": "5eafc3ef3beffaecc2bacf329d0b69051d295685302d9410ef256ccef5f2392b"
+    },
+    {
+      "claimId": "claim_8aaf2ab8cab3add036bfb158a244e225",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-48",
+      "unitDigest": "69dceaac752e861a29e869a905561a77730ad654a1447daf35ae69028dcf12c3"
+    },
+    {
+      "claimId": "claim_bb1abedd6124e01311d47db329134ed2",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-49",
+      "unitDigest": "55919a3c62b46ee8432b975ae44c4fcd01074f7403f6e627f72500559d1a1128"
+    },
+    {
+      "claimId": "claim_bc98aa13763205eb00cee4cc4b098195",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-50",
+      "unitDigest": "b166dfcc0268ae16b1c802d447fae76e3fcf211d53db89d771658ac6f06fe381"
+    },
+    {
+      "claimId": "claim_8c848adf5a592f82165f0d8961dcff9e",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-51",
+      "unitDigest": "c55f6ec48cf55337094638acaca6e109f0d37c78715262afa2f18b9f24040c46"
+    },
+    {
+      "claimId": "claim_f6c28a9097619631e3c748472cb73eac",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "65-backend-port",
+      "unitDigest": "bee6e6dcece03c04e46abffb9f0c09dde3b827cd7a14dd0564144a5f4f54edf0"
+    },
+    {
+      "claimId": "claim_14051869225dc8365787e98bc34a696f",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-52",
+      "unitDigest": "7718d52080bcbfd8bb8f3fa0973b4049dd6b2a03ea35c45f7074b8b6367792c5"
+    },
+    {
+      "claimId": "claim_23f24412e9b7d9cd5e0d20ad7061b716",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-53",
+      "unitDigest": "e81a571e9b40f865f5f99d9059280046325b34ab251552aab97756381f5df132"
+    },
+    {
+      "claimId": "claim_6cb105f8711384b40dda46a177f3232b",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-54",
+      "unitDigest": "046c553717b3b1b9f594a9befbd04ef2b033b5a4d266293ac583a2e2ff9d9140"
+    },
+    {
+      "claimId": "claim_81ce7171216b0ab5c9fc1550cefc6517",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-55",
+      "unitDigest": "7fe89045e3c2deaea6858de1a820ee4aa20aa4316e55cc36627a10e507f0d105"
+    },
+    {
+      "claimId": "claim_7097b62d1adb6bbc723f2ba0b17dada2",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-56",
+      "unitDigest": "4b4b9501f14522ae5b83efb77c99bcf71e3005b6ae4e013aa1d4eb7509d21cd8"
+    },
+    {
+      "claimId": "claim_6785a5f3a9f65744e05e4aaa247dd527",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-57",
+      "unitDigest": "7be3dcdd50f649f43befc5139eb6e222ff0fdd387e804b29e5b572b28a9a25f8"
+    },
+    {
+      "claimId": "claim_82aa2b5b7c4edb52f6c3419234feff1b",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "66-confinementattestation",
+      "unitDigest": "7910ea66141ac4cdc5435190e31331647fc75ef345b90de879cfe319daa295fc"
+    },
+    {
+      "claimId": "claim_881c7b860398ec56b2c53aa979f0d0ca",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-58",
+      "unitDigest": "36a3d1ddd473fd1b2848fa3c6363d939004fb9aed4f80e62b681881dab003ca5"
+    },
+    {
+      "claimId": "claim_c6f22c182809bfbdcd4b61c549448252",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-59",
+      "unitDigest": "c282c9ca04e89244a5b7af633db57c73254bc703712ff9c213f12ca4b7ac5564"
+    },
+    {
+      "claimId": "claim_3d3d04bb6d92e71fff28a2535e2f8d1f",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-60",
+      "unitDigest": "05814db74539896a48b020a0d6326bbe8d74f0b16d80853f167bba74afd12565"
+    },
+    {
+      "claimId": "claim_eba921b94dd5ea247782ceb609042aa8",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-61",
+      "unitDigest": "d01b91e92712ee83bb8180a17573637d4d14b6be07f0654cd489fe7d24884c53"
+    },
+    {
+      "claimId": "claim_f5a52c61864e3be61662d3a6b6665cf9",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-62",
+      "unitDigest": "118b8df1dd9ccee406f03b07de6bbfb3aa9807cd1147eacb99b882862cf7bf92"
+    },
+    {
+      "claimId": "claim_e62ed70d3a230f8d3b4ab87cb94ac3d0",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-63",
+      "unitDigest": "b78ccd4e97965c3fceb7afba5c77a41a5d81fa17f2b4ffe6fb70fd0a49eff3ba"
+    },
+    {
+      "claimId": "claim_7364f54a01fc546f38870ba83d71d755",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "67-detector-port",
+      "unitDigest": "335a5bff2b2c09683b4987219fc557c8b5e6ec8dfc2512d96584b6b38cbfa53f"
+    },
+    {
+      "claimId": "claim_5acbc6f092db10f71fc638cd5681c4cc",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-64",
+      "unitDigest": "7996504f5b372968107319eb1d902a4d02284ded0b1dadb1a6ad503f9c9f96c4"
+    },
+    {
+      "claimId": "claim_89dbdb0604715b690c4a8fce1234ba07",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-65",
+      "unitDigest": "6c9ce6d5f534d24f1b52f1a8b0bb41382ada3ba2a083950f3cccb57bee758494"
+    },
+    {
+      "claimId": "claim_2e17ec877991b8fb6dc15804c37b85aa",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "68-error-taxonomy",
+      "unitDigest": "5ad9f5cd9dbdbc7fe14ade3ba2eb1a86d19b04724a68ed36194ca7ddb27a3a94"
+    },
+    {
+      "claimId": "claim_52bf0b51048e5b812c73f85f42534778",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-66",
+      "unitDigest": "4d56df251bebef446e601cf783883d43113eb22e1267b40f06aace02dc3b206d"
+    },
+    {
+      "claimId": "claim_e8bcc991edd2f67a65a30b5f24bcb59e",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "69-kết-quả-của-cửa-authority",
+      "unitDigest": "6b3e7a7e5aadccfb087269b187bd790d4b324fc23e01e204f567288131a10876"
+    },
+    {
+      "claimId": "claim_76423af5e76cad7a760e473171db0bd8",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-67",
+      "unitDigest": "c3292d3cce896220e27ccd72807db17fa443d0a5b21c440d4f48ffc2f6132876"
+    },
+    {
+      "claimId": "claim_8ffc60e38f15f94900b7c256725b13c3",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-68",
+      "unitDigest": "7faea4602c2040282b0abba27d6ea2f973c717f8b3b5d7879f74f10d48daf964"
+    },
+    {
+      "claimId": "claim_d4954b95ae18bc6eadd2b456114a0d8d",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-69",
+      "unitDigest": "942ff1f486737c04212fd01dd4e86d0b478b13c618c90b210bf07e883bf6af0d"
+    },
+    {
+      "claimId": "claim_1069b219155903582589750241670b7b",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-70",
+      "unitDigest": "9c61a66f380d64bc09397aafa0e1a010dc539e91710f22c4a02cdf75516323ee"
+    },
+    {
+      "claimId": "claim_3c98b8b5291a36587d790c7c61bf0ec1",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "610-version-và-evolution",
+      "unitDigest": "b6080b189d01d802c981494c4390354d7a55948c50f69c8abfd796b997c9bbb0"
+    },
+    {
+      "claimId": "claim_98384851072d87294c97b641f88f418e",
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "anchor": "unheaded-block-71",
+      "unitDigest": "466b03f71b1611a2ebae145551d9229908f088c9084b6f91c3589e0e639b0769"
+    },
+    {
+      "claimId": "claim_c28415d164ab0eb7030c262155f29b43",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "7-luồng-runtime-một-cửa",
+      "unitDigest": "8c4ed3f626d9a63cfb4fb857667391ac65fa200135d46e948fc12706fad35504"
+    },
+    {
+      "claimId": "claim_d43968f2b346d8eb2c736f9cbf45a837",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-33",
+      "unitDigest": "27dc52c7862d7251d951ad1f856ae4384602106ba36de03aee380ed2836d1a6c"
+    },
+    {
+      "claimId": "claim_b74317580138e8ca89ad5beaaa9ebae5",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-34",
+      "unitDigest": "a66912f90790f4423a1b15c4d7c7793f67269922307207dac097b390fea6c688"
+    },
+    {
+      "claimId": "claim_bbe782e6ee2670e65302fb340888c612",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "8-policy-resolution-và-edge-cases",
+      "unitDigest": "3beaa2f403153f8265585eb96d5298e4cdad5afe11b99f436afcd1a16e8a7e22"
+    },
+    {
+      "claimId": "claim_945fc582f814a21a5b31b662e7730a80",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "81-quy-tắc-hợp-nhất",
+      "unitDigest": "e68830586ce11e6c4e7968c790646cebd95c121dbdd4b91b10b7679305dacf33"
+    },
+    {
+      "claimId": "claim_7519a17d8b83682007e1040f0208a38a",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-35",
+      "unitDigest": "3300e69aaf8c8b60327ca4e4500cf24b7d2bc0209017cc33ad23a4b47f626a51"
+    },
+    {
+      "claimId": "claim_d6e3a8b6bdbad6eb8832dedecce3af68",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "82-required-preferred-unconfined",
+      "unitDigest": "85dd373e75b663aca06c5bea845195248ff866e19991342b8b704f570c2b0bbe"
+    },
+    {
+      "claimId": "claim_5c6c4d70a4f3bcc674519b97ec484952",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-36",
+      "unitDigest": "ccb3a64a1dc5acf178a7ba526cf6a9be174bd826509e99d87c074a0eb7264643"
+    },
+    {
+      "claimId": "claim_9e6f7a0b46212d4b4f91e785385c6ea9",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-37",
+      "unitDigest": "9444b6beda96ccb7d692897811f254e234ebc9fcb63694100e8273c43ffc440f"
+    },
+    {
+      "claimId": "claim_fc0d0b9362e1734b895dc1915e30cfda",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-38",
+      "unitDigest": "cd788e051633b838a8eba0416f3addbdecd4a55c109c640e14a92a2018708af4"
+    },
+    {
+      "claimId": "claim_fcc46294f6051049cd4c77f67ed6af3d",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "83-resource-grant",
+      "unitDigest": "ed2f179549b0061424356439f6ef9956e448d0e26f174166d1d832c7b91314fd"
+    },
+    {
+      "claimId": "claim_88fa79d61b6875d241559f455b555e53",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-39",
+      "unitDigest": "d7c67ba46fef4124882b233b5de07688ed35bdc17bce71df485df3f12e93b77f"
+    },
+    {
+      "claimId": "claim_13da404317a8026e33afcd2e58ff4e13",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "84-fallback-executor",
+      "unitDigest": "249ab9b257397c2584a79bf73d4058e25a93b17b486b411b7fc6e37195190893"
+    },
+    {
+      "claimId": "claim_61c31179243d131b181e336912a03c4b",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-40",
+      "unitDigest": "6416dbce784bfaf46f852f45fd816295d0ac623d8599dc5c8bcf955ccea8e3da"
+    },
+    {
+      "claimId": "claim_b7a4044f5956f2a0da7a3f0b38c059c6",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-41",
+      "unitDigest": "518bb6a9bd04306acbbe91276823860e4203d0f26f481506b44059d186c4481c"
+    },
+    {
+      "claimId": "claim_8ee6a4ccd4df0de275866de0f669ae7e",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "85-adapter-mới",
+      "unitDigest": "a9cc6268ceefbee4a9a4ae3860b92fce90dfb47e76fbea54f4bfda1934449603"
+    },
+    {
+      "claimId": "claim_0117008e3dfef395f044eb1556ad0fca",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-42",
+      "unitDigest": "906e55e4bb1dac799667c832ac3b77cf4a3052bdaa8bd07aae21592364e59f44"
+    },
+    {
+      "claimId": "claim_46c173824da77fbf25f59072ae8e1620",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "86-crash-và-cleanup",
+      "unitDigest": "a021e5594432d44b1543517b1219a7406a72c4ba9503363e1f8eef3f8085524a"
+    },
+    {
+      "claimId": "claim_c0cd54862f6365e2da2856925bef04c1",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-43",
+      "unitDigest": "237461836affe4167aaf89d08ee087d9de21a39a3afc2f10e54bfe6bcaeaeb2b"
+    },
+    {
+      "claimId": "claim_2cfa54b977cf929a5f73250095379bd2",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-44",
+      "unitDigest": "0ab59371b3385f8142084098da1a758776a37360071cd460fdb90dea8eb2a8f1"
+    },
+    {
+      "claimId": "claim_26b3a49adef572e1be2ed219e292c8b0",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-45",
+      "unitDigest": "ab25a8a3c32e9f823859789e4005083667f0b527ebafe9a4d572c918738bdefe"
+    },
+    {
+      "claimId": "claim_d7fa39da9698c447594edefdc44d7ce5",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-46",
+      "unitDigest": "a89aecc164ff54f3f6807a0d3231e27b4ca2c77c4e41fd121bbfdb18ea8024f0"
+    },
+    {
+      "claimId": "claim_daf2ec0996ad074a68903680fce85adb",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-47",
+      "unitDigest": "f43f3ff53150980b52653b87618308619ddaae4a8ce19572b2589bb7cf744f7a"
+    },
+    {
+      "claimId": "claim_cd345b6c8a7da2451c2acf04ba8c5292",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "87-bảng-tình-huống-chuẩn",
+      "unitDigest": "951028a48688bf9bf121f61795876c4aa5bbe52d0dd58383dbb76608271980f9"
+    },
+    {
+      "claimId": "claim_73ae83a090b77eed0e84212e99fa6e7c",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-48",
+      "unitDigest": "0ef8d6c210698ac4fae241e133b626be662e36e1023900186b541f3f7d0e27b8"
+    },
+    {
+      "claimId": "claim_9a1cd05f74418890fbca8955aa76b378",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "9-default-implementation-đầu-tiên",
+      "unitDigest": "e78c37d28fb7fbf09e1c978624d56d78b442c8082d44b3b19c61e9be95642831"
+    },
+    {
+      "claimId": "claim_cc0d485b1b93357edb755f4121a26206",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-49",
+      "unitDigest": "f0aa8cea776fc1a9bd023b6e3e1318c7c9c16589a68d5ac16288b63f23634cbb"
+    },
+    {
+      "claimId": "claim_f1aeeff92e7bbf3f52b1cc88896cc41e",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-50",
+      "unitDigest": "2fcf6811e81b5faf421dcc8038872613f72ad4fb0f62a9c552a56c090a6b31c0"
+    },
+    {
+      "claimId": "claim_1538dad17e4fa44207a7f70dc2ca7b55",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-51",
+      "unitDigest": "9077d21c4c3ff52bd3ddcb04d54a03a978ee83919055752883a6609016055acf"
+    },
+    {
+      "claimId": "claim_daa730ce31dbd045d14a42c31c57f316",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-52",
+      "unitDigest": "fdcc56c6036171a7393772c55e187bfd7e86e9b00b045bc9d0ae3c81c963fd67"
+    },
+    {
+      "claimId": "claim_2c080a72c195a28a1ca8efb0e1187f11",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "91-support-matrix-của-default",
+      "unitDigest": "6547070a649080a9b46e64e56a74695a0a27993e07e7d917978fd4b56697af4d"
+    },
+    {
+      "claimId": "claim_1a847c3e3266a47169a83f7ac836ef7b",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-53",
+      "unitDigest": "14f3ee1a5085e8338b27e811d4a6fdddb36726d4f98c9df86111a65f594d85fa"
+    },
+    {
+      "claimId": "claim_d4bc3fb932ca2d29e917119191f45f1c",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-54",
+      "unitDigest": "62da6aab49287cf95b091c9f3b8d55e5eed5b510a040c7663c8d3616cef1a994"
+    },
+    {
+      "claimId": "claim_3770d5a0b897fbd8c1393a38c48c3333",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "92-hostread-blind-worker-mù-trước-run-state-của-peer",
+      "unitDigest": "28ef20e16a5b5c8d4fe7db58cfb81fa2915a15bd591ddfbdac9094abd5cdd4bc"
+    },
+    {
+      "claimId": "claim_68dd1d19379c9a16393429b5e2aac34a",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-55",
+      "unitDigest": "cd86d66ba41c3e216cfd4d8bd8d3d67ba807275450780add3123faf7d91d35bb"
+    },
+    {
+      "claimId": "claim_b1731956c352b9977eef7ffa07f88991",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-56",
+      "unitDigest": "7cf71cce1a2badb415557e66813aa0937d285bc90ad11c6264e1e54083199ff6"
+    },
+    {
+      "claimId": "claim_54f630d44a33c5624ebeca834cf25ceb",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-57",
+      "unitDigest": "8caafcb371d02a300d8aa42288fc25e25354ddd2301e48508ee4810c99340902"
+    },
+    {
+      "claimId": "claim_220b8163566ad8b38cbf1d534c871e42",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-58",
+      "unitDigest": "d0eb5b8c250cd17479ceba5b41a114e24933e13bfe9ca355ed5871091093e30f"
+    },
+    {
+      "claimId": "claim_9d863e7c1e4c3983292845628b60e041",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-59",
+      "unitDigest": "a42feb4ea36f23dcda856872a41811401e058cee1f3bfd71af95069725466bc8"
+    },
+    {
+      "claimId": "claim_1ef2bc00c79bc7a40787b62a4943f0df",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "11-proof-và-definition-of-done",
+      "unitDigest": "57cf348eee6c014023677b375f253194430c8b05e051987ccbb1ad56e611e828"
+    },
+    {
+      "claimId": "claim_7aacf43ab14386fce6c4a5a8a0519402",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "111-contract-tests",
+      "unitDigest": "6d170846be1146514c997c484be5a940415a4a695507cfad1750510d531bd0d9"
+    },
+    {
+      "claimId": "claim_bb5abf5828264d19c061b9b0920618a3",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-60",
+      "unitDigest": "7653e11267b25193a2a1f9c9969fffcc140830bfec41bb55bd80af4a541dc396"
+    },
+    {
+      "claimId": "claim_9168d8af609c58932a87918d4a49b8aa",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "112-one-door-tests",
+      "unitDigest": "82ad2c5e239e041eee2e98c16e8b463b09fb944eade7c446627ee3509bf79fc8"
+    },
+    {
+      "claimId": "claim_bd94f9efb9ccdbbc8ca5b90916290c6f",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-61",
+      "unitDigest": "ef13d34054bfb70d28e34612c2fa9c8baf76e7a153c8f38c1673b92b9936f2bd"
+    },
+    {
+      "claimId": "claim_78563a2491b11f7a0b412c5b900a7414",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "113-behavior-probes",
+      "unitDigest": "a7a202fee6a85efd0c8a379637bd43e9f5391a9cda96a3d428077837f92f3311"
+    },
+    {
+      "claimId": "claim_2977601fcac216f335c121ce5a58ec9e",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-62",
+      "unitDigest": "6dc2d3110bcb9737263766d842a280447bb840efd94b14cc54cbc739d7c3c0a8"
+    },
+    {
+      "claimId": "claim_d81f120837aab96ba270276e5090e2e0",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-63",
+      "unitDigest": "e3281f44b9de246979eb391c466d2aec235d67fd39c35775a42a31261ae2a129"
+    },
+    {
+      "claimId": "claim_34983077687032d7a49ecc61907a6806",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-64",
+      "unitDigest": "81541208991d526412de79630015558afcc29113e90b9e33d5818071621c09f7"
+    },
+    {
+      "claimId": "claim_dc8b5bc2507201dd705fcd64deba8224",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "114-observability",
+      "unitDigest": "3ab503ef0253b33caddd6ae3e969b0ca08877af01ef959ca2fcbce54b548419e"
+    },
+    {
+      "claimId": "claim_d9f0a2209948f0357cac70dc0778b0bb",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-65",
+      "unitDigest": "0863b0b9257af2b10d97f01c65e9433aa9e18f3bca620427ae014d6c874bd9dc"
+    },
+    {
+      "claimId": "claim_b532b9a9eb7f76d041c343e2d45bf859",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "115-doctorsetup",
+      "unitDigest": "2bcf45ee10d616e860737c38258d6a819c63e4a5f86ef7668e37abf3d6b9a3fe"
+    },
+    {
+      "claimId": "claim_f82a2cff173a458bb2231203222c10e0",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-66",
+      "unitDigest": "03aadf655bc30ec74e7e34d25a18d3b8f3f866fc2120a48550822fada8afa1d5"
+    },
+    {
+      "claimId": "claim_bed90dbb7de2a5782fafcdb4a3d6e0da",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "132-login-được-gia-hạn-trong-private-home-bản-chép-là-snapshot-bản-mới-hơn-được-ghi-ngược",
+      "unitDigest": "21f2bf3ad52967fc6e5414fed7ade9b084a6c1a76adf93fbcb39447ca3f5da84"
+    },
+    {
+      "claimId": "claim_022af2ccb616ad85400526fd94408258",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-67",
+      "unitDigest": "9c24e69b1b4a4ede9fce9ed6d771f342920397506c61c2a546df8163a810c5ae"
+    },
+    {
+      "claimId": "claim_19c1aba20ad51fafc86dc889996c2063",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-68",
+      "unitDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3"
+    },
+    {
+      "claimId": "claim_06e68651628b7a731b974ec5c34c9743",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "tồn-đọng-mở-open-deferred-items",
+      "unitDigest": "9f3428ddbdb9c7e79116cfd005571f29b2bf61f2f64344dedf46a0628b04b35f"
+    },
+    {
+      "claimId": "claim_dbbee9d940a2d595936e12ba6781f684",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-69",
+      "unitDigest": "63bf6e3f79aef39f4af16bbcdeb237dff250a8f2aefbe0e5b18249eab50649e1"
+    },
+    {
+      "claimId": "claim_1d1eb2ce98dcf1855678b2cf86c2ee67",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "14-pointers-hiện-tại",
+      "unitDigest": "68ee70ad03e7863859d56156353b04a9e61b3188841abf5c84e482b110afd3a2"
+    },
+    {
+      "claimId": "claim_c491a724bb730522215633d79a66e5b3",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-70",
+      "unitDigest": "b412674cbe8f64e89a752ba65cf9752f00b362a19455bcded73bd2a283d4ab16"
+    },
+    {
+      "claimId": "claim_905d120454c22b01bc7d709a1803ead5",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "accf803c7e73f896e243e25b1600bb5ab2d868fb2591e43054c4c283455d5c80"
+    },
+    {
+      "claimId": "claim_c7e7f597fc9c30ce57b225834fc66afa",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "spec-fgos-plugin-claude-code-slash-command-surface",
+      "unitDigest": "0ac7dd09127d236ff5c79bb080e4b3abc5ad55940171fc96ea0e0b0bacd97b5d"
+    },
+    {
+      "claimId": "claim_a3670407e66560218ba2688dd31075c7",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "unheaded-block-4",
+      "unitDigest": "d2988254b0a58d5ddf41e20b1c4fdc5bf07a35b3214fa61c94034e6b0f194e3a"
+    },
+    {
+      "claimId": "claim_3459a397e8c559a737ea21058ac35bd8",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "entry-points-triggers",
+      "unitDigest": "f3ffcdf9f308bc1515acae071d209a5f5f0fed0730bf3a41a14f07161970e891"
+    },
+    {
+      "claimId": "claim_d2d19426a24c78719c9ceb11bf924d33",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "unheaded-block-5",
+      "unitDigest": "b9e6c0ab26679c055bf00490c18221eab33d08712fbfd82458032f7cfded5642"
+    },
+    {
+      "claimId": "claim_74a311a5ab882fe8ee4806125167e2d4",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "data-dictionary",
+      "unitDigest": "5f7bbc0ccb0a688217a410356a618559820b7dfd24315cdd7dde1ca8ba7df0be"
+    },
+    {
+      "claimId": "claim_b78f1258e64bd182d527105502e087be",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "unheaded-block-6",
+      "unitDigest": "c4423a6e79bd0e75d2d4ddce1e935e386ad69ad08b3411958a40879bf0a320f9"
+    },
+    {
+      "claimId": "claim_3ec4250ed3c32495b43a85a96c5cff70",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "behaviors-operations",
+      "unitDigest": "39a803b85af853156a7029460b132103eac8017b2b1b7eb0b82d181f699b86f3"
+    },
+    {
+      "claimId": "claim_18ee900e609f459c318ac5997c68203b",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "submit",
+      "unitDigest": "69f4f3df21e60aa76283ace9189d4fab1934f4357c3550953af6e3c6de7953c1"
+    },
+    {
+      "claimId": "claim_385aed77384716abfc069f4a48427d88",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "unheaded-block-7",
+      "unitDigest": "69ee36940c62e85bae6cb0a8f6133292739fd5a659908adf38e9895c800d756c"
+    },
+    {
+      "claimId": "claim_daaf32f4b9ef0e4299e44b84d6def08d",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "pick",
+      "unitDigest": "9ac86adeef720db1e216359a68e7c1d5542d52f83de82a1d599adb1b87d8e8fa"
+    },
+    {
+      "claimId": "claim_8fb4083ea46573d60c5f2546534a4066",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "unheaded-block-8",
+      "unitDigest": "3248bbfe3551bed95fbe752e14d15dbf2423cf3faedfebe7861ded08cea3848b"
+    },
+    {
+      "claimId": "claim_c994cd3014f1e2d3ff41b2cfc002208c",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "move",
+      "unitDigest": "f554e2ae143d2fed3e65a0d422e0e8a61fd730f97478424bef8c1b53d463e507"
+    },
+    {
+      "claimId": "claim_a24a497ee44ed4600b872d298d5be9b2",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "unheaded-block-9",
+      "unitDigest": "bf99b50c0e43c39c941d57769068ae7d464d50c9b1424200b8e2db515b3c33f0"
+    },
+    {
+      "claimId": "claim_d02d04f7aac6728db08f6b541554038c",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "return",
+      "unitDigest": "1184c298d87f52f7092d885200d943efc6da34304b13cfb7f76a2e93f9cc66e6"
+    },
+    {
+      "claimId": "claim_e060be5e6acfef53337f6b999131cdce",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "unheaded-block-10",
+      "unitDigest": "277f2f5f4050e839469b2e30ec823c030fa3eb8484e123bf7ab838602344ab36"
+    },
+    {
+      "claimId": "claim_4d90e0f091439b7e3c59aacbf3ed4884",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "ask",
+      "unitDigest": "42231be494cebd0f44c944374d001b5720ab870ebd0f1891ad88b1d5befe0a5d"
+    },
+    {
+      "claimId": "claim_5d1a541d049da86b8276fd5bca6a6ca1",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "unheaded-block-11",
+      "unitDigest": "557f85599964f0fff74ee36cdecd5fd745b8178192267939c973f1e4ffc2722c"
+    },
+    {
+      "claimId": "claim_9f72e7f53d957604a35a4f033d1dcbb8",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "answer",
+      "unitDigest": "7db9db28197c1f24ed1332ec697e4415283e25961e0feb1bdf1758b8a01493d6"
+    },
+    {
+      "claimId": "claim_b1dd08c917b5378afded6ca097985955",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "unheaded-block-12",
+      "unitDigest": "a4b9943bc3c6e66737b9d80f3679611b3285299feedf1815d367d8ea48b7f78d"
+    },
+    {
+      "claimId": "claim_21db618b26ccfc7d18d41e3dd2188b2a",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "ready",
+      "unitDigest": "7e068866eabcfe636caa83acbf69276ca039f15a26b58acabe6382f1ab43e7f4"
+    },
+    {
+      "claimId": "claim_9010b5e75fd37710c5f44ad96a55639c",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "unheaded-block-13",
+      "unitDigest": "f74520870a5e9a82d39e255bf81abc8ceafd05921cedb345756469bf567a8924"
+    },
+    {
+      "claimId": "claim_f03a55e90d7410ff87e42a2c0bd78036",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "stale",
+      "unitDigest": "9a38b884fbb3be329f3ea305ba78dafdf134ba78cac639a85aa448461138f192"
+    },
+    {
+      "claimId": "claim_0346f6df67ee90d852cbf6b82a44e102",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "unheaded-block-14",
+      "unitDigest": "a6e56e7f186ae8caba61e67a7409c2326933f9fa5c42f7ded397110d75639bf4"
+    },
+    {
+      "claimId": "claim_7488655fde00478506a8a1faa605a42a",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "rollup",
+      "unitDigest": "2591c2c85553fdfc314114ab25b86b6297f87cf296df453e528cc2336963de1c"
+    },
+    {
+      "claimId": "claim_31e7045fdfec6efddb4c1ba1c5c9d667",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "unheaded-block-15",
+      "unitDigest": "4c8071c71c115b559f27ed2cad3a156e32341c1758e1cfd2363c9610d06a4af6"
+    },
+    {
+      "claimId": "claim_40755fce3ffebb9c3cd2f88f379038a2",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "check",
+      "unitDigest": "1b27de9e5f0e778a7ca3d492baef55ae37fb462d631a7e1f68d9dfc278e40159"
+    },
+    {
+      "claimId": "claim_511605d386df9bae4aa29fb1baad15ac",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "unheaded-block-16",
+      "unitDigest": "fd8bfcfe77b5019d779cae2f38067585409e1d8cceb5f0e767c515659ba4f1af"
+    },
+    {
+      "claimId": "claim_b92f03e0e94bc1ed715a6da0c42bbcf0",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "graph",
+      "unitDigest": "a3ac30bd6417b01ef703a8aad0ed671848ddba9d2e5be011dc3dad856b31b334"
+    },
+    {
+      "claimId": "claim_23f3500fb4d183df2bfccc49e503277c",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "unheaded-block-17",
+      "unitDigest": "cc42ca44f1f20f3a20b2ae3c472c41e3ce256c283f9cc81f00ee7fabf4d3a721"
+    },
+    {
+      "claimId": "claim_d249423f3f854623b4924fabe7996e69",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "conflicts",
+      "unitDigest": "74c55704f46e9f7586335e2f4e9bbb42b12a739f60dd18a75c71cc210983ddf5"
+    },
+    {
+      "claimId": "claim_50c93fdb3fd4fd3b6df90a9c6988209c",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "unheaded-block-18",
+      "unitDigest": "3cb73398342551d4386bd987ddb2b74058cfafa4fbbaca660057d11379725122"
+    },
+    {
+      "claimId": "claim_c4c6b55686b7e315f34ae005173b79db",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "actors-access",
+      "unitDigest": "4be8acef415d77200e8b8bef2f2f78665c99cf7882f2395a2597c5b9b99c8f01"
+    },
+    {
+      "claimId": "claim_32b42cc343ea5bed231dbfd43ef4b433",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "unheaded-block-19",
+      "unitDigest": "e02f12896615760aad3f55c30a0d47c09cf0019eb7e05580b82722c372172891"
+    },
+    {
+      "claimId": "claim_dd811f34a76357f46fd5bdf22fc90c93",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "unheaded-block-20",
+      "unitDigest": "a07dd8cc5608f2eb02359c77e86e8b33e108977fb591ad984ca41fc1e5791e9e"
+    },
+    {
+      "claimId": "claim_e7a3305a9d3e88e30a1d14fabe67f161",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "business-rules",
+      "unitDigest": "72f2603abf50c2aa2cb7a5186ac082c7a92c95eb394172013eb76b06ba8163b9"
+    },
+    {
+      "claimId": "claim_9ab01867539b225be5a4ee39b7034cd5",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "unheaded-block-21",
+      "unitDigest": "57301b02e1179ead982bc32b716f9c3afef040908df4c8885fda7999d10211ea"
+    },
+    {
+      "claimId": "claim_4ce8e817a2b14600b8261d72b1e36eb7",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "edge-cases-settled",
+      "unitDigest": "0860af295dafd0754f4998f0a8c294ddea276498c7e153d228acfe68ff9009af"
+    },
+    {
+      "claimId": "claim_59bc02175a2f8dc3faff32956d7b57d7",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "unheaded-block-22",
+      "unitDigest": "8f6837b88c85ff3a553869172595c5ec1cb22a56c067fd324aa576673c536cc1"
+    },
+    {
+      "claimId": "claim_ae9b022759d0facd00d2655cd08dee18",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "open-gaps",
+      "unitDigest": "52301bf84a319adb6cdee3a52044843d2cd0741101effc937f33f3836a680f69"
+    },
+    {
+      "claimId": "claim_2a1e1a761f429a1927ca41e55ee824a1",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "unheaded-block-23",
+      "unitDigest": "cfba02bb0c64c5f1e11aad85ce72d2127e002b8f7e28c505a3aff5ea0befc137"
+    },
+    {
+      "claimId": "claim_b205316c744392664543f72460d2d7c9",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "visuals",
+      "unitDigest": "8ccc4d4b2d41a29dca37e0a2f76827b370f532a0105d0ec6f6938aa97e41c57d"
+    },
+    {
+      "claimId": "claim_ca6cdaccc48e3ff8da4532ff2fc1fa55",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "unheaded-block-24",
+      "unitDigest": "15cc6bd4314b7981d203e220c5fe4e4c37dd75542ab1dc62aae55a8d3d1264e4"
+    },
+    {
+      "claimId": "claim_f6f21cf211510779923bb69c1986f195",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "pointers-implementation",
+      "unitDigest": "0db8134dd4c57e1f3f765358e948e88027b955927b1b35bb74f22e94e02ba0db"
+    },
+    {
+      "claimId": "claim_7937db7d5974c226d7e05f97326a5bc9",
+      "path": "docs/platform/claude-plugin/spec.md",
+      "anchor": "unheaded-block-25",
+      "unitDigest": "9e819c07e10200717785bb78ce288f08488d76f33547a8874f589fa191967bd5"
+    },
+    {
+      "claimId": "claim_e20f7ff7ebbd47f4699edd6198797231",
+      "path": "docs/platform/decision-citation-drift/spec.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "3893aff63d9705062d55c666da7760e16657cf2d144d1f702329a14948f64630"
+    },
+    {
+      "claimId": "claim_f8a80ce657505415a0cf4bdcbb8b1a82",
+      "path": "docs/platform/decision-citation-drift/spec.md",
+      "anchor": "spec-decision-citation-drift-check",
+      "unitDigest": "220c53cff76e8336290a335d8577e7bae5cc8394d137253ed17eb5956477d5ae"
+    },
+    {
+      "claimId": "claim_799091fae7d0b1a35a7053b22b43d065",
+      "path": "docs/platform/decision-citation-drift/spec.md",
+      "anchor": "unheaded-block-4",
+      "unitDigest": "408313efba87b25d55682f602abb76cc4728e6be0c0866bb434e7c027c0ce19e"
+    },
+    {
+      "claimId": "claim_4302bf09de5db8e70b5486c8bf75207b",
+      "path": "docs/platform/decision-citation-drift/spec.md",
+      "anchor": "entry-points-triggers",
+      "unitDigest": "c9fa0bb4f0fef1f62d90ca25359f7fc35f704628fe89c456c5f8517f8f84c2f0"
+    },
+    {
+      "claimId": "claim_3556818f023663dfcad72a90b7782e02",
+      "path": "docs/platform/decision-citation-drift/spec.md",
+      "anchor": "unheaded-block-5",
+      "unitDigest": "8914cbc1229686fc16ddda1dbde86708ac60615b0b313050b59e740ef45f8e9c"
+    },
+    {
+      "claimId": "claim_aef792d407cb3aa4c3eba1a859948b92",
+      "path": "docs/platform/decision-citation-drift/spec.md",
+      "anchor": "data-dictionary",
+      "unitDigest": "f327b12e6765878263e7c6ff7a5d9c1cf5171fa017c71b3a0e24b2e59044eea7"
+    },
+    {
+      "claimId": "claim_7e425277fb658644e211d3a6ba18f5c5",
+      "path": "docs/platform/decision-citation-drift/spec.md",
+      "anchor": "unheaded-block-6",
+      "unitDigest": "ddc10a212e811df7dfee1b3c902aa0417b08473aad551911cc5e52a0a2dc2ff8"
+    },
+    {
+      "claimId": "claim_293d81b12e6ce78ccc407ec7ac03faff",
+      "path": "docs/platform/decision-citation-drift/spec.md",
+      "anchor": "behaviors-operations",
+      "unitDigest": "39a803b85af853156a7029460b132103eac8017b2b1b7eb0b82d181f699b86f3"
+    },
+    {
+      "claimId": "claim_8ab66349995ddbb61028b6220f2e1efa",
+      "path": "docs/platform/decision-citation-drift/spec.md",
+      "anchor": "run-citation-drift-scan",
+      "unitDigest": "eaa622ae3f4ba7bcc253b063673b258f543583b8132c6458b4beaf2e4e2c25f5"
+    },
+    {
+      "claimId": "claim_98824ede2fb41b178a6a92aed5591b28",
+      "path": "docs/platform/decision-citation-drift/spec.md",
+      "anchor": "unheaded-block-7",
+      "unitDigest": "587dc1ed801795c039c0cf635242d774809fdd15591993e049f779d4cd523121"
+    },
+    {
+      "claimId": "claim_69cda08aab2b0c3dadce7df3298cbe89",
+      "path": "docs/platform/decision-citation-drift/spec.md",
+      "anchor": "actors-access",
+      "unitDigest": "7759adf4c9dcd9a1639bf350678d4d485ee698e66811a75de699bbcfe31bd396"
+    },
+    {
+      "claimId": "claim_5176afd2c7a6b5cf980c6ea133419f9e",
+      "path": "docs/platform/decision-citation-drift/spec.md",
+      "anchor": "unheaded-block-8",
+      "unitDigest": "fa66523b9149930dae2c9cbeb4d5dbfb5559e8ec842310f86505af1c0ae0ea54"
+    },
+    {
+      "claimId": "claim_8b1b71aab191aac54f12d37fccebc856",
+      "path": "docs/platform/decision-citation-drift/spec.md",
+      "anchor": "business-rules",
+      "unitDigest": "bd420c8f19c3d9aea688e4987228171062ce0af9bd385d9d85fd25e424f81c63"
+    },
+    {
+      "claimId": "claim_e26e9f5cc87f216bf7a4144f6a2fd62a",
+      "path": "docs/platform/decision-citation-drift/spec.md",
+      "anchor": "unheaded-block-9",
+      "unitDigest": "99281802ea8714ea8170f59bd553f0b307f603a746c6596110379cea0b5b1adc"
+    },
+    {
+      "claimId": "claim_1564e054266b55377f35a78418057318",
+      "path": "docs/platform/decision-citation-drift/spec.md",
+      "anchor": "edge-cases-settled",
+      "unitDigest": "01746da465cdcc5164e7031e314f9845dff72913f6118b480a75078f2c173ccb"
+    },
+    {
+      "claimId": "claim_2cba8bb652aeb76ce0ab3c0317c39a6b",
+      "path": "docs/platform/decision-citation-drift/spec.md",
+      "anchor": "unheaded-block-10",
+      "unitDigest": "590a6241c63ec4da994d248188f60056371d9051dcbd657d8ff59335dd382b60"
+    },
+    {
+      "claimId": "claim_10e84e63af173981738360d779c8039b",
+      "path": "docs/platform/decision-citation-drift/spec.md",
+      "anchor": "open-gaps",
+      "unitDigest": "2feb5276d5dc970b753498733b260a49392fe2200c9d02aaa915e5ed51cdd86d"
+    },
+    {
+      "claimId": "claim_231e775c29956a4a2a776810cc12a935",
+      "path": "docs/platform/decision-citation-drift/spec.md",
+      "anchor": "unheaded-block-11",
+      "unitDigest": "7a22bf47723aee067c9ee720b0fc8d75121b13f4aeb9aa8ed233d20da9c93500"
+    },
+    {
+      "claimId": "claim_fefb1bf47fc375b9e83089dc6059326c",
+      "path": "docs/platform/decision-citation-drift/spec.md",
+      "anchor": "pointers-implementation",
+      "unitDigest": "95e71b5dfa80858cdc6300b28de97966fb7de22d77bdba919c47ad7c9b81d32f"
+    },
+    {
+      "claimId": "claim_4966e71788ccddf622cb3c79fa20b4ec",
+      "path": "docs/platform/decision-citation-drift/spec.md",
+      "anchor": "unheaded-block-12",
+      "unitDigest": "b2c59c202dc6de42a01a6cec95a4aeca692960350aee8e0f37198a01c736dacd"
+    },
+    {
+      "claimId": "claim_8d4400399f1a8eb72474e15691577d1f",
+      "path": "docs/platform/distillery/spec.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "38b03ba75f9d6fd9e7f83f5ef5f909d79006e20e49a119a53a8a9a2c229e2e95"
+    },
+    {
+      "claimId": "claim_6ff089f694102599d1fc8273ea6bbae9",
+      "path": "docs/platform/distillery/spec.md",
+      "anchor": "distillery-porting-lifecycle",
+      "unitDigest": "23c12fdbccf665c6fc46ba5262d8cd57c2782e69f6938ea2509ffd336dcd0e61"
+    },
+    {
+      "claimId": "claim_1152a6c3ef3f0678dca8b5c4b28e7816",
+      "path": "docs/platform/distillery/spec.md",
+      "anchor": "purpose",
+      "unitDigest": "7d67a471d1c385ca8cc0546874593e824df4cf0d1f9c1c6db9741ee0a8bd3acc"
+    },
+    {
+      "claimId": "claim_030914214315e12e5ee492361b959fa8",
+      "path": "docs/platform/distillery/spec.md",
+      "anchor": "unheaded-block-4",
+      "unitDigest": "0601f676d24bb748feb8d5ef2ef95533e43b12671f4ded9087e77e0607038e9c"
+    },
+    {
+      "claimId": "claim_38c50f26b5eddc17470cbce12d130184",
+      "path": "docs/platform/distillery/spec.md",
+      "anchor": "entry-points-triggers",
+      "unitDigest": "870113cef74cbf14b1466445a335f784131f0db0065053e0f31e0b7f016f0ff6"
+    },
+    {
+      "claimId": "claim_40196224e217e77d89e57d0ffaf2abb2",
+      "path": "docs/platform/distillery/spec.md",
+      "anchor": "unheaded-block-5",
+      "unitDigest": "334c0e187773d73024ba617a9bed97656d0bbbcfdd3dcc49b1a6c8fd90b13275"
+    },
+    {
+      "claimId": "claim_f237c7dc974c7146bd3cd48a0a77d05d",
+      "path": "docs/platform/distillery/spec.md",
+      "anchor": "data-dictionary",
+      "unitDigest": "b0061eedc26338d900dcd637e1fecd0b447d89f7be32b6665942b2a39bcffd0c"
+    },
+    {
+      "claimId": "claim_a299172986d37bd5b62d22f36bbb8779",
+      "path": "docs/platform/distillery/spec.md",
+      "anchor": "unheaded-block-6",
+      "unitDigest": "3f0f6269d0ff09f0df3c6666b873653c8d001b1771a137fa043bec48268e6834"
+    },
+    {
+      "claimId": "claim_1672eea7b12dcca590a6976253d8f4c9",
+      "path": "docs/platform/distillery/spec.md",
+      "anchor": "behaviors-operations",
+      "unitDigest": "8944ba7233c55864d1d718a2e6a33aae31d0e4623adeb8eb6f911026282ed1f1"
+    },
+    {
+      "claimId": "claim_f9628d49e013fa3d4269ec432b7ba443",
+      "path": "docs/platform/distillery/spec.md",
+      "anchor": "unheaded-block-7",
+      "unitDigest": "51355c05a9fd75683883f82bc4d1d691274ca95e8d83722abe0933860c4bef99"
+    },
+    {
+      "claimId": "claim_5c674a057e92715ff96b88a32ae0f3f4",
+      "path": "docs/platform/distillery/spec.md",
+      "anchor": "unheaded-block-8",
+      "unitDigest": "02543d603ca0b1be88bae787b73b2603664554883fc89896ab0f0e916e3287c4"
+    },
+    {
+      "claimId": "claim_7af861c8f84a4a69a8e1bf2c05073f03",
+      "path": "docs/platform/distillery/spec.md",
+      "anchor": "actors-access",
+      "unitDigest": "af0dc11faf7105cb162d9ac1088a5b1c0cd5f5eeec2774b7004540fe897fd326"
+    },
+    {
+      "claimId": "claim_00affff32942b999e43d36d74d1d9917",
+      "path": "docs/platform/distillery/spec.md",
+      "anchor": "unheaded-block-9",
+      "unitDigest": "ecbc1e3549a472da566e42516264977768db33d26faedc079f50e6d641b9dc01"
+    },
+    {
+      "claimId": "claim_edc3a60c5df1d6a3d5180c628f8f97ba",
+      "path": "docs/platform/distillery/spec.md",
+      "anchor": "business-rules",
+      "unitDigest": "bf43300daaca9c3415aecfd3aa504ea3ef398b02ba4d9a78406d930e813fbc1e"
+    },
+    {
+      "claimId": "claim_637b69327d2486602ee428a8b90936c8",
+      "path": "docs/platform/distillery/spec.md",
+      "anchor": "unheaded-block-10",
+      "unitDigest": "f770390c5ca45f6660f36a2c5dff4a537e9b0ac7a021d4a00c09643851c1d49b"
+    },
+    {
+      "claimId": "claim_9d1d7d136b9a9ff869d6af4a12e042cc",
+      "path": "docs/platform/distillery/spec.md",
+      "anchor": "edge-cases-settled",
+      "unitDigest": "1bb6dbe7fdbfd4c9a7f067777e5cbeaa6b0af5a21bcd9633f5c2de56e164293b"
+    },
+    {
+      "claimId": "claim_4e14a24a1ef22e30a058748641d53ec4",
+      "path": "docs/platform/distillery/spec.md",
+      "anchor": "unheaded-block-11",
+      "unitDigest": "60a616595e9c4ddd3d8a4514541aaf9c72c57b1bcc93d97889c5769189adc60d"
+    },
+    {
+      "claimId": "claim_10b6865dee162e3401febaf6d905128f",
+      "path": "docs/platform/distillery/spec.md",
+      "anchor": "open-gaps",
+      "unitDigest": "3fd19bb3ad9f0ce5f6db178d1904f98fd67c78ddb7b39f1eb70cd561e52faadd"
+    },
+    {
+      "claimId": "claim_4e61f8ab46c7791e563a905c6dcc2ba4",
+      "path": "docs/platform/distillery/spec.md",
+      "anchor": "unheaded-block-12",
+      "unitDigest": "78a40b7774cf741b2728ba02969e60ad06b066734352b3445238c6cfb4c11b00"
+    },
+    {
+      "claimId": "claim_a81c4bc7792d5b2b576357b9543176fa",
+      "path": "docs/platform/distillery/spec.md",
+      "anchor": "pointers-implementation",
+      "unitDigest": "321c80e2289d089428120f6fb75f0ae62f81dd71cfe860c2f74b848981effb37"
+    },
+    {
+      "claimId": "claim_f94cf2b9ad1454f4fb3811c1cce319e6",
+      "path": "docs/platform/distillery/spec.md",
+      "anchor": "unheaded-block-13",
+      "unitDigest": "9423d35eb1a6338d9bcdac92d5492002e9328db395a488a88bd848e20be94289"
+    },
+    {
+      "claimId": "claim_a6e14d898be041f4bc809648957380c1",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "dea3185efa03fa43112df841e918ccc6c17fc3768e2b6617f6d9c2ebbefefda5"
+    },
+    {
+      "claimId": "claim_c947f71f7866d04b60b65ac874dd05a1",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "spec-herdr-web-dashboard-browser-surface-for-fgos-work",
+      "unitDigest": "fc4b99a650816005c9c724dfcb6964cccd401a8bfa963fd29af1d9eb669e4722"
+    },
+    {
+      "claimId": "claim_5dfe81b1cbec092126e1eaaed02da73f",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "purpose",
+      "unitDigest": "f1ff4f235336b1e131ee0185c562288043d9f1dc54231d3bf84360406893d587"
+    },
+    {
+      "claimId": "claim_48a409dd2114987646733cb3d66bd6b1",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "unheaded-block-4",
+      "unitDigest": "f5637b304adfb2017df338ea99078d779a43a721765c812868be7dce2b0b55d3"
+    },
+    {
+      "claimId": "claim_e9ca88e52937c9e6a7b45683453caf86",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "unheaded-block-5",
+      "unitDigest": "9cb9250c3b4a59113aabd2ea750c259a8d9dd93ec8c844738c9759af740673af"
+    },
+    {
+      "claimId": "claim_316763f2e8c486f23767f5235763a700",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "unheaded-block-6",
+      "unitDigest": "5505254e6beedd833219975b4c9da80989d411eb71c06cc1eb54b88cb9240c25"
+    },
+    {
+      "claimId": "claim_ba9a64fb389def2b21fce816844701ee",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "unheaded-block-7",
+      "unitDigest": "43742a6b577526fdf6a3e89da2aebda6d2c1b22533ba745d7b1a5399ba734fd5"
+    },
+    {
+      "claimId": "claim_ec3a7b2ec42c939b9ac745b6bdbcf5c3",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "unheaded-block-8",
+      "unitDigest": "95e0c20e567a40e3bb624dd8e039e6f08b3f079260bbe5fba7a95b53f03197d8"
+    },
+    {
+      "claimId": "claim_111f864d78a1bcae3e3c3c6b343a9ea5",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "entry-points-triggers",
+      "unitDigest": "44a01f946d9c3f460bbcf473ebb31d1c1911d455e66846c50ddd05c3fd30471e"
+    },
+    {
+      "claimId": "claim_5877600a52b4cf5568796da3c9044b65",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "unheaded-block-9",
+      "unitDigest": "6fe8b44476ba00c6aa3e5c46960ec7e060c6186fffd0f444669a3bc8950cb176"
+    },
+    {
+      "claimId": "claim_401864f1cbebeef845e6609d3b039738",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "data-dictionary",
+      "unitDigest": "056d9384358a4968cb87e85349ad9854943900aa79f69da3c5dcc8a7515f77ba"
+    },
+    {
+      "claimId": "claim_cdbe500eb5f501430eed0011898c2437",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "unheaded-block-10",
+      "unitDigest": "8e2f1fc09a1d0e22e5063a741ee91537bcccf3b7527fe5b49447c9c6c4526605"
+    },
+    {
+      "claimId": "claim_041b58ea676c91fd6d94a0b4772202f2",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "behaviors-operations",
+      "unitDigest": "082ab0793f07b48919cc224d5e470585bb8e77fea14f32c16a14ac05605500c9"
+    },
+    {
+      "claimId": "claim_7d20f3261994b06bf8aab4ce53375a6b",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "unheaded-block-11",
+      "unitDigest": "56ef9d1bb263a4c4ebb9bb6f14c8e76fc860e387d12b3bd162e9f7758fa7523a"
+    },
+    {
+      "claimId": "claim_c05db90b99b33fe90126ccbbfedb2dd6",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "sign-in",
+      "unitDigest": "29bf5d1958f9e29181d0a5a30d28b209340cce42f411c1eccfe918f454e6b37c"
+    },
+    {
+      "claimId": "claim_8fc8f5d9d754055cd3192f32178f0ef8",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "unheaded-block-12",
+      "unitDigest": "fa5bf141c33adf0feb5f6118ac5d549d6c8b49a74dc1bbd5c5ef5b12b54f90a3"
+    },
+    {
+      "claimId": "claim_112ba0e0b60b13aa2b6cef0cc605851e",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "view-the-taskboard",
+      "unitDigest": "3bb8852a0023788101d2a06064c4545cb7432ea4adc39f629083541c050d0889"
+    },
+    {
+      "claimId": "claim_713e8533374a977b44c019d9296ff88f",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "unheaded-block-13",
+      "unitDigest": "5dd7066702c3791b0b10a5648dbf72eadbd6caa22a72d2315ccbc363474cfd2d"
+    },
+    {
+      "claimId": "claim_2f001429d74fb896c6cbefc04c4a6936",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "view-a-tasks-detail",
+      "unitDigest": "4c6c04a8e9cf839adac66a55b2fc9c84b8bbbee138afd8d8d25626f9ec217500"
+    },
+    {
+      "claimId": "claim_0af7828129bb0ef344d1aff694b04b63",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "unheaded-block-14",
+      "unitDigest": "fddea92eb03048fc39ca8e07c7d5d6648080519149c35168970e5c5314579ceb"
+    },
+    {
+      "claimId": "claim_e4816bd194fd7cd72cde750ee0542bc3",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "answer-a-parked-question",
+      "unitDigest": "121b4db8a77c193d9b004fc14e6a0378aa9011932370640160d9642a1b3f0098"
+    },
+    {
+      "claimId": "claim_9d613c56217c5da75868821a335fafbc",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "unheaded-block-15",
+      "unitDigest": "02c2abfc0e3fe0906c987d5096cd89e700df4ddfdb6c624d8ca8c5014e313208"
+    },
+    {
+      "claimId": "claim_62afe657fd22865fb6384797ba8b2803",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "approve-a-merge",
+      "unitDigest": "dda55d405c2cee1c6f03f9706fc117d86cf9bd41ee1a4dfeab9d82390a888637"
+    },
+    {
+      "claimId": "claim_9d7b246d0d09f47c6fe718ca58c8d36b",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "unheaded-block-16",
+      "unitDigest": "56f851b8da5f2ef6070d3123168a84c84275cab6214cc0bc5c53c5fcfebf70a7"
+    },
+    {
+      "claimId": "claim_4058c2cbc13660c9131a073491489bcf",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "add-a-work-item",
+      "unitDigest": "6c1a2d0d5002be77b1c85ce17b652106f39f121388c6b9356ac61992ad455bd3"
+    },
+    {
+      "claimId": "claim_027ad55814e7186aae754658b36a3da4",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "unheaded-block-17",
+      "unitDigest": "4e9dfc7b870ed0c42ee01256f4dd11e3147a0fbcfee3110d924ca2a91bf50c4b"
+    },
+    {
+      "claimId": "claim_663e6a3f4590e633d46c480b812428d6",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "edit-a-work-item",
+      "unitDigest": "f46dae5b90188ed598fd3b80b6905e07a60bf36443fcd0e9c15bb21f0ef33d78"
+    },
+    {
+      "claimId": "claim_8103c8b9283356118e1c5f0126d387da",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "unheaded-block-18",
+      "unitDigest": "2f88434b367c4e8e15004d9d8dc0176f0c18d30dda2922a07a2272af81036838"
+    },
+    {
+      "claimId": "claim_4d256574d9d600433a7494bfed0048cb",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "retire-a-work-item",
+      "unitDigest": "0f289b671871480d5cd3f29770acb6242825365a44b07966e3631820348b49fe"
+    },
+    {
+      "claimId": "claim_1b33df3ee3004adf514f1532e32002cc",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "unheaded-block-19",
+      "unitDigest": "9e0b0e9b88a3b25b9731259e1c31d18661c588da2987fc364957d480a2391dd6"
+    },
+    {
+      "claimId": "claim_55d0bc07e0c1c36016fcff043a0c492e",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "actors-access",
+      "unitDigest": "c0f68bfbf42066278cf2e94e60e8919d9c54a16274952f3f46797c57d0d5dea1"
+    },
+    {
+      "claimId": "claim_ea002bc3d8c38abf1f348cce4f96931e",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "unheaded-block-20",
+      "unitDigest": "ab25ec2e78e6b621aef48959d5050681a09fcfcd9f0bb232c6e17fb089c3527a"
+    },
+    {
+      "claimId": "claim_7b00d9d035bd97de226726944f711311",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "unheaded-block-21",
+      "unitDigest": "956aba0bd61a349e8e839c956ce22ee818fd15e47af10c447c34b9030859ad27"
+    },
+    {
+      "claimId": "claim_1522a44e0505b7aaed5d55bf4f2b1900",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "unheaded-block-22",
+      "unitDigest": "b56dc220d011602cc15df733f86c367b9582332414162a6ca27b45ca34f09705"
+    },
+    {
+      "claimId": "claim_f41d47fdbe1875d4e57de8d2ecc6dcf7",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "business-rules",
+      "unitDigest": "aa8a1d069167968c4413d8380b065b9c70db60827dcffc5551b0dd8f66240125"
+    },
+    {
+      "claimId": "claim_45115f693318a55ed50c43db83c97baa",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "unheaded-block-23",
+      "unitDigest": "7d9e2d425937e495926bbff08bacc8e77e9781253b5c83692215e62cf6da2913"
+    },
+    {
+      "claimId": "claim_7e17ce226062d06a53b940f64b9d5cdb",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "edge-cases-settled",
+      "unitDigest": "e57fadfa3c6367e1098e0565fa3a61fe011bb34b4994eb241557beaa2c2ff879"
+    },
+    {
+      "claimId": "claim_878e9f5faa08a2977408f49e04af0a7a",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "unheaded-block-24",
+      "unitDigest": "1c226a16285c1c611d2dcbc3db679c21f6367eb19f66428f97fa0b6741c2027d"
+    },
+    {
+      "claimId": "claim_2aae8d6820a6ad622e47c07d29c428bf",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "open-gaps",
+      "unitDigest": "7eb0dd6b83a72e530a30575cbf43286ab809b83fba028d19ff465496a540375f"
+    },
+    {
+      "claimId": "claim_83dd4d99cd52076452282b5565b0ea22",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "unheaded-block-25",
+      "unitDigest": "ef410a08c708a2f590fd777deb282577a8712b80ca1eee9522247534cc06ad99"
+    },
+    {
+      "claimId": "claim_b2e9e87b9980819fad263ba9c6b02b33",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "visuals",
+      "unitDigest": "437a511cf26520d71ce066d992c8affdc6c87a686d737c2e54f748e640ee1b6a"
+    },
+    {
+      "claimId": "claim_dc3d0ae980bf2501bc8eabfa0484a46d",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "unheaded-block-26",
+      "unitDigest": "b3f1a4dd83b0ff718a816b9eb068e4c5521f1d4ee30919d3ad097e62f4d16512"
+    },
+    {
+      "claimId": "claim_28bc1b3d26ce9cf45d2477c1d69d181d",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "pointers-implementation",
+      "unitDigest": "89f24a77c23b2d756b009fe0082bcf8b38734023875f1b84869980e67e1ed580"
+    },
+    {
+      "claimId": "claim_69691b25b6d84c05b566346866ec6c83",
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "anchor": "unheaded-block-27",
+      "unitDigest": "b0d3ed0823c5a6e58fc870563461d32c3ce61fd9745b78444276500e7135addb"
+    },
+    {
+      "claimId": "claim_c9cc1ff2abdd7adf91641d4c8b240523",
+      "path": "docs/platform/observe/spec.md",
+      "anchor": "observe-component-specification",
+      "unitDigest": "a24fdb9ba9dc5da2ef380c707571435a37850ee1a527cfccdfdb0dc6ea39251b"
+    },
+    {
+      "claimId": "claim_398a2a6235ab1ae2d5264325daf42a5c",
+      "path": "docs/platform/observe/spec.md",
+      "anchor": "unheaded-block-3",
+      "unitDigest": "b268929538ae29dad4d30bcab03673684209ffaad00be9cf4e111374c1827513"
+    },
+    {
+      "claimId": "claim_a1ef5e3f7d16b7ab938e8ac6eb2209c3",
+      "path": "docs/platform/observe/spec.md",
+      "anchor": "1-overview-boundaries",
+      "unitDigest": "f3f902093f4846a4bad6229589c0ab856ff959871b4fe3a99cac6f176ec35e48"
+    },
+    {
+      "claimId": "claim_a2b2774f89a89257732a551b52addc22",
+      "path": "docs/platform/observe/spec.md",
+      "anchor": "unheaded-block-4",
+      "unitDigest": "4b789fc020f2595baff813b25b8f25e819353196670c3d4d838d46c72d70012d"
+    },
+    {
+      "claimId": "claim_b2a51d5d39832d330879947bdbbcb227",
+      "path": "docs/platform/observe/spec.md",
+      "anchor": "owns",
+      "unitDigest": "867c3b15546d97e9565b557a2dbff37cfde054ad310e8a19be48d316ef159476"
+    },
+    {
+      "claimId": "claim_a7278e1567e5432cfb079506cf2f5050",
+      "path": "docs/platform/observe/spec.md",
+      "anchor": "unheaded-block-5",
+      "unitDigest": "1840cc4b1da22587ed69755276cad9a882139c62a36179d8fba2269905414623"
+    },
+    {
+      "claimId": "claim_fde5bf697a74032ae96b87746d5f5f25",
+      "path": "docs/platform/observe/spec.md",
+      "anchor": "must-not-own",
+      "unitDigest": "24eb30e7b62ea4e840780b81f404e924c679dbc4002866fca5077bccb2b92b6e"
+    },
+    {
+      "claimId": "claim_50d0f11082f8a7c2a9460b3a970586af",
+      "path": "docs/platform/observe/spec.md",
+      "anchor": "unheaded-block-6",
+      "unitDigest": "cda71f698f80c3f641fc0c525f08d2e8ae35083e5e6b3619f97f815b5ec99f93"
+    },
+    {
+      "claimId": "claim_0494c6c790b6a6cb8aaaa6822467772e",
+      "path": "docs/platform/observe/spec.md",
+      "anchor": "2-shared-entities-subjects",
+      "unitDigest": "f3c03447025b806dfd933bff337de6626a77b8838d4fff1036b24bcab85a93ff"
+    },
+    {
+      "claimId": "claim_7910591f62e9bc90ce6c1a90b8aa31bc",
+      "path": "docs/platform/observe/spec.md",
+      "anchor": "unheaded-block-7",
+      "unitDigest": "f8410587c25fa1a5be9615ca6551e2347ce424eb682e8fe3867fd7775e96fadc"
+    },
+    {
+      "claimId": "claim_33ce1e718f0906ee1a5f76fb4907b417",
+      "path": "docs/platform/observe/spec.md",
+      "anchor": "3-storage-model",
+      "unitDigest": "da423b363032cc2e45d09d600c48d1da56a5ec68e1f2a8257529b8a1220cd2cb"
+    },
+    {
+      "claimId": "claim_7ff19d6895d1d1e5ea2d56e881259e4d",
+      "path": "docs/platform/observe/spec.md",
+      "anchor": "unheaded-block-8",
+      "unitDigest": "91ec155bfcec407b060d39ed9ca7458c928f51cc4ff4a69be8942daa0e8c943d"
+    },
+    {
+      "claimId": "claim_908fe7d610c47ed8348c6b10768539c9",
+      "path": "docs/platform/observe/spec.md",
+      "anchor": "4-commands-routing",
+      "unitDigest": "b0b1d84706367b794a79b08b31f2e5bcba0e4656af65400e602890505457198d"
+    },
+    {
+      "claimId": "claim_af8421bdba71901b8706678586ae03cb",
+      "path": "docs/platform/observe/spec.md",
+      "anchor": "unheaded-block-9",
+      "unitDigest": "9c492a74b2527331a937aced7683a78cd847277317273fe52b6a41c8119931ee"
+    },
+    {
+      "claimId": "claim_9e9c3f9e870fed7d23af811ce2178b47",
+      "path": "docs/platform/observe/spec.md",
+      "anchor": "unheaded-block-10",
+      "unitDigest": "ba7d2394b0857879e6448aaba7d9f085662941256e47407f0b72bd18e178a75c"
+    },
+    {
+      "claimId": "claim_7e870015f558a75e65adab6d1b3230d2",
+      "path": "docs/platform/observe/spec.md",
+      "anchor": "5-mục-theo-làn-sub-spec-sections",
+      "unitDigest": "bdac824aa1ded5a576aeca01899a159abcc604b48cfa2e31ad3f660415e78cd3"
+    },
+    {
+      "claimId": "claim_b0e62ed94ed2770d0225ff91b34cbadf",
+      "path": "docs/platform/observe/spec.md",
+      "anchor": "metrics-làn-a",
+      "unitDigest": "2ded62db9d6370e17b2cc65f35e45d117ee7b94c792128d359eb1229e628986f"
+    },
+    {
+      "claimId": "claim_46877d1e9417370e4b6f2c36cd2a84cb",
+      "path": "docs/platform/observe/spec.md",
+      "anchor": "unheaded-block-11",
+      "unitDigest": "38a6ec109f43ee224a59731555260f01a4727b8b0a39937a7e15fd7af3b3d731"
+    },
+    {
+      "claimId": "claim_3c03309b66efa4925f1255511ed80e22",
+      "path": "docs/platform/observe/spec.md",
+      "anchor": "friction-làn-b",
+      "unitDigest": "beb19f3cb48940ebb818fbbd587c431842314f1d66534d641baa04d9a48396ae"
+    },
+    {
+      "claimId": "claim_d8df03b03865a0d0968739d00129f0a3",
+      "path": "docs/platform/observe/spec.md",
+      "anchor": "unheaded-block-12",
+      "unitDigest": "6b68a1227525c179699df85a2740ac5cddef67482e08d171e27dfac789472e8b"
+    },
+    {
+      "claimId": "claim_12da781dbd66869bbf765410d887c7f0",
+      "path": "docs/platform/observe/spec.md",
+      "anchor": "contract-quyết-định-làn-c-f8",
+      "unitDigest": "2e58e1822dc58b46b60193348bdfef8dcba3ca8621bbd845c2ed61c95c720917"
+    },
+    {
+      "claimId": "claim_41988cae1fdd914bf7a8a4d1df2aeb82",
+      "path": "docs/platform/observe/spec.md",
+      "anchor": "unheaded-block-13",
+      "unitDigest": "a5d8dd83d3e9fc6729c2fd75300786b9c93aba271363a949245b25a52d760a7a"
+    },
+    {
+      "claimId": "claim_4fa792519d532d3ad333e0c2566bc935",
+      "path": "docs/platform/ui-spec/spec.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "b61e74726631cc9e12744d93383ce64b2afff77ec3d0a58e3fac7631be969ecd"
+    },
+    {
+      "claimId": "claim_4e48bd602a0ab47752c147905e76c3e2",
+      "path": "docs/platform/ui-spec/spec.md",
+      "anchor": "herdr-web-dashboard-ui-spec-overview",
+      "unitDigest": "d099070fdd330d25219555158140d87b108242e10e119bba5ce4d82ac40d2aa7"
+    },
+    {
+      "claimId": "claim_a6ab93a6bd86cc14f83e5022a2323387",
+      "path": "docs/platform/ui-spec/spec.md",
+      "anchor": "unheaded-block-4",
+      "unitDigest": "1e1a662c6e15fe8e83c97b729c44872d5cc75aa94cf4f8e1b1789d7e3ba2775d"
+    },
+    {
+      "claimId": "claim_88fd76453441113b17cd784177a9081c",
+      "path": "docs/platform/ui-spec/spec.md",
+      "anchor": "unheaded-block-5",
+      "unitDigest": "5d2b18d22620d6ad6bb42432f5f38fa6660f15e7e6c604225f67d96faa40ac55"
+    },
+    {
+      "claimId": "claim_91330f2248982f1d6df5071f335b1064",
+      "path": "docs/platform/ui-spec/spec.md",
+      "anchor": "unheaded-block-6",
+      "unitDigest": "ea8915b9b44ba81d2f47d5949641f3daf7f112d295f68b4e35e1d0e59576ee26"
+    },
+    {
+      "claimId": "claim_93f7e5f60f6407a6ff0969b5e85302fd",
+      "path": "docs/platform/ui-spec/spec.md",
+      "anchor": "surface-index",
+      "unitDigest": "c54dfe553e1f9d27c69b590fea4d02964f262edc90e49d59771e2fc45e7b7b2d"
+    },
+    {
+      "claimId": "claim_af10734d11a45127f86e662a27b20bff",
+      "path": "docs/platform/ui-spec/spec.md",
+      "anchor": "unheaded-block-7",
+      "unitDigest": "3a16ef11f4728b4ec8127ff4000b0c62f5f7c886f54be0e13e2a866539db5c69"
+    },
+    {
+      "claimId": "claim_902e852cbdd48042261059044bba9304",
+      "path": "docs/platform/ui-spec/spec.md",
+      "anchor": "unheaded-block-8",
+      "unitDigest": "3624843473276cc436449e523d8d392d2c97b9e91ba36ceb685f8b1fd295aea8"
+    },
+    {
+      "claimId": "claim_1745b0635297cf66ced230f28ef40703",
+      "path": "docs/platform/ui-spec/spec.md",
+      "anchor": "directory-tree",
+      "unitDigest": "2f2c656184619923093adc71d350ee383d96041799fff6813a967db841c5d032"
+    },
+    {
+      "claimId": "claim_23152a13579b15a727ac20354b0c0889",
+      "path": "docs/platform/ui-spec/spec.md",
+      "anchor": "unheaded-block-9",
+      "unitDigest": "6ebc8583aa59e28c3ce8bea6ad719ca3947b2625c56d1666dcc2cdb90f642277"
+    },
+    {
+      "claimId": "claim_a3fe6a352c2538925b3831551da1762d",
+      "path": "docs/platform/ui-spec/spec.md",
+      "anchor": "how-to-work-on-this-spec",
+      "unitDigest": "fb45e3220fd282bd5bfebfed7ffe2b753249fbe60f5bb2a66fc05f0764f44664"
+    },
+    {
+      "claimId": "claim_f5414fdf7b56dcc5ecfee0dbbe5b9cd2",
+      "path": "docs/platform/ui-spec/spec.md",
+      "anchor": "unheaded-block-10",
+      "unitDigest": "7e6438293b79664d86dbdd4dea092ac9cccbaa898bd646bdf0382525c97ac972"
+    },
+    {
+      "claimId": "claim_dd3ad839ba07d233d4389822d192e7a1",
+      "path": "docs/platform/ui-spec/spec.md",
+      "anchor": "unheaded-block-11",
+      "unitDigest": "aae24ffa47c4b917567873038a8c3a499338d69d9b42de12ac65ec64aef4782d"
+    },
+    {
+      "claimId": "claim_7adfa144991fe6de9a316f7ea81553d0",
+      "path": "docs/platform/ui-spec/spec.md",
+      "anchor": "unheaded-block-12",
+      "unitDigest": "3324fde2c080f440e352d3276b5dddb25b0b74dc48201f293d0e905c6afced8e"
+    },
+    {
+      "claimId": "claim_2361b06eda9a97678fdb502cb5949d3e",
+      "path": "docs/platform/ui-spec/spec.md",
+      "anchor": "a-note-on-scale",
+      "unitDigest": "4fe39a3a337800c3d7972d0517f0abb9601a73d047978fcb482a25c456da4cce"
+    },
+    {
+      "claimId": "claim_271679d81259c0ae4190964de3d736f2",
+      "path": "docs/platform/ui-spec/spec.md",
+      "anchor": "unheaded-block-13",
+      "unitDigest": "2f30aaa9f483a4a395a79fda930732ebc9e66af7d52852fad2ca25bf466cb218"
+    },
+    {
+      "claimId": "claim_1d9a2f67d538f7938f0987b2065c7e16",
+      "path": "docs/platform/ui-spec/contracts/15-system-events.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "e13c6b0538fcc22c0487c1bd07773dea3e9900b4add7789e144f0daf94145a66"
+    },
+    {
+      "claimId": "claim_72d974cfc4b8fc20f10bebfb25de4930",
+      "path": "docs/platform/ui-spec/contracts/15-system-events.md",
+      "anchor": "system-events",
+      "unitDigest": "ec92c276bba30aa7cee14efca6fbec7517137f00775ec64608fbfda2dd1cde0b"
+    },
+    {
+      "claimId": "claim_1ddab2f3852d81b387b8cf74a1311d0a",
+      "path": "docs/platform/ui-spec/contracts/15-system-events.md",
+      "anchor": "unheaded-block-4",
+      "unitDigest": "913f124f9b88bca2eb8e1d9d8350df0bb8b5637505ec127a5dad11a33e763f1a"
+    },
+    {
+      "claimId": "claim_d6076e6b828e60d4f4461a9fa942abd0",
+      "path": "docs/platform/ui-spec/contracts/15-system-events.md",
+      "anchor": "unheaded-block-5",
+      "unitDigest": "c75c05d93e077f415da151b39988a18e3fea9d74828310aad3e6b05e41d45220"
+    },
+    {
+      "claimId": "claim_de45b6ef8f78c2b53349376df8072f5d",
+      "path": "docs/platform/ui-spec/contracts/15-system-events.md",
+      "anchor": "unheaded-block-6",
+      "unitDigest": "3230d51afd86168ac0d6b0b941bdbec980f1c93342cfbf90d889d99a79c37b7c"
+    },
+    {
+      "claimId": "claim_96fc409e143e98260cfd0695c72fa9a0",
+      "path": "docs/platform/ui-spec/contracts/15-system-events.md",
+      "anchor": "unheaded-block-7",
+      "unitDigest": "c3d3ec45edcf27bd90678fd6c343e01f42f3b3e9d46dea269689f945734d04b7"
+    },
+    {
+      "claimId": "claim_c843b4d07d3d98b6ae711e0d44dee9cd",
+      "path": "docs/platform/ui-spec/contracts/15-system-events.md",
+      "anchor": "unheaded-block-8",
+      "unitDigest": "4bbbe0a7e63ef0ba2347a43f05399168b927a3be951963e858498793bbdc293d"
+    },
+    {
+      "claimId": "claim_0dfdb4f90458e4e9005cca22add8561e",
+      "path": "docs/platform/ui-spec/contracts/15-system-events.md",
+      "anchor": "unheaded-block-9",
+      "unitDigest": "4446f3202dc7b42c7772d91df31d7824e97d8b9cf83a0c7d621cdec61be731c5"
+    },
+    {
+      "claimId": "claim_3840275b1b17103c2967eb18f7a7406c",
+      "path": "docs/platform/ui-spec/contracts/15-system-events.md",
+      "anchor": "unheaded-block-10",
+      "unitDigest": "0254be7d0a2b2b74189749eac67e1264bef26cf1740265399789dc61ef6d4b45"
+    },
+    {
+      "claimId": "claim_27a3faa641f5cfd73b3038fcbaf000e5",
+      "path": "docs/platform/ui-spec/contracts/20-domain-rules.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "c69ce9aa380c0eefd8f19f2740d37efd0ed5db921081d06953a54ade0cd3f7b1"
+    },
+    {
+      "claimId": "claim_b7557c11c5f05a3e02439d60a904c9d1",
+      "path": "docs/platform/ui-spec/contracts/20-domain-rules.md",
+      "anchor": "domain-rules",
+      "unitDigest": "f31806949d7daf2dde868322ed78365e87bf39be0b3a91a6f1bb797b2846d9e9"
+    },
+    {
+      "claimId": "claim_0380d86ba81fabec2f0826967ca3371e",
+      "path": "docs/platform/ui-spec/contracts/20-domain-rules.md",
+      "anchor": "unheaded-block-4",
+      "unitDigest": "ff9d4af305d3725a010e2add750c1935610012e2cede02238b41d15df2b50f09"
+    },
+    {
+      "claimId": "claim_15126cc42a23aadb0a85c7a1328483f0",
+      "path": "docs/platform/ui-spec/contracts/20-domain-rules.md",
+      "anchor": "unheaded-block-5",
+      "unitDigest": "eefeb7d9db1e2cd91a10a80b8e5681f856ab4390d97cd3bbb209c25fb9601882"
+    },
+    {
+      "claimId": "claim_c8ef81d2c23f4c1a516b889b7793de8e",
+      "path": "docs/platform/ui-spec/contracts/20-domain-rules.md",
+      "anchor": "unheaded-block-6",
+      "unitDigest": "08e2b5ce8d14a2be7069be53afb328c74153781ca698650bb9c6e47326035862"
+    },
+    {
+      "claimId": "claim_8f1b4d60296f2d4ba2fa501e030aaeb1",
+      "path": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "anchor": "states-and-errors",
+      "unitDigest": "0c35ba3ca89c1e5e53c07a000a90460e1b3872d22f7cbfbc0d74acbdeb96ec0a"
+    },
+    {
+      "claimId": "claim_1528d6ae51b240a56a0e797f2791de5f",
+      "path": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "anchor": "unheaded-block-3",
+      "unitDigest": "111c5d3203513c70223511db3fe0713d6dab6173324ea10e21e75937087341b8"
+    },
+    {
+      "claimId": "claim_a0260deef6a9fe15f8b1d5315f7e7b21",
+      "path": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "anchor": "states",
+      "unitDigest": "ff2c6af1e1d2149fe2343d5550f9ea3e19ed5f23b6a42b30fe85b182b4d48703"
+    },
+    {
+      "claimId": "claim_7939c36c210900dcbd2b55308799eba6",
+      "path": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "anchor": "st-loading",
+      "unitDigest": "ea75f68b3235bf97831ce14092e89e9df3364fc722d97a02f88ad7e17a9cd65f"
+    },
+    {
+      "claimId": "claim_e0c32c0638e0318ea1837d3ba029b40a",
+      "path": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "anchor": "unheaded-block-4",
+      "unitDigest": "5047b3cf3d85feddac09d65297fff638c47d665f45b69cc315b9df3df3ec2897"
+    },
+    {
+      "claimId": "claim_e98bbb1eea67b538ff31ccb71ad227f4",
+      "path": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "anchor": "st-ready",
+      "unitDigest": "dfe3b0914cca94ee06e5d92e2e3992a39f4cee99d7589053054dbe08d55ed3ed"
+    },
+    {
+      "claimId": "claim_75cbd593e6d2b5d54941c39d4920196a",
+      "path": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "anchor": "unheaded-block-5",
+      "unitDigest": "0a92bd1e7ea79059af94d1df75208558e095e3dd4302138891c5f267f197f2d7"
+    },
+    {
+      "claimId": "claim_d6a08a3e71e1d6aa539deeccaf9ca18f",
+      "path": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "anchor": "st-empty-board",
+      "unitDigest": "58968fcfb8f6047deaeb0ef49c6679e6742bbce12ef7506d7232a529783ca68b"
+    },
+    {
+      "claimId": "claim_a722999eb69d1c9d24447a86e90fcfd8",
+      "path": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "anchor": "unheaded-block-6",
+      "unitDigest": "8d86adebaee9f38520cddd95e1244a8decea21908e574610b40ded1d4e2697c0"
+    },
+    {
+      "claimId": "claim_f2dbfad6908d2219d0e43956ad5ead5d",
+      "path": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "anchor": "st-empty-filter",
+      "unitDigest": "ae162b352c1077f2393891f5aa92706ed491476734ab956c889d1b034f4840f8"
+    },
+    {
+      "claimId": "claim_4c11f5b519993b7e09de5246b7233dff",
+      "path": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "anchor": "unheaded-block-7",
+      "unitDigest": "dc78b582477b8dbf10e9281aa4de123c7bff4bcf2345a79afc7c73a4c988f60f"
+    },
+    {
+      "claimId": "claim_fd8305adf7410dcf7029089190691d12",
+      "path": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "anchor": "st-empty-questions",
+      "unitDigest": "8075b081e44469488c63519e5100ecb51ba2913decc2229c48bef21968c8352f"
+    },
+    {
+      "claimId": "claim_808f0e82855544f8d09f94e674e44287",
+      "path": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "anchor": "unheaded-block-8",
+      "unitDigest": "89f5c24155ba871213196dbc7292ddd6f1592ffd1cdf3ddafceb23d8f7939638"
+    },
+    {
+      "claimId": "claim_dc81e768a064ae9f503bfbfbeea836f5",
+      "path": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "anchor": "st-never-parked",
+      "unitDigest": "0b6adf350411162247a40a74d7c82cf198397a12ed9f21e518229ee6eb88b641"
+    },
+    {
+      "claimId": "claim_d3d16b8feb8e452e15fe031621dd4629",
+      "path": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "anchor": "unheaded-block-9",
+      "unitDigest": "7c91a431b7eb89f26d1e8c10cc211b4528c38c3eb4cc72af2e54ab1c31368c51"
+    },
+    {
+      "claimId": "claim_c005b55a9dc04047098ac2c361e2461f",
+      "path": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "anchor": "st-narrative-missing",
+      "unitDigest": "89d0de517b89fe90ee96cac870abfad16e3800f9efd843c077988f1b5792903c"
+    },
+    {
+      "claimId": "claim_e3719cba1ffabfc2412cded7ca37041a",
+      "path": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "anchor": "unheaded-block-10",
+      "unitDigest": "45ee41b24f6371b6ae532ef8d3ccfe93ad3d9c86f0aff3eaeb685985c29e5088"
+    },
+    {
+      "claimId": "claim_d39b9def7f622ee7b7cef995f2dc1bdd",
+      "path": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "anchor": "st-submitting",
+      "unitDigest": "99faed1a60ea75076416859f5322019bc12f40d97beda67cbbd3ac8108655950"
+    },
+    {
+      "claimId": "claim_4bcebe987cb103cc6f08c0c5c0be4943",
+      "path": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "anchor": "unheaded-block-11",
+      "unitDigest": "b2979dfc61dbc48cc1ff19423e5bf2494d7dad75757e24c02ad4ce0622d6a9d1"
+    },
+    {
+      "claimId": "claim_d460dc5b3bb56788602326b5e40e00cd",
+      "path": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "anchor": "st-disconnected",
+      "unitDigest": "3596cc92d8b239eaaacf3856cc17f3ef4573aba3cbb4ecccb50e3194d77885fc"
+    },
+    {
+      "claimId": "claim_caad47154bc6946185ab1956c2af2435",
+      "path": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "anchor": "unheaded-block-12",
+      "unitDigest": "dfb06d8668600a4799167db2c6b4ab381430dd5497815057cbf7b2460d41171f"
+    },
+    {
+      "claimId": "claim_0c4304f431d9fd610caa555798eb2915",
+      "path": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "anchor": "errors",
+      "unitDigest": "55da08e87735251cc53a5de0f65cc29d7966759757c74c6b3a5769420c8051b5"
+    },
+    {
+      "claimId": "claim_a857fae6b9965edc23907b935497cccd",
+      "path": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "anchor": "err-auth",
+      "unitDigest": "ffd6e164d4f4383b549b6d5d643586e955282bb3b293217144294e7280d30a18"
+    },
+    {
+      "claimId": "claim_4c58ddfb5b033b778fa302b22391743f",
+      "path": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "anchor": "unheaded-block-13",
+      "unitDigest": "ebf2a831837a1fd9c887a6b857f3d17d9c0ba3c00cad23f49b9b80af521b6a97"
+    },
+    {
+      "claimId": "claim_d8d0977847458c69c1d43b18e460f0b0",
+      "path": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "anchor": "err-write-refused",
+      "unitDigest": "c6cf6debd4a1921b0a49ed216d310f767cf090f4d98f814404aee95ef976ff76"
+    },
+    {
+      "claimId": "claim_c8a3f574ec2210840cc738016305180b",
+      "path": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "anchor": "unheaded-block-14",
+      "unitDigest": "504311ca1d958ac45ae1698e7f2e1831d32f5f44ae97aa63c917b2f6634c6477"
+    },
+    {
+      "claimId": "claim_24a94954928e6613710b635d9db3c23b",
+      "path": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "anchor": "err-approve-unavailable",
+      "unitDigest": "df58a96aab2cff65e99e6dfb617252309aed229a14a27c1aea5c59eefe006133"
+    },
+    {
+      "claimId": "claim_aecbc3babae704d462203a431851ec94",
+      "path": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "anchor": "unheaded-block-15",
+      "unitDigest": "0784a58a7ce6f15c715fcdfb8aba800c83655eb9f5c95098954b0b38e9cf7fe9"
+    },
+    {
+      "claimId": "claim_44161b2503defd6c748dea08cb5223f7",
+      "path": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "anchor": "err-narrative-path",
+      "unitDigest": "36cb3463773ef5e07e0799d33ea65f93c6a391a7a5a3b21adc167a292a8ccefa"
+    },
+    {
+      "claimId": "claim_01ca3b8e35f5ed270cfdcdfdc91ff7ec",
+      "path": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "anchor": "unheaded-block-16",
+      "unitDigest": "45109a415776433fff6402225f349518b227508e1e3f0af58fa6d88c7c3c6c82"
+    },
+    {
+      "claimId": "claim_109add81bb924e6eee91fd71970cb736",
+      "path": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "3a145c4c61d69e30e4e21c9ec2b01c1a093c2f2cf67e3d4a755bd1e73a676d04"
+    },
+    {
+      "claimId": "claim_8627caebb796137a1850158610034a48",
+      "path": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "anchor": "c01-item-card-status-pill-quick-actions",
+      "unitDigest": "32dc856ec2c0aa3433f0fb42e7160e3a87f4694b111a3b1336544165e3769b99"
+    },
+    {
+      "claimId": "claim_882d57e5238d9ecd469765384149aa66",
+      "path": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "anchor": "purpose",
+      "unitDigest": "3e708823454641bbda3388d542273d11192509337285064feb4e9172e1642fa7"
+    },
+    {
+      "claimId": "claim_395f43e9fcab6a33a53287f989fc8c9f",
+      "path": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "anchor": "unheaded-block-4",
+      "unitDigest": "15b3c360bea3a0d48a0d56ddf9f43657b6155dd1d42168d987ccbaf856477ae5"
+    },
+    {
+      "claimId": "claim_538202d0e8e5c97c325d21ac4a0df9f0",
+      "path": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "anchor": "layout",
+      "unitDigest": "cdabcbb72c176864ea7a1b83c6b1edd9e361d54eeda367295f29f3cbd6023213"
+    },
+    {
+      "claimId": "claim_148f80fabb2860c02f3ecaae066d0dd9",
+      "path": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "anchor": "unheaded-block-5",
+      "unitDigest": "3f017de8e115fe6a31a606eff031929e6bfaa0d5fa79ea6bffc26784dc11510c"
+    },
+    {
+      "claimId": "claim_8979277c1d0e4524cae97fd341bebd94",
+      "path": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "anchor": "unheaded-block-6",
+      "unitDigest": "b1f21928b96cebaf6ee1f6dd16b8590999001215f981d3dc0299995c5954b32f"
+    },
+    {
+      "claimId": "claim_8a6a231da62f2274143d262fb24b062a",
+      "path": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "anchor": "unheaded-block-7",
+      "unitDigest": "55296892dc25c55b80f4e00a9369b7ebe0869ea53df9042f33894444baef91da"
+    },
+    {
+      "claimId": "claim_3df1dabc3fce9334394d809c46c61e6b",
+      "path": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "anchor": "unheaded-block-8",
+      "unitDigest": "31cdc0799218defe77f0c879496156f54d4a0ab2aea7f5ae6463e51838695364"
+    },
+    {
+      "claimId": "claim_63d6b36c5ef9c4bb74f84d3c4056928f",
+      "path": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "anchor": "component-contract",
+      "unitDigest": "b47a7823db8cba7179fcdd6ccee7b52d27241007655291db2d4da246540c28a0"
+    },
+    {
+      "claimId": "claim_5764f10fa89eb4c38e22ce38a4fb1d6a",
+      "path": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "anchor": "unheaded-block-9",
+      "unitDigest": "7ff302f6acd07aa606cb4da2969c237e465d58ffbf3fd77fe987f59fa33d808f"
+    },
+    {
+      "claimId": "claim_bd5ce1469ab840023fd2640668a1ab35",
+      "path": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "anchor": "unheaded-block-10",
+      "unitDigest": "6f2e5a2ea6ae53322b557ee6fbb8cc479c38e36e5737d0b2c9d9e76d4ccfb016"
+    },
+    {
+      "claimId": "claim_1d6b3967b477d9ada8de5c5b69a68ece",
+      "path": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "4b9fa3e77cd364e748d9e3e8b15c51ac292b76768c2acab6f609d94b85646480"
+    },
+    {
+      "claimId": "claim_9a46c9f995367d176ac61cf2d59647a4",
+      "path": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+      "anchor": "f01-answer-a-parked-question-end-to-end",
+      "unitDigest": "cc39f42f0483ed065fac41079ddfd01c8555123c26412021290c758fd09b2576"
+    },
+    {
+      "claimId": "claim_80ff4624d518db7befbdccfcd92a2ed3",
+      "path": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+      "anchor": "purpose",
+      "unitDigest": "223a81e591cd70cf4ff13dbbab0f2c60c71f512fbc35c8bbcd4564853d089024"
+    },
+    {
+      "claimId": "claim_4fca4420a5f2baea4c37309fdc4f7555",
+      "path": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+      "anchor": "unheaded-block-4",
+      "unitDigest": "09c8331014a8c087f0aea468f1aa00a8b993f995ab1d62de18323e208792328d"
+    },
+    {
+      "claimId": "claim_d17fc43b1d58c9992a60d5605b155e37",
+      "path": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+      "anchor": "unheaded-block-5",
+      "unitDigest": "09fa989ef2e7c36e36a09ac4b51d4066dbc9ed6069a3b04246606aad55053491"
+    },
+    {
+      "claimId": "claim_4ddde2c3d97535b424143c3847753bab",
+      "path": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+      "anchor": "steps",
+      "unitDigest": "5852d441d24adcc3831e02a5b4d4a2e463fcd1e593aba8dc9b7c184140386e7a"
+    },
+    {
+      "claimId": "claim_028c68be7bd8559c92b54d6a11eca48a",
+      "path": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+      "anchor": "unheaded-block-6",
+      "unitDigest": "999b24a2dff4d2d168348cafbfd961f1c3c9bfec878507ad95ec2e8493e45775"
+    },
+    {
+      "claimId": "claim_2e79d3dd87585da273910fa943bdccf7",
+      "path": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+      "anchor": "branches",
+      "unitDigest": "a9b491ffd9b9d866fb204799d5571f20b5818f322f6422d4ab4231b0b6608fbf"
+    },
+    {
+      "claimId": "claim_91a51cee06251cc0d253768eb037c821",
+      "path": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+      "anchor": "unheaded-block-7",
+      "unitDigest": "ac90701211328c0b7c9f37b1e2371c4e8ff39077d29e411b2b03155c0f6c613d"
+    },
+    {
+      "claimId": "claim_fc71787af183cc17ea2100bcecb32b58",
+      "path": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+      "anchor": "unheaded-block-8",
+      "unitDigest": "b7b08196e6a7323347802d2b1dcaee20799136977e5601548532afff12321643"
+    },
+    {
+      "claimId": "claim_5f420ddb02566c9c8a56fbafd6b983e2",
+      "path": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "7d74b74c5b051465a4b4e23eab5a5457e44425ba878bdede39e6035f831ef106"
+    },
+    {
+      "claimId": "claim_c3403dd5ad03f954dc9df76b0cdfd920",
+      "path": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+      "anchor": "f02-approve-a-merge-end-to-end",
+      "unitDigest": "9f0af999ce086d659b25211989bf844d88cedf2430226d3716cb22ecdadcfc50"
+    },
+    {
+      "claimId": "claim_f842d35b41d8dffa74f3046ff8849c84",
+      "path": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+      "anchor": "purpose",
+      "unitDigest": "964b1729bc45333c4be1e9e22133009a3ea41d19b56884481e8a1f3201d0d448"
+    },
+    {
+      "claimId": "claim_60dac881eaa2cdcd199178d215ffbb36",
+      "path": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+      "anchor": "unheaded-block-4",
+      "unitDigest": "b89920d32de2e95a424ca8027ac2ae5084becee16016525d4f12d2c9127b5aef"
+    },
+    {
+      "claimId": "claim_f7005f7ebad9ae0ce51496641db22437",
+      "path": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+      "anchor": "steps",
+      "unitDigest": "6c706c276db8d7ba2f3445aa4cddb2384a72168f10e8ec1ed0a5a096fe19bd39"
+    },
+    {
+      "claimId": "claim_1d369d57f0c92d6946fd444b3c185ee9",
+      "path": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+      "anchor": "unheaded-block-5",
+      "unitDigest": "c66607647f3353fc31e1b288c83d8edbac45954da8e277c6615a9f03a4c4550c"
+    },
+    {
+      "claimId": "claim_20574a3ed563c18bcb4429ef021da422",
+      "path": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+      "anchor": "branches",
+      "unitDigest": "0da42a6e808a2622f28dd6d96a2bd6685792bbccf20dae4cc3cee329ca8287f6"
+    },
+    {
+      "claimId": "claim_c4e3bc74cc2ced13097609eb24abd538",
+      "path": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+      "anchor": "unheaded-block-6",
+      "unitDigest": "bf3e48fb9720dee593a4bdf4ce216773a980635dc50b3a82abfbf94e65c60e04"
+    },
+    {
+      "claimId": "claim_0bdecaf6bb7f4c5d03d4dd32edd6e372",
+      "path": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+      "anchor": "unheaded-block-7",
+      "unitDigest": "f9712966a2963770e4d52613d18e2d66e61d803e2f24661f7b860ef640e35224"
+    },
+    {
+      "claimId": "claim_95276218caefe2d0e64ea8a6587912de",
+      "path": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "95fdfa2f1dfd4e34740fa261aaff32166299e3d447945559ef8b9a7743d75ecc"
+    },
+    {
+      "claimId": "claim_2904d9efd9dfa41ef624c3cde4680773",
+      "path": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+      "anchor": "m01-answer-a-parked-question",
+      "unitDigest": "84bef4adbd1d83ced73c9bd250861843f6d12d4fe70e65d87761cff233686498"
+    },
+    {
+      "claimId": "claim_7f3fff01ea50761fe1f33e54e1009dd5",
+      "path": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+      "anchor": "purpose",
+      "unitDigest": "59a831ae0edbf02969fdc01ec8a458ad4bf2f082b585938edca18fc6641e9df6"
+    },
+    {
+      "claimId": "claim_8d83aa2a13a65753ed3087531808f771",
+      "path": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+      "anchor": "unheaded-block-4",
+      "unitDigest": "0e19234fb7746212577c283341625672fb296ec9f7459dd55d7c65196a872ac4"
+    },
+    {
+      "claimId": "claim_57b00d818bf1ae24871c4bf3d2d75b79",
+      "path": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+      "anchor": "layout",
+      "unitDigest": "c2120985caf351f1ff6195e63d8723699bf5b23f2ea05a0d929501dbca458ff8"
+    },
+    {
+      "claimId": "claim_81e60ba98c086609376e50fcde631003",
+      "path": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+      "anchor": "unheaded-block-5",
+      "unitDigest": "243f37484ada7bbcf9a52d14082146a53a20d58cb9e6cf073444d668a3d1e70a"
+    },
+    {
+      "claimId": "claim_46d2aa894a82bd4231e161abc1de795a",
+      "path": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+      "anchor": "unheaded-block-6",
+      "unitDigest": "00da42d1fca43f605f8dfd40f68babb3a77c8d178aa33e60614543a7a7a3a759"
+    },
+    {
+      "claimId": "claim_2fca593fd29799a98ecb961e2bc31189",
+      "path": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+      "anchor": "states",
+      "unitDigest": "fed79adbb21c77cf08962e43f59af9709f516446087eed5db76b20d234ff76a2"
+    },
+    {
+      "claimId": "claim_5ff80d2788c64645819e4747c97586f3",
+      "path": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+      "anchor": "unheaded-block-7",
+      "unitDigest": "bd8db0fe9a91124526c6ea88ff30ddd6173dbc2b4eb00938d01ded7000ee3c74"
+    },
+    {
+      "claimId": "claim_42511baf61c8603df6dfa984707d7c02",
+      "path": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+      "anchor": "interactions",
+      "unitDigest": "0310499305b9425d55f76b3343b1886213c1d5dec72ba2a0951c583544352ecb"
+    },
+    {
+      "claimId": "claim_89e1dad5a298dcd9a584cf7e436b07c8",
+      "path": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+      "anchor": "unheaded-block-8",
+      "unitDigest": "3863c313178b0aea88f942dae236aeda908f0d6202da0384ce55f0fbe0b9601a"
+    },
+    {
+      "claimId": "claim_4c9a110f623532bc7d83fdf6f547093e",
+      "path": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "633382525da36aece4691ddcee98749217ae3c1281c0e6f6792ead72327c67ab"
+    },
+    {
+      "claimId": "claim_ae961815f238b5b8335b08e8b21662ee",
+      "path": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "anchor": "m02-approve-a-merge",
+      "unitDigest": "4ec2fd0d0b267020695e0142a23f26aae54497ae1e92e0390750d3c50e23ec32"
+    },
+    {
+      "claimId": "claim_d940a673245e4f5b3145c8b545ce299c",
+      "path": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "anchor": "purpose",
+      "unitDigest": "a900f08ce9335e018bcac1c24e3a3e5a244891ac9bd2a537680d6a60825f92d3"
+    },
+    {
+      "claimId": "claim_6c1cdb570e57b0c547e768903d487ca1",
+      "path": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "anchor": "unheaded-block-4",
+      "unitDigest": "16d1f15d8e32929635905282f55e305e296b5b158c7e85eb03afe669b45ef526"
+    },
+    {
+      "claimId": "claim_00353fead06bdc3f8468690a63df4aa7",
+      "path": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "anchor": "layout",
+      "unitDigest": "1f9bd3f97bba3865c620ce5b309166ef121aedb0a8432e2d141a53cae2821370"
+    },
+    {
+      "claimId": "claim_b0824e0cd564f4705e50da13b6780123",
+      "path": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "anchor": "unheaded-block-5",
+      "unitDigest": "3ac787a95b4671add2b27b1d4cc92720e884bef5507314bd6e2b1ac5610397d2"
+    },
+    {
+      "claimId": "claim_3048b1128d4d98dc6ee07aba2324c3b8",
+      "path": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "anchor": "unheaded-block-6",
+      "unitDigest": "a94a6123d5be3a892e593e2a46c81eff3b372cecd11436fa4316fa9b220d0e11"
+    },
+    {
+      "claimId": "claim_af451e04d9d67d144a3557b2403a3842",
+      "path": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "anchor": "unheaded-block-7",
+      "unitDigest": "dea3561c21d91935bd45492ef13274f2fcb98ce353514227b12dc4c81a4077e4"
+    },
+    {
+      "claimId": "claim_4734588af7752f05c0f3fd9b0ce531da",
+      "path": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "anchor": "states",
+      "unitDigest": "3fa89c4bcc1fa4ce08b6dda0fb96488d20612826c14e719d4db536cb6766140d"
+    },
+    {
+      "claimId": "claim_8078baf6ee718f1be4d482c2f303e62d",
+      "path": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "anchor": "unheaded-block-8",
+      "unitDigest": "adfe80ad864fe0a34219ab5c5201ed1e2423f5ab7ebd0e8b2ec9fdf7c0dab091"
+    },
+    {
+      "claimId": "claim_64fd7dcc92d75c4ea35fc85e3b0bf0e4",
+      "path": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "anchor": "interactions",
+      "unitDigest": "02c34309f74a28101722d3bf5d0e6c0f2fb7f3f6965cb299eb1e75435ebe0e29"
+    },
+    {
+      "claimId": "claim_c6659cd7ed74e445fe099f5236551cb7",
+      "path": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "anchor": "unheaded-block-9",
+      "unitDigest": "5cc68620a8b0811fa889b25ab1c46d45a394835254085bd439000aaff59b0fa6"
+    },
+    {
+      "claimId": "claim_e71250e07f6665431fa08d2d8e0b2dff",
+      "path": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "24c8d79862a55393166a0eaaacec85b4ae046d8a96f3a12e0b44b1784fc23550"
+    },
+    {
+      "claimId": "claim_9c63e8a354951e0f84f3a1399b6af388",
+      "path": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "anchor": "m03-add-or-edit-a-work-item",
+      "unitDigest": "942bb5ce19e825141370aa234cc3b8950559082e388a1e249824b6fba347e968"
+    },
+    {
+      "claimId": "claim_a72c34c5936a40c3517b75b6fac112b3",
+      "path": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "anchor": "purpose",
+      "unitDigest": "72e7d038a93f287e6aea46d022eced3b171773e84fa24195c4aed29922a35013"
+    },
+    {
+      "claimId": "claim_d7150c78cea2f7c841c76814f9dfea0f",
+      "path": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "anchor": "unheaded-block-4",
+      "unitDigest": "f23c10c096eb804d89eb694e20dfd43da56f30554d94a2927985c17698af5374"
+    },
+    {
+      "claimId": "claim_56170cb013fb6f88d51c9f9052edf8d5",
+      "path": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "anchor": "layout",
+      "unitDigest": "6f21e81bc2f36a0f4491679c7d0580c0b9f002aa939fbd25ff3425c65c9c0bbd"
+    },
+    {
+      "claimId": "claim_d01d11ce35e918523f65bc915d2da0b9",
+      "path": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "anchor": "unheaded-block-5",
+      "unitDigest": "15762277ea0230fa83aaef36a20d316da6a17d4f1ea9d3bbf12aae8d900f44de"
+    },
+    {
+      "claimId": "claim_4ad34124a2811bb062ec03fd65ac8dc7",
+      "path": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "anchor": "unheaded-block-6",
+      "unitDigest": "54e00a531b44734aed2fe09a8aa961df3451f98796ae523524be9a1f5e54d3f6"
+    },
+    {
+      "claimId": "claim_71d00e3b90a0d091b06f0cbf5dd1d360",
+      "path": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "anchor": "unheaded-block-7",
+      "unitDigest": "d025e2982b7a57e0a540fa8e9ab43023ae631df0c9f1d08e07abfa5fab364ff1"
+    },
+    {
+      "claimId": "claim_f25678161e3944edca10dce0bf2c9e83",
+      "path": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "anchor": "unheaded-block-8",
+      "unitDigest": "bfde915b1fb47245c55e1823285df8b92841101c0a8712bcb0ffdee98cf3663c"
+    },
+    {
+      "claimId": "claim_a3a9c673695f9ad9ae898eba35875979",
+      "path": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "anchor": "states",
+      "unitDigest": "238d0b1db923cf498006a239dcb275ea455dd286233baebfa2536ba8c0dae7e9"
+    },
+    {
+      "claimId": "claim_f2aac5602a04a55ae1af5277932bafa2",
+      "path": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "anchor": "unheaded-block-9",
+      "unitDigest": "ca36dd365ddfcc167033301303bc1d374cbaf26b13c05156626e8290f13ff5fc"
+    },
+    {
+      "claimId": "claim_68a4f9c55c4dd71e01dd0a511d3894c1",
+      "path": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "anchor": "interactions",
+      "unitDigest": "d49d33e9d7ce24ccc04ef064bf8da74c35144b715738215b4edef6aa32ae46fe"
+    },
+    {
+      "claimId": "claim_3d2697461e6860c1c7b7ad98e1bb2f75",
+      "path": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "anchor": "unheaded-block-10",
+      "unitDigest": "19182a48049bb62a94fdee2e76c7bcdd872da2397e0f65207b3f586a6ffb250b"
+    },
+    {
+      "claimId": "claim_7967889d10d6af36a4fb383045b65a96",
+      "path": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "77c1514fc17688374acb9a7a09ff5183257acf2a5c56401588c5c0d55052b99f"
+    },
+    {
+      "claimId": "claim_6cbca8eed8cc0595110b6b1bc8f0db80",
+      "path": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "anchor": "s01-sign-in",
+      "unitDigest": "55c57e558e6986ee134114e366b1ded489d53cf59522508214ef3244020bb46a"
+    },
+    {
+      "claimId": "claim_bba819e1574e95eb1c661ad4e65b52d7",
+      "path": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "anchor": "purpose",
+      "unitDigest": "dfb50996e4d6dd9f7668e8e6e4a51cd7f239e7d3550efc895cdfa1e34ef40679"
+    },
+    {
+      "claimId": "claim_3a04f4e739420cfc63f7fc90ee9d868e",
+      "path": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "anchor": "unheaded-block-4",
+      "unitDigest": "0beef4d2245a0124917db86d62ab32535b8d692d87092579891e6263a4565f04"
+    },
+    {
+      "claimId": "claim_ee445ed3633ffaf1046847c22af0fb7f",
+      "path": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "anchor": "unheaded-block-5",
+      "unitDigest": "ea5525c5b2864c0c8bb3de1d5af8e2533672b46433909f40dd3664a49ca805ef"
+    },
+    {
+      "claimId": "claim_7eb4d4508811b2fea52a5a0b1ca60f6b",
+      "path": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "anchor": "layout",
+      "unitDigest": "225d6cada78ff281f42012629d520aa2fd16e54a943a884653b295cde65f8bca"
+    },
+    {
+      "claimId": "claim_c114e4da6a0aa74dd6d6a4908b558893",
+      "path": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "anchor": "unheaded-block-6",
+      "unitDigest": "4fcd1b19835c8541752a8db0350ae5bf1912cea6549777cfbbf4020dea6146fe"
+    },
+    {
+      "claimId": "claim_c5c6c48bbd8baba4da9c0a46b757e1c6",
+      "path": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "anchor": "unheaded-block-7",
+      "unitDigest": "52e625daaea2d5fd48b3b9d4d436367a94d665c43b3f5902b377280ec9f265ec"
+    },
+    {
+      "claimId": "claim_39f417443d65ce04f112c932f2293375",
+      "path": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "anchor": "states",
+      "unitDigest": "9f2473dea651d71ca83df5c9284357798640160bfa24b7b10d8c3e47547e5133"
+    },
+    {
+      "claimId": "claim_cd456a28153788805cf7c6ebccf02f81",
+      "path": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "anchor": "unheaded-block-8",
+      "unitDigest": "a8ec43d1ca3cd4b07dce61b718332c537db2909bfcfe32c41a4e0223f97d3f64"
+    },
+    {
+      "claimId": "claim_d233fa65d860141b65898ec00d944180",
+      "path": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "anchor": "unheaded-block-9",
+      "unitDigest": "6c01f258d2d51d91bfb53840c1568640183da8669c640df98bc0a0999c5d28b7"
+    },
+    {
+      "claimId": "claim_45d619262877e3606c6434a80eac0ea7",
+      "path": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "anchor": "unheaded-block-10",
+      "unitDigest": "d30b7cd79d3cf89c5ab75507209b4bde9ac4646cb248f3fdd5ef19e3935895c3"
+    },
+    {
+      "claimId": "claim_3bd0f8ba521d2a8972d6e44b78002bc3",
+      "path": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "anchor": "interactions",
+      "unitDigest": "895f6a966aea555382214e9031cb9bd8e62d4c1782ad7bb3abe348c7deee2d07"
+    },
+    {
+      "claimId": "claim_66959db8980be9e2431a5436b0acdb21",
+      "path": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "anchor": "unheaded-block-11",
+      "unitDigest": "432201863dab2e41ba63bca951a1c5906c41ce90fe0ff2c4328e371b5df345f5"
+    },
+    {
+      "claimId": "claim_a7fe7d3eb849b053ed9e0649f9ccfa87",
+      "path": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "e8291716ea7a09bddc4a88d8afb788b8eabc0c6a4fdea6b026f41b0f6936ab32"
+    },
+    {
+      "claimId": "claim_1526b583a680ad5f2b907a7b5da02ad1",
+      "path": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "anchor": "s02-taskboard",
+      "unitDigest": "61e519c98077e79b1747ee49f4e236db58a523d35f2d053499b7f05898a3ca8a"
+    },
+    {
+      "claimId": "claim_e9363bc06e8f7f4b941bf74ea143ff6e",
+      "path": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "anchor": "purpose",
+      "unitDigest": "a6348ae6ccac163f26dc71670713e17a2fd89825093716c6cbbd9c3b9683828d"
+    },
+    {
+      "claimId": "claim_605e72f3a6df29f642a1f45962d051ff",
+      "path": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "anchor": "unheaded-block-4",
+      "unitDigest": "de8dfe32ef6f9e54cbc969902056ccde6751597aa532a45ef0fa6c510d3fa925"
+    },
+    {
+      "claimId": "claim_6a5a28e29d2e65708f5f17fef23e8ef0",
+      "path": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "anchor": "unheaded-block-5",
+      "unitDigest": "29fbb9af60bb2b881536741d9039a846bd2489688d77201bafd9167c567e2665"
+    },
+    {
+      "claimId": "claim_a3568914bacae6331716fa11beabe655",
+      "path": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "anchor": "layout",
+      "unitDigest": "4d0bf2c9e7d751d20034f938f244eb1ca5730b7473398737c9d3d150780e908e"
+    },
+    {
+      "claimId": "claim_6c49dcd927215fbd7baede5222cf1ab5",
+      "path": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "anchor": "unheaded-block-6",
+      "unitDigest": "92d5bb85b24a6afb40d5a3307f5ec307c29432af7ae1e8d96917e851e4f42559"
+    },
+    {
+      "claimId": "claim_8f3f773ca083b9fa8272988d07965164",
+      "path": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "anchor": "unheaded-block-7",
+      "unitDigest": "9d5272a9af071d018bebc204e6a0e664b384eeec29da148b705025af29ee6f65"
+    },
+    {
+      "claimId": "claim_369a407225765e238efb7a418e0a44a5",
+      "path": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "anchor": "unheaded-block-8",
+      "unitDigest": "2b6f1fe0ac2043898c36fa322709dbd8d1b00cc292b35b1d3e2fdf60ecc7d49c"
+    },
+    {
+      "claimId": "claim_d30db7db84e70167a04fe1c5fb39a4e5",
+      "path": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "anchor": "unheaded-block-9",
+      "unitDigest": "44e5096326dec39d14a8a592692f8a35506500aa313895e4f25751193f0be1a2"
+    },
+    {
+      "claimId": "claim_38f435fc7cb64228e37d157820f6222c",
+      "path": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "anchor": "unheaded-block-10",
+      "unitDigest": "b536b23ef7b47aec1235043d572a048bdfbcdf4339af68ecfccdd7977336c6a2"
+    },
+    {
+      "claimId": "claim_2cc8f26dc0394eb2b7b92cc169beb784",
+      "path": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "anchor": "unheaded-block-11",
+      "unitDigest": "5871d326ddf941670b46430bef5aeb8943e96bb7633632d0024e62ed91227d91"
+    },
+    {
+      "claimId": "claim_66dc01994689c5fb630f56fdb1180788",
+      "path": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "anchor": "unheaded-block-12",
+      "unitDigest": "a768cd0192df2071b079184f5b8405d4264a777258de3c2cbcb2001773328c9d"
+    },
+    {
+      "claimId": "claim_16ece324dc00b79759255e4acb8435ae",
+      "path": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "anchor": "unheaded-block-13",
+      "unitDigest": "0ca03f8d5a4fc7686ab220d8c37c4cb7550adbb659ba634f15b572532c529b6d"
+    },
+    {
+      "claimId": "claim_6cd22f67c65c9cc4aa70c160cababb24",
+      "path": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "anchor": "unheaded-block-14",
+      "unitDigest": "c6219ddf92aa1f458b5ff3801173d8bf355b5e4c27b4c1411258f4ac60bb49f7"
+    },
+    {
+      "claimId": "claim_1ed9286862955b20a1067b2ba1f9de9e",
+      "path": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "anchor": "states",
+      "unitDigest": "1293e7519f82a1ce0df25de2cde9a5f7a52fd645b74fae0d8b56a633a3035a43"
+    },
+    {
+      "claimId": "claim_9fe8558f49b4210f3268eaa0a158d8ee",
+      "path": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "anchor": "unheaded-block-15",
+      "unitDigest": "11e667e7a1a777b3438dc5cb09e5b06a99d03669ed81e932ae4039ab5830c1b2"
+    },
+    {
+      "claimId": "claim_6c75a8d85b8232cfedf1ae86a7eda90a",
+      "path": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "anchor": "unheaded-block-16",
+      "unitDigest": "6dde20c3978ee0c0934fe097a36e8d402767de43ff2d906b1f1f619356552e51"
+    },
+    {
+      "claimId": "claim_695d51475befe3701ccb1b7d9570db36",
+      "path": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "anchor": "interactions",
+      "unitDigest": "2ff4e1779675c3cd12fc22aa14a5a68e794b4b7d58cd001ad9e2eb945a8452d2"
+    },
+    {
+      "claimId": "claim_47dd03576e4ae838330cee0a1a15e4bd",
+      "path": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "anchor": "unheaded-block-17",
+      "unitDigest": "bad3057a791408cebe7749d16be0cac1086d0aa3a4825b16e2e96bf9494e5aa2"
+    },
+    {
+      "claimId": "claim_b1381898ffcd6fd63e9e64586b7acd6c",
+      "path": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "3567e61162c801d95c3b42120f6527521b11318fccd623d43dded28f5d14645d"
+    },
+    {
+      "claimId": "claim_57fe165c28132a8679657bc25f8aad0b",
+      "path": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "anchor": "s03-task-detail",
+      "unitDigest": "fc1c6f08523061fb099b0b259b952c6872be4d7cdf93376297dd191461c5f882"
+    },
+    {
+      "claimId": "claim_74176d4e4289afc7fcaa8a4e6deaa014",
+      "path": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "anchor": "purpose",
+      "unitDigest": "8e70f80a13bde941a81a989c9ca3ad71d671701b56f8c206c528335cd9659670"
+    },
+    {
+      "claimId": "claim_4a7fc646586751db12885986313c0350",
+      "path": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "anchor": "unheaded-block-4",
+      "unitDigest": "e5a061704919c09652d5d54bfeb63372e4172bf04727b1697c175ef6f895b376"
+    },
+    {
+      "claimId": "claim_ba270fdaa4bfeec20ceb3f52d7434e6d",
+      "path": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "anchor": "unheaded-block-5",
+      "unitDigest": "1ae9f696b585e22dc8277c99e20f55fbd09dde300571f51948fb4acc8e087cce"
+    },
+    {
+      "claimId": "claim_2833db673d67cf600233251aac117628",
+      "path": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "anchor": "layout",
+      "unitDigest": "f1c2ffc9a487b9f31419cb06961dd2e25f746de2aa4db30b780c0ce5ca520daa"
+    },
+    {
+      "claimId": "claim_4fb38e3e862e3f8fb1353ca7f5c38c87",
+      "path": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "anchor": "unheaded-block-6",
+      "unitDigest": "606f6a0016df5a909d44d0f75366ef2bf776b57ef7b47081b1ceab0cd79d23c3"
+    },
+    {
+      "claimId": "claim_692e59d327dfdc4ac060b679ff60a8df",
+      "path": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "anchor": "unheaded-block-7",
+      "unitDigest": "2f7ba97eab08768fccbc32a6b3edcbebeb7449cc07753e516da2cd883d52f3f2"
+    },
+    {
+      "claimId": "claim_093b3e6a5b56f2219f9056058964c884",
+      "path": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "anchor": "unheaded-block-8",
+      "unitDigest": "5011f46096ff98b1d5c0ce491fe5d75a52de5db059d305c8082096da2b8b930d"
+    },
+    {
+      "claimId": "claim_7c2b88b65ffc0692b8fe3d9751070b02",
+      "path": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "anchor": "why-the-three-regions-sit-in-this-order",
+      "unitDigest": "912c6946a895c279ae9ff495722a7afd0eb2905de2f117c5e3c6f7a98a7a27b1"
+    },
+    {
+      "claimId": "claim_26c0a04e72c06c15be9a007f50fd312b",
+      "path": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "anchor": "unheaded-block-9",
+      "unitDigest": "b68da59feac0406607b0751d67e0a3d2951a328011e0070a80ebb1cabf05efc3"
+    },
+    {
+      "claimId": "claim_b7bec6190021c6543edb08c12717fea6",
+      "path": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "anchor": "what-context-actually-shows-d17",
+      "unitDigest": "9542d216b781deb7ab31a504a5a3fbb10c1dba64b258e360234962c51992f10a"
+    },
+    {
+      "claimId": "claim_7b1759a49d26fd1dcc834b3f38bade04",
+      "path": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "anchor": "unheaded-block-10",
+      "unitDigest": "df88b650b1482175d2fb5e47624cd391af36bb52cc3f31aa67f8874a7ab75404"
+    },
+    {
+      "claimId": "claim_8320314c57006644884f6d5f4edfc5bd",
+      "path": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "anchor": "unheaded-block-11",
+      "unitDigest": "c1bdd1e5de39d873ebc746fa92ea8a7dbffd363be076c51141e9816788d242fc"
+    },
+    {
+      "claimId": "claim_eb244fc0c4068fc1ab3c907db369a326",
+      "path": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "anchor": "unheaded-block-12",
+      "unitDigest": "ded2ddb7ce7a2bdc492e95e3cd32732382f8048bd0e46a60bba2622026420f24"
+    },
+    {
+      "claimId": "claim_4abab9f7a787bead0ff5f1d162c2bd07",
+      "path": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "anchor": "unheaded-block-13",
+      "unitDigest": "7b636169f5f4f687e45215c4b3ebe993d604fca24992c590ebec1eb747eee029"
+    },
+    {
+      "claimId": "claim_0295a9bbd34b084c523f0c057b5899da",
+      "path": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "anchor": "the-questionanswer-timeline-across-rounds",
+      "unitDigest": "0a1c545c0f2469060bd1e06ebfa03c5eaf87ccfd97972784c2a969487d3ca1c7"
+    },
+    {
+      "claimId": "claim_e2969564bc033087099738ac927d2263",
+      "path": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "anchor": "unheaded-block-14",
+      "unitDigest": "b78f2fe03bdcec998a797758f3fc19d9e09d43c81b83a6e87923a2e83e450159"
+    },
+    {
+      "claimId": "claim_b391fc12268d78ddd19bf6a9f8f66656",
+      "path": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "anchor": "unheaded-block-15",
+      "unitDigest": "c5c214f47346cbc378a79c77a7bb210b510e6f2a5a7229f821f08e75fe587517"
+    },
+    {
+      "claimId": "claim_a59c4971ef0276a190d1436f39614c63",
+      "path": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "anchor": "states",
+      "unitDigest": "4bdb10422d9ccb84bd67360f748986ac2f5483abcc1e32c402e7964315af8bbf"
+    },
+    {
+      "claimId": "claim_9a2e11a231c97ddf61ceb228fed26010",
+      "path": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "anchor": "unheaded-block-16",
+      "unitDigest": "b2ada90792e03a4ebfe8767adbf7f9c86be70ba1f3ce4fe9d6269f8485a7fa05"
+    },
+    {
+      "claimId": "claim_73cab9a36191997438af84b13c76cf85",
+      "path": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "anchor": "unheaded-block-17",
+      "unitDigest": "0e91e3c92c13cc041ce0dc29fc7b5adde5f55b7b39db0afab2c854744aaae02c"
+    },
+    {
+      "claimId": "claim_0799ccec326a89dc36b6463e3a7d1699",
+      "path": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "anchor": "interactions",
+      "unitDigest": "bdf0b4839f92bed569d302ba225ffc3994a4a746184ad2b4268d9b604a6b935c"
+    },
+    {
+      "claimId": "claim_cb783b44a6284c43bbaac2e46c89026f",
+      "path": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "anchor": "unheaded-block-18",
+      "unitDigest": "a51154d8995076f88b5a062b8db7af5c48e04601c63c8df48791f741b52a9d08"
+    },
+    {
+      "claimId": "claim_879a93675dea691099f52d778198f61a",
+      "path": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "d6f3328dcbd970ce632f7c70c6eb9f9dd81e7a20eef758dfc5892d2851a00228"
+    },
+    {
+      "claimId": "claim_bbfba2a05bf22181fa09c1776b039725",
+      "path": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+      "anchor": "s04-questions-needing-answer",
+      "unitDigest": "27d2ba3ccb69c49ffbd953797ad3c68fdcc2deef0abc70f8a75d1cc376b82789"
+    },
+    {
+      "claimId": "claim_7a4d99e16fcdb83d87454e1b6ab06862",
+      "path": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+      "anchor": "purpose",
+      "unitDigest": "2ca84cac4e8d5b92cc126869e79508f40238182795f81ff98a7d18c2ed18d39b"
+    },
+    {
+      "claimId": "claim_99de7a5a1f002e16db2bbcf68045d707",
+      "path": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+      "anchor": "unheaded-block-4",
+      "unitDigest": "eda037d21266247be1f0691c0af1f92f5682eb6431ca5a1d3db13f82bab8b2b6"
+    },
+    {
+      "claimId": "claim_6998a7b8301334cca30507533c23e493",
+      "path": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+      "anchor": "unheaded-block-5",
+      "unitDigest": "7557c6339e87b867a3d0e076b1de35ca0b8e66e60c94a6bacd3a23a4ba5447a0"
+    },
+    {
+      "claimId": "claim_70b933b970a27de52840bcda846835b0",
+      "path": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+      "anchor": "layout",
+      "unitDigest": "d834276fd982b25e5f5f3f7a8b542a5ca475854dccd957af0d878cd02c84a624"
+    },
+    {
+      "claimId": "claim_228b96188da500e85ae818b66fe09233",
+      "path": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+      "anchor": "unheaded-block-6",
+      "unitDigest": "3c9936789761d321fdd43ad8661693f53d5243481db6bcce718ccae8616fbb3d"
+    },
+    {
+      "claimId": "claim_d922400df0f2e4df9838ec9c5670c0df",
+      "path": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+      "anchor": "unheaded-block-7",
+      "unitDigest": "cc6bae0c18965be51df7067ebc3df52dc68cb5b472f3569313b1a1c0fcb72b17"
+    },
+    {
+      "claimId": "claim_6765123fbb5f11ffe97a098154c0795e",
+      "path": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+      "anchor": "unheaded-block-8",
+      "unitDigest": "c6d3f9804798de60b16fbf791ff2bd3ec040dbea5c62b73f278ffaf2a4fffba3"
+    },
+    {
+      "claimId": "claim_8c5e3f2968eb2cc04ee63b53168afadd",
+      "path": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+      "anchor": "unheaded-block-9",
+      "unitDigest": "286a6ef07e9dccf18b6dbfc9862944028af76b5663812f047c214da01a4b5db8"
+    },
+    {
+      "claimId": "claim_a4f0b8d3ca1318b89d0c71aa9e4c801c",
+      "path": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+      "anchor": "states",
+      "unitDigest": "7af70fa5a51d976c04b8b474782abea76cb3f6aca70f936111b8133caa058f79"
+    },
+    {
+      "claimId": "claim_4543fb352c50cbb81ce2c271062f7d25",
+      "path": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+      "anchor": "unheaded-block-10",
+      "unitDigest": "18a084a1df6021dc90c5677b274a75f41401d3d50d2c9d373c5a039002c71531"
+    },
+    {
+      "claimId": "claim_41441a240174152e1705db9f6a528bc3",
+      "path": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+      "anchor": "unheaded-block-11",
+      "unitDigest": "f211ef10b17e1b4dd9f4188b7fa36304aa092c6c66b555cb9c0f3055882979f5"
+    },
+    {
+      "claimId": "claim_541edcbd2cfd7c2ea658c7f397fe9438",
+      "path": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+      "anchor": "interactions",
+      "unitDigest": "89f373ee4271ea752919c224b60d2fa835a8c2bbf52584b998beed6fd313e374"
+    },
+    {
+      "claimId": "claim_3c3858b298aac0087ecce77ed003fd63",
+      "path": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+      "anchor": "unheaded-block-12",
+      "unitDigest": "6779b6023c27123800d5f097b22f29fb334bc406514dab199240e9710996a477"
+    },
+    {
+      "claimId": "claim_a7dc196cb13fecefb11ee504bd56df4d",
+      "path": "docs/platform/ui-spec/architecture/spec.config.yaml",
+      "anchor": "file-block",
+      "unitDigest": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb"
+    }
+  ],
+  "additionalPopulation": "Union with all current-content native reverse units in candidate-unverified-specs-ui.json; deduplicate by actual native candidate claimId/path/anchor/unitDigest after excluding only history, provenance/bookkeeping/navigation-only and generated output. Record all exclusions and final population."
+}
+```
+
