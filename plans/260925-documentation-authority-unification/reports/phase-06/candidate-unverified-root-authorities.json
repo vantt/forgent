@@ -18674,6 +18674,21 @@
     "owner": "root-authorities",
     "exactlyOneOwner": true,
     "runnerContentCommit": "b80e8c16c94cb04c80cc4e858933a9b2a04ddc60",
-    "reviewStatus": "pending bounded accounting re-review; no truth approval"
+    "reviewStatus": "reviewed accounting; no truth approval"
+  },
+  "pendingAccountingReview": false,
+  "accountingReview": {
+    "entryId": "root-list",
+    "channel": "candidate-list",
+    "verdict": "ok",
+    "reviewNote": "deep: file sha eea30864 equals the committed list; 846 rows with no duplicate, rows byte-identical to the previous list (0 added, 0 removed, 0 changed, only pin metadata updated), every tuple equals the registry unit and the native reverse output, tuple SHA256 dec5b4a2 reproduced, root alone owns claim_fecee46f; the 62 runner rows are disjoint from it",
+    "sourceDigest": "eea30864e8d5467e2954c16e6757e08d4f02297f92d4d0bae1c7fddaab396053",
+    "targetDigest": "none",
+    "evidenceDigest": "e0299615a9e2e3764aca46cac0f9834dcabb8402651322657cc4079e76bd8589",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+    "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+    "bindingMatchedAtApplication": true,
+    "scope": "Five-field candidate list accounting only; candidate status and promotion truth obligations unchanged."
   }
 }

@@ -6,7 +6,7 @@
     "supersede": 19,
     "partial-carry": 9
   },
-  "status": "28 authored dispositions pending independent bounded review; L9-15 accepts 16 footer identity ambiguities as group supersedes; no approval or identity graft",
+  "status": "All 28 independently accepted dispositions; residual/group/cutover obligations persist",
   "rows": [
     {
       "predecessor": {
@@ -69,7 +69,7 @@
         "sourcePath": "docs/specs/runner.md",
         "sourceUnitDigest": "3f6a59c3d3764c1b978073ad68eb16ce1b0382d6bf362815f45ad79dd1625224",
         "authoredBy": "codex-session:unit-run-1792066534402-cb278bf5@2026-10-15",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "disposition": "supersede",
         "targetOwner": "docs/specs/runner.md",
         "targetAnchor": "unheaded-block-102",
@@ -78,7 +78,29 @@
           "Spec: Runner (vòng tự hành)",
           "Pointers (implementation)"
         ],
-        "rationale": "A34 pending predecessor disposition: All 49 historical lines remain in order; only unit-sync/run-timeout implementation pointers are inserted. Bound immutable witness and full current successor in step9-a42-predecessor-dispositions.json. No identity graft, truth approval or inherited review; revalidate/rebind at legacy cutover."
+        "rationale": "A34 pending predecessor disposition: All 49 historical lines remain in order; only unit-sync/run-timeout implementation pointers are inserted. Bound immutable witness and full current successor in step9-a42-predecessor-dispositions.json. No identity graft, truth approval or inherited review; revalidate/rebind at legacy cutover.",
+        "reviewNote": "entry gap-claim_a63132a3f76d6b8ea05461c48c818836: deep: witness 8b4be4fcf unit unheaded-block-102 (L1208-1256, digest recomputed) to current runner.md#unheaded-block-102 (L1213-1263, digest recomputed); all 49 historical lines recur verbatim and in order in the 51 successor lines, so supersede is legal under A34 and no residual is needed; the 2 inserted successor lines are unit-sync.mjs and run-timeout.mjs pointers as the reason says; reason text is accurate, shard row equals pack, successor anchor exists",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "reviewMode": "ordinary",
+        "reviewEntryId": "gap-claim_a63132a3f76d6b8ea05461c48c818836",
+        "evidenceDigest": "ddcc63f3f14921ed816bab258b99f56ff4d776c73598149b35351a162a6f22fa",
+        "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
+      },
+      "reviewAcceptance": {
+        "entryId": "gap-claim_a63132a3f76d6b8ea05461c48c818836",
+        "channel": "gap-disposition",
+        "verdict": "ok",
+        "reviewNote": "entry gap-claim_a63132a3f76d6b8ea05461c48c818836: deep: witness 8b4be4fcf unit unheaded-block-102 (L1208-1256, digest recomputed) to current runner.md#unheaded-block-102 (L1213-1263, digest recomputed); all 49 historical lines recur verbatim and in order in the 51 successor lines, so supersede is legal under A34 and no residual is needed; the 2 inserted successor lines are unit-sync.mjs and run-timeout.mjs pointers as the reason says; reason text is accurate, shard row equals pack, successor anchor exists",
+        "sourceDigest": "3f6a59c3d3764c1b978073ad68eb16ce1b0382d6bf362815f45ad79dd1625224",
+        "targetDigest": "b323720a9d4e93b156af47db347755f342dd8ad9fb9720466bb161732ebef4e3",
+        "evidenceDigest": "ddcc63f3f14921ed816bab258b99f56ff4d776c73598149b35351a162a6f22fa",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "bindingMatchedAtApplication": true
       }
     },
     {
@@ -144,7 +166,7 @@
         "sourcePath": "docs/specs/runner.md",
         "sourceUnitDigest": "92ca20e4e333b0933210a6adf9f39c7cc0a46eb800a1e19404ad019e80730e0a",
         "authoredBy": "codex-session:unit-run-1792066534402-cb278bf5@2026-10-15",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "disposition": "partial-carry",
         "targetOwner": "docs/specs/runner.md",
         "targetAnchor": "unheaded-block-125",
@@ -154,7 +176,29 @@
           "Dispatch operability implementation slice (2026-09-16)"
         ],
         "rationale": "A34 pending predecessor disposition: Architecture advisory boundary is rewritten from a five-step DAG with explicitly uncompleted capabilities to the completed advisory/reopen boundaries; preserve the former boundary and missing-capability statement. Bound immutable witness and full current successor in step9-a42-predecessor-dispositions.json. No identity graft, truth approval or inherited review; revalidate/rebind at legacy cutover.",
-        "remainder": "Only historical lines changed/removed from the successor, verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; file SHA256 4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f, row residual SHA256 92ca20e4e333b0933210a6adf9f39c7cc0a46eb800a1e19404ad019e80730e0a; source 92ca20e4e333b0933210a6adf9f39c7cc0a46eb800a1e19404ad019e80730e0a, primary target 97b0e92a0ff83b4b98002158e13f563d8738446ac64f0fcaeace320234d79b7b. Independent A34 acceptance pending; blocks cutover."
+        "remainder": "Only historical lines changed/removed from the successor, verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; file SHA256 4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f, row residual SHA256 92ca20e4e333b0933210a6adf9f39c7cc0a46eb800a1e19404ad019e80730e0a; source 92ca20e4e333b0933210a6adf9f39c7cc0a46eb800a1e19404ad019e80730e0a, primary target 97b0e92a0ff83b4b98002158e13f563d8738446ac64f0fcaeace320234d79b7b. Independent A34 acceptance pending; blocks cutover.",
+        "reviewNote": "entry gap-claim_f64fa4a36030f89feab71dc5943015c0: deep A34: witness 3d9e8087e unit unheaded-block-118 (L1423-1423, digest recomputed) to current runner.md#unheaded-block-125 (L1473-1480); 1 historical lines, exactly 1 not verbatim in the successor (the old five-step DAG boundary paragraph is rewritten into the completed advisory/reopen boundary text); residual file step9-a42-predecessor-residuals.json row equals that one line verbatim (recomputed), row SHA256 92ca20e4 and file SHA256 4be07f52 recomputed, bound to source and primary-target digests, successor anchor exists, shard row equals pack",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "reviewMode": "ordinary",
+        "reviewEntryId": "gap-claim_f64fa4a36030f89feab71dc5943015c0",
+        "evidenceDigest": "370a06d2f72342c74221f0ef71582ae07d5b3b211ca589508887b6f6fa23e8c3",
+        "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
+      },
+      "reviewAcceptance": {
+        "entryId": "gap-claim_f64fa4a36030f89feab71dc5943015c0",
+        "channel": "gap-disposition",
+        "verdict": "ok",
+        "reviewNote": "entry gap-claim_f64fa4a36030f89feab71dc5943015c0: deep A34: witness 3d9e8087e unit unheaded-block-118 (L1423-1423, digest recomputed) to current runner.md#unheaded-block-125 (L1473-1480); 1 historical lines, exactly 1 not verbatim in the successor (the old five-step DAG boundary paragraph is rewritten into the completed advisory/reopen boundary text); residual file step9-a42-predecessor-residuals.json row equals that one line verbatim (recomputed), row SHA256 92ca20e4 and file SHA256 4be07f52 recomputed, bound to source and primary-target digests, successor anchor exists, shard row equals pack",
+        "sourceDigest": "92ca20e4e333b0933210a6adf9f39c7cc0a46eb800a1e19404ad019e80730e0a",
+        "targetDigest": "97b0e92a0ff83b4b98002158e13f563d8738446ac64f0fcaeace320234d79b7b",
+        "evidenceDigest": "370a06d2f72342c74221f0ef71582ae07d5b3b211ca589508887b6f6fa23e8c3",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "bindingMatchedAtApplication": true
       }
     },
     {
@@ -290,7 +334,7 @@
         "sourcePath": "docs/specs/runner.md",
         "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
         "authoredBy": "codex-session:unit-run-1792067456433-d25e183b@2026-10-15",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "disposition": "supersede",
         "rationale": "A42 Lead L9-15: this predecessor is an old ID of the repeated decision footer “Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.” The complete text is conserved verbatim eight times, each within its own decision, in the listed contextual identical-unit successor group. Identity ambiguity is accepted because the text is conserved and cannot be split by identity. Supersede to all eight listed member units as a group; no unique member attribution or identity graft. Pending independent bounded review; no truth approval or inherited verdict.",
         "targetOwner": "docs/specs/runner.md",
@@ -493,7 +537,16 @@
             }
           ],
           "identityLimit": "Old IDs cannot be split by enclosing-decision identity; all eight current copies conserve the identical text verbatim. Group binding, not a chosen individual successor."
-        }
+        },
+        "reviewNote": "entry gap-claim_004b47fc284721eff96cfa890f85aac0: deep: L9-15 old ID of the repeated decision footer (old anchor unheaded-block-124, registry gap says 8 possible old units with one fingerprint); byte witness 24b8785d unit block-150 recomputed equals digest 95a357e2; legal under A34 because the footer sentence is carried verbatim in all 8 members, checked in docs/specs/runner.md at b80e8c16c (units 150,155,167,176,241,250,274,286, each text and digest equal, decisions 0005,0008,0020,0021,0028,0029,0031,0032) and in the 8 candidate counterparts in decisions/h-36d872fbb0e5.md (units 9,14,26,35,100,109,133,145, same text and digest, ancestry decision titles match); rationale states the ambiguity and that no unique member or identity graft is chosen; group target digest f201a195 equals sha256 of the shown successors array (JSON.stringify indent 2), the same group in all 16 rows, shard registryGaps row equals pack, row is a real registry identity gap",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "reviewMode": "ordinary",
+        "reviewEntryId": "gap-claim_004b47fc284721eff96cfa890f85aac0",
+        "evidenceDigest": "d732fc0bdf3782bcea8afb2265458765b9b5211d28d351731fe11f8f86912af2",
+        "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
       },
       "priorDecision": {
         "claimId": "claim_004b47fc284721eff96cfa890f85aac0",
@@ -704,7 +757,20 @@
         ],
         "identityLimit": "Old IDs cannot be split by enclosing-decision identity; all eight current copies conserve the identical text verbatim. Group binding, not a chosen individual successor."
       },
-      "leadDecision": "A42 L9-15"
+      "leadDecision": "A42 L9-15",
+      "reviewAcceptance": {
+        "entryId": "gap-claim_004b47fc284721eff96cfa890f85aac0",
+        "channel": "gap-disposition",
+        "verdict": "ok",
+        "reviewNote": "entry gap-claim_004b47fc284721eff96cfa890f85aac0: deep: L9-15 old ID of the repeated decision footer (old anchor unheaded-block-124, registry gap says 8 possible old units with one fingerprint); byte witness 24b8785d unit block-150 recomputed equals digest 95a357e2; legal under A34 because the footer sentence is carried verbatim in all 8 members, checked in docs/specs/runner.md at b80e8c16c (units 150,155,167,176,241,250,274,286, each text and digest equal, decisions 0005,0008,0020,0021,0028,0029,0031,0032) and in the 8 candidate counterparts in decisions/h-36d872fbb0e5.md (units 9,14,26,35,100,109,133,145, same text and digest, ancestry decision titles match); rationale states the ambiguity and that no unique member or identity graft is chosen; group target digest f201a195 equals sha256 of the shown successors array (JSON.stringify indent 2), the same group in all 16 rows, shard registryGaps row equals pack, row is a real registry identity gap",
+        "sourceDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetDigest": "f201a1958cd31ee30550b5d2d69dd9c88d09ce60db21025c7fda099d5fdbdb43",
+        "evidenceDigest": "d732fc0bdf3782bcea8afb2265458765b9b5211d28d351731fe11f8f86912af2",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "bindingMatchedAtApplication": true
+      }
     },
     {
       "predecessor": {
@@ -769,7 +835,7 @@
         "sourcePath": "docs/specs/runner.md",
         "sourceUnitDigest": "d2f7e04754c3720cace2cf46bb12fb5e3701574c76182e79aacbd1b6f6de95e8",
         "authoredBy": "codex-session:unit-run-1792066534402-cb278bf5@2026-10-15",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "disposition": "partial-carry",
         "targetOwner": "docs/specs/runner.md",
         "targetAnchor": "unheaded-block-134",
@@ -779,7 +845,29 @@
           "Dispatch operability implementation slice (2026-09-16)"
         ],
         "rationale": "A34 pending predecessor disposition: Blind posture paragraph now enables architecture-advisory and business-discussion; the old statement that their pools have not passed canary no longer stands. Bound immutable witness and full current successor in step9-a42-predecessor-dispositions.json. No identity graft, truth approval or inherited review; revalidate/rebind at legacy cutover.",
-        "remainder": "Only historical lines changed/removed from the successor, verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; file SHA256 4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f, row residual SHA256 d2f7e04754c3720cace2cf46bb12fb5e3701574c76182e79aacbd1b6f6de95e8; source d2f7e04754c3720cace2cf46bb12fb5e3701574c76182e79aacbd1b6f6de95e8, primary target 20b88b9765b1528632270f740a923bdcca1df84a4a3000f87e45e1b1b177ffcd. Independent A34 acceptance pending; blocks cutover."
+        "remainder": "Only historical lines changed/removed from the successor, verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; file SHA256 4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f, row residual SHA256 d2f7e04754c3720cace2cf46bb12fb5e3701574c76182e79aacbd1b6f6de95e8; source d2f7e04754c3720cace2cf46bb12fb5e3701574c76182e79aacbd1b6f6de95e8, primary target 20b88b9765b1528632270f740a923bdcca1df84a4a3000f87e45e1b1b177ffcd. Independent A34 acceptance pending; blocks cutover.",
+        "reviewNote": "entry gap-claim_f4058f068a378962aaf237ae038db5af: deep A34: witness 454d7a8df unit unheaded-block-127 (L1445-1445, digest recomputed) to current runner.md#unheaded-block-134 (L1498-1498); 1 historical lines, exactly 1 not verbatim in the successor (the old statement that the architecture-advisory and business-discussion pools have not passed canary is replaced); residual file step9-a42-predecessor-residuals.json row equals that one line verbatim (recomputed), row SHA256 d2f7e047 and file SHA256 4be07f52 recomputed, bound to source and primary-target digests, successor anchor exists, shard row equals pack",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "reviewMode": "ordinary",
+        "reviewEntryId": "gap-claim_f4058f068a378962aaf237ae038db5af",
+        "evidenceDigest": "2f2974c6b98cb1f77062005b6323e531305bdd2e255821924cedf1dd8440322a",
+        "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
+      },
+      "reviewAcceptance": {
+        "entryId": "gap-claim_f4058f068a378962aaf237ae038db5af",
+        "channel": "gap-disposition",
+        "verdict": "ok",
+        "reviewNote": "entry gap-claim_f4058f068a378962aaf237ae038db5af: deep A34: witness 454d7a8df unit unheaded-block-127 (L1445-1445, digest recomputed) to current runner.md#unheaded-block-134 (L1498-1498); 1 historical lines, exactly 1 not verbatim in the successor (the old statement that the architecture-advisory and business-discussion pools have not passed canary is replaced); residual file step9-a42-predecessor-residuals.json row equals that one line verbatim (recomputed), row SHA256 d2f7e047 and file SHA256 4be07f52 recomputed, bound to source and primary-target digests, successor anchor exists, shard row equals pack",
+        "sourceDigest": "d2f7e04754c3720cace2cf46bb12fb5e3701574c76182e79aacbd1b6f6de95e8",
+        "targetDigest": "20b88b9765b1528632270f740a923bdcca1df84a4a3000f87e45e1b1b177ffcd",
+        "evidenceDigest": "2f2974c6b98cb1f77062005b6323e531305bdd2e255821924cedf1dd8440322a",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "bindingMatchedAtApplication": true
       }
     },
     {
@@ -915,7 +1003,7 @@
         "sourcePath": "docs/specs/runner.md",
         "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
         "authoredBy": "codex-session:unit-run-1792067456433-d25e183b@2026-10-15",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "disposition": "supersede",
         "rationale": "A42 Lead L9-15: this predecessor is an old ID of the repeated decision footer “Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.” The complete text is conserved verbatim eight times, each within its own decision, in the listed contextual identical-unit successor group. Identity ambiguity is accepted because the text is conserved and cannot be split by identity. Supersede to all eight listed member units as a group; no unique member attribution or identity graft. Pending independent bounded review; no truth approval or inherited verdict.",
         "targetOwner": "docs/specs/runner.md",
@@ -1118,7 +1206,16 @@
             }
           ],
           "identityLimit": "Old IDs cannot be split by enclosing-decision identity; all eight current copies conserve the identical text verbatim. Group binding, not a chosen individual successor."
-        }
+        },
+        "reviewNote": "entry gap-claim_69311391fbb9b1cf924197e6063e5cad: deep: L9-15 old ID of the repeated decision footer (old anchor unheaded-block-129, registry gap says 8 possible old units with one fingerprint); byte witness 24b8785d unit block-150 recomputed equals digest 95a357e2; legal under A34 because the footer sentence is carried verbatim in all 8 members, checked in docs/specs/runner.md at b80e8c16c (units 150,155,167,176,241,250,274,286, each text and digest equal, decisions 0005,0008,0020,0021,0028,0029,0031,0032) and in the 8 candidate counterparts in decisions/h-36d872fbb0e5.md (units 9,14,26,35,100,109,133,145, same text and digest, ancestry decision titles match); rationale states the ambiguity and that no unique member or identity graft is chosen; group target digest f201a195 equals sha256 of the shown successors array (JSON.stringify indent 2), the same group in all 16 rows, shard registryGaps row equals pack, row is a real registry identity gap",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "reviewMode": "ordinary",
+        "reviewEntryId": "gap-claim_69311391fbb9b1cf924197e6063e5cad",
+        "evidenceDigest": "b2a41e953647900af3686ad2ada97007ed296e47b7d8c42858e29fb309d001c4",
+        "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
       },
       "priorDecision": {
         "claimId": "claim_69311391fbb9b1cf924197e6063e5cad",
@@ -1329,7 +1426,20 @@
         ],
         "identityLimit": "Old IDs cannot be split by enclosing-decision identity; all eight current copies conserve the identical text verbatim. Group binding, not a chosen individual successor."
       },
-      "leadDecision": "A42 L9-15"
+      "leadDecision": "A42 L9-15",
+      "reviewAcceptance": {
+        "entryId": "gap-claim_69311391fbb9b1cf924197e6063e5cad",
+        "channel": "gap-disposition",
+        "verdict": "ok",
+        "reviewNote": "entry gap-claim_69311391fbb9b1cf924197e6063e5cad: deep: L9-15 old ID of the repeated decision footer (old anchor unheaded-block-129, registry gap says 8 possible old units with one fingerprint); byte witness 24b8785d unit block-150 recomputed equals digest 95a357e2; legal under A34 because the footer sentence is carried verbatim in all 8 members, checked in docs/specs/runner.md at b80e8c16c (units 150,155,167,176,241,250,274,286, each text and digest equal, decisions 0005,0008,0020,0021,0028,0029,0031,0032) and in the 8 candidate counterparts in decisions/h-36d872fbb0e5.md (units 9,14,26,35,100,109,133,145, same text and digest, ancestry decision titles match); rationale states the ambiguity and that no unique member or identity graft is chosen; group target digest f201a195 equals sha256 of the shown successors array (JSON.stringify indent 2), the same group in all 16 rows, shard registryGaps row equals pack, row is a real registry identity gap",
+        "sourceDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetDigest": "f201a1958cd31ee30550b5d2d69dd9c88d09ce60db21025c7fda099d5fdbdb43",
+        "evidenceDigest": "b2a41e953647900af3686ad2ada97007ed296e47b7d8c42858e29fb309d001c4",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "bindingMatchedAtApplication": true
+      }
     },
     {
       "predecessor": {
@@ -1464,7 +1574,7 @@
         "sourcePath": "docs/specs/runner.md",
         "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
         "authoredBy": "codex-session:unit-run-1792067456433-d25e183b@2026-10-15",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "disposition": "supersede",
         "rationale": "A42 Lead L9-15: this predecessor is an old ID of the repeated decision footer “Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.” The complete text is conserved verbatim eight times, each within its own decision, in the listed contextual identical-unit successor group. Identity ambiguity is accepted because the text is conserved and cannot be split by identity. Supersede to all eight listed member units as a group; no unique member attribution or identity graft. Pending independent bounded review; no truth approval or inherited verdict.",
         "targetOwner": "docs/specs/runner.md",
@@ -1667,7 +1777,16 @@
             }
           ],
           "identityLimit": "Old IDs cannot be split by enclosing-decision identity; all eight current copies conserve the identical text verbatim. Group binding, not a chosen individual successor."
-        }
+        },
+        "reviewNote": "entry gap-claim_c1d4ad0697013185af2572dd0a944024: deep: L9-15 old ID of the repeated decision footer (old anchor unheaded-block-141, registry gap says 8 possible old units with one fingerprint); byte witness 24b8785d unit block-150 recomputed equals digest 95a357e2; legal under A34 because the footer sentence is carried verbatim in all 8 members, checked in docs/specs/runner.md at b80e8c16c (units 150,155,167,176,241,250,274,286, each text and digest equal, decisions 0005,0008,0020,0021,0028,0029,0031,0032) and in the 8 candidate counterparts in decisions/h-36d872fbb0e5.md (units 9,14,26,35,100,109,133,145, same text and digest, ancestry decision titles match); rationale states the ambiguity and that no unique member or identity graft is chosen; group target digest f201a195 equals sha256 of the shown successors array (JSON.stringify indent 2), the same group in all 16 rows, shard registryGaps row equals pack, row is a real registry identity gap",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "reviewMode": "ordinary",
+        "reviewEntryId": "gap-claim_c1d4ad0697013185af2572dd0a944024",
+        "evidenceDigest": "aa72e6361c91bffa68d71c8e92cdf3b59ff922e3eff5e1369dcf645e6e182fab",
+        "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
       },
       "priorDecision": {
         "claimId": "claim_c1d4ad0697013185af2572dd0a944024",
@@ -1878,7 +1997,20 @@
         ],
         "identityLimit": "Old IDs cannot be split by enclosing-decision identity; all eight current copies conserve the identical text verbatim. Group binding, not a chosen individual successor."
       },
-      "leadDecision": "A42 L9-15"
+      "leadDecision": "A42 L9-15",
+      "reviewAcceptance": {
+        "entryId": "gap-claim_c1d4ad0697013185af2572dd0a944024",
+        "channel": "gap-disposition",
+        "verdict": "ok",
+        "reviewNote": "entry gap-claim_c1d4ad0697013185af2572dd0a944024: deep: L9-15 old ID of the repeated decision footer (old anchor unheaded-block-141, registry gap says 8 possible old units with one fingerprint); byte witness 24b8785d unit block-150 recomputed equals digest 95a357e2; legal under A34 because the footer sentence is carried verbatim in all 8 members, checked in docs/specs/runner.md at b80e8c16c (units 150,155,167,176,241,250,274,286, each text and digest equal, decisions 0005,0008,0020,0021,0028,0029,0031,0032) and in the 8 candidate counterparts in decisions/h-36d872fbb0e5.md (units 9,14,26,35,100,109,133,145, same text and digest, ancestry decision titles match); rationale states the ambiguity and that no unique member or identity graft is chosen; group target digest f201a195 equals sha256 of the shown successors array (JSON.stringify indent 2), the same group in all 16 rows, shard registryGaps row equals pack, row is a real registry identity gap",
+        "sourceDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetDigest": "f201a1958cd31ee30550b5d2d69dd9c88d09ce60db21025c7fda099d5fdbdb43",
+        "evidenceDigest": "aa72e6361c91bffa68d71c8e92cdf3b59ff922e3eff5e1369dcf645e6e182fab",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "bindingMatchedAtApplication": true
+      }
     },
     {
       "predecessor": {
@@ -2014,7 +2146,7 @@
         "sourcePath": "docs/specs/runner.md",
         "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
         "authoredBy": "codex-session:unit-run-1792067456433-d25e183b@2026-10-15",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "disposition": "supersede",
         "rationale": "A42 Lead L9-15: this predecessor is an old ID of the repeated decision footer “Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.” The complete text is conserved verbatim eight times, each within its own decision, in the listed contextual identical-unit successor group. Identity ambiguity is accepted because the text is conserved and cannot be split by identity. Supersede to all eight listed member units as a group; no unique member attribution or identity graft. Pending independent bounded review; no truth approval or inherited verdict.",
         "targetOwner": "docs/specs/runner.md",
@@ -2217,7 +2349,16 @@
             }
           ],
           "identityLimit": "Old IDs cannot be split by enclosing-decision identity; all eight current copies conserve the identical text verbatim. Group binding, not a chosen individual successor."
-        }
+        },
+        "reviewNote": "entry gap-claim_79fd838ebf7eb7bbaa72efa619535671: deep: L9-15 old ID of the repeated decision footer (old anchor unheaded-block-142, registry gap says 8 possible old units with one fingerprint); byte witness 24b8785d unit block-150 recomputed equals digest 95a357e2; legal under A34 because the footer sentence is carried verbatim in all 8 members, checked in docs/specs/runner.md at b80e8c16c (units 150,155,167,176,241,250,274,286, each text and digest equal, decisions 0005,0008,0020,0021,0028,0029,0031,0032) and in the 8 candidate counterparts in decisions/h-36d872fbb0e5.md (units 9,14,26,35,100,109,133,145, same text and digest, ancestry decision titles match); rationale states the ambiguity and that no unique member or identity graft is chosen; group target digest f201a195 equals sha256 of the shown successors array (JSON.stringify indent 2), the same group in all 16 rows, shard registryGaps row equals pack, row is a real registry identity gap",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "reviewMode": "ordinary",
+        "reviewEntryId": "gap-claim_79fd838ebf7eb7bbaa72efa619535671",
+        "evidenceDigest": "39b7d5466dc8fb5a920b711632b9dc7381328a6308fb715874cd8366b1a809e2",
+        "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
       },
       "priorDecision": {
         "claimId": "claim_79fd838ebf7eb7bbaa72efa619535671",
@@ -2428,7 +2569,20 @@
         ],
         "identityLimit": "Old IDs cannot be split by enclosing-decision identity; all eight current copies conserve the identical text verbatim. Group binding, not a chosen individual successor."
       },
-      "leadDecision": "A42 L9-15"
+      "leadDecision": "A42 L9-15",
+      "reviewAcceptance": {
+        "entryId": "gap-claim_79fd838ebf7eb7bbaa72efa619535671",
+        "channel": "gap-disposition",
+        "verdict": "ok",
+        "reviewNote": "entry gap-claim_79fd838ebf7eb7bbaa72efa619535671: deep: L9-15 old ID of the repeated decision footer (old anchor unheaded-block-142, registry gap says 8 possible old units with one fingerprint); byte witness 24b8785d unit block-150 recomputed equals digest 95a357e2; legal under A34 because the footer sentence is carried verbatim in all 8 members, checked in docs/specs/runner.md at b80e8c16c (units 150,155,167,176,241,250,274,286, each text and digest equal, decisions 0005,0008,0020,0021,0028,0029,0031,0032) and in the 8 candidate counterparts in decisions/h-36d872fbb0e5.md (units 9,14,26,35,100,109,133,145, same text and digest, ancestry decision titles match); rationale states the ambiguity and that no unique member or identity graft is chosen; group target digest f201a195 equals sha256 of the shown successors array (JSON.stringify indent 2), the same group in all 16 rows, shard registryGaps row equals pack, row is a real registry identity gap",
+        "sourceDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetDigest": "f201a1958cd31ee30550b5d2d69dd9c88d09ce60db21025c7fda099d5fdbdb43",
+        "evidenceDigest": "39b7d5466dc8fb5a920b711632b9dc7381328a6308fb715874cd8366b1a809e2",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "bindingMatchedAtApplication": true
+      }
     },
     {
       "predecessor": {
@@ -2564,7 +2718,7 @@
         "sourcePath": "docs/specs/runner.md",
         "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
         "authoredBy": "codex-session:unit-run-1792067456433-d25e183b@2026-10-15",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "disposition": "supersede",
         "rationale": "A42 Lead L9-15: this predecessor is an old ID of the repeated decision footer “Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.” The complete text is conserved verbatim eight times, each within its own decision, in the listed contextual identical-unit successor group. Identity ambiguity is accepted because the text is conserved and cannot be split by identity. Supersede to all eight listed member units as a group; no unique member attribution or identity graft. Pending independent bounded review; no truth approval or inherited verdict.",
         "targetOwner": "docs/specs/runner.md",
@@ -2767,7 +2921,16 @@
             }
           ],
           "identityLimit": "Old IDs cannot be split by enclosing-decision identity; all eight current copies conserve the identical text verbatim. Group binding, not a chosen individual successor."
-        }
+        },
+        "reviewNote": "entry gap-claim_99f595d515a3a60d4796192d78e67eae: deep: L9-15 old ID of the repeated decision footer (old anchor unheaded-block-147, registry gap says 8 possible old units with one fingerprint); byte witness 24b8785d unit block-150 recomputed equals digest 95a357e2; legal under A34 because the footer sentence is carried verbatim in all 8 members, checked in docs/specs/runner.md at b80e8c16c (units 150,155,167,176,241,250,274,286, each text and digest equal, decisions 0005,0008,0020,0021,0028,0029,0031,0032) and in the 8 candidate counterparts in decisions/h-36d872fbb0e5.md (units 9,14,26,35,100,109,133,145, same text and digest, ancestry decision titles match); rationale states the ambiguity and that no unique member or identity graft is chosen; group target digest f201a195 equals sha256 of the shown successors array (JSON.stringify indent 2), the same group in all 16 rows, shard registryGaps row equals pack, row is a real registry identity gap",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "reviewMode": "ordinary",
+        "reviewEntryId": "gap-claim_99f595d515a3a60d4796192d78e67eae",
+        "evidenceDigest": "616a221410f7feadbff95e34aef587bf8bfeaf6c90cffb9722e1a9b2ddf53eb9",
+        "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
       },
       "priorDecision": {
         "claimId": "claim_99f595d515a3a60d4796192d78e67eae",
@@ -2978,7 +3141,20 @@
         ],
         "identityLimit": "Old IDs cannot be split by enclosing-decision identity; all eight current copies conserve the identical text verbatim. Group binding, not a chosen individual successor."
       },
-      "leadDecision": "A42 L9-15"
+      "leadDecision": "A42 L9-15",
+      "reviewAcceptance": {
+        "entryId": "gap-claim_99f595d515a3a60d4796192d78e67eae",
+        "channel": "gap-disposition",
+        "verdict": "ok",
+        "reviewNote": "entry gap-claim_99f595d515a3a60d4796192d78e67eae: deep: L9-15 old ID of the repeated decision footer (old anchor unheaded-block-147, registry gap says 8 possible old units with one fingerprint); byte witness 24b8785d unit block-150 recomputed equals digest 95a357e2; legal under A34 because the footer sentence is carried verbatim in all 8 members, checked in docs/specs/runner.md at b80e8c16c (units 150,155,167,176,241,250,274,286, each text and digest equal, decisions 0005,0008,0020,0021,0028,0029,0031,0032) and in the 8 candidate counterparts in decisions/h-36d872fbb0e5.md (units 9,14,26,35,100,109,133,145, same text and digest, ancestry decision titles match); rationale states the ambiguity and that no unique member or identity graft is chosen; group target digest f201a195 equals sha256 of the shown successors array (JSON.stringify indent 2), the same group in all 16 rows, shard registryGaps row equals pack, row is a real registry identity gap",
+        "sourceDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetDigest": "f201a1958cd31ee30550b5d2d69dd9c88d09ce60db21025c7fda099d5fdbdb43",
+        "evidenceDigest": "616a221410f7feadbff95e34aef587bf8bfeaf6c90cffb9722e1a9b2ddf53eb9",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "bindingMatchedAtApplication": true
+      }
     },
     {
       "predecessor": {
@@ -3113,7 +3289,7 @@
         "sourcePath": "docs/specs/runner.md",
         "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
         "authoredBy": "codex-session:unit-run-1792067456433-d25e183b@2026-10-15",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "disposition": "supersede",
         "rationale": "A42 Lead L9-15: this predecessor is an old ID of the repeated decision footer “Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.” The complete text is conserved verbatim eight times, each within its own decision, in the listed contextual identical-unit successor group. Identity ambiguity is accepted because the text is conserved and cannot be split by identity. Supersede to all eight listed member units as a group; no unique member attribution or identity graft. Pending independent bounded review; no truth approval or inherited verdict.",
         "targetOwner": "docs/specs/runner.md",
@@ -3316,7 +3492,16 @@
             }
           ],
           "identityLimit": "Old IDs cannot be split by enclosing-decision identity; all eight current copies conserve the identical text verbatim. Group binding, not a chosen individual successor."
-        }
+        },
+        "reviewNote": "entry gap-claim_0f9aa9f49945a45860e3e3c2d1e880bd: deep: L9-15 old ID of the repeated decision footer (old anchor unheaded-block-150, registry gap says 8 possible old units with one fingerprint); byte witness 24b8785d unit block-150 recomputed equals digest 95a357e2; legal under A34 because the footer sentence is carried verbatim in all 8 members, checked in docs/specs/runner.md at b80e8c16c (units 150,155,167,176,241,250,274,286, each text and digest equal, decisions 0005,0008,0020,0021,0028,0029,0031,0032) and in the 8 candidate counterparts in decisions/h-36d872fbb0e5.md (units 9,14,26,35,100,109,133,145, same text and digest, ancestry decision titles match); rationale states the ambiguity and that no unique member or identity graft is chosen; group target digest f201a195 equals sha256 of the shown successors array (JSON.stringify indent 2), the same group in all 16 rows, shard registryGaps row equals pack, row is a real registry identity gap",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "reviewMode": "ordinary",
+        "reviewEntryId": "gap-claim_0f9aa9f49945a45860e3e3c2d1e880bd",
+        "evidenceDigest": "1f341a60bb791ff3efc30a25139dc91c92e9ac8f338bcb220a62e323ed63af5d",
+        "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
       },
       "priorDecision": {
         "claimId": "claim_0f9aa9f49945a45860e3e3c2d1e880bd",
@@ -3527,7 +3712,20 @@
         ],
         "identityLimit": "Old IDs cannot be split by enclosing-decision identity; all eight current copies conserve the identical text verbatim. Group binding, not a chosen individual successor."
       },
-      "leadDecision": "A42 L9-15"
+      "leadDecision": "A42 L9-15",
+      "reviewAcceptance": {
+        "entryId": "gap-claim_0f9aa9f49945a45860e3e3c2d1e880bd",
+        "channel": "gap-disposition",
+        "verdict": "ok",
+        "reviewNote": "entry gap-claim_0f9aa9f49945a45860e3e3c2d1e880bd: deep: L9-15 old ID of the repeated decision footer (old anchor unheaded-block-150, registry gap says 8 possible old units with one fingerprint); byte witness 24b8785d unit block-150 recomputed equals digest 95a357e2; legal under A34 because the footer sentence is carried verbatim in all 8 members, checked in docs/specs/runner.md at b80e8c16c (units 150,155,167,176,241,250,274,286, each text and digest equal, decisions 0005,0008,0020,0021,0028,0029,0031,0032) and in the 8 candidate counterparts in decisions/h-36d872fbb0e5.md (units 9,14,26,35,100,109,133,145, same text and digest, ancestry decision titles match); rationale states the ambiguity and that no unique member or identity graft is chosen; group target digest f201a195 equals sha256 of the shown successors array (JSON.stringify indent 2), the same group in all 16 rows, shard registryGaps row equals pack, row is a real registry identity gap",
+        "sourceDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetDigest": "f201a1958cd31ee30550b5d2d69dd9c88d09ce60db21025c7fda099d5fdbdb43",
+        "evidenceDigest": "1f341a60bb791ff3efc30a25139dc91c92e9ac8f338bcb220a62e323ed63af5d",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "bindingMatchedAtApplication": true
+      }
     },
     {
       "predecessor": {
@@ -3663,7 +3861,7 @@
         "sourcePath": "docs/specs/runner.md",
         "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
         "authoredBy": "codex-session:unit-run-1792067456433-d25e183b@2026-10-15",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "disposition": "supersede",
         "rationale": "A42 Lead L9-15: this predecessor is an old ID of the repeated decision footer “Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.” The complete text is conserved verbatim eight times, each within its own decision, in the listed contextual identical-unit successor group. Identity ambiguity is accepted because the text is conserved and cannot be split by identity. Supersede to all eight listed member units as a group; no unique member attribution or identity graft. Pending independent bounded review; no truth approval or inherited verdict.",
         "targetOwner": "docs/specs/runner.md",
@@ -3866,7 +4064,16 @@
             }
           ],
           "identityLimit": "Old IDs cannot be split by enclosing-decision identity; all eight current copies conserve the identical text verbatim. Group binding, not a chosen individual successor."
-        }
+        },
+        "reviewNote": "entry gap-claim_b3960a6316827da8f49bc10a9221b4c5: deep: L9-15 old ID of the repeated decision footer (old anchor unheaded-block-159, registry gap says 8 possible old units with one fingerprint); byte witness 24b8785d unit block-150 recomputed equals digest 95a357e2; legal under A34 because the footer sentence is carried verbatim in all 8 members, checked in docs/specs/runner.md at b80e8c16c (units 150,155,167,176,241,250,274,286, each text and digest equal, decisions 0005,0008,0020,0021,0028,0029,0031,0032) and in the 8 candidate counterparts in decisions/h-36d872fbb0e5.md (units 9,14,26,35,100,109,133,145, same text and digest, ancestry decision titles match); rationale states the ambiguity and that no unique member or identity graft is chosen; group target digest f201a195 equals sha256 of the shown successors array (JSON.stringify indent 2), the same group in all 16 rows, shard registryGaps row equals pack, row is a real registry identity gap",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "reviewMode": "ordinary",
+        "reviewEntryId": "gap-claim_b3960a6316827da8f49bc10a9221b4c5",
+        "evidenceDigest": "bb82b05f589a0831acca37455ab381885b3d686415f6c522ceb52109bc4c999c",
+        "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
       },
       "priorDecision": {
         "claimId": "claim_b3960a6316827da8f49bc10a9221b4c5",
@@ -4077,7 +4284,20 @@
         ],
         "identityLimit": "Old IDs cannot be split by enclosing-decision identity; all eight current copies conserve the identical text verbatim. Group binding, not a chosen individual successor."
       },
-      "leadDecision": "A42 L9-15"
+      "leadDecision": "A42 L9-15",
+      "reviewAcceptance": {
+        "entryId": "gap-claim_b3960a6316827da8f49bc10a9221b4c5",
+        "channel": "gap-disposition",
+        "verdict": "ok",
+        "reviewNote": "entry gap-claim_b3960a6316827da8f49bc10a9221b4c5: deep: L9-15 old ID of the repeated decision footer (old anchor unheaded-block-159, registry gap says 8 possible old units with one fingerprint); byte witness 24b8785d unit block-150 recomputed equals digest 95a357e2; legal under A34 because the footer sentence is carried verbatim in all 8 members, checked in docs/specs/runner.md at b80e8c16c (units 150,155,167,176,241,250,274,286, each text and digest equal, decisions 0005,0008,0020,0021,0028,0029,0031,0032) and in the 8 candidate counterparts in decisions/h-36d872fbb0e5.md (units 9,14,26,35,100,109,133,145, same text and digest, ancestry decision titles match); rationale states the ambiguity and that no unique member or identity graft is chosen; group target digest f201a195 equals sha256 of the shown successors array (JSON.stringify indent 2), the same group in all 16 rows, shard registryGaps row equals pack, row is a real registry identity gap",
+        "sourceDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetDigest": "f201a1958cd31ee30550b5d2d69dd9c88d09ce60db21025c7fda099d5fdbdb43",
+        "evidenceDigest": "bb82b05f589a0831acca37455ab381885b3d686415f6c522ceb52109bc4c999c",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "bindingMatchedAtApplication": true
+      }
     },
     {
       "predecessor": {
@@ -4213,7 +4433,7 @@
         "sourcePath": "docs/specs/runner.md",
         "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
         "authoredBy": "codex-session:unit-run-1792067456433-d25e183b@2026-10-15",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "disposition": "supersede",
         "rationale": "A42 Lead L9-15: this predecessor is an old ID of the repeated decision footer “Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.” The complete text is conserved verbatim eight times, each within its own decision, in the listed contextual identical-unit successor group. Identity ambiguity is accepted because the text is conserved and cannot be split by identity. Supersede to all eight listed member units as a group; no unique member attribution or identity graft. Pending independent bounded review; no truth approval or inherited verdict.",
         "targetOwner": "docs/specs/runner.md",
@@ -4416,7 +4636,16 @@
             }
           ],
           "identityLimit": "Old IDs cannot be split by enclosing-decision identity; all eight current copies conserve the identical text verbatim. Group binding, not a chosen individual successor."
-        }
+        },
+        "reviewNote": "entry gap-claim_2afd573c3c2205adb49a698535fbf864: deep: L9-15 old ID of the repeated decision footer (old anchor unheaded-block-168, registry gap says 8 possible old units with one fingerprint); byte witness 24b8785d unit block-150 recomputed equals digest 95a357e2; legal under A34 because the footer sentence is carried verbatim in all 8 members, checked in docs/specs/runner.md at b80e8c16c (units 150,155,167,176,241,250,274,286, each text and digest equal, decisions 0005,0008,0020,0021,0028,0029,0031,0032) and in the 8 candidate counterparts in decisions/h-36d872fbb0e5.md (units 9,14,26,35,100,109,133,145, same text and digest, ancestry decision titles match); rationale states the ambiguity and that no unique member or identity graft is chosen; group target digest f201a195 equals sha256 of the shown successors array (JSON.stringify indent 2), the same group in all 16 rows, shard registryGaps row equals pack, row is a real registry identity gap",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "reviewMode": "ordinary",
+        "reviewEntryId": "gap-claim_2afd573c3c2205adb49a698535fbf864",
+        "evidenceDigest": "7f01641205834f09f4c44df4cf70d9a4d8057a28cdcd1a668e89def1a209d765",
+        "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
       },
       "priorDecision": {
         "claimId": "claim_2afd573c3c2205adb49a698535fbf864",
@@ -4627,7 +4856,20 @@
         ],
         "identityLimit": "Old IDs cannot be split by enclosing-decision identity; all eight current copies conserve the identical text verbatim. Group binding, not a chosen individual successor."
       },
-      "leadDecision": "A42 L9-15"
+      "leadDecision": "A42 L9-15",
+      "reviewAcceptance": {
+        "entryId": "gap-claim_2afd573c3c2205adb49a698535fbf864",
+        "channel": "gap-disposition",
+        "verdict": "ok",
+        "reviewNote": "entry gap-claim_2afd573c3c2205adb49a698535fbf864: deep: L9-15 old ID of the repeated decision footer (old anchor unheaded-block-168, registry gap says 8 possible old units with one fingerprint); byte witness 24b8785d unit block-150 recomputed equals digest 95a357e2; legal under A34 because the footer sentence is carried verbatim in all 8 members, checked in docs/specs/runner.md at b80e8c16c (units 150,155,167,176,241,250,274,286, each text and digest equal, decisions 0005,0008,0020,0021,0028,0029,0031,0032) and in the 8 candidate counterparts in decisions/h-36d872fbb0e5.md (units 9,14,26,35,100,109,133,145, same text and digest, ancestry decision titles match); rationale states the ambiguity and that no unique member or identity graft is chosen; group target digest f201a195 equals sha256 of the shown successors array (JSON.stringify indent 2), the same group in all 16 rows, shard registryGaps row equals pack, row is a real registry identity gap",
+        "sourceDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetDigest": "f201a1958cd31ee30550b5d2d69dd9c88d09ce60db21025c7fda099d5fdbdb43",
+        "evidenceDigest": "7f01641205834f09f4c44df4cf70d9a4d8057a28cdcd1a668e89def1a209d765",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "bindingMatchedAtApplication": true
+      }
     },
     {
       "predecessor": {
@@ -4762,7 +5004,7 @@
         "sourcePath": "docs/specs/runner.md",
         "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
         "authoredBy": "codex-session:unit-run-1792067456433-d25e183b@2026-10-15",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "disposition": "supersede",
         "rationale": "A42 Lead L9-15: this predecessor is an old ID of the repeated decision footer “Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.” The complete text is conserved verbatim eight times, each within its own decision, in the listed contextual identical-unit successor group. Identity ambiguity is accepted because the text is conserved and cannot be split by identity. Supersede to all eight listed member units as a group; no unique member attribution or identity graft. Pending independent bounded review; no truth approval or inherited verdict.",
         "targetOwner": "docs/specs/runner.md",
@@ -4965,7 +5207,16 @@
             }
           ],
           "identityLimit": "Old IDs cannot be split by enclosing-decision identity; all eight current copies conserve the identical text verbatim. Group binding, not a chosen individual successor."
-        }
+        },
+        "reviewNote": "entry gap-claim_298fc2ef185e234bd4b65f047f70ecec: deep: L9-15 old ID of the repeated decision footer (old anchor unheaded-block-215, registry gap says 8 possible old units with one fingerprint); byte witness 24b8785d unit block-150 recomputed equals digest 95a357e2; legal under A34 because the footer sentence is carried verbatim in all 8 members, checked in docs/specs/runner.md at b80e8c16c (units 150,155,167,176,241,250,274,286, each text and digest equal, decisions 0005,0008,0020,0021,0028,0029,0031,0032) and in the 8 candidate counterparts in decisions/h-36d872fbb0e5.md (units 9,14,26,35,100,109,133,145, same text and digest, ancestry decision titles match); rationale states the ambiguity and that no unique member or identity graft is chosen; group target digest f201a195 equals sha256 of the shown successors array (JSON.stringify indent 2), the same group in all 16 rows, shard registryGaps row equals pack, row is a real registry identity gap",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "reviewMode": "ordinary",
+        "reviewEntryId": "gap-claim_298fc2ef185e234bd4b65f047f70ecec",
+        "evidenceDigest": "c0864f5f109e534ed4027ba07aeed5ac985824ab9141a4c89ecc0ea752d97489",
+        "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
       },
       "priorDecision": {
         "claimId": "claim_298fc2ef185e234bd4b65f047f70ecec",
@@ -5176,7 +5427,20 @@
         ],
         "identityLimit": "Old IDs cannot be split by enclosing-decision identity; all eight current copies conserve the identical text verbatim. Group binding, not a chosen individual successor."
       },
-      "leadDecision": "A42 L9-15"
+      "leadDecision": "A42 L9-15",
+      "reviewAcceptance": {
+        "entryId": "gap-claim_298fc2ef185e234bd4b65f047f70ecec",
+        "channel": "gap-disposition",
+        "verdict": "ok",
+        "reviewNote": "entry gap-claim_298fc2ef185e234bd4b65f047f70ecec: deep: L9-15 old ID of the repeated decision footer (old anchor unheaded-block-215, registry gap says 8 possible old units with one fingerprint); byte witness 24b8785d unit block-150 recomputed equals digest 95a357e2; legal under A34 because the footer sentence is carried verbatim in all 8 members, checked in docs/specs/runner.md at b80e8c16c (units 150,155,167,176,241,250,274,286, each text and digest equal, decisions 0005,0008,0020,0021,0028,0029,0031,0032) and in the 8 candidate counterparts in decisions/h-36d872fbb0e5.md (units 9,14,26,35,100,109,133,145, same text and digest, ancestry decision titles match); rationale states the ambiguity and that no unique member or identity graft is chosen; group target digest f201a195 equals sha256 of the shown successors array (JSON.stringify indent 2), the same group in all 16 rows, shard registryGaps row equals pack, row is a real registry identity gap",
+        "sourceDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetDigest": "f201a1958cd31ee30550b5d2d69dd9c88d09ce60db21025c7fda099d5fdbdb43",
+        "evidenceDigest": "c0864f5f109e534ed4027ba07aeed5ac985824ab9141a4c89ecc0ea752d97489",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "bindingMatchedAtApplication": true
+      }
     },
     {
       "predecessor": {
@@ -5311,7 +5575,7 @@
         "sourcePath": "docs/specs/runner.md",
         "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
         "authoredBy": "codex-session:unit-run-1792067456433-d25e183b@2026-10-15",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "disposition": "supersede",
         "rationale": "A42 Lead L9-15: this predecessor is an old ID of the repeated decision footer “Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.” The complete text is conserved verbatim eight times, each within its own decision, in the listed contextual identical-unit successor group. Identity ambiguity is accepted because the text is conserved and cannot be split by identity. Supersede to all eight listed member units as a group; no unique member attribution or identity graft. Pending independent bounded review; no truth approval or inherited verdict.",
         "targetOwner": "docs/specs/runner.md",
@@ -5514,7 +5778,16 @@
             }
           ],
           "identityLimit": "Old IDs cannot be split by enclosing-decision identity; all eight current copies conserve the identical text verbatim. Group binding, not a chosen individual successor."
-        }
+        },
+        "reviewNote": "entry gap-claim_09dd63bd1aaf9b4b6078de434144efb0: deep: L9-15 old ID of the repeated decision footer (old anchor unheaded-block-224, registry gap says 8 possible old units with one fingerprint); byte witness 24b8785d unit block-150 recomputed equals digest 95a357e2; legal under A34 because the footer sentence is carried verbatim in all 8 members, checked in docs/specs/runner.md at b80e8c16c (units 150,155,167,176,241,250,274,286, each text and digest equal, decisions 0005,0008,0020,0021,0028,0029,0031,0032) and in the 8 candidate counterparts in decisions/h-36d872fbb0e5.md (units 9,14,26,35,100,109,133,145, same text and digest, ancestry decision titles match); rationale states the ambiguity and that no unique member or identity graft is chosen; group target digest f201a195 equals sha256 of the shown successors array (JSON.stringify indent 2), the same group in all 16 rows, shard registryGaps row equals pack, row is a real registry identity gap",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "reviewMode": "ordinary",
+        "reviewEntryId": "gap-claim_09dd63bd1aaf9b4b6078de434144efb0",
+        "evidenceDigest": "d8a914511225a33fa4b90d02727a90f4074d354d9fddf49c50abee7b1f2ab0e8",
+        "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
       },
       "priorDecision": {
         "claimId": "claim_09dd63bd1aaf9b4b6078de434144efb0",
@@ -5725,7 +5998,20 @@
         ],
         "identityLimit": "Old IDs cannot be split by enclosing-decision identity; all eight current copies conserve the identical text verbatim. Group binding, not a chosen individual successor."
       },
-      "leadDecision": "A42 L9-15"
+      "leadDecision": "A42 L9-15",
+      "reviewAcceptance": {
+        "entryId": "gap-claim_09dd63bd1aaf9b4b6078de434144efb0",
+        "channel": "gap-disposition",
+        "verdict": "ok",
+        "reviewNote": "entry gap-claim_09dd63bd1aaf9b4b6078de434144efb0: deep: L9-15 old ID of the repeated decision footer (old anchor unheaded-block-224, registry gap says 8 possible old units with one fingerprint); byte witness 24b8785d unit block-150 recomputed equals digest 95a357e2; legal under A34 because the footer sentence is carried verbatim in all 8 members, checked in docs/specs/runner.md at b80e8c16c (units 150,155,167,176,241,250,274,286, each text and digest equal, decisions 0005,0008,0020,0021,0028,0029,0031,0032) and in the 8 candidate counterparts in decisions/h-36d872fbb0e5.md (units 9,14,26,35,100,109,133,145, same text and digest, ancestry decision titles match); rationale states the ambiguity and that no unique member or identity graft is chosen; group target digest f201a195 equals sha256 of the shown successors array (JSON.stringify indent 2), the same group in all 16 rows, shard registryGaps row equals pack, row is a real registry identity gap",
+        "sourceDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetDigest": "f201a1958cd31ee30550b5d2d69dd9c88d09ce60db21025c7fda099d5fdbdb43",
+        "evidenceDigest": "d8a914511225a33fa4b90d02727a90f4074d354d9fddf49c50abee7b1f2ab0e8",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "bindingMatchedAtApplication": true
+      }
     },
     {
       "predecessor": {
@@ -5861,7 +6147,7 @@
         "sourcePath": "docs/specs/runner.md",
         "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
         "authoredBy": "codex-session:unit-run-1792067456433-d25e183b@2026-10-15",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "disposition": "supersede",
         "rationale": "A42 Lead L9-15: this predecessor is an old ID of the repeated decision footer “Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.” The complete text is conserved verbatim eight times, each within its own decision, in the listed contextual identical-unit successor group. Identity ambiguity is accepted because the text is conserved and cannot be split by identity. Supersede to all eight listed member units as a group; no unique member attribution or identity graft. Pending independent bounded review; no truth approval or inherited verdict.",
         "targetOwner": "docs/specs/runner.md",
@@ -6064,7 +6350,16 @@
             }
           ],
           "identityLimit": "Old IDs cannot be split by enclosing-decision identity; all eight current copies conserve the identical text verbatim. Group binding, not a chosen individual successor."
-        }
+        },
+        "reviewNote": "entry gap-claim_3c1dfb5d442b11bec14ecd32e309c1dd: deep: L9-15 old ID of the repeated decision footer (old anchor unheaded-block-233, registry gap says 8 possible old units with one fingerprint); byte witness 24b8785d unit block-150 recomputed equals digest 95a357e2; legal under A34 because the footer sentence is carried verbatim in all 8 members, checked in docs/specs/runner.md at b80e8c16c (units 150,155,167,176,241,250,274,286, each text and digest equal, decisions 0005,0008,0020,0021,0028,0029,0031,0032) and in the 8 candidate counterparts in decisions/h-36d872fbb0e5.md (units 9,14,26,35,100,109,133,145, same text and digest, ancestry decision titles match); rationale states the ambiguity and that no unique member or identity graft is chosen; group target digest f201a195 equals sha256 of the shown successors array (JSON.stringify indent 2), the same group in all 16 rows, shard registryGaps row equals pack, row is a real registry identity gap",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "reviewMode": "ordinary",
+        "reviewEntryId": "gap-claim_3c1dfb5d442b11bec14ecd32e309c1dd",
+        "evidenceDigest": "4ebae848ad3d18e48cbd0c3dcb20fb3aa2df00062f064fbd4d2101f7700323d6",
+        "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
       },
       "priorDecision": {
         "claimId": "claim_3c1dfb5d442b11bec14ecd32e309c1dd",
@@ -6275,7 +6570,20 @@
         ],
         "identityLimit": "Old IDs cannot be split by enclosing-decision identity; all eight current copies conserve the identical text verbatim. Group binding, not a chosen individual successor."
       },
-      "leadDecision": "A42 L9-15"
+      "leadDecision": "A42 L9-15",
+      "reviewAcceptance": {
+        "entryId": "gap-claim_3c1dfb5d442b11bec14ecd32e309c1dd",
+        "channel": "gap-disposition",
+        "verdict": "ok",
+        "reviewNote": "entry gap-claim_3c1dfb5d442b11bec14ecd32e309c1dd: deep: L9-15 old ID of the repeated decision footer (old anchor unheaded-block-233, registry gap says 8 possible old units with one fingerprint); byte witness 24b8785d unit block-150 recomputed equals digest 95a357e2; legal under A34 because the footer sentence is carried verbatim in all 8 members, checked in docs/specs/runner.md at b80e8c16c (units 150,155,167,176,241,250,274,286, each text and digest equal, decisions 0005,0008,0020,0021,0028,0029,0031,0032) and in the 8 candidate counterparts in decisions/h-36d872fbb0e5.md (units 9,14,26,35,100,109,133,145, same text and digest, ancestry decision titles match); rationale states the ambiguity and that no unique member or identity graft is chosen; group target digest f201a195 equals sha256 of the shown successors array (JSON.stringify indent 2), the same group in all 16 rows, shard registryGaps row equals pack, row is a real registry identity gap",
+        "sourceDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetDigest": "f201a1958cd31ee30550b5d2d69dd9c88d09ce60db21025c7fda099d5fdbdb43",
+        "evidenceDigest": "4ebae848ad3d18e48cbd0c3dcb20fb3aa2df00062f064fbd4d2101f7700323d6",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "bindingMatchedAtApplication": true
+      }
     },
     {
       "predecessor": {
@@ -6411,7 +6719,7 @@
         "sourcePath": "docs/specs/runner.md",
         "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
         "authoredBy": "codex-session:unit-run-1792067456433-d25e183b@2026-10-15",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "disposition": "supersede",
         "rationale": "A42 Lead L9-15: this predecessor is an old ID of the repeated decision footer “Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.” The complete text is conserved verbatim eight times, each within its own decision, in the listed contextual identical-unit successor group. Identity ambiguity is accepted because the text is conserved and cannot be split by identity. Supersede to all eight listed member units as a group; no unique member attribution or identity graft. Pending independent bounded review; no truth approval or inherited verdict.",
         "targetOwner": "docs/specs/runner.md",
@@ -6614,7 +6922,16 @@
             }
           ],
           "identityLimit": "Old IDs cannot be split by enclosing-decision identity; all eight current copies conserve the identical text verbatim. Group binding, not a chosen individual successor."
-        }
+        },
+        "reviewNote": "entry gap-claim_cad110bd532badff055f69c0a236644a: deep: L9-15 old ID of the repeated decision footer (old anchor unheaded-block-242, registry gap says 8 possible old units with one fingerprint); byte witness 24b8785d unit block-150 recomputed equals digest 95a357e2; legal under A34 because the footer sentence is carried verbatim in all 8 members, checked in docs/specs/runner.md at b80e8c16c (units 150,155,167,176,241,250,274,286, each text and digest equal, decisions 0005,0008,0020,0021,0028,0029,0031,0032) and in the 8 candidate counterparts in decisions/h-36d872fbb0e5.md (units 9,14,26,35,100,109,133,145, same text and digest, ancestry decision titles match); rationale states the ambiguity and that no unique member or identity graft is chosen; group target digest f201a195 equals sha256 of the shown successors array (JSON.stringify indent 2), the same group in all 16 rows, shard registryGaps row equals pack, row is a real registry identity gap",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "reviewMode": "ordinary",
+        "reviewEntryId": "gap-claim_cad110bd532badff055f69c0a236644a",
+        "evidenceDigest": "16205182945f7492df0d56c48506c4403d6a065bfe6c707c18981e0d626eb7ab",
+        "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
       },
       "priorDecision": {
         "claimId": "claim_cad110bd532badff055f69c0a236644a",
@@ -6825,7 +7142,20 @@
         ],
         "identityLimit": "Old IDs cannot be split by enclosing-decision identity; all eight current copies conserve the identical text verbatim. Group binding, not a chosen individual successor."
       },
-      "leadDecision": "A42 L9-15"
+      "leadDecision": "A42 L9-15",
+      "reviewAcceptance": {
+        "entryId": "gap-claim_cad110bd532badff055f69c0a236644a",
+        "channel": "gap-disposition",
+        "verdict": "ok",
+        "reviewNote": "entry gap-claim_cad110bd532badff055f69c0a236644a: deep: L9-15 old ID of the repeated decision footer (old anchor unheaded-block-242, registry gap says 8 possible old units with one fingerprint); byte witness 24b8785d unit block-150 recomputed equals digest 95a357e2; legal under A34 because the footer sentence is carried verbatim in all 8 members, checked in docs/specs/runner.md at b80e8c16c (units 150,155,167,176,241,250,274,286, each text and digest equal, decisions 0005,0008,0020,0021,0028,0029,0031,0032) and in the 8 candidate counterparts in decisions/h-36d872fbb0e5.md (units 9,14,26,35,100,109,133,145, same text and digest, ancestry decision titles match); rationale states the ambiguity and that no unique member or identity graft is chosen; group target digest f201a195 equals sha256 of the shown successors array (JSON.stringify indent 2), the same group in all 16 rows, shard registryGaps row equals pack, row is a real registry identity gap",
+        "sourceDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetDigest": "f201a1958cd31ee30550b5d2d69dd9c88d09ce60db21025c7fda099d5fdbdb43",
+        "evidenceDigest": "16205182945f7492df0d56c48506c4403d6a065bfe6c707c18981e0d626eb7ab",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "bindingMatchedAtApplication": true
+      }
     },
     {
       "predecessor": {
@@ -6960,7 +7290,7 @@
         "sourcePath": "docs/specs/runner.md",
         "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
         "authoredBy": "codex-session:unit-run-1792067456433-d25e183b@2026-10-15",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "disposition": "supersede",
         "rationale": "A42 Lead L9-15: this predecessor is an old ID of the repeated decision footer “Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.” The complete text is conserved verbatim eight times, each within its own decision, in the listed contextual identical-unit successor group. Identity ambiguity is accepted because the text is conserved and cannot be split by identity. Supersede to all eight listed member units as a group; no unique member attribution or identity graft. Pending independent bounded review; no truth approval or inherited verdict.",
         "targetOwner": "docs/specs/runner.md",
@@ -7163,7 +7493,16 @@
             }
           ],
           "identityLimit": "Old IDs cannot be split by enclosing-decision identity; all eight current copies conserve the identical text verbatim. Group binding, not a chosen individual successor."
-        }
+        },
+        "reviewNote": "entry gap-claim_d3cb0eccd8b39c08a3ec7af9b4b14d18: deep: L9-15 old ID of the repeated decision footer (old anchor unheaded-block-248, registry gap says 8 possible old units with one fingerprint); byte witness 24b8785d unit block-150 recomputed equals digest 95a357e2; legal under A34 because the footer sentence is carried verbatim in all 8 members, checked in docs/specs/runner.md at b80e8c16c (units 150,155,167,176,241,250,274,286, each text and digest equal, decisions 0005,0008,0020,0021,0028,0029,0031,0032) and in the 8 candidate counterparts in decisions/h-36d872fbb0e5.md (units 9,14,26,35,100,109,133,145, same text and digest, ancestry decision titles match); rationale states the ambiguity and that no unique member or identity graft is chosen; group target digest f201a195 equals sha256 of the shown successors array (JSON.stringify indent 2), the same group in all 16 rows, shard registryGaps row equals pack, row is a real registry identity gap",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "reviewMode": "ordinary",
+        "reviewEntryId": "gap-claim_d3cb0eccd8b39c08a3ec7af9b4b14d18",
+        "evidenceDigest": "fdfcd8b0b28014a97c27e2d0a411b14ac2bff5018b0f0aaeb861d0e3baaca9ec",
+        "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
       },
       "priorDecision": {
         "claimId": "claim_d3cb0eccd8b39c08a3ec7af9b4b14d18",
@@ -7374,7 +7713,20 @@
         ],
         "identityLimit": "Old IDs cannot be split by enclosing-decision identity; all eight current copies conserve the identical text verbatim. Group binding, not a chosen individual successor."
       },
-      "leadDecision": "A42 L9-15"
+      "leadDecision": "A42 L9-15",
+      "reviewAcceptance": {
+        "entryId": "gap-claim_d3cb0eccd8b39c08a3ec7af9b4b14d18",
+        "channel": "gap-disposition",
+        "verdict": "ok",
+        "reviewNote": "entry gap-claim_d3cb0eccd8b39c08a3ec7af9b4b14d18: deep: L9-15 old ID of the repeated decision footer (old anchor unheaded-block-248, registry gap says 8 possible old units with one fingerprint); byte witness 24b8785d unit block-150 recomputed equals digest 95a357e2; legal under A34 because the footer sentence is carried verbatim in all 8 members, checked in docs/specs/runner.md at b80e8c16c (units 150,155,167,176,241,250,274,286, each text and digest equal, decisions 0005,0008,0020,0021,0028,0029,0031,0032) and in the 8 candidate counterparts in decisions/h-36d872fbb0e5.md (units 9,14,26,35,100,109,133,145, same text and digest, ancestry decision titles match); rationale states the ambiguity and that no unique member or identity graft is chosen; group target digest f201a195 equals sha256 of the shown successors array (JSON.stringify indent 2), the same group in all 16 rows, shard registryGaps row equals pack, row is a real registry identity gap",
+        "sourceDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetDigest": "f201a1958cd31ee30550b5d2d69dd9c88d09ce60db21025c7fda099d5fdbdb43",
+        "evidenceDigest": "fdfcd8b0b28014a97c27e2d0a411b14ac2bff5018b0f0aaeb861d0e3baaca9ec",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "bindingMatchedAtApplication": true
+      }
     },
     {
       "predecessor": {
@@ -7509,7 +7861,7 @@
         "sourcePath": "docs/specs/runner.md",
         "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
         "authoredBy": "codex-session:unit-run-1792067456433-d25e183b@2026-10-15",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "disposition": "supersede",
         "rationale": "A42 Lead L9-15: this predecessor is an old ID of the repeated decision footer “Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.” The complete text is conserved verbatim eight times, each within its own decision, in the listed contextual identical-unit successor group. Identity ambiguity is accepted because the text is conserved and cannot be split by identity. Supersede to all eight listed member units as a group; no unique member attribution or identity graft. Pending independent bounded review; no truth approval or inherited verdict.",
         "targetOwner": "docs/specs/runner.md",
@@ -7712,7 +8064,16 @@
             }
           ],
           "identityLimit": "Old IDs cannot be split by enclosing-decision identity; all eight current copies conserve the identical text verbatim. Group binding, not a chosen individual successor."
-        }
+        },
+        "reviewNote": "entry gap-claim_b2afbadf035b6374ed73289b388f5d20: deep: L9-15 old ID of the repeated decision footer (old anchor unheaded-block-260, registry gap says 8 possible old units with one fingerprint); byte witness 24b8785d unit block-150 recomputed equals digest 95a357e2; legal under A34 because the footer sentence is carried verbatim in all 8 members, checked in docs/specs/runner.md at b80e8c16c (units 150,155,167,176,241,250,274,286, each text and digest equal, decisions 0005,0008,0020,0021,0028,0029,0031,0032) and in the 8 candidate counterparts in decisions/h-36d872fbb0e5.md (units 9,14,26,35,100,109,133,145, same text and digest, ancestry decision titles match); rationale states the ambiguity and that no unique member or identity graft is chosen; group target digest f201a195 equals sha256 of the shown successors array (JSON.stringify indent 2), the same group in all 16 rows, shard registryGaps row equals pack, row is a real registry identity gap",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "reviewMode": "ordinary",
+        "reviewEntryId": "gap-claim_b2afbadf035b6374ed73289b388f5d20",
+        "evidenceDigest": "e6f202ac3cb128d98cddbaa681d55bde29edbd7ddc34b248bab6ee9e76924330",
+        "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
       },
       "priorDecision": {
         "claimId": "claim_b2afbadf035b6374ed73289b388f5d20",
@@ -7923,7 +8284,20 @@
         ],
         "identityLimit": "Old IDs cannot be split by enclosing-decision identity; all eight current copies conserve the identical text verbatim. Group binding, not a chosen individual successor."
       },
-      "leadDecision": "A42 L9-15"
+      "leadDecision": "A42 L9-15",
+      "reviewAcceptance": {
+        "entryId": "gap-claim_b2afbadf035b6374ed73289b388f5d20",
+        "channel": "gap-disposition",
+        "verdict": "ok",
+        "reviewNote": "entry gap-claim_b2afbadf035b6374ed73289b388f5d20: deep: L9-15 old ID of the repeated decision footer (old anchor unheaded-block-260, registry gap says 8 possible old units with one fingerprint); byte witness 24b8785d unit block-150 recomputed equals digest 95a357e2; legal under A34 because the footer sentence is carried verbatim in all 8 members, checked in docs/specs/runner.md at b80e8c16c (units 150,155,167,176,241,250,274,286, each text and digest equal, decisions 0005,0008,0020,0021,0028,0029,0031,0032) and in the 8 candidate counterparts in decisions/h-36d872fbb0e5.md (units 9,14,26,35,100,109,133,145, same text and digest, ancestry decision titles match); rationale states the ambiguity and that no unique member or identity graft is chosen; group target digest f201a195 equals sha256 of the shown successors array (JSON.stringify indent 2), the same group in all 16 rows, shard registryGaps row equals pack, row is a real registry identity gap",
+        "sourceDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetDigest": "f201a1958cd31ee30550b5d2d69dd9c88d09ce60db21025c7fda099d5fdbdb43",
+        "evidenceDigest": "e6f202ac3cb128d98cddbaa681d55bde29edbd7ddc34b248bab6ee9e76924330",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "bindingMatchedAtApplication": true
+      }
     },
     {
       "predecessor": {
@@ -8059,7 +8433,7 @@
         "sourcePath": "docs/specs/runner.md",
         "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
         "authoredBy": "codex-session:unit-run-1792067456433-d25e183b@2026-10-15",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "disposition": "supersede",
         "rationale": "A42 Lead L9-15: this predecessor is an old ID of the repeated decision footer “Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.” The complete text is conserved verbatim eight times, each within its own decision, in the listed contextual identical-unit successor group. Identity ambiguity is accepted because the text is conserved and cannot be split by identity. Supersede to all eight listed member units as a group; no unique member attribution or identity graft. Pending independent bounded review; no truth approval or inherited verdict.",
         "targetOwner": "docs/specs/runner.md",
@@ -8262,7 +8636,16 @@
             }
           ],
           "identityLimit": "Old IDs cannot be split by enclosing-decision identity; all eight current copies conserve the identical text verbatim. Group binding, not a chosen individual successor."
-        }
+        },
+        "reviewNote": "entry gap-claim_33c41de79cf4a52288035a9656c09735: deep: L9-15 old ID of the repeated decision footer (old anchor unheaded-block-266, registry gap says 8 possible old units with one fingerprint); byte witness 24b8785d unit block-150 recomputed equals digest 95a357e2; legal under A34 because the footer sentence is carried verbatim in all 8 members, checked in docs/specs/runner.md at b80e8c16c (units 150,155,167,176,241,250,274,286, each text and digest equal, decisions 0005,0008,0020,0021,0028,0029,0031,0032) and in the 8 candidate counterparts in decisions/h-36d872fbb0e5.md (units 9,14,26,35,100,109,133,145, same text and digest, ancestry decision titles match); rationale states the ambiguity and that no unique member or identity graft is chosen; group target digest f201a195 equals sha256 of the shown successors array (JSON.stringify indent 2), the same group in all 16 rows, shard registryGaps row equals pack, row is a real registry identity gap",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "reviewMode": "ordinary",
+        "reviewEntryId": "gap-claim_33c41de79cf4a52288035a9656c09735",
+        "evidenceDigest": "ff4c882c8a98bf3d9548555c5255e218b9ae6c4b5f6d76f418f6e33e9b52fd8c",
+        "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
       },
       "priorDecision": {
         "claimId": "claim_33c41de79cf4a52288035a9656c09735",
@@ -8473,7 +8856,20 @@
         ],
         "identityLimit": "Old IDs cannot be split by enclosing-decision identity; all eight current copies conserve the identical text verbatim. Group binding, not a chosen individual successor."
       },
-      "leadDecision": "A42 L9-15"
+      "leadDecision": "A42 L9-15",
+      "reviewAcceptance": {
+        "entryId": "gap-claim_33c41de79cf4a52288035a9656c09735",
+        "channel": "gap-disposition",
+        "verdict": "ok",
+        "reviewNote": "entry gap-claim_33c41de79cf4a52288035a9656c09735: deep: L9-15 old ID of the repeated decision footer (old anchor unheaded-block-266, registry gap says 8 possible old units with one fingerprint); byte witness 24b8785d unit block-150 recomputed equals digest 95a357e2; legal under A34 because the footer sentence is carried verbatim in all 8 members, checked in docs/specs/runner.md at b80e8c16c (units 150,155,167,176,241,250,274,286, each text and digest equal, decisions 0005,0008,0020,0021,0028,0029,0031,0032) and in the 8 candidate counterparts in decisions/h-36d872fbb0e5.md (units 9,14,26,35,100,109,133,145, same text and digest, ancestry decision titles match); rationale states the ambiguity and that no unique member or identity graft is chosen; group target digest f201a195 equals sha256 of the shown successors array (JSON.stringify indent 2), the same group in all 16 rows, shard registryGaps row equals pack, row is a real registry identity gap",
+        "sourceDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetDigest": "f201a1958cd31ee30550b5d2d69dd9c88d09ce60db21025c7fda099d5fdbdb43",
+        "evidenceDigest": "ff4c882c8a98bf3d9548555c5255e218b9ae6c4b5f6d76f418f6e33e9b52fd8c",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "bindingMatchedAtApplication": true
+      }
     },
     {
       "predecessor": {
@@ -8609,7 +9005,7 @@
         "sourcePath": "docs/specs/runner.md",
         "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
         "authoredBy": "codex-session:unit-run-1792067456433-d25e183b@2026-10-15",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "disposition": "supersede",
         "rationale": "A42 Lead L9-15: this predecessor is an old ID of the repeated decision footer “Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.” The complete text is conserved verbatim eight times, each within its own decision, in the listed contextual identical-unit successor group. Identity ambiguity is accepted because the text is conserved and cannot be split by identity. Supersede to all eight listed member units as a group; no unique member attribution or identity graft. Pending independent bounded review; no truth approval or inherited verdict.",
         "targetOwner": "docs/specs/runner.md",
@@ -8812,7 +9208,16 @@
             }
           ],
           "identityLimit": "Old IDs cannot be split by enclosing-decision identity; all eight current copies conserve the identical text verbatim. Group binding, not a chosen individual successor."
-        }
+        },
+        "reviewNote": "entry gap-claim_fa95d7f496a850ef197d25f18ad6f760: deep: L9-15 old ID of the repeated decision footer (old anchor unheaded-block-278, registry gap says 8 possible old units with one fingerprint); byte witness 24b8785d unit block-150 recomputed equals digest 95a357e2; legal under A34 because the footer sentence is carried verbatim in all 8 members, checked in docs/specs/runner.md at b80e8c16c (units 150,155,167,176,241,250,274,286, each text and digest equal, decisions 0005,0008,0020,0021,0028,0029,0031,0032) and in the 8 candidate counterparts in decisions/h-36d872fbb0e5.md (units 9,14,26,35,100,109,133,145, same text and digest, ancestry decision titles match); rationale states the ambiguity and that no unique member or identity graft is chosen; group target digest f201a195 equals sha256 of the shown successors array (JSON.stringify indent 2), the same group in all 16 rows, shard registryGaps row equals pack, row is a real registry identity gap",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "reviewMode": "ordinary",
+        "reviewEntryId": "gap-claim_fa95d7f496a850ef197d25f18ad6f760",
+        "evidenceDigest": "fe0b38b2b00d39e6899398962adef59084343f91e08ca051bf325834f8c6495a",
+        "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
       },
       "priorDecision": {
         "claimId": "claim_fa95d7f496a850ef197d25f18ad6f760",
@@ -9023,7 +9428,20 @@
         ],
         "identityLimit": "Old IDs cannot be split by enclosing-decision identity; all eight current copies conserve the identical text verbatim. Group binding, not a chosen individual successor."
       },
-      "leadDecision": "A42 L9-15"
+      "leadDecision": "A42 L9-15",
+      "reviewAcceptance": {
+        "entryId": "gap-claim_fa95d7f496a850ef197d25f18ad6f760",
+        "channel": "gap-disposition",
+        "verdict": "ok",
+        "reviewNote": "entry gap-claim_fa95d7f496a850ef197d25f18ad6f760: deep: L9-15 old ID of the repeated decision footer (old anchor unheaded-block-278, registry gap says 8 possible old units with one fingerprint); byte witness 24b8785d unit block-150 recomputed equals digest 95a357e2; legal under A34 because the footer sentence is carried verbatim in all 8 members, checked in docs/specs/runner.md at b80e8c16c (units 150,155,167,176,241,250,274,286, each text and digest equal, decisions 0005,0008,0020,0021,0028,0029,0031,0032) and in the 8 candidate counterparts in decisions/h-36d872fbb0e5.md (units 9,14,26,35,100,109,133,145, same text and digest, ancestry decision titles match); rationale states the ambiguity and that no unique member or identity graft is chosen; group target digest f201a195 equals sha256 of the shown successors array (JSON.stringify indent 2), the same group in all 16 rows, shard registryGaps row equals pack, row is a real registry identity gap",
+        "sourceDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "targetDigest": "f201a1958cd31ee30550b5d2d69dd9c88d09ce60db21025c7fda099d5fdbdb43",
+        "evidenceDigest": "fe0b38b2b00d39e6899398962adef59084343f91e08ca051bf325834f8c6495a",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "bindingMatchedAtApplication": true
+      }
     },
     {
       "predecessor": {
@@ -9090,7 +9508,7 @@
         "sourcePath": "docs/specs/runner.md",
         "sourceUnitDigest": "5a99ae10ac39e5bf6d8b29289aaba42958a45534c58e9e2dfa85fbb744472f14",
         "authoredBy": "codex-session:unit-run-1792066534402-cb278bf5@2026-10-15",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "disposition": "partial-carry",
         "targetOwner": "docs/specs/runner.md",
         "targetAnchor": "unheaded-block-314",
@@ -9101,7 +9519,29 @@
           "0047 — P1 Lõi thực thi: Unit, một bind(), một cửa chạy fgos run, 3 Pattern cộng tác, đóng 4 mối authority L5 [§1 ĐÃ BỊ THAY MỘT PHẦN bởi 0061]"
         ],
         "rationale": "A34 pending predecessor disposition: Item 6 no longer says executors.*.for and PolicyPatch prefer* were wholly removed; retain that original obligation as historical residual. Bound immutable witness and full current successor in step9-a42-predecessor-dispositions.json. No identity graft, truth approval or inherited review; revalidate/rebind at legacy cutover.",
-        "remainder": "Only historical lines changed/removed from the successor, verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; file SHA256 4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f, row residual SHA256 bc156e257f11baa165661a9485843d88034862465f95da930b0b9d719cd02fbd; source 5a99ae10ac39e5bf6d8b29289aaba42958a45534c58e9e2dfa85fbb744472f14, primary target 7518a36eebda7c6697541c1dbcfba86b9d00018685cd6f34a0abf6d6a3c8bc27. Independent A34 acceptance pending; blocks cutover."
+        "remainder": "Only historical lines changed/removed from the successor, verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; file SHA256 4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f, row residual SHA256 bc156e257f11baa165661a9485843d88034862465f95da930b0b9d719cd02fbd; source 5a99ae10ac39e5bf6d8b29289aaba42958a45534c58e9e2dfa85fbb744472f14, primary target 7518a36eebda7c6697541c1dbcfba86b9d00018685cd6f34a0abf6d6a3c8bc27. Independent A34 acceptance pending; blocks cutover.",
+        "reviewNote": "entry gap-claim_77a827ba40c328bd2c4d6a8ec713df65: deep A34: witness 454d7a8df unit unheaded-block-307 (L3050-3059, digest recomputed) to current runner.md#unheaded-block-314 (L3103-3112); 10 historical lines, exactly 1 not verbatim in the successor (item 6 no longer says executors.*.for and PolicyPatch prefer* were wholly removed); residual file step9-a42-predecessor-residuals.json row equals that one line verbatim (recomputed), row SHA256 bc156e25 and file SHA256 4be07f52 recomputed, bound to source and primary-target digests, successor anchor exists, shard row equals pack",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "reviewMode": "ordinary",
+        "reviewEntryId": "gap-claim_77a827ba40c328bd2c4d6a8ec713df65",
+        "evidenceDigest": "87053869adfa8d3c9e8d224a452c19932145c7e392fdb14b1c0b1e04b69db483",
+        "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
+      },
+      "reviewAcceptance": {
+        "entryId": "gap-claim_77a827ba40c328bd2c4d6a8ec713df65",
+        "channel": "gap-disposition",
+        "verdict": "ok",
+        "reviewNote": "entry gap-claim_77a827ba40c328bd2c4d6a8ec713df65: deep A34: witness 454d7a8df unit unheaded-block-307 (L3050-3059, digest recomputed) to current runner.md#unheaded-block-314 (L3103-3112); 10 historical lines, exactly 1 not verbatim in the successor (item 6 no longer says executors.*.for and PolicyPatch prefer* were wholly removed); residual file step9-a42-predecessor-residuals.json row equals that one line verbatim (recomputed), row SHA256 bc156e25 and file SHA256 4be07f52 recomputed, bound to source and primary-target digests, successor anchor exists, shard row equals pack",
+        "sourceDigest": "5a99ae10ac39e5bf6d8b29289aaba42958a45534c58e9e2dfa85fbb744472f14",
+        "targetDigest": "7518a36eebda7c6697541c1dbcfba86b9d00018685cd6f34a0abf6d6a3c8bc27",
+        "evidenceDigest": "87053869adfa8d3c9e8d224a452c19932145c7e392fdb14b1c0b1e04b69db483",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "bindingMatchedAtApplication": true
       }
     },
     {
@@ -9169,7 +9609,7 @@
         "sourcePath": "docs/specs/runner.md",
         "sourceUnitDigest": "24e736b37697fbd3c3ce53ed568dfa89aa2bff023c3e3deb0ed686b364f327e6",
         "authoredBy": "codex-session:unit-run-1792066534402-cb278bf5@2026-10-15",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "disposition": "partial-carry",
         "targetOwner": "docs/specs/runner.md",
         "targetAnchor": "unheaded-block-315",
@@ -9180,7 +9620,29 @@
           "0048 — P2 Plan chạy được: Unit cho mọi đường vào, driver mỏng fgos-run, bỏ DemandFacts/matcher"
         ],
         "rationale": "A34 pending predecessor disposition: The human gate item was extended/reworded; retain its original precise gate and blocked-question obligation. Bound immutable witness and full current successor in step9-a42-predecessor-dispositions.json. No identity graft, truth approval or inherited review; revalidate/rebind at legacy cutover.",
-        "remainder": "Only historical lines changed/removed from the successor, verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; file SHA256 4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f, row residual SHA256 8bc3606b98c62ce25e24758e61ab2ce29d0b1cae7946de31ef9910caf3b93046; source 24e736b37697fbd3c3ce53ed568dfa89aa2bff023c3e3deb0ed686b364f327e6, primary target 715faf8184937613283eecfb3043d6da73c2aec15278e160e579e5d655f940a9. Independent A34 acceptance pending; blocks cutover."
+        "remainder": "Only historical lines changed/removed from the successor, verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; file SHA256 4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f, row residual SHA256 8bc3606b98c62ce25e24758e61ab2ce29d0b1cae7946de31ef9910caf3b93046; source 24e736b37697fbd3c3ce53ed568dfa89aa2bff023c3e3deb0ed686b364f327e6, primary target 715faf8184937613283eecfb3043d6da73c2aec15278e160e579e5d655f940a9. Independent A34 acceptance pending; blocks cutover.",
+        "reviewNote": "entry gap-claim_3dcf1baab2b0ac4b7ab7f84e30b8ab41: deep A34: witness 923876973 unit unheaded-block-308 (L3063-3070, digest recomputed) to current runner.md#unheaded-block-315 (L3116-3123); 8 historical lines, exactly 1 not verbatim in the successor (the old human-gate item is a verbatim prefix of the successor line, which only appends the consent-gate sentences); residual file step9-a42-predecessor-residuals.json row equals that one line verbatim (recomputed), row SHA256 8bc3606b and file SHA256 4be07f52 recomputed, bound to source and primary-target digests, successor anchor exists, shard row equals pack; stricter than L9-13 needs (the old words survive in order, only insertions) so a supersede would also have been lawful, the verbatim residual loses nothing",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "reviewMode": "ordinary",
+        "reviewEntryId": "gap-claim_3dcf1baab2b0ac4b7ab7f84e30b8ab41",
+        "evidenceDigest": "470725c5e5234de334a368c67bdb0b1fd929153c686ef4a0c1d0785e8debda84",
+        "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
+      },
+      "reviewAcceptance": {
+        "entryId": "gap-claim_3dcf1baab2b0ac4b7ab7f84e30b8ab41",
+        "channel": "gap-disposition",
+        "verdict": "ok",
+        "reviewNote": "entry gap-claim_3dcf1baab2b0ac4b7ab7f84e30b8ab41: deep A34: witness 923876973 unit unheaded-block-308 (L3063-3070, digest recomputed) to current runner.md#unheaded-block-315 (L3116-3123); 8 historical lines, exactly 1 not verbatim in the successor (the old human-gate item is a verbatim prefix of the successor line, which only appends the consent-gate sentences); residual file step9-a42-predecessor-residuals.json row equals that one line verbatim (recomputed), row SHA256 8bc3606b and file SHA256 4be07f52 recomputed, bound to source and primary-target digests, successor anchor exists, shard row equals pack; stricter than L9-13 needs (the old words survive in order, only insertions) so a supersede would also have been lawful, the verbatim residual loses nothing",
+        "sourceDigest": "24e736b37697fbd3c3ce53ed568dfa89aa2bff023c3e3deb0ed686b364f327e6",
+        "targetDigest": "715faf8184937613283eecfb3043d6da73c2aec15278e160e579e5d655f940a9",
+        "evidenceDigest": "470725c5e5234de334a368c67bdb0b1fd929153c686ef4a0c1d0785e8debda84",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "bindingMatchedAtApplication": true
       }
     },
     {
@@ -9248,7 +9710,7 @@
         "sourcePath": "docs/specs/runner.md",
         "sourceUnitDigest": "dea0728314fa0ae7aa5070aa2d76aa20e1788d2e18d9fcbbe80f5dae4be9ccd8",
         "authoredBy": "codex-session:unit-run-1792066534402-cb278bf5@2026-10-15",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "disposition": "partial-carry",
         "targetOwner": "docs/specs/runner.md",
         "targetAnchor": "unheaded-block-320",
@@ -9259,7 +9721,29 @@
           "0053 — Một cơ chế truyền kết quả: đường dẫn report trong contextRefs, phân giải một lần"
         ],
         "rationale": "A34 pending predecessor disposition: Workflow unit.complete result provenance wording changed; retain the former item 3 verbatim. Bound immutable witness and full current successor in step9-a42-predecessor-dispositions.json. No identity graft, truth approval or inherited review; revalidate/rebind at legacy cutover.",
-        "remainder": "Only historical lines changed/removed from the successor, verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; file SHA256 4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f, row residual SHA256 cb83b5bf2a58b18bafc0400f3f78322b8b96752a248e369e78da5e9c05fc0afd; source dea0728314fa0ae7aa5070aa2d76aa20e1788d2e18d9fcbbe80f5dae4be9ccd8, primary target 6adc7286a12983c2a05c64d6dce33d420d981369a2a0f7c019aa91445e84285f. Independent A34 acceptance pending; blocks cutover."
+        "remainder": "Only historical lines changed/removed from the successor, verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; file SHA256 4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f, row residual SHA256 cb83b5bf2a58b18bafc0400f3f78322b8b96752a248e369e78da5e9c05fc0afd; source dea0728314fa0ae7aa5070aa2d76aa20e1788d2e18d9fcbbe80f5dae4be9ccd8, primary target 6adc7286a12983c2a05c64d6dce33d420d981369a2a0f7c019aa91445e84285f. Independent A34 acceptance pending; blocks cutover.",
+        "reviewNote": "entry gap-claim_93d5f2d34cf452029462ea39674fd255: deep A34: witness 89304dbae unit unheaded-block-313 (L3129-3137, digest recomputed) to current runner.md#unheaded-block-320 (L3183-3191); 9 historical lines, exactly 1 not verbatim in the successor (item 3 keeps its old words in order but gains the unit.started provenance and resume wording); residual file step9-a42-predecessor-residuals.json row equals that one line verbatim (recomputed), row SHA256 cb83b5bf and file SHA256 4be07f52 recomputed, bound to source and primary-target digests, successor anchor exists, shard row equals pack; stricter than L9-13 needs (the old words survive in order, only insertions) so a supersede would also have been lawful, the verbatim residual loses nothing",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "reviewMode": "ordinary",
+        "reviewEntryId": "gap-claim_93d5f2d34cf452029462ea39674fd255",
+        "evidenceDigest": "758f2b0aa969ee86ebb3dba6e64eebf910a9dceafc6bbe4cb7e9c59b359c5415",
+        "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
+      },
+      "reviewAcceptance": {
+        "entryId": "gap-claim_93d5f2d34cf452029462ea39674fd255",
+        "channel": "gap-disposition",
+        "verdict": "ok",
+        "reviewNote": "entry gap-claim_93d5f2d34cf452029462ea39674fd255: deep A34: witness 89304dbae unit unheaded-block-313 (L3129-3137, digest recomputed) to current runner.md#unheaded-block-320 (L3183-3191); 9 historical lines, exactly 1 not verbatim in the successor (item 3 keeps its old words in order but gains the unit.started provenance and resume wording); residual file step9-a42-predecessor-residuals.json row equals that one line verbatim (recomputed), row SHA256 cb83b5bf and file SHA256 4be07f52 recomputed, bound to source and primary-target digests, successor anchor exists, shard row equals pack; stricter than L9-13 needs (the old words survive in order, only insertions) so a supersede would also have been lawful, the verbatim residual loses nothing",
+        "sourceDigest": "dea0728314fa0ae7aa5070aa2d76aa20e1788d2e18d9fcbbe80f5dae4be9ccd8",
+        "targetDigest": "6adc7286a12983c2a05c64d6dce33d420d981369a2a0f7c019aa91445e84285f",
+        "evidenceDigest": "758f2b0aa969ee86ebb3dba6e64eebf910a9dceafc6bbe4cb7e9c59b359c5415",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "bindingMatchedAtApplication": true
       }
     },
     {
@@ -9325,7 +9809,7 @@
         "sourcePath": "docs/specs/runner.md",
         "sourceUnitDigest": "1fd1ba41ab74a3e7207569fd1756de81dbbddbc579bb8b3fffac943d1d7fd4cf",
         "authoredBy": "codex-session:unit-run-1792066534402-cb278bf5@2026-10-15",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "disposition": "supersede",
         "targetOwner": "docs/specs/runner.md",
         "targetAnchor": "unheaded-block-317",
@@ -9335,7 +9819,29 @@
           "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
           "0050 — P6 Nối thật: herdr là transport mặc định, posture một đường, fallback quota qua pane mới"
         ],
-        "rationale": "A34 pending predecessor disposition: All 18 historical lines remain in order; current decision has additive implementation/history evidence. Bound immutable witness and full current successor in step9-a42-predecessor-dispositions.json. No identity graft, truth approval or inherited review; revalidate/rebind at legacy cutover."
+        "rationale": "A34 pending predecessor disposition: All 18 historical lines remain in order; current decision has additive implementation/history evidence. Bound immutable witness and full current successor in step9-a42-predecessor-dispositions.json. No identity graft, truth approval or inherited review; revalidate/rebind at legacy cutover.",
+        "reviewNote": "entry gap-claim_8f8191c13e179af31ad39593af9fe716: deep: witness 444c03a59 unit unheaded-block-317 (L3130-3147, digest recomputed) to current runner.md#unheaded-block-317 (L3138-3156, digest recomputed); all 18 historical lines recur verbatim and in order in the 19 successor lines, so supersede is legal under A34 and no residual is needed; the 1 inserted successor line is the herdr prompt-delivery evidence bullet of decision 0050; reason text is accurate, shard row equals pack, successor anchor exists",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "reviewMode": "ordinary",
+        "reviewEntryId": "gap-claim_8f8191c13e179af31ad39593af9fe716",
+        "evidenceDigest": "b8c9cdaae715502a4f7d0e90182f70ea3baa0bbd187aee78f9655759f7726571",
+        "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
+      },
+      "reviewAcceptance": {
+        "entryId": "gap-claim_8f8191c13e179af31ad39593af9fe716",
+        "channel": "gap-disposition",
+        "verdict": "ok",
+        "reviewNote": "entry gap-claim_8f8191c13e179af31ad39593af9fe716: deep: witness 444c03a59 unit unheaded-block-317 (L3130-3147, digest recomputed) to current runner.md#unheaded-block-317 (L3138-3156, digest recomputed); all 18 historical lines recur verbatim and in order in the 19 successor lines, so supersede is legal under A34 and no residual is needed; the 1 inserted successor line is the herdr prompt-delivery evidence bullet of decision 0050; reason text is accurate, shard row equals pack, successor anchor exists",
+        "sourceDigest": "1fd1ba41ab74a3e7207569fd1756de81dbbddbc579bb8b3fffac943d1d7fd4cf",
+        "targetDigest": "187780a987ac947043008e2cd2c7b5035b28dee6258ee03e9275cb2483f18ce3",
+        "evidenceDigest": "b8c9cdaae715502a4f7d0e90182f70ea3baa0bbd187aee78f9655759f7726571",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "bindingMatchedAtApplication": true
       }
     },
     {
@@ -9401,7 +9907,7 @@
         "sourcePath": "docs/specs/runner.md",
         "sourceUnitDigest": "f57b559b1939a5bead253cd2aaefc94ef14af54a42a8c15d7fbc3bf293ae4757",
         "authoredBy": "codex-session:unit-run-1792066534402-cb278bf5@2026-10-15",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "disposition": "partial-carry",
         "targetOwner": "docs/specs/runner.md",
         "targetAnchor": "unheaded-block-71",
@@ -9411,7 +9917,29 @@
           "Business Rules"
         ],
         "rationale": "A34 pending predecessor disposition: Provider fault classification/quarantine paragraph changed; retain the original precise classifier and quarantine clause. Bound immutable witness and full current successor in step9-a42-predecessor-dispositions.json. No identity graft, truth approval or inherited review; revalidate/rebind at legacy cutover.",
-        "remainder": "Only historical lines changed/removed from the successor, verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; file SHA256 4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f, row residual SHA256 f57b559b1939a5bead253cd2aaefc94ef14af54a42a8c15d7fbc3bf293ae4757; source f57b559b1939a5bead253cd2aaefc94ef14af54a42a8c15d7fbc3bf293ae4757, primary target 93eab619825cf7b3dc5c716075a75cd59df757298fe89f16b42990d4155e4167. Independent A34 acceptance pending; blocks cutover."
+        "remainder": "Only historical lines changed/removed from the successor, verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; file SHA256 4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f, row residual SHA256 f57b559b1939a5bead253cd2aaefc94ef14af54a42a8c15d7fbc3bf293ae4757; source f57b559b1939a5bead253cd2aaefc94ef14af54a42a8c15d7fbc3bf293ae4757, primary target 93eab619825cf7b3dc5c716075a75cd59df757298fe89f16b42990d4155e4167. Independent A34 acceptance pending; blocks cutover.",
+        "reviewNote": "entry gap-claim_74a47937380f03ed75fa755f0faccffb: deep A34: witness ce880fbed unit unheaded-block-69 (L1024-1024, digest recomputed) to current runner.md#unheaded-block-71 (L1028-1028); 1 historical lines, exactly 1 not verbatim in the successor (the old fault-classifier paragraph is a verbatim prefix of the successor, which appends the manual quarantine command); residual file step9-a42-predecessor-residuals.json row equals that one line verbatim (recomputed), row SHA256 f57b559b and file SHA256 4be07f52 recomputed, bound to source and primary-target digests, successor anchor exists, shard row equals pack; stricter than L9-13 needs (the old words survive in order, only insertions) so a supersede would also have been lawful, the verbatim residual loses nothing",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "reviewMode": "ordinary",
+        "reviewEntryId": "gap-claim_74a47937380f03ed75fa755f0faccffb",
+        "evidenceDigest": "5358b66f1ba23d720972c98c92342bb8f463fe9bce0c3238000fed0101fbac4d",
+        "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
+      },
+      "reviewAcceptance": {
+        "entryId": "gap-claim_74a47937380f03ed75fa755f0faccffb",
+        "channel": "gap-disposition",
+        "verdict": "ok",
+        "reviewNote": "entry gap-claim_74a47937380f03ed75fa755f0faccffb: deep A34: witness ce880fbed unit unheaded-block-69 (L1024-1024, digest recomputed) to current runner.md#unheaded-block-71 (L1028-1028); 1 historical lines, exactly 1 not verbatim in the successor (the old fault-classifier paragraph is a verbatim prefix of the successor, which appends the manual quarantine command); residual file step9-a42-predecessor-residuals.json row equals that one line verbatim (recomputed), row SHA256 f57b559b and file SHA256 4be07f52 recomputed, bound to source and primary-target digests, successor anchor exists, shard row equals pack; stricter than L9-13 needs (the old words survive in order, only insertions) so a supersede would also have been lawful, the verbatim residual loses nothing",
+        "sourceDigest": "f57b559b1939a5bead253cd2aaefc94ef14af54a42a8c15d7fbc3bf293ae4757",
+        "targetDigest": "93eab619825cf7b3dc5c716075a75cd59df757298fe89f16b42990d4155e4167",
+        "evidenceDigest": "5358b66f1ba23d720972c98c92342bb8f463fe9bce0c3238000fed0101fbac4d",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "bindingMatchedAtApplication": true
       }
     },
     {
@@ -9477,7 +10005,7 @@
         "sourcePath": "docs/specs/runner.md",
         "sourceUnitDigest": "f14dad0a401a272c3f3606f6c1e458003aacc9b553636202bf42ec9fad29a3f0",
         "authoredBy": "codex-session:unit-run-1792066534402-cb278bf5@2026-10-15",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "disposition": "partial-carry",
         "targetOwner": "docs/specs/runner.md",
         "targetAnchor": "unheaded-block-9",
@@ -9487,7 +10015,29 @@
           "Data Dictionary"
         ],
         "rationale": "A34 pending predecessor disposition: Data Dictionary config row now extends run timeout contract; the exact former default/maximum wording is retained in residual. Bound immutable witness and full current successor in step9-a42-predecessor-dispositions.json. No identity graft, truth approval or inherited review; revalidate/rebind at legacy cutover.",
-        "remainder": "Only historical lines changed/removed from the successor, verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; file SHA256 4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f, row residual SHA256 47a5cc727c912f76812cf4bffdbd6317c5283da0811822b14c5557f6f459dd7e; source f14dad0a401a272c3f3606f6c1e458003aacc9b553636202bf42ec9fad29a3f0, primary target 43f03eb4dffdeff420f464531d60be7e37e13192429963b10ba302be1e9b777e. Independent A34 acceptance pending; blocks cutover."
+        "remainder": "Only historical lines changed/removed from the successor, verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; file SHA256 4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f, row residual SHA256 47a5cc727c912f76812cf4bffdbd6317c5283da0811822b14c5557f6f459dd7e; source f14dad0a401a272c3f3606f6c1e458003aacc9b553636202bf42ec9fad29a3f0, primary target 43f03eb4dffdeff420f464531d60be7e37e13192429963b10ba302be1e9b777e. Independent A34 acceptance pending; blocks cutover.",
+        "reviewNote": "entry gap-claim_20a5804444535524364c0049e5bc87dd: deep A34: witness 8b4be4fcf unit unheaded-block-9 (L73-87, digest recomputed) to current runner.md#unheaded-block-9 (L73-87); 15 historical lines, exactly 1 not verbatim in the successor (the config table row gains the 4h maximum and RUL96 per-run timeout wording in place of the plain worker timeout); residual file step9-a42-predecessor-residuals.json row equals that one line verbatim (recomputed), row SHA256 47a5cc72 and file SHA256 4be07f52 recomputed, bound to source and primary-target digests, successor anchor exists, shard row equals pack",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "reviewMode": "ordinary",
+        "reviewEntryId": "gap-claim_20a5804444535524364c0049e5bc87dd",
+        "evidenceDigest": "a8e6658e8d9644c6e1d6913a43bfbd9a7025bfd7faea8b3a986580a2cf4e5ebf",
+        "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
+      },
+      "reviewAcceptance": {
+        "entryId": "gap-claim_20a5804444535524364c0049e5bc87dd",
+        "channel": "gap-disposition",
+        "verdict": "ok",
+        "reviewNote": "entry gap-claim_20a5804444535524364c0049e5bc87dd: deep A34: witness 8b4be4fcf unit unheaded-block-9 (L73-87, digest recomputed) to current runner.md#unheaded-block-9 (L73-87); 15 historical lines, exactly 1 not verbatim in the successor (the config table row gains the 4h maximum and RUL96 per-run timeout wording in place of the plain worker timeout); residual file step9-a42-predecessor-residuals.json row equals that one line verbatim (recomputed), row SHA256 47a5cc72 and file SHA256 4be07f52 recomputed, bound to source and primary-target digests, successor anchor exists, shard row equals pack",
+        "sourceDigest": "f14dad0a401a272c3f3606f6c1e458003aacc9b553636202bf42ec9fad29a3f0",
+        "targetDigest": "43f03eb4dffdeff420f464531d60be7e37e13192429963b10ba302be1e9b777e",
+        "evidenceDigest": "a8e6658e8d9644c6e1d6913a43bfbd9a7025bfd7faea8b3a986580a2cf4e5ebf",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "bindingMatchedAtApplication": true
       }
     },
     {
@@ -9553,7 +10103,7 @@
         "sourcePath": "docs/specs/runner.md",
         "sourceUnitDigest": "f503ccc86158d7a9b67881c8983a4acb08172087f1d5f736628e21ef3832a0b2",
         "authoredBy": "codex-session:unit-run-1792066534402-cb278bf5@2026-10-15",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "disposition": "partial-carry",
         "targetOwner": "docs/specs/runner.md",
         "targetAnchor": "unheaded-block-90",
@@ -9563,7 +10113,29 @@
           "Business Rules"
         ],
         "rationale": "A34 pending predecessor disposition: RUL73 item 2 changed Work-aware helper locations/inputs under RUL95; retain the old obligation exactly. Bound immutable witness and full current successor in step9-a42-predecessor-dispositions.json. No identity graft, truth approval or inherited review; revalidate/rebind at legacy cutover.",
-        "remainder": "Only historical lines changed/removed from the successor, verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; file SHA256 4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f, row residual SHA256 6516be6ac5cb103b5616f5df325fc593a00c484c50c6f44a6c490fd0ecc2c3fa; source f503ccc86158d7a9b67881c8983a4acb08172087f1d5f736628e21ef3832a0b2, primary target 8b0b585d72e6e964b858670c69a32f7c2983b02b8fd11c3fbceda65fc93daee0. Independent A34 acceptance pending; blocks cutover."
+        "remainder": "Only historical lines changed/removed from the successor, verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; file SHA256 4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f, row residual SHA256 6516be6ac5cb103b5616f5df325fc593a00c484c50c6f44a6c490fd0ecc2c3fa; source f503ccc86158d7a9b67881c8983a4acb08172087f1d5f736628e21ef3832a0b2, primary target 8b0b585d72e6e964b858670c69a32f7c2983b02b8fd11c3fbceda65fc93daee0. Independent A34 acceptance pending; blocks cutover.",
+        "reviewNote": "entry gap-claim_072766aafbaf01714df1aa65347a1d24: deep A34: witness febafe586 unit unheaded-block-90 (L1081-1085, digest recomputed) to current runner.md#unheaded-block-90 (L1081-1085); 5 historical lines, exactly 1 not verbatim in the successor (RUL73 item 2 keeps its old words in order behind an inserted bracketed RUL95 replacement note); residual file step9-a42-predecessor-residuals.json row equals that one line verbatim (recomputed), row SHA256 6516be6a and file SHA256 4be07f52 recomputed, bound to source and primary-target digests, successor anchor exists, shard row equals pack; stricter than L9-13 needs (the old words survive in order, only insertions) so a supersede would also have been lawful, the verbatim residual loses nothing",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "reviewMode": "ordinary",
+        "reviewEntryId": "gap-claim_072766aafbaf01714df1aa65347a1d24",
+        "evidenceDigest": "e3d0bfbca6a6423d947fb235a6b54b497187201a210fa33565aa5f02e02da708",
+        "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
+      },
+      "reviewAcceptance": {
+        "entryId": "gap-claim_072766aafbaf01714df1aa65347a1d24",
+        "channel": "gap-disposition",
+        "verdict": "ok",
+        "reviewNote": "entry gap-claim_072766aafbaf01714df1aa65347a1d24: deep A34: witness febafe586 unit unheaded-block-90 (L1081-1085, digest recomputed) to current runner.md#unheaded-block-90 (L1081-1085); 5 historical lines, exactly 1 not verbatim in the successor (RUL73 item 2 keeps its old words in order behind an inserted bracketed RUL95 replacement note); residual file step9-a42-predecessor-residuals.json row equals that one line verbatim (recomputed), row SHA256 6516be6a and file SHA256 4be07f52 recomputed, bound to source and primary-target digests, successor anchor exists, shard row equals pack; stricter than L9-13 needs (the old words survive in order, only insertions) so a supersede would also have been lawful, the verbatim residual loses nothing",
+        "sourceDigest": "f503ccc86158d7a9b67881c8983a4acb08172087f1d5f736628e21ef3832a0b2",
+        "targetDigest": "8b0b585d72e6e964b858670c69a32f7c2983b02b8fd11c3fbceda65fc93daee0",
+        "evidenceDigest": "e3d0bfbca6a6423d947fb235a6b54b497187201a210fa33565aa5f02e02da708",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "bindingMatchedAtApplication": true
       }
     },
     {
@@ -9627,7 +10199,7 @@
         "sourcePath": "docs/specs/runner.md",
         "sourceUnitDigest": "eb016bbb57ba643787f71c06f78838c1bf0bd938c028c8536acb66ee7c9a8d75",
         "authoredBy": "codex-session:unit-run-1792066534402-cb278bf5@2026-10-15",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "disposition": "supersede",
         "targetOwner": "docs/specs/runner.md",
         "targetAnchor": "unheaded-block-94",
@@ -9636,7 +10208,29 @@
           "Spec: Runner (vòng tự hành)",
           "Business Rules"
         ],
-        "rationale": "A34 pending predecessor disposition: All 26 historical lines remain in order in RUL77 onward; later rule additions do not replace old text. Bound immutable witness and full current successor in step9-a42-predecessor-dispositions.json. No identity graft, truth approval or inherited review; revalidate/rebind at legacy cutover."
+        "rationale": "A34 pending predecessor disposition: All 26 historical lines remain in order in RUL77 onward; later rule additions do not replace old text. Bound immutable witness and full current successor in step9-a42-predecessor-dispositions.json. No identity graft, truth approval or inherited review; revalidate/rebind at legacy cutover.",
+        "reviewNote": "entry gap-claim_4d5b7f73e28f18b31e0142bf48e21c3a: deep: witness ef2d9c334 unit unheaded-block-94 (L1093-1118, digest recomputed) to current runner.md#unheaded-block-94 (L1093-1121, digest recomputed); all 26 historical lines recur verbatim and in order in the 29 successor lines, so supersede is legal under A34 and no residual is needed; the 3 inserted successor lines are RUL98, RUL99 and RUL100, added after the old RUL77-onward text; reason text is accurate, shard row equals pack, successor anchor exists",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "reviewMode": "ordinary",
+        "reviewEntryId": "gap-claim_4d5b7f73e28f18b31e0142bf48e21c3a",
+        "evidenceDigest": "755326a75af64d0ee0d579bd4bcf67611835bd4ed070e5ab5d7346b520581198",
+        "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
+      },
+      "reviewAcceptance": {
+        "entryId": "gap-claim_4d5b7f73e28f18b31e0142bf48e21c3a",
+        "channel": "gap-disposition",
+        "verdict": "ok",
+        "reviewNote": "entry gap-claim_4d5b7f73e28f18b31e0142bf48e21c3a: deep: witness ef2d9c334 unit unheaded-block-94 (L1093-1118, digest recomputed) to current runner.md#unheaded-block-94 (L1093-1121, digest recomputed); all 26 historical lines recur verbatim and in order in the 29 successor lines, so supersede is legal under A34 and no residual is needed; the 3 inserted successor lines are RUL98, RUL99 and RUL100, added after the old RUL77-onward text; reason text is accurate, shard row equals pack, successor anchor exists",
+        "sourceDigest": "eb016bbb57ba643787f71c06f78838c1bf0bd938c028c8536acb66ee7c9a8d75",
+        "targetDigest": "3b974a9c1a82356e256e9b6923c80104f778651f67447179efdc0ffbf09ac485",
+        "evidenceDigest": "755326a75af64d0ee0d579bd4bcf67611835bd4ed070e5ab5d7346b520581198",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "bindingMatchedAtApplication": true
       }
     },
     {
@@ -9702,7 +10296,7 @@
         "sourcePath": "docs/specs/runner.md",
         "sourceUnitDigest": "77083ab43b25bd2e30eb1ff1f2b24db87e02420e7cc187773951d44a3a9df49f",
         "authoredBy": "codex-session:unit-run-1792066534402-cb278bf5@2026-10-15",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "disposition": "partial-carry",
         "targetOwner": "docs/specs/runner.md",
         "targetAnchor": "unheaded-block-94",
@@ -9712,12 +10306,35 @@
           "Business Rules"
         ],
         "rationale": "A34 pending predecessor disposition: RUL90 fan-out/caller closure wording changed as RUL95 landed; retain the original complete RUL90 line. Bound immutable witness and full current successor in step9-a42-predecessor-dispositions.json. No identity graft, truth approval or inherited review; revalidate/rebind at legacy cutover.",
-        "remainder": "Only historical lines changed/removed from the successor, verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; file SHA256 4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f, row residual SHA256 cecd70f251aacaf5bf34abe8b712e309493dbc9165e11c976f02af96118cce0a; source 77083ab43b25bd2e30eb1ff1f2b24db87e02420e7cc187773951d44a3a9df49f, primary target 3b974a9c1a82356e256e9b6923c80104f778651f67447179efdc0ffbf09ac485. Independent A34 acceptance pending; blocks cutover."
+        "remainder": "Only historical lines changed/removed from the successor, verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json; file SHA256 4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f, row residual SHA256 cecd70f251aacaf5bf34abe8b712e309493dbc9165e11c976f02af96118cce0a; source 77083ab43b25bd2e30eb1ff1f2b24db87e02420e7cc187773951d44a3a9df49f, primary target 3b974a9c1a82356e256e9b6923c80104f778651f67447179efdc0ffbf09ac485. Independent A34 acceptance pending; blocks cutover.",
+        "reviewNote": "entry gap-claim_d5ba1eda7530b865fec747ee0adbc102: deep A34: witness febafe586 unit unheaded-block-94 (L1093-1115, digest recomputed) to current runner.md#unheaded-block-94 (L1093-1121); 23 historical lines, exactly 1 not verbatim in the successor (the RUL90 line keeps its old words in order and gains the bracketed Closed by RUL95 passage); residual file step9-a42-predecessor-residuals.json row equals that one line verbatim (recomputed), row SHA256 cecd70f2 and file SHA256 4be07f52 recomputed, bound to source and primary-target digests, successor anchor exists, shard row equals pack; stricter than L9-13 needs (the old words survive in order, only insertions) so a supersede would also have been lawful, the verbatim residual loses nothing",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "reviewMode": "ordinary",
+        "reviewEntryId": "gap-claim_d5ba1eda7530b865fec747ee0adbc102",
+        "evidenceDigest": "a98c12de95095279fbfc6d85b3811beb9857ac21ed752da2f92d77b69c4d3044",
+        "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
+      },
+      "reviewAcceptance": {
+        "entryId": "gap-claim_d5ba1eda7530b865fec747ee0adbc102",
+        "channel": "gap-disposition",
+        "verdict": "ok",
+        "reviewNote": "entry gap-claim_d5ba1eda7530b865fec747ee0adbc102: deep A34: witness febafe586 unit unheaded-block-94 (L1093-1115, digest recomputed) to current runner.md#unheaded-block-94 (L1093-1121); 23 historical lines, exactly 1 not verbatim in the successor (the RUL90 line keeps its old words in order and gains the bracketed Closed by RUL95 passage); residual file step9-a42-predecessor-residuals.json row equals that one line verbatim (recomputed), row SHA256 cecd70f2 and file SHA256 4be07f52 recomputed, bound to source and primary-target digests, successor anchor exists, shard row equals pack; stricter than L9-13 needs (the old words survive in order, only insertions) so a supersede would also have been lawful, the verbatim residual loses nothing",
+        "sourceDigest": "77083ab43b25bd2e30eb1ff1f2b24db87e02420e7cc187773951d44a3a9df49f",
+        "targetDigest": "3b974a9c1a82356e256e9b6923c80104f778651f67447179efdc0ffbf09ac485",
+        "evidenceDigest": "a98c12de95095279fbfc6d85b3811beb9857ac21ed752da2f92d77b69c4d3044",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+        "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+        "bindingMatchedAtApplication": true
       }
     }
   ],
   "residualFile": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
   "residualFileSHA256": "4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f",
   "leadDecision": "A42 L9-15",
-  "contentCommit": "b80e8c16c94cb04c80cc4e858933a9b2a04ddc60"
+  "contentCommit": "b80e8c16c94cb04c80cc4e858933a9b2a04ddc60",
+  "decisionProjection": "Current canonical shard decisions after final independent acceptance; submitted before-review decisions remain in the immutable b80e8c16c request sidecar."
 }

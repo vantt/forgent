@@ -83,14 +83,23 @@
       "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
       "targetAnchor": "unheaded-block-36",
       "authoredBy": "codex-session:unit-run-1792066534402-cb278bf5@2026-10-15",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "L9-10/A22: partial-carry to the actual RUL77-RUL80 successor; only historical lines not carried verbatim form the residual. This witness item 4 is contained verbatim; successor item 4 is a pure insertion relative to this source, so it contributes no residual. RUL77 heading and RUL79 mixed suffix differ. Pending independent conservation and A34 review; blocks cutover.",
       "targetUnitDigest": "3b974a9c1a82356e256e9b6923c80104f778651f67447179efdc0ffbf09ac485",
       "targetAncestry": [
         "Added in candidate: Runner Business Rules",
         "Business Rules"
       ],
-      "remainder": "Only uncarried historical RUL77/RUL79 lines; item 4 is pure insertion and excluded retained verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-l9-9-partial-carry-residual.json, file SHA256 2cd7eb5b8a07e891d20bcd680ea83362c768566120f9b656d34d81559b63ad6c; row SHA256 78b792e3d90361b9fb4fc8443e03020e15e6b235f194744fa4b8dcb2ac8753cb; source c331d40816f84d25425abfdfdb8c6bff2a1e92b781bfe82d6f910fc0b1777917; primary target 3b974a9c1a82356e256e9b6923c80104f778651f67447179efdc0ffbf09ac485. Pending independent A34 acceptance; blocks cutover."
+      "remainder": "Only uncarried historical RUL77/RUL79 lines; item 4 is pure insertion and excluded retained verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-l9-9-partial-carry-residual.json, file SHA256 2cd7eb5b8a07e891d20bcd680ea83362c768566120f9b656d34d81559b63ad6c; row SHA256 78b792e3d90361b9fb4fc8443e03020e15e6b235f194744fa4b8dcb2ac8753cb; source c331d40816f84d25425abfdfdb8c6bff2a1e92b781bfe82d6f910fc0b1777917; primary target 3b974a9c1a82356e256e9b6923c80104f778651f67447179efdc0ffbf09ac485. Pending independent A34 acceptance; blocks cutover.",
+      "reviewNote": "deep A34: older historical RUL77-RUL80 unit (witness 8098d7be blob 682d867b, unit digest c331d408 recomputed) bound to the same successor h-6979005beaf7/spec.md#unheaded-block-36 digest 3b974a9c; own rationale is correct for this witness: residual is only RUL77 and RUL79 (2 lines, row SHA256 78b792e3 and file SHA256 2cd7eb5b recomputed, both verbatim from the witness and absent verbatim from the target), items 1,2,3,5,6 and RUL78 verbatim, item 4 and RUL80 successor text only inserts sentences or the phrase login store (per account for a single-store account, per stores/cli for a per-CLI one) so the old words stay in order; caveat for the Lead: the contiguous phrase five per account no longer appears in item 4, so this exclusion rests on the Lead pure-insertion standard, not on verbatim line carry; shard row equals pack",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+      "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+      "reviewMode": "ordinary",
+      "reviewEntryId": "claim_f033905b059f073c62ec27f0ee6da620",
+      "evidenceDigest": "ca1b4be0e93aa3510a96d8a4746f2be700336f2f1ad39c40747aa5747545467f",
+      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
     }
   ]
 }

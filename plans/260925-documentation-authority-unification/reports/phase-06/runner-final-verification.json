@@ -1,0 +1,263 @@
+{
+  "version": 1,
+  "contentCommit": "b80e8c16c94cb04c80cc4e858933a9b2a04ddc60",
+  "registryRequestCommit": "07d3dec1b",
+  "method": "Read-only generateInventory at committed review HEAD 11fc7590f7d0af4da10205359516aee0b0bff5c9 with existing byte-identical native registry; no carry-forward, sync or persistence. Full native checkInventory D and strict E; current decision shards and explicit committed report pins.",
+  "executionMode": "Completed each full native pass sequentially; remaining passes use fresh processes to release memory. Initial process completed both D/E and identity D; its running identity E was interrupted before fresh-pass rerun. No checker changes.",
+  "nativeSyncCount": 0,
+  "registryWrites": 0,
+  "readOnlyInventoryReconstructions": 2,
+  "initialDiagnostic": {
+    "file": "plans/260925-documentation-authority-unification/reports/phase-06/runner-final-initial-D-before-review-reports.json",
+    "fatal": 30,
+    "type": "decision-review-report-missing",
+    "cause": "Initial request commit predates the committed review reports; final inventory is reconstructed at committed review HEAD with unchanged registry, no checker bypass."
+  },
+  "registry": {
+    "path": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+    "bytes": 61903464,
+    "sha256": "d2675a26883ff1f81e86e6d107d76f315602ada5253d98d3c849c9a8fff09772",
+    "unchanged": true
+  },
+  "inventory": {
+    "commit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+    "items": 4484,
+    "activeUnits": 91331,
+    "activeRegistryTupleEquality": true
+  },
+  "runs": [
+    {
+      "label": "both",
+      "check": "D",
+      "inventoryCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+      "scope": [
+        "docs/specs/runner.md"
+      ],
+      "previousRegistries": [
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json"
+      ],
+      "file": "runner-final-D-both.json",
+      "fatal": 0,
+      "fatalTypes": [],
+      "open": [
+        {
+          "type": "claims-partial-carry",
+          "count": 11
+        },
+        {
+          "type": "claims-not-reviewed",
+          "count": 14
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 63
+        }
+      ]
+    },
+    {
+      "label": "both",
+      "check": "E",
+      "inventoryCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+      "scope": [
+        "docs/specs/runner.md"
+      ],
+      "previousRegistries": [
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json"
+      ],
+      "file": "runner-final-E-both.json",
+      "fatal": 3,
+      "fatalTypes": [
+        "claims-partial-carry",
+        "claims-not-reviewed",
+        "candidate-blocks-unreferenced"
+      ],
+      "open": [
+        {
+          "type": "claims-partial-carry",
+          "count": 11
+        },
+        {
+          "type": "claims-not-reviewed",
+          "count": 14
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 63
+        }
+      ]
+    },
+    {
+      "label": "identity",
+      "check": "D",
+      "inventoryCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+      "scope": [
+        "docs/specs/runner.md"
+      ],
+      "previousRegistries": [
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json"
+      ],
+      "file": "runner-final-D-identity.json",
+      "fatal": 0,
+      "fatalTypes": [],
+      "open": [
+        {
+          "type": "claims-partial-carry",
+          "count": 11
+        },
+        {
+          "type": "claims-not-reviewed",
+          "count": 14
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 63
+        }
+      ]
+    },
+    {
+      "label": "identity",
+      "check": "E",
+      "inventoryCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+      "scope": [
+        "docs/specs/runner.md"
+      ],
+      "previousRegistries": [
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json"
+      ],
+      "seconds": 125.023,
+      "file": "runner-final-E-identity.json",
+      "fatal": 3,
+      "fatalTypes": [
+        "claims-partial-carry",
+        "claims-not-reviewed",
+        "candidate-blocks-unreferenced"
+      ],
+      "open": [
+        {
+          "type": "claims-partial-carry",
+          "count": 11
+        },
+        {
+          "type": "claims-not-reviewed",
+          "count": 14
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 63
+        }
+      ]
+    },
+    {
+      "label": "phase02",
+      "check": "D",
+      "inventoryCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+      "scope": [
+        "docs/specs/runner.md"
+      ],
+      "previousRegistries": [
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json"
+      ],
+      "seconds": 130.157,
+      "file": "runner-final-D-phase02.json",
+      "fatal": 0,
+      "fatalTypes": [],
+      "open": [
+        {
+          "type": "claims-partial-carry",
+          "count": 11
+        },
+        {
+          "type": "claims-not-reviewed",
+          "count": 14
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 63
+        }
+      ]
+    },
+    {
+      "label": "phase02",
+      "check": "E",
+      "inventoryCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+      "scope": [
+        "docs/specs/runner.md"
+      ],
+      "previousRegistries": [
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json"
+      ],
+      "seconds": 148.471,
+      "file": "runner-final-E-phase02.json",
+      "fatal": 3,
+      "fatalTypes": [
+        "claims-partial-carry",
+        "claims-not-reviewed",
+        "candidate-blocks-unreferenced"
+      ],
+      "open": [
+        {
+          "type": "claims-partial-carry",
+          "count": 11
+        },
+        {
+          "type": "claims-not-reviewed",
+          "count": 14
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 63
+        }
+      ]
+    }
+  ],
+  "expectedOpen": [
+    {
+      "type": "claims-partial-carry",
+      "count": 11
+    },
+    {
+      "type": "claims-not-reviewed",
+      "count": 14
+    },
+    {
+      "type": "candidate-blocks-unreferenced",
+      "count": 63
+    }
+  ],
+  "pendingSourceRows": [
+    "claim_0686418ae7571d82eade8059c698709d",
+    "claim_099eb566c825967cf35f9397f2d7b947",
+    "claim_2811db1449ad8dc4655f8531d5c5701e",
+    "claim_36f4a3c4ae623f3a348faadd747dcba7",
+    "claim_3ff43c5fd67cb1df9a9c2f81a0849057",
+    "claim_4b223132b77128c46c544871c36a8e3b",
+    "claim_5f91b173c863af29efb4d8af8c734b4c",
+    "claim_66d031f3f3d5009c11d96357e48d985a",
+    "claim_88d627e8f4ea6556a45d97bc81b03f28",
+    "claim_a11926d30be8de43744fc81023f6dab5",
+    "claim_add6d13e14df87ad5d5bd46cc5bb98d4",
+    "claim_c989dc1877e144abd29d133c0a59efc9",
+    "claim_d29be3d33893c060220d82b135fcb7c0",
+    "claim_ef6c4ace21b84e2eeb9de2ad200e5cfb"
+  ],
+  "reviewedSourceCount": 481,
+  "exactPendingRequestEquality": true,
+  "reverseRowsUnchanged": true,
+  "strictEOnly14PlusClosureAllowed": true,
+  "strictGreen": false,
+  "closureAllowed": {
+    "partialCarry": 11,
+    "reverseCandidate": 63,
+    "runnerOwnedReverse": 62,
+    "rootOwnedDuplicate": 1,
+    "rule": "Accepted dispositions and residuals remain A34/cutover/promotion obligations; reverse rows persist on candidate lists. This is permitted pre-cutover openness, never strict-E green."
+  },
+  "reproduction": {
+    "inventoryHelper": "import fs from 'node:fs';import v8 from 'node:v8';import assert from 'node:assert/strict';import crypto from 'node:crypto';\nconst root=process.cwd(),R='plans/260925-documentation-authority-unification/reports/phase-06/';\nconst {generateInventory}=await import(root+'/scripts/generate-doc-inventory.mjs');\nconst before=fs.readFileSync(R+'working-identity-registry.json');\nconsole.log('inventory reconstruction only; NO carry-forward or registry persistence',new Date().toISOString());\nconst inv=generateInventory(root,{commit:'11fc7590f7d0af4da10205359516aee0b0bff5c9',identityRegistryPath:R+'working-identity-registry.json'});\nassert.equal(crypto.createHash('sha256').update(fs.readFileSync(R+'working-identity-registry.json')).digest('hex'),crypto.createHash('sha256').update(before).digest('hex'));\nfs.mkdirSync('/tmp/fgos-work/final-inventory-head',{recursive:true});const manifest=[];\nfor(const [key,value]of Object.entries(inv)){const parts=Array.isArray(value)?Array.from({length:Math.ceil(value.length/128)},(_,i)=>value.slice(i*128,(i+1)*128)):[value],files=[];for(const part of parts){const file=manifest.length+'-'+files.length+'.bin';fs.writeFileSync('/tmp/fgos-work/final-inventory-head/'+file,v8.serialize(part));files.push(file);}manifest.push({key,array:Array.isArray(value),files});}\nfs.writeFileSync('/tmp/fgos-work/final-inventory-head/manifest.json',JSON.stringify(manifest));console.log('DONE',inv.commit,inv.items.length,inv.claimLedger.length,new Date().toISOString());\n",
+    "checkHelper": "import fs from 'node:fs';import v8 from 'node:v8';import assert from 'node:assert/strict';import crypto from 'node:crypto';import {execFileSync as exec} from 'node:child_process';\nconst root=process.cwd(),P='plans/260925-documentation-authority-unification/',R=P+'reports/phase-06/',read=f=>JSON.parse(fs.readFileSync(f)),write=(n,j)=>fs.writeFileSync(R+n,JSON.stringify(j,null,2)+'\\n'),sha=b=>crypto.createHash('sha256').update(b).digest('hex');\nconst inv={};for(const f of read('/tmp/fgos-work/final-inventory-head/manifest.json')){if(f.array)inv[f.key]=[];for(const n of f.files){const part=v8.deserialize(fs.readFileSync('/tmp/fgos-work/final-inventory-head/'+n));if(f.array)inv[f.key].push(...part);else inv[f.key]=part;}global.gc?.();}\nconst g=await import(root+'/scripts/check-doc-inventory-gates.mjs'),bytes=fs.readFileSync(R+'working-identity-registry.json'),registry=JSON.parse(bytes),vocabulary=read(P+'claim-and-disposition-vocabulary.json'),droppedClaimsRegister=read(P+'dropped-claims-register.json'),decisions=[...g.loadDecisionShards(P+'pilot/decisions'),...g.loadDecisionShards(P+'ledger/decisions')],ratchetResult=g.loadRatchetResult(root),scope=['docs/specs/runner.md'],priors=[P+'reports/identity-registry.json',P+'reports/phase-02-identity-registry.json'].map(label=>({label,registry:read(label)})),runs=[];\nassert.equal(sha(bytes),'d2675a26883ff1f81e86e6d107d76f315602ada5253d98d3c849c9a8fff09772');\nassert.equal(exec('git',['diff','b80e8c16c','HEAD','--','docs/'],{encoding:'utf8'}),'');\nfor(const label of ['both','identity','phase02'])for(const check of ['D','E']){const result=read(R+'runner-final-'+check+'-'+label+'.json');const summaryPath='/tmp/fgos-work/final-single-'+label+'-'+check+'.json';runs.push(fs.existsSync(summaryPath)?read(summaryPath):{label,check,inventoryCommit:inv.commit,scope,previousRegistries:(label==='both'?priors:[priors[label==='identity'?0:1]]).map(x=>x.label),file:'runner-final-'+check+'-'+label+'.json',fatal:result.fatalFindings.length,fatalTypes:result.fatalFindings.map(f=>f.type),open:result.conservationOpen.map(x=>({type:x.type,count:x.count}))});}\nconst expectedOpen=[{type:'claims-partial-carry',count:11},{type:'claims-not-reviewed',count:14},{type:'candidate-blocks-unreferenced',count:63}];\nfor(const r of runs){assert.deepEqual(r.open,expectedOpen);if(r.check==='D')assert.equal(r.fatal,0);else assert.deepEqual(r.fatalTypes,expectedOpen.map(x=>x.type));}\nconst e=read(R+'runner-final-E-both.json');for(const label of ['identity','phase02'])assert.deepEqual(e.explicitOpenFindings,read(R+'runner-final-E-'+label+'.json').explicitOpenFindings);\nconst rows=read(P+'ledger/decisions/s9-runner-01.json').claims,pending=rows.filter(x=>x.reviewStatus!=='reviewed').map(x=>x.claimId).sort(),request=read(R+'review-request-runner-rationale-rereview-b80e8c16c.md.json');assert.deepEqual(pending,request.entries.map(x=>x.entryId).sort());\nconst tuple=u=>JSON.stringify([u.claimId,u.sourcePath,u.sourceAnchor,u.sourceUnitDigest]);assert.deepEqual(inv.claimLedger.map(tuple).sort(),registry.units.map(tuple).sort());\nconst old=read(R+'runner-b80e-native-E-both.json');assert.deepEqual(e.explicitOpenFindings.unreferencedCandidateRows,old.explicitOpenFindings.unreferencedCandidateRows);\nassert.equal(sha(fs.readFileSync(R+'working-identity-registry.json')),sha(bytes));\nwrite('runner-final-verification.json',{version:1,contentCommit:'b80e8c16c94cb04c80cc4e858933a9b2a04ddc60',registryRequestCommit:'07d3dec1b',method:'Read-only generateInventory at committed review HEAD 11fc7590f7d0af4da10205359516aee0b0bff5c9 with existing byte-identical native registry; no carry-forward, sync or persistence. Full native checkInventory D and strict E; current decision shards and explicit committed report pins.',executionMode:'Completed each full native pass sequentially; remaining passes use fresh processes to release memory. Initial process completed both D/E and identity D; its running identity E was interrupted before fresh-pass rerun. No checker changes.',nativeSyncCount:0,registryWrites:0,readOnlyInventoryReconstructions:2,initialDiagnostic:{file:R+'runner-final-initial-D-before-review-reports.json',fatal:30,type:'decision-review-report-missing',cause:'Initial request commit predates the committed review reports; final inventory is reconstructed at committed review HEAD with unchanged registry, no checker bypass.'},registry:{path:R+'working-identity-registry.json',bytes:bytes.length,sha256:sha(bytes),unchanged:true},inventory:{commit:inv.commit,items:inv.items.length,activeUnits:inv.claimLedger.length,activeRegistryTupleEquality:true},runs,expectedOpen,pendingSourceRows:pending,reviewedSourceCount:rows.length-pending.length,exactPendingRequestEquality:true,reverseRowsUnchanged:true,strictEOnly14PlusClosureAllowed:true,strictGreen:false,closureAllowed:{partialCarry:11,reverseCandidate:63,runnerOwnedReverse:62,rootOwnedDuplicate:1,rule:'Accepted dispositions and residuals remain A34/cutover/promotion obligations; reverse rows persist on candidate lists. This is permitted pre-cutover openness, never strict-E green.'},reproduction:{inventoryHelper:fs.readFileSync('/tmp/fgos-work/final-inventory.mjs','utf8'),checkHelper:fs.readFileSync('/tmp/fgos-work/final-checks-collect.mjs','utf8'),singlePassHelper:fs.readFileSync('/tmp/fgos-work/final-single-check.mjs','utf8')}});\nconsole.log('COMPLETE',JSON.stringify({D:0,E:expectedOpen,pending:pending.length}));\n",
+    "singlePassHelper": "import fs from 'node:fs';import v8 from 'node:v8';import assert from 'node:assert/strict';import crypto from 'node:crypto';import {execFileSync as exec} from 'node:child_process';\nconst root=process.cwd(),P='plans/260925-documentation-authority-unification/',R=P+'reports/phase-06/',read=f=>JSON.parse(fs.readFileSync(f)),write=(n,j)=>fs.writeFileSync(R+n,JSON.stringify(j,null,2)+'\\n'),sha=b=>crypto.createHash('sha256').update(b).digest('hex');\nconst inv={};for(const f of read('/tmp/fgos-work/final-inventory-head/manifest.json')){if(f.array)inv[f.key]=[];for(const n of f.files){const part=v8.deserialize(fs.readFileSync('/tmp/fgos-work/final-inventory-head/'+n));if(f.array)inv[f.key].push(...part);else inv[f.key]=part;}global.gc?.();}\nconst g=await import(root+'/scripts/check-doc-inventory-gates.mjs'),bytes=fs.readFileSync(R+'working-identity-registry.json'),registry=JSON.parse(bytes),vocabulary=read(P+'claim-and-disposition-vocabulary.json'),droppedClaimsRegister=read(P+'dropped-claims-register.json'),decisions=[...g.loadDecisionShards(P+'pilot/decisions'),...g.loadDecisionShards(P+'ledger/decisions')],ratchetResult=g.loadRatchetResult(root),scope=['docs/specs/runner.md'],priors=[P+'reports/identity-registry.json',P+'reports/phase-02-identity-registry.json'].map(label=>({label,registry:read(label)})),runs=[];\nassert.equal(sha(bytes),'d2675a26883ff1f81e86e6d107d76f315602ada5253d98d3c849c9a8fff09772');\nassert.equal(exec('git',['diff','b80e8c16c','HEAD','--','docs/'],{encoding:'utf8'}),'');\nconst label=process.argv[2],strict=process.argv[3]==='E',previousRegistries=label==='both'?priors:[priors[label==='identity'?0:1]],start=Date.now();console.log('START',label,strict?'E':'D',new Date().toISOString());const result=g.checkInventory({repoRoot:root,inventory:inv,vocabulary,identityRegistry:registry,droppedClaimsRegister,previousRegistries,ratchetResult,strict,headCommit:inv.commit,registryBytes:bytes,missingInputs:[],decisions,scope});const file='runner-final-'+(strict?'E':'D')+'-'+label+'.json';write(file,result);const summary={label,check:strict?'E':'D',inventoryCommit:inv.commit,scope,previousRegistries:previousRegistries.map(x=>x.label),seconds:(Date.now()-start)/1000,file,fatal:result.fatalFindings.length,fatalTypes:result.fatalFindings.map(f=>f.type),open:result.conservationOpen.map(x=>({type:x.type,count:x.count}))};fs.writeFileSync('/tmp/fgos-work/final-single-'+label+'-'+summary.check+'.json',JSON.stringify(summary));console.log('DONE',JSON.stringify(summary));\n",
+    "invocationInstructions": "Reconstruct once at the explicit committed review HEAD using the embedded inventoryHelper and byte-identical 07d3dec1b registry (no sync/carry-forward/persistence). Save the embedded singlePassHelper to /tmp/fgos-work/final-single-check.mjs; run it sequentially in fresh Node processes for both D, both E, identity D, identity E, phase02 D, phase02 E; then run the embedded checkHelper collector. All six raw final pass results are real checkInventory outputs. Initial wrong-pin D and interrupted diagnostic passes are retained separately."
+  }
+}

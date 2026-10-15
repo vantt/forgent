@@ -476,14 +476,23 @@
       "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
       "targetAnchor": "unheaded-block-36",
       "authoredBy": "codex-session:unit-run-1792066534402-cb278bf5@2026-10-15",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "L9-10/A22: partial-carry to the actual RUL77-RUL80 successor; only historical lines not carried verbatim form the residual. RUL77 heading, RUL79 mixed suffix and the old pending-copy cap line of item 4 are not carried verbatim. Pending independent conservation and A34 review; blocks cutover.",
       "targetUnitDigest": "3b974a9c1a82356e256e9b6923c80104f778651f67447179efdc0ffbf09ac485",
       "targetAncestry": [
         "Added in candidate: Runner Business Rules",
         "Business Rules"
       ],
-      "remainder": "Only uncarried historical RUL77/RUL79 lines and the changed item 4 pending-copy-cap line retained verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-l9-9-partial-carry-residual.json, file SHA256 2cd7eb5b8a07e891d20bcd680ea83362c768566120f9b656d34d81559b63ad6c; row SHA256 f4af984047c4b4749d392eb331da7317f24509ea78725acbe59ce605cef49ab7; source 95e75f7d43d50bbae0d6a7979aa0db2f01326f00fc290507fdf8bf046403a547; primary target 3b974a9c1a82356e256e9b6923c80104f778651f67447179efdc0ffbf09ac485. Pending independent A34 acceptance; blocks cutover."
+      "remainder": "Only uncarried historical RUL77/RUL79 lines and the changed item 4 pending-copy-cap line retained verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-l9-9-partial-carry-residual.json, file SHA256 2cd7eb5b8a07e891d20bcd680ea83362c768566120f9b656d34d81559b63ad6c; row SHA256 f4af984047c4b4749d392eb331da7317f24509ea78725acbe59ce605cef49ab7; source 95e75f7d43d50bbae0d6a7979aa0db2f01326f00fc290507fdf8bf046403a547; primary target 3b974a9c1a82356e256e9b6923c80104f778651f67447179efdc0ffbf09ac485. Pending independent A34 acceptance; blocks cutover.",
+      "reviewNote": "deep A34: historical RUL77-RUL80 unit (witness 31f676749 blob f101cf85, unit digest 95e75f7d recomputed, L1089-1098) bound to h-6979005beaf7/spec.md#unheaded-block-36 (L166-194, digest 3b974a9c recomputed, anchor exists, ancestry Added in candidate Runner Business Rules then Business Rules is real); 6 of its 10 lines (items 1,2,3,5,6 and RUL78) are verbatim in the target, residual is exactly the 3 lines not carried (RUL77 line with the bracketed replacement and appended sentence, item 4 with the changed pending-copy rule, RUL79 with its mixed suffix), residual text equals those lines joined, row SHA256 f4af9840 and file SHA256 2cd7eb5b recomputed, RUL80 excluded because the successor only inserts sentences into it; no carried line sits in the residual, rationale cites L9-10 where the Lead decision is L9-11 (label slip only), shard row equals pack",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+      "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+      "reviewMode": "ordinary",
+      "reviewEntryId": "claim_40aafcee52b22eda087c5f85eacb9392",
+      "evidenceDigest": "4ff260ff0616fc51883eb35fc9ff33f18317e57de34c496cd5ff5aa90e730c8f",
+      "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
     },
     {
       "claimId": "claim_c2aa4371cc420cd24793da9c23497e42",

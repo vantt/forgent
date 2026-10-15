@@ -1,0 +1,301 @@
+{
+  "version": 1,
+  "contentCommit": "b80e8c16c94cb04c80cc4e858933a9b2a04ddc60",
+  "requestCommit": "07d3dec1b",
+  "supplements": "runner-turn-mutation-coverage",
+  "priorCoverageRecord": {
+    "channel": "turn-coverage",
+    "entryId": "runner-turn-mutation-coverage",
+    "contentCommit": "b80e8c16c94cb04c80cc4e858933a9b2a04ddc60",
+    "files": [
+      {
+        "path": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+        "bytes": 1206532,
+        "sha256": "ee962ab2e32422401b95edf14cd18e9c310911df06a78e5d2a3eca575f1177ec"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-root-authorities.json",
+        "bytes": 757197,
+        "sha256": "eea30864e8d5467e2954c16e6757e08d4f02297f92d4d0bae1c7fddaab396053"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-runner.json",
+        "bytes": 249869,
+        "sha256": "dbe9b61087af7d673864750e1511cf1e601064d5a6e6abdcaf1060ec1a705dd8"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
+        "bytes": 87655,
+        "sha256": "6e4908b43a498e791abc9a39316f804380878633ca47bb0937f87a1604343171"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/progress.md",
+        "bytes": 636860,
+        "sha256": "9b8fa288a5d8dfc2a2eca678fcf32bc224bf596a20e0baf5cde20d1f56860529"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/step-09-report.md",
+        "bytes": 65729,
+        "sha256": "1c667ac81abafad49aa8268c596907db3b3897d337e7190143215c90956c7794"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-dispositions.json",
+        "bytes": 974677,
+        "sha256": "086efdb9e8d1fbf9f044e4d80c1d221981fe2d25d46d7c7bf5809b2f972836d5"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/step9-predecessor-accounting.json",
+        "bytes": 3611170,
+        "sha256": "7074fecd4c0a86d0177bcbeeef2f9dbd05e831c961526017b0359a2c8668e1d4"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+        "bytes": 61903464,
+        "sha256": "d2675a26883ff1f81e86e6d107d76f315602ada5253d98d3c849c9a8fff09772"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-candidate-list-equality.json",
+        "bytes": 73071,
+        "sha256": "291732392451e9386eddc71544da410f83193df51e3d5f9e871749f54aad3444"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-native-D-both.json",
+        "bytes": 1056306,
+        "sha256": "9ad5cde488de5af15ccb6894cee6d18f2ea5b193292962a5bd4397bda58feae7"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-native-D-identity.json",
+        "bytes": 1056306,
+        "sha256": "9ad5cde488de5af15ccb6894cee6d18f2ea5b193292962a5bd4397bda58feae7"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-native-D-phase02.json",
+        "bytes": 1056306,
+        "sha256": "9ad5cde488de5af15ccb6894cee6d18f2ea5b193292962a5bd4397bda58feae7"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-native-E-both.json",
+        "bytes": 1057645,
+        "sha256": "496257ce2d5a41dc1d04a23f019cc279daab133efa6a97b50cd771a26a44be18"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-native-E-identity.json",
+        "bytes": 1057645,
+        "sha256": "496257ce2d5a41dc1d04a23f019cc279daab133efa6a97b50cd771a26a44be18"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-native-E-phase02.json",
+        "bytes": 1057645,
+        "sha256": "496257ce2d5a41dc1d04a23f019cc279daab133efa6a97b50cd771a26a44be18"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-native-checks.log",
+        "bytes": 6018,
+        "sha256": "1660e7601446855b2ed305ef889d0e20474df16459521332cb2db9c9f6fba982"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-native-sync-proof.json",
+        "bytes": 39459,
+        "sha256": "6b48989468bd31e340482905725b7caa1dfc728265970858f26e66038efe3e3d"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-native-sync.log",
+        "bytes": 736,
+        "sha256": "b05a0f3325e16f32f03de557de9b4c8d7831bf290f8d95415d4506631bab048d"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-native-verification.json",
+        "bytes": 60588,
+        "sha256": "2fdb1e0124ebc4c27bdac6c0137afb5c866f7c50aebca0224120f9c30c018b8d"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-root-native-reverse.json",
+        "bytes": 832028,
+        "sha256": "2ec03873948372e7ed4eb047e12253a050124dd1812296bb9bda48d4a330d3c8"
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-tests.log",
+        "bytes": 7618,
+        "sha256": "c3d3cd16d10a0089c0bff6eb42908e129aca78ab0c06dc0d62bcfe885a873e2d"
+      }
+    ],
+    "mapping": {
+      "canonicalSourceShard": "44 source rows + 28 gap-disposition entries; this turn changes only 16 pending group supersedes",
+      "predecessorAccounting": "predecessor-accounting-current-L9-15 synchronizes the report projection for all 16 updated group supersedes",
+      "gapAccounting": "28 full gap-disposition entries with L9-15 before/current decisions and all successor members",
+      "nativeRegistry": "native-sync-and-checks + 28 native-predecessor entries + exact registry SHA256; compact persistence once and known-ID preservation",
+      "candidateLists": "runner-list, root-list, runner-root-union",
+      "report": "runner-current-report, runner-current-progress",
+      "ownerQueue": "owner-queue-current, owner-queue-reconcile-help-defect",
+      "nativeOutputs": "native-sync-and-checks, runner-root-union",
+      "contentCommit": "38 content-delta entries enumerate every changed content-commit file and every changed JSON row/field or Markdown hunk"
+    },
+    "sourceDigest": "a4ceb961cc80e5c869c7afc9ef3a71ca3d30341fd01ff432139a612a6fd93ac2",
+    "targetDigest": "none",
+    "reviewStatus": "pending",
+    "mandatoryDeep": true,
+    "evidenceDigest": "794cdd2ea33346c7e9292d416e1d561aab9df2c7cb7523a847dcf432a933058c"
+  },
+  "addedFiles": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-final-audit.json",
+      "commit": "07d3dec1b",
+      "bytes": 30185,
+      "sha256": "da5c4bfa5d60546dde57b54ae63ea820b903bd0165ff63cacb4b054dfe8b146a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-review-package-index.json",
+      "commit": "07d3dec1b",
+      "bytes": 43166,
+      "sha256": "8977131c1cb1f0b2d1169525d0b39e5c47bbc3a4a09592de78e73cb2ba8b1dd6"
+    }
+  ],
+  "reason": "Lead direction / part 1 Finding 3: add package index and final audit omitted from the original turn-coverage list; immutable reviewed sidecar preserved.",
+  "application": "plans/260925-documentation-authority-unification/reports/phase-06/runner-final-verdict-application.json",
+  "boundedRequest": {
+    "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-runner-rationale-rereview-b80e8c16c.md",
+    "sha256": "03682940530003a2143efaa4591066853b2fef8b6700e3e7d6a4edcd21f95c2e",
+    "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-runner-rationale-rereview-b80e8c16c.md.json",
+    "sidecarSHA256": "1a8490d297874e44f7456ec9d321be9a2a649ff342234e927121c3055d2af319",
+    "count": 14
+  },
+  "reviewScope": "Supplemental accounting record; no new seeds, verdicts or disposition approval.",
+  "files": [
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "bytes": 1206532,
+      "sha256": "ee962ab2e32422401b95edf14cd18e9c310911df06a78e5d2a3eca575f1177ec"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-root-authorities.json",
+      "bytes": 757197,
+      "sha256": "eea30864e8d5467e2954c16e6757e08d4f02297f92d4d0bae1c7fddaab396053"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-runner.json",
+      "bytes": 249869,
+      "sha256": "dbe9b61087af7d673864750e1511cf1e601064d5a6e6abdcaf1060ec1a705dd8"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
+      "bytes": 87655,
+      "sha256": "6e4908b43a498e791abc9a39316f804380878633ca47bb0937f87a1604343171"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/progress.md",
+      "bytes": 636860,
+      "sha256": "9b8fa288a5d8dfc2a2eca678fcf32bc224bf596a20e0baf5cde20d1f56860529"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step-09-report.md",
+      "bytes": 65729,
+      "sha256": "1c667ac81abafad49aa8268c596907db3b3897d337e7190143215c90956c7794"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-dispositions.json",
+      "bytes": 974677,
+      "sha256": "086efdb9e8d1fbf9f044e4d80c1d221981fe2d25d46d7c7bf5809b2f972836d5"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step9-predecessor-accounting.json",
+      "bytes": 3611170,
+      "sha256": "7074fecd4c0a86d0177bcbeeef2f9dbd05e831c961526017b0359a2c8668e1d4"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+      "bytes": 61903464,
+      "sha256": "d2675a26883ff1f81e86e6d107d76f315602ada5253d98d3c849c9a8fff09772"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-candidate-list-equality.json",
+      "bytes": 73071,
+      "sha256": "291732392451e9386eddc71544da410f83193df51e3d5f9e871749f54aad3444"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-native-D-both.json",
+      "bytes": 1056306,
+      "sha256": "9ad5cde488de5af15ccb6894cee6d18f2ea5b193292962a5bd4397bda58feae7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-native-D-identity.json",
+      "bytes": 1056306,
+      "sha256": "9ad5cde488de5af15ccb6894cee6d18f2ea5b193292962a5bd4397bda58feae7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-native-D-phase02.json",
+      "bytes": 1056306,
+      "sha256": "9ad5cde488de5af15ccb6894cee6d18f2ea5b193292962a5bd4397bda58feae7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-native-E-both.json",
+      "bytes": 1057645,
+      "sha256": "496257ce2d5a41dc1d04a23f019cc279daab133efa6a97b50cd771a26a44be18"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-native-E-identity.json",
+      "bytes": 1057645,
+      "sha256": "496257ce2d5a41dc1d04a23f019cc279daab133efa6a97b50cd771a26a44be18"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-native-E-phase02.json",
+      "bytes": 1057645,
+      "sha256": "496257ce2d5a41dc1d04a23f019cc279daab133efa6a97b50cd771a26a44be18"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-native-checks.log",
+      "bytes": 6018,
+      "sha256": "1660e7601446855b2ed305ef889d0e20474df16459521332cb2db9c9f6fba982"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-native-sync-proof.json",
+      "bytes": 39459,
+      "sha256": "6b48989468bd31e340482905725b7caa1dfc728265970858f26e66038efe3e3d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-native-sync.log",
+      "bytes": 736,
+      "sha256": "b05a0f3325e16f32f03de557de9b4c8d7831bf290f8d95415d4506631bab048d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-native-verification.json",
+      "bytes": 60588,
+      "sha256": "2fdb1e0124ebc4c27bdac6c0137afb5c866f7c50aebca0224120f9c30c018b8d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-root-native-reverse.json",
+      "bytes": 832028,
+      "sha256": "2ec03873948372e7ed4eb047e12253a050124dd1812296bb9bda48d4a330d3c8"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-tests.log",
+      "bytes": 7618,
+      "sha256": "c3d3cd16d10a0089c0bff6eb42908e129aca78ab0c06dc0d62bcfe885a873e2d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-final-audit.json",
+      "commit": "07d3dec1b",
+      "bytes": 30185,
+      "sha256": "da5c4bfa5d60546dde57b54ae63ea820b903bd0165ff63cacb4b054dfe8b146a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-b80e-review-package-index.json",
+      "commit": "07d3dec1b",
+      "bytes": 43166,
+      "sha256": "8977131c1cb1f0b2d1169525d0b39e5c47bbc3a4a09592de78e73cb2ba8b1dd6"
+    }
+  ],
+  "coverageCommit": "07d3dec1b",
+  "mapping": {
+    "canonicalSourceShard": "44 source rows + 28 gap-disposition entries; this turn changes only 16 pending group supersedes",
+    "predecessorAccounting": "predecessor-accounting-current-L9-15 synchronizes the report projection for all 16 updated group supersedes",
+    "gapAccounting": "28 full gap-disposition entries with L9-15 before/current decisions and all successor members",
+    "nativeRegistry": "native-sync-and-checks + 28 native-predecessor entries + exact registry SHA256; compact persistence once and known-ID preservation",
+    "candidateLists": "runner-list, root-list, runner-root-union",
+    "report": "runner-current-report, runner-current-progress",
+    "ownerQueue": "owner-queue-current, owner-queue-reconcile-help-defect",
+    "nativeOutputs": "native-sync-and-checks, runner-root-union",
+    "contentCommit": "38 content-delta entries enumerate every changed content-commit file and every changed JSON row/field or Markdown hunk",
+    "packageIndex": "runner-b80e-review-package-index.json binds the original request/sidecar hashes and channel counts",
+    "finalAudit": "runner-b80e-final-audit.json binds the original final package/scope/digest audit"
+  }
+}

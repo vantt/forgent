@@ -1,3 +1,13 @@
+# Runner promotion truth check — Lead L9-17 accepted
+
+Accepted by Lead on 2026-10-15: `truth-03` uses `canAdvanceEdge` wording slightly more broadly than `src/runner/loop.mjs:1689-1695`: the non-assignment branch still calls `resolvePlan` directly with the caller verdict. Both review Notes were read. This accepted observation is queued for the mandatory promotion truth check; it does not require candidate-doc edits or reopen the accepted truth-correction verdict. See `review-runner-bounded-rereview-b80e8c16c-part2.md`, truth-03 and Notes. Preserve the separate existing reconcile-help code-defect queue entry and the unrelated operations Afterwards sentence outside the reviewed corrections.
+
+Lead L9-16: both reviewed pure-insertion partial-carry approaches stay accepted, including the strict verbatim residuals for the five gap rows and the excluded pure insertion in the L9-9 f033905b residual. From now on use strict verbatim residual as the standard. Existing residual bytes/digests and cutover obligations stay as reviewed.
+
+All 256 final `ok` receipts are applied; only 14 rationale-only source reworks remain pending independent review. No new owner-direction question. Step 9 closes when these 14 are applied under existing closure rules; then Lead merges main and starts Step 10.
+
+---
+
 # Current Packaging decision status — 2026-10-14
 
 F6 is answered by the owner resolution committed at `5563bcb70d1c9f0706925271e8209e7eb49fd28b`: dropped-010 is superseded by decision, with the 2026-09-15 coordinator 30-day window as successor and removal or redirect after the window still owed to Packaging-distribution (release-owner decision). The FLAGGED status is resolved; the original clause remains verbatim as dated design. No owner direction question remains for this batch.

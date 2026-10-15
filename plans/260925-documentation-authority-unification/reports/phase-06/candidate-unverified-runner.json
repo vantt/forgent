@@ -1,7 +1,7 @@
 {
   "version": 3,
   "native": true,
-  "status": "candidate-unverified; current native reverse rows after root-owned duplicate exclusion; pending bounded re-review, no truth/promotion approval",
+  "status": "candidate-unverified; native reverse rows after root-owned duplicate exclusion; final list accounting accepted, no truth/promotion approval",
   "inputCommit": "42cf37c15047a8144366252d23f16f1a82787424",
   "scope": [
     "docs/specs/runner.md"
@@ -3171,7 +3171,7 @@
     "current": false
   },
   "overlayCaveat": "The earlier conservative working overlay is historical. This list now binds the complete native inventory and all existing decision shards; full five-field ownership partition is in runner-b80e-candidate-list-equality.json.",
-  "next": "Apply bounded re-review, resolve predecessor dispositions; Lead syncs main and starts Step 10 after Step 9 closure.",
+  "next": "Apply the bounded 14-row rationale re-review; Step 9 closes under existing closure rules, then Lead merges main and starts Step 10. Accepted predecessor residual/group and cutover obligations persist.",
   "ownership": {
     "claimId": "claim_fecee46f6c7c699047ffdb436bfdebe1",
     "owner": "candidate-unverified-root-authorities.json",
@@ -4077,7 +4077,7 @@
       }
     ]
   },
-  "pendingAccountingReview": true,
+  "pendingAccountingReview": false,
   "contentCommit": "b80e8c16c94cb04c80cc4e858933a9b2a04ddc60",
   "nativeEquality": {
     "contentCommit": "b80e8c16c94cb04c80cc4e858933a9b2a04ddc60",
@@ -4092,5 +4092,19 @@
     "tupleSHA256": "c1afe67ddb2306047f3eba51c7d2c851d0cf125d9f8e7cf680abfa837bfb2c44",
     "count": 62,
     "allThreePriors": true
+  },
+  "accountingReview": {
+    "entryId": "runner-list",
+    "channel": "candidate-list",
+    "verdict": "ok",
+    "reviewNote": "deep: file sha dbe9b610 equals the committed list at the request commit; 62 rows, no duplicate claimId, every row tuple claimId/path/anchor/unitDigest equals the working registry unit and the native E reverse output (63 raw rows minus the root-owned claim_fecee46f), all file headers Candidate, shown texts equal the units at b80e8c16c, tuple SHA256 c1afe67d reproduced (sorted five-field arrays joined by newlines); delta against the preceding list 29 added (all former claim_identity_gap IDs now native) and 48 removed recomputed and equal to the pack",
+    "sourceDigest": "dbe9b61087af7d673864750e1511cf1e601064d5a6e6abdcaf1060ec1a705dd8",
+    "targetDigest": "none",
+    "evidenceDigest": "e3c32f12dca47996d01b6a98b59e60e8df4067ee2a895fd90e6a419f50542827",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
+    "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+    "bindingMatchedAtApplication": true,
+    "scope": "Five-field candidate list accounting only; candidate status and promotion truth obligations unchanged."
   }
 }

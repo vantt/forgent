@@ -1,0 +1,27 @@
+# runner-final-checks-first-process.log
+START both D 2026-10-15T14:12:00.832Z
+DONE {"label":"both","check":"D","inventoryCommit":"11fc7590f7d0af4da10205359516aee0b0bff5c9","scope":["docs/specs/runner.md"],"previousRegistries":["plans/260925-documentation-authority-unification/reports/identity-registry.json","plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json"],"seconds":109.352,"file":"runner-final-D-both.json","fatal":0,"fatalTypes":[],"open":[{"type":"claims-partial-carry","count":11},{"type":"claims-not-reviewed","count":14},{"type":"candidate-blocks-unreferenced","count":63}]}
+START both E 2026-10-15T14:13:50.626Z
+DONE {"label":"both","check":"E","inventoryCommit":"11fc7590f7d0af4da10205359516aee0b0bff5c9","scope":["docs/specs/runner.md"],"previousRegistries":["plans/260925-documentation-authority-unification/reports/identity-registry.json","plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json"],"seconds":185.096,"file":"runner-final-E-both.json","fatal":3,"fatalTypes":["claims-partial-carry","claims-not-reviewed","candidate-blocks-unreferenced"],"open":[{"type":"claims-partial-carry","count":11},{"type":"claims-not-reviewed","count":14},{"type":"candidate-blocks-unreferenced","count":63}]}
+START identity D 2026-10-15T14:16:56.775Z
+DONE {"label":"identity","check":"D","inventoryCommit":"11fc7590f7d0af4da10205359516aee0b0bff5c9","scope":["docs/specs/runner.md"],"previousRegistries":["plans/260925-documentation-authority-unification/reports/identity-registry.json"],"seconds":244.755,"file":"runner-final-D-identity.json","fatal":0,"fatalTypes":[],"open":[{"type":"claims-partial-carry","count":11},{"type":"claims-not-reviewed","count":14},{"type":"candidate-blocks-unreferenced","count":63}]}
+START identity E 2026-10-15T14:21:01.961Z
+
+
+# final-single-identity-E.log
+START identity E 2026-10-15T14:23:28.733Z
+DONE {"label":"identity","check":"E","inventoryCommit":"11fc7590f7d0af4da10205359516aee0b0bff5c9","scope":["docs/specs/runner.md"],"previousRegistries":["plans/260925-documentation-authority-unification/reports/identity-registry.json"],"seconds":125.023,"file":"runner-final-E-identity.json","fatal":3,"fatalTypes":["claims-partial-carry","claims-not-reviewed","candidate-blocks-unreferenced"],"open":[{"type":"claims-partial-carry","count":11},{"type":"claims-not-reviewed","count":14},{"type":"candidate-blocks-unreferenced","count":63}]}
+
+
+# final-single-phase02-D.log
+START phase02 D 2026-10-15T14:25:44.488Z
+DONE {"label":"phase02","check":"D","inventoryCommit":"11fc7590f7d0af4da10205359516aee0b0bff5c9","scope":["docs/specs/runner.md"],"previousRegistries":["plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json"],"seconds":130.157,"file":"runner-final-D-phase02.json","fatal":0,"fatalTypes":[],"open":[{"type":"claims-partial-carry","count":11},{"type":"claims-not-reviewed","count":14},{"type":"candidate-blocks-unreferenced","count":63}]}
+
+
+# final-single-phase02-E.log
+START phase02 E 2026-10-15T14:28:05.105Z
+DONE {"label":"phase02","check":"E","inventoryCommit":"11fc7590f7d0af4da10205359516aee0b0bff5c9","scope":["docs/specs/runner.md"],"previousRegistries":["plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json"],"seconds":148.471,"file":"runner-final-E-phase02.json","fatal":3,"fatalTypes":["claims-partial-carry","claims-not-reviewed","candidate-blocks-unreferenced"],"open":[{"type":"claims-partial-carry","count":11},{"type":"claims-not-reviewed","count":14},{"type":"candidate-blocks-unreferenced","count":63}]}
+
+
+# final-collect.log
+COMPLETE {"D":0,"E":[{"type":"claims-partial-carry","count":11},{"type":"claims-not-reviewed","count":14},{"type":"candidate-blocks-unreferenced","count":63}],"pending":14}

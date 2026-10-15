@@ -1,3 +1,27 @@
+# Runner final application complete — one 14-row review pending
+
+Assignment `unit-run-1792071833745-bbef008d/producer/1`; content **b80e8c16c**, registry/request **07d3dec1b** reused unchanged. **256 ok applied, Notes verbatim; 14 rationale-only reworks fixed and pending**, all supersede; source **481 reviewed / 14 pending**. [Receipts](runner-final-verdict-application.json).
+
+**D zero fatal**, both priors together/each. **Strict E open only 14 pending + 11 partial-carry + 63 candidate reverse**, no other structural/gap findings; not strict green. **4484 files / 91331 active units**, native registry tuple equality, **zero sync / zero registry write**. List memberships unchanged **62 runner / 846 root / 908 union**. [Verification](runner-final-verification.json).
+
+**ONE bounded 14-row request**, complete before/after rationale, concrete correction labels, unchanged full source/target with digests, b80e8c16c pin, all mandatory deep: [request](review-request-runner-rationale-rereview-b80e8c16c.md), same-path JSON. No seeds/verdicts chosen. L9-16 accepts both reviewed insertion approaches, strict verbatim residual going forward; L9-17 truth-03 accepted and queued for promotion truth check. Original audit/package index added to [turn-coverage](runner-final-turn-coverage.json).
+
+Tests first **74/75** (synthetic randomized mutation-selection fixture), unchanged rerun **75/75**; both logs retained, no tool/test edits or full-suite claim. Scope/binding audit and whitespace check pass. [Report](step-09-report.md), [audit](runner-final-audit.json).
+
+**Step 9 closes when these 14 are applied; then Lead merges main and Step 10 starts.** No new blocker; independent review is pending. A34 residual/group/cutover obligations, Rings, final-main re-decisions, fresh-reader distinction and aliases/consumers/promotion checks remain. No closure/merge/Step 10 transition in this producer turn. Writes only this plan plus required external outbox; docs/protected tools/registry unchanged, no CLI/git writes; runner commits.
+
+---
+
+# Final runner reviews applied — D/E verification running
+
+Assignment `unit-run-1792071833745-bbef008d/producer/1`. **256 ok applied, Notes verbatim** (30 source, 30 predecessor disposition, 196 other scoped receipts); **14 rationale-only corrections complete and pending**. Source rows **481 reviewed / 14 pending**. [Applications](runner-final-verdict-application.json). One bounded **14-row** [request](review-request-runner-rationale-rereview-b80e8c16c.md), full before/after rationale and unchanged source/target, pinned **b80e8c16c**. No seeds/verdicts selected.
+
+L9-16 preserves both reviewed pure-insertion approaches, strict verbatim residual from now on. L9-17 truth-03 accepted, queued for promotion truth check. Omitted b80e final audit/package index added in [turn-coverage supplement](runner-final-turn-coverage.json). Existing registry **07d3dec1b** reused unchanged, **no native sync**; read-only inventory reconstruction and full D/strict E against both priors together/each running. Tests first **74/75** (randomized synthetic mutation fixture selection failure), unchanged rerun **75/75**, both logs retained; no tool/test edits. Scope and binding audit passes.
+
+**Step 9 closes when these 14 are applied under existing closure rules; then Lead merges main and Step 10 starts.** Existing A34 residual/group and cutover obligations, Rings, final-main re-decisions, fresh-reader distinction and promotion truth check remain. No owner-direction blocker. Writes only this plan plus required external result; no docs/protected tool/registry/CLI/git writes; runner commits.
+
+---
+
 # Runner native package complete — one bounded re-review pending
 
 Assignment `unit-run-1792067456433-d25e183b/producer/1`; content **b80e8c16c**. **L9-15 applied:** 16 footer predecessor IDs now pending supersedes to the complete eight-member contextual identical-unit group; identical text conserved within eight decisions, ambiguity accepted because identity cannot be split. All **28 dispositions = 19 supersede / 9 partial-carry**, pending independent review. No identity graft or verdict inferred.

@@ -1,0 +1,112 @@
+generate-doc-inventory: identity registry (commit 48be70239126715a9e62d9676a2b61bbe73e70a1) is bound to b04322bc0f36f33b20b9102b44def7fe15335e76; no carry-forward needed
+generate-doc-inventory: wrote plans/260925-documentation-authority-unification/reports/doc-inventory.json and plans/260925-documentation-authority-unification/reports/doc-inventory.md
+✔ row-set conservation rejects a previous claim id that is neither live, gap nor retired (2.043506ms)
+✔ two different target owners on one semantic claim are rejected, one shared owner is accepted (4.80792ms)
+✔ separate noncanonical evidence payload carriers do not compete for semantic ownership (1.299458ms)
+✔ evidence provenance cannot exempt canonical owners or other noncanonical kinds (0.964853ms)
+✔ a claim row without a disposition or with one outside the vocabulary is rejected (0.220327ms)
+✔ a disposition that requires a target owner is rejected without one, for every such disposition (0.537598ms)
+✔ legacy growth reported by the ratchet becomes a conservation finding (2.678549ms)
+✔ checkConservation separates fatal invariants from open data (0.682392ms)
+✔ a registry stays bound to later commits that change nothing in scope, and to none that do (73.639559ms)
+✔ generation and the gates accept a registry bound to an earlier commit with the same in-scope tree (113.88235ms)
+✔ refresh reuses a bound registry and carries identity forward when the in-scope tree changed (137.354794ms)
+✔ gates CLI: open conservation data is reported by default and fatal in strict mode; a lost claim id is always fatal (179.081334ms)
+✔ gates CLI combines repeated decision inputs and rejects a duplicate across inputs (172.04486ms)
+✔ gates CLI rejects each unreadable or empty decision input instead of ignoring later flags (82.084177ms)
+✔ gates CLI names the refresh command with the current commit when the shards are missing (26.533455ms)
+✔ a retired row without a vocabulary disposition is not a recorded removal (0.427786ms)
+✔ a partial-carry row is open data that blocks the cutover, scoped like the other open checks, and a decision for it names the remainder (1.057147ms)
+✔ identical source units that name different owners are reported as open data (0.211595ms)
+✔ the inventory must describe the current tree and the registry on disk (34.767229ms)
+✔ a targetAnchor is checked against the headings of the target document at the inventory commit (26.746215ms)
+✔ gates CLI strict mode refuses to run without its conservation inputs, and a stale inventory is always fatal (167.177931ms)
+✔ a reviewed decision on a registry gap resolves it while a pending decision does not (34.314645ms)
+✔ a registry gap decision overlays the gap row and reports an unknown, repeated or incomplete one (0.331875ms)
+✔ a reviewed decision is bound to its target unit and detects current digest drift (49.86271ms)
+✔ blocking pairs only with unknown-blocking, a file is decided once, and an unknown-blocking gap stays open (0.470459ms)
+✔ a scope that is an option or matches no inventory path is reported (0.170433ms)
+✔ a file decision replaces the proposed disposition, rationale and target owner of its item (0.231853ms)
+✔ each rule violated by a claim decision is reported with its own finding type (1.486359ms)
+✔ a claim decided twice, in one shard or across shards, is reported once as a duplicate (0.206113ms)
+✔ file decisions naming an unknown path or violating the vocabulary are reported (0.22199ms)
+✔ with decisions, a decided owner that is a promoted or candidate platform document counts as a valid target owner (0.218195ms)
+✔ loadDecisionShards reads one file or a directory in name order and rejects malformed input (1.232711ms)
+✔ a scope restricts every open conservation check to rows whose source path is in scope (0.57457ms)
+✔ a scope matches whole path segments and an empty scope changes nothing (0.237573ms)
+✔ checkConservation scopes the open data and leaves the invariants global (0.242535ms)
+✔ review pack contains full source and target units and reverse unmatched candidate blocks (3.222714ms)
+✔ seeded review uses six real text mutations and scores missed defects and false flags (12.997444ms)
+✔ review application binds current digest and keeps rework and hold pending without inventing approval (5.381104ms)
+✔ valid source digest prefixes survive pack and review application with full seen-text bindings (2.490989ms)
+✔ verdict table names the reviewer and requires an explicit verdict and own note for each row (0.793915ms)
+✔ unknown dispositions remain blocking after a hold verdict and pass decision validation (2.612294ms)
+✔ unknown dispositions remain blocking after a rework verdict and pass decision validation (1.293149ms)
+✔ the same reviewer session on another date is still the author session (0.3004ms)
+✔ pre-reviewed hand rows without committed evidence are rejected instead of skipped (0.338322ms)
+✔ a public seeded pack does not expose its replay inputs or retain original mutated digests (2.2332ms)
+✔ review application requires a passing sensitivity result for the exact shown pack (2.274006ms)
+✔ approval cannot attach to target text or heading ancestry changed after the pack (2.544519ms)
+✔ approved rows retain the seen unit binding and their own report across review rounds (1.951324ms)
+✔ sensitivity controls must belong to the bound batch even when the sensitivity score passes (1.997583ms)
+✔ reviewers receive full text and a unified diff in Markdown with safely nested fences (114.464838ms)
+✔ the public seeded Markdown can be scored without exposing the seed or private selection key (290.141916ms)
+✖ script-proven carries supply batch sensitivity controls without reopening accepted decisions (218.621655ms)
+✔ a new shard cannot claim legacy compatibility by deleting author fields (80.297929ms)
+✔ ordinary committed reviews approve seen text without a sensitivity pack and retain their report pin (213.588361ms)
+▶ ordinary reviews cannot approve a changed digest, an unauthored row or their own session
+  ✔ target-digest (94.21956ms)
+  ✔ source-digest (93.840313ms)
+  ✔ authoredBy (108.818341ms)
+  ✔ authorSession (132.722261ms)
+  ✔ same-session (101.870787ms)
+✔ ordinary reviews cannot approve a changed digest, an unauthored row or their own session (533.012625ms)
+▶ checkpoint reports cannot use the ordinary channel to omit sensitivity proof
+  ✔ checkpoint 3 (235.294178ms)
+  ✔ checkpoint 6 (220.575409ms)
+  ✔ checkpoint 10 (208.90355ms)
+✔ checkpoint reports cannot use the ordinary channel to omit sensitivity proof (665.82095ms)
+✔ the review lint accepts a well-formed ordinary report before application and writes nothing (91.875253ms)
+✔ the review lint uses the recorded target digest of an applied shard without an inventory (133.774953ms)
+▶ the review lint names the line and claim of each malformed verdict row
+  ✔ source-digest-not-64-hex (92.726988ms)
+  ✔ wrong-cell-count (88.566651ms)
+  ✔ non-bare-first-cell (85.242789ms)
+  ✔ target-digest-mismatch (94.929659ms)
+  ✔ source-digest-mismatch (92.488739ms)
+  ✔ bad-verdict (101.329469ms)
+✔ the review lint names the line and claim of each malformed verdict row (556.423616ms)
+✔ the review lint allows labelled non-claim rows but reports unknown claims and missing headers (266.242387ms)
+✔ runner liveness retains current decision assertions with complete-record consumer evidence (3393.95767ms)
+ℹ tests 75
+ℹ suites 0
+ℹ pass 74
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3442.601828
+
+✖ failing tests:
+
+test at test/scripts/doc-review-format.test.mjs:64:1
+✖ script-proven carries supply batch sensitivity controls without reopening accepted decisions (218.621655ms)
+  AssertionError [ERR_ASSERTION]: propose-doc-decisions: insufficient eligible rows for deleted-list-item
+  
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-review-format.test.mjs:71:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

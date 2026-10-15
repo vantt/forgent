@@ -1,0 +1,186 @@
+{
+  "version": 1,
+  "inputCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
+  "contentCommit": "b80e8c16c94cb04c80cc4e858933a9b2a04ddc60",
+  "reviewedOk": 256,
+  "rationaleOnlyCorrections": 14,
+  "sourcePending": 14,
+  "notesVerbatim": true,
+  "all270EvidenceBindingsMatched": true,
+  "all14RequestRowsEqualCurrentShard": true,
+  "unchangedDocumentBindings": true,
+  "docsUnchanged": true,
+  "protectedToolsUnchanged": true,
+  "scopeOnly": true,
+  "registryUnchanged": {
+    "bytes": 61903464,
+    "sha256": "d2675a26883ff1f81e86e6d107d76f315602ada5253d98d3c849c9a8fff09772"
+  },
+  "nativeSyncCount": 0,
+  "coverageIncludesMissingAuditAndIndex": true,
+  "candidateFiveFieldListsUnchanged": true,
+  "candidateUnionUnique": 908,
+  "verification": "plans/260925-documentation-authority-unification/reports/phase-06/runner-final-verification.json",
+  "tests": {
+    "first": {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/runner-final-tests.log",
+      "tests": 75,
+      "pass": 74,
+      "fail": 1,
+      "reason": "script-proven carries fixture: insufficient eligible rows for deleted-list-item; seedReviewPack uses random nonce and greedy removal of eligible units; existing test/tool unchanged"
+    },
+    "rerun": {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/runner-final-tests-rerun.log",
+      "tests": 75,
+      "pass": 75,
+      "fail": 0,
+      "skip": 0,
+      "cancel": 0,
+      "todo": 0
+    },
+    "meaning": "Both logs retained; isolated synthetic fixture selection failure in first run, unchanged rerun passed. No claim of full npm suite."
+  },
+  "files": [
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+      "bytes": 49392,
+      "sha256": "62156334d4d3b6254bf36ca279d430c2ba295295365b6dec7106fe3165359f9f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+      "bytes": 8307,
+      "sha256": "2e87db209cfc203646822fed585cc7b5ee7a1a7532e69ed15c2b8379a8f78eb2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "bytes": 1289379,
+      "sha256": "ce7cd7b4da28807cfd1d713f56c51e2badfa20eaa8d88845b48f850c1c87493d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-root-authorities.json",
+      "bytes": 758341,
+      "sha256": "969c4b56ae9a0fd1958c42ff098b79ce68a315b816310b1874a958e1fb077b2e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-runner.json",
+      "bytes": 251279,
+      "sha256": "4cca48ec5c213d98bf297089873ed6cea4bde5867f32a873e16158d2ead5ed81"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
+      "bytes": 88960,
+      "sha256": "007ed81a361fb0708541b3cfc8aa7f1c74f1679c6ea4a4285f04b2cb490f1ed1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/progress.md",
+      "bytes": 640494,
+      "sha256": "18bf16e218a951f7642662028c7c56645ab0e7038f79ffc35387bbe98a27b8ef"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step-09-report.md",
+      "bytes": 73705,
+      "sha256": "bb924380ab7f64d20d330808724f1bd78154b9997951fe64d83721d3e22a6c8f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-dispositions.json",
+      "bytes": 1063301,
+      "sha256": "2fda8946b027686be87ef60cd833c189a32c5ed04548b6516f478fc16fe63aa5"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-runner-rationale-rereview-b80e8c16c.md",
+      "bytes": 169782,
+      "sha256": "03682940530003a2143efaa4591066853b2fef8b6700e3e7d6a4edcd21f95c2e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-runner-rationale-rereview-b80e8c16c.md.json",
+      "bytes": 535035,
+      "sha256": "1a8490d297874e44f7456ec9d321be9a2a649ff342234e927121c3055d2af319"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-final-D-both.json",
+      "bytes": 1056286,
+      "sha256": "f75db6d906440b456274d1df696a76c43d506c108305fb08f49ff043a6d57151"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-final-D-identity.json",
+      "bytes": 1056286,
+      "sha256": "f75db6d906440b456274d1df696a76c43d506c108305fb08f49ff043a6d57151"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-final-D-phase02.json",
+      "bytes": 1056286,
+      "sha256": "f75db6d906440b456274d1df696a76c43d506c108305fb08f49ff043a6d57151"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-final-E-both.json",
+      "bytes": 1057605,
+      "sha256": "82a47c41e1b2cfbc0ac52ec8b1bf9967ad513e2a8e736758c0a7aad2c7e6789f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-final-E-identity.json",
+      "bytes": 1057605,
+      "sha256": "82a47c41e1b2cfbc0ac52ec8b1bf9967ad513e2a8e736758c0a7aad2c7e6789f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-final-E-phase02.json",
+      "bytes": 1057605,
+      "sha256": "82a47c41e1b2cfbc0ac52ec8b1bf9967ad513e2a8e736758c0a7aad2c7e6789f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-final-checks-first-process.log",
+      "bytes": 1797,
+      "sha256": "ea9d692705bf013b8cd3115fd1ac038d6cf9d84986b0a2c5bba411b57f49a39a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-final-checks.log",
+      "bytes": 3811,
+      "sha256": "8220dac44fefc3fa8e8c80ec30382d9304fbd184a7822eb8ef74efcc55b4ae03"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-final-initial-D-before-review-reports.json",
+      "bytes": 1062859,
+      "sha256": "871bad9c78dbab7ac376d648fd3affcb48990308bad6f3271500c48b89f57048"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-final-initial-checks.log",
+      "bytes": 1614,
+      "sha256": "8576cc50f4c204db338f61f9e06a5bd0713772934f36da51bb1feb0ba5bd5c62"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-final-initial-inventory.log",
+      "bytes": 179,
+      "sha256": "ab879c715edcd17c18530babe8b42d91aa5f60d16a5a3c189e5bf10d904cbbe3"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-final-inventory-read-only.log",
+      "bytes": 179,
+      "sha256": "a58e1f57f53afee262c8c8243d6d9242c84886a377bfeb94e08f55456e0b1083"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-final-tests-rerun.log",
+      "bytes": 7634,
+      "sha256": "4c9583e1121372222ca9a774a17f591cc5876e67eae566a0d001eb608a14ba11"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-final-tests.log",
+      "bytes": 8632,
+      "sha256": "7f0555eb06712fe0ff85c1805a56c5f78f314b861b5bda78c361d040ee297bd1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-final-turn-coverage.json",
+      "bytes": 15285,
+      "sha256": "1c8f285c097a0b02b702b77930ed4a2bc4360bf94e3af8ba1cac748570c65ea2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-final-verdict-application.json",
+      "bytes": 415671,
+      "sha256": "cb9b5d9b8795df8ac725467d65ee284bbe55baea5820bef4655294fcdac11538"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/runner-final-verification.json",
+      "bytes": 17906,
+      "sha256": "6b91134cdb1ac17cbeac4e1bcb747368f92a4699345a4fd6902e10f23994e7a4"
+    }
+  ],
+  "reproduction": "import fs from 'node:fs';import crypto from 'node:crypto';import assert from 'node:assert/strict';import {execFileSync as exec}from'node:child_process';\nconst P='plans/260925-documentation-authority-unification/',R=P+'reports/phase-06/',read=f=>JSON.parse(fs.readFileSync(f)),sha=x=>crypto.createHash('sha256').update(x).digest('hex'),head=exec('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),app=read(R+'runner-final-verdict-application.json'),pack=read(R+'review-request-runner-rationale-rereview-b80e8c16c.md.json'),old=read(R+'review-request-runner-bounded-rereview-b80e8c16c.md.json'),shard=read(P+'ledger/decisions/s9-runner-01.json');\nassert.equal(app.receipts.filter(r=>r.verdict==='ok').length,256);assert.equal(app.fixes.length,14);assert.equal(new Set(app.receipts.map(x=>x.entryId)).size,270);\nfor(const r of app.receipts){const text=exec('git',['show',r.reviewReportCommit+':'+r.reviewReport],{encoding:'utf8',maxBuffer:8e6});assert(text.includes(r.reviewNote),r.entryId);}\nfor(const f of app.fixes){const row=shard.claims.find(x=>x.claimId===f.claimId);assert.equal(row.reviewStatus,'pending');assert.equal(row.disposition,'supersede');assert(!row.rationale.includes('Full native unit digest equal'));assert(!/carried at/.test(row.rationale));assert(f.correctionLabels.every(l=>row.rationale.includes(l)));for(const k of ['sourceUnitDigest','targetOwner','targetAnchor','targetUnitDigest','targetAncestry','claimKind','disposition'])assert.deepEqual(row[k],f.beforeDecision[k]);}\nfor(const r of app.receipts.filter(r=>r.channel==='source'&&r.verdict==='ok')){const row=shard.claims.find(x=>x.claimId===r.entryId);assert.equal(row.reviewNote,r.reviewNote);assert.equal(row.reviewStatus,'reviewed');}\nfor(const e of pack.entries){const {evidenceDigest,sourceDigest,targetDigest,...payload}=e;assert.equal(sha(JSON.stringify(payload,null,2)),evidenceDigest);assert.deepEqual(e.decision,shard.claims.find(x=>x.claimId===e.entryId));const original=old.entries.find(x=>x.entryId===e.entryId);assert.deepEqual(e.after,original.after);assert.deepEqual(e.source,original.source);}\nconst touched=exec('git',['status','--porcelain','--untracked-files=all'],{encoding:'utf8',maxBuffer:8e6}).split('\\n').filter(Boolean).map(l=>l.slice(3));assert(touched.every(p=>p.startsWith(P)),touched.join('\\n'));assert.equal(exec('git',['diff','--','docs/','scripts/','test/'],{encoding:'utf8'}),'');assert.equal(exec('git',['diff','b80e8c16c','HEAD','--','docs/'],{encoding:'utf8'}),'');\nconst coverage=read(R+'runner-final-turn-coverage.json');for(const x of coverage.addedFiles)assert.equal(sha(fs.readFileSync(x.path)),x.sha256);\nconst candidateRows=[];for(const name of ['candidate-unverified-runner.json','candidate-unverified-root-authorities.json']){const before=JSON.parse(exec('git',['show','07d3dec1b:'+R+name],{encoding:'utf8',maxBuffer:8e6})),current=read(R+name),tuple=r=>JSON.stringify([r.claimId,r.path,r.anchor,r.unitDigest,r.fileStatus]);assert.deepEqual(current.rows.map(tuple).sort(),before.rows.map(tuple).sort());candidateRows.push(...current.rows);}assert.equal(candidateRows.length,908);assert.equal(new Set(candidateRows.map(x=>x.claimId)).size,908);assert(coverage.files.some(x=>x.path===R+'runner-b80e-final-audit.json'));assert(coverage.files.some(x=>x.path===R+'runner-b80e-review-package-index.json'));\nconst registry=fs.readFileSync(R+'working-identity-registry.json');assert.equal(sha(registry),'d2675a26883ff1f81e86e6d107d76f315602ada5253d98d3c849c9a8fff09772');\nconst files=touched.filter(p=>p!==R+'runner-final-audit.json').map(path=>{const b=fs.readFileSync(path);return {path,bytes:b.length,sha256:sha(b)};});\nconst check=fs.existsSync(R+'runner-final-verification.json')?read(R+'runner-final-verification.json'):null;\nif(check){assert.equal(check.runs.length,6);assert.equal(check.strictEOnly14PlusClosureAllowed,true);assert(check.runs.filter(x=>x.check==='D').every(x=>x.fatal===0));assert(check.runs.filter(x=>x.check==='E').every(x=>x.fatal===3));}\nconst audit={version:1,inputCommit:head,contentCommit:old.contentCommit,reviewedOk:256,rationaleOnlyCorrections:14,sourcePending:14,notesVerbatim:true,all270EvidenceBindingsMatched:true,all14RequestRowsEqualCurrentShard:true,unchangedDocumentBindings:true,docsUnchanged:true,protectedToolsUnchanged:true,scopeOnly:true,registryUnchanged:{bytes:registry.length,sha256:sha(registry)},nativeSyncCount:0,coverageIncludesMissingAuditAndIndex:true,candidateFiveFieldListsUnchanged:true,candidateUnionUnique:908,verification:check?R+'runner-final-verification.json':'pending full native checks',tests:{first:{file:R+'runner-final-tests.log',tests:75,pass:74,fail:1,reason:'script-proven carries fixture: insufficient eligible rows for deleted-list-item; seedReviewPack uses random nonce and greedy removal of eligible units; existing test/tool unchanged'},rerun:{file:R+'runner-final-tests-rerun.log',tests:75,pass:75,fail:0,skip:0,cancel:0,todo:0},meaning:'Both logs retained; isolated synthetic fixture selection failure in first run, unchanged rerun passed. No claim of full npm suite.'},files,reproduction:fs.readFileSync('/tmp/fgos-work/final-audit.mjs','utf8')};\nfs.writeFileSync(R+'runner-final-audit.json',JSON.stringify(audit,null,2)+'\\n');console.log('AUDIT OK',JSON.stringify({files:files.length,checksComplete:!!check}));\n"
+}
