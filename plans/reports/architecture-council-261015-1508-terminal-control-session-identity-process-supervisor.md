@@ -72,7 +72,7 @@ Code chạm tới: `src/runner/dispatch/confinement/cleanup.mjs`, `authority.mjs
 
 **Sẽ làm:** đóng pane gốc ngay sau worker đầu tiên. Tách worker sau từ pane còn sống; không còn pane thì mở tab mới. **Xoá hẳn** `closeIfEmpty`, vì giữ nó sau khi bỏ pane gốc sẽ đóng nhầm tab có đúng một worker.
 
-**Một thay đổi anh sẽ thấy:** các bước chạy nối tiếp nhau (ví dụ reviewer chạy sau producer) sẽ mở tab mới cùng nhãn, vì tab cũ đã tự biến mất. Muốn giữ một tab xuyên suốt thì có phương án giữ một pane giữ chỗ (ALT-TAB1).
+**Một thay đổi anh sẽ thấy:** các bước chạy nối tiếp nhau (ví dụ reviewer chạy sau producer) sẽ mở tab mới cùng nhãn, vì tab cũ đã tự biến mất. Phương án giữ một pane giữ chỗ để có một tab xuyên suốt (ALT-TAB1) **không làm** (anh quyết 2026-10-15).
 
 **Còn phải kiểm:** chạy lại qua đúng code `createBatchTab` trong sandbox (S3').
 
@@ -109,7 +109,7 @@ Các phép đo S5, S7, S8 rẻ, chạy được ngay để biến "hoãn" thành
 |---|---|---|---|
 | **Khi nào làm Rust** (OQ1) | (a) Node trước, Rust khi có trigger · (b) crate identity ngay · (c) hai crate + bản Node song song · (d) hai nền Rust, một nguồn identity, Node chỉ gọi sang | (a), **không bao giờ (c)** | **(d) thu hẹp**: S6 đã đạt có điều kiện, và hiện đã có hai bản Rust tự tính identity/lock lệch với Node, tức "Rust sau" nghĩa là chấp nhận hai sự thật. Chi tiết ở [thiết kế nền](design-261015-1755-lock-and-identity-foundation-lead-design.md) |
 | **Giữ credential khi không hỏi được pane** (OQ2): herdr không trả lời, credential đã quá hạn | (a) quá hạn thì xoá · (b) giữ tới khi chắc chắn pane đã đóng · (c) xoá nhưng liệt kê để người xử lý | (a) | Đồng ý (a). Sau cách vá 2.1, câu này chỉ còn áp dụng khi controller đã chết hoặc đã quá hạn |
-| **Một tab xuyên các bước nối tiếp** (ALT-TAB1) | có / không | — | Không cần, trừ khi anh thấy phiền vì tab mới |
+| **Một tab xuyên các bước nối tiếp** (ALT-TAB1) | có / không | — | **Đã quyết (anh, 2026-10-15): không làm.** Bước nối tiếp mở tab mới cùng nhãn. Xem lại chỉ khi dùng thực tế thấy phiền |
 | **Mời thêm chuyên môn ngoài** (gate `close`) | herdr nội bộ, process/PTY Linux, chính sách credential, tích hợp Rust/Node, thu hồi tài nguyên đồng thời | Hội đồng chỉ liệt kê | Không bắt buộc. Có giá trị nhất là người hiểu thu hồi tài nguyên đồng thời, khi viết S2 |
 
 ## 6. Bước tiếp theo đề nghị
