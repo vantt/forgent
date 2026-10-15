@@ -108,7 +108,7 @@ Các phép đo S5, S7, S8 rẻ, chạy được ngay để biến "hoãn" thành
 | Câu | Lựa chọn | Hội đồng khuyên | Lead nghĩ |
 |---|---|---|---|
 | **Khi nào làm Rust** (OQ1) | (a) Node trước, Rust khi có trigger · (b) crate identity ngay · (c) hai crate + bản Node song song · (d) hai nền Rust, một nguồn identity, Node chỉ gọi sang | (a), **không bao giờ (c)** | **(d) thu hẹp**: S6 đã đạt có điều kiện, và hiện đã có hai bản Rust tự tính identity/lock lệch với Node, tức "Rust sau" nghĩa là chấp nhận hai sự thật. Chi tiết ở [thiết kế nền](design-261015-1755-lock-and-identity-foundation-lead-design.md) |
-| **Giữ credential khi không hỏi được pane** (OQ2): herdr không trả lời, credential đã quá hạn | (a) quá hạn thì xoá · (b) giữ tới khi chắc chắn pane đã đóng · (c) xoá nhưng liệt kê để người xử lý | (a) | Đồng ý (a). Sau cách vá 2.1, câu này chỉ còn áp dụng khi controller đã chết hoặc đã quá hạn |
+| **Giữ credential khi không hỏi được pane** (OQ2): herdr không trả lời, credential đã quá hạn | (a) quá hạn thì xoá · (b) giữ tới khi chắc chắn pane đã đóng · (c) xoá nhưng liệt kê để người xử lý | (a) | **Đã quyết (anh, 2026-10-15): (a) quá hạn thì xoá.** Sau cách vá 2.1, chỉ áp dụng khi controller đã chết hoặc đã quá hạn; không lan sang run đang chạy |
 | **Một tab xuyên các bước nối tiếp** (ALT-TAB1) | có / không | — | **Đã quyết (anh, 2026-10-15): không làm.** Bước nối tiếp mở tab mới cùng nhãn. Xem lại chỉ khi dùng thực tế thấy phiền |
 | **Mời thêm chuyên môn ngoài** (gate `close`) | herdr nội bộ, process/PTY Linux, chính sách credential, tích hợp Rust/Node, thu hồi tài nguyên đồng thời | Hội đồng chỉ liệt kê | Không bắt buộc. Có giá trị nhất là người hiểu thu hồi tài nguyên đồng thời, khi viết S2 |
 
