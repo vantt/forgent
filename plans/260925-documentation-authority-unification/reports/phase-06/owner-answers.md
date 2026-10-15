@@ -202,3 +202,8 @@ A37 (owner-decided 2026-10-14, option A of the second Step 5 truth escalation, f
 2. Extend the A35 item 2 note ("known stale carried sentences; full truth check owed at promotion") to `docs/platform/work-state/contracts/cli-io-contract.md` in the candidate-unverified list. Do not sweep the rest of the work-state area against code in Phase 6.
 3. No further truth draw for Step 5: the batch truth sample obligation (A28 item 3(a)) is met by this draw plus the corrections and their re-review.
 4. Scope: this escalation only. A later batch whose truth sample exceeds 10% asks the owner again.
+
+A38 (owner-decided 2026-10-15, option A of the R6-1 reviewer-independence question raised by `red-team-6.md` and `review-6-checkpoint.md`, same finding as R5-1 in `red-team-5.md`): reviewer subagents started by the Lead session count as independent reviewers for all of Phase 6. Extends A32 (Lead-spawned fresh readers).
+1. A reviewer, red-team, truth-sample, block-sample, fresh-reader, key-author or checkpoint subagent that the Lead session starts with a fresh context (no conversation history, its own brief) is an independent session for the review rules, provided it authored none of the rows it reviews and the row author is a different session (the Doer).
+2. This applies to ordinary reviews and to the checkpoint reviews of Steps 6 and 10, including the reviewer-held sensitivity pack, which stays the evidence that the reviewer catches seeded defects.
+3. R5-1 and R6-1 are closed by this answer. Scope: all of Phase 6.
