@@ -13,7 +13,7 @@ Thiết kế: [phase-00 §12](phase-00-design-and-review.md).
 |---|---|
 | sửa | `src/setup/registrations.mjs` + test doctor tương ứng |
 | tạo | `docs/platform/session-identity/spec.md` |
-| sửa | `docs/io-contract.md`, `docs/platform/component-boundary.md`, `docs/specs/reading-map.md`, `docs/specs/observe.md`, `docs/specs/distribution.md`, `docs/platform/packaging-distribution/contracts/setup-doctor-registry.md`, `docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md`, `CHANGELOG.md` |
+| sửa | `AGENTS.md` (kênh tương thích cần binary host để ghi), `docs/io-contract.md`, `docs/platform/component-boundary.md`, `docs/specs/reading-map.md`, `docs/specs/observe.md`, `docs/specs/distribution.md`, `docs/platform/packaging-distribution/contracts/setup-doctor-registry.md`, `docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md`, `CHANGELOG.md` |
 
 ## Bước
 

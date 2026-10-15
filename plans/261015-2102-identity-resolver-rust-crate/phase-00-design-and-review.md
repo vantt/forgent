@@ -75,6 +75,11 @@ Giới hạn: nếu một CLI chạy mỗi lệnh tool trong session mới và k
 - Container khác pid namespace dùng chung `.fgos`: pid gốc có thể trùng giữa hai container.
 - Unix không phải Linux: không có bước 2, chỉ bước 3 (trên macOS session của shell terminal thường chính là gốc tab). macOS không phải target release.
 - Pid gốc có thể bị tái dùng sau khi pane đóng; không thêm starttime vì sẽ đổi kiểu `writer.id` (S7 câu 4).
+- Multiplexer không gọi `setsid` cho server: mọi pane gộp về một id. Doctor in `{id, source}` để thấy được.
+- CI runner tự host chạy như service: mọi job chung một session, nên chung id mãi mãi.
+- Process `nohup` sống sau khi pane đóng: rơi xuống bước 3, ra session id, thường bằng pid gốc pane cũ (ổn định chỉ khi tổ tiên cao nhất có tty là session leader).
+- Biến env id bị rò: herdr server hay Claude bật từ trong shell codex mang theo `CODEX_THREAD_ID`, và biến này nay đứng trước `CLAUDE_CODE_SESSION_ID`. Scrub env là việc của 6.3.
+- `FGOS_HOST_BIN` được kế thừa: process con (worker, payload worktree cũ) dùng binary của cha; cha sống lâu có thể giữ đường tới release đã bị dọn (khi đó `host-missing`).
 
 ## 5. Contract và verb
 
@@ -98,9 +103,20 @@ WriterIdentityError { code, category: 'precondition' }   // exit 2
 
 Bỏ các tham số `env`, `pid`, `execFile` hiện có (chỉ test cũ dùng). Không còn `procPpidOf`.
 
-- **Tìm binary (D5), một lần mỗi process, cùng luật với lệnh `fgos`:** `process.env.FGOS_HOST_BIN` nếu là file. Không thì làm đúng việc launcher `~/.local/bin/fgos` + shim fgctl làm: đi ngược từ `process.cwd()` tìm `.fgos/installation/activation.json` gần nhất, cần `status: "ready"` và `releasePath`, binary là `releasePath/bin/fgos` (hoặc `.exe`). Không tìm thấy → `host-missing`, thông báo nói rõ hai cách sửa (chạy qua `fgos`, hoặc đặt `FGOS_HOST_BIN`). Không đọc `target/`, không PATH, không qua shim (+5 ms, S6), không import `host-bin.mjs` (18 ms import; và `host-bin → paths → worktree → store → session-identity` thành vòng import).
-- **Exec:** `execFileSync(bin, ['identity', '--pid', String(process.pid), ...(fgosDir ? ['--fgos-dir', fgosDir] : [])], { timeout: 2000, killSignal: 'SIGKILL', stdio: ['ignore','pipe','pipe'], maxBuffer: 64 KiB })`.
-- **Cache (D3):** `Map` khoá `[fgosDir ?? null, FGOS_SESSION_ID, CODEX_THREAD_ID, CLAUDE_CODE_SESSION_ID]` đọc từ `process.env` lúc gọi. Khoá chỉ để nhớ, không quyết định gì; nhánh pid không cần khoá vì tổ tiên của một process không đổi theo nghĩa của luật (cache giữ câu trả lời đầu tiên, đúng tính chất "một process một id"). Ba tên biến lặp lại contract; test đối chiếu với `session-identity.resolve.v1.json`. Lỗi không bao giờ được cache.
+- **Tìm binary (D5), một lần mỗi process, một module lá cho cả Node:** tạo `src/util/host-bin-path.mjs` (chỉ `fs`/`path`, không vòng import) với `resolveActiveHostBin({ fgosDir, cwd })`, thứ tự:
+  1. `process.env.FGOS_HOST_BIN` nếu là file;
+  2. `<dirname(fgosDir)>/.fgos/installation/activation.json` (fgosDir của store đã là `.fgos` chính, kể cả khi đang ở worktree `fgos pick` dưới `/tmp/fgos-worktrees`; không cần gọi git);
+  3. đi ngược từ `cwd` tìm `.fgos/installation/activation.json` (đúng việc launcher `~/.local/bin/fgos` làm).
+
+  Đọc activation đúng luật shim fgctl: `status: "ready"`, `releasePath`, binary `releasePath/bin/fgos` (hoặc `.exe`), phải là file thực thi. Không tìm thấy → `host-missing`, thông báo nêu các đường đã thử và hai cách sửa (chạy qua `fgos`, hoặc đặt `FGOS_HOST_BIN`). Không đọc `target/`, không PATH, không qua shim (+5 ms, S6), không parse `manifest.json` 242 KB.
+  `src/util/host-bin.mjs` `resolveHostBin` chuyển sang gọi `resolveActiveHostBin` (với `fgosDir` = `.fgos` của main root nó vốn tìm bằng git), giữ phần dò thêm cho caller chỉ có cwd. Như vậy cả Node chỉ còn **một** luật "activation → binary", trùng với shim (RUL11: plan này tạo ra chỗ tách nên gom luôn trong phạm vi). Facade không import `host-bin.mjs` (18 ms import; vòng `host-bin → paths → worktree → store → session-identity`).
+- **Exec:** `execFileSync(bin, ['identity', '--pid', String(process.pid), ...(fgosDir ? ['--fgos-dir', fgosDir] : [])], { env: <process.env bỏ FGOS_INVOCATION_RECORD_PATH>, timeout: 2000, killSignal: 'SIGKILL', stdio: ['ignore','pipe','pipe'], maxBuffer: 64 KiB })`. Bỏ biến đó để verb thật sự không ghi gì (`main.rs` ghi invocation record khi biến có mặt).
+- **Cache (D3), hai tầng:**
+  - Khoá env = `[FGOS_SESSION_ID, CODEX_THREAD_ID, CLAUDE_CODE_SESSION_ID]` đọc từ `process.env` lúc gọi.
+  - Kết quả `pid`/`unresolved` không phụ thuộc `fgosDir`, nên lưu theo **khoá env** một mình: một process chỉ có một id nhánh pid dù gọi với bao nhiêu dir (giữ đúng tính chất của `ownPidIdentity` cũ). Câu trả lời đầu tiên được giữ suốt đời process, kể cả khi sau đó pane đóng và tty mất.
+  - Kết quả `env`/`registry` lưu theo `(khoá env, realpath(fgosDir))` (`path.resolve` khi realpath lỗi), vì `source` phụ thuộc registry của dir đó.
+  - Tra: thử bảng pid theo khoá env trước, rồi bảng env theo cặp. Facade không tự xét env nào hợp lệ (không chép luật); nó chỉ học từ `source` binary trả về.
+  - Ba tên biến lặp lại contract; test đối chiếu với `session-identity.resolve.v1.json`. Lỗi không bao giờ được cache.
 - **Kiểm output:** envelope `fgos.v1`, `ok: true`; `source` thuộc 4 giá trị; `id` đúng kiểu theo `source`. Sai → `bad-output`.
 - **Cache cả `source`:** session đăng ký giữa chừng sẽ không đổi `env` → `registry` trong cùng process. Chấp nhận: S1 #26 xác nhận không chỗ nào dùng `source` để cấp quyền.
 
@@ -109,11 +125,12 @@ Bỏ các tham số `env`, `pid`, `execFile` hiện có (chỉ test cũ dùng). 
 | Tình huống | Facade | Ghi chú |
 |---|---|---|
 | exit 0, envelope đúng | trả `{id, source}`, cache | |
-| không tìm thấy binary / spawn ENOENT, EACCES | `host-missing` | |
-| exit 4 và stderr chứa `unknown verb "identity"` | `host-version-mismatch` | release đang active cũ hơn payload; cần restage/activate |
-| quá 2000 ms | `timeout` | `execFileSync` gửi SIGKILL và **chờ child thoát** trước khi trả về; verb không có side effect nên không có kết quả lửng; lần gọi sau thử lại từ đầu |
-| exit khác 0 khác | `host-error` (kèm stderr) | |
+| không tìm thấy binary / spawn `ENOENT`, `EACCES` | `host-missing` (kèm đường đã thử) | |
+| exit 4 và stderr chứa `unknown verb "identity"` | `host-version-mismatch` | release đang active cũ hơn payload; cần restage/activate. Câu này cố định ở `main.rs` |
+| `err.code === 'ETIMEDOUT'` (quá 2000 ms) | `timeout` | `execFileSync` gửi SIGKILL và **chờ child thoát** trước khi trả về; verb không ghi gì nên không có kết quả lửng; lần gọi sau thử lại từ đầu |
+| mọi `err.code` khác (`ENOBUFS`, `EAGAIN`, `ENOMEM`, `EMFILE`…), chết vì signal khác, exit khác 0 khác | `host-error` (kèm errno/signal/exit, stderr) | |
 | output không parse được / sai hình | `bad-output` | |
+| cache trượt khi process đang giữ `events.lock`/`claims.lock` | `identity-in-lock` | xem §7; không exec |
 
 Không retry (D6). Không bao giờ trả id đoán. `unresolved` vẫn là kết quả hợp lệ, không chặn caller. **Lỗi cài đặt thì chặn verb ghi**: đây là sửa D9 của io-contract ("caller chưa xác danh không bị chặn" vẫn đúng; "không có binary host thì không ghi" là điều mới, theo O5).
 
@@ -130,15 +147,19 @@ Không retry (D6). Không bao giờ trả id đoán. `unresolved` vẫn là kế
 ## 7. Không exec khi đang giữ lock (D4, phần identity của B6)
 
 - Bất biến: **cầu identity không exec khi process đang giữ `events.lock` hoặc `claims.lock`.** Exec khác trong vùng găng (vd `git rev-parse HEAD` trong `claimWork`, B6) không thuộc 5.1 mà thuộc 4.3 (thu hẹp vùng claim). Spec ghi đúng phạm vi lời hứa này.
-- Cách giữ (cấu trúc, không dựa vào caller nhớ): `withEventsLock(logPath, fn, fgosDir = path.dirname(logPath))` và `withClaimsLock(fgosDir, fn)` gọi `resolveWriterIdentity(fgosDir)` **trước** khi lấy lock. `withClaimsLock` dùng đúng dir đã chuẩn hoá (`getMainFgosDir`) mà code bên trong dùng.
-- Call site phải truyền `fgosDir` khi `logPath` là file per-writer dưới `.fgos/events/` (vì `dirname` khi đó là `events/`, sai khoá): `store.mjs` `withEventsLockAndRefresh`, `porting-store.mjs` `withEventsLockAndRefresh`, `events-compaction.mjs:219`, `claim-port.mjs:301`, `events.mjs` `repairTruncatedLastLine`, `appendEvent(logPath, opts, fgosDir)`. Trong store, `resolveWriterLogPath(dir)` vốn đã resolve trước lock; prime trong lock helper làm cho mọi đường khác cũng vậy.
+- Cách giữ (cấu trúc, không dựa vào caller nhớ):
+  - `withEventsLock(logPath, fn, fgosDir = path.dirname(logPath))` và `withClaimsLock(fgosDir, fn)` gọi `resolveWriterIdentity(fgosDir)` **trước** khi lấy lock. `withClaimsLock` prime đúng dir đã chuẩn hoá (`getMainFgosDir`) mà code bên trong dùng.
+  - Lock lồng: `settleClaim` (`store.mjs:1147-1148`) và `claimWork` (`claim-port.mjs:301`) lấy `events.lock` rồi mới tới `claims.lock`. Hai chỗ này prime thêm `getMainFgosDir(dir)` **trước** lock ngoài. Nhờ cache hai tầng (§6), nhánh pid đã trúng sẵn; chỉ nhánh env cần dir đúng.
+  - Call site truyền `fgosDir` khi `logPath` là file per-writer dưới `.fgos/events/` (vì `dirname` khi đó là `events/`): `store.mjs` và `porting-store.mjs` `withEventsLockAndRefresh`, `events-compaction.mjs:219`, `claim-port.mjs:301`, `events.mjs` `repairTruncatedLastLine`, `appendEvent(logPath, opts, fgosDir)`.
+- **Cạnh có canh:** hai lock helper tăng/giảm một bộ đếm "đang giữ lock" cấp process (trong `finally`). Facade trượt cache khi bộ đếm > 0 thì ném `identity-in-lock`, không exec. Đây là lỗi lập trình (một đường mới chưa prime), verb fail sạch trước khi ghi, không phải nhánh riêng cho test.
 - Code bên trong lock vẫn gọi `resolveWriterIdentity(dir)` như cũ và trúng cache.
-- Proof: test đa process đặt `FGOS_HOST_BIN` là một wrapper `sh` ghi lại "lúc exec, `events.lock`/`claims.lock` có tồn tại không" rồi `exec` binary thật. Process mới (cache trống) chạy `addWork`, `editWork`, `moveWork`, `acquireClaim`, `releaseClaim`, `settleClaim`, `claimWork`, `appendEvent` với log per-writer. Wrapper không được thấy lock nào. Đây là hành vi thật, không có nhánh code riêng cho test.
+- Exec khác trong vùng găng vẫn còn và **không** thuộc 5.1: `git rev-parse HEAD` trong `claimWork` (B6), `getMainFgosDir` gọi git khi `acquireClaim`/`releaseClaim` chạy bên trong `events.lock`. Thuộc 4.3.
+- Proof: test đa process đặt `FGOS_HOST_BIN` là wrapper `sh` ghi lại "lúc exec, `events.lock`/`claims.lock` có tồn tại không" rồi `exec` binary thật. Chạy trên **repo git thật có linked worktree, đi qua một đường symlink**, process mới (cache trống), gọi `addWork`, `editWork`, `moveWork`, `acquireClaim`, `releaseClaim`, `settleClaim`, `claimWork`, `appendEvent` per-writer. Wrapper không được thấy lock nào và không có `identity-in-lock`.
 
 ## 8. Hook
 
 - Đổi tối thiểu: thân `resolveIdentity` bọc try/catch như §6.2. Dòng import giữ nguyên.
-- Hook chạy code working tree. Giữa merge và activate, binary đang active chưa có verb `identity` → commit ở main checkout bị từ chối với `host-version-mismatch` (lỗi rõ). Runbook phase 06: activate ngay sau merge, hoặc đặt `FGOS_HOST_BIN` trỏ binary vừa build cho các commit trong khoảng đó.
+- Hook chạy code working tree. Giữa merge và activate, binary đang active chưa có verb `identity` → commit ở main checkout bị từ chối với `host-version-mismatch` (lỗi rõ). Runbook phase 06: activate ngay sau merge, hoặc dùng `git commit` trần với `FGOS_HOST_BIN` trỏ binary vừa build. Commit do một verb `fgos` sinh ra không dùng cách này được: host luôn ghi đè `FGOS_HOST_BIN` bằng chính nó (`legacy_exec.rs:246-247`).
 - Clone mới chưa activate: commit ở main bị từ chối với `host-missing` (O5). Commit trong linked worktree không đi qua bước identity.
 - Điểm gặp với W1' (hook ghi beacon `.fgos/runtime/main-checkout-activity.json` thay cho `main-checkout.lock`): em chỉ sửa thân `resolveIdentity` (khoảng dòng 123–130). Nếu W1' land trước và đổi chỗ gọi, khi merge giữ try/catch quanh lời gọi resolve, bất kể nó đổ vào lock hay beacon.
 
@@ -155,12 +176,16 @@ Không retry (D6). Không bao giờ trả id đoán. `unresolved` vẫn là kế
 
 - `envCases`: env + trạng thái registry (`absent`, `rows`, `corrupt`, `not-array`, không có `fgosDir`) → `{id, source}`. Gồm: thứ tự ba biến; biến rỗng rơi xuống biến kế (bẫy S1 E11); `:` bị loại (dạng `HERDR_PANE_ID`); 201 ký tự bị loại; 200 ký tự nhận; trim; registry khớp/không khớp/hỏng.
 - `treeCases`: bảng process giả `{pid, ppid, session, tty}` + `callerPid` → `{id, source}`. Lấy từ S7: shell trần trong herdr, omp với pty riêng, tool shell của Claude (`tty=0`, session riêng) dưới claude, đường `host` và `direct` cùng pane ra cùng id, daemon codex không tty → session, container pid 1 có tty, process biến mất giữa đường, không đọc được caller → `unresolved`, vòng ppid → dừng.
+- `treeCases` thêm: sudo `use_pty` (pty trong pty, ra shell ngoài), multiplexer không `setsid`, process `nohup` mất tty sau khi pane đóng.
 - Cargo chạy cả hai nhóm. Node chạy `envCases` qua binary thật (env thật, thư mục registry tạm). Nhóm cây chỉ cargo chạy được; Node có thêm test process thật (§11).
 
 ## 11. Test
 
 - Cargo (`packages/session-identity/rust/tests/golden.rs` + unit): mọi vector; parse stat có `)` và khoảng trắng trong comm; `--pid` sai dạng bị từ chối (test binary thật trong `apps/fgos`).
 - Node `test/util/session-identity.test.mjs` (viết lại): `envCases` qua binary thật; đối chiếu ba tên biến với contract; cache (đổi env → kết quả mới; cùng env → không exec lại, đếm bằng wrapper); độ sâu không đổi id (con và cháu qua `sh -c` cùng id); `setsid` không tty → id là session; lỗi `host-missing`, `host-version-mismatch` (binary giả in đúng câu), `timeout` (binary giả ngủ, kiểm child đã chết khi facade trả về), `bad-output`, `host-error`; lỗi không bị cache; tìm binary qua `activation.json` trong cwd giả.
+- Node: cache hai tầng (nhánh pid một id cho mọi dir; nhánh env tách theo realpath dir); `identity-in-lock` khi trượt cache trong lock; env con không có `FGOS_INVOCATION_RECORD_PATH`; `host-bin-path.mjs` (thứ tự ba nguồn, luật shim, file không thực thi bị bỏ) và `host-bin.mjs` dùng nó.
+- Regex/độ dài id trong `execution-contract.mjs:249-250` là bản chép còn lại: test đối chiếu với contract JSON.
+- Baseline `scripts/check-decision-codes.baseline.json` có tên file test bị viết lại: sinh lại đúng lệnh mà suite dùng, `git diff --stat` trước khi stage.
 - Node đa process §7: `test/state/identity-before-lock.test.mjs`.
 - Test đang có cần sửa: hook e2e (truyền `FGOS_HOST_BIN` cho git), `test/state/store.test.mjs`, `runtime-coordination`, `test/cli/fgos-post-merge.test.mjs`, `merge*.test.mjs`, `runner-loop`, `root-file-guard-hook`, `command-routes`, `help-routes`, Observe `eval_journal_test.rs`.
 - Rà test spawn `bin/fgos.mjs` với env tự dựng không có `FGOS_HOST_BIN` (`env: {` không trải `process.env`): thêm biến vào env đó, không thêm nhánh bỏ qua.
@@ -168,7 +193,8 @@ Không retry (D6). Không bao giờ trả id đoán. `unresolved` vẫn là kế
 
 ## 12. Doctor, setup, docs
 
-- Doctor `writer-identity-resolvable` (`src/setup/registrations.mjs`): gọi facade với `.fgos` của cwd; pass in `{id, source, binary}`; fail với mã lỗi và cách sửa. Không thêm config default hay env var mới; `fgos setup` không đổi.
+- Doctor `writer-identity-resolvable` (`src/setup/registrations.mjs`): resolve **hai lần**, một lần theo đường bình thường (có `FGOS_HOST_BIN` khi chạy qua host), một lần bỏ qua `FGOS_HOST_BIN` (đường mà hook của `git commit` trần đi). In `{id, source}` và cả hai binary. Fail khi đường thứ hai không tìm được binary trong main checkout có activation, kèm mã lỗi và cách sửa. Không thêm config default hay env var mới; `fgos setup` không đổi.
+- Kênh tương thích (`node bin/fgos.mjs`, `bin.fgos` của npm global) không có `FGOS_HOST_BIN`: chỉ ghi được khi cwd/fgosDir nằm trong project đã activate. Ghi rõ ở [AGENTS.md](../../AGENTS.md) mục "Legacy-Node CLI Ownership Boundary", `docs/specs/distribution.md` và CHANGELOG. O5 giữ nguyên.
 - Ghi check vào [`docs/specs/distribution.md`](../../docs/specs/distribution.md) và [`setup-doctor-registry.md`](../../docs/platform/packaging-distribution/contracts/setup-doctor-registry.md).
 - Spec mới `docs/platform/session-identity/spec.md` (khung giống Convention spec). [`docs/io-contract.md`](../../docs/io-contract.md): câu `pid` đổi thành gốc terminal → session; thêm câu lỗi cài đặt chặn verb ghi. [`component-boundary.md`](../../docs/platform/component-boundary.md) thêm hàng. [`reading-map.md`](../../docs/specs/reading-map.md) thêm dòng. [`docs/specs/observe.md`](../../docs/specs/observe.md) câu tên shard. [node-to-rust-migration.md](../../docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md) thêm hàng "Session Identity in Rust".
 - CHANGELOG `[Unreleased]`: verb `fgos identity`; id mới cho shell trần, agy/pi/omp, pane codex; payload Node cần binary host cho mọi lần ghi; tên shard Observe; `sessionId` của friction; phải drain trước activate.
@@ -179,9 +205,9 @@ Không retry (D6). Không bao giờ trả id đoán. `unresolved` vẫn là kế
 |---|---|---|
 | D1 | Không tty → session id, `source: pid` | §4.1 |
 | D2 | `--pid` tuỳ chọn, mặc định `getppid()`; **không** so với `getppid()` | Luật không phụ thuộc độ sâu nên phép so chỉ thêm đường lỗi (wrapper, Windows). Identity không cấp quyền, khác owner pid của lock helper. Facade vẫn luôn truyền `--pid` (S6 điều kiện 5, nhánh `unresolved`) |
-| D3 | Cache theo `(fgosDir, ba biến env)` từ `process.env` | ~57 chỗ test đổi `process.env.FGOS_SESSION_ID` giữa chừng |
-| D4 | Prime trong `withEventsLock`/`withClaimsLock` | §7 |
-| D5 | `FGOS_HOST_BIN` → `activation.json` gần nhất đi ngược từ cwd | Đúng binary mà lệnh `fgos` chạy ở cwd đó (launcher + shim là cửa duy nhất người dùng đi qua). `host-bin.mjs` dùng luật thứ hai (manifest, main root); gom nó về luật này là việc riêng, ghi trong report (RUL11, ngoài phạm vi) |
+| D3 | Cache hai tầng: nhánh pid theo khoá env; nhánh env theo `(khoá env, realpath dir)` | ~57 chỗ test đổi `process.env.FGOS_SESSION_ID` giữa chừng; một process một id nhánh pid |
+| D4 | Prime trong `withEventsLock`/`withClaimsLock` + hai chỗ lock lồng; trượt cache trong lock → `identity-in-lock` | §7 |
+| D5 | Module lá `host-bin-path.mjs`: `FGOS_HOST_BIN` → activation cạnh `fgosDir` → activation gần nhất từ cwd; `host-bin.mjs` dùng lại nó | Một luật "activation → binary" cho cả Node, trùng shim. Chạy được trong worktree `/tmp/fgos-worktrees` |
 | D6 | Timeout 2000 ms, SIGKILL + chờ child thoát, không retry | §6.1 |
 | D7 | Hook chỉ thêm try/catch | §8 |
 | D8 | Facade ở `src/util/session-identity.mjs`, test ở `test/` | Payload release chỉ stage `src/` (`package.json` `files`), `npm test` chỉ tìm trong `test/`; tiền lệ Convention Q10/Observe. Đưa vào `packages/session-identity/src` phải đổi staging và runner test, không mua thêm gì |
@@ -191,7 +217,8 @@ Không retry (D6). Không bao giờ trả id đoán. `unresolved` vẫn là kế
 | Rủi ro | Giảm |
 |---|---|
 | Commit ở main bị chặn giữa merge và activate | Runbook phase 06; thông báo lỗi nói cách sửa |
-| Claim mở dưới id số không settle được sau đổi | Drain trước activate (phase 06). Hôm nay có 3 claim giữ bởi `"2548"` |
+| Claim mở dưới id cũ không settle được sau đổi | Drain **mọi** claim mở trước activate (phase 06), không chỉ id số: id chuỗi cũng đổi khi process có cả `CODEX_THREAD_ID` lẫn `CLAUDE_CODE_SESSION_ID`. Hôm nay có 12 claim mở, 3 giữ bởi `"2548"` |
+| Worktree tạo trước 5.1 vẫn chạy resolver Node cũ, ghi vào `.fgos` chính dưới id khác | Runbook phase 06: liệt kê worktree đang mở có merge-base trước 5.1, catch-up trước khi ghi |
 | Mọi lần ghi Node cần binary host | Production: host đặt `FGOS_HOST_BIN`. Dev/test: `run-tests.mjs` đã build. Chạy `node bin/fgos.mjs` trực tiếp ở chỗ không có activation thì fail rõ (O5) |
 | Test đổi hành vi theo có/không tty (local khác CI) | Bước 3 làm CI và local cùng "một writer cho cả lượt chạy" |
 | Cache theo khoá env làm test đổi env chậm hơn (mỗi khoá mới ~3 ms) | Chấp nhận |

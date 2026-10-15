@@ -13,7 +13,8 @@ Thiết kế: [phase-00 §6–§8, §11](phase-00-design-and-review.md).
 | Hành động | File |
 |---|---|
 | viết lại | `src/util/session-identity.mjs`, `test/util/session-identity.test.mjs` |
-| tạo | `test/state/identity-before-lock.test.mjs` |
+| tạo | `test/state/identity-before-lock.test.mjs`, `src/util/host-bin-path.mjs`, `test/util/host-bin-path.test.mjs` |
+| sửa | `src/util/host-bin.mjs` (`resolveHostBin` dùng `resolveActiveHostBin`) + test của nó |
 | sửa | `src/state/events.mjs`, `src/state/runtime-coordination.mjs`, `src/state/store.mjs`, `src/state/porting-store.mjs`, `src/state/events-compaction.mjs`, `src/runner/claim-port.mjs` |
 | sửa | `.githooks/pre-commit`, `bin/fgos.mjs` (5 chỗ nhả lock), `src/runner/lock-wait.mjs`, `src/cli/invocation-fault-log.mjs`, comment `src/runner/dispatch/execution-contract.mjs:244` |
 | sửa test | hook e2e, `store`, `runtime-coordination`, `fgos-post-merge`, `merge*`, `runner-loop`, `root-file-guard-hook`, harness CLI nếu env tự dựng |
