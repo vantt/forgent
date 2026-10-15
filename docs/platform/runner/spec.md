@@ -27,7 +27,7 @@ Supersedes: None; legacy authority retained
 Superseded by: None
 ```
 
-> Added in candidate: Metadata and map-based placement scaffolding. The area introduction follows the frozen map into architecture/h-e53a3a9829a8.md. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: A41 F4: candidate authoring date (docs/specs/runner.md:3193-3200); A41 F4: no current full-coverage certification (docs/specs/runner.md:3193-3200). Front-matter sources/decisions retain legacy provenance lists, not a completeness claim.
+> Added in candidate: Metadata and map-based placement scaffolding. The area introduction follows the frozen map into architecture/h-e53a3a9829a8.md. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: A41 F4: candidate authoring date (docs/specs/runner.md:1-7 front matter; :1121 RUL100 dated 2026-10-15); A41 F4: no current full-coverage certification (docs/specs/runner.md:1-7, stale sources/decisions lists; :1121 dated 2026-10-15). Front-matter sources/decisions retain legacy provenance lists, not a completeness claim.
 
 
 ## Added in candidate: Navigation

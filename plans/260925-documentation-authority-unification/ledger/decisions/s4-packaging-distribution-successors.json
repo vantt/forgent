@@ -474,16 +474,16 @@
       "sourceUnitDigest": "95e75f7d43d50bbae0d6a7979aa0db2f01326f00fc290507fdf8bf046403a547",
       "disposition": "partial-carry",
       "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
-      "targetAnchor": "unheaded-block-3",
-      "authoredBy": "codex-session:unit-run-1792062144702-ef1d2734@2026-10-15",
+      "targetAnchor": "unheaded-block-36",
+      "authoredBy": "codex-session:unit-run-1792066534402-cb278bf5@2026-10-15",
       "reviewStatus": "pending",
-      "rationale": "L9-9/A22 re-decision: upstream edits removed or rewrote RUL77 posture and pending-copy cap obligations, so whole-unit successor containment no longer holds. The mapped candidate retains only part. Partial-carry preserves the omitted wording in the full digest-bound residual; no retirement, truth or approval carry. Independent conservation and A34 representation review owed; blocks cutover.",
-      "targetUnitDigest": "d52805501d986df922e8ca582cc5ec3f5a78c7ece11bdac910f4e6ffdf9e2bdb",
+      "rationale": "L9-10/A22: partial-carry to the actual RUL77-RUL80 successor; only historical lines not carried verbatim form the residual. RUL77 heading, RUL79 mixed suffix and the old pending-copy cap line of item 4 are not carried verbatim. Pending independent conservation and A34 review; blocks cutover.",
+      "targetUnitDigest": "3b974a9c1a82356e256e9b6923c80104f778651f67447179efdc0ffbf09ac485",
       "targetAncestry": [
         "Added in candidate: Runner Business Rules",
         "Business Rules"
       ],
-      "remainder": "Full original and missing/rewritten lines retained verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-l9-9-partial-carry-residual.json, SHA256 e9e0f0c0c4f9c47ea8c51c7564a2892059d6697cfec6d1654d915f26f28c8e69; bound to source 95e75f7d43d50bbae0d6a7979aa0db2f01326f00fc290507fdf8bf046403a547 and primary target d52805501d986df922e8ca582cc5ec3f5a78c7ece11bdac910f4e6ffdf9e2bdb. Pending independent A34 review; blocks cutover."
+      "remainder": "Only uncarried historical RUL77/RUL79 lines and the changed item 4 pending-copy-cap line retained verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-l9-9-partial-carry-residual.json, file SHA256 2cd7eb5b8a07e891d20bcd680ea83362c768566120f9b656d34d81559b63ad6c; row SHA256 f4af984047c4b4749d392eb331da7317f24509ea78725acbe59ce605cef49ab7; source 95e75f7d43d50bbae0d6a7979aa0db2f01326f00fc290507fdf8bf046403a547; primary target 3b974a9c1a82356e256e9b6923c80104f778651f67447179efdc0ffbf09ac485. Pending independent A34 acceptance; blocks cutover."
     },
     {
       "claimId": "claim_c2aa4371cc420cd24793da9c23497e42",

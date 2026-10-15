@@ -1,0 +1,105 @@
+{
+  "version": 1,
+  "status": "pending A34 acceptance; historical wording only, not current truth",
+  "rows": [
+    {
+      "claimId": "claim_f64fa4a36030f89feab71dc5943015c0",
+      "sourceUnitDigest": "92ca20e4e333b0933210a6adf9f39c7cc0a46eb800a1e19404ad019e80730e0a",
+      "primaryTarget": {
+        "path": "docs/specs/runner.md",
+        "anchor": "unheaded-block-125",
+        "unitDigest": "97b0e92a0ff83b4b98002158e13f563d8738446ac64f0fcaeace320234d79b7b"
+      },
+      "residualText": "**Architecture advisory — current boundary.** `core/skills/fgos-architecture-panel/SKILL.md` guides the registered `architecture-advisory` Workflow's five-step DAG; executor/provider/model/invocation selection remains config + `bind()` owned, not a skill roster. Every advisory role requires read-only posture with `mode: \"required\"`, `policyId: \"host-write-denied\"` and `policy.controls.hostWrite: \"deny\"`; missing safe execution refuses, never silently falls back inline or unconfined. Binding/posture resolution is policy/provenance evidence, not live confinement proof. Retained cognitive doctrine is not a claim of end-to-end specialist, dialogue, distinct per-seat tasks, final-packet review or interrupted-Unit continuity; those gaps belong to the separate [advisory completion plan](../../plans/261006-1408-advisory-capability-completion/plan.md), not this single-door hygiene cleanup.",
+      "residualSHA256": "92ca20e4e333b0933210a6adf9f39c7cc0a46eb800a1e19404ad019e80730e0a"
+    },
+    {
+      "claimId": "claim_f4058f068a378962aaf237ae038db5af",
+      "sourceUnitDigest": "d2f7e04754c3720cace2cf46bb12fb5e3701574c76182e79aacbd1b6f6de95e8",
+      "primaryTarget": {
+        "path": "docs/specs/runner.md",
+        "anchor": "unheaded-block-134",
+        "unitDigest": "20b88b9765b1528632270f740a923bdcca1df84a4a3000f87e45e1b1b177ffcd"
+      },
+      "residualText": "**Vai mù thật sự (`blind`) — chặn đọc run state của peer.** Mặc định tắt (không đổi hành vi). Một cờ ở Unit (và ở `template` của Workflow): `blind: true` làm *mọi vai* của Unit chạy với `hostRead: blind` (`docs/specs/confinement-authority.md` §9.2): worker không đọc được `.fgos/assignments`, `.fgos/workflow-runs`, `.fgos/dispatch-runs` của project, thư mục socket herdr, private home của dispatch khác, hay `/proc/<pid>` của tiến trình anh em; chỉ đọc được thư mục của chính nó (brief, ref đã được trao — chỉ-đọc) và ghi outbox. Phần còn lại của host (repo, `node`, DNS) và file tracked trong `.fgos` không đổi. Unit `blind` không bao giờ chạy không-blind: nếu không thực thi được — `bind()` không chọn in-process/inline, không có bwrap, mode không `required`, probe hỏng/chưa tươi, `cwd` hay ref nằm trong vùng bị che — dispatch bị từ chối trước khi spawn với lý do có tên (`blind-in-process`, `blind-requires-confinement`, `blind-hides-workspace`, `blind-ref-hidden`, `confinement-probe-failed`, ...). Với Unit `blind`, input `unit-run:`/`gate-answer:` (và ref bất kỳ nằm trong vùng bị che) không được giao bằng đường dẫn gốc: lúc dispatch, `resolveUnitInputs` + `copyHandoffsInto` chép nguyên byte (kiểm sha256) vào `inputs/` của round dir của chính vai đó, mỗi vai một bản, tên trung tính khi có `anonymizeInputs`; `unit.json` giữ `inputMap`, resume dùng lại bản chép. `blind-ref-hidden` chỉ còn cho ref không chép được. Workflow bật `blind`: hai bước panel của `delphi` (`propose-round-1`, `propose-round-2`), `generate-ideas` của `nominal-group`, `sense-making-panel` của `group-cognition`; `architecture-advisory` và `business-discussion` chưa bật vì pool của chúng gồm agy, họ chưa qua canary blind.",
+      "residualSHA256": "d2f7e04754c3720cace2cf46bb12fb5e3701574c76182e79aacbd1b6f6de95e8"
+    },
+    {
+      "claimId": "claim_77a827ba40c328bd2c4d6a8ec713df65",
+      "sourceUnitDigest": "5a99ae10ac39e5bf6d8b29289aaba42958a45534c58e9e2dfa85fbb744472f14",
+      "primaryTarget": {
+        "path": "docs/specs/runner.md",
+        "anchor": "unheaded-block-314",
+        "unitDigest": "7518a36eebda7c6697541c1dbcfba86b9d00018685cd6f34a0abf6d6a3c8bc27"
+      },
+      "residualText": "  6. **Xoá bỏ hoàn toàn:** Invocations `*-readonly`, `readOnlyRedirects`, `placement-policy.mjs`, `executors.*.for`, PolicyPatch `prefer*`. Posture read-only/ghi file là confinement OS do fgOS áp cho cả herdr lẫn cli (X-1). Quota limit `provider-limit` kích hoạt `bind().nextCandidate` mở pane mới giữ pane cũ (X-3).",
+      "residualSHA256": "bc156e257f11baa165661a9485843d88034862465f95da930b0b9d719cd02fbd"
+    },
+    {
+      "claimId": "claim_3dcf1baab2b0ac4b7ab7f84e30b8ab41",
+      "sourceUnitDigest": "24e736b37697fbd3c3ce53ed568dfa89aa2bff023c3e3deb0ed686b364f327e6",
+      "primaryTarget": {
+        "path": "docs/specs/runner.md",
+        "anchor": "unheaded-block-315",
+        "unitDigest": "715faf8184937613283eecfb3043d6da73c2aec15278e160e579e5d655f940a9"
+      },
+      "residualText": "  3. **Cổng người thống nhất:** Authorize không parse từ prose plan. Phase chưa được duyệt sẽ dừng ở cổng người của Workflow run (`gate: { kind: \"human\" }`), owner trả lời qua `fgos workflow answer`. Mọi câu hỏi treo được gom thành một bộ duy nhất.",
+      "residualSHA256": "8bc3606b98c62ce25e24758e61ab2ce29d0b1cae7946de31ef9910caf3b93046"
+    },
+    {
+      "claimId": "claim_93d5f2d34cf452029462ea39674fd255",
+      "sourceUnitDigest": "dea0728314fa0ae7aa5070aa2d76aa20e1788d2e18d9fcbbe80f5dae4be9ccd8",
+      "primaryTarget": {
+        "path": "docs/specs/runner.md",
+        "anchor": "unheaded-block-320",
+        "unitDigest": "6adc7286a12983c2a05c64d6dce33d420d981369a2a0f7c019aa91445e84285f"
+      },
+      "residualText": "  3. **Workflow store ghi `unitRunId`** trên `unit.complete`; bước sau thấy report của mọi vai của mọi bước phụ thuộc, như trước.",
+      "residualSHA256": "cb83b5bf2a58b18bafc0400f3f78322b8b96752a248e369e78da5e9c05fc0afd"
+    },
+    {
+      "claimId": "claim_74a47937380f03ed75fa755f0faccffb",
+      "sourceUnitDigest": "f57b559b1939a5bead253cd2aaefc94ef14af54a42a8c15d7fbc3bf293ae4757",
+      "primaryTarget": {
+        "path": "docs/specs/runner.md",
+        "anchor": "unheaded-block-71",
+        "unitDigest": "93eab619825cf7b3dc5c716075a75cd59df757298fe89f16b42990d4155e4167"
+      },
+      "residualText": "Fault classifier chỉ đọc high-confidence provider stderr, adapter outcome đã biết (`paused-limit`), hoặc structured agent JSON như `stopReason`; không scan prompt/brief/report/general stdout. Quota/rate-limit quarantine account; auth/login/token quarantine dạng manual-clear; credential provisioning/config/test/confinement/work-product failure không quarantine. Manual clear duy nhất là `fgos dispatch reconcile provider-capacity clear-quarantine --provider <provider> --account <id> --reason \"<why>\"` (unknown provider/account bị refuse; non-quarantined account bị refuse trừ khi `--force`). `fgos dispatch inspect --provider-capacity` và `fgos doctor` chỉ report; doctor không auto-clear auth quarantine. `readOnlyExecutorRedirects` vẫn giữ nguyên trong slice này; không có `providerFallback`, `providerRuntimes`, `providers.<provider>.models`, six-tier runtime wiring, cross-provider fallback, hay retry loop trong rotator.",
+      "residualSHA256": "f57b559b1939a5bead253cd2aaefc94ef14af54a42a8c15d7fbc3bf293ae4757"
+    },
+    {
+      "claimId": "claim_20a5804444535524364c0049e5bc87dd",
+      "sourceUnitDigest": "f14dad0a401a272c3f3606f6c1e458003aacc9b553636202bf42ec9fad29a3f0",
+      "primaryTarget": {
+        "path": "docs/specs/runner.md",
+        "anchor": "unheaded-block-9",
+        "unitDigest": "43f03eb4dffdeff420f464531d60be7e37e13192429963b10ba302be1e9b777e"
+      },
+      "residualText": "| 1 | Cấu hình runner (file committed ở gốc repo) | Chính sách thực thi — LÀ CONFIG THỰC THI ĐƯỢC: ai sửa nó điều khiển tiến trình được spawn (đầu vào tin cậy) | `executor` — mẫu lệnh gọi trợ lý (thay thế `{prompt}`/`{model}` theo từng phần tử, không bao giờ qua shell), tùy chọn `adapter` (mặc định `cli-spawn`) · `executors` — catalog executor theo danh tính provider/cách gọi, không mang khẩu vị chất lượng · `modelPolicies` — bảng bắt buộc provider→tier→model với tier cung `nano|mini|standard|advanced|flagship|frontier` · `rigorToTier` — bảng bắt buộc ánh xạ đủ bốn mức cầu `low|standard|high|critical` sang tier cung · `capabilities.<name>.rigor` — sàn cầu tùy chọn, chỉ nâng; khối `capabilities.<name>.overrides` bị từ chối · `timeoutMs` — trần thời gian một worker · `confinement`/`confinementPolicies` — chính sách giam giữ · `capabilities` — catalog lời hứa hành vi và binding executor/invocation | yes | tự sinh khi vắng mặt tại đường dẫn mặc định (không kèm `--config`); `fgos setup` điền `rigorToTier`, `fgos doctor` kiểm bảng này và các khoá placement đã retired; một `--config <path>` tường minh trỏ vào đường vắng mặt vẫn báo lỗi ngay (`fgos discover`/`plan`; `fgos-runner` không còn `--config`, RUL93 (the runner loop's worker and the fan-out batch run as one Unit run each)) |",
+      "residualSHA256": "47a5cc727c912f76812cf4bffdbd6317c5283da0811822b14c5557f6f459dd7e"
+    },
+    {
+      "claimId": "claim_072766aafbaf01714df1aa65347a1d24",
+      "sourceUnitDigest": "f503ccc86158d7a9b67881c8983a4acb08172087f1d5f736628e21ef3832a0b2",
+      "primaryTarget": {
+        "path": "docs/specs/runner.md",
+        "anchor": "unheaded-block-90",
+        "unitDigest": "8b0b585d72e6e964b858670c69a32f7c2983b02b8fd11c3fbceda65fc93daee0"
+      },
+      "residualText": "  2. Mọi thứ Work-aware chuyển ra tầng Work: `src/runner/operation-choice.mjs` (chọn operation cho bước hiện tại, trước ở `dispatch/`), `src/runner/work-dispatch.mjs` (`spawnWorker`, `resolveAgentTypeForWork`, `resolveWorkForDispatch`, `workDispatchContext`), `src/runner/work-compat.mjs` (`executorIdForWork`, `buildPrompt`, `workCapabilityHints`). Dispatch nhận đầu vào đã phân giải: `workExecutorId` (plan), `capabilityHints`/`agentType` (`executeExecutorCli`/`executeAssignment`), và hook `resolveWork` cho `decide --work` — `dispatch/cli.mjs` không còn bộ đọc event Work riêng, không còn bản chép đồ thị stage.",
+      "residualSHA256": "6516be6ac5cb103b5616f5df325fc593a00c484c50c6f44a6c490fd0ecc2c3fa"
+    },
+    {
+      "claimId": "claim_d5ba1eda7530b865fec747ee0adbc102",
+      "sourceUnitDigest": "77083ab43b25bd2e30eb1ff1f2b24db87e02420e7cc187773951d44a3a9df49f",
+      "primaryTarget": {
+        "path": "docs/specs/runner.md",
+        "anchor": "unheaded-block-94",
+        "unitDigest": "3b974a9c1a82356e256e9b6923c80104f778651f67447179efdc0ffbf09ac485"
+      },
+      "residualText": "- **RUL90 (the raw dispatch doors are removed; dispatch is the lower layer and fanout belongs to the Work layer, 2026-10-14; decision 0062, replaces the purpose-door part of RUL68 (2 tầng dispatch) and the one-posture-lane-per-door part of RUL77 (posture belongs to the capability)).** Work is executed through two doors only, `fgos run` (`\"<prompt>\"`, `--unit`, `--resume`) and `fgos workflow start`, both on `runUnit`. `dispatch execute` (executor id, `--contract`, `--assignment`), `dispatch log` and `dispatch fanout-batch` are gone, with `src/runner/dispatch-log.mjs`; calling `dispatch execute` (any form) or `dispatch log` returns a `validation` error with one sentence naming the replacement (`fgos run \"<prompt>\" [--provider <executor>] [--capability <c>] [--writes …]` or `fgos run --unit`, where `--provider` is named only for an agent executor — `fgos run` refuses any other kind — the `--for` capability is kept when it is registered, and a tool executor's caller is told to call that tool directly; the dispatch-decide hook's BLOCKED message is built the same way, by `runDoorHint`; `fgos run --unit` or a Workflow for `--assignment`; provenance under `.fgos/assignments/<unitRunId>/` for `dispatch log`), from one place in `bin`, also for `returnResult` callers. `executeExecutorCli` has no CLI door left: it is the transport step of an Assignment (`assignment-runner.mjs`), and its one other caller, `fanout-batch.mjs`, is listed in `R3_PENDING_WORK_CALLERS` until fanout runs on `runUnit`; `fgos dispatch` keeps `decide`, `inspect`, `reconcile` and `probe-account`. `src/runner/dispatch.mjs` imports nothing from the Work layer: `decide --work` gets its Work resolver injected from `bin`, so it runs only as `fgos dispatch decide --work`. A Unit's posture comes from its `writes` (none: read-only, sandboxed; some: mutating, in a linked worktree) plus the capability's required confinement, never from which door was used. Fanout adds no verb: `node src/runner/fanout-batch.mjs \"<ids>\" [--has-live-task-access]` prints `fired`, `mechanismChanged`, `unavailable`, `deferred` (plus `slotsFull: true` when no slot was free); its body moves onto `runUnit` with the Work-layer cut. An import guard (`test/architecture.test.mjs`) keeps `dispatch.mjs` and `src/workflow/**` free of Work imports, following relative imports transitively (a re-export one or more hops away counts) and reading `require()` and literal `import()`; a call-site guard over `src`, `bin`, `scripts`, `domains` and `core` names the files allowed to call `executeAssignment`, `executeExecutorCli`, `commitUnitWork` and `executeThroughConfinement` (an aliased, destructured or namespace use counts as a call; `export *` from their home modules is refused), with Work-layer callers not yet on `runUnit` listed in `R3_PENDING_WORK_CALLERS`, compared by equality so the list can only shrink. An `import()` with a non-literal specifier is not yet seen by the import guard (left to the dispatch-generic-inputs phase). The doctrine test `test/docs/run-doors-doctrine.test.mjs` refuses `AGENTS.md`, any skill source or any render that still teaches a removed door.",
+      "residualSHA256": "cecd70f251aacaf5bf34abe8b712e309493dbc9165e11c976f02af96118cce0a"
+    }
+  ]
+}

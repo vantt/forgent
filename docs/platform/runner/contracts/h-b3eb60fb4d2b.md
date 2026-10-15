@@ -20,7 +20,7 @@ Supersedes: None; legacy authority retained
 Superseded by: None
 ```
 
-> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: R9-5: remove decisions-placement boilerplate from non-decision carrier ().
+> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: R9-5: remove decisions-placement boilerplate from non-decision carrier.
 
 ## ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)
 
@@ -36,16 +36,18 @@ made the **ExecutorProfile** half real too: `executors.<id>.identity`
 (all four fields required together when declared) and `executors.<id>.supports`
 (each field independently optional) are now validated, additive config
 fields (`validateExecutorIdentityShape`/`validateExecutorSupportsShape`,
-same file) that survive `resolveExecutorAndOverrides` unchanged. Neither
-field has a real consumer yet — no resolution/dispatch/PlacementPolicy code
-reads `identity`/`supports` for any decision — this is metadata a later
-phase can build on, not a behavior change. `claude` is the one real
-executor declaring both today (`.fgos/config.json`), proving the shape end
-to end; every other `runner.executors.<id>` entry stays exactly as it was,
-and legacy executor ids remain fully accepted. **No executor-id
-consolidation or config-shape retirement has happened** (that is Phase E,
-not started) — this section still describes the fuller target the
-vocabulary is headed toward, not a completed migration.
+same file) that survive `resolveExecutorAndOverrides` unchanged. **Added in
+candidate — current-state correction:** `supports.reasoningEffort` is consumed
+by `resolveExecutorCommand` when validating the requested effort; identity
+remains validated profile metadata, so the former blanket “no consumer”
+statement is stale. The archived migration plan records Phases A–E merged,
+including executor-id consolidation. The legacy reviewer ids no longer exist
+as registered executors; `EXECUTOR_KINDS` is now `agent|tool`. These facts
+come from code and the completed plan, without reading live configuration.
+Evidence: `src/runner/dispatch/transport.mjs:176`,
+`src/runner/dispatch/assignment-policy.mjs:88-98`,
+`src/runner/dispatch/config.mjs:457`, and
+`archive/plans/260917-executor-profile-schema-migration/plan.md:1-14,733-741`.
 
 **ExecutorProfile** answers "which principal/backend/trust boundary is
 this?" — a stable runtime boundary, never a policy choice:
@@ -66,23 +68,24 @@ backend trust, or egress boundary materially (the same rule design.md's
 ProviderAdapter section already states for the shadow-mode Phase 01 module,
 `src/runner/dispatch/provider-adapter.mjs`).
 
-Migration targets a legacy config entry maps onto once every executor
-consolidates onto this vocabulary (Phase D/E of
-`plans/260917-executor-profile-schema-migration/plan.md`, not yet — the
-`identity`/`supports` fields being real config, above, is not the same as
-this consolidation happening):
+**Added in candidate — migration status correction:** The following table
+records the migration mapping, rather than a migration still awaiting Phase
+D/E. The completed archived plan records consolidation as merged
+(`archive/plans/260917-executor-profile-schema-migration/plan.md:1-14,733-741`):
 
 | Legacy pattern | Target |
 |---|---|
 | policy-shaped flag hardcoded in `executors.<id>` args (`--model`, `--effort`, `--allowedTools`, `--permission-mode`, Codex `-s`, …) | `ProviderAdapter` runtime option (design.md §3.5) |
-| role/persona baked into an executor id (`claude-reviewer`) | a compatibility alias patch (Phase 03, `LEGACY_EXECUTOR_ALIASES` in `src/runner/dispatch/assignment-policy.mjs`) carrying `personaRef`/`toolIntent`/`reasoningEffort` |
+| role/persona baked into an executor id (`claude-reviewer`) | Former compatibility alias patch; retired after consolidation. Callers now declare invocation/policy explicitly (`src/runner/dispatch/assignment-policy.mjs:88-98`). |
 | legacy model overrides on an executor | `runner.modelPolicies.<provider>` tier entry |
 | adapter choice encoded as a separate executor id | an `invocation` on one `ExecutorProfile` |
 | bwrap/confinement encoded as a separate executor id | an invocation's confinement envelope, unless trust/egress genuinely differs |
 | account pool / credential home env on an executor (e.g. the retired `FGOS_CODEX_CREDENTIAL_HOMES`) | Provider Capacity Rotator's global `runner.providers.<provider>.accounts` inventory (`plans/260916-account-rotator/`) |
 
-A later migration (Phase E) can map `claude` + `claude-reviewer` +
-`claude-reviewer-herdr` and similar id families into one `ExecutorProfile`
-with multiple invocations, but that consolidation has not happened —
-`fgos doctor`'s `executor-profile-warnings` check makes the gap between
-current config and this target vocabulary machine-visible in the meantime.
+**Added in candidate — consolidation correction:** Phase E is complete;
+the archived plan records `claude`/`codex`/`agy` as multi-invocation
+executors and the former separate ids as removed. The assignment-policy
+module confirms retirement of its legacy-id alias seam. The doctor warning
+check remains a migration diagnostic, not evidence that Phase E is pending.
+Evidence: `archive/plans/260917-executor-profile-schema-migration/plan.md:733-741`
+and `src/runner/dispatch/assignment-policy.mjs:88-98`.

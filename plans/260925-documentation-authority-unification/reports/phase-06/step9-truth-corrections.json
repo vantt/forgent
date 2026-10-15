@@ -334,8 +334,12 @@
       "reason": "A41 F4: candidate authoring date",
       "evidence": [
         {
-          "ref": "docs/specs/runner.md:3193-3200",
-          "text": "### 0055 — Panel: khác họ provider giữa các ghế là ưu tiên mềm, `bind()` rải ghế theo thứ tự `prefer`; `reviewed` vẫn cứng\n\n- **Trạng thái:** Settled (owner, 2026-10-11). Thay thế quy tắc \"mỗi ghế panel một họ provider khác nhau, thiếu thì từ chối\" của `independentOf` cho `panel` (đặt ở abe6f2b3c, Wave B; role name resolve về executor ở 5f915db15; synthesizer bắt buộc khác họ ở 9420cf603). Phần `reviewed` (producer ≠ checker) và ngoại lệ `acceptDependence` (override `origin: human-cli`) không đổi.\n- **Bối cảnh:** `panel.mjs` cho mỗi panelist `independentOf` = mọi panelist khác và cho synthesizer `independentOf` = mọi panelist; `bind()` từ chối ứng viên cùng họ trừ khi có waiver của người. Số ghế vì vậy bị chặn bởi số họ provider dùng được (5 ở máy này, đa số người dùng ít hơn) và pool thiếu họ thì synthesizer bị `policy-refusal` sau khi các panelist đã chạy và tốn tiền. Cùng họ giữa các ghế làm giảm độc lập nhưng không làm panel vô nghĩa; từ chối là hậu quả quá nặng so với lợi ích.\n- **Quyết định:**\n  1. **Ưu tiên mềm, không bao giờ từ chối.** `runRole` nhận thêm `preferIndependentOf` (tên vai) tách khỏi `independentOf` cứng. `panel.mjs` chỉ KHAI: mỗi panelist ưu tiên khác mọi panelist còn lại, synthesizer ưu tiên khác mọi panelist; không nêu executor/họ/tier. `independentOf` (cứng) vẫn do `reviewed` dùng.\n  2. **Lựa chọn ở `bind()`, một nơi.** `ask.preferIndependentOf` là `[{ role, executor }]` của các ghế ĐÃ bind (runner/dry-bind lấy từ `role-ledger.mjs`, hàm `seats`; mảng rỗng cho ghế đầu, vắng mặt khi vai không xin rải). `bind()` vẫn lọc governance, độc lập cứng, posture, blind như cũ rồi, trong số ứng viên còn lại, chọn họ có ÍT ghế đã dùng nhất (họ chưa ai dùng = 0), hoà thì theo thứ tự `prefer` của capability (thứ tự do owner tuyển, tái dùng). Đủ họ thì ghế rơi vào họ khác nhau theo thứ tự pool như trước; hết họ thì ghế dùng chung họ ít dùng nhất. Không có bảng sức mạnh họ, bảng persona→họ, registry hay khoá config mới.\n  3. **Thứ tự bind xác định.** Các panelist bind theo thứ tự liệt kê, đồng bộ trong cùng một tick (trong `runRole` không có `await` giữa `bind` và `noteRoleExecutor`), nên ghế k chỉ thấy các ghế liệt kê trước nó (cộng ghế mà lần chạy resume đã ghi); synthesizer bind sau khi mọi panelist xong. Thứ tự liệt kê = thứ tự ưu tiên: ghế đứng trước được chọn trước. Nhu cầu theo ghế (rigor/tier riêng từng ghế) chưa có kênh per-seat nên để việc sau; bước này chỉ dùng thứ tự ghế."
+          "ref": "docs/specs/runner.md:1-7",
+          "text": "---\narea: runner\nupdated: 2026-08-12\nsources: [phase-2-routing, post-divorce-hardening, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-closeout, stage-clarify, stage-decompose-s1, stage-decompose-s2, pr-lifecycle-s1, discovery-context, worker-execution, fan-out-parallel, human-rounds, worker-dispatch-log, self-improve-loop, base-workflow-model-s2, fgos-multi-session-checkout, github-adapter-s3, github-adapter-s4, work-graph-intelligence-s2b, work-graph-intelligence-s10, work-graph-intelligence-s11, fgos-sample-testbed, p50-workflow-induct, str68-discovery-judge-robustness, str76-runner-bootstrap, str86-runner-headless-git, str7-str8-priority-intent, str51-2-reclaim-self-mount-fix, mvp2-scope-test-infra, str46-io-contract-lat2, spec-docs-lifecycle-realignment]\ndecisions: [feed7428, 14396a5c, 1a80b4d3, 9a19eea5, 96a65365, a7c099af, 43f257ae, 44936500, e1218b22, 6f2cbc47, a30a3d3c, 1359ab5e, cfae0120, 22699c61, 04a6cd05, 396d9d9e, 2e92b7a5, f0c40acc, 5a6900b2, 8575f1a3, c8df2479, cb09d6fd, b1aa1bdc, caecb9d1, 9b141173, a3176299, 140eb8a4, 76b7a36b, 8d04bba3, 1cd895e1, 38160a70, c11322cb, 2ac16176, f8a3a5d9, 3d4ea29c, 3c8e5926, 342102b9, d4c59ba2, 644916a4, ef6ed305, a4fe4c2b, f69951df, 5208dfe9, 8cf7effe, 7bbe6315, a7c93ec8, cfdd808f, 31b5f045, 87536f3f, 38f7e0b8, ecfd0d1a, f176c18a, d3445024, cf3ee399, fa12fd97, a58a7563, 6e2776cc, 8b95f883]\ncoverage: full\n---"
+        },
+        {
+          "ref": "docs/specs/runner.md:1121",
+          "text": "- **RUL100 (Doctor check `executor-posture-coverage` chẩn đoán posture readiness của các executor, 2026-10-15).** Check doctor `executor-posture-coverage` kiểm tra tĩnh khả năng áp dụng posture cho các core capabilities (`execute`, `code:implement`) và mọi capability khai báo pool agent (`prefer`). Quá trình kiểm tra chạy hoàn toàn khô qua `bind()`, không spawn tiến trình, không tạo pane herdr, không kích hoạt sandbox. Khi một capability có executor thiếu sandbox bwrap, check báo lỗi `posture-unavailable` (`passed: false`). Khi một capability thiếu pool (`headless-no-executor` / `no-candidate`), check chỉ phát cảnh báo (`passed: true`, tiền tố `warning:`) hướng dẫn khai báo `runner.capabilities.<cap>.prefer`."
         }
       ],
       "kind": "truth"
@@ -347,8 +351,12 @@
       "reason": "A41 F4: no current full-coverage certification",
       "evidence": [
         {
-          "ref": "docs/specs/runner.md:3193-3200",
-          "text": "### 0055 — Panel: khác họ provider giữa các ghế là ưu tiên mềm, `bind()` rải ghế theo thứ tự `prefer`; `reviewed` vẫn cứng\n\n- **Trạng thái:** Settled (owner, 2026-10-11). Thay thế quy tắc \"mỗi ghế panel một họ provider khác nhau, thiếu thì từ chối\" của `independentOf` cho `panel` (đặt ở abe6f2b3c, Wave B; role name resolve về executor ở 5f915db15; synthesizer bắt buộc khác họ ở 9420cf603). Phần `reviewed` (producer ≠ checker) và ngoại lệ `acceptDependence` (override `origin: human-cli`) không đổi.\n- **Bối cảnh:** `panel.mjs` cho mỗi panelist `independentOf` = mọi panelist khác và cho synthesizer `independentOf` = mọi panelist; `bind()` từ chối ứng viên cùng họ trừ khi có waiver của người. Số ghế vì vậy bị chặn bởi số họ provider dùng được (5 ở máy này, đa số người dùng ít hơn) và pool thiếu họ thì synthesizer bị `policy-refusal` sau khi các panelist đã chạy và tốn tiền. Cùng họ giữa các ghế làm giảm độc lập nhưng không làm panel vô nghĩa; từ chối là hậu quả quá nặng so với lợi ích.\n- **Quyết định:**\n  1. **Ưu tiên mềm, không bao giờ từ chối.** `runRole` nhận thêm `preferIndependentOf` (tên vai) tách khỏi `independentOf` cứng. `panel.mjs` chỉ KHAI: mỗi panelist ưu tiên khác mọi panelist còn lại, synthesizer ưu tiên khác mọi panelist; không nêu executor/họ/tier. `independentOf` (cứng) vẫn do `reviewed` dùng.\n  2. **Lựa chọn ở `bind()`, một nơi.** `ask.preferIndependentOf` là `[{ role, executor }]` của các ghế ĐÃ bind (runner/dry-bind lấy từ `role-ledger.mjs`, hàm `seats`; mảng rỗng cho ghế đầu, vắng mặt khi vai không xin rải). `bind()` vẫn lọc governance, độc lập cứng, posture, blind như cũ rồi, trong số ứng viên còn lại, chọn họ có ÍT ghế đã dùng nhất (họ chưa ai dùng = 0), hoà thì theo thứ tự `prefer` của capability (thứ tự do owner tuyển, tái dùng). Đủ họ thì ghế rơi vào họ khác nhau theo thứ tự pool như trước; hết họ thì ghế dùng chung họ ít dùng nhất. Không có bảng sức mạnh họ, bảng persona→họ, registry hay khoá config mới.\n  3. **Thứ tự bind xác định.** Các panelist bind theo thứ tự liệt kê, đồng bộ trong cùng một tick (trong `runRole` không có `await` giữa `bind` và `noteRoleExecutor`), nên ghế k chỉ thấy các ghế liệt kê trước nó (cộng ghế mà lần chạy resume đã ghi); synthesizer bind sau khi mọi panelist xong. Thứ tự liệt kê = thứ tự ưu tiên: ghế đứng trước được chọn trước. Nhu cầu theo ghế (rigor/tier riêng từng ghế) chưa có kênh per-seat nên để việc sau; bước này chỉ dùng thứ tự ghế."
+          "ref": "docs/specs/runner.md:1-7",
+          "text": "---\narea: runner\nupdated: 2026-08-12\nsources: [phase-2-routing, post-divorce-hardening, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-closeout, stage-clarify, stage-decompose-s1, stage-decompose-s2, pr-lifecycle-s1, discovery-context, worker-execution, fan-out-parallel, human-rounds, worker-dispatch-log, self-improve-loop, base-workflow-model-s2, fgos-multi-session-checkout, github-adapter-s3, github-adapter-s4, work-graph-intelligence-s2b, work-graph-intelligence-s10, work-graph-intelligence-s11, fgos-sample-testbed, p50-workflow-induct, str68-discovery-judge-robustness, str76-runner-bootstrap, str86-runner-headless-git, str7-str8-priority-intent, str51-2-reclaim-self-mount-fix, mvp2-scope-test-infra, str46-io-contract-lat2, spec-docs-lifecycle-realignment]\ndecisions: [feed7428, 14396a5c, 1a80b4d3, 9a19eea5, 96a65365, a7c099af, 43f257ae, 44936500, e1218b22, 6f2cbc47, a30a3d3c, 1359ab5e, cfae0120, 22699c61, 04a6cd05, 396d9d9e, 2e92b7a5, f0c40acc, 5a6900b2, 8575f1a3, c8df2479, cb09d6fd, b1aa1bdc, caecb9d1, 9b141173, a3176299, 140eb8a4, 76b7a36b, 8d04bba3, 1cd895e1, 38160a70, c11322cb, 2ac16176, f8a3a5d9, 3d4ea29c, 3c8e5926, 342102b9, d4c59ba2, 644916a4, ef6ed305, a4fe4c2b, f69951df, 5208dfe9, 8cf7effe, 7bbe6315, a7c93ec8, cfdd808f, 31b5f045, 87536f3f, 38f7e0b8, ecfd0d1a, f176c18a, d3445024, cf3ee399, fa12fd97, a58a7563, 6e2776cc, 8b95f883]\ncoverage: full\n---"
+        },
+        {
+          "ref": "docs/specs/runner.md:1121",
+          "text": "- **RUL100 (Doctor check `executor-posture-coverage` chẩn đoán posture readiness của các executor, 2026-10-15).** Check doctor `executor-posture-coverage` kiểm tra tĩnh khả năng áp dụng posture cho các core capabilities (`execute`, `code:implement`) và mọi capability khai báo pool agent (`prefer`). Quá trình kiểm tra chạy hoàn toàn khô qua `bind()`, không spawn tiến trình, không tạo pane herdr, không kích hoạt sandbox. Khi một capability có executor thiếu sandbox bwrap, check báo lỗi `posture-unavailable` (`passed: false`). Khi một capability thiếu pool (`headless-no-executor` / `no-candidate`), check chỉ phát cảnh báo (`passed: true`, tiền tố `warning:`) hướng dẫn khai báo `runner.capabilities.<cap>.prefer`."
         }
       ],
       "kind": "truth"
@@ -540,8 +548,8 @@
           "text": "      throw new StoreError('validation', `unknown verb \"${verb ?? ''}\". Usage: fgos <version|init|add|submit|discover|plan|move|retrospective|cleanup|compound|edit|item|ask|answer|decision|list|ready|rebuild|repair|rollup|take|return|review|approve|sync-root|reject|catchup|triage|session|gateway|goal|tool|setup|doctor|unlock|lock-status|main-checkout-reset> ...`);\n  }\n}\n\n// ─── --help / --help --json: machine-readable verb manifest (P37 deliverable\n// b) — mirrors `.bee/bin/bee.mjs`'s publicManifestEntries/renderHelpText/\n// handleHelp exactly. The manifest itself is NEVER wrapped in the fgos.v1\n// envelope (wrapEnvelope) — this is CTR001's documented exception for the"
         },
         {
-          "ref": "git log -- src/evolve/candidates.mjs",
-          "text": "c36f8d746 deletes legacy module"
+          "ref": "git show 120af6b3d -- src/evolve/candidates.mjs",
+          "text": "120af6b3d deletes legacy module"
         }
       ],
       "kind": "truth"
@@ -596,16 +604,23 @@
       ]
     },
     {
-      "subject": "ExecutorProfile proposed migration and superseded RUL68/RUL76",
-      "verdict": "Labelled proposal/history retained, not treated as current implementation assertions",
+      "subject": "ExecutorProfile migration status",
+      "verdict": "A42/L9-12: former keep decision withdrawn; present-tense sentences corrected against completed archive plan and current code. Dated decision records unchanged.",
       "evidence": [
-        "docs/platform/runner/contracts/h-b3eb60fb4d2b.md:69-73",
-        "src/runner/dispatch/config.mjs:457",
-        "src/runner/dispatch/cli.mjs:1268-1274"
+        "step9-a42-followup-corrections.json",
+        "src/runner/dispatch/assignment-policy.mjs:88-98",
+        "src/runner/dispatch/transport.mjs:176",
+        "archive/plans/260917-executor-profile-schema-migration/plan.md:1-14,733-741"
       ]
     }
   ],
   "noFullTruthSweep": true,
   "a42AdditionalEditRanges": 1,
-  "totalEditRanges": 43
+  "totalEditRanges": 43,
+  "a42FollowupEvidence": {
+    "truth-21": "docs/specs/runner.md:1-7,1121; values unchanged",
+    "truth-22": "docs/specs/runner.md:1-7 stale provenance lists,1121; values unchanged",
+    "truth-42": "120af6b3d",
+    "requestEvidencePolicy": "Committed 1803 request remains immutable historical evidence; these corrected request-evidence records feed the next bounded re-review. No new request/pack authored this turn."
+  }
 }

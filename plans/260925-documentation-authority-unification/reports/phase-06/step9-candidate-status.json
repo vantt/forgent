@@ -1,4 +1,5 @@
 {
+  "findings": [],
   "counts": {
     "files": 607,
     "byStatus": {
@@ -12,6 +13,5 @@
     "checked": 216,
     "findings": 0,
     "byType": {}
-  },
-  "findings": []
+  }
 }

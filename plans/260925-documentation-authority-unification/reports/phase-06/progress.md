@@ -1,3 +1,21 @@
+# Runner follow-up authored — native sync and one bounded review next
+
+Assignment `unit-run-1792066534402-cb278bf5/producer/1`. Both 1803 re-reviews read; **271 ok receipts applied with verbatim Notes**, including **43 source ok via ordinary applicator** and eight contextual duplicate-group entries. Subsequent corrections/hygiene reopen **44 current source rows**, **451 reviewed** retained; **28 changed candidate units** fully accounted; classes **446 Weak-exact / 49 Judgment**. ExecutorProfile, live tee, residual evolve/engine claims labelled against code; front-matter evidence fixed; truth-42 commit **120af6b3d**. Historical decision bodies unchanged.
+
+**Two pending partial-carries** now bind actual RUL77–RUL80 `unheaded-block-36`, residual **3/2 historical lines**; f033905b item 4 is pure insertion. **14 historical reviewed supersedes queued**, five absent stored target digests, including 76d404ea. **28 gap dispositions authored: 3 supersede / 9 partial-carry / 16 unknown-blocking**, each with witness/successor/residual or explicit eight-way identity ambiguity. No approval or identity graft; those 16 remain strict-E blockers.
+
+**FAST D/E zero structural fatal**, both priors together/each; E open **11 partial / 44 pending / 16 ambiguous gaps / 82 reverse**, runner provisional list 81 plus one root-owned fence. **Candidate-status 607 files / 216 checked / 0 findings / 0 unresolved links**; tests **74/74 pass**, no skip/fail/cancel/todo, env -u CLAUDE_CODE_SESSION_ID. Separate out-of-plan reconcile-help code defect queued. [Current report and L9-10–L9-14 decisions](step-09-report.md), [applications](step9-a42-followup-application.json), [rebindings](step9-a42-followup-rebindings.json), [28 dispositions](step9-a42-predecessor-dispositions.json), [checks](step9-fast-check.json).
+
+**Next turn = native sync ONCE at this turn’s runner commit + ONE bounded re-review of every changed row/entry plus all 28 new dispositions. Step 9 closes when it is applied under existing closure rules.** Identity ambiguity, A34 acceptance, Rings, final main sync, fresh-reader distinction and aliases/consumers/cutover obligations persist. No new owner-direction question. Author run performed **zero native sync / zero review packs**, no CLI/git write/legacy/protected tool/registry edit or .fgos/config/secret access. Scratch /tmp/fgos-work; mandatory external outbox exception; runner commits. No closure, promotion, retirement, main sync or Step 10 transition.
+
+---
+
+# Runner A42 follow-up author pass in progress
+
+Assignment `unit-run-1792066534402-cb278bf5/producer/1`. Applying binding-matching verdicts, evidenced corrections, pending rebindings and 28 A34 dispositions. Author only: no native sync or review packs. Next turn: sync once at this runner commit and one bounded re-review. Step 9 remains open.
+
+---
+
 # Runner native refresh complete — single bounded re-review pending
 
 Assignment `unit-run-1792062144702-ef1d2734/producer/1`; content pin **26f5f6119**; docs bytes **9f3e197bb**, unchanged. This checkpoint supersedes current counts below; historical checkpoints keep their own pins.

@@ -1,0 +1,422 @@
+{
+  "version": 1,
+  "inputCommit": "42cf37c15047a8144366252d23f16f1a82787424",
+  "status": "author pass verified; independent bounded re-review and committed native sync remain pending",
+  "checks": {
+    "writeScope": true,
+    "jsonValid": true,
+    "whitespace": true,
+    "matchingReviewEvidence": 277,
+    "okReceipts": 271,
+    "sourceRows": 495,
+    "reviewed": 451,
+    "pending": 44,
+    "changedSourceRows": 44,
+    "changedCandidateUnits": 28,
+    "newGapDispositions": 28,
+    "gapCounts": {
+      "supersede": 3,
+      "partial-carry": 9,
+      "unknown-blocking": 16
+    },
+    "partialCarryPrimaryTargets": true,
+    "residualHashes": true,
+    "cutoverHistoricalReviewed": 14,
+    "absentStoredDigest": 5,
+    "sourceBindings": true,
+    "sourceWitnesses": true,
+    "datedDecisionBodyUnchanged": true,
+    "registryUnchanged": true,
+    "nativeSyncs": 0,
+    "reviewPacksCreated": 0,
+    "protectedToolEdits": 0
+  },
+  "tests": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/scripts/check-doc-conservation.test.mjs test/scripts/doc-decision-review.test.mjs test/scripts/doc-review-format.test.mjs",
+    "pass": 74,
+    "fail": 0,
+    "skip": 0,
+    "cancel": 0,
+    "todo": 0,
+    "log": "step9-a42-followup-tests.log"
+  },
+  "FAST": [
+    {
+      "label": "both",
+      "D": 0,
+      "E": {
+        "structuralFatal": 0,
+        "conservationOpen": [
+          {
+            "type": "claims-partial-carry",
+            "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+            "count": 11,
+            "examples": [
+              "docs/specs/runner.md#unheaded-block-118",
+              "docs/specs/runner.md#unheaded-block-127",
+              "docs/specs/runner.md#unheaded-block-307",
+              "docs/specs/runner.md#unheaded-block-308",
+              "docs/specs/runner.md#unheaded-block-313"
+            ]
+          },
+          {
+            "type": "claims-not-reviewed",
+            "message": "claim rows whose reviewStatus is not reviewed",
+            "count": 44,
+            "examples": [
+              "docs/specs/runner.md#spec-runner-vòng-tự-hành",
+              "docs/specs/runner.md#guard-reconciliation",
+              "docs/specs/runner.md#unheaded-block-3",
+              "docs/specs/runner.md#entry-points-triggers",
+              "docs/specs/runner.md#unheaded-block-8"
+            ]
+          },
+          {
+            "type": "registry-gaps-without-disposition",
+            "message": "registry identity-gap rows with no vocabulary disposition",
+            "count": 16,
+            "examples": [
+              "docs/specs/runner.md#unheaded-block-124",
+              "docs/specs/runner.md#unheaded-block-129",
+              "docs/specs/runner.md#unheaded-block-141",
+              "docs/specs/runner.md#unheaded-block-142",
+              "docs/specs/runner.md#unheaded-block-147"
+            ]
+          },
+          {
+            "type": "candidate-blocks-unreferenced",
+            "message": "candidate conservation units not named by a source decision",
+            "count": 82,
+            "examples": [
+              "docs/platform/runner/spec.md#unheaded-block-2",
+              "docs/platform/runner/spec.md#unheaded-block-3",
+              "docs/platform/runner/spec.md#added-in-candidate-navigation",
+              "docs/platform/runner/spec.md#unheaded-block-4",
+              "docs/platform/runner/spec.md#unheaded-block-5"
+            ]
+          }
+        ],
+        "strictGreen": false
+      }
+    },
+    {
+      "label": "identity",
+      "D": 0,
+      "E": {
+        "structuralFatal": 0,
+        "conservationOpen": [
+          {
+            "type": "claims-partial-carry",
+            "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+            "count": 11,
+            "examples": [
+              "docs/specs/runner.md#unheaded-block-118",
+              "docs/specs/runner.md#unheaded-block-127",
+              "docs/specs/runner.md#unheaded-block-307",
+              "docs/specs/runner.md#unheaded-block-308",
+              "docs/specs/runner.md#unheaded-block-313"
+            ]
+          },
+          {
+            "type": "claims-not-reviewed",
+            "message": "claim rows whose reviewStatus is not reviewed",
+            "count": 44,
+            "examples": [
+              "docs/specs/runner.md#spec-runner-vòng-tự-hành",
+              "docs/specs/runner.md#guard-reconciliation",
+              "docs/specs/runner.md#unheaded-block-3",
+              "docs/specs/runner.md#entry-points-triggers",
+              "docs/specs/runner.md#unheaded-block-8"
+            ]
+          },
+          {
+            "type": "registry-gaps-without-disposition",
+            "message": "registry identity-gap rows with no vocabulary disposition",
+            "count": 16,
+            "examples": [
+              "docs/specs/runner.md#unheaded-block-124",
+              "docs/specs/runner.md#unheaded-block-129",
+              "docs/specs/runner.md#unheaded-block-141",
+              "docs/specs/runner.md#unheaded-block-142",
+              "docs/specs/runner.md#unheaded-block-147"
+            ]
+          },
+          {
+            "type": "candidate-blocks-unreferenced",
+            "message": "candidate conservation units not named by a source decision",
+            "count": 82,
+            "examples": [
+              "docs/platform/runner/spec.md#unheaded-block-2",
+              "docs/platform/runner/spec.md#unheaded-block-3",
+              "docs/platform/runner/spec.md#added-in-candidate-navigation",
+              "docs/platform/runner/spec.md#unheaded-block-4",
+              "docs/platform/runner/spec.md#unheaded-block-5"
+            ]
+          }
+        ],
+        "strictGreen": false
+      }
+    },
+    {
+      "label": "phase02",
+      "D": 0,
+      "E": {
+        "structuralFatal": 0,
+        "conservationOpen": [
+          {
+            "type": "claims-partial-carry",
+            "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+            "count": 11,
+            "examples": [
+              "docs/specs/runner.md#unheaded-block-118",
+              "docs/specs/runner.md#unheaded-block-127",
+              "docs/specs/runner.md#unheaded-block-307",
+              "docs/specs/runner.md#unheaded-block-308",
+              "docs/specs/runner.md#unheaded-block-313"
+            ]
+          },
+          {
+            "type": "claims-not-reviewed",
+            "message": "claim rows whose reviewStatus is not reviewed",
+            "count": 44,
+            "examples": [
+              "docs/specs/runner.md#spec-runner-vòng-tự-hành",
+              "docs/specs/runner.md#guard-reconciliation",
+              "docs/specs/runner.md#unheaded-block-3",
+              "docs/specs/runner.md#entry-points-triggers",
+              "docs/specs/runner.md#unheaded-block-8"
+            ]
+          },
+          {
+            "type": "registry-gaps-without-disposition",
+            "message": "registry identity-gap rows with no vocabulary disposition",
+            "count": 16,
+            "examples": [
+              "docs/specs/runner.md#unheaded-block-124",
+              "docs/specs/runner.md#unheaded-block-129",
+              "docs/specs/runner.md#unheaded-block-141",
+              "docs/specs/runner.md#unheaded-block-142",
+              "docs/specs/runner.md#unheaded-block-147"
+            ]
+          },
+          {
+            "type": "candidate-blocks-unreferenced",
+            "message": "candidate conservation units not named by a source decision",
+            "count": 82,
+            "examples": [
+              "docs/platform/runner/spec.md#unheaded-block-2",
+              "docs/platform/runner/spec.md#unheaded-block-3",
+              "docs/platform/runner/spec.md#added-in-candidate-navigation",
+              "docs/platform/runner/spec.md#unheaded-block-4",
+              "docs/platform/runner/spec.md#unheaded-block-5"
+            ]
+          }
+        ],
+        "strictGreen": false
+      }
+    }
+  ],
+  "candidateStatus": {
+    "files": 607,
+    "byStatus": {
+      "promoted": 3,
+      "candidate": 213,
+      "legacy-current": 0,
+      "non-authority": 1,
+      "unrouted": 390
+    },
+    "exemptUnrouted": 302,
+    "checked": 216,
+    "findings": 0,
+    "byType": {}
+  },
+  "changedFiles": [
+    {
+      "path": "docs/platform/runner/architecture/h-69197b459754.md",
+      "bytes": 42893,
+      "sha256": "3aee6efaa9dae5c439bd493758da1610fb641005022b2eac26eb2c12aa330adb"
+    },
+    {
+      "path": "docs/platform/runner/architecture/h-7af1f0242611.md",
+      "bytes": 7114,
+      "sha256": "b81b3567c39d9c84117919ea33588c4bec3bc6a3d45b815eb8ae783297cd64c1"
+    },
+    {
+      "path": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+      "bytes": 4190,
+      "sha256": "b94976ab75a5b09d1a888f94b5f77e93833f742d5547aba8696af9b3a1b8b598"
+    },
+    {
+      "path": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+      "bytes": 6342,
+      "sha256": "80820f44da4ec857d93e5c81da5d4205795b4b62381160a14a042c94e01a320c"
+    },
+    {
+      "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "bytes": 178155,
+      "sha256": "dd2c2b8b55c7b862f5d02bdfadd22d03bffdeaf6a2cc15260ff7c2681cf2535e"
+    },
+    {
+      "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "bytes": 91595,
+      "sha256": "e6dd4f821c480e8e284fb94d8790e4029e066ffb2198c2fb17b25074996b9cb1"
+    },
+    {
+      "path": "docs/platform/runner/spec.md",
+      "bytes": 4205,
+      "sha256": "08e31cdc6154f86851fc7985b39ab4e1695be9bd46b5320517f4bccf48bfc69a"
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+      "bytes": 15890,
+      "sha256": "f72b120e48ffd83ce41d1f2cf04276f8953c5ec850d12e93cb3532ff5495b8ae"
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-2e032393add1/spec.md",
+      "bytes": 13341,
+      "sha256": "0487ede5df0d6595249f6d0ed08695d838ad4af153e8f9da348b8cfe5e4d0331"
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-37aced3896a8/spec.md",
+      "bytes": 18424,
+      "sha256": "0434924075031288ec283082357cfd982ed5257ec6882c93daa95dc4be6adb66"
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "bytes": 173813,
+      "sha256": "463ff6d0b88d2dba4cad8276d82378bbff23b47097aff42e9b866c758bd81ec3"
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md",
+      "bytes": 2070,
+      "sha256": "56ba8ea9e4753594129efd4495b6ffc6af01d9a55d9d108d1f463441c676a41f"
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-ce5b9771a26a/spec.md",
+      "bytes": 5758,
+      "sha256": "62ea7805b18cc7d372bc2698a9f23e3ba9cf125180d4d200826344600d19c033"
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md",
+      "bytes": 1320,
+      "sha256": "903d758e17bc17334daa6eb161ea88746efcf5056c96ab11106d7fc9b24bb543"
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+      "bytes": 43020,
+      "sha256": "23ff9f5e134bc5447bf593d83e1ff2090b7d5df5f80beb0fb4dc78bc5f16a843"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+      "bytes": 47838,
+      "sha256": "c30777c259616117bcd5f63508293ff236ac1959ece226f9a4a970b97ed8326d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+      "bytes": 6780,
+      "sha256": "b5d1faaba1b4978cca9859be6b50d93b8f91bf0c64027fb02441cb6cabcc9b7c"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "bytes": 1028388,
+      "sha256": "90a180a3d972c6e34b3f129dd09ac7aa48be23932cca7bcb4903a883ee96ca43"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-runner.json",
+      "bytes": 191255,
+      "sha256": "49ff6dbd86271c9d6cb1593633658d6c3fe303e6a928d51b96a761634bbc76d1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/owner-answers.md",
+      "bytes": 72660,
+      "sha256": "fb510b853d840221138ebc45017d0296f63ebe122d3dec4bb9781eb1d3eba96f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
+      "bytes": 86522,
+      "sha256": "a4befbafb5694207ef2f07e08d28c5aab584a8fb985ac92d33aefc1e1340c814"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/progress.md",
+      "bytes": 633777,
+      "sha256": "0522d43cf578def73159de163fe48797a6d471376e1208877f9ae192cff6291a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step-09-report.md",
+      "bytes": 57281,
+      "sha256": "79750f17491ae0aa04580390cb223446f329285b31ba156adb5a600e97c06474"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step9-candidate-status.json",
+      "bytes": 286,
+      "sha256": "c76f8321ea323f1524579341b2f26b7f54c266dd9f360f78289960ced5d33910"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step9-carriage-accounting.json",
+      "bytes": 899328,
+      "sha256": "ccb358b87ad37e5c720f8e90c2293dcb5a7bb4f830c0d82ff78d5e1d1829b901"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step9-fast-check.json",
+      "bytes": 15431,
+      "sha256": "7d4e1fddc6b06fa65822615f2300b9fc01dac8dec79fc5b169ecc33779f55a1b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step9-l9-9-partial-carry-residual.json",
+      "bytes": 29912,
+      "sha256": "2cd7eb5b8a07e891d20bcd680ea83362c768566120f9b656d34d81559b63ad6c"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step9-l9-9-redecisions.json",
+      "bytes": 240882,
+      "sha256": "43044eed553b01793b57b8a2f2a66f0072b4b85fa9f039fabe2b7f7dac3c84ee"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step9-predecessor-accounting.json",
+      "bytes": 3407558,
+      "sha256": "2425e51ad450d8f4e791882ff7918675bd212427d354acddc096c4284f99fb37"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step9-rebound-units.json",
+      "bytes": 2373598,
+      "sha256": "a226cb5072131edca974a63bc05b0f16b95ea95ae1a127b2ebd9a23d6d4d440b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step9-truth-corrections.json",
+      "bytes": 60932,
+      "sha256": "5acec9156c8465763be3f952d717bf39554d80487cde1c57e1ae304e2baf590d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-followup-application.json",
+      "bytes": 431392,
+      "sha256": "f73f1293af35c7708519c27cdb0cce0ba1ba11ad4510b2b78708126b5bfb693c"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-followup-corrections.json",
+      "bytes": 891067,
+      "sha256": "642127947dca69c388cba18bd98964c6bf9103e554bec14fece4609ae6afa195"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-followup-rebindings.json",
+      "bytes": 775145,
+      "sha256": "b66856aa0ed5c8dcab660fb74fd5c8cfb1d228c49f48625afac6cfb4ceb94cc4"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-followup-tests.log",
+      "bytes": 7508,
+      "sha256": "56dd54fc520602015c312b7d3a865b13968dbbcf00a8bba54caad2936826b567"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-dispositions.json",
+      "bytes": 590979,
+      "sha256": "b8d34a9208434f594d62a4aa5864a960641724a69e1e14ba21d05dfa89faf840"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+      "bytes": 14447,
+      "sha256": "4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f"
+    }
+  ],
+  "next": "One native sync at this turn runner commit, then ONE bounded re-review of every changed row/entry and all 28 new dispositions. No author selected seed or verdict. Step 9 closes when applied under existing closure rules; 16 identity ambiguities and A34/other holds stay explicit.",
+  "reproductionSource": "import fs from 'node:fs';import crypto from 'node:crypto';import assert from 'node:assert/strict';import {execFileSync} from 'node:child_process';\nconst root=process.cwd(),P='plans/260925-documentation-authority-unification/',R=P+'reports/phase-06/',read=p=>JSON.parse(fs.readFileSync(p,'utf8')),sha=s=>crypto.createHash('sha256').update(s).digest('hex'),git=args=>execFileSync('git',args,{encoding:'utf8',maxBuffer:32*1024*1024}).trim(),head=git(['rev-parse','HEAD']),gen=await import(root+'/scripts/generate-doc-inventory.mjs');\nconst units=text=>{const ls=text.split('\\n');let stack=[];return gen.extractMarkdownConservationUnits(text).map(u=>{if(u.unitKind==='heading')while(stack.length&&stack.at(-1).level>=u.level)stack.pop();let ancestry=stack.map(h=>h.title);if(u.unitKind==='heading')stack.push(u);return {...u,ancestry,text:ls.slice(u.startLine-1,u.endLine).join('\\n').trim()};});};const us=p=>units(fs.readFileSync(p,'utf8'));\nconst changes=[...new Set([...git(['diff','--name-only']).split('\\n'),...git(['ls-files','--others','--exclude-standard']).split('\\n')].filter(Boolean))];assert(changes.every(p=>p.startsWith('docs/platform/')||p.startsWith(P)));assert(!changes.some(p=>p.includes('review-request-')||p.includes('review-pack-')));\nconst shard=read(P+'ledger/decisions/s9-runner-01.json'),rb=read(R+'step9-a42-followup-rebindings.json'),app=read(R+'step9-a42-followup-application.json'),pd=read(R+'step9-a42-predecessor-dispositions.json'),rd=read(R+'step9-l9-9-redecisions.json'),res=read(R+'step9-l9-9-partial-carry-residual.json'),prs=read(pd.residualFile),cache=new Map(),get=p=>{if(!cache.has(p))cache.set(p,us(p));return cache.get(p)};\nassert.equal(shard.claims.length,495);assert.equal(shard.claims.filter(d=>d.reviewStatus==='pending').length,44);assert.equal(shard.claims.filter(d=>d.reviewStatus==='reviewed').length,451);assert.equal(pd.rows.length,28);assert.equal(shard.registryGaps.length,28);assert.equal(rd.cutoverQueue.length,14);assert.equal(rd.cutoverQueue.filter(q=>!q.storedTargetDigestPresent).length,5);assert.equal(app.counts.ok,271);assert.equal(app.receipts.length,277);assert.equal(app.applicationBindingProof.checked,277);\nfor(const r of rb.rows){const d=shard.claims.find(d=>d.claimId===r.claimId);assert.deepEqual(d,r.after);assert.equal(d.reviewStatus,'pending');assert(!d.reviewedBy);assert.equal(get(d.targetOwner).find(u=>u.anchor===d.targetAnchor).text,r.afterText);}\nfor(const d of shard.claims){let u=get(d.targetOwner).find(u=>u.anchor===d.targetAnchor);assert.equal(u.textDigest,d.targetUnitDigest);assert.deepEqual(u.ancestry,d.targetAncestry);}\nfor(const delta of rb.candidateUnitChanges){let u=get(delta.path).find(u=>u.anchor===delta.anchor);assert.equal(u.textDigest,delta.after.textDigest);assert.equal(u.text,delta.after.text);}\nfor(const r of pd.rows){const d=shard.registryGaps.find(g=>g.claimId===r.decision.claimId);assert.deepEqual(d,r.decision);const w=r.witness??r.byteWitness,blob=git(['rev-parse',w.commit+':docs/specs/runner.md']);assert.equal(blob,w.blob);const old=execFileSync('git',['show',blob],{encoding:'utf8',maxBuffer:2*1024*1024}),witness=units(old).find(u=>u.textDigest===d.sourceUnitDigest&&u.text===w.unit.text);assert(witness);\n if(d.disposition!=='unknown-blocking'){const u=get(d.targetOwner).find(u=>u.anchor===d.targetAnchor);assert.equal(u.textDigest,d.targetUnitDigest);assert.equal(u.text,r.successor.text);if(d.disposition==='supersede'){let a=w.unit.text.split('\\n'),j=0;for(const l of u.text.split('\\n'))if(j<a.length&&a[j]===l)j++;assert.equal(j,a.length);}else{const rr=prs.rows.find(x=>x.claimId===d.claimId);assert.equal(sha(rr.residualText),rr.residualSHA256);assert.equal(rr.residualText,r.removedOrRewrittenLines.join('\\n'));assert(d.remainder.includes(pd.residualFileSHA256));}}\n else{assert.equal(d.reviewStatus,'blocking');assert.equal(r.currentCandidates.length,8);assert(r.witnessLimit.includes('not proven'));}}\nassert.equal(sha(fs.readFileSync(pd.residualFile)),pd.residualFileSHA256);assert.equal(sha(fs.readFileSync(rd.residualPath)),rd.residualSHA256);\nfor(const c of rd.changes){const current=read(c.shardPath).registryGaps.find(r=>r.claimId===c.claimId),r=res.rows.find(r=>r.claimId===c.claimId),u=get(current.targetOwner).find(u=>u.anchor===current.targetAnchor);assert.deepEqual(current,c.after);assert.equal(u.anchor,'unheaded-block-36');assert.equal(u.textDigest,'3b974a9c1a82356e256e9b6923c80104f778651f67447179efdc0ffbf09ac485');assert.equal(u.text,c.targetUnit.text);assert.equal(sha(r.residualText),r.residualSHA256);assert(current.remainder.includes(rd.residualSHA256));assert.equal(r.missingOrRewrittenLines.length,c.claimId.startsWith('claim_f033')?2:3);assert(r.missingOrRewrittenLines.every(l=>c.sourceUnit.text.split('\\n').includes(l)));assert(r.missingOrRewrittenLines.every(l=>!l.startsWith('- **RUL80 ')));if(c.claimId.startsWith('claim_f033'))assert(!r.missingOrRewrittenLines.some(l=>l.startsWith('  4. ')));}\nfor(const q of rd.cutoverQueue){let matches=get('docs/specs/runner.md').filter(u=>u.textDigest===q.storedTargetDigest);assert.equal(matches.length>0,q.storedTargetDigestPresent);}\nconst f=read(R+'step9-fast-check.json');assert(f.runs.every(r=>r.D.count===0&&r.E.structuralFatal===0));assert.equal(sha(fs.readFileSync(f.registry.path)),f.registry.sha256);assert.equal(read(R+'step9-candidate-status.json').findings.length,0);\nfor(const p of changes.filter(p=>p.endsWith('.json')))read(p);\nconst dp='docs/platform/runner/decisions/h-36d872fbb0e5.md',old=execFileSync('git',['show',head+':'+dp],{encoding:'utf8'}),current=fs.readFileSync(dp,'utf8');assert.equal(current.slice(current.indexOf('\\n## ')),old.slice(old.indexOf('\\n## ')));\nexecFileSync('git',['diff','--check']);\nconst result={version:1,inputCommit:head,status:'author pass verified; independent bounded re-review and committed native sync remain pending',checks:{writeScope:true,jsonValid:true,whitespace:true,matchingReviewEvidence:277,okReceipts:271,sourceRows:495,reviewed:451,pending:44,changedSourceRows:rb.rows.length,changedCandidateUnits:rb.candidateUnitChanges.length,newGapDispositions:28,gapCounts:pd.counts,partialCarryPrimaryTargets:true,residualHashes:true,cutoverHistoricalReviewed:14,absentStoredDigest:5,sourceBindings:true,sourceWitnesses:true,datedDecisionBodyUnchanged:true,registryUnchanged:true,nativeSyncs:0,reviewPacksCreated:0,protectedToolEdits:0},tests:{command:'env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/scripts/check-doc-conservation.test.mjs test/scripts/doc-decision-review.test.mjs test/scripts/doc-review-format.test.mjs',pass:74,fail:0,skip:0,cancel:0,todo:0,log:'step9-a42-followup-tests.log'},FAST:f.runs.map(r=>({label:r.label,D:r.D.count,E:r.E})),candidateStatus:read(R+'step9-candidate-status.json').counts,changedFiles:changes.map(p=>({path:p,bytes:fs.statSync(p).size,sha256:sha(fs.readFileSync(p))})),next:'One native sync at this turn runner commit, then ONE bounded re-review of every changed row/entry and all 28 new dispositions. No author selected seed or verdict. Step 9 closes when applied under existing closure rules; 16 identity ambiguities and A34/other holds stay explicit.',reproductionSource:fs.readFileSync('/tmp/fgos-work/audit-a42.mjs','utf8')};fs.writeFileSync(R+'step9-a42-followup-audit.json',JSON.stringify(result,null,2)+'\\n');console.log({scopeFiles:changes.length,checks:result.checks});\n"
+}
