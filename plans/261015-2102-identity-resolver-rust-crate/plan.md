@@ -1,7 +1,7 @@
 # Plan 5.1: chuyển resolver writer identity sang crate Rust `fgos-session-identity`
 
 - Ngày: 2026-10-15. Lead: agent 5.1, worktree `.claude/worktrees/agent-ac970642d8c2e90a0`, nhánh `worktree-agent-ac970642d8c2e90a0`. Tiếp bản nháp của lead trước (bị dừng nhầm).
-- Trạng thái: **thiết kế xong, đang phản biện**. Chưa code.
+- Trạng thái: **phase 00–04 xong trên nhánh, phase 05 đo xong (warm đạt, cold cần đo lại trên máy rảnh), phase 06 chờ Lead.** Báo cáo: [reports/implementation-261015-2240-identity-resolver-rust-crate.md](reports/implementation-261015-2240-identity-resolver-rust-crate.md).
 - Đầu việc: 5.1 trong [hội đồng §6.2](../reports/architecture-council-261015-1508-terminal-control-session-identity-process-supervisor.md). Không có work item (anh cấm cho track này).
 
 ## Mục tiêu
@@ -29,12 +29,12 @@ D1–D8 ở [phase-00 §13](phase-00-design-and-review.md#13-lead-tự-quyết-d
 
 | Phase | Nội dung | Phụ thuộc | Trạng thái |
 |---|---|---|---|
-| [00](phase-00-design-and-review.md) | Thiết kế + phản biện | — | đang phản biện |
-| [01](phase-01-rust-crate-and-verb.md) | Contract, vector, crate, verb `fgos identity` | 00 | chưa |
-| [02](phase-02-observe-uses-crate.md) | Observe dùng crate, xoá bản chép | 01 | chưa |
-| [03](phase-03-node-facade-and-callers.md) | Facade Node, prime trước lock, hook, xoá resolver Node | 01 | chưa |
-| [04](phase-04-doctor-docs-changelog.md) | Doctor, spec, io-contract, boundary, CHANGELOG | 03 | chưa |
-| [05](phase-05-measurement-gate.md) | Đo cổng S6 trên lời gọi thật | 03 | chưa |
+| [00](phase-00-design-and-review.md) | Thiết kế + phản biện | — | xong |
+| [01](phase-01-rust-crate-and-verb.md) | Contract, vector, crate, verb `fgos identity` | 00 | xong |
+| [02](phase-02-observe-uses-crate.md) | Observe dùng crate, xoá bản chép | 01 | xong |
+| [03](phase-03-node-facade-and-callers.md) | Facade Node, prime trước lock, hook, xoá resolver Node | 01 | xong |
+| [04](phase-04-doctor-docs-changelog.md) | Doctor, spec, io-contract, boundary, CHANGELOG | 03 | xong |
+| [05](phase-05-measurement-gate.md) | Đo cổng S6 trên lời gọi thật | 03 | warm đạt; cold +6.6–9 ms, đo lại |
 | [06](phase-06-landing-drain-activation.md) | Lead tích hợp: full `npm test`, merge, drain, activate | 01–05 | Lead chính |
 
 ## Tiêu chí xong
