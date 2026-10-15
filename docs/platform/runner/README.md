@@ -46,3 +46,5 @@ Start with [spec.md](spec.md) for the carried preamble and source identity. The 
 ## Added in candidate: Verification and boundary
 
 The original RUL ids, decision ids and headings remain verbatim. The source heading containing retired is preserved as source wording; decision placement grants no retirement judgment. Known stale carried sentences; full truth check owed at promotion. Independent conservation, liveness/triage, truth sampling, fresh readers, red-team, native sync and scoped strict E remain owed. See `plans/260925-documentation-authority-unification/reports/phase-06/step-09-report.md` and `plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json`. No component-boundary change. Legacy authority stays unchanged.
+
+> Added in candidate: [Decision records](decisions/h-36d872fbb0e5.md) include current records 0047, 0052 and 0055–0063 under the verbatim carried retired-history heading; later records partly supersede earlier rules.

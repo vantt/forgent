@@ -83,14 +83,20 @@
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-34",
       "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The predecessor block 32 at 9881f8622 already states COMMAND_REGISTRY, 15 externalEffect verbs and no coordination. The successor adds two deltas: the review/approve/run examples and the whole subcommands bullet (three lines), which the source never had. The other source field definitions, paginated/multiValueFormat bullet and dispatch executor qualifier are retained, with line reflow. Corrected binding remains the same-file bullets unit unheaded-block-34 (name, touchesState, externalEffect, paginated and subcommands), digest e013c5b05d6ff58782aa8231ab4a55967bd5ef853dac4015aec8f16f5fcf9c68; paragraph unheaded-block-33 was an inconsistent earlier binding. Native predecessor identity is conserved without graft or approval carry. Pending independent rationale re-review.",
+      "reviewNote": "deep: the diff of source block 32 against target block 34 has exactly two deltas, the example parenthetical (review, approve, run) added after the coordination clause and the three-line subcommands bullet appended; the rationale now names both and says the subcommands bullet was never in the source, which is true; every other source line is byte-identical apart from the wrapped qualifier line, so the stated reflow is accurate; binding unheaded-block-34 with e013c5b0 and source 5bed5c61 both recompute; status stays pending with no approval or graft carried",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1653-specs-ui-last-rationale.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "e013c5b05d6ff58782aa8231ab4a55967bd5ef853dac4015aec8f16f5fcf9c68",
       "targetAncestry": [
         "CLI I/O Contract",
         "7. Machine-Readable Verb Registry",
         "Entry Fields And Effect Axes"
-      ]
+      ],
+      "reviewReportCommit": "24be6cb1db1b16fd1b1dc244f1c7b46d851a330b"
     }
   ]
 }

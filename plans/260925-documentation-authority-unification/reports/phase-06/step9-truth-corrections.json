@@ -1,0 +1,585 @@
+{
+  "version": 1,
+  "inputCommit": "24be6cb1d",
+  "rule": "A41/A19/A22; pending independent truth re-review; no native sync",
+  "edits": [
+    {
+      "path": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "before": "Bước quét này KHÔNG gọi model: nó chỉ cho đi thẳng một item mà bản kế hoạch đã ghi tự khai là một-mảnh, mọi trường hợp khác nó không làm gì cả và chờ một phiên sống phán tay",
+      "after": "Bước quét này có thể gọi reviewer qua `executeDriverOperationChoice` khi workflow chọn operation `validate-plan`; kết quả reviewer quyết định có được đi tiếp hay không",
+      "reason": "A41 F-A: plan sweep may dispatch reviewer",
+      "evidence": [
+        {
+          "ref": "src/runner/loop.mjs:1641-1655",
+          "text": "          const choice = chooseStageOperation({ work: item, stage: item.workflowStep, domain: domain.name ?? item.domain, workflow: item.workflow, repoRoot });\n          if (choice.dispatch === 'assignment' && choice.operation === 'validate-plan') {\n            const contentRoot = resolveContentRoot(repoRoot, item.id, item.docsRef);\n            const outcome = await executeDriverOperationChoice(item, choice, {\n              cwd: contentRoot,\n              repoRoot,\n              runnerConfig: config,\n              work: item,\n            });\n            const validateOutcome = outcome.runResult ? runOutcome(outcome.runResult) : null;\n            log(`fgos-runner: reviewer validation assignment for \"${item.id}\" executed (confidence: ${validateOutcome?.evidence ?? 'none'}, status: ${validateOutcome?.category ?? 'none'})`);\n            if (outcome.canAdvanceEdge) {\n              // Cell P01.2 (R4/G5): `item.verdictPayload`/`item.callerVerdict`\n              // are dead reads (grep-confirmed: no writer for either exists\n              // anywhere in `src/`) -- removed. `options.callerVerdict` /"
+        },
+        {
+          "ref": "domains/coding/workflows/feature.yaml:75-82",
+          "text": "      - id: validate-plan\n        taskSpec: validate-plan\n        role: reviewer\n        reason: review\n        skills: [fgos-coding-validating]\n        policy:\n          rigor: standard\n      - id: scout-blast-radius"
+        }
+      ],
+      "kind": "truth"
+    },
+    {
+      "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "before": "- **Side effects:** KHÔNG có lời gọi model nào ở bước này.",
+      "after": "- **Side effects:** bước này có thể chạy reviewer assignment cho operation `validate-plan` do workflow khai báo.",
+      "reason": "A41 F-B: remove model-call denial",
+      "evidence": [
+        {
+          "ref": "src/runner/loop.mjs:1641-1655",
+          "text": "          const choice = chooseStageOperation({ work: item, stage: item.workflowStep, domain: domain.name ?? item.domain, workflow: item.workflow, repoRoot });\n          if (choice.dispatch === 'assignment' && choice.operation === 'validate-plan') {\n            const contentRoot = resolveContentRoot(repoRoot, item.id, item.docsRef);\n            const outcome = await executeDriverOperationChoice(item, choice, {\n              cwd: contentRoot,\n              repoRoot,\n              runnerConfig: config,\n              work: item,\n            });\n            const validateOutcome = outcome.runResult ? runOutcome(outcome.runResult) : null;\n            log(`fgos-runner: reviewer validation assignment for \"${item.id}\" executed (confidence: ${validateOutcome?.evidence ?? 'none'}, status: ${validateOutcome?.category ?? 'none'})`);\n            if (outcome.canAdvanceEdge) {\n              // Cell P01.2 (R4/G5): `item.verdictPayload`/`item.callerVerdict`\n              // are dead reads (grep-confirmed: no writer for either exists\n              // anywhere in `src/`) -- removed. `options.callerVerdict` /"
+        }
+      ],
+      "kind": "truth"
+    },
+    {
+      "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "before": " Quét của runner\n  không mang theo phán quyết của người/phiên nào, nên nó chỉ đi một trong hai\n  đường: bản kế hoạch đã ghi của item tự khai một cỡ việc một-mảnh (không\n  chia được nữa) → item đi thẳng sang `executing`; mọi trường hợp còn lại →\n  runner không làm gì cả, item nằm nguyên chờ một phiên sống tự phán rồi gọi\n  verb chia-việc tay. Đây là fail-safe có chủ đích: sinh con là hành động GHI\n  thật, không bao giờ được đoán — khác quét nghiên-cứu, nơi worker tự phán\n  được vì phán quyết ở đó không ghi ra item mới nào (fail-safe, xem spec\n  Work-State RUL48 (cấu hình runner tự sinh tại đường mặc định khi vắng mặt — không bao giờ đòi người tạo tay trước) (work-state)).",
+      "after": " Sinh con là hành động GHI thật, không được đoán; runner dùng kết quả operation validation và chỉ chuyển tiếp khi `canAdvanceEdge` cho phép.",
+      "reason": "A41 F-B continuation: validation precedes plan resolution",
+      "evidence": [
+        {
+          "ref": "src/runner/loop.mjs:1641-1678",
+          "text": "          const choice = chooseStageOperation({ work: item, stage: item.workflowStep, domain: domain.name ?? item.domain, workflow: item.workflow, repoRoot });\n          if (choice.dispatch === 'assignment' && choice.operation === 'validate-plan') {\n            const contentRoot = resolveContentRoot(repoRoot, item.id, item.docsRef);\n            const outcome = await executeDriverOperationChoice(item, choice, {\n              cwd: contentRoot,\n              repoRoot,\n              runnerConfig: config,\n              work: item,\n            });\n            const validateOutcome = outcome.runResult ? runOutcome(outcome.runResult) : null;\n            log(`fgos-runner: reviewer validation assignment for \"${item.id}\" executed (confidence: ${validateOutcome?.evidence ?? 'none'}, status: ${validateOutcome?.category ?? 'none'})`);\n            if (outcome.canAdvanceEdge) {\n              // Cell P01.2 (R4/G5): `item.verdictPayload`/`item.callerVerdict`\n              // are dead reads (grep-confirmed: no writer for either exists\n              // anywhere in `src/`) -- removed. `options.callerVerdict` /\n              // `options.verdictPayload` (an explicit override a `runOnce`\n              // caller supplies, e.g. tests) are still live and still win\n              // when present -- same \"explicit beats heuristic\" precedent\n              // `resolvePlan` itself already applies to its own\n              // callerVerdict-vs-tiny/small-heuristic fork. Otherwise, the\n              // driver never re-derives what `planning.validate-plan`\n              // already reasoned live and recorded in plan.md itself\n              // (gate-auto-approve-mechanics.md: \"hand that same JSON block\n              // through verbatim, never a re-derived or re-worded version of\n              // it\") -- it mechanically re-reads plan.md's own committed\n              // text and derives the same verdict plan.md already declared.\n              let verdict = options.callerVerdict ?? options.verdictPayload;\n              if (!verdict) {\n                let planContent = '';\n                const planPath = typeof item.docsRef === 'string' && item.docsRef.trim() ? path.join(contentRoot, item.docsRef, 'plan.md') : null;\n                if (planPath) {\n                  try {\n                    planContent = fs.readFileSync(planPath, 'utf8');\n                  } catch {\n                    // missing/unreadable plan.md -- planVerdictFromPlanMd('')\n                    // returns null, same as no callerVerdict at all: resolvePlan\n                    // falls through to its own tiny/small check / noop / refuse.\n                  }"
+        }
+      ],
+      "kind": "truth"
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+      "before": "lock ở `~/.fgos/runtime/provider-capacity/state.lock`",
+      "after": "lock là thư mục `~/.fgos/runtime/provider-capacity/state-lock`",
+      "reason": "A41 F-D: capacity lock is a directory",
+      "evidence": [
+        {
+          "ref": "src/runner/dispatch/provider-capacity.mjs:44-49",
+          "text": "    statePath: path.join(runtimeDir, 'state.json'),\n    // A directory of append-only generation records (dispatch-engine-\n    // liveness-hardening Phase 4 round 2), not a single lock file -- see\n    // withFileLock's own header comment for why.\n    lockDir: path.join(runtimeDir, 'state-lock'),\n  };"
+        }
+      ],
+      "kind": "truth"
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+      "before": "8 lớp: hỏng-spawn, quá-giờ, chấm-trượt, hỏng-worktree, nhật-ký-hỏng, đề-xuất-bị-trả, việc-kẹt-do-crash, tranh-chấp-ghi",
+      "after": "14 lớp: `worker-spawn-fail`, `worker-timeout`, `verify-miss`, `verify-timeout`, `worktree-fail`, `corrupt-log`, `reject-returned`, `stale-doing`, `state-conflict`, `dispatch-in-flight`, `dispatch-depth-exceeded`, `provider-limit`, `worker-failed`, `no-executor`",
+      "reason": "A41 F-D: recovery has 14 classes",
+      "evidence": [
+        {
+          "ref": "src/runner/recovery.mjs:126-141",
+          "text": "export const RECOVERY = Object.freeze({\n  'worker-spawn-fail': Object.freeze({ action: 'retry', maxRetries: DEFAULT_MAX_RETRIES }),\n  'worker-timeout': Object.freeze({ action: 'retry', maxRetries: DEFAULT_MAX_RETRIES }),\n  'verify-miss': Object.freeze({ action: 'retry', maxRetries: DEFAULT_MAX_RETRIES }),\n  'verify-timeout': Object.freeze({ action: 'retry', maxRetries: DEFAULT_MAX_RETRIES }),\n  'worktree-fail': Object.freeze({ action: 'retry', maxRetries: DEFAULT_MAX_RETRIES }),\n  'corrupt-log': Object.freeze({ action: 'halt' }),\n  'reject-returned': Object.freeze({ action: 'retry', maxRetries: DEFAULT_MAX_RETRIES }),\n  'stale-doing': Object.freeze({ action: 'park' }),\n  'state-conflict': Object.freeze({ action: 'halt' }),\n  'dispatch-in-flight': Object.freeze({ action: 'retry', maxRetries: DEFAULT_MAX_RETRIES }),\n  'dispatch-depth-exceeded': Object.freeze({ action: 'park' }),\n  'provider-limit': Object.freeze({ action: 'park' }),\n  'worker-failed': Object.freeze({ action: 'retry', maxRetries: DEFAULT_MAX_RETRIES }),\n  'no-executor': Object.freeze({ action: 'park' }),\n});"
+        }
+      ],
+      "kind": "truth"
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+      "before": "Cùng file còn nhận chunk stdout/stderr LIVE khi worker đang chạy (STR39, xem \"Xem live output worker khi đang chạy\") — `tail -f` thấy được ngay, không đợi khối kết-cục cuối",
+      "after": "Trong lúc worker chạy, file nhận con trỏ tới capture của Unit run; khối output được nối sau khi run kết thúc",
+      "reason": "A41 F-E: item log receives pointer and settled output",
+      "evidence": [
+        {
+          "ref": "src/runner/loop.mjs:349-351",
+          "text": "function workerRunPointer(unitRunId) {\n  return `fgos-runner: worker running as unit run ${unitRunId}; while it runs its output is captured under .fgos/assignments/${unitRunId}/producer/*/runs/*/protected/capture/, and lands in that run's stdout.log once it settles\\n`;\n}"
+        },
+        {
+          "ref": "src/runner/loop.mjs:1110-1112",
+          "text": "        // The run's id reaches the item's log the moment the run exists, so a\n        // runner that dies mid-round still leaves the id a resume needs.\n        onUnitRunCreated: (unitRunId) => appendWorkerLogChunk(dir, item.id, workerRunPointer(unitRunId)),"
+        },
+        {
+          "ref": "src/runner/loop.mjs:1150-1163",
+          "text": "      appendWorkerLog(dir, item.id, {\n        attempt,\n        commit,\n        unitRunId: worker.unitRunId,\n        tier: worker.tier,\n        model: worker.model,\n        templateName: worker.templateName,\n        templateHash: worker.templateHash,\n        status: worker.status,\n        signal: worker.signal,\n        stdout: worker.stdout,\n        stderr: worker.stderr,\n      });\n      for (const warning of worker.warnings ?? []) log(`fgos-runner: warning for \"${item.id}\": ${typeof warning === 'string' ? warning : JSON.stringify(warning)}`);"
+        }
+      ],
+      "kind": "truth"
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+      "before": "xen giữa các khối kết-cục là chunk thô không bọc, ghi ngay khi đến",
+      "after": "con trỏ Unit run được ghi khi run được tạo",
+      "reason": "A41 F-E: remove raw live-chunk claim",
+      "evidence": [
+        {
+          "ref": "src/runner/loop.mjs:1110-1112",
+          "text": "        // The run's id reaches the item's log the moment the run exists, so a\n        // runner that dies mid-round still leaves the id a resume needs.\n        onUnitRunCreated: (unitRunId) => appendWorkerLogChunk(dir, item.id, workerRunPointer(unitRunId)),"
+        }
+      ],
+      "kind": "truth"
+    },
+    {
+      "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "before": "- **Runs when:** ngay mỗi khi một chunk stdout/stderr của trợ lý ĐẾN —\n  trong lúc worker VẪN ĐANG CHẠY, không đợi lượt dispatch kết thúc (khác\n  với khối kết-cục cuối trên, chạy ĐÚNG MỘT LẦN sau khi worker đã xong).\n- **What changes:** chunk thô (không header/dấu thời gian, không bọc) được\n  nối thẳng vào CÙNG file `.fgos/logs/<id>.log` của chính việc đó — qua\n đúng cửa ghi worker-log.mjs (một-cửa, không mở cửa ghi thứ hai). Mỗi\n  việc chỉ ghi vào file của chính nó nên N việc dispatch song song không\n  bao giờ giẫm dòng nhau. Khối kết-cục cuối (trên) vẫn chạy nguyên vẹn sau\n  đó, không đổi — file cuối cùng mang cả live chunk lẫn khối tổng kết.",
+      "after": "- **Runs when:** khi Unit run được tạo, runner ghi một con trỏ vào log của item.\n- **What changes:** output trong lúc chạy được capture dưới `.fgos/assignments/<unitRunId>/producer/*/runs/*/protected/capture/`; khi settle, output nằm trong `stdout.log` của run và khối output được nối vào `.fgos/logs/<id>.log`.",
+      "reason": "A41 F-E: replace removed live tee with run capture",
+      "evidence": [
+        {
+          "ref": "src/runner/loop.mjs:349-351",
+          "text": "function workerRunPointer(unitRunId) {\n  return `fgos-runner: worker running as unit run ${unitRunId}; while it runs its output is captured under .fgos/assignments/${unitRunId}/producer/*/runs/*/protected/capture/, and lands in that run's stdout.log once it settles\\n`;\n}"
+        },
+        {
+          "ref": "src/runner/loop.mjs:1110-1112",
+          "text": "        // The run's id reaches the item's log the moment the run exists, so a\n        // runner that dies mid-round still leaves the id a resume needs.\n        onUnitRunCreated: (unitRunId) => appendWorkerLogChunk(dir, item.id, workerRunPointer(unitRunId)),"
+        },
+        {
+          "ref": "src/runner/loop.mjs:1150-1163",
+          "text": "      appendWorkerLog(dir, item.id, {\n        attempt,\n        commit,\n        unitRunId: worker.unitRunId,\n        tier: worker.tier,\n        model: worker.model,\n        templateName: worker.templateName,\n        templateHash: worker.templateHash,\n        status: worker.status,\n        signal: worker.signal,\n        stdout: worker.stdout,\n        stderr: worker.stderr,\n      });\n      for (const warning of worker.warnings ?? []) log(`fgos-runner: warning for \"${item.id}\": ${typeof warning === 'string' ? warning : JSON.stringify(warning)}`);"
+        }
+      ],
+      "kind": "truth"
+    },
+    {
+      "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "before": "- **Afterwards:** người vận hành `tail -f .fgos/logs/<id>.log` trong lúc\n  việc đang `doing` thấy output đến theo thời gian thực, thay vì phải đợi\n  worker xong mới đọc được gì. Nền cho chiều-ra của STR38/STR40 (UI tail +\n  tmux pane).",
+      "after": "- **Afterwards:** `tail -f .fgos/logs/<id>.log` thấy con trỏ Unit run trong lúc chạy; đọc capture của run để xem output trước khi khối kết-cục được nối sau settle.",
+      "reason": "A41 F-E: item-log tail does not stream worker chunks",
+      "evidence": [
+        {
+          "ref": "src/runner/loop.mjs:349-351",
+          "text": "function workerRunPointer(unitRunId) {\n  return `fgos-runner: worker running as unit run ${unitRunId}; while it runs its output is captured under .fgos/assignments/${unitRunId}/producer/*/runs/*/protected/capture/, and lands in that run's stdout.log once it settles\\n`;\n}"
+        },
+        {
+          "ref": "src/runner/loop.mjs:1150-1163",
+          "text": "      appendWorkerLog(dir, item.id, {\n        attempt,\n        commit,\n        unitRunId: worker.unitRunId,\n        tier: worker.tier,\n        model: worker.model,\n        templateName: worker.templateName,\n        templateHash: worker.templateHash,\n        status: worker.status,\n        signal: worker.signal,\n        stdout: worker.stdout,\n        stderr: worker.stderr,\n      });\n      for (const warning of worker.warnings ?? []) log(`fgos-runner: warning for \"${item.id}\": ${typeof warning === 'string' ? warning : JSON.stringify(warning)}`);"
+        }
+      ],
+      "kind": "truth"
+    },
+    {
+      "path": "docs/platform/runner/architecture/h-69197b459754.md",
+      "before": "`collect-result`, `clear-assignment-claim`, and `repair-projection`",
+      "after": "`collect-result` and `repair-projection`",
+      "reason": "A41 F-F: reconcile supports three actions",
+      "evidence": [
+        {
+          "ref": "src/runner/dispatch/reconciliation-planner.mjs:203-206",
+          "text": "function canonicalAction(root, kind, cwd) {\n  if (kind === 'clear-cwd-lock') return { kind, path: lockFile(root, cwd), cwd };\n  return null;\n}"
+        },
+        {
+          "ref": "src/runner/dispatch/reconciliation-planner.mjs:225-233",
+          "text": "export function planReconciliation(root, { action = 'clear-cwd-lock', runId, assignmentId, cwd = process.cwd(), now = new Date().toISOString(), ttlMs = 300000, runsCache = null } = {}) {\n  return withRunsCache(runsCache, () => {\n    if ((runId !== undefined || assignmentId !== undefined) && (!action || action === 'clear-cwd-lock')) {\n      return { outcome: 'refused', reason: 'dispatch reconcile plan with --run or --assignment requires --action (e.g. collect-result or repair-projection)' };\n    }\n    if (action === 'collect-result') return planCollectResult(root, { runId, now, ttlMs });\n    if (action === 'repair-projection') return planRepairProjection(root, { runId, now, ttlMs });\n    const proposedAction = canonicalAction(root, action, cwd);\n    if (!proposedAction) return { outcome: 'refused', reason: `unsupported reconciliation action: ${action}` };"
+        },
+        {
+          "ref": "src/runner/dispatch/reconciliation-planner.mjs:529-534",
+          "text": "export function applyReconciliation(root, plan, { now = new Date().toISOString(), runsCache = null } = {}) {\n  return withRunsCache(runsCache, () => {\n    if (plan?.proposedAction?.kind === 'collect-result') return applyCollectResult(root, plan, { now });\n    if (plan?.proposedAction?.kind === 'repair-projection') return applyRepairProjection(root, plan, { now });\n    const canonical = canonicalAction(root, plan?.proposedAction?.kind, plan?.proposedAction?.cwd);\n    if (!plan?.actionKey || !plan?.snapshot || !canonical) return { outcome: 'refused', reason: 'apply requires a reconcile plan for a supported action' };"
+        }
+      ],
+      "kind": "truth"
+    },
+    {
+      "path": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+      "before": ", `clear-assignment-claim --assignment\n<id>` (removes a dead-holder `dispatch.claim` once no admitted-but-\nunmaterialized launch, unsettled Run, or uncollected result is still pending\nfor that Assignment; also refused on a CoordinationSession-owned claim),",
+      "after": ",",
+      "reason": "A41 F-F: remove unsupported action description",
+      "evidence": [
+        {
+          "ref": "src/runner/dispatch/reconciliation-planner.mjs:225-233",
+          "text": "export function planReconciliation(root, { action = 'clear-cwd-lock', runId, assignmentId, cwd = process.cwd(), now = new Date().toISOString(), ttlMs = 300000, runsCache = null } = {}) {\n  return withRunsCache(runsCache, () => {\n    if ((runId !== undefined || assignmentId !== undefined) && (!action || action === 'clear-cwd-lock')) {\n      return { outcome: 'refused', reason: 'dispatch reconcile plan with --run or --assignment requires --action (e.g. collect-result or repair-projection)' };\n    }\n    if (action === 'collect-result') return planCollectResult(root, { runId, now, ttlMs });\n    if (action === 'repair-projection') return planRepairProjection(root, { runId, now, ttlMs });\n    const proposedAction = canonicalAction(root, action, cwd);\n    if (!proposedAction) return { outcome: 'refused', reason: `unsupported reconciliation action: ${action}` };"
+        }
+      ],
+      "kind": "truth"
+    },
+    {
+      "path": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+      "before": "Four actions are supported:",
+      "after": "Three actions are supported:",
+      "reason": "A41 F-F: reconcile action count",
+      "evidence": [
+        {
+          "ref": "src/runner/dispatch/reconciliation-planner.mjs:225-233",
+          "text": "export function planReconciliation(root, { action = 'clear-cwd-lock', runId, assignmentId, cwd = process.cwd(), now = new Date().toISOString(), ttlMs = 300000, runsCache = null } = {}) {\n  return withRunsCache(runsCache, () => {\n    if ((runId !== undefined || assignmentId !== undefined) && (!action || action === 'clear-cwd-lock')) {\n      return { outcome: 'refused', reason: 'dispatch reconcile plan with --run or --assignment requires --action (e.g. collect-result or repair-projection)' };\n    }\n    if (action === 'collect-result') return planCollectResult(root, { runId, now, ttlMs });\n    if (action === 'repair-projection') return planRepairProjection(root, { runId, now, ttlMs });\n    const proposedAction = canonicalAction(root, action, cwd);\n    if (!proposedAction) return { outcome: 'refused', reason: `unsupported reconciliation action: ${action}` };"
+        }
+      ],
+      "kind": "truth"
+    },
+    {
+      "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "before": "    module tính-điểm-entropy, mọi file trong nhóm tự-cải-thiện (chính vòng\n    evolve),",
+      "after": "    mọi file trong nhóm `src/evolve/`,",
+      "reason": "A41 F-G: Iron Law has no entropy-module rule",
+      "evidence": [
+        {
+          "ref": "src/evolve/iron-law.mjs:20-45",
+          "text": "const MODULE_RULES = [\n  { kind: 'prefix', value: 'src/runner/' },\n  { kind: 'prefix', value: 'src/evolve/' },\n  { kind: 'equals', value: 'bin/fgos.mjs' },\n  { kind: 'equals', value: 'src/state/store.mjs' },\n  { kind: 'equals', value: 'src/state/status-fsm.mjs' },\n  // Iron Law's own risk vocabulary (review-20260717-self-improve-base-workflow\n  // finding f1): without these two, a diff that narrows HEAVY_KEYWORDS or\n  // reweights classify.mjs's tiering silently gets required:false — the gate\n  // has no coverage of the files that define what it's supposed to flag.\n  { kind: 'equals', value: 'src/intake/risk-keywords.mjs' },\n  { kind: 'equals', value: 'src/intake/classify.mjs' },\n  // review-20260718-self-improve-loop finding f03: the step FSM decides a Work\n  // item's legal step moves from its Workflow's transition table, the same\n  // capability status-fsm.mjs already covers above — missing it let a diff\n  // widen a domain's legal transitions (e.g. skip a step) with\n  // required:false. The domain registry resolves which Workflow that is.\n  { kind: 'equals', value: 'src/state/step-fsm.mjs' },\n  { kind: 'equals', value: 'src/state/domain-registry.mjs' },\n  // bin-discovery.mjs houses the multi-tier resolver including tier-0\n  // workspace shim resolution; diffs touching it are flagged like bin/fgos.mjs.\n  { kind: 'equals', value: 'src/setup/bin-discovery.mjs' },\n];\n\nfunction matchesModuleRule(filePath, rule) {\n  return rule.kind === 'prefix'"
+        }
+      ],
+      "kind": "truth"
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "before": "`.fgos/config.json` SỐNG của chính repo này CHƯA migrate (`agy.kind` vẫn `\"cli\"`, `gitnexus`/`herdr` vẫn hình dạng cũ) — khác `runner.capabilities` (RUL trên, tsk-in1-3, thuần cộng thêm nên nạp được ở cả code cũ lẫn mới), đổi `kind` là đổi PHÁ VỠ tương thích ngược: code cũ từ chối thẳng `kind:\"agent\"/\"tool\"`. Nên KHÔNG commit thẳng lên `main` như các item liền trước (ADR0020 (chặn .fgos/ khỏi worktree worker — fgw/<id> không symlink lẫn bootstrap-copy .fgos/, merge.mjs từ chối cứng diff chạm .fgos/)'s \"commit trực tiếp lên main, tách khỏi vòng đời code\" chỉ an toàn khi dữ liệu mới còn tương thích code cũ) — phải land ĐỒNG THỜI với code của `fgw/tsk-in1` khi nhánh đó được merge lên `main`, không phải trước.",
+      "after": "schema hiện hành chỉ nhận executor `kind: \"agent\"` hoặc `\"tool\"`; `kind: \"cli\"` bị validator từ chối. Không dùng câu CHƯA migrate của slice cũ để mô tả cấu hình repo hiện tại.",
+      "reason": "A41 F-H: replace stale live-config assertion with verified current schema; live config not read under assignment boundary",
+      "evidence": [
+        {
+          "ref": "src/runner/dispatch/config.mjs:457",
+          "text": "export const EXECUTOR_KINDS = Object.freeze(['agent', 'tool']);"
+        },
+        {
+          "ref": "src/runner/dispatch/config.mjs:1015-1023",
+          "text": "function validateExecutorEntryShape(executor, label, capabilityNames) {\n  if (!executor || typeof executor !== 'object' || Array.isArray(executor)) {\n    throw new RunnerConfigError(`runner config (${label}) must be an object.`);\n  }\n  if (typeof executor.kind !== 'string' || !EXECUTOR_KINDS.includes(executor.kind)) {\n    throw new RunnerConfigError(\n      `runner config (${label}) \"kind\" must be one of ${EXECUTOR_KINDS.join('/')}, got: ${JSON.stringify(executor.kind)}.`,\n    );\n  }"
+        }
+      ],
+      "kind": "truth"
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+      "before": "Cửa compat `fgos dispatch execute --effort` (plain, `--assignment`, `--contract`) và `reasoningEffort` của operation policy đi cùng hàm kiểm đó.",
+      "after": "Cửa `fgos dispatch execute` (plain, `--assignment`, `--contract`) đã bị xoá; dùng `fgos run --effort` hoặc `reasoningEffort` của operation policy.",
+      "reason": "A41 Data Dictionary: removed effort door",
+      "evidence": [
+        {
+          "ref": "bin/fgos.mjs:960-980",
+          "text": "  const { event } = addWork(dir, work);\n  return event.payload;\n}\n\n// The dispatch doors that ran one task straight through dispatch are gone; each now has a\n// runUnit door. This is the one place that says which: every caller of `fgos dispatch`\n// (shell, gateway, scripts) gets the same validation error, before anything runs.\nfunction retiredDispatchDoorMessage(sub, positional, flags) {\n  if (sub === 'execute') {\n    if (flags.assignment !== undefined) {\n      return 'fgos dispatch execute --assignment was removed: run the unit with `fgos run --unit <file>`, or planned work with `fgos workflow start <preset>|--units <file>`.';\n    }\n    const executorId = positional[1] && !String(positional[1]).startsWith('--') ? positional[1] : undefined;\n    const hint = runDoorHint({\n      cwd: typeof flags.cwd === 'string' ? flags.cwd : process.cwd(),\n      executorId,\n      capability: typeof flags.for === 'string' ? flags.for : undefined,\n    });\n    return `fgos dispatch execute was removed: run one task with ${hint}, or a unit file with \\`fgos run --unit <file>\\`.`;\n  }\n  if (sub === 'log') {"
+        },
+        {
+          "ref": "src/runner/dispatch/cli.mjs:1268-1274",
+          "text": "    default: {\n      const msg = `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --needs-soul [--has-live-task-access] | reconcile <runDir> [--control-epoch <n>] [--control-token <t>] | probe-account --provider <provider> --account <accountId> [--executor <id>] [--invocation <id,...>] [--timeout-ms <ms>]. To run a task: fgos run \"<prompt>\"; decide --work: fgos dispatch decide --work <workId>\\n`;\n      if (returnResult) throw new StoreError('validation', msg.trim());\n      process.stderr.write(msg);\n      process.exitCode = 1;\n    }\n  }"
+        }
+      ],
+      "kind": "truth"
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-2e032393add1/spec.md",
+      "before": "- Tên nhánh trục (trunk) của cổng duyệt hiện là literal `\"main\"` (`merge.mjs`) — một host project dùng tên nhánh trục khác (vd `master`) sẽ gãy `approve`/`review`; đề xuất là tự phát hiện trunk lúc init/config thay vì literal (friction filed khi viết e2e cell pr-lifecycle-3, layer task-spec, severity P3 — xem `.bee/backlog.jsonl`).",
+      "after": "- Tên nhánh trục của cổng duyệt được phát hiện bằng `detectTrunk(repoRoot)` (origin/HEAD, rồi local `main`/`master`); không còn hardcode literal `\"main\"`.",
+      "reason": "A41 F3: trunk detection already exists",
+      "evidence": [
+        {
+          "ref": "src/runner/merge.mjs:38-40",
+          "text": "// omitted, `detectTrunk` resolves the default (origin/HEAD's target, falling\n// back to a local `main`/`master` branch) instead of a hardcoded `'main'` —\n// this repo's own trunk is `main`, but nothing here assumes that literal"
+        },
+        {
+          "ref": "src/runner/merge.mjs:267",
+          "text": "  const { trunk = detectTrunk(repoRoot), maxBuffer = DIFF_MAX_BUFFER } = opts;"
+        },
+        {
+          "ref": "src/runner/worktree.mjs:255-290",
+          "text": "export function detectTrunk(repoRoot) {\n  try {\n    const ref = gitQuiet(repoRoot, ['symbolic-ref', '--short', 'refs/remotes/origin/HEAD']).trim();\n    if (ref.startsWith('origin/')) {\n      return ref.slice('origin/'.length);\n    }\n  } catch {\n    // no origin remote, or origin/HEAD isn't set locally — fall through\n  }\n\n  for (const candidate of ['main', 'master']) {\n    try {\n      gitQuiet(repoRoot, ['show-ref', '--verify', '--quiet', `refs/heads/${candidate}`]);\n      return candidate;\n    } catch {\n      // candidate branch doesn't exist locally — try the next one\n    }\n  }\n\n  return 'main';\n}\n\n/**\n * Whether `repoRoot` IS the repo's main working tree — never a linked\n * worktree, registered through `fgos session start` (session.mjs) or ad-hoc\n * (a plain `git worktree add` run by hand, invisible to `sessions.json`).\n * `approve`'s registry-based guard only ever caught the registered case; an\n * ad-hoc worktree slipped through the exact same risk untouched — a merge\n * landing on that worktree's own checkout, or a goal-check verifying its own\n * (possibly stale/divergent) tree, while the item is still reported \"done\" /\n * \"verified on main\" (P44).\n *\n * The check is structural, not registry-based, so it catches both: a main\n * worktree's git-common-dir sits directly inside its own toplevel (its\n * parent IS the toplevel); a linked worktree's common-dir resolves to the\n * MAIN repo's `.git`, whose parent is the main repo root — never the linked"
+        }
+      ],
+      "kind": "truth"
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+      "before": "- `src/report/entropy.mjs` — thuần, không fs/Date.now(): `computeEntropy(view)` → `{score, parts}` (5 tín hiệu có trọng số, mỗi phần giải thích được); `computeCounts(view)` → tổng phẳng outcome/friction/settlement cho seal-digest; đọc/ghi lịch sử xu hướng (`.fgos/logs/entropy-history.jsonl`, gitignored, kể từ phase-01 plans/260825-0842-fgos-logs-dir-bucketing) và định dạng seal-digest là việc của `bin/fgos.mjs`'s verb `check`, không phải module này",
+      "after": "- `packages/observe/rust/src/metrics_cli/entropy.rs` — handler hiện hành cho `fgos metrics entropy`, tính score/parts và delta từ snapshot; `src/report/entropy.mjs` và CLI `check` cũ đã bị xoá.",
+      "reason": "A41 F2: replace deleted entropy pointer",
+      "evidence": [
+        {
+          "ref": "packages/observe/rust/src/metrics_cli/entropy.rs:1-8",
+          "text": "//! CLI handler for `fgos metrics entropy` (Lane A - Phase F7).\n//!\n//! Subcommand: `fgos metrics entropy [--dir <root>]`\n//!\n//! Computes entropy score, explainable parts, and delta compared to the most recent snapshot in\n//! `.fgos/observe/snapshots/*.jsonl`.\n\nuse crate::contract::{ObserveRequest, WorkObservationSource};"
+        },
+        {
+          "ref": "packages/observe/rust/src/metrics_cli/entropy.rs:107-127",
+          "text": "pub fn dispatch_entropy(\n    req: &ObserveRequest,\n    work_source: Option<&dyn WorkObservationSource>,\n) -> Result<Value, String> {\n    let mut i = 0;\n    while i < req.args.len() {\n        let arg = &req.args[i];\n        if arg == \"--dir\" {\n            i += 2;\n            continue;\n        } else if arg.starts_with(\"--dir=\") {\n            i += 1;\n            continue;\n        } else {\n            return Err(format!(\"unexpected argument for metrics entropy: {}\", arg));\n        }\n    }\n\n    let ws =\n        work_source.ok_or_else(|| \"work source not available for metrics entropy\".to_string())?;\n    let calc = calculate_entropy_score_and_parts(&req.root, ws)?;"
+        }
+      ],
+      "kind": "truth"
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+      "before": "- `src/evolve/candidates.mjs` — Gate A candidate ranking (self-improve loop STR13 Slice 1): thuần (`rankCandidates(view)`), không fs/Date.now, tái dùng `entropy.mjs`'s `listUnsettledFrictionsByWork`/`WEIGHTS.frictionUnsettled` (không tự định nghĩa \"chưa ngã-ngũ\" hay trọng số riêng); một candidate mỗi id còn friction chưa ngã-ngũ, trường hiển thị lấy từ bản ghi MỚI NHẤT theo `ts`, `score` cộng dồn TOÀN BỘ bản ghi chưa ngã-ngũ của id đó, sắp xếp score giảm dần rồi id tăng dần (tie-break). Manifest layer: domain.",
+      "after": "- `src/evolve/candidates.mjs` đã bị xoá; CLI hiện hành không có verb `evolve`, và `rankCandidates` chỉ còn được nhắc trong comment của entrypoint.",
+      "reason": "A41 F1: replace deleted ranking pointer",
+      "evidence": [
+        {
+          "ref": "bin/fgos.mjs:4640-4643",
+          "text": "// `evolve` added by tsk-5iv D3 (round-3 review, MEDIUM): same bug class\n// again -- `requiresExistingStore: false`, silently returns `[]` (an\n// empty-store `rankCandidates` result) from a `.fgos/`-less worktree\n// instead of its real candidate list. This is the fourth time this set"
+        },
+        {
+          "ref": "bin/fgos.mjs:4373-4380",
+          "text": "      throw new StoreError('validation', `unknown verb \"${verb ?? ''}\". Usage: fgos <version|init|add|submit|discover|plan|move|retrospective|cleanup|compound|edit|item|ask|answer|decision|list|ready|rebuild|repair|rollup|take|return|review|approve|sync-root|reject|catchup|triage|session|gateway|goal|tool|setup|doctor|unlock|lock-status|main-checkout-reset> ...`);\n  }\n}\n\n// ─── --help / --help --json: machine-readable verb manifest (P37 deliverable\n// b) — mirrors `.bee/bin/bee.mjs`'s publicManifestEntries/renderHelpText/\n// handleHelp exactly. The manifest itself is NEVER wrapped in the fgos.v1\n// envelope (wrapEnvelope) — this is CTR001's documented exception for the"
+        }
+      ],
+      "kind": "truth"
+    },
+    {
+      "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "before": "    - `fgos evolve` — xếp hạng MỖI id còn friction chưa ngã-ngũ\n (`src/evolve/candidates.mjs`'s `rankCandidates`, tái dùng cơ học\n      `listUnsettledFrictionsByWork`/`WEIGHTS.frictionUnsettled` của\n      `entropy.mjs`, không tự định nghĩa lại \"chưa ngã-ngũ\" hay trọng số\n      riêng) rồi in TOÀN BỘ danh sách — mỗi dòng mang đủ id/score/\n      disposition/errorClass/layer/attempts/detail, không cắt bớt (cùng kỷ\n      luật \"mọi trường người cần để phán\" như phần friction của `check`).\n      Không friction chưa ngã-ngũ nào → một thông điệp trạng-thái-rỗng rõ\n      ràng, exit 0 — chưa khởi tạo `.fgos/` nếu nó chưa tồn tại, giữ đúng hợp\n      đồng đọc-thuần của `ready`/`list`.",
+      "after": "    - CLI hiện hành không có verb `fgos evolve`; module `src/evolve/candidates.mjs` đã bị xoá và không có hàm `rankCandidates` đang chạy.",
+      "reason": "A41 F-C: evolve/ranking is absent",
+      "evidence": [
+        {
+          "ref": "bin/fgos.mjs:4373-4380",
+          "text": "      throw new StoreError('validation', `unknown verb \"${verb ?? ''}\". Usage: fgos <version|init|add|submit|discover|plan|move|retrospective|cleanup|compound|edit|item|ask|answer|decision|list|ready|rebuild|repair|rollup|take|return|review|approve|sync-root|reject|catchup|triage|session|gateway|goal|tool|setup|doctor|unlock|lock-status|main-checkout-reset> ...`);\n  }\n}\n\n// ─── --help / --help --json: machine-readable verb manifest (P37 deliverable\n// b) — mirrors `.bee/bin/bee.mjs`'s publicManifestEntries/renderHelpText/\n// handleHelp exactly. The manifest itself is NEVER wrapped in the fgos.v1\n// envelope (wrapEnvelope) — this is CTR001's documented exception for the"
+        },
+        {
+          "ref": "bin/fgos.mjs:4640-4643",
+          "text": "// `evolve` added by tsk-5iv D3 (round-3 review, MEDIUM): same bug class\n// again -- `requiresExistingStore: false`, silently returns `[]` (an\n// empty-store `rankCandidates` result) from a `.fgos/`-less worktree\n// instead of its real candidate list. This is the fourth time this set"
+        }
+      ],
+      "kind": "truth"
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-ce5b9771a26a/spec.md",
+      "before": "- `fgos evolve` / `fgos evolve --pick <id>` / `fgos evolve --submit <id>` (ngoài vòng runner, gọi bởi người vận hành, on-demand — self-improve loop STR13) — Gate A của vòng tự cải thiện: xếp hạng candidate từ friction chưa ngã-ngũ, người chọn một hoặc dừng (đọc-thuần tuyệt đối), hoặc bắc cầu candidate đã chọn sang một việc thật (`--submit`, hành động ghi duy nhất của bề mặt evolve) — xem \"Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)\" dưới",
+      "after": "- `fgos evolve`, `fgos evolve --pick` và `fgos evolve --submit` không còn là entry point hiện hành; module ranking cũ đã bị xoá.",
+      "reason": "A41 F1: remove unavailable entry point",
+      "evidence": [
+        {
+          "ref": "bin/fgos.mjs:4373-4380",
+          "text": "      throw new StoreError('validation', `unknown verb \"${verb ?? ''}\". Usage: fgos <version|init|add|submit|discover|plan|move|retrospective|cleanup|compound|edit|item|ask|answer|decision|list|ready|rebuild|repair|rollup|take|return|review|approve|sync-root|reject|catchup|triage|session|gateway|goal|tool|setup|doctor|unlock|lock-status|main-checkout-reset> ...`);\n  }\n}\n\n// ─── --help / --help --json: machine-readable verb manifest (P37 deliverable\n// b) — mirrors `.bee/bin/bee.mjs`'s publicManifestEntries/renderHelpText/\n// handleHelp exactly. The manifest itself is NEVER wrapped in the fgos.v1\n// envelope (wrapEnvelope) — this is CTR001's documented exception for the"
+        },
+        {
+          "ref": "bin/fgos.mjs:4640-4643",
+          "text": "// `evolve` added by tsk-5iv D3 (round-3 review, MEDIUM): same bug class\n// again -- `requiresExistingStore: false`, silently returns `[]` (an\n// empty-store `rankCandidates` result) from a `.fgos/`-less worktree\n// instead of its real candidate list. This is the fourth time this set"
+        }
+      ],
+      "kind": "truth"
+    },
+    {
+      "path": "docs/platform/runner/spec.md",
+      "before": "updated: 2026-08-12",
+      "after": "updated: 2026-10-15",
+      "reason": "A41 F4: candidate authoring date",
+      "evidence": [
+        {
+          "ref": "docs/specs/runner.md:3193-3200",
+          "text": "### 0055 — Panel: khác họ provider giữa các ghế là ưu tiên mềm, `bind()` rải ghế theo thứ tự `prefer`; `reviewed` vẫn cứng\n\n- **Trạng thái:** Settled (owner, 2026-10-11). Thay thế quy tắc \"mỗi ghế panel một họ provider khác nhau, thiếu thì từ chối\" của `independentOf` cho `panel` (đặt ở abe6f2b3c, Wave B; role name resolve về executor ở 5f915db15; synthesizer bắt buộc khác họ ở 9420cf603). Phần `reviewed` (producer ≠ checker) và ngoại lệ `acceptDependence` (override `origin: human-cli`) không đổi.\n- **Bối cảnh:** `panel.mjs` cho mỗi panelist `independentOf` = mọi panelist khác và cho synthesizer `independentOf` = mọi panelist; `bind()` từ chối ứng viên cùng họ trừ khi có waiver của người. Số ghế vì vậy bị chặn bởi số họ provider dùng được (5 ở máy này, đa số người dùng ít hơn) và pool thiếu họ thì synthesizer bị `policy-refusal` sau khi các panelist đã chạy và tốn tiền. Cùng họ giữa các ghế làm giảm độc lập nhưng không làm panel vô nghĩa; từ chối là hậu quả quá nặng so với lợi ích.\n- **Quyết định:**\n  1. **Ưu tiên mềm, không bao giờ từ chối.** `runRole` nhận thêm `preferIndependentOf` (tên vai) tách khỏi `independentOf` cứng. `panel.mjs` chỉ KHAI: mỗi panelist ưu tiên khác mọi panelist còn lại, synthesizer ưu tiên khác mọi panelist; không nêu executor/họ/tier. `independentOf` (cứng) vẫn do `reviewed` dùng.\n  2. **Lựa chọn ở `bind()`, một nơi.** `ask.preferIndependentOf` là `[{ role, executor }]` của các ghế ĐÃ bind (runner/dry-bind lấy từ `role-ledger.mjs`, hàm `seats`; mảng rỗng cho ghế đầu, vắng mặt khi vai không xin rải). `bind()` vẫn lọc governance, độc lập cứng, posture, blind như cũ rồi, trong số ứng viên còn lại, chọn họ có ÍT ghế đã dùng nhất (họ chưa ai dùng = 0), hoà thì theo thứ tự `prefer` của capability (thứ tự do owner tuyển, tái dùng). Đủ họ thì ghế rơi vào họ khác nhau theo thứ tự pool như trước; hết họ thì ghế dùng chung họ ít dùng nhất. Không có bảng sức mạnh họ, bảng persona→họ, registry hay khoá config mới.\n  3. **Thứ tự bind xác định.** Các panelist bind theo thứ tự liệt kê, đồng bộ trong cùng một tick (trong `runRole` không có `await` giữa `bind` và `noteRoleExecutor`), nên ghế k chỉ thấy các ghế liệt kê trước nó (cộng ghế mà lần chạy resume đã ghi); synthesizer bind sau khi mọi panelist xong. Thứ tự liệt kê = thứ tự ưu tiên: ghế đứng trước được chọn trước. Nhu cầu theo ghế (rigor/tier riêng từng ghế) chưa có kênh per-seat nên để việc sau; bước này chỉ dùng thứ tự ghế."
+        }
+      ],
+      "kind": "truth"
+    },
+    {
+      "path": "docs/platform/runner/spec.md",
+      "before": "coverage: full",
+      "after": "coverage: candidate-unverified",
+      "reason": "A41 F4: no current full-coverage certification",
+      "evidence": [
+        {
+          "ref": "docs/specs/runner.md:3193-3200",
+          "text": "### 0055 — Panel: khác họ provider giữa các ghế là ưu tiên mềm, `bind()` rải ghế theo thứ tự `prefer`; `reviewed` vẫn cứng\n\n- **Trạng thái:** Settled (owner, 2026-10-11). Thay thế quy tắc \"mỗi ghế panel một họ provider khác nhau, thiếu thì từ chối\" của `independentOf` cho `panel` (đặt ở abe6f2b3c, Wave B; role name resolve về executor ở 5f915db15; synthesizer bắt buộc khác họ ở 9420cf603). Phần `reviewed` (producer ≠ checker) và ngoại lệ `acceptDependence` (override `origin: human-cli`) không đổi.\n- **Bối cảnh:** `panel.mjs` cho mỗi panelist `independentOf` = mọi panelist khác và cho synthesizer `independentOf` = mọi panelist; `bind()` từ chối ứng viên cùng họ trừ khi có waiver của người. Số ghế vì vậy bị chặn bởi số họ provider dùng được (5 ở máy này, đa số người dùng ít hơn) và pool thiếu họ thì synthesizer bị `policy-refusal` sau khi các panelist đã chạy và tốn tiền. Cùng họ giữa các ghế làm giảm độc lập nhưng không làm panel vô nghĩa; từ chối là hậu quả quá nặng so với lợi ích.\n- **Quyết định:**\n  1. **Ưu tiên mềm, không bao giờ từ chối.** `runRole` nhận thêm `preferIndependentOf` (tên vai) tách khỏi `independentOf` cứng. `panel.mjs` chỉ KHAI: mỗi panelist ưu tiên khác mọi panelist còn lại, synthesizer ưu tiên khác mọi panelist; không nêu executor/họ/tier. `independentOf` (cứng) vẫn do `reviewed` dùng.\n  2. **Lựa chọn ở `bind()`, một nơi.** `ask.preferIndependentOf` là `[{ role, executor }]` của các ghế ĐÃ bind (runner/dry-bind lấy từ `role-ledger.mjs`, hàm `seats`; mảng rỗng cho ghế đầu, vắng mặt khi vai không xin rải). `bind()` vẫn lọc governance, độc lập cứng, posture, blind như cũ rồi, trong số ứng viên còn lại, chọn họ có ÍT ghế đã dùng nhất (họ chưa ai dùng = 0), hoà thì theo thứ tự `prefer` của capability (thứ tự do owner tuyển, tái dùng). Đủ họ thì ghế rơi vào họ khác nhau theo thứ tự pool như trước; hết họ thì ghế dùng chung họ ít dùng nhất. Không có bảng sức mạnh họ, bảng persona→họ, registry hay khoá config mới.\n  3. **Thứ tự bind xác định.** Các panelist bind theo thứ tự liệt kê, đồng bộ trong cùng một tick (trong `runRole` không có `await` giữa `bind` và `noteRoleExecutor`), nên ghế k chỉ thấy các ghế liệt kê trước nó (cộng ghế mà lần chạy resume đã ghi); synthesizer bind sau khi mọi panelist xong. Thứ tự liệt kê = thứ tự ưu tiên: ghế đứng trước được chọn trước. Nhu cầu theo ghế (rigor/tier riêng từng ghế) chưa có kênh per-seat nên để việc sau; bước này chỉ dùng thứ tự ghế."
+        }
+      ],
+      "kind": "truth"
+    },
+    {
+      "path": "docs/platform/runner/architecture/h-69197b459754.md",
+      "before": "](../../src/runner/dispatch/assignment-layout.mjs)",
+      "after": "](../../../../src/runner/dispatch/assignment-layout.mjs)",
+      "reason": "R9-1: link-only rebase; label and repository referent preserved",
+      "evidence": [
+        {
+          "ref": "src/runner/dispatch/assignment-layout.mjs"
+        }
+      ],
+      "kind": "link"
+    },
+    {
+      "path": "docs/platform/runner/architecture/h-69197b459754.md",
+      "before": "](../../test/fixtures/run-layout/expected.json)",
+      "after": "](../../../../test/fixtures/run-layout/expected.json)",
+      "reason": "R9-1: link-only rebase; label and repository referent preserved",
+      "evidence": [
+        {
+          "ref": "test/fixtures/run-layout/expected.json"
+        }
+      ],
+      "kind": "link"
+    },
+    {
+      "path": "docs/platform/runner/architecture/h-69197b459754.md",
+      "before": "](../../plans/reports/observe-unit-summary-stance-prior-art-261005.md)",
+      "after": "](../../../../plans/reports/observe-unit-summary-stance-prior-art-261005.md)",
+      "reason": "R9-1: link-only rebase; label and repository referent preserved",
+      "evidence": [
+        {
+          "ref": "plans/reports/observe-unit-summary-stance-prior-art-261005.md"
+        }
+      ],
+      "kind": "link"
+    },
+    {
+      "path": "docs/platform/runner/architecture/h-7af1f0242611.md",
+      "before": "](../architect/agent-coordination/architecture/dispatch-control-plane.md)",
+      "after": "](../../../architect/agent-coordination/architecture/dispatch-control-plane.md)",
+      "reason": "R9-1: link-only rebase; label and repository referent preserved",
+      "evidence": [
+        {
+          "ref": "docs/architect/agent-coordination/architecture/dispatch-control-plane.md"
+        }
+      ],
+      "kind": "link"
+    },
+    {
+      "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "before": "](./confinement-authority.md)",
+      "after": "](../../../specs/confinement-authority.md)",
+      "reason": "R9-1: link-only rebase; label and repository referent preserved",
+      "evidence": [
+        {
+          "ref": "docs/specs/confinement-authority.md"
+        }
+      ],
+      "kind": "link"
+    },
+    {
+      "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "before": "](../../plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/acceptance-herdr.md)",
+      "after": "](../../../../plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/acceptance-herdr.md)",
+      "reason": "R9-1: link-only rebase; label and repository referent preserved",
+      "evidence": [
+        {
+          "ref": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/acceptance-herdr.md"
+        }
+      ],
+      "kind": "link"
+    },
+    {
+      "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "before": "Placement in decisions does not declare the subject retired. ",
+      "after": "",
+      "reason": "R9-5: remove decisions-placement boilerplate from non-decision carrier",
+      "evidence": [],
+      "kind": "scaffolding"
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-37aced3896a8/spec.md",
+      "before": "Placement in decisions does not declare the subject retired. ",
+      "after": "",
+      "reason": "R9-5: remove decisions-placement boilerplate from non-decision carrier",
+      "evidence": [],
+      "kind": "scaffolding"
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md",
+      "before": "Placement in decisions does not declare the subject retired. ",
+      "after": "",
+      "reason": "R9-5: remove decisions-placement boilerplate from non-decision carrier",
+      "evidence": [],
+      "kind": "scaffolding"
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "before": "Placement in decisions does not declare the subject retired. ",
+      "after": "",
+      "reason": "R9-5: remove decisions-placement boilerplate from non-decision carrier",
+      "evidence": [],
+      "kind": "scaffolding"
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-ce5b9771a26a/spec.md",
+      "before": "Placement in decisions does not declare the subject retired. ",
+      "after": "",
+      "reason": "R9-5: remove decisions-placement boilerplate from non-decision carrier",
+      "evidence": [],
+      "kind": "scaffolding"
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md",
+      "before": "Placement in decisions does not declare the subject retired. ",
+      "after": "",
+      "reason": "R9-5: remove decisions-placement boilerplate from non-decision carrier",
+      "evidence": [],
+      "kind": "scaffolding"
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-2e032393add1/spec.md",
+      "before": "Placement in decisions does not declare the subject retired. ",
+      "after": "",
+      "reason": "R9-5: remove decisions-placement boilerplate from non-decision carrier",
+      "evidence": [],
+      "kind": "scaffolding"
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+      "before": "Placement in decisions does not declare the subject retired. ",
+      "after": "",
+      "reason": "R9-5: remove decisions-placement boilerplate from non-decision carrier",
+      "evidence": [],
+      "kind": "scaffolding"
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+      "before": "Placement in decisions does not declare the subject retired. ",
+      "after": "",
+      "reason": "R9-5: remove decisions-placement boilerplate from non-decision carrier",
+      "evidence": [],
+      "kind": "scaffolding"
+    },
+    {
+      "path": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+      "before": "Placement in decisions does not declare the subject retired. ",
+      "after": "",
+      "reason": "R9-5: remove decisions-placement boilerplate from non-decision carrier",
+      "evidence": [],
+      "kind": "scaffolding"
+    },
+    {
+      "path": "docs/platform/runner/architecture/h-69197b459754.md",
+      "before": "Placement in decisions does not declare the subject retired. ",
+      "after": "",
+      "reason": "R9-5: remove decisions-placement boilerplate from non-decision carrier",
+      "evidence": [],
+      "kind": "scaffolding"
+    },
+    {
+      "path": "docs/platform/runner/architecture/h-7af1f0242611.md",
+      "before": "Placement in decisions does not declare the subject retired. ",
+      "after": "",
+      "reason": "R9-5: remove decisions-placement boilerplate from non-decision carrier",
+      "evidence": [],
+      "kind": "scaffolding"
+    },
+    {
+      "path": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+      "before": "Placement in decisions does not declare the subject retired. ",
+      "after": "",
+      "reason": "R9-5: remove decisions-placement boilerplate from non-decision carrier",
+      "evidence": [],
+      "kind": "scaffolding"
+    },
+    {
+      "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "before": "- **Runs when:** người vận hành gọi `fgos evolve`",
+      "after": "- **Runs when:** CLI hiện hành không có `fgos evolve`; phần còn lại của mục này lưu hợp đồng Gate A trước khi module ranking bị xoá, không mô tả hành vi hiện hành. Theo hợp đồng cũ, người vận hành gọi `fgos evolve`",
+      "reason": "A41 F-C: scope the old Gate A contract explicitly; unavailable verb is not described as current",
+      "evidence": [
+        {
+          "ref": "bin/fgos.mjs:4373-4380",
+          "text": "      throw new StoreError('validation', `unknown verb \"${verb ?? ''}\". Usage: fgos <version|init|add|submit|discover|plan|move|retrospective|cleanup|compound|edit|item|ask|answer|decision|list|ready|rebuild|repair|rollup|take|return|review|approve|sync-root|reject|catchup|triage|session|gateway|goal|tool|setup|doctor|unlock|lock-status|main-checkout-reset> ...`);\n  }\n}\n\n// ─── --help / --help --json: machine-readable verb manifest (P37 deliverable\n// b) — mirrors `.bee/bin/bee.mjs`'s publicManifestEntries/renderHelpText/\n// handleHelp exactly. The manifest itself is NEVER wrapped in the fgos.v1\n// envelope (wrapEnvelope) — this is CTR001's documented exception for the"
+        },
+        {
+          "ref": "git log -- src/evolve/candidates.mjs",
+          "text": "c36f8d746 deletes legacy module"
+        }
+      ],
+      "kind": "truth"
+    }
+  ],
+  "trueOrHistoryLeft": [
+    {
+      "subject": "0062 R3_PENDING_WORK_CALLERS",
+      "verdict": "dated decision history, superseded by 0063; no truth correction",
+      "evidence": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md:1718-1746",
+        "test/architecture.test.mjs (no R3_PENDING_WORK_CALLERS match)"
+      ]
+    },
+    {
+      "subject": "deleted-module references explicitly saying deleted / superseded RUL68 and RUL76",
+      "verdict": "true historical statements left unchanged",
+      "evidence": [
+        "src/runner/dispatch/cli.mjs:1268-1274"
+      ]
+    },
+    {
+      "subject": "live config exact values",
+      "verdict": "not read: assignment forbids .fgos access; replaced false status with code-verifiable schema fact, no independent live-config claim",
+      "evidence": [
+        "src/runner/dispatch/config.mjs:457",
+        "src/runner/dispatch/config.mjs:1019-1023"
+      ]
+    },
+    {
+      "subject": "ExecutorProfile proposed migration and superseded RUL68/RUL76",
+      "verdict": "Labelled proposal/history retained, not treated as current implementation assertions",
+      "evidence": [
+        "docs/platform/runner/contracts/h-b3eb60fb4d2b.md:69-73",
+        "src/runner/dispatch/config.mjs:457",
+        "src/runner/dispatch/cli.mjs:1268-1274"
+      ]
+    }
+  ],
+  "noFullTruthSweep": true
+}

@@ -6,55 +6,55 @@
       "type": "unresolved-link",
       "path": "docs/platform/runner/architecture/h-69197b459754.md",
       "message": "link target does not exist: ../../src/runner/dispatch/assignment-layout.mjs",
-      "rule": "A19 carriage now; P6/Step 10 candidate link pass before promotion",
-      "status": "open",
+      "rule": "R9-1 Lead fix; A19/A22",
+      "status": "rebased in candidate; independent review pending",
       "owner": "Runner documentation migration owner",
-      "done": "Repoint to extant intended target, list post-review edit and rebind changed rows; independent re-review when bytes change."
+      "done": "Same repository referent and label preserved; changed source rows rebound pending; 0 unresolved links in current candidate-status check."
     },
     {
       "type": "unresolved-link",
       "path": "docs/platform/runner/architecture/h-69197b459754.md",
       "message": "link target does not exist: ../../test/fixtures/run-layout/expected.json",
-      "rule": "A19 carriage now; P6/Step 10 candidate link pass before promotion",
-      "status": "open",
+      "rule": "R9-1 Lead fix; A19/A22",
+      "status": "rebased in candidate; independent review pending",
       "owner": "Runner documentation migration owner",
-      "done": "Repoint to extant intended target, list post-review edit and rebind changed rows; independent re-review when bytes change."
+      "done": "Same repository referent and label preserved; changed source rows rebound pending; 0 unresolved links in current candidate-status check."
     },
     {
       "type": "unresolved-link",
       "path": "docs/platform/runner/architecture/h-69197b459754.md",
       "message": "link target does not exist: ../../plans/reports/observe-unit-summary-stance-prior-art-261005.md",
-      "rule": "A19 carriage now; P6/Step 10 candidate link pass before promotion",
-      "status": "open",
+      "rule": "R9-1 Lead fix; A19/A22",
+      "status": "rebased in candidate; independent review pending",
       "owner": "Runner documentation migration owner",
-      "done": "Repoint to extant intended target, list post-review edit and rebind changed rows; independent re-review when bytes change."
+      "done": "Same repository referent and label preserved; changed source rows rebound pending; 0 unresolved links in current candidate-status check."
     },
     {
       "type": "unresolved-link",
       "path": "docs/platform/runner/architecture/h-7af1f0242611.md",
       "message": "link target does not exist: ../architect/agent-coordination/architecture/dispatch-control-plane.md",
-      "rule": "A19 carriage now; P6/Step 10 candidate link pass before promotion",
-      "status": "open",
+      "rule": "R9-1 Lead fix; A19/A22",
+      "status": "rebased in candidate; independent review pending",
       "owner": "Runner documentation migration owner",
-      "done": "Repoint to extant intended target, list post-review edit and rebind changed rows; independent re-review when bytes change."
+      "done": "Same repository referent and label preserved; changed source rows rebound pending; 0 unresolved links in current candidate-status check."
     },
     {
       "type": "unresolved-link",
       "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
       "message": "link target does not exist: ./confinement-authority.md",
-      "rule": "A19 carriage now; P6/Step 10 candidate link pass before promotion",
-      "status": "open",
+      "rule": "R9-1 Lead fix; A19/A22",
+      "status": "rebased in candidate; independent review pending",
       "owner": "Runner documentation migration owner",
-      "done": "Repoint to extant intended target, list post-review edit and rebind changed rows; independent re-review when bytes change."
+      "done": "Same repository referent and label preserved; changed source rows rebound pending; 0 unresolved links in current candidate-status check."
     },
     {
       "type": "unresolved-link",
       "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
       "message": "link target does not exist: ../../plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/acceptance-herdr.md",
-      "rule": "A19 carriage now; P6/Step 10 candidate link pass before promotion",
-      "status": "open",
+      "rule": "R9-1 Lead fix; A19/A22",
+      "status": "rebased in candidate; independent review pending",
       "owner": "Runner documentation migration owner",
-      "done": "Repoint to extant intended target, list post-review edit and rebind changed rows; independent re-review when bytes change."
+      "done": "Same repository referent and label preserved; changed source rows rebound pending; 0 unresolved links in current candidate-status check."
     }
   ],
   "cutover": [
@@ -74,5 +74,7 @@
       "done": "All inbound/outbound consumer and alias routes classified and independently verified; no legacy edits during candidate carriage."
     }
   ],
-  "linksRewritten": false
+  "linksRewritten": false,
+  "currentCandidateStatusFindings": 0,
+  "currentEvidence": "step9-candidate-status.json"
 }

@@ -1,3 +1,25 @@
+# Step 8 closed; runner truth and red-team corrections authored
+
+Assignment `unit-run-1792060810360-fc3c5695/producer/1`; input HEAD **24be6cb1d**. **Step 8 closed**: final 1 ok applied through unchanged ordinary applicator with verbatim reviewer note and exact digests. Step 8 document bytes unchanged.
+
+**23 bounded assertion/sentence edit ranges**, each checked against code before editing; six link-only rebases; 13 added boilerplate removals. True labelled proposals, superseded rules and dated decision history (including 0062) retained. Stale self-line citations labelled only. Live config was not read; stale F-H now states the code-verified current schema. Full before/after and evidence: [truth accounting](audit-261015-1741-runner-truth-corrections.md). **34 source rows rebound, 68 candidate-unit changes**, all pending, no approval carry; **461 Weak-exact / 34 Judgment**. [Exact units](step9-rebound-units.json).
+
+R9-1–R9-8 author fixes complete: **0 unresolved links / candidate findings**; liveness regenerated with 40 section-class changes, 11 required records current-decision, 296 protected current units including 113 decision units. No new truth draw under A41. A35 item 2 exact note on 15 current carriers. Both drift figures disclosed: **27/470 = 5.74% selected**, **52/495 = 10.51% head-side alternative**, growth separate; stop 9 reading in report/owner queue. Placement current **607/606**, one exception, zero gaps.
+
+**Scoped FAST D 0 fatal, E 0 structural fatal**, both priors together/each; E open 495 unreviewed, 32 gaps, 86 conservative reverse entries (includes 19 routing-handoff context entries omitted by runner-only decisions). Not native equality or strict green. Registry unchanged. Tests initial **43/44**, sensitivity-fixture failure; targeted rerun **1/1 pass**, no code or checker changes. Failure and rerun logs retained. [Step 9 report](step-09-report.md).
+
+**Next turn:** native sync **once at this turn’s runner commit**, preserve known IDs and recompute native D/E/five-field accounting; apply committed runner review verdicts only where all shown bindings still match; package bounded independent truth re-review of rebound rows and candidate-unit changes, plus updated liveness/accounting review. Existing review packs/request files untouched this turn. Step 9 remains open for these, predecessor dispositions, final main sync, fresh readers, red-team acceptance and existing Rings/A34/Step 10/cutover obligations. No new owner-direction blocker.
+
+Writes only docs/platform and this plan; no native sync, git write, legacy source, gate/checker/vocabulary/extractor/baseline or registry edit, workspace .fgos access, secrets or lifecycle verbs. Scratch /tmp/fgos-work; mandatory result outbox is the explicit exception. Runner owns commit. MDView unavailable.
+
+---
+
+# Runner truth corrections and red-team repairs in progress
+
+Assignment `unit-run-1792060810360-fc3c5695/producer/1`; input HEAD `24be6cb1d`. Read the committed Lead reports and A41/A42. Applying Step 8 final accepted row with verbatim note; correcting only evidenced false current-state sentences, rebasing six links and rebinding changed units pending without approval carry. Liveness will be regenerated from section evidence. No native sync or review/request pack edits this turn; runner owns commit. Next turn syncs once at this turn’s commit, applies committed matching runner verdicts and packages bounded rebound truth review.
+
+---
+
 # Runner native proof complete — bounded independent review pending
 
 Assignment `unit-run-1792058627406-f75a7ed8/producer/1`. Content pin **81d0ed0747014e976c0d29222439fd6e3592b468**. Exactly one background sync **1349.35s**; 4484 files / 91324 active units; known IDs **98470 → 99020**, zero loss. Compact persistence once: **61883121 bytes**, SHA256 `dbf89fc898e1107d69bd60ad2f277fde74562732edf79d3a74b2ce1bd63e2b16`. Native active registry/inventory/applied tuples equal.

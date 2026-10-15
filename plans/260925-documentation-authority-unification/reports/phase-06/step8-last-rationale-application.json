@@ -1,206 +1,13 @@
 {
   "version": 1,
-  "inputCommit": "63fa6f15266f45c881f610235e0be8d61ff07120",
-  "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1625-specs-ui-nine-decision-reworks.md",
-  "reportCommit": "41f8a8febee24f252d9b9ebf7393e9e7656cec6a",
-  "requestCommit": "0be68ebeb",
-  "contentCommit": "7854cff84d8bcb67075d4f9c09cd0b6d04808ff4",
-  "appliedOkCount": 8,
+  "inputCommit": "24be6cb1db1b16fd1b1dc244f1c7b46d851a330b",
+  "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1653-specs-ui-last-rationale.md",
+  "reportCommit": "24be6cb1db1b16fd1b1dc244f1c7b46d851a330b",
   "ordinaryReview": true,
   "notesVerbatim": true,
-  "reportNotesVerbatim": "\n- Eight of nine fixes answer the earlier rework exactly. Rows 5 to 7 restore the reviewed disposition and rationale verbatim; rows 8 and 9 restore merge with an honest rationale replacing the earlier verbatim wording, which the vocabulary permits.\n- The one rework is claim_e597b776: its rationale asserts the only delta is the example list, but the target unit also adds the subcommands bullet that the source never had. A one-sentence rationale correction suffices; binding and digests are right.\n- claim_665eb7f4 also adds the subcommands bullet but names it in the corrected binding sentence, so I accepted it; a clearer statement that the bullet is new would be welcome but is not required.\n- Worktree git status is empty. Scratch scripts are in work-s8-nine/.\n\nUnresolved: none beyond claim_e597b776 rationale wording.\n",
+  "appliedOkCount": 1,
+  "previousApplication": "63fa6f152:step8-last-rationale-application.json (8 ok; retained in git history)",
   "applied": [
-    {
-      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-sc1-gaps.json",
-      "claimId": "claim_665eb7f4bfb9bee7ba3f5e58368eaba1",
-      "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "sourceUnitDigest": "ba9c9d6e641e3049b46d0596077eabd74593dd83e12391cd7336986f7733d796",
-      "disposition": "supersede",
-      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "targetAnchor": "unheaded-block-34",
-      "authoredBy": "codex-session:unit-run-1792056203419-9b5bd055@2026-10-15",
-      "reviewStatus": "reviewed",
-      "rationale": "The native predecessor docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-32 at 01fe216b4 is superseded by the complete same-file effect-axis unit. It preserves the field definitions, review/--github rationale where present, every list item and the external dispatch qualifier, adds explicit COMMAND_REGISTRY/15/no-coordination manifest wording, and keeps the valid review/approve/run examples. Whole source and target are shown; no identity graft or approval carry. Corrected binding: the successor is the bullets unit unheaded-block-34 (name, touchesState, externalEffect, paginated and subcommands), not the paragraph at unheaded-block-33. The old stored anchor/digest pair was inconsistent; no identity is grafted and no approval is carried.",
-      "reviewNote": "deep: repointed to unheaded-block-34 (the bullets unit, lines 304-318) with e013c5b0 which recomputes; source block 32 at 977509d5f recomputes to ba9c9d6e; diff shows only reworded effect-axis sentence with COMMAND_REGISTRY/15/no-coordination plus the new subcommands bullet, both named in the rationale; supersede legal as whole unit carried",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1625-specs-ui-nine-decision-reworks.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "e013c5b05d6ff58782aa8231ab4a55967bd5ef853dac4015aec8f16f5fcf9c68",
-      "targetAncestry": [
-        "CLI I/O Contract",
-        "7. Machine-Readable Verb Registry",
-        "Entry Fields And Effect Axes"
-      ],
-      "reviewReportCommit": "63fa6f15266f45c881f610235e0be8d61ff07120"
-    },
-    {
-      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s8-claude-plugin-01.json",
-      "claimId": "claim_74a311a5ab882fe8ee4806125167e2d4",
-      "sourceUnitDigest": "5f7bbc0ccb0a688217a410356a618559820b7dfd24315cdd7dde1ca8ba7df0be",
-      "targetOwner": "docs/platform/claude-plugin/spec.md",
-      "targetAnchor": "data-dictionary",
-      "claimKind": "specification",
-      "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792056203419-9b5bd055@2026-10-15",
-      "rationale": "The complete Data Dictionary section replaces the legacy section with the corrected Work item id sentence: id is optional for pick/graph, check is not a shipped skill, and behavior when id is unspecified follows the corrected row. The section therefore differs from its source and is supersede, consistent with the corrected sibling units; its whole current section is bound by digest and ancestry.",
-      "reviewNote": "deep: section differs from source only in the corrected Work item id row (check has no shipped skill, optional id for pick/graph); disposition now supersede matching corrected siblings claim_3459a397 and claim_511605d3 (both supersede in the same shard), rationale names the corrected row truthfully; target 80aad498 and anchor data-dictionary ok",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1625-specs-ui-nine-decision-reworks.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "80aad4984704cb2169f9b47f19b917eb49396d225f5ba07cd499b7ce6c68e015",
-      "targetAncestry": [
-        "Spec: fgOS Plugin (Claude Code slash-command surface)"
-      ],
-      "reviewReportCommit": "63fa6f15266f45c881f610235e0be8d61ff07120"
-    },
-    {
-      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s8-claude-plugin-01.json",
-      "claimId": "claim_c4c6b55686b7e315f34ae005173b79db",
-      "sourceUnitDigest": "4be8acef415d77200e8b8bef2f2f78665c99cf7882f2395a2597c5b9b99c8f01",
-      "targetOwner": "docs/platform/claude-plugin/spec.md",
-      "targetAnchor": "actors-access",
-      "claimKind": "specification",
-      "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792056203419-9b5bd055@2026-10-15",
-      "rationale": "The complete Actors & Access section replaces the legacy section with the corrected capability row: check is not a shipped skill. The corrected sentence makes the whole section differ from its source, so supersede matches the corrected sibling units; the full section is retained and bound by digest and ancestry.",
-      "reviewNote": "deep: section differs only in the capability row (check removed, parenthetical added); supersede now matches siblings, rationale names the corrected row and is true; target b1405975 and anchor actors-access ok",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1625-specs-ui-nine-decision-reworks.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "b1405975f4c717c854a7bb988a6af790be278401ffa1d415b2a24ec69c442c50",
-      "targetAncestry": [
-        "Spec: fgOS Plugin (Claude Code slash-command surface)"
-      ],
-      "reviewReportCommit": "63fa6f15266f45c881f610235e0be8d61ff07120"
-    },
-    {
-      "shard": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
-      "claimId": "claim_15a24dbb1f2d0470f04cdf8900da67a0",
-      "authoredBy": "codex-session:unit-run-1792056203419-9b5bd055@2026-10-15",
-      "sourceUnitDigest": "2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9",
-      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "targetAnchor": "unheaded-block-27",
-      "claimKind": "contract",
-      "disposition": "merge",
-      "reviewStatus": "reviewed",
-      "rationale": "Cursor pagination superset (adds permanent list --all --json exception and side-log narrowing) is carried verbatim; the io-contract short text follows it in the same section, so both sources are present.",
-      "reviewNote": "deep: disposition restored to merge with the previously reviewed rationale word for word; only anchor (26 to 27) and digests differ from the reviewed form; source block 69 byte-equal to target block 27 (2140755c)",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1625-specs-ui-nine-decision-reworks.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9",
-      "targetAncestry": [
-        "CLI I/O Contract",
-        "6. Cursor Pagination"
-      ],
-      "reviewReportCommit": "63fa6f15266f45c881f610235e0be8d61ff07120"
-    },
-    {
-      "shard": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
-      "claimId": "claim_5dcb56608e17caeb53c197186ae33827",
-      "authoredBy": "codex-session:unit-run-1792056203419-9b5bd055@2026-10-15",
-      "sourceUnitDigest": "3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62",
-      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "targetAnchor": "unheaded-block-36",
-      "claimKind": "contract",
-      "disposition": "merge",
-      "reviewStatus": "reviewed",
-      "rationale": "csv versus json-array multiValueFormat rule is stated in both sources; candidate carries both texts under the H2 8. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
-      "reviewNote": "deep: disposition restored to merge with the reviewed rationale unchanged (the reviewed text still ends with a stale pending re-carry boilerplate sentence, harmless); source block 70 byte-equal to target block 36 (3964ac13), anchor ok",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1625-specs-ui-nine-decision-reworks.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62",
-      "targetAncestry": [
-        "CLI I/O Contract",
-        "8. Multi-Value Flag Convention"
-      ],
-      "reviewReportCommit": "63fa6f15266f45c881f610235e0be8d61ff07120"
-    },
-    {
-      "shard": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
-      "claimId": "claim_6fe86521fead9cec7253443e3275a3cf",
-      "authoredBy": "codex-session:unit-run-1792056203419-9b5bd055@2026-10-15",
-      "sourceUnitDigest": "a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798",
-      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "targetAnchor": "unheaded-block-40",
-      "claimKind": "contract",
-      "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "Runs-when / Blocked-when bullets of per-verb help are carried verbatim; kept as contract since it is a CLI surface guarantee. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
-      "reviewNote": "deep: disposition restored to promote with the reviewed rationale unchanged; source block 73 byte-equal to target block 40 (a1c9e2eb), anchor ok; promote legal since the unit stays a contract in the platform tree",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1625-specs-ui-nine-decision-reworks.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798",
-      "targetAncestry": [
-        "CLI I/O Contract",
-        "9. Per-Verb Help"
-      ],
-      "reviewReportCommit": "63fa6f15266f45c881f610235e0be8d61ff07120"
-    },
-    {
-      "shard": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
-      "claimId": "claim_9959e82e2874baeb627a8441faa07e9a",
-      "authoredBy": "codex-session:unit-run-1792056203419-9b5bd055@2026-10-15",
-      "sourceUnitDigest": "a2e6a5ffa58ec1f13d1321cf4b14d70b2a261fba6ce0f15c0bda50975cf8de04",
-      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "targetAnchor": "unheaded-block-30",
-      "claimKind": "contract",
-      "disposition": "merge",
-      "reviewStatus": "reviewed",
-      "rationale": "Manifest fields are combined from work-state and io-contract in the single Manifest Shape section; the work-state contribution includes the positional-parameter rule. The source schema_version 2.0 sentence is represented by the corrected schema_version 3.0 successor, with the complete fields carried. The reviewed merge disposition is restored: vocabulary merge combines multiple sources and does not require byte equality. The anchor shift changes no target text in this turn.",
-      "sourcePath": "docs/specs/work-state.md",
-      "sourceAnchor": "unheaded-block-66",
-      "reviewNote": "deep: merge restored; rationale rewritten truthfully (not the earlier 2.0 verbatim claim): diff of 977509d5f block 66 against target block 30 is only the schema_version 2.0 to 3.0 history sentence, and the positional-parameter rule is in the target; 2.0 to 3.0 stated as correction, vocabulary merge needs no byte equality; target 878d708d and anchor ok",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1625-specs-ui-nine-decision-reworks.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "878d708db7a0afb3e23a0829f98be122c83ac562946b51ab1989e73e5e4a8bfe",
-      "targetAncestry": [
-        "CLI I/O Contract",
-        "7. Machine-Readable Verb Registry",
-        "Manifest Shape"
-      ],
-      "reviewReportCommit": "63fa6f15266f45c881f610235e0be8d61ff07120"
-    },
-    {
-      "shard": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
-      "claimId": "claim_19495d2772ced1aa1af4b20d4640fa3a",
-      "sourceUnitDigest": "83773dda67db8d5f71205bb8c7106186023672125b08cbe4f33b09b0578163ca",
-      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "targetAnchor": "unheaded-block-32",
-      "claimKind": "contract",
-      "disposition": "merge",
-      "reviewStatus": "reviewed",
-      "rationale": "The fgos --help --json manifest contract is combined with the work-state manifest contribution under Manifest Shape. Its schema_version 2.0 source wording is represented by the corrected schema_version 3.0 successor, including commands and per-verb entries; work-state adds the positional-parameter rule. The reviewed merge disposition is restored: vocabulary merge combines multiple sources and does not require byte equality. The anchor shift changes no target text in this turn.",
-      "authoredBy": "codex-session:unit-run-1792056203419-9b5bd055@2026-10-15",
-      "sourcePath": "docs/io-contract.md",
-      "sourceAnchor": "unheaded-block-18",
-      "reviewNote": "deep: merge restored with a truthful rationale; diff of 977509d5f io-contract block 18 against target block 32 is the 3.0 version sentence plus the added per-verb help --json and Rust host sentences, both covered by commands and per-verb entries wording; target 51dd3c8a and anchor ok",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1625-specs-ui-nine-decision-reworks.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "51dd3c8aa026a8f5a15e4c12c522b3bf2ad7c29238c49bf9ba51324806e10e23",
-      "targetAncestry": [
-        "CLI I/O Contract",
-        "7. Machine-Readable Verb Registry",
-        "Manifest Shape"
-      ],
-      "reviewReportCommit": "63fa6f15266f45c881f610235e0be8d61ff07120"
-    }
-  ],
-  "remainingPending": [
     {
       "claimId": "claim_e597b776163803dcf6e4194962ea4f6e",
       "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
@@ -209,15 +16,21 @@
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-34",
       "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The predecessor block 32 at 9881f8622 already states COMMAND_REGISTRY, 15 externalEffect verbs and no coordination. The successor adds two deltas: the review/approve/run examples and the whole subcommands bullet (three lines), which the source never had. The other source field definitions, paginated/multiValueFormat bullet and dispatch executor qualifier are retained, with line reflow. Corrected binding remains the same-file bullets unit unheaded-block-34 (name, touchesState, externalEffect, paginated and subcommands), digest e013c5b05d6ff58782aa8231ab4a55967bd5ef853dac4015aec8f16f5fcf9c68; paragraph unheaded-block-33 was an inconsistent earlier binding. Native predecessor identity is conserved without graft or approval carry. Pending independent rationale re-review.",
+      "reviewNote": "deep: the diff of source block 32 against target block 34 has exactly two deltas, the example parenthetical (review, approve, run) added after the coordination clause and the three-line subcommands bullet appended; the rationale now names both and says the subcommands bullet was never in the source, which is true; every other source line is byte-identical apart from the wrapped qualifier line, so the stated reflow is accurate; binding unheaded-block-34 with e013c5b0 and source 5bed5c61 both recompute; status stays pending with no approval or graft carried",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1653-specs-ui-last-rationale.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "e013c5b05d6ff58782aa8231ab4a55967bd5ef853dac4015aec8f16f5fcf9c68",
       "targetAncestry": [
         "CLI I/O Contract",
         "7. Machine-Readable Verb Registry",
         "Entry Fields And Effect Axes"
-      ]
+      ],
+      "reviewReportCommit": "24be6cb1db1b16fd1b1dc244f1c7b46d851a330b"
     }
   ],
-  "request": "review-request-261015-1653-specs-ui-last-rationale.md"
+  "step8Closed": true
 }

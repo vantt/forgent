@@ -1,3 +1,9 @@
+# Step 8 closed — final rationale accepted and applied
+
+At input HEAD `24be6cb1d`, applied the committed final **1 ok** for `claim_e597b776163803dcf6e4194962ea4f6e` through unchanged ordinary `applyReviewVerdicts`, with reviewer note verbatim and recomputed source/target digests. [Final application](step8-last-rationale-application.json), [committed review](review-261015-1653-specs-ui-last-rationale.md). The rationale and all Step 8 document bytes remain unchanged. **Step 8 is closed**; plan-wide promotion/cutover obligations remain separate. Earlier pending-one-row statements below are historical and superseded.
+
+---
+
 # Eight re-review verdicts applied — one rationale remains pending
 
 At main sync `63fa6f152`, applied all **8 ok** verdicts from `41f8a8feb` with verbatim notes through unchanged ordinary `applyReviewVerdicts`. Docs content remains pinned to `7854cff84`; reviewed request `0be68ebeb`. [Application record](step8-last-rationale-application.json) retains all eight exact decisions and the report Notes verbatim.

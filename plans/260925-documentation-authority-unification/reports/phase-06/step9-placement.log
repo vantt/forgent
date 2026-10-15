@@ -1,2 +1,2 @@
 check-doc-constitution: vocabulary and constitution are consistent (17 dispositions, 12 claim kinds, 27 document kinds, 16 deferred items).
-check-doc-constitution: placement: 590 files, 589 matched, 0 leftover, 0 ambiguous, 0 evidence without index (1 recorded exception(s))
+check-doc-constitution: placement: 607 files, 606 matched, 0 leftover, 0 ambiguous, 0 evidence without index (1 recorded exception(s))

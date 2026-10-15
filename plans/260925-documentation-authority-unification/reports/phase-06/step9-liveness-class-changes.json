@@ -1,0 +1,286 @@
+{
+  "inputCommit": "24be6cb1db1b16fd1b1dc244f1c7b46d851a330b",
+  "classificationChanges": 40,
+  "sections": [
+    {
+      "anchor": "lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4",
+      "heading": "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "before": "historical-or-decision-carriage",
+      "after": "current-by-default",
+      "reason": "Non-decision section; preserve current assertions unless history-only with no live evidence. 0 section-local rule-consumer hits; 0 extant cited paths; 0 missing cited paths. No lexical live hit is not proof of retirement. "
+    },
+    {
+      "anchor": "bối-cảnh-2",
+      "heading": "Bối cảnh",
+      "before": "historical-or-decision-carriage",
+      "after": "current-decision",
+      "reason": "Decision context 0020; conservatively include current assertions when live rule/path evidence exists. 0 section-local rule-consumer hits; 1 extant cited paths; 0 missing cited paths. Live evidence protects this section; dated/superseded statements retain historical semantics. "
+    },
+    {
+      "anchor": "bối-cảnh-3",
+      "heading": "Bối cảnh",
+      "before": "historical-or-decision-carriage",
+      "after": "current-decision",
+      "reason": "Decision context 0021; conservatively include current assertions when live rule/path evidence exists. 0 section-local rule-consumer hits; 2 extant cited paths; 0 missing cited paths. Live evidence protects this section; dated/superseded statements retain historical semantics. "
+    },
+    {
+      "anchor": "quyết-định-3",
+      "heading": "Quyết định",
+      "before": "historical-or-decision-carriage",
+      "after": "current-decision",
+      "reason": "Decision context 0021; conservatively include current assertions when live rule/path evidence exists. 0 section-local rule-consumer hits; 3 extant cited paths; 0 missing cited paths. Live evidence protects this section; dated/superseded statements retain historical semantics. "
+    },
+    {
+      "anchor": "1-take-vs-pick-2-định-nghĩa-khác-nhau-cho-item-này-claim-được-không",
+      "heading": "1. `take` vs `pick` — 2 định nghĩa khác nhau cho \"item này claim được không\"",
+      "before": "historical-or-decision-carriage",
+      "after": "current-decision",
+      "reason": "Decision context 0022; conservatively include current assertions when live rule/path evidence exists. 0 section-local rule-consumer hits; 3 extant cited paths; 0 missing cited paths. Live evidence protects this section; dated/superseded statements retain historical semantics. "
+    },
+    {
+      "anchor": "2-kiểm-tra-working-tree-sạch-2-định-nghĩa-độc-lập-cho-return-và-approve",
+      "heading": "2. Kiểm tra working-tree sạch — 2 định nghĩa độc lập cho `return` và `approve`",
+      "before": "historical-or-decision-carriage",
+      "after": "current-decision",
+      "reason": "Decision context 0022; conservatively include current assertions when live rule/path evidence exists. 0 section-local rule-consumer hits; 2 extant cited paths; 0 missing cited paths. Live evidence protects this section; dated/superseded statements retain historical semantics. "
+    },
+    {
+      "anchor": "3-createworktree-6-call-site-mỗi-nơi-tự-xử-lý-baserefcleanup-riêng",
+      "heading": "3. `createWorktree` — 6 call site, mỗi nơi tự xử lý baseRef/cleanup riêng",
+      "before": "historical-or-decision-carriage",
+      "after": "current-decision",
+      "reason": "Decision context 0022; conservatively include current assertions when live rule/path evidence exists. 0 section-local rule-consumer hits; 4 extant cited paths; 0 missing cited paths. Live evidence protects this section; dated/superseded statements retain historical semantics. "
+    },
+    {
+      "anchor": "đã-kiểm-tra-không-phải-choke-point-loại-khỏi-danh-sách-có-bằng-chứng",
+      "heading": "Đã kiểm tra, KHÔNG phải choke-point (loại khỏi danh sách, có bằng chứng)",
+      "before": "historical-or-decision-carriage",
+      "after": "current-decision",
+      "reason": "Decision context 0022; conservatively include current assertions when live rule/path evidence exists. 0 section-local rule-consumer hits; 6 extant cited paths; 0 missing cited paths. Live evidence protects this section; dated/superseded statements retain historical semantics. "
+    },
+    {
+      "anchor": "ghi-chú-liên-quan-không-phải-finding-mới-của-item-này",
+      "heading": "Ghi chú liên quan — không phải finding mới của item này",
+      "before": "historical-or-decision-carriage",
+      "after": "current-decision",
+      "reason": "Decision context 0022; conservatively include current assertions when live rule/path evidence exists. 0 section-local rule-consumer hits; 1 extant cited paths; 1 missing cited paths (docs/decisions/0021-wire-main-checkout-hook-qua-doctor-setup.md); missing citations are risk, not proof of falsehood or retirement. Live evidence protects this section; dated/superseded statements retain historical semantics. "
+    },
+    {
+      "anchor": "bối-cảnh-5",
+      "heading": "Bối cảnh",
+      "before": "historical-or-decision-carriage",
+      "after": "current-decision",
+      "reason": "Decision context 0023; conservatively include current assertions when live rule/path evidence exists. 0 section-local rule-consumer hits; 1 extant cited paths; 0 missing cited paths. Live evidence protects this section; dated/superseded statements retain historical semantics. "
+    },
+    {
+      "anchor": "đơn-vị-vận-hành-vocabulary-chốt-dùng-xuyên-suốt-từ-đây",
+      "heading": "Đơn vị vận hành (vocabulary, chốt dùng xuyên suốt từ đây)",
+      "before": "historical-or-decision-carriage",
+      "after": "current-decision",
+      "reason": "Decision context 0026; conservatively include current assertions when live rule/path evidence exists. 0 section-local rule-consumer hits; 1 extant cited paths; 0 missing cited paths. Live evidence protects this section; dated/superseded statements retain historical semantics. "
+    },
+    {
+      "anchor": "lớp-còn-thiếu-llm-đủ-thông-minh-để-tự-nhận-ra-khi-nào-dùng-nhánh-nào-đã-hoàn-thành-45-pha-pha-5-hoãnyagni",
+      "heading": "Lớp còn thiếu — LLM đủ thông minh để tự nhận ra khi nào dùng nhánh nào (Đã hoàn thành 4/5 pha; Pha 5 hoãn/YAGNI)",
+      "before": "historical-or-decision-carriage",
+      "after": "current-decision",
+      "reason": "Decision context 0026; conservatively include current assertions when live rule/path evidence exists. 0 section-local rule-consumer hits; 1 extant cited paths; 0 missing cited paths. Live evidence protects this section; dated/superseded statements retain historical semantics. "
+    },
+    {
+      "anchor": "việc-chưa-quyết-để-lại-cho-item-build-lớp-quyết-định-thật-đã-hoàn-tất-qua-dispatchmjs-decide-pha-1-4-pha-5-hoãn",
+      "heading": "Việc chưa quyết, để lại cho item build lớp quyết định thật (Đã hoàn tất qua `dispatch.mjs decide` & Pha 1-4; Pha 5 hoãn)",
+      "before": "historical-or-decision-carriage",
+      "after": "current-decision",
+      "reason": "Decision context 0026; conservatively include current assertions when live rule/path evidence exists. 0 section-local rule-consumer hits; 1 extant cited paths; 0 missing cited paths. Live evidence protects this section; dated/superseded statements retain historical semantics. "
+    },
+    {
+      "anchor": "hệ-quả-7",
+      "heading": "Hệ quả",
+      "before": "historical-or-decision-carriage",
+      "after": "current-decision",
+      "reason": "Decision context 0029; conservatively include current assertions when live rule/path evidence exists. 0 section-local rule-consumer hits; 1 extant cited paths; 1 missing cited paths (docs/decisions/0000-index.md); missing citations are risk, not proof of falsehood or retirement. Live evidence protects this section; dated/superseded statements retain historical semantics. "
+    },
+    {
+      "anchor": "bối-cảnh-12",
+      "heading": "Bối cảnh",
+      "before": "historical-or-decision-carriage",
+      "after": "current-decision",
+      "reason": "Decision context 0032; conservatively include current assertions when live rule/path evidence exists. 0 section-local rule-consumer hits; 1 extant cited paths; 0 missing cited paths. Live evidence protects this section; dated/superseded statements retain historical semantics. "
+    },
+    {
+      "anchor": "quyết-định-10",
+      "heading": "Quyết định",
+      "before": "historical-or-decision-carriage",
+      "after": "current-decision",
+      "reason": "Decision context 0032; conservatively include current assertions when live rule/path evidence exists. 0 section-local rule-consumer hits; 1 extant cited paths; 0 missing cited paths. Live evidence protects this section; dated/superseded statements retain historical semantics. "
+    },
+    {
+      "anchor": "vì-sao-supersedes-trống",
+      "heading": "Vì sao `supersedes:` trống",
+      "before": "historical-or-decision-carriage",
+      "after": "current-decision",
+      "reason": "Decision context 0032; conservatively include current assertions when live rule/path evidence exists. 14 section-local rule-consumer hits; 1 extant cited paths; 0 missing cited paths. Live evidence protects this section; dated/superseded statements retain historical semantics. "
+    },
+    {
+      "anchor": "hệ-quả-10",
+      "heading": "Hệ quả",
+      "before": "historical-or-decision-carriage",
+      "after": "current-decision",
+      "reason": "Decision context 0032; conservatively include current assertions when live rule/path evidence exists. 15 section-local rule-consumer hits; 1 extant cited paths; 0 missing cited paths. Live evidence protects this section; dated/superseded statements retain historical semantics. "
+    },
+    {
+      "anchor": "cơ-chế-phân-biệt-không-phải-heuristic-mới",
+      "heading": "Cơ chế phân biệt (không phải heuristic mới)",
+      "before": "historical-or-decision-carriage",
+      "after": "current-decision",
+      "reason": "Decision context 0033; conservatively include current assertions when live rule/path evidence exists. 0 section-local rule-consumer hits; 1 extant cited paths; 0 missing cited paths. Live evidence protects this section; dated/superseded statements retain historical semantics. "
+    },
+    {
+      "anchor": "bằng-chứng-đã-kiểm",
+      "heading": "Bằng chứng đã kiểm",
+      "before": "historical-or-decision-carriage",
+      "after": "current-decision",
+      "reason": "Decision context 0033; conservatively include current assertions when live rule/path evidence exists. 0 section-local rule-consumer hits; 1 extant cited paths; 0 missing cited paths. Live evidence protects this section; dated/superseded statements retain historical semantics. "
+    },
+    {
+      "anchor": "quyết-định-12",
+      "heading": "Quyết định",
+      "before": "historical-or-decision-carriage",
+      "after": "current-decision",
+      "reason": "Decision context 0034; conservatively include current assertions when live rule/path evidence exists. 0 section-local rule-consumer hits; 1 extant cited paths; 0 missing cited paths. Live evidence protects this section; dated/superseded statements retain historical semantics. "
+    },
+    {
+      "anchor": "phạm-vi-đổi-tên",
+      "heading": "Phạm vi đổi tên",
+      "before": "historical-or-decision-carriage",
+      "after": "current-decision",
+      "reason": "Decision context 0034; conservatively include current assertions when live rule/path evidence exists. 0 section-local rule-consumer hits; 3 extant cited paths; 1 missing cited paths (scripts/check-decision-codes.baseline.js); missing citations are risk, not proof of falsehood or retirement. Live evidence protects this section; dated/superseded statements retain historical semantics. "
+    },
+    {
+      "anchor": "quyết-định-13",
+      "heading": "Quyết định",
+      "before": "historical-or-decision-carriage",
+      "after": "current-decision",
+      "reason": "Decision context 0034; conservatively include current assertions when live rule/path evidence exists. 0 section-local rule-consumer hits; 1 extant cited paths; 0 missing cited paths. Live evidence protects this section; dated/superseded statements retain historical semantics. "
+    },
+    {
+      "anchor": "quyết-định-14",
+      "heading": "Quyết định",
+      "before": "historical-or-decision-carriage",
+      "after": "current-decision",
+      "reason": "Decision context 0034; conservatively include current assertions when live rule/path evidence exists. 0 section-local rule-consumer hits; 6 extant cited paths; 0 missing cited paths. Live evidence protects this section; dated/superseded statements retain historical semantics. "
+    },
+    {
+      "anchor": "quyết-định-15",
+      "heading": "Quyết định",
+      "before": "historical-or-decision-carriage",
+      "after": "current-decision",
+      "reason": "Decision context 0035; conservatively include current assertions when live rule/path evidence exists. 0 section-local rule-consumer hits; 2 extant cited paths; 0 missing cited paths. Live evidence protects this section; dated/superseded statements retain historical semantics. "
+    },
+    {
+      "anchor": "confinement-authority-một-cửa-kiểm-soát-giam-giữ-runtime-executethroughconfinement",
+      "heading": "Confinement Authority — một cửa kiểm soát giam giữ runtime (executeThroughConfinement)",
+      "before": "historical-or-decision-carriage",
+      "after": "current-decision",
+      "reason": "Decision context 0035; conservatively include current assertions when live rule/path evidence exists. 0 section-local rule-consumer hits; 2 extant cited paths; 0 missing cited paths. Live evidence protects this section; dated/superseded statements retain historical semantics. "
+    },
+    {
+      "anchor": "bối-cảnh-13",
+      "heading": "Bối cảnh",
+      "before": "historical-or-decision-carriage",
+      "after": "current-decision",
+      "reason": "Decision context 0043; conservatively include current assertions when live rule/path evidence exists. 0 section-local rule-consumer hits; 1 extant cited paths; 0 missing cited paths. Live evidence protects this section; dated/superseded statements retain historical semantics. "
+    },
+    {
+      "anchor": "0047-p1-lõi-thực-thi-unit-một-bind-một-cửa-chạy-fgos-run-3-pattern-cộng-tác-đóng-4-mối-authority-l5-1-đã-bị-thay-một-phần-bởi-0061",
+      "heading": "0047 — P1 Lõi thực thi: Unit, một bind(), một cửa chạy fgos run, 3 Pattern cộng tác, đóng 4 mối authority L5 [§1 ĐÃ BỊ THAY MỘT PHẦN bởi 0061]",
+      "before": "historical-or-decision-carriage",
+      "after": "current-decision",
+      "reason": "Live settled decision record 0047 (0047, 0052, 0055–0063); decisions/ placement is not historical retirement. 0 section-local rule-consumer hits; 5 extant cited paths; 0 missing cited paths. Live evidence protects this section; dated/superseded statements retain historical semantics. "
+    },
+    {
+      "anchor": "0048-p2-plan-chạy-được-unit-cho-mọi-đường-vào-driver-mỏng-fgos-run-bỏ-demandfactsmatcher",
+      "heading": "0048 — P2 Plan chạy được: Unit cho mọi đường vào, driver mỏng fgos-run, bỏ DemandFacts/matcher",
+      "before": "historical-or-decision-carriage",
+      "after": "current-decision",
+      "reason": "Decision context 0048; conservatively include current assertions when live rule/path evidence exists. 0 section-local rule-consumer hits; 2 extant cited paths; 1 missing cited paths (src/runner/capability-match.mjs); missing citations are risk, not proof of falsehood or retirement. Live evidence protects this section; dated/superseded statements retain historical semantics. "
+    },
+    {
+      "anchor": "0050-p6-nối-thật-herdr-là-transport-mặc-định-posture-một-đường-fallback-quota-qua-pane-mới",
+      "heading": "0050 — P6 Nối thật: herdr là transport mặc định, posture một đường, fallback quota qua pane mới",
+      "before": "historical-or-decision-carriage",
+      "after": "current-decision",
+      "reason": "Decision context 0050; conservatively include current assertions when live rule/path evidence exists. 0 section-local rule-consumer hits; 1 extant cited paths; 0 missing cited paths. Live evidence protects this section; dated/superseded statements retain historical semantics. "
+    },
+    {
+      "anchor": "0052-worker-không-bao-giờ-có-quyền-git-runner-commit-trên-mọi-đường-thay-mục-2-của-0051-đã-bị-thay-một-phần-bởi-0060",
+      "heading": "0052 — Worker không bao giờ có quyền git: runner commit trên mọi đường (thay mục 2 của 0051) [ĐÃ BỊ THAY MỘT PHẦN bởi 0060]",
+      "before": "historical-or-decision-carriage",
+      "after": "current-decision",
+      "reason": "Live settled decision record 0052 (0047, 0052, 0055–0063); decisions/ placement is not historical retirement. 0 section-local rule-consumer hits; 0 extant cited paths; 0 missing cited paths. No lexical live hit is not proof of retirement. "
+    },
+    {
+      "anchor": "0055-panel-khác-họ-provider-giữa-các-ghế-là-ưu-tiên-mềm-bind-rải-ghế-theo-thứ-tự-prefer-reviewed-vẫn-cứng",
+      "heading": "0055 — Panel: khác họ provider giữa các ghế là ưu tiên mềm, `bind()` rải ghế theo thứ tự `prefer`; `reviewed` vẫn cứng",
+      "before": "historical-or-decision-carriage",
+      "after": "current-decision",
+      "reason": "Live settled decision record 0055 (0047, 0052, 0055–0063); decisions/ placement is not historical retirement. 0 section-local rule-consumer hits; 0 extant cited paths; 0 missing cited paths. No lexical live hit is not proof of retirement. "
+    },
+    {
+      "anchor": "0056---seats-chuyên-biệt-hoá-ghế-panel-bằng-lens-khi-khởi-động-không-thêm-workflow-yaml-hay-registry",
+      "heading": "0056 — `--seats`: chuyên biệt hoá ghế panel bằng lens khi khởi động, không thêm workflow YAML hay registry",
+      "before": "historical-or-decision-carriage",
+      "after": "current-decision",
+      "reason": "Live settled decision record 0056 (0047, 0052, 0055–0063); decisions/ placement is not historical retirement. 0 section-local rule-consumer hits; 1 extant cited paths; 0 missing cited paths. Live evidence protects this section; dated/superseded statements retain historical semantics. "
+    },
+    {
+      "anchor": "0057---seats-name-persona-có-tên-theo-ba-tầng-tra-cứu-ghim-nội-dung-lúc-start-gắn-đúng-một-ghế",
+      "heading": "0057 — `--seats @name`: persona có tên theo ba tầng tra cứu, ghim nội dung lúc start, gắn đúng một ghế",
+      "before": "historical-or-decision-carriage",
+      "after": "current-decision",
+      "reason": "Live settled decision record 0057 (0047, 0052, 0055–0063); decisions/ placement is not historical retirement. 8 section-local rule-consumer hits; 1 extant cited paths; 0 missing cited paths. Live evidence protects this section; dated/superseded statements retain historical semantics. "
+    },
+    {
+      "anchor": "0058-provider-failure-fails-over-inside-execution-core-another-account-of-the-same-provider-first-then-the-next-candidate",
+      "heading": "0058 — Provider failure fails over inside Execution Core: another account of the same provider first, then the next candidate",
+      "before": "historical-or-decision-carriage",
+      "after": "current-decision",
+      "reason": "Live settled decision record 0058 (0047, 0052, 0055–0063); decisions/ placement is not historical retirement. 0 section-local rule-consumer hits; 0 extant cited paths; 0 missing cited paths. No lexical live hit is not proof of retirement. "
+    },
+    {
+      "anchor": "0059-a-domain-persona-pack-is-a-folder-what-a-seat-can-name-what-it-pinned-and-who-ran-it-are-each-stated-by-one-read",
+      "heading": "0059 — A domain persona pack is a folder; what a seat can name, what it pinned and who ran it are each stated by one read",
+      "before": "historical-or-decision-carriage",
+      "after": "current-decision",
+      "reason": "Live settled decision record 0059 (0047, 0052, 0055–0063); decisions/ placement is not historical retirement. 0 section-local rule-consumer hits; 0 extant cited paths; 0 missing cited paths. No lexical live hit is not proof of retirement. "
+    },
+    {
+      "anchor": "0060-runner-commit-theo-writes-của-unit-một-matcher-preflight-index-resume-chỉ-commit-brief-ghi-file-nói-rõ-phạm-vi-thay-mục-1-2-của-0052",
+      "heading": "0060 — Runner commit theo `writes` của Unit: một matcher, preflight index, resume chỉ commit, brief ghi file nói rõ phạm vi (thay mục 1-2 của 0052)",
+      "before": "historical-or-decision-carriage",
+      "after": "current-decision",
+      "reason": "Live settled decision record 0060 (0047, 0052, 0055–0063); decisions/ placement is not historical retirement. 1 section-local rule-consumer hits; 1 extant cited paths; 0 missing cited paths. Live evidence protects this section; dated/superseded statements retain historical semantics. "
+    },
+    {
+      "anchor": "0061-unit-ad-hoc-được-preferpersona-mềm-one-liner-fgos-run-workflow-start---units--effort-unit-ghi-nối-nhánh-thay-một-phần-mục-1-của-0047",
+      "heading": "0061 — Unit ad-hoc được `prefer`/`persona` mềm; one-liner `fgos run \"<prompt>\"`; `workflow start --units`/`--effort`; unit ghi nối nhánh (thay một phần mục 1 của 0047)",
+      "before": "historical-or-decision-carriage",
+      "after": "current-decision",
+      "reason": "Live settled decision record 0061 (0047, 0052, 0055–0063); decisions/ placement is not historical retirement. 1 section-local rule-consumer hits; 0 extant cited paths; 0 missing cited paths. Live evidence protects this section; dated/superseded statements retain historical semantics. "
+    },
+    {
+      "anchor": "0062-xoá-cửa-thô-dispatch-là-tầng-thấp-fanout-về-tầng-work-thay-phần-purpose-door-của-rul68-2-tầng-dispatch-và-phần-mỗi-cửa-một-lane-posture-của-rul77-posture-belongs-to-the-capability",
+      "heading": "0062 — Xoá cửa thô; dispatch là tầng thấp; fanout về tầng Work (thay phần purpose door của RUL68 (2 tầng dispatch) và phần \"mỗi cửa một lane posture\" của RUL77 (posture belongs to the capability))",
+      "before": "historical-or-decision-carriage",
+      "after": "current-decision",
+      "reason": "Live settled decision record 0062 (0047, 0052, 0055–0063); decisions/ placement is not historical retirement. 0 section-local rule-consumer hits; 3 extant cited paths; 0 missing cited paths. Live evidence protects this section; dated/superseded statements retain historical semantics. "
+    },
+    {
+      "anchor": "0063-work-chỉ-là-bên-dùng-dispatch-nhận-input-generic-thay-phần-đầu-vào-còn-lại-của-rul73-dispatch-does-not-know-work2",
+      "heading": "0063 — Work chỉ là bên dùng: dispatch nhận input generic (thay phần đầu vào còn lại của RUL73 (dispatch does not know Work).2)",
+      "before": "historical-or-decision-carriage",
+      "after": "current-decision",
+      "reason": "Live settled decision record 0063 (0047, 0052, 0055–0063); decisions/ placement is not historical retirement. 1 section-local rule-consumer hits; 1 extant cited paths; 0 missing cited paths. Live evidence protects this section; dated/superseded statements retain historical semantics. "
+    }
+  ]
+}

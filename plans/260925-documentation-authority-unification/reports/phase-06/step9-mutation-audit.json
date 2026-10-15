@@ -1,99 +1,72 @@
 {
   "version": 1,
-  "inputCommit": "63fa6f15266f45c881f610235e0be8d61ff07120",
-  "step8ChangedRows": [
-    {
-      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-sc1-gaps.json",
-      "key": "registryGaps",
-      "claimId": "claim_665eb7f4bfb9bee7ba3f5e58368eaba1",
-      "from": "pending",
-      "to": "reviewed"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-sc1-gaps.json",
-      "key": "registryGaps",
-      "claimId": "claim_e597b776163803dcf6e4194962ea4f6e",
-      "from": "pending",
-      "to": "pending"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-claude-plugin-01.json",
-      "key": "claims",
-      "claimId": "claim_74a311a5ab882fe8ee4806125167e2d4",
-      "from": "pending",
-      "to": "reviewed"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-claude-plugin-01.json",
-      "key": "claims",
-      "claimId": "claim_c4c6b55686b7e315f34ae005173b79db",
-      "from": "pending",
-      "to": "reviewed"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
-      "key": "claims",
-      "claimId": "claim_15a24dbb1f2d0470f04cdf8900da67a0",
-      "from": "pending",
-      "to": "reviewed"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
-      "key": "claims",
-      "claimId": "claim_5dcb56608e17caeb53c197186ae33827",
-      "from": "pending",
-      "to": "reviewed"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
-      "key": "claims",
-      "claimId": "claim_6fe86521fead9cec7253443e3275a3cf",
-      "from": "pending",
-      "to": "reviewed"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
-      "key": "registryGaps",
-      "claimId": "claim_9959e82e2874baeb627a8441faa07e9a",
-      "from": "pending",
-      "to": "reviewed"
-    },
-    {
-      "path": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
-      "key": "registryGaps",
-      "claimId": "claim_19495d2772ced1aa1af4b20d4640fa3a",
-      "from": "pending",
-      "to": "reviewed"
-    }
+  "inputCommit": "24be6cb1db1b16fd1b1dc244f1c7b46d851a330b",
+  "writeScopePass": true,
+  "changedTrackedPaths": [
+    "docs/platform/runner/README.md",
+    "docs/platform/runner/architecture/h-69197b459754.md",
+    "docs/platform/runner/architecture/h-7af1f0242611.md",
+    "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+    "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
+    "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+    "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "docs/platform/runner/spec.md",
+    "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+    "docs/platform/runner/subcomponents/h-2e032393add1/spec.md",
+    "docs/platform/runner/subcomponents/h-37aced3896a8/spec.md",
+    "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+    "docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md",
+    "docs/platform/runner/subcomponents/h-ce5b9771a26a/spec.md",
+    "docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md",
+    "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-sc1-gaps.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-runner.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
+    "plans/260925-documentation-authority-unification/reports/phase-06/progress.md",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step-08-report.md",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step-09-report.md",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step8-last-rationale-application.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step9-candidate-status.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step9-carriage-accounting.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step9-fast-check.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step9-liveness-scan.mjs",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step9-liveness.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step9-liveness.md",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step9-owed-repoints.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step9-placement.log",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step9-source-blobs.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step9-tests.log",
+    "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-runner.json"
   ],
-  "step8Applied": 8,
-  "step8ReworkPending": 1,
-  "sourceAndProtectedFilesEqualHead": [
-    "scripts/generate-doc-inventory.mjs",
-    "scripts/doc-inventory-artifact.mjs",
-    "scripts/generate-shipped-path-inventory.mjs",
-    "scripts/check-legacy-docs-ratchet.mjs",
-    "scripts/lib/is-main-module.mjs",
-    "scripts/check-doc-inventory-gates.mjs",
-    "scripts/propose-doc-decisions.mjs",
-    "plans/260925-documentation-authority-unification/claim-and-disposition-vocabulary.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/source-blobs.txt",
-    "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
-    "plans/260925-documentation-authority-unification/transitional-switchboard.json",
-    "docs/specs/runner.md"
+  "newPaths": [
+    "plans/260925-documentation-authority-unification/reports/phase-06/audit-261015-1741-runner-truth-corrections.md",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step9-liveness-class-changes.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step9-rebound-units.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step9-tests-rerun.log",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step9-truth-corrections.json"
   ],
-  "extractorClosureUnchanged": true,
-  "sourceBlob": "ddfa78cc7183cf1f7db8ee64d2339653a0aa0023",
-  "registryUnchanged": true,
-  "allWorkspaceWritesInScope": true,
-  "diffCheck": "pass",
-  "gitWrites": false,
-  "nativeSync": false,
-  "reviewPacks": false,
-  "needsWrites": [],
-  "finalWorkspaceChangedFiles": 49,
-  "finalScopeCheck": "pass",
-  "finalDiffCheck": "pass",
-  "allMapHeadingTargetAnchorsResolve": 165,
-  "knownRiskCarriageBindings": 119
+  "protectedBytesUnchanged": true,
+  "priorReviewPackAndRequestFilesUnchanged": true,
+  "sourceRowsRebound": 34,
+  "candidateUnitChanges": 68,
+  "allChangedBindingsPending": true,
+  "step8OkApplied": 1,
+  "step8NoteVerbatim": true,
+  "step8Closed": true,
+  "candidateFindings": 0,
+  "fastD": 0,
+  "fastEStructuralFatal": 0,
+  "nativeSyncRun": false,
+  "registryWritten": false,
+  "gitWriteRun": false,
+  "testInitial": {
+    "pass": 43,
+    "fail": 1
+  },
+  "targetedFailedTestRerun": {
+    "pass": 1,
+    "fail": 0
+  },
+  "step9Closed": false
 }

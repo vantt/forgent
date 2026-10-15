@@ -427,3 +427,7 @@ Source sync `63fa6f15266f45c881f610235e0be8d61ff07120`, blob `ddfa78cc7183cf1f7d
 | Candidate relative links | A19 / P6 / Step 10 | Link-pass owner before promotion | Six findings in step9-owed-repoints.json; exact bytes carried now, repoint then rebind/re-review. Open. |
 
 No component-boundary change. Source consumers (41 code files citing RUL ids), aliases, exact-heading test repoint, earlier RUL40 / dispatch-redesign / group-thinking provenance repoints and final sync remain cutover obligations.
+
+## Runner red-team rule-reading clarification (existing Lead decisions)
+
+Stop 6 uses changed pin digests **27/470 = 5.74%**. Alternative head-side **52/495 = 10.51%** exceeds 10%, but is not used because new-unit growth is separate under the approved pin-denominator reading (Step 8 precedent); net +25, remeasure each sync. Stop 9 concerns another plan writing this open batch’s target paths: no such write into `docs/platform/runner/**`; 64 runner source commits are drift under 6, while 36 Packaging commits concern another already-processed area (33 this plan, three upstream). No new owner question. A41 correction/review scope and A42 delegation unchanged.
