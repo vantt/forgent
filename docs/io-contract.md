@@ -25,10 +25,13 @@ Mỗi lần ghi mang thêm một trường danh tính người/tiến-trình g�
   song), luôn có mặt.
 - `writer.source` — độ tin của `id` đó, một trong bốn giá trị theo thứ tự ưu
   tiên: `registry` (đối chiếu được với `.fgos/sessions.json`, tin nhất) ·
-  `env` (biến môi trường, ai cũng set được) · `pid` (dò ngược tiến trình cha,
-  best-effort) · `unresolved` (không nguồn nào xác nhận được — `id` vẫn là
+  `env` (biến môi trường, ai cũng set được) · `pid` (tổ tiên cao nhất còn
+  terminal, không có thì session id của tiến trình gọi; best-effort) ·
+  `unresolved` (không nguồn nào xác nhận được — `id` vẫn là
   pid của chính tiến trình gọi, KHÔNG rỗng, KHÔNG vắng khoá; chỉ nhãn
-  `source` nói giá trị chưa kiểm chứng được).
+  `source` nói giá trị chưa kiểm chứng được). Luật đầy đủ (thứ tự biến env,
+  giới hạn đã biết) chỉ nằm ở [spec Session Identity](platform/session-identity/spec.md);
+  nguồn duy nhất là crate Rust `fgos-session-identity`.
 
 **Đây là quy thuộc, không phải xác thực** (D1): CLI local không xác thực
 được ai đang gọi nó — ai chạy được `fgos` thì đã ghi thẳng vào `.fgos/`
@@ -37,6 +40,13 @@ về an ninh. Do đó **caller chưa xác danh KHÔNG bị chặn** gọi verb g
 chọn ghi-không-chặn để không gãy luồng người gõ tay/CI đang chạy; chặn thật
 thuộc tầng phân quyền (STR38) và cửa mạng của daemon tương lai (STR48), cả
 hai nằm NGOÀI hợp đồng này.
+
+Khác với "chưa xác danh", **lỗi cài đặt** thì chặn: khi không có binary host
+Rust nào trả lời được identity (`host-missing`, `host-version-mismatch`,
+`timeout`, `host-error`, `bad-output`), verb ghi dừng với lỗi `precondition`
+(exit 2) trước khi ghi gì, không bao giờ đoán id. Kênh `node bin/fgos.mjs` và
+`bin.fgos` của npm global vì vậy chỉ ghi được trong project đã activate, hoặc
+khi `FGOS_HOST_BIN` trỏ tới một binary host.
 
 Song song với `writer` (cá thể), mỗi cạnh chuyển trạng thái còn mang `role`
 — **loại** caller: `human` · `runner` · `session` · `system` (giá trị thứ

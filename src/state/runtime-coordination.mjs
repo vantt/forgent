@@ -222,8 +222,8 @@ export function acquireClaim(fgosDirInput, {
     // tsk-40m code-review finding (blocker, confirmed needed by product
     // decision): the session/shell identity fgOS already resolves for
     // every mutation (session-identity.mjs — stable across separate CLI
-    // invocations from the SAME terminal, via its own env-session-var/
-    // pid-ancestor-walk). Recorded here so settleClaim can verify, at
+    // invocations from the SAME terminal, via an env session id or the
+    // terminal root / session id). Recorded here so settleClaim can verify, at
     // settle time, that the caller is really the same actor/session that
     // acquired this claim — independent of claimId, which a caller with no
     // in-process token (a fresh CLI invocation, e.g. `fgos return`,
