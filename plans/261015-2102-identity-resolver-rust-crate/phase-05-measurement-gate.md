@@ -4,7 +4,7 @@ Thiết kế: [S6 §7 điều kiện 4](../reports/spike-s6-261015-1638-rust-ide
 
 ## Yêu cầu
 
-Hook thêm **≤5 ms p95 warm** và **≤6 ms cold lần đầu** so với baseline Node, đo bằng lời gọi thật (binary release-mode của nhánh, `fgos identity`), không dùng proxy `version`.
+Hook thêm **≤5 ms p95 warm** và **≤10 ms cold lần đầu** (anh quyết 2026-10-15: nới từ 6 ms; cold chỉ xảy ra một lần sau khi OS đẩy binary khỏi cache, warm đã đạt, riêng exec `fgos identity` cold 4,45 ms median / 5,08 ms p95; giảm thời gian nạp binary hoặc số module Node là việc riêng nếu cần) so với baseline Node, đo bằng lời gọi thật (binary release-mode của nhánh, `fgos identity`), không dùng proxy `version`.
 
 ## Cách đo
 

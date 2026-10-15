@@ -59,3 +59,8 @@ Theo [runbook](../phase-06-landing-drain-activation.md): full `npm test` với `
 - `scripts/fgos-shell-integration.sh` và `packages/herdr-fgos-common/rust/src/fgos.rs` vẫn có bản riêng của luật tìm binary (theo shim ở `.fgos/installation/bin/fgos`).
 - `packages/observe/rust/src/store_lock.rs` và crate identity là hai bộ đọc `/proc`; gom vào process-facts (4.2).
 - `getMainFgosDir` và `git rev-parse HEAD` vẫn exec git bên trong `events.lock` (B6, thuộc 4.3).
+
+
+## Quyết định cổng cold (2026-10-15)
+
+Đo lại trên build release, load 1 phút 2,45–2,64: warm p95 +0,75 đến +4,84 ms (đạt ≤5 ms); cold median +4,3 đến +7,6 ms quanh ngưỡng cũ 6 ms; riêng exec `fgos identity` cold 4,45 ms median / 5,08 ms p95. Anh chọn nới cổng cold lên **≤10 ms**. Cổng hiện tại: **đạt**.

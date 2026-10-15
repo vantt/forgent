@@ -43,7 +43,7 @@ D1–D8 ở [phase-00 §13](phase-00-design-and-review.md#13-lead-tự-quyết-d
 2. `cargo test -p fgos-session-identity -p fgos-observe -p fgos` xanh; vector chung chạy ở cả cargo và Node.
 3. Test Node đã chạm xanh với `env -u CLAUDE_CODE_SESSION_ID -u FGOS_SESSION_ID -u CODEX_THREAD_ID FGOS_HOST_BIN=… node --test …`.
 4. Test đa process: không exec identity nào khi `events.lock`/`claims.lock` đang giữ.
-5. Cổng S6 trên lời gọi thật: hook thêm ≤5 ms p95 warm và ≤6 ms lần đầu cold so với baseline Node; số ghi trong report.
+5. Cổng S6 trên lời gọi thật: hook thêm ≤5 ms p95 warm và ≤10 ms lần đầu cold (nới từ 6 ms, anh quyết 2026-10-15) so với baseline Node; số ghi trong report.
 6. Doctor có `writer-identity-resolvable`; spec, `docs/io-contract.md`, `component-boundary.md`, reading-map, CHANGELOG cập nhật cùng thay đổi.
 7. Runbook drain có trong phase 06; Lead chạy trước activate.
 
