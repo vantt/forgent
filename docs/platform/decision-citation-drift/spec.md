@@ -27,7 +27,7 @@ Supersedes: None; candidate only
 Superseded by: None
 ```
 
-> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions.
+> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions. Truth correction (A40/A19): only identified false current sentences corrected; evidence: scripts/check-decision-citation-drift.mjs:16-20; docs/decisions/index.md:1; package.json:1; scripts/check-decision-citation-drift.mjs:1-34; no tracked .bee/config.json or CI trigger. A22 rebindings are pending; no truth approval carried.
 
 
 A read-only detection check that scans the product backlog and area specs for
@@ -52,7 +52,7 @@ an agent doing grooming/scribing).
 
 | # | Element | Meaning | Values | Required | Default |
 |---|---------|---------|--------|----------|---------|
-| 1 | Decision id | The 4-digit id of a decision record under the decisions directory | 4 digits, e.g. `0002` | yes | — |
+| 1 | Decision id | The 4-digit id of a legacy decision record read by the parser; this repo's hand-authored decisions corpus is retired | 4 digits, e.g. `0002` | yes | — |
 | 2 | Superseded-by id | The id of the decision that replaced a given decision, read from that decision's own front matter | 4 digits | no (absent when a decision was never superseded) | — |
 | 3 | Cited id (in a scanned line) | A decision id referenced in a backlog row or spec line | written either as `ADR<4-digit>` or as a bare 4-digit number that matches a known decision id | — | — |
 | 4 | Finding | One flagged line | `{kind: "dead-framing", file, line, id, supersededBy, message}` | — | — |
@@ -110,8 +110,7 @@ an agent doing grooming/scribing).
 
 ## Open Gaps
 
-- Not wired into any automated gate: neither an npm script, `.bee/config.json`
-  `commands.verify`, nor a CI workflow runs this check today. It must be
+- Not wired into any automated gate: neither an npm script nor a CI workflow runs this check today. It must be
   invoked manually, so citation drift can persist undetected between manual
   runs. Answerable by whoever next wires a backlog/spec consistency gate.
 - No auto-fix: a flagged line's acknowledgement of the superseding id must be

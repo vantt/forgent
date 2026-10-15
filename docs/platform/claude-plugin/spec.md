@@ -3,7 +3,7 @@ area: fgos-plugin
 updated: 2026-07-23
 sources: [str83-fgos-slash-commands, str88-fgos-verb-wrappers]
 decisions: [7574fe5a]
-coverage: full
+coverage: partial
 ---
 
 # Spec: fgOS Plugin (Claude Code slash-command surface)
@@ -27,7 +27,7 @@ Supersedes: None; candidate only
 Superseded by: None
 ```
 
-> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions.
+> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions. Truth correction (A40/A19): only identified false current sentences corrected; evidence: plugins/fgOS/skills/approve/SKILL.md:1-10; plugins/fgOS/skills/list/SKILL.md:1-9; no tracked plugins/fgOS/skills/check/SKILL.md; plugins/fgOS/skills/approve/SKILL.md:1-10; no tracked plugins/fgOS/skills/check/SKILL.md; plugins/fgOS/skills/approve/SKILL.md:1-10; tracked plugin skill inventory has no check/SKILL.md; plugins/fgOS/skills/approve/SKILL.md:1-10; plugins/fgOS/skills/list/SKILL.md:1-9; plugins/fgOS/skills/triage/SKILL.md:1-10; plugins/fgOS/skills/approve/SKILL.md:1-10; plugins/fgOS/skills/approve/SKILL.md:1-10; plugins/fgOS/skills/list/SKILL.md:1-9; plugins/fgOS/skills/triage/SKILL.md:1-10; plugins/fgOS/skills/approve/SKILL.md:1-10; plugins/fgOS/skills/list/SKILL.md:1-9; plugins/fgOS/skills/approve/SKILL.md:1-10. A22 rebindings are pending; no truth approval carried.
 
 
 The fgOS plugin lets a person working inside Claude Code operate the fgOS
@@ -52,7 +52,7 @@ convenience layer on top of that.
 - `/fgOS:ready` → list every work item ready to be picked up right now.
 - `/fgOS:stale` → list work items that look stuck (claimed but inactive too long).
 - `/fgOS:rollup <id>` → show one work item's children: how many are done out of the total, and each child's status.
-- `/fgOS:check [id]` → show the predicted-vs-actual outcome report for one item, or every item at once.
+- `/fgOS:check [id]` is not shipped; the original report description below is legacy surface documentation.
 - `/fgOS:graph [id]` → show work-graph metrics (independent parallel tracks), or — with an id — what completing that one item would unblock.
 - `/fgOS:conflicts` → list pairs of ready work items whose declared file footprints overlap (a parallel-work collision risk).
 
@@ -133,7 +133,7 @@ convenience layer on top of that.
 
 ### check
 
-- **Runs when:** invoked with or without an id.
+- **Runs when:** legacy description only; no `/fgOS:check` skill is shipped.
 - **What changes:** nothing — read-only.
 - **Side effects:** none.
 - **Afterwards:** the person sees the predicted-vs-actual report for the named item, or for every item when none is named.
@@ -165,10 +165,10 @@ role model of its own.
 
 ## Business Rules
 
-- **R1.** The plugin wraps exactly 12 verbs total: `submit`, `pick` (existing) plus `move`, `return`, `ask`, `answer` (manipulate), `ready`, `stale`, `rollup` (monitor), `check`, `graph`, `conflicts` (inspect) — added deliberately to cover convenience for manipulating, monitoring, and inspecting work, not to mirror every command the underlying tool exposes (per 7574fe5a).
+- **R1.** The plugin wraps more than the original 12 verbs: shipped skills include `approve`, `list` and `triage`; `/fgOS:check` has no shipped skill, so this is a partial inventory of the shipped surface.
 - **R2.** Every command is one-door-write: it only ever shells out to the underlying tool's own command for that verb — it never writes the work-item store directly.
 - **R3.** On a failing command, the person sees the real error and the command stops — it never retries with a guessed argument and never falls back silently.
-- **R4 (not yet implemented — see `docs/backlog.md`).** The remaining verbs the underlying tool exposes (`init`, `add`, `discover`, `compound`, `edit`, `decision`, `list`, `rebuild`, `repair`, `take`, `review`, `approve`, `reject`, `catchup`, `evolve`, `triage`, `docs-index`, `doc-sources`, `session`) have no plugin wrapper; a person needs them must use the underlying tool directly.
+- **R4.** Additional plugin wrappers are shipped, including `approve`, `list` and `triage`; the original remaining-verbs list is no longer a list of unimplemented wrappers.
 
 ## Edge Cases Settled
 
@@ -177,7 +177,7 @@ role model of its own.
 
 ## Open Gaps
 
-- none — every entry point, behavior, and rule above is evidenced against the shipped skill files and the underlying tool's source.
+- This partial spec retains the original surface descriptions; the expanded shipped skill set is not fully inventoried here, and `/fgOS:check` is not shipped.
 
 ## Visuals
 
@@ -186,6 +186,6 @@ Not applicable — no screen; this is a command-line/chat interaction surface.
 ## Pointers (implementation)
 
 - `repo/plugins/fgOS/.claude-plugin/plugin.json` — plugin manifest (name, description, version).
-- `repo/plugins/fgOS/skills/<verb>/SKILL.md` — one skill per verb (`submit`, `pick`, `move`, `return`, `ask`, `answer`, `ready`, `stale`, `rollup`, `check`, `graph`, `conflicts`); each wraps `fgos <verb> ...`, resolved via the project-local `bin/fgos.mjs` when present, else a global PATH install of `fgos`, else a clear stated error (tsk-1no) — never a raw Node "Cannot find module".
+- `repo/plugins/fgOS/skills/<verb>/SKILL.md` — shipped skills including `submit`, `pick`, `move`, `return`, `ask`, `answer`, `ready`, `stale`, `rollup`, `graph`, `conflicts`, `approve`, `list` and `triage` (no `check` skill); each wraps `fgos <verb> ...`, resolved via the project-local `bin/fgos.mjs` when present, else a global PATH install of `fgos`, else a clear stated error (tsk-1no) — never a raw Node "Cannot find module".
 - `repo/bin/fgos.mjs` — the underlying CLI every wrapper shells out to; owns argument validation and all lifecycle enforcement.
 - `docs/specs/work-state.md` — the lifecycle/FSM meaning behind `move`/`return`/`ask`/`answer` and every other verb's business rules.

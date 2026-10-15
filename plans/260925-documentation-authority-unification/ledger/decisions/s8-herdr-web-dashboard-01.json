@@ -38,9 +38,9 @@
       "claimKind": "specification",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Judgment: no target digest match. The whole heading unit docs/specs/herdr-web-dashboard.md#spec-herdr-web-dashboard-browser-surface-for-fgos-work (source lines 9-9) is carried at docs/platform/herdr-web-dashboard/spec.md#spec-herdr-web-dashboard-browser-surface-for-fgos-work (candidate lines 9-9). The heading section digest changes because labelled candidate metadata is inserted after the original H1; original heading and direct source payload remain verbatim. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "fc4b99a650816005c9c724dfcb6964cccd401a8bfa963fd29af1d9eb669e4722",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The heading or scaffolding binding changes while its source heading text remains. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "4801d2363f66799ebd1c2d07e63d8846092df4de43f35c384497f71417fa932f",
       "targetAncestry": []
     },
     {
@@ -49,11 +49,11 @@
       "targetOwner": "docs/platform/herdr-web-dashboard/spec.md",
       "targetAnchor": "purpose",
       "claimKind": "specification",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/herdr-web-dashboard.md#purpose (source lines 11-11) is carried at docs/platform/herdr-web-dashboard/spec.md#purpose (candidate lines 33-33). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "f1ff4f235336b1e131ee0185c562288043d9f1dc54231d3bf84360406893d587",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "ef2a1ed7582f5cbc052018fe9df390a369bc5fa302495a1fbea230ffb6e42a61",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)"
       ]
@@ -128,11 +128,11 @@
       "targetOwner": "docs/platform/herdr-web-dashboard/spec.md",
       "targetAnchor": "unheaded-block-8",
       "claimKind": "specification",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/herdr-web-dashboard.md#unheaded-block-6 (source lines 36-40) is carried at docs/platform/herdr-web-dashboard/spec.md#unheaded-block-8 (candidate lines 58-62). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "95e0c20e567a40e3bb624dd8e039e6f08b3f079260bbe5fba7a95b53f03197d8",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "0c0821a2f7c97ab9efc90ea2a3ddfafe182807e1e63acd44862f60ce730a81ac",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)",
         "Purpose"
@@ -144,11 +144,11 @@
       "targetOwner": "docs/platform/herdr-web-dashboard/spec.md",
       "targetAnchor": "entry-points-triggers",
       "claimKind": "specification",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/herdr-web-dashboard.md#entry-points-triggers (source lines 42-42) is carried at docs/platform/herdr-web-dashboard/spec.md#entry-points-triggers (candidate lines 64-64). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "44a01f946d9c3f460bbcf473ebb31d1c1911d455e66846c50ddd05c3fd30471e",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "8a8bbf7b6a16f552ae3fbb6a38fdf71f7e86b7de9853c6da29e9958ab0aba79a",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)"
       ]
@@ -159,11 +159,11 @@
       "targetOwner": "docs/platform/herdr-web-dashboard/spec.md",
       "targetAnchor": "unheaded-block-9",
       "claimKind": "specification",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/herdr-web-dashboard.md#unheaded-block-7 (source lines 44-62) is carried at docs/platform/herdr-web-dashboard/spec.md#unheaded-block-9 (candidate lines 66-84). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "6fe8b44476ba00c6aa3e5c46960ec7e060c6186fffd0f444669a3bc8950cb176",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "8de029edb99b82340cfc8c7d129d09c9cb7d493ac7e17bc2008056f4eb0290ec",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)",
         "Entry Points & Triggers"
@@ -564,11 +564,11 @@
       "targetOwner": "docs/platform/herdr-web-dashboard/spec.md",
       "targetAnchor": "business-rules",
       "claimKind": "specification",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/herdr-web-dashboard.md#business-rules (source lines 198-198) is carried at docs/platform/herdr-web-dashboard/spec.md#business-rules (candidate lines 220-220). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "aa8a1d069167968c4413d8380b065b9c70db60827dcffc5551b0dd8f66240125",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "724a5a0d50b4eff3931f4914e25965bede8af8febc8ce77a8a0c47fa6742e9de",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)"
       ]
@@ -579,11 +579,11 @@
       "targetOwner": "docs/platform/herdr-web-dashboard/spec.md",
       "targetAnchor": "unheaded-block-23",
       "claimKind": "decision",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/herdr-web-dashboard.md#unheaded-block-21 (source lines 200-244) is carried at docs/platform/herdr-web-dashboard/spec.md#unheaded-block-23 (candidate lines 222-266). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "7d9e2d425937e495926bbff08bacc8e77e9781253b5c83692215e62cf6da2913",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "50fa0c8fa5d1a3a43503513fe324791f37d4da34be798177f14520d04c6cf98b",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)",
         "Business Rules"
@@ -626,11 +626,11 @@
       "targetOwner": "docs/platform/herdr-web-dashboard/spec.md",
       "targetAnchor": "open-gaps",
       "claimKind": "specification",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/herdr-web-dashboard.md#open-gaps (source lines 266-266) is carried at docs/platform/herdr-web-dashboard/spec.md#open-gaps (candidate lines 288-288). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "7eb0dd6b83a72e530a30575cbf43286ab809b83fba028d19ff465496a540375f",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "b6cb7f404452ffa2bd04ddc9e4af9a41e9c0a8471018381a226eb374d84e4448",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)"
       ]
@@ -641,11 +641,11 @@
       "targetOwner": "docs/platform/herdr-web-dashboard/spec.md",
       "targetAnchor": "unheaded-block-25",
       "claimKind": "specification",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/herdr-web-dashboard.md#unheaded-block-23 (source lines 268-298) is carried at docs/platform/herdr-web-dashboard/spec.md#unheaded-block-25 (candidate lines 290-320). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "ef410a08c708a2f590fd777deb282577a8712b80ca1eee9522247534cc06ad99",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "c1636dcb33981d273c811c4a29d9f600b05a8b16d83d96b73cee5f7a6be11a4a",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)",
         "Open Gaps"
@@ -657,11 +657,11 @@
       "targetOwner": "docs/platform/herdr-web-dashboard/spec.md",
       "targetAnchor": "visuals",
       "claimKind": "specification",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/herdr-web-dashboard.md#visuals (source lines 300-300) is carried at docs/platform/herdr-web-dashboard/spec.md#visuals (candidate lines 322-322). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "437a511cf26520d71ce066d992c8affdc6c87a686d737c2e54f748e640ee1b6a",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "d230de27c884d96858b24f66ddd1cfe3c7586f3bb083b4a203ba3bb5842d2730",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)"
       ]
@@ -672,11 +672,11 @@
       "targetOwner": "docs/platform/herdr-web-dashboard/spec.md",
       "targetAnchor": "unheaded-block-26",
       "claimKind": "specification",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/herdr-web-dashboard.md#unheaded-block-24 (source lines 302-307) is carried at docs/platform/herdr-web-dashboard/spec.md#unheaded-block-26 (candidate lines 324-329). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "b3f1a4dd83b0ff718a816b9eb068e4c5521f1d4ee30919d3ad097e62f4d16512",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "e4c1c02a152529d2409df384b704a9f13dcee678a105613ca7cdddec3c27a84a",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)",
         "Visuals"
@@ -688,11 +688,11 @@
       "targetOwner": "docs/platform/herdr-web-dashboard/spec.md",
       "targetAnchor": "pointers-implementation",
       "claimKind": "specification",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/herdr-web-dashboard.md#pointers-implementation (source lines 309-309) is carried at docs/platform/herdr-web-dashboard/spec.md#pointers-implementation (candidate lines 331-331). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "89f24a77c23b2d756b009fe0082bcf8b38734023875f1b84869980e67e1ed580",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "f25ec48ba8bfaa487507266b1c441de2544034423f8e5cd7096839c30f0de908",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)"
       ]
@@ -703,11 +703,11 @@
       "targetOwner": "docs/platform/herdr-web-dashboard/spec.md",
       "targetAnchor": "unheaded-block-27",
       "claimKind": "specification",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/herdr-web-dashboard.md#unheaded-block-25 (source lines 311-331) is carried at docs/platform/herdr-web-dashboard/spec.md#unheaded-block-27 (candidate lines 333-353). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "b0d3ed0823c5a6e58fc870563461d32c3ce61fd9745b78444276500e7135addb",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "4fa7b23eea5b8318dbc1d332d03d4c982d70b119425cc014e645d96184343682",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)",
         "Pointers (implementation)"

@@ -26,9 +26,9 @@
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Judgment: labelled candidate note and/or explicit relative-link destination rebases; labels, repository referents and source wording otherwise preserved. Source digest is unchanged; target digest is unequal and requires independent deep review. Judgment: no target digest match. The whole heading unit docs/specs/observe.md#observe-component-specification (source lines 1-1) is carried at docs/platform/observe/spec.md#observe-component-specification (candidate lines 1-1). The heading section digest changes because labelled candidate metadata is inserted after the original H1; original heading and direct source payload remain verbatim. Frozen specs-ui map and Step 8: preserve docs/specs/observe.md verbatim in docs/platform/observe/spec.md, docs/platform/observe/decisions/observe-component-architecture.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "a24fdb9ba9dc5da2ef380c707571435a37850ee1a527cfccdfdb0dc6ea39251b",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The heading or scaffolding binding changes while its source heading text remains. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "4d4c1b5f2a290762fd6921a907d31e21e2dce776ea157119f963959606d94de9",
       "targetAncestry": []
     },
     {
@@ -52,11 +52,11 @@
       "targetOwner": "docs/platform/observe/spec.md",
       "targetAnchor": "1-overview-boundaries",
       "claimKind": "specification",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/observe.md#1-overview-boundaries (source lines 7-7) is carried at docs/platform/observe/spec.md#1-overview-boundaries (candidate lines 29-29). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/observe.md verbatim in docs/platform/observe/spec.md, docs/platform/observe/decisions/observe-component-architecture.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "f3f902093f4846a4bad6229589c0ab856ff959871b4fe3a99cac6f176ec35e48",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "3c5f074f9b5cfbd5f02d866cbcd9eac50b3c9e5f4ba8ad5d430bf42a0d598c65",
       "targetAncestry": [
         "Observe Component Specification"
       ]
@@ -67,11 +67,11 @@
       "targetOwner": "docs/platform/observe/spec.md",
       "targetAnchor": "unheaded-block-4",
       "claimKind": "specification",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/observe.md#unheaded-block-2 (source lines 9-10) is carried at docs/platform/observe/spec.md#unheaded-block-4 (candidate lines 31-32). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/observe.md verbatim in docs/platform/observe/spec.md, docs/platform/observe/decisions/observe-component-architecture.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "4b789fc020f2595baff813b25b8f25e819353196670c3d4d838d46c72d70012d",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "d143f579b390e92b5f0830d13b54c3de218f6bf4c1d65e84986d2d42f0447e57",
       "targetAncestry": [
         "Observe Component Specification",
         "1. Overview & Boundaries"
@@ -83,11 +83,11 @@
       "targetOwner": "docs/platform/observe/spec.md",
       "targetAnchor": "owns",
       "claimKind": "specification",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/observe.md#owns (source lines 12-12) is carried at docs/platform/observe/spec.md#owns (candidate lines 34-34). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/observe.md verbatim in docs/platform/observe/spec.md, docs/platform/observe/decisions/observe-component-architecture.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "867c3b15546d97e9565b557a2dbff37cfde054ad310e8a19be48d316ef159476",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "104495512d35295fbc91fbc2d7a68a6b3c78bdb661eedfc6fbbb42a0b52acb0a",
       "targetAncestry": [
         "Observe Component Specification",
         "1. Overview & Boundaries"
@@ -99,11 +99,11 @@
       "targetOwner": "docs/platform/observe/spec.md",
       "targetAnchor": "unheaded-block-5",
       "claimKind": "specification",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/observe.md#unheaded-block-3 (source lines 13-17) is carried at docs/platform/observe/spec.md#unheaded-block-5 (candidate lines 35-39). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/observe.md verbatim in docs/platform/observe/spec.md, docs/platform/observe/decisions/observe-component-architecture.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "1840cc4b1da22587ed69755276cad9a882139c62a36179d8fba2269905414623",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "fb157c8023d0df3a8f9673a7659d80b88bde4b76d28c32811d5b0552f530bb4d",
       "targetAncestry": [
         "Observe Component Specification",
         "1. Overview & Boundaries",
@@ -211,11 +211,11 @@
       "targetOwner": "docs/platform/observe/spec.md",
       "targetAnchor": "4-commands-routing",
       "claimKind": "specification",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/observe.md#4-commands-routing (source lines 42-42) is carried at docs/platform/observe/spec.md#4-commands-routing (candidate lines 64-64). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/observe.md verbatim in docs/platform/observe/spec.md, docs/platform/observe/decisions/observe-component-architecture.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "b0b1d84706367b794a79b08b31f2e5bcba0e4656af65400e602890505457198d",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "48ada5d895788c31e0cfc7f9dc44b26c62ca362a58d42791af1d1faae52c5567",
       "targetAncestry": [
         "Observe Component Specification"
       ]
@@ -226,11 +226,11 @@
       "targetOwner": "docs/platform/observe/spec.md",
       "targetAnchor": "unheaded-block-9",
       "claimKind": "specification",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/observe.md#unheaded-block-7 (source lines 44-45) is carried at docs/platform/observe/spec.md#unheaded-block-9 (candidate lines 66-67). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/observe.md verbatim in docs/platform/observe/spec.md, docs/platform/observe/decisions/observe-component-architecture.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "9c492a74b2527331a937aced7683a78cd847277317273fe52b6a41c8119931ee",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "33769cd1d473d8fdaaf0f64d9b71d047bcfeefe3e9eab5ce87844f8743f4146a",
       "targetAncestry": [
         "Observe Component Specification",
         "4. Commands & Routing"

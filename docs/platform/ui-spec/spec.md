@@ -27,7 +27,7 @@ Supersedes: None; candidate only
 Superseded by: None
 ```
 
-> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions.
+> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions. Truth correction (A40/A19): only identified false current sentences corrected; evidence: docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md:5-8; docs/ui-spec/generated/coverage-report.md:1; git ls-files docs/ui-spec/generated; git check-ignore (no matches). A22 rebindings are pending; no truth approval carried.
 
 
 Interaction and layout layer for the herdr web dashboard.
@@ -37,7 +37,7 @@ spec, `tsk-54j`). Every surface, rule and behaviour here traces back to a
 section of that document. This layer never settles a product question —
 where the area spec has an Open Gap, so does this spec.
 
-**Human-readable companion:** `docs/reference/herdr-web-dashboard-layout.md`
+**Human-readable companion:** `docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md`
 — the read-in-one-pass layout document that `tsk-5jr` (taskboard) and
 `tsk-4id` (task detail) open while building.
 
@@ -104,7 +104,7 @@ node interpret-wireframe.mjs --root <repo>/docs/ui-spec
 `validate` is the trust gate — dangling navigate targets, bad component
 hosts, listen-orphans and rule drift are errors, not warnings.
 `interpret-wireframe` produces the clickable wireframe;
-`generated/` is build output and is gitignored.
+`generated/` is build output; its five output files are tracked in this repo.
 
 ## A note on scale
 

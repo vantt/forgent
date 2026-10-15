@@ -1,3 +1,21 @@
+# Step 8 truth corrections complete — native sync and bounded re-review next
+
+Assignment unit-run-1792049113860-a8237dd4/producer/1. Input **2107c4761cdde5f4302502ad564258220ba6a09d**. A40/A19: **25 text/field/path occurrences corrected (23 replacement groups)** in six candidate carriers. Two checks found true: implemented decisions-dir default and surviving 0014 narrative (two inline references), left unchanged. **51 changed candidate units / 45 rebound source rows**, all pending, no approval carry. Updated six carrier A35 promotion-truth notes; historical native list retained separately from current digest overlay. Pending dashboard predecessor registry-gap accounting authored, full old/current witness retained, two reviewed confinement records unchanged.
+
+Fast scoped **D 0 structural fatal; E 0 structural fatal**, E still **566 pending source rows / 1 contextual identical group / 136 provisional reverse units**, no undisposed predecessor gap in scoped overlay. Scoped 33 Markdown candidates: **0 findings / unresolved links**; global candidate-status: **199 checked / 0 findings**. Tests **44/44**, zero fail/cancel/skip/todo, env -u CLAUDE_CODE_SESSION_ID. Exact inverse reconstruction proves all surrounding candidate bytes unchanged; all 27 legacy sources keep their SHA256. Full before/after, rows, evidence and pending dashboard accounting: [truth accounting](step8-truth-corrections.json); results and reproducible helper sources: [verification](step8-truth-verification.json); [report](step-08-report.md#truth-corrections). Classes: **254 Unit-exact / 242 Weak-exact / 70 Judgment**. No native-sync or strict-E-green claim.
+
+**Next turn:** at **this turn's actual runner commit**, run native sync **once**; preserve known IDs and unchanged reviews, refresh current native candidate tuples, apply the committed independent verdicts only to unchanged digest/ancestry bindings, and package bounded truth re-review of the **45 rebound rows, 51 changed units and one pending dashboard gap judgment**. Old approval cannot carry onto changed content. Review packs/requests pinned to prior content are untouched. Preserve prior Rings holds, A34 residuals, truth/fresh-reader, token checkpoint and all promotion/navigation/consumer/alias obligations.
+
+No blocker within this turn's authorized work; native sync and independent acceptance remain pending. No source/gate/checker/vocabulary/extractor/baseline, review pack/request, working registry, .fgos workspace, secrets, git write or lifecycle mutation. Writes only docs/platform and this plan; scratch /tmp/fgos-work; runner commits. Required external result is the sole explicit exception; no needsWrites. Markdown MCP viewer unavailable, CLI preview omitted to respect scope.
+
+---
+
+# Step 8 truth corrections in progress
+
+Assignment unit-run-1792049113860-a8237dd4/producer/1. Read progress first. A40 authorizes candidate-only sentence corrections checked against code, A22 pending rebindings without approval carry, six-carrier A35 notes and pending dashboard predecessor accounting. No native sync, review pack/request edit, legacy source edit, gate/checker edit or git write in this turn. Next turn will run one native sync at this runner commit, apply committed verdicts and package bounded truth re-review.
+
+---
+
 # Native sync and bounded requests prepared — one dashboard gap disposition awaits authorization
 
 Content pin: **1276467f37a99d19aff05808d42fafbf40341449**. Assignment unit-run-1792047735364-5c1a0eb5/producer/1.

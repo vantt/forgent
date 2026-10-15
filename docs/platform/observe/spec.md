@@ -19,7 +19,7 @@ Supersedes: None; candidate only
 Superseded by: None
 ```
 
-> Added in candidate: Candidate metadata and placement scaffolding. Relative link destinations rebased from ../reference/discussion-quality-rubric.md and ../how-to/compare-discussion-setups-with-metrics-eval.md to ../../reference/discussion-quality-rubric.md and ../../how-to/compare-discussion-setups-with-metrics-eval.md; labels and repository referents unchanged. Split companions are listed in the area portal; original section numbers are retained. Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions.
+> Added in candidate: Candidate metadata and placement scaffolding. Relative link destinations rebased from ../reference/discussion-quality-rubric.md and ../how-to/compare-discussion-setups-with-metrics-eval.md to ../../reference/discussion-quality-rubric.md and ../../how-to/compare-discussion-setups-with-metrics-eval.md; labels and repository referents unchanged. Split companions are listed in the area portal; original section numbers are retained. Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions. Truth correction (A40/A19): only identified false current sentences corrected; evidence: packages/observe/rust/src/friction_cli.rs:7-9; archive/plans/260929-1501-metrics-friction-rust-native/plan.md:1. A22 rebindings are pending; no truth approval carried.
 
 
 Document type: BA-grade area specification
@@ -29,12 +29,12 @@ Substrate stores: `.fgos/observe/<store>/<writerId>.jsonl`
 ## 1. Overview & Boundaries
 
 Observe là platform layer chuyên trách việc đo lường (`fgos metrics`) và theo dõi trở ngại (`fgos friction`) xuyên suốt mọi tầng của hệ thống fgOS.
-Observe được chuyển trọn gói sang Rust trong kế hoạch `plans/260929-1501-metrics-friction-rust-native`.
+Observe được chuyển trọn gói sang Rust trong kế hoạch `archive/plans/260929-1501-metrics-friction-rust-native`.
 
 ### Owns
 - Quản lý nhật ký và vòng đời case đo lường (`fgos metrics case`).
 - Thu thập và tính toán scorecard tầng nền (`fgos metrics harness`, `fgos metrics runs`, `fgos metrics coverage`, `fgos metrics outcomes`, `fgos metrics entropy`, `fgos metrics snapshot`).
-- Quản lý kho lưu trữ friction độc lập, phi tập trung (`fgos friction record`, `fgos friction resolve`, `fgos friction list`, `fgos friction show`, `fgos friction rank`).
+- Quản lý kho lưu trữ friction độc lập, phi tập trung (`fgos friction record`, `fgos friction resolve`, `fgos friction list`, `fgos friction show`, `fgos friction rank`, `fgos friction ping`, `fgos friction migrate`).
 - Quản lý store lock (`.fgos/observe/.lock`) và phân mảnh writer shard (`.fgos/observe/<store>/<writerId>.jsonl`).
 - Khai báo traits `ObservationSource` và `LegacyFrictionSource` cho các crate khác triển khai.
 
@@ -64,7 +64,7 @@ Observe được chuyển trọn gói sang Rust trong kế hoạch `plans/260929
 ## 4. Commands & Routing
 
 - `fgos metrics <subcommand>` — lệnh đo lường native (Rust host). Subcommands: `ping`, `case`, `harness`, `faults`, `runs`, `coverage`, `discussions`, `eval`, `outcomes`, `entropy`, `snapshot`.
-- `fgos friction <subcommand>` — lệnh friction native (Rust host). Subcommands: `ping`, `record`, `resolve`, `list`, `show`, `rank`.
+- `fgos friction <subcommand>` — lệnh friction native (Rust host). Subcommands: `ping`, `record`, `resolve`, `list`, `show`, `rank`, `migrate`.
 
 Node legacy CLI cắm cờ `nativeOnly: true` cho `metrics` và `friction`, từ chối chạy trực tiếp với exit 4.
 Mọi component Node hoặc ngôn ngữ ngoài gọi qua helper `src/util/host-bin.mjs` (`invokeHost`).

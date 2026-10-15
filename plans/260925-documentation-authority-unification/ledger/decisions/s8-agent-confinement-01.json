@@ -39,11 +39,11 @@
       "targetOwner": "docs/platform/agent-confinement/spec.md",
       "targetAnchor": "spec-agent-confinement-authority",
       "claimKind": "specification",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Judgment: no target digest match. The whole heading unit docs/specs/confinement-authority.md#spec-agent-confinement-authority (source lines 7-7) is carried at docs/platform/agent-confinement/spec.md#spec-agent-confinement-authority (candidate lines 7-7). The heading section digest changes because labelled candidate metadata is inserted after the original H1; original heading and direct source payload remain verbatim. Frozen specs-ui map and Step 8: preserve docs/specs/confinement-authority.md verbatim in docs/platform/agent-confinement/spec.md, docs/platform/agent-confinement/contracts/confinement-authority-v1.md, docs/platform/agent-confinement/history/rollout-and-settled-facts.md, docs/platform/agent-confinement/decisions/confinement-authority-decisions.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "8fb2143ec2d34a8501d2b0b5f4f81d0e0dd0300b41ac8af267bfb0c166e083b0",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "07f260af60693c5d02d4348272875ed2db88c37847b8bca5d708739f37e43e39",
       "targetAncestry": []
     },
     {
@@ -52,11 +52,11 @@
       "targetOwner": "docs/platform/agent-confinement/spec.md",
       "targetAnchor": "unheaded-block-4",
       "claimKind": "specification",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/confinement-authority.md#unheaded-block-2 (source lines 9-22) is carried at docs/platform/agent-confinement/spec.md#unheaded-block-4 (candidate lines 31-44). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/confinement-authority.md verbatim in docs/platform/agent-confinement/spec.md, docs/platform/agent-confinement/contracts/confinement-authority-v1.md, docs/platform/agent-confinement/history/rollout-and-settled-facts.md, docs/platform/agent-confinement/decisions/confinement-authority-decisions.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "9c7a5f29c2242f9aae324b709b533335f6161724e9882e17db9d1a999d86988c",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "6531cbd5a0586a09857a76ca282d787526c86006b41db6f4cd10b98542977f67",
       "targetAncestry": [
         "Spec: Agent Confinement Authority"
       ]
@@ -632,11 +632,11 @@
       "targetOwner": "docs/platform/agent-confinement/spec.md",
       "targetAnchor": "52-quy-tắc-dependency",
       "claimKind": "specification",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/confinement-authority.md#52-quy-tắc-dependency (source lines 188-188) is carried at docs/platform/agent-confinement/spec.md#52-quy-tắc-dependency (candidate lines 210-210). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/confinement-authority.md verbatim in docs/platform/agent-confinement/spec.md, docs/platform/agent-confinement/contracts/confinement-authority-v1.md, docs/platform/agent-confinement/history/rollout-and-settled-facts.md, docs/platform/agent-confinement/decisions/confinement-authority-decisions.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "12f929a888d5b3bdf3a8e7a1509877484be9590833fdebce0277c0e6e7d228b9",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "e8c7eee6176e190b96b95b1e3b176acd116578dd43dd17332d7d3924d54c81c0",
       "targetAncestry": [
         "Spec: Agent Confinement Authority",
         "5. Component boundary"
@@ -682,11 +682,11 @@
       "targetOwner": "docs/platform/agent-confinement/spec.md",
       "targetAnchor": "unheaded-block-32",
       "claimKind": "specification",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/confinement-authority.md#unheaded-block-30 (source lines 203-209) is carried at docs/platform/agent-confinement/spec.md#unheaded-block-32 (candidate lines 225-231). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/confinement-authority.md verbatim in docs/platform/agent-confinement/spec.md, docs/platform/agent-confinement/contracts/confinement-authority-v1.md, docs/platform/agent-confinement/history/rollout-and-settled-facts.md, docs/platform/agent-confinement/decisions/confinement-authority-decisions.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "f922c23605a7afcce50568cdb5592cf3aeabed7b4e80cb18c659f784cfd691f7",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "872e36adb904d7de53366a46ce523413a6460409a990194cefc392bc5edd90d7",
       "targetAncestry": [
         "Spec: Agent Confinement Authority",
         "5. Component boundary",

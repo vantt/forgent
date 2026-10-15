@@ -1919,5 +1919,785 @@
     "nativePersistedAppliedTupleEquality": true,
     "threeStrictEEquality": true,
     "tupleSHA256": "44c55f937dc11ae811eb637ce15075edf3b7d5a45fd59a259e434f58f86f0150"
+  },
+  "carrierTruthObligations": [
+    {
+      "path": "docs/platform/agent-confinement/spec.md",
+      "status": "candidate-unverified",
+      "reviewStatus": "pending",
+      "note": "known stale carried sentences; full truth check owed at promotion",
+      "authorization": "A40 item 2 / A35 item 2",
+      "boundedCorrectionAccounting": "plans/260925-documentation-authority-unification/reports/phase-06/step8-truth-corrections.json"
+    },
+    {
+      "path": "docs/platform/claude-plugin/spec.md",
+      "status": "candidate-unverified",
+      "reviewStatus": "pending",
+      "note": "known stale carried sentences; full truth check owed at promotion",
+      "authorization": "A40 item 2 / A35 item 2",
+      "boundedCorrectionAccounting": "plans/260925-documentation-authority-unification/reports/phase-06/step8-truth-corrections.json"
+    },
+    {
+      "path": "docs/platform/decision-citation-drift/spec.md",
+      "status": "candidate-unverified",
+      "reviewStatus": "pending",
+      "note": "known stale carried sentences; full truth check owed at promotion",
+      "authorization": "A40 item 2 / A35 item 2",
+      "boundedCorrectionAccounting": "plans/260925-documentation-authority-unification/reports/phase-06/step8-truth-corrections.json"
+    },
+    {
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "status": "candidate-unverified",
+      "reviewStatus": "pending",
+      "note": "known stale carried sentences; full truth check owed at promotion",
+      "authorization": "A40 item 2 / A35 item 2",
+      "boundedCorrectionAccounting": "plans/260925-documentation-authority-unification/reports/phase-06/step8-truth-corrections.json"
+    },
+    {
+      "path": "docs/platform/observe/spec.md",
+      "status": "candidate-unverified",
+      "reviewStatus": "pending",
+      "note": "known stale carried sentences; full truth check owed at promotion",
+      "authorization": "A40 item 2 / A35 item 2",
+      "boundedCorrectionAccounting": "plans/260925-documentation-authority-unification/reports/phase-06/step8-truth-corrections.json"
+    },
+    {
+      "path": "docs/platform/ui-spec/spec.md",
+      "status": "candidate-unverified",
+      "reviewStatus": "pending",
+      "note": "known stale carried sentences; full truth check owed at promotion",
+      "authorization": "A40 item 2 / A35 item 2",
+      "boundedCorrectionAccounting": "plans/260925-documentation-authority-unification/reports/phase-06/step8-truth-corrections.json"
+    }
+  ],
+  "truthCorrectionOverlay": {
+    "nativeSyncDeferred": true,
+    "meaning": "Native rows below remain pinned historical inventory, not refreshed identities. Do not reuse changed candidate unit IDs as native successors before next committed native sync.",
+    "changedUnits": [
+      {
+        "path": "docs/platform/observe/spec.md",
+        "anchor": "observe-component-specification",
+        "unitKind": "heading",
+        "beforeDigest": "a24fdb9ba9dc5da2ef380c707571435a37850ee1a527cfccdfdb0dc6ea39251b",
+        "afterDigest": "4d4c1b5f2a290762fd6921a907d31e21e2dce776ea157119f963959606d94de9",
+        "before": "# Observe Component Specification\n\n```txt\nDocument type: Specification\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve mapped legacy content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; current implementation truth is not certified\nProvenance: docs/specs/observe.md at 111adc51fd047d99121fd9d076eb4794c87045a4\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing carriage, placement and source conservation\nDo not use this for: Current canonical authority or implemented-behavior proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/specs/observe.md\nSupersedes: None; candidate only\nSuperseded by: None\n```\n\n> Added in candidate: Candidate metadata and placement scaffolding. Relative link destinations rebased from ../reference/discussion-quality-rubric.md and ../how-to/compare-discussion-setups-with-metrics-eval.md to ../../reference/discussion-quality-rubric.md and ../../how-to/compare-discussion-setups-with-metrics-eval.md; labels and repository referents unchanged. Split companions are listed in the area portal; original section numbers are retained. Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions.\n\n\nDocument type: BA-grade area specification\nOwnership: `packages/observe/rust` (`fgos-observe`)\nSubstrate stores: `.fgos/observe/<store>/<writerId>.jsonl`",
+        "after": "# Observe Component Specification\n\n```txt\nDocument type: Specification\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve mapped legacy content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; current implementation truth is not certified\nProvenance: docs/specs/observe.md at 111adc51fd047d99121fd9d076eb4794c87045a4\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing carriage, placement and source conservation\nDo not use this for: Current canonical authority or implemented-behavior proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/specs/observe.md\nSupersedes: None; candidate only\nSuperseded by: None\n```\n\n> Added in candidate: Candidate metadata and placement scaffolding. Relative link destinations rebased from ../reference/discussion-quality-rubric.md and ../how-to/compare-discussion-setups-with-metrics-eval.md to ../../reference/discussion-quality-rubric.md and ../../how-to/compare-discussion-setups-with-metrics-eval.md; labels and repository referents unchanged. Split companions are listed in the area portal; original section numbers are retained. Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions. Truth correction (A40/A19): only identified false current sentences corrected; evidence: packages/observe/rust/src/friction_cli.rs:7-9; archive/plans/260929-1501-metrics-friction-rust-native/plan.md:1. A22 rebindings are pending; no truth approval carried.\n\n\nDocument type: BA-grade area specification\nOwnership: `packages/observe/rust` (`fgos-observe`)\nSubstrate stores: `.fgos/observe/<store>/<writerId>.jsonl`",
+        "ancestry": [],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/observe/spec.md",
+        "anchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "beforeDigest": "de673f8911ccc21e0400871a9bdd664f28549e03b580ade6011148e7072c0070",
+        "afterDigest": "1cdde7ed7db6d3826a2eeaa048904706f079cb81502b91c32d27feb1bb932ab0",
+        "before": "> Added in candidate: Candidate metadata and placement scaffolding. Relative link destinations rebased from ../reference/discussion-quality-rubric.md and ../how-to/compare-discussion-setups-with-metrics-eval.md to ../../reference/discussion-quality-rubric.md and ../../how-to/compare-discussion-setups-with-metrics-eval.md; labels and repository referents unchanged. Split companions are listed in the area portal; original section numbers are retained. Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions.",
+        "after": "> Added in candidate: Candidate metadata and placement scaffolding. Relative link destinations rebased from ../reference/discussion-quality-rubric.md and ../how-to/compare-discussion-setups-with-metrics-eval.md to ../../reference/discussion-quality-rubric.md and ../../how-to/compare-discussion-setups-with-metrics-eval.md; labels and repository referents unchanged. Split companions are listed in the area portal; original section numbers are retained. Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions. Truth correction (A40/A19): only identified false current sentences corrected; evidence: packages/observe/rust/src/friction_cli.rs:7-9; archive/plans/260929-1501-metrics-friction-rust-native/plan.md:1. A22 rebindings are pending; no truth approval carried.",
+        "ancestry": [
+          "Observe Component Specification"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/observe/spec.md",
+        "anchor": "1-overview-boundaries",
+        "unitKind": "heading",
+        "beforeDigest": "f3f902093f4846a4bad6229589c0ab856ff959871b4fe3a99cac6f176ec35e48",
+        "afterDigest": "3c5f074f9b5cfbd5f02d866cbcd9eac50b3c9e5f4ba8ad5d430bf42a0d598c65",
+        "before": "## 1. Overview & Boundaries\n\nObserve là platform layer chuyên trách việc đo lường (`fgos metrics`) và theo dõi trở ngại (`fgos friction`) xuyên suốt mọi tầng của hệ thống fgOS.\nObserve được chuyển trọn gói sang Rust trong kế hoạch `plans/260929-1501-metrics-friction-rust-native`.",
+        "after": "## 1. Overview & Boundaries\n\nObserve là platform layer chuyên trách việc đo lường (`fgos metrics`) và theo dõi trở ngại (`fgos friction`) xuyên suốt mọi tầng của hệ thống fgOS.\nObserve được chuyển trọn gói sang Rust trong kế hoạch `archive/plans/260929-1501-metrics-friction-rust-native`.",
+        "ancestry": [
+          "Observe Component Specification"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/observe/spec.md",
+        "anchor": "unheaded-block-4",
+        "unitKind": "unheaded-block",
+        "beforeDigest": "4b789fc020f2595baff813b25b8f25e819353196670c3d4d838d46c72d70012d",
+        "afterDigest": "d143f579b390e92b5f0830d13b54c3de218f6bf4c1d65e84986d2d42f0447e57",
+        "before": "Observe là platform layer chuyên trách việc đo lường (`fgos metrics`) và theo dõi trở ngại (`fgos friction`) xuyên suốt mọi tầng của hệ thống fgOS.\nObserve được chuyển trọn gói sang Rust trong kế hoạch `plans/260929-1501-metrics-friction-rust-native`.",
+        "after": "Observe là platform layer chuyên trách việc đo lường (`fgos metrics`) và theo dõi trở ngại (`fgos friction`) xuyên suốt mọi tầng của hệ thống fgOS.\nObserve được chuyển trọn gói sang Rust trong kế hoạch `archive/plans/260929-1501-metrics-friction-rust-native`.",
+        "ancestry": [
+          "Observe Component Specification",
+          "1. Overview & Boundaries"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/observe/spec.md",
+        "anchor": "owns",
+        "unitKind": "heading",
+        "beforeDigest": "867c3b15546d97e9565b557a2dbff37cfde054ad310e8a19be48d316ef159476",
+        "afterDigest": "104495512d35295fbc91fbc2d7a68a6b3c78bdb661eedfc6fbbb42a0b52acb0a",
+        "before": "### Owns\n- Quản lý nhật ký và vòng đời case đo lường (`fgos metrics case`).\n- Thu thập và tính toán scorecard tầng nền (`fgos metrics harness`, `fgos metrics runs`, `fgos metrics coverage`, `fgos metrics outcomes`, `fgos metrics entropy`, `fgos metrics snapshot`).\n- Quản lý kho lưu trữ friction độc lập, phi tập trung (`fgos friction record`, `fgos friction resolve`, `fgos friction list`, `fgos friction show`, `fgos friction rank`).\n- Quản lý store lock (`.fgos/observe/.lock`) và phân mảnh writer shard (`.fgos/observe/<store>/<writerId>.jsonl`).\n- Khai báo traits `ObservationSource` và `LegacyFrictionSource` cho các crate khác triển khai.",
+        "after": "### Owns\n- Quản lý nhật ký và vòng đời case đo lường (`fgos metrics case`).\n- Thu thập và tính toán scorecard tầng nền (`fgos metrics harness`, `fgos metrics runs`, `fgos metrics coverage`, `fgos metrics outcomes`, `fgos metrics entropy`, `fgos metrics snapshot`).\n- Quản lý kho lưu trữ friction độc lập, phi tập trung (`fgos friction record`, `fgos friction resolve`, `fgos friction list`, `fgos friction show`, `fgos friction rank`, `fgos friction ping`, `fgos friction migrate`).\n- Quản lý store lock (`.fgos/observe/.lock`) và phân mảnh writer shard (`.fgos/observe/<store>/<writerId>.jsonl`).\n- Khai báo traits `ObservationSource` và `LegacyFrictionSource` cho các crate khác triển khai.",
+        "ancestry": [
+          "Observe Component Specification",
+          "1. Overview & Boundaries"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/observe/spec.md",
+        "anchor": "unheaded-block-5",
+        "unitKind": "unheaded-block",
+        "beforeDigest": "1840cc4b1da22587ed69755276cad9a882139c62a36179d8fba2269905414623",
+        "afterDigest": "fb157c8023d0df3a8f9673a7659d80b88bde4b76d28c32811d5b0552f530bb4d",
+        "before": "- Quản lý nhật ký và vòng đời case đo lường (`fgos metrics case`).\n- Thu thập và tính toán scorecard tầng nền (`fgos metrics harness`, `fgos metrics runs`, `fgos metrics coverage`, `fgos metrics outcomes`, `fgos metrics entropy`, `fgos metrics snapshot`).\n- Quản lý kho lưu trữ friction độc lập, phi tập trung (`fgos friction record`, `fgos friction resolve`, `fgos friction list`, `fgos friction show`, `fgos friction rank`).\n- Quản lý store lock (`.fgos/observe/.lock`) và phân mảnh writer shard (`.fgos/observe/<store>/<writerId>.jsonl`).\n- Khai báo traits `ObservationSource` và `LegacyFrictionSource` cho các crate khác triển khai.",
+        "after": "- Quản lý nhật ký và vòng đời case đo lường (`fgos metrics case`).\n- Thu thập và tính toán scorecard tầng nền (`fgos metrics harness`, `fgos metrics runs`, `fgos metrics coverage`, `fgos metrics outcomes`, `fgos metrics entropy`, `fgos metrics snapshot`).\n- Quản lý kho lưu trữ friction độc lập, phi tập trung (`fgos friction record`, `fgos friction resolve`, `fgos friction list`, `fgos friction show`, `fgos friction rank`, `fgos friction ping`, `fgos friction migrate`).\n- Quản lý store lock (`.fgos/observe/.lock`) và phân mảnh writer shard (`.fgos/observe/<store>/<writerId>.jsonl`).\n- Khai báo traits `ObservationSource` và `LegacyFrictionSource` cho các crate khác triển khai.",
+        "ancestry": [
+          "Observe Component Specification",
+          "1. Overview & Boundaries",
+          "Owns"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/observe/spec.md",
+        "anchor": "4-commands-routing",
+        "unitKind": "heading",
+        "beforeDigest": "b0b1d84706367b794a79b08b31f2e5bcba0e4656af65400e602890505457198d",
+        "afterDigest": "48ada5d895788c31e0cfc7f9dc44b26c62ca362a58d42791af1d1faae52c5567",
+        "before": "## 4. Commands & Routing\n\n- `fgos metrics <subcommand>` — lệnh đo lường native (Rust host). Subcommands: `ping`, `case`, `harness`, `faults`, `runs`, `coverage`, `discussions`, `eval`, `outcomes`, `entropy`, `snapshot`.\n- `fgos friction <subcommand>` — lệnh friction native (Rust host). Subcommands: `ping`, `record`, `resolve`, `list`, `show`, `rank`.\n\nNode legacy CLI cắm cờ `nativeOnly: true` cho `metrics` và `friction`, từ chối chạy trực tiếp với exit 4.\nMọi component Node hoặc ngôn ngữ ngoài gọi qua helper `src/util/host-bin.mjs` (`invokeHost`).",
+        "after": "## 4. Commands & Routing\n\n- `fgos metrics <subcommand>` — lệnh đo lường native (Rust host). Subcommands: `ping`, `case`, `harness`, `faults`, `runs`, `coverage`, `discussions`, `eval`, `outcomes`, `entropy`, `snapshot`.\n- `fgos friction <subcommand>` — lệnh friction native (Rust host). Subcommands: `ping`, `record`, `resolve`, `list`, `show`, `rank`, `migrate`.\n\nNode legacy CLI cắm cờ `nativeOnly: true` cho `metrics` và `friction`, từ chối chạy trực tiếp với exit 4.\nMọi component Node hoặc ngôn ngữ ngoài gọi qua helper `src/util/host-bin.mjs` (`invokeHost`).",
+        "ancestry": [
+          "Observe Component Specification"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/observe/spec.md",
+        "anchor": "unheaded-block-9",
+        "unitKind": "unheaded-block",
+        "beforeDigest": "9c492a74b2527331a937aced7683a78cd847277317273fe52b6a41c8119931ee",
+        "afterDigest": "33769cd1d473d8fdaaf0f64d9b71d047bcfeefe3e9eab5ce87844f8743f4146a",
+        "before": "- `fgos metrics <subcommand>` — lệnh đo lường native (Rust host). Subcommands: `ping`, `case`, `harness`, `faults`, `runs`, `coverage`, `discussions`, `eval`, `outcomes`, `entropy`, `snapshot`.\n- `fgos friction <subcommand>` — lệnh friction native (Rust host). Subcommands: `ping`, `record`, `resolve`, `list`, `show`, `rank`.",
+        "after": "- `fgos metrics <subcommand>` — lệnh đo lường native (Rust host). Subcommands: `ping`, `case`, `harness`, `faults`, `runs`, `coverage`, `discussions`, `eval`, `outcomes`, `entropy`, `snapshot`.\n- `fgos friction <subcommand>` — lệnh friction native (Rust host). Subcommands: `ping`, `record`, `resolve`, `list`, `show`, `rank`, `migrate`.",
+        "ancestry": [
+          "Observe Component Specification",
+          "4. Commands & Routing"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/agent-confinement/spec.md",
+        "anchor": "spec-agent-confinement-authority",
+        "unitKind": "heading",
+        "beforeDigest": "8fb2143ec2d34a8501d2b0b5f4f81d0e0dd0300b41ac8af267bfb0c166e083b0",
+        "afterDigest": "07f260af60693c5d02d4348272875ed2db88c37847b8bca5d708739f37e43e39",
+        "before": "# Spec: Agent Confinement Authority\n\n```txt\nDocument type: Specification\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve mapped legacy content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; current implementation truth is not certified\nProvenance: docs/specs/confinement-authority.md at 111adc51fd047d99121fd9d076eb4794c87045a4\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing carriage, placement and source conservation\nDo not use this for: Current canonical authority or implemented-behavior proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/specs/confinement-authority.md\nSupersedes: None; candidate only\nSuperseded by: None\n```\n\n> Added in candidate: Candidate metadata and placement scaffolding. Split companions are listed in the area portal; original section numbers are retained. Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions.\n\n\n> **Trạng thái:** IMPLEMENTED. Đã được hiện thực hoá hoàn chỉnh qua track `confinement-authority-implementation` (P00-P07).\n> Một cửa runtime duy nhất `executeThroughConfinement` bảo vệ mọi dispatch ngoại trình (`cli-spawn`, `herdr-spawn`, `http`)\n> trước khi adapter được spawn agent. Backend registry `~/.fgos/confinement-backends.json` quản lý backend instances máy chủ,\n> driver `bwrap` v1 bảo đảm fail-closed cho `required` với 8 falsification probes. Ba executor bwrap (`claude-bwrap`, `agy-bwrap`, `codex-bwrap`)\n> chỉ di trú sang backend reference ở dạng fixture (P04.md R4) — bản `.fgos/config.json` thật vẫn giữ hand-rolled `command:\"bwrap\"` argv,\n> không có key `confinement`; live migration để deferred cho một phase sau (P06 thử tạm rồi revert nguyên trạng, sha256-verified). Live dogfood\n> coordination đã chứng minh multi-agent cross-provider enforcement trên đường observe/legacy hiện có, không phụ thuộc migration nói trên.\n> Chế độ strict mode (`runner.confinement.strict`) mặc định giữ `false` với chẩn đoán sẵn sàng từ `fgos doctor` (xem R1 decision).\n>\n> **Nguồn:** RUN1\n> `plans/reports/architecture-advisory-panel-260909-2107-confinement-authority-fgos-dispatch-report.md`,\n> RUN2\n> `plans/reports/architecture-advisory-panel-260910-0216-confinement-authority-run2-decision-and-run1-comparison-report.md`,\n> và source được đối chiếu ngày 2026-09-11.",
+        "after": "# Spec: Agent Confinement Authority\n\n```txt\nDocument type: Specification\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve mapped legacy content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; current implementation truth is not certified\nProvenance: docs/specs/confinement-authority.md at 111adc51fd047d99121fd9d076eb4794c87045a4\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing carriage, placement and source conservation\nDo not use this for: Current canonical authority or implemented-behavior proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/specs/confinement-authority.md\nSupersedes: None; candidate only\nSuperseded by: None\n```\n\n> Added in candidate: Candidate metadata and placement scaffolding. Split companions are listed in the area portal; original section numbers are retained. Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions. Truth correction (A40/A19): only identified false current sentences corrected; evidence: src/runner/dispatch/adapters.mjs:20-33; src/runner/dispatch/confinement/backend-registry.mjs:52-58; test/runner/dispatch-confinement-p04.test.mjs:663-675; migration commit 5a42bc376; review-8-specs-ui-truth.md U24 (committed live-config evidence, no configuration read this turn). A22 rebindings are pending; no truth approval carried.\n\n\n> **Trạng thái:** IMPLEMENTED. Đã được hiện thực hoá hoàn chỉnh qua track `confinement-authority-implementation` (P00-P07).\n> Một cửa runtime duy nhất `executeThroughConfinement` bảo vệ mọi dispatch ngoại trình (`cli-spawn`, `herdr-spawn`, `http`)\n> trước khi adapter được spawn agent. Backend registry `~/.fgos/confinement-backends.json` quản lý backend instances máy chủ,\n> driver `bwrap` v1 bảo đảm fail-closed cho `required` với 8 falsification probes. Các invocation bwrap hiện dùng backend reference `confinement.backend: bwrap`;\n> các executor id cũ `claude-bwrap`, `agy-bwrap`, `codex-bwrap` đã được hợp nhất thành các invocation cli/cli-bwrap.\n> Live migration đã được thực hiện, không còn chỉ ở fixture hay deferred. Live dogfood\n> coordination đã chứng minh multi-agent cross-provider enforcement trên đường observe/legacy hiện có, không phụ thuộc migration nói trên.\n> Chế độ strict mode (`runner.confinement.strict`) mặc định giữ `false` với chẩn đoán sẵn sàng từ `fgos doctor` (xem R1 decision).\n>\n> **Nguồn:** RUN1\n> `plans/reports/architecture-advisory-panel-260909-2107-confinement-authority-fgos-dispatch-report.md`,\n> RUN2\n> `plans/reports/architecture-advisory-panel-260910-0216-confinement-authority-run2-decision-and-run1-comparison-report.md`,\n> và source được đối chiếu ngày 2026-09-11.",
+        "ancestry": [],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/agent-confinement/spec.md",
+        "anchor": "unheaded-block-3",
+        "unitKind": "unheaded-block",
+        "beforeDigest": "5872213e7045308646ea615963c6fb4dd624e2b0dfa8fa445e6a4b0b45351559",
+        "afterDigest": "481800d052d19a1d731fa71da7e4cb130e0e3ffd98d4e663e4c1ce239729b1e9",
+        "before": "> Added in candidate: Candidate metadata and placement scaffolding. Split companions are listed in the area portal; original section numbers are retained. Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions.",
+        "after": "> Added in candidate: Candidate metadata and placement scaffolding. Split companions are listed in the area portal; original section numbers are retained. Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions. Truth correction (A40/A19): only identified false current sentences corrected; evidence: src/runner/dispatch/adapters.mjs:20-33; src/runner/dispatch/confinement/backend-registry.mjs:52-58; test/runner/dispatch-confinement-p04.test.mjs:663-675; migration commit 5a42bc376; review-8-specs-ui-truth.md U24 (committed live-config evidence, no configuration read this turn). A22 rebindings are pending; no truth approval carried.",
+        "ancestry": [
+          "Spec: Agent Confinement Authority"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/agent-confinement/spec.md",
+        "anchor": "unheaded-block-4",
+        "unitKind": "unheaded-block",
+        "beforeDigest": "9c7a5f29c2242f9aae324b709b533335f6161724e9882e17db9d1a999d86988c",
+        "afterDigest": "6531cbd5a0586a09857a76ca282d787526c86006b41db6f4cd10b98542977f67",
+        "before": "> **Trạng thái:** IMPLEMENTED. Đã được hiện thực hoá hoàn chỉnh qua track `confinement-authority-implementation` (P00-P07).\n> Một cửa runtime duy nhất `executeThroughConfinement` bảo vệ mọi dispatch ngoại trình (`cli-spawn`, `herdr-spawn`, `http`)\n> trước khi adapter được spawn agent. Backend registry `~/.fgos/confinement-backends.json` quản lý backend instances máy chủ,\n> driver `bwrap` v1 bảo đảm fail-closed cho `required` với 8 falsification probes. Ba executor bwrap (`claude-bwrap`, `agy-bwrap`, `codex-bwrap`)\n> chỉ di trú sang backend reference ở dạng fixture (P04.md R4) — bản `.fgos/config.json` thật vẫn giữ hand-rolled `command:\"bwrap\"` argv,\n> không có key `confinement`; live migration để deferred cho một phase sau (P06 thử tạm rồi revert nguyên trạng, sha256-verified). Live dogfood\n> coordination đã chứng minh multi-agent cross-provider enforcement trên đường observe/legacy hiện có, không phụ thuộc migration nói trên.\n> Chế độ strict mode (`runner.confinement.strict`) mặc định giữ `false` với chẩn đoán sẵn sàng từ `fgos doctor` (xem R1 decision).\n>\n> **Nguồn:** RUN1\n> `plans/reports/architecture-advisory-panel-260909-2107-confinement-authority-fgos-dispatch-report.md`,\n> RUN2\n> `plans/reports/architecture-advisory-panel-260910-0216-confinement-authority-run2-decision-and-run1-comparison-report.md`,\n> và source được đối chiếu ngày 2026-09-11.",
+        "after": "> **Trạng thái:** IMPLEMENTED. Đã được hiện thực hoá hoàn chỉnh qua track `confinement-authority-implementation` (P00-P07).\n> Một cửa runtime duy nhất `executeThroughConfinement` bảo vệ mọi dispatch ngoại trình (`cli-spawn`, `herdr-spawn`, `http`)\n> trước khi adapter được spawn agent. Backend registry `~/.fgos/confinement-backends.json` quản lý backend instances máy chủ,\n> driver `bwrap` v1 bảo đảm fail-closed cho `required` với 8 falsification probes. Các invocation bwrap hiện dùng backend reference `confinement.backend: bwrap`;\n> các executor id cũ `claude-bwrap`, `agy-bwrap`, `codex-bwrap` đã được hợp nhất thành các invocation cli/cli-bwrap.\n> Live migration đã được thực hiện, không còn chỉ ở fixture hay deferred. Live dogfood\n> coordination đã chứng minh multi-agent cross-provider enforcement trên đường observe/legacy hiện có, không phụ thuộc migration nói trên.\n> Chế độ strict mode (`runner.confinement.strict`) mặc định giữ `false` với chẩn đoán sẵn sàng từ `fgos doctor` (xem R1 decision).\n>\n> **Nguồn:** RUN1\n> `plans/reports/architecture-advisory-panel-260909-2107-confinement-authority-fgos-dispatch-report.md`,\n> RUN2\n> `plans/reports/architecture-advisory-panel-260910-0216-confinement-authority-run2-decision-and-run1-comparison-report.md`,\n> và source được đối chiếu ngày 2026-09-11.",
+        "ancestry": [
+          "Spec: Agent Confinement Authority"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/agent-confinement/spec.md",
+        "anchor": "52-quy-tắc-dependency",
+        "unitKind": "heading",
+        "beforeDigest": "12f929a888d5b3bdf3a8e7a1509877484be9590833fdebce0277c0e6e7d228b9",
+        "afterDigest": "e8c7eee6176e190b96b95b1e3b176acd116578dd43dd17332d7d3924d54c81c0",
+        "before": "### 5.2 Quy tắc dependency\n\n1. Hai đường trong `dispatch/cli.mjs` resolve executor như hiện tại.\n2. Mỗi đường tạo hoặc nhận `runDir` trước.\n3. Mỗi đường gọi cùng `executeThroughConfinement`.\n4. Chỉ Agent Confinement Authority tra adapter execute function từ registry và gọi nó.\n5. Config validator chỉ đọc metadata registry, không nắm execute handle.\n6. Backend không được tự spawn agent. Backend chỉ prepare guarded invocation và\n   lifecycle cleanup; Authority vẫn giữ quyền execute.\n\nQuy tắc 4 và 6 làm cho “một cửa” kiểm được bằng code, không chỉ là cách gọi tên.\n`adapterPort` là execute handle do Authority nhận từ registry tin cậy của\nprocess dispatch; caller không được tự truyền implementation hoặc đổi handle\nsau khi plan đã compile.\n\nAdapter metadata có `locus: local-process | remote`. cli-spawn/herdr-spawn là\nlocal-process; http là remote dù request được gửi từ host. Bwrap chỉ nhận\nlocal-process, không coi việc bọc HTTP client là confine remote agent.\nIn-process Agent/Task tool nằm ngoài execution authority này: dispatch ghi\n`authorityScope: external-harness`, attestation null, không gọi đó là unconfined.\nCapability required không được dispatch in-process khi chưa có trusted harness\nattestation contract đáp ứng policy; phải refuse thay vì bỏ requirement.",
+        "after": "### 5.2 Quy tắc dependency\n\n1. Hai đường trong `dispatch/cli.mjs` resolve executor như hiện tại.\n2. Mỗi đường tạo hoặc nhận `runDir` trước.\n3. Mỗi đường gọi cùng `executeThroughConfinement`.\n4. Chỉ Agent Confinement Authority tra adapter execute function từ registry và gọi nó.\n5. Config validator chỉ đọc metadata registry, không nắm execute handle.\n6. Backend không được tự spawn agent. Backend chỉ prepare guarded invocation và\n   lifecycle cleanup; Authority vẫn giữ quyền execute.\n\nQuy tắc 4 và 6 làm cho “một cửa” kiểm được bằng code, không chỉ là cách gọi tên.\n`adapterPort` là execute handle do Authority nhận từ registry tin cậy của\nprocess dispatch; caller không được tự truyền implementation hoặc đổi handle\nsau khi plan đã compile.\n\nAdapter metadata có `locus: local-process | remote-http | herdr-pane`. cli-spawn là\nlocal-process; http là remote-http; herdr-spawn là herdr-pane dù request được gửi từ host. Bwrap chỉ nhận\nlocal-process, không coi việc bọc HTTP client là confine remote agent.\nIn-process Agent/Task tool nằm ngoài execution authority này: dispatch ghi\n`authorityScope: external-harness`, attestation null, không gọi đó là unconfined.\nCapability required không được dispatch in-process khi chưa có trusted harness\nattestation contract đáp ứng policy; phải refuse thay vì bỏ requirement.",
+        "ancestry": [
+          "Spec: Agent Confinement Authority",
+          "5. Component boundary"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/agent-confinement/spec.md",
+        "anchor": "unheaded-block-32",
+        "unitKind": "unheaded-block",
+        "beforeDigest": "f922c23605a7afcce50568cdb5592cf3aeabed7b4e80cb18c659f784cfd691f7",
+        "afterDigest": "872e36adb904d7de53366a46ce523413a6460409a990194cefc392bc5edd90d7",
+        "before": "Adapter metadata có `locus: local-process | remote`. cli-spawn/herdr-spawn là\nlocal-process; http là remote dù request được gửi từ host. Bwrap chỉ nhận\nlocal-process, không coi việc bọc HTTP client là confine remote agent.\nIn-process Agent/Task tool nằm ngoài execution authority này: dispatch ghi\n`authorityScope: external-harness`, attestation null, không gọi đó là unconfined.\nCapability required không được dispatch in-process khi chưa có trusted harness\nattestation contract đáp ứng policy; phải refuse thay vì bỏ requirement.",
+        "after": "Adapter metadata có `locus: local-process | remote-http | herdr-pane`. cli-spawn là\nlocal-process; http là remote-http; herdr-spawn là herdr-pane dù request được gửi từ host. Bwrap chỉ nhận\nlocal-process, không coi việc bọc HTTP client là confine remote agent.\nIn-process Agent/Task tool nằm ngoài execution authority này: dispatch ghi\n`authorityScope: external-harness`, attestation null, không gọi đó là unconfined.\nCapability required không được dispatch in-process khi chưa có trusted harness\nattestation contract đáp ứng policy; phải refuse thay vì bỏ requirement.",
+        "ancestry": [
+          "Spec: Agent Confinement Authority",
+          "5. Component boundary",
+          "5.2 Quy tắc dependency"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/claude-plugin/spec.md",
+        "anchor": "unheaded-block-1",
+        "unitKind": "unheaded-preamble",
+        "beforeDigest": "accf803c7e73f896e243e25b1600bb5ab2d868fb2591e43054c4c283455d5c80",
+        "afterDigest": "58252dca40b604e3b4e45c81a0c33677faa99a1a546c68b28956ea06d6dddeed",
+        "before": "---\narea: fgos-plugin\nupdated: 2026-07-23\nsources: [str83-fgos-slash-commands, str88-fgos-verb-wrappers]\ndecisions: [7574fe5a]\ncoverage: full\n---",
+        "after": "---\narea: fgos-plugin\nupdated: 2026-07-23\nsources: [str83-fgos-slash-commands, str88-fgos-verb-wrappers]\ndecisions: [7574fe5a]\ncoverage: partial\n---",
+        "ancestry": [],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/claude-plugin/spec.md",
+        "anchor": "spec-fgos-plugin-claude-code-slash-command-surface",
+        "unitKind": "heading",
+        "beforeDigest": "0ac7dd09127d236ff5c79bb080e4b3abc5ad55940171fc96ea0e0b0bacd97b5d",
+        "afterDigest": "d6668e44d9a9903c4991b93694cce7417b44ed7543f45451de9918a45e257245",
+        "before": "# Spec: fgOS Plugin (Claude Code slash-command surface)\n\n```txt\nDocument type: Specification\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve mapped legacy content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; current implementation truth is not certified\nProvenance: docs/specs/fgos-plugin.md at 111adc51fd047d99121fd9d076eb4794c87045a4\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing carriage, placement and source conservation\nDo not use this for: Current canonical authority or implemented-behavior proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/specs/fgos-plugin.md\nSupersedes: None; candidate only\nSuperseded by: None\n```\n\n> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions.\n\n\nThe fgOS plugin lets a person working inside Claude Code operate the fgOS\nwork-item lifecycle — claim, submit, move, monitor, and inspect work — as\n`/fgOS:<verb>` slash commands, without hand-typing the underlying command-line\ntool or its arguments. Every command is a thin, safety-checked wrapper: it\nshells out to the one underlying tool, never touches the work-item store\ndirectly, and shows the real error and stops when anything goes wrong. The\nlifecycle rules each verb enforces (what \"move\" is allowed, what \"return\"\nchecks, what triggers \"awaiting-human\") are owned by the Work-State area\n(`docs/specs/work-state.md`) — this spec covers only the plugin's own\nconvenience layer on top of that.",
+        "after": "# Spec: fgOS Plugin (Claude Code slash-command surface)\n\n```txt\nDocument type: Specification\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve mapped legacy content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; current implementation truth is not certified\nProvenance: docs/specs/fgos-plugin.md at 111adc51fd047d99121fd9d076eb4794c87045a4\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing carriage, placement and source conservation\nDo not use this for: Current canonical authority or implemented-behavior proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/specs/fgos-plugin.md\nSupersedes: None; candidate only\nSuperseded by: None\n```\n\n> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions. Truth correction (A40/A19): only identified false current sentences corrected; evidence: plugins/fgOS/skills/approve/SKILL.md:1-10; plugins/fgOS/skills/list/SKILL.md:1-9; no tracked plugins/fgOS/skills/check/SKILL.md; plugins/fgOS/skills/approve/SKILL.md:1-10; no tracked plugins/fgOS/skills/check/SKILL.md; plugins/fgOS/skills/approve/SKILL.md:1-10; tracked plugin skill inventory has no check/SKILL.md; plugins/fgOS/skills/approve/SKILL.md:1-10; plugins/fgOS/skills/list/SKILL.md:1-9; plugins/fgOS/skills/triage/SKILL.md:1-10; plugins/fgOS/skills/approve/SKILL.md:1-10; plugins/fgOS/skills/approve/SKILL.md:1-10; plugins/fgOS/skills/list/SKILL.md:1-9; plugins/fgOS/skills/triage/SKILL.md:1-10; plugins/fgOS/skills/approve/SKILL.md:1-10; plugins/fgOS/skills/list/SKILL.md:1-9; plugins/fgOS/skills/approve/SKILL.md:1-10. A22 rebindings are pending; no truth approval carried.\n\n\nThe fgOS plugin lets a person working inside Claude Code operate the fgOS\nwork-item lifecycle — claim, submit, move, monitor, and inspect work — as\n`/fgOS:<verb>` slash commands, without hand-typing the underlying command-line\ntool or its arguments. Every command is a thin, safety-checked wrapper: it\nshells out to the one underlying tool, never touches the work-item store\ndirectly, and shows the real error and stops when anything goes wrong. The\nlifecycle rules each verb enforces (what \"move\" is allowed, what \"return\"\nchecks, what triggers \"awaiting-human\") are owned by the Work-State area\n(`docs/specs/work-state.md`) — this spec covers only the plugin's own\nconvenience layer on top of that.",
+        "ancestry": [],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/claude-plugin/spec.md",
+        "anchor": "unheaded-block-3",
+        "unitKind": "unheaded-block",
+        "beforeDigest": "7a16f93c0d7d23c5915d7afe7e93d6b32d9eda0b659d66f240912d863eeaa196",
+        "afterDigest": "3dd45fbead6cb1155301681c99ba38813943f8e6fcfc86f11901e47633ef717d",
+        "before": "> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions.",
+        "after": "> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions. Truth correction (A40/A19): only identified false current sentences corrected; evidence: plugins/fgOS/skills/approve/SKILL.md:1-10; plugins/fgOS/skills/list/SKILL.md:1-9; no tracked plugins/fgOS/skills/check/SKILL.md; plugins/fgOS/skills/approve/SKILL.md:1-10; no tracked plugins/fgOS/skills/check/SKILL.md; plugins/fgOS/skills/approve/SKILL.md:1-10; tracked plugin skill inventory has no check/SKILL.md; plugins/fgOS/skills/approve/SKILL.md:1-10; plugins/fgOS/skills/list/SKILL.md:1-9; plugins/fgOS/skills/triage/SKILL.md:1-10; plugins/fgOS/skills/approve/SKILL.md:1-10; plugins/fgOS/skills/approve/SKILL.md:1-10; plugins/fgOS/skills/list/SKILL.md:1-9; plugins/fgOS/skills/triage/SKILL.md:1-10; plugins/fgOS/skills/approve/SKILL.md:1-10; plugins/fgOS/skills/list/SKILL.md:1-9; plugins/fgOS/skills/approve/SKILL.md:1-10. A22 rebindings are pending; no truth approval carried.",
+        "ancestry": [
+          "Spec: fgOS Plugin (Claude Code slash-command surface)"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/claude-plugin/spec.md",
+        "anchor": "entry-points-triggers",
+        "unitKind": "heading",
+        "beforeDigest": "f3ffcdf9f308bc1515acae071d209a5f5f0fed0730bf3a41a14f07161970e891",
+        "afterDigest": "80047ed46735979a109e623515a4466175a7519b84211a9d69a44f4d89f0ac94",
+        "before": "## Entry Points & Triggers\n\n- `/fgOS:submit <free-text>` → intake a new work item from a plain-language description.\n- `/fgOS:pick [id]` → claim the next (or a named) work item and switch straight into its own isolated workspace.\n- `/fgOS:move <id> <status>` → move a work item to a new status.\n- `/fgOS:return <id>` → complete a claimed item: run its own verification and advance it.\n- `/fgOS:ask <id> <question text>` → park a work item pending a question, with the question attached.\n- `/fgOS:answer <id> <answer text>` → resume a parked work item once its question is answered.\n- `/fgOS:ready` → list every work item ready to be picked up right now.\n- `/fgOS:stale` → list work items that look stuck (claimed but inactive too long).\n- `/fgOS:rollup <id>` → show one work item's children: how many are done out of the total, and each child's status.\n- `/fgOS:check [id]` → show the predicted-vs-actual outcome report for one item, or every item at once.\n- `/fgOS:graph [id]` → show work-graph metrics (independent parallel tracks), or — with an id — what completing that one item would unblock.\n- `/fgOS:conflicts` → list pairs of ready work items whose declared file footprints overlap (a parallel-work collision risk).",
+        "after": "## Entry Points & Triggers\n\n- `/fgOS:submit <free-text>` → intake a new work item from a plain-language description.\n- `/fgOS:pick [id]` → claim the next (or a named) work item and switch straight into its own isolated workspace.\n- `/fgOS:move <id> <status>` → move a work item to a new status.\n- `/fgOS:return <id>` → complete a claimed item: run its own verification and advance it.\n- `/fgOS:ask <id> <question text>` → park a work item pending a question, with the question attached.\n- `/fgOS:answer <id> <answer text>` → resume a parked work item once its question is answered.\n- `/fgOS:ready` → list every work item ready to be picked up right now.\n- `/fgOS:stale` → list work items that look stuck (claimed but inactive too long).\n- `/fgOS:rollup <id>` → show one work item's children: how many are done out of the total, and each child's status.\n- `/fgOS:check [id]` is not shipped; the original report description below is legacy surface documentation.\n- `/fgOS:graph [id]` → show work-graph metrics (independent parallel tracks), or — with an id — what completing that one item would unblock.\n- `/fgOS:conflicts` → list pairs of ready work items whose declared file footprints overlap (a parallel-work collision risk).",
+        "ancestry": [
+          "Spec: fgOS Plugin (Claude Code slash-command surface)"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/claude-plugin/spec.md",
+        "anchor": "unheaded-block-5",
+        "unitKind": "unheaded-block",
+        "beforeDigest": "b9e6c0ab26679c055bf00490c18221eab33d08712fbfd82458032f7cfded5642",
+        "afterDigest": "5d247f3352fcd65e47112e59a6bd5274a6236eaebc24680e7df7716c361f6871",
+        "before": "- `/fgOS:submit <free-text>` → intake a new work item from a plain-language description.\n- `/fgOS:pick [id]` → claim the next (or a named) work item and switch straight into its own isolated workspace.\n- `/fgOS:move <id> <status>` → move a work item to a new status.\n- `/fgOS:return <id>` → complete a claimed item: run its own verification and advance it.\n- `/fgOS:ask <id> <question text>` → park a work item pending a question, with the question attached.\n- `/fgOS:answer <id> <answer text>` → resume a parked work item once its question is answered.\n- `/fgOS:ready` → list every work item ready to be picked up right now.\n- `/fgOS:stale` → list work items that look stuck (claimed but inactive too long).\n- `/fgOS:rollup <id>` → show one work item's children: how many are done out of the total, and each child's status.\n- `/fgOS:check [id]` → show the predicted-vs-actual outcome report for one item, or every item at once.\n- `/fgOS:graph [id]` → show work-graph metrics (independent parallel tracks), or — with an id — what completing that one item would unblock.\n- `/fgOS:conflicts` → list pairs of ready work items whose declared file footprints overlap (a parallel-work collision risk).",
+        "after": "- `/fgOS:submit <free-text>` → intake a new work item from a plain-language description.\n- `/fgOS:pick [id]` → claim the next (or a named) work item and switch straight into its own isolated workspace.\n- `/fgOS:move <id> <status>` → move a work item to a new status.\n- `/fgOS:return <id>` → complete a claimed item: run its own verification and advance it.\n- `/fgOS:ask <id> <question text>` → park a work item pending a question, with the question attached.\n- `/fgOS:answer <id> <answer text>` → resume a parked work item once its question is answered.\n- `/fgOS:ready` → list every work item ready to be picked up right now.\n- `/fgOS:stale` → list work items that look stuck (claimed but inactive too long).\n- `/fgOS:rollup <id>` → show one work item's children: how many are done out of the total, and each child's status.\n- `/fgOS:check [id]` is not shipped; the original report description below is legacy surface documentation.\n- `/fgOS:graph [id]` → show work-graph metrics (independent parallel tracks), or — with an id — what completing that one item would unblock.\n- `/fgOS:conflicts` → list pairs of ready work items whose declared file footprints overlap (a parallel-work collision risk).",
+        "ancestry": [
+          "Spec: fgOS Plugin (Claude Code slash-command surface)",
+          "Entry Points & Triggers"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/claude-plugin/spec.md",
+        "anchor": "check",
+        "unitKind": "heading",
+        "beforeDigest": "1b27de9e5f0e778a7ca3d492baef55ae37fb462d631a7e1f68d9dfc278e40159",
+        "afterDigest": "dc17e82d43d791ef16b8c9321ad8ddc5160f98ef5595cae774118463ea650e47",
+        "before": "### check\n\n- **Runs when:** invoked with or without an id.\n- **What changes:** nothing — read-only.\n- **Side effects:** none.\n- **Afterwards:** the person sees the predicted-vs-actual report for the named item, or for every item when none is named.",
+        "after": "### check\n\n- **Runs when:** legacy description only; no `/fgOS:check` skill is shipped.\n- **What changes:** nothing — read-only.\n- **Side effects:** none.\n- **Afterwards:** the person sees the predicted-vs-actual report for the named item, or for every item when none is named.",
+        "ancestry": [
+          "Spec: fgOS Plugin (Claude Code slash-command surface)",
+          "Behaviors & Operations"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/claude-plugin/spec.md",
+        "anchor": "unheaded-block-16",
+        "unitKind": "unheaded-block",
+        "beforeDigest": "fd8bfcfe77b5019d779cae2f38067585409e1d8cceb5f0e767c515659ba4f1af",
+        "afterDigest": "198b783f76cc48a151d57bb5ecad73617c356411d147ae4374d67c274934918b",
+        "before": "- **Runs when:** invoked with or without an id.\n- **What changes:** nothing — read-only.\n- **Side effects:** none.\n- **Afterwards:** the person sees the predicted-vs-actual report for the named item, or for every item when none is named.",
+        "after": "- **Runs when:** legacy description only; no `/fgOS:check` skill is shipped.\n- **What changes:** nothing — read-only.\n- **Side effects:** none.\n- **Afterwards:** the person sees the predicted-vs-actual report for the named item, or for every item when none is named.",
+        "ancestry": [
+          "Spec: fgOS Plugin (Claude Code slash-command surface)",
+          "Behaviors & Operations",
+          "check"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/claude-plugin/spec.md",
+        "anchor": "business-rules",
+        "unitKind": "heading",
+        "beforeDigest": "72f2603abf50c2aa2cb7a5186ac082c7a92c95eb394172013eb76b06ba8163b9",
+        "afterDigest": "cfa6959da586958a88ea42331b22902773cd833a358b142574d13593c9af525e",
+        "before": "## Business Rules\n\n- **R1.** The plugin wraps exactly 12 verbs total: `submit`, `pick` (existing) plus `move`, `return`, `ask`, `answer` (manipulate), `ready`, `stale`, `rollup` (monitor), `check`, `graph`, `conflicts` (inspect) — added deliberately to cover convenience for manipulating, monitoring, and inspecting work, not to mirror every command the underlying tool exposes (per 7574fe5a).\n- **R2.** Every command is one-door-write: it only ever shells out to the underlying tool's own command for that verb — it never writes the work-item store directly.\n- **R3.** On a failing command, the person sees the real error and the command stops — it never retries with a guessed argument and never falls back silently.\n- **R4 (not yet implemented — see `docs/backlog.md`).** The remaining verbs the underlying tool exposes (`init`, `add`, `discover`, `compound`, `edit`, `decision`, `list`, `rebuild`, `repair`, `take`, `review`, `approve`, `reject`, `catchup`, `evolve`, `triage`, `docs-index`, `doc-sources`, `session`) have no plugin wrapper; a person needs them must use the underlying tool directly.",
+        "after": "## Business Rules\n\n- **R1.** The plugin wraps more than the original 12 verbs: shipped skills include `approve`, `list` and `triage`; `/fgOS:check` has no shipped skill, so this is a partial inventory of the shipped surface.\n- **R2.** Every command is one-door-write: it only ever shells out to the underlying tool's own command for that verb — it never writes the work-item store directly.\n- **R3.** On a failing command, the person sees the real error and the command stops — it never retries with a guessed argument and never falls back silently.\n- **R4.** Additional plugin wrappers are shipped, including `approve`, `list` and `triage`; the original remaining-verbs list is no longer a list of unimplemented wrappers.",
+        "ancestry": [
+          "Spec: fgOS Plugin (Claude Code slash-command surface)"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/claude-plugin/spec.md",
+        "anchor": "unheaded-block-21",
+        "unitKind": "unheaded-block",
+        "beforeDigest": "57301b02e1179ead982bc32b716f9c3afef040908df4c8885fda7999d10211ea",
+        "afterDigest": "542aa6780221f52af7820095996d0b162a74cba2340128ff3ea4dbbeb4a119e3",
+        "before": "- **R1.** The plugin wraps exactly 12 verbs total: `submit`, `pick` (existing) plus `move`, `return`, `ask`, `answer` (manipulate), `ready`, `stale`, `rollup` (monitor), `check`, `graph`, `conflicts` (inspect) — added deliberately to cover convenience for manipulating, monitoring, and inspecting work, not to mirror every command the underlying tool exposes (per 7574fe5a).\n- **R2.** Every command is one-door-write: it only ever shells out to the underlying tool's own command for that verb — it never writes the work-item store directly.\n- **R3.** On a failing command, the person sees the real error and the command stops — it never retries with a guessed argument and never falls back silently.\n- **R4 (not yet implemented — see `docs/backlog.md`).** The remaining verbs the underlying tool exposes (`init`, `add`, `discover`, `compound`, `edit`, `decision`, `list`, `rebuild`, `repair`, `take`, `review`, `approve`, `reject`, `catchup`, `evolve`, `triage`, `docs-index`, `doc-sources`, `session`) have no plugin wrapper; a person needs them must use the underlying tool directly.",
+        "after": "- **R1.** The plugin wraps more than the original 12 verbs: shipped skills include `approve`, `list` and `triage`; `/fgOS:check` has no shipped skill, so this is a partial inventory of the shipped surface.\n- **R2.** Every command is one-door-write: it only ever shells out to the underlying tool's own command for that verb — it never writes the work-item store directly.\n- **R3.** On a failing command, the person sees the real error and the command stops — it never retries with a guessed argument and never falls back silently.\n- **R4.** Additional plugin wrappers are shipped, including `approve`, `list` and `triage`; the original remaining-verbs list is no longer a list of unimplemented wrappers.",
+        "ancestry": [
+          "Spec: fgOS Plugin (Claude Code slash-command surface)",
+          "Business Rules"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/claude-plugin/spec.md",
+        "anchor": "open-gaps",
+        "unitKind": "heading",
+        "beforeDigest": "52301bf84a319adb6cdee3a52044843d2cd0741101effc937f33f3836a680f69",
+        "afterDigest": "1c4c9c17c18d25d57bc4e8eac5addd11d18c6461579925842e2abb6a21966d9e",
+        "before": "## Open Gaps\n\n- none — every entry point, behavior, and rule above is evidenced against the shipped skill files and the underlying tool's source.",
+        "after": "## Open Gaps\n\n- This partial spec retains the original surface descriptions; the expanded shipped skill set is not fully inventoried here, and `/fgOS:check` is not shipped.",
+        "ancestry": [
+          "Spec: fgOS Plugin (Claude Code slash-command surface)"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/claude-plugin/spec.md",
+        "anchor": "unheaded-block-23",
+        "unitKind": "unheaded-block",
+        "beforeDigest": "cfba02bb0c64c5f1e11aad85ce72d2127e002b8f7e28c505a3aff5ea0befc137",
+        "afterDigest": "493f04e9b160ae52c07e87a65bdb834ae38825f834a6ba98e9d398d49d7950cc",
+        "before": "- none — every entry point, behavior, and rule above is evidenced against the shipped skill files and the underlying tool's source.",
+        "after": "- This partial spec retains the original surface descriptions; the expanded shipped skill set is not fully inventoried here, and `/fgOS:check` is not shipped.",
+        "ancestry": [
+          "Spec: fgOS Plugin (Claude Code slash-command surface)",
+          "Open Gaps"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/claude-plugin/spec.md",
+        "anchor": "pointers-implementation",
+        "unitKind": "heading",
+        "beforeDigest": "0db8134dd4c57e1f3f765358e948e88027b955927b1b35bb74f22e94e02ba0db",
+        "afterDigest": "a59342013a31dbacd5d48cdbbb4b6ddd5e842c1e76558f9305e6f18ab5eab0b0",
+        "before": "## Pointers (implementation)\n\n- `repo/plugins/fgOS/.claude-plugin/plugin.json` — plugin manifest (name, description, version).\n- `repo/plugins/fgOS/skills/<verb>/SKILL.md` — one skill per verb (`submit`, `pick`, `move`, `return`, `ask`, `answer`, `ready`, `stale`, `rollup`, `check`, `graph`, `conflicts`); each wraps `fgos <verb> ...`, resolved via the project-local `bin/fgos.mjs` when present, else a global PATH install of `fgos`, else a clear stated error (tsk-1no) — never a raw Node \"Cannot find module\".\n- `repo/bin/fgos.mjs` — the underlying CLI every wrapper shells out to; owns argument validation and all lifecycle enforcement.\n- `docs/specs/work-state.md` — the lifecycle/FSM meaning behind `move`/`return`/`ask`/`answer` and every other verb's business rules.",
+        "after": "## Pointers (implementation)\n\n- `repo/plugins/fgOS/.claude-plugin/plugin.json` — plugin manifest (name, description, version).\n- `repo/plugins/fgOS/skills/<verb>/SKILL.md` — shipped skills including `submit`, `pick`, `move`, `return`, `ask`, `answer`, `ready`, `stale`, `rollup`, `graph`, `conflicts`, `approve`, `list` and `triage` (no `check` skill); each wraps `fgos <verb> ...`, resolved via the project-local `bin/fgos.mjs` when present, else a global PATH install of `fgos`, else a clear stated error (tsk-1no) — never a raw Node \"Cannot find module\".\n- `repo/bin/fgos.mjs` — the underlying CLI every wrapper shells out to; owns argument validation and all lifecycle enforcement.\n- `docs/specs/work-state.md` — the lifecycle/FSM meaning behind `move`/`return`/`ask`/`answer` and every other verb's business rules.",
+        "ancestry": [
+          "Spec: fgOS Plugin (Claude Code slash-command surface)"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/claude-plugin/spec.md",
+        "anchor": "unheaded-block-25",
+        "unitKind": "unheaded-block",
+        "beforeDigest": "9e819c07e10200717785bb78ce288f08488d76f33547a8874f589fa191967bd5",
+        "afterDigest": "4e3b4f507555fb6843e8d5e9f62011e33500cb02d4d6ca4f36628f94071df1dd",
+        "before": "- `repo/plugins/fgOS/.claude-plugin/plugin.json` — plugin manifest (name, description, version).\n- `repo/plugins/fgOS/skills/<verb>/SKILL.md` — one skill per verb (`submit`, `pick`, `move`, `return`, `ask`, `answer`, `ready`, `stale`, `rollup`, `check`, `graph`, `conflicts`); each wraps `fgos <verb> ...`, resolved via the project-local `bin/fgos.mjs` when present, else a global PATH install of `fgos`, else a clear stated error (tsk-1no) — never a raw Node \"Cannot find module\".\n- `repo/bin/fgos.mjs` — the underlying CLI every wrapper shells out to; owns argument validation and all lifecycle enforcement.\n- `docs/specs/work-state.md` — the lifecycle/FSM meaning behind `move`/`return`/`ask`/`answer` and every other verb's business rules.",
+        "after": "- `repo/plugins/fgOS/.claude-plugin/plugin.json` — plugin manifest (name, description, version).\n- `repo/plugins/fgOS/skills/<verb>/SKILL.md` — shipped skills including `submit`, `pick`, `move`, `return`, `ask`, `answer`, `ready`, `stale`, `rollup`, `graph`, `conflicts`, `approve`, `list` and `triage` (no `check` skill); each wraps `fgos <verb> ...`, resolved via the project-local `bin/fgos.mjs` when present, else a global PATH install of `fgos`, else a clear stated error (tsk-1no) — never a raw Node \"Cannot find module\".\n- `repo/bin/fgos.mjs` — the underlying CLI every wrapper shells out to; owns argument validation and all lifecycle enforcement.\n- `docs/specs/work-state.md` — the lifecycle/FSM meaning behind `move`/`return`/`ask`/`answer` and every other verb's business rules.",
+        "ancestry": [
+          "Spec: fgOS Plugin (Claude Code slash-command surface)",
+          "Pointers (implementation)"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/decision-citation-drift/spec.md",
+        "anchor": "spec-decision-citation-drift-check",
+        "unitKind": "heading",
+        "beforeDigest": "220c53cff76e8336290a335d8577e7bae5cc8394d137253ed17eb5956477d5ae",
+        "afterDigest": "c13987b412a65b196c3e686a1ce85481caa185ec2358f4fb43b7f330f3b8e7b5",
+        "before": "# Spec: Decision Citation Drift Check\n\n```txt\nDocument type: Specification\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve mapped legacy content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; current implementation truth is not certified\nProvenance: docs/specs/decision-citation-drift.md at 111adc51fd047d99121fd9d076eb4794c87045a4\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing carriage, placement and source conservation\nDo not use this for: Current canonical authority or implemented-behavior proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/specs/decision-citation-drift.md\nSupersedes: None; candidate only\nSuperseded by: None\n```\n\n> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions.\n\n\nA read-only detection check that scans the product backlog and area specs for\nlines that still cite a decision by its old id after that decision has been\nsuperseded, without also naming the decision that replaced it. Its purpose is\nto catch \"dead framing\" — a backlog row or spec line whose reasoning was\noverturned, but whose wording still reads as if the old decision were current,\nso a reader (human or agent) re-derives the outdated conclusion. Used by\nwhoever maintains `docs/backlog.md` and `docs/specs/*.md` (a human operator or\nan agent doing grooming/scribing).",
+        "after": "# Spec: Decision Citation Drift Check\n\n```txt\nDocument type: Specification\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve mapped legacy content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; current implementation truth is not certified\nProvenance: docs/specs/decision-citation-drift.md at 111adc51fd047d99121fd9d076eb4794c87045a4\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing carriage, placement and source conservation\nDo not use this for: Current canonical authority or implemented-behavior proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/specs/decision-citation-drift.md\nSupersedes: None; candidate only\nSuperseded by: None\n```\n\n> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions. Truth correction (A40/A19): only identified false current sentences corrected; evidence: scripts/check-decision-citation-drift.mjs:16-20; docs/decisions/index.md:1; package.json:1; scripts/check-decision-citation-drift.mjs:1-34; no tracked .bee/config.json or CI trigger. A22 rebindings are pending; no truth approval carried.\n\n\nA read-only detection check that scans the product backlog and area specs for\nlines that still cite a decision by its old id after that decision has been\nsuperseded, without also naming the decision that replaced it. Its purpose is\nto catch \"dead framing\" — a backlog row or spec line whose reasoning was\noverturned, but whose wording still reads as if the old decision were current,\nso a reader (human or agent) re-derives the outdated conclusion. Used by\nwhoever maintains `docs/backlog.md` and `docs/specs/*.md` (a human operator or\nan agent doing grooming/scribing).",
+        "ancestry": [],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/decision-citation-drift/spec.md",
+        "anchor": "unheaded-block-3",
+        "unitKind": "unheaded-block",
+        "beforeDigest": "7a16f93c0d7d23c5915d7afe7e93d6b32d9eda0b659d66f240912d863eeaa196",
+        "afterDigest": "4337bf49c9fccc2fa7d50292178cdae501ad871c834b510ee7c0b33f14c0fd2a",
+        "before": "> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions.",
+        "after": "> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions. Truth correction (A40/A19): only identified false current sentences corrected; evidence: scripts/check-decision-citation-drift.mjs:16-20; docs/decisions/index.md:1; package.json:1; scripts/check-decision-citation-drift.mjs:1-34; no tracked .bee/config.json or CI trigger. A22 rebindings are pending; no truth approval carried.",
+        "ancestry": [
+          "Spec: Decision Citation Drift Check"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/decision-citation-drift/spec.md",
+        "anchor": "data-dictionary",
+        "unitKind": "heading",
+        "beforeDigest": "f327b12e6765878263e7c6ff7a5d9c1cf5171fa017c71b3a0e24b2e59044eea7",
+        "afterDigest": "0469137fcd78cd85fe5320a1300302dd1db0440c0cd537d3ff23dd84496ca1f2",
+        "before": "## Data Dictionary\n\n| # | Element | Meaning | Values | Required | Default |\n|---|---------|---------|--------|----------|---------|\n| 1 | Decision id | The 4-digit id of a decision record under the decisions directory | 4 digits, e.g. `0002` | yes | — |\n| 2 | Superseded-by id | The id of the decision that replaced a given decision, read from that decision's own front matter | 4 digits | no (absent when a decision was never superseded) | — |\n| 3 | Cited id (in a scanned line) | A decision id referenced in a backlog row or spec line | written either as `ADR<4-digit>` or as a bare 4-digit number that matches a known decision id | — | — |\n| 4 | Finding | One flagged line | `{kind: \"dead-framing\", file, line, id, supersededBy, message}` | — | — |\n| 5 | Scan scope | Which files are scanned | the backlog file + every file in the specs directory | — | fixed: `docs/backlog.md` + `docs/specs/*.md` |",
+        "after": "## Data Dictionary\n\n| # | Element | Meaning | Values | Required | Default |\n|---|---------|---------|--------|----------|---------|\n| 1 | Decision id | The 4-digit id of a legacy decision record read by the parser; this repo's hand-authored decisions corpus is retired | 4 digits, e.g. `0002` | yes | — |\n| 2 | Superseded-by id | The id of the decision that replaced a given decision, read from that decision's own front matter | 4 digits | no (absent when a decision was never superseded) | — |\n| 3 | Cited id (in a scanned line) | A decision id referenced in a backlog row or spec line | written either as `ADR<4-digit>` or as a bare 4-digit number that matches a known decision id | — | — |\n| 4 | Finding | One flagged line | `{kind: \"dead-framing\", file, line, id, supersededBy, message}` | — | — |\n| 5 | Scan scope | Which files are scanned | the backlog file + every file in the specs directory | — | fixed: `docs/backlog.md` + `docs/specs/*.md` |",
+        "ancestry": [
+          "Spec: Decision Citation Drift Check"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/decision-citation-drift/spec.md",
+        "anchor": "unheaded-block-6",
+        "unitKind": "unheaded-block",
+        "beforeDigest": "ddc10a212e811df7dfee1b3c902aa0417b08473aad551911cc5e52a0a2dc2ff8",
+        "afterDigest": "a8b3b87460680963a648678fccb82b1b76b9aba04c24aaea49f0f8ef3eaec55e",
+        "before": "| # | Element | Meaning | Values | Required | Default |\n|---|---------|---------|--------|----------|---------|\n| 1 | Decision id | The 4-digit id of a decision record under the decisions directory | 4 digits, e.g. `0002` | yes | — |\n| 2 | Superseded-by id | The id of the decision that replaced a given decision, read from that decision's own front matter | 4 digits | no (absent when a decision was never superseded) | — |\n| 3 | Cited id (in a scanned line) | A decision id referenced in a backlog row or spec line | written either as `ADR<4-digit>` or as a bare 4-digit number that matches a known decision id | — | — |\n| 4 | Finding | One flagged line | `{kind: \"dead-framing\", file, line, id, supersededBy, message}` | — | — |\n| 5 | Scan scope | Which files are scanned | the backlog file + every file in the specs directory | — | fixed: `docs/backlog.md` + `docs/specs/*.md` |",
+        "after": "| # | Element | Meaning | Values | Required | Default |\n|---|---------|---------|--------|----------|---------|\n| 1 | Decision id | The 4-digit id of a legacy decision record read by the parser; this repo's hand-authored decisions corpus is retired | 4 digits, e.g. `0002` | yes | — |\n| 2 | Superseded-by id | The id of the decision that replaced a given decision, read from that decision's own front matter | 4 digits | no (absent when a decision was never superseded) | — |\n| 3 | Cited id (in a scanned line) | A decision id referenced in a backlog row or spec line | written either as `ADR<4-digit>` or as a bare 4-digit number that matches a known decision id | — | — |\n| 4 | Finding | One flagged line | `{kind: \"dead-framing\", file, line, id, supersededBy, message}` | — | — |\n| 5 | Scan scope | Which files are scanned | the backlog file + every file in the specs directory | — | fixed: `docs/backlog.md` + `docs/specs/*.md` |",
+        "ancestry": [
+          "Spec: Decision Citation Drift Check",
+          "Data Dictionary"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/decision-citation-drift/spec.md",
+        "anchor": "open-gaps",
+        "unitKind": "heading",
+        "beforeDigest": "2feb5276d5dc970b753498733b260a49392fe2200c9d02aaa915e5ed51cdd86d",
+        "afterDigest": "739844989064aa19abd787360c52e156c6f0d65cfc4b8055a61179252e13777e",
+        "before": "## Open Gaps\n\n- Not wired into any automated gate: neither an npm script, `.bee/config.json`\n  `commands.verify`, nor a CI workflow runs this check today. It must be\n  invoked manually, so citation drift can persist undetected between manual\n  runs. Answerable by whoever next wires a backlog/spec consistency gate.\n- No auto-fix: a flagged line's acknowledgement of the superseding id must be\n  added by hand; the check only ever reports.",
+        "after": "## Open Gaps\n\n- Not wired into any automated gate: neither an npm script nor a CI workflow runs this check today. It must be\n  invoked manually, so citation drift can persist undetected between manual\n  runs. Answerable by whoever next wires a backlog/spec consistency gate.\n- No auto-fix: a flagged line's acknowledgement of the superseding id must be\n  added by hand; the check only ever reports.",
+        "ancestry": [
+          "Spec: Decision Citation Drift Check"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/decision-citation-drift/spec.md",
+        "anchor": "unheaded-block-11",
+        "unitKind": "unheaded-block",
+        "beforeDigest": "7a22bf47723aee067c9ee720b0fc8d75121b13f4aeb9aa8ed233d20da9c93500",
+        "afterDigest": "74df64aecf9677de9fdd24b2fea746ba82c190499b3e7b84c32632f78ed8c5c8",
+        "before": "- Not wired into any automated gate: neither an npm script, `.bee/config.json`\n  `commands.verify`, nor a CI workflow runs this check today. It must be\n  invoked manually, so citation drift can persist undetected between manual\n  runs. Answerable by whoever next wires a backlog/spec consistency gate.\n- No auto-fix: a flagged line's acknowledgement of the superseding id must be\n  added by hand; the check only ever reports.",
+        "after": "- Not wired into any automated gate: neither an npm script nor a CI workflow runs this check today. It must be\n  invoked manually, so citation drift can persist undetected between manual\n  runs. Answerable by whoever next wires a backlog/spec consistency gate.\n- No auto-fix: a flagged line's acknowledgement of the superseding id must be\n  added by hand; the check only ever reports.",
+        "ancestry": [
+          "Spec: Decision Citation Drift Check",
+          "Open Gaps"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/spec.md",
+        "anchor": "spec-herdr-web-dashboard-browser-surface-for-fgos-work",
+        "unitKind": "heading",
+        "beforeDigest": "fc4b99a650816005c9c724dfcb6964cccd401a8bfa963fd29af1d9eb669e4722",
+        "afterDigest": "4801d2363f66799ebd1c2d07e63d8846092df4de43f35c384497f71417fa932f",
+        "before": "# Spec: herdr Web Dashboard (browser surface for fgOS work)\n\n```txt\nDocument type: Specification\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve mapped legacy content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; current implementation truth is not certified\nProvenance: docs/specs/herdr-web-dashboard.md at 111adc51fd047d99121fd9d076eb4794c87045a4\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing carriage, placement and source conservation\nDo not use this for: Current canonical authority or implemented-behavior proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/specs/herdr-web-dashboard.md\nSupersedes: None; candidate only\nSuperseded by: None\n```\n\n> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions.",
+        "after": "# Spec: herdr Web Dashboard (browser surface for fgOS work)\n\n```txt\nDocument type: Specification\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve mapped legacy content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; current implementation truth is not certified\nProvenance: docs/specs/herdr-web-dashboard.md at 111adc51fd047d99121fd9d076eb4794c87045a4\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing carriage, placement and source conservation\nDo not use this for: Current canonical authority or implemented-behavior proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/specs/herdr-web-dashboard.md\nSupersedes: None; candidate only\nSuperseded by: None\n```\n\n> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions. Truth correction (A40/A19): only identified false current sentences corrected; evidence: docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md:5-8; docs/specs/platform-foundations.md:179-184; docs/decisions/index.md:1; apps/fgos-gateway/src/gateway.rs:42,174; src/setup/registrations.mjs:3468-3470; docs/contracts/fgos-gateway-api-v1.yaml:82-599 (19 path keys); docs/contracts/fgos-gateway-api-v1.yaml:212-222; apps/fgos-gateway/src/gateway.rs:687-707. A22 rebindings are pending; no truth approval carried.",
+        "ancestry": [],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/spec.md",
+        "anchor": "unheaded-block-3",
+        "unitKind": "unheaded-block",
+        "beforeDigest": "7a16f93c0d7d23c5915d7afe7e93d6b32d9eda0b659d66f240912d863eeaa196",
+        "afterDigest": "389766338cbb1db768db41ba97d799313c92ce04edec7301dc305b78fc73051f",
+        "before": "> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions.",
+        "after": "> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions. Truth correction (A40/A19): only identified false current sentences corrected; evidence: docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md:5-8; docs/specs/platform-foundations.md:179-184; docs/decisions/index.md:1; apps/fgos-gateway/src/gateway.rs:42,174; src/setup/registrations.mjs:3468-3470; docs/contracts/fgos-gateway-api-v1.yaml:82-599 (19 path keys); docs/contracts/fgos-gateway-api-v1.yaml:212-222; apps/fgos-gateway/src/gateway.rs:687-707. A22 rebindings are pending; no truth approval carried.",
+        "ancestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/spec.md",
+        "anchor": "purpose",
+        "unitKind": "heading",
+        "beforeDigest": "f1ff4f235336b1e131ee0185c562288043d9f1dc54231d3bf84360406893d587",
+        "afterDigest": "ef2a1ed7582f5cbc052018fe9df390a369bc5fa302495a1fbea230ffb6e42a61",
+        "before": "## Purpose\n\nThe web dashboard is a browser surface for watching fgOS work and answering\nthe questions it raises, from a device that is not the developer's machine.\n\nThe need it exists for is concrete, and it is the reason the design looks the\nway it does: the product owner wants to **review and approve from a phone**,\nand at exactly that moment there is usually no cockpit terminal open\n(rationale: `docs/history/herdr-web-dashboard/CONTEXT.md`'s own rationale section for the child-process decision — the dashboard runs as a child process that outlives the cockpit pane, precisely so it does not vanish when the terminal closes). A surface that\nonly lives as long as a terminal pane is absent precisely when it is needed.\n\nThree things bound this surface:\n\n- It runs **alongside** the herdr TUI, never replacing it (boundary: the web dashboard belongs to the fgos gateway, `apps/fgos-gateway/`; it runs alongside, not instead of, the `herdr-dashboard` TUI plugin). A\n  person at a terminal keeps the TUI; the dashboard serves the person who is\n  not at one.\n- It is an **independent client project**, not server code inside the gateway\n  (per fgos-interface-daemon — gateway and TUI sit behind hexagonal ports; the web client is a separate adapter calling in from outside). Its source lives at `apps/fgos-gateway/web/`; the fgos gateway embeds the built bundle and serves it, which is hosting, not ownership of any API logic. It calls the gateway's REST/RPC API from the outside,\n  which is what decision `0014` requires of any non-terminal UI. An earlier\n  decision of this feature (tsk-ldb's own — web dashboard as a new subsystem inside the former single herdr crate) proposed embedding an HTTP server\n  directly in the former combined gateway-and-TUI binary (since split into `fgos-gateway` and `herdr-dashboard`); that branch is closed — cite fgos-interface-daemon's hexagonal-ports decision, not\n  tsk-ldb's original one, for where the web client lives.\n- It never becomes a second write path. Every change it makes goes through\n  an fgOS one-door-write verb executed by the gateway (R2 below).\n\n**Out of scope for this spec.** Question authoring quality at the source\n(`tsk-539`, deliberately decoupled — tsk-ldb and tsk-539 stay scope-separated). Multi-project port/identity\nmechanics (`tsk-3b0` — multi-project port/identity handling is deferred to tsk-3b0). The concrete visual layout, colour and\ntypography (`tsk-3x6`, `docs/reference/herdr-web-dashboard-layout.md`) — this\nspec states what an actor expects to be able to do, never how it is drawn.",
+        "after": "## Purpose\n\nThe web dashboard is a browser surface for watching fgOS work and answering\nthe questions it raises, from a device that is not the developer's machine.\n\nThe need it exists for is concrete, and it is the reason the design looks the\nway it does: the product owner wants to **review and approve from a phone**,\nand at exactly that moment there is usually no cockpit terminal open\n(rationale: `docs/history/herdr-web-dashboard/CONTEXT.md`'s own rationale section for the child-process decision — the dashboard runs as a child process that outlives the cockpit pane, precisely so it does not vanish when the terminal closes). A surface that\nonly lives as long as a terminal pane is absent precisely when it is needed.\n\nThree things bound this surface:\n\n- It runs **alongside** the herdr TUI, never replacing it (boundary: the web dashboard belongs to the fgos gateway, `apps/fgos-gateway/`; it runs alongside, not instead of, the `herdr-dashboard` TUI plugin). A\n  person at a terminal keeps the TUI; the dashboard serves the person who is\n  not at one.\n- It is an **independent client project**, not server code inside the gateway\n  (per fgos-interface-daemon — gateway and TUI sit behind hexagonal ports; the web client is a separate adapter calling in from outside). Its source lives at `apps/fgos-gateway/web/`; the fgos gateway embeds the built bundle and serves it, which is hosting, not ownership of any API logic. It calls the gateway's REST/RPC API from the outside,\n  which is what decision `0014` requires of any non-terminal UI. An earlier\n  decision of this feature (tsk-ldb's own — web dashboard as a new subsystem inside the former single herdr crate) proposed embedding an HTTP server\n  directly in the former combined gateway-and-TUI binary (since split into `fgos-gateway` and `herdr-dashboard`); that branch is closed — cite fgos-interface-daemon's hexagonal-ports decision, not\n  tsk-ldb's original one, for where the web client lives.\n- It never becomes a second write path. Every change it makes goes through\n  an fgOS one-door-write verb executed by the gateway (R2 below).\n\n**Out of scope for this spec.** Question authoring quality at the source\n(`tsk-539`, deliberately decoupled — tsk-ldb and tsk-539 stay scope-separated). Multi-project port/identity\nmechanics (`tsk-3b0` — multi-project port/identity handling is deferred to tsk-3b0). The concrete visual layout, colour and\ntypography (`tsk-3x6`, `docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md`) — this\nspec states what an actor expects to be able to do, never how it is drawn.",
+        "ancestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/spec.md",
+        "anchor": "unheaded-block-8",
+        "unitKind": "unheaded-block",
+        "beforeDigest": "95e0c20e567a40e3bb624dd8e039e6f08b3f079260bbe5fba7a95b53f03197d8",
+        "afterDigest": "0c0821a2f7c97ab9efc90ea2a3ddfafe182807e1e63acd44862f60ce730a81ac",
+        "before": "**Out of scope for this spec.** Question authoring quality at the source\n(`tsk-539`, deliberately decoupled — tsk-ldb and tsk-539 stay scope-separated). Multi-project port/identity\nmechanics (`tsk-3b0` — multi-project port/identity handling is deferred to tsk-3b0). The concrete visual layout, colour and\ntypography (`tsk-3x6`, `docs/reference/herdr-web-dashboard-layout.md`) — this\nspec states what an actor expects to be able to do, never how it is drawn.",
+        "after": "**Out of scope for this spec.** Question authoring quality at the source\n(`tsk-539`, deliberately decoupled — tsk-ldb and tsk-539 stay scope-separated). Multi-project port/identity\nmechanics (`tsk-3b0` — multi-project port/identity handling is deferred to tsk-3b0). The concrete visual layout, colour and\ntypography (`tsk-3x6`, `docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md`) — this\nspec states what an actor expects to be able to do, never how it is drawn.",
+        "ancestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)",
+          "Purpose"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/spec.md",
+        "anchor": "entry-points-triggers",
+        "unitKind": "heading",
+        "beforeDigest": "44a01f946d9c3f460bbcf473ebb31d1c1911d455e66846c50ddd05c3fd30471e",
+        "afterDigest": "8a8bbf7b6a16f552ae3fbb6a38fdf71f7e86b7de9853c6da29e9958ab0aba79a",
+        "before": "## Entry Points & Triggers\n\n- **Open the dashboard.** A person opens the dashboard's address in a browser\n  on any device that can reach the machine. The first interaction is always\n  sign-in; there is no anonymous view (mandatory token auth from v1, not deferred to a later version).\n- **Open the taskboard.** The default landing surface once signed in: every\n  work item on the connected project, grouped so the person can see state at a\n  glance.\n- **Open one task's detail.** From the taskboard, or directly by address.\n- **Open \"questions needing answer\".** The list of everything currently\n  waiting on a person — covering **both** channels, `ask` questions and\n  `gate-approve` questions (question-needing-answer covers both channels), not just the `ask` channel.\n- **Availability trigger (not a person's action).** The dashboard is reachable\n  whenever its own process is running. That process is started and stopped\n  from the cockpit but **outlives the cockpit pane** — closing the cockpit does\n  not stop the dashboard (it runs as a child process outliving the cockpit pane). It is enabled by default (its own config toggle defaults ON, unlike other auto-launch toggles), listens on the\n  configured bind address (default reaches beyond loopback — binds 0.0.0.0 by default, bind address configurable, warns when non-loopback) and on port\n  8788 (its config section carries a port field, defaulting to 8788).\n- **No outbound trigger exists.** Nothing notifies the person that a question\n  is waiting; they have to come and look. A push/attention channel is a\n  different, unbuilt capability (`docs/io-contract.md` §Ranh giới — STR48).",
+        "after": "## Entry Points & Triggers\n\n- **Open the dashboard.** A person opens the dashboard's address in a browser\n  on any device that can reach the machine. The first interaction is always\n  sign-in; there is no anonymous view (mandatory token auth from v1, not deferred to a later version).\n- **Open the taskboard.** The default landing surface once signed in: every\n  work item on the connected project, grouped so the person can see state at a\n  glance.\n- **Open one task's detail.** From the taskboard, or directly by address.\n- **Open \"questions needing answer\".** The list of everything currently\n  waiting on a person — covering **both** channels, `ask` questions and\n  `gate-approve` questions (question-needing-answer covers both channels), not just the `ask` channel.\n- **Availability trigger (not a person's action).** The dashboard is reachable\n  whenever its own process is running. That process is started and stopped\n  from the cockpit but **outlives the cockpit pane** — closing the cockpit does\n  not stop the dashboard (it runs as a child process outliving the cockpit pane). Static serving defaults ON (`herdrWebDashboard.staticServing`); the gateway started with `fgos gateway start` listens on the\n  configured bind address (default reaches beyond loopback — binds 0.0.0.0 by default, bind address configurable, warns when non-loopback) and on port\n  4170 by default (`gateway.port` overrides it).\n- **No outbound trigger exists.** Nothing notifies the person that a question\n  is waiting; they have to come and look. A push/attention channel is a\n  different, unbuilt capability (`docs/io-contract.md` §Ranh giới — STR48).",
+        "ancestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/spec.md",
+        "anchor": "unheaded-block-9",
+        "unitKind": "unheaded-block",
+        "beforeDigest": "6fe8b44476ba00c6aa3e5c46960ec7e060c6186fffd0f444669a3bc8950cb176",
+        "afterDigest": "8de029edb99b82340cfc8c7d129d09c9cb7d493ac7e17bc2008056f4eb0290ec",
+        "before": "- **Open the dashboard.** A person opens the dashboard's address in a browser\n  on any device that can reach the machine. The first interaction is always\n  sign-in; there is no anonymous view (mandatory token auth from v1, not deferred to a later version).\n- **Open the taskboard.** The default landing surface once signed in: every\n  work item on the connected project, grouped so the person can see state at a\n  glance.\n- **Open one task's detail.** From the taskboard, or directly by address.\n- **Open \"questions needing answer\".** The list of everything currently\n  waiting on a person — covering **both** channels, `ask` questions and\n  `gate-approve` questions (question-needing-answer covers both channels), not just the `ask` channel.\n- **Availability trigger (not a person's action).** The dashboard is reachable\n  whenever its own process is running. That process is started and stopped\n  from the cockpit but **outlives the cockpit pane** — closing the cockpit does\n  not stop the dashboard (it runs as a child process outliving the cockpit pane). It is enabled by default (its own config toggle defaults ON, unlike other auto-launch toggles), listens on the\n  configured bind address (default reaches beyond loopback — binds 0.0.0.0 by default, bind address configurable, warns when non-loopback) and on port\n  8788 (its config section carries a port field, defaulting to 8788).\n- **No outbound trigger exists.** Nothing notifies the person that a question\n  is waiting; they have to come and look. A push/attention channel is a\n  different, unbuilt capability (`docs/io-contract.md` §Ranh giới — STR48).",
+        "after": "- **Open the dashboard.** A person opens the dashboard's address in a browser\n  on any device that can reach the machine. The first interaction is always\n  sign-in; there is no anonymous view (mandatory token auth from v1, not deferred to a later version).\n- **Open the taskboard.** The default landing surface once signed in: every\n  work item on the connected project, grouped so the person can see state at a\n  glance.\n- **Open one task's detail.** From the taskboard, or directly by address.\n- **Open \"questions needing answer\".** The list of everything currently\n  waiting on a person — covering **both** channels, `ask` questions and\n  `gate-approve` questions (question-needing-answer covers both channels), not just the `ask` channel.\n- **Availability trigger (not a person's action).** The dashboard is reachable\n  whenever its own process is running. That process is started and stopped\n  from the cockpit but **outlives the cockpit pane** — closing the cockpit does\n  not stop the dashboard (it runs as a child process outliving the cockpit pane). Static serving defaults ON (`herdrWebDashboard.staticServing`); the gateway started with `fgos gateway start` listens on the\n  configured bind address (default reaches beyond loopback — binds 0.0.0.0 by default, bind address configurable, warns when non-loopback) and on port\n  4170 by default (`gateway.port` overrides it).\n- **No outbound trigger exists.** Nothing notifies the person that a question\n  is waiting; they have to come and look. A push/attention channel is a\n  different, unbuilt capability (`docs/io-contract.md` §Ranh giới — STR48).",
+        "ancestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)",
+          "Entry Points & Triggers"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/spec.md",
+        "anchor": "business-rules",
+        "unitKind": "heading",
+        "beforeDigest": "aa8a1d069167968c4413d8380b065b9c70db60827dcffc5551b0dd8f66240125",
+        "afterDigest": "724a5a0d50b4eff3931f4914e25965bede8af8febc8ce77a8a0c47fa6742e9de",
+        "before": "## Business Rules\n\n- **R1.** The surface is a client of the gateway's API, never an embedded\n  server inside the former combined binary (per fgos-interface-daemon's hexagonal-ports decision, decision `0014`). It is built to\n  address more than one gateway, so no single fixed origin may be baked into\n  it (per fgos-interface-daemon's per-machine-scope decision).\n- **R2.** Every write goes through an fgOS one-door-write verb — `answer`\n  (forwarding `--approve` when `approve: true`), `approve`, the intake verb, `edit`,\n  `move` (forwarding `--approve` when `approve: true`) — executed by the gateway, which\n  is the sole component that runs those verbs on a client's behalf (per fgos-interface-daemon — gateway is the sole chokepoint that ever spawns fgos verbs). The web surface never writes fgOS state directly. No second write path\n  is introduced by anything in this spec.\n- **R3.** A person may not read anything before signing in (mandatory token auth from v1). Sign-in is\n  token-based, and every failure is indistinguishable from \"nothing here\"\n  (an opaque 404, never 401). A second, alternative credential path exists in the design and, if\n  used, must verify its assertion's signature properly rather than trusting a\n  header (the two-layer additive auth design — cookie session plus an optional cf-access JWT that must be cryptographically verified, never trusted on the header alone).\n- **R4.** The token is never stored anywhere that is committed. It comes from\n  the environment when set; otherwise it is generated into a local file that\n  is excluded from version control and readable only by its owner.\n- **R5.** The surface is enabled by default (its own config toggle defaults ON, unlike other auto-launch toggles) and its default bind reaches\n  beyond loopback (binds 0.0.0.0 by default, bind address configurable), with a warning raised when the bind is not loopback.\n  Its port is 8788, chosen to coexist with the neighbouring service on 8787\n  (its config section carries a port field, defaulting to 8788).\n- **R6.** The dashboard's lifetime is independent of the cockpit's. Closing a\n  cockpit pane does not stop it (it runs as a child process outliving the cockpit pane).\n- **R7.** A merge approval can only be performed where fgOS allows it: the\n  `approve` verb structurally refuses to run from a linked worktree and\n  requires the repository's main working tree. This is a real mechanical\n  constraint on the deployment, not a UI concern — a gateway positioned\n  anywhere else cannot offer this operation at all, and the surface must\n  report that honestly rather than appearing to offer it.\n- **R8.** The combination of R5 (on by default, bind beyond loopback) and the\n  write operations above means **the first run of the cockpit exposes a\n  trunk-changing surface on the network, without anyone having chosen to**.\n  The token (R3/R4) is therefore not a hardening layer that can be traded away\n  for convenience — it is the only thing holding the surface closed. The\n  product owner decided this default having been shown this exact consequence\n  (rationale: `docs/history/herdr-web-dashboard/CONTEXT.md`'s own consequences section for the on-by-default decision), and the\n  write operations added later raise its weight rather than changing the\n  decision.\n- **R9.** Questions and answers are paired positionally, by order of\n  recording, with no linking key added to the underlying records — the record\n  shape is deliberately unchanged.\n- **R10.** The narrative written for humans is the primary account of what an\n  agent did; the machine-side decision log is secondary detail.\n- **R11.** Nothing on this surface pushes to a person. Being informed is a\n  pull: the person opens the dashboard and looks.",
+        "after": "## Business Rules\n\n- **R1.** The surface is a client of the gateway's API, never an embedded\n  server inside the former combined binary (per fgos-interface-daemon's hexagonal-ports decision, decision `0014`). It is built to\n  address more than one gateway, so no single fixed origin may be baked into\n  it (per fgos-interface-daemon's per-machine-scope decision).\n- **R2.** Every write goes through an fgOS one-door-write verb — `answer`\n  (forwarding `--approve` when `approve: true`), `approve`, the intake verb, `edit`,\n  `move` (forwarding `--approve` when `approve: true`) — executed by the gateway, which\n  is the sole component that runs those verbs on a client's behalf (per fgos-interface-daemon — gateway is the sole chokepoint that ever spawns fgos verbs). The web surface never writes fgOS state directly. No second write path\n  is introduced by anything in this spec.\n- **R3.** A person may not read anything before signing in (mandatory token auth from v1). Sign-in is\n  token-based, and every failure is indistinguishable from \"nothing here\"\n  (an opaque 404, never 401). A second, alternative credential path exists in the design and, if\n  used, must verify its assertion's signature properly rather than trusting a\n  header (the two-layer additive auth design — cookie session plus an optional cf-access JWT that must be cryptographically verified, never trusted on the header alone).\n- **R4.** The token is never stored anywhere that is committed. It comes from\n  the environment when set; otherwise it is generated into a local file that\n  is excluded from version control and readable only by its owner.\n- **R5.** Static serving defaults ON (`herdrWebDashboard.staticServing`), while gateway lifecycle is controlled by `fgos gateway start`; its default bind reaches\n  beyond loopback (binds 0.0.0.0 by default, bind address configurable), with a warning raised when the bind is not loopback.\n  Its port defaults to 4170; the override is `gateway.port`.\n- **R6.** The dashboard's lifetime is independent of the cockpit's. Closing a\n  cockpit pane does not stop it (it runs as a child process outliving the cockpit pane).\n- **R7.** A merge approval can only be performed where fgOS allows it: the\n  `approve` verb structurally refuses to run from a linked worktree and\n  requires the repository's main working tree. This is a real mechanical\n  constraint on the deployment, not a UI concern — a gateway positioned\n  anywhere else cannot offer this operation at all, and the surface must\n  report that honestly rather than appearing to offer it.\n- **R8.** The combination of R5 (on by default, bind beyond loopback) and the\n  write operations above means **the first run of the cockpit exposes a\n  trunk-changing surface on the network, without anyone having chosen to**.\n  The token (R3/R4) is therefore not a hardening layer that can be traded away\n  for convenience — it is the only thing holding the surface closed. The\n  product owner decided this default having been shown this exact consequence\n  (rationale: `docs/history/herdr-web-dashboard/CONTEXT.md`'s own consequences section for the on-by-default decision), and the\n  write operations added later raise its weight rather than changing the\n  decision.\n- **R9.** Questions and answers are paired positionally, by order of\n  recording, with no linking key added to the underlying records — the record\n  shape is deliberately unchanged.\n- **R10.** The narrative written for humans is the primary account of what an\n  agent did; the machine-side decision log is secondary detail.\n- **R11.** Nothing on this surface pushes to a person. Being informed is a\n  pull: the person opens the dashboard and looks.",
+        "ancestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/spec.md",
+        "anchor": "unheaded-block-23",
+        "unitKind": "unheaded-block",
+        "beforeDigest": "7d9e2d425937e495926bbff08bacc8e77e9781253b5c83692215e62cf6da2913",
+        "afterDigest": "50fa0c8fa5d1a3a43503513fe324791f37d4da34be798177f14520d04c6cf98b",
+        "before": "- **R1.** The surface is a client of the gateway's API, never an embedded\n  server inside the former combined binary (per fgos-interface-daemon's hexagonal-ports decision, decision `0014`). It is built to\n  address more than one gateway, so no single fixed origin may be baked into\n  it (per fgos-interface-daemon's per-machine-scope decision).\n- **R2.** Every write goes through an fgOS one-door-write verb — `answer`\n  (forwarding `--approve` when `approve: true`), `approve`, the intake verb, `edit`,\n  `move` (forwarding `--approve` when `approve: true`) — executed by the gateway, which\n  is the sole component that runs those verbs on a client's behalf (per fgos-interface-daemon — gateway is the sole chokepoint that ever spawns fgos verbs). The web surface never writes fgOS state directly. No second write path\n  is introduced by anything in this spec.\n- **R3.** A person may not read anything before signing in (mandatory token auth from v1). Sign-in is\n  token-based, and every failure is indistinguishable from \"nothing here\"\n  (an opaque 404, never 401). A second, alternative credential path exists in the design and, if\n  used, must verify its assertion's signature properly rather than trusting a\n  header (the two-layer additive auth design — cookie session plus an optional cf-access JWT that must be cryptographically verified, never trusted on the header alone).\n- **R4.** The token is never stored anywhere that is committed. It comes from\n  the environment when set; otherwise it is generated into a local file that\n  is excluded from version control and readable only by its owner.\n- **R5.** The surface is enabled by default (its own config toggle defaults ON, unlike other auto-launch toggles) and its default bind reaches\n  beyond loopback (binds 0.0.0.0 by default, bind address configurable), with a warning raised when the bind is not loopback.\n  Its port is 8788, chosen to coexist with the neighbouring service on 8787\n  (its config section carries a port field, defaulting to 8788).\n- **R6.** The dashboard's lifetime is independent of the cockpit's. Closing a\n  cockpit pane does not stop it (it runs as a child process outliving the cockpit pane).\n- **R7.** A merge approval can only be performed where fgOS allows it: the\n  `approve` verb structurally refuses to run from a linked worktree and\n  requires the repository's main working tree. This is a real mechanical\n  constraint on the deployment, not a UI concern — a gateway positioned\n  anywhere else cannot offer this operation at all, and the surface must\n  report that honestly rather than appearing to offer it.\n- **R8.** The combination of R5 (on by default, bind beyond loopback) and the\n  write operations above means **the first run of the cockpit exposes a\n  trunk-changing surface on the network, without anyone having chosen to**.\n  The token (R3/R4) is therefore not a hardening layer that can be traded away\n  for convenience — it is the only thing holding the surface closed. The\n  product owner decided this default having been shown this exact consequence\n  (rationale: `docs/history/herdr-web-dashboard/CONTEXT.md`'s own consequences section for the on-by-default decision), and the\n  write operations added later raise its weight rather than changing the\n  decision.\n- **R9.** Questions and answers are paired positionally, by order of\n  recording, with no linking key added to the underlying records — the record\n  shape is deliberately unchanged.\n- **R10.** The narrative written for humans is the primary account of what an\n  agent did; the machine-side decision log is secondary detail.\n- **R11.** Nothing on this surface pushes to a person. Being informed is a\n  pull: the person opens the dashboard and looks.",
+        "after": "- **R1.** The surface is a client of the gateway's API, never an embedded\n  server inside the former combined binary (per fgos-interface-daemon's hexagonal-ports decision, decision `0014`). It is built to\n  address more than one gateway, so no single fixed origin may be baked into\n  it (per fgos-interface-daemon's per-machine-scope decision).\n- **R2.** Every write goes through an fgOS one-door-write verb — `answer`\n  (forwarding `--approve` when `approve: true`), `approve`, the intake verb, `edit`,\n  `move` (forwarding `--approve` when `approve: true`) — executed by the gateway, which\n  is the sole component that runs those verbs on a client's behalf (per fgos-interface-daemon — gateway is the sole chokepoint that ever spawns fgos verbs). The web surface never writes fgOS state directly. No second write path\n  is introduced by anything in this spec.\n- **R3.** A person may not read anything before signing in (mandatory token auth from v1). Sign-in is\n  token-based, and every failure is indistinguishable from \"nothing here\"\n  (an opaque 404, never 401). A second, alternative credential path exists in the design and, if\n  used, must verify its assertion's signature properly rather than trusting a\n  header (the two-layer additive auth design — cookie session plus an optional cf-access JWT that must be cryptographically verified, never trusted on the header alone).\n- **R4.** The token is never stored anywhere that is committed. It comes from\n  the environment when set; otherwise it is generated into a local file that\n  is excluded from version control and readable only by its owner.\n- **R5.** Static serving defaults ON (`herdrWebDashboard.staticServing`), while gateway lifecycle is controlled by `fgos gateway start`; its default bind reaches\n  beyond loopback (binds 0.0.0.0 by default, bind address configurable), with a warning raised when the bind is not loopback.\n  Its port defaults to 4170; the override is `gateway.port`.\n- **R6.** The dashboard's lifetime is independent of the cockpit's. Closing a\n  cockpit pane does not stop it (it runs as a child process outliving the cockpit pane).\n- **R7.** A merge approval can only be performed where fgOS allows it: the\n  `approve` verb structurally refuses to run from a linked worktree and\n  requires the repository's main working tree. This is a real mechanical\n  constraint on the deployment, not a UI concern — a gateway positioned\n  anywhere else cannot offer this operation at all, and the surface must\n  report that honestly rather than appearing to offer it.\n- **R8.** The combination of R5 (on by default, bind beyond loopback) and the\n  write operations above means **the first run of the cockpit exposes a\n  trunk-changing surface on the network, without anyone having chosen to**.\n  The token (R3/R4) is therefore not a hardening layer that can be traded away\n  for convenience — it is the only thing holding the surface closed. The\n  product owner decided this default having been shown this exact consequence\n  (rationale: `docs/history/herdr-web-dashboard/CONTEXT.md`'s own consequences section for the on-by-default decision), and the\n  write operations added later raise its weight rather than changing the\n  decision.\n- **R9.** Questions and answers are paired positionally, by order of\n  recording, with no linking key added to the underlying records — the record\n  shape is deliberately unchanged.\n- **R10.** The narrative written for humans is the primary account of what an\n  agent did; the machine-side decision log is secondary detail.\n- **R11.** Nothing on this surface pushes to a person. Being informed is a\n  pull: the person opens the dashboard and looks.",
+        "ancestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)",
+          "Business Rules"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/spec.md",
+        "anchor": "open-gaps",
+        "unitKind": "heading",
+        "beforeDigest": "7eb0dd6b83a72e530a30575cbf43286ab809b83fba028d19ff465496a540375f",
+        "afterDigest": "b6cb7f404452ffa2bd04ddc9e4af9a41e9c0a8471018381a226eb374d84e4448",
+        "before": "## Open Gaps\n\n- **Authorization granularity for write actions — unresolved, and it is the\n  significant one.** Everything under Behaviors & Operations that writes, and\n  `approve` above all, is available to whoever holds the machine's single\n  token. There is no per-person, per-project, or per-verb distinction to\n  spec against, because neither fgOS nor the gateway has one (STR38 unbuilt;\n  fgos-interface-daemon's own one-token-per-machine decision does not add one). The exposure is stated rather than mitigated. Closing this\n  needs its own item and its own decision — the authorization layer's own\n  scope, not this spec's, and not something to be improvised inside the web\n  client.\n- **The gateway's own API contract now exists** —\n  `docs/contracts/fgos-gateway-api-v1.yaml`, landed by tsk-7l9, carrying 18\n  paths that match `apps/fgos-gateway/src/gateway.rs`'s registered routes 1-to-1.\n  This spec still describes operations in product terms rather than\n  restating endpoint shapes, but that contract — not this prose — is the\n  boundary's source of truth, and any surface built against it cites it\n  directly. Two facts from it constrain this spec's own surfaces and are\n  recorded here rather than left to be rediscovered: there is **no edit\n  route** (`/work/{id}` is `get` only), so M03's edit mode depends on a\n  route that has to be added first; and there is **no SSE or WebSocket**,\n  only a `GET /state/digest` cheap poll, which is why `15-system-events.md`\n  describes client-derived events rather than server-pushed ones.\n- **Multi-project and multi-endpoint behaviour is only half-decided.** The\n  client must not assume one fixed gateway (fgos-interface-daemon's per-machine-scope decision, R1), but how a person\n  chooses between projects and instances, and how the surface shows which one\n  they are looking at, is deferred to `tsk-3b0` (multi-project port/identity handling is deferred there).\n- **No attention channel.** R11 records that nothing notifies a person. Whether\n  it should is a separate, unbuilt capability (STR48).\n- **Coverage is `partial` on purpose.** The three read screens are locked by\n  fourteen decisions; the six write operations were added later, outside that\n  discussion, and are settled here only as far as existing mechanisms and the\n  product owner's decisions at this item's own gate allow.",
+        "after": "## Open Gaps\n\n- **Authorization granularity for write actions — unresolved, and it is the\n  significant one.** Everything under Behaviors & Operations that writes, and\n  `approve` above all, is available to whoever holds the machine's single\n  token. There is no per-person, per-project, or per-verb distinction to\n  spec against, because neither fgOS nor the gateway has one (STR38 unbuilt;\n  fgos-interface-daemon's own one-token-per-machine decision does not add one). The exposure is stated rather than mitigated. Closing this\n  needs its own item and its own decision — the authorization layer's own\n  scope, not this spec's, and not something to be improvised inside the web\n  client.\n- **The gateway's own API contract now exists** —\n  `docs/contracts/fgos-gateway-api-v1.yaml`, landed by tsk-7l9, carrying 19\n  paths that match `apps/fgos-gateway/src/gateway.rs`'s registered routes 1-to-1.\n  This spec still describes operations in product terms rather than\n  restating endpoint shapes, but that contract — not this prose — is the\n  boundary's source of truth, and any surface built against it cites it\n  directly. Two facts from it constrain this spec's own surfaces and are\n  recorded here rather than left to be rediscovered: there is an **edit\n  route** (`PATCH /work/{id}`, operation `editWork`), which supports M03's edit mode; and there is **no SSE or WebSocket**,\n  only a `GET /state/digest` cheap poll, which is why `15-system-events.md`\n  describes client-derived events rather than server-pushed ones.\n- **Multi-project and multi-endpoint behaviour is only half-decided.** The\n  client must not assume one fixed gateway (fgos-interface-daemon's per-machine-scope decision, R1), but how a person\n  chooses between projects and instances, and how the surface shows which one\n  they are looking at, is deferred to `tsk-3b0` (multi-project port/identity handling is deferred there).\n- **No attention channel.** R11 records that nothing notifies a person. Whether\n  it should is a separate, unbuilt capability (STR48).\n- **Coverage is `partial` on purpose.** The three read screens are locked by\n  fourteen decisions; the six write operations were added later, outside that\n  discussion, and are settled here only as far as existing mechanisms and the\n  product owner's decisions at this item's own gate allow.",
+        "ancestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/spec.md",
+        "anchor": "unheaded-block-25",
+        "unitKind": "unheaded-block",
+        "beforeDigest": "ef410a08c708a2f590fd777deb282577a8712b80ca1eee9522247534cc06ad99",
+        "afterDigest": "c1636dcb33981d273c811c4a29d9f600b05a8b16d83d96b73cee5f7a6be11a4a",
+        "before": "- **Authorization granularity for write actions — unresolved, and it is the\n  significant one.** Everything under Behaviors & Operations that writes, and\n  `approve` above all, is available to whoever holds the machine's single\n  token. There is no per-person, per-project, or per-verb distinction to\n  spec against, because neither fgOS nor the gateway has one (STR38 unbuilt;\n  fgos-interface-daemon's own one-token-per-machine decision does not add one). The exposure is stated rather than mitigated. Closing this\n  needs its own item and its own decision — the authorization layer's own\n  scope, not this spec's, and not something to be improvised inside the web\n  client.\n- **The gateway's own API contract now exists** —\n  `docs/contracts/fgos-gateway-api-v1.yaml`, landed by tsk-7l9, carrying 18\n  paths that match `apps/fgos-gateway/src/gateway.rs`'s registered routes 1-to-1.\n  This spec still describes operations in product terms rather than\n  restating endpoint shapes, but that contract — not this prose — is the\n  boundary's source of truth, and any surface built against it cites it\n  directly. Two facts from it constrain this spec's own surfaces and are\n  recorded here rather than left to be rediscovered: there is **no edit\n  route** (`/work/{id}` is `get` only), so M03's edit mode depends on a\n  route that has to be added first; and there is **no SSE or WebSocket**,\n  only a `GET /state/digest` cheap poll, which is why `15-system-events.md`\n  describes client-derived events rather than server-pushed ones.\n- **Multi-project and multi-endpoint behaviour is only half-decided.** The\n  client must not assume one fixed gateway (fgos-interface-daemon's per-machine-scope decision, R1), but how a person\n  chooses between projects and instances, and how the surface shows which one\n  they are looking at, is deferred to `tsk-3b0` (multi-project port/identity handling is deferred there).\n- **No attention channel.** R11 records that nothing notifies a person. Whether\n  it should is a separate, unbuilt capability (STR48).\n- **Coverage is `partial` on purpose.** The three read screens are locked by\n  fourteen decisions; the six write operations were added later, outside that\n  discussion, and are settled here only as far as existing mechanisms and the\n  product owner's decisions at this item's own gate allow.",
+        "after": "- **Authorization granularity for write actions — unresolved, and it is the\n  significant one.** Everything under Behaviors & Operations that writes, and\n  `approve` above all, is available to whoever holds the machine's single\n  token. There is no per-person, per-project, or per-verb distinction to\n  spec against, because neither fgOS nor the gateway has one (STR38 unbuilt;\n  fgos-interface-daemon's own one-token-per-machine decision does not add one). The exposure is stated rather than mitigated. Closing this\n  needs its own item and its own decision — the authorization layer's own\n  scope, not this spec's, and not something to be improvised inside the web\n  client.\n- **The gateway's own API contract now exists** —\n  `docs/contracts/fgos-gateway-api-v1.yaml`, landed by tsk-7l9, carrying 19\n  paths that match `apps/fgos-gateway/src/gateway.rs`'s registered routes 1-to-1.\n  This spec still describes operations in product terms rather than\n  restating endpoint shapes, but that contract — not this prose — is the\n  boundary's source of truth, and any surface built against it cites it\n  directly. Two facts from it constrain this spec's own surfaces and are\n  recorded here rather than left to be rediscovered: there is an **edit\n  route** (`PATCH /work/{id}`, operation `editWork`), which supports M03's edit mode; and there is **no SSE or WebSocket**,\n  only a `GET /state/digest` cheap poll, which is why `15-system-events.md`\n  describes client-derived events rather than server-pushed ones.\n- **Multi-project and multi-endpoint behaviour is only half-decided.** The\n  client must not assume one fixed gateway (fgos-interface-daemon's per-machine-scope decision, R1), but how a person\n  chooses between projects and instances, and how the surface shows which one\n  they are looking at, is deferred to `tsk-3b0` (multi-project port/identity handling is deferred there).\n- **No attention channel.** R11 records that nothing notifies a person. Whether\n  it should is a separate, unbuilt capability (STR48).\n- **Coverage is `partial` on purpose.** The three read screens are locked by\n  fourteen decisions; the six write operations were added later, outside that\n  discussion, and are settled here only as far as existing mechanisms and the\n  product owner's decisions at this item's own gate allow.",
+        "ancestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)",
+          "Open Gaps"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/spec.md",
+        "anchor": "visuals",
+        "unitKind": "heading",
+        "beforeDigest": "437a511cf26520d71ce066d992c8affdc6c87a686d737c2e54f748e640ee1b6a",
+        "afterDigest": "d230de27c884d96858b24f66ddd1cfe3c7586f3bb083b4a203ba3bb5842d2730",
+        "before": "## Visuals\n\nNot specified here by design. The concrete layout, userflow, empty/error\npresentation, colour and typography are `tsk-3x6`'s deliverable:\n`docs/reference/herdr-web-dashboard-layout.md`, which takes this spec as its\nproduct input. The one direction this spec pins is the actor-facing\nexpectation recorded under \"View the taskboard\": a Monday.com/ClickUp-style\ngrouped board with in-place quick actions and filtering, not a flat table.",
+        "after": "## Visuals\n\nNot specified here by design. The concrete layout, userflow, empty/error\npresentation, colour and typography are `tsk-3x6`'s deliverable:\n`docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md`, which takes this spec as its\nproduct input. The one direction this spec pins is the actor-facing\nexpectation recorded under \"View the taskboard\": a Monday.com/ClickUp-style\ngrouped board with in-place quick actions and filtering, not a flat table.",
+        "ancestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/spec.md",
+        "anchor": "unheaded-block-26",
+        "unitKind": "unheaded-block",
+        "beforeDigest": "b3f1a4dd83b0ff718a816b9eb068e4c5521f1d4ee30919d3ad097e62f4d16512",
+        "afterDigest": "e4c1c02a152529d2409df384b704a9f13dcee678a105613ca7cdddec3c27a84a",
+        "before": "Not specified here by design. The concrete layout, userflow, empty/error\npresentation, colour and typography are `tsk-3x6`'s deliverable:\n`docs/reference/herdr-web-dashboard-layout.md`, which takes this spec as its\nproduct input. The one direction this spec pins is the actor-facing\nexpectation recorded under \"View the taskboard\": a Monday.com/ClickUp-style\ngrouped board with in-place quick actions and filtering, not a flat table.",
+        "after": "Not specified here by design. The concrete layout, userflow, empty/error\npresentation, colour and typography are `tsk-3x6`'s deliverable:\n`docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md`, which takes this spec as its\nproduct input. The one direction this spec pins is the actor-facing\nexpectation recorded under \"View the taskboard\": a Monday.com/ClickUp-style\ngrouped board with in-place quick actions and filtering, not a flat table.",
+        "ancestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)",
+          "Visuals"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/spec.md",
+        "anchor": "pointers-implementation",
+        "unitKind": "heading",
+        "beforeDigest": "89f24a77c23b2d756b009fe0082bcf8b38734023875f1b84869980e67e1ed580",
+        "afterDigest": "f25ec48ba8bfaa487507266b1c441de2544034423f8e5cd7096839c30f0de908",
+        "before": "## Pointers (implementation)\n\n- `docs/history/herdr-web-dashboard/CONTEXT.md` — the fourteen locked\n  decisions this spec cites throughout, plus the scout evidence\n  behind them.\n- `docs/history/herdr-web-dashboard/DISCUSSION.md` — the five discussion\n  rounds those decisions came out of.\n- `docs/history/herdr-web-dashboard/plan.md` — the build shape: five pieces\n  (config/doctor, server core and sign-in, taskboard, task detail, alternative\n  credential path), plus this spec's own planning section.\n- `docs/history/fgos-interface-daemon/CONTEXT.md` — the gateway's own locked\n  decisions, in particular per-machine scope (multi-endpoint clients),\n  one token per machine, gateway is the sole runner of fgOS verbs,\n  where gateway lives (that web is an independent client), and the API\n  contract still to be written.\n- `docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md` — why a non-terminal\n  UI is a client of a network gate rather than its own server.\n- `docs/io-contract.md` — the CLI's in/out contract, and the explicit boundary\n  saying the authorization layer (STR38) and the attention channel (STR48) are\n  outside it.\n- `docs/specs/work-state.md` — the lifecycle meaning behind every status,\n  stage, question and answer this surface displays.\n- `docs/reference/herdr-web-dashboard-layout.md` — the UI layer (`tsk-3x6`).",
+        "after": "## Pointers (implementation)\n\n- `docs/history/herdr-web-dashboard/CONTEXT.md` — the fourteen locked\n  decisions this spec cites throughout, plus the scout evidence\n  behind them.\n- `docs/history/herdr-web-dashboard/DISCUSSION.md` — the five discussion\n  rounds those decisions came out of.\n- `docs/history/herdr-web-dashboard/plan.md` — the build shape: five pieces\n  (config/doctor, server core and sign-in, taskboard, task detail, alternative\n  credential path), plus this spec's own planning section.\n- `docs/history/fgos-interface-daemon/CONTEXT.md` — the gateway's own locked\n  decisions, in particular per-machine scope (multi-endpoint clients),\n  one token per machine, gateway is the sole runner of fgOS verbs,\n  where gateway lives (that web is an independent client), and the API\n  contract still to be written.\n- `docs/specs/platform-foundations.md#0014--kiến-trúc-giao-tiếp-người--fgos` — why a non-terminal\n  UI is a client of a network gate rather than its own server.\n- `docs/io-contract.md` — the CLI's in/out contract, and the explicit boundary\n  saying the authorization layer (STR38) and the attention channel (STR48) are\n  outside it.\n- `docs/specs/work-state.md` — the lifecycle meaning behind every status,\n  stage, question and answer this surface displays.\n- `docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md` — the UI layer (`tsk-3x6`).",
+        "ancestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/herdr-web-dashboard/spec.md",
+        "anchor": "unheaded-block-27",
+        "unitKind": "unheaded-block",
+        "beforeDigest": "b0d3ed0823c5a6e58fc870563461d32c3ce61fd9745b78444276500e7135addb",
+        "afterDigest": "4fa7b23eea5b8318dbc1d332d03d4c982d70b119425cc014e645d96184343682",
+        "before": "- `docs/history/herdr-web-dashboard/CONTEXT.md` — the fourteen locked\n  decisions this spec cites throughout, plus the scout evidence\n  behind them.\n- `docs/history/herdr-web-dashboard/DISCUSSION.md` — the five discussion\n  rounds those decisions came out of.\n- `docs/history/herdr-web-dashboard/plan.md` — the build shape: five pieces\n  (config/doctor, server core and sign-in, taskboard, task detail, alternative\n  credential path), plus this spec's own planning section.\n- `docs/history/fgos-interface-daemon/CONTEXT.md` — the gateway's own locked\n  decisions, in particular per-machine scope (multi-endpoint clients),\n  one token per machine, gateway is the sole runner of fgOS verbs,\n  where gateway lives (that web is an independent client), and the API\n  contract still to be written.\n- `docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md` — why a non-terminal\n  UI is a client of a network gate rather than its own server.\n- `docs/io-contract.md` — the CLI's in/out contract, and the explicit boundary\n  saying the authorization layer (STR38) and the attention channel (STR48) are\n  outside it.\n- `docs/specs/work-state.md` — the lifecycle meaning behind every status,\n  stage, question and answer this surface displays.\n- `docs/reference/herdr-web-dashboard-layout.md` — the UI layer (`tsk-3x6`).",
+        "after": "- `docs/history/herdr-web-dashboard/CONTEXT.md` — the fourteen locked\n  decisions this spec cites throughout, plus the scout evidence\n  behind them.\n- `docs/history/herdr-web-dashboard/DISCUSSION.md` — the five discussion\n  rounds those decisions came out of.\n- `docs/history/herdr-web-dashboard/plan.md` — the build shape: five pieces\n  (config/doctor, server core and sign-in, taskboard, task detail, alternative\n  credential path), plus this spec's own planning section.\n- `docs/history/fgos-interface-daemon/CONTEXT.md` — the gateway's own locked\n  decisions, in particular per-machine scope (multi-endpoint clients),\n  one token per machine, gateway is the sole runner of fgOS verbs,\n  where gateway lives (that web is an independent client), and the API\n  contract still to be written.\n- `docs/specs/platform-foundations.md#0014--kiến-trúc-giao-tiếp-người--fgos` — why a non-terminal\n  UI is a client of a network gate rather than its own server.\n- `docs/io-contract.md` — the CLI's in/out contract, and the explicit boundary\n  saying the authorization layer (STR38) and the attention channel (STR48) are\n  outside it.\n- `docs/specs/work-state.md` — the lifecycle meaning behind every status,\n  stage, question and answer this surface displays.\n- `docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md` — the UI layer (`tsk-3x6`).",
+        "ancestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)",
+          "Pointers (implementation)"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/ui-spec/spec.md",
+        "anchor": "herdr-web-dashboard-ui-spec-overview",
+        "unitKind": "heading",
+        "beforeDigest": "d099070fdd330d25219555158140d87b108242e10e119bba5ce4d82ac40d2aa7",
+        "afterDigest": "a6b43dc0113eb342bfaa10ceae3e840b28bfab1589dbb6b846f2e3899bc50874",
+        "before": "# herdr web dashboard — UI spec overview\n\n```txt\nDocument type: Specification\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve mapped legacy content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; current implementation truth is not certified\nProvenance: docs/ui-spec/00-overview.md at 111adc51fd047d99121fd9d076eb4794c87045a4\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing carriage, placement and source conservation\nDo not use this for: Current canonical authority or implemented-behavior proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/ui-spec/00-overview.md\nSupersedes: None; candidate only\nSuperseded by: None\n```\n\n> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions.\n\n\nInteraction and layout layer for the herdr web dashboard.\n\n**Product source of truth:** `docs/specs/herdr-web-dashboard.md` (the area\nspec, `tsk-54j`). Every surface, rule and behaviour here traces back to a\nsection of that document. This layer never settles a product question —\nwhere the area spec has an Open Gap, so does this spec.\n\n**Human-readable companion:** `docs/reference/herdr-web-dashboard-layout.md`\n— the read-in-one-pass layout document that `tsk-5jr` (taskboard) and\n`tsk-4id` (task detail) open while building.",
+        "after": "# herdr web dashboard — UI spec overview\n\n```txt\nDocument type: Specification\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve mapped legacy content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; current implementation truth is not certified\nProvenance: docs/ui-spec/00-overview.md at 111adc51fd047d99121fd9d076eb4794c87045a4\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing carriage, placement and source conservation\nDo not use this for: Current canonical authority or implemented-behavior proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/ui-spec/00-overview.md\nSupersedes: None; candidate only\nSuperseded by: None\n```\n\n> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions. Truth correction (A40/A19): only identified false current sentences corrected; evidence: docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md:5-8; docs/ui-spec/generated/coverage-report.md:1; git ls-files docs/ui-spec/generated; git check-ignore (no matches). A22 rebindings are pending; no truth approval carried.\n\n\nInteraction and layout layer for the herdr web dashboard.\n\n**Product source of truth:** `docs/specs/herdr-web-dashboard.md` (the area\nspec, `tsk-54j`). Every surface, rule and behaviour here traces back to a\nsection of that document. This layer never settles a product question —\nwhere the area spec has an Open Gap, so does this spec.\n\n**Human-readable companion:** `docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md`\n— the read-in-one-pass layout document that `tsk-5jr` (taskboard) and\n`tsk-4id` (task detail) open while building.",
+        "ancestry": [],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/ui-spec/spec.md",
+        "anchor": "unheaded-block-3",
+        "unitKind": "unheaded-block",
+        "beforeDigest": "7a16f93c0d7d23c5915d7afe7e93d6b32d9eda0b659d66f240912d863eeaa196",
+        "afterDigest": "f47ee7d8e25274da52860d9c18873bf06f1e76b39074e641511024d93fca8e3e",
+        "before": "> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions.",
+        "after": "> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions. Truth correction (A40/A19): only identified false current sentences corrected; evidence: docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md:5-8; docs/ui-spec/generated/coverage-report.md:1; git ls-files docs/ui-spec/generated; git check-ignore (no matches). A22 rebindings are pending; no truth approval carried.",
+        "ancestry": [
+          "herdr web dashboard — UI spec overview"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/ui-spec/spec.md",
+        "anchor": "unheaded-block-6",
+        "unitKind": "unheaded-block",
+        "beforeDigest": "ea8915b9b44ba81d2f47d5949641f3daf7f112d295f68b4e35e1d0e59576ee26",
+        "afterDigest": "e5ba41fce76696fe402892f4d2b6108a436c364cb752b08b397507ea263e8f4d",
+        "before": "**Human-readable companion:** `docs/reference/herdr-web-dashboard-layout.md`\n— the read-in-one-pass layout document that `tsk-5jr` (taskboard) and\n`tsk-4id` (task detail) open while building.",
+        "after": "**Human-readable companion:** `docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md`\n— the read-in-one-pass layout document that `tsk-5jr` (taskboard) and\n`tsk-4id` (task detail) open while building.",
+        "ancestry": [
+          "herdr web dashboard — UI spec overview"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/ui-spec/spec.md",
+        "anchor": "how-to-work-on-this-spec",
+        "unitKind": "heading",
+        "beforeDigest": "fb45e3220fd282bd5bfebfed7ffe2b753249fbe60f5bb2a66fc05f0764f44664",
+        "afterDigest": "35bb9af04cb01c193eeea48d2fbc2b61d222e90eea33f4fddd57147442625c3d",
+        "before": "## How to work on this spec\n\nThe compiler lives with the `ui-spec` skill, not in this tree. Run it\nagainst this root:\n\n```bash\ncd ~/.claude/skills/ui-spec/tools\nnpm ci                                   # once, if node_modules is absent\nnode validate.mjs --root <repo>/docs/ui-spec\nnode build.mjs    --root <repo>/docs/ui-spec\nnode interpret-wireframe.mjs --root <repo>/docs/ui-spec\n```\n\n`validate` is the trust gate — dangling navigate targets, bad component\nhosts, listen-orphans and rule drift are errors, not warnings.\n`interpret-wireframe` produces the clickable wireframe;\n`generated/` is build output and is gitignored.",
+        "after": "## How to work on this spec\n\nThe compiler lives with the `ui-spec` skill, not in this tree. Run it\nagainst this root:\n\n```bash\ncd ~/.claude/skills/ui-spec/tools\nnpm ci                                   # once, if node_modules is absent\nnode validate.mjs --root <repo>/docs/ui-spec\nnode build.mjs    --root <repo>/docs/ui-spec\nnode interpret-wireframe.mjs --root <repo>/docs/ui-spec\n```\n\n`validate` is the trust gate — dangling navigate targets, bad component\nhosts, listen-orphans and rule drift are errors, not warnings.\n`interpret-wireframe` produces the clickable wireframe;\n`generated/` is build output; its five output files are tracked in this repo.",
+        "ancestry": [
+          "herdr web dashboard — UI spec overview"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      },
+      {
+        "path": "docs/platform/ui-spec/spec.md",
+        "anchor": "unheaded-block-12",
+        "unitKind": "unheaded-block",
+        "beforeDigest": "3324fde2c080f440e352d3276b5dddb25b0b74dc48201f293d0e905c6afced8e",
+        "afterDigest": "7e07d5abf293de68419126409ea6c5451f1ddc4d70e5a7202e679c44d5e63759",
+        "before": "`validate` is the trust gate — dangling navigate targets, bad component\nhosts, listen-orphans and rule drift are errors, not warnings.\n`interpret-wireframe` produces the clickable wireframe;\n`generated/` is build output and is gitignored.",
+        "after": "`validate` is the trust gate — dangling navigate targets, bad component\nhosts, listen-orphans and rule drift are errors, not warnings.\n`interpret-wireframe` produces the clickable wireframe;\n`generated/` is build output; its five output files are tracked in this repo.",
+        "ancestry": [
+          "herdr web dashboard — UI spec overview",
+          "How to work on this spec"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      }
+    ]
   }
 }

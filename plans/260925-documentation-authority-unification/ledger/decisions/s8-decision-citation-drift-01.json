@@ -38,9 +38,9 @@
       "claimKind": "decision",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Judgment: no target digest match. The whole heading unit docs/specs/decision-citation-drift.md#spec-decision-citation-drift-check (source lines 9-9) is carried at docs/platform/decision-citation-drift/spec.md#spec-decision-citation-drift-check (candidate lines 9-9). The heading section digest changes because labelled candidate metadata is inserted after the original H1; original heading and direct source payload remain verbatim. Frozen specs-ui map and Step 8: preserve docs/specs/decision-citation-drift.md verbatim in docs/platform/decision-citation-drift/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "220c53cff76e8336290a335d8577e7bae5cc8394d137253ed17eb5956477d5ae",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The heading or scaffolding binding changes while its source heading text remains. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "c13987b412a65b196c3e686a1ce85481caa185ec2358f4fb43b7f330f3b8e7b5",
       "targetAncestry": []
     },
     {
@@ -95,11 +95,11 @@
       "targetOwner": "docs/platform/decision-citation-drift/spec.md",
       "targetAnchor": "data-dictionary",
       "claimKind": "decision",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/decision-citation-drift.md#data-dictionary (source lines 29-29) is carried at docs/platform/decision-citation-drift/spec.md#data-dictionary (candidate lines 51-51). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/decision-citation-drift.md verbatim in docs/platform/decision-citation-drift/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "f327b12e6765878263e7c6ff7a5d9c1cf5171fa017c71b3a0e24b2e59044eea7",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "0469137fcd78cd85fe5320a1300302dd1db0440c0cd537d3ff23dd84496ca1f2",
       "targetAncestry": [
         "Spec: Decision Citation Drift Check"
       ]
@@ -110,11 +110,11 @@
       "targetOwner": "docs/platform/decision-citation-drift/spec.md",
       "targetAnchor": "unheaded-block-6",
       "claimKind": "decision",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/decision-citation-drift.md#unheaded-block-4 (source lines 31-37) is carried at docs/platform/decision-citation-drift/spec.md#unheaded-block-6 (candidate lines 53-59). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/decision-citation-drift.md verbatim in docs/platform/decision-citation-drift/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "ddc10a212e811df7dfee1b3c902aa0417b08473aad551911cc5e52a0a2dc2ff8",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "a8b3b87460680963a648678fccb82b1b76b9aba04c24aaea49f0f8ef3eaec55e",
       "targetAncestry": [
         "Spec: Decision Citation Drift Check",
         "Data Dictionary"
@@ -267,11 +267,11 @@
       "targetOwner": "docs/platform/decision-citation-drift/spec.md",
       "targetAnchor": "open-gaps",
       "claimKind": "decision",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/decision-citation-drift.md#open-gaps (source lines 89-89) is carried at docs/platform/decision-citation-drift/spec.md#open-gaps (candidate lines 111-111). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/decision-citation-drift.md verbatim in docs/platform/decision-citation-drift/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "2feb5276d5dc970b753498733b260a49392fe2200c9d02aaa915e5ed51cdd86d",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "739844989064aa19abd787360c52e156c6f0d65cfc4b8055a61179252e13777e",
       "targetAncestry": [
         "Spec: Decision Citation Drift Check"
       ]
@@ -282,11 +282,11 @@
       "targetOwner": "docs/platform/decision-citation-drift/spec.md",
       "targetAnchor": "unheaded-block-11",
       "claimKind": "decision",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/decision-citation-drift.md#unheaded-block-9 (source lines 91-96) is carried at docs/platform/decision-citation-drift/spec.md#unheaded-block-11 (candidate lines 113-118). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/decision-citation-drift.md verbatim in docs/platform/decision-citation-drift/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "7a22bf47723aee067c9ee720b0fc8d75121b13f4aeb9aa8ed233d20da9c93500",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "74df64aecf9677de9fdd24b2fea746ba82c190499b3e7b84c32632f78ed8c5c8",
       "targetAncestry": [
         "Spec: Decision Citation Drift Check",
         "Open Gaps"

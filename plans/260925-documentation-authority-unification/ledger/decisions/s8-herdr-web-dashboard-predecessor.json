@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "shard": "s8-herdr-web-dashboard-predecessor.json",
+  "authorSession": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+  "authorshipRequired": true,
+  "sources": [],
+  "claims": [],
+  "registryGaps": [
+    {
+      "claimId": "claim_7d5937c751aa5fa0db3a489560c25b6b",
+      "sourcePath": "docs/specs/herdr-web-dashboard.md",
+      "sourceUnitDigest": "dfb39feda064d64c81b97e75de9dc9de5f2f795a6828e777f50fad3014f56e97",
+      "disposition": "supersede",
+      "targetOwner": "docs/specs/herdr-web-dashboard.md",
+      "targetAnchor": "unheaded-block-21",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "reviewStatus": "pending",
+      "rationale": "A40 explicit authorization of A22/A34 dashboard predecessor accounting. The complete same-file current successor adds answer/move --approve forwarding; full old/current text and native successor are in step8-predecessor-reconciliation.json. Accounting only, no identity graft, no approval carry, no source edit. Include in the next bounded truth re-review.",
+      "targetUnitDigest": "7d9e2d425937e495926bbff08bacc8e77e9781253b5c83692215e62cf6da2913",
+      "targetAncestry": [
+        "Spec: herdr Web Dashboard (browser surface for fgOS work)",
+        "Business Rules"
+      ]
+    }
+  ]
+}

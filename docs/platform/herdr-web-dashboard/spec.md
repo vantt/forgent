@@ -27,7 +27,7 @@ Supersedes: None; candidate only
 Superseded by: None
 ```
 
-> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions.
+> Added in candidate: Candidate metadata and placement scaffolding.  Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions. Truth correction (A40/A19): only identified false current sentences corrected; evidence: docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md:5-8; docs/specs/platform-foundations.md:179-184; docs/decisions/index.md:1; apps/fgos-gateway/src/gateway.rs:42,174; src/setup/registrations.mjs:3468-3470; docs/contracts/fgos-gateway-api-v1.yaml:82-599 (19 path keys); docs/contracts/fgos-gateway-api-v1.yaml:212-222; apps/fgos-gateway/src/gateway.rs:687-707. A22 rebindings are pending; no truth approval carried.
 
 
 ## Purpose
@@ -58,7 +58,7 @@ Three things bound this surface:
 **Out of scope for this spec.** Question authoring quality at the source
 (`tsk-539`, deliberately decoupled — tsk-ldb and tsk-539 stay scope-separated). Multi-project port/identity
 mechanics (`tsk-3b0` — multi-project port/identity handling is deferred to tsk-3b0). The concrete visual layout, colour and
-typography (`tsk-3x6`, `docs/reference/herdr-web-dashboard-layout.md`) — this
+typography (`tsk-3x6`, `docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md`) — this
 spec states what an actor expects to be able to do, never how it is drawn.
 
 ## Entry Points & Triggers
@@ -76,9 +76,9 @@ spec states what an actor expects to be able to do, never how it is drawn.
 - **Availability trigger (not a person's action).** The dashboard is reachable
   whenever its own process is running. That process is started and stopped
   from the cockpit but **outlives the cockpit pane** — closing the cockpit does
-  not stop the dashboard (it runs as a child process outliving the cockpit pane). It is enabled by default (its own config toggle defaults ON, unlike other auto-launch toggles), listens on the
+  not stop the dashboard (it runs as a child process outliving the cockpit pane). Static serving defaults ON (`herdrWebDashboard.staticServing`); the gateway started with `fgos gateway start` listens on the
   configured bind address (default reaches beyond loopback — binds 0.0.0.0 by default, bind address configurable, warns when non-loopback) and on port
-  8788 (its config section carries a port field, defaulting to 8788).
+  4170 by default (`gateway.port` overrides it).
 - **No outbound trigger exists.** Nothing notifies the person that a question
   is waiting; they have to come and look. A push/attention channel is a
   different, unbuilt capability (`docs/io-contract.md` §Ranh giới — STR48).
@@ -236,10 +236,9 @@ leaving a reader to discover them:
 - **R4.** The token is never stored anywhere that is committed. It comes from
   the environment when set; otherwise it is generated into a local file that
   is excluded from version control and readable only by its owner.
-- **R5.** The surface is enabled by default (its own config toggle defaults ON, unlike other auto-launch toggles) and its default bind reaches
+- **R5.** Static serving defaults ON (`herdrWebDashboard.staticServing`), while gateway lifecycle is controlled by `fgos gateway start`; its default bind reaches
   beyond loopback (binds 0.0.0.0 by default, bind address configurable), with a warning raised when the bind is not loopback.
-  Its port is 8788, chosen to coexist with the neighbouring service on 8787
-  (its config section carries a port field, defaulting to 8788).
+  Its port defaults to 4170; the override is `gateway.port`.
 - **R6.** The dashboard's lifetime is independent of the cockpit's. Closing a
   cockpit pane does not stop it (it runs as a child process outliving the cockpit pane).
 - **R7.** A merge approval can only be performed where fgOS allows it: the
@@ -297,15 +296,14 @@ leaving a reader to discover them:
   scope, not this spec's, and not something to be improvised inside the web
   client.
 - **The gateway's own API contract now exists** —
-  `docs/contracts/fgos-gateway-api-v1.yaml`, landed by tsk-7l9, carrying 18
+  `docs/contracts/fgos-gateway-api-v1.yaml`, landed by tsk-7l9, carrying 19
   paths that match `apps/fgos-gateway/src/gateway.rs`'s registered routes 1-to-1.
   This spec still describes operations in product terms rather than
   restating endpoint shapes, but that contract — not this prose — is the
   boundary's source of truth, and any surface built against it cites it
   directly. Two facts from it constrain this spec's own surfaces and are
-  recorded here rather than left to be rediscovered: there is **no edit
-  route** (`/work/{id}` is `get` only), so M03's edit mode depends on a
-  route that has to be added first; and there is **no SSE or WebSocket**,
+  recorded here rather than left to be rediscovered: there is an **edit
+  route** (`PATCH /work/{id}`, operation `editWork`), which supports M03's edit mode; and there is **no SSE or WebSocket**,
   only a `GET /state/digest` cheap poll, which is why `15-system-events.md`
   describes client-derived events rather than server-pushed ones.
 - **Multi-project and multi-endpoint behaviour is only half-decided.** The
@@ -323,7 +321,7 @@ leaving a reader to discover them:
 
 Not specified here by design. The concrete layout, userflow, empty/error
 presentation, colour and typography are `tsk-3x6`'s deliverable:
-`docs/reference/herdr-web-dashboard-layout.md`, which takes this spec as its
+`docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md`, which takes this spec as its
 product input. The one direction this spec pins is the actor-facing
 expectation recorded under "View the taskboard": a Monday.com/ClickUp-style
 grouped board with in-place quick actions and filtering, not a flat table.
@@ -343,11 +341,11 @@ grouped board with in-place quick actions and filtering, not a flat table.
   one token per machine, gateway is the sole runner of fgOS verbs,
   where gateway lives (that web is an independent client), and the API
   contract still to be written.
-- `docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md` — why a non-terminal
+- `docs/specs/platform-foundations.md#0014--kiến-trúc-giao-tiếp-người--fgos` — why a non-terminal
   UI is a client of a network gate rather than its own server.
 - `docs/io-contract.md` — the CLI's in/out contract, and the explicit boundary
   saying the authorization layer (STR38) and the attention channel (STR48) are
   outside it.
 - `docs/specs/work-state.md` — the lifecycle meaning behind every status,
   stage, question and answer this surface displays.
-- `docs/reference/herdr-web-dashboard-layout.md` — the UI layer (`tsk-3x6`).
+- `docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md` — the UI layer (`tsk-3x6`).

@@ -23,11 +23,11 @@
       "targetOwner": "docs/platform/claude-plugin/spec.md",
       "targetAnchor": "unheaded-block-1",
       "claimKind": "specification",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-preamble unit docs/specs/fgos-plugin.md#unheaded-block-1 (source lines 1-7) is carried at docs/platform/claude-plugin/spec.md#unheaded-block-1 (candidate lines 1-7). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "accf803c7e73f896e243e25b1600bb5ab2d868fb2591e43054c4c283455d5c80",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "58252dca40b604e3b4e45c81a0c33677faa99a1a546c68b28956ea06d6dddeed",
       "targetAncestry": []
     },
     {
@@ -38,9 +38,9 @@
       "claimKind": "specification",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Judgment: no target digest match. The whole heading unit docs/specs/fgos-plugin.md#spec-fgos-plugin-claude-code-slash-command-surface (source lines 9-9) is carried at docs/platform/claude-plugin/spec.md#spec-fgos-plugin-claude-code-slash-command-surface (candidate lines 9-9). The heading section digest changes because labelled candidate metadata is inserted after the original H1; original heading and direct source payload remain verbatim. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "0ac7dd09127d236ff5c79bb080e4b3abc5ad55940171fc96ea0e0b0bacd97b5d",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The heading or scaffolding binding changes while its source heading text remains. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "d6668e44d9a9903c4991b93694cce7417b44ed7543f45451de9918a45e257245",
       "targetAncestry": []
     },
     {
@@ -64,11 +64,11 @@
       "targetOwner": "docs/platform/claude-plugin/spec.md",
       "targetAnchor": "entry-points-triggers",
       "claimKind": "specification",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/fgos-plugin.md#entry-points-triggers (source lines 22-22) is carried at docs/platform/claude-plugin/spec.md#entry-points-triggers (candidate lines 44-44). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "f3ffcdf9f308bc1515acae071d209a5f5f0fed0730bf3a41a14f07161970e891",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "80047ed46735979a109e623515a4466175a7519b84211a9d69a44f4d89f0ac94",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)"
       ]
@@ -79,11 +79,11 @@
       "targetOwner": "docs/platform/claude-plugin/spec.md",
       "targetAnchor": "unheaded-block-5",
       "claimKind": "specification",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/fgos-plugin.md#unheaded-block-3 (source lines 24-35) is carried at docs/platform/claude-plugin/spec.md#unheaded-block-5 (candidate lines 46-57). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "b9e6c0ab26679c055bf00490c18221eab33d08712fbfd82458032f7cfded5642",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "5d247f3352fcd65e47112e59a6bd5274a6236eaebc24680e7df7716c361f6871",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Entry Points & Triggers"
@@ -438,11 +438,11 @@
       "targetOwner": "docs/platform/claude-plugin/spec.md",
       "targetAnchor": "check",
       "claimKind": "specification",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/fgos-plugin.md#check (source lines 112-112) is carried at docs/platform/claude-plugin/spec.md#check (candidate lines 134-134). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "1b27de9e5f0e778a7ca3d492baef55ae37fb462d631a7e1f68d9dfc278e40159",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "dc17e82d43d791ef16b8c9321ad8ddc5160f98ef5595cae774118463ea650e47",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Behaviors & Operations"
@@ -456,9 +456,9 @@
       "claimKind": "specification",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/fgos-plugin.md#unheaded-block-14 (source lines 114-117) is carried at docs/platform/claude-plugin/spec.md#unheaded-block-16 (candidate lines 136-139). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "fd8bfcfe77b5019d779cae2f38067585409e1d8cceb5f0e767c515659ba4f1af",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The heading or scaffolding binding changes while its source heading text remains. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "198b783f76cc48a151d57bb5ecad73617c356411d147ae4374d67c274934918b",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Behaviors & Operations",
@@ -584,11 +584,11 @@
       "targetOwner": "docs/platform/claude-plugin/spec.md",
       "targetAnchor": "business-rules",
       "claimKind": "specification",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/fgos-plugin.md#business-rules (source lines 144-144) is carried at docs/platform/claude-plugin/spec.md#business-rules (candidate lines 166-166). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "72f2603abf50c2aa2cb7a5186ac082c7a92c95eb394172013eb76b06ba8163b9",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "cfa6959da586958a88ea42331b22902773cd833a358b142574d13593c9af525e",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)"
       ]
@@ -599,11 +599,11 @@
       "targetOwner": "docs/platform/claude-plugin/spec.md",
       "targetAnchor": "unheaded-block-21",
       "claimKind": "specification",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/fgos-plugin.md#unheaded-block-19 (source lines 146-149) is carried at docs/platform/claude-plugin/spec.md#unheaded-block-21 (candidate lines 168-171). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "57301b02e1179ead982bc32b716f9c3afef040908df4c8885fda7999d10211ea",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "542aa6780221f52af7820095996d0b162a74cba2340128ff3ea4dbbeb4a119e3",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Business Rules"
@@ -646,11 +646,11 @@
       "targetOwner": "docs/platform/claude-plugin/spec.md",
       "targetAnchor": "open-gaps",
       "claimKind": "specification",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/fgos-plugin.md#open-gaps (source lines 156-156) is carried at docs/platform/claude-plugin/spec.md#open-gaps (candidate lines 178-178). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "52301bf84a319adb6cdee3a52044843d2cd0741101effc937f33f3836a680f69",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "1c4c9c17c18d25d57bc4e8eac5addd11d18c6461579925842e2abb6a21966d9e",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)"
       ]
@@ -661,11 +661,11 @@
       "targetOwner": "docs/platform/claude-plugin/spec.md",
       "targetAnchor": "unheaded-block-23",
       "claimKind": "specification",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/fgos-plugin.md#unheaded-block-21 (source lines 158-158) is carried at docs/platform/claude-plugin/spec.md#unheaded-block-23 (candidate lines 180-180). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "cfba02bb0c64c5f1e11aad85ce72d2127e002b8f7e28c505a3aff5ea0befc137",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "493f04e9b160ae52c07e87a65bdb834ae38825f834a6ba98e9d398d49d7950cc",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Open Gaps"
@@ -708,11 +708,11 @@
       "targetOwner": "docs/platform/claude-plugin/spec.md",
       "targetAnchor": "pointers-implementation",
       "claimKind": "specification",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/fgos-plugin.md#pointers-implementation (source lines 164-164) is carried at docs/platform/claude-plugin/spec.md#pointers-implementation (candidate lines 186-186). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "0db8134dd4c57e1f3f765358e948e88027b955927b1b35bb74f22e94e02ba0db",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "a59342013a31dbacd5d48cdbbb4b6ddd5e842c1e76558f9305e6f18ab5eab0b0",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)"
       ]
@@ -723,11 +723,11 @@
       "targetOwner": "docs/platform/claude-plugin/spec.md",
       "targetAnchor": "unheaded-block-25",
       "claimKind": "specification",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/fgos-plugin.md#unheaded-block-23 (source lines 166-169) is carried at docs/platform/claude-plugin/spec.md#unheaded-block-25 (candidate lines 188-191). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "targetUnitDigest": "9e819c07e10200717785bb78ce288f08488d76f33547a8874f589fa191967bd5",
+      "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "rationale": "Judgment: no target digest match. A40/A19 truth correction or its candidate-note binding consequence; A22 real target digest rebound, pending independent bounded truth re-review with no approval carry. Whole original unit and corrected counterpart are in reports/phase-06/step8-truth-corrections.json. The corrected current claim supersedes the stale source assertion. Legacy source untouched; no promotion or cutover approval.",
+      "targetUnitDigest": "4e3b4f507555fb6843e8d5e9f62011e33500cb02d4d6ca4f36628f94071df1dd",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Pointers (implementation)"

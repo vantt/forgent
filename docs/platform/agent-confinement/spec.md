@@ -25,15 +25,15 @@ Supersedes: None; candidate only
 Superseded by: None
 ```
 
-> Added in candidate: Candidate metadata and placement scaffolding. Split companions are listed in the area portal; original section numbers are retained. Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions.
+> Added in candidate: Candidate metadata and placement scaffolding. Split companions are listed in the area portal; original section numbers are retained. Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions. Truth correction (A40/A19): only identified false current sentences corrected; evidence: src/runner/dispatch/adapters.mjs:20-33; src/runner/dispatch/confinement/backend-registry.mjs:52-58; test/runner/dispatch-confinement-p04.test.mjs:663-675; migration commit 5a42bc376; review-8-specs-ui-truth.md U24 (committed live-config evidence, no configuration read this turn). A22 rebindings are pending; no truth approval carried.
 
 
 > **Trạng thái:** IMPLEMENTED. Đã được hiện thực hoá hoàn chỉnh qua track `confinement-authority-implementation` (P00-P07).
 > Một cửa runtime duy nhất `executeThroughConfinement` bảo vệ mọi dispatch ngoại trình (`cli-spawn`, `herdr-spawn`, `http`)
 > trước khi adapter được spawn agent. Backend registry `~/.fgos/confinement-backends.json` quản lý backend instances máy chủ,
-> driver `bwrap` v1 bảo đảm fail-closed cho `required` với 8 falsification probes. Ba executor bwrap (`claude-bwrap`, `agy-bwrap`, `codex-bwrap`)
-> chỉ di trú sang backend reference ở dạng fixture (P04.md R4) — bản `.fgos/config.json` thật vẫn giữ hand-rolled `command:"bwrap"` argv,
-> không có key `confinement`; live migration để deferred cho một phase sau (P06 thử tạm rồi revert nguyên trạng, sha256-verified). Live dogfood
+> driver `bwrap` v1 bảo đảm fail-closed cho `required` với 8 falsification probes. Các invocation bwrap hiện dùng backend reference `confinement.backend: bwrap`;
+> các executor id cũ `claude-bwrap`, `agy-bwrap`, `codex-bwrap` đã được hợp nhất thành các invocation cli/cli-bwrap.
+> Live migration đã được thực hiện, không còn chỉ ở fixture hay deferred. Live dogfood
 > coordination đã chứng minh multi-agent cross-provider enforcement trên đường observe/legacy hiện có, không phụ thuộc migration nói trên.
 > Chế độ strict mode (`runner.confinement.strict`) mặc định giữ `false` với chẩn đoán sẵn sàng từ `fgos doctor` (xem R1 decision).
 >
@@ -222,8 +222,8 @@ Quy tắc 4 và 6 làm cho “một cửa” kiểm được bằng code, không
 process dispatch; caller không được tự truyền implementation hoặc đổi handle
 sau khi plan đã compile.
 
-Adapter metadata có `locus: local-process | remote`. cli-spawn/herdr-spawn là
-local-process; http là remote dù request được gửi từ host. Bwrap chỉ nhận
+Adapter metadata có `locus: local-process | remote-http | herdr-pane`. cli-spawn là
+local-process; http là remote-http; herdr-spawn là herdr-pane dù request được gửi từ host. Bwrap chỉ nhận
 local-process, không coi việc bọc HTTP client là confine remote agent.
 In-process Agent/Task tool nằm ngoài execution authority này: dispatch ghi
 `authorityScope: external-harness`, attestation null, không gọi đó là unconfined.
