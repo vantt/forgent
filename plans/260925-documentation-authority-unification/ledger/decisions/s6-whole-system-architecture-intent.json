@@ -1544,19 +1544,36 @@
       "targetAnchor": "11-current-system-fit-and-conflicts",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "authoredBy": "codex-session:37@2026-10-15",
-      "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/architecture-intent.md#11-current-system-fit-and-conflicts (lines 384–384) into docs/platform/system-architecture/architecture/architecture-intent.md#11-current-system-fit-and-conflicts (lines 407–407), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
-      "reviewNote": "deep: heading 11-current-system-fit-and-conflicts src L384-384 tgt L407-407; Weak-exact; source and target text read side by side and identical, ancestry equal, rationale line numbers and anchors match, target anchor passes check",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0450-whole-system-01.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "03fd6abc56c13bf09ccf7e76efb7ebc0f4749a170b6a783cfea0c2769708e09c",
+      "rationale": "The heading text and ancestry are unchanged; its section payload changes only by the three authorized retired-engine qualifications in unheaded-block-61. Carry the complete heading; A22 digest consequence pending independent review. No source retirement, promotion or truth approval.",
+      "targetUnitDigest": "46269aecc47b5e4332545a798e6ff5941dddb956a2854c28a36d1f78e38eefdb",
       "targetAncestry": [
         "Architecture Intent"
       ],
-      "reviewReportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930"
+      "priorReview": {
+        "claimId": "claim_7a46ef41a328177fdcf07014a1a7b6b8",
+        "sourceUnitDigest": "03fd6abc56c13bf09ccf7e76efb7ebc0f4749a170b6a783cfea0c2769708e09c",
+        "targetOwner": "docs/platform/system-architecture/architecture/architecture-intent.md",
+        "targetAnchor": "11-current-system-fit-and-conflicts",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "reviewed",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/architecture-intent.md#11-current-system-fit-and-conflicts (lines 384–384) into docs/platform/system-architecture/architecture/architecture-intent.md#11-current-system-fit-and-conflicts (lines 407–407), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
+        "reviewNote": "deep: heading 11-current-system-fit-and-conflicts src L384-384 tgt L407-407; Weak-exact; source and target text read side by side and identical, ancestry equal, rationale line numbers and anchors match, target anchor passes check",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0450-whole-system-01.md",
+        "reviewMode": "ordinary",
+        "targetUnitDigest": "03fd6abc56c13bf09ccf7e76efb7ebc0f4749a170b6a783cfea0c2769708e09c",
+        "targetAncestry": [
+          "Architecture Intent"
+        ],
+        "reviewReportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930"
+      },
+      "amendedBy": "codex-session:unit-run-1792028685519-ebec4fbb@2026-10-15",
+      "rebindingReason": "A19 authorized retired-engine qualification; A22 actual target digest rebind, independent review pending. Native consequences deferred to next sync."
     },
     {
       "claimId": "claim_0695c3372c09aa0acfee179437772bdc",
@@ -1586,21 +1603,39 @@
       "targetOwner": "docs/platform/system-architecture/architecture/architecture-intent.md",
       "targetAnchor": "unheaded-block-61",
       "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "reviewed",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
       "authoredBy": "codex-session:37@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/architecture-intent.md#unheaded-block-59 (lines 390–400) into docs/platform/system-architecture/architecture/architecture-intent.md#unheaded-block-61 (lines 413–423), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
-      "reviewNote": "mechanical: unheaded-block unheaded-block-59 src L390-400 tgt L413-423; Unit-exact; script digest recompute, anchor check, shard/pack equality and ancestry equality pass",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0450-whole-system-01.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "bc122fa9bf3e6e08e05d6e56a77bc3024ea43fc8c9592061233120b1757f7b72",
+      "rationale": "A19 truth correction supersedes only the three false present-tense sentences with explicit retired-engine qualifications. All other source clauses, conflicts and obligations are retained byte-for-byte. Original source remains unchanged. Evidence: step-06-report.md, authorized corrections section; independent A22 review pending, no approval carry.",
+      "targetUnitDigest": "ea09318ffc9d78390e907d8a3315328cfffa4ccab17e96085ca822c373e41520",
       "targetAncestry": [
         "Architecture Intent",
         "11. Current System Fit And Conflicts"
       ],
-      "reviewReportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930"
+      "priorReview": {
+        "claimId": "claim_c70f25eac4a54d44efef50283846611f",
+        "sourceUnitDigest": "bc122fa9bf3e6e08e05d6e56a77bc3024ea43fc8c9592061233120b1757f7b72",
+        "targetOwner": "docs/platform/system-architecture/architecture/architecture-intent.md",
+        "targetAnchor": "unheaded-block-61",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "reviewed",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/architecture-intent.md#unheaded-block-59 (lines 390–400) into docs/platform/system-architecture/architecture/architecture-intent.md#unheaded-block-61 (lines 413–423), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
+        "reviewNote": "mechanical: unheaded-block unheaded-block-59 src L390-400 tgt L413-423; Unit-exact; script digest recompute, anchor check, shard/pack equality and ancestry equality pass",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0450-whole-system-01.md",
+        "reviewMode": "ordinary",
+        "targetUnitDigest": "bc122fa9bf3e6e08e05d6e56a77bc3024ea43fc8c9592061233120b1757f7b72",
+        "targetAncestry": [
+          "Architecture Intent",
+          "11. Current System Fit And Conflicts"
+        ],
+        "reviewReportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930"
+      },
+      "amendedBy": "codex-session:unit-run-1792028685519-ebec4fbb@2026-10-15",
+      "rebindingReason": "A19 authorized retired-engine qualification; A22 actual target digest rebind, independent review pending. Native consequences deferred to next sync."
     },
     {
       "claimId": "claim_d0168f188b22ce2596a186be875b1fb8",

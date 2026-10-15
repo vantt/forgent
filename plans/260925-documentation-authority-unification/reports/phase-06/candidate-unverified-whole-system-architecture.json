@@ -846,29 +846,49 @@
       "claimId": "claim_cb9bec6c6a80cc775721132cb7569f54",
       "path": "docs/platform/system-architecture/history/architect-readme.md",
       "anchor": "architect-readme-source-carriage",
-      "unitDigest": "648af7d32f3e04c2103dcf13265abdc3670f511c2b4ade961a9e02c7e00ca050",
+      "unitDigest": "1918b66f54a462fa3d1611abefac357f4866d38afba8c6ef6e2051a57c2da12c",
       "status": "candidate-unverified",
-      "reviewStatus": "reviewed",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewMode": "ordinary",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
-      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
-      "reviewNote": "mechanical: heading section architect-readme-source-carriage of system-architecture/history/architect-readme.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest a7422f57dfaad386 equal the request, sidecar and committed bytes; system-architecture/history/architect-readme.md declares Design status Candidate (history), non-canonical history carrier, not promoted; before and current records identical."
+      "reviewStatus": "pending",
+      "priorReview": {
+        "claimId": "claim_cb9bec6c6a80cc775721132cb7569f54",
+        "path": "docs/platform/system-architecture/history/architect-readme.md",
+        "anchor": "architect-readme-source-carriage",
+        "unitDigest": "648af7d32f3e04c2103dcf13265abdc3670f511c2b4ade961a9e02c7e00ca050",
+        "status": "candidate-unverified",
+        "reviewStatus": "reviewed",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+        "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
+        "reviewNote": "mechanical: heading section architect-readme-source-carriage of system-architecture/history/architect-readme.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest a7422f57dfaad386 equal the request, sidecar and committed bytes; system-architecture/history/architect-readme.md declares Design status Candidate (history), non-canonical history carrier, not promoted; before and current records identical."
+      },
+      "amendedBy": "codex-session:unit-run-1792028685519-ebec4fbb@2026-10-15",
+      "rebindingReason": "R6-8 header completion / A22 local digest rebind only. Current native identity and list equality require next sync; no identity is allocated or approval carried."
     },
     {
       "claimId": "claim_61cd2622fa0c5c1b7c18ea39e2f85579",
       "path": "docs/platform/system-architecture/history/architect-readme.md",
       "anchor": "unheaded-block-1",
-      "unitDigest": "1d36d1e33d5a609ac2d610bc7608684ececb4120b29215e9b56e1d04d066e3cd",
+      "unitDigest": "3a1a1314891f35aa67ccdf4fec0c5415cbb568f5e4d6a1a6eb97a690e51e3c0b",
       "status": "candidate-unverified",
-      "reviewStatus": "reviewed",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewMode": "ordinary",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
-      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
-      "reviewNote": "mechanical: text block unheaded-block-1 of system-architecture/history/architect-readme.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 1d36d1e33d5a609a equal the request, sidecar and committed bytes; system-architecture/history/architect-readme.md declares Design status Candidate (history), non-canonical history carrier, not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
+      "reviewStatus": "pending",
+      "priorReview": {
+        "claimId": "claim_61cd2622fa0c5c1b7c18ea39e2f85579",
+        "path": "docs/platform/system-architecture/history/architect-readme.md",
+        "anchor": "unheaded-block-1",
+        "unitDigest": "1d36d1e33d5a609ac2d610bc7608684ececb4120b29215e9b56e1d04d066e3cd",
+        "status": "candidate-unverified",
+        "reviewStatus": "reviewed",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+        "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
+        "reviewNote": "mechanical: text block unheaded-block-1 of system-architecture/history/architect-readme.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 1d36d1e33d5a609a equal the request, sidecar and committed bytes; system-architecture/history/architect-readme.md declares Design status Candidate (history), non-canonical history carrier, not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
+      },
+      "amendedBy": "codex-session:unit-run-1792028685519-ebec4fbb@2026-10-15",
+      "rebindingReason": "R6-8 header completion / A22 local digest rebind only. Current native identity and list equality require next sync; no identity is allocated or approval carried."
     },
     {
       "claimId": "claim_4ea489ceb9de68fc157a43c0496640a8",
@@ -959,25 +979,17 @@
   "previousCount": 82,
   "authoredCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
   "nativeRebinding": {
-    "fullNativeTupleEquality": true,
+    "status": "pending-native-sync",
+    "fullNativeTupleEquality": false,
+    "currentFullTupleEquality": false,
+    "partitionTupleEquality": false,
     "knownIDsPreserved": true,
     "noApprovalCarry": true,
-    "verifiedCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
-    "verification": "plans/260925-documentation-authority-unification/reports/phase-06/verification-261015-0710-native-sync-bounded-rereview.md",
-    "reviewStatus": "candidate-unverified; no approval or truth certification",
-    "meaning": "Actual native conservation output; all newly allocated identities and predecessor gaps retained without graft or invented disposition.",
-    "currentVerification": "Completed from the once-run native inventory at dfff335d3; all five-field tuples directly equal native output. Formal classification approval remains separate.",
-    "partitionTupleEquality": true,
-    "currentFullTupleEquality": true
+    "meaning": "R6-8: two wrapper tuples locally rebound; native identity/gap reconciliation owed. Earlier complete verification retained in previousNativeVerificationMetadata.beforeClosureCorrection."
   },
   "nativeEquality": {
-    "contentCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
-    "fullTupleEquality": true,
-    "eligibleTupleEquality": true,
-    "nativeReverseCount": 67,
-    "candidateUnverifiedCount": 67,
-    "nativeSync": false,
-    "meaning": "Fresh comparison from persisted registry; metadata application only."
+    "status": "pending-native-sync",
+    "reason": "R6-8 changed two history-wrapper tuples; prior equality is historical."
   },
   "portalCorrection": {
     "reportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
@@ -1234,16 +1246,43 @@
         "meaning": "Accepted canonical portal units are not A28 candidate-unverified; no fresh native equality claimed."
       }
     },
-    "meaning": "Historical metadata at input pin, superseded by the current native proof only; no review or truth acceptance."
+    "meaning": "Historical metadata at input pin, superseded by the current native proof only; no review or truth acceptance.",
+    "beforeClosureCorrection": {
+      "nativeEquality": {
+        "contentCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
+        "fullTupleEquality": true,
+        "eligibleTupleEquality": true,
+        "nativeReverseCount": 67,
+        "candidateUnverifiedCount": 67,
+        "nativeSync": false,
+        "meaning": "Fresh comparison from persisted registry; metadata application only."
+      },
+      "nativeRebinding": {
+        "fullNativeTupleEquality": true,
+        "knownIDsPreserved": true,
+        "noApprovalCarry": true,
+        "verifiedCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
+        "verification": "plans/260925-documentation-authority-unification/reports/phase-06/verification-261015-0710-native-sync-bounded-rereview.md",
+        "reviewStatus": "candidate-unverified; no approval or truth certification",
+        "meaning": "Actual native conservation output; all newly allocated identities and predecessor gaps retained without graft or invented disposition.",
+        "currentVerification": "Completed from the once-run native inventory at dfff335d3; all five-field tuples directly equal native output. Formal classification approval remains separate.",
+        "partitionTupleEquality": true,
+        "currentFullTupleEquality": true
+      },
+      "listReview": {
+        "reviewStatus": "reviewed",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+        "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
+        "meaning": "Accepted committed pre-application list membership and eligibility only; metadata additions below are current verification, not code-truth approval.",
+        "reviewNote": "deep: list file has 67 rows, count 67, previousCount 82, all status candidate-unverified and each row equal to the native strict E reverse tuple against both prior registries (67 of 67, 0 missing, 0 extra), to the request tuples and to the sidecar rows; none is in docs/platform/README.md (the 15 removed portal rows are listed under portalCorrection and removedCanonicalRows and are separately receipted); this applies the author action I required in my earlier review of the 82-row list.",
+        "shownListDigest": "c168d7a2f331586328a70710ed647360923b3f0d73f94f9957faa2b6d6f08e80"
+      }
+    }
   },
   "listReview": {
-    "reviewStatus": "reviewed",
-    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-    "reviewedAt": "2026-10-15",
-    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
-    "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
-    "meaning": "Accepted committed pre-application list membership and eligibility only; metadata additions below are current verification, not code-truth approval.",
-    "reviewNote": "deep: list file has 67 rows, count 67, previousCount 82, all status candidate-unverified and each row equal to the native strict E reverse tuple against both prior registries (67 of 67, 0 missing, 0 extra), to the request tuples and to the sidecar rows; none is in docs/platform/README.md (the 15 removed portal rows are listed under portalCorrection and removedCanonicalRows and are separately receipted); this applies the author action I required in my earlier review of the 82-row list.",
-    "shownListDigest": "c168d7a2f331586328a70710ed647360923b3f0d73f94f9957faa2b6d6f08e80"
+    "reviewStatus": "pending",
+    "reason": "Two R6-8 changed tuple bindings need bounded independent review; remaining 65 row approvals unchanged."
   }
 }

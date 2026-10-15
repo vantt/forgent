@@ -15,6 +15,8 @@ Last reviewed: Pending independent review
 Related:
 - docs/platform/README.md
 - docs/architect/README.md
+Supersedes: None; no legacy source is edited
+Superseded by: None
 ```
 
 Added in candidate: metadata above identifies a non-canonical history carrier. The complete previously reviewed source carriage follows.

@@ -4089,12 +4089,26 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
       "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "proposals/dispatch-control-plane-redesign.md#unheaded-block-39: Lines 172-177 list the exact compiled fields of plan.mjs:444-461 and correctly deny target/handback/execution wrappers and egress.allowed (governance egress is kind/target/content, resolve.mjs:470-477).",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      "reviewStatus": "pending",
+      "priorReview": {
+        "claimId": "claim_de1bde6579325220fa5ddea79b9cd77f",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+        "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+        "authoredBy": "codex-session:1@2026-10-10",
+        "reviewStatus": "reviewed",
+        "reviewNote": "proposals/dispatch-control-plane-redesign.md#unheaded-block-39: Lines 172-177 list the exact compiled fields of plan.mjs:444-461 and correctly deny target/handback/execution wrappers and egress.allowed (governance egress is kind/target/content, resolve.mjs:470-477).",
+        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+        "reviewedAt": "2026-10-10",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+        "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      },
+      "amendedBy": "codex-session:unit-run-1792028685519-ebec4fbb@2026-10-15",
+      "rebindingReason": "R6-5 / A22: historical receipt refers to pre-A19 citation text. Return reference to pending; prior acceptance is history only. Replacement is separately bound, without successor approval carry.",
+      "replacementReceipt": {
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-step6-repin.json",
+        "claimId": "claim_366503bd4dadea43469f1586f4f25f60",
+        "receiptCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452"
+      }
     },
     {
       "claimId": "claim_271c8a780dde80cb18e612f908a4eca1",
@@ -4138,12 +4152,26 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
       "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "proposals/dispatch-control-plane-redesign.md#unheaded-block-47: Lines 210-213: agentType/mcpTool are top-level at plan.mjs:453-454 and the decision does not invoke the facility (caller must hold it), which matches the AGENTS dispatch doctrine.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      "reviewStatus": "pending",
+      "priorReview": {
+        "claimId": "claim_56af2fc53f516253db192a78f0dddc70",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+        "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+        "authoredBy": "codex-session:1@2026-10-10",
+        "reviewStatus": "reviewed",
+        "reviewNote": "proposals/dispatch-control-plane-redesign.md#unheaded-block-47: Lines 210-213: agentType/mcpTool are top-level at plan.mjs:453-454 and the decision does not invoke the facility (caller must hold it), which matches the AGENTS dispatch doctrine.",
+        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+        "reviewedAt": "2026-10-10",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+        "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      },
+      "amendedBy": "codex-session:unit-run-1792028685519-ebec4fbb@2026-10-15",
+      "rebindingReason": "R6-5 / A22: historical receipt refers to pre-A19 citation text. Return reference to pending; prior acceptance is history only. Replacement is separately bound, without successor approval carry.",
+      "replacementReceipt": {
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-step6-repin.json",
+        "claimId": "claim_c5395a2e8480ce44d27f2873c02b8746",
+        "receiptCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452"
+      }
     },
     {
       "claimId": "claim_5eb1a66a85debe24e36af4c7e071cc4a",

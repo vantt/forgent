@@ -41,3 +41,35 @@ Assignment `unit-run-1792013490296-c08d7894/producer/1` authorizes Step 6 file-o
 ## Accepted portal carriage relocation — 2026-10-15
 
 Lead instruction at `48da12f2b5dedd6d9dd047ffb9c96f9259e20930`: remove the labelled README source carriage appendix from `docs/platform/README.md` and preserve it in `docs/platform/system-architecture/history/architect-readme.md`. Portal prefix restored byte-for-byte; existing reviewed routing retained. Eleven source target bindings pending under A22. No portal authority, design status or implementation statement changed.
+
+## A19 Accepted portal corrections — checkpoint accounting
+
+R6-4 accounting only, 2026-10-15. The two corrections below were already committed; this turn does not edit the portal. Its `Last reviewed: 2026-09-25` stays provenance until promotion review.
+
+### Line 51: archived knowledge-registry plan path
+
+A19 authorizing/applying evidence: `dfff335d3`; include this exact promoted-document diff at the Step 6 checkpoint. Line 59 still uses legacy numbering (R6-3); no further portal change is authorized in this turn.
+
+```diff
+diff --git a/docs/platform/README.md b/docs/platform/README.md
+index 718c746d1..249169217 100644
+--- a/docs/platform/README.md
++++ b/docs/platform/README.md
+@@ -51 +51 @@ Target area docs live at `docs/platform/<area>/`.
+-| `documentation-system` | Full-horizon proposal: [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md); proposed active H1 migration plan: `plans/260925-documentation-authority-unification/plan.md`; implemented end-user registry foundation: `plans/260825-1841-knowledge-registry/plan.md` |
++| `documentation-system` | Full-horizon proposal: [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md); proposed active H1 migration plan: `plans/260925-documentation-authority-unification/plan.md`; implemented end-user registry foundation: `archive/plans/260825-1841-knowledge-registry/plan.md` |
+```
+
+### Line 59: authorized migration status correction
+
+A19 authorizing/applying evidence: `2c228f69c`; include this exact promoted-document diff at the Step 6 checkpoint. Line 59 still uses legacy numbering (R6-3); no further portal change is authorized in this turn.
+
+```diff
+diff --git a/docs/platform/README.md b/docs/platform/README.md
+index baee43418..718c746d1 100644
+--- a/docs/platform/README.md
++++ b/docs/platform/README.md
+@@ -59 +59 @@ Target area docs live at `docs/platform/<area>/`.
+-| Proposed | Exact migration order for existing areas | `plans/260925-documentation-authority-unification/plan.md`; Phases 00–02 are completed, Phases 03–09 remain unauthorized |
++| Proposed | Exact migration order for existing areas | `plans/260925-documentation-authority-unification/plan.md`; Phases 00–04 are completed, Phase 05 is authorized and in progress, Phases 06–09 remain unauthorized |
+```
