@@ -135,7 +135,30 @@ Các phép đo S5, S7, S8 rẻ, chạy được ngay để biến "hoãn" thành
 
 Kiểm chứng hai bản sửa: `npm test` đầy đủ trên nhánh tích hợp 7730 test — 11 fail, **không cái nào do hai bản sửa** (10 là regression snapshot ở trên, đã sửa; 1 là test herdr live flaky khi chạy cả bộ, chạy riêng xanh 2/2 trên cả main và nhánh tích hợp). Sau khi land, 8 file test liên quan trên main: 203/203 xanh. Chưa push, chưa activate. Còn hở: lý do `adminReason` mới hiện ở output, chưa ghi vào event log.
 
-### 6.2 Còn lại
+### 6.2 Đầu việc theo ba vấn đề nền (anh duyệt 2026-10-15)
+
+Loại: **code** = viết test rồi code luôn; **plan** = plan có phase rồi code; **thiết kế** = thiết kế + phản biện (Astra) trước.
+
+| # | Đầu việc | Loại | Đợt |
+|---|---|---|---|
+| 4.0 | W1': gỡ kẹt 180 s của `main-checkout.lock` + bảo vệ checkpoint dưới merge-slot (vá tạm, Node) | code (đang làm) → Astra review diff | 1 |
+| 4.1 | Thiết kế lock bản 3 (sửa B1–B9) — **chung một tài liệu với 6.1** | thiết kế | 1 |
+| 4.2 | Holder-lock trên ledger (Node) + tầng process-facts, chuyển từng lock | plan | 2 |
+| 4.3 | Main checkout một cửa ghi; kiểm trần worker trong `events.lock`; thu hẹp vùng claim | plan | 2 |
+| 4.4 | Port holder-lock sang crate Rust (đường nóng `events`/`claims` giữ Node) | plan | 3 |
+| 4.5 | Doctor/registry các lock, dọn đồ thừa | code | 4 |
+| 5.1 | **Resolver identity sang crate Rust** `fgos-session-identity` (nguồn duy nhất): thứ tự env `FGOS_SESSION_ID → CODEX_THREAD_ID → CLAUDE_CODE_SESSION_ID`, đi ngược tới tổ tiên còn tty, lớp gọi mỏng từ Node đủ 5 điều kiện S6, `shard.rs` dùng chung, xoá resolver Node, không fallback Node khi thiếu binary, dọn claim một lần trước activate | plan + phản biện (có lead agent riêng) | 1 |
+| 5.2 | Nửa launcher: mint id cho worker, scrub env, lineage | nằm trong 6.3 | 4 |
+| 6.0 | Vá tạm: lỗi IPC của cli-spawn (xong, chưa merge) + bản vá reaper gọn (đang làm, gồm marker cho cli-spawn) | code | 1 |
+| 6.1 | Thiết kế run supervisor dùng chung mọi carrier (chủ lần chạy, hạn giờ, receipt, heartbeat, `--resume` nhận kết quả cũ, driver cli/herdr/tmux) | thiết kế | 1 |
+| 6.2 | Lõi supervisor Rust + driver cli | plan (cần 4.4) | 3 |
+| 6.3 | Driver herdr + 5.2 + supervisor làm chủ home; xoá phần canh pane trong `herdr-round` và bản vá reaper tạm; S2 phải xanh hết | plan | 4 |
+| 6.4 | Hoàn tất việc khi process điều khiển chết (`result.json`, `unit-summary`, trả credential); đóng lần chạy treo `running` | plan | 4 |
+| — | Tab/pane herdr: gom tab (2.3), bỏ root pane (2.4) | code | 1 |
+
+Đường găng: 4.1+6.1 → 4.2/4.3 → 4.4 → 6.2 → 6.3/6.4. **Quyết định thời điểm Rust (OQ1):** identity — nửa resolver sang Rust ngay (5.1), nửa launcher đi cùng run supervisor Rust (6.3); lock và supervisor viết Rust theo thiết kế 4.1+6.1.
+
+### 6.3 Còn lại
 
 1. **Astra vòng 2** cho thiết kế lock bản 2 → rồi trả lời 4 câu ở mục 17 của bản 2 và OQ1.
 2. **T8** (giết process điều khiển giữa lúc chạy herdr-spawn / cli-spawn): đang đo; quyết có làm **run supervisor component dùng chung** cho mọi carrier không.
