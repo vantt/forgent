@@ -24,17 +24,12 @@
       "targetAnchor": "coordination-dispatch-execution-contract",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep the map proposal conservatively: the shared dispatch boundary survives. No acceptance of its unbuilt coordinator-facing contract or historical observations as current truth. Evidence: Source Correction to the current discussion / Responsibility split makes Dispatch the execution substrate. src/runner/execution/bind.mjs and run.mjs, src/runner/dispatch/assignment.mjs and assignment-runner.mjs survive; retired engine-internal consult/close observations remain dated. Complete source heading docs/architect/proposals/coordination-dispatch-contract.md#coordination-dispatch-execution-contract (lines 1–1) is carried at docs/platform/proposals/coordination-dispatch-contract.md#coordination-dispatch-execution-contract (lines 1–1); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: read src L1-1 (heading coordination-dispatch-execution-contract) to tgt L1-1 with diff (Judgment, mandatory differing pair); H1 section grows only by the candidate metadata fence, the labelled Added in candidate paragraph and the Source relationship line; remaining source text identical; digests recomputed by script equal pack and shard, anchor passes list-doc-anchors, owner and disposition supersede match the frozen map target",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-10-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "1dfc677cd18cd822072acc9494aea6cdadf3f7a7e46c7cb33a27db1274776b2b",
-      "targetAncestry": [],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep the map proposal conservatively: the shared dispatch boundary survives. No acceptance of its unbuilt coordinator-facing contract or historical observations as current truth. Evidence: Source Correction to the current discussion / Responsibility split makes Dispatch the execution substrate. src/runner/execution/bind.mjs and run.mjs, src/runner/dispatch/assignment.mjs and assignment-runner.mjs survive; retired engine-internal consult/close observations remain dated. Complete source heading docs/architect/proposals/coordination-dispatch-contract.md#coordination-dispatch-execution-contract (lines 1–1) is carried at docs/platform/proposals/coordination-dispatch-contract.md#coordination-dispatch-execution-contract (lines 1–1); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "82e90ef583401448e13d3d31ef8d3282808450b97089263c660247a492214e75",
+      "targetAncestry": []
     },
     {
       "claimId": "claim_517b04975763b42dd775bc2d49f1f559",
@@ -64,19 +59,14 @@
       "targetAnchor": "unheaded-block-5",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep the map proposal conservatively: the shared dispatch boundary survives. No acceptance of its unbuilt coordinator-facing contract or historical observations as current truth. Evidence: Source Correction to the current discussion / Responsibility split makes Dispatch the execution substrate. src/runner/execution/bind.mjs and run.mjs, src/runner/dispatch/assignment.mjs and assignment-runner.mjs survive; retired engine-internal consult/close observations remain dated. Complete source unheaded-block docs/architect/proposals/coordination-dispatch-contract.md#unheaded-block-2 (lines 10–13) is carried at docs/platform/proposals/coordination-dispatch-contract.md#unheaded-block-5 (lines 34–37); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: read src L10-13 (unheaded-block unheaded-block-2) to tgt L34-37 with diff (Judgment, mandatory differing pair); 4 line(s) differ only in physical link destinations; each rebased link resolves to the same legacy repository path as the source link (referents compared); digests recomputed by script equal pack and shard, anchor passes list-doc-anchors, owner and disposition supersede match the frozen map target",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-10-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "e41bfc4e3ab998469ceeab7f7d6ec7fc34102db880e8a1c4cbee9df9299adc75",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep the map proposal conservatively: the shared dispatch boundary survives. No acceptance of its unbuilt coordinator-facing contract or historical observations as current truth. Evidence: Source Correction to the current discussion / Responsibility split makes Dispatch the execution substrate. src/runner/execution/bind.mjs and run.mjs, src/runner/dispatch/assignment.mjs and assignment-runner.mjs survive; retired engine-internal consult/close observations remain dated. Complete source unheaded-block docs/architect/proposals/coordination-dispatch-contract.md#unheaded-block-2 (lines 10–13) is carried at docs/platform/proposals/coordination-dispatch-contract.md#unheaded-block-5 (lines 34–37); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "b584a09e419efdcaa3c420106c969b32f6db91c76b1f8917a63dd00ce3147986",
       "targetAncestry": [
         "Coordination ↔ Dispatch & Execution Contract"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_6c299fe3f83c529c32ea5062d20d92a7",

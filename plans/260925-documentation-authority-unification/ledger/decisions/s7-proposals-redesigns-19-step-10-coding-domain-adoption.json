@@ -24,17 +24,12 @@
       "targetAnchor": "step-10---coding-domain-adoption-of-the-coordination-foundation",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Evidence: docs/platform/system-architecture/architecture/roadmap.md:53 retains the direction, explicitly using Workflow runner and Execution Core. Source lines 3–32 calls itself Discussion, Not started and no implemented slice. domains/coding/workflows/feature.yaml and harness/enrich-and-validate-contract.mjs survive. Complete source heading docs/architect/proposals/step-10-coding-domain-adoption.md#step-10---coding-domain-adoption-of-the-coordination-foundation (lines 1–1) is carried at docs/platform/proposals/step-10-coding-domain-adoption.md#step-10---coding-domain-adoption-of-the-coordination-foundation (lines 1–1); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: H1 text equal at S1 and T1; digest differs only because the section payload S2-34 now includes the inserted candidate txt metadata, Added in candidate and Source relationship units plus the four-backtick fence wrapped around source lines 3-26; no source line altered.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-19-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "5dbab26a094bf907350b2791dbc50948793875dcc8b0d410619d08e38e8b57b5",
-      "targetAncestry": [],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Evidence: docs/platform/system-architecture/architecture/roadmap.md:53 retains the direction, explicitly using Workflow runner and Execution Core. Source lines 3–32 calls itself Discussion, Not started and no implemented slice. domains/coding/workflows/feature.yaml and harness/enrich-and-validate-contract.mjs survive. Complete source heading docs/architect/proposals/step-10-coding-domain-adoption.md#step-10---coding-domain-adoption-of-the-coordination-foundation (lines 1–1) is carried at docs/platform/proposals/step-10-coding-domain-adoption.md#step-10---coding-domain-adoption-of-the-coordination-foundation (lines 1–1); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "0f62bfc397e8c3151ffac4d9ae7849d7222516c0708ba4c41a649c7c560251ce",
+      "targetAncestry": []
     },
     {
       "claimId": "claim_4e779fb6d6117a8afbb9b4231fc41517",
@@ -85,19 +80,14 @@
       "targetAnchor": "1-how-to-read-this-draft",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Evidence: docs/platform/system-architecture/architecture/roadmap.md:53 retains the direction, explicitly using Workflow runner and Execution Core. Source lines 3–32 calls itself Discussion, Not started and no implemented slice. domains/coding/workflows/feature.yaml and harness/enrich-and-validate-contract.mjs survive. Complete source heading docs/architect/proposals/step-10-coding-domain-adoption.md#1-how-to-read-this-draft (lines 35–35) is carried at docs/platform/proposals/step-10-coding-domain-adoption.md#1-how-to-read-this-draft (lines 62–62); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: heading equal; section S36-49 digest differs only through the single rebased link at S45 (Agent Coordination Vision, now ../../architect/agent-coordination/vision.md, same referent); rest of the section byte-equal.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-19-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "fdd4cda38bcac2605dcbc9b3e6aed65aaceb9659649561898f5710cab3e2548b",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Evidence: docs/platform/system-architecture/architecture/roadmap.md:53 retains the direction, explicitly using Workflow runner and Execution Core. Source lines 3–32 calls itself Discussion, Not started and no implemented slice. domains/coding/workflows/feature.yaml and harness/enrich-and-validate-contract.mjs survive. Complete source heading docs/architect/proposals/step-10-coding-domain-adoption.md#1-how-to-read-this-draft (lines 35–35) is carried at docs/platform/proposals/step-10-coding-domain-adoption.md#1-how-to-read-this-draft (lines 62–62); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "6b25a37938e9866fcdd2d75b1146dcd8f169f3f79b77ee811d51226951caa2f6",
       "targetAncestry": [
         "Step 10 - Coding Domain Adoption Of The Coordination Foundation"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_c9c28e6e9b543488b1cb729ebd0b5bf1",
@@ -150,20 +140,15 @@
       "targetAnchor": "unheaded-block-8",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Evidence: docs/platform/system-architecture/architecture/roadmap.md:53 retains the direction, explicitly using Workflow runner and Execution Core. Source lines 3–32 calls itself Discussion, Not started and no implemented slice. domains/coding/workflows/feature.yaml and harness/enrich-and-validate-contract.mjs survive. Complete source unheaded-block docs/architect/proposals/step-10-coding-domain-adoption.md#unheaded-block-5 (lines 44–48) is carried at docs/platform/proposals/step-10-coding-domain-adoption.md#unheaded-block-8 (lines 71–75); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: S44-48 vs T71-75 byte-equal except the Agent Coordination Vision link rebased from ../agent-coordination/vision.md to ../../architect/agent-coordination/vision.md, same repository path; V-002 V-008 V-011 V-012 text intact.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-19-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "89660d655f8ac9af2bbc282ab32c946c3be366e096c6fe19c61f571058dc5635",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Evidence: docs/platform/system-architecture/architecture/roadmap.md:53 retains the direction, explicitly using Workflow runner and Execution Core. Source lines 3–32 calls itself Discussion, Not started and no implemented slice. domains/coding/workflows/feature.yaml and harness/enrich-and-validate-contract.mjs survive. Complete source unheaded-block docs/architect/proposals/step-10-coding-domain-adoption.md#unheaded-block-5 (lines 44–48) is carried at docs/platform/proposals/step-10-coding-domain-adoption.md#unheaded-block-8 (lines 71–75); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "9a72764f43e157ead45583cb9c4c767db45439bc8754e850f2594e1dc750de89",
       "targetAncestry": [
         "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
         "1. How To Read This Draft"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_278cd2fef40a0c6f76eec033d9a2ab07",
@@ -346,19 +331,14 @@
       "targetAnchor": "3-high-level-adoption-plan",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Evidence: docs/platform/system-architecture/architecture/roadmap.md:53 retains the direction, explicitly using Workflow runner and Execution Core. Source lines 3–32 calls itself Discussion, Not started and no implemented slice. domains/coding/workflows/feature.yaml and harness/enrich-and-validate-contract.mjs survive. Complete source heading docs/architect/proposals/step-10-coding-domain-adoption.md#3-high-level-adoption-plan (lines 93–93) is carried at docs/platform/proposals/step-10-coding-domain-adoption.md#3-high-level-adoption-plan (lines 120–120); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: heading equal; section S94-274 digest differs only through the one rebased link at S212 (A0 plan link); the txt fenced blocks inside the section are byte-equal.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-19-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "57e2aec68e3b6a1134a3f47e90c648ece550254d5e539c6ece244dc5c107549f",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Evidence: docs/platform/system-architecture/architecture/roadmap.md:53 retains the direction, explicitly using Workflow runner and Execution Core. Source lines 3–32 calls itself Discussion, Not started and no implemented slice. domains/coding/workflows/feature.yaml and harness/enrich-and-validate-contract.mjs survive. Complete source heading docs/architect/proposals/step-10-coding-domain-adoption.md#3-high-level-adoption-plan (lines 93–93) is carried at docs/platform/proposals/step-10-coding-domain-adoption.md#3-high-level-adoption-plan (lines 120–120); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "96d3315704f20b8c03a7b92426d0929daa1331997f6c8bc9cfe91eaa32d75c0b",
       "targetAncestry": [
         "Step 10 - Coding Domain Adoption Of The Coordination Foundation"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_67505ee7846969c26c97829b79c58434",
@@ -587,20 +567,15 @@
       "targetAnchor": "unheaded-block-25",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Evidence: docs/platform/system-architecture/architecture/roadmap.md:53 retains the direction, explicitly using Workflow runner and Execution Core. Source lines 3–32 calls itself Discussion, Not started and no implemented slice. domains/coding/workflows/feature.yaml and harness/enrich-and-validate-contract.mjs survive. Complete source unheaded-block docs/architect/proposals/step-10-coding-domain-adoption.md#unheaded-block-22 (lines 211–212) is carried at docs/platform/proposals/step-10-coding-domain-adoption.md#unheaded-block-25 (lines 238–239); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: S211-212 vs T238-239 equal except the A0 plan link rebased to ../../architect/proposals/step-10-a0-coding-domain-boundary-facade-plan.md, which resolves to the original referent and exists.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-19-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "fcced8e49866778eb28238af97c2e051af2ee7cd0e43e7618cd6e2b2ce1df721",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Evidence: docs/platform/system-architecture/architecture/roadmap.md:53 retains the direction, explicitly using Workflow runner and Execution Core. Source lines 3–32 calls itself Discussion, Not started and no implemented slice. domains/coding/workflows/feature.yaml and harness/enrich-and-validate-contract.mjs survive. Complete source unheaded-block docs/architect/proposals/step-10-coding-domain-adoption.md#unheaded-block-22 (lines 211–212) is carried at docs/platform/proposals/step-10-coding-domain-adoption.md#unheaded-block-25 (lines 238–239); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "95b35698d2e26e6bb38bd5ea8151b5e1c96dafa5ec873310d9006ba1f9f8adca",
       "targetAncestry": [
         "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
         "3. High-Level Adoption Plan"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_297959b4b26fd7d081334fc586f8873b",
@@ -854,19 +829,14 @@
       "targetAnchor": "4-dependency-on-step-08-and-step-09",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Evidence: docs/platform/system-architecture/architecture/roadmap.md:53 retains the direction, explicitly using Workflow runner and Execution Core. Source lines 3–32 calls itself Discussion, Not started and no implemented slice. domains/coding/workflows/feature.yaml and harness/enrich-and-validate-contract.mjs survive. Complete source heading docs/architect/proposals/step-10-coding-domain-adoption.md#4-dependency-on-step-08-and-step-09 (lines 311–311) is carried at docs/platform/proposals/step-10-coding-domain-adoption.md#4-dependency-on-step-08-and-step-09 (lines 338–338); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: heading equal; section S312-339 differs only through the rebased Component Authority Boundary Map link at S326, same referent.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-19-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "8e891c41440fba675e7aa1038d558b28e4a1f92c31403adcc46342a509ccb981",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Evidence: docs/platform/system-architecture/architecture/roadmap.md:53 retains the direction, explicitly using Workflow runner and Execution Core. Source lines 3–32 calls itself Discussion, Not started and no implemented slice. domains/coding/workflows/feature.yaml and harness/enrich-and-validate-contract.mjs survive. Complete source heading docs/architect/proposals/step-10-coding-domain-adoption.md#4-dependency-on-step-08-and-step-09 (lines 311–311) is carried at docs/platform/proposals/step-10-coding-domain-adoption.md#4-dependency-on-step-08-and-step-09 (lines 338–338); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "1d879354ffc73a1ec525472763b1eb42f37800cacb97c1bbb72fc61194e12b74",
       "targetAncestry": [
         "Step 10 - Coding Domain Adoption Of The Coordination Foundation"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_b3809c970cd360e7286a3cfb37e432be",
@@ -919,20 +889,15 @@
       "targetAnchor": "unheaded-block-38",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Evidence: docs/platform/system-architecture/architecture/roadmap.md:53 retains the direction, explicitly using Workflow runner and Execution Core. Source lines 3–32 calls itself Discussion, Not started and no implemented slice. domains/coding/workflows/feature.yaml and harness/enrich-and-validate-contract.mjs survive. Complete source unheaded-block docs/architect/proposals/step-10-coding-domain-adoption.md#unheaded-block-35 (lines 324–329) is carried at docs/platform/proposals/step-10-coding-domain-adoption.md#unheaded-block-38 (lines 351–356); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: S324-329 vs T351-356 equal except the Component Authority Boundary Map link rebased to ../../architect/proposals/component-authority-boundary-map.md, same referent, exists.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-19-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "3e55a6bee078e912313eb1bf9d17c2936238dd1e9ee7564b5c68f6c4747d524a",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Evidence: docs/platform/system-architecture/architecture/roadmap.md:53 retains the direction, explicitly using Workflow runner and Execution Core. Source lines 3–32 calls itself Discussion, Not started and no implemented slice. domains/coding/workflows/feature.yaml and harness/enrich-and-validate-contract.mjs survive. Complete source unheaded-block docs/architect/proposals/step-10-coding-domain-adoption.md#unheaded-block-35 (lines 324–329) is carried at docs/platform/proposals/step-10-coding-domain-adoption.md#unheaded-block-38 (lines 351–356); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "84b3bb414cc305a853a6c1861dfd52727d90d0ce7febceff36bde8e4c7ec64cc",
       "targetAncestry": [
         "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
         "4. Dependency On Step 08 And Step 09"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_3e71ad7bb30b6e567c5116c45794a382",
@@ -1346,19 +1311,14 @@
       "targetAnchor": "6-architectural-stance",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Evidence: docs/platform/system-architecture/architecture/roadmap.md:53 retains the direction, explicitly using Workflow runner and Execution Core. Source lines 3–32 calls itself Discussion, Not started and no implemented slice. domains/coding/workflows/feature.yaml and harness/enrich-and-validate-contract.mjs survive. Complete source heading docs/architect/proposals/step-10-coding-domain-adoption.md#6-architectural-stance (lines 431–431) is carried at docs/platform/proposals/step-10-coding-domain-adoption.md#6-architectural-stance (lines 458–458); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: heading equal; section S432-489 differs only through the rebased advisory section 10 link at S435, same referent.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-19-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "6c4d67aae25eab8f5ed3615c12f5c9e6443c3294823a26d1502a75677253293c",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Evidence: docs/platform/system-architecture/architecture/roadmap.md:53 retains the direction, explicitly using Workflow runner and Execution Core. Source lines 3–32 calls itself Discussion, Not started and no implemented slice. domains/coding/workflows/feature.yaml and harness/enrich-and-validate-contract.mjs survive. Complete source heading docs/architect/proposals/step-10-coding-domain-adoption.md#6-architectural-stance (lines 431–431) is carried at docs/platform/proposals/step-10-coding-domain-adoption.md#6-architectural-stance (lines 458–458); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "cf1b22b48074c778936589f6415434ea5f61b1a50cc240af7b72b8e26bfb2ba2",
       "targetAncestry": [
         "Step 10 - Coding Domain Adoption Of The Coordination Foundation"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_c549231db06f3511d15fc9534421715c",
@@ -1367,20 +1327,15 @@
       "targetAnchor": "unheaded-block-51",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Evidence: docs/platform/system-architecture/architecture/roadmap.md:53 retains the direction, explicitly using Workflow runner and Execution Core. Source lines 3–32 calls itself Discussion, Not started and no implemented slice. domains/coding/workflows/feature.yaml and harness/enrich-and-validate-contract.mjs survive. Complete source unheaded-block docs/architect/proposals/step-10-coding-domain-adoption.md#unheaded-block-48 (lines 433–435) is carried at docs/platform/proposals/step-10-coding-domain-adoption.md#unheaded-block-51 (lines 460–462); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: S433-435 vs T460-462 equal except the component-boundary-advisory link rebased to ../../architect/component-boundary/component-boundary-advisory.md, same referent; the four platform engines sentence intact.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-19-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "ff4e419713858a3e2ae05d04d1beb07ecd9aaa12d0578fdc89aeb5f38eb0a188",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Evidence: docs/platform/system-architecture/architecture/roadmap.md:53 retains the direction, explicitly using Workflow runner and Execution Core. Source lines 3–32 calls itself Discussion, Not started and no implemented slice. domains/coding/workflows/feature.yaml and harness/enrich-and-validate-contract.mjs survive. Complete source unheaded-block docs/architect/proposals/step-10-coding-domain-adoption.md#unheaded-block-48 (lines 433–435) is carried at docs/platform/proposals/step-10-coding-domain-adoption.md#unheaded-block-51 (lines 460–462); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "8fcaa27106459c74b11c9c7d3a8e7d2c71d5ef50241584bdd899b883ca8ef6eb",
       "targetAncestry": [
         "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
         "6. Architectural Stance"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_0bc395532fcfa75036424f99375762e5",
@@ -1716,20 +1671,15 @@
       "targetAnchor": "91-boundary-map-input-shape",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Evidence: docs/platform/system-architecture/architecture/roadmap.md:53 retains the direction, explicitly using Workflow runner and Execution Core. Source lines 3–32 calls itself Discussion, Not started and no implemented slice. domains/coding/workflows/feature.yaml and harness/enrich-and-validate-contract.mjs survive. Complete source heading docs/architect/proposals/step-10-coding-domain-adoption.md#91-boundary-map-input-shape (lines 547–547) is carried at docs/platform/proposals/step-10-coding-domain-adoption.md#91-boundary-map-input-shape (lines 574–574); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: heading equal; section S548-609 differs only through the rebased Component Authority Boundary Map link at S557, same referent.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-19-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "4f3162f65a350d3a52e930890085e6591e32267011e497b41d5a0887f607c1da",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Evidence: docs/platform/system-architecture/architecture/roadmap.md:53 retains the direction, explicitly using Workflow runner and Execution Core. Source lines 3–32 calls itself Discussion, Not started and no implemented slice. domains/coding/workflows/feature.yaml and harness/enrich-and-validate-contract.mjs survive. Complete source heading docs/architect/proposals/step-10-coding-domain-adoption.md#91-boundary-map-input-shape (lines 547–547) is carried at docs/platform/proposals/step-10-coding-domain-adoption.md#91-boundary-map-input-shape (lines 574–574); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "6aee115d6a5ef8ae9048352100bb8e7a006af2373e23ac36d343c152c9934597",
       "targetAncestry": [
         "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
         "9. Candidate Step Sequence"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_457dcb9815214f3655a3ebf8120ef65f",
@@ -1761,21 +1711,16 @@
       "targetAnchor": "unheaded-block-65",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Evidence: docs/platform/system-architecture/architecture/roadmap.md:53 retains the direction, explicitly using Workflow runner and Execution Core. Source lines 3–32 calls itself Discussion, Not started and no implemented slice. domains/coding/workflows/feature.yaml and harness/enrich-and-validate-contract.mjs survive. Complete source unheaded-block docs/architect/proposals/step-10-coding-domain-adoption.md#unheaded-block-62 (lines 553–568) is carried at docs/platform/proposals/step-10-coding-domain-adoption.md#unheaded-block-65 (lines 580–595); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: S553-568 vs T580-595 equal except the Component Authority Boundary Map link at S557 rebased (indentation kept); the inline-code path component-boundary/repo-layout-vision.md is not a link and stays unchanged; all four numbered items intact.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-19-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "217569c4e4b3dcc07bd536f9d861518458ab3fb766107b0afea4a9c1ec24c998",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Evidence: docs/platform/system-architecture/architecture/roadmap.md:53 retains the direction, explicitly using Workflow runner and Execution Core. Source lines 3–32 calls itself Discussion, Not started and no implemented slice. domains/coding/workflows/feature.yaml and harness/enrich-and-validate-contract.mjs survive. Complete source unheaded-block docs/architect/proposals/step-10-coding-domain-adoption.md#unheaded-block-62 (lines 553–568) is carried at docs/platform/proposals/step-10-coding-domain-adoption.md#unheaded-block-65 (lines 580–595); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "8c86310dc03b26aada935eac76ada9ca7fc24ebceb452d901ecb7e7db23e3680",
       "targetAncestry": [
         "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
         "9. Candidate Step Sequence",
         "9.1 Boundary Map Input Shape"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_d6958c5271b710ec7b3340bea0aa0343",

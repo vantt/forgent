@@ -1,0 +1,58 @@
+✔ review pack contains full source and target units and reverse unmatched candidate blocks (4.246223ms)
+✔ seeded review uses six real text mutations and scores missed defects and false flags (15.637474ms)
+✔ review application binds current digest and keeps rework and hold pending without inventing approval (6.727033ms)
+✔ valid source digest prefixes survive pack and review application with full seen-text bindings (3.680086ms)
+✔ verdict table names the reviewer and requires an explicit verdict and own note for each row (1.280568ms)
+✔ unknown dispositions remain blocking after a hold verdict and pass decision validation (4.186388ms)
+✔ unknown dispositions remain blocking after a rework verdict and pass decision validation (2.262105ms)
+✔ the same reviewer session on another date is still the author session (0.47748ms)
+✔ pre-reviewed hand rows without committed evidence are rejected instead of skipped (0.643462ms)
+✔ a public seeded pack does not expose its replay inputs or retain original mutated digests (3.473885ms)
+✔ review application requires a passing sensitivity result for the exact shown pack (3.689976ms)
+✔ approval cannot attach to target text or heading ancestry changed after the pack (4.250978ms)
+✔ approved rows retain the seen unit binding and their own report across review rounds (3.411305ms)
+✔ sensitivity controls must belong to the bound batch even when the sensitivity score passes (3.119099ms)
+✔ deduplicates overlapping candidate lists and accounts native strict red without claiming strict green (3.493494ms)
+✔ rejects same-size candidate substitutions and stale digest/anchor/path/identity (0.679116ms)
+✔ rejects unexpected fatal, unknown open category and summary-count mismatch (0.85374ms)
+✔ pending claims must equal holds by identity; unknown-blocking also counted (0.338358ms)
+✔ partial carries compare full native identity including registry predecessors (0.366931ms)
+✔ identical groups compare digest and exact owner sets rather than group counts (0.419663ms)
+✔ missing explicit rows, malformed data and duplicate native identities fail closed (0.313996ms)
+✔ native registry partial rows use source text digest rather than opaque unit identity digest (0.243033ms)
+✔ reviewers receive full text and a unified diff in Markdown with safely nested fences (125.508332ms)
+✔ the public seeded Markdown can be scored without exposing the seed or private selection key (316.462742ms)
+✔ script-proven carries supply batch sensitivity controls without reopening accepted decisions (350.555024ms)
+✔ a new shard cannot claim legacy compatibility by deleting author fields (93.725804ms)
+✔ ordinary committed reviews approve seen text without a sensitivity pack and retain their report pin (274.451315ms)
+▶ ordinary reviews cannot approve a changed digest, an unauthored row or their own session
+  ✔ target-digest (110.595118ms)
+  ✔ source-digest (108.219131ms)
+  ✔ authoredBy (112.47581ms)
+  ✔ authorSession (129.13255ms)
+  ✔ same-session (115.574671ms)
+✔ ordinary reviews cannot approve a changed digest, an unauthored row or their own session (577.408714ms)
+▶ checkpoint reports cannot use the ordinary channel to omit sensitivity proof
+  ✔ checkpoint 3 (222.513708ms)
+  ✔ checkpoint 6 (209.988968ms)
+  ✔ checkpoint 10 (214.561295ms)
+✔ checkpoint reports cannot use the ordinary channel to omit sensitivity proof (647.815888ms)
+✔ the review lint accepts a well-formed ordinary report before application and writes nothing (110.514735ms)
+✔ the review lint uses the recorded target digest of an applied shard without an inventory (165.514008ms)
+▶ the review lint names the line and claim of each malformed verdict row
+  ✔ source-digest-not-64-hex (128.74898ms)
+  ✔ wrong-cell-count (102.525082ms)
+  ✔ non-bare-first-cell (108.869136ms)
+  ✔ target-digest-mismatch (111.679669ms)
+  ✔ source-digest-mismatch (102.580885ms)
+  ✔ bad-verdict (105.374114ms)
+✔ the review lint names the line and claim of each malformed verdict row (660.904276ms)
+✔ the review lint allows labelled non-claim rows but reports unknown claims and missing headers (312.870773ms)
+ℹ tests 47
+ℹ suites 0
+ℹ pass 47
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3745.12421

@@ -1,3 +1,52 @@
+# Step 10 package complete — independent review next
+
+Assignment `unit-run-1792077702187-860e8753/producer/1`; content pin **aecdc30aad0ffd65a2956ff642c4be9410686ede**; comparison base **980cb29312b8701f5ea639278f44e1a57a6e5c02**; SYNC **17b751966**. State: **packaged for independent review; one native source-proof blocker remains**. This checkpoint supersedes the historical docs/data-turn next actions and blanket deep-read wording below. Runner owns commits; no git writes or fgOS CLI calls.
+
+**One background native sync: 857.092s (14m17s)**, compact registry persistence once, **4485 files / 91343 active units**, **99090 → 99300 known IDs**, zero loss, active native inventory/registry tuples equal. **210 new active identities / 198 preserved new gaps / zero new retired identities**; 246 retained native identities have changed path/anchor/text tuples (fully enumerated, not replacement IDs). Registry SHA256 `d447fa18b07d1bf3895800afcc3e099a08887edf8ed21be298991299a4d1bee9`. [Proof](step10-package-native-sync-proof.json), [own background log](step10-package-native-sync.log), [accounting](step10-package-accounting.json). Complete native inventory transported by temporary v8 cache; no field omitted for D, no second generation or sync.
+
+**196 target drift rows in 30 shards rebound pending**, via final bounded native `propose-doc-decisions.mjs --rebind` calls; all returned bounded rows are shown. Only these rows were merged; no other verdict, source correction, disposition, classification, alias, hold/group resolution or baseline was applied. Old approvals removed from current bindings; exact original decisions remain in [before/after receipts](step10-package-rebindings.json). The initial full-shard scratch-only probe also exposed unrelated pre-existing ancestry conditions; none was merged, and its receipts are retained separately. Target text changed in 171 rows; 25 are equal-text anchor relocation. These before/after counts are **not** the A36 source/target comparison.
+
+## D and item 8 dry run
+
+Native D uses the same complete inventory with both prior registries together and each separately. **All three runs return exactly one fatal: `decision-digest-stale` on `claim_46c173824da77fbf25f59072ae8e1620`, source `docs/specs/confinement-authority.md#86-crash-và-cleanup`. Zero remaining decision-target-drift, zero target-anchor failure, zero known-ID conservation loss. D is not green.** [Summary](step10-package-D-summary.json); [both](step10-package-D-both.json), [identity prior](step10-package-D-identity.json), [Phase 02 prior](step10-package-D-phase02.json).
+
+That source heading changed at final main sync before the docs turn. Stored source digest is `a021e5594432d44b1543517b1219a7406a72c4ba9503363e1f8eef3f8085524a`; current source digest is `018713d3e9d6a59a7fb677b2dfa0225a5461509d1b26c27c0cfde12103d9d67a`. Full historical/current source witnesses and the unchanged source-decision boundary are in section c and accounting. **Apply nothing else** prevents silently re-deciding that source or inventing a disposition for its new native binding unit here. Source re-decision/new-unit accounting needs the next authorized author/global work and independent review; a target verdict cannot clear the stale source proof.
+
+**Native `--snapshot` and explicit `--verify` dry runs both exit 1**, rejected by that same decision-proof failure. No valid snapshot was produced. `--verify` was explicitly supplied the failed-snapshot receipt, clearly marked as such, and recomputed/rejected the same decision prerequisites before snapshot comparison. An earlier direct native verify-implementation attempt is also retained. No valid/verified snapshot or sealing is claimed; no history/doc bytes written. [Exact commands/results](step10-package-dry-run.json), [verification log](step10-package-verification.log). For JSON transport only, snapshot receives every native item/claim plus commit and registry binding; D used the complete enumerable object.
+
+D's non-strict conservation-open data remains recorded in full; strict E/global closure comparison was **not** run in this package turn and no global green is claimed. Read-only current comparisons flag stale native tuples in the eight old candidate-list arrays: **24 / 110 / 0 / 40 / 27 / 0 / 0 / 10** (raw list counts, overlaps retained). No list or expected-global input was changed under the target-rebind-only boundary. Native list reconciliation, undisposed gaps, classifications and strict closure belong to the global turn.
+
+## One request, all eight sections
+
+[Single request index](review-request-step10-index-aecdc30aa.md), [machine index](review-request-step10-index-aecdc30aa.json): **854 entries / 13 parts**, each at most 120 entries, pinned to **aecdc30aa**. Part hashes verified. Resulting package commit supplies pending ledger bytes; the content pin supplies immutable document bytes. No producer seed, sample, verdict, sensitivity pack or key.
+
+| Section | Contents | Entries by part |
+|---|---|---:|
+| a | Closing-instructions shard: 109 active + 18 gap decisions; unchanged reviewed row; nine retired accounting records; complete claim_5c520fcb rationale, both lines/retained IDs/digests and A34 residual | 120 + 17 |
+| b | 53-entry retained-map merge and three pending source-map redecisions; exact paths, known-stale/missing-reference caveats | 56 |
+| c | Every rebound row, full before/after decisions/text/digests, native receipts, current source witnesses and the source-proof blocker | 120 + 76 |
+| d | All 37 header fills, fields/provenance/full headers and final file hashes; body-link pass separate | 37 |
+| e | Complete confinement re-carry including admitted RT2-1 limitation, native current source/target binding, all 39 source/alias comparisons | 40 |
+| f | Every link's old/new destination, native committed resolution and unchanged-label/exact-alias referent proof; portal repoints included | 120 + 120 + 120 + 6 |
+| g | Complete history README; no sealed-history claim | 1 |
+| h | All 15 group records, three Rings holds, comparison helper/tests at 980cb2931, other-group/global limits | 21 |
+
+A36 is applied precisely: **mechanical all 196** (digest recompute, anchor check, shard/pack equality and one verdict per row); **deep all 143 source/target-unequal rows**, plus reviewer-seeded **at least 27 of the 176 Weak-exact/Judgment observations** (143 Judgment + 33 Weak-exact). Twenty observed native Unit-exact rows remain pending too. The reviewer records seed/IDs and `deep`/`mechanical` notes; more than 3% rework among deep rows escalates to whole-pack deep reading. Classification observations are request evidence only, no ledger classification/approval. Checkpoint/truth/merge/hold requirements remain unchanged.
+
+All **366 new links resolve** at the content commit, keep labels and match the exact alias-origin/target mapping; every row carries that proof. Independent referent semantics remain owed. 41 historical referents, nine queued links, fenced text, inline-code and non-doc consumer queues remain as logged. Reading-map stale sentences and three literal missing paths retain A35; neither destination existence nor complete headers certify truth.
+
+Confinement: 38 of 39 prior source texts and candidate texts uniquely re-found; only 13 draft target anchors still identify that same text directly. Full current lookup witnesses expose shifted aliases; drafts stay unchanged. The §8.6 heading is edited, not an equal-text match. New verbatim binding unit source `claim_d572bb9dc8501362ae23e6d4a71975d2` and target `claim_339635aad9f4cdcf889b1181ea29d9bd` share full digest `a7af69f1674754e516550a8802a2acc64dd3a49655a4cdd01fa82d43a540d5ed`; identity existence is not a newly authored source disposition.
+
+Six historical instruction witnesses are explicitly unavailable after searching normal and full merge history of AGENTS/CLAUDE, with exact IDs/digests in accounting and section a (five gap records, one retired record). Their native identities and existing rationale remain preserved; no present numbered anchor or original text is fabricated. The complete claim_5c520fcb witness/rationale and both current native identities are shown. Review must assess these limitations; retired records are accounting only, not new native dispositions.
+
+## Validation and next work
+
+A/B/H/I pass: eight unchanged historical A observations, no new scope violation; all five extractor-closure blobs match; H **608 files / 216 checked / zero findings**; I equals baseline. **47/47 targeted review-format/decision-review/global-helper tests pass**, no fail/skip/cancel/todo, `env -u CLAUDE_CODE_SESSION_ID`; [log](step10-package-tests.log). No new tests or full npm-suite claim. [Final audit](step10-package-final-audit.json): only the 196 expected decision rows changed, other shard bytes semantically unchanged; docs/root instructions and 617 tracked script/test files unchanged; every request-part hash matches; one persisted registry hash remains exact. [Reproduction](step10-package-reproduction.json).
+
+**NEXT = independent ordinary review + A28 truth draw over 30 Step 10 current units + red-team-10, then the global turn.** The one stale source decision blocks native proof/snapshot green; six historical instruction witness limits and stale candidate/alias tuples are exposed to review, not silently cleared. No new product-direction question is introduced. Existing three Rings holds, separate pending dashboard predecessor, A34 residual/group/cutover obligations, 14 runner historical cutover revalidations, source/new-unit dispositions, other-group/inbound consumers, T9, full rehearsal (including Step 2), third checkpoint refresh/mutations, independent checkpoint and scorecard/effort remain. Owner token total remains unreported. L10-11 skips Step 10 fresh readers; Phase 7 owns cross-area readers. No promotion, authority flip, legacy retirement, deletion, push, main landing or Phase 6 closure. Phase 6 eventually stops at awaiting owner review.
+
+---
+
 # Step 10 report — docs turn complete
 
 State: **authoring complete; next = package turn** (step10-evidence section 9 turn 3). Assignment `unit-run-1792076952136-42ac8e36/producer/1`; input HEAD `980cb29312b8701f5ea639278f44e1a57a6e5c02`; final main SYNC `17b751966`; B0 `dbe5c432852837ea01e6025b35868bcb7271495d`. Runner owns the resulting content commit. **Zero native sync, zero review packs**, no CLI or git writes. This checkpoint supersedes the next-action wording in the historical data-turn draft below.

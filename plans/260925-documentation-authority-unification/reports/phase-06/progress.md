@@ -1,3 +1,29 @@
+# Step 10 package complete — independent review next
+
+Assignment `unit-run-1792077702187-860e8753/producer/1`; content **aecdc30aa**. **One background native sync 857.092s (~14m17s)**; compact persistence once; **4,485 files / 91,343 active units**, known IDs **99,090 → 99,300, zero loss**; **210 new active / 198 preserved gaps**, active inventory/registry tuples equal. **196 target drift rows / 30 shards rebound pending**, no approval carry or other applications.
+
+**D = one identical fatal against both priors together and each**: source `claim_46c173824da77fbf25f59072ae8e1620` at confinement §8.6 has stale source digest from final-main sync. Target drift is zero; D is not green. Source re-decision/new-unit disposition is outside this target-only package. **Dry-run --snapshot / --verify both exit 1** on that proof; no valid or sealed snapshot. Full old/current source witnesses retained.
+
+**ONE review request: [index](review-request-step10-index-aecdc30aa.md), 854 entries / 13 files (max 120).** Counts a **120/17**, b **56**, c **120/76**, d **37**, e **40**, f **120/120/120/6**, g **1**, h **21**. All 53 map entries + three redecisions; complete closing-instructions rationale/accounting; all rebinds; all 37 headers; confinement carry/39 comparisons; all 366 link destinations/resolution/referents; history index; groups/holds/helper. No seeds/verdicts. **A36: mechanical all196; deep all143 source/target-unequal + reviewer-seeded ≥27/176 Weak-exact/Judgment; >3% deep rework escalates.** The historical interim 171/25 counts below describe before/after target changes, not this corrected A36 denominator.
+
+A/B/H/I pass; **47/47 targeted tests pass**. Scope/hash audit passes; docs/protected tools/root instructions unchanged. Six historical instruction source witnesses remain explicitly unavailable; native candidate/alias/list drift remains accounted for the global turn, unchanged here. No global E/closure or full-suite claim. [Report](step-10-report.md), [native proof](step10-package-native-sync-proof.json), [D](step10-package-D-summary.json), [dry runs](step10-package-dry-run.json), [accounting](step10-package-accounting.json).
+
+**NEXT = independent review + A28 truth draw over Step 10 current units + red-team-10, then the global turn.** Existing source-proof blocker, Rings/dashboard/A34/cutover/groups/consumers/T9/rehearsal/checkpoint/effort obligations stay explicit. No new owner-direction question, CLI/git write, docs mutation, authority flip, retirement, deletion, push/main landing or Phase 6 closure; runner owns commit.
+
+---
+
+# Step 10 package interim checkpoint
+
+Pinned **aecdc30aa**. Native carry persisted compact once: **99,090 → 99,300 known IDs, zero loss**, **210 new active IDs / 198 preserved predecessor gaps**; inventory generation still running in the background. **196 rows rebound pending in 30 shards**, **171 unequal-digest deep / 25 equal-digest seeded population**. One request drafted: **854 entries / 13 parts**, at most 120 each, index `review-request-step10-index-aecdc30aa.md`. All **366 links resolve and retain labels/exact alias referents**; independent semantics remain owed. Six historical instruction witnesses explicitly unavailable. A/B/H/I pass with unchanged eight historical A observations; **47/47 targeted regression tests pass**. D and snapshot/verify remain in progress. Next = independent review + A28 truth draw over Step 10 current units + red-team-10, then global turn.
+
+---
+
+# Step 10 package turn in progress
+
+Assignment `unit-run-1792077702187-860e8753/producer/1`; content pin **aecdc30aad0ffd65a2956ff642c4be9410686ede**. Native sync once, compact persistence once, no known-ID loss; D against both priors, pending target rebindings, snapshot/verify dry run and one partitioned review request are in progress. No docs edits, seeds, verdicts, fgOS CLI or git writes. Next = independent review + A28 current-unit truth draw + red-team-10, then global turn.
+
+---
+
 # Step 10 docs turn complete — package turn next
 
 Assignment `unit-run-1792076952136-42ac8e36/producer/1`; input **980cb2931**, SYNC **17b751966**, B0 **dbe5c432852837ea01e6025b35868bcb7271495d**. State **authoring complete**. Runner owns the content commit. **Zero native sync / zero review packs** this turn.

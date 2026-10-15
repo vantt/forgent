@@ -1539,19 +1539,14 @@
       "targetAnchor": "13-migration-rule",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:17@2026-10-14",
-      "rationale": "Whole Migration Rule section is retained; only two relative link spellings change, to ../transitional-switchboard.md and migration-authoring-rules.md, preserving the original repository destinations. Every prose clause and obligation is retained. No governance rule or authority changes.",
-      "reviewNote": "Section diff shows only the two link destinations changed (../transitional-switchboard.md and migration-authoring-rules.md); both resolve to the same docs files as the source links; the stale component-boundary sentence is gone and nothing else was claimed.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-rework.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "c75402a1584a65fe82b7c8343d1694feb1ac4af353095ac1e3a7c46356d01100",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Whole Migration Rule section is retained; only two relative link spellings change, to ../transitional-switchboard.md and migration-authoring-rules.md, preserving the original repository destinations. Every prose clause and obligation is retained. No governance rule or authority changes. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "19fe9bf85f578c7681a72d982c0c65fb87a21d03f6394be522e1d88054921337",
       "targetAncestry": [
         "Documentation Governance"
-      ],
-      "reviewReportCommit": "18962827a371c629b91475e6b2540a998fa30e9a"
+      ]
     },
     {
       "claimId": "claim_c40dc0b5fa924e4daedc4551ec10a67c",
@@ -1582,20 +1577,15 @@
       "targetAnchor": "unheaded-block-59",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:17@2026-10-14",
-      "rationale": "Whole Migration Rule block is retained; only two relative link spellings change, to ../transitional-switchboard.md and migration-authoring-rules.md, preserving the original repository destinations. Every prose clause and obligation is retained. No governance rule or authority changes.",
-      "reviewNote": "Body block 59 differs from the source block only by the same two link spellings, which the rationale names; prose and the parenthetical obligation list are verbatim; the removed component-boundary wording was never in this block.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-rework.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "fb5565f1a415763fd84e9474b968e9780d3cf1ede3d0bdc242c58b499f90bfc3",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Whole Migration Rule block is retained; only two relative link spellings change, to ../transitional-switchboard.md and migration-authoring-rules.md, preserving the original repository destinations. Every prose clause and obligation is retained. No governance rule or authority changes. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "b285c3c99d4ba9b0b55f76043cae7212eafcf0f67324ea18cc084f0d4465692d",
       "targetAncestry": [
         "Documentation Governance",
         "13. Migration Rule"
-      ],
-      "reviewReportCommit": "18962827a371c629b91475e6b2540a998fa30e9a"
+      ]
     },
     {
       "claimId": "claim_66f7be3b79ca1fe458ce0416ba1adf89",
@@ -1604,19 +1594,14 @@
       "targetAnchor": "14-related-files",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:17@2026-10-14",
-      "rationale": "Whole Related Files section is retained. Nine relative link spellings are adjusted across governance.md to preserve the original repository destinations, including the documentation portal README.md now written ../README.md (docs/README.md), distinct from the platform portal. This unit contains no component-boundary plain path. No governance rule or authority changes.",
-      "reviewNote": "All six table links resolve to the source destinations and the documentation portal row now reaches docs/README.md, distinct from the platform portal row (README.md = docs/platform/README.md); the nine count is 8 respelled links plus one link-to-plain-path elsewhere in the file (nit, not misleading); the section has no component-boundary path.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-rework.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "e589d54d9c81da5e926e98fa5cecf502a3fbe44355a75963d71242b42ef55edb",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Whole Related Files section is retained. Nine relative link spellings are adjusted across governance.md to preserve the original repository destinations, including the documentation portal README.md now written ../README.md (docs/README.md), distinct from the platform portal. This unit contains no component-boundary plain path. No governance rule or authority changes. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "1b5703ab9905bb5b86c289e9b6474f95cb2313ac563451919595515af5f1000c",
       "targetAncestry": [
         "Documentation Governance"
-      ],
-      "reviewReportCommit": "18962827a371c629b91475e6b2540a998fa30e9a"
+      ]
     },
     {
       "claimId": "claim_5f99956630d0cb78499c2a3542d2e5e3",
@@ -1625,20 +1610,15 @@
       "targetAnchor": "unheaded-block-60",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:17@2026-10-14",
-      "rationale": "Whole Related Files table is retained. Nine relative link spellings are adjusted across governance.md to preserve the original repository destinations, including the documentation portal README.md now written ../README.md (docs/README.md), distinct from the platform portal. This unit contains no component-boundary plain path. No governance rule or authority changes.",
-      "reviewNote": "Table block 60 carries the same six rows and labels with only destinations changed; the rationale about ../README.md = docs/README.md is true and the former wrong README target is gone; same nine-count nit as the heading row.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-rework.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "0729946d01afffc2b5800527271a368947d3971968759a447bd51eec81f15f5b",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Whole Related Files table is retained. Nine relative link spellings are adjusted across governance.md to preserve the original repository destinations, including the documentation portal README.md now written ../README.md (docs/README.md), distinct from the platform portal. This unit contains no component-boundary plain path. No governance rule or authority changes. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "32b40e383cb5cb41ff5b61f312d99116278ddac6728391109adbd1f7f891c4ba",
       "targetAncestry": [
         "Documentation Governance",
         "14. Related Files"
-      ],
-      "reviewReportCommit": "18962827a371c629b91475e6b2540a998fa30e9a"
+      ]
     },
     {
       "claimId": "claim_1ac3dcd4a11d62a3397b6563d1e0a386",

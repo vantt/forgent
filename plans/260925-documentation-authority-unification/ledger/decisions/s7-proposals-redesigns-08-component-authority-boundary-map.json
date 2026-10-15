@@ -24,17 +24,12 @@
       "targetAnchor": "component-authority-boundary-map",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal. No component-boundary change; no promotion of draft ports or ownership. Evidence: docs/platform/component-boundary.md:40,90,511 directly cites the draft; docs/platform/system-architecture/architecture/roadmap.md:55 still schedules component-boundary work. Source lines 3–18 explicitly withholds accepted authority. Complete source heading docs/architect/proposals/component-authority-boundary-map.md#component-authority-boundary-map (lines 1–1) is carried at docs/platform/proposals/component-authority-boundary-map.md#component-authority-boundary-map (lines 1–1); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: H1 differs only by the inserted candidate metadata block, the Added in candidate paragraph and Source relationship line (labelled, no unlabelled claim) and the rebased links of the Related line; source Draft/Not started header and status text carried verbatim; rationale evidence component-boundary.md lines 40, 90, 511 and roadmap.md line 55 verified",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-08-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "dd6f0ca1c6cde70d021a36a77ae3ba02fe91701fc2b1ecf01c15273afdf9b485",
-      "targetAncestry": [],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal. No component-boundary change; no promotion of draft ports or ownership. Evidence: docs/platform/component-boundary.md:40,90,511 directly cites the draft; docs/platform/system-architecture/architecture/roadmap.md:55 still schedules component-boundary work. Source lines 3–18 explicitly withholds accepted authority. Complete source heading docs/architect/proposals/component-authority-boundary-map.md#component-authority-boundary-map (lines 1–1) is carried at docs/platform/proposals/component-authority-boundary-map.md#component-authority-boundary-map (lines 1–1); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "ea76b5f02344271149099a664a5f178492877996d5e5b0b3c6f548533cd8829b",
+      "targetAncestry": []
     },
     {
       "claimId": "claim_d9bc09e7463502aa503b0e6024f5fc32",
@@ -43,19 +38,14 @@
       "targetAnchor": "unheaded-block-4",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal. No component-boundary change; no promotion of draft ports or ownership. Evidence: docs/platform/component-boundary.md:40,90,511 directly cites the draft; docs/platform/system-architecture/architecture/roadmap.md:55 still schedules component-boundary work. Source lines 3–18 explicitly withholds accepted authority. Complete source unheaded-block docs/architect/proposals/component-authority-boundary-map.md#unheaded-block-1 (lines 3–8) is carried at docs/platform/proposals/component-authority-boundary-map.md#unheaded-block-4 (lines 27–32); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: header unit (Related line) differs only by link destinations; all 9 rebased destinations resolve to the same legacy files as the source ones, labels untouched; Document type, Design status Draft, Implementation Not started lines verbatim",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-08-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "bfbe7b58638e0205b5a87258235220798b6f87e3395dee5c9ce3ae3085d8d615",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal. No component-boundary change; no promotion of draft ports or ownership. Evidence: docs/platform/component-boundary.md:40,90,511 directly cites the draft; docs/platform/system-architecture/architecture/roadmap.md:55 still schedules component-boundary work. Source lines 3–18 explicitly withholds accepted authority. Complete source unheaded-block docs/architect/proposals/component-authority-boundary-map.md#unheaded-block-1 (lines 3–8) is carried at docs/platform/proposals/component-authority-boundary-map.md#unheaded-block-4 (lines 27–32); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "f357bd2fe393c910bd82e9a5e8929b625e9707cf9473586bfa468c6c48f5b6dd",
       "targetAncestry": [
         "Component Authority Boundary Map"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_7be7f2579917656f6790c5fd8ffefb32",
@@ -499,19 +489,14 @@
       "targetAnchor": "6-authority-ownership",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal. No component-boundary change; no promotion of draft ports or ownership. Evidence: docs/platform/component-boundary.md:40,90,511 directly cites the draft; docs/platform/system-architecture/architecture/roadmap.md:55 still schedules component-boundary work. Source lines 3–18 explicitly withholds accepted authority. Complete source heading docs/architect/proposals/component-authority-boundary-map.md#6-authority-ownership (lines 184–184) is carried at docs/platform/proposals/component-authority-boundary-map.md#6-authority-ownership (lines 208–208); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: section 6 differs only in the Dispatch Control Plane link in the Dispatch And Execution Engine table row, rebased to ../../architect/agent-coordination/architecture/dispatch-control-plane.md (same legacy file as source); every other row and cell identical",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-08-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "3142af64d8983cac38dd92004bf0ca844e8bfc627b6677aeb2a377d59f248b3d",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal. No component-boundary change; no promotion of draft ports or ownership. Evidence: docs/platform/component-boundary.md:40,90,511 directly cites the draft; docs/platform/system-architecture/architecture/roadmap.md:55 still schedules component-boundary work. Source lines 3–18 explicitly withholds accepted authority. Complete source heading docs/architect/proposals/component-authority-boundary-map.md#6-authority-ownership (lines 184–184) is carried at docs/platform/proposals/component-authority-boundary-map.md#6-authority-ownership (lines 208–208); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "6f0fccd03e3b260486fb2238b8621254a1c4ab436c1c3a70ba7d36f1fc75e464",
       "targetAncestry": [
         "Component Authority Boundary Map"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_21929c380c2aa47b4c919e6738c75db8",
@@ -520,20 +505,15 @@
       "targetAnchor": "unheaded-block-20",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal. No component-boundary change; no promotion of draft ports or ownership. Evidence: docs/platform/component-boundary.md:40,90,511 directly cites the draft; docs/platform/system-architecture/architecture/roadmap.md:55 still schedules component-boundary work. Source lines 3–18 explicitly withholds accepted authority. Complete source unheaded-block docs/architect/proposals/component-authority-boundary-map.md#unheaded-block-17 (lines 186–201) is carried at docs/platform/proposals/component-authority-boundary-map.md#unheaded-block-20 (lines 210–225); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: table block of section 6 differs only in the same Dispatch Control Plane link rebase; text verbatim",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-08-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "8783ca2eda7577abab8dae70890cbb413943999de555ba932680707abdc86893",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal. No component-boundary change; no promotion of draft ports or ownership. Evidence: docs/platform/component-boundary.md:40,90,511 directly cites the draft; docs/platform/system-architecture/architecture/roadmap.md:55 still schedules component-boundary work. Source lines 3–18 explicitly withholds accepted authority. Complete source unheaded-block docs/architect/proposals/component-authority-boundary-map.md#unheaded-block-17 (lines 186–201) is carried at docs/platform/proposals/component-authority-boundary-map.md#unheaded-block-20 (lines 210–225); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "600893ad856696d1ddfe3cc8d2816f6acc976d1dae272318436a8c5fc2024c20",
       "targetAncestry": [
         "Component Authority Boundary Map",
         "6. Authority Ownership"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_eca5f985d835c77e88b23df03cd01afe",
@@ -1570,19 +1550,14 @@
       "targetAnchor": "13-draft-ports",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal. No component-boundary change; no promotion of draft ports or ownership. Evidence: docs/platform/component-boundary.md:40,90,511 directly cites the draft; docs/platform/system-architecture/architecture/roadmap.md:55 still schedules component-boundary work. Source lines 3–18 explicitly withholds accepted authority. Complete source heading docs/architect/proposals/component-authority-boundary-map.md#13-draft-ports (lines 484–484) is carried at docs/platform/proposals/component-authority-boundary-map.md#13-draft-ports (lines 508–508); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: section 13 differs only in the DispatchRuntimePort row links (Component Boundary Advisory section 9 anchor and Dispatch Control Plane), both rebased to the same legacy referents; the anchor 9-hexagonal-architecture-view still exists in the legacy file",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-08-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "435d86bbc645aacf73ddb38aadfa994dae4adc4bfe425cd506b9bbd890046051",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal. No component-boundary change; no promotion of draft ports or ownership. Evidence: docs/platform/component-boundary.md:40,90,511 directly cites the draft; docs/platform/system-architecture/architecture/roadmap.md:55 still schedules component-boundary work. Source lines 3–18 explicitly withholds accepted authority. Complete source heading docs/architect/proposals/component-authority-boundary-map.md#13-draft-ports (lines 484–484) is carried at docs/platform/proposals/component-authority-boundary-map.md#13-draft-ports (lines 508–508); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "adbd3b303d38b06c5a7a651696efbc5b85bd91da9a7cdba745f6def758b673f7",
       "targetAncestry": [
         "Component Authority Boundary Map"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_2fd39611a4b6aab39b7ff11fbf195287",
@@ -1613,20 +1588,15 @@
       "targetAnchor": "unheaded-block-63",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal. No component-boundary change; no promotion of draft ports or ownership. Evidence: docs/platform/component-boundary.md:40,90,511 directly cites the draft; docs/platform/system-architecture/architecture/roadmap.md:55 still schedules component-boundary work. Source lines 3–18 explicitly withholds accepted authority. Complete source unheaded-block docs/architect/proposals/component-authority-boundary-map.md#unheaded-block-60 (lines 489–502) is carried at docs/platform/proposals/component-authority-boundary-map.md#unheaded-block-63 (lines 513–526); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: Draft Ports table block differs only by the same two link rebases; text verbatim",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-08-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "38d5336c4a92d6bb904a832355ebd1b3c874afe5326ca137874fd3ab5812c3c8",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal. No component-boundary change; no promotion of draft ports or ownership. Evidence: docs/platform/component-boundary.md:40,90,511 directly cites the draft; docs/platform/system-architecture/architecture/roadmap.md:55 still schedules component-boundary work. Source lines 3–18 explicitly withholds accepted authority. Complete source unheaded-block docs/architect/proposals/component-authority-boundary-map.md#unheaded-block-60 (lines 489–502) is carried at docs/platform/proposals/component-authority-boundary-map.md#unheaded-block-63 (lines 513–526); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "4b3d13d7316e8fa33b32d2f73cd529cef2f253f6bcb1c3044b228765aeb9dba8",
       "targetAncestry": [
         "Component Authority Boundary Map",
         "13. Draft Ports"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_84061a6f94082fd16f75e419144a02b8",

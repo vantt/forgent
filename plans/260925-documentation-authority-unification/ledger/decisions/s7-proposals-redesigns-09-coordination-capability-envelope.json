@@ -24,17 +24,12 @@
       "targetAnchor": "agent-coordination-capability-envelope-và-coordinator-owned-deliberation",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject inference that engine retirement retires this alternative recommendation. Preserve the complete map proposal, with stale code citations literal; no assumption the proposed envelope shipped. Evidence: Source section 2 cites surviving src/runner/dispatch/assignment-runner.mjs and assignment.mjs, while the session-engine/store/coordination verbs it criticizes were removed in 2180b4e72. Source lines 34–43 recommends an alternative to graph-owned deliberation, not merely use of the old graph. Complete source heading docs/architect/proposals/coordination-capability-envelope.md#agent-coordination-capability-envelope-và-coordinator-owned-deliberation (lines 1–1) is carried at docs/platform/proposals/coordination-capability-envelope.md#agent-coordination-capability-envelope-và-coordinator-owned-deliberation (lines 1–1); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: read src L1-1 (heading agent-coordination-capability-envelope-v) to tgt L1-1 with diff (Judgment, mandatory differing pair); H1 section grows only by the candidate metadata fence, the labelled Added in candidate paragraph and the Source relationship line; remaining source text identical; digests recomputed by script equal pack and shard, anchor passes list-doc-anchors, owner and disposition supersede match the frozen map target",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-09-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "478a72d4b4897394c014166b8178ea78fe90f112f248bf150611ececcf54bd1a",
-      "targetAncestry": [],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject inference that engine retirement retires this alternative recommendation. Preserve the complete map proposal, with stale code citations literal; no assumption the proposed envelope shipped. Evidence: Source section 2 cites surviving src/runner/dispatch/assignment-runner.mjs and assignment.mjs, while the session-engine/store/coordination verbs it criticizes were removed in 2180b4e72. Source lines 34–43 recommends an alternative to graph-owned deliberation, not merely use of the old graph. Complete source heading docs/architect/proposals/coordination-capability-envelope.md#agent-coordination-capability-envelope-và-coordinator-owned-deliberation (lines 1–1) is carried at docs/platform/proposals/coordination-capability-envelope.md#agent-coordination-capability-envelope-và-coordinator-owned-deliberation (lines 1–1); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "1691499bfcc170b63032e1425cca6313ee074c0bfe79c80b6afd1cd6545ff583",
+      "targetAncestry": []
     },
     {
       "claimId": "claim_2e70653d20889cd97e419baa94eefded",
@@ -64,19 +59,14 @@
       "targetAnchor": "reading-context-and-authority",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject inference that engine retirement retires this alternative recommendation. Preserve the complete map proposal, with stale code citations literal; no assumption the proposed envelope shipped. Evidence: Source section 2 cites surviving src/runner/dispatch/assignment-runner.mjs and assignment.mjs, while the session-engine/store/coordination verbs it criticizes were removed in 2180b4e72. Source lines 34–43 recommends an alternative to graph-owned deliberation, not merely use of the old graph. Complete source heading docs/architect/proposals/coordination-capability-envelope.md#reading-context-and-authority (lines 10–10) is carried at docs/platform/proposals/coordination-capability-envelope.md#reading-context-and-authority (lines 34–34); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: read src L10-10 (heading reading-context-and-authority) to tgt L34-34 with diff (Judgment, mandatory differing pair); 10 line(s) differ only in physical link destinations; each rebased link resolves to the same legacy repository path as the source link (referents compared); digests recomputed by script equal pack and shard, anchor passes list-doc-anchors, owner and disposition supersede match the frozen map target",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-09-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "7e8c27e66df9b32c5e9291e13467ef5f5b96b2a462262bd83c29c5cf9439c666",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject inference that engine retirement retires this alternative recommendation. Preserve the complete map proposal, with stale code citations literal; no assumption the proposed envelope shipped. Evidence: Source section 2 cites surviving src/runner/dispatch/assignment-runner.mjs and assignment.mjs, while the session-engine/store/coordination verbs it criticizes were removed in 2180b4e72. Source lines 34–43 recommends an alternative to graph-owned deliberation, not merely use of the old graph. Complete source heading docs/architect/proposals/coordination-capability-envelope.md#reading-context-and-authority (lines 10–10) is carried at docs/platform/proposals/coordination-capability-envelope.md#reading-context-and-authority (lines 34–34); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "751324f6e5cd58dd9ab888598baedb4a53123d513a813476e39beb5979f4dfa5",
       "targetAncestry": [
         "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_85e9b5ff587ba23b26257be6b6130590",
@@ -85,20 +75,15 @@
       "targetAnchor": "unheaded-block-5",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject inference that engine retirement retires this alternative recommendation. Preserve the complete map proposal, with stale code citations literal; no assumption the proposed envelope shipped. Evidence: Source section 2 cites surviving src/runner/dispatch/assignment-runner.mjs and assignment.mjs, while the session-engine/store/coordination verbs it criticizes were removed in 2180b4e72. Source lines 34–43 recommends an alternative to graph-owned deliberation, not merely use of the old graph. Complete source unheaded-block docs/architect/proposals/coordination-capability-envelope.md#unheaded-block-2 (lines 12–13) is carried at docs/platform/proposals/coordination-capability-envelope.md#unheaded-block-5 (lines 36–37); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: read src L12-13 (unheaded-block unheaded-block-2) to tgt L36-37 with diff (Judgment, mandatory differing pair); 1 line(s) differ only in physical link destinations; each rebased link resolves to the same legacy repository path as the source link (referents compared); digests recomputed by script equal pack and shard, anchor passes list-doc-anchors, owner and disposition supersede match the frozen map target",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-09-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "22857411d9d89ab4fabe26d969affb082c947f70147b79311bb6d4b6e2bceafb",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject inference that engine retirement retires this alternative recommendation. Preserve the complete map proposal, with stale code citations literal; no assumption the proposed envelope shipped. Evidence: Source section 2 cites surviving src/runner/dispatch/assignment-runner.mjs and assignment.mjs, while the session-engine/store/coordination verbs it criticizes were removed in 2180b4e72. Source lines 34–43 recommends an alternative to graph-owned deliberation, not merely use of the old graph. Complete source unheaded-block docs/architect/proposals/coordination-capability-envelope.md#unheaded-block-2 (lines 12–13) is carried at docs/platform/proposals/coordination-capability-envelope.md#unheaded-block-5 (lines 36–37); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "dc1c28c5dc467e28dd0a904e78a7c9b9ec32427bd1e3240b6816ec621b79e433",
       "targetAncestry": [
         "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
         "Reading context and authority"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_ef60991eccbc94b8ea96109cd3a0523c",
@@ -107,20 +92,15 @@
       "targetAnchor": "unheaded-block-6",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject inference that engine retirement retires this alternative recommendation. Preserve the complete map proposal, with stale code citations literal; no assumption the proposed envelope shipped. Evidence: Source section 2 cites surviving src/runner/dispatch/assignment-runner.mjs and assignment.mjs, while the session-engine/store/coordination verbs it criticizes were removed in 2180b4e72. Source lines 34–43 recommends an alternative to graph-owned deliberation, not merely use of the old graph. Complete source unheaded-block docs/architect/proposals/coordination-capability-envelope.md#unheaded-block-3 (lines 15–18) is carried at docs/platform/proposals/coordination-capability-envelope.md#unheaded-block-6 (lines 39–42); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: read src L15-18 (unheaded-block unheaded-block-3) to tgt L39-42 with diff (Judgment, mandatory differing pair); 3 line(s) differ only in physical link destinations; each rebased link resolves to the same legacy repository path as the source link (referents compared); digests recomputed by script equal pack and shard, anchor passes list-doc-anchors, owner and disposition supersede match the frozen map target",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-09-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "f132c042e3bc5eb099140fcb0d7c0c6af81bf8e7cdc3647ea1632b445ab1b8ba",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject inference that engine retirement retires this alternative recommendation. Preserve the complete map proposal, with stale code citations literal; no assumption the proposed envelope shipped. Evidence: Source section 2 cites surviving src/runner/dispatch/assignment-runner.mjs and assignment.mjs, while the session-engine/store/coordination verbs it criticizes were removed in 2180b4e72. Source lines 34–43 recommends an alternative to graph-owned deliberation, not merely use of the old graph. Complete source unheaded-block docs/architect/proposals/coordination-capability-envelope.md#unheaded-block-3 (lines 15–18) is carried at docs/platform/proposals/coordination-capability-envelope.md#unheaded-block-6 (lines 39–42); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "a8989d0f0e0938d6e90bd9ffebb73794c6a3b05dc5f8704bb4d5ab3391524193",
       "targetAncestry": [
         "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
         "Reading context and authority"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_47481f3d934351c88fe870e1bef64df2",
@@ -129,20 +109,15 @@
       "targetAnchor": "unheaded-block-7",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject inference that engine retirement retires this alternative recommendation. Preserve the complete map proposal, with stale code citations literal; no assumption the proposed envelope shipped. Evidence: Source section 2 cites surviving src/runner/dispatch/assignment-runner.mjs and assignment.mjs, while the session-engine/store/coordination verbs it criticizes were removed in 2180b4e72. Source lines 34–43 recommends an alternative to graph-owned deliberation, not merely use of the old graph. Complete source unheaded-block docs/architect/proposals/coordination-capability-envelope.md#unheaded-block-4 (lines 20–29) is carried at docs/platform/proposals/coordination-capability-envelope.md#unheaded-block-7 (lines 44–53); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: read src L20-29 (unheaded-block unheaded-block-4) to tgt L44-53 with diff (Judgment, mandatory differing pair); 6 line(s) differ only in physical link destinations; each rebased link resolves to the same legacy repository path as the source link (referents compared); digests recomputed by script equal pack and shard, anchor passes list-doc-anchors, owner and disposition supersede match the frozen map target",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-09-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "16dd0d80088622eb15c3e16e519661d1b17b48891c0512ac7b3c726a1e522dce",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject inference that engine retirement retires this alternative recommendation. Preserve the complete map proposal, with stale code citations literal; no assumption the proposed envelope shipped. Evidence: Source section 2 cites surviving src/runner/dispatch/assignment-runner.mjs and assignment.mjs, while the session-engine/store/coordination verbs it criticizes were removed in 2180b4e72. Source lines 34–43 recommends an alternative to graph-owned deliberation, not merely use of the old graph. Complete source unheaded-block docs/architect/proposals/coordination-capability-envelope.md#unheaded-block-4 (lines 20–29) is carried at docs/platform/proposals/coordination-capability-envelope.md#unheaded-block-7 (lines 44–53); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "b34a824cc5642fbccf2c5c81f2cfda9a163904de3cad058c65606e7c75da78c9",
       "targetAncestry": [
         "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
         "Reading context and authority"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_516e3e368afc06dd75eb5c65be686a3f",
@@ -1032,19 +1007,14 @@
       "targetAnchor": "7-recommendation-and-reversal-conditions",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Reject inference that engine retirement retires this alternative recommendation. Preserve the complete map proposal, with stale code citations literal; no assumption the proposed envelope shipped. Evidence: Source section 2 cites surviving src/runner/dispatch/assignment-runner.mjs and assignment.mjs, while the session-engine/store/coordination verbs it criticizes were removed in 2180b4e72. Source lines 34–43 recommends an alternative to graph-owned deliberation, not merely use of the old graph. Complete source heading docs/architect/proposals/coordination-capability-envelope.md#7-recommendation-and-reversal-conditions (lines 228–228) is carried at docs/platform/proposals/coordination-capability-envelope.md#7-recommendation-and-reversal-conditions (lines 255–255); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "mechanical: Unit-exact, full unit digest equal at src L228-228 (heading 7-recommendation-and-reversal-conditions) to tgt L255-255; digests recomputed by script equal pack and shard, anchor passes list-doc-anchors, owner and disposition supersede match the frozen map target",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-09-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "5b4364f6620caa1faab1760178302653b50c0e7b33a23fa146459cf40adfdab9",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Reject inference that engine retirement retires this alternative recommendation. Preserve the complete map proposal, with stale code citations literal; no assumption the proposed envelope shipped. Evidence: Source section 2 cites surviving src/runner/dispatch/assignment-runner.mjs and assignment.mjs, while the session-engine/store/coordination verbs it criticizes were removed in 2180b4e72. Source lines 34–43 recommends an alternative to graph-owned deliberation, not merely use of the old graph. Complete source heading docs/architect/proposals/coordination-capability-envelope.md#7-recommendation-and-reversal-conditions (lines 228–228) is carried at docs/platform/proposals/coordination-capability-envelope.md#7-recommendation-and-reversal-conditions (lines 255–255); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "3de5c084b76b8a00dbc836e8530724edb337c9b37b954b98e7668446f63bd743",
       "targetAncestry": [
         "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_7464ca1b7f4f2b9375802d9551bcf9de",
@@ -1141,20 +1111,15 @@
       "targetAnchor": "unheaded-block-43",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Reject inference that engine retirement retires this alternative recommendation. Preserve the complete map proposal, with stale code citations literal; no assumption the proposed envelope shipped. Evidence: Source section 2 cites surviving src/runner/dispatch/assignment-runner.mjs and assignment.mjs, while the session-engine/store/coordination verbs it criticizes were removed in 2180b4e72. Source lines 34–43 recommends an alternative to graph-owned deliberation, not merely use of the old graph. Complete source unheaded-block docs/architect/proposals/coordination-capability-envelope.md#unheaded-block-40 (lines 250–253) is carried at docs/platform/proposals/coordination-capability-envelope.md#unheaded-block-43 (lines 277–280); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "mechanical: Unit-exact, full unit digest equal at src L250-253 (unheaded-block unheaded-block-40) to tgt L277-280; digests recomputed by script equal pack and shard, anchor passes list-doc-anchors, owner and disposition supersede match the frozen map target",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-09-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "1dcc99a8d286c2a7810ab416e8252315a28c7ff47fa6f257e1cb992980b4eb1a",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Reject inference that engine retirement retires this alternative recommendation. Preserve the complete map proposal, with stale code citations literal; no assumption the proposed envelope shipped. Evidence: Source section 2 cites surviving src/runner/dispatch/assignment-runner.mjs and assignment.mjs, while the session-engine/store/coordination verbs it criticizes were removed in 2180b4e72. Source lines 34–43 recommends an alternative to graph-owned deliberation, not merely use of the old graph. Complete source unheaded-block docs/architect/proposals/coordination-capability-envelope.md#unheaded-block-40 (lines 250–253) is carried at docs/platform/proposals/coordination-capability-envelope.md#unheaded-block-43 (lines 277–280); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "cf4d4ac0a274cf811024779a39918371bcf922db8ec1d3893163c0fc3d3c660a",
       "targetAncestry": [
         "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
         "7. Recommendation and reversal conditions"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_282b6362035c0d1bc2db4ba997a1870f",
@@ -1861,19 +1826,14 @@
       "targetAnchor": "10-smallest-experiments-before-implementation-planning",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject inference that engine retirement retires this alternative recommendation. Preserve the complete map proposal, with stale code citations literal; no assumption the proposed envelope shipped. Evidence: Source section 2 cites surviving src/runner/dispatch/assignment-runner.mjs and assignment.mjs, while the session-engine/store/coordination verbs it criticizes were removed in 2180b4e72. Source lines 34–43 recommends an alternative to graph-owned deliberation, not merely use of the old graph. Complete source heading docs/architect/proposals/coordination-capability-envelope.md#10-smallest-experiments-before-implementation-planning (lines 386–386) is carried at docs/platform/proposals/coordination-capability-envelope.md#10-smallest-experiments-before-implementation-planning (lines 413–413); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: read src L386-386 (heading 10-smallest-experiments-before-implement) to tgt L413-413 with diff (Judgment, mandatory differing pair); 1 line(s) differ only in physical link destinations; each rebased link resolves to the same legacy repository path as the source link (referents compared); digests recomputed by script equal pack and shard, anchor passes list-doc-anchors, owner and disposition supersede match the frozen map target",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-09-02-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "6eb9c4cf7e468bac1245f3279d82afb7ce7797be857e2c0b68e647cd18c4c4c3",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject inference that engine retirement retires this alternative recommendation. Preserve the complete map proposal, with stale code citations literal; no assumption the proposed envelope shipped. Evidence: Source section 2 cites surviving src/runner/dispatch/assignment-runner.mjs and assignment.mjs, while the session-engine/store/coordination verbs it criticizes were removed in 2180b4e72. Source lines 34–43 recommends an alternative to graph-owned deliberation, not merely use of the old graph. Complete source heading docs/architect/proposals/coordination-capability-envelope.md#10-smallest-experiments-before-implementation-planning (lines 386–386) is carried at docs/platform/proposals/coordination-capability-envelope.md#10-smallest-experiments-before-implementation-planning (lines 413–413); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "c35e33bb5e4d4fc730ef52f6b5823601188c474715bde9adaf98fbfd83276415",
       "targetAncestry": [
         "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_63e205836d7968a5141e0350e70ad8a8",
@@ -1882,20 +1842,15 @@
       "targetAnchor": "unheaded-block-65",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject inference that engine retirement retires this alternative recommendation. Preserve the complete map proposal, with stale code citations literal; no assumption the proposed envelope shipped. Evidence: Source section 2 cites surviving src/runner/dispatch/assignment-runner.mjs and assignment.mjs, while the session-engine/store/coordination verbs it criticizes were removed in 2180b4e72. Source lines 34–43 recommends an alternative to graph-owned deliberation, not merely use of the old graph. Complete source unheaded-block docs/architect/proposals/coordination-capability-envelope.md#unheaded-block-62 (lines 388–394) is carried at docs/platform/proposals/coordination-capability-envelope.md#unheaded-block-65 (lines 415–421); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: read src L388-394 (unheaded-block unheaded-block-62) to tgt L415-421 with diff (Judgment, mandatory differing pair); 1 line(s) differ only in physical link destinations; each rebased link resolves to the same legacy repository path as the source link (referents compared); digests recomputed by script equal pack and shard, anchor passes list-doc-anchors, owner and disposition supersede match the frozen map target",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-09-02-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "8b90e05654b92caa7c9d8602c64cd9e17bb44e3e76cd183246906b942958423f",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject inference that engine retirement retires this alternative recommendation. Preserve the complete map proposal, with stale code citations literal; no assumption the proposed envelope shipped. Evidence: Source section 2 cites surviving src/runner/dispatch/assignment-runner.mjs and assignment.mjs, while the session-engine/store/coordination verbs it criticizes were removed in 2180b4e72. Source lines 34–43 recommends an alternative to graph-owned deliberation, not merely use of the old graph. Complete source unheaded-block docs/architect/proposals/coordination-capability-envelope.md#unheaded-block-62 (lines 388–394) is carried at docs/platform/proposals/coordination-capability-envelope.md#unheaded-block-65 (lines 415–421); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "d7fa9577c7921ff566d2e242f7c0a358a6f81a0c611c500eb7f923ba3d18a211",
       "targetAncestry": [
         "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
         "10. Smallest experiments before implementation planning"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_6163ea1b7781f128baa4ecf5d0ad746f",

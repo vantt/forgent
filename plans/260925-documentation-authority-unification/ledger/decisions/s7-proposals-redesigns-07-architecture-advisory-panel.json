@@ -24,17 +24,12 @@
       "targetAnchor": "architecture-advisory-panel",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject whole-file archive: surviving workflow use case protects intent under A17/A19. Keep map proposal, including stale Not started header; do not claim the old protocol was retained. Evidence: core/workflows/architecture-advisory.yaml:1–6,24–45 implements framing/panel/critique/synthesis; core/skills/fgos-architecture-panel/SKILL.md is current. Commit 2180b4e72 removed the original architecture-advisory-panel-v1.yaml. Source lines 3–7 still says Not started. Complete source heading docs/architect/proposals/architecture-advisory-panel.md#architecture-advisory-panel (lines 1–1) is carried at docs/platform/proposals/architecture-advisory-panel.md#architecture-advisory-panel (lines 1–1); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: H1 unit differs only by the inserted candidate block (txt metadata fence, Added in candidate paragraph, Source relationship line) and two literal-fence wrappers around the Related and Implementation-plan blocks; source H1 text and everything after it carried byte-for-byte; the 0f063d18f rewrite of the Added in candidate paragraph is true (core/workflows/architecture-advisory.yaml and core/skills/fgos-architecture-panel/SKILL.md exist, 2180b4e72 deleted architecture-advisory-panel-v1.yaml) and drops the owner-answer label; supersede matches triage row 7",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-07-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "e82955a32175ed9d12dfcadf8373ba47a507a1e58d54bab7a9a30065d78d977d",
-      "targetAncestry": [],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject whole-file archive: surviving workflow use case protects intent under A17/A19. Keep map proposal, including stale Not started header; do not claim the old protocol was retained. Evidence: core/workflows/architecture-advisory.yaml:1–6,24–45 implements framing/panel/critique/synthesis; core/skills/fgos-architecture-panel/SKILL.md is current. Commit 2180b4e72 removed the original architecture-advisory-panel-v1.yaml. Source lines 3–7 still says Not started. Complete source heading docs/architect/proposals/architecture-advisory-panel.md#architecture-advisory-panel (lines 1–1) is carried at docs/platform/proposals/architecture-advisory-panel.md#architecture-advisory-panel (lines 1–1); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "e7448aaac301af577b2157d8e86e6bdbba67e65d887d8424707085dfb91d2a37",
+      "targetAncestry": []
     },
     {
       "claimId": "claim_e4d03af71785136f44f4721c291091bd",
@@ -127,19 +122,14 @@
       "targetAnchor": "1-why-this-use-case-exists",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject whole-file archive: surviving workflow use case protects intent under A17/A19. Keep map proposal, including stale Not started header; do not claim the old protocol was retained. Evidence: core/workflows/architecture-advisory.yaml:1–6,24–45 implements framing/panel/critique/synthesis; core/skills/fgos-architecture-panel/SKILL.md is current. Commit 2180b4e72 removed the original architecture-advisory-panel-v1.yaml. Source lines 3–7 still says Not started. Complete source heading docs/architect/proposals/architecture-advisory-panel.md#1-why-this-use-case-exists (lines 27–27) is carried at docs/platform/proposals/architecture-advisory-panel.md#1-why-this-use-case-exists (lines 57–57); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: section 1 differs only in one link destination, coordination-capability-envelope.md rebased to ../../architect/proposals/coordination-capability-envelope.md which resolves to the same legacy file (exists); rest of the section byte-equal incl. the text fence",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-07-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "136816209d1b8dfb993d49319d15ed3e687d1df9927f8bece40f01ddc34bfab5",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject whole-file archive: surviving workflow use case protects intent under A17/A19. Keep map proposal, including stale Not started header; do not claim the old protocol was retained. Evidence: core/workflows/architecture-advisory.yaml:1–6,24–45 implements framing/panel/critique/synthesis; core/skills/fgos-architecture-panel/SKILL.md is current. Commit 2180b4e72 removed the original architecture-advisory-panel-v1.yaml. Source lines 3–7 still says Not started. Complete source heading docs/architect/proposals/architecture-advisory-panel.md#1-why-this-use-case-exists (lines 27–27) is carried at docs/platform/proposals/architecture-advisory-panel.md#1-why-this-use-case-exists (lines 57–57); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "79bf9bfe96f9639354bb5f881c56a0c9778d40618b5902cf139890284866204e",
       "targetAncestry": [
         "Architecture Advisory Panel"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_c9589a9aac2a821697b1a0942e121c84",
@@ -148,20 +138,15 @@
       "targetAnchor": "unheaded-block-8",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject whole-file archive: surviving workflow use case protects intent under A17/A19. Keep map proposal, including stale Not started header; do not claim the old protocol was retained. Evidence: core/workflows/architecture-advisory.yaml:1–6,24–45 implements framing/panel/critique/synthesis; core/skills/fgos-architecture-panel/SKILL.md is current. Commit 2180b4e72 removed the original architecture-advisory-panel-v1.yaml. Source lines 3–7 still says Not started. Complete source unheaded-block docs/architect/proposals/architecture-advisory-panel.md#unheaded-block-5 (lines 29–32) is carried at docs/platform/proposals/architecture-advisory-panel.md#unheaded-block-8 (lines 59–62); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: unheaded block 5 (Architecture follow-up line) differs only by the same link rebase to the same legacy referent; text verbatim",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-07-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "aea9f69a683ed485fba138c7d4c9740fec96e8ad7b715680fdc065a60bca1694",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject whole-file archive: surviving workflow use case protects intent under A17/A19. Keep map proposal, including stale Not started header; do not claim the old protocol was retained. Evidence: core/workflows/architecture-advisory.yaml:1–6,24–45 implements framing/panel/critique/synthesis; core/skills/fgos-architecture-panel/SKILL.md is current. Commit 2180b4e72 removed the original architecture-advisory-panel-v1.yaml. Source lines 3–7 still says Not started. Complete source unheaded-block docs/architect/proposals/architecture-advisory-panel.md#unheaded-block-5 (lines 29–32) is carried at docs/platform/proposals/architecture-advisory-panel.md#unheaded-block-8 (lines 59–62); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "1931a38a18229f97e8363e60a58fa6c9259c0209faaf59506fedd68c64cc348c",
       "targetAncestry": [
         "Architecture Advisory Panel",
         "1. Why This Use Case Exists"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_cf8a0a304268918d85b35fc5131db131",

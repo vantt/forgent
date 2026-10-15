@@ -24,17 +24,12 @@
       "targetAnchor": "visibility-và-interactive-contact-trong-dispatch-execution-herdr-spawn-là-candidate-đầu-tiên",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject input report’s no-direct-ref finding: RUL40 is a live spec citation. Keep map proposal as design evidence; dated transport line numbers and unbuilt recommendations stay verbatim. Evidence: docs/specs/runner.md:999 RUL40 directly cites this exact proposal sections 3.3,4,14 H1. src/runner/dispatch/herdr-agent.mjs, herdr-round.mjs, herdr-reconcile.mjs and herdr-diagnosis.mjs implement current transport/outcome machinery. Complete source heading docs/architect/proposals/visibility-and-interactive-contact-herdr-spawn.md#visibility-và-interactive-contact-trong-dispatch-execution-herdr-spawn-là-candidate-đầu-tiên (lines 1–1) is carried at docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md#visibility-và-interactive-contact-trong-dispatch-execution-herdr-spawn-là-candidate-đầu-tiên (lines 1–1); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: H1 text equal; digest differs only because its section payload now holds the inserted txt metadata, the labelled Added in candidate paragraph and Source relationship line (R7-6 neutral wording cites runner.md:999 RUL40, which I confirmed names sections 3.3, 4 and 14 H1); full-file diff shows no other change; supersede and anchor right",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-20-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "151ad429b2747f33872adfaece97118eebd64b153feb127ad195eeec175b9caa",
-      "targetAncestry": [],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject input report’s no-direct-ref finding: RUL40 is a live spec citation. Keep map proposal as design evidence; dated transport line numbers and unbuilt recommendations stay verbatim. Evidence: docs/specs/runner.md:999 RUL40 directly cites this exact proposal sections 3.3,4,14 H1. src/runner/dispatch/herdr-agent.mjs, herdr-round.mjs, herdr-reconcile.mjs and herdr-diagnosis.mjs implement current transport/outcome machinery. Complete source heading docs/architect/proposals/visibility-and-interactive-contact-herdr-spawn.md#visibility-và-interactive-contact-trong-dispatch-execution-herdr-spawn-là-candidate-đầu-tiên (lines 1–1) is carried at docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md#visibility-và-interactive-contact-trong-dispatch-execution-herdr-spawn-là-candidate-đầu-tiên (lines 1–1); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "123a08add0c34cce298f2c769a965c59ce4abc1cf6bb75a326e23615980e5b51",
+      "targetAncestry": []
     },
     {
       "claimId": "claim_7082c16a8b1598cae59022ce455b9597",
@@ -64,19 +59,14 @@
       "targetAnchor": "unheaded-block-5",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject input report’s no-direct-ref finding: RUL40 is a live spec citation. Keep map proposal as design evidence; dated transport line numbers and unbuilt recommendations stay verbatim. Evidence: docs/specs/runner.md:999 RUL40 directly cites this exact proposal sections 3.3,4,14 H1. src/runner/dispatch/herdr-agent.mjs, herdr-round.mjs, herdr-reconcile.mjs and herdr-diagnosis.mjs implement current transport/outcome machinery. Complete source unheaded-block docs/architect/proposals/visibility-and-interactive-contact-herdr-spawn.md#unheaded-block-2 (lines 10–15) is carried at docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md#unheaded-block-5 (lines 34–39); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: lines 10-15 vs 34-39 diffed; only the five rebased Related link destinations differ (../agent-coordination and sibling names now ../../architect/...; the ../../explanation link is untouched), every referent file exists and equals the source referent, labels and the line break unchanged",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-20-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "52f715a408328b91d35f99fb67c3f35c6a8cc1c79dc2d1b37078c0cabd4b55e8",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject input report’s no-direct-ref finding: RUL40 is a live spec citation. Keep map proposal as design evidence; dated transport line numbers and unbuilt recommendations stay verbatim. Evidence: docs/specs/runner.md:999 RUL40 directly cites this exact proposal sections 3.3,4,14 H1. src/runner/dispatch/herdr-agent.mjs, herdr-round.mjs, herdr-reconcile.mjs and herdr-diagnosis.mjs implement current transport/outcome machinery. Complete source unheaded-block docs/architect/proposals/visibility-and-interactive-contact-herdr-spawn.md#unheaded-block-2 (lines 10–15) is carried at docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md#unheaded-block-5 (lines 34–39); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "1553f0c7bb5f4fcb29b30874cad24453111978f09fed4d8d7cbbce0d2ffec371",
       "targetAncestry": [
         "Visibility và Interactive Contact trong Dispatch & Execution — herdr-spawn là candidate đầu tiên"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_76a87648ab887934fefe3e9c9d24f068",
@@ -2431,20 +2421,15 @@
       "targetAnchor": "12b-kết-quả-probe-đã-chạy-2026-09-06-herdr-082-default-session-tab-tạm-fgos-probe-p7-không-agent",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject input report’s no-direct-ref finding: RUL40 is a live spec citation. Keep map proposal as design evidence; dated transport line numbers and unbuilt recommendations stay verbatim. Evidence: docs/specs/runner.md:999 RUL40 directly cites this exact proposal sections 3.3,4,14 H1. src/runner/dispatch/herdr-agent.mjs, herdr-round.mjs, herdr-reconcile.mjs and herdr-diagnosis.mjs implement current transport/outcome machinery. Complete source heading docs/architect/proposals/visibility-and-interactive-contact-herdr-spawn.md#12b-kết-quả-probe-đã-chạy-2026-09-06-herdr-082-default-session-tab-tạm-fgos-probe-p7-không-agent (lines 483–483) is carried at docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md#12b-kết-quả-probe-đã-chạy-2026-09-06-herdr-082-default-session-tab-tạm-fgos-probe-p7-không-agent (lines 507–507); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: heading 12b text equal at L483 to L507; digest differs only because its section payload contains the one rebased permission-posture-findings link on source L492; no other payload line differs",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-20-02-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "548e4189e3a015f62c2c1c046b31bc75cfc265c3d32adfd34775ea347cc7bd28",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject input report’s no-direct-ref finding: RUL40 is a live spec citation. Keep map proposal as design evidence; dated transport line numbers and unbuilt recommendations stay verbatim. Evidence: docs/specs/runner.md:999 RUL40 directly cites this exact proposal sections 3.3,4,14 H1. src/runner/dispatch/herdr-agent.mjs, herdr-round.mjs, herdr-reconcile.mjs and herdr-diagnosis.mjs implement current transport/outcome machinery. Complete source heading docs/architect/proposals/visibility-and-interactive-contact-herdr-spawn.md#12b-kết-quả-probe-đã-chạy-2026-09-06-herdr-082-default-session-tab-tạm-fgos-probe-p7-không-agent (lines 483–483) is carried at docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md#12b-kết-quả-probe-đã-chạy-2026-09-06-herdr-082-default-session-tab-tạm-fgos-probe-p7-không-agent (lines 507–507); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "00e6c7dfdba65c3d4cd3e2a2f8592d83a52d5a70d1cb65d0d4ce87e99be86b00",
       "targetAncestry": [
         "Visibility và Interactive Contact trong Dispatch & Execution — herdr-spawn là candidate đầu tiên",
         "12. Minimal probes trước implementation plan (read-only với repo, live với herdr thật, disposable dir)"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_9da7c5f236f54e3c812f4c488a6f044f",
@@ -2453,21 +2438,16 @@
       "targetAnchor": "unheaded-block-77",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject input report’s no-direct-ref finding: RUL40 is a live spec citation. Keep map proposal as design evidence; dated transport line numbers and unbuilt recommendations stay verbatim. Evidence: docs/specs/runner.md:999 RUL40 directly cites this exact proposal sections 3.3,4,14 H1. src/runner/dispatch/herdr-agent.mjs, herdr-round.mjs, herdr-reconcile.mjs and herdr-diagnosis.mjs implement current transport/outcome machinery. Complete source unheaded-block docs/architect/proposals/visibility-and-interactive-contact-herdr-spawn.md#unheaded-block-74 (lines 485–496) is carried at docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md#unheaded-block-77 (lines 509–520); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: probe table L485-496 vs L509-520 diffed line by line; sole difference is the single link destination on L492 now ../../architect/agent-coordination/verification/... (same referent, file exists); the other table rows and Vietnamese text are byte-equal",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-20-02-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "bde694e15333571b2cd21bd42201653234ac96bf179e928048d9739f5c22942a",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject input report’s no-direct-ref finding: RUL40 is a live spec citation. Keep map proposal as design evidence; dated transport line numbers and unbuilt recommendations stay verbatim. Evidence: docs/specs/runner.md:999 RUL40 directly cites this exact proposal sections 3.3,4,14 H1. src/runner/dispatch/herdr-agent.mjs, herdr-round.mjs, herdr-reconcile.mjs and herdr-diagnosis.mjs implement current transport/outcome machinery. Complete source unheaded-block docs/architect/proposals/visibility-and-interactive-contact-herdr-spawn.md#unheaded-block-74 (lines 485–496) is carried at docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md#unheaded-block-77 (lines 509–520); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "8a6c208de4b598018b53e22005d82c98c74f09235ee19ae7b5659c75e8786450",
       "targetAncestry": [
         "Visibility và Interactive Contact trong Dispatch & Execution — herdr-spawn là candidate đầu tiên",
         "12. Minimal probes trước implementation plan (read-only với repo, live với herdr thật, disposable dir)",
         "12b. Kết quả probe đã chạy 2026-09-06 (herdr 0.8.2, default session, tab tạm `fgos-probe-p7`, không agent)"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_60fb5d5fe3c44d3a9d1c14acb8cc7ef6",

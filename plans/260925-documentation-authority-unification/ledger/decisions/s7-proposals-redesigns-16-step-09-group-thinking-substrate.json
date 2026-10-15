@@ -24,17 +24,12 @@
       "targetAnchor": "step-09---group-thinking-substrate",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject whole-file archive because live guidance still consumes its unfulfilled intent. Keep map proposal verbatim; old shipped slice is not claimed current and deferred obligations are not dropped. Evidence: docs/how-to/use-fgos-group-thinking.md:196–200 cites this source for deferred capabilities. core/skills/fgos-group-thinking/SKILL.md:27–40 now drives Workflows/presets; 2180b4e72 removed the old pack. Source header distinguishes implemented MVP0–9 from still-deferred items. Complete source heading docs/architect/proposals/step-09-group-thinking-substrate.md#step-09---group-thinking-substrate (lines 1–1) is carried at docs/platform/proposals/step-09-group-thinking-substrate.md#step-09---group-thinking-substrate (lines 1–1); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: heading step-09---group-thinking-substrate src lines 1-1 -> tgt step-09---group-thinking-substrate lines 1-1; target adds only the labelled candidate metadata (txt fence, Added in candidate, Source relationship) before the byte-equal source payload and rebases 13 link destination(s) to the same repository paths; no source wording lost. Changed by the content commit: the Added in candidate paragraph was reworded to a neutral placement statement whose facts (how-to lines 196-200, removal in 2180b4e72) check out.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-16-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "3cf00a3c56f5c4f25a61320fd95f88fd93e01903118d429d576e70347dac8396",
-      "targetAncestry": [],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject whole-file archive because live guidance still consumes its unfulfilled intent. Keep map proposal verbatim; old shipped slice is not claimed current and deferred obligations are not dropped. Evidence: docs/how-to/use-fgos-group-thinking.md:196–200 cites this source for deferred capabilities. core/skills/fgos-group-thinking/SKILL.md:27–40 now drives Workflows/presets; 2180b4e72 removed the old pack. Source header distinguishes implemented MVP0–9 from still-deferred items. Complete source heading docs/architect/proposals/step-09-group-thinking-substrate.md#step-09---group-thinking-substrate (lines 1–1) is carried at docs/platform/proposals/step-09-group-thinking-substrate.md#step-09---group-thinking-substrate (lines 1–1); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "96585078e961d44eda9b2c8a7eb1c6143fc19ba767e1d9af2bd9b4c134cb0852",
+      "targetAncestry": []
     },
     {
       "claimId": "claim_2b571132cc8fd45580b1ec2dba340ba9",
@@ -43,19 +38,14 @@
       "targetAnchor": "unheaded-block-4",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject whole-file archive because live guidance still consumes its unfulfilled intent. Keep map proposal verbatim; old shipped slice is not claimed current and deferred obligations are not dropped. Evidence: docs/how-to/use-fgos-group-thinking.md:196–200 cites this source for deferred capabilities. core/skills/fgos-group-thinking/SKILL.md:27–40 now drives Workflows/presets; 2180b4e72 removed the old pack. Source header distinguishes implemented MVP0–9 from still-deferred items. Complete source unheaded-block docs/architect/proposals/step-09-group-thinking-substrate.md#unheaded-block-1 (lines 3–43) is carried at docs/platform/proposals/step-09-group-thinking-substrate.md#unheaded-block-4 (lines 27–67); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: unheaded-block unheaded-block-1 src lines 3-43 -> tgt unheaded-block-4 lines 27-67; shown source and target diffed line by line, only 13 link destination(s) rebased and each resolves to the same repository path as the source link, no wording change; supersede to step-09-group-thinking-substrate.md per map/triage, rationale evidence true.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-16-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "dade66367ef432177726221ddcf8ffa27926128294f1bfa4d07bb6305c826eaa",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject whole-file archive because live guidance still consumes its unfulfilled intent. Keep map proposal verbatim; old shipped slice is not claimed current and deferred obligations are not dropped. Evidence: docs/how-to/use-fgos-group-thinking.md:196–200 cites this source for deferred capabilities. core/skills/fgos-group-thinking/SKILL.md:27–40 now drives Workflows/presets; 2180b4e72 removed the old pack. Source header distinguishes implemented MVP0–9 from still-deferred items. Complete source unheaded-block docs/architect/proposals/step-09-group-thinking-substrate.md#unheaded-block-1 (lines 3–43) is carried at docs/platform/proposals/step-09-group-thinking-substrate.md#unheaded-block-4 (lines 27–67); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "ddf1c9b771d35632b8996a162617a65b7ff4ec46571cb54e8243868d1b689ac6",
       "targetAncestry": [
         "Step 09 - Group Thinking Substrate"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_881322674e920410ea8b09d0a9e7012b",
@@ -194,19 +184,14 @@
       "targetAnchor": "2-intent-guardrail",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject whole-file archive because live guidance still consumes its unfulfilled intent. Keep map proposal verbatim; old shipped slice is not claimed current and deferred obligations are not dropped. Evidence: docs/how-to/use-fgos-group-thinking.md:196–200 cites this source for deferred capabilities. core/skills/fgos-group-thinking/SKILL.md:27–40 now drives Workflows/presets; 2180b4e72 removed the old pack. Source header distinguishes implemented MVP0–9 from still-deferred items. Complete source heading docs/architect/proposals/step-09-group-thinking-substrate.md#2-intent-guardrail (lines 93–93) is carried at docs/platform/proposals/step-09-group-thinking-substrate.md#2-intent-guardrail (lines 117–117); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: heading 2-intent-guardrail src lines 93-93 -> tgt 2-intent-guardrail lines 117-117; shown source and target diffed line by line, only 1 link destination(s) rebased and each resolves to the same repository path as the source link, no wording change; supersede to step-09-group-thinking-substrate.md per map/triage, rationale evidence true.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-16-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "4dc79412839b6a867f5db44209a72950977a22130c3def4e2e2b7e8c3ea4083d",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject whole-file archive because live guidance still consumes its unfulfilled intent. Keep map proposal verbatim; old shipped slice is not claimed current and deferred obligations are not dropped. Evidence: docs/how-to/use-fgos-group-thinking.md:196–200 cites this source for deferred capabilities. core/skills/fgos-group-thinking/SKILL.md:27–40 now drives Workflows/presets; 2180b4e72 removed the old pack. Source header distinguishes implemented MVP0–9 from still-deferred items. Complete source heading docs/architect/proposals/step-09-group-thinking-substrate.md#2-intent-guardrail (lines 93–93) is carried at docs/platform/proposals/step-09-group-thinking-substrate.md#2-intent-guardrail (lines 117–117); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "323432be65f6d0dc1d2540da3262f4328317db567a697c5292b825bd0d2e854b",
       "targetAncestry": [
         "Step 09 - Group Thinking Substrate"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_0a9f610a3b20d4a1f5acd024bd9172b9",
@@ -237,20 +222,15 @@
       "targetAnchor": "unheaded-block-11",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject whole-file archive because live guidance still consumes its unfulfilled intent. Keep map proposal verbatim; old shipped slice is not claimed current and deferred obligations are not dropped. Evidence: docs/how-to/use-fgos-group-thinking.md:196–200 cites this source for deferred capabilities. core/skills/fgos-group-thinking/SKILL.md:27–40 now drives Workflows/presets; 2180b4e72 removed the old pack. Source header distinguishes implemented MVP0–9 from still-deferred items. Complete source unheaded-block docs/architect/proposals/step-09-group-thinking-substrate.md#unheaded-block-8 (lines 100–101) is carried at docs/platform/proposals/step-09-group-thinking-substrate.md#unheaded-block-11 (lines 124–125); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: unheaded-block unheaded-block-8 src lines 100-101 -> tgt unheaded-block-11 lines 124-125; shown source and target diffed line by line, only 1 link destination(s) rebased and each resolves to the same repository path as the source link, no wording change; supersede to step-09-group-thinking-substrate.md per map/triage, rationale evidence true.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-16-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "e4de43f774db5f89a02336e2ee84cf0dbae525e5d95693a68163cee1dea9dd46",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject whole-file archive because live guidance still consumes its unfulfilled intent. Keep map proposal verbatim; old shipped slice is not claimed current and deferred obligations are not dropped. Evidence: docs/how-to/use-fgos-group-thinking.md:196–200 cites this source for deferred capabilities. core/skills/fgos-group-thinking/SKILL.md:27–40 now drives Workflows/presets; 2180b4e72 removed the old pack. Source header distinguishes implemented MVP0–9 from still-deferred items. Complete source unheaded-block docs/architect/proposals/step-09-group-thinking-substrate.md#unheaded-block-8 (lines 100–101) is carried at docs/platform/proposals/step-09-group-thinking-substrate.md#unheaded-block-11 (lines 124–125); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "53383ee7676f8236457f81e668f65abb829090a2fca2865aad7cbdf56299ad45",
       "targetAncestry": [
         "Step 09 - Group Thinking Substrate",
         "2. Intent Guardrail"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_62c0e0eda98fb826f31d02b5754f06e7",
@@ -477,19 +457,14 @@
       "targetAnchor": "5-prompt-source-not-runtime-dependency",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject whole-file archive because live guidance still consumes its unfulfilled intent. Keep map proposal verbatim; old shipped slice is not claimed current and deferred obligations are not dropped. Evidence: docs/how-to/use-fgos-group-thinking.md:196–200 cites this source for deferred capabilities. core/skills/fgos-group-thinking/SKILL.md:27–40 now drives Workflows/presets; 2180b4e72 removed the old pack. Source header distinguishes implemented MVP0–9 from still-deferred items. Complete source heading docs/architect/proposals/step-09-group-thinking-substrate.md#5-prompt-source-not-runtime-dependency (lines 167–167) is carried at docs/platform/proposals/step-09-group-thinking-substrate.md#5-prompt-source-not-runtime-dependency (lines 191–191); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: heading 5-prompt-source-not-runtime-dependency src lines 167-167 -> tgt 5-prompt-source-not-runtime-dependency lines 191-191; shown source and target diffed line by line, only 2 link destination(s) rebased and each resolves to the same repository path as the source link, no wording change; supersede to step-09-group-thinking-substrate.md per map/triage, rationale evidence true.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-16-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "ae8a662d909b551afc353c70333e4086f5cef65daa92a6daa1860b58567d4db9",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject whole-file archive because live guidance still consumes its unfulfilled intent. Keep map proposal verbatim; old shipped slice is not claimed current and deferred obligations are not dropped. Evidence: docs/how-to/use-fgos-group-thinking.md:196–200 cites this source for deferred capabilities. core/skills/fgos-group-thinking/SKILL.md:27–40 now drives Workflows/presets; 2180b4e72 removed the old pack. Source header distinguishes implemented MVP0–9 from still-deferred items. Complete source heading docs/architect/proposals/step-09-group-thinking-substrate.md#5-prompt-source-not-runtime-dependency (lines 167–167) is carried at docs/platform/proposals/step-09-group-thinking-substrate.md#5-prompt-source-not-runtime-dependency (lines 191–191); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "bd0c7548f4f71e9a4a22b6b6e7969d3731c12f5b68cacc813c200af23bf6b845",
       "targetAncestry": [
         "Step 09 - Group Thinking Substrate"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_77e26521b60e819e54cd3ddaebf8f20f",
@@ -498,20 +473,15 @@
       "targetAnchor": "unheaded-block-20",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject whole-file archive because live guidance still consumes its unfulfilled intent. Keep map proposal verbatim; old shipped slice is not claimed current and deferred obligations are not dropped. Evidence: docs/how-to/use-fgos-group-thinking.md:196–200 cites this source for deferred capabilities. core/skills/fgos-group-thinking/SKILL.md:27–40 now drives Workflows/presets; 2180b4e72 removed the old pack. Source header distinguishes implemented MVP0–9 from still-deferred items. Complete source unheaded-block docs/architect/proposals/step-09-group-thinking-substrate.md#unheaded-block-17 (lines 169–174) is carried at docs/platform/proposals/step-09-group-thinking-substrate.md#unheaded-block-20 (lines 193–198); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: unheaded-block unheaded-block-17 src lines 169-174 -> tgt unheaded-block-20 lines 193-198; shown source and target diffed line by line, only 2 link destination(s) rebased and each resolves to the same repository path as the source link, no wording change; supersede to step-09-group-thinking-substrate.md per map/triage, rationale evidence true.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-16-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "15d5ed596398980d281b469c3068d4d9963149350c65c8c041afe4f07f6fc3e0",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject whole-file archive because live guidance still consumes its unfulfilled intent. Keep map proposal verbatim; old shipped slice is not claimed current and deferred obligations are not dropped. Evidence: docs/how-to/use-fgos-group-thinking.md:196–200 cites this source for deferred capabilities. core/skills/fgos-group-thinking/SKILL.md:27–40 now drives Workflows/presets; 2180b4e72 removed the old pack. Source header distinguishes implemented MVP0–9 from still-deferred items. Complete source unheaded-block docs/architect/proposals/step-09-group-thinking-substrate.md#unheaded-block-17 (lines 169–174) is carried at docs/platform/proposals/step-09-group-thinking-substrate.md#unheaded-block-20 (lines 193–198); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "ae1fe31eb4a902e012d8b99dd9cdc7d65ef20ba4e21c3001445d8216daeafb98",
       "targetAncestry": [
         "Step 09 - Group Thinking Substrate",
         "5. Prompt Source, Not Runtime Dependency"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_abab70a0365ac246c96517ab7177daec",
@@ -1799,19 +1769,14 @@
       "targetAnchor": "12-relationship-to-component-boundary",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject whole-file archive because live guidance still consumes its unfulfilled intent. Keep map proposal verbatim; old shipped slice is not claimed current and deferred obligations are not dropped. Evidence: docs/how-to/use-fgos-group-thinking.md:196–200 cites this source for deferred capabilities. core/skills/fgos-group-thinking/SKILL.md:27–40 now drives Workflows/presets; 2180b4e72 removed the old pack. Source header distinguishes implemented MVP0–9 from still-deferred items. Complete source heading docs/architect/proposals/step-09-group-thinking-substrate.md#12-relationship-to-component-boundary (lines 540–540) is carried at docs/platform/proposals/step-09-group-thinking-substrate.md#12-relationship-to-component-boundary (lines 564–564); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: heading 12-relationship-to-component-boundary src lines 540-540 -> tgt 12-relationship-to-component-boundary lines 564-564; shown source and target diffed line by line, only 1 link destination(s) rebased and each resolves to the same repository path as the source link, no wording change; supersede to step-09-group-thinking-substrate.md per map/triage, rationale evidence true.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-16-02-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "7cba744e7326699381393f02f40f101912a0181955898c2f7afb25966de0d620",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject whole-file archive because live guidance still consumes its unfulfilled intent. Keep map proposal verbatim; old shipped slice is not claimed current and deferred obligations are not dropped. Evidence: docs/how-to/use-fgos-group-thinking.md:196–200 cites this source for deferred capabilities. core/skills/fgos-group-thinking/SKILL.md:27–40 now drives Workflows/presets; 2180b4e72 removed the old pack. Source header distinguishes implemented MVP0–9 from still-deferred items. Complete source heading docs/architect/proposals/step-09-group-thinking-substrate.md#12-relationship-to-component-boundary (lines 540–540) is carried at docs/platform/proposals/step-09-group-thinking-substrate.md#12-relationship-to-component-boundary (lines 564–564); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "b9ea808cae6c10547475a63cfc946bd98e11dafd258f2f14334bb31ad11d40e1",
       "targetAncestry": [
         "Step 09 - Group Thinking Substrate"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_f89b2bed2567e78d27a202ee0ee0c2ca",
@@ -1820,20 +1785,15 @@
       "targetAnchor": "unheaded-block-71",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject whole-file archive because live guidance still consumes its unfulfilled intent. Keep map proposal verbatim; old shipped slice is not claimed current and deferred obligations are not dropped. Evidence: docs/how-to/use-fgos-group-thinking.md:196–200 cites this source for deferred capabilities. core/skills/fgos-group-thinking/SKILL.md:27–40 now drives Workflows/presets; 2180b4e72 removed the old pack. Source header distinguishes implemented MVP0–9 from still-deferred items. Complete source unheaded-block docs/architect/proposals/step-09-group-thinking-substrate.md#unheaded-block-68 (lines 542–543) is carried at docs/platform/proposals/step-09-group-thinking-substrate.md#unheaded-block-71 (lines 566–567); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: unheaded-block unheaded-block-68 src lines 542-543 -> tgt unheaded-block-71 lines 566-567; shown source and target diffed line by line, only 1 link destination(s) rebased and each resolves to the same repository path as the source link, no wording change; supersede to step-09-group-thinking-substrate.md per map/triage, rationale evidence true.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-16-02-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "3acf7fcfb798f2ba7e946b9a5071b19cdfb577777ecb7172ae2c80959ac8fce2",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject whole-file archive because live guidance still consumes its unfulfilled intent. Keep map proposal verbatim; old shipped slice is not claimed current and deferred obligations are not dropped. Evidence: docs/how-to/use-fgos-group-thinking.md:196–200 cites this source for deferred capabilities. core/skills/fgos-group-thinking/SKILL.md:27–40 now drives Workflows/presets; 2180b4e72 removed the old pack. Source header distinguishes implemented MVP0–9 from still-deferred items. Complete source unheaded-block docs/architect/proposals/step-09-group-thinking-substrate.md#unheaded-block-68 (lines 542–543) is carried at docs/platform/proposals/step-09-group-thinking-substrate.md#unheaded-block-71 (lines 566–567); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "575b16caed0746115a42be20c669b3d6e822f1b4d58daae8bfbc6f3d3ae0abb8",
       "targetAncestry": [
         "Step 09 - Group Thinking Substrate",
         "12. Relationship To Component Boundary"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_6bef4890302810601f9f03d4ebc38d6f",
@@ -1886,19 +1846,14 @@
       "targetAnchor": "13-relationship-to-step-10",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject whole-file archive because live guidance still consumes its unfulfilled intent. Keep map proposal verbatim; old shipped slice is not claimed current and deferred obligations are not dropped. Evidence: docs/how-to/use-fgos-group-thinking.md:196–200 cites this source for deferred capabilities. core/skills/fgos-group-thinking/SKILL.md:27–40 now drives Workflows/presets; 2180b4e72 removed the old pack. Source header distinguishes implemented MVP0–9 from still-deferred items. Complete source heading docs/architect/proposals/step-09-group-thinking-substrate.md#13-relationship-to-step-10 (lines 554–554) is carried at docs/platform/proposals/step-09-group-thinking-substrate.md#13-relationship-to-step-10 (lines 578–578); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: heading 13-relationship-to-step-10 src lines 554-554 -> tgt 13-relationship-to-step-10 lines 578-578; shown source and target diffed line by line, only 1 link destination(s) rebased and each resolves to the same repository path as the source link, no wording change; supersede to step-09-group-thinking-substrate.md per map/triage, rationale evidence true.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-16-02-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "08185bfae95395866a463f537908e0ff521134935fa08dbec87029332adfe5a0",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject whole-file archive because live guidance still consumes its unfulfilled intent. Keep map proposal verbatim; old shipped slice is not claimed current and deferred obligations are not dropped. Evidence: docs/how-to/use-fgos-group-thinking.md:196–200 cites this source for deferred capabilities. core/skills/fgos-group-thinking/SKILL.md:27–40 now drives Workflows/presets; 2180b4e72 removed the old pack. Source header distinguishes implemented MVP0–9 from still-deferred items. Complete source heading docs/architect/proposals/step-09-group-thinking-substrate.md#13-relationship-to-step-10 (lines 554–554) is carried at docs/platform/proposals/step-09-group-thinking-substrate.md#13-relationship-to-step-10 (lines 578–578); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "a9986b0abded736cb24f40b01c86bcacfe9349f0d8172cbf883a3b7a4d955bf5",
       "targetAncestry": [
         "Step 09 - Group Thinking Substrate"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_275235f3135d9c91c97b72039ab95501",
@@ -1907,20 +1862,15 @@
       "targetAnchor": "unheaded-block-74",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject whole-file archive because live guidance still consumes its unfulfilled intent. Keep map proposal verbatim; old shipped slice is not claimed current and deferred obligations are not dropped. Evidence: docs/how-to/use-fgos-group-thinking.md:196–200 cites this source for deferred capabilities. core/skills/fgos-group-thinking/SKILL.md:27–40 now drives Workflows/presets; 2180b4e72 removed the old pack. Source header distinguishes implemented MVP0–9 from still-deferred items. Complete source unheaded-block docs/architect/proposals/step-09-group-thinking-substrate.md#unheaded-block-71 (lines 556–558) is carried at docs/platform/proposals/step-09-group-thinking-substrate.md#unheaded-block-74 (lines 580–582); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: unheaded-block unheaded-block-71 src lines 556-558 -> tgt unheaded-block-74 lines 580-582; shown source and target diffed line by line, only 1 link destination(s) rebased and each resolves to the same repository path as the source link, no wording change; supersede to step-09-group-thinking-substrate.md per map/triage, rationale evidence true.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-16-02-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "f52aab2b10467f59440348eedf807e13063453fc0d8fc8b60557819774542a37",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject whole-file archive because live guidance still consumes its unfulfilled intent. Keep map proposal verbatim; old shipped slice is not claimed current and deferred obligations are not dropped. Evidence: docs/how-to/use-fgos-group-thinking.md:196–200 cites this source for deferred capabilities. core/skills/fgos-group-thinking/SKILL.md:27–40 now drives Workflows/presets; 2180b4e72 removed the old pack. Source header distinguishes implemented MVP0–9 from still-deferred items. Complete source unheaded-block docs/architect/proposals/step-09-group-thinking-substrate.md#unheaded-block-71 (lines 556–558) is carried at docs/platform/proposals/step-09-group-thinking-substrate.md#unheaded-block-74 (lines 580–582); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "472338c56495259cbf528d57d38b9fe7146d09bba7cbfdfbb143e4292d599b66",
       "targetAncestry": [
         "Step 09 - Group Thinking Substrate",
         "13. Relationship To Step 10"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_84a6b197ebded5531279a5fb83ee1845",

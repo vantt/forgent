@@ -24,20 +24,15 @@
       "targetAnchor": "fgos-component-boundary-advisory",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:37@2026-10-15",
-      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architect/component-boundary/component-boundary-advisory.md#fgos-component-boundary-advisory (lines 1–1) into docs/platform/component-boundary.md#fgos-component-boundary-advisory (lines 98–98), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
-      "reviewNote": "deep: source L1-1 heading under 'fgOS Component Boundary Advisory'; source H1 title carried as H3 under the 'Added in candidate' H2, text identical; digest differs by level and the following Related block whose links were rebased; anchor ok; rationale truthful",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0450-whole-system-03.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "649b5512477ff5be808c16e91fb1ccb75d026ebc8778314a2d08c7641e51b4da",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architect/component-boundary/component-boundary-advisory.md#fgos-component-boundary-advisory (lines 1–1) into docs/platform/component-boundary.md#fgos-component-boundary-advisory (lines 98–98), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "cef01b7bcb79441b21c155752aa4ba1a0f7802df7e79f95fa41eb97ec39c80bd",
       "targetAncestry": [
         "Component Boundary",
         "Added in candidate: component-boundary-advisory source carriage"
-      ],
-      "reviewReportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930"
+      ]
     },
     {
       "claimId": "claim_b5eaf900c55b4d0160e490fd9da0de39",
@@ -46,21 +41,16 @@
       "targetAnchor": "unheaded-block-15",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:37@2026-10-15",
-      "rationale": "Judgment: no target digest match. Carry the complete unheaded-block at docs/architect/component-boundary/component-boundary-advisory.md#unheaded-block-1 (lines 3–8) into docs/platform/component-boundary.md#unheaded-block-15 (lines 100–105), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
-      "reviewNote": "deep: source L3-8 unheaded-block under 'fgOS Component Boundary Advisory'; line diff shows only relative-link destinations rebased from docs/architect/component-boundary to docs/platform, every rebased link resolves to the same repo path as its source link; prose, cells and table order unchanged; anchor ok",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0450-whole-system-03.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "2fe14948da8854744ebb6006b5a35d8f16dc79988c74fa56e3880297da287e1d",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete unheaded-block at docs/architect/component-boundary/component-boundary-advisory.md#unheaded-block-1 (lines 3–8) into docs/platform/component-boundary.md#unheaded-block-15 (lines 100–105), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "7933a60d470d025f7fa141462dd005bff6e8b5a7c87d0fb713a808aa385c3d43",
       "targetAncestry": [
         "Component Boundary",
         "Added in candidate: component-boundary-advisory source carriage",
         "fgOS Component Boundary Advisory"
-      ],
-      "reviewReportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930"
+      ]
     },
     {
       "claimId": "claim_046eeac7c222602b244507f2829c43d7",
@@ -665,21 +655,16 @@
       "targetAnchor": "5-high-level-component-authority-register",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:37@2026-10-15",
-      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architect/component-boundary/component-boundary-advisory.md#5-high-level-component-authority-register (lines 127–127) into docs/platform/component-boundary.md#5-high-level-component-authority-register (lines 224–224), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
-      "reviewNote": "deep: source L127-127 heading under 'fgOS Component Boundary Advisory'; heading text identical, level 2 to 4 (uniform +2 shift under the labelled carriage H2 so one H1 holds); digest differs only by the level/payload fold; anchor ok; rationale truthful",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0450-whole-system-03.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "5eb77ad16f6e0462b50d39b83e428a0ac9ecd6ef1fc37d2fea71eb929fe4af05",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architect/component-boundary/component-boundary-advisory.md#5-high-level-component-authority-register (lines 127–127) into docs/platform/component-boundary.md#5-high-level-component-authority-register (lines 224–224), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "ab0b345ff26b19e4c70142d6b8ea5664b1dbc8bb2197a6aee83a721b72532ad4",
       "targetAncestry": [
         "Component Boundary",
         "Added in candidate: component-boundary-advisory source carriage",
         "fgOS Component Boundary Advisory"
-      ],
-      "reviewReportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930"
+      ]
     },
     {
       "claimId": "claim_aac411c433a46e14d6964975230acbb0",
@@ -736,22 +721,17 @@
       "targetAnchor": "unheaded-block-39",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:37@2026-10-15",
-      "rationale": "Judgment: no target digest match. Carry the complete unheaded-block at docs/architect/component-boundary/component-boundary-advisory.md#unheaded-block-25 (lines 138–147) into docs/platform/component-boundary.md#unheaded-block-39 (lines 235–244), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
-      "reviewNote": "deep: source L138-147 unheaded-block under '5. High-Level Component Authority Register'; line diff shows only relative-link destinations rebased from docs/architect/component-boundary to docs/platform, every rebased link resolves to the same repo path as its source link; prose, cells and table order unchanged; anchor ok",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0450-whole-system-03.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "34c525efcf0ba3c78a5c597ee3171e727708b425b32c3e0ad22b06335b212324",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete unheaded-block at docs/architect/component-boundary/component-boundary-advisory.md#unheaded-block-25 (lines 138–147) into docs/platform/component-boundary.md#unheaded-block-39 (lines 235–244), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "99dad1bc2d7cc772c8aebbb5b12f97ec1c18571001a00e0b04e1e01e9d87a852",
       "targetAncestry": [
         "Component Boundary",
         "Added in candidate: component-boundary-advisory source carriage",
         "fgOS Component Boundary Advisory",
         "5. High-Level Component Authority Register"
-      ],
-      "reviewReportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930"
+      ]
     },
     {
       "claimId": "claim_23a0c7979ae73ea30c2532171f40fd25",
@@ -1119,21 +1099,16 @@
       "targetAnchor": "7-contract-authority-matrix",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:37@2026-10-15",
-      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architect/component-boundary/component-boundary-advisory.md#7-contract-authority-matrix (lines 277–277) into docs/platform/component-boundary.md#7-contract-authority-matrix (lines 374–374), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
-      "reviewNote": "deep: source L277-277 heading under 'fgOS Component Boundary Advisory'; heading text identical, level 2 to 4 (uniform +2 shift under the labelled carriage H2 so one H1 holds); digest differs only by the level/payload fold; anchor ok; rationale truthful",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0450-whole-system-03.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "ef8cba2d9be208afdf9a91a7cc5f7c2e49c3600f74ba9f913b7c3aff8a3a40fc",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architect/component-boundary/component-boundary-advisory.md#7-contract-authority-matrix (lines 277–277) into docs/platform/component-boundary.md#7-contract-authority-matrix (lines 374–374), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "8f99ea365de4aed673b87511d51775ce357be6be3a54f36f8bf013ee9338d083",
       "targetAncestry": [
         "Component Boundary",
         "Added in candidate: component-boundary-advisory source carriage",
         "fgOS Component Boundary Advisory"
-      ],
-      "reviewReportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930"
+      ]
     },
     {
       "claimId": "claim_a308864955bd4f2a7067191e4087a00a",
@@ -1190,22 +1165,17 @@
       "targetAnchor": "unheaded-block-56",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:37@2026-10-15",
-      "rationale": "Judgment: no target digest match. Carry the complete unheaded-block at docs/architect/component-boundary/component-boundary-advisory.md#unheaded-block-42 (lines 288–303) into docs/platform/component-boundary.md#unheaded-block-56 (lines 385–400), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
-      "reviewNote": "deep: source L288-303 unheaded-block under '7. Contract Authority Matrix'; line diff shows only relative-link destinations rebased from docs/architect/component-boundary to docs/platform, every rebased link resolves to the same repo path as its source link; prose, cells and table order unchanged; anchor ok",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0450-whole-system-03.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "06417e3a3ff67aff178b8e1cb564bcd32c7fc5032bdf1b738e4bf34313a0cff6",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete unheaded-block at docs/architect/component-boundary/component-boundary-advisory.md#unheaded-block-42 (lines 288–303) into docs/platform/component-boundary.md#unheaded-block-56 (lines 385–400), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "cb6efa1b6c13d5803b75b7c387eb055ba4586d287d0e42c0ffea2d9e24b2cc88",
       "targetAncestry": [
         "Component Boundary",
         "Added in candidate: component-boundary-advisory source carriage",
         "fgOS Component Boundary Advisory",
         "7. Contract Authority Matrix"
-      ],
-      "reviewReportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930"
+      ]
     },
     {
       "claimId": "claim_e4c5c8bed3b38df479ea7bb9fbc237c3",
@@ -1310,21 +1280,16 @@
       "targetAnchor": "8-internal-boundary-map",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:37@2026-10-15",
-      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architect/component-boundary/component-boundary-advisory.md#8-internal-boundary-map (lines 325–325) into docs/platform/component-boundary.md#8-internal-boundary-map (lines 422–422), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
-      "reviewNote": "deep: source L325-325 heading under 'fgOS Component Boundary Advisory'; heading text identical, level 2 to 4 (uniform +2 shift under the labelled carriage H2 so one H1 holds); digest differs only by the level/payload fold; anchor ok; rationale truthful",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0450-whole-system-03.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "a9dfd52ce5279d1126f5acff4866e16263c4d65ac6777f2a6a2e692afefce479",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architect/component-boundary/component-boundary-advisory.md#8-internal-boundary-map (lines 325–325) into docs/platform/component-boundary.md#8-internal-boundary-map (lines 422–422), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "7334b3174da2c73d1c452c30506f563c0e225c82493dcd181101f62e254f4302",
       "targetAncestry": [
         "Component Boundary",
         "Added in candidate: component-boundary-advisory source carriage",
         "fgOS Component Boundary Advisory"
-      ],
-      "reviewReportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930"
+      ]
     },
     {
       "claimId": "claim_e34280f4e5259d4bc456ed92df61b1f8",
@@ -1357,22 +1322,17 @@
       "targetAnchor": "unheaded-block-62",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:37@2026-10-15",
-      "rationale": "Judgment: no target digest match. Carry the complete unheaded-block at docs/architect/component-boundary/component-boundary-advisory.md#unheaded-block-48 (lines 332–348) into docs/platform/component-boundary.md#unheaded-block-62 (lines 429–445), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
-      "reviewNote": "deep: source L332-348 unheaded-block under '8. Internal Boundary Map'; line diff shows only relative-link destinations rebased from docs/architect/component-boundary to docs/platform, every rebased link resolves to the same repo path as its source link; prose, cells and table order unchanged; anchor ok",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0450-whole-system-03.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "0fbb26b5b55ac7b4a59c5822c3a1d8b7d79929464f29ff7217e322b46e2b7d63",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete unheaded-block at docs/architect/component-boundary/component-boundary-advisory.md#unheaded-block-48 (lines 332–348) into docs/platform/component-boundary.md#unheaded-block-62 (lines 429–445), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "1ca371d0061fda0fe84b0949508a5bd0fd2015ed9e3605d7857edde7846cb8de",
       "targetAncestry": [
         "Component Boundary",
         "Added in candidate: component-boundary-advisory source carriage",
         "fgOS Component Boundary Advisory",
         "8. Internal Boundary Map"
-      ],
-      "reviewReportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930"
+      ]
     },
     {
       "claimId": "claim_96e947d6daf7dd7612cc711be8e3e22e",

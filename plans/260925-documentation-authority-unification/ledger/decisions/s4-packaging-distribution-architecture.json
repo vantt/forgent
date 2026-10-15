@@ -1784,21 +1784,16 @@
       "targetAnchor": "1-historical-read-order",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete heading from docs/architect/packaging-distribution/README.md#1-historical-read-order, under \"1. Historical Read Order\", is retained at docs/platform/packaging-distribution/README.md#1-historical-read-order. Heading depth and relative-link destinations change; rewritten links resolve to the same files; the direct section payload follows the original source order. The named owner is the packaging-distribution/README.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "Verbatim carry: section equals source after heading-depth shift and link normalisation; 5 relative link(s) rewritten, each resolving to the same file and fragment; shard row differs from 09fdd6746 only in rationale and reviewNote; corrected rationale names the link rewrite and is true; anchors check ok",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-13",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-followup.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "3eec93e722cb187e30a087567678012796959fb0762a1b99d9ede0eced1ce364",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "The complete heading from docs/architect/packaging-distribution/README.md#1-historical-read-order, under \"1. Historical Read Order\", is retained at docs/platform/packaging-distribution/README.md#1-historical-read-order. Heading depth and relative-link destinations change; rewritten links resolve to the same files; the direct section payload follows the original source order. The named owner is the packaging-distribution/README.md topic owner; carriage does not certify current implementation. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "0de78d892454a177993573aa2e504c9d01a038f1715a5e711668e586c4a36bf8",
       "targetAncestry": [
         "Packaging-Distribution",
         "Retained Readme Source Detail",
         "Packaging And Distribution Architecture"
-      ],
-      "reviewReportCommit": "d57231686ec1533d4de36507e814c2484da31f72"
+      ]
     },
     {
       "claimId": "claim_180db2a5b2592775ada69d493e5e04f2",
@@ -1831,22 +1826,17 @@
       "targetAnchor": "unheaded-block-36",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/README.md#unheaded-block-7, under \"1. Historical Read Order\", is retained at docs/platform/packaging-distribution/README.md#unheaded-block-36. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/README.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "unheaded-block-7 text identical except relative links rewritten to the same files, rationale names the link change, anchor exists.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-13",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-architecture-02.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "467f04e58456e8e5a0bf3be6b9a065fb5ddbddf9606cff13954bc6f95200dea0",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/README.md#unheaded-block-7, under \"1. Historical Read Order\", is retained at docs/platform/packaging-distribution/README.md#unheaded-block-36. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/README.md topic owner; carriage does not certify current implementation. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "5c316ba0db34e70b770e9fa9f45f8511ef7ce127eb158639ff84d01160522320",
       "targetAncestry": [
         "Packaging-Distribution",
         "Retained Readme Source Detail",
         "Packaging And Distribution Architecture",
         "1. Historical Read Order"
-      ],
-      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
+      ]
     },
     {
       "claimId": "claim_c7ca681b20d38642b7df57b79289d6e5",
@@ -1879,21 +1869,16 @@
       "targetAnchor": "2-historical-supersession-table",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete heading from docs/architect/packaging-distribution/README.md#2-historical-supersession-table, under \"2. Historical Supersession Table\", is retained at docs/platform/packaging-distribution/README.md#2-historical-supersession-table. Heading depth and relative-link destinations change; rewritten links resolve to the same files; the direct section payload follows the original source order. The named owner is the packaging-distribution/README.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "Verbatim carry: section equals source after heading-depth shift and link normalisation; 4 relative link(s) rewritten, each resolving to the same file and fragment; shard row differs from 09fdd6746 only in rationale and reviewNote; corrected rationale names the link rewrite and is true; anchors check ok",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-13",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-followup.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "7a121f1faaa77b183e3e2d5b187d1ae7a2d65980bfa7a3a4ead0088e25ef938e",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "The complete heading from docs/architect/packaging-distribution/README.md#2-historical-supersession-table, under \"2. Historical Supersession Table\", is retained at docs/platform/packaging-distribution/README.md#2-historical-supersession-table. Heading depth and relative-link destinations change; rewritten links resolve to the same files; the direct section payload follows the original source order. The named owner is the packaging-distribution/README.md topic owner; carriage does not certify current implementation. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "d41a78b83c4a2934d6c9744590320b8e641311d2e31a580c0018a4feb64cdba3",
       "targetAncestry": [
         "Packaging-Distribution",
         "Retained Readme Source Detail",
         "Packaging And Distribution Architecture"
-      ],
-      "reviewReportCommit": "d57231686ec1533d4de36507e814c2484da31f72"
+      ]
     },
     {
       "claimId": "claim_37a8691bba650ed4cd9d98314b6a2b1a",
@@ -1902,22 +1887,17 @@
       "targetAnchor": "unheaded-block-38",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/README.md#unheaded-block-9, under \"2. Historical Supersession Table\", is retained at docs/platform/packaging-distribution/README.md#unheaded-block-38. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/README.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "unheaded-block-9 text identical except relative links rewritten to the same files, rationale names the link change, anchor exists.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-13",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-architecture-02.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "8938a4cbe3f1099f298566f2fd822d2745030454f4f50025e8f9ff685a38f405",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/README.md#unheaded-block-9, under \"2. Historical Supersession Table\", is retained at docs/platform/packaging-distribution/README.md#unheaded-block-38. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/README.md topic owner; carriage does not certify current implementation. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "f5197870363cbb04004795f6a8a85550585141fd999e6d913ae7874f0282afbf",
       "targetAncestry": [
         "Packaging-Distribution",
         "Retained Readme Source Detail",
         "Packaging And Distribution Architecture",
         "2. Historical Supersession Table"
-      ],
-      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
+      ]
     },
     {
       "claimId": "claim_b8f77a61e158f2e2d0415b1bad9a1134",
@@ -4022,21 +4002,16 @@
       "targetAnchor": "how-to-use-this-document",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete heading from docs/architect/packaging-distribution/runtime-identity-and-activation.md#how-to-use-this-document, under \"How To Use This Document\", is retained at docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md#how-to-use-this-document. Heading depth and relative-link destinations change; rewritten links resolve to the same files; the direct section payload follows the original source order. The named owner is the architecture/runtime-identity-and-activation.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "Verbatim carry: section equals source after heading-depth shift and link normalisation; 6 relative link(s) rewritten, each resolving to the same file and fragment; shard row differs from 09fdd6746 only in rationale and reviewNote; corrected rationale names the link rewrite and is true; anchors check ok",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-13",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-followup.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "af9d7395f28979e64969c6ed6a2c53b35d1de02b1d879d4649c16bd5d841329f",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "The complete heading from docs/architect/packaging-distribution/runtime-identity-and-activation.md#how-to-use-this-document, under \"How To Use This Document\", is retained at docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md#how-to-use-this-document. Heading depth and relative-link destinations change; rewritten links resolve to the same files; the direct section payload follows the original source order. The named owner is the architecture/runtime-identity-and-activation.md topic owner; carriage does not certify current implementation. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "09d80c8c5a1f2d0b48a3ba23b932ee64734bb881f132dd2a619920767c7aa7ae",
       "targetAncestry": [
         "Runtime Identity And Activation",
         "Retained Runtime Identity And Activation Source Detail",
         "Runtime Identity And Activation"
-      ],
-      "reviewReportCommit": "d57231686ec1533d4de36507e814c2484da31f72"
+      ]
     },
     {
       "claimId": "claim_6f1dc76a5f99b9f747725aef60bd5d12",
@@ -4069,22 +4044,17 @@
       "targetAnchor": "unheaded-block-30",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-6, under \"How To Use This Document\", is retained at docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md#unheaded-block-30. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the architecture/runtime-identity-and-activation.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "Only relative links differ from source; every rewritten link resolves to the same destination file as before; rationale states link rewrite truthfully; parent How To Use This Document kept",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-13",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-architecture-03.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "2f95e86d725a3a2577ebdcb12f9ba2ef5fb74a15465af07a456766752243aa6c",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-6, under \"How To Use This Document\", is retained at docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md#unheaded-block-30. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the architecture/runtime-identity-and-activation.md topic owner; carriage does not certify current implementation. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "08f3c84ed43e45ba91d0b87a6fc376c3b893ff12bd3ba9a56419aecf7e571dbb",
       "targetAncestry": [
         "Runtime Identity And Activation",
         "Retained Runtime Identity And Activation Source Detail",
         "Runtime Identity And Activation",
         "How To Use This Document"
-      ],
-      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
+      ]
     },
     {
       "claimId": "claim_dc75ad7e62660d3711910c31e2882533",
@@ -4354,20 +4324,15 @@
       "targetAnchor": "3-roots-and-on-disk-shape",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete heading from docs/architect/packaging-distribution/runtime-identity-and-activation.md#3-roots-and-on-disk-shape, under \"3. Roots And On-Disk Shape\", is retained at docs/platform/packaging-distribution/contracts/repository-runtime-layout.md#3-roots-and-on-disk-shape. Heading depth and relative-link destinations change; rewritten links resolve to the same files; the direct section payload follows the original source order. The named owner is the contracts/repository-runtime-layout.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "Verbatim carry: section equals source after heading-depth shift and link normalisation; 2 relative link(s) rewritten, each resolving to the same file and fragment; shard row differs from 09fdd6746 only in rationale and reviewNote; corrected rationale names the link rewrite and is true; anchors check ok",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-13",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-followup.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "8663234273000c940a8a87fcb1ecec9558e979f5135b38d28a91f7ad61474f1a",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "The complete heading from docs/architect/packaging-distribution/runtime-identity-and-activation.md#3-roots-and-on-disk-shape, under \"3. Roots And On-Disk Shape\", is retained at docs/platform/packaging-distribution/contracts/repository-runtime-layout.md#3-roots-and-on-disk-shape. Heading depth and relative-link destinations change; rewritten links resolve to the same files; the direct section payload follows the original source order. The named owner is the contracts/repository-runtime-layout.md topic owner; carriage does not certify current implementation. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "bb13a047ba4c19afed8c063fe3d3b5aff39ad5b07d3286ade0f42c8f0e3c9af3",
       "targetAncestry": [
         "Contract: Repository Runtime Layout",
         "Retained Runtime Identity And Activation Source Detail"
-      ],
-      "reviewReportCommit": "d57231686ec1533d4de36507e814c2484da31f72"
+      ]
     },
     {
       "claimId": "claim_a2ffbcf3bf179c454c210a649e55c3e8",
@@ -4376,21 +4341,16 @@
       "targetAnchor": "unheaded-block-21",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-15, under \"3. Roots And On-Disk Shape\", is retained at docs/platform/packaging-distribution/contracts/repository-runtime-layout.md#unheaded-block-21. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/repository-runtime-layout.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "Only relative links differ from source; every rewritten link resolves to the same destination file as before; rationale states link rewrite truthfully; parent 3. Roots And On-Disk Shape kept",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-13",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-architecture-03.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "bed9bf803d2c33e72ec33d712567dd322f7c5b20fff0747060948c46c4ad348b",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-15, under \"3. Roots And On-Disk Shape\", is retained at docs/platform/packaging-distribution/contracts/repository-runtime-layout.md#unheaded-block-21. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/repository-runtime-layout.md topic owner; carriage does not certify current implementation. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "ce8755943e8ab3f69643a1a5e41745bfa978163376e0a1ce251c22b469ffe8c2",
       "targetAncestry": [
         "Contract: Repository Runtime Layout",
         "Retained Runtime Identity And Activation Source Detail",
         "3. Roots And On-Disk Shape"
-      ],
-      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
+      ]
     },
     {
       "claimId": "claim_734e7078568afb68a70dd0e07119dea1",
@@ -4445,21 +4405,16 @@
       "targetAnchor": "unheaded-block-24",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-18, under \"3. Roots And On-Disk Shape\", is retained at docs/platform/packaging-distribution/contracts/repository-runtime-layout.md#unheaded-block-24. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/repository-runtime-layout.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "Only relative links differ from source; every rewritten link resolves to the same destination file as before; rationale states link rewrite truthfully; parent 3. Roots And On-Disk Shape kept",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-13",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-architecture-03.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "54fc6294ee0fb2999689259d21a78848ea10781e84ee5484af55747d4336c303",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-18, under \"3. Roots And On-Disk Shape\", is retained at docs/platform/packaging-distribution/contracts/repository-runtime-layout.md#unheaded-block-24. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/repository-runtime-layout.md topic owner; carriage does not certify current implementation. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "9d2d2161b7973e4cbb1e3ca4da844e70284b15efbd4a0f918e93f560da2fef88",
       "targetAncestry": [
         "Contract: Repository Runtime Layout",
         "Retained Runtime Identity And Activation Source Detail",
         "3. Roots And On-Disk Shape"
-      ],
-      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
+      ]
     },
     {
       "claimId": "claim_78fb7962a13f38faf373501503aad531",
@@ -4884,20 +4839,15 @@
       "targetAnchor": "5-releasemanifest",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete heading from docs/architect/packaging-distribution/runtime-identity-and-activation.md#5-releasemanifest, under \"5. ReleaseManifest\", is retained at docs/platform/packaging-distribution/contracts/release-manifest.md#5-releasemanifest. Heading depth and relative-link destinations change; rewritten links resolve to the same files; the direct section payload follows the original source order. The named owner is the contracts/release-manifest.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "Verbatim carry: section equals source after heading-depth shift and link normalisation; 1 relative link(s) rewritten, each resolving to the same file and fragment; shard row differs from 09fdd6746 only in rationale and reviewNote; corrected rationale names the link rewrite and is true; anchors check ok",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-13",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-followup.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "dab662376a62121a0cdec73438f62b6955fe94aa868d54deceb124c3aceaefee",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "The complete heading from docs/architect/packaging-distribution/runtime-identity-and-activation.md#5-releasemanifest, under \"5. ReleaseManifest\", is retained at docs/platform/packaging-distribution/contracts/release-manifest.md#5-releasemanifest. Heading depth and relative-link destinations change; rewritten links resolve to the same files; the direct section payload follows the original source order. The named owner is the contracts/release-manifest.md topic owner; carriage does not certify current implementation. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "cceaac3e9fc823ee407fe10f75b8c5b37118b902e0c34b6df0ef005b9e7b45dd",
       "targetAncestry": [
         "Contract: Release Manifest",
         "Retained Runtime Identity And Activation Source Detail"
-      ],
-      "reviewReportCommit": "d57231686ec1533d4de36507e814c2484da31f72"
+      ]
     },
     {
       "claimId": "claim_f7b23e10496a2460c655bbcd0c765cfb",
@@ -5021,21 +4971,16 @@
       "targetAnchor": "unheaded-block-17",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-41, under \"5. ReleaseManifest\", is retained at docs/platform/packaging-distribution/contracts/release-manifest.md#unheaded-block-17. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/release-manifest.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "Only relative links differ from source; every rewritten link resolves to the same destination file as before; rationale states link rewrite truthfully; parent 5. ReleaseManifest kept",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-13",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-architecture-03.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "2c2c843c119b46a01d8e99728f09aa95a1bd650fe7c85276230a0324ccf40265",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-41, under \"5. ReleaseManifest\", is retained at docs/platform/packaging-distribution/contracts/release-manifest.md#unheaded-block-17. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/release-manifest.md topic owner; carriage does not certify current implementation. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "14256af7581ef2bfaa818af8fba135a0031d0fb6f3c67397f4f72dff9ab738c2",
       "targetAncestry": [
         "Contract: Release Manifest",
         "Retained Runtime Identity And Activation Source Detail",
         "5. ReleaseManifest"
-      ],
-      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
+      ]
     },
     {
       "claimId": "claim_66db7a2760e67bac298e8fa999e03918",
@@ -8010,21 +7955,16 @@
       "targetAnchor": "2-historical-document-split",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete heading from docs/architect/packaging-distribution/scope-map.md#2-historical-document-split, under \"2. Historical Document Split\", is retained at docs/platform/packaging-distribution/spec.md#2-historical-document-split. Heading depth and relative-link destinations change; rewritten links resolve to the same files; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "Verbatim carry: section equals source after heading-depth shift and link normalisation; 3 relative link(s) rewritten, each resolving to the same file and fragment; shard row differs from 09fdd6746 only in rationale and reviewNote; corrected rationale names the link rewrite and is true; anchors check ok",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-13",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-followup.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "697dcb0fc77b4574bc4785abc062489f7b8d7ed3fcc636d2f93d67873d5434a7",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "The complete heading from docs/architect/packaging-distribution/scope-map.md#2-historical-document-split, under \"2. Historical Document Split\", is retained at docs/platform/packaging-distribution/spec.md#2-historical-document-split. Heading depth and relative-link destinations change; rewritten links resolve to the same files; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "5373a570cdf8056e0c304e6f7e49845e6ae094cfe54619cb65a980f4f82cb68e",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Scope Map Source Detail",
         "Packaging Distribution Scope Map"
-      ],
-      "reviewReportCommit": "d57231686ec1533d4de36507e814c2484da31f72"
+      ]
     },
     {
       "claimId": "claim_b43688fff7d34b97772efcb6d81018bf",
@@ -8081,22 +8021,17 @@
       "targetAnchor": "unheaded-block-59",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/scope-map.md#unheaded-block-9, under \"2. Historical Document Split\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-59. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "relative links re-pointed only (normalised destinations equal and all exist); rationale names link changes; digests recomputed from content commit",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-13",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-architecture-05.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "0963efc29ce84598b9296ee2a2d8cb02b825693121516fb939830568a5b639fc",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/scope-map.md#unheaded-block-9, under \"2. Historical Document Split\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-59. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "f27a31d2c4b1b629627bf0d316a268aa31c8c40632534b157a59c6e66a6bac7f",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Scope Map Source Detail",
         "Packaging Distribution Scope Map",
         "2. Historical Document Split"
-      ],
-      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
+      ]
     },
     {
       "claimId": "claim_7c93e9a44c1e8eb580ebb1c28fbc9d3f",
@@ -8486,20 +8421,15 @@
       "targetAnchor": "workspace-runtime-model",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete heading from docs/architect/packaging-distribution/workspace-runtime-model.md#workspace-runtime-model, under \"Workspace Runtime Model\", is retained at docs/platform/packaging-distribution/spec.md#workspace-runtime-model. Heading depth and relative-link destinations change; rewritten links resolve to the same files; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "Verbatim carry: section equals source after heading-depth shift and link normalisation; 3 relative link(s) rewritten, each resolving to the same file and fragment; shard row differs from 09fdd6746 only in rationale and reviewNote; corrected rationale names the link rewrite and is true; anchors check ok",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-13",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-followup.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "bb51245f797ae2ff9c26ec3eeda2eec25bae525e30543a9a658a47dd84109dd6",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "The complete heading from docs/architect/packaging-distribution/workspace-runtime-model.md#workspace-runtime-model, under \"Workspace Runtime Model\", is retained at docs/platform/packaging-distribution/spec.md#workspace-runtime-model. Heading depth and relative-link destinations change; rewritten links resolve to the same files; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "b17cd70e3bb848b985deb966b7c9ffc192142e8f887bfb49d3bf4d76c70efa15",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Workspace Runtime Model Source Detail"
-      ],
-      "reviewReportCommit": "d57231686ec1533d4de36507e814c2484da31f72"
+      ]
     },
     {
       "claimId": "claim_da41a9786ba80d8a51c540a03d4dc2c6",
@@ -8531,21 +8461,16 @@
       "targetAnchor": "unheaded-block-75",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/workspace-runtime-model.md#unheaded-block-2, under \"Workspace Runtime Model\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-75. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "relative links re-pointed only (normalised destinations equal and all exist); rationale names link changes; digests recomputed from content commit",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-13",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-architecture-05.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "19851b062b9026d35b203683af36c1a27d3cf542f557549831e1e860138dee6a",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/workspace-runtime-model.md#unheaded-block-2, under \"Workspace Runtime Model\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-75. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "9aefc76daebb502839626d20f26342d459be16ca0412bed1a7d4d3af5dd4ea9c",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Workspace Runtime Model Source Detail",
         "Workspace Runtime Model"
-      ],
-      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
+      ]
     },
     {
       "claimId": "claim_d897f2b8b6a0fc956ef2232d1d7b90c3",
@@ -8600,21 +8525,16 @@
       "targetAnchor": "unheaded-block-78",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/workspace-runtime-model.md#unheaded-block-5, under \"Workspace Runtime Model\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-78. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "relative links re-pointed only (normalised destinations equal and all exist); rationale names link changes; digests recomputed from content commit",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-13",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-architecture-05.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "cd74dfc705f04854cfa17eebf4d9491c6d8006a272e739e8463415183d6a81f5",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/workspace-runtime-model.md#unheaded-block-5, under \"Workspace Runtime Model\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-78. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "90fe2ceaeaddd20677f3b4740a9a6f34912bae20dea39e1ebbd453a224ebf173",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Workspace Runtime Model Source Detail",
         "Workspace Runtime Model"
-      ],
-      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
+      ]
     },
     {
       "claimId": "claim_ffe2d79ceecc8d5f4c380c2ecbaa86ed",

@@ -3202,20 +3202,15 @@
       "targetAnchor": "bảng-đối-chiếu-từ-vựng-dispatch",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792066534402-cb278bf5@2026-10-15",
-      "rationale": "Judgment: A41/A19 truth correction or explicitly labelled candidate navigation/link/scaffolding repair. Complete original source remains in immutable docs/specs/runner.md; candidate supersedes the identified false current assertion or rebases the same link referent, with unchanged dated decision semantics. R9-1: link-only rebase; label and repository referent preserved Full before/after text and evidence in reports/phase-06/step9-rebound-units.json. A22 rebind, pending independent bounded review; no approval carry, retirement or promotion.",
-      "reviewNote": "deep: heading Bảng đối chiếu từ vựng dispatch source L1269-1269 to architecture/h-7af1f0242611.md#bảng-đối-chiếu-từ-vựng-dispatch; token-level source-to-target diff read both directions, every hunk lies inside an edit range (truth-26) and is labelled in the carrier, nothing else added or lost; the rebased relative links were resolved from the new file location and point at the same existing repo files; disposition stays supersede, legal for a labelled correction and the rationale names the correction; shard row equals pack, anchors exist, source and target digests recomputed by script",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "1d8763f85c867467e7523ad5b32c3a9f6b771977afc247d8f923ef97cef06a23",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: A41/A19 truth correction or explicitly labelled candidate navigation/link/scaffolding repair. Complete original source remains in immutable docs/specs/runner.md; candidate supersedes the identified false current assertion or rebases the same link referent, with unchanged dated decision semantics. R9-1: link-only rebase; label and repository referent preserved Full before/after text and evidence in reports/phase-06/step9-rebound-units.json. A22 rebind, pending independent bounded review; no approval carry, retirement or promotion. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "dd171406c5d055a93ca63bb5de0d73cac56e1256a0f30e7e07831ccdca6d0fd3",
       "targetAncestry": [
         "Added in candidate: Runner Từ vựng dispatch hiện hành",
         "Từ vựng dispatch hiện hành"
-      ],
-      "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9"
+      ]
     },
     {
       "claimId": "claim_e212e87da06a0a552cc1ccde10b5aaab",
@@ -3247,21 +3242,16 @@
       "targetAnchor": "unheaded-block-5",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792066534402-cb278bf5@2026-10-15",
-      "rationale": "Judgment: A41/A19 truth correction or explicitly labelled candidate navigation/link/scaffolding repair. Complete original source remains in immutable docs/specs/runner.md; candidate supersedes the identified false current assertion or rebases the same link referent, with unchanged dated decision semantics. R9-1: link-only rebase; label and repository referent preserved Full before/after text and evidence in reports/phase-06/step9-rebound-units.json. A22 rebind, pending independent bounded review; no approval carry, retirement or promotion.",
-      "reviewNote": "deep: block Unheaded block 105 source L1287-1295 to architecture/h-7af1f0242611.md#unheaded-block-5; token-level source-to-target diff read both directions, every hunk lies inside an edit range (truth-26) and is labelled in the carrier, nothing else added or lost; the rebased relative links were resolved from the new file location and point at the same existing repo files; disposition stays supersede, legal for a labelled correction and the rationale names the correction; shard row equals pack, anchors exist, source and target digests recomputed by script",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "dc159fdd4da098255cd80e196b70428b0a748a715e8d9cb250c325b6f2ef4095",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: A41/A19 truth correction or explicitly labelled candidate navigation/link/scaffolding repair. Complete original source remains in immutable docs/specs/runner.md; candidate supersedes the identified false current assertion or rebases the same link referent, with unchanged dated decision semantics. R9-1: link-only rebase; label and repository referent preserved Full before/after text and evidence in reports/phase-06/step9-rebound-units.json. A22 rebind, pending independent bounded review; no approval carry, retirement or promotion. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "ef1e4aaed5e7b7406e56e522c11bb11808a36eda45a25947196a5a45d208bd9e",
       "targetAncestry": [
         "Added in candidate: Runner Từ vựng dispatch hiện hành",
         "Từ vựng dispatch hiện hành",
         "Bảng đối chiếu từ vựng dispatch"
-      ],
-      "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9"
+      ]
     },
     {
       "claimId": "claim_ef6c4ace21b84e2eeb9de2ad200e5cfb",
@@ -10871,20 +10861,15 @@
       "targetAnchor": "0050-p6-nối-thật-herdr-là-transport-mặc-định-posture-một-đường-fallback-quota-qua-pane-mới",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792060810360-fc3c5695@2026-10-15",
-      "rationale": "Judgment: A41/A19 truth correction or explicitly labelled candidate navigation/link/scaffolding repair. Complete original source remains in immutable docs/specs/runner.md; candidate supersedes the identified false current assertion or rebases the same link referent, with unchanged dated decision semantics. R9-1: link-only rebase; label and repository referent preserved; R9-1: link-only rebase; label and repository referent preserved. Full before/after text and evidence in reports/phase-06/step9-rebound-units.json. A22 rebind, pending independent bounded review; no approval carry, retirement or promotion.",
-      "reviewNote": "deep: heading source L3136-3136 to decisions/h-36d872fbb0e5.md#0050-p6-nối-thật-herdr-là-transport-mặc-định-posture-một-đường-fallback-quota-qua-pane-mới; before/after read in both directions, change is only: two links rebased (confinement-authority.md to ../../../specs/, acceptance-herdr.md to ../../../../plans/), both resolve to the same files as in the source; disposition move to supersede is legal and the rationale names the correction; shard row equals pack, anchor exists, digests recomputed by script, before target equalled the source",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1803-runner-bounded-rereview-26f5f6119-part1.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "840d005fc176f7061f4b952d33f2064a086656dcc6a618d03ace5c5fef37ed99",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: A41/A19 truth correction or explicitly labelled candidate navigation/link/scaffolding repair. Complete original source remains in immutable docs/specs/runner.md; candidate supersedes the identified false current assertion or rebases the same link referent, with unchanged dated decision semantics. R9-1: link-only rebase; label and repository referent preserved; R9-1: link-only rebase; label and repository referent preserved. Full before/after text and evidence in reports/phase-06/step9-rebound-units.json. A22 rebind, pending independent bounded review; no approval carry, retirement or promotion. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "d2cdc4e9f454fb873be67d3d0f50d13d58e6cd3539581768aee9acfc0610a475",
       "targetAncestry": [
         "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
         "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)"
-      ],
-      "reviewReportCommit": "42cf37c15047a8144366252d23f16f1a82787424"
+      ]
     },
     {
       "claimId": "claim_dc4ce18e6e9fb14f1c49564fb00173ba",
@@ -10893,21 +10878,16 @@
       "targetAnchor": "unheaded-block-176",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792060810360-fc3c5695@2026-10-15",
-      "rationale": "Judgment: A41/A19 truth correction or explicitly labelled candidate navigation/link/scaffolding repair. Complete original source remains in immutable docs/specs/runner.md; candidate supersedes the identified false current assertion or rebases the same link referent, with unchanged dated decision semantics. R9-1: link-only rebase; label and repository referent preserved; R9-1: link-only rebase; label and repository referent preserved. Full before/after text and evidence in reports/phase-06/step9-rebound-units.json. A22 rebind, pending independent bounded review; no approval carry, retirement or promotion.",
-      "reviewNote": "deep: unheaded-block source L3138-3156 to decisions/h-36d872fbb0e5.md#unheaded-block-176; before/after read in both directions, change is only: same two link rebases inside the block; disposition move to supersede is legal and the rationale names the correction; shard row equals pack, anchor exists, digests recomputed by script, before target equalled the source",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1803-runner-bounded-rereview-26f5f6119-part1.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "fe5727e65a11421bc04706605835f8404083697917498f53a38aaf4801e6120e",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: A41/A19 truth correction or explicitly labelled candidate navigation/link/scaffolding repair. Complete original source remains in immutable docs/specs/runner.md; candidate supersedes the identified false current assertion or rebases the same link referent, with unchanged dated decision semantics. R9-1: link-only rebase; label and repository referent preserved; R9-1: link-only rebase; label and repository referent preserved. Full before/after text and evidence in reports/phase-06/step9-rebound-units.json. A22 rebind, pending independent bounded review; no approval carry, retirement or promotion. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "03328a2f6bf124219beb8730571e4adce1e26aa452657605713c4887aa8f866f",
       "targetAncestry": [
         "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
         "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
         "0050 — P6 Nối thật: herdr là transport mặc định, posture một đường, fallback quota qua pane mới"
-      ],
-      "reviewReportCommit": "42cf37c15047a8144366252d23f16f1a82787424"
+      ]
     },
     {
       "claimId": "claim_c7b6b863e630f2b685c29f09b5db02c4",

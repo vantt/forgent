@@ -1,0 +1,8 @@
+D start both 2026-10-15T15:37:05.655Z
+D result both 1 ["decision-digest-stale"] 2026-10-15T15:38:26.150Z
+D start identity 2026-10-15T15:38:26.151Z
+D result identity 1 ["decision-digest-stale"] 2026-10-15T15:41:23.311Z
+D start phase02 2026-10-15T15:41:23.313Z
+D result phase02 1 ["decision-digest-stale"] 2026-10-15T15:44:59.546Z
+Snapshot dry-run start 2026-10-15T15:44:59.546Z
+Dry run result {"contentCommit":"aecdc30aad0ffd65a2956ff642c4be9410686ede","snapshot":{"exitCode":1,"stderr":"propose-doc-decisions: decision proof failed: decision-digest-stale\n"},"verify":{"mode":"native verifyClaimSnapshot (--verify implementation), dry-run only","inputSnapshot":null,"reason":"--snapshot failed; no valid snapshot is fabricated. Invoke the same native verify implementation to recompute proof prerequisites; it rejects before snapshot comparison.","ok":false,"error":"decision proof failed: decision-digest-stale"},"snapshotFields":["commit","generatedAt","items","claimLedger","identityRegistry"],"projectionNote":"All native items and claimLedger rows retained; omitted inventory fields are not consumed by snapshot/verify. Complete native object used for D.","docsWrites":0,"sealed":false} 2026-10-15T15:46:19.189Z

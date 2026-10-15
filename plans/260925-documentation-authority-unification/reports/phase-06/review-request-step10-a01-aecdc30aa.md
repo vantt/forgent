@@ -1,0 +1,6236 @@
+# Closing instructions — part 1
+
+One review request; entry 1–120 of section a (137 total). Content pin `aecdc30aad0ffd65a2956ff642c4be9410686ede`; comparison base `980cb29312b8701f5ea639278f44e1a57a6e5c02`. See [single request index](review-request-step10-index-aecdc30aa.md). This part contains **120 entries**.
+
+Independent review required. No producer-selected seed or verdict. The JSON sidecar carries the same complete entries.
+
+109 new active decisions + 18 pending gap decisions + one unchanged reviewed active decision + nine historical retired accounting records. Retired records are accounting only, not native gap overlays. Full claim_5c520fcb rationale supersedes source-to-self A34 acceptance pending independent review. All current root instruction identities retained outside platform authority.
+
+## Entry a-001: claim_0a800ae3d8a50ecdf22bf6c4604167d5
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_0a800ae3d8a50ecdf22bf6c4604167d5",
+    "sourceUnitDigest": "e51ed959e5aae86e5f000c44f5ef903c202b286098b279fb9e892f8db3a0c1d3",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#always-do as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "e7fc714a9a73a84cbd1d93c998bc3f55888c9b537891eb0b0caf9771fb8cde98",
+    "identityFingerprint": "c869c48c9abaf53e8f0d5566184b23c92991743b2b6726980b3111dafc540cd4",
+    "claimId": "claim_0a800ae3d8a50ecdf22bf6c4604167d5",
+    "sourceAnchor": "always-do",
+    "unitKind": "heading",
+    "sourceUnitDigest": "e51ed959e5aae86e5f000c44f5ef903c202b286098b279fb9e892f8db3a0c1d3",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "Always Do",
+      "anchor": "always-do",
+      "githubAnchor": "always-do",
+      "stableAnchor": "h-e1090517c985",
+      "startLine": 216,
+      "endLine": 216,
+      "textDigest": "e51ed959e5aae86e5f000c44f5ef903c202b286098b279fb9e892f8db3a0c1d3",
+      "sample": "Always Do",
+      "sectionPayloadDigest": "e23a5ee9ace2850ec670037d92a358e58770bdd73439c4234c7c5b9f40e24c22",
+      "followingBlockDigest": "e23a5ee9ace2850ec670037d92a358e58770bdd73439c4234c7c5b9f40e24c22",
+      "identityFingerprint": "c869c48c9abaf53e8f0d5566184b23c92991743b2b6726980b3111dafc540cd4",
+      "ancestry": [
+        "GitNexus — Code Intelligence"
+      ],
+      "text": "## Always Do",
+      "sectionText": "## Always Do\n\n- **MUST run impact analysis before editing any symbol.** Before modifying a function, class, or method, run `impact({target: \"symbolName\", direction: \"upstream\"})` and report the blast radius (direct callers, affected processes, risk level) to the user.\n- **MUST run `detect_changes()` before committing** to verify your changes only affect expected symbols and execution flows. For regression review, compare against the default branch: `detect_changes({scope: \"compare\", base_ref: \"main\"})`.\n- **MUST warn the user** if impact analysis returns HIGH or CRITICAL risk before proceeding with edits.\n- When exploring unfamiliar code, use `query({search_query: \"concept\"})` to find execution flows instead of grepping. It returns process-grouped results ranked by relevance.\n- When you need full context on a specific symbol — callers, callees, which execution flows it participates in — use `context({name: \"symbolName\"})`.\n- For security review, `explain({target: \"fileOrSymbol\"})` lists taint findings (source→sink flows; needs `analyze --pdg`)."
+    },
+    "fullDigest": "e51ed959e5aae86e5f000c44f5ef903c202b286098b279fb9e892f8db3a0c1d3",
+    "shownTextSHA256": "15c9e1cbf7de6f573d691d9a6236862f24324b73583170bd00a63bba45e3d9c5"
+  }
+}
+```
+
+## Entry a-002: claim_fa3bda92497320da1952eb67f4d954ef
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_fa3bda92497320da1952eb67f4d954ef",
+    "sourceUnitDigest": "8e8826de669f94e45cffc5920f71ccb772d818f5b1651501ca305f53124acf35",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#before-touching-code as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "9de1b1241ef403eadd82f74614ceb84b29fa92d787cd492004fdc7b6968d3dac",
+    "identityFingerprint": "b1291c96e28472dec7f8f53799be8bffe8985cf97b31f1079e39c740fb991242",
+    "claimId": "claim_fa3bda92497320da1952eb67f4d954ef",
+    "sourceAnchor": "before-touching-code",
+    "unitKind": "heading",
+    "sourceUnitDigest": "8e8826de669f94e45cffc5920f71ccb772d818f5b1651501ca305f53124acf35",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "Before touching code",
+      "anchor": "before-touching-code",
+      "githubAnchor": "before-touching-code",
+      "stableAnchor": "h-b06af558e03c",
+      "startLine": 37,
+      "endLine": 37,
+      "textDigest": "8e8826de669f94e45cffc5920f71ccb772d818f5b1651501ca305f53124acf35",
+      "sample": "Before touching code",
+      "sectionPayloadDigest": "5156b1a159ea85fd1d9648644bd16f20345fa3a0645bf21e781010edd54a0dea",
+      "followingBlockDigest": "4c9c8cc9ca45762d287d773c9625e674f5eed86e549fceb7f42325667a575d80",
+      "identityFingerprint": "b1291c96e28472dec7f8f53799be8bffe8985cf97b31f1079e39c740fb991242",
+      "ancestry": [
+        "forgent"
+      ],
+      "text": "## Before touching code",
+      "sectionText": "## Before touching code\n\nRead `docs/specs/reading-map.md`, then the area spec under `docs/specs/` for whatever\nyou're about to change. Specs are the state layer — BA-grade, tech-agnostic — read\nthe spec before the code.\n\n**Prior art before design.** Before designing a mechanism, find out what already existed\nand why it went away: `git log -S'<symbol>'` / `-G` on the symbol, config key and spec term,\nalso under the executor ids and names the thing had before the renames (ids were renamed and\ndormant ones deleted), and read the area spec's \"Lịch sử quyết định\" and settled-facts\nsections. A plan's facts phase answers \"what existed before, and which change removed it,\nand was that intended?\" next to its questions about current code. Reuse or extend what is\nfound; say in the plan what was reused and what was missing.\n**Convention paths.** For report, plan, and journal names and locations—including paths placed in briefs for other agents—use `fgos convention name|path --json`, never construct them; parallel agents MUST choose distinct slugs, and pre-commit `convention check` warnings do not block commits."
+    },
+    "fullDigest": "8e8826de669f94e45cffc5920f71ccb772d818f5b1651501ca305f53124acf35",
+    "shownTextSHA256": "27f26b5b9f4509b04d428c40928ef7a2e15fa886640e3b7b5879270b771f5a32"
+  }
+}
+```
+
+## Entry a-003: claim_00ee16658d1baf1ac05b8e371408fd01
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_00ee16658d1baf1ac05b8e371408fd01",
+    "sourceUnitDigest": "52fb0a5c25e6db85488c58b5926c5346395ba8cfdeb8a8bc42d14336424b38dd",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#changing-a-locked-law as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "93017f7499889ed3adbc83ef2718abca2283dfa02243c88e8cf8e9d0bdce2c17",
+    "identityFingerprint": "a3c1ea9b5b6b0a3e4323e71b6d24f6f6b6e8bdb0c40503ef33f1692ffb268add",
+    "claimId": "claim_00ee16658d1baf1ac05b8e371408fd01",
+    "sourceAnchor": "changing-a-locked-law",
+    "unitKind": "heading",
+    "sourceUnitDigest": "52fb0a5c25e6db85488c58b5926c5346395ba8cfdeb8a8bc42d14336424b38dd",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "Changing a locked law",
+      "anchor": "changing-a-locked-law",
+      "githubAnchor": "changing-a-locked-law",
+      "stableAnchor": "h-f45020e597b6",
+      "startLine": 130,
+      "endLine": 130,
+      "textDigest": "52fb0a5c25e6db85488c58b5926c5346395ba8cfdeb8a8bc42d14336424b38dd",
+      "sample": "Changing a locked law",
+      "sectionPayloadDigest": "d8b0fa240f28f96e7b3f9f24704c72a898d7b0d64a37662d2179c5f0c7216a71",
+      "followingBlockDigest": "d8b0fa240f28f96e7b3f9f24704c72a898d7b0d64a37662d2179c5f0c7216a71",
+      "identityFingerprint": "a3c1ea9b5b6b0a3e4323e71b6d24f6f6b6e8bdb0c40503ef33f1692ffb268add",
+      "ancestry": [
+        "forgent"
+      ],
+      "text": "## Changing a locked law",
+      "sectionText": "## Changing a locked law\n\nLaws in `docs/platform-foundations.md` are fixed until their named review\nthreshold is hit. Changing one supersedes its decision ID — never edit it in place."
+    },
+    "fullDigest": "52fb0a5c25e6db85488c58b5926c5346395ba8cfdeb8a8bc42d14336424b38dd",
+    "shownTextSHA256": "52c58893cdac2546942080e64d0f82bfb3a99c0f936019112b09d8831bc4c153"
+  }
+}
+```
+
+## Entry a-004: claim_7b36640f7d6ced0d3f089a419f5d26ff
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_7b36640f7d6ced0d3f089a419f5d26ff",
+    "sourceUnitDigest": "ed59f3cfa95f9a1572033e2cafba1fc7e0a12ae65bec9ca0e8740ca99ff2261e",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#cli as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "f4d3636f9a037f355fde489879d19dd6cfa50b39b98d44e4d741fc04b2cc8e21",
+    "identityFingerprint": "0faf8e782d75a0c1cbc8c3aedfd14a39cb946e0444b318605efd05d7c1ea2fc3",
+    "claimId": "claim_7b36640f7d6ced0d3f089a419f5d26ff",
+    "sourceAnchor": "cli",
+    "unitKind": "heading",
+    "sourceUnitDigest": "ed59f3cfa95f9a1572033e2cafba1fc7e0a12ae65bec9ca0e8740ca99ff2261e",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "CLI",
+      "anchor": "cli",
+      "githubAnchor": "cli",
+      "stableAnchor": "h-0c39a3e537ce",
+      "startLine": 241,
+      "endLine": 241,
+      "textDigest": "ed59f3cfa95f9a1572033e2cafba1fc7e0a12ae65bec9ca0e8740ca99ff2261e",
+      "sample": "CLI",
+      "sectionPayloadDigest": "e2fffb19db664dbd8503e4c376974a3ffeb814760f3d7680221b615ec1e02003",
+      "followingBlockDigest": "8ca4c5c61c7f369a197d6118f0a325cc39727dbc792d3c53b1c2b1dd2aa7648a",
+      "identityFingerprint": "0faf8e782d75a0c1cbc8c3aedfd14a39cb946e0444b318605efd05d7c1ea2fc3",
+      "ancestry": [
+        "GitNexus — Code Intelligence"
+      ],
+      "text": "## CLI",
+      "sectionText": "## CLI\n\n| Task | Read this skill file |\n|------|---------------------|\n| Understand architecture / \"How does X work?\" | `.claude/skills/gitnexus/gitnexus-exploring/SKILL.md` |\n| Blast radius / \"What breaks if I change X?\" | `.claude/skills/gitnexus/gitnexus-impact-analysis/SKILL.md` |\n| Trace bugs / \"Why is X failing?\" | `.claude/skills/gitnexus/gitnexus-debugging/SKILL.md` |\n| Rename / extract / split / refactor | `.claude/skills/gitnexus/gitnexus-refactoring/SKILL.md` |\n| Tools, resources, schema reference | `.claude/skills/gitnexus/gitnexus-guide/SKILL.md` |\n| Index, status, clean, wiki CLI commands | `.claude/skills/gitnexus/gitnexus-cli/SKILL.md` |\n\n<!-- gitnexus:end -->\n\n<!-- fgos:instruction-projection:start -->\n<!-- generated by fgos instruction projection; edit canonical instruction sources, not this block -->\n<!-- effective-set: .fgos/instructions/effective/repo.json; key=repo; host=* -->"
+    },
+    "fullDigest": "ed59f3cfa95f9a1572033e2cafba1fc7e0a12ae65bec9ca0e8740ca99ff2261e",
+    "shownTextSHA256": "04e1df190eadf9da88b47c0fec70a8ae87a0478340c2fa4e85ce5a5ebed0f88f"
+  }
+}
+```
+
+## Entry a-005: claim_a700bf68bba6456dc5d22693e0a42ff4
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_a700bf68bba6456dc5d22693e0a42ff4",
+    "sourceUnitDigest": "e1f3e3fd66dbac0da5125fc9c981101e44757f5b285e6fe0d6b083c9a28cdb42",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#decision-question-template as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "cd15c048c6a853f2c487a4f71f984c8f69b17371f0ddc86856a7bfe6c3905811",
+    "identityFingerprint": "51d1919097cdb97874b7d2d607d209fa4442b27bc286cbd35a0d9caff5eb9645",
+    "claimId": "claim_a700bf68bba6456dc5d22693e0a42ff4",
+    "sourceAnchor": "decision-question-template",
+    "unitKind": "heading",
+    "sourceUnitDigest": "e1f3e3fd66dbac0da5125fc9c981101e44757f5b285e6fe0d6b083c9a28cdb42",
+    "claimKind": "decision",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "heading",
+      "level": 4,
+      "title": "Decision Question Template",
+      "anchor": "decision-question-template",
+      "githubAnchor": "decision-question-template",
+      "stableAnchor": "h-c637e426e867",
+      "startLine": 262,
+      "endLine": 262,
+      "textDigest": "e1f3e3fd66dbac0da5125fc9c981101e44757f5b285e6fe0d6b083c9a28cdb42",
+      "sample": "Decision Question Template",
+      "sectionPayloadDigest": "a412a2f5e102f17d8b6b108830fed27c29021381ac59ea9695c43d604e1a6570",
+      "followingBlockDigest": "a412a2f5e102f17d8b6b108830fed27c29021381ac59ea9695c43d604e1a6570",
+      "identityFingerprint": "51d1919097cdb97874b7d2d607d209fa4442b27bc286cbd35a0d9caff5eb9645",
+      "ancestry": [
+        "GitNexus — Code Intelligence",
+        "fgOS Effective Instructions",
+        "law"
+      ],
+      "text": "#### Decision Question Template",
+      "sectionText": "#### Decision Question Template\n\n- id: `decision-question-template`\n- source: `core/instructions/decision-question.md`"
+    },
+    "fullDigest": "e1f3e3fd66dbac0da5125fc9c981101e44757f5b285e6fe0d6b083c9a28cdb42",
+    "shownTextSHA256": "c1955447751da06f3cd4e02acd550c572c8b739292eacd32b68862aa5d68aa30"
+  }
+}
+```
+
+## Entry a-006: claim_e922726b8953ed0cc00db6c4cdad3b48
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_e922726b8953ed0cc00db6c4cdad3b48",
+    "sourceUnitDigest": "0083e74994df923befc95fcd51a367519f38136583b1b5af81b103a14f77ad0c",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#decision-question-template-1 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "d15b9adab02129db231b0c66a0ab64e06e6456c28f08620647e22732f1da0b6e",
+    "identityFingerprint": "c5d92e9611e773253acb3248d087caa5abab3806f1638839c62e3c85cb49d69d",
+    "claimId": "claim_e922726b8953ed0cc00db6c4cdad3b48",
+    "sourceAnchor": "decision-question-template-1",
+    "unitKind": "heading",
+    "sourceUnitDigest": "0083e74994df923befc95fcd51a367519f38136583b1b5af81b103a14f77ad0c",
+    "claimKind": "decision",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "heading",
+      "level": 1,
+      "title": "Decision Question Template",
+      "anchor": "decision-question-template-1",
+      "githubAnchor": "decision-question-template-1",
+      "stableAnchor": "h-f1eef25db26d",
+      "startLine": 267,
+      "endLine": 267,
+      "textDigest": "0083e74994df923befc95fcd51a367519f38136583b1b5af81b103a14f77ad0c",
+      "sample": "Decision Question Template",
+      "sectionPayloadDigest": "1297672f2b5e8ad757858b4c7e8e54e6713cabadc7461f2f561b92e4e17bb16e",
+      "followingBlockDigest": "1297672f2b5e8ad757858b4c7e8e54e6713cabadc7461f2f561b92e4e17bb16e",
+      "identityFingerprint": "c5d92e9611e773253acb3248d087caa5abab3806f1638839c62e3c85cb49d69d",
+      "ancestry": [],
+      "text": "# Decision Question Template",
+      "sectionText": "# Decision Question Template\n\nEvery question asking the owner to choose a direction carries five parts: what is happening, cause, options with cost, recommendation, and scope of the answer. Full template: `core/skills/_shared/decision-question.md`. Inside the approved frame (scope + budget set at approval) decide and report; about to leave it, stop and ask in this template."
+    },
+    "fullDigest": "0083e74994df923befc95fcd51a367519f38136583b1b5af81b103a14f77ad0c",
+    "shownTextSHA256": "0a6bf82bdf3a6a2ed40161c5b656c27b68e3be120791168d8dc7b46dc00eda27"
+  }
+}
+```
+
+## Entry a-007: claim_22c44c85aa5a35949e59c1fa1a36bd1a
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_22c44c85aa5a35949e59c1fa1a36bd1a",
+    "sourceUnitDigest": "660e492187a6eb5ca8607cfa85b81c83daaaa7ac5d7fd2c5e553f20d3db084f6",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#definition-of-done-platform-foundations-l5 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "30f6e72edbe2a3bfe7a18e984297bfd4e32ae43afcdd28a014fae6fcd6f4edf7",
+    "identityFingerprint": "0756c7cf80fcc132917ea5a31778087b175b99d1710bf3ac2762db8ebf8a3bd0",
+    "claimId": "claim_22c44c85aa5a35949e59c1fa1a36bd1a",
+    "sourceAnchor": "definition-of-done-platform-foundations-l5",
+    "unitKind": "heading",
+    "sourceUnitDigest": "660e492187a6eb5ca8607cfa85b81c83daaaa7ac5d7fd2c5e553f20d3db084f6",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "Definition of done (platform-foundations L5)",
+      "anchor": "definition-of-done-platform-foundations-l5",
+      "githubAnchor": "definition-of-done-platform-foundations-l5",
+      "stableAnchor": "h-907e08faa8b0",
+      "startLine": 52,
+      "endLine": 52,
+      "textDigest": "660e492187a6eb5ca8607cfa85b81c83daaaa7ac5d7fd2c5e553f20d3db084f6",
+      "sample": "Definition of done (platform-foundations L5)",
+      "sectionPayloadDigest": "e1ea0ee8f64de13392ecb2737536248aee607ad1487f98b780891a6dcdf49108",
+      "followingBlockDigest": "0ac33ce3b212c69bd641ab67172cc109ba70735d9242bbee1b913ae1ff922aa1",
+      "identityFingerprint": "0756c7cf80fcc132917ea5a31778087b175b99d1710bf3ac2762db8ebf8a3bd0",
+      "ancestry": [
+        "forgent"
+      ],
+      "text": "## Definition of done (platform-foundations L5)",
+      "sectionText": "## Definition of done (platform-foundations L5)\n\nA stranger agent with no chat history should be able to answer, for any change:\n\n1. **What to read first?** `docs/specs/reading-map.md`, then the relevant area spec.\n2. **What kind of work is this?** Check it against the area's spec and\n   `docs/backlog.md`; a new product area gets a spec before it gets code.\n3. **What contract does it touch?** `docs/routing-handoff-contract.md` for\n   agent-to-agent boundaries; the area spec's Shared Entities table for\n   in-process contracts.\n4. **How much risk?** Does it change a locked law in `docs/platform-foundations.md`,\n   or existing covered behavior in the test suite? Either raises the bar.\n5. **What proof means done?** `npm test` (state + cli + runner + e2e suite) green;\n   new or changed behavior gets a matching test. Green must come from real\n   behavior: never add an env switch, flag, or test-only code branch that skips\n   checks to make tests pass; fix production code or the fixture instead.\n6. **What learning gets left behind?** A settled decision goes into\n   `docs/decisions/`; a settled spec fact goes into the relevant\n   `docs/specs/<area>.md`."
+    },
+    "fullDigest": "660e492187a6eb5ca8607cfa85b81c83daaaa7ac5d7fd2c5e553f20d3db084f6",
+    "shownTextSHA256": "05223a69cf3f06e2b34250342fcf91f83b3c67e0f2bab14987e322fae5df4095"
+  }
+}
+```
+
+## Entry a-008: claim_67eb8d55ba3230adf56b929b3b549cdc
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_67eb8d55ba3230adf56b929b3b549cdc",
+    "sourceUnitDigest": "3bbd7ce498a66733e262dc20e3185319b3c9ca346d5bf4c114d2ea7b37e3fe75",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#dispatch-routing-work-to-an-executor as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "be96cf98081517744945cfc57aff8119c2ad286b234a2fc393c05d71af2fc1f7",
+    "identityFingerprint": "d3617ecd8feadb081e5491d54fea96b1715ad1fd6848478f5a4eb0133268999a",
+    "claimId": "claim_67eb8d55ba3230adf56b929b3b549cdc",
+    "sourceAnchor": "dispatch-routing-work-to-an-executor",
+    "unitKind": "heading",
+    "sourceUnitDigest": "3bbd7ce498a66733e262dc20e3185319b3c9ca346d5bf4c114d2ea7b37e3fe75",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "Dispatch — routing work to an executor",
+      "anchor": "dispatch-routing-work-to-an-executor",
+      "githubAnchor": "dispatch-routing-work-to-an-executor",
+      "stableAnchor": "h-9eac6e2c294f",
+      "startLine": 147,
+      "endLine": 147,
+      "textDigest": "3bbd7ce498a66733e262dc20e3185319b3c9ca346d5bf4c114d2ea7b37e3fe75",
+      "sample": "Dispatch — routing work to an executor",
+      "sectionPayloadDigest": "28dccb7256cea333d921a8a0fe4b25e76a04b9acfceeec65f5be825af8b6face",
+      "followingBlockDigest": "b093c6fb2a5d0ad347222f5cd68b1b44614799ac24ed54b60a29134c5f7ddfb8",
+      "identityFingerprint": "d3617ecd8feadb081e5491d54fea96b1715ad1fd6848478f5a4eb0133268999a",
+      "ancestry": [
+        "forgent"
+      ],
+      "text": "## Dispatch — routing work to an executor",
+      "sectionText": "## Dispatch — routing work to an executor\n\n`fgos run` is the primary door for executing new work in the execution core.\n\n**Two doors, one runUnit — the preferred path for new work.** One task: `fgos run \"<prompt>\" [--provider <id>] [--writes <paths> --worktree <path>]` builds a Unit from the prompt (read-only without `--writes`; `--writes` needs a linked worktree; `--provider` is a soft preference, not a pin). Planned work: `fgos workflow start <preset>|--units <file>`, one step per Unit. Both bind through `bind()`; the runner commits only the Unit's declared `writes` after a passing round, and the worker never runs `git add`/`git commit`. These two doors are the only ones that execute work; `fgos dispatch` keeps only the lower-level reads (`decide`, `inspect`, `reconcile`, `probe-account`).\n\nFor routing checks, `fgos dispatch decide` computes the execution mechanism and executor via `bind()` (`src/runner/execution/bind.mjs`). herdr is the default transport when present in the session/environment.\n\n**Before dispatching any task out of the current turn — a work item, a registered executor, an ad-hoc task, or your own direct Agent/Task-tool call — run `fgos dispatch decide` (or compatibility alias `node src/runner/dispatch.mjs decide`; `--work` only through `fgos dispatch decide`) first. Never decide the mechanism yourself.** A `PreToolUse` hook enforces this on Agent/Task-tool calls: it delegates to `bind()` and refuses the call when the answer comes back as anything other than `in-process`.\n\nFour ways to call `decide`, for four different situations:\n\n- `decide <executorId>` — you already know the exact executor name (e.g. `judge-discovery`).\n- `decide --for <purpose>` — you know what JOB you need done (e.g. `judge`), but not which executor serves it.\n- `decide --work <id> [--stage <stage>]` — you have a real work item and want it dispatched.\n- `decide --for <label> --needs-soul` — you are about to fire an Agent/Task tool yourself, with no executor or work item to name.\n\nAdd `--has-live-task-access` when you already have the Agent/Task tool in your own tool manifest. This is always your own self-declaration — never probed from the environment, never guessed.\n\nThree possible `mechanism` results, each needing a different response:\n\n- **`\"unavailable\"`** — nothing serves this. NOT an error: do it inline yourself, and report nothing.\n- **`\"in-process\"`** — call it yourself, with your own live capability: pass the returned agentType to your Agent/Task tool, or call the returned mcpTool directly. Dispatch cannot do this for you — it has neither an Agent/Task tool nor an MCP client of its own. When neither field is returned, use whichever agent type you would have used by default.\n- **`\"out-of-process\"`** — run `fgos run \"<prompt>\" --provider <executorId> --capability <purpose> [--writes <paths> --worktree <linked-worktree>]` (or `fgos run --unit <file>`), passing the same capability `decide` was asked for (left out, it defaults to the writing capability `execute`). `--provider` takes agent executors only: when the decided executor is a `kind: \"tool\"` executor, `fgos run` refuses it, so call that tool directly instead. Never run the resolved command yourself through Bash: `fgos run` binds, runs and settles the Unit and records its provenance under `.fgos/assignments/<unitRunId>/`, so there is nothing to log by hand. With `--writes` the runner commits only those paths after a passing round; with `--json` read the result at `data.results[-1].runResult.agentClaim.summary` and `data.results[-1].commit`.\n\nEvery result also carries `configured: true|false`, additive `reasonCodes: [...]`, and optional `blockedReason` (e.g. when blocked by governance policy) — `false` means nothing is configured for that name or job, and the answer came from the default.\nA skill that dispatches should not re-derive any of this. Reference `../_shared/executor-dispatch-fallback.md` from the skill; its canonical source is `core/skills/_shared/executor-dispatch-fallback.md`. `.agents/skills/` and `plugins/fgOS/skills/` are generated render surfaces carrying source headers, rebuilt with `npm run build:skills`; never edit them by hand. For fgOS thin wrappers, `.claude/skills` contains generated wrappers only; it has no `_shared` directory of its own."
+    },
+    "fullDigest": "3bbd7ce498a66733e262dc20e3185319b3c9ca346d5bf4c114d2ea7b37e3fe75",
+    "shownTextSHA256": "b86dd09a9de5939e177c88373a476d62f93cc2d2be4dd7c75ef206a433601696"
+  }
+}
+```
+
+## Entry a-009: claim_2e45cfdcd3f2bf602787b37feac667f3
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_2e45cfdcd3f2bf602787b37feac667f3",
+    "sourceUnitDigest": "7d84eb3c654fd06a78b9e1d55f1aac0787beba431be44c4c11800b92f10afb45",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#documentation-viewing-mdview as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "0f88b95c0f0147c03c08add070d474d7ef4c3a939596793c8c59454d131e5012",
+    "identityFingerprint": "a85309a1368c7071897daf4e20c262bcb79dd91fbe446b59da8b88d773bbed8e",
+    "claimId": "claim_2e45cfdcd3f2bf602787b37feac667f3",
+    "sourceAnchor": "documentation-viewing-mdview",
+    "unitKind": "heading",
+    "sourceUnitDigest": "7d84eb3c654fd06a78b9e1d55f1aac0787beba431be44c4c11800b92f10afb45",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "Documentation Viewing (MDView)",
+      "anchor": "documentation-viewing-mdview",
+      "githubAnchor": "documentation-viewing-mdview",
+      "stableAnchor": "h-85abc1c86722",
+      "startLine": 180,
+      "endLine": 180,
+      "textDigest": "7d84eb3c654fd06a78b9e1d55f1aac0787beba431be44c4c11800b92f10afb45",
+      "sample": "Documentation Viewing (MDView)",
+      "sectionPayloadDigest": "42d278bba4a7ce9c2f7ff755227feb14483587d3ace2b687a5c732999eb053bc",
+      "followingBlockDigest": "42d278bba4a7ce9c2f7ff755227feb14483587d3ace2b687a5c732999eb053bc",
+      "identityFingerprint": "a85309a1368c7071897daf4e20c262bcb79dd91fbe446b59da8b88d773bbed8e",
+      "ancestry": [
+        "forgent"
+      ],
+      "text": "## Documentation Viewing (MDView)",
+      "sectionText": "## Documentation Viewing (MDView)\n\nAfter creating or updating any markdown file, make it viewable in ONE call —\nno project registration step needed:"
+    },
+    "fullDigest": "7d84eb3c654fd06a78b9e1d55f1aac0787beba431be44c4c11800b92f10afb45",
+    "shownTextSHA256": "807c5223c5d730e0a986f428ec5a2aa3518bb0705b9415919e355b82ea38a610"
+  }
+}
+```
+
+## Entry a-010: claim_6acc93d03a89146ebf7f4903938fabd9
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_6acc93d03a89146ebf7f4903938fabd9",
+    "sourceUnitDigest": "10e4f148b6be98e0dd1bbe35554836c6d8ab0bbb981b9a8d25a38460cb6cf137",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#fgos-effective-instructions as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "bcd4ee82489105df3562bef9a377f5d3048852978098654513d14af88bd358b3",
+    "identityFingerprint": "8c746a55cb5fbbead40a732f0e05e776b3f02b56ef96e9ade1101e523c7b13e7",
+    "claimId": "claim_6acc93d03a89146ebf7f4903938fabd9",
+    "sourceAnchor": "fgos-effective-instructions",
+    "unitKind": "heading",
+    "sourceUnitDigest": "10e4f148b6be98e0dd1bbe35554836c6d8ab0bbb981b9a8d25a38460cb6cf137",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "fgOS Effective Instructions",
+      "anchor": "fgos-effective-instructions",
+      "githubAnchor": "fgos-effective-instructions",
+      "stableAnchor": "h-13b5550f07b6",
+      "startLine": 258,
+      "endLine": 258,
+      "textDigest": "10e4f148b6be98e0dd1bbe35554836c6d8ab0bbb981b9a8d25a38460cb6cf137",
+      "sample": "fgOS Effective Instructions",
+      "sectionPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "followingBlockDigest": null,
+      "identityFingerprint": "8c746a55cb5fbbead40a732f0e05e776b3f02b56ef96e9ade1101e523c7b13e7",
+      "ancestry": [
+        "GitNexus — Code Intelligence"
+      ],
+      "text": "## fgOS Effective Instructions",
+      "sectionText": "## fgOS Effective Instructions"
+    },
+    "fullDigest": "10e4f148b6be98e0dd1bbe35554836c6d8ab0bbb981b9a8d25a38460cb6cf137",
+    "shownTextSHA256": "766ecceb2ed05c3a4ce725f8ce1d5e05904553d5710c8330a7f2a18903dc19d5"
+  }
+}
+```
+
+## Entry a-011: claim_9039ff2ea2cb745f4758ba64efaf4d1b
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_9039ff2ea2cb745f4758ba64efaf4d1b",
+    "sourceUnitDigest": "0c141b80ec54c16e0ee9165ede524471c64520c1b5baff0ced2438c2aa65f675",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#forgent as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "0c34769d657f24071ee0db8625b4b1dd7e6031ee550c3262d8f11913020dbe5d",
+    "identityFingerprint": "0c141b80ec54c16e0ee9165ede524471c64520c1b5baff0ced2438c2aa65f675",
+    "claimId": "claim_9039ff2ea2cb745f4758ba64efaf4d1b",
+    "sourceAnchor": "forgent",
+    "unitKind": "heading",
+    "sourceUnitDigest": "0c141b80ec54c16e0ee9165ede524471c64520c1b5baff0ced2438c2aa65f675",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "heading",
+      "level": 1,
+      "title": "forgent",
+      "anchor": "forgent",
+      "githubAnchor": "forgent",
+      "stableAnchor": "h-289558a71b11",
+      "startLine": 1,
+      "endLine": 1,
+      "textDigest": "0c141b80ec54c16e0ee9165ede524471c64520c1b5baff0ced2438c2aa65f675",
+      "sample": "forgent",
+      "sectionPayloadDigest": "c88ead802ce5e5513955e1c3c6ff5783c1e8bbdb5e8cfe240d436b3176556806",
+      "followingBlockDigest": "0e1c4d453af7446fe6407a536afd028a8ba765267631778c410e15f2b8c03d3a",
+      "identityFingerprint": "0c141b80ec54c16e0ee9165ede524471c64520c1b5baff0ced2438c2aa65f675",
+      "ancestry": [],
+      "text": "# forgent",
+      "sectionText": "# forgent\n\n**The Foundation for Generative Agents.**\n\nForgent (fgOS) is the platform layer for building and running agent applications — the infrastructure, skills, and automation that sit beneath every agent app, so developers can forge new agents instead of building everything from scratch.\n\n- README.md — product description + documentation index\n- docs/platform-foundations.md — L1-L8 locked design laws; L5 is this repo's definition of done (six questions, below)\n- docs/specs/system-overview.md — area map, shared entities, cross-area flows\n- docs/specs/reading-map.md — where every doc and source path in this repo lives\n- docs/backlog.md — product backlog (PBI rows: proposed / in-flight / done)\n- docs/routing-handoff-contract.md — agent-to-agent handoff contract + trust boundary\n- docs/decisions/index.md — generated projection of platform/repo-wide decisions (`fgos decision-index`); narrative lives in docs/specs/<area>.md's own \"Lịch sử quyết định\" sections (tsk-1lv-4)\n- domains/<domain>/AGENTS.md — domain-specific doctrine (e.g. domains/coding/AGENTS.md for fgos-coding-* workflows), read dynamically by fgos-routing"
+    },
+    "fullDigest": "0c141b80ec54c16e0ee9165ede524471c64520c1b5baff0ced2438c2aa65f675",
+    "shownTextSHA256": "e43504f27a0ba0696a043b51357ca0892dcd53a90e93ec55efccb24307ada100"
+  }
+}
+```
+
+## Entry a-012: claim_fd05edc9de6352f95be164482329687d
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_fd05edc9de6352f95be164482329687d",
+    "sourceUnitDigest": "150e95a64fd2a52cc454a2386a8dc3aec0b3a47eb54fb1fd8d02576899ea4461",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#gitnexus-code-intelligence as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "7e21885df02fa86d9033eceab65bd533c10a1d3f2050558e15d06ff344688416",
+    "identityFingerprint": "90f2c0bea757e4b6d760c9285e2e357ff406f5b7e86be8712c375ef5f13385ed",
+    "claimId": "claim_fd05edc9de6352f95be164482329687d",
+    "sourceAnchor": "gitnexus-code-intelligence",
+    "unitKind": "heading",
+    "sourceUnitDigest": "150e95a64fd2a52cc454a2386a8dc3aec0b3a47eb54fb1fd8d02576899ea4461",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "heading",
+      "level": 1,
+      "title": "GitNexus — Code Intelligence",
+      "anchor": "gitnexus-code-intelligence",
+      "githubAnchor": "gitnexus-code-intelligence",
+      "stableAnchor": "h-4a5b16888fee",
+      "startLine": 210,
+      "endLine": 210,
+      "textDigest": "150e95a64fd2a52cc454a2386a8dc3aec0b3a47eb54fb1fd8d02576899ea4461",
+      "sample": "GitNexus — Code Intelligence",
+      "sectionPayloadDigest": "1eda83dbf1720e219c9f3e3f46b9c2f3450fbfe82710ae49935a0d7a105d8db9",
+      "followingBlockDigest": "39fe4d8d1ecc03cbf722efdf8de807822733f8f4f5cdd40cb10419c65ad79b46",
+      "identityFingerprint": "90f2c0bea757e4b6d760c9285e2e357ff406f5b7e86be8712c375ef5f13385ed",
+      "ancestry": [],
+      "text": "# GitNexus — Code Intelligence",
+      "sectionText": "# GitNexus — Code Intelligence\n\nThis project is indexed by GitNexus as **forgent** (58821 symbols, 81138 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.\n\n> Index stale? Run `node .gitnexus/run.cjs analyze` from the project root — it auto-selects an available runner. No `.gitnexus/run.cjs` yet? `npx gitnexus analyze` (npm 11 crash → `npm i -g gitnexus`; #1939)."
+    },
+    "fullDigest": "150e95a64fd2a52cc454a2386a8dc3aec0b3a47eb54fb1fd8d02576899ea4461",
+    "shownTextSHA256": "75f492850c607aef170096b9c8c8b0a69d5aa869c1d96cadebee2de1432c73f8"
+  }
+}
+```
+
+## Entry a-013: claim_ac6849769045271a57023dd684980fe6
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_ac6849769045271a57023dd684980fe6",
+    "sourceUnitDigest": "4739566357f3acd72b7f74ebe9d971eb577b915a0927fca5c39c2cae5cfe5c65",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#installsetupdoctor-gate as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "1fc7aa45e22dc10c2dbc4fcd5a2230c58bb86de5870af58e58151a499f9f8643",
+    "identityFingerprint": "63d04279fd2a1fc54070dcb38bdd5267b829ff597a2fe745710d7f94768fba4e",
+    "claimId": "claim_ac6849769045271a57023dd684980fe6",
+    "sourceAnchor": "installsetupdoctor-gate",
+    "unitKind": "heading",
+    "sourceUnitDigest": "4739566357f3acd72b7f74ebe9d971eb577b915a0927fca5c39c2cae5cfe5c65",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "Install/setup/doctor gate",
+      "anchor": "installsetupdoctor-gate",
+      "githubAnchor": "installsetupdoctor-gate",
+      "stableAnchor": "h-99c0bced7094",
+      "startLine": 110,
+      "endLine": 110,
+      "textDigest": "4739566357f3acd72b7f74ebe9d971eb577b915a0927fca5c39c2cae5cfe5c65",
+      "sample": "Install/setup/doctor gate",
+      "sectionPayloadDigest": "136a17be664535a0899cf7112c5981d1786393916d863ca3f783899ad5aaf2eb",
+      "followingBlockDigest": "3f149be4bf754b1ad1a12eb8d3e7a24a1db97ca4aa3cf15fd7cf3bae732b7f3f",
+      "identityFingerprint": "63d04279fd2a1fc54070dcb38bdd5267b829ff597a2fe745710d7f94768fba4e",
+      "ancestry": [
+        "forgent"
+      ],
+      "text": "## Install/setup/doctor gate",
+      "sectionText": "## Install/setup/doctor gate\n\n`docs/distribution-vision.md` sets the direction for this repo's own\ncài đặt/setup/doctor story. Before any change is done, ask:\n\n- Does this add a config default, env var, or infra dependency (a new\n  file it expects to exist, a tool it shells out to, a directory it\n  assumes is writable)? If yes, it must register into `fgos setup`'s\n  config-merge and `fgos doctor`'s check registry (`src/setup/checks.mjs`)\n  — not stand alone, undiscoverable by `doctor`.\n- Never hardcode an assumption about which install level (global vs\n  project) is active — per the vision doc, project config always\n  overwrites global, and fgOS stays aware of both without conflict.\n- If the change touches how fgOS gets installed, upgraded, or diagnosed at\n  all, read `docs/distribution-vision.md` and `docs/specs/distribution.md`\n  first — a new module gets a spec/config-registry entry before it gets\n  code, same bar as a new product area (question 2 above).\n- Does this change something a user of fgOS would see? If yes, add a line\n  to `## [Unreleased]` in `CHANGELOG.md`."
+    },
+    "fullDigest": "4739566357f3acd72b7f74ebe9d971eb577b915a0927fca5c39c2cae5cfe5c65",
+    "shownTextSHA256": "a17ca325253c8f5172421760c69f7b9d9ee2ef4a9fac2b5c25f9fce4abc49cd3"
+  }
+}
+```
+
+## Entry a-014: claim_9474ae42b4d6e079fcf33fec49e746fa
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_9474ae42b4d6e079fcf33fec49e746fa",
+    "sourceUnitDigest": "28440004ae9b19f77cd7e12234d43d8f163fcfe5868fb96b470f55d196de8861",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#law as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "de1df04a038983af8c2904d37bd118fe0cf79e183304076cc9136fe07b464757",
+    "identityFingerprint": "28440004ae9b19f77cd7e12234d43d8f163fcfe5868fb96b470f55d196de8861",
+    "claimId": "claim_9474ae42b4d6e079fcf33fec49e746fa",
+    "sourceAnchor": "law",
+    "unitKind": "heading",
+    "sourceUnitDigest": "28440004ae9b19f77cd7e12234d43d8f163fcfe5868fb96b470f55d196de8861",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "heading",
+      "level": 3,
+      "title": "law",
+      "anchor": "law",
+      "githubAnchor": "law",
+      "stableAnchor": "h-e15303a871aa",
+      "startLine": 260,
+      "endLine": 260,
+      "textDigest": "28440004ae9b19f77cd7e12234d43d8f163fcfe5868fb96b470f55d196de8861",
+      "sample": "law",
+      "sectionPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "followingBlockDigest": null,
+      "identityFingerprint": "28440004ae9b19f77cd7e12234d43d8f163fcfe5868fb96b470f55d196de8861",
+      "ancestry": [
+        "GitNexus — Code Intelligence",
+        "fgOS Effective Instructions"
+      ],
+      "text": "### law",
+      "sectionText": "### law"
+    },
+    "fullDigest": "28440004ae9b19f77cd7e12234d43d8f163fcfe5868fb96b470f55d196de8861",
+    "shownTextSHA256": "84df6463ee8a61b0abc09ed2a809004806f86ff278516c198d0615481f78d535"
+  }
+}
+```
+
+## Entry a-015: claim_ccf1acf857fc4e9757a933ca22ed34f1
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_ccf1acf857fc4e9757a933ca22ed34f1",
+    "sourceUnitDigest": "0951d8b2cc464fa07dc2db5e313c9aa31a4bd64acf9000bbd1f00e85ca17c4e5",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#legacy-node-cli-ownership-boundary as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "23f1a1a44bcbd0668f8f545b5508024b57db8171e828816c1c9d064c5e94dfd4",
+    "identityFingerprint": "763eccb4a0f5b2da851cbe6313f021081dc116b68cae242a3cd2d0280c718ac6",
+    "claimId": "claim_ccf1acf857fc4e9757a933ca22ed34f1",
+    "sourceAnchor": "legacy-node-cli-ownership-boundary",
+    "unitKind": "heading",
+    "sourceUnitDigest": "0951d8b2cc464fa07dc2db5e313c9aa31a4bd64acf9000bbd1f00e85ca17c4e5",
+    "claimKind": "contract",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "Legacy-Node CLI Ownership Boundary",
+      "anchor": "legacy-node-cli-ownership-boundary",
+      "githubAnchor": "legacy-node-cli-ownership-boundary",
+      "stableAnchor": "h-389367d240cb",
+      "startLine": 83,
+      "endLine": 83,
+      "textDigest": "0951d8b2cc464fa07dc2db5e313c9aa31a4bd64acf9000bbd1f00e85ca17c4e5",
+      "sample": "Legacy-Node CLI Ownership Boundary",
+      "sectionPayloadDigest": "d3ea0a363dc71ec956f780a1d6dd66b57d916bbad7bd7d89f0dfcebf35856428",
+      "followingBlockDigest": "9babb9141d90b2e3a99f353c735db9e64679ea4be0bc12cf27432d1cd728df8f",
+      "identityFingerprint": "763eccb4a0f5b2da851cbe6313f021081dc116b68cae242a3cd2d0280c718ac6",
+      "ancestry": [
+        "forgent"
+      ],
+      "text": "## Legacy-Node CLI Ownership Boundary",
+      "sectionText": "## Legacy-Node CLI Ownership Boundary\n\nRust `fgos` is the standard door for every verb. `bin/fgos.mjs` is the\n`legacy-node` payload entry, staged whole under a release's\n`components.legacyNode.root` and exec'd by the Rust host at\n`components.legacyNode.entry` — never relocated or renamed in the source tree.\nThe host resolves it only through those manifest fields, never PATH, cwd or\nhardcoded locations outside the manifest. Global npm `bin.fgos` and fallback\n`node bin/fgos.mjs` are compatibility channels calling this entry directly.\n\nPlain `fgos` runs the activated release recorded in\n`.fgos/installation/activation.json`, not newly edited `bin/` or `src/` bytes.\nUse `npm run fgos:dev -- <verb> [args]` to run working-tree code through the Rust\nhost. It preserves caller cwd via `INIT_CWD`, honors `CARGO_TARGET_DIR`, and\nmaterializes confined per-invocation artifacts under `.fgos/runtime/dev-host/`,\nremoving only its own directory after the child exits. Serialize invocations\nacross worktrees only where their Cargo target is actually shared.\n\n`fgos doctor` check `active-release-matches-checkout` compares the owned source\ncheckout's working-tree Node payload with its activation; it does not certify\nRust freshness. Dependencies do not count as drift, but symlink/unsafe manifest\nentries still fail. It skips activation owned by main from a linked worktree\nand the same-checkout dev manifest. To update plain `fgos`, build/stage/activate\nthe intended tree, then verify doctor through the installed shim. Old-release\n`fgos setup` can overwrite generated render headers until that release is\nrestaged; activation never refreshes itself merely because source was edited."
+    },
+    "fullDigest": "0951d8b2cc464fa07dc2db5e313c9aa31a4bd64acf9000bbd1f00e85ca17c4e5",
+    "shownTextSHA256": "343b8082c95ceb9d61c885d1d5baba5b929ba22fb1035f9d424dd22ea09490ac"
+  }
+}
+```
+
+## Entry a-016: claim_133b6f931d35a06604813e97ac11bd8f
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_133b6f931d35a06604813e97ac11bd8f",
+    "sourceUnitDigest": "f081560dd43881074ceded6248a3ead793add48968f3eedf2ff2aa7f6284951e",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#never-do as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "e873cf37f739248eee0224ea543d02a9977ac6de94f24baae620e4996419e733",
+    "identityFingerprint": "8af2b2f9f6ea42011e3c43d9d4e6c9dea0fbdb647c5d036f260eab9912d97535",
+    "claimId": "claim_133b6f931d35a06604813e97ac11bd8f",
+    "sourceAnchor": "never-do",
+    "unitKind": "heading",
+    "sourceUnitDigest": "f081560dd43881074ceded6248a3ead793add48968f3eedf2ff2aa7f6284951e",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "Never Do",
+      "anchor": "never-do",
+      "githubAnchor": "never-do",
+      "stableAnchor": "h-828850a01888",
+      "startLine": 225,
+      "endLine": 225,
+      "textDigest": "f081560dd43881074ceded6248a3ead793add48968f3eedf2ff2aa7f6284951e",
+      "sample": "Never Do",
+      "sectionPayloadDigest": "6f63dffd5c7d710ca600d3ad22016e4e73cf9729a299b36d624070a87429d6e1",
+      "followingBlockDigest": "6f63dffd5c7d710ca600d3ad22016e4e73cf9729a299b36d624070a87429d6e1",
+      "identityFingerprint": "8af2b2f9f6ea42011e3c43d9d4e6c9dea0fbdb647c5d036f260eab9912d97535",
+      "ancestry": [
+        "GitNexus — Code Intelligence"
+      ],
+      "text": "## Never Do",
+      "sectionText": "## Never Do\n\n- NEVER edit a function, class, or method without first running `impact` on it.\n- NEVER ignore HIGH or CRITICAL risk warnings from impact analysis.\n- NEVER rename symbols with find-and-replace — use `rename` which understands the call graph.\n- NEVER commit changes without running `detect_changes()` to check affected scope."
+    },
+    "fullDigest": "f081560dd43881074ceded6248a3ead793add48968f3eedf2ff2aa7f6284951e",
+    "shownTextSHA256": "9322d24a0468af4e14fec52061787b7bdb7a0fa9286098ca653193ce96a39fe0"
+  }
+}
+```
+
+## Entry a-017: claim_fde89656fbadabacb69e8f793b223377
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_fde89656fbadabacb69e8f793b223377",
+    "sourceUnitDigest": "dc48182c384ef81504a14678e50d3c47a3358a2170c301b4cff15a0de7f7725a",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#platform-operating-laws as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "0354536faa4153dc95db6df263f73275e4a25d99efe037da70354410e7f4c970",
+    "identityFingerprint": "32b040fb71f2f208f769259bca815d0bf06cda230b31e065b765cf776c7bac21",
+    "claimId": "claim_fde89656fbadabacb69e8f793b223377",
+    "sourceAnchor": "platform-operating-laws",
+    "unitKind": "heading",
+    "sourceUnitDigest": "dc48182c384ef81504a14678e50d3c47a3358a2170c301b4cff15a0de7f7725a",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "heading",
+      "level": 4,
+      "title": "Platform Operating Laws",
+      "anchor": "platform-operating-laws",
+      "githubAnchor": "platform-operating-laws",
+      "stableAnchor": "h-9929360fdd74",
+      "startLine": 271,
+      "endLine": 271,
+      "textDigest": "dc48182c384ef81504a14678e50d3c47a3358a2170c301b4cff15a0de7f7725a",
+      "sample": "Platform Operating Laws",
+      "sectionPayloadDigest": "0634893a1881205c0eb9275047c5b3a44f596f2dff7a47fb0d0e10aae07aebb4",
+      "followingBlockDigest": "0634893a1881205c0eb9275047c5b3a44f596f2dff7a47fb0d0e10aae07aebb4",
+      "identityFingerprint": "32b040fb71f2f208f769259bca815d0bf06cda230b31e065b765cf776c7bac21",
+      "ancestry": [
+        "Decision Question Template"
+      ],
+      "text": "#### Platform Operating Laws",
+      "sectionText": "#### Platform Operating Laws\n\n- id: `platform-operating-laws`\n- source: `core/instructions/platform-laws.md`"
+    },
+    "fullDigest": "dc48182c384ef81504a14678e50d3c47a3358a2170c301b4cff15a0de7f7725a",
+    "shownTextSHA256": "fab24d389fc9c6134b52e630d32f6ef240f821f83b05b5bcf00b7b24410b930b"
+  }
+}
+```
+
+## Entry a-018: claim_8231e682b35899eed43b85ce92dbc6ba
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_8231e682b35899eed43b85ce92dbc6ba",
+    "sourceUnitDigest": "192d7bf6d359979a7ee22a18c66efd97acc8704687f07c222cc20bdf2cc14389",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#platform-operating-laws-1 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "f3c82916dd872269bef1ac1d81471c525fad070e463f3c14107a957b72db4877",
+    "identityFingerprint": "9d6dcb22bd41cdf5a71ede72b70557de9da3f1342df41b8501d212e2f9070bf1",
+    "claimId": "claim_8231e682b35899eed43b85ce92dbc6ba",
+    "sourceAnchor": "platform-operating-laws-1",
+    "unitKind": "heading",
+    "sourceUnitDigest": "192d7bf6d359979a7ee22a18c66efd97acc8704687f07c222cc20bdf2cc14389",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "heading",
+      "level": 1,
+      "title": "Platform Operating Laws",
+      "anchor": "platform-operating-laws-1",
+      "githubAnchor": "platform-operating-laws-1",
+      "stableAnchor": "h-27dc13499156",
+      "startLine": 276,
+      "endLine": 276,
+      "textDigest": "192d7bf6d359979a7ee22a18c66efd97acc8704687f07c222cc20bdf2cc14389",
+      "sample": "Platform Operating Laws",
+      "sectionPayloadDigest": "af2187fac10d6b881f350198038d5aed0e8043091dead5b59a26b375f12394b5",
+      "followingBlockDigest": "7e4431ca6a7e941fe10d3962f79815b135aeb90897d2ab15817a4e7a903bd2a7",
+      "identityFingerprint": "9d6dcb22bd41cdf5a71ede72b70557de9da3f1342df41b8501d212e2f9070bf1",
+      "ancestry": [],
+      "text": "# Platform Operating Laws",
+      "sectionText": "# Platform Operating Laws\n\nPlatform laws L1-L8 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:\n\n- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)\n- **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundations.md#l2--kin-trc-memory-hai-tng`)\n- **L3 — Luật store: truth ở JSONL, db là view** (`docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view`)\n- **L4 — Routing model theo audience của từng interface** (`docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface`)\n- **L5 — Definition of done: sáu câu hỏi** (`docs/platform-foundations.md#l5--definition-of-done-su-cu-hi`)\n- **L6 — Maturity ladder F0–F5** (`docs/platform-foundations.md#l6--maturity-ladder-f0f5`)\n- **L7 — Durability ladder** (`docs/platform-foundations.md#l7--durability-ladder`)\n- **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer`)\n\nAuthoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires superseding its decision ID rather than editing in place.\n\n<!-- fgos:instruction-projection:end -->"
+    },
+    "fullDigest": "192d7bf6d359979a7ee22a18c66efd97acc8704687f07c222cc20bdf2cc14389",
+    "shownTextSHA256": "07ded014d0feb036f9219a8fe46872f7871cfccdba41c7cb2aabde102ad1f6e6"
+  }
+}
+```
+
+## Entry a-019: claim_dadecacb903167be7252b40d75033a56
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_dadecacb903167be7252b40d75033a56",
+    "sourceUnitDigest": "7a863d1c86d51e3842a3abdd6ab13b94240b726f456143e1e129be217e939bc6",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "b23e5d50ce12bca6c31aa4cb5a1623155014fa1857af46db82a691211d154f68",
+    "identityFingerprint": "e0c69764781bb2c94ed8565f9eea8f2259a9950831e630a818a3c6331e53c58c",
+    "claimId": "claim_dadecacb903167be7252b40d75033a56",
+    "sourceAnchor": "product-priority-order-d-adr0030-docsspecsrunnermd",
+    "unitKind": "heading",
+    "sourceUnitDigest": "7a863d1c86d51e3842a3abdd6ab13b94240b726f456143e1e129be217e939bc6",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "Product priority order (D-ADR0030, docs/specs/runner.md)",
+      "anchor": "product-priority-order-d-adr0030-docsspecsrunnermd",
+      "githubAnchor": "product-priority-order-d-adr0030-docsspecsrunnermd",
+      "stableAnchor": "h-068daad8f921",
+      "startLine": 16,
+      "endLine": 16,
+      "textDigest": "7a863d1c86d51e3842a3abdd6ab13b94240b726f456143e1e129be217e939bc6",
+      "sample": "Product priority order (D-ADR0030, docs/specs/runner.md)",
+      "sectionPayloadDigest": "88a81016769ea1d2903cfb176c5a8b27145f6d4bdcfcc6b2a27f820814143a15",
+      "followingBlockDigest": "1647ee808cc12762f3eebd5a3caa23b1b24da3fddbd71297903d0ddb798ed718",
+      "identityFingerprint": "e0c69764781bb2c94ed8565f9eea8f2259a9950831e630a818a3c6331e53c58c",
+      "ancestry": [
+        "forgent"
+      ],
+      "text": "## Product priority order (D-ADR0030, docs/specs/runner.md)",
+      "sectionText": "## Product priority order (D-ADR0030, docs/specs/runner.md)\n\n1. **Ship Faster** — giao nhanh hơn, không đoán mò, giảm friction/better-dev-ux, ít chờ đợi.\n2. **Release con người** — giải phóng con người khỏi việc ngồi canh chờ trả lời. Hệ thống tự phán đoán, tự vận hành ở mức cao nhất có thể; chỉ hỏi người khi thật sự cần, và khi hỏi thì gom thành bộ để mỗi lần người quay lại trả lời được nhiều nhất rồi đi tiếp; mỗi câu theo mẫu câu hỏi quyết định (`core/skills/_shared/decision-question.md`). Tự quyết trong khung đã duyệt (phạm vi + ngân sách ghi lúc duyệt); sắp vượt khung thì dừng và hỏi theo mẫu. Một câu hỏi treo không được nghẽn phần việc khác của cùng item còn tiến được — stage/skill vì vậy phải chia nhỏ, mịn, mỗi mảnh park/tiến độc lập.\n   Khi phân tích của chính agent đã chọn rõ một phương án, hãy quyết và báo cáo, không hỏi lại. Chỉ hỏi khi các phương án thật sự ngang nhau hoặc phụ thuộc vào ý định của người dùng.\n3. **DoD** — reproducibly verifiable result + evidence-linked documentation.\n4. **Polish Sau DoD** — hoàn thiện sau ngưỡng, không mở scope.\n\nTốc độ ở mục 1 là tốc độ ship của **project đang DÙNG fgOS** (fgOS không loại trừ khi tự dogfood) — không phải tốc độ tự thân team fgOS build một tính năng của chính fgOS. Đừng chọn phương án rẻ để fgOS tự triển khai nếu nó làm project dùng fgOS chậm hơn.\n\nThứ tự cố định — bậc dưới không ghi đè bậc trên. Chi tiết: docs/specs/runner.md's \"Lịch sử quyết định\" § D-ADR0030 (mở rộng D-ADR0025; narrative đầy đủ, docs/decisions/*.md corpus đã retired tsk-1lv-4)."
+    },
+    "fullDigest": "7a863d1c86d51e3842a3abdd6ab13b94240b726f456143e1e129be217e939bc6",
+    "shownTextSHA256": "ce8116e1154d2fa63829944f4333467375e047003936c814eed857ebb21ca0a0"
+  }
+}
+```
+
+## Entry a-020: claim_2c843f49586c14b6d70149ae591d47f9
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_2c843f49586c14b6d70149ae591d47f9",
+    "sourceUnitDigest": "b0c5afec8bbc85b96206854945bcd84f6ca85f3995ba34cd7efc69907c0d5a29",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#ranh-giới-sứ-mệnh-d-adr0035-docsspecsplatform-foundationsmd as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "b95650b3b0b8b23330947abe9f4622c3aef7d43f9f31eb139740144b2be6ef48",
+    "identityFingerprint": "36a6e08c9c128784285c5a96c1cb67ae78e2f153f6d389f9bdbb355f86a9ebe4",
+    "claimId": "claim_2c843f49586c14b6d70149ae591d47f9",
+    "sourceAnchor": "ranh-giới-sứ-mệnh-d-adr0035-docsspecsplatform-foundationsmd",
+    "unitKind": "heading",
+    "sourceUnitDigest": "b0c5afec8bbc85b96206854945bcd84f6ca85f3995ba34cd7efc69907c0d5a29",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "Ranh giới sứ mệnh (D-ADR0035, docs/specs/platform-foundations.md)",
+      "anchor": "ranh-giới-sứ-mệnh-d-adr0035-docsspecsplatform-foundationsmd",
+      "githubAnchor": "ranh-giới-sứ-mệnh-d-adr0035-docsspecsplatform-foundationsmd",
+      "stableAnchor": "h-24d05552722a",
+      "startLine": 28,
+      "endLine": 28,
+      "textDigest": "b0c5afec8bbc85b96206854945bcd84f6ca85f3995ba34cd7efc69907c0d5a29",
+      "sample": "Ranh giới sứ mệnh (D-ADR0035, docs/specs/platform-foundations.md)",
+      "sectionPayloadDigest": "aaa7d6e4db6d375f3fa0da034424e3cdfef4b3486d7ff842f1fd9e6e11ad6f31",
+      "followingBlockDigest": "2f43e6ba7d13c017035a4295381b83e9a4d21eaf658d0c1f90f4bbf9608c137f",
+      "identityFingerprint": "36a6e08c9c128784285c5a96c1cb67ae78e2f153f6d389f9bdbb355f86a9ebe4",
+      "ancestry": [
+        "forgent"
+      ],
+      "text": "## Ranh giới sứ mệnh (D-ADR0035, docs/specs/platform-foundations.md)",
+      "sectionText": "## Ranh giới sứ mệnh (D-ADR0035, docs/specs/platform-foundations.md)\n\nfgOS tồn tại để: \n 1. phát triển các project khác \n 2. làm nền vận hành các business base workflow \n \nfgOS KHÔNG phải để (3) tự phát triển chính nó. Mission #3 là dogfood cần thiết trong lúc xây, không phải lý do fgOS tồn tại.  Khi làm việc trong chính repo (nơi fgOS tự-host trên chính source của mình), đừng mặc định coi \"sửa fgOS\" là mục tiêu chỉ vì đó là việc trước mắt — hỏi việc đang làm có phục vụ mission #1/#2 (năng lực fgOS mang lại cho project/workflow khác) hay chỉ tiện cho chính đội fgOS (mission #3). fgOS đã cài global và đang vận hành thật trên nhiều project khác ngoài repo này — mission #1/#2 không phải lý thuyết. Chi tiết + bằng chứng: docs/specs/platform-foundations.md's \"Lịch sử quyết định\" § D-ADR0035 (docs/decisions/*.md corpus đã retired tsk-1lv-4)."
+    },
+    "fullDigest": "b0c5afec8bbc85b96206854945bcd84f6ca85f3995ba34cd7efc69907c0d5a29",
+    "shownTextSHA256": "10b6e1f79f600572442b03ca28d075369adf86f5dd27089a5c28f66c9f366627"
+  }
+}
+```
+
+## Entry a-021: claim_42108ffe5c72a9f3ca2c7ef904fd14ec
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_42108ffe5c72a9f3ca2c7ef904fd14ec",
+    "sourceUnitDigest": "14d6f595788e8fc244f48477644d5527eeba45c4172ee04717caf23b04cb172e",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#resources as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "47c3568ddec4bc9a7f6ec4204979a30b266331dcb09c21d41582d97a07d97b47",
+    "identityFingerprint": "833eaa198037a7b8bb2619b6a371f2efa587939fd9b66541b45b5e8c14a02d93",
+    "claimId": "claim_42108ffe5c72a9f3ca2c7ef904fd14ec",
+    "sourceAnchor": "resources",
+    "unitKind": "heading",
+    "sourceUnitDigest": "14d6f595788e8fc244f48477644d5527eeba45c4172ee04717caf23b04cb172e",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "Resources",
+      "anchor": "resources",
+      "githubAnchor": "resources",
+      "stableAnchor": "h-a46fd3c653ec",
+      "startLine": 232,
+      "endLine": 232,
+      "textDigest": "14d6f595788e8fc244f48477644d5527eeba45c4172ee04717caf23b04cb172e",
+      "sample": "Resources",
+      "sectionPayloadDigest": "b64e3f9772c143e0d911c16218f5a9f280f96b0c1466f43f52e5aa4d63855221",
+      "followingBlockDigest": "b64e3f9772c143e0d911c16218f5a9f280f96b0c1466f43f52e5aa4d63855221",
+      "identityFingerprint": "833eaa198037a7b8bb2619b6a371f2efa587939fd9b66541b45b5e8c14a02d93",
+      "ancestry": [
+        "GitNexus — Code Intelligence"
+      ],
+      "text": "## Resources",
+      "sectionText": "## Resources\n\n| Resource | Use for |\n|----------|---------|\n| `gitnexus://repo/forgent/context` | Codebase overview, check index freshness |\n| `gitnexus://repo/forgent/clusters` | All functional areas |\n| `gitnexus://repo/forgent/processes` | All execution flows |\n| `gitnexus://repo/forgent/process/{name}` | Step-by-step execution trace |"
+    },
+    "fullDigest": "14d6f595788e8fc244f48477644d5527eeba45c4172ee04717caf23b04cb172e",
+    "shownTextSHA256": "75c6211de8f8951e8037d10289e3e5d0177b8a172b593345006b5b42a8e08e0e"
+  }
+}
+```
+
+## Entry a-022: claim_5f15ada3e8a013ad4b1c962bd082ea68
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_5f15ada3e8a013ad4b1c962bd082ea68",
+    "sourceUnitDigest": "52ff86d66f342109d00adeffc09b80352fec793ccd934413bf59a0d8dd0d32c2",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#rul11-tùm-lum-không-phải-nặng-d-adr0054-supersedes-d-adr0036-docsspecsplatform-foundationsmd as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "9c29970d9665aa032e9021ce1ac20794d0d5531d1319052264dabd4c87686a4d",
+    "identityFingerprint": "4dbcd5d22c9272810b60cf3b65b18893f6fec1a78034dde8fd217fec2524b728",
+    "claimId": "claim_5f15ada3e8a013ad4b1c962bd082ea68",
+    "sourceAnchor": "rul11-tùm-lum-không-phải-nặng-d-adr0054-supersedes-d-adr0036-docsspecsplatform-foundationsmd",
+    "unitKind": "heading",
+    "sourceUnitDigest": "52ff86d66f342109d00adeffc09b80352fec793ccd934413bf59a0d8dd0d32c2",
+    "claimKind": "decision",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "RUL11 — tùm lum, không phải nặng (D-ADR0054, supersedes D-ADR0036, docs/specs/platform-foundations.md)",
+      "anchor": "rul11-tùm-lum-không-phải-nặng-d-adr0054-supersedes-d-adr0036-docsspecsplatform-foundationsmd",
+      "githubAnchor": "rul11-tùm-lum-không-phải-nặng-d-adr0054-supersedes-d-adr0036-docsspecsplatform-foundationsmd",
+      "stableAnchor": "h-90de0e39272c",
+      "startLine": 135,
+      "endLine": 135,
+      "textDigest": "52ff86d66f342109d00adeffc09b80352fec793ccd934413bf59a0d8dd0d32c2",
+      "sample": "RUL11 — tùm lum, không phải nặng (D-ADR0054, supersedes D-ADR0036, docs/specs/platform-foundations.md)",
+      "sectionPayloadDigest": "d5348e589de1e3d325ade1ee9ad282e22a625a581c92c6360897dd5e19b193ac",
+      "followingBlockDigest": "38f511a5d090b7f9fc9b928ea29af5d75e01bfe5c18e3287977d5a335e2a7fcf",
+      "identityFingerprint": "4dbcd5d22c9272810b60cf3b65b18893f6fec1a78034dde8fd217fec2524b728",
+      "ancestry": [
+        "forgent"
+      ],
+      "text": "## RUL11 — tùm lum, không phải nặng (D-ADR0054, supersedes D-ADR0036, docs/specs/platform-foundations.md)",
+      "sectionText": "## RUL11 — tùm lum, không phải nặng (D-ADR0054, supersedes D-ADR0036, docs/specs/platform-foundations.md)\n\nViệc trở nặng không vì bản chất nó lớn mà vì thiếu và quên — tên đúng của\ntình trạng đó là tùm lum, không phải nặng. Khi thấy tùm lum trong phạm vi\nviệc đang làm, gom lại — gom tới khi hết; quy mô không bao giờ là lý do miễn\ntrừ. Tùm lum thấy ngoài phạm vi thì ghi thành item riêng; gom mà phải xây\ncông cụ mới là một câu hỏi quyết định. Đích của mọi lần gom\nlà một hình dạng duy nhất: ranh giới rõ, contract tường minh, đổi và biến\nhình dễ, không chắp vá.\n\nkhong phai no nang ma no tum lum"
+    },
+    "fullDigest": "52ff86d66f342109d00adeffc09b80352fec793ccd934413bf59a0d8dd0d32c2",
+    "shownTextSHA256": "541ad7d938433c0d86e6bf458b739aa575dc78979e015f51da1b1aa1f684dad3"
+  }
+}
+```
+
+## Entry a-023: claim_12e5db9cba7b51a5d83d737740f873f3
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_12e5db9cba7b51a5d83d737740f873f3",
+    "sourceUnitDigest": "960948ac07d48bbfa4a8aacadb3243d066876e5789243ea58d067719ef620c85",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#scratch-artifacts as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "447cd419cf40ea458f036ce4af2c7e37323d3e8a6579393bb74138e9a0cea917",
+    "identityFingerprint": "89686e887dfa5b4776c167cf9d391470ac239da19d2e94781308b47c4d7ff297",
+    "claimId": "claim_12e5db9cba7b51a5d83d737740f873f3",
+    "sourceAnchor": "scratch-artifacts",
+    "unitKind": "heading",
+    "sourceUnitDigest": "960948ac07d48bbfa4a8aacadb3243d066876e5789243ea58d067719ef620c85",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "Scratch artifacts",
+      "anchor": "scratch-artifacts",
+      "githubAnchor": "scratch-artifacts",
+      "stableAnchor": "h-1dfd5f9c30aa",
+      "startLine": 72,
+      "endLine": 72,
+      "textDigest": "960948ac07d48bbfa4a8aacadb3243d066876e5789243ea58d067719ef620c85",
+      "sample": "Scratch artifacts",
+      "sectionPayloadDigest": "ce273268d1c631cd2401722d415ec5e2fed97fab11ed089d8f81259f80152f80",
+      "followingBlockDigest": "ce273268d1c631cd2401722d415ec5e2fed97fab11ed089d8f81259f80152f80",
+      "identityFingerprint": "89686e887dfa5b4776c167cf9d391470ac239da19d2e94781308b47c4d7ff297",
+      "ancestry": [
+        "forgent"
+      ],
+      "text": "## Scratch artifacts",
+      "sectionText": "## Scratch artifacts\n\nKeep draft scripts, logs, patches and dumps out of the repository root. Use\n`.fgos/runtime/tmp/`, falling back to `${TMPDIR:-/tmp}/fgos-work/`.\n`.githooks/pre-commit` owns the single root-file allowlist and refuses new root\nfiles outside it, including linked worktrees. Legitimate root additions require\nan allowlist change in a separate commit, landed on main before the addition.\nThe hook runs only when wired via `npm run setup:hooks`; `fgos doctor` checks\nthat wiring with `main-checkout-hook-wired`. `MERGE_HEAD` skips only the root\nguard, never existing data-loss guards."
+    },
+    "fullDigest": "960948ac07d48bbfa4a8aacadb3243d066876e5789243ea58d067719ef620c85",
+    "shownTextSHA256": "bdf9185b4c9e5304d9f43a25791fcaf9fafb2f4844dc5f5260cffb6f8f1111cd"
+  }
+}
+```
+
+## Entry a-024: claim_9dd28187a839e2ce10f2e9dd3f020cdf
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_9dd28187a839e2ce10f2e9dd3f020cdf",
+    "sourceUnitDigest": "ea437289b5b734237fdab9974e6b10855573dcba1c6a707ea7f51dc0d5c60c1e",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#starting-the-fgos-gateway-one-door-never-a-raw-process as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "25e50de9c5068dbf869d761965a07d7e23c716d006daf288c1186b30e7daf364",
+    "identityFingerprint": "cce8c70423a062205dfc24d7706bc6ad3ee008e3de1a9752d90fef8ebc9fa1c3",
+    "claimId": "claim_9dd28187a839e2ce10f2e9dd3f020cdf",
+    "sourceAnchor": "starting-the-fgos-gateway-one-door-never-a-raw-process",
+    "unitKind": "heading",
+    "sourceUnitDigest": "ea437289b5b734237fdab9974e6b10855573dcba1c6a707ea7f51dc0d5c60c1e",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "Starting the fgos gateway — one door, never a raw process",
+      "anchor": "starting-the-fgos-gateway-one-door-never-a-raw-process",
+      "githubAnchor": "starting-the-fgos-gateway-one-door-never-a-raw-process",
+      "stableAnchor": "h-1b429dd0545a",
+      "startLine": 175,
+      "endLine": 175,
+      "textDigest": "ea437289b5b734237fdab9974e6b10855573dcba1c6a707ea7f51dc0d5c60c1e",
+      "sample": "Starting the fgos gateway — one door, never a raw process",
+      "sectionPayloadDigest": "ef5cbba01528872900e82f37785833b107cd0e4ee5d95379c8e9cae8a6f1a90c",
+      "followingBlockDigest": "ef5cbba01528872900e82f37785833b107cd0e4ee5d95379c8e9cae8a6f1a90c",
+      "identityFingerprint": "cce8c70423a062205dfc24d7706bc6ad3ee008e3de1a9752d90fef8ebc9fa1c3",
+      "ancestry": [
+        "forgent"
+      ],
+      "text": "## Starting the fgos gateway — one door, never a raw process",
+      "sectionText": "## Starting the fgos gateway — one door, never a raw process\n\n**If a task needs the fgos gateway (REST API + web dashboard, binary `fgos-gateway` built from `apps/fgos-gateway`) running, run `fgos gateway start` — never a hand-rolled `cargo run`/`nohup`/`tmux`/systemd invocation.** (tsk-31v) This is the one place that builds the release binary and spawns it detached, so the process outlives the CLI call. `fgos gateway status` reports real liveness plus an actual `/v1/contract` reachability check; `fgos gateway stop` sends SIGTERM and clears the registry. The gateway's own MCP surface (`search`/`execute`, `apps/fgos-gateway/src/mcp.rs`) is mounted on this SAME process — it cannot bootstrap itself, so starting the gateway is always a `fgos` CLI call, never an MCP tool call.\n\n<!-- mdview:START -->"
+    },
+    "fullDigest": "ea437289b5b734237fdab9974e6b10855573dcba1c6a707ea7f51dc0d5c60c1e",
+    "shownTextSHA256": "ef3063310d58b372691f678d44ba7867d7b7a33e4efc24b3824f20124d700eef"
+  }
+}
+```
+
+## Entry a-025: claim_89185e56cc8ad38646b1045d993b3eb3
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_89185e56cc8ad38646b1045d993b3eb3",
+    "sourceUnitDigest": "0e1c4d453af7446fe6407a536afd028a8ba765267631778c410e15f2b8c03d3a",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-1 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "7abfe542e18d9618e720a67ffe6328458d08df20f7468d1974f71a558535bf7d",
+    "identityFingerprint": "7abfe542e18d9618e720a67ffe6328458d08df20f7468d1974f71a558535bf7d",
+    "claimId": "claim_89185e56cc8ad38646b1045d993b3eb3",
+    "sourceAnchor": "unheaded-block-1",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "0e1c4d453af7446fe6407a536afd028a8ba765267631778c410e15f2b8c03d3a",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-1",
+      "githubAnchor": "unheaded-block-1",
+      "stableAnchor": "unheaded-block-1",
+      "title": "Unheaded block 1",
+      "startLine": 3,
+      "endLine": 3,
+      "textDigest": "0e1c4d453af7446fe6407a536afd028a8ba765267631778c410e15f2b8c03d3a",
+      "sample": "**The Foundation for Generative Agents.**",
+      "identityFingerprint": "7abfe542e18d9618e720a67ffe6328458d08df20f7468d1974f71a558535bf7d",
+      "ancestry": [
+        "forgent"
+      ],
+      "text": "**The Foundation for Generative Agents.**"
+    },
+    "fullDigest": "0e1c4d453af7446fe6407a536afd028a8ba765267631778c410e15f2b8c03d3a",
+    "shownTextSHA256": "0e1c4d453af7446fe6407a536afd028a8ba765267631778c410e15f2b8c03d3a"
+  }
+}
+```
+
+## Entry a-026: claim_ea03152273de3a7844527cc84b92cdfd
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_ea03152273de3a7844527cc84b92cdfd",
+    "sourceUnitDigest": "d511b50a182ac22df8994c43e7b61c81d2826a9279fa331e4a09a65d8d233874",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-10 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "2bd9f2cc8633ecc85a74f179e9b3055d331cad945ef9793df35773a2aab2cec4",
+    "identityFingerprint": "2bd9f2cc8633ecc85a74f179e9b3055d331cad945ef9793df35773a2aab2cec4",
+    "claimId": "claim_ea03152273de3a7844527cc84b92cdfd",
+    "sourceAnchor": "unheaded-block-10",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "d511b50a182ac22df8994c43e7b61c81d2826a9279fa331e4a09a65d8d233874",
+    "claimKind": "specification",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-10",
+      "githubAnchor": "unheaded-block-10",
+      "stableAnchor": "unheaded-block-10",
+      "title": "Unheaded block 10",
+      "startLine": 43,
+      "endLine": 50,
+      "textDigest": "d511b50a182ac22df8994c43e7b61c81d2826a9279fa331e4a09a65d8d233874",
+      "sample": "**Prior art before design.** Before designing a mechanism, find out what already existed\nand why it went away: `git log -S'<symbol>'` / `-G` on the symbol, config key and spec term",
+      "identityFingerprint": "2bd9f2cc8633ecc85a74f179e9b3055d331cad945ef9793df35773a2aab2cec4",
+      "ancestry": [
+        "forgent",
+        "Before touching code"
+      ],
+      "text": "**Prior art before design.** Before designing a mechanism, find out what already existed\nand why it went away: `git log -S'<symbol>'` / `-G` on the symbol, config key and spec term,\nalso under the executor ids and names the thing had before the renames (ids were renamed and\ndormant ones deleted), and read the area spec's \"Lịch sử quyết định\" and settled-facts\nsections. A plan's facts phase answers \"what existed before, and which change removed it,\nand was that intended?\" next to its questions about current code. Reuse or extend what is\nfound; say in the plan what was reused and what was missing.\n**Convention paths.** For report, plan, and journal names and locations—including paths placed in briefs for other agents—use `fgos convention name|path --json`, never construct them; parallel agents MUST choose distinct slugs, and pre-commit `convention check` warnings do not block commits."
+    },
+    "fullDigest": "d511b50a182ac22df8994c43e7b61c81d2826a9279fa331e4a09a65d8d233874",
+    "shownTextSHA256": "d511b50a182ac22df8994c43e7b61c81d2826a9279fa331e4a09a65d8d233874"
+  }
+}
+```
+
+## Entry a-027: claim_8ce5210314473b1e660025261f39ae5a
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_8ce5210314473b1e660025261f39ae5a",
+    "sourceUnitDigest": "0ac33ce3b212c69bd641ab67172cc109ba70735d9242bbee1b913ae1ff922aa1",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-11 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "829ea882876aaf6865eee624f2f63ed8c3a3a0a55a419ba7ae9e5225f9862bc9",
+    "identityFingerprint": "829ea882876aaf6865eee624f2f63ed8c3a3a0a55a419ba7ae9e5225f9862bc9",
+    "claimId": "claim_8ce5210314473b1e660025261f39ae5a",
+    "sourceAnchor": "unheaded-block-11",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "0ac33ce3b212c69bd641ab67172cc109ba70735d9242bbee1b913ae1ff922aa1",
+    "claimKind": "historical-context",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-11",
+      "githubAnchor": "unheaded-block-11",
+      "stableAnchor": "unheaded-block-11",
+      "title": "Unheaded block 11",
+      "startLine": 54,
+      "endLine": 54,
+      "textDigest": "0ac33ce3b212c69bd641ab67172cc109ba70735d9242bbee1b913ae1ff922aa1",
+      "sample": "A stranger agent with no chat history should be able to answer, for any change:",
+      "identityFingerprint": "829ea882876aaf6865eee624f2f63ed8c3a3a0a55a419ba7ae9e5225f9862bc9",
+      "ancestry": [
+        "forgent",
+        "Definition of done (platform-foundations L5)"
+      ],
+      "text": "A stranger agent with no chat history should be able to answer, for any change:"
+    },
+    "fullDigest": "0ac33ce3b212c69bd641ab67172cc109ba70735d9242bbee1b913ae1ff922aa1",
+    "shownTextSHA256": "0ac33ce3b212c69bd641ab67172cc109ba70735d9242bbee1b913ae1ff922aa1"
+  }
+}
+```
+
+## Entry a-028: claim_d0e83fdb2650d447afd25c0f61efc4ec
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_d0e83fdb2650d447afd25c0f61efc4ec",
+    "sourceUnitDigest": "b390474069d64b0572bd78c4c0e0e47c2da91a5114360b4da7eb36cfea82a3b4",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-12 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "6aefb1fae238d8a78b7361cc040a66e5fb04ddd786e1f3f990a8ad03da84cedc",
+    "identityFingerprint": "6aefb1fae238d8a78b7361cc040a66e5fb04ddd786e1f3f990a8ad03da84cedc",
+    "claimId": "claim_d0e83fdb2650d447afd25c0f61efc4ec",
+    "sourceAnchor": "unheaded-block-12",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "b390474069d64b0572bd78c4c0e0e47c2da91a5114360b4da7eb36cfea82a3b4",
+    "claimKind": "specification",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-12",
+      "githubAnchor": "unheaded-block-12",
+      "stableAnchor": "unheaded-block-12",
+      "title": "Unheaded block 12",
+      "startLine": 56,
+      "endLine": 70,
+      "textDigest": "b390474069d64b0572bd78c4c0e0e47c2da91a5114360b4da7eb36cfea82a3b4",
+      "sample": "1. **What to read first?** `docs/specs/reading-map.md`, then the relevant area spec.\n2. **What kind of work is this?** Check it against the area's spec and\n   `docs/backlog.md`; a ",
+      "identityFingerprint": "6aefb1fae238d8a78b7361cc040a66e5fb04ddd786e1f3f990a8ad03da84cedc",
+      "ancestry": [
+        "forgent",
+        "Definition of done (platform-foundations L5)"
+      ],
+      "text": "1. **What to read first?** `docs/specs/reading-map.md`, then the relevant area spec.\n2. **What kind of work is this?** Check it against the area's spec and\n   `docs/backlog.md`; a new product area gets a spec before it gets code.\n3. **What contract does it touch?** `docs/routing-handoff-contract.md` for\n   agent-to-agent boundaries; the area spec's Shared Entities table for\n   in-process contracts.\n4. **How much risk?** Does it change a locked law in `docs/platform-foundations.md`,\n   or existing covered behavior in the test suite? Either raises the bar.\n5. **What proof means done?** `npm test` (state + cli + runner + e2e suite) green;\n   new or changed behavior gets a matching test. Green must come from real\n   behavior: never add an env switch, flag, or test-only code branch that skips\n   checks to make tests pass; fix production code or the fixture instead.\n6. **What learning gets left behind?** A settled decision goes into\n   `docs/decisions/`; a settled spec fact goes into the relevant\n   `docs/specs/<area>.md`."
+    },
+    "fullDigest": "b390474069d64b0572bd78c4c0e0e47c2da91a5114360b4da7eb36cfea82a3b4",
+    "shownTextSHA256": "b390474069d64b0572bd78c4c0e0e47c2da91a5114360b4da7eb36cfea82a3b4"
+  }
+}
+```
+
+## Entry a-029: claim_ad994bc3d2c97fb0d69e749535454434
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_ad994bc3d2c97fb0d69e749535454434",
+    "sourceUnitDigest": "ce273268d1c631cd2401722d415ec5e2fed97fab11ed089d8f81259f80152f80",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-13 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "c4dd883ef0fa26ab86a407e188a73a12f925f0e9537b2348c8c865c033b58926",
+    "identityFingerprint": "c4dd883ef0fa26ab86a407e188a73a12f925f0e9537b2348c8c865c033b58926",
+    "claimId": "claim_ad994bc3d2c97fb0d69e749535454434",
+    "sourceAnchor": "unheaded-block-13",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "ce273268d1c631cd2401722d415ec5e2fed97fab11ed089d8f81259f80152f80",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-13",
+      "githubAnchor": "unheaded-block-13",
+      "stableAnchor": "unheaded-block-13",
+      "title": "Unheaded block 13",
+      "startLine": 74,
+      "endLine": 81,
+      "textDigest": "ce273268d1c631cd2401722d415ec5e2fed97fab11ed089d8f81259f80152f80",
+      "sample": "Keep draft scripts, logs, patches and dumps out of the repository root. Use\n`.fgos/runtime/tmp/`, falling back to `${TMPDIR:-/tmp}/fgos-work/`.\n`.githooks/pre-commit` owns the sing",
+      "identityFingerprint": "c4dd883ef0fa26ab86a407e188a73a12f925f0e9537b2348c8c865c033b58926",
+      "ancestry": [
+        "forgent",
+        "Scratch artifacts"
+      ],
+      "text": "Keep draft scripts, logs, patches and dumps out of the repository root. Use\n`.fgos/runtime/tmp/`, falling back to `${TMPDIR:-/tmp}/fgos-work/`.\n`.githooks/pre-commit` owns the single root-file allowlist and refuses new root\nfiles outside it, including linked worktrees. Legitimate root additions require\nan allowlist change in a separate commit, landed on main before the addition.\nThe hook runs only when wired via `npm run setup:hooks`; `fgos doctor` checks\nthat wiring with `main-checkout-hook-wired`. `MERGE_HEAD` skips only the root\nguard, never existing data-loss guards."
+    },
+    "fullDigest": "ce273268d1c631cd2401722d415ec5e2fed97fab11ed089d8f81259f80152f80",
+    "shownTextSHA256": "ce273268d1c631cd2401722d415ec5e2fed97fab11ed089d8f81259f80152f80"
+  }
+}
+```
+
+## Entry a-030: claim_251b389b227a62ef26b0fd3e1f0bebd9
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_251b389b227a62ef26b0fd3e1f0bebd9",
+    "sourceUnitDigest": "9babb9141d90b2e3a99f353c735db9e64679ea4be0bc12cf27432d1cd728df8f",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-14 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "68d6174b9b02bd3e5b9ef8e9b95f911a4888abd54545339bc6856b028a81da02",
+    "identityFingerprint": "68d6174b9b02bd3e5b9ef8e9b95f911a4888abd54545339bc6856b028a81da02",
+    "claimId": "claim_251b389b227a62ef26b0fd3e1f0bebd9",
+    "sourceAnchor": "unheaded-block-14",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "9babb9141d90b2e3a99f353c735db9e64679ea4be0bc12cf27432d1cd728df8f",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-14",
+      "githubAnchor": "unheaded-block-14",
+      "stableAnchor": "unheaded-block-14",
+      "title": "Unheaded block 14",
+      "startLine": 85,
+      "endLine": 91,
+      "textDigest": "9babb9141d90b2e3a99f353c735db9e64679ea4be0bc12cf27432d1cd728df8f",
+      "sample": "Rust `fgos` is the standard door for every verb. `bin/fgos.mjs` is the\n`legacy-node` payload entry, staged whole under a release's\n`components.legacyNode.root` and exec'd by the Ru",
+      "identityFingerprint": "68d6174b9b02bd3e5b9ef8e9b95f911a4888abd54545339bc6856b028a81da02",
+      "ancestry": [
+        "forgent",
+        "Legacy-Node CLI Ownership Boundary"
+      ],
+      "text": "Rust `fgos` is the standard door for every verb. `bin/fgos.mjs` is the\n`legacy-node` payload entry, staged whole under a release's\n`components.legacyNode.root` and exec'd by the Rust host at\n`components.legacyNode.entry` — never relocated or renamed in the source tree.\nThe host resolves it only through those manifest fields, never PATH, cwd or\nhardcoded locations outside the manifest. Global npm `bin.fgos` and fallback\n`node bin/fgos.mjs` are compatibility channels calling this entry directly."
+    },
+    "fullDigest": "9babb9141d90b2e3a99f353c735db9e64679ea4be0bc12cf27432d1cd728df8f",
+    "shownTextSHA256": "9babb9141d90b2e3a99f353c735db9e64679ea4be0bc12cf27432d1cd728df8f"
+  }
+}
+```
+
+## Entry a-031: claim_bb94912817abe39b4f476ea70b22d3ae
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_bb94912817abe39b4f476ea70b22d3ae",
+    "sourceUnitDigest": "1eaa0634f12da821254d772ea6bed7a0e6ecd4541de713eba0f573ab4b2c1052",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-15 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "c44506d16346f698e2b2a257e746d89512e0b7fe7bbf602f1dd3ce5da8ba2568",
+    "identityFingerprint": "c44506d16346f698e2b2a257e746d89512e0b7fe7bbf602f1dd3ce5da8ba2568",
+    "claimId": "claim_bb94912817abe39b4f476ea70b22d3ae",
+    "sourceAnchor": "unheaded-block-15",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "1eaa0634f12da821254d772ea6bed7a0e6ecd4541de713eba0f573ab4b2c1052",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-15",
+      "githubAnchor": "unheaded-block-15",
+      "stableAnchor": "unheaded-block-15",
+      "title": "Unheaded block 15",
+      "startLine": 93,
+      "endLine": 99,
+      "textDigest": "1eaa0634f12da821254d772ea6bed7a0e6ecd4541de713eba0f573ab4b2c1052",
+      "sample": "Plain `fgos` runs the activated release recorded in\n`.fgos/installation/activation.json`, not newly edited `bin/` or `src/` bytes.\nUse `npm run fgos:dev -- <verb> [args]` to run wo",
+      "identityFingerprint": "c44506d16346f698e2b2a257e746d89512e0b7fe7bbf602f1dd3ce5da8ba2568",
+      "ancestry": [
+        "forgent",
+        "Legacy-Node CLI Ownership Boundary"
+      ],
+      "text": "Plain `fgos` runs the activated release recorded in\n`.fgos/installation/activation.json`, not newly edited `bin/` or `src/` bytes.\nUse `npm run fgos:dev -- <verb> [args]` to run working-tree code through the Rust\nhost. It preserves caller cwd via `INIT_CWD`, honors `CARGO_TARGET_DIR`, and\nmaterializes confined per-invocation artifacts under `.fgos/runtime/dev-host/`,\nremoving only its own directory after the child exits. Serialize invocations\nacross worktrees only where their Cargo target is actually shared."
+    },
+    "fullDigest": "1eaa0634f12da821254d772ea6bed7a0e6ecd4541de713eba0f573ab4b2c1052",
+    "shownTextSHA256": "1eaa0634f12da821254d772ea6bed7a0e6ecd4541de713eba0f573ab4b2c1052"
+  }
+}
+```
+
+## Entry a-032: claim_01354c596b32d883dcceda730047e156
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_01354c596b32d883dcceda730047e156",
+    "sourceUnitDigest": "879d83e8c8148a4e7cdc6086a8b06d7d7093e97e9cdddb7c0db1412443574e50",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-16 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "d23d1df6cd4978077e3cf266d13f225875ed20e6e7e2565660b4b1187e0a2d84",
+    "identityFingerprint": "d23d1df6cd4978077e3cf266d13f225875ed20e6e7e2565660b4b1187e0a2d84",
+    "claimId": "claim_01354c596b32d883dcceda730047e156",
+    "sourceAnchor": "unheaded-block-16",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "879d83e8c8148a4e7cdc6086a8b06d7d7093e97e9cdddb7c0db1412443574e50",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-16",
+      "githubAnchor": "unheaded-block-16",
+      "stableAnchor": "unheaded-block-16",
+      "title": "Unheaded block 16",
+      "startLine": 101,
+      "endLine": 108,
+      "textDigest": "879d83e8c8148a4e7cdc6086a8b06d7d7093e97e9cdddb7c0db1412443574e50",
+      "sample": "`fgos doctor` check `active-release-matches-checkout` compares the owned source\ncheckout's working-tree Node payload with its activation; it does not certify\nRust freshness. Depend",
+      "identityFingerprint": "d23d1df6cd4978077e3cf266d13f225875ed20e6e7e2565660b4b1187e0a2d84",
+      "ancestry": [
+        "forgent",
+        "Legacy-Node CLI Ownership Boundary"
+      ],
+      "text": "`fgos doctor` check `active-release-matches-checkout` compares the owned source\ncheckout's working-tree Node payload with its activation; it does not certify\nRust freshness. Dependencies do not count as drift, but symlink/unsafe manifest\nentries still fail. It skips activation owned by main from a linked worktree\nand the same-checkout dev manifest. To update plain `fgos`, build/stage/activate\nthe intended tree, then verify doctor through the installed shim. Old-release\n`fgos setup` can overwrite generated render headers until that release is\nrestaged; activation never refreshes itself merely because source was edited."
+    },
+    "fullDigest": "879d83e8c8148a4e7cdc6086a8b06d7d7093e97e9cdddb7c0db1412443574e50",
+    "shownTextSHA256": "879d83e8c8148a4e7cdc6086a8b06d7d7093e97e9cdddb7c0db1412443574e50"
+  }
+}
+```
+
+## Entry a-033: claim_143633192ebdc23ebdd1b38df0ae42b0
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_143633192ebdc23ebdd1b38df0ae42b0",
+    "sourceUnitDigest": "3f149be4bf754b1ad1a12eb8d3e7a24a1db97ca4aa3cf15fd7cf3bae732b7f3f",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-17 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "1f4df04e8a093a9e4b545f4fc3b8f13f8779e11f879d4d329ed60ff33a202e11",
+    "identityFingerprint": "1f4df04e8a093a9e4b545f4fc3b8f13f8779e11f879d4d329ed60ff33a202e11",
+    "claimId": "claim_143633192ebdc23ebdd1b38df0ae42b0",
+    "sourceAnchor": "unheaded-block-17",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "3f149be4bf754b1ad1a12eb8d3e7a24a1db97ca4aa3cf15fd7cf3bae732b7f3f",
+    "claimKind": "vision",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-17",
+      "githubAnchor": "unheaded-block-17",
+      "stableAnchor": "unheaded-block-17",
+      "title": "Unheaded block 17",
+      "startLine": 112,
+      "endLine": 113,
+      "textDigest": "3f149be4bf754b1ad1a12eb8d3e7a24a1db97ca4aa3cf15fd7cf3bae732b7f3f",
+      "sample": "`docs/distribution-vision.md` sets the direction for this repo's own\ncài đặt/setup/doctor story. Before any change is done, ask:",
+      "identityFingerprint": "1f4df04e8a093a9e4b545f4fc3b8f13f8779e11f879d4d329ed60ff33a202e11",
+      "ancestry": [
+        "forgent",
+        "Install/setup/doctor gate"
+      ],
+      "text": "`docs/distribution-vision.md` sets the direction for this repo's own\ncài đặt/setup/doctor story. Before any change is done, ask:"
+    },
+    "fullDigest": "3f149be4bf754b1ad1a12eb8d3e7a24a1db97ca4aa3cf15fd7cf3bae732b7f3f",
+    "shownTextSHA256": "3f149be4bf754b1ad1a12eb8d3e7a24a1db97ca4aa3cf15fd7cf3bae732b7f3f"
+  }
+}
+```
+
+## Entry a-034: claim_423281216eb15889f63560a84ca0959a
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_423281216eb15889f63560a84ca0959a",
+    "sourceUnitDigest": "e33601b47f3590f43b695faa7647181ca8e7d5ee83cb8944bcf976ff4e801197",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-18 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "f1db613f54535e0036ed5c2f758b8e4f15e9f78fc89f3d3e30282c24507e9147",
+    "identityFingerprint": "f1db613f54535e0036ed5c2f758b8e4f15e9f78fc89f3d3e30282c24507e9147",
+    "claimId": "claim_423281216eb15889f63560a84ca0959a",
+    "sourceAnchor": "unheaded-block-18",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "e33601b47f3590f43b695faa7647181ca8e7d5ee83cb8944bcf976ff4e801197",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-18",
+      "githubAnchor": "unheaded-block-18",
+      "stableAnchor": "unheaded-block-18",
+      "title": "Unheaded block 18",
+      "startLine": 115,
+      "endLine": 128,
+      "textDigest": "e33601b47f3590f43b695faa7647181ca8e7d5ee83cb8944bcf976ff4e801197",
+      "sample": "- Does this add a config default, env var, or infra dependency (a new\n  file it expects to exist, a tool it shells out to, a directory it\n  assumes is writable)? If yes, it must re",
+      "identityFingerprint": "f1db613f54535e0036ed5c2f758b8e4f15e9f78fc89f3d3e30282c24507e9147",
+      "ancestry": [
+        "forgent",
+        "Install/setup/doctor gate"
+      ],
+      "text": "- Does this add a config default, env var, or infra dependency (a new\n  file it expects to exist, a tool it shells out to, a directory it\n  assumes is writable)? If yes, it must register into `fgos setup`'s\n  config-merge and `fgos doctor`'s check registry (`src/setup/checks.mjs`)\n  — not stand alone, undiscoverable by `doctor`.\n- Never hardcode an assumption about which install level (global vs\n  project) is active — per the vision doc, project config always\n  overwrites global, and fgOS stays aware of both without conflict.\n- If the change touches how fgOS gets installed, upgraded, or diagnosed at\n  all, read `docs/distribution-vision.md` and `docs/specs/distribution.md`\n  first — a new module gets a spec/config-registry entry before it gets\n  code, same bar as a new product area (question 2 above).\n- Does this change something a user of fgOS would see? If yes, add a line\n  to `## [Unreleased]` in `CHANGELOG.md`."
+    },
+    "fullDigest": "e33601b47f3590f43b695faa7647181ca8e7d5ee83cb8944bcf976ff4e801197",
+    "shownTextSHA256": "e33601b47f3590f43b695faa7647181ca8e7d5ee83cb8944bcf976ff4e801197"
+  }
+}
+```
+
+## Entry a-035: claim_2240f88d1d1a961cc8ce6c8517572f36
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_2240f88d1d1a961cc8ce6c8517572f36",
+    "sourceUnitDigest": "d8b0fa240f28f96e7b3f9f24704c72a898d7b0d64a37662d2179c5f0c7216a71",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-19 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "cad0dc701ee2d9490016c461844c4577a74e05715278200a6f89553950039951",
+    "identityFingerprint": "cad0dc701ee2d9490016c461844c4577a74e05715278200a6f89553950039951",
+    "claimId": "claim_2240f88d1d1a961cc8ce6c8517572f36",
+    "sourceAnchor": "unheaded-block-19",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "d8b0fa240f28f96e7b3f9f24704c72a898d7b0d64a37662d2179c5f0c7216a71",
+    "claimKind": "decision",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-19",
+      "githubAnchor": "unheaded-block-19",
+      "stableAnchor": "unheaded-block-19",
+      "title": "Unheaded block 19",
+      "startLine": 132,
+      "endLine": 133,
+      "textDigest": "d8b0fa240f28f96e7b3f9f24704c72a898d7b0d64a37662d2179c5f0c7216a71",
+      "sample": "Laws in `docs/platform-foundations.md` are fixed until their named review\nthreshold is hit. Changing one supersedes its decision ID — never edit it in place.",
+      "identityFingerprint": "cad0dc701ee2d9490016c461844c4577a74e05715278200a6f89553950039951",
+      "ancestry": [
+        "forgent",
+        "Changing a locked law"
+      ],
+      "text": "Laws in `docs/platform-foundations.md` are fixed until their named review\nthreshold is hit. Changing one supersedes its decision ID — never edit it in place."
+    },
+    "fullDigest": "d8b0fa240f28f96e7b3f9f24704c72a898d7b0d64a37662d2179c5f0c7216a71",
+    "shownTextSHA256": "d8b0fa240f28f96e7b3f9f24704c72a898d7b0d64a37662d2179c5f0c7216a71"
+  }
+}
+```
+
+## Entry a-036: claim_9651770c2d3f7530312292fe3e96176b
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_9651770c2d3f7530312292fe3e96176b",
+    "sourceUnitDigest": "babd3d9aafc706794ad0a450194ec0cc7eef902802d73a383fb4ddf3e94392e5",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-2 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "3d1392fda430780460dfe609f7d4bebbfa0f030252e2501aafc922a6df323dab",
+    "identityFingerprint": "3d1392fda430780460dfe609f7d4bebbfa0f030252e2501aafc922a6df323dab",
+    "claimId": "claim_9651770c2d3f7530312292fe3e96176b",
+    "sourceAnchor": "unheaded-block-2",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "babd3d9aafc706794ad0a450194ec0cc7eef902802d73a383fb4ddf3e94392e5",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-2",
+      "githubAnchor": "unheaded-block-2",
+      "stableAnchor": "unheaded-block-2",
+      "title": "Unheaded block 2",
+      "startLine": 5,
+      "endLine": 5,
+      "textDigest": "babd3d9aafc706794ad0a450194ec0cc7eef902802d73a383fb4ddf3e94392e5",
+      "sample": "Forgent (fgOS) is the platform layer for building and running agent applications — the infrastructure, skills, and automation that sit beneath every agent app, so developers can fo",
+      "identityFingerprint": "3d1392fda430780460dfe609f7d4bebbfa0f030252e2501aafc922a6df323dab",
+      "ancestry": [
+        "forgent"
+      ],
+      "text": "Forgent (fgOS) is the platform layer for building and running agent applications — the infrastructure, skills, and automation that sit beneath every agent app, so developers can forge new agents instead of building everything from scratch."
+    },
+    "fullDigest": "babd3d9aafc706794ad0a450194ec0cc7eef902802d73a383fb4ddf3e94392e5",
+    "shownTextSHA256": "babd3d9aafc706794ad0a450194ec0cc7eef902802d73a383fb4ddf3e94392e5"
+  }
+}
+```
+
+## Entry a-037: claim_bb0f60933b1e135c60b80e82db86625d
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_bb0f60933b1e135c60b80e82db86625d",
+    "sourceUnitDigest": "38f511a5d090b7f9fc9b928ea29af5d75e01bfe5c18e3287977d5a335e2a7fcf",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-20 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "c55032e5be8b07532df393b7d063e8b759b9c801cb118cb611059d08f021481a",
+    "identityFingerprint": "c55032e5be8b07532df393b7d063e8b759b9c801cb118cb611059d08f021481a",
+    "claimId": "claim_bb0f60933b1e135c60b80e82db86625d",
+    "sourceAnchor": "unheaded-block-20",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "38f511a5d090b7f9fc9b928ea29af5d75e01bfe5c18e3287977d5a335e2a7fcf",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-20",
+      "githubAnchor": "unheaded-block-20",
+      "stableAnchor": "unheaded-block-20",
+      "title": "Unheaded block 20",
+      "startLine": 137,
+      "endLine": 143,
+      "textDigest": "38f511a5d090b7f9fc9b928ea29af5d75e01bfe5c18e3287977d5a335e2a7fcf",
+      "sample": "Việc trở nặng không vì bản chất nó lớn mà vì thiếu và quên — tên đúng của\ntình trạng đó là tùm lum, không phải nặng. Khi thấy tùm lum trong phạm vi\nviệc đang làm, gom lại — gom tới",
+      "identityFingerprint": "c55032e5be8b07532df393b7d063e8b759b9c801cb118cb611059d08f021481a",
+      "ancestry": [
+        "forgent",
+        "RUL11 — tùm lum, không phải nặng (D-ADR0054, supersedes D-ADR0036, docs/specs/platform-foundations.md)"
+      ],
+      "text": "Việc trở nặng không vì bản chất nó lớn mà vì thiếu và quên — tên đúng của\ntình trạng đó là tùm lum, không phải nặng. Khi thấy tùm lum trong phạm vi\nviệc đang làm, gom lại — gom tới khi hết; quy mô không bao giờ là lý do miễn\ntrừ. Tùm lum thấy ngoài phạm vi thì ghi thành item riêng; gom mà phải xây\ncông cụ mới là một câu hỏi quyết định. Đích của mọi lần gom\nlà một hình dạng duy nhất: ranh giới rõ, contract tường minh, đổi và biến\nhình dễ, không chắp vá."
+    },
+    "fullDigest": "38f511a5d090b7f9fc9b928ea29af5d75e01bfe5c18e3287977d5a335e2a7fcf",
+    "shownTextSHA256": "38f511a5d090b7f9fc9b928ea29af5d75e01bfe5c18e3287977d5a335e2a7fcf"
+  }
+}
+```
+
+## Entry a-038: claim_442a4d4d948d6535b15da70f73519395
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_442a4d4d948d6535b15da70f73519395",
+    "sourceUnitDigest": "48a48fccb2f49e68118ccf48cd466cc2fda6ecfd606caeaac32f64a387c72841",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-21 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "58845dac9fa56af575c4751d6eb9bb4917924c7aae974a87177386224194eebb",
+    "identityFingerprint": "58845dac9fa56af575c4751d6eb9bb4917924c7aae974a87177386224194eebb",
+    "claimId": "claim_442a4d4d948d6535b15da70f73519395",
+    "sourceAnchor": "unheaded-block-21",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "48a48fccb2f49e68118ccf48cd466cc2fda6ecfd606caeaac32f64a387c72841",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-21",
+      "githubAnchor": "unheaded-block-21",
+      "stableAnchor": "unheaded-block-21",
+      "title": "Unheaded block 21",
+      "startLine": 145,
+      "endLine": 145,
+      "textDigest": "48a48fccb2f49e68118ccf48cd466cc2fda6ecfd606caeaac32f64a387c72841",
+      "sample": "khong phai no nang ma no tum lum",
+      "identityFingerprint": "58845dac9fa56af575c4751d6eb9bb4917924c7aae974a87177386224194eebb",
+      "ancestry": [
+        "forgent",
+        "RUL11 — tùm lum, không phải nặng (D-ADR0054, supersedes D-ADR0036, docs/specs/platform-foundations.md)"
+      ],
+      "text": "khong phai no nang ma no tum lum"
+    },
+    "fullDigest": "48a48fccb2f49e68118ccf48cd466cc2fda6ecfd606caeaac32f64a387c72841",
+    "shownTextSHA256": "48a48fccb2f49e68118ccf48cd466cc2fda6ecfd606caeaac32f64a387c72841"
+  }
+}
+```
+
+## Entry a-039: claim_bfd24ffa5a43c26830bb9771c04de7f1
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_bfd24ffa5a43c26830bb9771c04de7f1",
+    "sourceUnitDigest": "b093c6fb2a5d0ad347222f5cd68b1b44614799ac24ed54b60a29134c5f7ddfb8",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-22 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "32131ae0ab24fa7ab8ccc53bf267eee749d6b8ce58bd17d7f0b960d4e21c35ae",
+    "identityFingerprint": "32131ae0ab24fa7ab8ccc53bf267eee749d6b8ce58bd17d7f0b960d4e21c35ae",
+    "claimId": "claim_bfd24ffa5a43c26830bb9771c04de7f1",
+    "sourceAnchor": "unheaded-block-22",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "b093c6fb2a5d0ad347222f5cd68b1b44614799ac24ed54b60a29134c5f7ddfb8",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-22",
+      "githubAnchor": "unheaded-block-22",
+      "stableAnchor": "unheaded-block-22",
+      "title": "Unheaded block 22",
+      "startLine": 149,
+      "endLine": 149,
+      "textDigest": "b093c6fb2a5d0ad347222f5cd68b1b44614799ac24ed54b60a29134c5f7ddfb8",
+      "sample": "`fgos run` is the primary door for executing new work in the execution core.",
+      "identityFingerprint": "32131ae0ab24fa7ab8ccc53bf267eee749d6b8ce58bd17d7f0b960d4e21c35ae",
+      "ancestry": [
+        "forgent",
+        "Dispatch — routing work to an executor"
+      ],
+      "text": "`fgos run` is the primary door for executing new work in the execution core."
+    },
+    "fullDigest": "b093c6fb2a5d0ad347222f5cd68b1b44614799ac24ed54b60a29134c5f7ddfb8",
+    "shownTextSHA256": "b093c6fb2a5d0ad347222f5cd68b1b44614799ac24ed54b60a29134c5f7ddfb8"
+  }
+}
+```
+
+## Entry a-040: claim_33713bd504d89af5cfb1eb5d6fa16d01
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_33713bd504d89af5cfb1eb5d6fa16d01",
+    "sourceUnitDigest": "88710807df8d6f060e3bd95f8ead6bdab4cca68dd6aed10fad45ebd46ac64333",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-23 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "f835ee42aee59e3f916f5f10376a6e0fbde1b9d8e35407abaf21a7632a89ebdb",
+    "identityFingerprint": "f835ee42aee59e3f916f5f10376a6e0fbde1b9d8e35407abaf21a7632a89ebdb",
+    "claimId": "claim_33713bd504d89af5cfb1eb5d6fa16d01",
+    "sourceAnchor": "unheaded-block-23",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "88710807df8d6f060e3bd95f8ead6bdab4cca68dd6aed10fad45ebd46ac64333",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-23",
+      "githubAnchor": "unheaded-block-23",
+      "stableAnchor": "unheaded-block-23",
+      "title": "Unheaded block 23",
+      "startLine": 151,
+      "endLine": 151,
+      "textDigest": "88710807df8d6f060e3bd95f8ead6bdab4cca68dd6aed10fad45ebd46ac64333",
+      "sample": "**Two doors, one runUnit — the preferred path for new work.** One task: `fgos run \"<prompt>\" [--provider <id>] [--writes <paths> --worktree <path>]` builds a Unit from the prompt (",
+      "identityFingerprint": "f835ee42aee59e3f916f5f10376a6e0fbde1b9d8e35407abaf21a7632a89ebdb",
+      "ancestry": [
+        "forgent",
+        "Dispatch — routing work to an executor"
+      ],
+      "text": "**Two doors, one runUnit — the preferred path for new work.** One task: `fgos run \"<prompt>\" [--provider <id>] [--writes <paths> --worktree <path>]` builds a Unit from the prompt (read-only without `--writes`; `--writes` needs a linked worktree; `--provider` is a soft preference, not a pin). Planned work: `fgos workflow start <preset>|--units <file>`, one step per Unit. Both bind through `bind()`; the runner commits only the Unit's declared `writes` after a passing round, and the worker never runs `git add`/`git commit`. These two doors are the only ones that execute work; `fgos dispatch` keeps only the lower-level reads (`decide`, `inspect`, `reconcile`, `probe-account`)."
+    },
+    "fullDigest": "88710807df8d6f060e3bd95f8ead6bdab4cca68dd6aed10fad45ebd46ac64333",
+    "shownTextSHA256": "88710807df8d6f060e3bd95f8ead6bdab4cca68dd6aed10fad45ebd46ac64333"
+  }
+}
+```
+
+## Entry a-041: claim_7d42588d114718c42e806e4070f1a22c
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_7d42588d114718c42e806e4070f1a22c",
+    "sourceUnitDigest": "22f293adbd476c3d765f9b9a328ce2ca00f6acb474d5817225c0cc1c2da49ace",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-25 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "625f4030ba1ea8e1d56a46b00a5b59f507074f02edaea2b7c91cb2addaee929d",
+    "identityFingerprint": "625f4030ba1ea8e1d56a46b00a5b59f507074f02edaea2b7c91cb2addaee929d",
+    "claimId": "claim_7d42588d114718c42e806e4070f1a22c",
+    "sourceAnchor": "unheaded-block-25",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "22f293adbd476c3d765f9b9a328ce2ca00f6acb474d5817225c0cc1c2da49ace",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-25",
+      "githubAnchor": "unheaded-block-25",
+      "stableAnchor": "unheaded-block-25",
+      "title": "Unheaded block 25",
+      "startLine": 155,
+      "endLine": 155,
+      "textDigest": "22f293adbd476c3d765f9b9a328ce2ca00f6acb474d5817225c0cc1c2da49ace",
+      "sample": "**Before dispatching any task out of the current turn — a work item, a registered executor, an ad-hoc task, or your own direct Agent/Task-tool call — run `fgos dispatch decide` (or",
+      "identityFingerprint": "625f4030ba1ea8e1d56a46b00a5b59f507074f02edaea2b7c91cb2addaee929d",
+      "ancestry": [
+        "forgent",
+        "Dispatch — routing work to an executor"
+      ],
+      "text": "**Before dispatching any task out of the current turn — a work item, a registered executor, an ad-hoc task, or your own direct Agent/Task-tool call — run `fgos dispatch decide` (or compatibility alias `node src/runner/dispatch.mjs decide`; `--work` only through `fgos dispatch decide`) first. Never decide the mechanism yourself.** A `PreToolUse` hook enforces this on Agent/Task-tool calls: it delegates to `bind()` and refuses the call when the answer comes back as anything other than `in-process`."
+    },
+    "fullDigest": "22f293adbd476c3d765f9b9a328ce2ca00f6acb474d5817225c0cc1c2da49ace",
+    "shownTextSHA256": "22f293adbd476c3d765f9b9a328ce2ca00f6acb474d5817225c0cc1c2da49ace"
+  }
+}
+```
+
+## Entry a-042: claim_2e415bdb6f89215b30a9306f2b525bf7
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_2e415bdb6f89215b30a9306f2b525bf7",
+    "sourceUnitDigest": "19dace9440953c3a6867e37dd8cc45293a339d4a4fae79d7ff7c870461afb2d3",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-26 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "3af6c481b85cf5330944b67a068233bbce008b9eecd028a58868db3a3a2f6135",
+    "identityFingerprint": "3af6c481b85cf5330944b67a068233bbce008b9eecd028a58868db3a3a2f6135",
+    "claimId": "claim_2e415bdb6f89215b30a9306f2b525bf7",
+    "sourceAnchor": "unheaded-block-26",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "19dace9440953c3a6867e37dd8cc45293a339d4a4fae79d7ff7c870461afb2d3",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-26",
+      "githubAnchor": "unheaded-block-26",
+      "stableAnchor": "unheaded-block-26",
+      "title": "Unheaded block 26",
+      "startLine": 157,
+      "endLine": 157,
+      "textDigest": "19dace9440953c3a6867e37dd8cc45293a339d4a4fae79d7ff7c870461afb2d3",
+      "sample": "Four ways to call `decide`, for four different situations:",
+      "identityFingerprint": "3af6c481b85cf5330944b67a068233bbce008b9eecd028a58868db3a3a2f6135",
+      "ancestry": [
+        "forgent",
+        "Dispatch — routing work to an executor"
+      ],
+      "text": "Four ways to call `decide`, for four different situations:"
+    },
+    "fullDigest": "19dace9440953c3a6867e37dd8cc45293a339d4a4fae79d7ff7c870461afb2d3",
+    "shownTextSHA256": "19dace9440953c3a6867e37dd8cc45293a339d4a4fae79d7ff7c870461afb2d3"
+  }
+}
+```
+
+## Entry a-043: claim_351e6c4a4690c52f77aee859728d1140
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_351e6c4a4690c52f77aee859728d1140",
+    "sourceUnitDigest": "227ca5a5e89112140bd9827bb072840016509dd62d8868ad83d5feccd5715906",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-27 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "c8cebad809cd76a514660363a0b440cb9f9b4dbbcdbabe6d74e83d5fcc239369",
+    "identityFingerprint": "c8cebad809cd76a514660363a0b440cb9f9b4dbbcdbabe6d74e83d5fcc239369",
+    "claimId": "claim_351e6c4a4690c52f77aee859728d1140",
+    "sourceAnchor": "unheaded-block-27",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "227ca5a5e89112140bd9827bb072840016509dd62d8868ad83d5feccd5715906",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-27",
+      "githubAnchor": "unheaded-block-27",
+      "stableAnchor": "unheaded-block-27",
+      "title": "Unheaded block 27",
+      "startLine": 159,
+      "endLine": 162,
+      "textDigest": "227ca5a5e89112140bd9827bb072840016509dd62d8868ad83d5feccd5715906",
+      "sample": "- `decide <executorId>` — you already know the exact executor name (e.g. `judge-discovery`).\n- `decide --for <purpose>` — you know what JOB you need done (e.g. `judge`), but not wh",
+      "identityFingerprint": "c8cebad809cd76a514660363a0b440cb9f9b4dbbcdbabe6d74e83d5fcc239369",
+      "ancestry": [
+        "forgent",
+        "Dispatch — routing work to an executor"
+      ],
+      "text": "- `decide <executorId>` — you already know the exact executor name (e.g. `judge-discovery`).\n- `decide --for <purpose>` — you know what JOB you need done (e.g. `judge`), but not which executor serves it.\n- `decide --work <id> [--stage <stage>]` — you have a real work item and want it dispatched.\n- `decide --for <label> --needs-soul` — you are about to fire an Agent/Task tool yourself, with no executor or work item to name."
+    },
+    "fullDigest": "227ca5a5e89112140bd9827bb072840016509dd62d8868ad83d5feccd5715906",
+    "shownTextSHA256": "227ca5a5e89112140bd9827bb072840016509dd62d8868ad83d5feccd5715906"
+  }
+}
+```
+
+## Entry a-044: claim_c43cebec858362eb7b73975080dba714
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_c43cebec858362eb7b73975080dba714",
+    "sourceUnitDigest": "d932c8e6777b05420fd75005a2aea166004ff704dab07cafd9a35695b3750940",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-28 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "bd8bd2692f026c8b10fc6009af3b67974948e083ca17847aefa3700ebf5302ab",
+    "identityFingerprint": "bd8bd2692f026c8b10fc6009af3b67974948e083ca17847aefa3700ebf5302ab",
+    "claimId": "claim_c43cebec858362eb7b73975080dba714",
+    "sourceAnchor": "unheaded-block-28",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "d932c8e6777b05420fd75005a2aea166004ff704dab07cafd9a35695b3750940",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-28",
+      "githubAnchor": "unheaded-block-28",
+      "stableAnchor": "unheaded-block-28",
+      "title": "Unheaded block 28",
+      "startLine": 164,
+      "endLine": 164,
+      "textDigest": "d932c8e6777b05420fd75005a2aea166004ff704dab07cafd9a35695b3750940",
+      "sample": "Add `--has-live-task-access` when you already have the Agent/Task tool in your own tool manifest. This is always your own self-declaration — never probed from the environment, neve",
+      "identityFingerprint": "bd8bd2692f026c8b10fc6009af3b67974948e083ca17847aefa3700ebf5302ab",
+      "ancestry": [
+        "forgent",
+        "Dispatch — routing work to an executor"
+      ],
+      "text": "Add `--has-live-task-access` when you already have the Agent/Task tool in your own tool manifest. This is always your own self-declaration — never probed from the environment, never guessed."
+    },
+    "fullDigest": "d932c8e6777b05420fd75005a2aea166004ff704dab07cafd9a35695b3750940",
+    "shownTextSHA256": "d932c8e6777b05420fd75005a2aea166004ff704dab07cafd9a35695b3750940"
+  }
+}
+```
+
+## Entry a-045: claim_664343a3da26204b9baf654b1ca4cb58
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_664343a3da26204b9baf654b1ca4cb58",
+    "sourceUnitDigest": "53d8b06d46db5384e659a463daf9bd99ef4cfb443fc6ef9c8d236b22bb8a7686",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-29 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "2500ad7016fa51069d642e93439d66c25560d763a57d9232d7860f733ed44daf",
+    "identityFingerprint": "2500ad7016fa51069d642e93439d66c25560d763a57d9232d7860f733ed44daf",
+    "claimId": "claim_664343a3da26204b9baf654b1ca4cb58",
+    "sourceAnchor": "unheaded-block-29",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "53d8b06d46db5384e659a463daf9bd99ef4cfb443fc6ef9c8d236b22bb8a7686",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-29",
+      "githubAnchor": "unheaded-block-29",
+      "stableAnchor": "unheaded-block-29",
+      "title": "Unheaded block 29",
+      "startLine": 166,
+      "endLine": 166,
+      "textDigest": "53d8b06d46db5384e659a463daf9bd99ef4cfb443fc6ef9c8d236b22bb8a7686",
+      "sample": "Three possible `mechanism` results, each needing a different response:",
+      "identityFingerprint": "2500ad7016fa51069d642e93439d66c25560d763a57d9232d7860f733ed44daf",
+      "ancestry": [
+        "forgent",
+        "Dispatch — routing work to an executor"
+      ],
+      "text": "Three possible `mechanism` results, each needing a different response:"
+    },
+    "fullDigest": "53d8b06d46db5384e659a463daf9bd99ef4cfb443fc6ef9c8d236b22bb8a7686",
+    "shownTextSHA256": "53d8b06d46db5384e659a463daf9bd99ef4cfb443fc6ef9c8d236b22bb8a7686"
+  }
+}
+```
+
+## Entry a-046: claim_2d6f7d92e02f721eb5133494e12686e0
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_2d6f7d92e02f721eb5133494e12686e0",
+    "sourceUnitDigest": "d8043519ce093af41d14fb81d784bc4e63eb1718c0201f2e28299b1649b588b5",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-3 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "30a2996cd78d52f99f29835f0112ecd47f019b8afc568fd4131577d291164c4f",
+    "identityFingerprint": "30a2996cd78d52f99f29835f0112ecd47f019b8afc568fd4131577d291164c4f",
+    "claimId": "claim_2d6f7d92e02f721eb5133494e12686e0",
+    "sourceAnchor": "unheaded-block-3",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "d8043519ce093af41d14fb81d784bc4e63eb1718c0201f2e28299b1649b588b5",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-3",
+      "githubAnchor": "unheaded-block-3",
+      "stableAnchor": "unheaded-block-3",
+      "title": "Unheaded block 3",
+      "startLine": 7,
+      "endLine": 14,
+      "textDigest": "d8043519ce093af41d14fb81d784bc4e63eb1718c0201f2e28299b1649b588b5",
+      "sample": "- README.md — product description + documentation index\n- docs/platform-foundations.md — L1-L8 locked design laws; L5 is this repo's definition of done (six questions, below)\n- doc",
+      "identityFingerprint": "30a2996cd78d52f99f29835f0112ecd47f019b8afc568fd4131577d291164c4f",
+      "ancestry": [
+        "forgent"
+      ],
+      "text": "- README.md — product description + documentation index\n- docs/platform-foundations.md — L1-L8 locked design laws; L5 is this repo's definition of done (six questions, below)\n- docs/specs/system-overview.md — area map, shared entities, cross-area flows\n- docs/specs/reading-map.md — where every doc and source path in this repo lives\n- docs/backlog.md — product backlog (PBI rows: proposed / in-flight / done)\n- docs/routing-handoff-contract.md — agent-to-agent handoff contract + trust boundary\n- docs/decisions/index.md — generated projection of platform/repo-wide decisions (`fgos decision-index`); narrative lives in docs/specs/<area>.md's own \"Lịch sử quyết định\" sections (tsk-1lv-4)\n- domains/<domain>/AGENTS.md — domain-specific doctrine (e.g. domains/coding/AGENTS.md for fgos-coding-* workflows), read dynamically by fgos-routing"
+    },
+    "fullDigest": "d8043519ce093af41d14fb81d784bc4e63eb1718c0201f2e28299b1649b588b5",
+    "shownTextSHA256": "d8043519ce093af41d14fb81d784bc4e63eb1718c0201f2e28299b1649b588b5"
+  }
+}
+```
+
+## Entry a-047: claim_25243986083e5e07c7bfd524504fb054
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_25243986083e5e07c7bfd524504fb054",
+    "sourceUnitDigest": "6617933a8600b16d505f88c3484e3d98d692c62896c674f5f7fc0f2fc550cc3a",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-30 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "06e5d2f155fd144e5e394c6182e72d48ea04f8db04da33afbfd8d5b607d64928",
+    "identityFingerprint": "06e5d2f155fd144e5e394c6182e72d48ea04f8db04da33afbfd8d5b607d64928",
+    "claimId": "claim_25243986083e5e07c7bfd524504fb054",
+    "sourceAnchor": "unheaded-block-30",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "6617933a8600b16d505f88c3484e3d98d692c62896c674f5f7fc0f2fc550cc3a",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-30",
+      "githubAnchor": "unheaded-block-30",
+      "stableAnchor": "unheaded-block-30",
+      "title": "Unheaded block 30",
+      "startLine": 168,
+      "endLine": 170,
+      "textDigest": "6617933a8600b16d505f88c3484e3d98d692c62896c674f5f7fc0f2fc550cc3a",
+      "sample": "- **`\"unavailable\"`** — nothing serves this. NOT an error: do it inline yourself, and report nothing.\n- **`\"in-process\"`** — call it yourself, with your own live capability: pass t",
+      "identityFingerprint": "06e5d2f155fd144e5e394c6182e72d48ea04f8db04da33afbfd8d5b607d64928",
+      "ancestry": [
+        "forgent",
+        "Dispatch — routing work to an executor"
+      ],
+      "text": "- **`\"unavailable\"`** — nothing serves this. NOT an error: do it inline yourself, and report nothing.\n- **`\"in-process\"`** — call it yourself, with your own live capability: pass the returned agentType to your Agent/Task tool, or call the returned mcpTool directly. Dispatch cannot do this for you — it has neither an Agent/Task tool nor an MCP client of its own. When neither field is returned, use whichever agent type you would have used by default.\n- **`\"out-of-process\"`** — run `fgos run \"<prompt>\" --provider <executorId> --capability <purpose> [--writes <paths> --worktree <linked-worktree>]` (or `fgos run --unit <file>`), passing the same capability `decide` was asked for (left out, it defaults to the writing capability `execute`). `--provider` takes agent executors only: when the decided executor is a `kind: \"tool\"` executor, `fgos run` refuses it, so call that tool directly instead. Never run the resolved command yourself through Bash: `fgos run` binds, runs and settles the Unit and records its provenance under `.fgos/assignments/<unitRunId>/`, so there is nothing to log by hand. With `--writes` the runner commits only those paths after a passing round; with `--json` read the result at `data.results[-1].runResult.agentClaim.summary` and `data.results[-1].commit`."
+    },
+    "fullDigest": "6617933a8600b16d505f88c3484e3d98d692c62896c674f5f7fc0f2fc550cc3a",
+    "shownTextSHA256": "6617933a8600b16d505f88c3484e3d98d692c62896c674f5f7fc0f2fc550cc3a"
+  }
+}
+```
+
+## Entry a-048: claim_1c85e6258b0455d9b44d738f833e1bb9
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_1c85e6258b0455d9b44d738f833e1bb9",
+    "sourceUnitDigest": "5c6ae58482c007eee6f3544b2a64bc96a8d552c66ffd091912d420004312f020",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-31 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "36f9cfda82b5d55a787b61051920caace74fe341bbb8fc15c02d512ad7c6392f",
+    "identityFingerprint": "36f9cfda82b5d55a787b61051920caace74fe341bbb8fc15c02d512ad7c6392f",
+    "claimId": "claim_1c85e6258b0455d9b44d738f833e1bb9",
+    "sourceAnchor": "unheaded-block-31",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "5c6ae58482c007eee6f3544b2a64bc96a8d552c66ffd091912d420004312f020",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-31",
+      "githubAnchor": "unheaded-block-31",
+      "stableAnchor": "unheaded-block-31",
+      "title": "Unheaded block 31",
+      "startLine": 172,
+      "endLine": 173,
+      "textDigest": "5c6ae58482c007eee6f3544b2a64bc96a8d552c66ffd091912d420004312f020",
+      "sample": "Every result also carries `configured: true|false`, additive `reasonCodes: [...]`, and optional `blockedReason` (e.g. when blocked by governance policy) — `false` means nothing is ",
+      "identityFingerprint": "36f9cfda82b5d55a787b61051920caace74fe341bbb8fc15c02d512ad7c6392f",
+      "ancestry": [
+        "forgent",
+        "Dispatch — routing work to an executor"
+      ],
+      "text": "Every result also carries `configured: true|false`, additive `reasonCodes: [...]`, and optional `blockedReason` (e.g. when blocked by governance policy) — `false` means nothing is configured for that name or job, and the answer came from the default.\nA skill that dispatches should not re-derive any of this. Reference `../_shared/executor-dispatch-fallback.md` from the skill; its canonical source is `core/skills/_shared/executor-dispatch-fallback.md`. `.agents/skills/` and `plugins/fgOS/skills/` are generated render surfaces carrying source headers, rebuilt with `npm run build:skills`; never edit them by hand. For fgOS thin wrappers, `.claude/skills` contains generated wrappers only; it has no `_shared` directory of its own."
+    },
+    "fullDigest": "5c6ae58482c007eee6f3544b2a64bc96a8d552c66ffd091912d420004312f020",
+    "shownTextSHA256": "5c6ae58482c007eee6f3544b2a64bc96a8d552c66ffd091912d420004312f020"
+  }
+}
+```
+
+## Entry a-049: claim_1e668e7697680b80953d4a1bc8bd65e4
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_1e668e7697680b80953d4a1bc8bd65e4",
+    "sourceUnitDigest": "ef5cbba01528872900e82f37785833b107cd0e4ee5d95379c8e9cae8a6f1a90c",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-32 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "dac441c5b82c994c40baff041d438bbd38846691f0bb8dd3098f64b1f4168bde",
+    "identityFingerprint": "dac441c5b82c994c40baff041d438bbd38846691f0bb8dd3098f64b1f4168bde",
+    "claimId": "claim_1e668e7697680b80953d4a1bc8bd65e4",
+    "sourceAnchor": "unheaded-block-32",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "ef5cbba01528872900e82f37785833b107cd0e4ee5d95379c8e9cae8a6f1a90c",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-32",
+      "githubAnchor": "unheaded-block-32",
+      "stableAnchor": "unheaded-block-32",
+      "title": "Unheaded block 32",
+      "startLine": 177,
+      "endLine": 179,
+      "textDigest": "ef5cbba01528872900e82f37785833b107cd0e4ee5d95379c8e9cae8a6f1a90c",
+      "sample": "**If a task needs the fgos gateway (REST API + web dashboard, binary `fgos-gateway` built from `apps/fgos-gateway`) running, run `fgos gateway start` — never a hand-rolled `cargo r",
+      "identityFingerprint": "dac441c5b82c994c40baff041d438bbd38846691f0bb8dd3098f64b1f4168bde",
+      "ancestry": [
+        "forgent",
+        "Starting the fgos gateway — one door, never a raw process"
+      ],
+      "text": "**If a task needs the fgos gateway (REST API + web dashboard, binary `fgos-gateway` built from `apps/fgos-gateway`) running, run `fgos gateway start` — never a hand-rolled `cargo run`/`nohup`/`tmux`/systemd invocation.** (tsk-31v) This is the one place that builds the release binary and spawns it detached, so the process outlives the CLI call. `fgos gateway status` reports real liveness plus an actual `/v1/contract` reachability check; `fgos gateway stop` sends SIGTERM and clears the registry. The gateway's own MCP surface (`search`/`execute`, `apps/fgos-gateway/src/mcp.rs`) is mounted on this SAME process — it cannot bootstrap itself, so starting the gateway is always a `fgos` CLI call, never an MCP tool call.\n\n<!-- mdview:START -->"
+    },
+    "fullDigest": "ef5cbba01528872900e82f37785833b107cd0e4ee5d95379c8e9cae8a6f1a90c",
+    "shownTextSHA256": "ef5cbba01528872900e82f37785833b107cd0e4ee5d95379c8e9cae8a6f1a90c"
+  }
+}
+```
+
+## Entry a-050: claim_ae5e7954251083afc5130d73333ef771
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_ae5e7954251083afc5130d73333ef771",
+    "sourceUnitDigest": "42d278bba4a7ce9c2f7ff755227feb14483587d3ace2b687a5c732999eb053bc",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-33 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "767dce734927611abb1a8072262d051f78f233901d809a55cbfa9e4f895da39e",
+    "identityFingerprint": "767dce734927611abb1a8072262d051f78f233901d809a55cbfa9e4f895da39e",
+    "claimId": "claim_ae5e7954251083afc5130d73333ef771",
+    "sourceAnchor": "unheaded-block-33",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "42d278bba4a7ce9c2f7ff755227feb14483587d3ace2b687a5c732999eb053bc",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-33",
+      "githubAnchor": "unheaded-block-33",
+      "stableAnchor": "unheaded-block-33",
+      "title": "Unheaded block 33",
+      "startLine": 182,
+      "endLine": 183,
+      "textDigest": "42d278bba4a7ce9c2f7ff755227feb14483587d3ace2b687a5c732999eb053bc",
+      "sample": "After creating or updating any markdown file, make it viewable in ONE call —\nno project registration step needed:",
+      "identityFingerprint": "767dce734927611abb1a8072262d051f78f233901d809a55cbfa9e4f895da39e",
+      "ancestry": [
+        "forgent",
+        "Documentation Viewing (MDView)"
+      ],
+      "text": "After creating or updating any markdown file, make it viewable in ONE call —\nno project registration step needed:"
+    },
+    "fullDigest": "42d278bba4a7ce9c2f7ff755227feb14483587d3ace2b687a5c732999eb053bc",
+    "shownTextSHA256": "42d278bba4a7ce9c2f7ff755227feb14483587d3ace2b687a5c732999eb053bc"
+  }
+}
+```
+
+## Entry a-051: claim_6a2cb3a88c1fb4c7faf143fa5ec076f3
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_6a2cb3a88c1fb4c7faf143fa5ec076f3",
+    "sourceUnitDigest": "c45eed179f4de74f88ec92f86a5647eb5e6625d60cb844671ac83b3f0d1c6694",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-34 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "129d2af46c1244a7331ebb168b0ef6e9ff7663a084dee39d54bf881f2dbf5a7b",
+    "identityFingerprint": "129d2af46c1244a7331ebb168b0ef6e9ff7663a084dee39d54bf881f2dbf5a7b",
+    "claimId": "claim_6a2cb3a88c1fb4c7faf143fa5ec076f3",
+    "sourceAnchor": "unheaded-block-34",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "c45eed179f4de74f88ec92f86a5647eb5e6625d60cb844671ac83b3f0d1c6694",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-34",
+      "githubAnchor": "unheaded-block-34",
+      "stableAnchor": "unheaded-block-34",
+      "title": "Unheaded block 34",
+      "startLine": 187,
+      "endLine": 187,
+      "textDigest": "c45eed179f4de74f88ec92f86a5647eb5e6625d60cb844671ac83b3f0d1c6694",
+      "sample": "Call `mdview_view_file` with:",
+      "identityFingerprint": "129d2af46c1244a7331ebb168b0ef6e9ff7663a084dee39d54bf881f2dbf5a7b",
+      "ancestry": [
+        "forgent",
+        "Documentation Viewing (MDView)",
+        "Using MCP (preferred)"
+      ],
+      "text": "Call `mdview_view_file` with:"
+    },
+    "fullDigest": "c45eed179f4de74f88ec92f86a5647eb5e6625d60cb844671ac83b3f0d1c6694",
+    "shownTextSHA256": "c45eed179f4de74f88ec92f86a5647eb5e6625d60cb844671ac83b3f0d1c6694"
+  }
+}
+```
+
+## Entry a-052: claim_d18c939cc9436e830dae9214808c21ae
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_d18c939cc9436e830dae9214808c21ae",
+    "sourceUnitDigest": "9283c37aa6e87094b10f57541497888b092b13116846386cfaf2cdab0e8cae4d",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-35 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "b0870e4f3c89405386e3abed54c284c5a54aa30d57417406bbcfb30c9a19566c",
+    "identityFingerprint": "b0870e4f3c89405386e3abed54c284c5a54aa30d57417406bbcfb30c9a19566c",
+    "claimId": "claim_d18c939cc9436e830dae9214808c21ae",
+    "sourceAnchor": "unheaded-block-35",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "9283c37aa6e87094b10f57541497888b092b13116846386cfaf2cdab0e8cae4d",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-35",
+      "githubAnchor": "unheaded-block-35",
+      "stableAnchor": "unheaded-block-35",
+      "title": "Unheaded block 35",
+      "startLine": 189,
+      "endLine": 190,
+      "textDigest": "9283c37aa6e87094b10f57541497888b092b13116846386cfaf2cdab0e8cae4d",
+      "sample": "- `project_root`: absolute path to the project root\n- `relative_path`: the file path relative to that root",
+      "identityFingerprint": "b0870e4f3c89405386e3abed54c284c5a54aa30d57417406bbcfb30c9a19566c",
+      "ancestry": [
+        "forgent",
+        "Documentation Viewing (MDView)",
+        "Using MCP (preferred)"
+      ],
+      "text": "- `project_root`: absolute path to the project root\n- `relative_path`: the file path relative to that root"
+    },
+    "fullDigest": "9283c37aa6e87094b10f57541497888b092b13116846386cfaf2cdab0e8cae4d",
+    "shownTextSHA256": "9283c37aa6e87094b10f57541497888b092b13116846386cfaf2cdab0e8cae4d"
+  }
+}
+```
+
+## Entry a-053: claim_74542e8562e9dd16128fadd8a2dbfaca
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_74542e8562e9dd16128fadd8a2dbfaca",
+    "sourceUnitDigest": "e0bf1a3052c0f3659d2cac6267fcf556c467957bb4de49a27962fa353ec8aec3",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-36 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "e354eba5c22b7204a004ad6a559521216737fcc8287e0314181c6d7851448974",
+    "identityFingerprint": "e354eba5c22b7204a004ad6a559521216737fcc8287e0314181c6d7851448974",
+    "claimId": "claim_74542e8562e9dd16128fadd8a2dbfaca",
+    "sourceAnchor": "unheaded-block-36",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "e0bf1a3052c0f3659d2cac6267fcf556c467957bb4de49a27962fa353ec8aec3",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-36",
+      "githubAnchor": "unheaded-block-36",
+      "stableAnchor": "unheaded-block-36",
+      "title": "Unheaded block 36",
+      "startLine": 192,
+      "endLine": 194,
+      "textDigest": "e0bf1a3052c0f3659d2cac6267fcf556c467957bb4de49a27962fa353ec8aec3",
+      "sample": "It returns a browser `url`. Tell the user: \"You can view this at: `<url>`\".\nThe server auto-registers the project on first use and indexes the file\nimmediately.",
+      "identityFingerprint": "e354eba5c22b7204a004ad6a559521216737fcc8287e0314181c6d7851448974",
+      "ancestry": [
+        "forgent",
+        "Documentation Viewing (MDView)",
+        "Using MCP (preferred)"
+      ],
+      "text": "It returns a browser `url`. Tell the user: \"You can view this at: `<url>`\".\nThe server auto-registers the project on first use and indexes the file\nimmediately."
+    },
+    "fullDigest": "e0bf1a3052c0f3659d2cac6267fcf556c467957bb4de49a27962fa353ec8aec3",
+    "shownTextSHA256": "e0bf1a3052c0f3659d2cac6267fcf556c467957bb4de49a27962fa353ec8aec3"
+  }
+}
+```
+
+## Entry a-054: claim_351eb1f4f67c8aaee59631dad24f99d8
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_351eb1f4f67c8aaee59631dad24f99d8",
+    "sourceUnitDigest": "2ce479d07da3c54df383f1e0441adf783699b2e90e56b9fe6c4e6b56777a7af0",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-37 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "fbc2f00290b92cfee3c2ba0ab087a4dd8777024bc804524d830d423f77bac29a",
+    "identityFingerprint": "fbc2f00290b92cfee3c2ba0ab087a4dd8777024bc804524d830d423f77bac29a",
+    "claimId": "claim_351eb1f4f67c8aaee59631dad24f99d8",
+    "sourceAnchor": "unheaded-block-37",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "2ce479d07da3c54df383f1e0441adf783699b2e90e56b9fe6c4e6b56777a7af0",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-37",
+      "githubAnchor": "unheaded-block-37",
+      "stableAnchor": "unheaded-block-37",
+      "title": "Unheaded block 37",
+      "startLine": 198,
+      "endLine": 200,
+      "textDigest": "2ce479d07da3c54df383f1e0441adf783699b2e90e56b9fe6c4e6b56777a7af0",
+      "sample": "```sh\nmdview open <absolute-path-to-file.md>\n```",
+      "identityFingerprint": "fbc2f00290b92cfee3c2ba0ab087a4dd8777024bc804524d830d423f77bac29a",
+      "ancestry": [
+        "forgent",
+        "Documentation Viewing (MDView)",
+        "Using CLI fallback"
+      ],
+      "text": "```sh\nmdview open <absolute-path-to-file.md>\n```"
+    },
+    "fullDigest": "2ce479d07da3c54df383f1e0441adf783699b2e90e56b9fe6c4e6b56777a7af0",
+    "shownTextSHA256": "2ce479d07da3c54df383f1e0441adf783699b2e90e56b9fe6c4e6b56777a7af0"
+  }
+}
+```
+
+## Entry a-055: claim_95164f1150b3c485deff5673f7b4ef15
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_95164f1150b3c485deff5673f7b4ef15",
+    "sourceUnitDigest": "6c33aac3c8d229e5f9e4122d414e1fed0afb9f727868500b7c7c5fb0035268a4",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-38 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "b39c9c5a4047e4ee228f9ad3945c453a573de86c783a9f828d493de9b3c99e04",
+    "identityFingerprint": "b39c9c5a4047e4ee228f9ad3945c453a573de86c783a9f828d493de9b3c99e04",
+    "claimId": "claim_95164f1150b3c485deff5673f7b4ef15",
+    "sourceAnchor": "unheaded-block-38",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "6c33aac3c8d229e5f9e4122d414e1fed0afb9f727868500b7c7c5fb0035268a4",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-38",
+      "githubAnchor": "unheaded-block-38",
+      "stableAnchor": "unheaded-block-38",
+      "title": "Unheaded block 38",
+      "startLine": 204,
+      "endLine": 207,
+      "textDigest": "6c33aac3c8d229e5f9e4122d414e1fed0afb9f727868500b7c7c5fb0035268a4",
+      "sample": "Spin up a preview for long docs, tables, Mermaid diagrams, multi-file document\nsets, or when the user asks to \"preview\"/\"render\". Skip it for short, trivial\nsnippets.\n<!-- mdview:E",
+      "identityFingerprint": "b39c9c5a4047e4ee228f9ad3945c453a573de86c783a9f828d493de9b3c99e04",
+      "ancestry": [
+        "forgent",
+        "Documentation Viewing (MDView)",
+        "When to render"
+      ],
+      "text": "Spin up a preview for long docs, tables, Mermaid diagrams, multi-file document\nsets, or when the user asks to \"preview\"/\"render\". Skip it for short, trivial\nsnippets.\n<!-- mdview:END -->"
+    },
+    "fullDigest": "6c33aac3c8d229e5f9e4122d414e1fed0afb9f727868500b7c7c5fb0035268a4",
+    "shownTextSHA256": "6c33aac3c8d229e5f9e4122d414e1fed0afb9f727868500b7c7c5fb0035268a4"
+  }
+}
+```
+
+## Entry a-056: claim_7e77c676144c5ca6cdc3351f5a5ef632
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_7e77c676144c5ca6cdc3351f5a5ef632",
+    "sourceUnitDigest": "52ee0c226963abfd99219e552e38ac7b06cbe349e31d31a470fc328c095fd703",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-39 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "706320cb3749b6c9eb831ae60d98c72ce1ca08073eb95edbab4eba567080c53b",
+    "identityFingerprint": "706320cb3749b6c9eb831ae60d98c72ce1ca08073eb95edbab4eba567080c53b",
+    "claimId": "claim_7e77c676144c5ca6cdc3351f5a5ef632",
+    "sourceAnchor": "unheaded-block-39",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "52ee0c226963abfd99219e552e38ac7b06cbe349e31d31a470fc328c095fd703",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-39",
+      "githubAnchor": "unheaded-block-39",
+      "stableAnchor": "unheaded-block-39",
+      "title": "Unheaded block 39",
+      "startLine": 209,
+      "endLine": 209,
+      "textDigest": "52ee0c226963abfd99219e552e38ac7b06cbe349e31d31a470fc328c095fd703",
+      "sample": "<!-- gitnexus:start -->",
+      "identityFingerprint": "706320cb3749b6c9eb831ae60d98c72ce1ca08073eb95edbab4eba567080c53b",
+      "ancestry": [
+        "forgent",
+        "Documentation Viewing (MDView)",
+        "When to render"
+      ],
+      "text": "<!-- gitnexus:start -->"
+    },
+    "fullDigest": "52ee0c226963abfd99219e552e38ac7b06cbe349e31d31a470fc328c095fd703",
+    "shownTextSHA256": "52ee0c226963abfd99219e552e38ac7b06cbe349e31d31a470fc328c095fd703"
+  }
+}
+```
+
+## Entry a-057: claim_c1dcdd55c1f539b738ff1ad9467d95b6
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_c1dcdd55c1f539b738ff1ad9467d95b6",
+    "sourceUnitDigest": "1647ee808cc12762f3eebd5a3caa23b1b24da3fddbd71297903d0ddb798ed718",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-4 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "786bf9c6c89ff23cf46664e3460d7191c787ecfd9c05860c351b4319abb97e50",
+    "identityFingerprint": "786bf9c6c89ff23cf46664e3460d7191c787ecfd9c05860c351b4319abb97e50",
+    "claimId": "claim_c1dcdd55c1f539b738ff1ad9467d95b6",
+    "sourceAnchor": "unheaded-block-4",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "1647ee808cc12762f3eebd5a3caa23b1b24da3fddbd71297903d0ddb798ed718",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-4",
+      "githubAnchor": "unheaded-block-4",
+      "stableAnchor": "unheaded-block-4",
+      "title": "Unheaded block 4",
+      "startLine": 18,
+      "endLine": 22,
+      "textDigest": "1647ee808cc12762f3eebd5a3caa23b1b24da3fddbd71297903d0ddb798ed718",
+      "sample": "1. **Ship Faster** — giao nhanh hơn, không đoán mò, giảm friction/better-dev-ux, ít chờ đợi.\n2. **Release con người** — giải phóng con người khỏi việc ngồi canh chờ trả lời. Hệ thố",
+      "identityFingerprint": "786bf9c6c89ff23cf46664e3460d7191c787ecfd9c05860c351b4319abb97e50",
+      "ancestry": [
+        "forgent",
+        "Product priority order (D-ADR0030, docs/specs/runner.md)"
+      ],
+      "text": "1. **Ship Faster** — giao nhanh hơn, không đoán mò, giảm friction/better-dev-ux, ít chờ đợi.\n2. **Release con người** — giải phóng con người khỏi việc ngồi canh chờ trả lời. Hệ thống tự phán đoán, tự vận hành ở mức cao nhất có thể; chỉ hỏi người khi thật sự cần, và khi hỏi thì gom thành bộ để mỗi lần người quay lại trả lời được nhiều nhất rồi đi tiếp; mỗi câu theo mẫu câu hỏi quyết định (`core/skills/_shared/decision-question.md`). Tự quyết trong khung đã duyệt (phạm vi + ngân sách ghi lúc duyệt); sắp vượt khung thì dừng và hỏi theo mẫu. Một câu hỏi treo không được nghẽn phần việc khác của cùng item còn tiến được — stage/skill vì vậy phải chia nhỏ, mịn, mỗi mảnh park/tiến độc lập.\n   Khi phân tích của chính agent đã chọn rõ một phương án, hãy quyết và báo cáo, không hỏi lại. Chỉ hỏi khi các phương án thật sự ngang nhau hoặc phụ thuộc vào ý định của người dùng.\n3. **DoD** — reproducibly verifiable result + evidence-linked documentation.\n4. **Polish Sau DoD** — hoàn thiện sau ngưỡng, không mở scope."
+    },
+    "fullDigest": "1647ee808cc12762f3eebd5a3caa23b1b24da3fddbd71297903d0ddb798ed718",
+    "shownTextSHA256": "1647ee808cc12762f3eebd5a3caa23b1b24da3fddbd71297903d0ddb798ed718"
+  }
+}
+```
+
+## Entry a-058: claim_08f8581721e89c08f589e3bb8002b6ce
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_08f8581721e89c08f589e3bb8002b6ce",
+    "sourceUnitDigest": "39fe4d8d1ecc03cbf722efdf8de807822733f8f4f5cdd40cb10419c65ad79b46",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-40 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "da364888e2bbe78f471164ded231d90c2431b54a78f5434932173e74b8788d2f",
+    "identityFingerprint": "da364888e2bbe78f471164ded231d90c2431b54a78f5434932173e74b8788d2f",
+    "claimId": "claim_08f8581721e89c08f589e3bb8002b6ce",
+    "sourceAnchor": "unheaded-block-40",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "39fe4d8d1ecc03cbf722efdf8de807822733f8f4f5cdd40cb10419c65ad79b46",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-40",
+      "githubAnchor": "unheaded-block-40",
+      "stableAnchor": "unheaded-block-40",
+      "title": "Unheaded block 40",
+      "startLine": 212,
+      "endLine": 212,
+      "textDigest": "39fe4d8d1ecc03cbf722efdf8de807822733f8f4f5cdd40cb10419c65ad79b46",
+      "sample": "This project is indexed by GitNexus as **forgent** (58821 symbols, 81138 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navi",
+      "identityFingerprint": "da364888e2bbe78f471164ded231d90c2431b54a78f5434932173e74b8788d2f",
+      "ancestry": [
+        "GitNexus — Code Intelligence"
+      ],
+      "text": "This project is indexed by GitNexus as **forgent** (58821 symbols, 81138 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely."
+    },
+    "fullDigest": "39fe4d8d1ecc03cbf722efdf8de807822733f8f4f5cdd40cb10419c65ad79b46",
+    "shownTextSHA256": "39fe4d8d1ecc03cbf722efdf8de807822733f8f4f5cdd40cb10419c65ad79b46"
+  }
+}
+```
+
+## Entry a-059: claim_d6a9e43c0997b6993a5d9670af469258
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_d6a9e43c0997b6993a5d9670af469258",
+    "sourceUnitDigest": "46ba7c1470400a34fe1ff4796da8a95587bfbe41171b92eb8ba9a4fd38b0d51b",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-41 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "c9dcc854cd9641cea58ae3b52c4d5c9339f14e7229a6022fad5a39a0e1e8d0c7",
+    "identityFingerprint": "c9dcc854cd9641cea58ae3b52c4d5c9339f14e7229a6022fad5a39a0e1e8d0c7",
+    "claimId": "claim_d6a9e43c0997b6993a5d9670af469258",
+    "sourceAnchor": "unheaded-block-41",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "46ba7c1470400a34fe1ff4796da8a95587bfbe41171b92eb8ba9a4fd38b0d51b",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-41",
+      "githubAnchor": "unheaded-block-41",
+      "stableAnchor": "unheaded-block-41",
+      "title": "Unheaded block 41",
+      "startLine": 214,
+      "endLine": 214,
+      "textDigest": "46ba7c1470400a34fe1ff4796da8a95587bfbe41171b92eb8ba9a4fd38b0d51b",
+      "sample": "> Index stale? Run `node .gitnexus/run.cjs analyze` from the project root — it auto-selects an available runner. No `.gitnexus/run.cjs` yet? `npx gitnexus analyze` (npm 11 crash → ",
+      "identityFingerprint": "c9dcc854cd9641cea58ae3b52c4d5c9339f14e7229a6022fad5a39a0e1e8d0c7",
+      "ancestry": [
+        "GitNexus — Code Intelligence"
+      ],
+      "text": "> Index stale? Run `node .gitnexus/run.cjs analyze` from the project root — it auto-selects an available runner. No `.gitnexus/run.cjs` yet? `npx gitnexus analyze` (npm 11 crash → `npm i -g gitnexus`; #1939)."
+    },
+    "fullDigest": "46ba7c1470400a34fe1ff4796da8a95587bfbe41171b92eb8ba9a4fd38b0d51b",
+    "shownTextSHA256": "46ba7c1470400a34fe1ff4796da8a95587bfbe41171b92eb8ba9a4fd38b0d51b"
+  }
+}
+```
+
+## Entry a-060: claim_f2afc3a44e09eb918aa8c59d42ffe195
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_f2afc3a44e09eb918aa8c59d42ffe195",
+    "sourceUnitDigest": "e23a5ee9ace2850ec670037d92a358e58770bdd73439c4234c7c5b9f40e24c22",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-42 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "a8494e1a68489007e4644648096c49f64630b92223de2b4076987dbbd9413dbe",
+    "identityFingerprint": "a8494e1a68489007e4644648096c49f64630b92223de2b4076987dbbd9413dbe",
+    "claimId": "claim_f2afc3a44e09eb918aa8c59d42ffe195",
+    "sourceAnchor": "unheaded-block-42",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "e23a5ee9ace2850ec670037d92a358e58770bdd73439c4234c7c5b9f40e24c22",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-42",
+      "githubAnchor": "unheaded-block-42",
+      "stableAnchor": "unheaded-block-42",
+      "title": "Unheaded block 42",
+      "startLine": 218,
+      "endLine": 223,
+      "textDigest": "e23a5ee9ace2850ec670037d92a358e58770bdd73439c4234c7c5b9f40e24c22",
+      "sample": "- **MUST run impact analysis before editing any symbol.** Before modifying a function, class, or method, run `impact({target: \"symbolName\", direction: \"upstream\"})` and report the ",
+      "identityFingerprint": "a8494e1a68489007e4644648096c49f64630b92223de2b4076987dbbd9413dbe",
+      "ancestry": [
+        "GitNexus — Code Intelligence",
+        "Always Do"
+      ],
+      "text": "- **MUST run impact analysis before editing any symbol.** Before modifying a function, class, or method, run `impact({target: \"symbolName\", direction: \"upstream\"})` and report the blast radius (direct callers, affected processes, risk level) to the user.\n- **MUST run `detect_changes()` before committing** to verify your changes only affect expected symbols and execution flows. For regression review, compare against the default branch: `detect_changes({scope: \"compare\", base_ref: \"main\"})`.\n- **MUST warn the user** if impact analysis returns HIGH or CRITICAL risk before proceeding with edits.\n- When exploring unfamiliar code, use `query({search_query: \"concept\"})` to find execution flows instead of grepping. It returns process-grouped results ranked by relevance.\n- When you need full context on a specific symbol — callers, callees, which execution flows it participates in — use `context({name: \"symbolName\"})`.\n- For security review, `explain({target: \"fileOrSymbol\"})` lists taint findings (source→sink flows; needs `analyze --pdg`)."
+    },
+    "fullDigest": "e23a5ee9ace2850ec670037d92a358e58770bdd73439c4234c7c5b9f40e24c22",
+    "shownTextSHA256": "e23a5ee9ace2850ec670037d92a358e58770bdd73439c4234c7c5b9f40e24c22"
+  }
+}
+```
+
+## Entry a-061: claim_3ca28ff7ed502c1bfd8e695a7387f753
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_3ca28ff7ed502c1bfd8e695a7387f753",
+    "sourceUnitDigest": "6f63dffd5c7d710ca600d3ad22016e4e73cf9729a299b36d624070a87429d6e1",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-43 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "f58061fe68cb3656428115f47420de5b2b91d8c3b41781447ba7dbb2da1b0a15",
+    "identityFingerprint": "f58061fe68cb3656428115f47420de5b2b91d8c3b41781447ba7dbb2da1b0a15",
+    "claimId": "claim_3ca28ff7ed502c1bfd8e695a7387f753",
+    "sourceAnchor": "unheaded-block-43",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "6f63dffd5c7d710ca600d3ad22016e4e73cf9729a299b36d624070a87429d6e1",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-43",
+      "githubAnchor": "unheaded-block-43",
+      "stableAnchor": "unheaded-block-43",
+      "title": "Unheaded block 43",
+      "startLine": 227,
+      "endLine": 230,
+      "textDigest": "6f63dffd5c7d710ca600d3ad22016e4e73cf9729a299b36d624070a87429d6e1",
+      "sample": "- NEVER edit a function, class, or method without first running `impact` on it.\n- NEVER ignore HIGH or CRITICAL risk warnings from impact analysis.\n- NEVER rename symbols with find",
+      "identityFingerprint": "f58061fe68cb3656428115f47420de5b2b91d8c3b41781447ba7dbb2da1b0a15",
+      "ancestry": [
+        "GitNexus — Code Intelligence",
+        "Never Do"
+      ],
+      "text": "- NEVER edit a function, class, or method without first running `impact` on it.\n- NEVER ignore HIGH or CRITICAL risk warnings from impact analysis.\n- NEVER rename symbols with find-and-replace — use `rename` which understands the call graph.\n- NEVER commit changes without running `detect_changes()` to check affected scope."
+    },
+    "fullDigest": "6f63dffd5c7d710ca600d3ad22016e4e73cf9729a299b36d624070a87429d6e1",
+    "shownTextSHA256": "6f63dffd5c7d710ca600d3ad22016e4e73cf9729a299b36d624070a87429d6e1"
+  }
+}
+```
+
+## Entry a-062: claim_11685a19f556cf213ef62e11a1d2d5c6
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_11685a19f556cf213ef62e11a1d2d5c6",
+    "sourceUnitDigest": "b64e3f9772c143e0d911c16218f5a9f280f96b0c1466f43f52e5aa4d63855221",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-44 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "34aa5e40911ba6123b6d0707f7695e1442650901433fd5b94a9216d2904827ef",
+    "identityFingerprint": "34aa5e40911ba6123b6d0707f7695e1442650901433fd5b94a9216d2904827ef",
+    "claimId": "claim_11685a19f556cf213ef62e11a1d2d5c6",
+    "sourceAnchor": "unheaded-block-44",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "b64e3f9772c143e0d911c16218f5a9f280f96b0c1466f43f52e5aa4d63855221",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-44",
+      "githubAnchor": "unheaded-block-44",
+      "stableAnchor": "unheaded-block-44",
+      "title": "Unheaded block 44",
+      "startLine": 234,
+      "endLine": 239,
+      "textDigest": "b64e3f9772c143e0d911c16218f5a9f280f96b0c1466f43f52e5aa4d63855221",
+      "sample": "| Resource | Use for |\n|----------|---------|\n| `gitnexus://repo/forgent/context` | Codebase overview, check index freshness |\n| `gitnexus://repo/forgent/clusters` | All functional",
+      "identityFingerprint": "34aa5e40911ba6123b6d0707f7695e1442650901433fd5b94a9216d2904827ef",
+      "ancestry": [
+        "GitNexus — Code Intelligence",
+        "Resources"
+      ],
+      "text": "| Resource | Use for |\n|----------|---------|\n| `gitnexus://repo/forgent/context` | Codebase overview, check index freshness |\n| `gitnexus://repo/forgent/clusters` | All functional areas |\n| `gitnexus://repo/forgent/processes` | All execution flows |\n| `gitnexus://repo/forgent/process/{name}` | Step-by-step execution trace |"
+    },
+    "fullDigest": "b64e3f9772c143e0d911c16218f5a9f280f96b0c1466f43f52e5aa4d63855221",
+    "shownTextSHA256": "b64e3f9772c143e0d911c16218f5a9f280f96b0c1466f43f52e5aa4d63855221"
+  }
+}
+```
+
+## Entry a-063: claim_1661543368ff1c7e6f57d20e2345cf4d
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_1661543368ff1c7e6f57d20e2345cf4d",
+    "sourceUnitDigest": "8ca4c5c61c7f369a197d6118f0a325cc39727dbc792d3c53b1c2b1dd2aa7648a",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-45 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "997ac9a133379d07dbffa20be94e3af97bfff03015a23a4d6f15c603eebce7fc",
+    "identityFingerprint": "997ac9a133379d07dbffa20be94e3af97bfff03015a23a4d6f15c603eebce7fc",
+    "claimId": "claim_1661543368ff1c7e6f57d20e2345cf4d",
+    "sourceAnchor": "unheaded-block-45",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "8ca4c5c61c7f369a197d6118f0a325cc39727dbc792d3c53b1c2b1dd2aa7648a",
+    "claimKind": "architecture",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-45",
+      "githubAnchor": "unheaded-block-45",
+      "stableAnchor": "unheaded-block-45",
+      "title": "Unheaded block 45",
+      "startLine": 243,
+      "endLine": 252,
+      "textDigest": "8ca4c5c61c7f369a197d6118f0a325cc39727dbc792d3c53b1c2b1dd2aa7648a",
+      "sample": "| Task | Read this skill file |\n|------|---------------------|\n| Understand architecture / \"How does X work?\" | `.claude/skills/gitnexus/gitnexus-exploring/SKILL.md` |\n| Blast radi",
+      "identityFingerprint": "997ac9a133379d07dbffa20be94e3af97bfff03015a23a4d6f15c603eebce7fc",
+      "ancestry": [
+        "GitNexus — Code Intelligence",
+        "CLI"
+      ],
+      "text": "| Task | Read this skill file |\n|------|---------------------|\n| Understand architecture / \"How does X work?\" | `.claude/skills/gitnexus/gitnexus-exploring/SKILL.md` |\n| Blast radius / \"What breaks if I change X?\" | `.claude/skills/gitnexus/gitnexus-impact-analysis/SKILL.md` |\n| Trace bugs / \"Why is X failing?\" | `.claude/skills/gitnexus/gitnexus-debugging/SKILL.md` |\n| Rename / extract / split / refactor | `.claude/skills/gitnexus/gitnexus-refactoring/SKILL.md` |\n| Tools, resources, schema reference | `.claude/skills/gitnexus/gitnexus-guide/SKILL.md` |\n| Index, status, clean, wiki CLI commands | `.claude/skills/gitnexus/gitnexus-cli/SKILL.md` |\n\n<!-- gitnexus:end -->"
+    },
+    "fullDigest": "8ca4c5c61c7f369a197d6118f0a325cc39727dbc792d3c53b1c2b1dd2aa7648a",
+    "shownTextSHA256": "8ca4c5c61c7f369a197d6118f0a325cc39727dbc792d3c53b1c2b1dd2aa7648a"
+  }
+}
+```
+
+## Entry a-064: claim_2165e8fcd1ec571e64eae458439bb309
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_2165e8fcd1ec571e64eae458439bb309",
+    "sourceUnitDigest": "1ac5061190836bd1107ae3eb6460b899d1d92486a62077b653cbf7d2016b2101",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-46 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "a85fe9414c1a3cf1695e14b11411af38501670dcd1d04450dba4f35f51f5c697",
+    "identityFingerprint": "a85fe9414c1a3cf1695e14b11411af38501670dcd1d04450dba4f35f51f5c697",
+    "claimId": "claim_2165e8fcd1ec571e64eae458439bb309",
+    "sourceAnchor": "unheaded-block-46",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "1ac5061190836bd1107ae3eb6460b899d1d92486a62077b653cbf7d2016b2101",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-46",
+      "githubAnchor": "unheaded-block-46",
+      "stableAnchor": "unheaded-block-46",
+      "title": "Unheaded block 46",
+      "startLine": 254,
+      "endLine": 256,
+      "textDigest": "1ac5061190836bd1107ae3eb6460b899d1d92486a62077b653cbf7d2016b2101",
+      "sample": "<!-- fgos:instruction-projection:start -->\n<!-- generated by fgos instruction projection; edit canonical instruction sources, not this block -->\n<!-- effective-set: .fgos/instructi",
+      "identityFingerprint": "a85fe9414c1a3cf1695e14b11411af38501670dcd1d04450dba4f35f51f5c697",
+      "ancestry": [
+        "GitNexus — Code Intelligence",
+        "CLI"
+      ],
+      "text": "<!-- fgos:instruction-projection:start -->\n<!-- generated by fgos instruction projection; edit canonical instruction sources, not this block -->\n<!-- effective-set: .fgos/instructions/effective/repo.json; key=repo; host=* -->"
+    },
+    "fullDigest": "1ac5061190836bd1107ae3eb6460b899d1d92486a62077b653cbf7d2016b2101",
+    "shownTextSHA256": "1ac5061190836bd1107ae3eb6460b899d1d92486a62077b653cbf7d2016b2101"
+  }
+}
+```
+
+## Entry a-065: claim_1ac1158b31cf27d233825c9e70232fdb
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_1ac1158b31cf27d233825c9e70232fdb",
+    "sourceUnitDigest": "a412a2f5e102f17d8b6b108830fed27c29021381ac59ea9695c43d604e1a6570",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-47 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "429a4f29dac7ef512da7d79c1d342bf071f8fb22d5e861477bbb0447a8914d6c",
+    "identityFingerprint": "429a4f29dac7ef512da7d79c1d342bf071f8fb22d5e861477bbb0447a8914d6c",
+    "claimId": "claim_1ac1158b31cf27d233825c9e70232fdb",
+    "sourceAnchor": "unheaded-block-47",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "a412a2f5e102f17d8b6b108830fed27c29021381ac59ea9695c43d604e1a6570",
+    "claimKind": "decision",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-47",
+      "githubAnchor": "unheaded-block-47",
+      "stableAnchor": "unheaded-block-47",
+      "title": "Unheaded block 47",
+      "startLine": 264,
+      "endLine": 265,
+      "textDigest": "a412a2f5e102f17d8b6b108830fed27c29021381ac59ea9695c43d604e1a6570",
+      "sample": "- id: `decision-question-template`\n- source: `core/instructions/decision-question.md`",
+      "identityFingerprint": "429a4f29dac7ef512da7d79c1d342bf071f8fb22d5e861477bbb0447a8914d6c",
+      "ancestry": [
+        "GitNexus — Code Intelligence",
+        "fgOS Effective Instructions",
+        "law",
+        "Decision Question Template"
+      ],
+      "text": "- id: `decision-question-template`\n- source: `core/instructions/decision-question.md`"
+    },
+    "fullDigest": "a412a2f5e102f17d8b6b108830fed27c29021381ac59ea9695c43d604e1a6570",
+    "shownTextSHA256": "a412a2f5e102f17d8b6b108830fed27c29021381ac59ea9695c43d604e1a6570"
+  }
+}
+```
+
+## Entry a-066: claim_1c0fa8ed450e9b4d240269ee06fbb6d2
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_1c0fa8ed450e9b4d240269ee06fbb6d2",
+    "sourceUnitDigest": "1297672f2b5e8ad757858b4c7e8e54e6713cabadc7461f2f561b92e4e17bb16e",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-48 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "ea404dddeafc115ecadb052516f26f57d720590f44181ba73275fc4711565b48",
+    "identityFingerprint": "ea404dddeafc115ecadb052516f26f57d720590f44181ba73275fc4711565b48",
+    "claimId": "claim_1c0fa8ed450e9b4d240269ee06fbb6d2",
+    "sourceAnchor": "unheaded-block-48",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "1297672f2b5e8ad757858b4c7e8e54e6713cabadc7461f2f561b92e4e17bb16e",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-48",
+      "githubAnchor": "unheaded-block-48",
+      "stableAnchor": "unheaded-block-48",
+      "title": "Unheaded block 48",
+      "startLine": 269,
+      "endLine": 269,
+      "textDigest": "1297672f2b5e8ad757858b4c7e8e54e6713cabadc7461f2f561b92e4e17bb16e",
+      "sample": "Every question asking the owner to choose a direction carries five parts: what is happening, cause, options with cost, recommendation, and scope of the answer. Full template: `core",
+      "identityFingerprint": "ea404dddeafc115ecadb052516f26f57d720590f44181ba73275fc4711565b48",
+      "ancestry": [
+        "Decision Question Template"
+      ],
+      "text": "Every question asking the owner to choose a direction carries five parts: what is happening, cause, options with cost, recommendation, and scope of the answer. Full template: `core/skills/_shared/decision-question.md`. Inside the approved frame (scope + budget set at approval) decide and report; about to leave it, stop and ask in this template."
+    },
+    "fullDigest": "1297672f2b5e8ad757858b4c7e8e54e6713cabadc7461f2f561b92e4e17bb16e",
+    "shownTextSHA256": "1297672f2b5e8ad757858b4c7e8e54e6713cabadc7461f2f561b92e4e17bb16e"
+  }
+}
+```
+
+## Entry a-067: claim_b70e7c39975314f130e9a2501156721d
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_b70e7c39975314f130e9a2501156721d",
+    "sourceUnitDigest": "0634893a1881205c0eb9275047c5b3a44f596f2dff7a47fb0d0e10aae07aebb4",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-49 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "a218f1e2f6e8372a9838d0964cd93896ae9c1fcbe62cb39aaa3bb791b3f6fb7f",
+    "identityFingerprint": "a218f1e2f6e8372a9838d0964cd93896ae9c1fcbe62cb39aaa3bb791b3f6fb7f",
+    "claimId": "claim_b70e7c39975314f130e9a2501156721d",
+    "sourceAnchor": "unheaded-block-49",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "0634893a1881205c0eb9275047c5b3a44f596f2dff7a47fb0d0e10aae07aebb4",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-49",
+      "githubAnchor": "unheaded-block-49",
+      "stableAnchor": "unheaded-block-49",
+      "title": "Unheaded block 49",
+      "startLine": 273,
+      "endLine": 274,
+      "textDigest": "0634893a1881205c0eb9275047c5b3a44f596f2dff7a47fb0d0e10aae07aebb4",
+      "sample": "- id: `platform-operating-laws`\n- source: `core/instructions/platform-laws.md`",
+      "identityFingerprint": "a218f1e2f6e8372a9838d0964cd93896ae9c1fcbe62cb39aaa3bb791b3f6fb7f",
+      "ancestry": [
+        "Decision Question Template",
+        "Platform Operating Laws"
+      ],
+      "text": "- id: `platform-operating-laws`\n- source: `core/instructions/platform-laws.md`"
+    },
+    "fullDigest": "0634893a1881205c0eb9275047c5b3a44f596f2dff7a47fb0d0e10aae07aebb4",
+    "shownTextSHA256": "0634893a1881205c0eb9275047c5b3a44f596f2dff7a47fb0d0e10aae07aebb4"
+  }
+}
+```
+
+## Entry a-068: claim_0b999bb17fb999e00f51a138af84c8a2
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_0b999bb17fb999e00f51a138af84c8a2",
+    "sourceUnitDigest": "f553a3334af338a1e4d76df5657adc8ac73d99d8971bd031043545b288db1cc7",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-5 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "c43d5590635cae129f1d97db2c2be44025969986827e132d5e4c46ce40bbf85c",
+    "identityFingerprint": "c43d5590635cae129f1d97db2c2be44025969986827e132d5e4c46ce40bbf85c",
+    "claimId": "claim_0b999bb17fb999e00f51a138af84c8a2",
+    "sourceAnchor": "unheaded-block-5",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "f553a3334af338a1e4d76df5657adc8ac73d99d8971bd031043545b288db1cc7",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-5",
+      "githubAnchor": "unheaded-block-5",
+      "stableAnchor": "unheaded-block-5",
+      "title": "Unheaded block 5",
+      "startLine": 24,
+      "endLine": 24,
+      "textDigest": "f553a3334af338a1e4d76df5657adc8ac73d99d8971bd031043545b288db1cc7",
+      "sample": "Tốc độ ở mục 1 là tốc độ ship của **project đang DÙNG fgOS** (fgOS không loại trừ khi tự dogfood) — không phải tốc độ tự thân team fgOS build một tính năng của chính fgOS. Đừng chọ",
+      "identityFingerprint": "c43d5590635cae129f1d97db2c2be44025969986827e132d5e4c46ce40bbf85c",
+      "ancestry": [
+        "forgent",
+        "Product priority order (D-ADR0030, docs/specs/runner.md)"
+      ],
+      "text": "Tốc độ ở mục 1 là tốc độ ship của **project đang DÙNG fgOS** (fgOS không loại trừ khi tự dogfood) — không phải tốc độ tự thân team fgOS build một tính năng của chính fgOS. Đừng chọn phương án rẻ để fgOS tự triển khai nếu nó làm project dùng fgOS chậm hơn."
+    },
+    "fullDigest": "f553a3334af338a1e4d76df5657adc8ac73d99d8971bd031043545b288db1cc7",
+    "shownTextSHA256": "f553a3334af338a1e4d76df5657adc8ac73d99d8971bd031043545b288db1cc7"
+  }
+}
+```
+
+## Entry a-069: claim_cace4724d966bb5a40bc0b17768520c1
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_cace4724d966bb5a40bc0b17768520c1",
+    "sourceUnitDigest": "7e4431ca6a7e941fe10d3962f79815b135aeb90897d2ab15817a4e7a903bd2a7",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-50 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "70b9f49880a5bfb21a2796e1982c104a3cd0adcef96ccabb4a8ac6c30605b37a",
+    "identityFingerprint": "70b9f49880a5bfb21a2796e1982c104a3cd0adcef96ccabb4a8ac6c30605b37a",
+    "claimId": "claim_cace4724d966bb5a40bc0b17768520c1",
+    "sourceAnchor": "unheaded-block-50",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "7e4431ca6a7e941fe10d3962f79815b135aeb90897d2ab15817a4e7a903bd2a7",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-50",
+      "githubAnchor": "unheaded-block-50",
+      "stableAnchor": "unheaded-block-50",
+      "title": "Unheaded block 50",
+      "startLine": 278,
+      "endLine": 278,
+      "textDigest": "7e4431ca6a7e941fe10d3962f79815b135aeb90897d2ab15817a4e7a903bd2a7",
+      "sample": "Platform laws L1-L8 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:",
+      "identityFingerprint": "70b9f49880a5bfb21a2796e1982c104a3cd0adcef96ccabb4a8ac6c30605b37a",
+      "ancestry": [
+        "Platform Operating Laws"
+      ],
+      "text": "Platform laws L1-L8 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:"
+    },
+    "fullDigest": "7e4431ca6a7e941fe10d3962f79815b135aeb90897d2ab15817a4e7a903bd2a7",
+    "shownTextSHA256": "7e4431ca6a7e941fe10d3962f79815b135aeb90897d2ab15817a4e7a903bd2a7"
+  }
+}
+```
+
+## Entry a-070: claim_07e83f30731906c4f25c96625cd95e26
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_07e83f30731906c4f25c96625cd95e26",
+    "sourceUnitDigest": "e9d6edc10b3656ef6f99a50549a6fd76c6a6010c62040c5ea6a8d61c753da3cc",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-51 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "0602222a6b64b5c7ddf675a474b8c83ee9ac159bca286dd50d3f543e9e542583",
+    "identityFingerprint": "0602222a6b64b5c7ddf675a474b8c83ee9ac159bca286dd50d3f543e9e542583",
+    "claimId": "claim_07e83f30731906c4f25c96625cd95e26",
+    "sourceAnchor": "unheaded-block-51",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "e9d6edc10b3656ef6f99a50549a6fd76c6a6010c62040c5ea6a8d61c753da3cc",
+    "claimKind": "specification",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-51",
+      "githubAnchor": "unheaded-block-51",
+      "stableAnchor": "unheaded-block-51",
+      "title": "Unheaded block 51",
+      "startLine": 280,
+      "endLine": 287,
+      "textDigest": "e9d6edc10b3656ef6f99a50549a6fd76c6a6010c62040c5ea6a8d61c753da3cc",
+      "sample": "- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)\n- **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundati",
+      "identityFingerprint": "0602222a6b64b5c7ddf675a474b8c83ee9ac159bca286dd50d3f543e9e542583",
+      "ancestry": [
+        "Platform Operating Laws"
+      ],
+      "text": "- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)\n- **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundations.md#l2--kin-trc-memory-hai-tng`)\n- **L3 — Luật store: truth ở JSONL, db là view** (`docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view`)\n- **L4 — Routing model theo audience của từng interface** (`docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface`)\n- **L5 — Definition of done: sáu câu hỏi** (`docs/platform-foundations.md#l5--definition-of-done-su-cu-hi`)\n- **L6 — Maturity ladder F0–F5** (`docs/platform-foundations.md#l6--maturity-ladder-f0f5`)\n- **L7 — Durability ladder** (`docs/platform-foundations.md#l7--durability-ladder`)\n- **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer`)"
+    },
+    "fullDigest": "e9d6edc10b3656ef6f99a50549a6fd76c6a6010c62040c5ea6a8d61c753da3cc",
+    "shownTextSHA256": "e9d6edc10b3656ef6f99a50549a6fd76c6a6010c62040c5ea6a8d61c753da3cc"
+  }
+}
+```
+
+## Entry a-071: claim_4c8b5dcba297831ece58a92091e942d6
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_4c8b5dcba297831ece58a92091e942d6",
+    "sourceUnitDigest": "f4b273ed312216976ee427785fccce89a1aaf29fe108f4af626cab39ee1b70fb",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-52 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "f00d38c2a727238520d4481c55505b14c6a1d67c2f2a570b6f30a8239e792616",
+    "identityFingerprint": "f00d38c2a727238520d4481c55505b14c6a1d67c2f2a570b6f30a8239e792616",
+    "claimId": "claim_4c8b5dcba297831ece58a92091e942d6",
+    "sourceAnchor": "unheaded-block-52",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "f4b273ed312216976ee427785fccce89a1aaf29fe108f4af626cab39ee1b70fb",
+    "claimKind": "verification",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-52",
+      "githubAnchor": "unheaded-block-52",
+      "stableAnchor": "unheaded-block-52",
+      "title": "Unheaded block 52",
+      "startLine": 289,
+      "endLine": 289,
+      "textDigest": "f4b273ed312216976ee427785fccce89a1aaf29fe108f4af626cab39ee1b70fb",
+      "sample": "Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires supersedin",
+      "identityFingerprint": "f00d38c2a727238520d4481c55505b14c6a1d67c2f2a570b6f30a8239e792616",
+      "ancestry": [
+        "Platform Operating Laws"
+      ],
+      "text": "Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires superseding its decision ID rather than editing in place."
+    },
+    "fullDigest": "f4b273ed312216976ee427785fccce89a1aaf29fe108f4af626cab39ee1b70fb",
+    "shownTextSHA256": "f4b273ed312216976ee427785fccce89a1aaf29fe108f4af626cab39ee1b70fb"
+  }
+}
+```
+
+## Entry a-072: claim_e59f80485141f1b75d155dca7272c34e
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_e59f80485141f1b75d155dca7272c34e",
+    "sourceUnitDigest": "040484693fc054f7b37f6dc489b6295d3ccc3df440c68ceea04c9584ccf4b144",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-53 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "9ce1f70b037039c00ea42a1c449a54f3774ecb2595c19a5785275305efd618a0",
+    "identityFingerprint": "9ce1f70b037039c00ea42a1c449a54f3774ecb2595c19a5785275305efd618a0",
+    "claimId": "claim_e59f80485141f1b75d155dca7272c34e",
+    "sourceAnchor": "unheaded-block-53",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "040484693fc054f7b37f6dc489b6295d3ccc3df440c68ceea04c9584ccf4b144",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-53",
+      "githubAnchor": "unheaded-block-53",
+      "stableAnchor": "unheaded-block-53",
+      "title": "Unheaded block 53",
+      "startLine": 291,
+      "endLine": 291,
+      "textDigest": "040484693fc054f7b37f6dc489b6295d3ccc3df440c68ceea04c9584ccf4b144",
+      "sample": "<!-- fgos:instruction-projection:end -->",
+      "identityFingerprint": "9ce1f70b037039c00ea42a1c449a54f3774ecb2595c19a5785275305efd618a0",
+      "ancestry": [
+        "Platform Operating Laws"
+      ],
+      "text": "<!-- fgos:instruction-projection:end -->"
+    },
+    "fullDigest": "040484693fc054f7b37f6dc489b6295d3ccc3df440c68ceea04c9584ccf4b144",
+    "shownTextSHA256": "040484693fc054f7b37f6dc489b6295d3ccc3df440c68ceea04c9584ccf4b144"
+  }
+}
+```
+
+## Entry a-073: claim_77dd0bf33d012bb3b23d9a8e8f0f7d3e
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_77dd0bf33d012bb3b23d9a8e8f0f7d3e",
+    "sourceUnitDigest": "60091b05c3c7e85182c3645da54621b6e3b9fdb4da2666cdd5ede92dbe6c9b9a",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-6 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "38c535b908324eeb35b8cd8e372768f2038aacd6f4fef2c624decb7ee11a4422",
+    "identityFingerprint": "38c535b908324eeb35b8cd8e372768f2038aacd6f4fef2c624decb7ee11a4422",
+    "claimId": "claim_77dd0bf33d012bb3b23d9a8e8f0f7d3e",
+    "sourceAnchor": "unheaded-block-6",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "60091b05c3c7e85182c3645da54621b6e3b9fdb4da2666cdd5ede92dbe6c9b9a",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-6",
+      "githubAnchor": "unheaded-block-6",
+      "stableAnchor": "unheaded-block-6",
+      "title": "Unheaded block 6",
+      "startLine": 26,
+      "endLine": 26,
+      "textDigest": "60091b05c3c7e85182c3645da54621b6e3b9fdb4da2666cdd5ede92dbe6c9b9a",
+      "sample": "Thứ tự cố định — bậc dưới không ghi đè bậc trên. Chi tiết: docs/specs/runner.md's \"Lịch sử quyết định\" § D-ADR0030 (mở rộng D-ADR0025; narrative đầy đủ, docs/decisions/*.md corpus ",
+      "identityFingerprint": "38c535b908324eeb35b8cd8e372768f2038aacd6f4fef2c624decb7ee11a4422",
+      "ancestry": [
+        "forgent",
+        "Product priority order (D-ADR0030, docs/specs/runner.md)"
+      ],
+      "text": "Thứ tự cố định — bậc dưới không ghi đè bậc trên. Chi tiết: docs/specs/runner.md's \"Lịch sử quyết định\" § D-ADR0030 (mở rộng D-ADR0025; narrative đầy đủ, docs/decisions/*.md corpus đã retired tsk-1lv-4)."
+    },
+    "fullDigest": "60091b05c3c7e85182c3645da54621b6e3b9fdb4da2666cdd5ede92dbe6c9b9a",
+    "shownTextSHA256": "60091b05c3c7e85182c3645da54621b6e3b9fdb4da2666cdd5ede92dbe6c9b9a"
+  }
+}
+```
+
+## Entry a-074: claim_f5c89fb59effe1dbfc4f83d06a78aefa
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_f5c89fb59effe1dbfc4f83d06a78aefa",
+    "sourceUnitDigest": "2f43e6ba7d13c017035a4295381b83e9a4d21eaf658d0c1f90f4bbf9608c137f",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-7 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "cb71ba812d7994a469718956fc59a066abed3919eca5abdde7715883526fb4fe",
+    "identityFingerprint": "cb71ba812d7994a469718956fc59a066abed3919eca5abdde7715883526fb4fe",
+    "claimId": "claim_f5c89fb59effe1dbfc4f83d06a78aefa",
+    "sourceAnchor": "unheaded-block-7",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "2f43e6ba7d13c017035a4295381b83e9a4d21eaf658d0c1f90f4bbf9608c137f",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-7",
+      "githubAnchor": "unheaded-block-7",
+      "stableAnchor": "unheaded-block-7",
+      "title": "Unheaded block 7",
+      "startLine": 30,
+      "endLine": 32,
+      "textDigest": "2f43e6ba7d13c017035a4295381b83e9a4d21eaf658d0c1f90f4bbf9608c137f",
+      "sample": "fgOS tồn tại để: \n 1. phát triển các project khác \n 2. làm nền vận hành các business base workflow",
+      "identityFingerprint": "cb71ba812d7994a469718956fc59a066abed3919eca5abdde7715883526fb4fe",
+      "ancestry": [
+        "forgent",
+        "Ranh giới sứ mệnh (D-ADR0035, docs/specs/platform-foundations.md)"
+      ],
+      "text": "fgOS tồn tại để: \n 1. phát triển các project khác \n 2. làm nền vận hành các business base workflow"
+    },
+    "fullDigest": "2f43e6ba7d13c017035a4295381b83e9a4d21eaf658d0c1f90f4bbf9608c137f",
+    "shownTextSHA256": "2f43e6ba7d13c017035a4295381b83e9a4d21eaf658d0c1f90f4bbf9608c137f"
+  }
+}
+```
+
+## Entry a-075: claim_a719410d0483e23da77bdbc36c01983a
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_a719410d0483e23da77bdbc36c01983a",
+    "sourceUnitDigest": "0423f98e178718c6acb150ab0fe91edf12bdcbaac258e1c213aeb912fd1d625f",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-8 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "9f2d17b816d3b450fa285c1ba97b8151c25703960a00b4a1411c5bb5dad7d75c",
+    "identityFingerprint": "9f2d17b816d3b450fa285c1ba97b8151c25703960a00b4a1411c5bb5dad7d75c",
+    "claimId": "claim_a719410d0483e23da77bdbc36c01983a",
+    "sourceAnchor": "unheaded-block-8",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "0423f98e178718c6acb150ab0fe91edf12bdcbaac258e1c213aeb912fd1d625f",
+    "claimKind": "vision",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-8",
+      "githubAnchor": "unheaded-block-8",
+      "stableAnchor": "unheaded-block-8",
+      "title": "Unheaded block 8",
+      "startLine": 34,
+      "endLine": 34,
+      "textDigest": "0423f98e178718c6acb150ab0fe91edf12bdcbaac258e1c213aeb912fd1d625f",
+      "sample": "fgOS KHÔNG phải để (3) tự phát triển chính nó. Mission #3 là dogfood cần thiết trong lúc xây, không phải lý do fgOS tồn tại.  Khi làm việc trong chính repo (nơi fgOS tự-host trên c",
+      "identityFingerprint": "9f2d17b816d3b450fa285c1ba97b8151c25703960a00b4a1411c5bb5dad7d75c",
+      "ancestry": [
+        "forgent",
+        "Ranh giới sứ mệnh (D-ADR0035, docs/specs/platform-foundations.md)"
+      ],
+      "text": "fgOS KHÔNG phải để (3) tự phát triển chính nó. Mission #3 là dogfood cần thiết trong lúc xây, không phải lý do fgOS tồn tại.  Khi làm việc trong chính repo (nơi fgOS tự-host trên chính source của mình), đừng mặc định coi \"sửa fgOS\" là mục tiêu chỉ vì đó là việc trước mắt — hỏi việc đang làm có phục vụ mission #1/#2 (năng lực fgOS mang lại cho project/workflow khác) hay chỉ tiện cho chính đội fgOS (mission #3). fgOS đã cài global và đang vận hành thật trên nhiều project khác ngoài repo này — mission #1/#2 không phải lý thuyết. Chi tiết + bằng chứng: docs/specs/platform-foundations.md's \"Lịch sử quyết định\" § D-ADR0035 (docs/decisions/*.md corpus đã retired tsk-1lv-4)."
+    },
+    "fullDigest": "0423f98e178718c6acb150ab0fe91edf12bdcbaac258e1c213aeb912fd1d625f",
+    "shownTextSHA256": "0423f98e178718c6acb150ab0fe91edf12bdcbaac258e1c213aeb912fd1d625f"
+  }
+}
+```
+
+## Entry a-076: claim_5225c43306e2c6004040bcdc1c833b9b
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_5225c43306e2c6004040bcdc1c833b9b",
+    "sourceUnitDigest": "4c9c8cc9ca45762d287d773c9625e674f5eed86e549fceb7f42325667a575d80",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-9 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "a863722d44f7db7055c38f38bbd28d772628298088c27befedbfbf9b93531f48",
+    "identityFingerprint": "a863722d44f7db7055c38f38bbd28d772628298088c27befedbfbf9b93531f48",
+    "claimId": "claim_5225c43306e2c6004040bcdc1c833b9b",
+    "sourceAnchor": "unheaded-block-9",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "4c9c8cc9ca45762d287d773c9625e674f5eed86e549fceb7f42325667a575d80",
+    "claimKind": "specification",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-9",
+      "githubAnchor": "unheaded-block-9",
+      "stableAnchor": "unheaded-block-9",
+      "title": "Unheaded block 9",
+      "startLine": 39,
+      "endLine": 41,
+      "textDigest": "4c9c8cc9ca45762d287d773c9625e674f5eed86e549fceb7f42325667a575d80",
+      "sample": "Read `docs/specs/reading-map.md`, then the area spec under `docs/specs/` for whatever\nyou're about to change. Specs are the state layer — BA-grade, tech-agnostic — read\nthe spec be",
+      "identityFingerprint": "a863722d44f7db7055c38f38bbd28d772628298088c27befedbfbf9b93531f48",
+      "ancestry": [
+        "forgent",
+        "Before touching code"
+      ],
+      "text": "Read `docs/specs/reading-map.md`, then the area spec under `docs/specs/` for whatever\nyou're about to change. Specs are the state layer — BA-grade, tech-agnostic — read\nthe spec before the code."
+    },
+    "fullDigest": "4c9c8cc9ca45762d287d773c9625e674f5eed86e549fceb7f42325667a575d80",
+    "shownTextSHA256": "4c9c8cc9ca45762d287d773c9625e674f5eed86e549fceb7f42325667a575d80"
+  }
+}
+```
+
+## Entry a-077: claim_33fda3508cbed38745f7b6796ea65709
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_33fda3508cbed38745f7b6796ea65709",
+    "sourceUnitDigest": "64aa23ebc68629f08a1537e7c3249b810327ec02c53a5ad2d4c98589bd174a3e",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#using-cli-fallback as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "0792cde98de8f0ac84eac0a49f473981a04bb641227e8f1f3d3508fa878a4f69",
+    "identityFingerprint": "ac55ea750c0493c91beb4800994cd142fc91a14dd4a3a5328e6669db560f9c31",
+    "claimId": "claim_33fda3508cbed38745f7b6796ea65709",
+    "sourceAnchor": "using-cli-fallback",
+    "unitKind": "heading",
+    "sourceUnitDigest": "64aa23ebc68629f08a1537e7c3249b810327ec02c53a5ad2d4c98589bd174a3e",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "heading",
+      "level": 3,
+      "title": "Using CLI fallback",
+      "anchor": "using-cli-fallback",
+      "githubAnchor": "using-cli-fallback",
+      "stableAnchor": "h-0e6965b3b3d4",
+      "startLine": 196,
+      "endLine": 196,
+      "textDigest": "64aa23ebc68629f08a1537e7c3249b810327ec02c53a5ad2d4c98589bd174a3e",
+      "sample": "Using CLI fallback",
+      "sectionPayloadDigest": "2ce479d07da3c54df383f1e0441adf783699b2e90e56b9fe6c4e6b56777a7af0",
+      "followingBlockDigest": "2ce479d07da3c54df383f1e0441adf783699b2e90e56b9fe6c4e6b56777a7af0",
+      "identityFingerprint": "ac55ea750c0493c91beb4800994cd142fc91a14dd4a3a5328e6669db560f9c31",
+      "ancestry": [
+        "forgent",
+        "Documentation Viewing (MDView)"
+      ],
+      "text": "### Using CLI fallback",
+      "sectionText": "### Using CLI fallback\n\n```sh\nmdview open <absolute-path-to-file.md>\n```"
+    },
+    "fullDigest": "64aa23ebc68629f08a1537e7c3249b810327ec02c53a5ad2d4c98589bd174a3e",
+    "shownTextSHA256": "f0d029a1a852f9072a93263fe18c5eb1f7a928969fbd65624cf187ce5f6bb4ae"
+  }
+}
+```
+
+## Entry a-078: claim_9f129b46b75d0c4d4e7119da265c74b0
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_9f129b46b75d0c4d4e7119da265c74b0",
+    "sourceUnitDigest": "c1a9ae0dbb63cc6b9d2cdd56221d17c475fa8a12f90a2d9fe4d742ffbeddae51",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#using-mcp-preferred as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "add9ae634458efb15c314541de6a24d7d31d6075f980993b30645461042f9c24",
+    "identityFingerprint": "80bcdb5b6c8e6e58e4a9f9f08e7d0eac18adc118c19dafae2a1271ae0766abca",
+    "claimId": "claim_9f129b46b75d0c4d4e7119da265c74b0",
+    "sourceAnchor": "using-mcp-preferred",
+    "unitKind": "heading",
+    "sourceUnitDigest": "c1a9ae0dbb63cc6b9d2cdd56221d17c475fa8a12f90a2d9fe4d742ffbeddae51",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "heading",
+      "level": 3,
+      "title": "Using MCP (preferred)",
+      "anchor": "using-mcp-preferred",
+      "githubAnchor": "using-mcp-preferred",
+      "stableAnchor": "h-a2e122338b85",
+      "startLine": 185,
+      "endLine": 185,
+      "textDigest": "c1a9ae0dbb63cc6b9d2cdd56221d17c475fa8a12f90a2d9fe4d742ffbeddae51",
+      "sample": "Using MCP (preferred)",
+      "sectionPayloadDigest": "3ca5741759261d7ba84669ad09a2b7bb5b94acd64316912ea79fead73397a330",
+      "followingBlockDigest": "c45eed179f4de74f88ec92f86a5647eb5e6625d60cb844671ac83b3f0d1c6694",
+      "identityFingerprint": "80bcdb5b6c8e6e58e4a9f9f08e7d0eac18adc118c19dafae2a1271ae0766abca",
+      "ancestry": [
+        "forgent",
+        "Documentation Viewing (MDView)"
+      ],
+      "text": "### Using MCP (preferred)",
+      "sectionText": "### Using MCP (preferred)\n\nCall `mdview_view_file` with:\n\n- `project_root`: absolute path to the project root\n- `relative_path`: the file path relative to that root\n\nIt returns a browser `url`. Tell the user: \"You can view this at: `<url>`\".\nThe server auto-registers the project on first use and indexes the file\nimmediately."
+    },
+    "fullDigest": "c1a9ae0dbb63cc6b9d2cdd56221d17c475fa8a12f90a2d9fe4d742ffbeddae51",
+    "shownTextSHA256": "a2a13c34155102d37aca3136a2c7df2f9c4caf01b77ff75b6d70c2ad1dd81a5b"
+  }
+}
+```
+
+## Entry a-079: claim_73ca3e1b87514a160d7114e22318f1e9
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_73ca3e1b87514a160d7114e22318f1e9",
+    "sourceUnitDigest": "b8596a3138791147b0ffa9b666027206135a910a94b7c8391467f8559fdb7828",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain AGENTS.md#when-to-render as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "3dae37d5d36974bbfdb4a9fe17a2e07d382905b25c6272be1058cdfbd2db26b6",
+    "identityFingerprint": "147222488a836b02a9081f3efb61f8a098a36bc197ecec6248a4ab3b828c5cfe",
+    "claimId": "claim_73ca3e1b87514a160d7114e22318f1e9",
+    "sourceAnchor": "when-to-render",
+    "unitKind": "heading",
+    "sourceUnitDigest": "b8596a3138791147b0ffa9b666027206135a910a94b7c8391467f8559fdb7828",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "heading",
+      "level": 3,
+      "title": "When to render",
+      "anchor": "when-to-render",
+      "githubAnchor": "when-to-render",
+      "stableAnchor": "h-5e889a30efe8",
+      "startLine": 202,
+      "endLine": 202,
+      "textDigest": "b8596a3138791147b0ffa9b666027206135a910a94b7c8391467f8559fdb7828",
+      "sample": "When to render",
+      "sectionPayloadDigest": "8772b52c2f648e9051b5724741ea577dfae619775654c3f3dddb52774e71c37e",
+      "followingBlockDigest": "6c33aac3c8d229e5f9e4122d414e1fed0afb9f727868500b7c7c5fb0035268a4",
+      "identityFingerprint": "147222488a836b02a9081f3efb61f8a098a36bc197ecec6248a4ab3b828c5cfe",
+      "ancestry": [
+        "forgent",
+        "Documentation Viewing (MDView)"
+      ],
+      "text": "### When to render",
+      "sectionText": "### When to render\n\nSpin up a preview for long docs, tables, Mermaid diagrams, multi-file document\nsets, or when the user asks to \"preview\"/\"render\". Skip it for short, trivial\nsnippets.\n<!-- mdview:END -->\n\n<!-- gitnexus:start -->"
+    },
+    "fullDigest": "b8596a3138791147b0ffa9b666027206135a910a94b7c8391467f8559fdb7828",
+    "shownTextSHA256": "708573f457e037ae7a57b75924ec04c40bc40cdfea5abbad15cd16e87b880424"
+  }
+}
+```
+
+## Entry a-080: claim_79dd88f1fb058d9385445406fbd9296d
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_79dd88f1fb058d9385445406fbd9296d",
+    "sourceUnitDigest": "e51ed959e5aae86e5f000c44f5ef903c202b286098b279fb9e892f8db3a0c1d3",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain CLAUDE.md#always-do as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 473df70d0879413dac335100339bb5157ee58aef78ef08800acacbb9a96db1b5, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "CLAUDE.md",
+    "unitDigest": "e7fc714a9a73a84cbd1d93c998bc3f55888c9b537891eb0b0caf9771fb8cde98",
+    "identityFingerprint": "c869c48c9abaf53e8f0d5566184b23c92991743b2b6726980b3111dafc540cd4",
+    "claimId": "claim_79dd88f1fb058d9385445406fbd9296d",
+    "sourceAnchor": "always-do",
+    "unitKind": "heading",
+    "sourceUnitDigest": "e51ed959e5aae86e5f000c44f5ef903c202b286098b279fb9e892f8db3a0c1d3",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "Always Do",
+      "anchor": "always-do",
+      "githubAnchor": "always-do",
+      "stableAnchor": "h-f124f731fb03",
+      "startLine": 86,
+      "endLine": 86,
+      "textDigest": "e51ed959e5aae86e5f000c44f5ef903c202b286098b279fb9e892f8db3a0c1d3",
+      "sample": "Always Do",
+      "sectionPayloadDigest": "e23a5ee9ace2850ec670037d92a358e58770bdd73439c4234c7c5b9f40e24c22",
+      "followingBlockDigest": "e23a5ee9ace2850ec670037d92a358e58770bdd73439c4234c7c5b9f40e24c22",
+      "identityFingerprint": "c869c48c9abaf53e8f0d5566184b23c92991743b2b6726980b3111dafc540cd4",
+      "ancestry": [
+        "GitNexus — Code Intelligence"
+      ],
+      "text": "## Always Do",
+      "sectionText": "## Always Do\n\n- **MUST run impact analysis before editing any symbol.** Before modifying a function, class, or method, run `impact({target: \"symbolName\", direction: \"upstream\"})` and report the blast radius (direct callers, affected processes, risk level) to the user.\n- **MUST run `detect_changes()` before committing** to verify your changes only affect expected symbols and execution flows. For regression review, compare against the default branch: `detect_changes({scope: \"compare\", base_ref: \"main\"})`.\n- **MUST warn the user** if impact analysis returns HIGH or CRITICAL risk before proceeding with edits.\n- When exploring unfamiliar code, use `query({search_query: \"concept\"})` to find execution flows instead of grepping. It returns process-grouped results ranked by relevance.\n- When you need full context on a specific symbol — callers, callees, which execution flows it participates in — use `context({name: \"symbolName\"})`.\n- For security review, `explain({target: \"fileOrSymbol\"})` lists taint findings (source→sink flows; needs `analyze --pdg`)."
+    },
+    "fullDigest": "e51ed959e5aae86e5f000c44f5ef903c202b286098b279fb9e892f8db3a0c1d3",
+    "shownTextSHA256": "15c9e1cbf7de6f573d691d9a6236862f24324b73583170bd00a63bba45e3d9c5"
+  }
+}
+```
+
+## Entry a-081: claim_8c2cca9caea197a0601c680f4bfcbb23
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_8c2cca9caea197a0601c680f4bfcbb23",
+    "sourceUnitDigest": "b1a93fca9c3b2fa56e2de420c36fb04c464ff5925c93e4902e70d7f7bd7eb1d3",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain CLAUDE.md#cli as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 473df70d0879413dac335100339bb5157ee58aef78ef08800acacbb9a96db1b5, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "CLAUDE.md",
+    "unitDigest": "071d72578c3d9b5918351e94257453094051994b8cd49f682c935cf046b0fed4",
+    "identityFingerprint": "81f0ad51435143bb181c3d0d4bc70aecc6a8a74f13515cebfd517b841b1a0a26",
+    "claimId": "claim_8c2cca9caea197a0601c680f4bfcbb23",
+    "sourceAnchor": "cli",
+    "unitKind": "heading",
+    "sourceUnitDigest": "b1a93fca9c3b2fa56e2de420c36fb04c464ff5925c93e4902e70d7f7bd7eb1d3",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "CLI",
+      "anchor": "cli",
+      "githubAnchor": "cli",
+      "stableAnchor": "h-ec20c0dbb718",
+      "startLine": 111,
+      "endLine": 111,
+      "textDigest": "b1a93fca9c3b2fa56e2de420c36fb04c464ff5925c93e4902e70d7f7bd7eb1d3",
+      "sample": "CLI",
+      "sectionPayloadDigest": "8ca4c5c61c7f369a197d6118f0a325cc39727dbc792d3c53b1c2b1dd2aa7648a",
+      "followingBlockDigest": "8ca4c5c61c7f369a197d6118f0a325cc39727dbc792d3c53b1c2b1dd2aa7648a",
+      "identityFingerprint": "81f0ad51435143bb181c3d0d4bc70aecc6a8a74f13515cebfd517b841b1a0a26",
+      "ancestry": [
+        "GitNexus — Code Intelligence"
+      ],
+      "text": "## CLI",
+      "sectionText": "## CLI\n\n| Task | Read this skill file |\n|------|---------------------|\n| Understand architecture / \"How does X work?\" | `.claude/skills/gitnexus/gitnexus-exploring/SKILL.md` |\n| Blast radius / \"What breaks if I change X?\" | `.claude/skills/gitnexus/gitnexus-impact-analysis/SKILL.md` |\n| Trace bugs / \"Why is X failing?\" | `.claude/skills/gitnexus/gitnexus-debugging/SKILL.md` |\n| Rename / extract / split / refactor | `.claude/skills/gitnexus/gitnexus-refactoring/SKILL.md` |\n| Tools, resources, schema reference | `.claude/skills/gitnexus/gitnexus-guide/SKILL.md` |\n| Index, status, clean, wiki CLI commands | `.claude/skills/gitnexus/gitnexus-cli/SKILL.md` |\n\n<!-- gitnexus:end -->"
+    },
+    "fullDigest": "b1a93fca9c3b2fa56e2de420c36fb04c464ff5925c93e4902e70d7f7bd7eb1d3",
+    "shownTextSHA256": "04e1df190eadf9da88b47c0fec70a8ae87a0478340c2fa4e85ce5a5ebed0f88f"
+  }
+}
+```
+
+## Entry a-082: claim_8396a2952ef6cbcae93835afb0a73152
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_8396a2952ef6cbcae93835afb0a73152",
+    "sourceUnitDigest": "7d84eb3c654fd06a78b9e1d55f1aac0787beba431be44c4c11800b92f10afb45",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain CLAUDE.md#documentation-viewing-mdview as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 473df70d0879413dac335100339bb5157ee58aef78ef08800acacbb9a96db1b5, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "CLAUDE.md",
+    "unitDigest": "0f88b95c0f0147c03c08add070d474d7ef4c3a939596793c8c59454d131e5012",
+    "identityFingerprint": "a85309a1368c7071897daf4e20c262bcb79dd91fbe446b59da8b88d773bbed8e",
+    "claimId": "claim_8396a2952ef6cbcae93835afb0a73152",
+    "sourceAnchor": "documentation-viewing-mdview",
+    "unitKind": "heading",
+    "sourceUnitDigest": "7d84eb3c654fd06a78b9e1d55f1aac0787beba431be44c4c11800b92f10afb45",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "Documentation Viewing (MDView)",
+      "anchor": "documentation-viewing-mdview",
+      "githubAnchor": "documentation-viewing-mdview",
+      "stableAnchor": "h-ec9cf36e2500",
+      "startLine": 50,
+      "endLine": 50,
+      "textDigest": "7d84eb3c654fd06a78b9e1d55f1aac0787beba431be44c4c11800b92f10afb45",
+      "sample": "Documentation Viewing (MDView)",
+      "sectionPayloadDigest": "42d278bba4a7ce9c2f7ff755227feb14483587d3ace2b687a5c732999eb053bc",
+      "followingBlockDigest": "42d278bba4a7ce9c2f7ff755227feb14483587d3ace2b687a5c732999eb053bc",
+      "identityFingerprint": "a85309a1368c7071897daf4e20c262bcb79dd91fbe446b59da8b88d773bbed8e",
+      "ancestry": [
+        "Project Rules"
+      ],
+      "text": "## Documentation Viewing (MDView)",
+      "sectionText": "## Documentation Viewing (MDView)\n\nAfter creating or updating any markdown file, make it viewable in ONE call —\nno project registration step needed:"
+    },
+    "fullDigest": "7d84eb3c654fd06a78b9e1d55f1aac0787beba431be44c4c11800b92f10afb45",
+    "shownTextSHA256": "807c5223c5d730e0a986f428ec5a2aa3518bb0705b9415919e355b82ea38a610"
+  }
+}
+```
+
+## Entry a-083: claim_2f612bbe8e8413b66477d06bf6046ed4
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_2f612bbe8e8413b66477d06bf6046ed4",
+    "sourceUnitDigest": "150e95a64fd2a52cc454a2386a8dc3aec0b3a47eb54fb1fd8d02576899ea4461",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain CLAUDE.md#gitnexus-code-intelligence as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 473df70d0879413dac335100339bb5157ee58aef78ef08800acacbb9a96db1b5, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "CLAUDE.md",
+    "unitDigest": "7e21885df02fa86d9033eceab65bd533c10a1d3f2050558e15d06ff344688416",
+    "identityFingerprint": "90f2c0bea757e4b6d760c9285e2e357ff406f5b7e86be8712c375ef5f13385ed",
+    "claimId": "claim_2f612bbe8e8413b66477d06bf6046ed4",
+    "sourceAnchor": "gitnexus-code-intelligence",
+    "unitKind": "heading",
+    "sourceUnitDigest": "150e95a64fd2a52cc454a2386a8dc3aec0b3a47eb54fb1fd8d02576899ea4461",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "heading",
+      "level": 1,
+      "title": "GitNexus — Code Intelligence",
+      "anchor": "gitnexus-code-intelligence",
+      "githubAnchor": "gitnexus-code-intelligence",
+      "stableAnchor": "h-f95fdc1f2475",
+      "startLine": 80,
+      "endLine": 80,
+      "textDigest": "150e95a64fd2a52cc454a2386a8dc3aec0b3a47eb54fb1fd8d02576899ea4461",
+      "sample": "GitNexus — Code Intelligence",
+      "sectionPayloadDigest": "1eda83dbf1720e219c9f3e3f46b9c2f3450fbfe82710ae49935a0d7a105d8db9",
+      "followingBlockDigest": "39fe4d8d1ecc03cbf722efdf8de807822733f8f4f5cdd40cb10419c65ad79b46",
+      "identityFingerprint": "90f2c0bea757e4b6d760c9285e2e357ff406f5b7e86be8712c375ef5f13385ed",
+      "ancestry": [],
+      "text": "# GitNexus — Code Intelligence",
+      "sectionText": "# GitNexus — Code Intelligence\n\nThis project is indexed by GitNexus as **forgent** (58821 symbols, 81138 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.\n\n> Index stale? Run `node .gitnexus/run.cjs analyze` from the project root — it auto-selects an available runner. No `.gitnexus/run.cjs` yet? `npx gitnexus analyze` (npm 11 crash → `npm i -g gitnexus`; #1939)."
+    },
+    "fullDigest": "150e95a64fd2a52cc454a2386a8dc3aec0b3a47eb54fb1fd8d02576899ea4461",
+    "shownTextSHA256": "75f492850c607aef170096b9c8c8b0a69d5aa869c1d96cadebee2de1432c73f8"
+  }
+}
+```
+
+## Entry a-084: claim_a18fb2712669f362c16aa39841718116
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_a18fb2712669f362c16aa39841718116",
+    "sourceUnitDigest": "9f085e90490eabb709bbb9121644075c09d080ce012ee19af7fd656cef02ad4a",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain CLAUDE.md#impact-analysis-capability-gate as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 473df70d0879413dac335100339bb5157ee58aef78ef08800acacbb9a96db1b5, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "CLAUDE.md",
+    "unitDigest": "f7d4f7bb7d2590a0e23bc5ea3baaf574025eaacee1f49c7d980183a8b45f8877",
+    "identityFingerprint": "25bc24b81e69a17acda8ba8b87d0b559947d0ead224259982ae8cf0f99084386",
+    "claimId": "claim_a18fb2712669f362c16aa39841718116",
+    "sourceAnchor": "impact-analysis-capability-gate",
+    "unitKind": "heading",
+    "sourceUnitDigest": "9f085e90490eabb709bbb9121644075c09d080ce012ee19af7fd656cef02ad4a",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "Impact-analysis capability gate",
+      "anchor": "impact-analysis-capability-gate",
+      "githubAnchor": "impact-analysis-capability-gate",
+      "stableAnchor": "h-0201ddc68a77",
+      "startLine": 8,
+      "endLine": 8,
+      "textDigest": "9f085e90490eabb709bbb9121644075c09d080ce012ee19af7fd656cef02ad4a",
+      "sample": "Impact-analysis capability gate",
+      "sectionPayloadDigest": "f9ede378a328746537492e9b4a897ca7e9f16a0891fc32abde75497d111abc2e",
+      "followingBlockDigest": "7fd75c1135e7ea9df4294bcee9f875ea87ea1157484a7b6a78180dfb85cd9824",
+      "identityFingerprint": "25bc24b81e69a17acda8ba8b87d0b559947d0ead224259982ae8cf0f99084386",
+      "ancestry": [
+        "Project Rules"
+      ],
+      "text": "## Impact-analysis capability gate",
+      "sectionText": "## Impact-analysis capability gate\n\nThe GitNexus \"Always Do\" / \"Never Do\" rules below assume GitNexus is\npresent on this machine. Before treating them as binding — and before\n`fgos-coding-planning`/`fgos-coding-validating`/`fgos-coding-implement`\ndecide how much\nimpact-analysis evidence a plan's verify/test scope needs — query the\ncapability instead of assuming the tool:\n\n```bash\nfgos tool query --capability impact-analysis --status present\n```\n\n- **0 providers registered** — Inactive: skip impact-analysis evidence in\n  verify/test scope; note `impact-analysis: inactive` in the plan/verify\n  note. Not a gap.\n- **Registered but not `present`, or `present` but flagged `stale`** —\n  Degraded: run every other required check, mark that proof weak, and name\n  the gap plainly (e.g. \"GitNexus registered but not present on this\n  machine — blast radius not confirmed\", or \"GitNexus present but its\n  index is behind the current HEAD — blast radius may be stale\"). A\n  `present` status only means the tool is installed, never that its index\n  is fresh or intact (tsk-j7y) — a suspicious zero-result or \"not found\"\n  answer from an impact-analysis tool is worth a quick grep/rg cross-check\n  before being trusted, regardless of what `fgos tool query` reports.\n- **`present`, freshly checked** — Full: the MUST rules below apply exactly\n  as written. A `full` posture still is not a guarantee of complete\n  per-file coverage: a genuinely fresh, non-stale index can still carry\n  zero indexed symbols for one large/complex file (tsk-38h — confirmed on\n  `bin/fgos.mjs`, 5000+ lines, zero indexed `Function` symbols even\n  immediately after a fresh reindex), a distinct mechanism from staleness\n  that the cross-check line above already covers unconditionally.\n\n**Multi-target resolution:** if the active impact-analysis providers tool errors because more than one target/repo is registered and needs disambiguation (e.g. \"multiple ... indexed\" / \"not found\"), never guess and never reuse any display string quoted in that error -- it is not guaranteed to be a valid value to pass back in. Instead, look at that same MCP servers own tool list for a listing/discovery tool (name suggests enumeration -- list/search/discover), call it to read back the exact registered identifiers, and match this project by a stable field it reports (an absolute path/scan-root, never a human-readable label) before retrying with that exact identifier (tsk-5nz).\n\nThis gate is prose the agent reads, never compiled logic — GitNexus is\nthe first registered provider for `impact-analysis`, not the only one\nthis gate can ever recognize. The block below regenerates from\nGitNexus's own template on `gitnexus analyze`; edit this gate section\nwhen the policy changes, never the rules inside the block.\n\n<!-- mdview:START -->"
+    },
+    "fullDigest": "9f085e90490eabb709bbb9121644075c09d080ce012ee19af7fd656cef02ad4a",
+    "shownTextSHA256": "bf65a6f34dae5e9c5c409ec5c7a54f2468b7cec23f103f6b68449bb62038def1"
+  }
+}
+```
+
+## Entry a-085: claim_b0612b463c58046dea6ba09504d97a82
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_b0612b463c58046dea6ba09504d97a82",
+    "sourceUnitDigest": "f081560dd43881074ceded6248a3ead793add48968f3eedf2ff2aa7f6284951e",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain CLAUDE.md#never-do as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 473df70d0879413dac335100339bb5157ee58aef78ef08800acacbb9a96db1b5, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "CLAUDE.md",
+    "unitDigest": "e873cf37f739248eee0224ea543d02a9977ac6de94f24baae620e4996419e733",
+    "identityFingerprint": "8af2b2f9f6ea42011e3c43d9d4e6c9dea0fbdb647c5d036f260eab9912d97535",
+    "claimId": "claim_b0612b463c58046dea6ba09504d97a82",
+    "sourceAnchor": "never-do",
+    "unitKind": "heading",
+    "sourceUnitDigest": "f081560dd43881074ceded6248a3ead793add48968f3eedf2ff2aa7f6284951e",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "Never Do",
+      "anchor": "never-do",
+      "githubAnchor": "never-do",
+      "stableAnchor": "h-ed75c9025241",
+      "startLine": 95,
+      "endLine": 95,
+      "textDigest": "f081560dd43881074ceded6248a3ead793add48968f3eedf2ff2aa7f6284951e",
+      "sample": "Never Do",
+      "sectionPayloadDigest": "6f63dffd5c7d710ca600d3ad22016e4e73cf9729a299b36d624070a87429d6e1",
+      "followingBlockDigest": "6f63dffd5c7d710ca600d3ad22016e4e73cf9729a299b36d624070a87429d6e1",
+      "identityFingerprint": "8af2b2f9f6ea42011e3c43d9d4e6c9dea0fbdb647c5d036f260eab9912d97535",
+      "ancestry": [
+        "GitNexus — Code Intelligence"
+      ],
+      "text": "## Never Do",
+      "sectionText": "## Never Do\n\n- NEVER edit a function, class, or method without first running `impact` on it.\n- NEVER ignore HIGH or CRITICAL risk warnings from impact analysis.\n- NEVER rename symbols with find-and-replace — use `rename` which understands the call graph.\n- NEVER commit changes without running `detect_changes()` to check affected scope."
+    },
+    "fullDigest": "f081560dd43881074ceded6248a3ead793add48968f3eedf2ff2aa7f6284951e",
+    "shownTextSHA256": "9322d24a0468af4e14fec52061787b7bdb7a0fa9286098ca653193ce96a39fe0"
+  }
+}
+```
+
+## Entry a-086: claim_0d2c13615099d78c5e38533379ecf7cc
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_0d2c13615099d78c5e38533379ecf7cc",
+    "sourceUnitDigest": "8cfd6f83037e10f65f4fab831d75c6b0ef373c7841bc510090b83310b5739537",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain CLAUDE.md#project-rules as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 473df70d0879413dac335100339bb5157ee58aef78ef08800acacbb9a96db1b5, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "CLAUDE.md",
+    "unitDigest": "523ea659ccfa1e1db11781921e5ccc0496006f3f26483c9e1006faee7ab26173",
+    "identityFingerprint": "5af12b481133fcd13dc1117e73480d91013903422393d2bba04f48e528e4595d",
+    "claimId": "claim_0d2c13615099d78c5e38533379ecf7cc",
+    "sourceAnchor": "project-rules",
+    "unitKind": "heading",
+    "sourceUnitDigest": "8cfd6f83037e10f65f4fab831d75c6b0ef373c7841bc510090b83310b5739537",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "heading",
+      "level": 1,
+      "title": "Project Rules",
+      "anchor": "project-rules",
+      "githubAnchor": "project-rules",
+      "stableAnchor": "h-6f2eafd68e56",
+      "startLine": 1,
+      "endLine": 1,
+      "textDigest": "8cfd6f83037e10f65f4fab831d75c6b0ef373c7841bc510090b83310b5739537",
+      "sample": "Project Rules",
+      "sectionPayloadDigest": "5ee1f1a48ddcb69e62623b1abb1c6f3434fae4b31adb2f45cfb28e55736c2aef",
+      "followingBlockDigest": "5ee1f1a48ddcb69e62623b1abb1c6f3434fae4b31adb2f45cfb28e55736c2aef",
+      "identityFingerprint": "5af12b481133fcd13dc1117e73480d91013903422393d2bba04f48e528e4595d",
+      "ancestry": [],
+      "text": "# Project Rules",
+      "sectionText": "# Project Rules\n\nThe bare import below loads the project rules from AGENTS.md at\ncontext-load time. Never wrap it in backticks; that disables it.\n\n@AGENTS.md"
+    },
+    "fullDigest": "8cfd6f83037e10f65f4fab831d75c6b0ef373c7841bc510090b83310b5739537",
+    "shownTextSHA256": "4c3b798d41eb62a633e0954b2cbdd4b388ca0b83f84a89cc7936cf8575d7349e"
+  }
+}
+```
+
+## Entry a-087: claim_928e5b681c1bbc6c51563c78de0b4f23
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_928e5b681c1bbc6c51563c78de0b4f23",
+    "sourceUnitDigest": "14d6f595788e8fc244f48477644d5527eeba45c4172ee04717caf23b04cb172e",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain CLAUDE.md#resources as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 473df70d0879413dac335100339bb5157ee58aef78ef08800acacbb9a96db1b5, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "CLAUDE.md",
+    "unitDigest": "47c3568ddec4bc9a7f6ec4204979a30b266331dcb09c21d41582d97a07d97b47",
+    "identityFingerprint": "833eaa198037a7b8bb2619b6a371f2efa587939fd9b66541b45b5e8c14a02d93",
+    "claimId": "claim_928e5b681c1bbc6c51563c78de0b4f23",
+    "sourceAnchor": "resources",
+    "unitKind": "heading",
+    "sourceUnitDigest": "14d6f595788e8fc244f48477644d5527eeba45c4172ee04717caf23b04cb172e",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "Resources",
+      "anchor": "resources",
+      "githubAnchor": "resources",
+      "stableAnchor": "h-09cae6daf197",
+      "startLine": 102,
+      "endLine": 102,
+      "textDigest": "14d6f595788e8fc244f48477644d5527eeba45c4172ee04717caf23b04cb172e",
+      "sample": "Resources",
+      "sectionPayloadDigest": "b64e3f9772c143e0d911c16218f5a9f280f96b0c1466f43f52e5aa4d63855221",
+      "followingBlockDigest": "b64e3f9772c143e0d911c16218f5a9f280f96b0c1466f43f52e5aa4d63855221",
+      "identityFingerprint": "833eaa198037a7b8bb2619b6a371f2efa587939fd9b66541b45b5e8c14a02d93",
+      "ancestry": [
+        "GitNexus — Code Intelligence"
+      ],
+      "text": "## Resources",
+      "sectionText": "## Resources\n\n| Resource | Use for |\n|----------|---------|\n| `gitnexus://repo/forgent/context` | Codebase overview, check index freshness |\n| `gitnexus://repo/forgent/clusters` | All functional areas |\n| `gitnexus://repo/forgent/processes` | All execution flows |\n| `gitnexus://repo/forgent/process/{name}` | Step-by-step execution trace |"
+    },
+    "fullDigest": "14d6f595788e8fc244f48477644d5527eeba45c4172ee04717caf23b04cb172e",
+    "shownTextSHA256": "75c6211de8f8951e8037d10289e3e5d0177b8a172b593345006b5b42a8e08e0e"
+  }
+}
+```
+
+## Entry a-088: claim_db83a4c14e03868fccf833f00f51f296
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_db83a4c14e03868fccf833f00f51f296",
+    "sourceUnitDigest": "5ee1f1a48ddcb69e62623b1abb1c6f3434fae4b31adb2f45cfb28e55736c2aef",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain CLAUDE.md#unheaded-block-1 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 473df70d0879413dac335100339bb5157ee58aef78ef08800acacbb9a96db1b5, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "CLAUDE.md",
+    "unitDigest": "b260c5e12df55b221346adf094cf18cf55a5c5c68f0038b378db55d904aa8963",
+    "identityFingerprint": "b260c5e12df55b221346adf094cf18cf55a5c5c68f0038b378db55d904aa8963",
+    "claimId": "claim_db83a4c14e03868fccf833f00f51f296",
+    "sourceAnchor": "unheaded-block-1",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "5ee1f1a48ddcb69e62623b1abb1c6f3434fae4b31adb2f45cfb28e55736c2aef",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-1",
+      "githubAnchor": "unheaded-block-1",
+      "stableAnchor": "unheaded-block-1",
+      "title": "Unheaded block 1",
+      "startLine": 3,
+      "endLine": 6,
+      "textDigest": "5ee1f1a48ddcb69e62623b1abb1c6f3434fae4b31adb2f45cfb28e55736c2aef",
+      "sample": "The bare import below loads the project rules from AGENTS.md at\ncontext-load time. Never wrap it in backticks; that disables it.\n\n@AGENTS.md",
+      "identityFingerprint": "b260c5e12df55b221346adf094cf18cf55a5c5c68f0038b378db55d904aa8963",
+      "ancestry": [
+        "Project Rules"
+      ],
+      "text": "The bare import below loads the project rules from AGENTS.md at\ncontext-load time. Never wrap it in backticks; that disables it.\n\n@AGENTS.md"
+    },
+    "fullDigest": "5ee1f1a48ddcb69e62623b1abb1c6f3434fae4b31adb2f45cfb28e55736c2aef",
+    "shownTextSHA256": "5ee1f1a48ddcb69e62623b1abb1c6f3434fae4b31adb2f45cfb28e55736c2aef"
+  }
+}
+```
+
+## Entry a-089: claim_809815d317fc255da84f53b1c30431cf
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_809815d317fc255da84f53b1c30431cf",
+    "sourceUnitDigest": "e0bf1a3052c0f3659d2cac6267fcf556c467957bb4de49a27962fa353ec8aec3",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain CLAUDE.md#unheaded-block-10 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 473df70d0879413dac335100339bb5157ee58aef78ef08800acacbb9a96db1b5, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "CLAUDE.md",
+    "unitDigest": "e354eba5c22b7204a004ad6a559521216737fcc8287e0314181c6d7851448974",
+    "identityFingerprint": "e354eba5c22b7204a004ad6a559521216737fcc8287e0314181c6d7851448974",
+    "claimId": "claim_809815d317fc255da84f53b1c30431cf",
+    "sourceAnchor": "unheaded-block-10",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "e0bf1a3052c0f3659d2cac6267fcf556c467957bb4de49a27962fa353ec8aec3",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-10",
+      "githubAnchor": "unheaded-block-10",
+      "stableAnchor": "unheaded-block-10",
+      "title": "Unheaded block 10",
+      "startLine": 62,
+      "endLine": 64,
+      "textDigest": "e0bf1a3052c0f3659d2cac6267fcf556c467957bb4de49a27962fa353ec8aec3",
+      "sample": "It returns a browser `url`. Tell the user: \"You can view this at: `<url>`\".\nThe server auto-registers the project on first use and indexes the file\nimmediately.",
+      "identityFingerprint": "e354eba5c22b7204a004ad6a559521216737fcc8287e0314181c6d7851448974",
+      "ancestry": [
+        "Project Rules",
+        "Documentation Viewing (MDView)",
+        "Using MCP (preferred)"
+      ],
+      "text": "It returns a browser `url`. Tell the user: \"You can view this at: `<url>`\".\nThe server auto-registers the project on first use and indexes the file\nimmediately."
+    },
+    "fullDigest": "e0bf1a3052c0f3659d2cac6267fcf556c467957bb4de49a27962fa353ec8aec3",
+    "shownTextSHA256": "e0bf1a3052c0f3659d2cac6267fcf556c467957bb4de49a27962fa353ec8aec3"
+  }
+}
+```
+
+## Entry a-090: claim_5010f46edb2e930c7efebd3876a7942d
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_5010f46edb2e930c7efebd3876a7942d",
+    "sourceUnitDigest": "2ce479d07da3c54df383f1e0441adf783699b2e90e56b9fe6c4e6b56777a7af0",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain CLAUDE.md#unheaded-block-11 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 473df70d0879413dac335100339bb5157ee58aef78ef08800acacbb9a96db1b5, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "CLAUDE.md",
+    "unitDigest": "fbc2f00290b92cfee3c2ba0ab087a4dd8777024bc804524d830d423f77bac29a",
+    "identityFingerprint": "fbc2f00290b92cfee3c2ba0ab087a4dd8777024bc804524d830d423f77bac29a",
+    "claimId": "claim_5010f46edb2e930c7efebd3876a7942d",
+    "sourceAnchor": "unheaded-block-11",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "2ce479d07da3c54df383f1e0441adf783699b2e90e56b9fe6c4e6b56777a7af0",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-11",
+      "githubAnchor": "unheaded-block-11",
+      "stableAnchor": "unheaded-block-11",
+      "title": "Unheaded block 11",
+      "startLine": 68,
+      "endLine": 70,
+      "textDigest": "2ce479d07da3c54df383f1e0441adf783699b2e90e56b9fe6c4e6b56777a7af0",
+      "sample": "```sh\nmdview open <absolute-path-to-file.md>\n```",
+      "identityFingerprint": "fbc2f00290b92cfee3c2ba0ab087a4dd8777024bc804524d830d423f77bac29a",
+      "ancestry": [
+        "Project Rules",
+        "Documentation Viewing (MDView)",
+        "Using CLI fallback"
+      ],
+      "text": "```sh\nmdview open <absolute-path-to-file.md>\n```"
+    },
+    "fullDigest": "2ce479d07da3c54df383f1e0441adf783699b2e90e56b9fe6c4e6b56777a7af0",
+    "shownTextSHA256": "2ce479d07da3c54df383f1e0441adf783699b2e90e56b9fe6c4e6b56777a7af0"
+  }
+}
+```
+
+## Entry a-091: claim_88fca05f9afd9c63fe14ebb5a08e5094
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_88fca05f9afd9c63fe14ebb5a08e5094",
+    "sourceUnitDigest": "6c33aac3c8d229e5f9e4122d414e1fed0afb9f727868500b7c7c5fb0035268a4",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain CLAUDE.md#unheaded-block-12 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 473df70d0879413dac335100339bb5157ee58aef78ef08800acacbb9a96db1b5, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "CLAUDE.md",
+    "unitDigest": "b39c9c5a4047e4ee228f9ad3945c453a573de86c783a9f828d493de9b3c99e04",
+    "identityFingerprint": "b39c9c5a4047e4ee228f9ad3945c453a573de86c783a9f828d493de9b3c99e04",
+    "claimId": "claim_88fca05f9afd9c63fe14ebb5a08e5094",
+    "sourceAnchor": "unheaded-block-12",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "6c33aac3c8d229e5f9e4122d414e1fed0afb9f727868500b7c7c5fb0035268a4",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-12",
+      "githubAnchor": "unheaded-block-12",
+      "stableAnchor": "unheaded-block-12",
+      "title": "Unheaded block 12",
+      "startLine": 74,
+      "endLine": 77,
+      "textDigest": "6c33aac3c8d229e5f9e4122d414e1fed0afb9f727868500b7c7c5fb0035268a4",
+      "sample": "Spin up a preview for long docs, tables, Mermaid diagrams, multi-file document\nsets, or when the user asks to \"preview\"/\"render\". Skip it for short, trivial\nsnippets.\n<!-- mdview:E",
+      "identityFingerprint": "b39c9c5a4047e4ee228f9ad3945c453a573de86c783a9f828d493de9b3c99e04",
+      "ancestry": [
+        "Project Rules",
+        "Documentation Viewing (MDView)",
+        "When to render"
+      ],
+      "text": "Spin up a preview for long docs, tables, Mermaid diagrams, multi-file document\nsets, or when the user asks to \"preview\"/\"render\". Skip it for short, trivial\nsnippets.\n<!-- mdview:END -->"
+    },
+    "fullDigest": "6c33aac3c8d229e5f9e4122d414e1fed0afb9f727868500b7c7c5fb0035268a4",
+    "shownTextSHA256": "6c33aac3c8d229e5f9e4122d414e1fed0afb9f727868500b7c7c5fb0035268a4"
+  }
+}
+```
+
+## Entry a-092: claim_7251396790f9d7a220a2c6f8ffde55c3
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_7251396790f9d7a220a2c6f8ffde55c3",
+    "sourceUnitDigest": "52ee0c226963abfd99219e552e38ac7b06cbe349e31d31a470fc328c095fd703",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain CLAUDE.md#unheaded-block-13 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 473df70d0879413dac335100339bb5157ee58aef78ef08800acacbb9a96db1b5, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "CLAUDE.md",
+    "unitDigest": "706320cb3749b6c9eb831ae60d98c72ce1ca08073eb95edbab4eba567080c53b",
+    "identityFingerprint": "706320cb3749b6c9eb831ae60d98c72ce1ca08073eb95edbab4eba567080c53b",
+    "claimId": "claim_7251396790f9d7a220a2c6f8ffde55c3",
+    "sourceAnchor": "unheaded-block-13",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "52ee0c226963abfd99219e552e38ac7b06cbe349e31d31a470fc328c095fd703",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-13",
+      "githubAnchor": "unheaded-block-13",
+      "stableAnchor": "unheaded-block-13",
+      "title": "Unheaded block 13",
+      "startLine": 79,
+      "endLine": 79,
+      "textDigest": "52ee0c226963abfd99219e552e38ac7b06cbe349e31d31a470fc328c095fd703",
+      "sample": "<!-- gitnexus:start -->",
+      "identityFingerprint": "706320cb3749b6c9eb831ae60d98c72ce1ca08073eb95edbab4eba567080c53b",
+      "ancestry": [
+        "Project Rules",
+        "Documentation Viewing (MDView)",
+        "When to render"
+      ],
+      "text": "<!-- gitnexus:start -->"
+    },
+    "fullDigest": "52ee0c226963abfd99219e552e38ac7b06cbe349e31d31a470fc328c095fd703",
+    "shownTextSHA256": "52ee0c226963abfd99219e552e38ac7b06cbe349e31d31a470fc328c095fd703"
+  }
+}
+```
+
+## Entry a-093: claim_d50f2409ac827afeb65163065905a878
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_d50f2409ac827afeb65163065905a878",
+    "sourceUnitDigest": "39fe4d8d1ecc03cbf722efdf8de807822733f8f4f5cdd40cb10419c65ad79b46",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain CLAUDE.md#unheaded-block-14 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 473df70d0879413dac335100339bb5157ee58aef78ef08800acacbb9a96db1b5, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "CLAUDE.md",
+    "unitDigest": "da364888e2bbe78f471164ded231d90c2431b54a78f5434932173e74b8788d2f",
+    "identityFingerprint": "da364888e2bbe78f471164ded231d90c2431b54a78f5434932173e74b8788d2f",
+    "claimId": "claim_d50f2409ac827afeb65163065905a878",
+    "sourceAnchor": "unheaded-block-14",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "39fe4d8d1ecc03cbf722efdf8de807822733f8f4f5cdd40cb10419c65ad79b46",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-14",
+      "githubAnchor": "unheaded-block-14",
+      "stableAnchor": "unheaded-block-14",
+      "title": "Unheaded block 14",
+      "startLine": 82,
+      "endLine": 82,
+      "textDigest": "39fe4d8d1ecc03cbf722efdf8de807822733f8f4f5cdd40cb10419c65ad79b46",
+      "sample": "This project is indexed by GitNexus as **forgent** (58821 symbols, 81138 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navi",
+      "identityFingerprint": "da364888e2bbe78f471164ded231d90c2431b54a78f5434932173e74b8788d2f",
+      "ancestry": [
+        "GitNexus — Code Intelligence"
+      ],
+      "text": "This project is indexed by GitNexus as **forgent** (58821 symbols, 81138 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely."
+    },
+    "fullDigest": "39fe4d8d1ecc03cbf722efdf8de807822733f8f4f5cdd40cb10419c65ad79b46",
+    "shownTextSHA256": "39fe4d8d1ecc03cbf722efdf8de807822733f8f4f5cdd40cb10419c65ad79b46"
+  }
+}
+```
+
+## Entry a-094: claim_1e109a5e30aba0234c61706edad2c820
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_1e109a5e30aba0234c61706edad2c820",
+    "sourceUnitDigest": "46ba7c1470400a34fe1ff4796da8a95587bfbe41171b92eb8ba9a4fd38b0d51b",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain CLAUDE.md#unheaded-block-15 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 473df70d0879413dac335100339bb5157ee58aef78ef08800acacbb9a96db1b5, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "CLAUDE.md",
+    "unitDigest": "c9dcc854cd9641cea58ae3b52c4d5c9339f14e7229a6022fad5a39a0e1e8d0c7",
+    "identityFingerprint": "c9dcc854cd9641cea58ae3b52c4d5c9339f14e7229a6022fad5a39a0e1e8d0c7",
+    "claimId": "claim_1e109a5e30aba0234c61706edad2c820",
+    "sourceAnchor": "unheaded-block-15",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "46ba7c1470400a34fe1ff4796da8a95587bfbe41171b92eb8ba9a4fd38b0d51b",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-15",
+      "githubAnchor": "unheaded-block-15",
+      "stableAnchor": "unheaded-block-15",
+      "title": "Unheaded block 15",
+      "startLine": 84,
+      "endLine": 84,
+      "textDigest": "46ba7c1470400a34fe1ff4796da8a95587bfbe41171b92eb8ba9a4fd38b0d51b",
+      "sample": "> Index stale? Run `node .gitnexus/run.cjs analyze` from the project root — it auto-selects an available runner. No `.gitnexus/run.cjs` yet? `npx gitnexus analyze` (npm 11 crash → ",
+      "identityFingerprint": "c9dcc854cd9641cea58ae3b52c4d5c9339f14e7229a6022fad5a39a0e1e8d0c7",
+      "ancestry": [
+        "GitNexus — Code Intelligence"
+      ],
+      "text": "> Index stale? Run `node .gitnexus/run.cjs analyze` from the project root — it auto-selects an available runner. No `.gitnexus/run.cjs` yet? `npx gitnexus analyze` (npm 11 crash → `npm i -g gitnexus`; #1939)."
+    },
+    "fullDigest": "46ba7c1470400a34fe1ff4796da8a95587bfbe41171b92eb8ba9a4fd38b0d51b",
+    "shownTextSHA256": "46ba7c1470400a34fe1ff4796da8a95587bfbe41171b92eb8ba9a4fd38b0d51b"
+  }
+}
+```
+
+## Entry a-095: claim_ae71daeca0febe5384359e3ad92443e8
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_ae71daeca0febe5384359e3ad92443e8",
+    "sourceUnitDigest": "e23a5ee9ace2850ec670037d92a358e58770bdd73439c4234c7c5b9f40e24c22",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain CLAUDE.md#unheaded-block-16 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 473df70d0879413dac335100339bb5157ee58aef78ef08800acacbb9a96db1b5, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "CLAUDE.md",
+    "unitDigest": "a8494e1a68489007e4644648096c49f64630b92223de2b4076987dbbd9413dbe",
+    "identityFingerprint": "a8494e1a68489007e4644648096c49f64630b92223de2b4076987dbbd9413dbe",
+    "claimId": "claim_ae71daeca0febe5384359e3ad92443e8",
+    "sourceAnchor": "unheaded-block-16",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "e23a5ee9ace2850ec670037d92a358e58770bdd73439c4234c7c5b9f40e24c22",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-16",
+      "githubAnchor": "unheaded-block-16",
+      "stableAnchor": "unheaded-block-16",
+      "title": "Unheaded block 16",
+      "startLine": 88,
+      "endLine": 93,
+      "textDigest": "e23a5ee9ace2850ec670037d92a358e58770bdd73439c4234c7c5b9f40e24c22",
+      "sample": "- **MUST run impact analysis before editing any symbol.** Before modifying a function, class, or method, run `impact({target: \"symbolName\", direction: \"upstream\"})` and report the ",
+      "identityFingerprint": "a8494e1a68489007e4644648096c49f64630b92223de2b4076987dbbd9413dbe",
+      "ancestry": [
+        "GitNexus — Code Intelligence",
+        "Always Do"
+      ],
+      "text": "- **MUST run impact analysis before editing any symbol.** Before modifying a function, class, or method, run `impact({target: \"symbolName\", direction: \"upstream\"})` and report the blast radius (direct callers, affected processes, risk level) to the user.\n- **MUST run `detect_changes()` before committing** to verify your changes only affect expected symbols and execution flows. For regression review, compare against the default branch: `detect_changes({scope: \"compare\", base_ref: \"main\"})`.\n- **MUST warn the user** if impact analysis returns HIGH or CRITICAL risk before proceeding with edits.\n- When exploring unfamiliar code, use `query({search_query: \"concept\"})` to find execution flows instead of grepping. It returns process-grouped results ranked by relevance.\n- When you need full context on a specific symbol — callers, callees, which execution flows it participates in — use `context({name: \"symbolName\"})`.\n- For security review, `explain({target: \"fileOrSymbol\"})` lists taint findings (source→sink flows; needs `analyze --pdg`)."
+    },
+    "fullDigest": "e23a5ee9ace2850ec670037d92a358e58770bdd73439c4234c7c5b9f40e24c22",
+    "shownTextSHA256": "e23a5ee9ace2850ec670037d92a358e58770bdd73439c4234c7c5b9f40e24c22"
+  }
+}
+```
+
+## Entry a-096: claim_3f0ed45ecb0952e67c013b52f129fedc
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_3f0ed45ecb0952e67c013b52f129fedc",
+    "sourceUnitDigest": "6f63dffd5c7d710ca600d3ad22016e4e73cf9729a299b36d624070a87429d6e1",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain CLAUDE.md#unheaded-block-17 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 473df70d0879413dac335100339bb5157ee58aef78ef08800acacbb9a96db1b5, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "CLAUDE.md",
+    "unitDigest": "f58061fe68cb3656428115f47420de5b2b91d8c3b41781447ba7dbb2da1b0a15",
+    "identityFingerprint": "f58061fe68cb3656428115f47420de5b2b91d8c3b41781447ba7dbb2da1b0a15",
+    "claimId": "claim_3f0ed45ecb0952e67c013b52f129fedc",
+    "sourceAnchor": "unheaded-block-17",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "6f63dffd5c7d710ca600d3ad22016e4e73cf9729a299b36d624070a87429d6e1",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-17",
+      "githubAnchor": "unheaded-block-17",
+      "stableAnchor": "unheaded-block-17",
+      "title": "Unheaded block 17",
+      "startLine": 97,
+      "endLine": 100,
+      "textDigest": "6f63dffd5c7d710ca600d3ad22016e4e73cf9729a299b36d624070a87429d6e1",
+      "sample": "- NEVER edit a function, class, or method without first running `impact` on it.\n- NEVER ignore HIGH or CRITICAL risk warnings from impact analysis.\n- NEVER rename symbols with find",
+      "identityFingerprint": "f58061fe68cb3656428115f47420de5b2b91d8c3b41781447ba7dbb2da1b0a15",
+      "ancestry": [
+        "GitNexus — Code Intelligence",
+        "Never Do"
+      ],
+      "text": "- NEVER edit a function, class, or method without first running `impact` on it.\n- NEVER ignore HIGH or CRITICAL risk warnings from impact analysis.\n- NEVER rename symbols with find-and-replace — use `rename` which understands the call graph.\n- NEVER commit changes without running `detect_changes()` to check affected scope."
+    },
+    "fullDigest": "6f63dffd5c7d710ca600d3ad22016e4e73cf9729a299b36d624070a87429d6e1",
+    "shownTextSHA256": "6f63dffd5c7d710ca600d3ad22016e4e73cf9729a299b36d624070a87429d6e1"
+  }
+}
+```
+
+## Entry a-097: claim_6bd09ad125ddd52d9563117b379ecc60
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_6bd09ad125ddd52d9563117b379ecc60",
+    "sourceUnitDigest": "b64e3f9772c143e0d911c16218f5a9f280f96b0c1466f43f52e5aa4d63855221",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain CLAUDE.md#unheaded-block-18 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 473df70d0879413dac335100339bb5157ee58aef78ef08800acacbb9a96db1b5, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "CLAUDE.md",
+    "unitDigest": "34aa5e40911ba6123b6d0707f7695e1442650901433fd5b94a9216d2904827ef",
+    "identityFingerprint": "34aa5e40911ba6123b6d0707f7695e1442650901433fd5b94a9216d2904827ef",
+    "claimId": "claim_6bd09ad125ddd52d9563117b379ecc60",
+    "sourceAnchor": "unheaded-block-18",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "b64e3f9772c143e0d911c16218f5a9f280f96b0c1466f43f52e5aa4d63855221",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-18",
+      "githubAnchor": "unheaded-block-18",
+      "stableAnchor": "unheaded-block-18",
+      "title": "Unheaded block 18",
+      "startLine": 104,
+      "endLine": 109,
+      "textDigest": "b64e3f9772c143e0d911c16218f5a9f280f96b0c1466f43f52e5aa4d63855221",
+      "sample": "| Resource | Use for |\n|----------|---------|\n| `gitnexus://repo/forgent/context` | Codebase overview, check index freshness |\n| `gitnexus://repo/forgent/clusters` | All functional",
+      "identityFingerprint": "34aa5e40911ba6123b6d0707f7695e1442650901433fd5b94a9216d2904827ef",
+      "ancestry": [
+        "GitNexus — Code Intelligence",
+        "Resources"
+      ],
+      "text": "| Resource | Use for |\n|----------|---------|\n| `gitnexus://repo/forgent/context` | Codebase overview, check index freshness |\n| `gitnexus://repo/forgent/clusters` | All functional areas |\n| `gitnexus://repo/forgent/processes` | All execution flows |\n| `gitnexus://repo/forgent/process/{name}` | Step-by-step execution trace |"
+    },
+    "fullDigest": "b64e3f9772c143e0d911c16218f5a9f280f96b0c1466f43f52e5aa4d63855221",
+    "shownTextSHA256": "b64e3f9772c143e0d911c16218f5a9f280f96b0c1466f43f52e5aa4d63855221"
+  }
+}
+```
+
+## Entry a-098: claim_05d3c5f6af634e345b6e32290900c232
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_05d3c5f6af634e345b6e32290900c232",
+    "sourceUnitDigest": "8ca4c5c61c7f369a197d6118f0a325cc39727dbc792d3c53b1c2b1dd2aa7648a",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain CLAUDE.md#unheaded-block-19 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 473df70d0879413dac335100339bb5157ee58aef78ef08800acacbb9a96db1b5, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "CLAUDE.md",
+    "unitDigest": "997ac9a133379d07dbffa20be94e3af97bfff03015a23a4d6f15c603eebce7fc",
+    "identityFingerprint": "997ac9a133379d07dbffa20be94e3af97bfff03015a23a4d6f15c603eebce7fc",
+    "claimId": "claim_05d3c5f6af634e345b6e32290900c232",
+    "sourceAnchor": "unheaded-block-19",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "8ca4c5c61c7f369a197d6118f0a325cc39727dbc792d3c53b1c2b1dd2aa7648a",
+    "claimKind": "architecture",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-19",
+      "githubAnchor": "unheaded-block-19",
+      "stableAnchor": "unheaded-block-19",
+      "title": "Unheaded block 19",
+      "startLine": 113,
+      "endLine": 122,
+      "textDigest": "8ca4c5c61c7f369a197d6118f0a325cc39727dbc792d3c53b1c2b1dd2aa7648a",
+      "sample": "| Task | Read this skill file |\n|------|---------------------|\n| Understand architecture / \"How does X work?\" | `.claude/skills/gitnexus/gitnexus-exploring/SKILL.md` |\n| Blast radi",
+      "identityFingerprint": "997ac9a133379d07dbffa20be94e3af97bfff03015a23a4d6f15c603eebce7fc",
+      "ancestry": [
+        "GitNexus — Code Intelligence",
+        "CLI"
+      ],
+      "text": "| Task | Read this skill file |\n|------|---------------------|\n| Understand architecture / \"How does X work?\" | `.claude/skills/gitnexus/gitnexus-exploring/SKILL.md` |\n| Blast radius / \"What breaks if I change X?\" | `.claude/skills/gitnexus/gitnexus-impact-analysis/SKILL.md` |\n| Trace bugs / \"Why is X failing?\" | `.claude/skills/gitnexus/gitnexus-debugging/SKILL.md` |\n| Rename / extract / split / refactor | `.claude/skills/gitnexus/gitnexus-refactoring/SKILL.md` |\n| Tools, resources, schema reference | `.claude/skills/gitnexus/gitnexus-guide/SKILL.md` |\n| Index, status, clean, wiki CLI commands | `.claude/skills/gitnexus/gitnexus-cli/SKILL.md` |\n\n<!-- gitnexus:end -->"
+    },
+    "fullDigest": "8ca4c5c61c7f369a197d6118f0a325cc39727dbc792d3c53b1c2b1dd2aa7648a",
+    "shownTextSHA256": "8ca4c5c61c7f369a197d6118f0a325cc39727dbc792d3c53b1c2b1dd2aa7648a"
+  }
+}
+```
+
+## Entry a-099: claim_7cff4d97b31e33a4ca0b8a4b505c8807
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_7cff4d97b31e33a4ca0b8a4b505c8807",
+    "sourceUnitDigest": "7fd75c1135e7ea9df4294bcee9f875ea87ea1157484a7b6a78180dfb85cd9824",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain CLAUDE.md#unheaded-block-2 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 473df70d0879413dac335100339bb5157ee58aef78ef08800acacbb9a96db1b5, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "CLAUDE.md",
+    "unitDigest": "f06847feee6532c979ac4d0358d4322c29f02b68025c9c57e4c4e70b00f10714",
+    "identityFingerprint": "f06847feee6532c979ac4d0358d4322c29f02b68025c9c57e4c4e70b00f10714",
+    "claimId": "claim_7cff4d97b31e33a4ca0b8a4b505c8807",
+    "sourceAnchor": "unheaded-block-2",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "7fd75c1135e7ea9df4294bcee9f875ea87ea1157484a7b6a78180dfb85cd9824",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-2",
+      "githubAnchor": "unheaded-block-2",
+      "stableAnchor": "unheaded-block-2",
+      "title": "Unheaded block 2",
+      "startLine": 10,
+      "endLine": 15,
+      "textDigest": "7fd75c1135e7ea9df4294bcee9f875ea87ea1157484a7b6a78180dfb85cd9824",
+      "sample": "The GitNexus \"Always Do\" / \"Never Do\" rules below assume GitNexus is\npresent on this machine. Before treating them as binding — and before\n`fgos-coding-planning`/`fgos-coding-valid",
+      "identityFingerprint": "f06847feee6532c979ac4d0358d4322c29f02b68025c9c57e4c4e70b00f10714",
+      "ancestry": [
+        "Project Rules",
+        "Impact-analysis capability gate"
+      ],
+      "text": "The GitNexus \"Always Do\" / \"Never Do\" rules below assume GitNexus is\npresent on this machine. Before treating them as binding — and before\n`fgos-coding-planning`/`fgos-coding-validating`/`fgos-coding-implement`\ndecide how much\nimpact-analysis evidence a plan's verify/test scope needs — query the\ncapability instead of assuming the tool:"
+    },
+    "fullDigest": "7fd75c1135e7ea9df4294bcee9f875ea87ea1157484a7b6a78180dfb85cd9824",
+    "shownTextSHA256": "7fd75c1135e7ea9df4294bcee9f875ea87ea1157484a7b6a78180dfb85cd9824"
+  }
+}
+```
+
+## Entry a-100: claim_34e5aadf94d955884ab6041bc388d0b0
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_34e5aadf94d955884ab6041bc388d0b0",
+    "sourceUnitDigest": "226b024897f07907322a11454fbde4c344bb3c0459d235fbb0d79e5b682d1921",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain CLAUDE.md#unheaded-block-3 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 473df70d0879413dac335100339bb5157ee58aef78ef08800acacbb9a96db1b5, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "CLAUDE.md",
+    "unitDigest": "a2a1fd7502aa8ed938a98e09578cab019f3375335dfd3e3d9b6e0926f2ffe720",
+    "identityFingerprint": "a2a1fd7502aa8ed938a98e09578cab019f3375335dfd3e3d9b6e0926f2ffe720",
+    "claimId": "claim_34e5aadf94d955884ab6041bc388d0b0",
+    "sourceAnchor": "unheaded-block-3",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "226b024897f07907322a11454fbde4c344bb3c0459d235fbb0d79e5b682d1921",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-3",
+      "githubAnchor": "unheaded-block-3",
+      "stableAnchor": "unheaded-block-3",
+      "title": "Unheaded block 3",
+      "startLine": 17,
+      "endLine": 19,
+      "textDigest": "226b024897f07907322a11454fbde4c344bb3c0459d235fbb0d79e5b682d1921",
+      "sample": "```bash\nfgos tool query --capability impact-analysis --status present\n```",
+      "identityFingerprint": "a2a1fd7502aa8ed938a98e09578cab019f3375335dfd3e3d9b6e0926f2ffe720",
+      "ancestry": [
+        "Project Rules",
+        "Impact-analysis capability gate"
+      ],
+      "text": "```bash\nfgos tool query --capability impact-analysis --status present\n```"
+    },
+    "fullDigest": "226b024897f07907322a11454fbde4c344bb3c0459d235fbb0d79e5b682d1921",
+    "shownTextSHA256": "226b024897f07907322a11454fbde4c344bb3c0459d235fbb0d79e5b682d1921"
+  }
+}
+```
+
+## Entry a-101: claim_81adf946018de3aee151fbb350719862
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_81adf946018de3aee151fbb350719862",
+    "sourceUnitDigest": "bc235f0b750993d157e6192d56c297e4373976d92f32b3322342286165cd06af",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain CLAUDE.md#unheaded-block-4 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 473df70d0879413dac335100339bb5157ee58aef78ef08800acacbb9a96db1b5, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "CLAUDE.md",
+    "unitDigest": "91789cc35ef1a2e16d2dfa01b05d4d5afc0c35fda51b11ce67512b4fdf70a839",
+    "identityFingerprint": "91789cc35ef1a2e16d2dfa01b05d4d5afc0c35fda51b11ce67512b4fdf70a839",
+    "claimId": "claim_81adf946018de3aee151fbb350719862",
+    "sourceAnchor": "unheaded-block-4",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "bc235f0b750993d157e6192d56c297e4373976d92f32b3322342286165cd06af",
+    "claimKind": "verification",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-4",
+      "githubAnchor": "unheaded-block-4",
+      "stableAnchor": "unheaded-block-4",
+      "title": "Unheaded block 4",
+      "startLine": 21,
+      "endLine": 39,
+      "textDigest": "bc235f0b750993d157e6192d56c297e4373976d92f32b3322342286165cd06af",
+      "sample": "- **0 providers registered** — Inactive: skip impact-analysis evidence in\n  verify/test scope; note `impact-analysis: inactive` in the plan/verify\n  note. Not a gap.\n- **Registered",
+      "identityFingerprint": "91789cc35ef1a2e16d2dfa01b05d4d5afc0c35fda51b11ce67512b4fdf70a839",
+      "ancestry": [
+        "Project Rules",
+        "Impact-analysis capability gate"
+      ],
+      "text": "- **0 providers registered** — Inactive: skip impact-analysis evidence in\n  verify/test scope; note `impact-analysis: inactive` in the plan/verify\n  note. Not a gap.\n- **Registered but not `present`, or `present` but flagged `stale`** —\n  Degraded: run every other required check, mark that proof weak, and name\n  the gap plainly (e.g. \"GitNexus registered but not present on this\n  machine — blast radius not confirmed\", or \"GitNexus present but its\n  index is behind the current HEAD — blast radius may be stale\"). A\n  `present` status only means the tool is installed, never that its index\n  is fresh or intact (tsk-j7y) — a suspicious zero-result or \"not found\"\n  answer from an impact-analysis tool is worth a quick grep/rg cross-check\n  before being trusted, regardless of what `fgos tool query` reports.\n- **`present`, freshly checked** — Full: the MUST rules below apply exactly\n  as written. A `full` posture still is not a guarantee of complete\n  per-file coverage: a genuinely fresh, non-stale index can still carry\n  zero indexed symbols for one large/complex file (tsk-38h — confirmed on\n  `bin/fgos.mjs`, 5000+ lines, zero indexed `Function` symbols even\n  immediately after a fresh reindex), a distinct mechanism from staleness\n  that the cross-check line above already covers unconditionally."
+    },
+    "fullDigest": "bc235f0b750993d157e6192d56c297e4373976d92f32b3322342286165cd06af",
+    "shownTextSHA256": "bc235f0b750993d157e6192d56c297e4373976d92f32b3322342286165cd06af"
+  }
+}
+```
+
+## Entry a-102: claim_32f35a95feb5773ca27979295027897f
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_32f35a95feb5773ca27979295027897f",
+    "sourceUnitDigest": "6607b84c0b5d87053383a57ad03d8ac292df94227bb60eed9f81664ba11ed4ff",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain CLAUDE.md#unheaded-block-5 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 473df70d0879413dac335100339bb5157ee58aef78ef08800acacbb9a96db1b5, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "CLAUDE.md",
+    "unitDigest": "35b00867ab67601824894f8a2a0994cf8a24e89b9310ba65004187ed722eee0d",
+    "identityFingerprint": "35b00867ab67601824894f8a2a0994cf8a24e89b9310ba65004187ed722eee0d",
+    "claimId": "claim_32f35a95feb5773ca27979295027897f",
+    "sourceAnchor": "unheaded-block-5",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "6607b84c0b5d87053383a57ad03d8ac292df94227bb60eed9f81664ba11ed4ff",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-5",
+      "githubAnchor": "unheaded-block-5",
+      "stableAnchor": "unheaded-block-5",
+      "title": "Unheaded block 5",
+      "startLine": 41,
+      "endLine": 41,
+      "textDigest": "6607b84c0b5d87053383a57ad03d8ac292df94227bb60eed9f81664ba11ed4ff",
+      "sample": "**Multi-target resolution:** if the active impact-analysis providers tool errors because more than one target/repo is registered and needs disambiguation (e.g. \"multiple ... indexe",
+      "identityFingerprint": "35b00867ab67601824894f8a2a0994cf8a24e89b9310ba65004187ed722eee0d",
+      "ancestry": [
+        "Project Rules",
+        "Impact-analysis capability gate"
+      ],
+      "text": "**Multi-target resolution:** if the active impact-analysis providers tool errors because more than one target/repo is registered and needs disambiguation (e.g. \"multiple ... indexed\" / \"not found\"), never guess and never reuse any display string quoted in that error -- it is not guaranteed to be a valid value to pass back in. Instead, look at that same MCP servers own tool list for a listing/discovery tool (name suggests enumeration -- list/search/discover), call it to read back the exact registered identifiers, and match this project by a stable field it reports (an absolute path/scan-root, never a human-readable label) before retrying with that exact identifier (tsk-5nz)."
+    },
+    "fullDigest": "6607b84c0b5d87053383a57ad03d8ac292df94227bb60eed9f81664ba11ed4ff",
+    "shownTextSHA256": "6607b84c0b5d87053383a57ad03d8ac292df94227bb60eed9f81664ba11ed4ff"
+  }
+}
+```
+
+## Entry a-103: claim_5c07823ad6d47b3e9ac91dfbf41aa56f
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_5c07823ad6d47b3e9ac91dfbf41aa56f",
+    "sourceUnitDigest": "ffc67a1eab2b7b0589ff8ebc2b85736441958ade69576583be4c07a0d57ace8c",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain CLAUDE.md#unheaded-block-6 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 473df70d0879413dac335100339bb5157ee58aef78ef08800acacbb9a96db1b5, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "CLAUDE.md",
+    "unitDigest": "0db5143cf64ed364d6b5963d60d6bd82cf7224b10e1861510a69755c5cacbdf1",
+    "identityFingerprint": "0db5143cf64ed364d6b5963d60d6bd82cf7224b10e1861510a69755c5cacbdf1",
+    "claimId": "claim_5c07823ad6d47b3e9ac91dfbf41aa56f",
+    "sourceAnchor": "unheaded-block-6",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "ffc67a1eab2b7b0589ff8ebc2b85736441958ade69576583be4c07a0d57ace8c",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-6",
+      "githubAnchor": "unheaded-block-6",
+      "stableAnchor": "unheaded-block-6",
+      "title": "Unheaded block 6",
+      "startLine": 43,
+      "endLine": 49,
+      "textDigest": "ffc67a1eab2b7b0589ff8ebc2b85736441958ade69576583be4c07a0d57ace8c",
+      "sample": "This gate is prose the agent reads, never compiled logic — GitNexus is\nthe first registered provider for `impact-analysis`, not the only one\nthis gate can ever recognize. The block",
+      "identityFingerprint": "0db5143cf64ed364d6b5963d60d6bd82cf7224b10e1861510a69755c5cacbdf1",
+      "ancestry": [
+        "Project Rules",
+        "Impact-analysis capability gate"
+      ],
+      "text": "This gate is prose the agent reads, never compiled logic — GitNexus is\nthe first registered provider for `impact-analysis`, not the only one\nthis gate can ever recognize. The block below regenerates from\nGitNexus's own template on `gitnexus analyze`; edit this gate section\nwhen the policy changes, never the rules inside the block.\n\n<!-- mdview:START -->"
+    },
+    "fullDigest": "ffc67a1eab2b7b0589ff8ebc2b85736441958ade69576583be4c07a0d57ace8c",
+    "shownTextSHA256": "ffc67a1eab2b7b0589ff8ebc2b85736441958ade69576583be4c07a0d57ace8c"
+  }
+}
+```
+
+## Entry a-104: claim_50134455b2dca31dc4bd662b22744a21
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_50134455b2dca31dc4bd662b22744a21",
+    "sourceUnitDigest": "42d278bba4a7ce9c2f7ff755227feb14483587d3ace2b687a5c732999eb053bc",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain CLAUDE.md#unheaded-block-7 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 473df70d0879413dac335100339bb5157ee58aef78ef08800acacbb9a96db1b5, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "CLAUDE.md",
+    "unitDigest": "767dce734927611abb1a8072262d051f78f233901d809a55cbfa9e4f895da39e",
+    "identityFingerprint": "767dce734927611abb1a8072262d051f78f233901d809a55cbfa9e4f895da39e",
+    "claimId": "claim_50134455b2dca31dc4bd662b22744a21",
+    "sourceAnchor": "unheaded-block-7",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "42d278bba4a7ce9c2f7ff755227feb14483587d3ace2b687a5c732999eb053bc",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-7",
+      "githubAnchor": "unheaded-block-7",
+      "stableAnchor": "unheaded-block-7",
+      "title": "Unheaded block 7",
+      "startLine": 52,
+      "endLine": 53,
+      "textDigest": "42d278bba4a7ce9c2f7ff755227feb14483587d3ace2b687a5c732999eb053bc",
+      "sample": "After creating or updating any markdown file, make it viewable in ONE call —\nno project registration step needed:",
+      "identityFingerprint": "767dce734927611abb1a8072262d051f78f233901d809a55cbfa9e4f895da39e",
+      "ancestry": [
+        "Project Rules",
+        "Documentation Viewing (MDView)"
+      ],
+      "text": "After creating or updating any markdown file, make it viewable in ONE call —\nno project registration step needed:"
+    },
+    "fullDigest": "42d278bba4a7ce9c2f7ff755227feb14483587d3ace2b687a5c732999eb053bc",
+    "shownTextSHA256": "42d278bba4a7ce9c2f7ff755227feb14483587d3ace2b687a5c732999eb053bc"
+  }
+}
+```
+
+## Entry a-105: claim_fc5de985b938821c067f1a79009368ed
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_fc5de985b938821c067f1a79009368ed",
+    "sourceUnitDigest": "c45eed179f4de74f88ec92f86a5647eb5e6625d60cb844671ac83b3f0d1c6694",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain CLAUDE.md#unheaded-block-8 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 473df70d0879413dac335100339bb5157ee58aef78ef08800acacbb9a96db1b5, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "CLAUDE.md",
+    "unitDigest": "129d2af46c1244a7331ebb168b0ef6e9ff7663a084dee39d54bf881f2dbf5a7b",
+    "identityFingerprint": "129d2af46c1244a7331ebb168b0ef6e9ff7663a084dee39d54bf881f2dbf5a7b",
+    "claimId": "claim_fc5de985b938821c067f1a79009368ed",
+    "sourceAnchor": "unheaded-block-8",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "c45eed179f4de74f88ec92f86a5647eb5e6625d60cb844671ac83b3f0d1c6694",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-8",
+      "githubAnchor": "unheaded-block-8",
+      "stableAnchor": "unheaded-block-8",
+      "title": "Unheaded block 8",
+      "startLine": 57,
+      "endLine": 57,
+      "textDigest": "c45eed179f4de74f88ec92f86a5647eb5e6625d60cb844671ac83b3f0d1c6694",
+      "sample": "Call `mdview_view_file` with:",
+      "identityFingerprint": "129d2af46c1244a7331ebb168b0ef6e9ff7663a084dee39d54bf881f2dbf5a7b",
+      "ancestry": [
+        "Project Rules",
+        "Documentation Viewing (MDView)",
+        "Using MCP (preferred)"
+      ],
+      "text": "Call `mdview_view_file` with:"
+    },
+    "fullDigest": "c45eed179f4de74f88ec92f86a5647eb5e6625d60cb844671ac83b3f0d1c6694",
+    "shownTextSHA256": "c45eed179f4de74f88ec92f86a5647eb5e6625d60cb844671ac83b3f0d1c6694"
+  }
+}
+```
+
+## Entry a-106: claim_2afb04da34da039e196e613f3262cdec
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_2afb04da34da039e196e613f3262cdec",
+    "sourceUnitDigest": "9283c37aa6e87094b10f57541497888b092b13116846386cfaf2cdab0e8cae4d",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain CLAUDE.md#unheaded-block-9 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 473df70d0879413dac335100339bb5157ee58aef78ef08800acacbb9a96db1b5, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "CLAUDE.md",
+    "unitDigest": "b0870e4f3c89405386e3abed54c284c5a54aa30d57417406bbcfb30c9a19566c",
+    "identityFingerprint": "b0870e4f3c89405386e3abed54c284c5a54aa30d57417406bbcfb30c9a19566c",
+    "claimId": "claim_2afb04da34da039e196e613f3262cdec",
+    "sourceAnchor": "unheaded-block-9",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "9283c37aa6e87094b10f57541497888b092b13116846386cfaf2cdab0e8cae4d",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-9",
+      "githubAnchor": "unheaded-block-9",
+      "stableAnchor": "unheaded-block-9",
+      "title": "Unheaded block 9",
+      "startLine": 59,
+      "endLine": 60,
+      "textDigest": "9283c37aa6e87094b10f57541497888b092b13116846386cfaf2cdab0e8cae4d",
+      "sample": "- `project_root`: absolute path to the project root\n- `relative_path`: the file path relative to that root",
+      "identityFingerprint": "b0870e4f3c89405386e3abed54c284c5a54aa30d57417406bbcfb30c9a19566c",
+      "ancestry": [
+        "Project Rules",
+        "Documentation Viewing (MDView)",
+        "Using MCP (preferred)"
+      ],
+      "text": "- `project_root`: absolute path to the project root\n- `relative_path`: the file path relative to that root"
+    },
+    "fullDigest": "9283c37aa6e87094b10f57541497888b092b13116846386cfaf2cdab0e8cae4d",
+    "shownTextSHA256": "9283c37aa6e87094b10f57541497888b092b13116846386cfaf2cdab0e8cae4d"
+  }
+}
+```
+
+## Entry a-107: claim_6540d24a1703d63c0b4645efaaccc891
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_6540d24a1703d63c0b4645efaaccc891",
+    "sourceUnitDigest": "64aa23ebc68629f08a1537e7c3249b810327ec02c53a5ad2d4c98589bd174a3e",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain CLAUDE.md#using-cli-fallback as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 473df70d0879413dac335100339bb5157ee58aef78ef08800acacbb9a96db1b5, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "CLAUDE.md",
+    "unitDigest": "0792cde98de8f0ac84eac0a49f473981a04bb641227e8f1f3d3508fa878a4f69",
+    "identityFingerprint": "ac55ea750c0493c91beb4800994cd142fc91a14dd4a3a5328e6669db560f9c31",
+    "claimId": "claim_6540d24a1703d63c0b4645efaaccc891",
+    "sourceAnchor": "using-cli-fallback",
+    "unitKind": "heading",
+    "sourceUnitDigest": "64aa23ebc68629f08a1537e7c3249b810327ec02c53a5ad2d4c98589bd174a3e",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "heading",
+      "level": 3,
+      "title": "Using CLI fallback",
+      "anchor": "using-cli-fallback",
+      "githubAnchor": "using-cli-fallback",
+      "stableAnchor": "h-08b5440456a2",
+      "startLine": 66,
+      "endLine": 66,
+      "textDigest": "64aa23ebc68629f08a1537e7c3249b810327ec02c53a5ad2d4c98589bd174a3e",
+      "sample": "Using CLI fallback",
+      "sectionPayloadDigest": "2ce479d07da3c54df383f1e0441adf783699b2e90e56b9fe6c4e6b56777a7af0",
+      "followingBlockDigest": "2ce479d07da3c54df383f1e0441adf783699b2e90e56b9fe6c4e6b56777a7af0",
+      "identityFingerprint": "ac55ea750c0493c91beb4800994cd142fc91a14dd4a3a5328e6669db560f9c31",
+      "ancestry": [
+        "Project Rules",
+        "Documentation Viewing (MDView)"
+      ],
+      "text": "### Using CLI fallback",
+      "sectionText": "### Using CLI fallback\n\n```sh\nmdview open <absolute-path-to-file.md>\n```"
+    },
+    "fullDigest": "64aa23ebc68629f08a1537e7c3249b810327ec02c53a5ad2d4c98589bd174a3e",
+    "shownTextSHA256": "f0d029a1a852f9072a93263fe18c5eb1f7a928969fbd65624cf187ce5f6bb4ae"
+  }
+}
+```
+
+## Entry a-108: claim_e6e4b2ccbaf2497ac1ff7ef374d2821b
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_e6e4b2ccbaf2497ac1ff7ef374d2821b",
+    "sourceUnitDigest": "c1a9ae0dbb63cc6b9d2cdd56221d17c475fa8a12f90a2d9fe4d742ffbeddae51",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain CLAUDE.md#using-mcp-preferred as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 473df70d0879413dac335100339bb5157ee58aef78ef08800acacbb9a96db1b5, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "CLAUDE.md",
+    "unitDigest": "add9ae634458efb15c314541de6a24d7d31d6075f980993b30645461042f9c24",
+    "identityFingerprint": "80bcdb5b6c8e6e58e4a9f9f08e7d0eac18adc118c19dafae2a1271ae0766abca",
+    "claimId": "claim_e6e4b2ccbaf2497ac1ff7ef374d2821b",
+    "sourceAnchor": "using-mcp-preferred",
+    "unitKind": "heading",
+    "sourceUnitDigest": "c1a9ae0dbb63cc6b9d2cdd56221d17c475fa8a12f90a2d9fe4d742ffbeddae51",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "heading",
+      "level": 3,
+      "title": "Using MCP (preferred)",
+      "anchor": "using-mcp-preferred",
+      "githubAnchor": "using-mcp-preferred",
+      "stableAnchor": "h-1168dbf713d8",
+      "startLine": 55,
+      "endLine": 55,
+      "textDigest": "c1a9ae0dbb63cc6b9d2cdd56221d17c475fa8a12f90a2d9fe4d742ffbeddae51",
+      "sample": "Using MCP (preferred)",
+      "sectionPayloadDigest": "3ca5741759261d7ba84669ad09a2b7bb5b94acd64316912ea79fead73397a330",
+      "followingBlockDigest": "c45eed179f4de74f88ec92f86a5647eb5e6625d60cb844671ac83b3f0d1c6694",
+      "identityFingerprint": "80bcdb5b6c8e6e58e4a9f9f08e7d0eac18adc118c19dafae2a1271ae0766abca",
+      "ancestry": [
+        "Project Rules",
+        "Documentation Viewing (MDView)"
+      ],
+      "text": "### Using MCP (preferred)",
+      "sectionText": "### Using MCP (preferred)\n\nCall `mdview_view_file` with:\n\n- `project_root`: absolute path to the project root\n- `relative_path`: the file path relative to that root\n\nIt returns a browser `url`. Tell the user: \"You can view this at: `<url>`\".\nThe server auto-registers the project on first use and indexes the file\nimmediately."
+    },
+    "fullDigest": "c1a9ae0dbb63cc6b9d2cdd56221d17c475fa8a12f90a2d9fe4d742ffbeddae51",
+    "shownTextSHA256": "a2a13c34155102d37aca3136a2c7df2f9c4caf01b77ff75b6d70c2ad1dd81a5b"
+  }
+}
+```
+
+## Entry a-109: claim_a1fe07b1842007c25172823b1716b586
+
+```json
+{
+  "kind": "active",
+  "row": {
+    "claimId": "claim_a1fe07b1842007c25172823b1716b586",
+    "sourceUnitDigest": "b8596a3138791147b0ffa9b666027206135a910a94b7c8391467f8559fdb7828",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+    "rationale": "L10-3: retain CLAUDE.md#when-to-render as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 473df70d0879413dac335100339bb5157ee58aef78ef08800acacbb9a96db1b5, pinned at 980cb29312b8701f5ea639278f44e1a57a6e5c02."
+  },
+  "source": {
+    "sourcePath": "CLAUDE.md",
+    "unitDigest": "3dae37d5d36974bbfdb4a9fe17a2e07d382905b25c6272be1058cdfbd2db26b6",
+    "identityFingerprint": "147222488a836b02a9081f3efb61f8a098a36bc197ecec6248a4ab3b828c5cfe",
+    "claimId": "claim_a1fe07b1842007c25172823b1716b586",
+    "sourceAnchor": "when-to-render",
+    "unitKind": "heading",
+    "sourceUnitDigest": "b8596a3138791147b0ffa9b666027206135a910a94b7c8391467f8559fdb7828",
+    "claimKind": "unclassified",
+    "status": "current",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "heading",
+      "level": 3,
+      "title": "When to render",
+      "anchor": "when-to-render",
+      "githubAnchor": "when-to-render",
+      "stableAnchor": "h-3bf09d97ec41",
+      "startLine": 72,
+      "endLine": 72,
+      "textDigest": "b8596a3138791147b0ffa9b666027206135a910a94b7c8391467f8559fdb7828",
+      "sample": "When to render",
+      "sectionPayloadDigest": "8772b52c2f648e9051b5724741ea577dfae619775654c3f3dddb52774e71c37e",
+      "followingBlockDigest": "6c33aac3c8d229e5f9e4122d414e1fed0afb9f727868500b7c7c5fb0035268a4",
+      "identityFingerprint": "147222488a836b02a9081f3efb61f8a098a36bc197ecec6248a4ab3b828c5cfe",
+      "ancestry": [
+        "Project Rules",
+        "Documentation Viewing (MDView)"
+      ],
+      "text": "### When to render",
+      "sectionText": "### When to render\n\nSpin up a preview for long docs, tables, Mermaid diagrams, multi-file document\nsets, or when the user asks to \"preview\"/\"render\". Skip it for short, trivial\nsnippets.\n<!-- mdview:END -->\n\n<!-- gitnexus:start -->"
+    },
+    "fullDigest": "b8596a3138791147b0ffa9b666027206135a910a94b7c8391467f8559fdb7828",
+    "shownTextSHA256": "708573f457e037ae7a57b75924ec04c40bc40cdfea5abbad15cd16e87b880424"
+  }
+}
+```
+
+## Entry a-110: claim_3de04e2fc7142ed6f2d1d6639e4c3dda
+
+```json
+{
+  "kind": "predecessor-gap",
+  "row": {
+    "claimId": "claim_3de04e2fc7142ed6f2d1d6639e4c3dda",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-10",
+    "sourceUnitDigest": "3e31a6424a4469dd4a7d238a9113fca9ab926a0deacd65b4192f36dd1c4c6d89",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-3: claim_3de04e2fc7142ed6f2d1d6639e4c3dda records the historical native instruction identity AGENTS.md#unheaded-block-10 (digest 3e31a6424a4469dd4a7d238a9113fca9ab926a0deacd65b4192f36dd1c4c6d89). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
+    "reviewStatus": "pending",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15"
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "77e986e5a5738181f9b53b050e28075b2532eea0ededca45ff2e58263a9cb78d",
+    "identityFingerprint": "77e986e5a5738181f9b53b050e28075b2532eea0ededca45ff2e58263a9cb78d",
+    "claimId": "claim_3de04e2fc7142ed6f2d1d6639e4c3dda",
+    "sourceAnchor": "unheaded-block-10",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "3e31a6424a4469dd4a7d238a9113fca9ab926a0deacd65b4192f36dd1c4c6d89",
+    "claimKind": "specification",
+    "status": "current",
+    "identityStatus": "identity-gap",
+    "gapReason": "edited unit whose anchor unheaded-block-10 is not a stable heading anchor",
+    "commit": "d98a5c5e75e4529cd99dd9c8bce95a0032806d95",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-10",
+      "githubAnchor": "unheaded-block-10",
+      "stableAnchor": "unheaded-block-10",
+      "title": "Unheaded block 10",
+      "startLine": 43,
+      "endLine": 49,
+      "textDigest": "3e31a6424a4469dd4a7d238a9113fca9ab926a0deacd65b4192f36dd1c4c6d89",
+      "sample": "**Prior art before design.** Before designing a mechanism, find out what already existed\nand why it went away: `git log -S'<symbol>'` / `-G` on the symbol, config key and spec term",
+      "identityFingerprint": "77e986e5a5738181f9b53b050e28075b2532eea0ededca45ff2e58263a9cb78d",
+      "ancestry": [
+        "forgent",
+        "Before touching code"
+      ],
+      "text": "**Prior art before design.** Before designing a mechanism, find out what already existed\nand why it went away: `git log -S'<symbol>'` / `-G` on the symbol, config key and spec term,\nalso under the executor ids and names the thing had before the renames (ids were renamed and\ndormant ones deleted), and read the area spec's \"Lịch sử quyết định\" and settled-facts\nsections. A plan's facts phase answers \"what existed before, and which change removed it,\nand was that intended?\" next to its questions about current code. Reuse or extend what is\nfound; say in the plan what was reused and what was missing."
+    },
+    "fullDigest": "3e31a6424a4469dd4a7d238a9113fca9ab926a0deacd65b4192f36dd1c4c6d89",
+    "shownTextSHA256": "3e31a6424a4469dd4a7d238a9113fca9ab926a0deacd65b4192f36dd1c4c6d89"
+  },
+  "priorDecision": null
+}
+```
+
+## Entry a-111: claim_d8880e475680012ef18a447f529e9d4f
+
+```json
+{
+  "kind": "predecessor-gap",
+  "row": {
+    "claimId": "claim_d8880e475680012ef18a447f529e9d4f",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-12",
+    "sourceUnitDigest": "29f993be5c8705744b12957cb1dfd328fc338ca8d6a368c78876e8d82d8f4109",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-3: claim_d8880e475680012ef18a447f529e9d4f records the historical native instruction identity AGENTS.md#unheaded-block-12 (digest 29f993be5c8705744b12957cb1dfd328fc338ca8d6a368c78876e8d82d8f4109). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
+    "reviewStatus": "pending",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15"
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "26f06b5d24cda6b910ccbe8f60010e41bdc7d9f5c3890371c508fbe3afa2c668",
+    "identityFingerprint": "26f06b5d24cda6b910ccbe8f60010e41bdc7d9f5c3890371c508fbe3afa2c668",
+    "claimId": "claim_d8880e475680012ef18a447f529e9d4f",
+    "sourceAnchor": "unheaded-block-12",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "29f993be5c8705744b12957cb1dfd328fc338ca8d6a368c78876e8d82d8f4109",
+    "claimKind": "specification",
+    "status": "current",
+    "identityStatus": "identity-gap",
+    "gapReason": "edited unit whose anchor unheaded-block-12 is not a stable heading anchor",
+    "commit": "b9fee1e560c456d64c628fd3abe273adf326d22f",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-12",
+      "githubAnchor": "unheaded-block-12",
+      "stableAnchor": "unheaded-block-12",
+      "title": "Unheaded block 12",
+      "startLine": 54,
+      "endLine": 66,
+      "textDigest": "29f993be5c8705744b12957cb1dfd328fc338ca8d6a368c78876e8d82d8f4109",
+      "sample": "1. **What to read first?** `docs/specs/reading-map.md`, then the relevant area spec.\n2. **What kind of work is this?** Check it against the area's spec and\n   `docs/backlog.md`; a ",
+      "identityFingerprint": "26f06b5d24cda6b910ccbe8f60010e41bdc7d9f5c3890371c508fbe3afa2c668",
+      "ancestry": [
+        "forgent",
+        "Definition of done (platform-foundations L5)"
+      ],
+      "text": "1. **What to read first?** `docs/specs/reading-map.md`, then the relevant area spec.\n2. **What kind of work is this?** Check it against the area's spec and\n   `docs/backlog.md`; a new product area gets a spec before it gets code.\n3. **What contract does it touch?** `docs/routing-handoff-contract.md` for\n   agent-to-agent boundaries; the area spec's Shared Entities table for\n   in-process contracts.\n4. **How much risk?** Does it change a locked law in `docs/platform-foundations.md`,\n   or existing covered behavior in the test suite? Either raises the bar.\n5. **What proof means done?** `npm test` (state + cli + runner + e2e suite) green;\n   new or changed behavior gets a matching test.\n6. **What learning gets left behind?** A settled decision goes into\n   `docs/decisions/`; a settled spec fact goes into the relevant\n   `docs/specs/<area>.md`."
+    },
+    "fullDigest": "29f993be5c8705744b12957cb1dfd328fc338ca8d6a368c78876e8d82d8f4109",
+    "shownTextSHA256": "29f993be5c8705744b12957cb1dfd328fc338ca8d6a368c78876e8d82d8f4109"
+  },
+  "priorDecision": null
+}
+```
+
+## Entry a-112: claim_903d53d47d24348c7f74569a2b68db7e
+
+```json
+{
+  "kind": "predecessor-gap",
+  "row": {
+    "claimId": "claim_903d53d47d24348c7f74569a2b68db7e",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-13",
+    "sourceUnitDigest": "91cfb1a76c93278e5944afad4fc06073798af2103066f2558cd659de938d3ec3",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-3: claim_903d53d47d24348c7f74569a2b68db7e records the historical native instruction identity AGENTS.md#unheaded-block-13 (digest 91cfb1a76c93278e5944afad4fc06073798af2103066f2558cd659de938d3ec3). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
+    "reviewStatus": "pending",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15"
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "5268d0f87d9491a512401824c12594347e7dd8fcef7829cc9afa97569c1067f4",
+    "identityFingerprint": "5268d0f87d9491a512401824c12594347e7dd8fcef7829cc9afa97569c1067f4",
+    "claimId": "claim_903d53d47d24348c7f74569a2b68db7e",
+    "sourceAnchor": "unheaded-block-13",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "91cfb1a76c93278e5944afad4fc06073798af2103066f2558cd659de938d3ec3",
+    "claimKind": "unclassified",
+    "status": "current",
+    "identityStatus": "identity-gap",
+    "gapReason": "edited unit whose anchor unheaded-block-13 is not a stable heading anchor",
+    "commit": "b9fee1e560c456d64c628fd3abe273adf326d22f",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-13",
+      "githubAnchor": "unheaded-block-13",
+      "stableAnchor": "unheaded-block-13",
+      "title": "Unheaded block 13",
+      "startLine": 70,
+      "endLine": 70,
+      "textDigest": "91cfb1a76c93278e5944afad4fc06073798af2103066f2558cd659de938d3ec3",
+      "sample": "`bin/fgos.mjs` is the `legacy-node` payload entry, staged whole under a release's `components.legacyNode.root` and exec'd by the Rust host at `components.legacyNode.entry` — never ",
+      "identityFingerprint": "5268d0f87d9491a512401824c12594347e7dd8fcef7829cc9afa97569c1067f4",
+      "ancestry": [
+        "forgent",
+        "Legacy-Node CLI Ownership Boundary"
+      ],
+      "text": "`bin/fgos.mjs` is the `legacy-node` payload entry, staged whole under a release's `components.legacyNode.root` and exec'd by the Rust host at `components.legacyNode.entry` — never relocated, never renamed in the source tree. The Rust host resolves this file only through the release manifest's `components.legacyNode` fields, never PATH, never cwd, never hardcoded outside the manifest. Global npm `bin.fgos` and fallback `node bin/fgos.mjs` remain compatibility channels that call this file directly."
+    },
+    "fullDigest": "91cfb1a76c93278e5944afad4fc06073798af2103066f2558cd659de938d3ec3",
+    "shownTextSHA256": "91cfb1a76c93278e5944afad4fc06073798af2103066f2558cd659de938d3ec3"
+  },
+  "priorDecision": null
+}
+```
+
+## Entry a-113: claim_4bc8eb18f4e9c507c2f05a9467a16b4c
+
+```json
+{
+  "kind": "predecessor-gap",
+  "row": {
+    "claimId": "claim_4bc8eb18f4e9c507c2f05a9467a16b4c",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-20",
+    "sourceUnitDigest": "227ca5a5e89112140bd9827bb072840016509dd62d8868ad83d5feccd5715906",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-3: claim_4bc8eb18f4e9c507c2f05a9467a16b4c records the historical native instruction identity AGENTS.md#unheaded-block-20 (digest 227ca5a5e89112140bd9827bb072840016509dd62d8868ad83d5feccd5715906). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
+    "reviewStatus": "pending",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15"
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "c8cebad809cd76a514660363a0b440cb9f9b4dbbcdbabe6d74e83d5fcc239369",
+    "identityFingerprint": "c8cebad809cd76a514660363a0b440cb9f9b4dbbcdbabe6d74e83d5fcc239369",
+    "claimId": "claim_4bc8eb18f4e9c507c2f05a9467a16b4c",
+    "sourceAnchor": "unheaded-block-20",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "227ca5a5e89112140bd9827bb072840016509dd62d8868ad83d5feccd5715906",
+    "claimKind": "unclassified",
+    "status": "current",
+    "identityStatus": "identity-gap",
+    "gapReason": "edited unit whose anchor unheaded-block-20 is not a stable heading anchor",
+    "disposition": "supersede",
+    "targetOwner": "AGENTS.md",
+    "targetAnchor": "unheaded-block-20",
+    "dispositionRationale": "unit reworked; successor unit needs content review",
+    "dispositionEvidence": [
+      "classification real-edit"
+    ],
+    "dispositionSource": "carry-forward-classification",
+    "dispositionConfidence": "needs-owner-review",
+    "dispositionReviewer": "lead 2026-10-06",
+    "commit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-27",
+      "githubAnchor": "unheaded-block-27",
+      "stableAnchor": "unheaded-block-27",
+      "title": "Unheaded block 27",
+      "startLine": 159,
+      "endLine": 162,
+      "textDigest": "227ca5a5e89112140bd9827bb072840016509dd62d8868ad83d5feccd5715906",
+      "sample": "- `decide <executorId>` — you already know the exact executor name (e.g. `judge-discovery`).\n- `decide --for <purpose>` — you know what JOB you need done (e.g. `judge`), but not wh",
+      "identityFingerprint": "c8cebad809cd76a514660363a0b440cb9f9b4dbbcdbabe6d74e83d5fcc239369",
+      "ancestry": [
+        "forgent",
+        "Dispatch — routing work to an executor"
+      ],
+      "text": "- `decide <executorId>` — you already know the exact executor name (e.g. `judge-discovery`).\n- `decide --for <purpose>` — you know what JOB you need done (e.g. `judge`), but not which executor serves it.\n- `decide --work <id> [--stage <stage>]` — you have a real work item and want it dispatched.\n- `decide --for <label> --needs-soul` — you are about to fire an Agent/Task tool yourself, with no executor or work item to name."
+    },
+    "fullDigest": "227ca5a5e89112140bd9827bb072840016509dd62d8868ad83d5feccd5715906",
+    "shownTextSHA256": "227ca5a5e89112140bd9827bb072840016509dd62d8868ad83d5feccd5715906"
+  },
+  "priorDecision": null
+}
+```
+
+## Entry a-114: claim_8e643b64b72bef823e75904425fc6d07
+
+```json
+{
+  "kind": "predecessor-gap",
+  "row": {
+    "claimId": "claim_8e643b64b72bef823e75904425fc6d07",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-20",
+    "sourceUnitDigest": "2921133d68f4ba5dfc0428f6e63c3eafc839091ef150a7d174a7ec0925bb185e",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-3: claim_8e643b64b72bef823e75904425fc6d07 records the historical native instruction identity AGENTS.md#unheaded-block-20 (digest 2921133d68f4ba5dfc0428f6e63c3eafc839091ef150a7d174a7ec0925bb185e). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
+    "reviewStatus": "pending",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15"
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "0453782a9e27e1d01b4d54d9b47445a8e378ee47c9b9bcd47a68f8091b543e42",
+    "identityFingerprint": "0453782a9e27e1d01b4d54d9b47445a8e378ee47c9b9bcd47a68f8091b543e42",
+    "claimId": "claim_8e643b64b72bef823e75904425fc6d07",
+    "sourceAnchor": "unheaded-block-20",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "2921133d68f4ba5dfc0428f6e63c3eafc839091ef150a7d174a7ec0925bb185e",
+    "claimKind": "unclassified",
+    "status": "current",
+    "identityStatus": "identity-gap",
+    "gapReason": "edited unit whose anchor unheaded-block-20 is not a stable heading anchor",
+    "commit": "b33876bce00d485d7ef238b784a154e6015fac4b",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-20",
+      "githubAnchor": "unheaded-block-20",
+      "stableAnchor": "unheaded-block-20",
+      "title": "Unheaded block 20",
+      "startLine": 136,
+      "endLine": 140,
+      "textDigest": "2921133d68f4ba5dfc0428f6e63c3eafc839091ef150a7d174a7ec0925bb185e",
+      "sample": "Việc trở nặng không vì bản chất nó lớn mà vì thiếu và quên — tên đúng của\ntình trạng đó là tùm lum, không phải nặng. Khi thấy tùm lum, gom lại — gom\ntới khi hết; quy mô không bao g",
+      "identityFingerprint": "0453782a9e27e1d01b4d54d9b47445a8e378ee47c9b9bcd47a68f8091b543e42",
+      "ancestry": [
+        "forgent",
+        "RUL11 — tùm lum, không phải nặng (D-ADR0036, docs/specs/platform-foundations.md)"
+      ],
+      "text": "Việc trở nặng không vì bản chất nó lớn mà vì thiếu và quên — tên đúng của\ntình trạng đó là tùm lum, không phải nặng. Khi thấy tùm lum, gom lại — gom\ntới khi hết; quy mô không bao giờ là lý do miễn trừ. Đích của mọi lần gom\nlà một hình dạng duy nhất: ranh giới rõ, contract tường minh, đổi và biến\nhình dễ, không chắp vá."
+    },
+    "fullDigest": "2921133d68f4ba5dfc0428f6e63c3eafc839091ef150a7d174a7ec0925bb185e",
+    "shownTextSHA256": "2921133d68f4ba5dfc0428f6e63c3eafc839091ef150a7d174a7ec0925bb185e"
+  },
+  "priorDecision": null
+}
+```
+
+## Entry a-115: claim_5c520fcb1a68ba27e2093341834258c7
+
+```json
+{
+  "kind": "predecessor-gap",
+  "row": {
+    "claimId": "claim_5c520fcb1a68ba27e2093341834258c7",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-22",
+    "sourceUnitDigest": "938342cd7dfcb965b91bb4ab13461c296dbda391d975bca9d1f5e296e9b75895",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-2 supersedes the earlier A34 source-to-self partial-carry acceptance with reclassify-out-of-platform-scope, pending independent review. The historical two-line unit claim_5c520fcb1a68ba27e2093341834258c7 has old digest 938342cd7dfcb965b91bb4ab13461c296dbda391d975bca9d1f5e296e9b75895. Both complete original lines are retained in the always-loaded AGENTS.md, outside platform documentation authority: (1) `fgos run` is the primary door for executing new work in the execution core. (2) For routing checks, `fgos dispatch decide` computes the execution mechanism and executor via `bind()` (`src/runner/execution/bind.mjs`). herdr is the default transport when present in the session/environment. The first retained native identity is claim_bfd24ffa5a43c26830bb9771c04de7f1 at AGENTS.md#unheaded-block-22 with digest b093c6fb2a5d0ad347222f5cd68b1b44614799ac24ed54b60a29134c5f7ddfb8; the second is claim_2ae81c7bed935553943d6777b81e2114 at AGENTS.md#unheaded-block-24 with digest e4e33c148710cfb9775867b0160ed6e82d2e469d0f118ad9ba5ae33ce79c2484. Residual evidence plans/260925-documentation-authority-unification/reports/phase-06/root-instructions-partial-carry-residual.json has SHA256 d4bd139d397c007d0f633998319284bfc37073b27ed39f377cd677946fe00a0d. Both native identities are preserved; the claim_2ae81c7bed935553943d6777b81e2114 decision remains byte-for-byte unchanged in its existing shard. No platform instruction copy is created. Q5a and L10-3 retain all root doctrine outside platform authority. This reclassification is not source-to-self carry proof, truth certification or approval carry. Source file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c at HEAD 980cb29312b8701f5ea639278f44e1a57a6e5c02.",
+    "reviewStatus": "pending",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15"
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "82eaf1f6b88b8e45913b626cd3d3d3a1dc1a1bbe6603647cc3c6707171c0d089",
+    "identityFingerprint": "82eaf1f6b88b8e45913b626cd3d3d3a1dc1a1bbe6603647cc3c6707171c0d089",
+    "claimId": "claim_5c520fcb1a68ba27e2093341834258c7",
+    "sourceAnchor": "unheaded-block-22",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "938342cd7dfcb965b91bb4ab13461c296dbda391d975bca9d1f5e296e9b75895",
+    "claimKind": "unclassified",
+    "status": "current",
+    "identityStatus": "identity-gap",
+    "gapReason": "edited unit whose anchor unheaded-block-22 is not a stable heading anchor",
+    "commit": "727a9bd0183cd870611ccc22f2ee44303b6f0493",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-22",
+      "githubAnchor": "unheaded-block-22",
+      "stableAnchor": "unheaded-block-22",
+      "title": "Unheaded block 22",
+      "startLine": 149,
+      "endLine": 150,
+      "textDigest": "938342cd7dfcb965b91bb4ab13461c296dbda391d975bca9d1f5e296e9b75895",
+      "sample": "`fgos run` is the primary door for executing new work in the execution core.\nFor routing checks, `fgos dispatch decide` computes the execution mechanism and executor via `bind()` (",
+      "identityFingerprint": "82eaf1f6b88b8e45913b626cd3d3d3a1dc1a1bbe6603647cc3c6707171c0d089",
+      "ancestry": [
+        "forgent",
+        "Dispatch — routing work to an executor"
+      ],
+      "text": "`fgos run` is the primary door for executing new work in the execution core.\nFor routing checks, `fgos dispatch decide` computes the execution mechanism and executor via `bind()` (`src/runner/execution/bind.mjs`). herdr is the default transport when present in the session/environment."
+    },
+    "fullDigest": "938342cd7dfcb965b91bb4ab13461c296dbda391d975bca9d1f5e296e9b75895",
+    "shownTextSHA256": "938342cd7dfcb965b91bb4ab13461c296dbda391d975bca9d1f5e296e9b75895"
+  },
+  "priorDecision": {
+    "claimId": "claim_5c520fcb1a68ba27e2093341834258c7",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-22",
+    "sourceUnitDigest": "938342cd7dfcb965b91bb4ab13461c296dbda391d975bca9d1f5e296e9b75895",
+    "disposition": "partial-carry",
+    "targetOwner": "AGENTS.md",
+    "targetAnchor": "unheaded-block-22",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:34@2026-10-15",
+    "rationale": "A31 upstream splits the exact old two-line AGENTS unit. The primary target retains the first line; the committed A34 residual shows the second line verbatim and binds both full native unit digests. Source-to-self retention is outside platform authority, not a truth certificate. Pending independent conservation/representation re-review; no approval carry.",
+    "remainder": "The second original line is shown verbatim in plans/260925-documentation-authority-unification/reports/phase-06/root-instructions-partial-carry-residual.json, SHA256 d4bd139d397c007d0f633998319284bfc37073b27ed39f377cd677946fe00a0d; current retained AGENTS.md#unheaded-block-24 is claim_2ae81c7bed935553943d6777b81e2114. This A34 representation is pending independent re-review and remains a Step 10 / cutover obligation.",
+    "reviewNote": "deep: partial-carry back to pending, residual shows line 2 verbatim, SHA256 d4bd139d and all three unit digests recompute, A34 shape matches packaging residual, cutover obligation named",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-15",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0340-root-closure-fixes.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "b093c6fb2a5d0ad347222f5cd68b1b44614799ac24ed54b60a29134c5f7ddfb8",
+    "targetAncestry": [
+      "forgent",
+      "Dispatch — routing work to an executor"
+    ],
+    "reviewReportCommit": "6dadbb3685126542e6a2cecd64bcbae035b4fb58"
+  }
+}
+```
+
+## Entry a-116: claim_0bf7d168f64e5d7bf9add3470f4b6ec4
+
+```json
+{
+  "kind": "predecessor-gap",
+  "row": {
+    "claimId": "claim_0bf7d168f64e5d7bf9add3470f4b6ec4",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-23",
+    "sourceUnitDigest": "d7739e01344e0690261be6b9b224533f7adeae09df56f59f5cd8d474aad51207",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-3: claim_0bf7d168f64e5d7bf9add3470f4b6ec4 records the historical native instruction identity AGENTS.md#unheaded-block-23 (digest d7739e01344e0690261be6b9b224533f7adeae09df56f59f5cd8d474aad51207). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
+    "reviewStatus": "pending",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15"
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "67652c25cf281e56be58d02505683c4b9b29f8e8cd1067879d05ad93ef5fe61b",
+    "identityFingerprint": "67652c25cf281e56be58d02505683c4b9b29f8e8cd1067879d05ad93ef5fe61b",
+    "claimId": "claim_0bf7d168f64e5d7bf9add3470f4b6ec4",
+    "sourceAnchor": "unheaded-block-23",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "d7739e01344e0690261be6b9b224533f7adeae09df56f59f5cd8d474aad51207",
+    "claimKind": "unclassified",
+    "status": "current",
+    "identityStatus": "identity-gap",
+    "gapReason": "edited unit whose anchor unheaded-block-23 is not a stable heading anchor",
+    "commit": "fba5d042675c4348fb46fb39464e495517ed3eb7",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-25",
+      "githubAnchor": "unheaded-block-25",
+      "stableAnchor": "unheaded-block-25",
+      "title": "Unheaded block 25",
+      "startLine": 155,
+      "endLine": 155,
+      "textDigest": "d7739e01344e0690261be6b9b224533f7adeae09df56f59f5cd8d474aad51207",
+      "sample": "**Before dispatching any task out of the current turn — a work item, a registered executor, an ad-hoc task, or your own direct Agent/Task-tool call — run `fgos dispatch decide` (or",
+      "identityFingerprint": "67652c25cf281e56be58d02505683c4b9b29f8e8cd1067879d05ad93ef5fe61b",
+      "ancestry": [
+        "forgent",
+        "Dispatch — routing work to an executor"
+      ],
+      "text": "**Before dispatching any task out of the current turn — a work item, a registered executor, an ad-hoc task, or your own direct Agent/Task-tool call — run `fgos dispatch decide` (or compatibility alias `node src/runner/dispatch.mjs decide`) first. Never decide the mechanism yourself.** A `PreToolUse` hook enforces this on Agent/Task-tool calls: it delegates to `bind()` and refuses the call when the answer comes back as anything other than `in-process`."
+    },
+    "fullDigest": "d7739e01344e0690261be6b9b224533f7adeae09df56f59f5cd8d474aad51207",
+    "shownTextSHA256": "d7739e01344e0690261be6b9b224533f7adeae09df56f59f5cd8d474aad51207"
+  },
+  "priorDecision": {
+    "claimId": "claim_0bf7d168f64e5d7bf9add3470f4b6ec4",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-23",
+    "sourceUnitDigest": "d7739e01344e0690261be6b9b224533f7adeae09df56f59f5cd8d474aad51207",
+    "disposition": "supersede",
+    "targetOwner": "AGENTS.md",
+    "targetAnchor": "unheaded-block-25",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:27@2026-10-14",
+    "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+    "reviewNote": "deep: Same-file successor; target equals main's new sentence (--work only through fgos dispatch decide).",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-15",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "22f293adbd476c3d765f9b9a328ce2ca00f6acb474d5817225c0cc1c2da49ace",
+    "targetAncestry": [
+      "forgent",
+      "Dispatch — routing work to an executor"
+    ],
+    "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+  }
+}
+```
+
+## Entry a-117: claim_47e8159f8179edd8e17fd67c744d1e89
+
+```json
+{
+  "kind": "predecessor-gap",
+  "row": {
+    "claimId": "claim_47e8159f8179edd8e17fd67c744d1e89",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-25",
+    "sourceUnitDigest": "0f92ddb61556abcd67763a48ab1ad339f83d77aab6c2f4b399ef7418672b5a09",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-3: claim_47e8159f8179edd8e17fd67c744d1e89 records the historical native instruction identity AGENTS.md#unheaded-block-25 (digest 0f92ddb61556abcd67763a48ab1ad339f83d77aab6c2f4b399ef7418672b5a09). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
+    "reviewStatus": "pending",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15"
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "9f88d13d3001cff6fdc45961d3453270c5092b5b014b649638e0085070d7a335",
+    "identityFingerprint": "9f88d13d3001cff6fdc45961d3453270c5092b5b014b649638e0085070d7a335",
+    "claimId": "claim_47e8159f8179edd8e17fd67c744d1e89",
+    "sourceAnchor": "unheaded-block-25",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "0f92ddb61556abcd67763a48ab1ad339f83d77aab6c2f4b399ef7418672b5a09",
+    "claimKind": "unclassified",
+    "status": "current",
+    "identityStatus": "identity-gap",
+    "gapReason": "edited unit whose anchor unheaded-block-25 is not a stable heading anchor",
+    "commit": "ab8cd3fc93741085b7a6af67c77d13478a1f0cdf",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-27",
+      "githubAnchor": "unheaded-block-27",
+      "stableAnchor": "unheaded-block-27",
+      "title": "Unheaded block 27",
+      "startLine": 159,
+      "endLine": 162,
+      "textDigest": "0f92ddb61556abcd67763a48ab1ad339f83d77aab6c2f4b399ef7418672b5a09",
+      "sample": "- `decide <executorId>` — you already know the exact executor name (e.g. `judge-discovery`).\n- `decide --for <purpose>` — you know what JOB you need done (e.g. `judge`), but not wh",
+      "identityFingerprint": "9f88d13d3001cff6fdc45961d3453270c5092b5b014b649638e0085070d7a335",
+      "ancestry": [
+        "forgent",
+        "Dispatch — routing work to an executor"
+      ],
+      "text": "- `decide <executorId>` — you already know the exact executor name (e.g. `judge-discovery`).\n- `decide --for <purpose>` — you know what JOB you need done (e.g. `judge`), but not which executor serves it.\n- `decide --work <id> [--step <step>]` — you have a real work item and want it dispatched.\n- `decide --for <label> --needs-soul` — you are about to fire an Agent/Task tool yourself, with no executor or work item to name."
+    },
+    "fullDigest": "0f92ddb61556abcd67763a48ab1ad339f83d77aab6c2f4b399ef7418672b5a09",
+    "shownTextSHA256": "0f92ddb61556abcd67763a48ab1ad339f83d77aab6c2f4b399ef7418672b5a09"
+  },
+  "priorDecision": {
+    "claimId": "claim_47e8159f8179edd8e17fd67c744d1e89",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-25",
+    "sourceUnitDigest": "0f92ddb61556abcd67763a48ab1ad339f83d77aab6c2f4b399ef7418672b5a09",
+    "disposition": "supersede",
+    "targetOwner": "AGENTS.md",
+    "targetAnchor": "unheaded-block-27",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:27@2026-10-14",
+    "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+    "reviewNote": "deep: Same-file successor; only change is --step to --stage, verbatim from main.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-15",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "227ca5a5e89112140bd9827bb072840016509dd62d8868ad83d5feccd5715906",
+    "targetAncestry": [
+      "forgent",
+      "Dispatch — routing work to an executor"
+    ],
+    "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+  }
+}
+```
+
+## Entry a-118: claim_56d2e0f6f92f0430dab1e197c01d67ad
+
+```json
+{
+  "kind": "predecessor-gap",
+  "row": {
+    "claimId": "claim_56d2e0f6f92f0430dab1e197c01d67ad",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-25",
+    "sourceUnitDigest": "3502656dc385cc030c054352caaca9a331d186bfc1470f990ac9126fa1f86d45",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-3: claim_56d2e0f6f92f0430dab1e197c01d67ad records the historical native instruction identity AGENTS.md#unheaded-block-25 (digest 3502656dc385cc030c054352caaca9a331d186bfc1470f990ac9126fa1f86d45). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
+    "reviewStatus": "pending",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15"
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "86502b551eee4640bc4b6439aef3e3d4088ec5ef35278252d1965d4133f770ba",
+    "identityFingerprint": "86502b551eee4640bc4b6439aef3e3d4088ec5ef35278252d1965d4133f770ba",
+    "claimId": "claim_56d2e0f6f92f0430dab1e197c01d67ad",
+    "sourceAnchor": "unheaded-block-25",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "3502656dc385cc030c054352caaca9a331d186bfc1470f990ac9126fa1f86d45",
+    "claimKind": "unclassified",
+    "status": "current",
+    "identityStatus": "identity-gap",
+    "gapReason": "edited unit whose anchor unheaded-block-25 is not a stable heading anchor",
+    "disposition": "supersede",
+    "targetOwner": "AGENTS.md",
+    "targetAnchor": "unheaded-block-25",
+    "dispositionRationale": "content unchanged, unit boundary or position moved within the same file",
+    "dispositionEvidence": [
+      "classification renumbered-only"
+    ],
+    "dispositionSource": "carry-forward-classification",
+    "dispositionConfidence": "high",
+    "dispositionReviewer": "lead 2026-10-06",
+    "commit": "70a5e6e302e93f558d851b1dd76ce2666331338d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-25",
+      "githubAnchor": "unheaded-block-25",
+      "stableAnchor": "unheaded-block-25",
+      "title": "Unheaded block 25",
+      "startLine": 120,
+      "endLine": 120,
+      "textDigest": "3502656dc385cc030c054352caaca9a331d186bfc1470f990ac9126fa1f86d45",
+      "sample": "A skill that dispatches should not re-derive any of this. Point its reasoning step at the shared fragment `.agents/skills/_shared/executor-dispatch-fallback.md` (mirrored byte-iden",
+      "identityFingerprint": "86502b551eee4640bc4b6439aef3e3d4088ec5ef35278252d1965d4133f770ba",
+      "ancestry": [
+        "forgent",
+        "Dispatch — routing work to a executor"
+      ],
+      "text": "A skill that dispatches should not re-derive any of this. Point its reasoning step at the shared fragment `.agents/skills/_shared/executor-dispatch-fallback.md` (mirrored byte-identical at `plugins/fgOS/skills/_shared/`). `.claude/skills` contains generated wrappers only; it has no `_shared` directory of its own."
+    },
+    "fullDigest": "3502656dc385cc030c054352caaca9a331d186bfc1470f990ac9126fa1f86d45",
+    "shownTextSHA256": "3502656dc385cc030c054352caaca9a331d186bfc1470f990ac9126fa1f86d45"
+  },
+  "priorDecision": null
+}
+```
+
+## Entry a-119: claim_a55aa524e35b109695acc79c3c4d7c75
+
+```json
+{
+  "kind": "predecessor-gap",
+  "row": {
+    "claimId": "claim_a55aa524e35b109695acc79c3c4d7c75",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-26",
+    "sourceUnitDigest": "d3121f545f6a84c5ffe0eea34fff6dbaf7578c9c6573ecfda87214959a872021",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-3: claim_a55aa524e35b109695acc79c3c4d7c75 records the historical native instruction identity AGENTS.md#unheaded-block-26 (digest d3121f545f6a84c5ffe0eea34fff6dbaf7578c9c6573ecfda87214959a872021). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
+    "reviewStatus": "pending",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15"
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "29b90db2b3d1c85a3c1a74152b171f1855b1390bb2808caaa7160b59c2b64754",
+    "identityFingerprint": "29b90db2b3d1c85a3c1a74152b171f1855b1390bb2808caaa7160b59c2b64754",
+    "claimId": "claim_a55aa524e35b109695acc79c3c4d7c75",
+    "sourceAnchor": "unheaded-block-26",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "d3121f545f6a84c5ffe0eea34fff6dbaf7578c9c6573ecfda87214959a872021",
+    "claimKind": "unclassified",
+    "status": "current",
+    "identityStatus": "identity-gap",
+    "gapReason": "edited unit whose anchor unheaded-block-26 is not a stable heading anchor",
+    "disposition": "supersede",
+    "targetOwner": "AGENTS.md",
+    "targetAnchor": "unheaded-block-26",
+    "dispositionRationale": "unit reworked; successor unit needs content review",
+    "dispositionEvidence": [
+      "classification real-edit"
+    ],
+    "dispositionSource": "carry-forward-classification",
+    "dispositionConfidence": "needs-owner-review",
+    "dispositionReviewer": "lead 2026-10-06",
+    "digest": "d3121f545f6a84c5ffe0eea34fff6dbaf7578c9c6573ecfda87214959a872021",
+    "unavailable": true
+  },
+  "priorDecision": null
+}
+```
+
+## Entry a-120: claim_adc150a41d48dfde06422405a5b0f277
+
+```json
+{
+  "kind": "predecessor-gap",
+  "row": {
+    "claimId": "claim_adc150a41d48dfde06422405a5b0f277",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-30",
+    "sourceUnitDigest": "e19ff915b019695296a84779c61f78737d18266ded2094e5f712297bbb701861",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-3: claim_adc150a41d48dfde06422405a5b0f277 records the historical native instruction identity AGENTS.md#unheaded-block-30 (digest e19ff915b019695296a84779c61f78737d18266ded2094e5f712297bbb701861). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
+    "reviewStatus": "pending",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15"
+  },
+  "source": {
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "73625595e3a68219005df56df6dbf3543b433c522764a449fef46e065c2ff3c6",
+    "identityFingerprint": "73625595e3a68219005df56df6dbf3543b433c522764a449fef46e065c2ff3c6",
+    "claimId": "claim_adc150a41d48dfde06422405a5b0f277",
+    "sourceAnchor": "unheaded-block-30",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "e19ff915b019695296a84779c61f78737d18266ded2094e5f712297bbb701861",
+    "claimKind": "unclassified",
+    "status": "current",
+    "identityStatus": "identity-gap",
+    "gapReason": "edited unit whose anchor unheaded-block-30 is not a stable heading anchor",
+    "disposition": "supersede",
+    "targetOwner": "AGENTS.md",
+    "targetAnchor": "unheaded-block-30",
+    "dispositionRationale": "unit extended by an adjacent short block that the extraction rule now includes (or its successor heading follows an extended block); the same text is carried by the unit at the successor anchor",
+    "dispositionEvidence": [
+      "classification extraction-rule-change",
+      "every added line of the successor unit is a non-blank line that no unit covered before (checked by script)"
+    ],
+    "dispositionSource": "carry-forward-classification",
+    "dispositionConfidence": "high",
+    "dispositionReviewer": "lead delegate 2026-10-07",
+    "digest": "e19ff915b019695296a84779c61f78737d18266ded2094e5f712297bbb701861",
+    "unavailable": true
+  },
+  "priorDecision": null
+}
+```
+

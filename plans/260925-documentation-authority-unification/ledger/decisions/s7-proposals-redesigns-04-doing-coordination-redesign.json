@@ -24,17 +24,12 @@
       "targetAnchor": "doing-coordination-redesign",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Retain proposal kind at the map target; source gap/header are dated claims, not newly certified current behavior. Evidence: Source lines 3–19 records tsk-40m / 401a2282ee381b5c2831e6f4d7538e834ada6503 and the dated reconcile gap. src/state/status-fsm.mjs:117, src/state/store.mjs:749,1039,1164,1342, src/state/replay.mjs:710, src/runner/claim-port.mjs:219 and merge.mjs:1409 still cite it. Complete source heading docs/architect/doing-coordination-redesign.md#doing-coordination-redesign (lines 1–1) is carried at docs/platform/proposals/doing-coordination-redesign.md#doing-coordination-redesign (lines 1–1); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending.",
-      "reviewNote": "deep: read the H1 source section and the carrier H1 section in full; the carrier is the source section verbatim (status header tsk-40m 401a2282 and the tsk-1ht reconcile gap, Date, Scope, History lines) preceded only by the inserted metadata fence, Added in candidate paragraph and relationship link, so the digest differs only by that insertion; rationale evidence lines in src/state (status-fsm 117, store 749/1039/1164/1342, replay 710, claim-port 219, merge 1409) cite this doc at HEAD; the rationale lists YAML relocation and link rebasing as possible differences although neither occurs here (imprecise, not false)",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-04-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "da72635f1357888e24cffdc3a048739901fe210764c2adb2b6c2c378cfc4ec0f",
-      "targetAncestry": [],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Retain proposal kind at the map target; source gap/header are dated claims, not newly certified current behavior. Evidence: Source lines 3–19 records tsk-40m / 401a2282ee381b5c2831e6f4d7538e834ada6503 and the dated reconcile gap. src/state/status-fsm.mjs:117, src/state/store.mjs:749,1039,1164,1342, src/state/replay.mjs:710, src/runner/claim-port.mjs:219 and merge.mjs:1409 still cite it. Complete source heading docs/architect/doing-coordination-redesign.md#doing-coordination-redesign (lines 1–1) is carried at docs/platform/proposals/doing-coordination-redesign.md#doing-coordination-redesign (lines 1–1); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "ef91148598cf3feecd511dc70a828bde34157e4025332bf7963cdd0b7c885b28",
+      "targetAncestry": []
     },
     {
       "claimId": "claim_9e58375ad7618f7acef45d5448de37b0",

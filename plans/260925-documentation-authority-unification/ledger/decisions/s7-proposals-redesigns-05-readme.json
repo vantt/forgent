@@ -24,17 +24,12 @@
       "targetAnchor": "fgos-domainization-architecture",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Retain mapped architecture; preserve advisory and partial status verbatim. Evidence: docs/specs/reading-map.md:40 and docs/platform/component-boundary.md:241,1364 still route to this direction. domains/coding/AGENTS.md, domains/coding/registry.yaml and domains/marketing/AGENTS.md survive. Source lines 29–43 states the closed-core/open-domain rule. Complete source heading docs/architect/domainization/README.md#fgos-domainization-architecture (lines 1–1) is carried at docs/platform/domainization/architecture/domainization.md#fgos-domainization-architecture (lines 1–1); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending.",
-      "reviewNote": "deep: mandatory differing pair, H1 fgos-domainization-architecture 1-1 to fgos-domainization-architecture 1-1; target section adds only the candidate txt header, Added in candidate line, Source relationship link and rebased Related links, original metadata lines kept word for word, move label equals the triage row disposition, rationale names these differences truthfully",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-05-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "9bb121feab75e0ced717554459cdef36e2d7c633e521d520776097bde350862e",
-      "targetAncestry": [],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Retain mapped architecture; preserve advisory and partial status verbatim. Evidence: docs/specs/reading-map.md:40 and docs/platform/component-boundary.md:241,1364 still route to this direction. domains/coding/AGENTS.md, domains/coding/registry.yaml and domains/marketing/AGENTS.md survive. Source lines 29–43 states the closed-core/open-domain rule. Complete source heading docs/architect/domainization/README.md#fgos-domainization-architecture (lines 1–1) is carried at docs/platform/domainization/architecture/domainization.md#fgos-domainization-architecture (lines 1–1); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "78feb072acedefed0b4d8fa8f1fcd1798d8c69c646ac496c6e9f9f4a199eb125",
+      "targetAncestry": []
     },
     {
       "claimId": "claim_a65f6b3bb2c15aef0e2b9f212f68545e",
@@ -43,19 +38,14 @@
       "targetAnchor": "unheaded-block-4",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Retain mapped architecture; preserve advisory and partial status verbatim. Evidence: docs/specs/reading-map.md:40 and docs/platform/component-boundary.md:241,1364 still route to this direction. domains/coding/AGENTS.md, domains/coding/registry.yaml and domains/marketing/AGENTS.md survive. Source lines 29–43 states the closed-core/open-domain rule. Complete source unheaded-block docs/architect/domainization/README.md#unheaded-block-1 (lines 3–8) is carried at docs/platform/domainization/architecture/domainization.md#unheaded-block-4 (lines 27–32); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending.",
-      "reviewNote": "deep: mandatory differing pair, unheaded-block-1 3-8 to unheaded-block-4 27-32; read both, text equal once link destinations are masked, every rebased link resolves to the same repository path as its source link, no word lost or added",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-05-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "516282d7224eb21eb086442d86425f77135258878fe288e77ff3071b4faf0d84",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Retain mapped architecture; preserve advisory and partial status verbatim. Evidence: docs/specs/reading-map.md:40 and docs/platform/component-boundary.md:241,1364 still route to this direction. domains/coding/AGENTS.md, domains/coding/registry.yaml and domains/marketing/AGENTS.md survive. Source lines 29–43 states the closed-core/open-domain rule. Complete source unheaded-block docs/architect/domainization/README.md#unheaded-block-1 (lines 3–8) is carried at docs/platform/domainization/architecture/domainization.md#unheaded-block-4 (lines 27–32); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "dacd5e323b4421298f300e2adef85b583ce9c7dd4909af87702a820a8ce101c1",
       "targetAncestry": [
         "fgOS Domainization Architecture"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_1353216031d7519ce0bb17d0b9772a6c",
@@ -64,19 +54,14 @@
       "targetAnchor": "1-purpose",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Retain mapped architecture; preserve advisory and partial status verbatim. Evidence: docs/specs/reading-map.md:40 and docs/platform/component-boundary.md:241,1364 still route to this direction. domains/coding/AGENTS.md, domains/coding/registry.yaml and domains/marketing/AGENTS.md survive. Source lines 29–43 states the closed-core/open-domain rule. Complete source heading docs/architect/domainization/README.md#1-purpose (lines 10–10) is carried at docs/platform/domainization/architecture/domainization.md#1-purpose (lines 34–34); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending.",
-      "reviewNote": "deep: mandatory differing pair, 1-purpose 10-10 to 1-purpose 34-34; read both, text equal once link destinations are masked, every rebased link resolves to the same repository path as its source link, no word lost or added; hand-recomputed digest",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-05-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "ea88c12c80b9d502f4030eb168312e3190beeb929ffadc2f1b083af5e0a5a09e",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Retain mapped architecture; preserve advisory and partial status verbatim. Evidence: docs/specs/reading-map.md:40 and docs/platform/component-boundary.md:241,1364 still route to this direction. domains/coding/AGENTS.md, domains/coding/registry.yaml and domains/marketing/AGENTS.md survive. Source lines 29–43 states the closed-core/open-domain rule. Complete source heading docs/architect/domainization/README.md#1-purpose (lines 10–10) is carried at docs/platform/domainization/architecture/domainization.md#1-purpose (lines 34–34); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "9aa71578a27bcabae0fc1527e47f2bf973f995c82f756f74e70f2c31ae43a6f2",
       "targetAncestry": [
         "fgOS Domainization Architecture"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_478b542735d3495bea9ad08001909ed9",
@@ -151,20 +136,15 @@
       "targetAnchor": "unheaded-block-8",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Retain mapped architecture; preserve advisory and partial status verbatim. Evidence: docs/specs/reading-map.md:40 and docs/platform/component-boundary.md:241,1364 still route to this direction. domains/coding/AGENTS.md, domains/coding/registry.yaml and domains/marketing/AGENTS.md survive. Source lines 29–43 states the closed-core/open-domain rule. Complete source unheaded-block docs/architect/domainization/README.md#unheaded-block-5 (lines 25–26) is carried at docs/platform/domainization/architecture/domainization.md#unheaded-block-8 (lines 49–50); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending.",
-      "reviewNote": "deep: mandatory differing pair, unheaded-block-5 25-26 to unheaded-block-8 49-50; read both, text equal once link destinations are masked, every rebased link resolves to the same repository path as its source link, no word lost or added",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-05-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "73eb5cd7cac55dc1c0ee15ccb8db94b0ddf1d0260f4332f9055d140b7d106c88",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Retain mapped architecture; preserve advisory and partial status verbatim. Evidence: docs/specs/reading-map.md:40 and docs/platform/component-boundary.md:241,1364 still route to this direction. domains/coding/AGENTS.md, domains/coding/registry.yaml and domains/marketing/AGENTS.md survive. Source lines 29–43 states the closed-core/open-domain rule. Complete source unheaded-block docs/architect/domainization/README.md#unheaded-block-5 (lines 25–26) is carried at docs/platform/domainization/architecture/domainization.md#unheaded-block-8 (lines 49–50); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "ad104b93d2fe8be7ecb79fd3b62df9a5b8633e4cb87498b96f7fe6ec342139eb",
       "targetAncestry": [
         "fgOS Domainization Architecture",
         "1. Purpose"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_a191d9efd716e4e29890c907f1f11c1e",

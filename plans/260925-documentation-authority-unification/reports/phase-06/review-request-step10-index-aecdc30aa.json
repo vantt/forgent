@@ -1,0 +1,216 @@
+{
+  "version": 1,
+  "contentCommit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+  "comparisonBase": "980cb29312b8701f5ea639278f44e1a57a6e5c02",
+  "authorSession": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+  "oneReviewRequest": true,
+  "seedChosen": false,
+  "verdictChosen": false,
+  "parts": [
+    {
+      "section": "a",
+      "title": "Closing instructions",
+      "file": "review-request-step10-a01-aecdc30aa.md",
+      "sidecar": "review-request-step10-a01-aecdc30aa.json",
+      "entryCount": 120,
+      "range": [
+        1,
+        120
+      ],
+      "markdownSHA256": "aa6b99d81d4d95805b23f5dd0ee0acff152078bd44eaa6317a9375efaeead363",
+      "sidecarSHA256": "385f4a698da4ccf7a7aece302be9d15d03b58af23eef1638f6548c9531e286db"
+    },
+    {
+      "section": "a",
+      "title": "Closing instructions",
+      "file": "review-request-step10-a02-aecdc30aa.md",
+      "sidecar": "review-request-step10-a02-aecdc30aa.json",
+      "entryCount": 17,
+      "range": [
+        121,
+        137
+      ],
+      "markdownSHA256": "c2149fd266f02d57836800b533a9c870933fbaa6740583a57dc40f1f9927698d",
+      "sidecarSHA256": "f4938314579fbee40e6357347341220158529e252d306e01d38e9c40b3afd93f"
+    },
+    {
+      "section": "b",
+      "title": "Reading-map merge",
+      "file": "review-request-step10-b01-aecdc30aa.md",
+      "sidecar": "review-request-step10-b01-aecdc30aa.json",
+      "entryCount": 56,
+      "range": [
+        1,
+        56
+      ],
+      "markdownSHA256": "9b3185fceb589a5e9fc8925ddb56aa3bd4c6e5f6f80a9c2ad56cffee67e9427e",
+      "sidecarSHA256": "57764c0e96078b7a45df7d4ff759df8a800e5358114634ba88112955f80c49ba"
+    },
+    {
+      "section": "c",
+      "title": "Rebound decisions",
+      "file": "review-request-step10-c01-aecdc30aa.md",
+      "sidecar": "review-request-step10-c01-aecdc30aa.json",
+      "entryCount": 120,
+      "range": [
+        1,
+        120
+      ],
+      "markdownSHA256": "ae38e3bcd21b29d1dfdc9b5d34e9e9c8fea53caf3a7cc7f447f59d70737f7b98",
+      "sidecarSHA256": "f5a541c1a4006082137c292b1751db352e93cbf34976f343119686a9dcd79764"
+    },
+    {
+      "section": "c",
+      "title": "Rebound decisions",
+      "file": "review-request-step10-c02-aecdc30aa.md",
+      "sidecar": "review-request-step10-c02-aecdc30aa.json",
+      "entryCount": 76,
+      "range": [
+        121,
+        196
+      ],
+      "markdownSHA256": "8fedba1f70c3cf6bf3038597959a1922fcf1ef3cec9842ea623202644ca76522",
+      "sidecarSHA256": "5830d689e62bd361982a148ec11ceba2b7bc1b3b760ca984fa3bafd7b922d821"
+    },
+    {
+      "section": "d",
+      "title": "Header fills",
+      "file": "review-request-step10-d01-aecdc30aa.md",
+      "sidecar": "review-request-step10-d01-aecdc30aa.json",
+      "entryCount": 37,
+      "range": [
+        1,
+        37
+      ],
+      "markdownSHA256": "14470d9ffaa7f344b2983292e5658a6089df8b2e9ec7be453dfa0b7bc04a5db2",
+      "sidecarSHA256": "67fd4639a6b7ad593d25ff968345001239191dedd290eaa8367d9ecfa963282d"
+    },
+    {
+      "section": "e",
+      "title": "Confinement re-carry",
+      "file": "review-request-step10-e01-aecdc30aa.md",
+      "sidecar": "review-request-step10-e01-aecdc30aa.json",
+      "entryCount": 40,
+      "range": [
+        1,
+        40
+      ],
+      "markdownSHA256": "e0870619665f46ef9ef2f143d038bd5b930ce070b129cd5b78371968d381e321",
+      "sidecarSHA256": "850da2008c9ba3d3c386d3db754ab02e29b0304384c4626f985b25b4cb0972aa"
+    },
+    {
+      "section": "f",
+      "title": "Link repoints",
+      "file": "review-request-step10-f01-aecdc30aa.md",
+      "sidecar": "review-request-step10-f01-aecdc30aa.json",
+      "entryCount": 120,
+      "range": [
+        1,
+        120
+      ],
+      "markdownSHA256": "f501f182e6a9d575a73b854ae4e196ae73917259351d1ed1d18745862507a049",
+      "sidecarSHA256": "fc0fbb95ef434e5b9f8f8bbf2d724d0237107d401b32c1adde9e5922c13fad38"
+    },
+    {
+      "section": "f",
+      "title": "Link repoints",
+      "file": "review-request-step10-f02-aecdc30aa.md",
+      "sidecar": "review-request-step10-f02-aecdc30aa.json",
+      "entryCount": 120,
+      "range": [
+        121,
+        240
+      ],
+      "markdownSHA256": "81d589836a8b5f6a38b07c31027a43cec35c5ed9f37880ee9b1d977c2d8f0549",
+      "sidecarSHA256": "35b454b3abbbf952eb2a13d4c1db5791a5ef5fa1268d3e3817453d6216c489ee"
+    },
+    {
+      "section": "f",
+      "title": "Link repoints",
+      "file": "review-request-step10-f03-aecdc30aa.md",
+      "sidecar": "review-request-step10-f03-aecdc30aa.json",
+      "entryCount": 120,
+      "range": [
+        241,
+        360
+      ],
+      "markdownSHA256": "03bb57639397ccd972dce5883c722f47c0f6ecb2ddce80ea77a1259aa7156060",
+      "sidecarSHA256": "e175cd94ab04ec9980c9bfec19116cebd6d6d140e09f27aa17d0127723ff2d67"
+    },
+    {
+      "section": "f",
+      "title": "Link repoints",
+      "file": "review-request-step10-f04-aecdc30aa.md",
+      "sidecar": "review-request-step10-f04-aecdc30aa.json",
+      "entryCount": 6,
+      "range": [
+        361,
+        366
+      ],
+      "markdownSHA256": "5e002c228858be16eb63e8c4b46bad8ec0c759403e7049190f67738d8d6e2d81",
+      "sidecarSHA256": "3f19d55bbe44bd4d1489976c2f86fc68e876f6dd5e33645466487d153217132d"
+    },
+    {
+      "section": "g",
+      "title": "History index",
+      "file": "review-request-step10-g01-aecdc30aa.md",
+      "sidecar": "review-request-step10-g01-aecdc30aa.json",
+      "entryCount": 1,
+      "range": [
+        1,
+        1
+      ],
+      "markdownSHA256": "4d91efae33e664409fb005092671f7d7cb34751d4245cb0ebb48259f8a0977a5",
+      "sidecarSHA256": "686cbd7eeb140a3fbbe7448ac32e082ef11933ba4dbe4629d7aaec1e0ae87f59"
+    },
+    {
+      "section": "h",
+      "title": "Groups, holds and comparison helper",
+      "file": "review-request-step10-h01-aecdc30aa.md",
+      "sidecar": "review-request-step10-h01-aecdc30aa.json",
+      "entryCount": 21,
+      "range": [
+        1,
+        21
+      ],
+      "markdownSHA256": "c54fa057414e9101834ff5a859ffcccc3914530b3b166e648f6f9a24d5e09266",
+      "sidecarSHA256": "6fc21a962576a6c98e5194869f92af8bdb37e908a190c628ce45193c6f1a3ba6"
+    }
+  ],
+  "totalEntries": 854,
+  "sectionCounts": {
+    "a": 137,
+    "b": 56,
+    "c": 196,
+    "d": 37,
+    "e": 40,
+    "f": 366,
+    "g": 1,
+    "h": 21
+  },
+  "nativeEvidence": {
+    "sync": "step10-package-native-sync-proof.json",
+    "D": "step10-package-D-summary.json",
+    "dryRuns": "step10-package-dry-run.json",
+    "accounting": "step10-package-accounting.json",
+    "rebindings": "step10-package-rebindings.json",
+    "audit": "step10-package-final-audit.json",
+    "sourceProofBlocker": [
+      {
+        "type": "decision-digest-stale",
+        "message": "claim claim_46c173824da77fbf25f59072ae8e1620: sourceUnitDigest does not match the current source text (needs at least 16 hex characters of the row's digest)",
+        "path": "docs/specs/confinement-authority.md"
+      }
+    ],
+    "historicalWitnessLimits": 6,
+    "A36": {
+      "populationCount": 176,
+      "minimumSeededDraw": 27,
+      "nativeClassObservationCounts": {
+        "Judgment": 143,
+        "Weak-exact": 33,
+        "Unit-exact": 20
+      }
+    }
+  }
+}

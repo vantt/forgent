@@ -1,0 +1,78 @@
+{
+  "contentCommit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
+  "snapshot": {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "node",
+      "scripts/propose-doc-decisions.mjs",
+      "--inventory",
+      "/tmp/fgos-work/step10-snapshot-inventory.json",
+      "--repo-root",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification",
+      "--identity-registry",
+      "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/pilot/decisions",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions",
+      "--snapshot",
+      "--out",
+      "/tmp/fgos-work/step10-history-dry-snapshot.json"
+    ],
+    "exitCode": 1,
+    "signal": null,
+    "error": null,
+    "seconds": 36.532,
+    "stdout": "",
+    "stderr": "propose-doc-decisions: decision proof failed: decision-digest-stale\n"
+  },
+  "verify": {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "node",
+      "scripts/propose-doc-decisions.mjs",
+      "--verify",
+      "/tmp/fgos-work/step10-history-snapshot-failure-receipt.json",
+      "--inventory",
+      "/tmp/fgos-work/step10-snapshot-inventory.json",
+      "--repo-root",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification",
+      "--identity-registry",
+      "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/pilot/decisions",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions",
+      "--out",
+      "/tmp/fgos-work/step10-history-dry-verify.json"
+    ],
+    "exitCode": 1,
+    "signal": null,
+    "seconds": 27.145,
+    "stdout": "",
+    "stderr": "propose-doc-decisions: decision proof failed: decision-digest-stale\n",
+    "inputIsFailureReceiptNotSnapshot": true,
+    "reason": "No valid snapshot exists because the native decision proof failed. A failure receipt is supplied explicitly, never asserted as a snapshot. --verify recomputes that same proof and rejects before snapshot comparison; no verified or sealed ledger is claimed."
+  },
+  "snapshotFields": [
+    "commit",
+    "generatedAt",
+    "items",
+    "claimLedger",
+    "identityRegistry"
+  ],
+  "projectionNote": "All native items and claimLedger rows retained; omitted inventory fields are not consumed by snapshot/verify. Complete native object used for D.",
+  "docsWrites": 0,
+  "sealed": false,
+  "verifyOriginalAttempt": {
+    "mode": "native verifyClaimSnapshot (--verify implementation), dry-run only",
+    "inputSnapshot": null,
+    "reason": "--snapshot failed; no valid snapshot is fabricated. Invoke the same native verify implementation to recompute proof prerequisites; it rejects before snapshot comparison.",
+    "ok": false,
+    "error": "decision proof failed: decision-digest-stale"
+  }
+}

@@ -24,17 +24,12 @@
       "targetAnchor": "coordination-envelope-worker-provider-and-control-boundary",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal in full. Supporting OS probes and private HOME are not full implementation; retain Not started statement as source metadata. Evidence: src/runner/dispatch/worker-home.mjs:32–37 explicitly cites this proposal; source Worker filesystem and process envelope / Output ingestion and mutation records the boundary. Private-home implementation survives, while relay/full containment is still proposed. Complete source heading docs/architect/proposals/coordination-worker-provider-boundary.md#coordination-envelope-worker-provider-and-control-boundary (lines 1–1) is carried at docs/platform/proposals/coordination-worker-provider-boundary.md#coordination-envelope-worker-provider-and-control-boundary (lines 1–1); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: heading coordination-envelope-worker-provider-and-control-boundary src lines 1-1 -> tgt coordination-envelope-worker-provider-and-control-boundary lines 1-1; target adds the txt metadata fence, labelled Added in candidate paragraph and Source relationship line, then source payload byte-equal with the 5 Related links rebased to the same referents; Added text restates the triage and is labelled.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-13-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "ce7fe142a4b45d0d76d62cd125c25dbca79c22e19987cf43774054d17a8f96c5",
-      "targetAncestry": [],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal in full. Supporting OS probes and private HOME are not full implementation; retain Not started statement as source metadata. Evidence: src/runner/dispatch/worker-home.mjs:32–37 explicitly cites this proposal; source Worker filesystem and process envelope / Output ingestion and mutation records the boundary. Private-home implementation survives, while relay/full containment is still proposed. Complete source heading docs/architect/proposals/coordination-worker-provider-boundary.md#coordination-envelope-worker-provider-and-control-boundary (lines 1–1) is carried at docs/platform/proposals/coordination-worker-provider-boundary.md#coordination-envelope-worker-provider-and-control-boundary (lines 1–1); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "a3af59cfe684b859097c56dc9d60c9047b985f2b53aa22ba74790eb6a727fae9",
+      "targetAncestry": []
     },
     {
       "claimId": "claim_00315f842705c7b0e5178482431f9ba4",
@@ -64,19 +59,14 @@
       "targetAnchor": "unheaded-block-5",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal in full. Supporting OS probes and private HOME are not full implementation; retain Not started statement as source metadata. Evidence: src/runner/dispatch/worker-home.mjs:32–37 explicitly cites this proposal; source Worker filesystem and process envelope / Output ingestion and mutation records the boundary. Private-home implementation survives, while relay/full containment is still proposed. Complete source unheaded-block docs/architect/proposals/coordination-worker-provider-boundary.md#unheaded-block-2 (lines 10–14) is carried at docs/platform/proposals/coordination-worker-provider-boundary.md#unheaded-block-5 (lines 34–38); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: unheaded-block unheaded-block-2 src lines 10-14 -> tgt unheaded-block-5 lines 34-38; shown source and target diffed line by line, only 5 link destination(s) rebased and each resolves to the same repository path as the source link, no wording change; supersede to coordination-worker-provider-boundary.md per map/triage, rationale evidence true.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-13-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "4f2d8d7b088378a76495b80a3ee3a90a30d362dbd203a70b2885b672e034636f",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal in full. Supporting OS probes and private HOME are not full implementation; retain Not started statement as source metadata. Evidence: src/runner/dispatch/worker-home.mjs:32–37 explicitly cites this proposal; source Worker filesystem and process envelope / Output ingestion and mutation records the boundary. Private-home implementation survives, while relay/full containment is still proposed. Complete source unheaded-block docs/architect/proposals/coordination-worker-provider-boundary.md#unheaded-block-2 (lines 10–14) is carried at docs/platform/proposals/coordination-worker-provider-boundary.md#unheaded-block-5 (lines 34–38); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "92d84affebc7949c2d85729d4a6764eb314bea43d4e70eeb001c48ebab3b184c",
       "targetAncestry": [
         "Coordination Envelope — Worker, Provider, and Control Boundary"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_af86398e2f1675cee4c1d79bcc7024b9",
@@ -172,19 +162,14 @@
       "targetAnchor": "new-evidence-since-the-first-capability-audit",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal in full. Supporting OS probes and private HOME are not full implementation; retain Not started statement as source metadata. Evidence: src/runner/dispatch/worker-home.mjs:32–37 explicitly cites this proposal; source Worker filesystem and process envelope / Output ingestion and mutation records the boundary. Private-home implementation survives, while relay/full containment is still proposed. Complete source heading docs/architect/proposals/coordination-worker-provider-boundary.md#new-evidence-since-the-first-capability-audit (lines 34–34) is carried at docs/platform/proposals/coordination-worker-provider-boundary.md#new-evidence-since-the-first-capability-audit (lines 58–58); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: heading new-evidence-since-the-first-capability-audit src lines 34-34 -> tgt new-evidence-since-the-first-capability-audit lines 58-58; shown source and target diffed line by line, only 2 link destination(s) rebased and each resolves to the same repository path as the source link, no wording change; supersede to coordination-worker-provider-boundary.md per map/triage, rationale evidence true.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-13-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "e2ebf08ea337ebdd80d8b52f033f0820b4659aac6b300a630c8611f134eb945d",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal in full. Supporting OS probes and private HOME are not full implementation; retain Not started statement as source metadata. Evidence: src/runner/dispatch/worker-home.mjs:32–37 explicitly cites this proposal; source Worker filesystem and process envelope / Output ingestion and mutation records the boundary. Private-home implementation survives, while relay/full containment is still proposed. Complete source heading docs/architect/proposals/coordination-worker-provider-boundary.md#new-evidence-since-the-first-capability-audit (lines 34–34) is carried at docs/platform/proposals/coordination-worker-provider-boundary.md#new-evidence-since-the-first-capability-audit (lines 58–58); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "ff821d613e8f839e523d5262b1f93881db3e7beefc78eb34bce79a6d152e2301",
       "targetAncestry": [
         "Coordination Envelope — Worker, Provider, and Control Boundary"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_4bd75d27758a44171b95ec07322056e3",
@@ -237,20 +222,15 @@
       "targetAnchor": "unheaded-block-11",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
-      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal in full. Supporting OS probes and private HOME are not full implementation; retain Not started statement as source metadata. Evidence: src/runner/dispatch/worker-home.mjs:32–37 explicitly cites this proposal; source Worker filesystem and process envelope / Output ingestion and mutation records the boundary. Private-home implementation survives, while relay/full containment is still proposed. Complete source unheaded-block docs/architect/proposals/coordination-worker-provider-boundary.md#unheaded-block-8 (lines 50–54) is carried at docs/platform/proposals/coordination-worker-provider-boundary.md#unheaded-block-11 (lines 74–78); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
-      "reviewNote": "deep: unheaded-block unheaded-block-8 src lines 50-54 -> tgt unheaded-block-11 lines 74-78; shown source and target diffed line by line, only 2 link destination(s) rebased and each resolves to the same repository path as the source link, no wording change; supersede to coordination-worker-provider-boundary.md per map/triage, rationale evidence true.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-source-13-01-0f063d18f.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "7f084e6c082bbe0577d250710ee60eeaaa81f73371d2c467ec73b44bc20b43bf",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792077702187-860e8753@2026-10-15",
+      "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep map proposal in full. Supporting OS probes and private HOME are not full implementation; retain Not started statement as source metadata. Evidence: src/runner/dispatch/worker-home.mjs:32–37 explicitly cites this proposal; source Worker filesystem and process envelope / Output ingestion and mutation records the boundary. Private-home implementation survives, while relay/full containment is still proposed. Complete source unheaded-block docs/architect/proposals/coordination-worker-provider-boundary.md#unheaded-block-8 (lines 50–54) is carried at docs/platform/proposals/coordination-worker-provider-boundary.md#unheaded-block-11 (lines 74–78); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+      "reviewNote": "Independent review required for this package binding; no approval carried.",
+      "targetUnitDigest": "87f61928718040da2b901c10a384cf8eed30496a360d1ffc73db97f6a77bc46c",
       "targetAncestry": [
         "Coordination Envelope — Worker, Provider, and Control Boundary",
         "New evidence since the first capability audit"
-      ],
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      ]
     },
     {
       "claimId": "claim_74de88f31f31c6000939ff1c46cfe87a",
