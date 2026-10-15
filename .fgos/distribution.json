@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "projectRuntime": {
     "policy": "exact-digest",
-    "artifactDigest": "sha256:fee5e262dcb7fe391e7be2acba48d81966dc7c3ff17f8161c42dc3f63af39eaf",
+    "artifactDigest": "sha256:a12255830a2d2956d047d10fe6be53545eb9bb452da89672be92ced48c491a4e",
     "releaseVersion": null,
     "channel": null,
     "allowPrerelease": false
