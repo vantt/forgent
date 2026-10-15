@@ -1260,3 +1260,127 @@ test('R6 / M7 lock: runDetachedRunSupervisor fails immediately with spawn-failed
 
   fs.rmSync(tmp, { recursive: true, force: true });
 });
+
+// A real `fgos run` controller holds the supervisor's IPC channel and stdio pipes. When that
+// controller dies mid-run, the detached supervisor must keep owning the worker: no crash on the
+// next live chunk, the worker finishes, the deadline is still enforced and the receipt lands.
+async function startSupervisorUnderDisposableController(tmp, envPath) {
+  const controllerScript = path.join(tmp, 'controller.mjs');
+  const supervisorModule = new URL('../../src/runner/dispatch/detached-run-supervisor.mjs', import.meta.url).href;
+  fs.writeFileSync(
+    controllerScript,
+    `
+    import { startDetachedRunSupervisorProcess } from ${JSON.stringify(supervisorModule)};
+    const proc = startDetachedRunSupervisorProcess({
+      envelopePath: process.argv[2],
+      detached: true,
+      onChunk: () => {},
+    });
+    process.stdout.write(String(proc.pid) + "\\n");
+    setInterval(() => {}, 1000);
+    `,
+  );
+  const { spawn } = await import('node:child_process');
+  const controller = spawn(process.execPath, [controllerScript, envPath], { stdio: ['ignore', 'pipe', 'inherit'] });
+  const supervisorPid = await new Promise((resolve, reject) => {
+    let buf = '';
+    controller.stdout.on('data', (d) => {
+      buf += d.toString('utf8');
+      const line = buf.split('\n')[0];
+      if (buf.includes('\n')) resolve(Number(line));
+    });
+    controller.on('exit', () => reject(new Error('controller exited before reporting the supervisor pid')));
+  });
+  return { controller, supervisorPid };
+}
+
+function buildChattyWorkerEnvelope(tmp, runDir, launchCommandId, workerSource, limits) {
+  const workerScript = path.join(tmp, `${launchCommandId}-worker.mjs`);
+  fs.writeFileSync(workerScript, workerSource);
+  const envelope = {
+    contract: 'cli-spawn-launch-envelope.v1',
+    launchCommandId,
+    adapter: 'cli-spawn',
+    run: { runDir },
+    invocation: { command: process.execPath, args: [workerScript], env: {}, cwd: tmp },
+    limits,
+  };
+  const envPath = path.join(runDir, 'protected', 'launch-envelope', `${launchCommandId}.json`);
+  publishImmutableProof(envPath, envelope);
+  return envPath;
+}
+
+async function waitForSupervisorBinding(runDir, launchCommandId, { timeoutMs = 20_000 } = {}) {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    const worker = readDetachedRunWorkerBinding(runDir, launchCommandId);
+    if (worker?.worker?.pid) return worker;
+    await new Promise((r) => setTimeout(r, 50));
+  }
+  return null;
+}
+
+test('20. supervisor survives a SIGKILLed controller: worker output keeps flowing, worker completes and the receipt is published', async () => {
+  const tmp = mkTempDir();
+  const runDir = path.join(tmp, 'run');
+  fs.mkdirSync(runDir, { recursive: true });
+  const launchCommandId = 'cmd_controller_killed';
+  const envPath = buildChattyWorkerEnvelope(
+    tmp,
+    runDir,
+    launchCommandId,
+    `
+    let n = 0;
+    const t = setInterval(() => {
+      n += 1;
+      process.stdout.write("tick " + n + "\\n");
+      process.stderr.write("err tick " + n + "\\n");
+      if (n >= 12) { clearInterval(t); process.stdout.write("CHATTY-DONE\\n"); }
+    }, 250);
+    `,
+    { timeoutMs: 40_000 },
+  );
+
+  const { controller, supervisorPid } = await startSupervisorUnderDisposableController(tmp, envPath);
+  const workerBinding = await waitForSupervisorBinding(runDir, launchCommandId);
+  assert.ok(workerBinding, 'worker binding must be published while the controller is alive');
+  controller.kill('SIGKILL');
+
+  const receipt = await waitForReceipt(runDir, launchCommandId);
+  assert.ok(receipt, 'receipt must be published after the controller died');
+  assert.equal(receipt.completion.kind, 'exited');
+  assert.equal(receipt.completion.exitCode, 0);
+  const stdout = fs.readFileSync(path.join(runDir, 'protected', 'capture', launchCommandId, 'stdout.log'), 'utf8');
+  assert.match(stdout, /tick 12\n/);
+  assert.match(stdout, /CHATTY-DONE/);
+  assert.equal(await waitForProcessExit(supervisorPid), true, 'supervisor exits on its own after publishing');
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+test('21. supervisor still enforces the deadline after a SIGTERMed controller', async () => {
+  const tmp = mkTempDir();
+  const runDir = path.join(tmp, 'run');
+  fs.mkdirSync(runDir, { recursive: true });
+  const launchCommandId = 'cmd_controller_terminated_deadline';
+  const envPath = buildChattyWorkerEnvelope(
+    tmp,
+    runDir,
+    launchCommandId,
+    `
+    let n = 0;
+    setInterval(() => { n += 1; process.stdout.write("forever " + n + "\\n"); }, 100);
+    `,
+    { timeoutMs: 3_000 },
+  );
+
+  const { controller } = await startSupervisorUnderDisposableController(tmp, envPath);
+  const workerBinding = await waitForSupervisorBinding(runDir, launchCommandId);
+  assert.ok(workerBinding);
+  controller.kill('SIGTERM');
+
+  const receipt = await waitForReceipt(runDir, launchCommandId);
+  assert.ok(receipt, 'receipt must be published by the supervisor at the deadline');
+  assert.equal(receipt.completion.kind, 'timeout');
+  assert.equal(await waitForProcessExit(workerBinding.worker.pid), true, 'worker is stopped at the deadline');
+  fs.rmSync(tmp, { recursive: true, force: true });
+});

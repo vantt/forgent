@@ -265,7 +265,9 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
             ? 'execute'
             : (item.workflowStep || 'unknown');
           recordClaimAttempt(dir, { id, phase: claimPhase, result: 'reclaimed', claimId: activeClaim.claimId, actor: activeClaim.actor });
-          releaseClaim(dir, { id, claimId: activeClaim.claimId });
+          // Another session's claim, past its liveness threshold: released
+          // through the named admin path, never the owner-only default.
+          releaseClaim(dir, { id, claimId: activeClaim.claimId, adminReason: 'stale-claim-reclaim' });
         } else if (item.status === 'doing') {
           moveWork(dir, { id, to: 'todo', expectedStatus: 'doing' });
         }

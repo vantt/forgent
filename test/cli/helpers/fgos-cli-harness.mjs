@@ -218,9 +218,11 @@ function moveToDurableDoingForTest(cwd, id, from = 'todo', extra = {}) {
 // -- releasing a mid-work claim while the branch/worktree survive is now a
 // pure runtime-claim release, no durable move). Fixture-only helper: real
 // callers release through settleClaim (return/reject/verify-fail-park),
-// never a bare release with no durable transition.
+// never a bare release with no durable transition. The claim was taken by a
+// CLI child process, whose writer id can differ from this test process's, so
+// the release goes through the named admin path.
 function releaseClaimFor(cwd, id) {
-  releaseClaim(path.join(cwd, '.fgos'), { id });
+  releaseClaim(path.join(cwd, '.fgos'), { id, adminReason: 'test-fixture:claim-lock-release' });
 }
 
 // Raw persisted cache file, byte-for-byte -- distinct from stateView()

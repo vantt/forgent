@@ -361,6 +361,23 @@ function killChildTree(child, signal) {
   }
 }
 
+/**
+ * Bind a cli-spawn round's confined homes to the detached run supervisor that runs its worker, so the
+ * orphan reaper keeps them while the supervisor lives even after this controller is gone. The supervisor
+ * is already running when its pid exists, so a binding that cannot be written leaves the home as prepare
+ * wrote it (bound to this controller), reported by a fixed code; it never stops the run.
+ */
+export function bindConfinedHomesToSupervisor(binding, supervisorProc) {
+  if (!binding || !Number.isInteger(supervisorProc?.pid)) return false;
+  try {
+    binding.bind({ binderPid: supervisorProc.pid });
+    return true;
+  } catch {
+    process.stderr.write('fgos: confined home not bound to its run supervisor (confinement-bind-failed)\n');
+    return false;
+  }
+}
+
 export function cliSpawnAdapter(invocation, opts) {
   const { command, args, env: rawEnv } = invocation;
   const { cwd, timeoutMs, idleTimeoutMs, maxBuffer, onChunk, workId, tier, model } = opts;
@@ -386,6 +403,7 @@ export function cliSpawnAdapter(invocation, opts) {
           cause: err.message,
         }));
       }
+      bindConfinedHomesToSupervisor(opts.confinementBinding, supervisorProc);
 
       let settled = false;
       let pollInterval = null;
@@ -880,6 +898,8 @@ function herdrSpawnInteractiveAdapter(invocation, opts) {
     controlToken: opts.controlToken ?? invocation.controlToken,
     preparedInvocationDigest: opts.preparedInvocationDigest ?? invocation.preparedInvocationDigest,
     effectiveContract: opts.effectiveContract ?? invocation.effectiveContract ?? null,
+    // Confinement Authority's binding functions for this dispatch's homes (absent when unconfined).
+    confinementBinding: opts.confinementBinding ?? null,
     agentKind,
     agentArgs: agentArgsWithoutPrompt({ argsTemplate, args, prompt, model }),
     prompt: prompt ?? '',

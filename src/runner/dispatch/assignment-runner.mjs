@@ -82,7 +82,7 @@ import {
   inspectRunControl,
   resolveHolderLiveness,
 } from './run-lock.mjs';
-import { resolveExecutorCommand, currentDispatchDepth, MAX_DISPATCH_DEPTH, DispatchError } from './transport.mjs';
+import { resolveExecutorCommand, currentDispatchDepth, MAX_DISPATCH_DEPTH, DispatchError, bindConfinedHomesToSupervisor } from './transport.mjs';
 import {
   acquireMainCheckoutLock,
   renewMainCheckoutLockIfOwn,
@@ -93,7 +93,7 @@ import {
   formatLockDurationMs,
 } from '../main-checkout-lock.mjs';
 import { reconcileHerdrSpawnRun, isHerdrSpawnRunStillWorking } from './herdr-reconcile.mjs';
-import { prepareConfinementForLaunch, finalizeConfinementResources } from './confinement/authority.mjs';
+import { prepareConfinementForLaunch, finalizeConfinementResources, bindingForPrepared } from './confinement/authority.mjs';
 import { buildConfinementRequest } from './confinement/request.mjs';
 import { resolvePosture } from './confinement/policies.mjs';
 import { sha256FileSync } from './proof-helpers.mjs';
@@ -2529,6 +2529,8 @@ export async function executeAssignment(assignment, opts = {}) {
         publishMutableProjection(commandPath, commandState);
         throw err;
       }
+      // The confined homes now belong to the supervisor running the worker, not to this controller.
+      bindConfinedHomesToSupervisor(bindingForPrepared([prepResult?.preparedConfinement]), supervisorProc);
 
       // 8. Wait for receipt in live execution (event-driven with fs.watch + 20ms fallback)
       const receiptPath = path.join(runDir, 'protected', 'adapter-receipts', `${launchCommandId}.json`);
