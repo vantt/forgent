@@ -99,7 +99,8 @@ pub fn project_cli_invocation(
     Ok((invocation, request))
 }
 
-/// `fgos identity [--pid <n>] [--fgos-dir <dir>] [--json]`.
+/// `fgos identity [--pid <n>] [--fgos-dir <dir>] [--json]`. `--dir` is accepted
+/// and ignored, like every verb, because the shell integration appends it.
 fn project_identity_request(
     args: &[OsString],
 ) -> Result<fgos_session_identity::IdentityRequest, String> {
@@ -116,7 +117,7 @@ fn project_identity_request(
             .map_or((value.as_str(), None), |(flag, value)| {
                 (flag, Some(value.to_owned()))
             });
-        if !matches!(flag, "--pid" | "--fgos-dir") {
+        if !matches!(flag, "--pid" | "--fgos-dir" | "--dir") {
             return Err(format!("unknown identity option '{value}'"));
         }
         let flag_value = match inline_value {
@@ -130,6 +131,9 @@ fn project_identity_request(
                 next
             }
         };
+        if flag == "--dir" {
+            continue;
+        }
         if flag == "--pid" {
             let pid = flag_value
                 .parse::<u32>()
@@ -263,6 +267,17 @@ fn project_convention_request(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn identity_request_ignores_the_shell_appended_dir_flag() {
+        let args: Vec<OsString> = ["identity", "--json", "--dir", "/repo", "--pid=42"]
+            .iter()
+            .map(OsString::from)
+            .collect();
+        let request = project_identity_request(&args).unwrap();
+        assert_eq!(request.pid, Some(42));
+        assert_eq!(request.fgos_dir, None);
+    }
 
     #[test]
     fn test_project_cli_invocation_for_version() {
